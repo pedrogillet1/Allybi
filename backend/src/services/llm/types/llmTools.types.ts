@@ -269,11 +269,6 @@ export type ProviderToolCall =
       args: unknown;
     }
   | {
-      provider: "anthropic";
-      name: string;
-      args: unknown;
-    }
-  | {
       provider: "unknown";
       name: string;
       args: unknown;

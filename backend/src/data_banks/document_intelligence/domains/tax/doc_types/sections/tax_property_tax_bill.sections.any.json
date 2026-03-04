@@ -34,7 +34,7 @@
       "id": "issuer_information",
       "name": {
         "en": "Property Tax Bill Issuer Information",
-        "pt": "Informacoes do Emissor de Cobranca de Imposto Predial"
+        "pt": "Informações do Emissor de Cobranca de Imposto Predial"
       },
       "required": true,
       "order": 2
@@ -52,7 +52,7 @@
       "id": "period_and_jurisdiction",
       "name": {
         "en": "Period and Jurisdiction",
-        "pt": "Periodo e Jurisdicao"
+        "pt": "Período e Jurisdicao"
       },
       "required": true,
       "order": 4
@@ -97,7 +97,7 @@
       "id": "obligations_and_conditions",
       "name": {
         "en": "Obligations and Conditions",
-        "pt": "Obrigacoes e Condicoes"
+        "pt": "Obrigacoes e Condições"
       },
       "required": false,
       "order": 9
@@ -124,7 +124,7 @@
       "id": "footnotes",
       "name": {
         "en": "Footnotes",
-        "pt": "Notas de Rodape"
+        "pt": "Notas de Rodapé"
       },
       "required": false,
       "order": 12

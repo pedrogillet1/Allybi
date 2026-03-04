@@ -1,13 +1,28 @@
 {
   "_meta": {
-    "description": "Golden retrieval evaluation dataset — 25 query/expected-doc pairs",
+    "description": "Golden retrieval evaluation dataset — 45 query/expected-doc pairs",
     "version": "1.0.0",
     "categories": [
       "single_doc_extract",
       "multi_doc_compare",
       "numeric_precision",
       "legal_clause",
-      "time_scoped"
+      "time_scoped",
+      "table_context",
+      "negation",
+      "crossdoc_conflict",
+      "section_diversity",
+      "unit_preservation",
+      "scope_lock",
+      "discovery_mode",
+      "pptx_notes",
+      "near_dup_tables",
+      "footnote_preservation",
+      "cross_domain_confusion",
+      "wrong_doc_trap",
+      "section_target_no_anchor",
+      "table_header_mismatch",
+      "version_disambiguation"
     ]
   },
   "seeds": [
@@ -210,6 +225,172 @@
       "expectedDocIds": ["doc-close-pack-dec"],
       "expectedMinScore": 0.4,
       "expectedTopK": 3
+    },
+    {
+      "id": "GE_026",
+      "category": "table_context",
+      "query": "What is the total revenue in thousands?",
+      "expectedDocIds": ["doc-financial-001"],
+      "expectedMinScore": 0.4,
+      "expectedTopK": 5
+    },
+    {
+      "id": "GE_027",
+      "category": "negation",
+      "query": "Which metrics did NOT increase year over year?",
+      "expectedDocIds": ["doc-annual-report-001"],
+      "expectedMinScore": 0.4,
+      "expectedTopK": 5
+    },
+    {
+      "id": "GE_028",
+      "category": "crossdoc_conflict",
+      "query": "Compare revenue between the two reports",
+      "expectedDocIds": ["doc-report-A", "doc-report-B"],
+      "expectedMinScore": 0.3,
+      "expectedTopK": 10
+    },
+    {
+      "id": "GE_029",
+      "category": "section_diversity",
+      "query": "Summarize each section of the document",
+      "expectedDocIds": ["doc-multi-section-001"],
+      "expectedMinScore": 0.3,
+      "expectedTopK": 10
+    },
+    {
+      "id": "GE_030",
+      "category": "unit_preservation",
+      "query": "What are the costs in BRL?",
+      "expectedDocIds": ["doc-brazil-financials"],
+      "expectedMinScore": 0.4,
+      "expectedTopK": 5
+    },
+    {
+      "id": "GE_031",
+      "category": "scope_lock",
+      "query": "Find revenue in this specific document",
+      "expectedDocIds": ["doc-locked-001"],
+      "expectedMinScore": 0.4,
+      "expectedTopK": 3
+    },
+    {
+      "id": "GE_032",
+      "category": "discovery_mode",
+      "query": "Which documents mention quarterly results?",
+      "expectedDocIds": ["doc-q1", "doc-q2"],
+      "expectedMinScore": 0.3,
+      "expectedTopK": 10
+    },
+    {
+      "id": "GE_033",
+      "category": "pptx_notes",
+      "query": "What did the presenter say about market share?",
+      "expectedDocIds": ["doc-presentation-001"],
+      "expectedMinScore": 0.4,
+      "expectedTopK": 5
+    },
+    {
+      "id": "GE_034",
+      "category": "near_dup_tables",
+      "query": "Show all revenue line items across sheets",
+      "expectedDocIds": ["doc-multi-sheet-001"],
+      "expectedMinScore": 0.4,
+      "expectedTopK": 8
+    },
+    {
+      "id": "GE_035",
+      "category": "footnote_preservation",
+      "query": "What is the restated EBITDA with footnotes?",
+      "expectedDocIds": ["doc-restated-001"],
+      "expectedMinScore": 0.4,
+      "expectedTopK": 5
+    },
+    {
+      "id": "GE_036",
+      "category": "cross_domain_confusion",
+      "query": "What is the bank balance from the statement?",
+      "expectedDocIds": ["doc-bank-statement-001"],
+      "expectedMinScore": 0.4,
+      "expectedTopK": 3,
+      "confusionPair": "banking_bank_statement vs every_bank_statement"
+    },
+    {
+      "id": "GE_037",
+      "category": "cross_domain_confusion",
+      "query": "Show the tax return filing details",
+      "expectedDocIds": ["doc-tax-return-001"],
+      "expectedMinScore": 0.4,
+      "expectedTopK": 3,
+      "confusionPair": "every_tax_return vs tax_individual_income_return"
+    },
+    {
+      "id": "GE_038",
+      "category": "wrong_doc_trap",
+      "query": "Extract insurance claim amount from the policy document",
+      "expectedDocIds": ["doc-ins-claim-001"],
+      "expectedMinScore": 0.3,
+      "expectedTopK": 5,
+      "mustNotConfuse": "ins_policy_document"
+    },
+    {
+      "id": "GE_039",
+      "category": "wrong_doc_trap",
+      "query": "Show the mortgage payment from the bank statement",
+      "expectedDocIds": ["doc-mortgage-001"],
+      "expectedMinScore": 0.3,
+      "expectedTopK": 5,
+      "mustNotConfuse": "banking_bank_statement"
+    },
+    {
+      "id": "GE_040",
+      "category": "section_target_no_anchor",
+      "query": "Find the exclusions section in the umbrella policy",
+      "expectedDocIds": ["doc-umbrella-001"],
+      "expectedMinScore": 0.4,
+      "expectedTopK": 3
+    },
+    {
+      "id": "GE_041",
+      "category": "section_target_no_anchor",
+      "query": "Extract the MRZ data from the passport",
+      "expectedDocIds": ["doc-passport-001"],
+      "expectedMinScore": 0.4,
+      "expectedTopK": 3
+    },
+    {
+      "id": "GE_042",
+      "category": "table_header_mismatch",
+      "query": "Show all debit entries from the trial balance",
+      "expectedDocIds": ["doc-trial-balance-001"],
+      "expectedMinScore": 0.4,
+      "expectedTopK": 5
+    },
+    {
+      "id": "GE_043",
+      "category": "table_header_mismatch",
+      "query": "List the coverage limits per category",
+      "expectedDocIds": ["doc-ins-policy-001"],
+      "expectedMinScore": 0.4,
+      "expectedTopK": 5
+    },
+    {
+      "id": "GE_044",
+      "category": "version_disambiguation",
+      "query": "Show the latest version of the employment agreement",
+      "expectedDocIds": ["doc-employment-v2"],
+      "expectedMinScore": 0.4,
+      "expectedTopK": 3,
+      "mustPreferVersion": "latest"
+    },
+    {
+      "id": "GE_045",
+      "category": "version_disambiguation",
+      "query": "What changed between the signed and draft policy?",
+      "expectedDocIds": ["doc-policy-signed", "doc-policy-draft"],
+      "expectedMinScore": 0.3,
+      "expectedTopK": 5,
+      "mustPreferVersion": "signed_over_draft"
     }
   ]
 }

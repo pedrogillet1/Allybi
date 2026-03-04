@@ -24,6 +24,21 @@ export interface BaseExtractionResult {
 }
 
 // ---------------------------------------------------------------------------
+// Shared structured table type (PDF, DOCX, PPTX)
+// ---------------------------------------------------------------------------
+
+export interface ExtractedTable {
+  tableId: string;
+  pageOrSlide?: number;
+  markdown: string;
+  rows: Array<{
+    rowIndex: number;
+    isHeader: boolean;
+    cells: Array<{ text: string; colIndex: number }>;
+  }>;
+}
+
+// ---------------------------------------------------------------------------
 // Per-format result types
 // ---------------------------------------------------------------------------
 
@@ -32,6 +47,8 @@ export interface PdfExtractionResult extends BaseExtractionResult {
   pageCount: number;
   pages: Array<{ page: number; text: string }>;
   hasTextLayer?: boolean;
+  outlines?: Array<{ title: string; level: number; pageIndex: number }>;
+  extractedTables?: ExtractedTable[];
 }
 
 export interface DocxExtractionResult extends BaseExtractionResult {
@@ -41,6 +58,7 @@ export interface DocxExtractionResult extends BaseExtractionResult {
   paragraphCount?: number;
   hasToc?: boolean;
   documentTitle?: string;
+  extractedTables?: ExtractedTable[];
 }
 
 export interface XlsxExtractionResult extends BaseExtractionResult {
@@ -83,6 +101,7 @@ export interface PptxExtractionResult extends BaseExtractionResult {
   slideTitles?: (string | null)[];
   hasNotes?: boolean;
   presentationTitle?: string;
+  extractedTables?: ExtractedTable[];
 }
 
 export interface PlainTextExtractionResult extends BaseExtractionResult {

@@ -47,7 +47,7 @@
       "displayName": "Google Gemini",
       "capabilities": {
         "text": true,
-        "vision": true,
+        "vision": false,
         "streaming": true,
         "toolCalling": true,
         "jsonMode": false,
@@ -90,7 +90,7 @@
       "displayName": "OpenAI",
       "capabilities": {
         "text": true,
-        "vision": true,
+        "vision": false,
         "streaming": true,
         "toolCalling": true,
         "jsonMode": true,
@@ -124,54 +124,6 @@
               "quality_gates_strict"
             ]
           }
-        },
-        "gpt-5-mini": {
-          "tier": "precision",
-          "pinnedVersion": "gpt-5-mini-2026-01-15",
-          "supportsStreaming": true,
-          "supportsTools": true,
-          "maxOutputTokens": 16384,
-          "maxInputTokens": 128000,
-          "capabilities": {
-            "bestFor": [
-              "final_compose_medium_stakes",
-              "structured_outputs",
-              "formatting_tables_summaries"
-            ]
-          }
-        }
-      }
-    },
-    "local": {
-      "displayName": "Local LLM",
-      "capabilities": {
-        "text": true,
-        "vision": false,
-        "streaming": true,
-        "toolCalling": false,
-        "jsonMode": false,
-        "seededDeterminism": false,
-        "logProbs": false
-      },
-      "limits": {
-        "maxOutputTokensDefault": 1024,
-        "maxToolsPerTurnDefault": 0,
-        "streaming": {
-          "supportsDeltaText": true,
-          "supportsStructuredMarkers": false,
-          "framing": "ndjson_or_sse"
-        }
-      },
-      "models": {
-        "ollama:*": {
-          "tier": "local",
-          "capabilities": {
-            "bestFor": [
-              "offline_mode",
-              "low_cost_fallback",
-              "simple_summaries"
-            ]
-          }
         }
       }
     }
@@ -179,7 +131,6 @@
   "featureFlags": {
     "preferGeminiFlashForFastStages": true,
     "preferOpenAIForHighStakesCompose": true,
-    "disableToolCallingOnLocal": true,
     "enableStreamingEverywhere": true,
     "markerHoldRecommended": true
   },
@@ -212,20 +163,6 @@
           "jsonMode": true,
           "toolCalling": true
         }
-      }
-    },
-    {
-      "name": "local_has_no_toolcalling",
-      "input": {
-        "provider": "local",
-        "model": "ollama:gemma2",
-        "mode": "answer"
-      },
-      "expect": {
-        "capabilities": {
-          "toolCalling": false
-        },
-        "limits.maxToolsPerTurnDefault": 0
       }
     }
   ]

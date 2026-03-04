@@ -9,7 +9,7 @@
  *  - Bank-driven behavior (capabilities + fallbacks + feature flags)
  *  - Deterministic routing (same inputs => same route)
  *  - “Fast path” vs “precision finish”:
- *      - Fast path: ultra low latency + smooth streaming (Gemini 3.0 Flash)
+ *      - Fast path: ultra low latency + smooth streaming (Gemini 2.5 Flash)
  *      - Precision finish: stricter correctness (GPT-5.2) used selectively
  *
  * This service does NOT:
@@ -98,6 +98,12 @@ export interface RouteContext {
    * Optional provider health snapshot (if you run health pings).
    */
   providerHealth?: ProviderHealth[];
+
+  /**
+   * Estimated input token count for context length validation.
+   * When set, the router rejects models whose maxInputTokens is exceeded.
+   */
+  estimatedInputTokens?: number;
 
   /**
    * Optional explicit override (admin/dev/testing)
@@ -328,6 +334,13 @@ export class LlmRouterService {
     const needStreaming = bool(ctx.requireStreaming);
     const needTools = ctx.allowTools !== false;
 
+    if (!ctx.providerHealth?.length) {
+      this.logger?.warn("No provider health data available; assuming all providers healthy", {
+        provider: primary.provider,
+        model: primary.model,
+      });
+    }
+
     const okPrimary =
       this.isTargetSupported(
         primary.provider,
@@ -335,6 +348,7 @@ export class LlmRouterService {
         caps,
         needStreaming,
         needTools,
+        ctx.estimatedInputTokens,
       ) && pickHealth(ctx.providerHealth, primary.provider, primary.model).ok;
 
     if (okPrimary) {
@@ -365,6 +379,7 @@ export class LlmRouterService {
           caps,
           needStreaming,
           needTools,
+          ctx.estimatedInputTokens,
         ) && pickHealth(ctx.providerHealth, cand.provider, cand.model).ok;
 
       if (supported) {
@@ -434,7 +449,7 @@ export class LlmRouterService {
     )
       return "fast_path";
 
-    return "fast_path";
+    return "unknown";
   }
 
   // -----------------------------
@@ -563,6 +578,7 @@ export class LlmRouterService {
     caps: ProviderCapabilitiesBank | null,
     needStreaming: boolean,
     needTools: boolean,
+    estimatedInputTokens?: number,
   ): boolean {
     // If no capabilities bank, assume supported (system is configured elsewhere)
     if (!caps?.providers) return true;
@@ -577,6 +593,17 @@ export class LlmRouterService {
 
     if (needStreaming && m.supportsStreaming === false) return false;
     if (needTools && m.supportsTools === false) return false;
+
+    // Context length check
+    if (
+      typeof estimatedInputTokens === "number" &&
+      estimatedInputTokens > 0 &&
+      typeof m.maxInputTokens === "number" &&
+      m.maxInputTokens > 0 &&
+      estimatedInputTokens > m.maxInputTokens
+    ) {
+      return false;
+    }
 
     return true;
   }
@@ -635,32 +662,16 @@ export class LlmRouterService {
 
     if (enableMultiProvider) {
       if (primary.provider === "gemini") {
-        if (primary.stage === "final") {
-          add("openai", "gpt-5.2");
-          add("openai", "gpt-5-mini");
-        } else {
-          add("openai", "gpt-5-mini");
-          add("openai", "gpt-5.2");
-        }
-        add("local", "local-default");
+        add("openai", "gpt-5.2");
       } else if (primary.provider === "openai") {
-        if (primary.model === "gpt-5-mini") {
-          add("openai", "gpt-5.2");
-          add("gemini", "gemini-2.5-flash");
-        } else {
-          add("gemini", "gemini-2.5-flash");
-          add("openai", "gpt-5-mini");
-        }
-        add("local", "local-default");
+        add("gemini", "gemini-2.5-flash");
       } else {
         // local primary
         if (primary.stage === "final") {
           add("openai", "gpt-5.2");
           add("gemini", "gemini-2.5-flash");
-          add("openai", "gpt-5-mini");
         } else {
           add("gemini", "gemini-2.5-flash");
-          add("openai", "gpt-5-mini");
           add("openai", "gpt-5.2");
         }
       }

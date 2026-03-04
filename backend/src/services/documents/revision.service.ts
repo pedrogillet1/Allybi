@@ -3,6 +3,7 @@ import prisma from "../../config/database";
 import { uploadFile } from "../../config/storage";
 import { addDocumentJob } from "../../queues/document.queue";
 import { logger } from "../../utils/logger";
+import { createDocumentLink } from "./documentLink.service";
 
 export interface RevisionContext {
   correlationId?: string;
@@ -20,6 +21,7 @@ export interface CreateRevisionInput {
   metadata?: Record<string, unknown>;
   enqueueReindex?: boolean;
   reason?: string;
+  authorId?: string;
 }
 
 export interface RevisionRecord {
@@ -46,6 +48,12 @@ export class RevisionServiceError extends Error {
     this.name = "RevisionServiceError";
     this.code = code;
   }
+}
+
+export function getRevisionMaxDepth(): number {
+  const raw = Number(process.env.REVISION_MAX_DEPTH);
+  if (Number.isFinite(raw) && raw >= 2 && raw <= 1000) return Math.floor(raw);
+  return 20;
 }
 
 const MIME_EXTENSION_MAP: Record<string, string> = {
@@ -153,14 +161,6 @@ export class RevisionService {
     }
 
     const rootDocumentId = await this.resolveRootDocumentId(source.id);
-    const currentRevisions = await prisma.document.count({
-      where: {
-        userId,
-        OR: [{ id: rootDocumentId }, { parentVersionId: rootDocumentId }],
-      },
-    });
-
-    const revisionNumber = currentRevisions;
 
     const mimeType = input.mimeType?.trim() || source.mimeType;
     const sourceFilename =
@@ -168,10 +168,8 @@ export class RevisionService {
     const preferredExt =
       extensionForMime(mimeType) || toExtension(sourceFilename) || ".bin";
     const baseName = toBaseName(sourceFilename) || "document";
-    const revisionFilename = normalizeFilename(
-      `${baseName} (rev ${revisionNumber})${preferredExt}`,
-    );
 
+    // Upload file BEFORE the transaction — storageKey doesn't depend on revisionNumber
     const storageKey = generateRevisionStorageKey(
       userId,
       rootDocumentId,
@@ -185,29 +183,49 @@ export class RevisionService {
 
     const fileHash = sha256(input.contentBuffer);
 
-    const created = await prisma.document.create({
-      data: {
-        userId,
-        folderId: source.folderId,
-        filename: revisionFilename,
-        encryptedFilename: storageKey,
-        fileSize: input.contentBuffer.length,
-        mimeType,
-        fileHash,
-        parentVersionId: rootDocumentId,
-        status: "uploaded",
-        indexingState: "pending",
-        indexingUpdatedAt: new Date(),
-        error: null,
+    // Wrap count + create in a serializable transaction to prevent
+    // concurrent revisions from getting the same revisionNumber
+    const { revisionNumber, created, revisionFilename } = await prisma.$transaction(
+      async (tx) => {
+        const revNum = await tx.document.count({
+          where: {
+            userId,
+            OR: [{ id: rootDocumentId }, { parentVersionId: rootDocumentId }],
+          },
+        });
+
+        const revisionFilename = normalizeFilename(
+          `${baseName} (rev ${revNum})${preferredExt}`,
+        );
+
+        const doc = await tx.document.create({
+          data: {
+            userId,
+            folderId: source.folderId,
+            filename: revisionFilename,
+            encryptedFilename: storageKey,
+            fileSize: input.contentBuffer.length,
+            mimeType,
+            fileHash,
+            parentVersionId: rootDocumentId,
+            status: "uploaded",
+            indexingState: "pending",
+            indexingUpdatedAt: new Date(),
+            error: null,
+          },
+          select: {
+            id: true,
+            filename: true,
+            mimeType: true,
+            fileSize: true,
+            createdAt: true,
+          },
+        });
+
+        return { revisionNumber: revNum, created: doc, revisionFilename };
       },
-      select: {
-        id: true,
-        filename: true,
-        mimeType: true,
-        fileSize: true,
-        createdAt: true,
-      },
-    });
+      { isolationLevel: "Serializable" },
+    );
 
     const shouldEnqueue = input.enqueueReindex !== false;
     if (shouldEnqueue) {
@@ -221,6 +239,28 @@ export class RevisionService {
       });
     }
 
+    // Non-blocking: persist cross-doc link with conflict detection
+    try {
+      await createDocumentLink({
+        sourceDocumentId: created.id,
+        targetDocumentId: rootDocumentId,
+        relationshipType: "amends",
+      });
+    } catch (linkErr: any) {
+      // Link creation is non-blocking — log but don't fail the revision
+      logger.warn("[RevisionService] cross-doc link creation warning", {
+        documentId: created.id,
+        rootDocumentId,
+        error: linkErr.message,
+      });
+    }
+
+    // Store author attribution in revision metadata
+    const authorId = input.authorId || ctx?.userId || userId;
+    if (authorId) {
+      input.metadata = { ...(input.metadata || {}), authorId };
+    }
+
     logger.info("[RevisionService] revision created", {
       documentId: created.id,
       sourceDocumentId: source.id,
@@ -232,6 +272,7 @@ export class RevisionService {
       clientMessageId: ctx?.clientMessageId,
       reason: input.reason,
       metadata: input.metadata,
+      authorId,
       enqueued: shouldEnqueue,
     });
 
@@ -311,8 +352,18 @@ export class RevisionService {
     let currentId: string | null = documentId;
     let safety = 0;
 
-    while (currentId && safety < 20) {
+    const maxDepth = getRevisionMaxDepth();
+    const warnThreshold = Math.floor(maxDepth * 0.8);
+
+    while (currentId && safety < maxDepth) {
       safety += 1;
+      if (safety === warnThreshold) {
+        logger.warn("[RevisionService] Approaching revision chain depth limit", {
+          documentId,
+          currentDepth: safety,
+          maxDepth,
+        });
+      }
       const row: { id: string; parentVersionId: string | null } | null =
         await prisma.document.findUnique({
           where: { id: currentId },
@@ -334,7 +385,7 @@ export class RevisionService {
     }
 
     throw new RevisionServiceError(
-      "Revision chain exceeded safety depth.",
+      `Revision chain exceeded safety depth (max: ${maxDepth}).`,
       "REVISION_CHAIN_DEPTH_EXCEEDED",
     );
   }

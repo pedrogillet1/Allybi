@@ -15,7 +15,7 @@ describe("LLMChatEngine retrieval planner delegation", () => {
 
     const engine = new LLMChatEngine(gateway, {
       provider: "openai",
-      modelId: "gpt-5-mini",
+      modelId: "gpt-5.2",
     });
 
     const out = await engine.generateRetrievalPlan({
@@ -38,6 +38,6 @@ describe("LLMChatEngine retrieval planner delegation", () => {
     });
     expect(out.text).toContain("schemaVersion");
     expect((out.telemetry as any)?.provider).toBe("openai");
-    expect((out.telemetry as any)?.model).toBe("gpt-5-mini");
+    expect((out.telemetry as any)?.model).toBe("gpt-5.2");
   });
 });

@@ -1,14 +1,14 @@
 /**
  * Parallel Data Bank Generator
- * Uses Claude API to generate comprehensive intent patterns, aliases, and data planes
+ * Uses GPT-5.2 to generate comprehensive intent patterns, aliases, and data planes
  * Runs multiple branches in parallel for maximum speed
  */
 
-import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 import * as fs from "fs";
 import * as path from "path";
 
-const client = new Anthropic();
+const client = new OpenAI();
 
 const OUTPUT_DIR = path.join(__dirname, "..");
 const TRIGGERS_DIR = path.join(OUTPUT_DIR, "triggers");
@@ -516,13 +516,13 @@ Output ONLY valid JSON.`,
 
 // ========== GENERATION FUNCTIONS ==========
 
-async function generateWithClaude(task: GenerationTask): Promise<void> {
+async function generateWithLLM(task: GenerationTask): Promise<void> {
   console.log(`  [${task.name}] Starting generation...`);
 
   try {
-    const response = await client.messages.create({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 16000,
+    const response = await client.chat.completions.create({
+      model: "gpt-5.2",
+      max_completion_tokens: 16000,
       messages: [
         {
           role: "user",
@@ -531,13 +531,13 @@ async function generateWithClaude(task: GenerationTask): Promise<void> {
       ],
     });
 
-    const content = response.content[0];
-    if (content.type !== "text") {
-      throw new Error("Unexpected response type");
+    const content = response.choices[0]?.message?.content;
+    if (!content) {
+      throw new Error("Unexpected empty response");
     }
 
     // Extract JSON from response
-    let jsonStr = content.text;
+    let jsonStr = content;
 
     // Try to find JSON in the response
     const jsonMatch = jsonStr.match(/\{[\s\S]*\}/);
@@ -567,7 +567,7 @@ async function runParallelBranch(
 
   // Run tasks in parallel within the branch
   const results = await Promise.allSettled(
-    tasks.map((task) => generateWithClaude(task)),
+    tasks.map((task) => generateWithLLM(task)),
   );
 
   const successful = results.filter((r) => r.status === "fulfilled").length;

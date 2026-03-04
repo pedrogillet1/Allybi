@@ -5,10 +5,20 @@
  * ✅ FIX: Preserves table structure in extracted text as markdown tables
  */
 
+import { logger } from "./logger";
+import { recordTablesDetected } from "../services/ingestion/pipeline/pipelineMetrics.service";
+
+export interface StructuredRow {
+  rowIndex: number;
+  cells: Array<{ text: string; colIndex: number }>;
+  isHeader: boolean;
+}
+
 export interface TableInfo {
   startLine: number;
   endLine: number;
   rows: string[][];
+  structuredRows?: StructuredRow[];
   markdown: string;
   confidence: number;
 }
@@ -338,10 +348,18 @@ function processTableLines(
   // Generate markdown
   const markdown = formatAsMarkdownTable(rows);
 
+  // Build structured rows with positional metadata
+  const structuredRows: StructuredRow[] = rows.map((row, rIdx) => ({
+    rowIndex: rIdx,
+    cells: row.map((text, cIdx) => ({ text, colIndex: cIdx })),
+    isHeader: rIdx === 0,
+  }));
+
   return {
     startLine,
     endLine,
     rows,
+    structuredRows,
     markdown,
     confidence,
   };
@@ -355,9 +373,10 @@ export function extractPDFWithTables(text: string): string {
   const result = extractTablesFromText(text);
 
   if (result.tableCount > 0) {
-    console.log(
-      `📊 [PDFTableExtractor] Detected ${result.tableCount} table(s) in PDF text`,
-    );
+    logger.debug("[PDFTableExtractor] Detected tables in PDF text", {
+      tableCount: result.tableCount,
+    });
+    recordTablesDetected(result.tableCount);
     return result.text;
   }
 

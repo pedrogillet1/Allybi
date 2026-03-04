@@ -271,3 +271,141 @@ describe("Retrieval Golden Eval — certification gate", () => {
     expect(precision).toBeGreaterThanOrEqual(0.7);
   });
 });
+
+// ── Production-weights suite ──────────────────────────────────────────
+
+function makeProductionWeightsBanks() {
+  return {
+    semantic_search_config: {
+      config: {
+        queryExpansionPolicy: { enabled: false },
+        hybridPhases: [
+          { id: "phase_semantic", type: "semantic", enabled: true, k: 10 },
+        ],
+      },
+    },
+    retrieval_ranker_config: {
+      config: {
+        weights: {
+          semantic: 0.46,
+          lexical: 0.20,
+          structural: 0.12,
+          titleBoost: 0.06,
+          typeBoost: 0.02,
+          recencyBoost: 0.02,
+          documentIntelligenceBoost: 0.08,
+          routingPriorityBoost: 0.04,
+        },
+        normalization: {
+          lexicalScore: { curve: "sqrt", inputRange: [0, 1], outputRange: [0, 1] },
+          semanticScore: { curve: "linear", inputRange: [0, 1], outputRange: [0, 1] },
+          structuralScore: { curve: "linear", inputRange: [0, 1], outputRange: [0, 1] },
+        },
+        actionsContract: {
+          thresholds: { minFinalScore: 0 },
+        },
+      },
+    },
+    retrieval_negatives: {
+      config: { enabled: true, actionsContract: { thresholds: { minRelevanceScore: 0 } } },
+    },
+    diversification_rules: {
+      config: {
+        enabled: true,
+        actionsContract: {
+          thresholds: {
+            maxPerDocHard: 8, maxTotalChunksHard: 32,
+            maxNearDuplicatesPerDoc: 5, nearDuplicateWindowChars: 280,
+          },
+        },
+      },
+    },
+    evidence_packaging: {
+      config: {
+        actionsContract: {
+          thresholds: { maxEvidenceItemsHard: 32, maxEvidencePerDocHard: 12, minFinalScore: 0 },
+        },
+      },
+    },
+    table_render_policy: {
+      config: { maxRowsPerChunk: 140 },
+    },
+  };
+}
+
+function makeProductionGoldenEngine(targetDocIds: string[]): RetrievalEngineService {
+  const prodBanks = makeProductionWeightsBanks() as Record<string, unknown>;
+  const bankLoader = {
+    getBank<T = unknown>(bankId: string): T {
+      const resolved = prodBanks[bankId];
+      if (!resolved) throw new Error(`missing required bank: ${bankId}`);
+      return resolved as T;
+    },
+  };
+
+  const docStore = {
+    async listDocs() {
+      return ALL_DOC_IDS.map((docId) => ({
+        docId, title: docId, filename: `${docId}.pdf`,
+      }));
+    },
+    async getDocMeta(docId: string) {
+      return { docId, title: docId, filename: `${docId}.pdf` };
+    },
+  };
+
+  const semanticIndex = {
+    async search(opts: { query: string }) {
+      const results: Array<{
+        docId: string; location: { page: number }; snippet: string;
+        score: number; locationKey: string; chunkId: string;
+      }> = [];
+      for (const [idx, docId] of targetDocIds.entries()) {
+        results.push({
+          docId, location: { page: 1 },
+          snippet: `${opts.query} — relevant content from ${docId}`,
+          score: 0.85 - idx * 0.05,
+          locationKey: `d:${docId}|p:1|c:1`,
+          chunkId: `${docId}-chunk-1`,
+        });
+      }
+      results.push({
+        docId: "doc-noise-a", location: { page: 1 },
+        snippet: `${opts.query} unrelated alpha`, score: 0.45,
+        locationKey: "d:doc-noise-a|p:1|c:1", chunkId: "noise-a-1",
+      });
+      results.push({
+        docId: "doc-noise-b", location: { page: 1 },
+        snippet: `${opts.query} unrelated beta`, score: 0.40,
+        locationKey: "d:doc-noise-b|p:1|c:1", chunkId: "noise-b-1",
+      });
+      return results;
+    },
+  };
+  const lexicalIndex = { async search() { return []; } };
+  const structuralIndex = { async search() { return []; } };
+
+  return new RetrievalEngineService(
+    bankLoader as any, docStore as any, semanticIndex as any,
+    lexicalIndex as any, structuralIndex as any,
+  );
+}
+
+describe("Retrieval Golden Eval — production-like weights", () => {
+  for (const seed of goldenSeeds) {
+    test(`[prod-weights][${seed.id}] ${seed.query.slice(0, 60)}`, async () => {
+      const engine = makeProductionGoldenEngine(seed.expectedDocIds);
+      const pack = await engine.retrieve({
+        conversationId: "golden-eval-prod",
+        workspaceId: "ws-eval",
+        query: seed.query,
+        sourceDocumentIds: [],
+        signals: {},
+      });
+      const topK = pack.evidence.slice(0, seed.expectedTopK);
+      const topDocIds = new Set(topK.map((e) => e.docId));
+      const targetInTopK = seed.expectedDocIds.some((id) => topDocIds.has(id));
+      expect(targetInTopK).toBe(true);
+    });
+  }
+});

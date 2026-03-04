@@ -30,6 +30,8 @@ interface BasePipelineTimings {
 export interface SkippedPipelineTimings extends BasePipelineTimings {
   skipped: true;
   skipReason: string;
+  /** Structured error code for categorized tracking (e.g. "NO_TEXT_CONTENT", "FILE_CORRUPTED") */
+  skipCode?: string;
 }
 
 export interface CompletedPipelineTimings extends BasePipelineTimings {
@@ -68,6 +70,8 @@ export interface InputChunkMetadata {
   unitRaw?: string;
   unitNormalized?: string;
   numericValue?: number;
+  scaleRaw?: string;
+  scaleMultiplier?: number;
   startChar?: number;
   endChar?: number;
   sheetName?: string;
@@ -80,16 +84,18 @@ export interface InputChunkMetadata {
   hasNotes?: boolean;
   ocrConfidence?: number;
   sourceType?: "pdf" | "docx" | "xlsx" | "pptx" | "text" | "image";
+  documentId?: string;
   versionId?: string;
   rootDocumentId?: string;
   isLatestVersion?: boolean;
+  unitConsistencyWarning?: string;
 }
 
 export interface InputChunk {
   chunkIndex: number;
   content: string;
   pageNumber?: number;
-  metadata?: InputChunkMetadata;
+  metadata: InputChunkMetadata;
 }
 
 // ---------------------------------------------------------------------------

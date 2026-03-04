@@ -219,7 +219,9 @@ model Document {
   metadata                   DocumentMetadata?
   processingMetrics          DocumentProcessingMetrics?
   folder                     Folder?                    @relation(fields: [folderId], references: [id], onDelete: Cascade)
-  parentVersion              Document?                  @relation("DocumentVersions", fields: [parentVersionId], references: [id])
+  parentVersion              Document?                  @relation("DocumentVersions", fields: [parentVersionId], references: [id], onDelete: SetNull)
+  linksOut                   DocumentLink[]             @relation("DocumentLinksSource")
+  linksIn                    DocumentLink[]             @relation("DocumentLinksTarget")
   versions                   Document[]                 @relation("DocumentVersions")
   user                       User                       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -316,6 +318,10 @@ model DocumentChunk {
   unitRaw       String?  @map("unit_raw")
   unitNormalized String? @map("unit_normalized")
   numericValue  Float?   @map("numeric_value")
+  chunkType     String?  @map("chunk_type")
+  sectionLevel  Int?     @map("section_level")
+  sourceType    String?  @map("source_type")
+  ocrConfidence Float?   @map("ocr_confidence")
   metadata      Json?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -328,8 +334,28 @@ model DocumentChunk {
   @@index([documentId, sheetName])
   @@index([documentId, tableChunkForm])
   @@index([documentId, rowLabel, colHeader])
+  @@index([documentId, chunkType])
+  @@index([documentId, sourceType])
   @@unique([documentId, chunkIndex])
   @@map("document_chunks")
+}
+
+model DocumentLink {
+  id               String   @id @default(uuid())
+  sourceDocumentId String   @map("source_document_id")
+  targetDocumentId String   @map("target_document_id")
+  relationshipType String   @map("relationship_type")
+  status           String   @default("active")
+  metadata         Json?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  sourceDocument   Document @relation("DocumentLinksSource", fields: [sourceDocumentId], references: [id], onDelete: Cascade)
+  targetDocument   Document @relation("DocumentLinksTarget", fields: [targetDocumentId], references: [id], onDelete: Cascade)
+
+  @@unique([sourceDocumentId, targetDocumentId, relationshipType])
+  @@index([sourceDocumentId])
+  @@index([targetDocumentId])
+  @@map("document_links")
 }
 
 model VerificationCode {

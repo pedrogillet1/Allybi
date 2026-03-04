@@ -1,0 +1,99 @@
+{
+  "_meta": {
+    "id": "di_banking_tables_banking_brokerage_statement",
+    "version": "1.0.0",
+    "description": "Expected table patterns for banking_brokerage_statement documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-04",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "banking",
+    "docType": "banking_brokerage_statement"
+  },
+  "tableHeaderSynonyms": {
+    "symbol": [
+      "symbol",
+      "ticker",
+      "codigo"
+    ],
+    "quantity": [
+      "quantity",
+      "shares",
+      "qty",
+      "quantidade"
+    ],
+    "market_value": [
+      "market value",
+      "value",
+      "valor de mercado"
+    ]
+  },
+  "tables": [
+    {
+      "id": "banking_brokerage_statement_holdings_table",
+      "name": {
+        "en": "Holdings Table",
+        "pt": "Tabela de Posicoes"
+      },
+      "section": "holdings",
+      "expectedColumns": [
+        "symbol",
+        "description",
+        "quantity",
+        "price",
+        "market_value"
+      ],
+      "keyRows": [
+        "total_market_value"
+      ]
+    },
+    {
+      "id": "banking_brokerage_statement_transactions_table",
+      "name": {
+        "en": "Transactions Table",
+        "pt": "Tabela de Transacoes"
+      },
+      "section": "transactions",
+      "expectedColumns": [
+        "trade_date",
+        "settlement_date",
+        "description",
+        "quantity",
+        "price",
+        "amount"
+      ],
+      "keyRows": [
+        "total_buys",
+        "total_sells"
+      ]
+    },
+    {
+      "id": "banking_brokerage_statement_gains_losses_table",
+      "name": {
+        "en": "Gains and Losses Table",
+        "pt": "Tabela de Ganhos e Perdas"
+      },
+      "section": "gains_losses",
+      "expectedColumns": [
+        "security",
+        "cost_basis",
+        "proceeds",
+        "gain_loss"
+      ],
+      "keyRows": [
+        "total_realized",
+        "total_unrealized"
+      ]
+    }
+  ]
+}

@@ -17,6 +17,9 @@ import type {
 } from "../../types/extraction.types";
 import type { PptSlideAnchor } from "../../types/extraction.types";
 import { createPptSlideAnchor } from "../../types/extraction.types";
+import { formatAsMarkdownTable } from "../../utils/pdfTableExtractor";
+import { logger } from "../../utils/logger";
+import type { ExtractedTable } from "../ingestion/extraction/extractionResult.types";
 
 // ============================================================================
 // Post-processing
@@ -128,17 +131,52 @@ function extractTextFromRuns(runs: any): string {
 }
 
 /**
+ * Extract a table from a:tbl node as markdown.
+ * Walks a:tbl > a:tr > a:tc > a:txBody to build a 2D string array,
+ * then formats via the shared formatAsMarkdownTable helper.
+ */
+function extractTableMarkdown(tblNode: any): { markdown: string; rows2d: string[][] } {
+  const tbl = Array.isArray(tblNode) ? tblNode[0] : tblNode;
+  if (!tbl) return { markdown: "", rows2d: [] };
+
+  const trNodes = tbl["a:tr"];
+  if (!trNodes) return { markdown: "", rows2d: [] };
+
+  const trArray = Array.isArray(trNodes) ? trNodes : [trNodes];
+  const rows: string[][] = [];
+
+  for (const tr of trArray) {
+    const tcNodes = tr["a:tc"];
+    if (!tcNodes) {
+      rows.push([]);
+      continue;
+    }
+    const tcArray = Array.isArray(tcNodes) ? tcNodes : [tcNodes];
+    const cells: string[] = [];
+    for (const tc of tcArray) {
+      const { text } = extractTextFromBody(tc["a:txBody"]);
+      cells.push(text.trim());
+    }
+    rows.push(cells);
+  }
+
+  if (rows.length === 0) return { markdown: "", rows2d: [] };
+  return { markdown: formatAsMarkdownTable(rows), rows2d: rows };
+}
+
+/**
  * Recursively find text bodies in slide XML and extract text
  */
 function findTextBodies(
   node: any,
-  collected: { title?: string; bodyParts: string[]; bullets: string[] },
+  collected: { title?: string; bodyParts: string[]; bullets: string[]; extractedTables?: ExtractedTable[] },
+  slideCtx?: { slideNum: number; tableCounter: { count: number } },
 ): void {
   if (!node || typeof node !== "object") return;
 
   if (Array.isArray(node)) {
     for (const item of node) {
-      findTextBodies(item, collected);
+      findTextBodies(item, collected, slideCtx);
     }
     return;
   }
@@ -183,7 +221,34 @@ function findTextBodies(
     }
   }
 
-  // Recurse into container elements
+  // Intercept table nodes — render as markdown instead of recursing into cells
+  if (node["a:tbl"]) {
+    const tblNodes = Array.isArray(node["a:tbl"])
+      ? node["a:tbl"]
+      : [node["a:tbl"]];
+    for (const tbl of tblNodes) {
+      const { markdown, rows2d } = extractTableMarkdown(tbl);
+      if (markdown.trim()) {
+        collected.bodyParts.push(markdown.trim());
+        // Collect structured table for cell-level indexing
+        if (collected.extractedTables && slideCtx && rows2d.length > 0) {
+          const tIdx = slideCtx.tableCounter.count++;
+          collected.extractedTables.push({
+            tableId: `pptx:s${slideCtx.slideNum}:t${tIdx}`,
+            pageOrSlide: slideCtx.slideNum,
+            markdown,
+            rows: rows2d.map((row, rIdx) => ({
+              rowIndex: rIdx,
+              isHeader: rIdx === 0,
+              cells: row.map((text, cIdx) => ({ text, colIndex: cIdx })),
+            })),
+          });
+        }
+      }
+    }
+  }
+
+  // Recurse into container elements (table keys excluded — handled above)
   const containerKeys = [
     "p:sld",
     "p:cSld",
@@ -193,13 +258,10 @@ function findTextBodies(
     "p:graphicFrame",
     "a:graphic",
     "a:graphicData",
-    "a:tbl",
-    "a:tr",
-    "a:tc",
   ];
   for (const key of containerKeys) {
     if (node[key]) {
-      findTextBodies(node[key], collected);
+      findTextBodies(node[key], collected, slideCtx);
     }
   }
 }
@@ -245,9 +307,9 @@ export async function extractPptxWithAnchors(
   buffer: Buffer,
 ): Promise<PptxExtractionResult> {
   const t0 = Date.now();
-  console.log(
-    `📊 [PPTX] Starting per-slide extraction (${(buffer.length / 1024 / 1024).toFixed(1)} MB)...`,
-  );
+  logger.info("[PPTX] Starting per-slide extraction", {
+    sizeMB: parseFloat((buffer.length / 1024 / 1024).toFixed(1)),
+  });
 
   const AdmZip = require("adm-zip");
   const xml2js = require("xml2js");
@@ -256,9 +318,10 @@ export async function extractPptxWithAnchors(
     const tZipStart = Date.now();
     const zip = new AdmZip(buffer);
     const zipEntries = zip.getEntries();
-    console.log(
-      `⏱️ [PPTX] ZIP parse: ${Date.now() - tZipStart}ms (${zipEntries.length} entries)`,
-    );
+    logger.debug("[PPTX] ZIP parse complete", {
+      durationMs: Date.now() - tZipStart,
+      entryCount: zipEntries.length,
+    });
 
     // Collect slide and notes entries
     const slideEntries: { slideNum: number; entry: any }[] = [];
@@ -289,9 +352,11 @@ export async function extractPptxWithAnchors(
 
     // Sort slides by number
     slideEntries.sort((a, b) => a.slideNum - b.slideNum);
-    console.log(
-      `⏱️ [PPTX] Found ${slideEntries.length} slides, ${notesEntries.size} notes in ${Date.now() - tZipStart}ms`,
-    );
+    logger.debug("[PPTX] Found slides and notes", {
+      slideCount: slideEntries.length,
+      notesCount: notesEntries.size,
+      durationMs: Date.now() - tZipStart,
+    });
 
     const tParseStart = Date.now();
     const slides: PptxExtractedSlide[] = [];
@@ -313,8 +378,10 @@ export async function extractPptxWithAnchors(
             title: undefined as string | undefined,
             bodyParts: [] as string[],
             bullets: [] as string[],
+            extractedTables: [] as ExtractedTable[],
           };
-          findTextBodies(result, collected);
+          const slideTableCtx = { slideNum, tableCounter: { count: 0 } };
+          findTextBodies(result, collected, slideTableCtx);
 
           // Get notes for this slide
           let notes: string | undefined;
@@ -346,12 +413,13 @@ export async function extractPptxWithAnchors(
                 collected.bullets.length > 0 ? collected.bullets : undefined,
             } as PptxExtractedSlide,
             hasNotes: !!(notes && notes.trim()),
+            slideTables: collected.extractedTables,
           };
         } catch (parseError) {
-          console.warn(
-            `⚠️ [PPTX] Failed to parse slide ${slideNum}:`,
-            parseError,
-          );
+          logger.warn("[PPTX] Failed to parse slide", {
+            slideNumber: slideNum,
+            error: parseError,
+          });
           return {
             slideNum,
             slideData: {
@@ -364,12 +432,15 @@ export async function extractPptxWithAnchors(
       }),
     );
 
-    console.log(
-      `⏱️ [PPTX] Slide XML parsing: ${Date.now() - tParseStart}ms (${slideParseResults.length} slides)`,
-    );
+    logger.debug("[PPTX] Slide XML parsing complete", {
+      durationMs: Date.now() - tParseStart,
+      slideCount: slideParseResults.length,
+    });
 
     // Reassemble results in slide order (Promise.all preserves order)
-    for (const { slideData, hasNotes: slideHasNotes } of slideParseResults) {
+    const allPptxExtractedTables: ExtractedTable[] = [];
+    for (const { slideData, hasNotes: slideHasNotes, slideTables } of slideParseResults) {
+      if (slideTables) allPptxExtractedTables.push(...slideTables);
       slides.push(slideData);
       slideTitles.push(slideData.title || null);
       if (slideHasNotes) hasNotes = true;
@@ -397,9 +468,11 @@ export async function extractPptxWithAnchors(
       0,
     );
 
-    console.log(
-      `✅ [PPTX] Extracted ${slides.length} slides, ${totalWordCount} words, ${hasNotes ? "has notes" : "no notes"}`,
-    );
+    logger.info("[PPTX] Extraction complete", {
+      slideCount: slides.length,
+      wordCount: totalWordCount,
+      hasNotes,
+    });
 
     return {
       sourceType: "pptx",
@@ -411,9 +484,10 @@ export async function extractPptxWithAnchors(
       presentationTitle,
       wordCount: totalWordCount,
       confidence: 1.0,
+      ...(allPptxExtractedTables.length > 0 ? { extractedTables: allPptxExtractedTables } : {}),
     };
   } catch (error: any) {
-    console.error("❌ [PPTX] Extraction failed:", error.message);
+    logger.error("[PPTX] Extraction failed", { error: error.message });
 
     if (
       error.message?.includes("invalid zip") ||
@@ -475,6 +549,59 @@ export function getSlideAnchors(
 }
 
 // ============================================================================
+// Image OCR Text Merging
+// ============================================================================
+
+/**
+ * Append image OCR text to slide text content.
+ *
+ * Call this after both extraction and image OCR are complete.
+ * For each slide, if any associated images have `ocrText`, the text is
+ * appended as `\n[Image text: ...]` to the slide's text field.
+ *
+ * @param result - The PPTX extraction result from extractPptxWithAnchors
+ * @param imageOcrMap - Map from slide number to array of OCR text strings
+ * @returns The mutated result with OCR text appended to slide text
+ */
+export function mergeImageOcrText(
+  result: PptxExtractionResult,
+  imageOcrMap: Map<number, string[]>,
+): PptxExtractionResult {
+  if (imageOcrMap.size === 0) return result;
+
+  for (const slide of result.slides) {
+    const slideNum = slide.slide ?? (slide as any).slideNumber;
+    const ocrTexts = imageOcrMap.get(slideNum);
+    if (!ocrTexts || ocrTexts.length === 0) continue;
+
+    const ocrSuffix = ocrTexts
+      .map((text) => `\n[Image text: ${text}]`)
+      .join("");
+    slide.text = (slide.text || "") + ocrSuffix;
+
+    logger.debug("[PPTX] Merged image OCR text into slide", {
+      slideNumber: slideNum,
+      ocrSegments: ocrTexts.length,
+    });
+  }
+
+  // Rebuild combined text for legacy compatibility
+  const allText = result.slides
+    .map((s) => {
+      let slideText = "";
+      if (s.title) slideText += `${s.title}\n\n`;
+      slideText += s.text;
+      if (s.notes) slideText += `\n\nNotes: ${s.notes}`;
+      return slideText;
+    })
+    .join("\n\n---\n\n");
+
+  result.text = postProcessText(allText);
+
+  return result;
+}
+
+// ============================================================================
 // Exports
 // ============================================================================
 
@@ -483,4 +610,5 @@ export default {
   extractTextFromPowerPoint,
   createSlideAnchor,
   getSlideAnchors,
+  mergeImageOcrText,
 };

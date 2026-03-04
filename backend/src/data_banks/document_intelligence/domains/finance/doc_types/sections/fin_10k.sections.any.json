@@ -1,12 +1,12 @@
 {
   "_meta": {
     "id": "di_finance_sections_fin_10k",
-    "version": "2.1.0",
+    "version": "3.0.0",
     "description": "Sections mapping for 10-K Annual Report.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-03-03",
+    "lastUpdated": "2026-03-04",
     "owner": "data-bank-governance",
     "usedBy": [
       "services/core/banks/dataBankLoader.service.ts"
@@ -22,1368 +22,216 @@
   },
   "sections": [
     {
-      "id": "business_overview_1",
+      "id": "business_overview",
       "name": {
-        "en": "Business Overview Segment 1",
-        "pt": "Business Overview segmento 1"
+        "en": "Business Overview",
+        "pt": "Visão Geral do Negócio"
       },
-      "mustHave": true,
+      "required": true,
       "order": 1,
       "headingAnchors": [
-        "Business Overview 1",
-        "business_overview 1",
-        "Business Overview section",
-        "seção Business Overview 1"
-      ],
-      "confidence": 0.81,
-      "fallbackPatterns": [
-        "\bbusiness_overview\b",
-        "\bbusiness_overview_1\b",
-        "\bbusiness_overview section\b"
-      ],
-      "description": "Canonical section business_overview for 10-K Annual Report"
+        "Business Overview",
+        "Visão Geral do Negócio",
+        "Item 1. Business",
+        "Item 1 Business",
+        "ITEM 1",
+        "Part I Item 1"
+      ]
     },
     {
-      "id": "fiscal_position_2",
+      "id": "fiscal_position",
       "name": {
-        "en": "Fiscal Position Segment 2",
-        "pt": "Fiscal Position segmento 2"
+        "en": "Fiscal Position",
+        "pt": "Posição Fiscal"
       },
-      "mustHave": true,
+      "required": true,
       "order": 2,
       "headingAnchors": [
-        "Fiscal Position 2",
-        "fiscal_position 2",
-        "Fiscal Position section",
-        "seção Fiscal Position 2"
-      ],
-      "confidence": 0.82,
-      "fallbackPatterns": [
-        "\bfiscal_position\b",
-        "\bfiscal_position_2\b",
-        "\bfiscal_position section\b"
-      ],
-      "description": "Canonical section fiscal_position for 10-K Annual Report"
+        "Fiscal Position",
+        "Posição Fiscal",
+        "Item 2. Properties",
+        "Item 3. Legal Proceedings",
+        "Item 4. Mine Safety"
+      ]
     },
     {
-      "id": "financial_statements_3",
+      "id": "financial_statements",
       "name": {
-        "en": "Financial Statements Segment 3",
-        "pt": "Financial Statements segmento 3"
+        "en": "Financial Statements",
+        "pt": "Demonstrações Financeiras"
       },
-      "mustHave": true,
+      "required": true,
       "order": 3,
       "headingAnchors": [
-        "Financial Statements 3",
-        "financial_statements 3",
-        "Financial Statements section",
-        "seção Financial Statements 3"
-      ],
-      "confidence": 0.83,
-      "fallbackPatterns": [
-        "\bfinancial_statements\b",
-        "\bfinancial_statements_3\b",
-        "\bfinancial_statements section\b"
-      ],
-      "description": "Canonical section financial_statements for 10-K Annual Report"
+        "Financial Statements",
+        "Demonstrações Financeiras",
+        "Item 8. Financial Statements",
+        "Item 8",
+        "Consolidated Financial Statements"
+      ]
     },
     {
-      "id": "consolidated_income_statement_4",
+      "id": "consolidated_income_statement",
       "name": {
-        "en": "Consolidated Income Statement Segment 4",
-        "pt": "Consolidated Income Statement segmento 4"
+        "en": "Consolidated Income Statement",
+        "pt": "Demonstração de Resultado Consolidada"
       },
-      "mustHave": true,
+      "required": true,
       "order": 4,
       "headingAnchors": [
-        "Consolidated Income Statement 4",
-        "consolidated_income_statement 4",
-        "Consolidated Income Statement section",
-        "seção Consolidated Income Statement 4"
-      ],
-      "confidence": 0.84,
-      "fallbackPatterns": [
-        "\bconsolidated_income_statement\b",
-        "\bconsolidated_income_statement_4\b",
-        "\bconsolidated_income_statement section\b"
-      ],
-      "description": "Canonical section consolidated_income_statement for 10-K Annual Report"
+        "Consolidated Income Statement",
+        "Demonstração de Resultado Consolidada"
+      ]
     },
     {
-      "id": "balance_sheet_5",
+      "id": "balance_sheet",
       "name": {
-        "en": "Balance Sheet Segment 5",
-        "pt": "Balance Sheet segmento 5"
+        "en": "Balance Sheet",
+        "pt": "Balanço Patrimonial"
       },
-      "mustHave": true,
+      "required": true,
       "order": 5,
       "headingAnchors": [
-        "Balance Sheet 5",
-        "balance_sheet 5",
-        "Balance Sheet section",
-        "seção Balance Sheet 5"
-      ],
-      "confidence": 0.85,
-      "fallbackPatterns": [
-        "\bbalance_sheet\b",
-        "\bbalance_sheet_5\b",
-        "\bbalance_sheet section\b"
-      ],
-      "description": "Canonical section balance_sheet for 10-K Annual Report"
+        "Balance Sheet",
+        "Balanço Patrimonial"
+      ]
     },
     {
-      "id": "cash_flow_statement_6",
+      "id": "cash_flow_statement",
       "name": {
-        "en": "Cash Flow Statement Segment 6",
-        "pt": "Cash Flow Statement segmento 6"
+        "en": "Cash Flow Statement",
+        "pt": "Demonstração de Fluxo de Caixa"
       },
-      "mustHave": true,
+      "required": true,
       "order": 6,
       "headingAnchors": [
-        "Cash Flow Statement 6",
-        "cash_flow_statement 6",
-        "Cash Flow Statement section",
-        "seção Cash Flow Statement 6"
-      ],
-      "confidence": 0.86,
-      "fallbackPatterns": [
-        "\bcash_flow_statement\b",
-        "\bcash_flow_statement_6\b",
-        "\bcash_flow_statement section\b"
-      ],
-      "description": "Canonical section cash_flow_statement for 10-K Annual Report"
+        "Cash Flow Statement",
+        "Demonstração de Fluxo de Caixa"
+      ]
     },
     {
-      "id": "mda_7",
+      "id": "mda",
       "name": {
-        "en": "Mda Segment 7",
-        "pt": "Mda segmento 7"
+        "en": "Management Discussion & Analysis",
+        "pt": "Discussão e Análise da Administração"
       },
-      "mustHave": true,
+      "required": true,
       "order": 7,
       "headingAnchors": [
-        "Mda 7",
-        "mda 7",
-        "Mda section",
-        "seção Mda 7"
-      ],
-      "confidence": 0.87,
-      "fallbackPatterns": [
-        "\bmda\b",
-        "\bmda_7\b",
-        "\bmda section\b"
-      ],
-      "description": "Canonical section mda for 10-K Annual Report"
+        "Management Discussion & Analysis",
+        "Discussão e Análise da Administração",
+        "Item 7. Management's Discussion and Analysis",
+        "Management's Discussion",
+        "MD&A",
+        "Item 7"
+      ]
     },
     {
-      "id": "risk_factors_8",
+      "id": "risk_factors",
       "name": {
-        "en": "Risk Factors Segment 8",
-        "pt": "Risk Factors segmento 8"
+        "en": "Risk Factors",
+        "pt": "Fatores de Risco"
       },
-      "mustHave": true,
+      "required": true,
       "order": 8,
       "headingAnchors": [
-        "Risk Factors 8",
-        "risk_factors 8",
-        "Risk Factors section",
-        "seção Risk Factors 8"
-      ],
-      "confidence": 0.88,
-      "fallbackPatterns": [
-        "\brisk_factors\b",
-        "\brisk_factors_8\b",
-        "\brisk_factors section\b"
-      ],
-      "description": "Canonical section risk_factors for 10-K Annual Report"
+        "Risk Factors",
+        "Fatores de Risco",
+        "Item 1A. Risk Factors",
+        "Item 1A"
+      ]
     },
     {
-      "id": "legal_proceedings_9",
+      "id": "legal_proceedings",
       "name": {
-        "en": "Legal Proceedings Segment 9",
-        "pt": "Legal Proceedings segmento 9"
+        "en": "Legal Proceedings",
+        "pt": "Processos Judiciais"
       },
-      "mustHave": true,
+      "required": true,
       "order": 9,
       "headingAnchors": [
-        "Legal Proceedings 9",
-        "legal_proceedings 9",
-        "Legal Proceedings section",
-        "seção Legal Proceedings 9"
-      ],
-      "confidence": 0.89,
-      "fallbackPatterns": [
-        "\blegal_proceedings\b",
-        "\blegal_proceedings_9\b",
-        "\blegal_proceedings section\b"
-      ],
-      "description": "Canonical section legal_proceedings for 10-K Annual Report"
+        "Legal Proceedings",
+        "Processos Judiciais"
+      ]
     },
     {
-      "id": "notes_to_financial_statements_10",
+      "id": "notes_to_financial_statements",
       "name": {
-        "en": "Notes To Financial Statements Segment 10",
-        "pt": "Notes To Financial Statements segmento 10"
+        "en": "Notes to Financial Statements",
+        "pt": "Notas Explicativas"
       },
-      "mustHave": true,
+      "required": false,
       "order": 10,
       "headingAnchors": [
-        "Notes To Financial Statements 10",
-        "notes_to_financial_statements 10",
-        "Notes To Financial Statements section",
-        "seção Notes To Financial Statements 10"
-      ],
-      "confidence": 0.9,
-      "fallbackPatterns": [
-        "\bnotes_to_financial_statements\b",
-        "\bnotes_to_financial_statements_10\b",
-        "\bnotes_to_financial_statements section\b"
-      ],
-      "description": "Canonical section notes_to_financial_statements for 10-K Annual Report"
+        "Notes to Financial Statements",
+        "Notas Explicativas",
+        "Notes to Consolidated Financial Statements"
+      ]
     },
     {
-      "id": "segment_information_11",
+      "id": "segment_information",
       "name": {
-        "en": "Segment Information Segment 11",
-        "pt": "Segment Information segmento 11"
+        "en": "Segment Information",
+        "pt": "Informações por Segmento"
       },
-      "mustHave": false,
+      "required": false,
       "order": 11,
       "headingAnchors": [
-        "Segment Information 11",
-        "segment_information 11",
-        "Segment Information section",
-        "seção Segment Information 11"
-      ],
-      "confidence": 0.91,
-      "fallbackPatterns": [
-        "\bsegment_information\b",
-        "\bsegment_information_11\b",
-        "\bsegment_information section\b"
-      ],
-      "description": "Canonical section segment_information for 10-K Annual Report"
+        "Segment Information",
+        "Informações por Segmento"
+      ]
     },
     {
-      "id": "market_risk_12",
+      "id": "market_risk",
       "name": {
-        "en": "Market Risk Segment 12",
-        "pt": "Market Risk segmento 12"
+        "en": "Market Risk",
+        "pt": "Risco de Mercado"
       },
-      "mustHave": false,
+      "required": false,
       "order": 12,
       "headingAnchors": [
-        "Market Risk 12",
-        "market_risk 12",
-        "Market Risk section",
-        "seção Market Risk 12"
-      ],
-      "confidence": 0.92,
-      "fallbackPatterns": [
-        "\bmarket_risk\b",
-        "\bmarket_risk_12\b",
-        "\bmarket_risk section\b"
-      ],
-      "description": "Canonical section market_risk for 10-K Annual Report"
+        "Market Risk",
+        "Risco de Mercado"
+      ]
     },
     {
-      "id": "shareholder_matters_13",
+      "id": "shareholder_matters",
       "name": {
-        "en": "Shareholder Matters Segment 13",
-        "pt": "Shareholder Matters segmento 13"
+        "en": "Shareholder Matters",
+        "pt": "Assuntos dos Acionistas"
       },
-      "mustHave": false,
+      "required": false,
       "order": 13,
       "headingAnchors": [
-        "Shareholder Matters 13",
-        "shareholder_matters 13",
-        "Shareholder Matters section",
-        "seção Shareholder Matters 13"
-      ],
-      "confidence": 0.93,
-      "fallbackPatterns": [
-        "\bshareholder_matters\b",
-        "\bshareholder_matters_13\b",
-        "\bshareholder_matters section\b"
-      ],
-      "description": "Canonical section shareholder_matters for 10-K Annual Report"
+        "Shareholder Matters",
+        "Assuntos dos Acionistas"
+      ]
     },
     {
-      "id": "tax_notes_14",
+      "id": "tax_notes",
       "name": {
-        "en": "Tax Notes Segment 14",
-        "pt": "Tax Notes segmento 14"
+        "en": "Tax Notes",
+        "pt": "Notas Fiscais"
       },
-      "mustHave": false,
+      "required": false,
       "order": 14,
       "headingAnchors": [
-        "Tax Notes 14",
-        "tax_notes 14",
-        "Tax Notes section",
-        "seção Tax Notes 14"
-      ],
-      "confidence": 0.94,
-      "fallbackPatterns": [
-        "\btax_notes\b",
-        "\btax_notes_14\b",
-        "\btax_notes section\b"
-      ],
-      "description": "Canonical section tax_notes for 10-K Annual Report"
+        "Tax Notes",
+        "Notas Fiscais"
+      ]
     },
     {
-      "id": "executive_summary_15",
+      "id": "executive_summary",
       "name": {
-        "en": "Executive Summary Segment 15",
-        "pt": "Executive Summary segmento 15"
+        "en": "Executive Summary",
+        "pt": "Resumo Executivo"
       },
-      "mustHave": false,
+      "required": false,
       "order": 15,
       "headingAnchors": [
-        "Executive Summary 15",
-        "executive_summary 15",
-        "Executive Summary section",
-        "seção Executive Summary 15"
-      ],
-      "confidence": 0.8,
-      "fallbackPatterns": [
-        "\bexecutive_summary\b",
-        "\bexecutive_summary_15\b",
-        "\bexecutive_summary section\b"
-      ],
-      "description": "Canonical section executive_summary for 10-K Annual Report"
-    },
-    {
-      "id": "business_overview_16",
-      "name": {
-        "en": "Business Overview Segment 16",
-        "pt": "Business Overview segmento 16"
-      },
-      "mustHave": false,
-      "order": 16,
-      "headingAnchors": [
-        "Business Overview 16",
-        "business_overview 16",
-        "Business Overview section",
-        "seção Business Overview 16"
-      ],
-      "confidence": 0.81,
-      "fallbackPatterns": [
-        "\bbusiness_overview\b",
-        "\bbusiness_overview_16\b",
-        "\bbusiness_overview section\b"
-      ],
-      "description": "Canonical section business_overview for 10-K Annual Report"
-    },
-    {
-      "id": "fiscal_position_17",
-      "name": {
-        "en": "Fiscal Position Segment 17",
-        "pt": "Fiscal Position segmento 17"
-      },
-      "mustHave": false,
-      "order": 17,
-      "headingAnchors": [
-        "Fiscal Position 17",
-        "fiscal_position 17",
-        "Fiscal Position section",
-        "seção Fiscal Position 17"
-      ],
-      "confidence": 0.82,
-      "fallbackPatterns": [
-        "\bfiscal_position\b",
-        "\bfiscal_position_17\b",
-        "\bfiscal_position section\b"
-      ],
-      "description": "Canonical section fiscal_position for 10-K Annual Report"
-    },
-    {
-      "id": "financial_statements_18",
-      "name": {
-        "en": "Financial Statements Segment 18",
-        "pt": "Financial Statements segmento 18"
-      },
-      "mustHave": false,
-      "order": 18,
-      "headingAnchors": [
-        "Financial Statements 18",
-        "financial_statements 18",
-        "Financial Statements section",
-        "seção Financial Statements 18"
-      ],
-      "confidence": 0.83,
-      "fallbackPatterns": [
-        "\bfinancial_statements\b",
-        "\bfinancial_statements_18\b",
-        "\bfinancial_statements section\b"
-      ],
-      "description": "Canonical section financial_statements for 10-K Annual Report"
-    },
-    {
-      "id": "consolidated_income_statement_19",
-      "name": {
-        "en": "Consolidated Income Statement Segment 19",
-        "pt": "Consolidated Income Statement segmento 19"
-      },
-      "mustHave": false,
-      "order": 19,
-      "headingAnchors": [
-        "Consolidated Income Statement 19",
-        "consolidated_income_statement 19",
-        "Consolidated Income Statement section",
-        "seção Consolidated Income Statement 19"
-      ],
-      "confidence": 0.84,
-      "fallbackPatterns": [
-        "\bconsolidated_income_statement\b",
-        "\bconsolidated_income_statement_19\b",
-        "\bconsolidated_income_statement section\b"
-      ],
-      "description": "Canonical section consolidated_income_statement for 10-K Annual Report"
-    },
-    {
-      "id": "balance_sheet_20",
-      "name": {
-        "en": "Balance Sheet Segment 20",
-        "pt": "Balance Sheet segmento 20"
-      },
-      "mustHave": false,
-      "order": 20,
-      "headingAnchors": [
-        "Balance Sheet 20",
-        "balance_sheet 20",
-        "Balance Sheet section",
-        "seção Balance Sheet 20"
-      ],
-      "confidence": 0.85,
-      "fallbackPatterns": [
-        "\bbalance_sheet\b",
-        "\bbalance_sheet_20\b",
-        "\bbalance_sheet section\b"
-      ],
-      "description": "Canonical section balance_sheet for 10-K Annual Report"
-    },
-    {
-      "id": "cash_flow_statement_21",
-      "name": {
-        "en": "Cash Flow Statement Segment 21",
-        "pt": "Cash Flow Statement segmento 21"
-      },
-      "mustHave": false,
-      "order": 21,
-      "headingAnchors": [
-        "Cash Flow Statement 21",
-        "cash_flow_statement 21",
-        "Cash Flow Statement section",
-        "seção Cash Flow Statement 21"
-      ],
-      "confidence": 0.86,
-      "fallbackPatterns": [
-        "\bcash_flow_statement\b",
-        "\bcash_flow_statement_21\b",
-        "\bcash_flow_statement section\b"
-      ],
-      "description": "Canonical section cash_flow_statement for 10-K Annual Report"
-    },
-    {
-      "id": "mda_22",
-      "name": {
-        "en": "Mda Segment 22",
-        "pt": "Mda segmento 22"
-      },
-      "mustHave": false,
-      "order": 22,
-      "headingAnchors": [
-        "Mda 22",
-        "mda 22",
-        "Mda section",
-        "seção Mda 22"
-      ],
-      "confidence": 0.87,
-      "fallbackPatterns": [
-        "\bmda\b",
-        "\bmda_22\b",
-        "\bmda section\b"
-      ],
-      "description": "Canonical section mda for 10-K Annual Report"
-    },
-    {
-      "id": "risk_factors_23",
-      "name": {
-        "en": "Risk Factors Segment 23",
-        "pt": "Risk Factors segmento 23"
-      },
-      "mustHave": false,
-      "order": 23,
-      "headingAnchors": [
-        "Risk Factors 23",
-        "risk_factors 23",
-        "Risk Factors section",
-        "seção Risk Factors 23"
-      ],
-      "confidence": 0.88,
-      "fallbackPatterns": [
-        "\brisk_factors\b",
-        "\brisk_factors_23\b",
-        "\brisk_factors section\b"
-      ],
-      "description": "Canonical section risk_factors for 10-K Annual Report"
-    },
-    {
-      "id": "legal_proceedings_24",
-      "name": {
-        "en": "Legal Proceedings Segment 24",
-        "pt": "Legal Proceedings segmento 24"
-      },
-      "mustHave": false,
-      "order": 24,
-      "headingAnchors": [
-        "Legal Proceedings 24",
-        "legal_proceedings 24",
-        "Legal Proceedings section",
-        "seção Legal Proceedings 24"
-      ],
-      "confidence": 0.89,
-      "fallbackPatterns": [
-        "\blegal_proceedings\b",
-        "\blegal_proceedings_24\b",
-        "\blegal_proceedings section\b"
-      ],
-      "description": "Canonical section legal_proceedings for 10-K Annual Report"
-    },
-    {
-      "id": "notes_to_financial_statements_25",
-      "name": {
-        "en": "Notes To Financial Statements Segment 25",
-        "pt": "Notes To Financial Statements segmento 25"
-      },
-      "mustHave": false,
-      "order": 25,
-      "headingAnchors": [
-        "Notes To Financial Statements 25",
-        "notes_to_financial_statements 25",
-        "Notes To Financial Statements section",
-        "seção Notes To Financial Statements 25"
-      ],
-      "confidence": 0.9,
-      "fallbackPatterns": [
-        "\bnotes_to_financial_statements\b",
-        "\bnotes_to_financial_statements_25\b",
-        "\bnotes_to_financial_statements section\b"
-      ],
-      "description": "Canonical section notes_to_financial_statements for 10-K Annual Report"
-    },
-    {
-      "id": "segment_information_26",
-      "name": {
-        "en": "Segment Information Segment 26",
-        "pt": "Segment Information segmento 26"
-      },
-      "mustHave": false,
-      "order": 26,
-      "headingAnchors": [
-        "Segment Information 26",
-        "segment_information 26",
-        "Segment Information section",
-        "seção Segment Information 26"
-      ],
-      "confidence": 0.91,
-      "fallbackPatterns": [
-        "\bsegment_information\b",
-        "\bsegment_information_26\b",
-        "\bsegment_information section\b"
-      ],
-      "description": "Canonical section segment_information for 10-K Annual Report"
-    },
-    {
-      "id": "market_risk_27",
-      "name": {
-        "en": "Market Risk Segment 27",
-        "pt": "Market Risk segmento 27"
-      },
-      "mustHave": false,
-      "order": 27,
-      "headingAnchors": [
-        "Market Risk 27",
-        "market_risk 27",
-        "Market Risk section",
-        "seção Market Risk 27"
-      ],
-      "confidence": 0.92,
-      "fallbackPatterns": [
-        "\bmarket_risk\b",
-        "\bmarket_risk_27\b",
-        "\bmarket_risk section\b"
-      ],
-      "description": "Canonical section market_risk for 10-K Annual Report"
-    },
-    {
-      "id": "shareholder_matters_28",
-      "name": {
-        "en": "Shareholder Matters Segment 28",
-        "pt": "Shareholder Matters segmento 28"
-      },
-      "mustHave": false,
-      "order": 28,
-      "headingAnchors": [
-        "Shareholder Matters 28",
-        "shareholder_matters 28",
-        "Shareholder Matters section",
-        "seção Shareholder Matters 28"
-      ],
-      "confidence": 0.93,
-      "fallbackPatterns": [
-        "\bshareholder_matters\b",
-        "\bshareholder_matters_28\b",
-        "\bshareholder_matters section\b"
-      ],
-      "description": "Canonical section shareholder_matters for 10-K Annual Report"
-    },
-    {
-      "id": "tax_notes_29",
-      "name": {
-        "en": "Tax Notes Segment 29",
-        "pt": "Tax Notes segmento 29"
-      },
-      "mustHave": false,
-      "order": 29,
-      "headingAnchors": [
-        "Tax Notes 29",
-        "tax_notes 29",
-        "Tax Notes section",
-        "seção Tax Notes 29"
-      ],
-      "confidence": 0.94,
-      "fallbackPatterns": [
-        "\btax_notes\b",
-        "\btax_notes_29\b",
-        "\btax_notes section\b"
-      ],
-      "description": "Canonical section tax_notes for 10-K Annual Report"
-    },
-    {
-      "id": "executive_summary_30",
-      "name": {
-        "en": "Executive Summary Segment 30",
-        "pt": "Executive Summary segmento 30"
-      },
-      "mustHave": false,
-      "order": 30,
-      "headingAnchors": [
-        "Executive Summary 30",
-        "executive_summary 30",
-        "Executive Summary section",
-        "seção Executive Summary 30"
-      ],
-      "confidence": 0.8,
-      "fallbackPatterns": [
-        "\bexecutive_summary\b",
-        "\bexecutive_summary_30\b",
-        "\bexecutive_summary section\b"
-      ],
-      "description": "Canonical section executive_summary for 10-K Annual Report"
-    },
-    {
-      "id": "business_overview_31",
-      "name": {
-        "en": "Business Overview Segment 31",
-        "pt": "Business Overview segmento 31"
-      },
-      "mustHave": false,
-      "order": 31,
-      "headingAnchors": [
-        "Business Overview 31",
-        "business_overview 31",
-        "Business Overview section",
-        "seção Business Overview 31"
-      ],
-      "confidence": 0.81,
-      "fallbackPatterns": [
-        "\bbusiness_overview\b",
-        "\bbusiness_overview_31\b",
-        "\bbusiness_overview section\b"
-      ],
-      "description": "Canonical section business_overview for 10-K Annual Report"
-    },
-    {
-      "id": "fiscal_position_32",
-      "name": {
-        "en": "Fiscal Position Segment 32",
-        "pt": "Fiscal Position segmento 32"
-      },
-      "mustHave": false,
-      "order": 32,
-      "headingAnchors": [
-        "Fiscal Position 32",
-        "fiscal_position 32",
-        "Fiscal Position section",
-        "seção Fiscal Position 32"
-      ],
-      "confidence": 0.82,
-      "fallbackPatterns": [
-        "\bfiscal_position\b",
-        "\bfiscal_position_32\b",
-        "\bfiscal_position section\b"
-      ],
-      "description": "Canonical section fiscal_position for 10-K Annual Report"
-    },
-    {
-      "id": "financial_statements_33",
-      "name": {
-        "en": "Financial Statements Segment 33",
-        "pt": "Financial Statements segmento 33"
-      },
-      "mustHave": false,
-      "order": 33,
-      "headingAnchors": [
-        "Financial Statements 33",
-        "financial_statements 33",
-        "Financial Statements section",
-        "seção Financial Statements 33"
-      ],
-      "confidence": 0.83,
-      "fallbackPatterns": [
-        "\bfinancial_statements\b",
-        "\bfinancial_statements_33\b",
-        "\bfinancial_statements section\b"
-      ],
-      "description": "Canonical section financial_statements for 10-K Annual Report"
-    },
-    {
-      "id": "consolidated_income_statement_34",
-      "name": {
-        "en": "Consolidated Income Statement Segment 34",
-        "pt": "Consolidated Income Statement segmento 34"
-      },
-      "mustHave": false,
-      "order": 34,
-      "headingAnchors": [
-        "Consolidated Income Statement 34",
-        "consolidated_income_statement 34",
-        "Consolidated Income Statement section",
-        "seção Consolidated Income Statement 34"
-      ],
-      "confidence": 0.84,
-      "fallbackPatterns": [
-        "\bconsolidated_income_statement\b",
-        "\bconsolidated_income_statement_34\b",
-        "\bconsolidated_income_statement section\b"
-      ],
-      "description": "Canonical section consolidated_income_statement for 10-K Annual Report"
-    },
-    {
-      "id": "balance_sheet_35",
-      "name": {
-        "en": "Balance Sheet Segment 35",
-        "pt": "Balance Sheet segmento 35"
-      },
-      "mustHave": false,
-      "order": 35,
-      "headingAnchors": [
-        "Balance Sheet 35",
-        "balance_sheet 35",
-        "Balance Sheet section",
-        "seção Balance Sheet 35"
-      ],
-      "confidence": 0.85,
-      "fallbackPatterns": [
-        "\bbalance_sheet\b",
-        "\bbalance_sheet_35\b",
-        "\bbalance_sheet section\b"
-      ],
-      "description": "Canonical section balance_sheet for 10-K Annual Report"
-    },
-    {
-      "id": "cash_flow_statement_36",
-      "name": {
-        "en": "Cash Flow Statement Segment 36",
-        "pt": "Cash Flow Statement segmento 36"
-      },
-      "mustHave": false,
-      "order": 36,
-      "headingAnchors": [
-        "Cash Flow Statement 36",
-        "cash_flow_statement 36",
-        "Cash Flow Statement section",
-        "seção Cash Flow Statement 36"
-      ],
-      "confidence": 0.86,
-      "fallbackPatterns": [
-        "\bcash_flow_statement\b",
-        "\bcash_flow_statement_36\b",
-        "\bcash_flow_statement section\b"
-      ],
-      "description": "Canonical section cash_flow_statement for 10-K Annual Report"
-    },
-    {
-      "id": "mda_37",
-      "name": {
-        "en": "Mda Segment 37",
-        "pt": "Mda segmento 37"
-      },
-      "mustHave": false,
-      "order": 37,
-      "headingAnchors": [
-        "Mda 37",
-        "mda 37",
-        "Mda section",
-        "seção Mda 37"
-      ],
-      "confidence": 0.87,
-      "fallbackPatterns": [
-        "\bmda\b",
-        "\bmda_37\b",
-        "\bmda section\b"
-      ],
-      "description": "Canonical section mda for 10-K Annual Report"
-    },
-    {
-      "id": "risk_factors_38",
-      "name": {
-        "en": "Risk Factors Segment 38",
-        "pt": "Risk Factors segmento 38"
-      },
-      "mustHave": false,
-      "order": 38,
-      "headingAnchors": [
-        "Risk Factors 38",
-        "risk_factors 38",
-        "Risk Factors section",
-        "seção Risk Factors 38"
-      ],
-      "confidence": 0.88,
-      "fallbackPatterns": [
-        "\brisk_factors\b",
-        "\brisk_factors_38\b",
-        "\brisk_factors section\b"
-      ],
-      "description": "Canonical section risk_factors for 10-K Annual Report"
-    },
-    {
-      "id": "legal_proceedings_39",
-      "name": {
-        "en": "Legal Proceedings Segment 39",
-        "pt": "Legal Proceedings segmento 39"
-      },
-      "mustHave": false,
-      "order": 39,
-      "headingAnchors": [
-        "Legal Proceedings 39",
-        "legal_proceedings 39",
-        "Legal Proceedings section",
-        "seção Legal Proceedings 39"
-      ],
-      "confidence": 0.89,
-      "fallbackPatterns": [
-        "\blegal_proceedings\b",
-        "\blegal_proceedings_39\b",
-        "\blegal_proceedings section\b"
-      ],
-      "description": "Canonical section legal_proceedings for 10-K Annual Report"
-    },
-    {
-      "id": "notes_to_financial_statements_40",
-      "name": {
-        "en": "Notes To Financial Statements Segment 40",
-        "pt": "Notes To Financial Statements segmento 40"
-      },
-      "mustHave": false,
-      "order": 40,
-      "headingAnchors": [
-        "Notes To Financial Statements 40",
-        "notes_to_financial_statements 40",
-        "Notes To Financial Statements section",
-        "seção Notes To Financial Statements 40"
-      ],
-      "confidence": 0.9,
-      "fallbackPatterns": [
-        "\bnotes_to_financial_statements\b",
-        "\bnotes_to_financial_statements_40\b",
-        "\bnotes_to_financial_statements section\b"
-      ],
-      "description": "Canonical section notes_to_financial_statements for 10-K Annual Report"
-    },
-    {
-      "id": "segment_information_41",
-      "name": {
-        "en": "Segment Information Segment 41",
-        "pt": "Segment Information segmento 41"
-      },
-      "mustHave": false,
-      "order": 41,
-      "headingAnchors": [
-        "Segment Information 41",
-        "segment_information 41",
-        "Segment Information section",
-        "seção Segment Information 41"
-      ],
-      "confidence": 0.91,
-      "fallbackPatterns": [
-        "\bsegment_information\b",
-        "\bsegment_information_41\b",
-        "\bsegment_information section\b"
-      ],
-      "description": "Canonical section segment_information for 10-K Annual Report"
-    },
-    {
-      "id": "market_risk_42",
-      "name": {
-        "en": "Market Risk Segment 42",
-        "pt": "Market Risk segmento 42"
-      },
-      "mustHave": false,
-      "order": 42,
-      "headingAnchors": [
-        "Market Risk 42",
-        "market_risk 42",
-        "Market Risk section",
-        "seção Market Risk 42"
-      ],
-      "confidence": 0.92,
-      "fallbackPatterns": [
-        "\bmarket_risk\b",
-        "\bmarket_risk_42\b",
-        "\bmarket_risk section\b"
-      ],
-      "description": "Canonical section market_risk for 10-K Annual Report"
-    },
-    {
-      "id": "shareholder_matters_43",
-      "name": {
-        "en": "Shareholder Matters Segment 43",
-        "pt": "Shareholder Matters segmento 43"
-      },
-      "mustHave": false,
-      "order": 43,
-      "headingAnchors": [
-        "Shareholder Matters 43",
-        "shareholder_matters 43",
-        "Shareholder Matters section",
-        "seção Shareholder Matters 43"
-      ],
-      "confidence": 0.93,
-      "fallbackPatterns": [
-        "\bshareholder_matters\b",
-        "\bshareholder_matters_43\b",
-        "\bshareholder_matters section\b"
-      ],
-      "description": "Canonical section shareholder_matters for 10-K Annual Report"
-    },
-    {
-      "id": "tax_notes_44",
-      "name": {
-        "en": "Tax Notes Segment 44",
-        "pt": "Tax Notes segmento 44"
-      },
-      "mustHave": false,
-      "order": 44,
-      "headingAnchors": [
-        "Tax Notes 44",
-        "tax_notes 44",
-        "Tax Notes section",
-        "seção Tax Notes 44"
-      ],
-      "confidence": 0.94,
-      "fallbackPatterns": [
-        "\btax_notes\b",
-        "\btax_notes_44\b",
-        "\btax_notes section\b"
-      ],
-      "description": "Canonical section tax_notes for 10-K Annual Report"
-    },
-    {
-      "id": "executive_summary_45",
-      "name": {
-        "en": "Executive Summary Segment 45",
-        "pt": "Executive Summary segmento 45"
-      },
-      "mustHave": false,
-      "order": 45,
-      "headingAnchors": [
-        "Executive Summary 45",
-        "executive_summary 45",
-        "Executive Summary section",
-        "seção Executive Summary 45"
-      ],
-      "confidence": 0.8,
-      "fallbackPatterns": [
-        "\bexecutive_summary\b",
-        "\bexecutive_summary_45\b",
-        "\bexecutive_summary section\b"
-      ],
-      "description": "Canonical section executive_summary for 10-K Annual Report"
-    },
-    {
-      "id": "business_overview_46",
-      "name": {
-        "en": "Business Overview Segment 46",
-        "pt": "Business Overview segmento 46"
-      },
-      "mustHave": false,
-      "order": 46,
-      "headingAnchors": [
-        "Business Overview 46",
-        "business_overview 46",
-        "Business Overview section",
-        "seção Business Overview 46"
-      ],
-      "confidence": 0.81,
-      "fallbackPatterns": [
-        "\bbusiness_overview\b",
-        "\bbusiness_overview_46\b",
-        "\bbusiness_overview section\b"
-      ],
-      "description": "Canonical section business_overview for 10-K Annual Report"
-    },
-    {
-      "id": "fiscal_position_47",
-      "name": {
-        "en": "Fiscal Position Segment 47",
-        "pt": "Fiscal Position segmento 47"
-      },
-      "mustHave": false,
-      "order": 47,
-      "headingAnchors": [
-        "Fiscal Position 47",
-        "fiscal_position 47",
-        "Fiscal Position section",
-        "seção Fiscal Position 47"
-      ],
-      "confidence": 0.82,
-      "fallbackPatterns": [
-        "\bfiscal_position\b",
-        "\bfiscal_position_47\b",
-        "\bfiscal_position section\b"
-      ],
-      "description": "Canonical section fiscal_position for 10-K Annual Report"
-    },
-    {
-      "id": "financial_statements_48",
-      "name": {
-        "en": "Financial Statements Segment 48",
-        "pt": "Financial Statements segmento 48"
-      },
-      "mustHave": false,
-      "order": 48,
-      "headingAnchors": [
-        "Financial Statements 48",
-        "financial_statements 48",
-        "Financial Statements section",
-        "seção Financial Statements 48"
-      ],
-      "confidence": 0.83,
-      "fallbackPatterns": [
-        "\bfinancial_statements\b",
-        "\bfinancial_statements_48\b",
-        "\bfinancial_statements section\b"
-      ],
-      "description": "Canonical section financial_statements for 10-K Annual Report"
-    },
-    {
-      "id": "consolidated_income_statement_49",
-      "name": {
-        "en": "Consolidated Income Statement Segment 49",
-        "pt": "Consolidated Income Statement segmento 49"
-      },
-      "mustHave": false,
-      "order": 49,
-      "headingAnchors": [
-        "Consolidated Income Statement 49",
-        "consolidated_income_statement 49",
-        "Consolidated Income Statement section",
-        "seção Consolidated Income Statement 49"
-      ],
-      "confidence": 0.84,
-      "fallbackPatterns": [
-        "\bconsolidated_income_statement\b",
-        "\bconsolidated_income_statement_49\b",
-        "\bconsolidated_income_statement section\b"
-      ],
-      "description": "Canonical section consolidated_income_statement for 10-K Annual Report"
-    },
-    {
-      "id": "balance_sheet_50",
-      "name": {
-        "en": "Balance Sheet Segment 50",
-        "pt": "Balance Sheet segmento 50"
-      },
-      "mustHave": false,
-      "order": 50,
-      "headingAnchors": [
-        "Balance Sheet 50",
-        "balance_sheet 50",
-        "Balance Sheet section",
-        "seção Balance Sheet 50"
-      ],
-      "confidence": 0.85,
-      "fallbackPatterns": [
-        "\bbalance_sheet\b",
-        "\bbalance_sheet_50\b",
-        "\bbalance_sheet section\b"
-      ],
-      "description": "Canonical section balance_sheet for 10-K Annual Report"
-    },
-    {
-      "id": "cash_flow_statement_51",
-      "name": {
-        "en": "Cash Flow Statement Segment 51",
-        "pt": "Cash Flow Statement segmento 51"
-      },
-      "mustHave": false,
-      "order": 51,
-      "headingAnchors": [
-        "Cash Flow Statement 51",
-        "cash_flow_statement 51",
-        "Cash Flow Statement section",
-        "seção Cash Flow Statement 51"
-      ],
-      "confidence": 0.86,
-      "fallbackPatterns": [
-        "\bcash_flow_statement\b",
-        "\bcash_flow_statement_51\b",
-        "\bcash_flow_statement section\b"
-      ],
-      "description": "Canonical section cash_flow_statement for 10-K Annual Report"
-    },
-    {
-      "id": "mda_52",
-      "name": {
-        "en": "Mda Segment 52",
-        "pt": "Mda segmento 52"
-      },
-      "mustHave": false,
-      "order": 52,
-      "headingAnchors": [
-        "Mda 52",
-        "mda 52",
-        "Mda section",
-        "seção Mda 52"
-      ],
-      "confidence": 0.87,
-      "fallbackPatterns": [
-        "\bmda\b",
-        "\bmda_52\b",
-        "\bmda section\b"
-      ],
-      "description": "Canonical section mda for 10-K Annual Report"
-    },
-    {
-      "id": "risk_factors_53",
-      "name": {
-        "en": "Risk Factors Segment 53",
-        "pt": "Risk Factors segmento 53"
-      },
-      "mustHave": false,
-      "order": 53,
-      "headingAnchors": [
-        "Risk Factors 53",
-        "risk_factors 53",
-        "Risk Factors section",
-        "seção Risk Factors 53"
-      ],
-      "confidence": 0.88,
-      "fallbackPatterns": [
-        "\brisk_factors\b",
-        "\brisk_factors_53\b",
-        "\brisk_factors section\b"
-      ],
-      "description": "Canonical section risk_factors for 10-K Annual Report"
-    },
-    {
-      "id": "legal_proceedings_54",
-      "name": {
-        "en": "Legal Proceedings Segment 54",
-        "pt": "Legal Proceedings segmento 54"
-      },
-      "mustHave": false,
-      "order": 54,
-      "headingAnchors": [
-        "Legal Proceedings 54",
-        "legal_proceedings 54",
-        "Legal Proceedings section",
-        "seção Legal Proceedings 54"
-      ],
-      "confidence": 0.89,
-      "fallbackPatterns": [
-        "\blegal_proceedings\b",
-        "\blegal_proceedings_54\b",
-        "\blegal_proceedings section\b"
-      ],
-      "description": "Canonical section legal_proceedings for 10-K Annual Report"
-    },
-    {
-      "id": "notes_to_financial_statements_55",
-      "name": {
-        "en": "Notes To Financial Statements Segment 55",
-        "pt": "Notes To Financial Statements segmento 55"
-      },
-      "mustHave": false,
-      "order": 55,
-      "headingAnchors": [
-        "Notes To Financial Statements 55",
-        "notes_to_financial_statements 55",
-        "Notes To Financial Statements section",
-        "seção Notes To Financial Statements 55"
-      ],
-      "confidence": 0.9,
-      "fallbackPatterns": [
-        "\bnotes_to_financial_statements\b",
-        "\bnotes_to_financial_statements_55\b",
-        "\bnotes_to_financial_statements section\b"
-      ],
-      "description": "Canonical section notes_to_financial_statements for 10-K Annual Report"
-    },
-    {
-      "id": "segment_information_56",
-      "name": {
-        "en": "Segment Information Segment 56",
-        "pt": "Segment Information segmento 56"
-      },
-      "mustHave": false,
-      "order": 56,
-      "headingAnchors": [
-        "Segment Information 56",
-        "segment_information 56",
-        "Segment Information section",
-        "seção Segment Information 56"
-      ],
-      "confidence": 0.91,
-      "fallbackPatterns": [
-        "\bsegment_information\b",
-        "\bsegment_information_56\b",
-        "\bsegment_information section\b"
-      ],
-      "description": "Canonical section segment_information for 10-K Annual Report"
-    },
-    {
-      "id": "market_risk_57",
-      "name": {
-        "en": "Market Risk Segment 57",
-        "pt": "Market Risk segmento 57"
-      },
-      "mustHave": false,
-      "order": 57,
-      "headingAnchors": [
-        "Market Risk 57",
-        "market_risk 57",
-        "Market Risk section",
-        "seção Market Risk 57"
-      ],
-      "confidence": 0.92,
-      "fallbackPatterns": [
-        "\bmarket_risk\b",
-        "\bmarket_risk_57\b",
-        "\bmarket_risk section\b"
-      ],
-      "description": "Canonical section market_risk for 10-K Annual Report"
-    },
-    {
-      "id": "shareholder_matters_58",
-      "name": {
-        "en": "Shareholder Matters Segment 58",
-        "pt": "Shareholder Matters segmento 58"
-      },
-      "mustHave": false,
-      "order": 58,
-      "headingAnchors": [
-        "Shareholder Matters 58",
-        "shareholder_matters 58",
-        "Shareholder Matters section",
-        "seção Shareholder Matters 58"
-      ],
-      "confidence": 0.93,
-      "fallbackPatterns": [
-        "\bshareholder_matters\b",
-        "\bshareholder_matters_58\b",
-        "\bshareholder_matters section\b"
-      ],
-      "description": "Canonical section shareholder_matters for 10-K Annual Report"
-    },
-    {
-      "id": "tax_notes_59",
-      "name": {
-        "en": "Tax Notes Segment 59",
-        "pt": "Tax Notes segmento 59"
-      },
-      "mustHave": false,
-      "order": 59,
-      "headingAnchors": [
-        "Tax Notes 59",
-        "tax_notes 59",
-        "Tax Notes section",
-        "seção Tax Notes 59"
-      ],
-      "confidence": 0.94,
-      "fallbackPatterns": [
-        "\btax_notes\b",
-        "\btax_notes_59\b",
-        "\btax_notes section\b"
-      ],
-      "description": "Canonical section tax_notes for 10-K Annual Report"
-    },
-    {
-      "id": "executive_summary_60",
-      "name": {
-        "en": "Executive Summary Segment 60",
-        "pt": "Executive Summary segmento 60"
-      },
-      "mustHave": false,
-      "order": 60,
-      "headingAnchors": [
-        "Executive Summary 60",
-        "executive_summary 60",
-        "Executive Summary section",
-        "seção Executive Summary 60"
-      ],
-      "confidence": 0.8,
-      "fallbackPatterns": [
-        "\bexecutive_summary\b",
-        "\bexecutive_summary_60\b",
-        "\bexecutive_summary section\b"
-      ],
-      "description": "Canonical section executive_summary for 10-K Annual Report"
-    },
-    {
-      "id": "business_overview_61",
-      "name": {
-        "en": "Business Overview Segment 61",
-        "pt": "Business Overview segmento 61"
-      },
-      "mustHave": false,
-      "order": 61,
-      "headingAnchors": [
-        "Business Overview 61",
-        "business_overview 61",
-        "Business Overview section",
-        "seção Business Overview 61"
-      ],
-      "confidence": 0.81,
-      "fallbackPatterns": [
-        "\bbusiness_overview\b",
-        "\bbusiness_overview_61\b",
-        "\bbusiness_overview section\b"
-      ],
-      "description": "Canonical section business_overview for 10-K Annual Report"
-    },
-    {
-      "id": "fiscal_position_62",
-      "name": {
-        "en": "Fiscal Position Segment 62",
-        "pt": "Fiscal Position segmento 62"
-      },
-      "mustHave": false,
-      "order": 62,
-      "headingAnchors": [
-        "Fiscal Position 62",
-        "fiscal_position 62",
-        "Fiscal Position section",
-        "seção Fiscal Position 62"
-      ],
-      "confidence": 0.82,
-      "fallbackPatterns": [
-        "\bfiscal_position\b",
-        "\bfiscal_position_62\b",
-        "\bfiscal_position section\b"
-      ],
-      "description": "Canonical section fiscal_position for 10-K Annual Report"
+        "Executive Summary",
+        "Resumo Executivo"
+      ]
     }
   ]
 }

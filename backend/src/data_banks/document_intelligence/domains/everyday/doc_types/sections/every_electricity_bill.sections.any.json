@@ -25,11 +25,10 @@
       "id": "document_header",
       "name": {
         "en": "Document Header",
-        "pt": "Cabecalho do Documento"
+        "pt": "Cabeçalho do Documento"
       },
       "order": 1,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "electricity bill",
         "kwh",
@@ -44,7 +43,6 @@
       },
       "order": 2,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "provider",
         "utility",
@@ -60,7 +58,6 @@
       },
       "order": 3,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "service address",
         "endereco",
@@ -71,11 +68,10 @@
       "id": "billing_period",
       "name": {
         "en": "Billing Period",
-        "pt": "Periodo de Medicao"
+        "pt": "Período de Medicao"
       },
       "order": 4,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "period",
         "from",
@@ -91,7 +87,6 @@
       },
       "order": 5,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "meter",
         "reading",
@@ -106,7 +101,6 @@
       },
       "order": 6,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "consumption",
         "kwh",
@@ -121,7 +115,6 @@
       },
       "order": 7,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "tariff",
         "rate",
@@ -136,7 +129,6 @@
       },
       "order": 8,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "energy charge",
         "icms",
@@ -152,7 +144,6 @@
       },
       "order": 9,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "total",
         "amount due",
@@ -167,7 +158,6 @@
       },
       "order": 10,
       "required": false,
-      "mustHave": false,
       "headingAnchors": [
         "notice",
         "maintenance",

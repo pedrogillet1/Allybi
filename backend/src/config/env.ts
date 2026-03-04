@@ -107,8 +107,6 @@ interface EnvConfig {
   // AI / LLM
   OPENAI_API_KEY: string;
   GEMINI_API_KEY: string;
-  MISTRAL_API_KEY: string;
-  CLAUDE_API_KEY: string;
   // Search
   GOOGLE_SEARCH_API_KEY: string;
   GOOGLE_SEARCH_ENGINE_ID: string;
@@ -142,6 +140,17 @@ interface EnvConfig {
   YOUTUBE_API_KEY?: string;
   YOUTUBE_CHANNEL_ID?: string;
   TIKTOK_ACCESS_TOKEN?: string;
+
+  // Document AI (optional)
+  DOCUMENT_AI_PROCESSOR_ID?: string;
+  DOCUMENT_AI_LOCATION?: string;
+  DOCUMENT_AI_ENABLED?: string;
+
+  // Editing save mode (optional)
+  KODA_EDITING_SAVE_MODE?: string;
+
+  // PPTX Image OCR (optional)
+  PPTX_IMAGE_OCR_ENABLED?: string;
 
   // GCP Workers (Pub/Sub)
   USE_GCP_WORKERS?: boolean;
@@ -221,10 +230,8 @@ export const config: EnvConfig = {
   INFOBIP_BASE_URL: process.env.INFOBIP_BASE_URL || "",
   EMAIL_FROM: process.env.EMAIL_FROM || "info@allybi.co",
   // AI / LLM
-  OPENAI_API_KEY: getEnvVar("OPENAI_API_KEY"),
+  OPENAI_API_KEY: getEnvVar("OPENAI_API_KEY", false),
   GEMINI_API_KEY: getEnvVar("GEMINI_API_KEY", false),
-  MISTRAL_API_KEY: getEnvVar("MISTRAL_API_KEY", false),
-  CLAUDE_API_KEY: getEnvVar("CLAUDE_API_KEY", false),
   // Search
   GOOGLE_SEARCH_API_KEY: getEnvVar("GOOGLE_SEARCH_API_KEY", false),
   GOOGLE_SEARCH_ENGINE_ID: getEnvVar("GOOGLE_SEARCH_ENGINE_ID", false),
@@ -258,6 +265,17 @@ export const config: EnvConfig = {
   YOUTUBE_API_KEY: getEnvVar("YOUTUBE_API_KEY", false),
   YOUTUBE_CHANNEL_ID: getEnvVar("YOUTUBE_CHANNEL_ID", false),
   TIKTOK_ACCESS_TOKEN: getEnvVar("TIKTOK_ACCESS_TOKEN", false),
+
+  // Document AI (optional)
+  DOCUMENT_AI_PROCESSOR_ID: getEnvVar("DOCUMENT_AI_PROCESSOR_ID", false),
+  DOCUMENT_AI_LOCATION: getEnvVar("DOCUMENT_AI_LOCATION", false) || "us",
+  DOCUMENT_AI_ENABLED: getEnvVar("DOCUMENT_AI_ENABLED", false) || "false",
+
+  // Editing save mode (optional — defaults to "revision" for versioning safety)
+  KODA_EDITING_SAVE_MODE: getEnvVar("KODA_EDITING_SAVE_MODE", false) || "revision",
+
+  // PPTX Image OCR (optional)
+  PPTX_IMAGE_OCR_ENABLED: getEnvVar("PPTX_IMAGE_OCR_ENABLED", false) || "false",
 
   // GCP Workers (Pub/Sub)
   USE_GCP_WORKERS: process.env.USE_GCP_WORKERS === "true",

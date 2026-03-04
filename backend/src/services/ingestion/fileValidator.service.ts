@@ -5,7 +5,7 @@
  *
  * VALIDATION LAYERS:
  * 1. File type validation (supported formats)
- * 2. File size validation (max 50MB)
+ * 2. File size validation (uses centralized UPLOAD_CONFIG.MAX_FILE_SIZE_BYTES)
  * 3. File integrity validation (not corrupted)
  * 4. Password protection detection
  * 5. OCR quality validation (for scanned documents)
@@ -15,6 +15,7 @@
 
 import * as XLSX from "xlsx";
 import mammoth from "mammoth";
+import { UPLOAD_CONFIG } from "../../config/upload.config";
 
 export interface ValidationResult {
   isValid: boolean;
@@ -76,16 +77,23 @@ const MAGIC_BYTES: Record<string, { signature: number[]; offset?: number }[]> =
     ],
   };
 
+/** Legacy formats that should be rejected with a specific conversion suggestion. */
+const LEGACY_FORMAT_SUGGESTIONS: Record<string, string> = {
+  "application/msword":
+    "Legacy .doc format is not supported. Please convert to .docx (File > Save As > .docx) and re-upload.",
+  "application/vnd.ms-excel":
+    "Legacy .xls format is not supported. Please convert to .xlsx (File > Save As > .xlsx) and re-upload.",
+  "application/vnd.ms-powerpoint":
+    "Legacy .ppt format is not supported. Please convert to .pptx (File > Save As > .pptx) and re-upload.",
+};
+
 class FileValidatorService {
   // Supported file types (aligned with text extraction service)
   private supportedTypes = [
     "application/pdf",
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
-    "application/msword", // .doc
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
-    "application/vnd.ms-excel", // .xls
     "application/vnd.openxmlformats-officedocument.presentationml.presentation", // .pptx
-    "application/vnd.ms-powerpoint", // .ppt
     "text/plain", // .txt
     "text/html", // .html
     "text/csv", // .csv
@@ -175,8 +183,8 @@ class FileValidatorService {
     return { isValid: true };
   }
 
-  // Max file size: 50MB
-  private maxFileSize = 50 * 1024 * 1024;
+  // Max file size: uses centralized upload config (single source of truth)
+  private maxFileSize = UPLOAD_CONFIG.MAX_FILE_SIZE_BYTES;
 
   /**
    * LAYER 1: Client-Side Pre-Upload Validation
@@ -192,6 +200,17 @@ class FileValidatorService {
     size: number;
     name: string;
   }): ValidationResult {
+    // Check for legacy Office formats first
+    const legacySuggestion = LEGACY_FORMAT_SUGGESTIONS[file.type];
+    if (legacySuggestion) {
+      return {
+        isValid: false,
+        error: `File type not supported: ${file.type}`,
+        errorCode: ValidationErrorCode.UNSUPPORTED_TYPE,
+        suggestion: legacySuggestion,
+      };
+    }
+
     // Check file type
     if (!this.supportedTypes.includes(file.type)) {
       return {
@@ -235,6 +254,17 @@ class FileValidatorService {
     filename: string,
   ): Promise<ValidationResult> {
     try {
+      // Check for legacy Office formats first
+      const legacySuggestion = LEGACY_FORMAT_SUGGESTIONS[mimeType];
+      if (legacySuggestion) {
+        return {
+          isValid: false,
+          error: `Unsupported file type: ${mimeType}`,
+          errorCode: ValidationErrorCode.UNSUPPORTED_TYPE,
+          suggestion: legacySuggestion,
+        };
+      }
+
       // Check file type again (don't trust client)
       if (!this.supportedTypes.includes(mimeType)) {
         return {
@@ -252,7 +282,7 @@ class FileValidatorService {
           isValid: false,
           error: "File too large",
           errorCode: ValidationErrorCode.FILE_TOO_LARGE,
-          suggestion: "Please reduce file size to under 50MB.",
+          suggestion: `Please reduce file size to under ${(this.maxFileSize / (1024 * 1024)).toFixed(0)}MB.`,
         };
       }
 
@@ -422,9 +452,12 @@ class FileValidatorService {
       // For now, we'll catch errors during extraction
       return { isValid: true };
     } catch (error: any) {
-      // If we can't check, assume it's okay
-      // Errors will be caught during extraction
-      return { isValid: true };
+      return {
+        isValid: false,
+        errorCode: ValidationErrorCode.FILE_CORRUPTED,
+        suggestion:
+          "File could not be read. It may be corrupted or password-protected.",
+      };
     }
   }
 

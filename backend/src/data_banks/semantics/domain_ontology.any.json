@@ -15,7 +15,8 @@
     ],
     "tests": [
       "tests/patternWiringProof.test.ts"
-    ]
+    ],
+    "ssotRole": "root_taxonomy"
   },
   "config": {
     "enabled": true,
@@ -355,6 +356,146 @@
         "billing"
       ],
       "defaultChild": "general"
+    },
+    {
+      "id": "tax",
+      "label": {
+        "en": "Tax",
+        "pt": "Tributário"
+      },
+      "children": [
+        "accounting_tax_us",
+        "accounting_tax_br",
+        "taxes_property_fees"
+      ],
+      "relatedParents": [
+        "accounting",
+        "finance",
+        "billing",
+        "personal_docs"
+      ],
+      "defaultChild": "accounting_tax_us"
+    },
+    {
+      "id": "ops",
+      "label": {
+        "en": "Operations",
+        "pt": "Operações"
+      },
+      "children": [
+        "ops_incident",
+        "ops_maintenance",
+        "ops_quality"
+      ],
+      "relatedParents": [
+        "finance",
+        "legal"
+      ],
+      "defaultChild": "ops_incident"
+    },
+    {
+      "id": "hr_payroll",
+      "label": {
+        "en": "HR & Payroll",
+        "pt": "RH e Folha de Pagamento"
+      },
+      "children": [
+        "hr_benefits",
+        "hr_compensation",
+        "hr_timekeeping"
+      ],
+      "relatedParents": [
+        "finance",
+        "accounting",
+        "legal"
+      ],
+      "defaultChild": "hr_compensation"
+    },
+    {
+      "id": "identity",
+      "label": {
+        "en": "Identity Documents",
+        "pt": "Documentos de Identidade"
+      },
+      "children": [
+        "identity_docs",
+        "address_proof"
+      ],
+      "relatedParents": [
+        "personal_docs",
+        "legal",
+        "insurance"
+      ],
+      "defaultChild": "identity_docs"
+    },
+    {
+      "id": "education",
+      "label": {
+        "en": "Education",
+        "pt": "Educação"
+      },
+      "children": [
+        "edu_academic",
+        "edu_financial_aid"
+      ],
+      "relatedParents": [
+        "personal_docs",
+        "finance"
+      ],
+      "defaultChild": "edu_academic"
+    },
+    {
+      "id": "everyday",
+      "label": {
+        "en": "Everyday Documents",
+        "pt": "Documentos do Dia a Dia"
+      },
+      "children": [
+        "identity_docs",
+        "utilities_bills",
+        "receipts_proof_of_payment"
+      ],
+      "relatedParents": [
+        "personal_docs",
+        "billing",
+        "banking",
+        "insurance"
+      ],
+      "defaultChild": "utilities_bills"
+    },
+    {
+      "id": "housing",
+      "label": {
+        "en": "Housing",
+        "pt": "Moradia"
+      },
+      "children": [
+        "housing_rent_mortgage"
+      ],
+      "relatedParents": [
+        "personal_docs",
+        "finance",
+        "legal",
+        "insurance"
+      ],
+      "defaultChild": "housing_rent_mortgage"
+    },
+    {
+      "id": "travel",
+      "label": {
+        "en": "Travel",
+        "pt": "Viagens"
+      },
+      "children": [
+        "travel_transport",
+        "travel_accommodation"
+      ],
+      "relatedParents": [
+        "personal_docs",
+        "insurance",
+        "billing"
+      ],
+      "defaultChild": "travel_transport"
     }
   ],
   "subdomains": [
@@ -1173,6 +1314,116 @@
       },
       "retrievalProfile": "balanced",
       "formattingProfile": "default",
+      "terminologyKey": "general"
+    },
+    {
+      "id": "ops_incident",
+      "parentId": "ops",
+      "docAffinity": {
+        "preferredDocTypes": ["pdf", "docx"],
+        "ocrTolerance": "medium"
+      },
+      "retrievalProfile": "balanced",
+      "formattingProfile": "bullets_first",
+      "terminologyKey": "general"
+    },
+    {
+      "id": "ops_maintenance",
+      "parentId": "ops",
+      "docAffinity": {
+        "preferredDocTypes": ["pdf", "xlsx"],
+        "ocrTolerance": "medium"
+      },
+      "retrievalProfile": "balanced",
+      "formattingProfile": "tables_first",
+      "terminologyKey": "general"
+    },
+    {
+      "id": "ops_quality",
+      "parentId": "ops",
+      "docAffinity": {
+        "preferredDocTypes": ["pdf", "docx"],
+        "ocrTolerance": "medium"
+      },
+      "retrievalProfile": "balanced",
+      "formattingProfile": "bullets_first",
+      "terminologyKey": "general"
+    },
+    {
+      "id": "hr_benefits",
+      "parentId": "hr_payroll",
+      "docAffinity": {
+        "preferredDocTypes": ["pdf", "docx"],
+        "ocrTolerance": "medium"
+      },
+      "retrievalProfile": "field_extraction",
+      "formattingProfile": "fields_first",
+      "terminologyKey": "general"
+    },
+    {
+      "id": "hr_compensation",
+      "parentId": "hr_payroll",
+      "docAffinity": {
+        "preferredDocTypes": ["pdf", "xlsx"],
+        "ocrTolerance": "medium"
+      },
+      "retrievalProfile": "numbers_first",
+      "formattingProfile": "numbers_first",
+      "terminologyKey": "general"
+    },
+    {
+      "id": "hr_timekeeping",
+      "parentId": "hr_payroll",
+      "docAffinity": {
+        "preferredDocTypes": ["pdf", "xlsx"],
+        "ocrTolerance": "medium"
+      },
+      "retrievalProfile": "numbers_first",
+      "formattingProfile": "tables_first",
+      "terminologyKey": "general"
+    },
+    {
+      "id": "edu_academic",
+      "parentId": "education",
+      "docAffinity": {
+        "preferredDocTypes": ["pdf", "docx"],
+        "ocrTolerance": "medium"
+      },
+      "retrievalProfile": "balanced",
+      "formattingProfile": "bullets_first",
+      "terminologyKey": "general"
+    },
+    {
+      "id": "edu_financial_aid",
+      "parentId": "education",
+      "docAffinity": {
+        "preferredDocTypes": ["pdf"],
+        "ocrTolerance": "medium"
+      },
+      "retrievalProfile": "numbers_first",
+      "formattingProfile": "fields_first",
+      "terminologyKey": "general"
+    },
+    {
+      "id": "travel_transport",
+      "parentId": "travel",
+      "docAffinity": {
+        "preferredDocTypes": ["pdf", "jpg", "jpeg", "png"],
+        "ocrTolerance": "high"
+      },
+      "retrievalProfile": "field_extraction",
+      "formattingProfile": "fields_first",
+      "terminologyKey": "general"
+    },
+    {
+      "id": "travel_accommodation",
+      "parentId": "travel",
+      "docAffinity": {
+        "preferredDocTypes": ["pdf"],
+        "ocrTolerance": "medium"
+      },
+      "retrievalProfile": "field_extraction",
+      "formattingProfile": "fields_first",
       "terminologyKey": "general"
     }
   ],

@@ -1,0 +1,25 @@
+{"id":"TC-001","query":"total revenue in thousands from Q1","mustCite":["doc-financial-001"],"mustContainValue":"1,250","mustPreserveUnit":"USD","category":"scaleFactor"}
+{"id":"TC-002","query":"operating margin percentage","mustCite":["doc-financial-001"],"mustContainValue":"23.5","mustPreserveUnit":"%","category":"unit_preservation"}
+{"id":"TC-003","query":"cost did NOT increase","mustCite":["doc-annual-report-001"],"mustPreserveNegation":"NOT increase","category":"negation"}
+{"id":"TC-004","query":"compare revenue doc A vs doc B","mustCite":["doc-report-A","doc-report-B"],"mustDetectConflict":true,"category":"crossdoc"}
+{"id":"TC-005","query":"footnote about restated figures","mustCite":["doc-restated-001"],"mustContainFootnote":"Restated","category":"footnotes"}
+{"id":"TC-006","query":"net income from merged header row","mustCite":["doc-merged-001"],"mustContainValue":"850","mustPreserveUnit":"USD","category":"mergedCells"}
+{"id":"TC-007","query":"Q2 expenses under merged department header","mustCite":["doc-merged-002"],"mustContainValue":"2,300","mustPreserveUnit":"USD","category":"mergedCells"}
+{"id":"TC-008","query":"employee count from merged region cells","mustCite":["doc-merged-003"],"mustContainValue":"1,450","mustPreserveUnit":"headcount","category":"mergedCells"}
+{"id":"TC-009","query":"total assets under consolidated merged header","mustCite":["doc-merged-004"],"mustContainValue":"15,200","mustPreserveUnit":"USD","category":"mergedCells"}
+{"id":"TC-010","query":"quarterly sales from vertically merged product rows","mustCite":["doc-merged-005"],"mustContainValue":"4,750","mustPreserveUnit":"USD","category":"mergedCells"}
+{"id":"TC-011","query":"total revenue across all regional sheets","mustCite":["doc-multi-sheet-001"],"mustContainValue":"12,500","mustPreserveUnit":"USD","mustTrackSheet":true,"category":"multiSheet"}
+{"id":"TC-012","query":"compare Q1 vs Q2 from different worksheet tabs","mustCite":["doc-multi-sheet-002"],"mustDetectConflict":false,"mustTrackSheet":true,"category":"multiSheet"}
+{"id":"TC-013","query":"sum inventory from warehouse sheet and retail sheet","mustCite":["doc-multi-sheet-003"],"mustContainValue":"8,200","mustPreserveUnit":"units","mustTrackSheet":true,"category":"multiSheet"}
+{"id":"TC-014","query":"total expenses mixing USD and EUR","mustCite":["doc-currency-001"],"mustDetectConflict":true,"mustPreserveUnit":"mixed","category":"currencyMixed"}
+{"id":"TC-015","query":"net profit in BRL when costs are in USD","mustCite":["doc-currency-002"],"mustContainValue":"45,000","mustPreserveUnit":"BRL","category":"currencyMixed"}
+{"id":"TC-016","query":"compare salaries across USD GBP EUR columns","mustCite":["doc-currency-003"],"mustDetectConflict":true,"mustPreserveUnit":"mixed","category":"currencyMixed"}
+{"id":"TC-017","query":"trial balance debit total for period","mustCite":["doc-trial-balance-001"],"mustContainValue":"500,000","mustPreserveUnit":"USD","category":"accounting_specific","domainHint":"accounting"}
+{"id":"TC-018","query":"total deposits in bank statement transaction table","mustCite":["doc-bank-stmt-001"],"mustContainValue":"15,750","mustPreserveUnit":"USD","category":"banking_specific","domainHint":"banking"}
+{"id":"TC-019","query":"coverage limit from insurance schedule table","mustCite":["doc-insurance-001"],"mustContainValue":"1,000,000","mustPreserveUnit":"USD","category":"insurance_specific","domainHint":"insurance"}
+{"id":"TC-020","query":"total hours from timesheet weekly grid","mustCite":["doc-timesheet-001"],"mustContainValue":"42.5","mustPreserveUnit":"hours","category":"hr_specific","domainHint":"hr_payroll"}
+{"id":"TC-021","query":"hemoglobin level from lab results with reference range","mustCite":["doc-lab-001"],"mustContainValue":"14.2","mustPreserveUnit":"g/dL","mustContainReferenceRange":"12.0-17.5","category":"medical_specific","domainHint":"medical"}
+{"id":"TC-022","query":"revenue in millions USD vs costs in thousands EUR","mustCite":["doc-scale-001"],"mustDetectConflict":true,"mustPreserveUnit":"mixed","category":"scaleConflict"}
+{"id":"TC-023","query":"compare BRL thousands to USD millions","mustCite":["doc-scale-002"],"mustDetectConflict":true,"mustPreserveUnit":"mixed","category":"scaleConflict"}
+{"id":"TC-024","query":"EBITDA in billions from consolidated report","mustCite":["doc-scale-003"],"mustContainValue":"2.4","mustPreserveUnit":"USD","scaleFactor":"billions","category":"scaleConflict"}
+{"id":"TC-025","query":"operating expenses with mixed K and M notation","mustCite":["doc-scale-004"],"mustContainValue":"3,500","mustPreserveUnit":"USD","scaleFactor":"thousands","category":"scaleConflict"}

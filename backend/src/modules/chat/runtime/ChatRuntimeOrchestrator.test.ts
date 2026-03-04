@@ -599,7 +599,7 @@ describe("ChatRuntimeOrchestrator", () => {
       delegate.streamChat.mockResolvedValue(raw);
 
       const sink = { write: jest.fn(), end: jest.fn() } as any;
-      const streamingConfig = { model: "gpt-4" } as any;
+      const streamingConfig = { model: "gpt-5.2" } as any;
 
       const result = await orchestrator.streamChat({
         req: makeChatRequest(),
@@ -616,7 +616,7 @@ describe("ChatRuntimeOrchestrator", () => {
       delegate.streamChat.mockResolvedValue(makeChatResult());
 
       const sink = { write: jest.fn(), end: jest.fn() } as any;
-      const streamingConfig = { model: "claude-3" } as any;
+      const streamingConfig = { model: "gemini-2.5-flash" } as any;
 
       await orchestrator.streamChat({
         req: makeChatRequest(),

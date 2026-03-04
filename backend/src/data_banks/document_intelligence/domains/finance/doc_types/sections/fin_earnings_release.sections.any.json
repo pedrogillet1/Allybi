@@ -1,12 +1,12 @@
 {
   "_meta": {
     "id": "di_finance_sections_fin_earnings_release",
-    "version": "2.1.0",
+    "version": "3.0.0",
     "description": "Sections mapping for Earnings Release.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-03-03",
+    "lastUpdated": "2026-03-04",
     "owner": "data-bank-governance",
     "usedBy": [
       "services/core/banks/dataBankLoader.service.ts"
@@ -22,1368 +22,162 @@
   },
   "sections": [
     {
-      "id": "highlights_1",
+      "id": "highlights",
       "name": {
-        "en": "Highlights Segment 1",
-        "pt": "Highlights segmento 1"
+        "en": "Highlights",
+        "pt": "Destaques"
       },
-      "mustHave": true,
+      "required": true,
       "order": 1,
       "headingAnchors": [
-        "Highlights 1",
-        "highlights 1",
-        "Highlights section",
-        "seção Highlights 1"
-      ],
-      "confidence": 0.81,
-      "fallbackPatterns": [
-        "\bhighlights\b",
-        "\bhighlights_1\b",
-        "\bhighlights section\b"
-      ],
-      "description": "Canonical section highlights for Earnings Release"
+        "Highlights",
+        "Destaques"
+      ]
     },
     {
-      "id": "kpi_release_2",
+      "id": "kpi_release",
       "name": {
-        "en": "Kpi Release Segment 2",
-        "pt": "Kpi Release segmento 2"
+        "en": "Kpi Release",
+        "pt": "Kpi Release"
       },
-      "mustHave": true,
+      "required": true,
       "order": 2,
       "headingAnchors": [
-        "Kpi Release 2",
-        "kpi_release 2",
-        "Kpi Release section",
-        "seção Kpi Release 2"
-      ],
-      "confidence": 0.82,
-      "fallbackPatterns": [
-        "\bkpi_release\b",
-        "\bkpi_release_2\b",
-        "\bkpi_release section\b"
-      ],
-      "description": "Canonical section kpi_release for Earnings Release"
+        "kpi release"
+      ]
     },
     {
-      "id": "guidance_section_3",
+      "id": "guidance_section",
       "name": {
-        "en": "Guidance Section Segment 3",
-        "pt": "Guidance Section segmento 3"
+        "en": "Guidance Section",
+        "pt": "Guidance Section"
       },
-      "mustHave": true,
+      "required": true,
       "order": 3,
       "headingAnchors": [
-        "Guidance Section 3",
-        "guidance_section 3",
-        "Guidance Section section",
-        "seção Guidance Section 3"
-      ],
-      "confidence": 0.83,
-      "fallbackPatterns": [
-        "\bguidance_section\b",
-        "\bguidance_section_3\b",
-        "\bguidance_section section\b"
-      ],
-      "description": "Canonical section guidance_section for Earnings Release"
+        "guidance section"
+      ]
     },
     {
-      "id": "conference_call_4",
+      "id": "conference_call",
       "name": {
-        "en": "Conference Call Segment 4",
-        "pt": "Conference Call segmento 4"
+        "en": "Conference Call",
+        "pt": "Conference Call"
       },
-      "mustHave": true,
+      "required": true,
       "order": 4,
       "headingAnchors": [
-        "Conference Call 4",
-        "conference_call 4",
-        "Conference Call section",
-        "seção Conference Call 4"
-      ],
-      "confidence": 0.84,
-      "fallbackPatterns": [
-        "\bconference_call\b",
-        "\bconference_call_4\b",
-        "\bconference_call section\b"
-      ],
-      "description": "Canonical section conference_call for Earnings Release"
+        "conference call"
+      ]
     },
     {
-      "id": "earnings_call_note_5",
+      "id": "earnings_call_note",
       "name": {
-        "en": "Earnings Call Note Segment 5",
-        "pt": "Earnings Call Note segmento 5"
+        "en": "Earnings Call Note",
+        "pt": "Earnings Call Note"
       },
-      "mustHave": true,
+      "required": true,
       "order": 5,
       "headingAnchors": [
-        "Earnings Call Note 5",
-        "earnings_call_note 5",
-        "Earnings Call Note section",
-        "seção Earnings Call Note 5"
-      ],
-      "confidence": 0.85,
-      "fallbackPatterns": [
-        "\bearnings_call_note\b",
-        "\bearnings_call_note_5\b",
-        "\bearnings_call_note section\b"
-      ],
-      "description": "Canonical section earnings_call_note for Earnings Release"
+        "earnings call note"
+      ]
     },
     {
-      "id": "revenue_breakdown_6",
+      "id": "revenue_breakdown",
       "name": {
-        "en": "Revenue Breakdown Segment 6",
-        "pt": "Revenue Breakdown segmento 6"
+        "en": "Revenue Breakdown",
+        "pt": "Revenue Breakdown"
       },
-      "mustHave": true,
+      "required": true,
       "order": 6,
       "headingAnchors": [
-        "Revenue Breakdown 6",
-        "revenue_breakdown 6",
-        "Revenue Breakdown section",
-        "seção Revenue Breakdown 6"
-      ],
-      "confidence": 0.86,
-      "fallbackPatterns": [
-        "\brevenue_breakdown\b",
-        "\brevenue_breakdown_6\b",
-        "\brevenue_breakdown section\b"
-      ],
-      "description": "Canonical section revenue_breakdown for Earnings Release"
+        "revenue breakdown"
+      ]
     },
     {
-      "id": "margin_analysis_7",
+      "id": "margin_analysis",
       "name": {
-        "en": "Margin Analysis Segment 7",
-        "pt": "Margin Analysis segmento 7"
+        "en": "Margin Analysis",
+        "pt": "Margin Analysis"
       },
-      "mustHave": true,
+      "required": true,
       "order": 7,
       "headingAnchors": [
-        "Margin Analysis 7",
-        "margin_analysis 7",
-        "Margin Analysis section",
-        "seção Margin Analysis 7"
-      ],
-      "confidence": 0.87,
-      "fallbackPatterns": [
-        "\bmargin_analysis\b",
-        "\bmargin_analysis_7\b",
-        "\bmargin_analysis section\b"
-      ],
-      "description": "Canonical section margin_analysis for Earnings Release"
+        "margin analysis"
+      ]
     },
     {
-      "id": "cash_guidance_8",
+      "id": "cash_guidance",
       "name": {
-        "en": "Cash Guidance Segment 8",
-        "pt": "Cash Guidance segmento 8"
+        "en": "Cash Guidance",
+        "pt": "Cash Guidance"
       },
-      "mustHave": true,
+      "required": true,
       "order": 8,
       "headingAnchors": [
-        "Cash Guidance 8",
-        "cash_guidance 8",
-        "Cash Guidance section",
-        "seção Cash Guidance 8"
-      ],
-      "confidence": 0.88,
-      "fallbackPatterns": [
-        "\bcash_guidance\b",
-        "\bcash_guidance_8\b",
-        "\bcash_guidance section\b"
-      ],
-      "description": "Canonical section cash_guidance for Earnings Release"
+        "cash guidance"
+      ]
     },
     {
-      "id": "guidance_next_quarter_9",
+      "id": "guidance_next_quarter",
       "name": {
-        "en": "Guidance Next Quarter Segment 9",
-        "pt": "Guidance Next Quarter segmento 9"
+        "en": "Guidance Next Quarter",
+        "pt": "Guidance Next Quarter"
       },
-      "mustHave": true,
+      "required": false,
       "order": 9,
       "headingAnchors": [
-        "Guidance Next Quarter 9",
-        "guidance_next_quarter 9",
-        "Guidance Next Quarter section",
-        "seção Guidance Next Quarter 9"
-      ],
-      "confidence": 0.89,
-      "fallbackPatterns": [
-        "\bguidance_next_quarter\b",
-        "\bguidance_next_quarter_9\b",
-        "\bguidance_next_quarter section\b"
-      ],
-      "description": "Canonical section guidance_next_quarter for Earnings Release"
+        "guidance next quarter"
+      ]
     },
     {
-      "id": "risk_callout_10",
+      "id": "risk_callout",
       "name": {
-        "en": "Risk Callout Segment 10",
-        "pt": "Risk Callout segmento 10"
+        "en": "Risk Callout",
+        "pt": "Risk Callout"
       },
-      "mustHave": true,
+      "required": false,
       "order": 10,
       "headingAnchors": [
-        "Risk Callout 10",
-        "risk_callout 10",
-        "Risk Callout section",
-        "seção Risk Callout 10"
-      ],
-      "confidence": 0.9,
-      "fallbackPatterns": [
-        "\brisk_callout\b",
-        "\brisk_callout_10\b",
-        "\brisk_callout section\b"
-      ],
-      "description": "Canonical section risk_callout for Earnings Release"
+        "risk callout"
+      ]
     },
     {
-      "id": "appendix_11",
+      "id": "appendix",
       "name": {
-        "en": "Appendix Segment 11",
-        "pt": "Appendix segmento 11"
+        "en": "Appendix",
+        "pt": "Apêndice"
       },
-      "mustHave": false,
+      "required": false,
       "order": 11,
       "headingAnchors": [
-        "Appendix 11",
-        "appendix 11",
-        "Appendix section",
-        "seção Appendix 11"
-      ],
-      "confidence": 0.91,
-      "fallbackPatterns": [
-        "\bappendix\b",
-        "\bappendix_11\b",
-        "\bappendix section\b"
-      ],
-      "description": "Canonical section appendix for Earnings Release"
+        "Appendix",
+        "Apêndice"
+      ]
     },
     {
-      "id": "contact_box_12",
+      "id": "contact_box",
       "name": {
-        "en": "Contact Box Segment 12",
-        "pt": "Contact Box segmento 12"
+        "en": "Contact Box",
+        "pt": "Contact Box"
       },
-      "mustHave": false,
+      "required": false,
       "order": 12,
       "headingAnchors": [
-        "Contact Box 12",
-        "contact_box 12",
-        "Contact Box section",
-        "seção Contact Box 12"
-      ],
-      "confidence": 0.92,
-      "fallbackPatterns": [
-        "\bcontact_box\b",
-        "\bcontact_box_12\b",
-        "\bcontact_box section\b"
-      ],
-      "description": "Canonical section contact_box for Earnings Release"
+        "contact box"
+      ]
     },
     {
-      "id": "headline_summary_13",
+      "id": "headline_summary",
       "name": {
-        "en": "Headline Summary Segment 13",
-        "pt": "Headline Summary segmento 13"
+        "en": "Headline Summary",
+        "pt": "Headline Summary"
       },
-      "mustHave": false,
+      "required": false,
       "order": 13,
       "headingAnchors": [
-        "Headline Summary 13",
-        "headline_summary 13",
-        "Headline Summary section",
-        "seção Headline Summary 13"
-      ],
-      "confidence": 0.93,
-      "fallbackPatterns": [
-        "\bheadline_summary\b",
-        "\bheadline_summary_13\b",
-        "\bheadline_summary section\b"
-      ],
-      "description": "Canonical section headline_summary for Earnings Release"
-    },
-    {
-      "id": "highlights_14",
-      "name": {
-        "en": "Highlights Segment 14",
-        "pt": "Highlights segmento 14"
-      },
-      "mustHave": false,
-      "order": 14,
-      "headingAnchors": [
-        "Highlights 14",
-        "highlights 14",
-        "Highlights section",
-        "seção Highlights 14"
-      ],
-      "confidence": 0.94,
-      "fallbackPatterns": [
-        "\bhighlights\b",
-        "\bhighlights_14\b",
-        "\bhighlights section\b"
-      ],
-      "description": "Canonical section highlights for Earnings Release"
-    },
-    {
-      "id": "kpi_release_15",
-      "name": {
-        "en": "Kpi Release Segment 15",
-        "pt": "Kpi Release segmento 15"
-      },
-      "mustHave": false,
-      "order": 15,
-      "headingAnchors": [
-        "Kpi Release 15",
-        "kpi_release 15",
-        "Kpi Release section",
-        "seção Kpi Release 15"
-      ],
-      "confidence": 0.8,
-      "fallbackPatterns": [
-        "\bkpi_release\b",
-        "\bkpi_release_15\b",
-        "\bkpi_release section\b"
-      ],
-      "description": "Canonical section kpi_release for Earnings Release"
-    },
-    {
-      "id": "guidance_section_16",
-      "name": {
-        "en": "Guidance Section Segment 16",
-        "pt": "Guidance Section segmento 16"
-      },
-      "mustHave": false,
-      "order": 16,
-      "headingAnchors": [
-        "Guidance Section 16",
-        "guidance_section 16",
-        "Guidance Section section",
-        "seção Guidance Section 16"
-      ],
-      "confidence": 0.81,
-      "fallbackPatterns": [
-        "\bguidance_section\b",
-        "\bguidance_section_16\b",
-        "\bguidance_section section\b"
-      ],
-      "description": "Canonical section guidance_section for Earnings Release"
-    },
-    {
-      "id": "conference_call_17",
-      "name": {
-        "en": "Conference Call Segment 17",
-        "pt": "Conference Call segmento 17"
-      },
-      "mustHave": false,
-      "order": 17,
-      "headingAnchors": [
-        "Conference Call 17",
-        "conference_call 17",
-        "Conference Call section",
-        "seção Conference Call 17"
-      ],
-      "confidence": 0.82,
-      "fallbackPatterns": [
-        "\bconference_call\b",
-        "\bconference_call_17\b",
-        "\bconference_call section\b"
-      ],
-      "description": "Canonical section conference_call for Earnings Release"
-    },
-    {
-      "id": "earnings_call_note_18",
-      "name": {
-        "en": "Earnings Call Note Segment 18",
-        "pt": "Earnings Call Note segmento 18"
-      },
-      "mustHave": false,
-      "order": 18,
-      "headingAnchors": [
-        "Earnings Call Note 18",
-        "earnings_call_note 18",
-        "Earnings Call Note section",
-        "seção Earnings Call Note 18"
-      ],
-      "confidence": 0.83,
-      "fallbackPatterns": [
-        "\bearnings_call_note\b",
-        "\bearnings_call_note_18\b",
-        "\bearnings_call_note section\b"
-      ],
-      "description": "Canonical section earnings_call_note for Earnings Release"
-    },
-    {
-      "id": "revenue_breakdown_19",
-      "name": {
-        "en": "Revenue Breakdown Segment 19",
-        "pt": "Revenue Breakdown segmento 19"
-      },
-      "mustHave": false,
-      "order": 19,
-      "headingAnchors": [
-        "Revenue Breakdown 19",
-        "revenue_breakdown 19",
-        "Revenue Breakdown section",
-        "seção Revenue Breakdown 19"
-      ],
-      "confidence": 0.84,
-      "fallbackPatterns": [
-        "\brevenue_breakdown\b",
-        "\brevenue_breakdown_19\b",
-        "\brevenue_breakdown section\b"
-      ],
-      "description": "Canonical section revenue_breakdown for Earnings Release"
-    },
-    {
-      "id": "margin_analysis_20",
-      "name": {
-        "en": "Margin Analysis Segment 20",
-        "pt": "Margin Analysis segmento 20"
-      },
-      "mustHave": false,
-      "order": 20,
-      "headingAnchors": [
-        "Margin Analysis 20",
-        "margin_analysis 20",
-        "Margin Analysis section",
-        "seção Margin Analysis 20"
-      ],
-      "confidence": 0.85,
-      "fallbackPatterns": [
-        "\bmargin_analysis\b",
-        "\bmargin_analysis_20\b",
-        "\bmargin_analysis section\b"
-      ],
-      "description": "Canonical section margin_analysis for Earnings Release"
-    },
-    {
-      "id": "cash_guidance_21",
-      "name": {
-        "en": "Cash Guidance Segment 21",
-        "pt": "Cash Guidance segmento 21"
-      },
-      "mustHave": false,
-      "order": 21,
-      "headingAnchors": [
-        "Cash Guidance 21",
-        "cash_guidance 21",
-        "Cash Guidance section",
-        "seção Cash Guidance 21"
-      ],
-      "confidence": 0.86,
-      "fallbackPatterns": [
-        "\bcash_guidance\b",
-        "\bcash_guidance_21\b",
-        "\bcash_guidance section\b"
-      ],
-      "description": "Canonical section cash_guidance for Earnings Release"
-    },
-    {
-      "id": "guidance_next_quarter_22",
-      "name": {
-        "en": "Guidance Next Quarter Segment 22",
-        "pt": "Guidance Next Quarter segmento 22"
-      },
-      "mustHave": false,
-      "order": 22,
-      "headingAnchors": [
-        "Guidance Next Quarter 22",
-        "guidance_next_quarter 22",
-        "Guidance Next Quarter section",
-        "seção Guidance Next Quarter 22"
-      ],
-      "confidence": 0.87,
-      "fallbackPatterns": [
-        "\bguidance_next_quarter\b",
-        "\bguidance_next_quarter_22\b",
-        "\bguidance_next_quarter section\b"
-      ],
-      "description": "Canonical section guidance_next_quarter for Earnings Release"
-    },
-    {
-      "id": "risk_callout_23",
-      "name": {
-        "en": "Risk Callout Segment 23",
-        "pt": "Risk Callout segmento 23"
-      },
-      "mustHave": false,
-      "order": 23,
-      "headingAnchors": [
-        "Risk Callout 23",
-        "risk_callout 23",
-        "Risk Callout section",
-        "seção Risk Callout 23"
-      ],
-      "confidence": 0.88,
-      "fallbackPatterns": [
-        "\brisk_callout\b",
-        "\brisk_callout_23\b",
-        "\brisk_callout section\b"
-      ],
-      "description": "Canonical section risk_callout for Earnings Release"
-    },
-    {
-      "id": "appendix_24",
-      "name": {
-        "en": "Appendix Segment 24",
-        "pt": "Appendix segmento 24"
-      },
-      "mustHave": false,
-      "order": 24,
-      "headingAnchors": [
-        "Appendix 24",
-        "appendix 24",
-        "Appendix section",
-        "seção Appendix 24"
-      ],
-      "confidence": 0.89,
-      "fallbackPatterns": [
-        "\bappendix\b",
-        "\bappendix_24\b",
-        "\bappendix section\b"
-      ],
-      "description": "Canonical section appendix for Earnings Release"
-    },
-    {
-      "id": "contact_box_25",
-      "name": {
-        "en": "Contact Box Segment 25",
-        "pt": "Contact Box segmento 25"
-      },
-      "mustHave": false,
-      "order": 25,
-      "headingAnchors": [
-        "Contact Box 25",
-        "contact_box 25",
-        "Contact Box section",
-        "seção Contact Box 25"
-      ],
-      "confidence": 0.9,
-      "fallbackPatterns": [
-        "\bcontact_box\b",
-        "\bcontact_box_25\b",
-        "\bcontact_box section\b"
-      ],
-      "description": "Canonical section contact_box for Earnings Release"
-    },
-    {
-      "id": "headline_summary_26",
-      "name": {
-        "en": "Headline Summary Segment 26",
-        "pt": "Headline Summary segmento 26"
-      },
-      "mustHave": false,
-      "order": 26,
-      "headingAnchors": [
-        "Headline Summary 26",
-        "headline_summary 26",
-        "Headline Summary section",
-        "seção Headline Summary 26"
-      ],
-      "confidence": 0.91,
-      "fallbackPatterns": [
-        "\bheadline_summary\b",
-        "\bheadline_summary_26\b",
-        "\bheadline_summary section\b"
-      ],
-      "description": "Canonical section headline_summary for Earnings Release"
-    },
-    {
-      "id": "highlights_27",
-      "name": {
-        "en": "Highlights Segment 27",
-        "pt": "Highlights segmento 27"
-      },
-      "mustHave": false,
-      "order": 27,
-      "headingAnchors": [
-        "Highlights 27",
-        "highlights 27",
-        "Highlights section",
-        "seção Highlights 27"
-      ],
-      "confidence": 0.92,
-      "fallbackPatterns": [
-        "\bhighlights\b",
-        "\bhighlights_27\b",
-        "\bhighlights section\b"
-      ],
-      "description": "Canonical section highlights for Earnings Release"
-    },
-    {
-      "id": "kpi_release_28",
-      "name": {
-        "en": "Kpi Release Segment 28",
-        "pt": "Kpi Release segmento 28"
-      },
-      "mustHave": false,
-      "order": 28,
-      "headingAnchors": [
-        "Kpi Release 28",
-        "kpi_release 28",
-        "Kpi Release section",
-        "seção Kpi Release 28"
-      ],
-      "confidence": 0.93,
-      "fallbackPatterns": [
-        "\bkpi_release\b",
-        "\bkpi_release_28\b",
-        "\bkpi_release section\b"
-      ],
-      "description": "Canonical section kpi_release for Earnings Release"
-    },
-    {
-      "id": "guidance_section_29",
-      "name": {
-        "en": "Guidance Section Segment 29",
-        "pt": "Guidance Section segmento 29"
-      },
-      "mustHave": false,
-      "order": 29,
-      "headingAnchors": [
-        "Guidance Section 29",
-        "guidance_section 29",
-        "Guidance Section section",
-        "seção Guidance Section 29"
-      ],
-      "confidence": 0.94,
-      "fallbackPatterns": [
-        "\bguidance_section\b",
-        "\bguidance_section_29\b",
-        "\bguidance_section section\b"
-      ],
-      "description": "Canonical section guidance_section for Earnings Release"
-    },
-    {
-      "id": "conference_call_30",
-      "name": {
-        "en": "Conference Call Segment 30",
-        "pt": "Conference Call segmento 30"
-      },
-      "mustHave": false,
-      "order": 30,
-      "headingAnchors": [
-        "Conference Call 30",
-        "conference_call 30",
-        "Conference Call section",
-        "seção Conference Call 30"
-      ],
-      "confidence": 0.8,
-      "fallbackPatterns": [
-        "\bconference_call\b",
-        "\bconference_call_30\b",
-        "\bconference_call section\b"
-      ],
-      "description": "Canonical section conference_call for Earnings Release"
-    },
-    {
-      "id": "earnings_call_note_31",
-      "name": {
-        "en": "Earnings Call Note Segment 31",
-        "pt": "Earnings Call Note segmento 31"
-      },
-      "mustHave": false,
-      "order": 31,
-      "headingAnchors": [
-        "Earnings Call Note 31",
-        "earnings_call_note 31",
-        "Earnings Call Note section",
-        "seção Earnings Call Note 31"
-      ],
-      "confidence": 0.81,
-      "fallbackPatterns": [
-        "\bearnings_call_note\b",
-        "\bearnings_call_note_31\b",
-        "\bearnings_call_note section\b"
-      ],
-      "description": "Canonical section earnings_call_note for Earnings Release"
-    },
-    {
-      "id": "revenue_breakdown_32",
-      "name": {
-        "en": "Revenue Breakdown Segment 32",
-        "pt": "Revenue Breakdown segmento 32"
-      },
-      "mustHave": false,
-      "order": 32,
-      "headingAnchors": [
-        "Revenue Breakdown 32",
-        "revenue_breakdown 32",
-        "Revenue Breakdown section",
-        "seção Revenue Breakdown 32"
-      ],
-      "confidence": 0.82,
-      "fallbackPatterns": [
-        "\brevenue_breakdown\b",
-        "\brevenue_breakdown_32\b",
-        "\brevenue_breakdown section\b"
-      ],
-      "description": "Canonical section revenue_breakdown for Earnings Release"
-    },
-    {
-      "id": "margin_analysis_33",
-      "name": {
-        "en": "Margin Analysis Segment 33",
-        "pt": "Margin Analysis segmento 33"
-      },
-      "mustHave": false,
-      "order": 33,
-      "headingAnchors": [
-        "Margin Analysis 33",
-        "margin_analysis 33",
-        "Margin Analysis section",
-        "seção Margin Analysis 33"
-      ],
-      "confidence": 0.83,
-      "fallbackPatterns": [
-        "\bmargin_analysis\b",
-        "\bmargin_analysis_33\b",
-        "\bmargin_analysis section\b"
-      ],
-      "description": "Canonical section margin_analysis for Earnings Release"
-    },
-    {
-      "id": "cash_guidance_34",
-      "name": {
-        "en": "Cash Guidance Segment 34",
-        "pt": "Cash Guidance segmento 34"
-      },
-      "mustHave": false,
-      "order": 34,
-      "headingAnchors": [
-        "Cash Guidance 34",
-        "cash_guidance 34",
-        "Cash Guidance section",
-        "seção Cash Guidance 34"
-      ],
-      "confidence": 0.84,
-      "fallbackPatterns": [
-        "\bcash_guidance\b",
-        "\bcash_guidance_34\b",
-        "\bcash_guidance section\b"
-      ],
-      "description": "Canonical section cash_guidance for Earnings Release"
-    },
-    {
-      "id": "guidance_next_quarter_35",
-      "name": {
-        "en": "Guidance Next Quarter Segment 35",
-        "pt": "Guidance Next Quarter segmento 35"
-      },
-      "mustHave": false,
-      "order": 35,
-      "headingAnchors": [
-        "Guidance Next Quarter 35",
-        "guidance_next_quarter 35",
-        "Guidance Next Quarter section",
-        "seção Guidance Next Quarter 35"
-      ],
-      "confidence": 0.85,
-      "fallbackPatterns": [
-        "\bguidance_next_quarter\b",
-        "\bguidance_next_quarter_35\b",
-        "\bguidance_next_quarter section\b"
-      ],
-      "description": "Canonical section guidance_next_quarter for Earnings Release"
-    },
-    {
-      "id": "risk_callout_36",
-      "name": {
-        "en": "Risk Callout Segment 36",
-        "pt": "Risk Callout segmento 36"
-      },
-      "mustHave": false,
-      "order": 36,
-      "headingAnchors": [
-        "Risk Callout 36",
-        "risk_callout 36",
-        "Risk Callout section",
-        "seção Risk Callout 36"
-      ],
-      "confidence": 0.86,
-      "fallbackPatterns": [
-        "\brisk_callout\b",
-        "\brisk_callout_36\b",
-        "\brisk_callout section\b"
-      ],
-      "description": "Canonical section risk_callout for Earnings Release"
-    },
-    {
-      "id": "appendix_37",
-      "name": {
-        "en": "Appendix Segment 37",
-        "pt": "Appendix segmento 37"
-      },
-      "mustHave": false,
-      "order": 37,
-      "headingAnchors": [
-        "Appendix 37",
-        "appendix 37",
-        "Appendix section",
-        "seção Appendix 37"
-      ],
-      "confidence": 0.87,
-      "fallbackPatterns": [
-        "\bappendix\b",
-        "\bappendix_37\b",
-        "\bappendix section\b"
-      ],
-      "description": "Canonical section appendix for Earnings Release"
-    },
-    {
-      "id": "contact_box_38",
-      "name": {
-        "en": "Contact Box Segment 38",
-        "pt": "Contact Box segmento 38"
-      },
-      "mustHave": false,
-      "order": 38,
-      "headingAnchors": [
-        "Contact Box 38",
-        "contact_box 38",
-        "Contact Box section",
-        "seção Contact Box 38"
-      ],
-      "confidence": 0.88,
-      "fallbackPatterns": [
-        "\bcontact_box\b",
-        "\bcontact_box_38\b",
-        "\bcontact_box section\b"
-      ],
-      "description": "Canonical section contact_box for Earnings Release"
-    },
-    {
-      "id": "headline_summary_39",
-      "name": {
-        "en": "Headline Summary Segment 39",
-        "pt": "Headline Summary segmento 39"
-      },
-      "mustHave": false,
-      "order": 39,
-      "headingAnchors": [
-        "Headline Summary 39",
-        "headline_summary 39",
-        "Headline Summary section",
-        "seção Headline Summary 39"
-      ],
-      "confidence": 0.89,
-      "fallbackPatterns": [
-        "\bheadline_summary\b",
-        "\bheadline_summary_39\b",
-        "\bheadline_summary section\b"
-      ],
-      "description": "Canonical section headline_summary for Earnings Release"
-    },
-    {
-      "id": "highlights_40",
-      "name": {
-        "en": "Highlights Segment 40",
-        "pt": "Highlights segmento 40"
-      },
-      "mustHave": false,
-      "order": 40,
-      "headingAnchors": [
-        "Highlights 40",
-        "highlights 40",
-        "Highlights section",
-        "seção Highlights 40"
-      ],
-      "confidence": 0.9,
-      "fallbackPatterns": [
-        "\bhighlights\b",
-        "\bhighlights_40\b",
-        "\bhighlights section\b"
-      ],
-      "description": "Canonical section highlights for Earnings Release"
-    },
-    {
-      "id": "kpi_release_41",
-      "name": {
-        "en": "Kpi Release Segment 41",
-        "pt": "Kpi Release segmento 41"
-      },
-      "mustHave": false,
-      "order": 41,
-      "headingAnchors": [
-        "Kpi Release 41",
-        "kpi_release 41",
-        "Kpi Release section",
-        "seção Kpi Release 41"
-      ],
-      "confidence": 0.91,
-      "fallbackPatterns": [
-        "\bkpi_release\b",
-        "\bkpi_release_41\b",
-        "\bkpi_release section\b"
-      ],
-      "description": "Canonical section kpi_release for Earnings Release"
-    },
-    {
-      "id": "guidance_section_42",
-      "name": {
-        "en": "Guidance Section Segment 42",
-        "pt": "Guidance Section segmento 42"
-      },
-      "mustHave": false,
-      "order": 42,
-      "headingAnchors": [
-        "Guidance Section 42",
-        "guidance_section 42",
-        "Guidance Section section",
-        "seção Guidance Section 42"
-      ],
-      "confidence": 0.92,
-      "fallbackPatterns": [
-        "\bguidance_section\b",
-        "\bguidance_section_42\b",
-        "\bguidance_section section\b"
-      ],
-      "description": "Canonical section guidance_section for Earnings Release"
-    },
-    {
-      "id": "conference_call_43",
-      "name": {
-        "en": "Conference Call Segment 43",
-        "pt": "Conference Call segmento 43"
-      },
-      "mustHave": false,
-      "order": 43,
-      "headingAnchors": [
-        "Conference Call 43",
-        "conference_call 43",
-        "Conference Call section",
-        "seção Conference Call 43"
-      ],
-      "confidence": 0.93,
-      "fallbackPatterns": [
-        "\bconference_call\b",
-        "\bconference_call_43\b",
-        "\bconference_call section\b"
-      ],
-      "description": "Canonical section conference_call for Earnings Release"
-    },
-    {
-      "id": "earnings_call_note_44",
-      "name": {
-        "en": "Earnings Call Note Segment 44",
-        "pt": "Earnings Call Note segmento 44"
-      },
-      "mustHave": false,
-      "order": 44,
-      "headingAnchors": [
-        "Earnings Call Note 44",
-        "earnings_call_note 44",
-        "Earnings Call Note section",
-        "seção Earnings Call Note 44"
-      ],
-      "confidence": 0.94,
-      "fallbackPatterns": [
-        "\bearnings_call_note\b",
-        "\bearnings_call_note_44\b",
-        "\bearnings_call_note section\b"
-      ],
-      "description": "Canonical section earnings_call_note for Earnings Release"
-    },
-    {
-      "id": "revenue_breakdown_45",
-      "name": {
-        "en": "Revenue Breakdown Segment 45",
-        "pt": "Revenue Breakdown segmento 45"
-      },
-      "mustHave": false,
-      "order": 45,
-      "headingAnchors": [
-        "Revenue Breakdown 45",
-        "revenue_breakdown 45",
-        "Revenue Breakdown section",
-        "seção Revenue Breakdown 45"
-      ],
-      "confidence": 0.8,
-      "fallbackPatterns": [
-        "\brevenue_breakdown\b",
-        "\brevenue_breakdown_45\b",
-        "\brevenue_breakdown section\b"
-      ],
-      "description": "Canonical section revenue_breakdown for Earnings Release"
-    },
-    {
-      "id": "margin_analysis_46",
-      "name": {
-        "en": "Margin Analysis Segment 46",
-        "pt": "Margin Analysis segmento 46"
-      },
-      "mustHave": false,
-      "order": 46,
-      "headingAnchors": [
-        "Margin Analysis 46",
-        "margin_analysis 46",
-        "Margin Analysis section",
-        "seção Margin Analysis 46"
-      ],
-      "confidence": 0.81,
-      "fallbackPatterns": [
-        "\bmargin_analysis\b",
-        "\bmargin_analysis_46\b",
-        "\bmargin_analysis section\b"
-      ],
-      "description": "Canonical section margin_analysis for Earnings Release"
-    },
-    {
-      "id": "cash_guidance_47",
-      "name": {
-        "en": "Cash Guidance Segment 47",
-        "pt": "Cash Guidance segmento 47"
-      },
-      "mustHave": false,
-      "order": 47,
-      "headingAnchors": [
-        "Cash Guidance 47",
-        "cash_guidance 47",
-        "Cash Guidance section",
-        "seção Cash Guidance 47"
-      ],
-      "confidence": 0.82,
-      "fallbackPatterns": [
-        "\bcash_guidance\b",
-        "\bcash_guidance_47\b",
-        "\bcash_guidance section\b"
-      ],
-      "description": "Canonical section cash_guidance for Earnings Release"
-    },
-    {
-      "id": "guidance_next_quarter_48",
-      "name": {
-        "en": "Guidance Next Quarter Segment 48",
-        "pt": "Guidance Next Quarter segmento 48"
-      },
-      "mustHave": false,
-      "order": 48,
-      "headingAnchors": [
-        "Guidance Next Quarter 48",
-        "guidance_next_quarter 48",
-        "Guidance Next Quarter section",
-        "seção Guidance Next Quarter 48"
-      ],
-      "confidence": 0.83,
-      "fallbackPatterns": [
-        "\bguidance_next_quarter\b",
-        "\bguidance_next_quarter_48\b",
-        "\bguidance_next_quarter section\b"
-      ],
-      "description": "Canonical section guidance_next_quarter for Earnings Release"
-    },
-    {
-      "id": "risk_callout_49",
-      "name": {
-        "en": "Risk Callout Segment 49",
-        "pt": "Risk Callout segmento 49"
-      },
-      "mustHave": false,
-      "order": 49,
-      "headingAnchors": [
-        "Risk Callout 49",
-        "risk_callout 49",
-        "Risk Callout section",
-        "seção Risk Callout 49"
-      ],
-      "confidence": 0.84,
-      "fallbackPatterns": [
-        "\brisk_callout\b",
-        "\brisk_callout_49\b",
-        "\brisk_callout section\b"
-      ],
-      "description": "Canonical section risk_callout for Earnings Release"
-    },
-    {
-      "id": "appendix_50",
-      "name": {
-        "en": "Appendix Segment 50",
-        "pt": "Appendix segmento 50"
-      },
-      "mustHave": false,
-      "order": 50,
-      "headingAnchors": [
-        "Appendix 50",
-        "appendix 50",
-        "Appendix section",
-        "seção Appendix 50"
-      ],
-      "confidence": 0.85,
-      "fallbackPatterns": [
-        "\bappendix\b",
-        "\bappendix_50\b",
-        "\bappendix section\b"
-      ],
-      "description": "Canonical section appendix for Earnings Release"
-    },
-    {
-      "id": "contact_box_51",
-      "name": {
-        "en": "Contact Box Segment 51",
-        "pt": "Contact Box segmento 51"
-      },
-      "mustHave": false,
-      "order": 51,
-      "headingAnchors": [
-        "Contact Box 51",
-        "contact_box 51",
-        "Contact Box section",
-        "seção Contact Box 51"
-      ],
-      "confidence": 0.86,
-      "fallbackPatterns": [
-        "\bcontact_box\b",
-        "\bcontact_box_51\b",
-        "\bcontact_box section\b"
-      ],
-      "description": "Canonical section contact_box for Earnings Release"
-    },
-    {
-      "id": "headline_summary_52",
-      "name": {
-        "en": "Headline Summary Segment 52",
-        "pt": "Headline Summary segmento 52"
-      },
-      "mustHave": false,
-      "order": 52,
-      "headingAnchors": [
-        "Headline Summary 52",
-        "headline_summary 52",
-        "Headline Summary section",
-        "seção Headline Summary 52"
-      ],
-      "confidence": 0.87,
-      "fallbackPatterns": [
-        "\bheadline_summary\b",
-        "\bheadline_summary_52\b",
-        "\bheadline_summary section\b"
-      ],
-      "description": "Canonical section headline_summary for Earnings Release"
-    },
-    {
-      "id": "highlights_53",
-      "name": {
-        "en": "Highlights Segment 53",
-        "pt": "Highlights segmento 53"
-      },
-      "mustHave": false,
-      "order": 53,
-      "headingAnchors": [
-        "Highlights 53",
-        "highlights 53",
-        "Highlights section",
-        "seção Highlights 53"
-      ],
-      "confidence": 0.88,
-      "fallbackPatterns": [
-        "\bhighlights\b",
-        "\bhighlights_53\b",
-        "\bhighlights section\b"
-      ],
-      "description": "Canonical section highlights for Earnings Release"
-    },
-    {
-      "id": "kpi_release_54",
-      "name": {
-        "en": "Kpi Release Segment 54",
-        "pt": "Kpi Release segmento 54"
-      },
-      "mustHave": false,
-      "order": 54,
-      "headingAnchors": [
-        "Kpi Release 54",
-        "kpi_release 54",
-        "Kpi Release section",
-        "seção Kpi Release 54"
-      ],
-      "confidence": 0.89,
-      "fallbackPatterns": [
-        "\bkpi_release\b",
-        "\bkpi_release_54\b",
-        "\bkpi_release section\b"
-      ],
-      "description": "Canonical section kpi_release for Earnings Release"
-    },
-    {
-      "id": "guidance_section_55",
-      "name": {
-        "en": "Guidance Section Segment 55",
-        "pt": "Guidance Section segmento 55"
-      },
-      "mustHave": false,
-      "order": 55,
-      "headingAnchors": [
-        "Guidance Section 55",
-        "guidance_section 55",
-        "Guidance Section section",
-        "seção Guidance Section 55"
-      ],
-      "confidence": 0.9,
-      "fallbackPatterns": [
-        "\bguidance_section\b",
-        "\bguidance_section_55\b",
-        "\bguidance_section section\b"
-      ],
-      "description": "Canonical section guidance_section for Earnings Release"
-    },
-    {
-      "id": "conference_call_56",
-      "name": {
-        "en": "Conference Call Segment 56",
-        "pt": "Conference Call segmento 56"
-      },
-      "mustHave": false,
-      "order": 56,
-      "headingAnchors": [
-        "Conference Call 56",
-        "conference_call 56",
-        "Conference Call section",
-        "seção Conference Call 56"
-      ],
-      "confidence": 0.91,
-      "fallbackPatterns": [
-        "\bconference_call\b",
-        "\bconference_call_56\b",
-        "\bconference_call section\b"
-      ],
-      "description": "Canonical section conference_call for Earnings Release"
-    },
-    {
-      "id": "earnings_call_note_57",
-      "name": {
-        "en": "Earnings Call Note Segment 57",
-        "pt": "Earnings Call Note segmento 57"
-      },
-      "mustHave": false,
-      "order": 57,
-      "headingAnchors": [
-        "Earnings Call Note 57",
-        "earnings_call_note 57",
-        "Earnings Call Note section",
-        "seção Earnings Call Note 57"
-      ],
-      "confidence": 0.92,
-      "fallbackPatterns": [
-        "\bearnings_call_note\b",
-        "\bearnings_call_note_57\b",
-        "\bearnings_call_note section\b"
-      ],
-      "description": "Canonical section earnings_call_note for Earnings Release"
-    },
-    {
-      "id": "revenue_breakdown_58",
-      "name": {
-        "en": "Revenue Breakdown Segment 58",
-        "pt": "Revenue Breakdown segmento 58"
-      },
-      "mustHave": false,
-      "order": 58,
-      "headingAnchors": [
-        "Revenue Breakdown 58",
-        "revenue_breakdown 58",
-        "Revenue Breakdown section",
-        "seção Revenue Breakdown 58"
-      ],
-      "confidence": 0.93,
-      "fallbackPatterns": [
-        "\brevenue_breakdown\b",
-        "\brevenue_breakdown_58\b",
-        "\brevenue_breakdown section\b"
-      ],
-      "description": "Canonical section revenue_breakdown for Earnings Release"
-    },
-    {
-      "id": "margin_analysis_59",
-      "name": {
-        "en": "Margin Analysis Segment 59",
-        "pt": "Margin Analysis segmento 59"
-      },
-      "mustHave": false,
-      "order": 59,
-      "headingAnchors": [
-        "Margin Analysis 59",
-        "margin_analysis 59",
-        "Margin Analysis section",
-        "seção Margin Analysis 59"
-      ],
-      "confidence": 0.94,
-      "fallbackPatterns": [
-        "\bmargin_analysis\b",
-        "\bmargin_analysis_59\b",
-        "\bmargin_analysis section\b"
-      ],
-      "description": "Canonical section margin_analysis for Earnings Release"
-    },
-    {
-      "id": "cash_guidance_60",
-      "name": {
-        "en": "Cash Guidance Segment 60",
-        "pt": "Cash Guidance segmento 60"
-      },
-      "mustHave": false,
-      "order": 60,
-      "headingAnchors": [
-        "Cash Guidance 60",
-        "cash_guidance 60",
-        "Cash Guidance section",
-        "seção Cash Guidance 60"
-      ],
-      "confidence": 0.8,
-      "fallbackPatterns": [
-        "\bcash_guidance\b",
-        "\bcash_guidance_60\b",
-        "\bcash_guidance section\b"
-      ],
-      "description": "Canonical section cash_guidance for Earnings Release"
-    },
-    {
-      "id": "guidance_next_quarter_61",
-      "name": {
-        "en": "Guidance Next Quarter Segment 61",
-        "pt": "Guidance Next Quarter segmento 61"
-      },
-      "mustHave": false,
-      "order": 61,
-      "headingAnchors": [
-        "Guidance Next Quarter 61",
-        "guidance_next_quarter 61",
-        "Guidance Next Quarter section",
-        "seção Guidance Next Quarter 61"
-      ],
-      "confidence": 0.81,
-      "fallbackPatterns": [
-        "\bguidance_next_quarter\b",
-        "\bguidance_next_quarter_61\b",
-        "\bguidance_next_quarter section\b"
-      ],
-      "description": "Canonical section guidance_next_quarter for Earnings Release"
-    },
-    {
-      "id": "risk_callout_62",
-      "name": {
-        "en": "Risk Callout Segment 62",
-        "pt": "Risk Callout segmento 62"
-      },
-      "mustHave": false,
-      "order": 62,
-      "headingAnchors": [
-        "Risk Callout 62",
-        "risk_callout 62",
-        "Risk Callout section",
-        "seção Risk Callout 62"
-      ],
-      "confidence": 0.82,
-      "fallbackPatterns": [
-        "\brisk_callout\b",
-        "\brisk_callout_62\b",
-        "\brisk_callout section\b"
-      ],
-      "description": "Canonical section risk_callout for Earnings Release"
+        "headline summary"
+      ]
     }
   ]
 }

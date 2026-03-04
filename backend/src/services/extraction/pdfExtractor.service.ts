@@ -18,7 +18,14 @@ import type {
 import type { PdfPageAnchor } from "../../types/extraction.types";
 import { createPdfPageAnchor } from "../../types/extraction.types";
 import googleVisionOCR from "./google-vision-ocr.service";
-import { extractPDFWithTables } from "../../utils/pdfTableExtractor";
+import { extractPDFWithTables, extractTablesFromText } from "../../utils/pdfTableExtractor";
+import type { ExtractedTable } from "../ingestion/extraction/extractionResult.types";
+import { extractTablesWithDocumentAI } from "./documentAiTableExtractor.service";
+import { extractPdfOutline } from "./pdfOutlineExtractor.service";
+import { logger } from "../../utils/logger";
+
+/** Timeout (ms) for Document AI table extraction */
+const DOCUMENT_AI_TIMEOUT_MS = 5000;
 
 // ============================================================================
 // Constants
@@ -340,9 +347,10 @@ async function extractPagesNative(buffer: Buffer): Promise<{
 
   const quality = evaluateNativeTextQuality(fullText, pageCount);
   if (quality.weak) {
-    console.log(
-      `⚠️ [PDF] Native text appears weak/boilerplate (score ${quality.score.toFixed(2)}): ${quality.reasons.join(", ")}`,
-    );
+    logger.warn("[PDF] Native text appears weak/boilerplate", {
+      score: quality.score,
+      reasons: quality.reasons,
+    });
     return {
       pages,
       pageCount,
@@ -404,7 +412,7 @@ async function extractPagesSelectiveOCR(
 
   // If no pages need OCR, return native pages as-is
   if (pagesToOcr.length === 0) {
-    console.log("✅ [PDF] All pages have sufficient text, skipping OCR");
+    logger.debug("[PDF] All pages have sufficient text, skipping OCR");
     return {
       pages: nativePages,
       pageCount: totalPageCount,
@@ -417,9 +425,7 @@ async function extractPagesSelectiveOCR(
 
   // If ALL pages need OCR, use batch OCR (more efficient)
   if (pagesToOcr.length === totalPageCount) {
-    console.log(
-      `🔍 [PDF] All ${totalPageCount} pages need OCR, using batch...`,
-    );
+    logger.info("[PDF] All pages need OCR, using batch", { totalPageCount });
     const fullOcr = await extractPagesOCR(buffer);
     return {
       ...fullOcr,
@@ -430,9 +436,10 @@ async function extractPagesSelectiveOCR(
   }
 
   // SELECTIVE OCR: Only OCR the pages that need it
-  console.log(
-    `🔍 [PDF] Selective OCR: ${pagesToOcr.length}/${totalPageCount} pages need OCR`,
-  );
+  logger.info("[PDF] Selective OCR: pages need OCR", {
+    ocrPageCount: pagesToOcr.length,
+    totalPageCount,
+  });
   const ocrPagesResult = await (googleVisionOCR as any).processPdfPages(
     buffer,
     {
@@ -486,9 +493,10 @@ async function extractPagesSelectiveOCR(
   }
 
   const avgConfidence = confCount > 0 ? totalConfidence / confCount : 1.0;
-  console.log(
-    `✅ [PDF] Selective OCR complete: ${ocrResults.size} pages OCR'd, confidence: ${(avgConfidence * 100).toFixed(0)}%`,
-  );
+  logger.info("[PDF] Selective OCR complete", {
+    ocrPagesCompleted: ocrResults.size,
+    confidencePct: Math.round(avgConfidence * 100),
+  });
 
   return {
     pages: finalPages,
@@ -517,7 +525,7 @@ async function extractPagesOCR(buffer: Buffer): Promise<{
     throw new Error("Google Vision OCR not available");
   }
 
-  console.log("🔍 [PDF] Using Google Vision OCR for full PDF extraction...");
+  logger.info("[PDF] Using Google Vision OCR for full PDF extraction");
 
   const ocrResult = await (googleVisionOCR as any).processPdfPages(buffer);
   const pageCount = ocrResult.pageCount || 1;
@@ -582,24 +590,95 @@ async function extractPagesOCR(buffer: Buffer): Promise<{
 export async function extractPdfWithAnchors(
   buffer: Buffer,
 ): Promise<PdfExtractionResult> {
-  console.log(
-    `📄 [PDF] Starting per-page extraction (${buffer.length} bytes)...`,
-  );
+  logger.info("[PDF] Starting per-page extraction", { sizeBytes: buffer.length });
 
   try {
     // Step 1: Try native text extraction first
     const nativeResult = await extractPagesNative(buffer);
 
     if (nativeResult.hasTextLayer && nativeResult.pages.length > 0) {
-      // Native extraction succeeded - apply table preservation
-      const enhancedPages = nativeResult.pages.map((page) => {
+      // Track which pages got Document AI tables (used to skip heuristic on those pages)
+      const docAiPageSet = new Set<number>();
+
+      // Optional Document AI pass: try structured table extraction FIRST
+      // when DOCUMENT_AI_ENABLED=true — pages with Doc AI tables skip heuristic
+      let docAiTablesByPage = new Map<number, string[]>();
+      if (process.env.DOCUMENT_AI_ENABLED === "true") {
         try {
-          const textWithTables = extractPDFWithTables(page.text);
-          return { ...page, text: textWithTables };
+          const docAiResult = await Promise.race([
+            extractTablesWithDocumentAI(buffer),
+            new Promise<null>((resolve) =>
+              setTimeout(() => resolve(null), DOCUMENT_AI_TIMEOUT_MS),
+            ),
+          ]);
+
+          if (docAiResult && docAiResult.tableCount > 0) {
+            for (const entry of docAiResult.pages) {
+              docAiTablesByPage.set(entry.page, entry.tables);
+              docAiPageSet.add(entry.page);
+            }
+
+            logger.info("[PDF] Document AI tables extracted", {
+              tableCount: docAiResult.tableCount,
+              pagesWithTables: docAiResult.pages.length,
+              tableConfidences: docAiResult.tableConfidences,
+            });
+          }
+        } catch (docAiErr: any) {
+          logger.warn("[PDF] Document AI table pass failed, falling back to heuristic for all pages", {
+            error: docAiErr.message,
+          });
+        }
+      }
+
+      // Apply table preservation: Doc AI pages get Doc AI tables appended to
+      // RAW page text; other pages get heuristic table enhancement
+      const allExtractedTables: ExtractedTable[] = [];
+      let enhancedPages = nativeResult.pages.map((page) => {
+        const pageNum = page.page ?? (page as any).pageNumber ?? 0;
+        const aiTables = docAiTablesByPage.get(pageNum);
+
+        if (aiTables && aiTables.length > 0) {
+          // Page covered by Document AI — append structured tables to raw text
+          return {
+            ...page,
+            text: page.text + "\n\n" + aiTables.join("\n\n"),
+          };
+        }
+
+        // No Document AI tables for this page — apply heuristic extraction
+        try {
+          const tableResult = extractTablesFromText(page.text);
+          // Collect structured tables for cell-level indexing
+          for (let tIdx = 0; tIdx < tableResult.tables.length; tIdx++) {
+            const t = tableResult.tables[tIdx];
+            if (t.structuredRows && t.structuredRows.length > 0) {
+              allExtractedTables.push({
+                tableId: `pdf:p${pageNum}:t${tIdx}`,
+                pageOrSlide: pageNum,
+                markdown: t.markdown,
+                rows: t.structuredRows,
+              });
+            }
+          }
+          return { ...page, text: tableResult.tableCount > 0 ? tableResult.text : page.text };
         } catch {
           return page;
         }
       });
+
+      // Extract PDF outline / bookmarks (non-blocking)
+      let outlines: Array<{ title: string; level: number; pageIndex: number }> | undefined;
+      try {
+        const outlineEntries = await extractPdfOutline(buffer);
+        if (outlineEntries.length > 0) {
+          outlines = outlineEntries;
+        }
+      } catch (outlineErr: any) {
+        logger.warn("[PDF] Outline extraction failed, continuing without outlines", {
+          error: outlineErr.message,
+        });
+      }
 
       const totalText = enhancedPages.map((p) => p.text).join("\n\n");
       const totalWordCount = enhancedPages.reduce(
@@ -607,9 +686,11 @@ export async function extractPdfWithAnchors(
         0,
       );
 
-      console.log(
-        `✅ [PDF] Native extraction: ${nativeResult.pageCount} pages, ${totalWordCount} words`,
-      );
+      logger.info("[PDF] Native extraction complete", {
+        pageCount: nativeResult.pageCount,
+        wordCount: totalWordCount,
+        outlineCount: outlines?.length ?? 0,
+      });
 
       return {
         sourceType: "pdf",
@@ -622,6 +703,8 @@ export async function extractPdfWithAnchors(
         confidence: 1.0,
         textQuality: "high",
         textQualityScore: nativeResult.nativeQualityScore,
+        ...(outlines ? { outlines } : {}),
+        ...(allExtractedTables.length > 0 ? { extractedTables: allExtractedTables } : {}),
       };
     }
 
@@ -631,9 +714,21 @@ export async function extractPdfWithAnchors(
       nativeResult.weakTextReasons.length > 0
         ? ` reasons=${nativeResult.weakTextReasons.join(",")}`
         : "";
-    console.log(
-      `📄 [PDF] Native extraction requires OCR (${nativeResult.pageCount} pages).${weakReasonText}`,
-    );
+    logger.info("[PDF] Native extraction requires OCR", {
+      pageCount: nativeResult.pageCount,
+      weakTextReasons: nativeResult.weakTextReasons,
+    });
+
+    // Extract PDF outline / bookmarks for OCR and fallback paths (non-blocking)
+    let ocrOutlines: Array<{ title: string; level: number; pageIndex: number }> | undefined;
+    try {
+      const outlineEntries = await extractPdfOutline(buffer);
+      if (outlineEntries.length > 0) {
+        ocrOutlines = outlineEntries;
+      }
+    } catch {
+      // Outline extraction is best-effort; ignore failures
+    }
 
     if (googleVisionOCR.isAvailable()) {
       try {
@@ -664,9 +759,12 @@ export async function extractPdfWithAnchors(
         const ocrPct = Math.round(
           (ocrResult.ocrPageCount / ocrResult.pageCount) * 100,
         );
-        console.log(
-          `✅ [PDF] Selective OCR: ${ocrResult.pageCount} pages, ${ocrResult.ocrPageCount} OCR'd (${ocrPct}%), ${totalWordCount} words`,
-        );
+        logger.info("[PDF] Selective OCR extraction complete", {
+          pageCount: ocrResult.pageCount,
+          ocrPageCount: ocrResult.ocrPageCount,
+          ocrPct,
+          wordCount: totalWordCount,
+        });
 
         return {
           sourceType: "pdf",
@@ -684,15 +782,21 @@ export async function extractPdfWithAnchors(
           textQualityScore: ocrResult.overallConfidence,
           weakTextReasons: nativeResult.weakTextReasons,
           extractionWarnings: ocrResult.warnings,
+          ...(ocrOutlines ? { outlines: ocrOutlines } : {}),
         };
       } catch (ocrError: any) {
-        console.error("❌ [PDF] OCR failed:", ocrError.message);
+        logger.error("[PDF] OCR failed", { error: ocrError.message });
       }
     } else {
-      console.warn(
-        "⚠️ [PDF] OCR not available:",
-        (googleVisionOCR as any).getInitializationError?.(),
+      const nativeTextLength = nativeResult.pages.reduce(
+        (sum, p) => sum + (p.text?.length || 0), 0,
       );
+      logger.warn("[PDF] OCR not available — scanned/low-quality PDF will have degraded text", {
+        pageCount: nativeResult.pageCount,
+        nativeTextLength,
+        weakTextReasons: nativeResult.weakTextReasons,
+        initError: (googleVisionOCR as any).getInitializationError?.(),
+      });
     }
 
     // Step 3: Fallback - return whatever native extraction gave us
@@ -701,9 +805,10 @@ export async function extractPdfWithAnchors(
       .split(/\s+/)
       .filter((w) => w.length > 0).length;
 
-    console.log(
-      `⚠️ [PDF] Fallback extraction: ${nativeResult.pageCount} pages, ${fallbackWordCount} words (low confidence)`,
-    );
+    logger.warn("[PDF] Fallback extraction with low confidence", {
+      pageCount: nativeResult.pageCount,
+      wordCount: fallbackWordCount,
+    });
 
     return {
       sourceType: "pdf",
@@ -717,9 +822,10 @@ export async function extractPdfWithAnchors(
       textQuality: "low",
       textQualityScore: nativeResult.nativeQualityScore,
       weakTextReasons: nativeResult.weakTextReasons,
+      ...(ocrOutlines ? { outlines: ocrOutlines } : {}),
     };
   } catch (error: any) {
-    console.error("❌ [PDF] Extraction failed:", error.message);
+    logger.error("[PDF] Extraction failed", { error: error.message });
     throw new Error(`Failed to extract text from PDF: ${error.message}`);
   }
 }

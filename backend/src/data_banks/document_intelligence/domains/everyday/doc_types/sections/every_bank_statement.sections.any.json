@@ -25,11 +25,10 @@
       "id": "document_header",
       "name": {
         "en": "Header",
-        "pt": "Cabecalho"
+        "pt": "Cabeçalho"
       },
       "order": 1,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "bank statement",
         "extrato",
@@ -44,7 +43,6 @@
       },
       "order": 2,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "account",
         "bank",
@@ -56,11 +54,10 @@
       "id": "statement_period",
       "name": {
         "en": "Statement Period",
-        "pt": "Periodo do Extrato"
+        "pt": "Período do Extrato"
       },
       "order": 3,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "period",
         "from",
@@ -77,7 +74,6 @@
       },
       "order": 4,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "opening balance",
         "closing balance",
@@ -89,11 +85,10 @@
       "id": "transactions",
       "name": {
         "en": "Transactions",
-        "pt": "Transacoes"
+        "pt": "Transações"
       },
       "order": 5,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "transactions",
         "deposits",
@@ -109,7 +104,6 @@
       },
       "order": 6,
       "required": false,
-      "mustHave": false,
       "headingAnchors": [
         "interest",
         "fees",
@@ -124,7 +118,6 @@
       },
       "order": 7,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "debit",
         "credit",
@@ -135,11 +128,10 @@
       "id": "foreign_or_card_transactions",
       "name": {
         "en": "Card and Transfer Rows",
-        "pt": "Transacoes de Cartao e Transferencias"
+        "pt": "Transações de Cartao e Transferencias"
       },
       "order": 8,
       "required": false,
-      "mustHave": false,
       "headingAnchors": [
         "transfer",
         "card",
@@ -150,11 +142,10 @@
       "id": "footer",
       "name": {
         "en": "Footer",
-        "pt": "Rodape"
+        "pt": "Rodapé"
       },
       "order": 9,
       "required": false,
-      "mustHave": false,
       "headingAnchors": [
         "contact",
         "notice",

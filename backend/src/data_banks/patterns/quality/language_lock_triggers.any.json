@@ -16,6 +16,7 @@
       "fallback_router_v1"
     ],
     "usedBy": [
+      "services/core/scope/scopeGate.service.ts",
       "services/chat/turnRoutePolicy.service.ts"
     ],
     "tests": [

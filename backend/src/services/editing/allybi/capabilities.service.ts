@@ -102,7 +102,7 @@ export function buildDocumentCapabilities(input: {
     filename: input.filename,
     mimeType: input.mimeType,
     filetype,
-    saveMode: String(process.env.KODA_EDITING_SAVE_MODE || "overwrite")
+    saveMode: String(process.env.KODA_EDITING_SAVE_MODE || "revision")
       .trim()
       .toLowerCase(),
     supports: {

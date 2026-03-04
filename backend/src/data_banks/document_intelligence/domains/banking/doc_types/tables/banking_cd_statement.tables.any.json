@@ -1,0 +1,88 @@
+{
+  "_meta": {
+    "id": "di_banking_tables_banking_cd_statement",
+    "version": "1.0.0",
+    "description": "Expected table patterns for banking_cd_statement documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-04",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "banking",
+    "docType": "banking_cd_statement"
+  },
+  "tableHeaderSynonyms": {
+    "principal": [
+      "principal",
+      "deposit",
+      "valor principal"
+    ],
+    "interest_rate": [
+      "rate",
+      "apy",
+      "taxa"
+    ]
+  },
+  "tables": [
+    {
+      "id": "banking_cd_statement_summary_table",
+      "name": {
+        "en": "CD Summary Table",
+        "pt": "Tabela Resumo do CD"
+      },
+      "section": "deposit_details",
+      "expectedColumns": [
+        "field",
+        "value"
+      ],
+      "keyRows": [
+        "principal",
+        "interest_rate",
+        "maturity_date",
+        "current_value"
+      ]
+    },
+    {
+      "id": "banking_cd_statement_interest_table",
+      "name": {
+        "en": "Interest Accrual Table",
+        "pt": "Tabela de Juros Acumulados"
+      },
+      "section": "interest_terms",
+      "expectedColumns": [
+        "period",
+        "interest_earned",
+        "cumulative_interest",
+        "balance"
+      ],
+      "keyRows": [
+        "total_interest"
+      ]
+    },
+    {
+      "id": "banking_cd_statement_penalty_table",
+      "name": {
+        "en": "Penalty Schedule Table",
+        "pt": "Tabela de Penalidades"
+      },
+      "section": "early_withdrawal_penalties",
+      "expectedColumns": [
+        "withdrawal_timing",
+        "penalty_rate",
+        "penalty_amount"
+      ],
+      "keyRows": [
+        "forfeited_interest"
+      ]
+    }
+  ]
+}

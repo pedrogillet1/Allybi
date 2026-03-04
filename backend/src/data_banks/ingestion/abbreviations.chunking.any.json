@@ -1,0 +1,14 @@
+{
+  "$schema": "bank_schema",
+  "id": "abbreviations_chunking",
+  "version": "1.0.0",
+  "description": "Extended abbreviation list for sentence-boundary detection in chunking. Prevents false splits on domain terms.",
+  "lastUpdated": "2026-03-04",
+  "usedBy": ["chunking.service.ts"],
+  "abbreviations": {
+    "accounting": ["ebitda", "gaap", "ifrs", "capex", "opex", "cogs", "wacc", "roe", "roa", "eps", "nav", "aum"],
+    "legal": ["llc", "llp", "esq", "atty", "def", "plf", "resp"],
+    "medical": ["dx", "rx", "hx", "fx", "tx", "sx", "bx", "cx", "prn", "bid", "tid", "qid", "qhs"],
+    "general": ["approx", "dept", "govt", "assoc", "intl", "natl", "mgmt", "acct", "qty", "amt"]
+  }
+}

@@ -4,15 +4,14 @@
  * OpenAI Models (Allybi)
  * -----------------------------------
  * Allybi strategy:
- *  - Draft / fast lane: gpt-5-mini
- *  - Final / authority lane: gpt-5.2
+ *  - Single OpenAI model: gpt-5.2 (precision finisher for all OpenAI lanes)
  *
  * This file is deliberately small but strict:
  *  - typed metadata so routers / capability checks can stay deterministic
  *  - safe defaults for streaming + final passes
  */
 
-export type OpenAIModelId = "gpt-5-mini" | "gpt-5.2";
+export type OpenAIModelId = "gpt-5.2";
 
 export interface OpenAIModelSpec {
   id: OpenAIModelId;
@@ -20,16 +19,15 @@ export interface OpenAIModelSpec {
   /**
    * Allybi semantic role for routing.
    */
-  role: "draft" | "precision_finish";
+  role: "precision_finish";
 
   /**
    * Capability flags (used by providerCapabilities / router constraints).
-   * Keep these conservative; if you add tools/images, update here and in providerCapabilities bank.
    */
   capabilities: {
     streaming: true;
     tools: true;
-    images: false; // Allybi chat is doc-grounded; images handled by extraction pipeline, not LLM input
+    images: false;
   };
 
   /**
@@ -47,21 +45,6 @@ export interface OpenAIModelSpec {
  * Canonical OpenAI models used by Allybi.
  */
 export const OPENAI_MODELS: Record<OpenAIModelId, OpenAIModelSpec> = {
-  "gpt-5-mini": {
-    id: "gpt-5-mini",
-    role: "draft",
-    capabilities: {
-      streaming: true,
-      tools: true,
-      images: false,
-    },
-    defaults: {
-      temperatureDraft: 0.5,
-      temperatureFinal: 0.25,
-      maxOutputTokensDraft: 1600,
-      maxOutputTokensFinal: 4096,
-    },
-  },
   "gpt-5.2": {
     id: "gpt-5.2",
     role: "precision_finish",
@@ -80,16 +63,15 @@ export const OPENAI_MODELS: Record<OpenAIModelId, OpenAIModelSpec> = {
 };
 
 /**
- * Primary model ids for Allybi's OpenAI lane.
+ * Primary model id for Allybi's OpenAI lane.
  */
-export const OPENAI_DRAFT_MODEL: OpenAIModelId = "gpt-5-mini";
 export const OPENAI_PRIMARY_MODEL: OpenAIModelId = "gpt-5.2";
 
 /**
  * Convenience helpers
  */
 export function isOpenAIModelId(x: unknown): x is OpenAIModelId {
-  return x === "gpt-5-mini" || x === "gpt-5.2";
+  return x === "gpt-5.2";
 }
 
 export function listOpenAIModels(): OpenAIModelId[] {

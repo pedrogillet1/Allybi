@@ -1,0 +1,62 @@
+{
+  "_meta": {
+    "id": "di_insurance_tables_ins_umbrella_policy",
+    "version": "2.0.0",
+    "description": "Table patterns for ins_umbrella_policy.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-04",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "insurance",
+    "docType": "ins_umbrella_policy"
+  },
+  "tables": [
+    {
+      "id": "underlying_policies_table",
+      "name": {
+        "en": "Underlying Policies Table",
+        "pt": "Tabela de Apolices Subjacentes"
+      },
+      "section": "underlying_policies",
+      "expectedColumns": [
+        "policy_type",
+        "carrier",
+        "policy_number",
+        "limit"
+      ],
+      "keyRows": [
+        "auto",
+        "homeowners",
+        "watercraft"
+      ]
+    },
+    {
+      "id": "excess_limits_table",
+      "name": {
+        "en": "Excess Limits Table",
+        "pt": "Tabela de Limites Excedentes"
+      },
+      "section": "excess_coverage",
+      "expectedColumns": [
+        "coverage_type",
+        "occurrence_limit",
+        "aggregate_limit"
+      ],
+      "keyRows": [
+        "personal_liability",
+        "retained_limit",
+        "total_umbrella"
+      ]
+    }
+  ]
+}

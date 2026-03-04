@@ -12,6 +12,7 @@ import { connection, QUEUE_PREFIX } from "../queueConfig";
 import type { ProcessDocumentJobData } from "../queueConfig";
 import { runDocumentIngestionPipeline } from "./documentIngestionPipeline.service";
 import { documentDlqQueue } from "../queueConfig";
+import { recordDlqEntry } from "../../services/ingestion/pipeline/pipelineMetrics.service";
 
 let worker: Worker | null = null;
 
@@ -67,6 +68,17 @@ export function startDocumentWorker() {
 
     // Push to DLQ when all attempts exhausted
     if (job && job.attemptsMade >= 3) {
+      logger.error("[DocumentQueue] DLQ entry", {
+        documentId: job.data?.documentId,
+        filename: job.data?.filename,
+        mimeType: job.data?.mimeType,
+        attempts: job.attemptsMade,
+        error: err.message,
+      });
+      recordDlqEntry(
+        job.data?.documentId || "unknown",
+        job.data?.mimeType || "unknown",
+      );
       documentDlqQueue
         .add("dlq-document", {
           ...job.data,

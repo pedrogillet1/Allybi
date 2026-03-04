@@ -1,5 +1,6 @@
 // src/services/extraction/googleVisionOcr.service.ts
 import { ImageAnnotatorClient } from "@google-cloud/vision";
+import { logger } from "../../utils/logger";
 
 export type OcrMode = "document" | "text";
 
@@ -175,9 +176,11 @@ export class GoogleVisionOcrService {
       };
     }
 
-    console.log(
-      `[OCR] Processing PDF pages ${targetPages.length}/${maxPages} via batchAnnotateFiles (buffer ${(buffer.length / 1024 / 1024).toFixed(1)} MB)...`,
-    );
+    logger.info("[OCR] Processing PDF pages via batchAnnotateFiles", {
+      targetPageCount: targetPages.length,
+      maxPages,
+      bufferSizeMB: parseFloat((buffer.length / 1024 / 1024).toFixed(1)),
+    });
 
     const direct = await this.runDirectPdfBatches(buffer, targetPages);
     let pages = direct.pages;
@@ -227,9 +230,12 @@ export class GoogleVisionOcrService {
           confidenceValues.length
         : 0.7;
 
-    console.log(
-      `[OCR] PDF OCR complete (${mode}): ${sortedPages.length}/${targetPages.length} pages, confidence ${(confidence * 100).toFixed(1)}%`,
-    );
+    logger.info("[OCR] PDF OCR complete", {
+      mode,
+      pagesProcessed: sortedPages.length,
+      targetPageCount: targetPages.length,
+      confidencePct: parseFloat((confidence * 100).toFixed(1)),
+    });
 
     return {
       pages: sortedPages,
@@ -339,10 +345,10 @@ export class GoogleVisionOcrService {
         } catch (err: any) {
           if (this.isPayloadLimitError(err)) payloadLimitHit = true;
           if (this.isResourceExhaustedError(err)) resourceExhaustedHit = true;
-          console.warn(
-            `[OCR] Direct batch failed for pages ${batchPages.join(",")}:`,
-            err?.message || err,
-          );
+          logger.warn("[OCR] Direct batch failed for pages", {
+            pages: batchPages,
+            error: err?.message || err,
+          });
         }
       }
     });
@@ -410,10 +416,10 @@ export class GoogleVisionOcrService {
           warnings.push("SPLIT_BATCH_BY_RESOURCE");
           continue;
         }
-        console.warn(
-          `[OCR] Split batch failed for pages ${globalPages.join(",")}:`,
-          err?.message || err,
-        );
+        logger.warn("[OCR] Split batch failed for pages", {
+          pages: globalPages,
+          error: err?.message || err,
+        });
       } finally {
         subsetBuffer = Buffer.alloc(0);
       }
@@ -511,9 +517,12 @@ export class GoogleVisionOcrService {
         if (isTransient && attempt < maxRetries) {
           // Exponential backoff: 1s, 2s, 4s (capped at 8s)
           const delay = Math.min(1000 * Math.pow(2, attempt - 1), 8000);
-          console.log(
-            `[OCR] Transient error (attempt ${attempt}/${maxRetries}), retrying in ${delay}ms: ${err.message}`,
-          );
+          logger.warn("[OCR] Transient error, retrying", {
+            attempt,
+            maxRetries,
+            delayMs: delay,
+            error: err.message,
+          });
           await new Promise((r) => setTimeout(r, delay));
           continue;
         }

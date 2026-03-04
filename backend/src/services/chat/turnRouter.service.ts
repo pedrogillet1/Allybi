@@ -228,6 +228,31 @@ export class TurnRouterService {
     }
   }
 
+  /**
+   * Loads a per-operator pattern bank (e.g. "operator_patterns_advise").
+   * Returns null when bank is unavailable (fail-open).
+   */
+  private getOperatorPatternBank(operatorId: string): any | null {
+    try {
+      return this.routingBankProvider(`operator_patterns_${operatorId}`);
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Loads a navigation pattern bank for the given locale.
+   * Returns null when bank is unavailable (fail-open).
+   */
+  private getNavIntentsBank(locale: "en" | "pt" | "es"): any | null {
+    const bankId = locale === "es" ? "nav_intents_en" : `nav_intents_${locale}`;
+    try {
+      return this.routingBankProvider(bankId);
+    } catch {
+      return null;
+    }
+  }
+
   private getPatterns(value: unknown): string[] {
     if (!value || typeof value !== "object") return [];
     const obj = value as Record<string, unknown>;
@@ -373,6 +398,17 @@ export class TurnRouterService {
         score,
       });
     }
+    // Supplement with per-operator pattern banks (fail-open: missing banks are skipped).
+    for (const candidate of out) {
+      const opBank = this.getOperatorPatternBank(candidate.operatorId);
+      if (!opBank?.config?.enabled) continue;
+      // If the per-operator bank has supplementary confidence boosts, apply them.
+      const supplementaryBoost = Number(opBank?.config?.confidenceBoost || 0);
+      if (supplementaryBoost > 0 && supplementaryBoost < 0.1) {
+        candidate.score = Math.min(1, candidate.score + supplementaryBoost);
+      }
+    }
+
     out.sort((a, b) => b.score - a.score);
     return out;
   }
@@ -806,6 +842,9 @@ export class TurnRouterService {
       nav &&
       !hasFamily("file_actions")
     ) {
+      // Load supplementary nav intent bank for locale-aware score refinement.
+      const navBank = this.getNavIntentsBank(locale);
+      const navBoost = navBank?.config?.enabled ? 0.01 : 0;
       candidates.push({
         intentId: "file_actions",
         operatorId: "open",
@@ -813,7 +852,8 @@ export class TurnRouterService {
         domainId: "general",
         score:
           (docsAvailable ? 0.76 : 0.82) +
-          this.getRoutingPriorityBoost("file_actions"),
+          this.getRoutingPriorityBoost("file_actions") +
+          navBoost,
       });
     }
     if (howTo && !hasFamily("help")) {

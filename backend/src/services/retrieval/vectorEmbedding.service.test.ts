@@ -109,6 +109,10 @@ jest.mock("../security/tenantKey.service", () => ({
 jest.mock("crypto", () => ({
   __esModule: true,
   randomUUID: (...args: any[]) => mockRandomUUID(...args),
+  createHash: (algo: string) => {
+    const { createHash: realCreateHash } = jest.requireActual("crypto") as any;
+    return realCreateHash(algo);
+  },
 }));
 
 /* ------------------------------------------------------------------ */
@@ -660,5 +664,30 @@ describe("vectorEmbedding.service", () => {
     expect(mockChunkCount).toHaveBeenCalledWith({
       where: { documentId: DOC_ID },
     });
+  });
+
+  /* ================================================================ */
+  /*  Pinecone receives empty content + contentHash in encrypted mode  */
+  /* ================================================================ */
+  test("strips plaintext from Pinecone payload when encrypted-only", async () => {
+    process.env.INDEXING_ENCRYPTED_CHUNKS_ONLY = "true";
+
+    const chunks = makeChunks(2);
+    mockGenerateBatchEmbeddings.mockResolvedValue(makeBatchResult(2));
+    mockEmbeddingCount.mockResolvedValue(2);
+    mockChunkCount.mockResolvedValue(2);
+
+    await storeDocumentEmbeddings(DOC_ID, chunks, {
+      maxRetries: 1,
+      strictVerify: false,
+      encryptionMode: "encrypted_only",
+    });
+
+    expect(mockUpsertDocumentEmbeddings).toHaveBeenCalled();
+    const pineconeChunks = mockUpsertDocumentEmbeddings.mock.calls[0][3] as any[];
+    for (const pc of pineconeChunks) {
+      expect(pc.content).toBe("");
+      expect(pc.metadata.contentHash).toMatch(/^[a-f0-9]{64}$/);
+    }
   });
 });

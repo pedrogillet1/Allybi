@@ -1,0 +1,81 @@
+{
+  "_meta": {
+    "id": "di_insurance_tables_ins_auto_declaration",
+    "version": "2.0.0",
+    "description": "Table patterns for ins_auto_declaration.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-04",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "insurance",
+    "docType": "ins_auto_declaration"
+  },
+  "tables": [
+    {
+      "id": "coverage_limits_table",
+      "name": {
+        "en": "Coverage Limits Table",
+        "pt": "Tabela de Limites de Cobertura"
+      },
+      "section": "coverage_summary",
+      "expectedColumns": [
+        "coverage_type",
+        "limit",
+        "deductible",
+        "premium"
+      ],
+      "keyRows": [
+        "bodily_injury",
+        "property_damage",
+        "collision",
+        "comprehensive"
+      ]
+    },
+    {
+      "id": "vehicle_schedule_table",
+      "name": {
+        "en": "Vehicle Schedule Table",
+        "pt": "Tabela de Veiculos"
+      },
+      "section": "vehicle_details",
+      "expectedColumns": [
+        "vehicle",
+        "vin",
+        "year_make_model",
+        "usage"
+      ],
+      "keyRows": [
+        "primary_vehicle",
+        "secondary_vehicle"
+      ]
+    },
+    {
+      "id": "premium_breakdown_table",
+      "name": {
+        "en": "Premium Breakdown Table",
+        "pt": "Tabela de Detalhamento de Premio"
+      },
+      "section": "premium_breakdown",
+      "expectedColumns": [
+        "component",
+        "amount"
+      ],
+      "keyRows": [
+        "base_premium",
+        "discounts",
+        "surcharges",
+        "total_premium"
+      ]
+    }
+  ]
+}

@@ -1,12 +1,12 @@
 {
   "_meta": {
     "id": "di_finance_sections_fin_forecast",
-    "version": "2.1.0",
+    "version": "3.0.0",
     "description": "Sections mapping for Forecast.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-03-03",
+    "lastUpdated": "2026-03-04",
     "owner": "data-bank-governance",
     "usedBy": [
       "services/core/banks/dataBankLoader.service.ts"
@@ -22,1368 +22,186 @@
   },
   "sections": [
     {
-      "id": "base_case_1",
+      "id": "base_case",
       "name": {
-        "en": "Base Case Segment 1",
-        "pt": "Base Case segmento 1"
+        "en": "Base Case",
+        "pt": "Base Case"
       },
-      "mustHave": true,
+      "required": true,
       "order": 1,
       "headingAnchors": [
-        "Base Case 1",
-        "base_case 1",
-        "Base Case section",
-        "seção Base Case 1"
-      ],
-      "confidence": 0.81,
-      "fallbackPatterns": [
-        "\bbase_case\b",
-        "\bbase_case_1\b",
-        "\bbase_case section\b"
-      ],
-      "description": "Canonical section base_case for Forecast"
+        "base case"
+      ]
     },
     {
-      "id": "bull_case_2",
+      "id": "bull_case",
       "name": {
-        "en": "Bull Case Segment 2",
-        "pt": "Bull Case segmento 2"
+        "en": "Bull Case",
+        "pt": "Bull Case"
       },
-      "mustHave": true,
+      "required": true,
       "order": 2,
       "headingAnchors": [
-        "Bull Case 2",
-        "bull_case 2",
-        "Bull Case section",
-        "seção Bull Case 2"
-      ],
-      "confidence": 0.82,
-      "fallbackPatterns": [
-        "\bbull_case\b",
-        "\bbull_case_2\b",
-        "\bbull_case section\b"
-      ],
-      "description": "Canonical section bull_case for Forecast"
+        "bull case"
+      ]
     },
     {
-      "id": "bear_case_3",
+      "id": "bear_case",
       "name": {
-        "en": "Bear Case Segment 3",
-        "pt": "Bear Case segmento 3"
+        "en": "Bear Case",
+        "pt": "Bear Case"
       },
-      "mustHave": true,
+      "required": true,
       "order": 3,
       "headingAnchors": [
-        "Bear Case 3",
-        "bear_case 3",
-        "Bear Case section",
-        "seção Bear Case 3"
-      ],
-      "confidence": 0.83,
-      "fallbackPatterns": [
-        "\bbear_case\b",
-        "\bbear_case_3\b",
-        "\bbear_case section\b"
-      ],
-      "description": "Canonical section bear_case for Forecast"
+        "bear case"
+      ]
     },
     {
-      "id": "assumptions_4",
+      "id": "assumptions",
       "name": {
-        "en": "Assumptions Segment 4",
-        "pt": "Assumptions segmento 4"
+        "en": "Assumptions",
+        "pt": "Premissas"
       },
-      "mustHave": true,
+      "required": true,
       "order": 4,
       "headingAnchors": [
-        "Assumptions 4",
-        "assumptions 4",
-        "Assumptions section",
-        "seção Assumptions 4"
-      ],
-      "confidence": 0.84,
-      "fallbackPatterns": [
-        "\bassumptions\b",
-        "\bassumptions_4\b",
-        "\bassumptions section\b"
-      ],
-      "description": "Canonical section assumptions for Forecast"
+        "Assumptions",
+        "Premissas"
+      ]
     },
     {
-      "id": "sensitivity_5",
+      "id": "sensitivity",
       "name": {
-        "en": "Sensitivity Segment 5",
-        "pt": "Sensitivity segmento 5"
+        "en": "Sensitivity Analysis",
+        "pt": "Análise de Sensibilidade"
       },
-      "mustHave": true,
+      "required": true,
       "order": 5,
       "headingAnchors": [
-        "Sensitivity 5",
-        "sensitivity 5",
-        "Sensitivity section",
-        "seção Sensitivity 5"
-      ],
-      "confidence": 0.85,
-      "fallbackPatterns": [
-        "\bsensitivity\b",
-        "\bsensitivity_5\b",
-        "\bsensitivity section\b"
-      ],
-      "description": "Canonical section sensitivity for Forecast"
+        "Sensitivity Analysis",
+        "Análise de Sensibilidade"
+      ]
     },
     {
-      "id": "driver_model_6",
+      "id": "driver_model",
       "name": {
-        "en": "Driver Model Segment 6",
-        "pt": "Driver Model segmento 6"
+        "en": "Driver Model",
+        "pt": "Driver Model"
       },
-      "mustHave": true,
+      "required": true,
       "order": 6,
       "headingAnchors": [
-        "Driver Model 6",
-        "driver_model 6",
-        "Driver Model section",
-        "seção Driver Model 6"
-      ],
-      "confidence": 0.86,
-      "fallbackPatterns": [
-        "\bdriver_model\b",
-        "\bdriver_model_6\b",
-        "\bdriver_model section\b"
-      ],
-      "description": "Canonical section driver_model for Forecast"
+        "driver model"
+      ]
     },
     {
-      "id": "cash_runway_7",
+      "id": "cash_runway",
       "name": {
-        "en": "Cash Runway Segment 7",
-        "pt": "Cash Runway segmento 7"
+        "en": "Cash Runway",
+        "pt": "Cash Runway"
       },
-      "mustHave": true,
+      "required": true,
       "order": 7,
       "headingAnchors": [
-        "Cash Runway 7",
-        "cash_runway 7",
-        "Cash Runway section",
-        "seção Cash Runway 7"
-      ],
-      "confidence": 0.87,
-      "fallbackPatterns": [
-        "\bcash_runway\b",
-        "\bcash_runway_7\b",
-        "\bcash_runway section\b"
-      ],
-      "description": "Canonical section cash_runway for Forecast"
+        "cash runway"
+      ]
     },
     {
-      "id": "revenue_projection_8",
+      "id": "revenue_projection",
       "name": {
-        "en": "Revenue Projection Segment 8",
-        "pt": "Revenue Projection segmento 8"
+        "en": "Revenue Projection",
+        "pt": "Revenue Projection"
       },
-      "mustHave": true,
+      "required": true,
       "order": 8,
       "headingAnchors": [
-        "Revenue Projection 8",
-        "revenue_projection 8",
-        "Revenue Projection section",
-        "seção Revenue Projection 8"
-      ],
-      "confidence": 0.88,
-      "fallbackPatterns": [
-        "\brevenue_projection\b",
-        "\brevenue_projection_8\b",
-        "\brevenue_projection section\b"
-      ],
-      "description": "Canonical section revenue_projection for Forecast"
+        "revenue projection"
+      ]
     },
     {
-      "id": "cost_projection_9",
+      "id": "cost_projection",
       "name": {
-        "en": "Cost Projection Segment 9",
-        "pt": "Cost Projection segmento 9"
+        "en": "Cost Projection",
+        "pt": "Cost Projection"
       },
-      "mustHave": true,
+      "required": true,
       "order": 9,
       "headingAnchors": [
-        "Cost Projection 9",
-        "cost_projection 9",
-        "Cost Projection section",
-        "seção Cost Projection 9"
-      ],
-      "confidence": 0.89,
-      "fallbackPatterns": [
-        "\bcost_projection\b",
-        "\bcost_projection_9\b",
-        "\bcost_projection section\b"
-      ],
-      "description": "Canonical section cost_projection for Forecast"
+        "cost projection"
+      ]
     },
     {
-      "id": "gross_margin_projection_10",
+      "id": "gross_margin_projection",
       "name": {
-        "en": "Gross Margin Projection Segment 10",
-        "pt": "Gross Margin Projection segmento 10"
+        "en": "Gross Margin Projection",
+        "pt": "Gross Margin Projection"
       },
-      "mustHave": true,
+      "required": false,
       "order": 10,
       "headingAnchors": [
-        "Gross Margin Projection 10",
-        "gross_margin_projection 10",
-        "Gross Margin Projection section",
-        "seção Gross Margin Projection 10"
-      ],
-      "confidence": 0.9,
-      "fallbackPatterns": [
-        "\bgross_margin_projection\b",
-        "\bgross_margin_projection_10\b",
-        "\bgross_margin_projection section\b"
-      ],
-      "description": "Canonical section gross_margin_projection for Forecast"
+        "gross margin projection"
+      ]
     },
     {
-      "id": "working_capital_projection_11",
+      "id": "working_capital_projection",
       "name": {
-        "en": "Working Capital Projection Segment 11",
-        "pt": "Working Capital Projection segmento 11"
+        "en": "Working Capital Projection",
+        "pt": "Working Capital Projection"
       },
-      "mustHave": false,
+      "required": false,
       "order": 11,
       "headingAnchors": [
-        "Working Capital Projection 11",
-        "working_capital_projection 11",
-        "Working Capital Projection section",
-        "seção Working Capital Projection 11"
-      ],
-      "confidence": 0.91,
-      "fallbackPatterns": [
-        "\bworking_capital_projection\b",
-        "\bworking_capital_projection_11\b",
-        "\bworking_capital_projection section\b"
-      ],
-      "description": "Canonical section working_capital_projection for Forecast"
+        "working capital projection"
+      ]
     },
     {
-      "id": "balance_sheet_projection_12",
+      "id": "balance_sheet_projection",
       "name": {
-        "en": "Balance Sheet Projection Segment 12",
-        "pt": "Balance Sheet Projection segmento 12"
+        "en": "Balance Sheet Projection",
+        "pt": "Balance Sheet Projection"
       },
-      "mustHave": false,
+      "required": false,
       "order": 12,
       "headingAnchors": [
-        "Balance Sheet Projection 12",
-        "balance_sheet_projection 12",
-        "Balance Sheet Projection section",
-        "seção Balance Sheet Projection 12"
-      ],
-      "confidence": 0.92,
-      "fallbackPatterns": [
-        "\bbalance_sheet_projection\b",
-        "\bbalance_sheet_projection_12\b",
-        "\bbalance_sheet_projection section\b"
-      ],
-      "description": "Canonical section balance_sheet_projection for Forecast"
+        "balance sheet projection"
+      ]
     },
     {
-      "id": "cash_flow_projection_13",
+      "id": "cash_flow_projection",
       "name": {
-        "en": "Cash Flow Projection Segment 13",
-        "pt": "Cash Flow Projection segmento 13"
+        "en": "Cash Flow Projection",
+        "pt": "Cash Flow Projection"
       },
-      "mustHave": false,
+      "required": false,
       "order": 13,
       "headingAnchors": [
-        "Cash Flow Projection 13",
-        "cash_flow_projection 13",
-        "Cash Flow Projection section",
-        "seção Cash Flow Projection 13"
-      ],
-      "confidence": 0.93,
-      "fallbackPatterns": [
-        "\bcash_flow_projection\b",
-        "\bcash_flow_projection_13\b",
-        "\bcash_flow_projection section\b"
-      ],
-      "description": "Canonical section cash_flow_projection for Forecast"
+        "cash flow projection"
+      ]
     },
     {
-      "id": "risk_overlay_14",
+      "id": "risk_overlay",
       "name": {
-        "en": "Risk Overlay Segment 14",
-        "pt": "Risk Overlay segmento 14"
+        "en": "Risk Overlay",
+        "pt": "Risk Overlay"
       },
-      "mustHave": false,
+      "required": false,
       "order": 14,
       "headingAnchors": [
-        "Risk Overlay 14",
-        "risk_overlay 14",
-        "Risk Overlay section",
-        "seção Risk Overlay 14"
-      ],
-      "confidence": 0.94,
-      "fallbackPatterns": [
-        "\brisk_overlay\b",
-        "\brisk_overlay_14\b",
-        "\brisk_overlay section\b"
-      ],
-      "description": "Canonical section risk_overlay for Forecast"
+        "risk overlay"
+      ]
     },
     {
-      "id": "forecast_purpose_15",
+      "id": "forecast_purpose",
       "name": {
-        "en": "Forecast Purpose Segment 15",
-        "pt": "Previsao Purpose segmento 15"
+        "en": "Forecast Purpose",
+        "pt": "Forecast Purpose"
       },
-      "mustHave": false,
+      "required": false,
       "order": 15,
       "headingAnchors": [
-        "Forecast Purpose 15",
-        "forecast_purpose 15",
-        "Forecast Purpose section",
-        "seção Forecast Purpose 15"
-      ],
-      "confidence": 0.8,
-      "fallbackPatterns": [
-        "\bforecast_purpose\b",
-        "\bforecast_purpose_15\b",
-        "\bforecast_purpose section\b"
-      ],
-      "description": "Canonical section forecast_purpose for Forecast"
-    },
-    {
-      "id": "base_case_16",
-      "name": {
-        "en": "Base Case Segment 16",
-        "pt": "Base Case segmento 16"
-      },
-      "mustHave": false,
-      "order": 16,
-      "headingAnchors": [
-        "Base Case 16",
-        "base_case 16",
-        "Base Case section",
-        "seção Base Case 16"
-      ],
-      "confidence": 0.81,
-      "fallbackPatterns": [
-        "\bbase_case\b",
-        "\bbase_case_16\b",
-        "\bbase_case section\b"
-      ],
-      "description": "Canonical section base_case for Forecast"
-    },
-    {
-      "id": "bull_case_17",
-      "name": {
-        "en": "Bull Case Segment 17",
-        "pt": "Bull Case segmento 17"
-      },
-      "mustHave": false,
-      "order": 17,
-      "headingAnchors": [
-        "Bull Case 17",
-        "bull_case 17",
-        "Bull Case section",
-        "seção Bull Case 17"
-      ],
-      "confidence": 0.82,
-      "fallbackPatterns": [
-        "\bbull_case\b",
-        "\bbull_case_17\b",
-        "\bbull_case section\b"
-      ],
-      "description": "Canonical section bull_case for Forecast"
-    },
-    {
-      "id": "bear_case_18",
-      "name": {
-        "en": "Bear Case Segment 18",
-        "pt": "Bear Case segmento 18"
-      },
-      "mustHave": false,
-      "order": 18,
-      "headingAnchors": [
-        "Bear Case 18",
-        "bear_case 18",
-        "Bear Case section",
-        "seção Bear Case 18"
-      ],
-      "confidence": 0.83,
-      "fallbackPatterns": [
-        "\bbear_case\b",
-        "\bbear_case_18\b",
-        "\bbear_case section\b"
-      ],
-      "description": "Canonical section bear_case for Forecast"
-    },
-    {
-      "id": "assumptions_19",
-      "name": {
-        "en": "Assumptions Segment 19",
-        "pt": "Assumptions segmento 19"
-      },
-      "mustHave": false,
-      "order": 19,
-      "headingAnchors": [
-        "Assumptions 19",
-        "assumptions 19",
-        "Assumptions section",
-        "seção Assumptions 19"
-      ],
-      "confidence": 0.84,
-      "fallbackPatterns": [
-        "\bassumptions\b",
-        "\bassumptions_19\b",
-        "\bassumptions section\b"
-      ],
-      "description": "Canonical section assumptions for Forecast"
-    },
-    {
-      "id": "sensitivity_20",
-      "name": {
-        "en": "Sensitivity Segment 20",
-        "pt": "Sensitivity segmento 20"
-      },
-      "mustHave": false,
-      "order": 20,
-      "headingAnchors": [
-        "Sensitivity 20",
-        "sensitivity 20",
-        "Sensitivity section",
-        "seção Sensitivity 20"
-      ],
-      "confidence": 0.85,
-      "fallbackPatterns": [
-        "\bsensitivity\b",
-        "\bsensitivity_20\b",
-        "\bsensitivity section\b"
-      ],
-      "description": "Canonical section sensitivity for Forecast"
-    },
-    {
-      "id": "driver_model_21",
-      "name": {
-        "en": "Driver Model Segment 21",
-        "pt": "Driver Model segmento 21"
-      },
-      "mustHave": false,
-      "order": 21,
-      "headingAnchors": [
-        "Driver Model 21",
-        "driver_model 21",
-        "Driver Model section",
-        "seção Driver Model 21"
-      ],
-      "confidence": 0.86,
-      "fallbackPatterns": [
-        "\bdriver_model\b",
-        "\bdriver_model_21\b",
-        "\bdriver_model section\b"
-      ],
-      "description": "Canonical section driver_model for Forecast"
-    },
-    {
-      "id": "cash_runway_22",
-      "name": {
-        "en": "Cash Runway Segment 22",
-        "pt": "Cash Runway segmento 22"
-      },
-      "mustHave": false,
-      "order": 22,
-      "headingAnchors": [
-        "Cash Runway 22",
-        "cash_runway 22",
-        "Cash Runway section",
-        "seção Cash Runway 22"
-      ],
-      "confidence": 0.87,
-      "fallbackPatterns": [
-        "\bcash_runway\b",
-        "\bcash_runway_22\b",
-        "\bcash_runway section\b"
-      ],
-      "description": "Canonical section cash_runway for Forecast"
-    },
-    {
-      "id": "revenue_projection_23",
-      "name": {
-        "en": "Revenue Projection Segment 23",
-        "pt": "Revenue Projection segmento 23"
-      },
-      "mustHave": false,
-      "order": 23,
-      "headingAnchors": [
-        "Revenue Projection 23",
-        "revenue_projection 23",
-        "Revenue Projection section",
-        "seção Revenue Projection 23"
-      ],
-      "confidence": 0.88,
-      "fallbackPatterns": [
-        "\brevenue_projection\b",
-        "\brevenue_projection_23\b",
-        "\brevenue_projection section\b"
-      ],
-      "description": "Canonical section revenue_projection for Forecast"
-    },
-    {
-      "id": "cost_projection_24",
-      "name": {
-        "en": "Cost Projection Segment 24",
-        "pt": "Cost Projection segmento 24"
-      },
-      "mustHave": false,
-      "order": 24,
-      "headingAnchors": [
-        "Cost Projection 24",
-        "cost_projection 24",
-        "Cost Projection section",
-        "seção Cost Projection 24"
-      ],
-      "confidence": 0.89,
-      "fallbackPatterns": [
-        "\bcost_projection\b",
-        "\bcost_projection_24\b",
-        "\bcost_projection section\b"
-      ],
-      "description": "Canonical section cost_projection for Forecast"
-    },
-    {
-      "id": "gross_margin_projection_25",
-      "name": {
-        "en": "Gross Margin Projection Segment 25",
-        "pt": "Gross Margin Projection segmento 25"
-      },
-      "mustHave": false,
-      "order": 25,
-      "headingAnchors": [
-        "Gross Margin Projection 25",
-        "gross_margin_projection 25",
-        "Gross Margin Projection section",
-        "seção Gross Margin Projection 25"
-      ],
-      "confidence": 0.9,
-      "fallbackPatterns": [
-        "\bgross_margin_projection\b",
-        "\bgross_margin_projection_25\b",
-        "\bgross_margin_projection section\b"
-      ],
-      "description": "Canonical section gross_margin_projection for Forecast"
-    },
-    {
-      "id": "working_capital_projection_26",
-      "name": {
-        "en": "Working Capital Projection Segment 26",
-        "pt": "Working Capital Projection segmento 26"
-      },
-      "mustHave": false,
-      "order": 26,
-      "headingAnchors": [
-        "Working Capital Projection 26",
-        "working_capital_projection 26",
-        "Working Capital Projection section",
-        "seção Working Capital Projection 26"
-      ],
-      "confidence": 0.91,
-      "fallbackPatterns": [
-        "\bworking_capital_projection\b",
-        "\bworking_capital_projection_26\b",
-        "\bworking_capital_projection section\b"
-      ],
-      "description": "Canonical section working_capital_projection for Forecast"
-    },
-    {
-      "id": "balance_sheet_projection_27",
-      "name": {
-        "en": "Balance Sheet Projection Segment 27",
-        "pt": "Balance Sheet Projection segmento 27"
-      },
-      "mustHave": false,
-      "order": 27,
-      "headingAnchors": [
-        "Balance Sheet Projection 27",
-        "balance_sheet_projection 27",
-        "Balance Sheet Projection section",
-        "seção Balance Sheet Projection 27"
-      ],
-      "confidence": 0.92,
-      "fallbackPatterns": [
-        "\bbalance_sheet_projection\b",
-        "\bbalance_sheet_projection_27\b",
-        "\bbalance_sheet_projection section\b"
-      ],
-      "description": "Canonical section balance_sheet_projection for Forecast"
-    },
-    {
-      "id": "cash_flow_projection_28",
-      "name": {
-        "en": "Cash Flow Projection Segment 28",
-        "pt": "Cash Flow Projection segmento 28"
-      },
-      "mustHave": false,
-      "order": 28,
-      "headingAnchors": [
-        "Cash Flow Projection 28",
-        "cash_flow_projection 28",
-        "Cash Flow Projection section",
-        "seção Cash Flow Projection 28"
-      ],
-      "confidence": 0.93,
-      "fallbackPatterns": [
-        "\bcash_flow_projection\b",
-        "\bcash_flow_projection_28\b",
-        "\bcash_flow_projection section\b"
-      ],
-      "description": "Canonical section cash_flow_projection for Forecast"
-    },
-    {
-      "id": "risk_overlay_29",
-      "name": {
-        "en": "Risk Overlay Segment 29",
-        "pt": "Risk Overlay segmento 29"
-      },
-      "mustHave": false,
-      "order": 29,
-      "headingAnchors": [
-        "Risk Overlay 29",
-        "risk_overlay 29",
-        "Risk Overlay section",
-        "seção Risk Overlay 29"
-      ],
-      "confidence": 0.94,
-      "fallbackPatterns": [
-        "\brisk_overlay\b",
-        "\brisk_overlay_29\b",
-        "\brisk_overlay section\b"
-      ],
-      "description": "Canonical section risk_overlay for Forecast"
-    },
-    {
-      "id": "forecast_purpose_30",
-      "name": {
-        "en": "Forecast Purpose Segment 30",
-        "pt": "Previsao Purpose segmento 30"
-      },
-      "mustHave": false,
-      "order": 30,
-      "headingAnchors": [
-        "Forecast Purpose 30",
-        "forecast_purpose 30",
-        "Forecast Purpose section",
-        "seção Forecast Purpose 30"
-      ],
-      "confidence": 0.8,
-      "fallbackPatterns": [
-        "\bforecast_purpose\b",
-        "\bforecast_purpose_30\b",
-        "\bforecast_purpose section\b"
-      ],
-      "description": "Canonical section forecast_purpose for Forecast"
-    },
-    {
-      "id": "base_case_31",
-      "name": {
-        "en": "Base Case Segment 31",
-        "pt": "Base Case segmento 31"
-      },
-      "mustHave": false,
-      "order": 31,
-      "headingAnchors": [
-        "Base Case 31",
-        "base_case 31",
-        "Base Case section",
-        "seção Base Case 31"
-      ],
-      "confidence": 0.81,
-      "fallbackPatterns": [
-        "\bbase_case\b",
-        "\bbase_case_31\b",
-        "\bbase_case section\b"
-      ],
-      "description": "Canonical section base_case for Forecast"
-    },
-    {
-      "id": "bull_case_32",
-      "name": {
-        "en": "Bull Case Segment 32",
-        "pt": "Bull Case segmento 32"
-      },
-      "mustHave": false,
-      "order": 32,
-      "headingAnchors": [
-        "Bull Case 32",
-        "bull_case 32",
-        "Bull Case section",
-        "seção Bull Case 32"
-      ],
-      "confidence": 0.82,
-      "fallbackPatterns": [
-        "\bbull_case\b",
-        "\bbull_case_32\b",
-        "\bbull_case section\b"
-      ],
-      "description": "Canonical section bull_case for Forecast"
-    },
-    {
-      "id": "bear_case_33",
-      "name": {
-        "en": "Bear Case Segment 33",
-        "pt": "Bear Case segmento 33"
-      },
-      "mustHave": false,
-      "order": 33,
-      "headingAnchors": [
-        "Bear Case 33",
-        "bear_case 33",
-        "Bear Case section",
-        "seção Bear Case 33"
-      ],
-      "confidence": 0.83,
-      "fallbackPatterns": [
-        "\bbear_case\b",
-        "\bbear_case_33\b",
-        "\bbear_case section\b"
-      ],
-      "description": "Canonical section bear_case for Forecast"
-    },
-    {
-      "id": "assumptions_34",
-      "name": {
-        "en": "Assumptions Segment 34",
-        "pt": "Assumptions segmento 34"
-      },
-      "mustHave": false,
-      "order": 34,
-      "headingAnchors": [
-        "Assumptions 34",
-        "assumptions 34",
-        "Assumptions section",
-        "seção Assumptions 34"
-      ],
-      "confidence": 0.84,
-      "fallbackPatterns": [
-        "\bassumptions\b",
-        "\bassumptions_34\b",
-        "\bassumptions section\b"
-      ],
-      "description": "Canonical section assumptions for Forecast"
-    },
-    {
-      "id": "sensitivity_35",
-      "name": {
-        "en": "Sensitivity Segment 35",
-        "pt": "Sensitivity segmento 35"
-      },
-      "mustHave": false,
-      "order": 35,
-      "headingAnchors": [
-        "Sensitivity 35",
-        "sensitivity 35",
-        "Sensitivity section",
-        "seção Sensitivity 35"
-      ],
-      "confidence": 0.85,
-      "fallbackPatterns": [
-        "\bsensitivity\b",
-        "\bsensitivity_35\b",
-        "\bsensitivity section\b"
-      ],
-      "description": "Canonical section sensitivity for Forecast"
-    },
-    {
-      "id": "driver_model_36",
-      "name": {
-        "en": "Driver Model Segment 36",
-        "pt": "Driver Model segmento 36"
-      },
-      "mustHave": false,
-      "order": 36,
-      "headingAnchors": [
-        "Driver Model 36",
-        "driver_model 36",
-        "Driver Model section",
-        "seção Driver Model 36"
-      ],
-      "confidence": 0.86,
-      "fallbackPatterns": [
-        "\bdriver_model\b",
-        "\bdriver_model_36\b",
-        "\bdriver_model section\b"
-      ],
-      "description": "Canonical section driver_model for Forecast"
-    },
-    {
-      "id": "cash_runway_37",
-      "name": {
-        "en": "Cash Runway Segment 37",
-        "pt": "Cash Runway segmento 37"
-      },
-      "mustHave": false,
-      "order": 37,
-      "headingAnchors": [
-        "Cash Runway 37",
-        "cash_runway 37",
-        "Cash Runway section",
-        "seção Cash Runway 37"
-      ],
-      "confidence": 0.87,
-      "fallbackPatterns": [
-        "\bcash_runway\b",
-        "\bcash_runway_37\b",
-        "\bcash_runway section\b"
-      ],
-      "description": "Canonical section cash_runway for Forecast"
-    },
-    {
-      "id": "revenue_projection_38",
-      "name": {
-        "en": "Revenue Projection Segment 38",
-        "pt": "Revenue Projection segmento 38"
-      },
-      "mustHave": false,
-      "order": 38,
-      "headingAnchors": [
-        "Revenue Projection 38",
-        "revenue_projection 38",
-        "Revenue Projection section",
-        "seção Revenue Projection 38"
-      ],
-      "confidence": 0.88,
-      "fallbackPatterns": [
-        "\brevenue_projection\b",
-        "\brevenue_projection_38\b",
-        "\brevenue_projection section\b"
-      ],
-      "description": "Canonical section revenue_projection for Forecast"
-    },
-    {
-      "id": "cost_projection_39",
-      "name": {
-        "en": "Cost Projection Segment 39",
-        "pt": "Cost Projection segmento 39"
-      },
-      "mustHave": false,
-      "order": 39,
-      "headingAnchors": [
-        "Cost Projection 39",
-        "cost_projection 39",
-        "Cost Projection section",
-        "seção Cost Projection 39"
-      ],
-      "confidence": 0.89,
-      "fallbackPatterns": [
-        "\bcost_projection\b",
-        "\bcost_projection_39\b",
-        "\bcost_projection section\b"
-      ],
-      "description": "Canonical section cost_projection for Forecast"
-    },
-    {
-      "id": "gross_margin_projection_40",
-      "name": {
-        "en": "Gross Margin Projection Segment 40",
-        "pt": "Gross Margin Projection segmento 40"
-      },
-      "mustHave": false,
-      "order": 40,
-      "headingAnchors": [
-        "Gross Margin Projection 40",
-        "gross_margin_projection 40",
-        "Gross Margin Projection section",
-        "seção Gross Margin Projection 40"
-      ],
-      "confidence": 0.9,
-      "fallbackPatterns": [
-        "\bgross_margin_projection\b",
-        "\bgross_margin_projection_40\b",
-        "\bgross_margin_projection section\b"
-      ],
-      "description": "Canonical section gross_margin_projection for Forecast"
-    },
-    {
-      "id": "working_capital_projection_41",
-      "name": {
-        "en": "Working Capital Projection Segment 41",
-        "pt": "Working Capital Projection segmento 41"
-      },
-      "mustHave": false,
-      "order": 41,
-      "headingAnchors": [
-        "Working Capital Projection 41",
-        "working_capital_projection 41",
-        "Working Capital Projection section",
-        "seção Working Capital Projection 41"
-      ],
-      "confidence": 0.91,
-      "fallbackPatterns": [
-        "\bworking_capital_projection\b",
-        "\bworking_capital_projection_41\b",
-        "\bworking_capital_projection section\b"
-      ],
-      "description": "Canonical section working_capital_projection for Forecast"
-    },
-    {
-      "id": "balance_sheet_projection_42",
-      "name": {
-        "en": "Balance Sheet Projection Segment 42",
-        "pt": "Balance Sheet Projection segmento 42"
-      },
-      "mustHave": false,
-      "order": 42,
-      "headingAnchors": [
-        "Balance Sheet Projection 42",
-        "balance_sheet_projection 42",
-        "Balance Sheet Projection section",
-        "seção Balance Sheet Projection 42"
-      ],
-      "confidence": 0.92,
-      "fallbackPatterns": [
-        "\bbalance_sheet_projection\b",
-        "\bbalance_sheet_projection_42\b",
-        "\bbalance_sheet_projection section\b"
-      ],
-      "description": "Canonical section balance_sheet_projection for Forecast"
-    },
-    {
-      "id": "cash_flow_projection_43",
-      "name": {
-        "en": "Cash Flow Projection Segment 43",
-        "pt": "Cash Flow Projection segmento 43"
-      },
-      "mustHave": false,
-      "order": 43,
-      "headingAnchors": [
-        "Cash Flow Projection 43",
-        "cash_flow_projection 43",
-        "Cash Flow Projection section",
-        "seção Cash Flow Projection 43"
-      ],
-      "confidence": 0.93,
-      "fallbackPatterns": [
-        "\bcash_flow_projection\b",
-        "\bcash_flow_projection_43\b",
-        "\bcash_flow_projection section\b"
-      ],
-      "description": "Canonical section cash_flow_projection for Forecast"
-    },
-    {
-      "id": "risk_overlay_44",
-      "name": {
-        "en": "Risk Overlay Segment 44",
-        "pt": "Risk Overlay segmento 44"
-      },
-      "mustHave": false,
-      "order": 44,
-      "headingAnchors": [
-        "Risk Overlay 44",
-        "risk_overlay 44",
-        "Risk Overlay section",
-        "seção Risk Overlay 44"
-      ],
-      "confidence": 0.94,
-      "fallbackPatterns": [
-        "\brisk_overlay\b",
-        "\brisk_overlay_44\b",
-        "\brisk_overlay section\b"
-      ],
-      "description": "Canonical section risk_overlay for Forecast"
-    },
-    {
-      "id": "forecast_purpose_45",
-      "name": {
-        "en": "Forecast Purpose Segment 45",
-        "pt": "Previsao Purpose segmento 45"
-      },
-      "mustHave": false,
-      "order": 45,
-      "headingAnchors": [
-        "Forecast Purpose 45",
-        "forecast_purpose 45",
-        "Forecast Purpose section",
-        "seção Forecast Purpose 45"
-      ],
-      "confidence": 0.8,
-      "fallbackPatterns": [
-        "\bforecast_purpose\b",
-        "\bforecast_purpose_45\b",
-        "\bforecast_purpose section\b"
-      ],
-      "description": "Canonical section forecast_purpose for Forecast"
-    },
-    {
-      "id": "base_case_46",
-      "name": {
-        "en": "Base Case Segment 46",
-        "pt": "Base Case segmento 46"
-      },
-      "mustHave": false,
-      "order": 46,
-      "headingAnchors": [
-        "Base Case 46",
-        "base_case 46",
-        "Base Case section",
-        "seção Base Case 46"
-      ],
-      "confidence": 0.81,
-      "fallbackPatterns": [
-        "\bbase_case\b",
-        "\bbase_case_46\b",
-        "\bbase_case section\b"
-      ],
-      "description": "Canonical section base_case for Forecast"
-    },
-    {
-      "id": "bull_case_47",
-      "name": {
-        "en": "Bull Case Segment 47",
-        "pt": "Bull Case segmento 47"
-      },
-      "mustHave": false,
-      "order": 47,
-      "headingAnchors": [
-        "Bull Case 47",
-        "bull_case 47",
-        "Bull Case section",
-        "seção Bull Case 47"
-      ],
-      "confidence": 0.82,
-      "fallbackPatterns": [
-        "\bbull_case\b",
-        "\bbull_case_47\b",
-        "\bbull_case section\b"
-      ],
-      "description": "Canonical section bull_case for Forecast"
-    },
-    {
-      "id": "bear_case_48",
-      "name": {
-        "en": "Bear Case Segment 48",
-        "pt": "Bear Case segmento 48"
-      },
-      "mustHave": false,
-      "order": 48,
-      "headingAnchors": [
-        "Bear Case 48",
-        "bear_case 48",
-        "Bear Case section",
-        "seção Bear Case 48"
-      ],
-      "confidence": 0.83,
-      "fallbackPatterns": [
-        "\bbear_case\b",
-        "\bbear_case_48\b",
-        "\bbear_case section\b"
-      ],
-      "description": "Canonical section bear_case for Forecast"
-    },
-    {
-      "id": "assumptions_49",
-      "name": {
-        "en": "Assumptions Segment 49",
-        "pt": "Assumptions segmento 49"
-      },
-      "mustHave": false,
-      "order": 49,
-      "headingAnchors": [
-        "Assumptions 49",
-        "assumptions 49",
-        "Assumptions section",
-        "seção Assumptions 49"
-      ],
-      "confidence": 0.84,
-      "fallbackPatterns": [
-        "\bassumptions\b",
-        "\bassumptions_49\b",
-        "\bassumptions section\b"
-      ],
-      "description": "Canonical section assumptions for Forecast"
-    },
-    {
-      "id": "sensitivity_50",
-      "name": {
-        "en": "Sensitivity Segment 50",
-        "pt": "Sensitivity segmento 50"
-      },
-      "mustHave": false,
-      "order": 50,
-      "headingAnchors": [
-        "Sensitivity 50",
-        "sensitivity 50",
-        "Sensitivity section",
-        "seção Sensitivity 50"
-      ],
-      "confidence": 0.85,
-      "fallbackPatterns": [
-        "\bsensitivity\b",
-        "\bsensitivity_50\b",
-        "\bsensitivity section\b"
-      ],
-      "description": "Canonical section sensitivity for Forecast"
-    },
-    {
-      "id": "driver_model_51",
-      "name": {
-        "en": "Driver Model Segment 51",
-        "pt": "Driver Model segmento 51"
-      },
-      "mustHave": false,
-      "order": 51,
-      "headingAnchors": [
-        "Driver Model 51",
-        "driver_model 51",
-        "Driver Model section",
-        "seção Driver Model 51"
-      ],
-      "confidence": 0.86,
-      "fallbackPatterns": [
-        "\bdriver_model\b",
-        "\bdriver_model_51\b",
-        "\bdriver_model section\b"
-      ],
-      "description": "Canonical section driver_model for Forecast"
-    },
-    {
-      "id": "cash_runway_52",
-      "name": {
-        "en": "Cash Runway Segment 52",
-        "pt": "Cash Runway segmento 52"
-      },
-      "mustHave": false,
-      "order": 52,
-      "headingAnchors": [
-        "Cash Runway 52",
-        "cash_runway 52",
-        "Cash Runway section",
-        "seção Cash Runway 52"
-      ],
-      "confidence": 0.87,
-      "fallbackPatterns": [
-        "\bcash_runway\b",
-        "\bcash_runway_52\b",
-        "\bcash_runway section\b"
-      ],
-      "description": "Canonical section cash_runway for Forecast"
-    },
-    {
-      "id": "revenue_projection_53",
-      "name": {
-        "en": "Revenue Projection Segment 53",
-        "pt": "Revenue Projection segmento 53"
-      },
-      "mustHave": false,
-      "order": 53,
-      "headingAnchors": [
-        "Revenue Projection 53",
-        "revenue_projection 53",
-        "Revenue Projection section",
-        "seção Revenue Projection 53"
-      ],
-      "confidence": 0.88,
-      "fallbackPatterns": [
-        "\brevenue_projection\b",
-        "\brevenue_projection_53\b",
-        "\brevenue_projection section\b"
-      ],
-      "description": "Canonical section revenue_projection for Forecast"
-    },
-    {
-      "id": "cost_projection_54",
-      "name": {
-        "en": "Cost Projection Segment 54",
-        "pt": "Cost Projection segmento 54"
-      },
-      "mustHave": false,
-      "order": 54,
-      "headingAnchors": [
-        "Cost Projection 54",
-        "cost_projection 54",
-        "Cost Projection section",
-        "seção Cost Projection 54"
-      ],
-      "confidence": 0.89,
-      "fallbackPatterns": [
-        "\bcost_projection\b",
-        "\bcost_projection_54\b",
-        "\bcost_projection section\b"
-      ],
-      "description": "Canonical section cost_projection for Forecast"
-    },
-    {
-      "id": "gross_margin_projection_55",
-      "name": {
-        "en": "Gross Margin Projection Segment 55",
-        "pt": "Gross Margin Projection segmento 55"
-      },
-      "mustHave": false,
-      "order": 55,
-      "headingAnchors": [
-        "Gross Margin Projection 55",
-        "gross_margin_projection 55",
-        "Gross Margin Projection section",
-        "seção Gross Margin Projection 55"
-      ],
-      "confidence": 0.9,
-      "fallbackPatterns": [
-        "\bgross_margin_projection\b",
-        "\bgross_margin_projection_55\b",
-        "\bgross_margin_projection section\b"
-      ],
-      "description": "Canonical section gross_margin_projection for Forecast"
-    },
-    {
-      "id": "working_capital_projection_56",
-      "name": {
-        "en": "Working Capital Projection Segment 56",
-        "pt": "Working Capital Projection segmento 56"
-      },
-      "mustHave": false,
-      "order": 56,
-      "headingAnchors": [
-        "Working Capital Projection 56",
-        "working_capital_projection 56",
-        "Working Capital Projection section",
-        "seção Working Capital Projection 56"
-      ],
-      "confidence": 0.91,
-      "fallbackPatterns": [
-        "\bworking_capital_projection\b",
-        "\bworking_capital_projection_56\b",
-        "\bworking_capital_projection section\b"
-      ],
-      "description": "Canonical section working_capital_projection for Forecast"
-    },
-    {
-      "id": "balance_sheet_projection_57",
-      "name": {
-        "en": "Balance Sheet Projection Segment 57",
-        "pt": "Balance Sheet Projection segmento 57"
-      },
-      "mustHave": false,
-      "order": 57,
-      "headingAnchors": [
-        "Balance Sheet Projection 57",
-        "balance_sheet_projection 57",
-        "Balance Sheet Projection section",
-        "seção Balance Sheet Projection 57"
-      ],
-      "confidence": 0.92,
-      "fallbackPatterns": [
-        "\bbalance_sheet_projection\b",
-        "\bbalance_sheet_projection_57\b",
-        "\bbalance_sheet_projection section\b"
-      ],
-      "description": "Canonical section balance_sheet_projection for Forecast"
-    },
-    {
-      "id": "cash_flow_projection_58",
-      "name": {
-        "en": "Cash Flow Projection Segment 58",
-        "pt": "Cash Flow Projection segmento 58"
-      },
-      "mustHave": false,
-      "order": 58,
-      "headingAnchors": [
-        "Cash Flow Projection 58",
-        "cash_flow_projection 58",
-        "Cash Flow Projection section",
-        "seção Cash Flow Projection 58"
-      ],
-      "confidence": 0.93,
-      "fallbackPatterns": [
-        "\bcash_flow_projection\b",
-        "\bcash_flow_projection_58\b",
-        "\bcash_flow_projection section\b"
-      ],
-      "description": "Canonical section cash_flow_projection for Forecast"
-    },
-    {
-      "id": "risk_overlay_59",
-      "name": {
-        "en": "Risk Overlay Segment 59",
-        "pt": "Risk Overlay segmento 59"
-      },
-      "mustHave": false,
-      "order": 59,
-      "headingAnchors": [
-        "Risk Overlay 59",
-        "risk_overlay 59",
-        "Risk Overlay section",
-        "seção Risk Overlay 59"
-      ],
-      "confidence": 0.94,
-      "fallbackPatterns": [
-        "\brisk_overlay\b",
-        "\brisk_overlay_59\b",
-        "\brisk_overlay section\b"
-      ],
-      "description": "Canonical section risk_overlay for Forecast"
-    },
-    {
-      "id": "forecast_purpose_60",
-      "name": {
-        "en": "Forecast Purpose Segment 60",
-        "pt": "Previsao Purpose segmento 60"
-      },
-      "mustHave": false,
-      "order": 60,
-      "headingAnchors": [
-        "Forecast Purpose 60",
-        "forecast_purpose 60",
-        "Forecast Purpose section",
-        "seção Forecast Purpose 60"
-      ],
-      "confidence": 0.8,
-      "fallbackPatterns": [
-        "\bforecast_purpose\b",
-        "\bforecast_purpose_60\b",
-        "\bforecast_purpose section\b"
-      ],
-      "description": "Canonical section forecast_purpose for Forecast"
-    },
-    {
-      "id": "base_case_61",
-      "name": {
-        "en": "Base Case Segment 61",
-        "pt": "Base Case segmento 61"
-      },
-      "mustHave": false,
-      "order": 61,
-      "headingAnchors": [
-        "Base Case 61",
-        "base_case 61",
-        "Base Case section",
-        "seção Base Case 61"
-      ],
-      "confidence": 0.81,
-      "fallbackPatterns": [
-        "\bbase_case\b",
-        "\bbase_case_61\b",
-        "\bbase_case section\b"
-      ],
-      "description": "Canonical section base_case for Forecast"
-    },
-    {
-      "id": "bull_case_62",
-      "name": {
-        "en": "Bull Case Segment 62",
-        "pt": "Bull Case segmento 62"
-      },
-      "mustHave": false,
-      "order": 62,
-      "headingAnchors": [
-        "Bull Case 62",
-        "bull_case 62",
-        "Bull Case section",
-        "seção Bull Case 62"
-      ],
-      "confidence": 0.82,
-      "fallbackPatterns": [
-        "\bbull_case\b",
-        "\bbull_case_62\b",
-        "\bbull_case section\b"
-      ],
-      "description": "Canonical section bull_case for Forecast"
+        "forecast purpose"
+      ]
     }
   ]
 }

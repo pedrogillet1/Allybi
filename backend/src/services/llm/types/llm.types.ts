@@ -37,7 +37,7 @@ export type LlmProviderId = "openai" | "gemini" | "local" | (string & {});
 
 /**
  * Model id is provider-specific but treated as a string across Allybi.
- * Example: "gpt-5-mini", "gpt-5.2", "gemini-2.5-flash", etc.
+ * Example: "gpt-5.2", "gemini-2.5-flash", etc.
  */
 export type LlmModelId = string;
 

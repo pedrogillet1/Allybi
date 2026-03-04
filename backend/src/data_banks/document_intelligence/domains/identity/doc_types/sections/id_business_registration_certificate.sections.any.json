@@ -1,19 +1,13 @@
 {
   "_meta": {
     "id": "di_identity_sections_id_business_registration_certificate",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "description": "Section map for id_business_registration_certificate.",
-    "languages": [
-      "any"
-    ],
-    "lastUpdated": "2026-02-28",
+    "languages": ["any"],
+    "lastUpdated": "2026-03-04",
     "owner": "data-bank-governance",
-    "usedBy": [
-      "services/core/banks/dataBankLoader.service.ts"
-    ],
-    "tests": [
-      "tests/patternWiringProof.test.ts"
-    ]
+    "usedBy": ["services/core/banks/dataBankLoader.service.ts"],
+    "tests": ["tests/patternWiringProof.test.ts"]
   },
   "config": {
     "enabled": true,
@@ -23,129 +17,38 @@
   "sections": [
     {
       "id": "document_identification",
-      "name": {
-        "en": "Document Identification",
-        "pt": "Identificacao do Documento"
-      },
+      "name": { "en": "Document Identification", "pt": "Identificação do Documento" },
       "required": true,
-      "order": 1
+      "order": 1,
+      "headingAnchors": ["Certificate of Registration", "Certidão de Registro", "Business Certificate", "Certificado Empresarial"]
     },
     {
-      "id": "issuer_information",
-      "name": {
-        "en": "Business Registration Certificate Issuer Information",
-        "pt": "Informacoes do Emissor de Certificado de Registro Empresarial"
-      },
+      "id": "entity_information",
+      "name": { "en": "Entity Information", "pt": "Informações da Entidade" },
       "required": true,
-      "order": 2
+      "order": 2,
+      "headingAnchors": ["Corporate Name", "Razão Social", "CNPJ", "EIN", "Company Name", "Nome da Empresa"]
     },
     {
-      "id": "party_identification",
-      "name": {
-        "en": "Party Identification",
-        "pt": "Identificacao das Partes"
-      },
+      "id": "registration_details",
+      "name": { "en": "Registration Details", "pt": "Detalhes do Registro" },
       "required": true,
-      "order": 3
+      "order": 3,
+      "headingAnchors": ["Registration Number", "Número de Registro", "Date of Incorporation", "Data de Constituição", "State of Formation"]
     },
     {
-      "id": "period_and_jurisdiction",
-      "name": {
-        "en": "Period and Jurisdiction",
-        "pt": "Periodo e Jurisdicao"
-      },
-      "required": true,
-      "order": 4
-    },
-    {
-      "id": "status_and_summary",
-      "name": {
-        "en": "Status and Summary",
-        "pt": "Status e Resumo"
-      },
-      "required": true,
-      "order": 5
-    },
-    {
-      "id": "line_items",
-      "name": {
-        "en": "Line Items",
-        "pt": "Itens de Linha"
-      },
-      "required": true,
-      "order": 6
-    },
-    {
-      "id": "calculation_basis",
-      "name": {
-        "en": "Calculation Basis",
-        "pt": "Base de Calculo"
-      },
+      "id": "authorized_activities",
+      "name": { "en": "Authorized Activities", "pt": "Atividades Autorizadas" },
       "required": false,
-      "order": 7
+      "order": 4,
+      "headingAnchors": ["Business Activity", "Atividade Econômica", "CNAE", "SIC Code", "Purpose", "Objeto Social"]
     },
     {
-      "id": "critical_dates",
-      "name": {
-        "en": "Critical Dates",
-        "pt": "Datas Criticas"
-      },
-      "required": true,
-      "order": 8
-    },
-    {
-      "id": "obligations_and_conditions",
-      "name": {
-        "en": "Obligations and Conditions",
-        "pt": "Obrigacoes e Condicoes"
-      },
+      "id": "officers_and_directors",
+      "name": { "en": "Officers and Directors", "pt": "Diretores e Administradores" },
       "required": false,
-      "order": 9
-    },
-    {
-      "id": "supporting_documents",
-      "name": {
-        "en": "Supporting Documents",
-        "pt": "Documentos de Suporte"
-      },
-      "required": false,
-      "order": 10
-    },
-    {
-      "id": "annexes_exhibits",
-      "name": {
-        "en": "Annexes and Exhibits",
-        "pt": "Anexos e Apensos"
-      },
-      "required": false,
-      "order": 11
-    },
-    {
-      "id": "footnotes",
-      "name": {
-        "en": "Footnotes",
-        "pt": "Notas de Rodape"
-      },
-      "required": false,
-      "order": 12
-    },
-    {
-      "id": "signatures_attestations",
-      "name": {
-        "en": "Signatures and Attestations",
-        "pt": "Assinaturas e Atestacoes"
-      },
-      "required": false,
-      "order": 13
-    },
-    {
-      "id": "contacts_and_instructions",
-      "name": {
-        "en": "Contacts and Instructions",
-        "pt": "Contatos e Instrucoes"
-      },
-      "required": false,
-      "order": 14
+      "order": 5,
+      "headingAnchors": ["Officers", "Directors", "Diretores", "Administradores", "Board Members", "Sócios"]
     }
   ]
 }

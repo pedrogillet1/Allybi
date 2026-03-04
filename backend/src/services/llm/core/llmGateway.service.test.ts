@@ -1,6 +1,6 @@
 import { describe, expect, jest, test } from "@jest/globals";
 import type { LLMClient } from "./llmClient.interface";
-import { LlmGatewayService, type LlmGatewayRequest } from "./llmGateway.service";
+import { FallbackExhaustedError, invalidateComposedCache, LlmGatewayService, type LlmGatewayRequest } from "./llmGateway.service";
 
 jest.mock("../../core/banks/bankLoader.service", () => ({
   getOptionalBank: jest.fn((bankId: string) => {
@@ -67,13 +67,13 @@ describe("LlmGatewayService retrieval-plan producer", () => {
       complete: jest.fn(async () => ({
         traceId: "trace-1",
         turnId: "turn-1",
-        model: { provider: "openai", model: "gpt-5-mini" },
+        model: { provider: "openai", model: "gpt-5.2" },
         content: "queryVariants:\n- revenue",
       })),
       stream: jest.fn(async () => ({
         traceId: "trace-1",
         turnId: "turn-1",
-        model: { provider: "openai", model: "gpt-5-mini" },
+        model: { provider: "openai", model: "gpt-5.2" },
         finalText: "",
       })),
     };
@@ -81,7 +81,7 @@ describe("LlmGatewayService retrieval-plan producer", () => {
     const router: any = {
       route: jest.fn(() => ({
         provider: "openai",
-        model: "gpt-5-mini",
+        model: "gpt-5.2",
         reason: "quality_finish",
         stage: "final",
         constraints: {},
@@ -123,7 +123,7 @@ describe("LlmGatewayService retrieval-plan producer", () => {
       {
         env: "local",
         provider: "openai",
-        modelId: "gpt-5-mini",
+        modelId: "gpt-5.2",
       },
       answerModeRouter,
     );
@@ -153,20 +153,20 @@ describe("LlmGatewayService retrieval-plan producer", () => {
       complete: jest.fn(async () => ({
         traceId: "trace-2",
         turnId: "turn-2",
-        model: { provider: "openai", model: "gpt-5-mini" },
+        model: { provider: "openai", model: "gpt-5.2" },
         content: "ok",
       })),
       stream: jest.fn(async () => ({
         traceId: "trace-2",
         turnId: "turn-2",
-        model: { provider: "openai", model: "gpt-5-mini" },
+        model: { provider: "openai", model: "gpt-5.2" },
         finalText: "",
       })),
     };
     const router: any = {
       route: jest.fn(() => ({
         provider: "openai",
-        model: "gpt-5-mini",
+        model: "gpt-5.2",
         reason: "quality_finish",
         stage: "final",
         constraints: {},
@@ -202,7 +202,7 @@ describe("LlmGatewayService retrieval-plan producer", () => {
       {
         env: "local",
         provider: "openai",
-        modelId: "gpt-5-mini",
+        modelId: "gpt-5.2",
       },
       answerModeRouter,
     );
@@ -228,20 +228,20 @@ describe("LlmGatewayService retrieval-plan producer", () => {
       complete: jest.fn(async () => ({
         traceId: "trace-3",
         turnId: "turn-3",
-        model: { provider: "openai", model: "gpt-5-mini" },
+        model: { provider: "openai", model: "gpt-5.2" },
         content: "{\"plan\":[]}",
       })),
       stream: jest.fn(async () => ({
         traceId: "trace-3",
         turnId: "turn-3",
-        model: { provider: "openai", model: "gpt-5-mini" },
+        model: { provider: "openai", model: "gpt-5.2" },
         finalText: "",
       })),
     };
     const router: any = {
       route: jest.fn(() => ({
         provider: "openai",
-        model: "gpt-5-mini",
+        model: "gpt-5.2",
         reason: "quality_finish",
         stage: "final",
         constraints: {},
@@ -277,7 +277,7 @@ describe("LlmGatewayService retrieval-plan producer", () => {
       {
         env: "local",
         provider: "openai",
-        modelId: "gpt-5-mini",
+        modelId: "gpt-5.2",
       },
       answerModeRouter,
     );
@@ -303,20 +303,20 @@ describe("LlmGatewayService retrieval-plan producer", () => {
       complete: jest.fn(async () => ({
         traceId: "trace-4",
         turnId: "turn-4",
-        model: { provider: "openai", model: "gpt-5-mini" },
+        model: { provider: "openai", model: "gpt-5.2" },
         content: "ok",
       })),
       stream: jest.fn(async () => ({
         traceId: "trace-4",
         turnId: "turn-4",
-        model: { provider: "openai", model: "gpt-5-mini" },
+        model: { provider: "openai", model: "gpt-5.2" },
         finalText: "",
       })),
     };
     const router: any = {
       route: jest.fn(() => ({
         provider: "openai",
-        model: "gpt-5-mini",
+        model: "gpt-5.2",
         reason: "quality_finish",
         stage: "final",
         constraints: {},
@@ -352,7 +352,7 @@ describe("LlmGatewayService retrieval-plan producer", () => {
       {
         env: "local",
         provider: "openai",
-        modelId: "gpt-5-mini",
+        modelId: "gpt-5.2",
       },
       answerModeRouter,
     );
@@ -378,13 +378,13 @@ describe("LlmGatewayService retrieval-plan producer", () => {
       complete: jest.fn(async () => ({
         traceId: "trace-5",
         turnId: "turn-5",
-        model: { provider: "openai", model: "gpt-5-mini" },
+        model: { provider: "openai", model: "gpt-5.2" },
         content: "openai",
       })),
       stream: jest.fn(async () => ({
         traceId: "trace-5",
         turnId: "turn-5",
-        model: { provider: "openai", model: "gpt-5-mini" },
+        model: { provider: "openai", model: "gpt-5.2" },
         finalText: "",
       })),
     };
@@ -441,7 +441,7 @@ describe("LlmGatewayService retrieval-plan producer", () => {
       {
         env: "local",
         provider: "openai",
-        modelId: "gpt-5-mini",
+        modelId: "gpt-5.2",
       },
       {
         resolve(provider) {
@@ -539,7 +539,7 @@ describe("LlmGatewayService retrieval-plan producer", () => {
       {
         env: "local",
         provider: "openai",
-        modelId: "gpt-5-mini",
+        modelId: "gpt-5.2",
       },
       {
         resolve(provider) {
@@ -638,7 +638,7 @@ describe("LlmGatewayService retrieval-plan producer", () => {
       {
         env: "local",
         provider: "openai",
-        modelId: "gpt-5-mini",
+        modelId: "gpt-5.2",
       },
       {
         resolve(provider) {
@@ -681,7 +681,7 @@ describe("LlmGatewayService retrieval-plan producer", () => {
     expect(sinkEvents).toHaveLength(0);
   });
 
-  test("stream does not retry after emitting any stream events", async () => {
+  test("stream retries when only preamble events were emitted", async () => {
     const openaiClient: LLMClient = {
       provider: "openai",
       complete: jest.fn(async () => ({
@@ -694,6 +694,10 @@ describe("LlmGatewayService retrieval-plan producer", () => {
         sink.write({
           event: "start",
           data: { kind: "answer", t: Date.now(), traceId: "trace-8" },
+        });
+        sink.write({
+          event: "progress",
+          data: { stage: "generation", t: Date.now() },
         });
         throw new Error("openai stream interrupted");
       }),
@@ -709,6 +713,110 @@ describe("LlmGatewayService retrieval-plan producer", () => {
       stream: jest.fn(async () => ({
         traceId: "trace-8",
         turnId: "turn-8",
+        model: { provider: "google", model: "gemini-2.5-flash" },
+        finalText: "fallback-after-preamble",
+      })),
+    };
+    const router: any = {
+      route: jest.fn(() => ({
+        provider: "openai",
+        model: "gpt-5.2",
+        reason: "quality_finish",
+        stage: "final",
+        constraints: { requireStreaming: true },
+      })),
+      listFallbackTargets: jest.fn(() => [
+        { provider: "gemini", model: "gemini-2.5-flash" },
+      ]),
+    };
+    const builder: any = {
+      build: jest.fn((input: any) => ({
+        route: input.route,
+        messages: [{ role: "system", content: "compose" }],
+        options: { stream: true, maxOutputTokens: 256 },
+        kodaMeta: {
+          promptType: "compose_answer",
+          promptTrace: {
+            orderedPrompts: [
+              {
+                bankId: "compose_prompt",
+                version: "1.0.0",
+                templateId: "compose_prompt:templates.en",
+                hash: "h",
+              },
+            ],
+          },
+        },
+      })),
+    };
+
+    const gateway = new LlmGatewayService(
+      openaiClient,
+      router,
+      builder,
+      {
+        env: "local",
+        provider: "openai",
+        modelId: "gpt-5.2",
+      },
+      {
+        resolve(provider) {
+          if (provider === "google") return googleClient;
+          return null;
+        },
+      },
+    );
+
+    const out = await gateway.stream({
+      traceId: "trace-8",
+      userId: "u1",
+      conversationId: "c1",
+      messages: [{ role: "user", content: "hello stream" }],
+      sink: {
+        transport: "inproc",
+        write() {},
+        close() {},
+        isOpen() {
+          return true;
+        },
+      },
+      streamingConfig: {
+        markerHold: { enabled: true, flushAt: "final", maxBufferedMarkers: 16 },
+      },
+    });
+    expect((openaiClient.stream as jest.Mock).mock.calls).toHaveLength(1);
+    expect((googleClient.stream as jest.Mock).mock.calls).toHaveLength(1);
+    expect(out.finalText).toBe("fallback-after-preamble");
+  });
+
+  test("stream does not retry after emitting visible output", async () => {
+    const openaiClient: LLMClient = {
+      provider: "openai",
+      complete: jest.fn(async () => ({
+        traceId: "trace-9",
+        turnId: "turn-9",
+        model: { provider: "openai", model: "gpt-5.2" },
+        content: "unused",
+      })),
+      stream: jest.fn(async ({ sink }) => {
+        sink.write({
+          event: "delta",
+          data: { text: "partial" },
+        });
+        throw new Error("openai stream interrupted");
+      }),
+    };
+    const googleClient: LLMClient = {
+      provider: "google",
+      complete: jest.fn(async () => ({
+        traceId: "trace-9",
+        turnId: "turn-9",
+        model: { provider: "google", model: "gemini-2.5-flash" },
+        content: "unused",
+      })),
+      stream: jest.fn(async () => ({
+        traceId: "trace-9",
+        turnId: "turn-9",
         model: { provider: "google", model: "gemini-2.5-flash" },
         finalText: "should-not-run",
       })),
@@ -753,7 +861,7 @@ describe("LlmGatewayService retrieval-plan producer", () => {
       {
         env: "local",
         provider: "openai",
-        modelId: "gpt-5-mini",
+        modelId: "gpt-5.2",
       },
       {
         resolve(provider) {
@@ -765,7 +873,7 @@ describe("LlmGatewayService retrieval-plan producer", () => {
 
     await expect(
       gateway.stream({
-        traceId: "trace-8",
+        traceId: "trace-9",
         userId: "u1",
         conversationId: "c1",
         messages: [{ role: "user", content: "hello stream" }],
@@ -784,5 +892,286 @@ describe("LlmGatewayService retrieval-plan producer", () => {
     ).rejects.toThrow("openai stream interrupted");
     expect((openaiClient.stream as jest.Mock).mock.calls).toHaveLength(1);
     expect((googleClient.stream as jest.Mock).mock.calls).toHaveLength(0);
+  });
+
+  test("throws FallbackExhaustedError with attempts when all providers fail", async () => {
+    const openaiClient: LLMClient = {
+      provider: "openai",
+      complete: jest.fn(async () => {
+        throw new Error("openai down");
+      }),
+      stream: jest.fn(async () => {
+        throw new Error("openai stream down");
+      }),
+    };
+    const googleClient: LLMClient = {
+      provider: "google",
+      complete: jest.fn(async () => {
+        throw new Error("google down");
+      }),
+      stream: jest.fn(async () => {
+        throw new Error("google stream down");
+      }),
+    };
+    const router: any = {
+      route: jest.fn(() => ({
+        provider: "openai",
+        model: "gpt-5.2",
+        modelFamily: "gpt-5.2",
+        reason: "quality_finish",
+        lane: "final_authority_default",
+        policyRuleId: "final_authority_default",
+        qualityReason: "quality_finish",
+        stage: "final",
+        constraints: {},
+      })),
+      listFallbackTargets: jest.fn(() => [
+        { provider: "gemini", model: "gemini-2.5-flash" },
+      ]),
+    };
+    const builder: any = {
+      build: jest.fn((input: any) => ({
+        route: input.route,
+        messages: [{ role: "system", content: "compose" }],
+        options: { stream: false, maxOutputTokens: 256 },
+        kodaMeta: {
+          promptType: "compose_answer",
+          promptTrace: {
+            orderedPrompts: [
+              {
+                bankId: "compose_prompt",
+                version: "1.0.0",
+                templateId: "compose_prompt:templates.en",
+                hash: "h",
+              },
+            ],
+          },
+        },
+      })),
+    };
+
+    const gateway = new LlmGatewayService(
+      openaiClient,
+      router,
+      builder,
+      {
+        env: "local",
+        provider: "openai",
+        modelId: "gpt-5.2",
+      },
+      {
+        resolve(provider) {
+          if (provider === "google") return googleClient;
+          return null;
+        },
+      },
+    );
+
+    try {
+      await gateway.generate({
+        traceId: "trace-exhaust",
+        userId: "u1",
+        conversationId: "c1",
+        messages: [{ role: "user", content: "hello" }],
+      });
+      throw new Error("should have thrown");
+    } catch (err) {
+      expect(err).toBeInstanceOf(FallbackExhaustedError);
+      const exhausted = err as FallbackExhaustedError;
+      expect(exhausted.attempts.length).toBeGreaterThan(0);
+      expect(exhausted.attempts[0].status).toBe("fail");
+      expect(exhausted.code).toBe("LLM_ALL_FALLBACKS_EXHAUSTED");
+    }
+  });
+
+  test("invalidateComposedCache is exported and callable", () => {
+    expect(typeof invalidateComposedCache).toBe("function");
+    // Should not throw
+    invalidateComposedCache("doc-123");
+  });
+
+  test("fallback exhaustion error includes all attempt details", async () => {
+    const openaiClient: LLMClient = {
+      provider: "openai",
+      complete: jest.fn(async () => {
+        throw new Error("openai rate limit");
+      }),
+      stream: jest.fn(async () => {
+        throw new Error("openai stream rate limit");
+      }),
+    };
+    const googleClient: LLMClient = {
+      provider: "google",
+      complete: jest.fn(async () => {
+        throw new Error("google quota exceeded");
+      }),
+      stream: jest.fn(async () => {
+        throw new Error("google stream quota exceeded");
+      }),
+    };
+    const router: any = {
+      route: jest.fn(() => ({
+        provider: "openai",
+        model: "gpt-5.2",
+        modelFamily: "gpt-5.2",
+        reason: "quality_finish",
+        lane: "final_authority_default",
+        policyRuleId: "final_authority_default",
+        qualityReason: "quality_finish",
+        stage: "final",
+        constraints: {},
+      })),
+      listFallbackTargets: jest.fn(() => [
+        { provider: "gemini", model: "gemini-2.5-flash" },
+      ]),
+    };
+    const builder: any = {
+      build: jest.fn((input: any) => ({
+        route: input.route,
+        messages: [{ role: "system", content: "compose" }],
+        options: { stream: false, maxOutputTokens: 256 },
+        kodaMeta: {
+          promptType: "compose_answer",
+          promptTrace: {
+            orderedPrompts: [
+              {
+                bankId: "compose_prompt",
+                version: "1.0.0",
+                templateId: "compose_prompt:templates.en",
+                hash: "h",
+              },
+            ],
+          },
+        },
+      })),
+    };
+
+    const gateway = new LlmGatewayService(
+      openaiClient,
+      router,
+      builder,
+      {
+        env: "local",
+        provider: "openai",
+        modelId: "gpt-5.2",
+      },
+      {
+        resolve(provider) {
+          if (provider === "google") return googleClient;
+          return null;
+        },
+      },
+    );
+
+    try {
+      await gateway.generate({
+        traceId: "trace-exhaust-2",
+        userId: "u1",
+        conversationId: "c1",
+        messages: [{ role: "user", content: "hello" }],
+      });
+      throw new Error("should have thrown");
+    } catch (err) {
+      expect(err).toBeInstanceOf(FallbackExhaustedError);
+      const exhausted = err as FallbackExhaustedError;
+      expect(exhausted.attempts).toHaveLength(2);
+      expect(exhausted.attempts[0].provider).toBe("openai");
+      expect(exhausted.attempts[0].status).toBe("fail");
+      expect(exhausted.attempts[1].provider).toBe("google");
+      expect(exhausted.attempts[1].status).toBe("fail");
+    }
+  });
+
+  test("stream emits fallback_failed error event when visible output was sent then provider fails", async () => {
+    const openaiClient: LLMClient = {
+      provider: "openai",
+      complete: jest.fn(async () => ({
+        traceId: "trace-fb",
+        turnId: "turn-fb",
+        model: { provider: "openai", model: "gpt-5.2" },
+        content: "unused",
+      })),
+      stream: jest.fn(async ({ sink }) => {
+        sink.write({
+          event: "delta",
+          data: { text: "partial content" },
+        });
+        throw new Error("openai stream crashed after delta");
+      }),
+    };
+    const router: any = {
+      route: jest.fn(() => ({
+        provider: "openai",
+        model: "gpt-5.2",
+        reason: "quality_finish",
+        stage: "final",
+        constraints: { requireStreaming: true },
+      })),
+      listFallbackTargets: jest.fn(() => [
+        { provider: "gemini", model: "gemini-2.5-flash" },
+      ]),
+    };
+    const builder: any = {
+      build: jest.fn((input: any) => ({
+        route: input.route,
+        messages: [{ role: "system", content: "compose" }],
+        options: { stream: true, maxOutputTokens: 256 },
+        kodaMeta: {
+          promptType: "compose_answer",
+          promptTrace: {
+            orderedPrompts: [
+              {
+                bankId: "compose_prompt",
+                version: "1.0.0",
+                templateId: "compose_prompt:templates.en",
+                hash: "h",
+              },
+            ],
+          },
+        },
+      })),
+    };
+
+    const gateway = new LlmGatewayService(
+      openaiClient,
+      router,
+      builder,
+      {
+        env: "local",
+        provider: "openai",
+        modelId: "gpt-5.2",
+      },
+    );
+
+    const sinkEvents: unknown[] = [];
+    let sinkClosed = false;
+    await expect(
+      gateway.stream({
+        traceId: "trace-fb",
+        userId: "u1",
+        conversationId: "c1",
+        messages: [{ role: "user", content: "hello stream" }],
+        sink: {
+          transport: "inproc",
+          write(event) {
+            sinkEvents.push(event);
+          },
+          close() {
+            sinkClosed = true;
+          },
+          isOpen() {
+            return !sinkClosed;
+          },
+        },
+        streamingConfig: {
+          markerHold: { enabled: true, flushAt: "final", maxBufferedMarkers: 16 },
+        },
+      }),
+    ).rejects.toThrow("openai stream crashed after delta");
+
+    const errorEvent = sinkEvents.find(
+      (e: any) => e.event === "error" && e.data?.code === "fallback_failed",
+    );
+    expect(errorEvent).toBeDefined();
   });
 });

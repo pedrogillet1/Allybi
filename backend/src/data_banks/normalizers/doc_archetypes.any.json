@@ -19,7 +19,7 @@
     "enabled": true,
     "enforceDeterministicSort": true,
     "dedupeCaseInsensitive": true,
-    "docTypeCount": 65
+    "docTypeCount": 129
   },
   "archetypes": [
     {
@@ -2051,6 +2051,1976 @@
           "payer",
           "cash date",
           "counterparty"
+        ]
+      }
+    },
+    {
+      "docTypeId": "banking_bank_statement",
+      "domainId": "banking",
+      "displayName": "Bank Statement",
+      "description": "Checking/savings account transaction statement",
+      "structureSignatures": {
+        "headings": [
+          "Account Summary",
+          "Statement Period",
+          "Transactions",
+          "Opening Balance",
+          "Closing Balance"
+        ],
+        "tableSignatures": [
+          "Date/description/amount table",
+          "Debit-credit columns",
+          "Running balance"
+        ],
+        "layoutCues": [
+          "Time-ordered transaction rows",
+          "Bank logo header",
+          "Balance summary box"
+        ],
+        "metadataCues": [
+          "account number",
+          "statement period",
+          "bank name",
+          "branch"
+        ]
+      }
+    },
+    {
+      "docTypeId": "banking_credit_card_statement",
+      "domainId": "banking",
+      "displayName": "Credit Card Statement",
+      "description": "Monthly credit card billing statement",
+      "structureSignatures": {
+        "headings": [
+          "Card Summary",
+          "Transaction Details",
+          "Payment Due",
+          "Rewards",
+          "Interest Charges"
+        ],
+        "tableSignatures": [
+          "Transaction date/merchant/amount table",
+          "Payment breakdown",
+          "Rewards summary"
+        ],
+        "layoutCues": [
+          "Running total bar",
+          "Minimum payment box",
+          "Transaction list"
+        ],
+        "metadataCues": [
+          "card number",
+          "statement date",
+          "credit limit",
+          "available credit"
+        ]
+      }
+    },
+    {
+      "docTypeId": "banking_loan_statement",
+      "domainId": "banking",
+      "displayName": "Loan Statement",
+      "description": "Loan account balance and payment history",
+      "structureSignatures": {
+        "headings": [
+          "Loan Summary",
+          "Payment History",
+          "Outstanding Balance",
+          "Interest Accrued",
+          "Next Payment"
+        ],
+        "tableSignatures": [
+          "Payment schedule table",
+          "Principal vs interest breakdown",
+          "Balance history"
+        ],
+        "layoutCues": [
+          "Amortization schedule",
+          "Balance bar chart",
+          "Payment calendar"
+        ],
+        "metadataCues": [
+          "loan number",
+          "interest rate",
+          "original amount",
+          "maturity date"
+        ]
+      }
+    },
+    {
+      "docTypeId": "banking_payment_receipt",
+      "domainId": "banking",
+      "displayName": "Payment Receipt",
+      "description": "Transaction confirmation receipt",
+      "structureSignatures": {
+        "headings": [
+          "Transaction Details",
+          "Sender",
+          "Recipient",
+          "Confirmation",
+          "Amount"
+        ],
+        "tableSignatures": [
+          "Transaction summary table",
+          "Fee breakdown",
+          "Exchange rate table"
+        ],
+        "layoutCues": [
+          "Confirmation number header",
+          "Amount highlight",
+          "Status indicator"
+        ],
+        "metadataCues": [
+          "transaction id",
+          "timestamp",
+          "payment method",
+          "reference number"
+        ]
+      }
+    },
+    {
+      "docTypeId": "banking_brokerage_statement",
+      "domainId": "banking",
+      "displayName": "Brokerage Statement",
+      "description": "Investment account holdings statement",
+      "structureSignatures": {
+        "headings": [
+          "Account Summary",
+          "Holdings",
+          "Transactions",
+          "Dividends",
+          "Gains and Losses"
+        ],
+        "tableSignatures": [
+          "Holdings position table",
+          "Transaction activity table",
+          "Dividend income table"
+        ],
+        "layoutCues": [
+          "Portfolio pie chart",
+          "Performance chart",
+          "Asset allocation"
+        ],
+        "metadataCues": [
+          "account number",
+          "statement period",
+          "total value",
+          "advisor"
+        ]
+      }
+    },
+    {
+      "docTypeId": "banking_cd_statement",
+      "domainId": "banking",
+      "displayName": "CD Statement",
+      "description": "Certificate of deposit account statement",
+      "structureSignatures": {
+        "headings": [
+          "CD Summary",
+          "Interest Earned",
+          "Maturity Details",
+          "Renewal Options",
+          "Account Terms"
+        ],
+        "tableSignatures": [
+          "Interest accrual table",
+          "CD terms summary",
+          "Maturity schedule"
+        ],
+        "layoutCues": [
+          "Maturity date highlight",
+          "Interest rate box",
+          "Penalty terms"
+        ],
+        "metadataCues": [
+          "cd number",
+          "interest rate",
+          "maturity date",
+          "principal amount"
+        ]
+      }
+    },
+    {
+      "docTypeId": "banking_investment_account_statement",
+      "domainId": "banking",
+      "displayName": "Investment Account Statement",
+      "description": "Investment account periodic statement",
+      "structureSignatures": {
+        "headings": [
+          "Account Overview",
+          "Asset Allocation",
+          "Performance",
+          "Transactions",
+          "Fees"
+        ],
+        "tableSignatures": [
+          "Holdings table",
+          "Performance by asset class",
+          "Fee schedule"
+        ],
+        "layoutCues": [
+          "Performance chart",
+          "Asset allocation donut",
+          "Benchmark comparison"
+        ],
+        "metadataCues": [
+          "account number",
+          "period",
+          "total value",
+          "advisor"
+        ]
+      }
+    },
+    {
+      "docTypeId": "banking_wire_transfer_confirmation",
+      "domainId": "banking",
+      "displayName": "Wire Transfer Confirmation",
+      "description": "Wire transfer execution confirmation",
+      "structureSignatures": {
+        "headings": [
+          "Transfer Details",
+          "Sender",
+          "Beneficiary",
+          "Bank Info",
+          "Confirmation"
+        ],
+        "tableSignatures": [
+          "Transfer detail table",
+          "Fee table",
+          "Exchange conversion"
+        ],
+        "layoutCues": [
+          "SWIFT/BIC code display",
+          "Amount highlight",
+          "Status stamp"
+        ],
+        "metadataCues": [
+          "wire reference",
+          "date",
+          "amount",
+          "currency"
+        ]
+      }
+    },
+    {
+      "docTypeId": "billing_electricity_bill",
+      "domainId": "billing",
+      "displayName": "Electricity Bill",
+      "description": "Monthly electric utility bill",
+      "structureSignatures": {
+        "headings": [
+          "Account Information",
+          "Meter Reading",
+          "Consumption",
+          "Charges",
+          "Payment"
+        ],
+        "tableSignatures": [
+          "Usage by tier table",
+          "Charge breakdown",
+          "Historical comparison"
+        ],
+        "layoutCues": [
+          "Usage bar chart",
+          "Billing period header",
+          "Payment stub"
+        ],
+        "metadataCues": [
+          "account number",
+          "meter number",
+          "billing period",
+          "due date"
+        ]
+      }
+    },
+    {
+      "docTypeId": "billing_internet_bill",
+      "domainId": "billing",
+      "displayName": "Internet Bill",
+      "description": "Monthly internet service bill",
+      "structureSignatures": {
+        "headings": [
+          "Account",
+          "Service Plan",
+          "Usage",
+          "Charges",
+          "Payment"
+        ],
+        "tableSignatures": [
+          "Plan details table",
+          "Additional charges",
+          "Equipment fees"
+        ],
+        "layoutCues": [
+          "Plan speed display",
+          "Data usage meter",
+          "Payment stub"
+        ],
+        "metadataCues": [
+          "account number",
+          "plan name",
+          "billing period",
+          "due date"
+        ]
+      }
+    },
+    {
+      "docTypeId": "billing_invoice_business",
+      "domainId": "billing",
+      "displayName": "Business Invoice",
+      "description": "B2B commercial invoice",
+      "structureSignatures": {
+        "headings": [
+          "Invoice Header",
+          "Bill To",
+          "Line Items",
+          "Tax",
+          "Total Due"
+        ],
+        "tableSignatures": [
+          "Itemized billing rows",
+          "Tax calculation",
+          "Subtotal/total table"
+        ],
+        "layoutCues": [
+          "Invoice number header",
+          "Line item grid",
+          "Payment terms block"
+        ],
+        "metadataCues": [
+          "invoice number",
+          "issue date",
+          "due date",
+          "PO number"
+        ]
+      }
+    },
+    {
+      "docTypeId": "billing_phone_bill_mobile",
+      "domainId": "billing",
+      "displayName": "Mobile Phone Bill",
+      "description": "Monthly mobile phone bill",
+      "structureSignatures": {
+        "headings": [
+          "Account",
+          "Plan Details",
+          "Usage",
+          "Charges",
+          "Equipment"
+        ],
+        "tableSignatures": [
+          "Call/text/data usage table",
+          "Line-by-line charges",
+          "Equipment installment"
+        ],
+        "layoutCues": [
+          "Usage meter graphics",
+          "Multi-line summary",
+          "Payment stub"
+        ],
+        "metadataCues": [
+          "account number",
+          "phone number",
+          "billing period",
+          "due date"
+        ]
+      }
+    },
+    {
+      "docTypeId": "billing_retail_receipt",
+      "domainId": "billing",
+      "displayName": "Retail Receipt",
+      "description": "Point-of-sale receipt",
+      "structureSignatures": {
+        "headings": [
+          "Store Info",
+          "Items",
+          "Subtotal",
+          "Tax",
+          "Total"
+        ],
+        "tableSignatures": [
+          "Item/price list",
+          "Tax breakdown",
+          "Payment method"
+        ],
+        "layoutCues": [
+          "Store logo header",
+          "Barcode footer",
+          "Item list format"
+        ],
+        "metadataCues": [
+          "store number",
+          "transaction date",
+          "register",
+          "cashier"
+        ]
+      }
+    },
+    {
+      "docTypeId": "billing_water_sewer_bill",
+      "domainId": "billing",
+      "displayName": "Water & Sewer Bill",
+      "description": "Monthly water utility bill",
+      "structureSignatures": {
+        "headings": [
+          "Account",
+          "Meter Reading",
+          "Consumption",
+          "Charges",
+          "Payment"
+        ],
+        "tableSignatures": [
+          "Usage tier table",
+          "Sewer surcharge",
+          "Historical usage"
+        ],
+        "layoutCues": [
+          "Usage graph",
+          "Billing period display",
+          "Payment coupon"
+        ],
+        "metadataCues": [
+          "account number",
+          "meter number",
+          "billing period",
+          "due date"
+        ]
+      }
+    },
+    {
+      "docTypeId": "edu_course_syllabus",
+      "domainId": "education",
+      "displayName": "Course Syllabus",
+      "description": "Academic course outline and schedule",
+      "structureSignatures": {
+        "headings": [
+          "Course Info",
+          "Instructor",
+          "Schedule",
+          "Assignments",
+          "Grading Policy"
+        ],
+        "tableSignatures": [
+          "Weekly schedule table",
+          "Assignment due dates",
+          "Grade weight table"
+        ],
+        "layoutCues": [
+          "Course header block",
+          "Calendar format",
+          "Policy sections"
+        ],
+        "metadataCues": [
+          "course code",
+          "instructor",
+          "semester",
+          "credits"
+        ]
+      }
+    },
+    {
+      "docTypeId": "edu_diploma_certificate",
+      "domainId": "education",
+      "displayName": "Diploma/Certificate",
+      "description": "Academic degree or certificate",
+      "structureSignatures": {
+        "headings": [
+          "Institution",
+          "Recipient",
+          "Degree",
+          "Date Conferred",
+          "Signatures"
+        ],
+        "tableSignatures": [
+          "Honors/distinctions list",
+          "Degree requirements",
+          "Certification details"
+        ],
+        "layoutCues": [
+          "Formal seal",
+          "Calligraphic text",
+          "Signature block"
+        ],
+        "metadataCues": [
+          "institution name",
+          "graduate name",
+          "degree",
+          "conferral date"
+        ]
+      }
+    },
+    {
+      "docTypeId": "edu_enrollment_letter",
+      "domainId": "education",
+      "displayName": "Enrollment Letter",
+      "description": "Student enrollment confirmation letter",
+      "structureSignatures": {
+        "headings": [
+          "Institution",
+          "Student",
+          "Program",
+          "Enrollment Status",
+          "Academic Period"
+        ],
+        "tableSignatures": [
+          "Course enrollment table",
+          "Credit summary",
+          "Financial obligations"
+        ],
+        "layoutCues": [
+          "Letterhead format",
+          "Official seal",
+          "Registrar signature"
+        ],
+        "metadataCues": [
+          "student id",
+          "program",
+          "enrollment date",
+          "academic year"
+        ]
+      }
+    },
+    {
+      "docTypeId": "edu_student_financial_aid_award",
+      "domainId": "education",
+      "displayName": "Financial Aid Award",
+      "description": "Student financial aid award letter",
+      "structureSignatures": {
+        "headings": [
+          "Student",
+          "Award Summary",
+          "Grants",
+          "Loans",
+          "Work Study"
+        ],
+        "tableSignatures": [
+          "Award breakdown table",
+          "Disbursement schedule",
+          "Cost of attendance"
+        ],
+        "layoutCues": [
+          "Award comparison columns",
+          "Acceptance signature line",
+          "Deadline highlight"
+        ],
+        "metadataCues": [
+          "student id",
+          "academic year",
+          "total award",
+          "EFC"
+        ]
+      }
+    },
+    {
+      "docTypeId": "edu_student_schedule",
+      "domainId": "education",
+      "displayName": "Student Schedule",
+      "description": "Student class schedule",
+      "structureSignatures": {
+        "headings": [
+          "Student",
+          "Term",
+          "Courses",
+          "Times",
+          "Locations"
+        ],
+        "tableSignatures": [
+          "Course/time/room table",
+          "Weekly grid",
+          "Credit summary"
+        ],
+        "layoutCues": [
+          "Weekly grid format",
+          "Color-coded courses",
+          "Time slot rows"
+        ],
+        "metadataCues": [
+          "student id",
+          "term",
+          "total credits",
+          "advisor"
+        ]
+      }
+    },
+    {
+      "docTypeId": "edu_transcript",
+      "domainId": "education",
+      "displayName": "Academic Transcript",
+      "description": "Official academic record",
+      "structureSignatures": {
+        "headings": [
+          "Student Info",
+          "Academic Record",
+          "GPA",
+          "Degree",
+          "Transfer Credits"
+        ],
+        "tableSignatures": [
+          "Course/grade/credit table",
+          "Term GPA summary",
+          "Cumulative record"
+        ],
+        "layoutCues": [
+          "Semester blocks",
+          "Grade column",
+          "Cumulative GPA footer"
+        ],
+        "metadataCues": [
+          "student id",
+          "institution",
+          "degree",
+          "graduation date"
+        ]
+      }
+    },
+    {
+      "docTypeId": "housing_hoa_statement",
+      "domainId": "housing",
+      "displayName": "HOA Statement",
+      "description": "Homeowners association dues statement",
+      "structureSignatures": {
+        "headings": [
+          "Property",
+          "Assessment",
+          "Fees",
+          "Special Assessments",
+          "Payment"
+        ],
+        "tableSignatures": [
+          "Monthly dues table",
+          "Special assessment breakdown",
+          "Payment history"
+        ],
+        "layoutCues": [
+          "Property address header",
+          "Amount due highlight",
+          "Payment coupon"
+        ],
+        "metadataCues": [
+          "unit number",
+          "assessment period",
+          "HOA name",
+          "due date"
+        ]
+      }
+    },
+    {
+      "docTypeId": "housing_home_inspection_report",
+      "domainId": "housing",
+      "displayName": "Home Inspection Report",
+      "description": "Property condition inspection report",
+      "structureSignatures": {
+        "headings": [
+          "Property",
+          "Structural",
+          "Electrical",
+          "Plumbing",
+          "HVAC"
+        ],
+        "tableSignatures": [
+          "Deficiency checklist",
+          "System rating table",
+          "Repair estimate"
+        ],
+        "layoutCues": [
+          "Photo documentation",
+          "Rating system",
+          "Section-by-system layout"
+        ],
+        "metadataCues": [
+          "property address",
+          "inspector",
+          "inspection date",
+          "report number"
+        ]
+      }
+    },
+    {
+      "docTypeId": "housing_lease_summary",
+      "domainId": "housing",
+      "displayName": "Lease Summary",
+      "description": "Residential lease key terms summary",
+      "structureSignatures": {
+        "headings": [
+          "Parties",
+          "Property",
+          "Term",
+          "Rent",
+          "Conditions"
+        ],
+        "tableSignatures": [
+          "Rent schedule table",
+          "Deposit breakdown",
+          "Utility responsibility"
+        ],
+        "layoutCues": [
+          "Key terms highlighted",
+          "Signature blocks",
+          "Term calendar"
+        ],
+        "metadataCues": [
+          "landlord",
+          "tenant",
+          "property address",
+          "lease term"
+        ]
+      }
+    },
+    {
+      "docTypeId": "housing_mortgage_statement",
+      "domainId": "housing",
+      "displayName": "Mortgage Statement",
+      "description": "Monthly mortgage payment statement",
+      "structureSignatures": {
+        "headings": [
+          "Loan Summary",
+          "Payment Breakdown",
+          "Escrow",
+          "Outstanding Balance",
+          "Year-to-Date"
+        ],
+        "tableSignatures": [
+          "Payment allocation table",
+          "Escrow analysis",
+          "Tax/insurance detail"
+        ],
+        "layoutCues": [
+          "Payment due box",
+          "Principal vs interest bar",
+          "Escrow breakdown"
+        ],
+        "metadataCues": [
+          "loan number",
+          "interest rate",
+          "payment due date",
+          "servicer"
+        ]
+      }
+    },
+    {
+      "docTypeId": "housing_property_tax_bill",
+      "domainId": "housing",
+      "displayName": "Property Tax Bill",
+      "description": "Annual property tax assessment bill",
+      "structureSignatures": {
+        "headings": [
+          "Property",
+          "Assessed Value",
+          "Tax Rate",
+          "Tax Due",
+          "Exemptions"
+        ],
+        "tableSignatures": [
+          "Tax calculation table",
+          "Exemption detail",
+          "Payment schedule"
+        ],
+        "layoutCues": [
+          "Parcel map reference",
+          "Assessment breakdown",
+          "Payment stub"
+        ],
+        "metadataCues": [
+          "parcel number",
+          "tax year",
+          "assessed value",
+          "jurisdiction"
+        ]
+      }
+    },
+    {
+      "docTypeId": "housing_rent_receipt",
+      "domainId": "housing",
+      "displayName": "Rent Receipt",
+      "description": "Monthly rent payment receipt",
+      "structureSignatures": {
+        "headings": [
+          "Landlord",
+          "Tenant",
+          "Property",
+          "Payment",
+          "Period"
+        ],
+        "tableSignatures": [
+          "Payment detail table",
+          "Balance summary",
+          "Late fee calculation"
+        ],
+        "layoutCues": [
+          "Receipt number header",
+          "Amount received highlight",
+          "Signature line"
+        ],
+        "metadataCues": [
+          "tenant name",
+          "property address",
+          "amount",
+          "payment date"
+        ]
+      }
+    },
+    {
+      "docTypeId": "hr_benefits_enrollment_summary",
+      "domainId": "hr_payroll",
+      "displayName": "Benefits Enrollment Summary",
+      "description": "Employee benefits election summary",
+      "structureSignatures": {
+        "headings": [
+          "Employee",
+          "Medical",
+          "Dental",
+          "Vision",
+          "Life Insurance"
+        ],
+        "tableSignatures": [
+          "Plan comparison table",
+          "Premium breakdown",
+          "Dependent listing"
+        ],
+        "layoutCues": [
+          "Plan tier columns",
+          "Enrollment period header",
+          "Cost comparison"
+        ],
+        "metadataCues": [
+          "employee id",
+          "effective date",
+          "plan year",
+          "enrollment status"
+        ]
+      }
+    },
+    {
+      "docTypeId": "hr_employment_verification_letter",
+      "domainId": "hr_payroll",
+      "displayName": "Employment Verification Letter",
+      "description": "Employer letter confirming employment",
+      "structureSignatures": {
+        "headings": [
+          "Employee",
+          "Position",
+          "Employment Dates",
+          "Salary",
+          "Employer"
+        ],
+        "tableSignatures": [
+          "Employment history table",
+          "Compensation summary",
+          "Contact info"
+        ],
+        "layoutCues": [
+          "Company letterhead",
+          "HR signature block",
+          "Official stamp"
+        ],
+        "metadataCues": [
+          "employee name",
+          "title",
+          "start date",
+          "issuing date"
+        ]
+      }
+    },
+    {
+      "docTypeId": "hr_expense_report",
+      "domainId": "hr_payroll",
+      "displayName": "Expense Report",
+      "description": "Employee expense reimbursement report",
+      "structureSignatures": {
+        "headings": [
+          "Employee",
+          "Expenses",
+          "Receipts",
+          "Approval",
+          "Reimbursement"
+        ],
+        "tableSignatures": [
+          "Expense line items",
+          "Category breakdown",
+          "Receipt attachment list"
+        ],
+        "layoutCues": [
+          "Expense category rows",
+          "Total row",
+          "Approval chain"
+        ],
+        "metadataCues": [
+          "employee id",
+          "department",
+          "submission date",
+          "total amount"
+        ]
+      }
+    },
+    {
+      "docTypeId": "hr_pay_stub",
+      "domainId": "hr_payroll",
+      "displayName": "Pay Stub",
+      "description": "Employee paycheck stub",
+      "structureSignatures": {
+        "headings": [
+          "Employee",
+          "Earnings",
+          "Deductions",
+          "Taxes",
+          "Net Pay"
+        ],
+        "tableSignatures": [
+          "Earnings breakdown table",
+          "Deduction detail",
+          "Tax withholding table"
+        ],
+        "layoutCues": [
+          "Gross to net flow",
+          "Year-to-date column",
+          "Check number"
+        ],
+        "metadataCues": [
+          "employee id",
+          "pay date",
+          "pay period",
+          "employer"
+        ]
+      }
+    },
+    {
+      "docTypeId": "hr_timesheet",
+      "domainId": "hr_payroll",
+      "displayName": "Timesheet",
+      "description": "Employee time tracking sheet",
+      "structureSignatures": {
+        "headings": [
+          "Employee",
+          "Period",
+          "Daily Hours",
+          "Overtime",
+          "Totals"
+        ],
+        "tableSignatures": [
+          "Daily hours grid",
+          "Project allocation",
+          "Overtime calculation"
+        ],
+        "layoutCues": [
+          "Calendar grid layout",
+          "Hour entry cells",
+          "Weekly totals row"
+        ],
+        "metadataCues": [
+          "employee id",
+          "pay period",
+          "supervisor",
+          "department"
+        ]
+      }
+    },
+    {
+      "docTypeId": "id_passport",
+      "domainId": "identity",
+      "displayName": "Passport",
+      "description": "International travel document",
+      "structureSignatures": {
+        "headings": [
+          "Document Identification",
+          "Holder Information",
+          "Biographic Data",
+          "Validity and Issuance",
+          "Machine Readable Zone"
+        ],
+        "tableSignatures": [
+          "Biographic data field/value table",
+          "MRZ line content table"
+        ],
+        "layoutCues": [
+          "Photo area",
+          "MRZ at bottom",
+          "Booklet format"
+        ],
+        "metadataCues": [
+          "passport number",
+          "nationality",
+          "date of birth",
+          "expiry date"
+        ]
+      }
+    },
+    {
+      "docTypeId": "id_driver_license",
+      "domainId": "identity",
+      "displayName": "Driver License",
+      "description": "Motor vehicle operator license",
+      "structureSignatures": {
+        "headings": [
+          "Document Identification",
+          "License Holder",
+          "License Details",
+          "Restrictions",
+          "Validity"
+        ],
+        "tableSignatures": [
+          "License details table",
+          "Restrictions code table"
+        ],
+        "layoutCues": [
+          "Photo area",
+          "Card format",
+          "Barcode/QR code"
+        ],
+        "metadataCues": [
+          "license number",
+          "class",
+          "issue date",
+          "expiry date"
+        ]
+      }
+    },
+    {
+      "docTypeId": "id_business_registration_certificate",
+      "domainId": "identity",
+      "displayName": "Business Registration Certificate",
+      "description": "Company incorporation certificate",
+      "structureSignatures": {
+        "headings": [
+          "Document Identification",
+          "Entity Information",
+          "Registration Details",
+          "Activities",
+          "Officers"
+        ],
+        "tableSignatures": [
+          "Entity details table",
+          "Officers/directors table"
+        ],
+        "layoutCues": [
+          "Official seal",
+          "Government header",
+          "Registration number highlight"
+        ],
+        "metadataCues": [
+          "registration number",
+          "corporate name",
+          "jurisdiction",
+          "incorporation date"
+        ]
+      }
+    },
+    {
+      "docTypeId": "id_proof_of_address",
+      "domainId": "identity",
+      "displayName": "Proof of Address",
+      "description": "Address verification document",
+      "structureSignatures": {
+        "headings": [
+          "Document Identification",
+          "Addressee",
+          "Address Details",
+          "Verification"
+        ],
+        "tableSignatures": [
+          "Address field/value table",
+          "Verification details table"
+        ],
+        "layoutCues": [
+          "Service provider header",
+          "Address block",
+          "Statement date"
+        ],
+        "metadataCues": [
+          "addressee name",
+          "service address",
+          "issue date",
+          "provider"
+        ]
+      }
+    },
+    {
+      "docTypeId": "id_birth_certificate",
+      "domainId": "identity",
+      "displayName": "Birth Certificate",
+      "description": "Official record of birth",
+      "structureSignatures": {
+        "headings": [
+          "Document Identification",
+          "Child Information",
+          "Parents Information",
+          "Birth Details",
+          "Registrar"
+        ],
+        "tableSignatures": [
+          "Birth details table",
+          "Parents information table"
+        ],
+        "layoutCues": [
+          "Government seal",
+          "Official registry format",
+          "Certificate border"
+        ],
+        "metadataCues": [
+          "certificate number",
+          "date of birth",
+          "place of birth",
+          "registrar"
+        ]
+      }
+    },
+    {
+      "docTypeId": "id_marriage_license",
+      "domainId": "identity",
+      "displayName": "Marriage License",
+      "description": "Official marriage certificate",
+      "structureSignatures": {
+        "headings": [
+          "Document Identification",
+          "Spouse Information",
+          "Ceremony Details",
+          "Witnesses",
+          "Officiant"
+        ],
+        "tableSignatures": [
+          "Spouse details table",
+          "Ceremony details table"
+        ],
+        "layoutCues": [
+          "Ornamental border",
+          "Official seal",
+          "Dual signature areas"
+        ],
+        "metadataCues": [
+          "certificate number",
+          "marriage date",
+          "jurisdiction",
+          "officiant"
+        ]
+      }
+    },
+    {
+      "docTypeId": "id_social_security_card",
+      "domainId": "identity",
+      "displayName": "Social Security Card",
+      "description": "National social security identification card",
+      "structureSignatures": {
+        "headings": [
+          "Document Identification",
+          "Cardholder",
+          "Social Security Number",
+          "Issuing Authority"
+        ],
+        "tableSignatures": [
+          "Cardholder information table"
+        ],
+        "layoutCues": [
+          "Card format",
+          "SSN display",
+          "Government agency header"
+        ],
+        "metadataCues": [
+          "SSN",
+          "cardholder name",
+          "issue date",
+          "agency"
+        ]
+      }
+    },
+    {
+      "docTypeId": "id_visa",
+      "domainId": "identity",
+      "displayName": "Visa",
+      "description": "Travel visa document",
+      "structureSignatures": {
+        "headings": [
+          "Document Identification",
+          "Applicant",
+          "Visa Classification",
+          "Validity Period",
+          "Conditions"
+        ],
+        "tableSignatures": [
+          "Visa details table",
+          "Conditions table"
+        ],
+        "layoutCues": [
+          "Visa sticker format",
+          "Photo area",
+          "Passport page"
+        ],
+        "metadataCues": [
+          "visa number",
+          "visa type",
+          "validity dates",
+          "entries allowed"
+        ]
+      }
+    },
+    {
+      "docTypeId": "id_voter_registration",
+      "domainId": "identity",
+      "displayName": "Voter Registration",
+      "description": "Voter registration card",
+      "structureSignatures": {
+        "headings": [
+          "Document Identification",
+          "Voter Information",
+          "Electoral Details",
+          "Registration Status"
+        ],
+        "tableSignatures": [
+          "Voter details table",
+          "Electoral zone table"
+        ],
+        "layoutCues": [
+          "Government seal",
+          "Card format",
+          "Electoral zone display"
+        ],
+        "metadataCues": [
+          "voter id",
+          "electoral zone",
+          "section",
+          "registration date"
+        ]
+      }
+    },
+    {
+      "docTypeId": "ins_claim_submission",
+      "domainId": "insurance",
+      "displayName": "Claim Submission",
+      "description": "Insurance claim filing document",
+      "structureSignatures": {
+        "headings": [
+          "Claimant",
+          "Policy",
+          "Incident Details",
+          "Claim Amount",
+          "Supporting Documents"
+        ],
+        "tableSignatures": [
+          "Claim detail table",
+          "Damage itemization",
+          "Supporting docs list"
+        ],
+        "layoutCues": [
+          "Claim form format",
+          "Incident description block",
+          "Signature area"
+        ],
+        "metadataCues": [
+          "claim number",
+          "policy number",
+          "incident date",
+          "amount claimed"
+        ]
+      }
+    },
+    {
+      "docTypeId": "ins_explanation_of_benefits",
+      "domainId": "insurance",
+      "displayName": "Explanation of Benefits",
+      "description": "EOB statement from insurer",
+      "structureSignatures": {
+        "headings": [
+          "Patient",
+          "Provider",
+          "Services",
+          "Benefits Applied",
+          "Patient Responsibility"
+        ],
+        "tableSignatures": [
+          "Service/charge/benefit table",
+          "Deductible tracking",
+          "Copay breakdown"
+        ],
+        "layoutCues": [
+          "Grid of services",
+          "Amount columns",
+          "Appeal instructions"
+        ],
+        "metadataCues": [
+          "patient name",
+          "claim number",
+          "provider",
+          "service date"
+        ]
+      }
+    },
+    {
+      "docTypeId": "ins_policy_document",
+      "domainId": "insurance",
+      "displayName": "Insurance Policy",
+      "description": "Full insurance policy document",
+      "structureSignatures": {
+        "headings": [
+          "Declarations",
+          "Insuring Agreement",
+          "Coverage",
+          "Exclusions",
+          "Conditions"
+        ],
+        "tableSignatures": [
+          "Coverage limits table",
+          "Premium schedule",
+          "Endorsement list"
+        ],
+        "layoutCues": [
+          "Legal document format",
+          "Numbered sections",
+          "Definition blocks"
+        ],
+        "metadataCues": [
+          "policy number",
+          "named insured",
+          "effective date",
+          "premium"
+        ]
+      }
+    },
+    {
+      "docTypeId": "ins_premium_invoice",
+      "domainId": "insurance",
+      "displayName": "Premium Invoice",
+      "description": "Insurance premium billing invoice",
+      "structureSignatures": {
+        "headings": [
+          "Policy Info",
+          "Premium Calculation",
+          "Coverage Summary",
+          "Payment Terms",
+          "Discounts"
+        ],
+        "tableSignatures": [
+          "Premium breakdown table",
+          "Coverage-by-coverage cost",
+          "Discount detail"
+        ],
+        "layoutCues": [
+          "Invoice format",
+          "Amount due highlight",
+          "Payment stub"
+        ],
+        "metadataCues": [
+          "policy number",
+          "invoice date",
+          "premium amount",
+          "due date"
+        ]
+      }
+    },
+    {
+      "docTypeId": "ins_auto_declaration",
+      "domainId": "insurance",
+      "displayName": "Auto Insurance Declaration",
+      "description": "Auto insurance declarations page",
+      "structureSignatures": {
+        "headings": [
+          "Policyholder",
+          "Vehicle Details",
+          "Coverage Summary",
+          "Premium Breakdown",
+          "Endorsements"
+        ],
+        "tableSignatures": [
+          "Vehicle detail table",
+          "Coverage/limit/deductible table",
+          "Premium by coverage"
+        ],
+        "layoutCues": [
+          "Vehicle listing",
+          "Coverage grid",
+          "Driver list"
+        ],
+        "metadataCues": [
+          "policy number",
+          "vehicle VIN",
+          "effective date",
+          "premium"
+        ]
+      }
+    },
+    {
+      "docTypeId": "ins_dental_plan",
+      "domainId": "insurance",
+      "displayName": "Dental Plan",
+      "description": "Dental insurance plan summary",
+      "structureSignatures": {
+        "headings": [
+          "Member",
+          "Plan Details",
+          "Benefits",
+          "Covered Procedures",
+          "Limitations"
+        ],
+        "tableSignatures": [
+          "Procedure/coverage table",
+          "Annual max tracking",
+          "Copay schedule"
+        ],
+        "layoutCues": [
+          "Benefit schedule grid",
+          "Coverage percentage tiers",
+          "Provider network info"
+        ],
+        "metadataCues": [
+          "member id",
+          "plan name",
+          "group number",
+          "effective date"
+        ]
+      }
+    },
+    {
+      "docTypeId": "ins_disability",
+      "domainId": "insurance",
+      "displayName": "Disability Insurance",
+      "description": "Disability insurance policy or certificate",
+      "structureSignatures": {
+        "headings": [
+          "Insured",
+          "Coverage",
+          "Benefit Amount",
+          "Elimination Period",
+          "Definitions"
+        ],
+        "tableSignatures": [
+          "Benefit calculation table",
+          "Elimination period detail",
+          "Occupation class table"
+        ],
+        "layoutCues": [
+          "Policy format",
+          "Definition section",
+          "Benefit formula display"
+        ],
+        "metadataCues": [
+          "policy number",
+          "insured name",
+          "monthly benefit",
+          "elimination period"
+        ]
+      }
+    },
+    {
+      "docTypeId": "ins_umbrella_policy",
+      "domainId": "insurance",
+      "displayName": "Umbrella Policy",
+      "description": "Excess liability umbrella policy",
+      "structureSignatures": {
+        "headings": [
+          "Named Insured",
+          "Underlying Policies",
+          "Coverage",
+          "Self-Insured Retention",
+          "Exclusions"
+        ],
+        "tableSignatures": [
+          "Underlying policy schedule",
+          "Coverage limit table",
+          "SIR table"
+        ],
+        "layoutCues": [
+          "Policy format",
+          "Underlying coverage list",
+          "Excess coverage diagram"
+        ],
+        "metadataCues": [
+          "policy number",
+          "aggregate limit",
+          "SIR amount",
+          "effective date"
+        ]
+      }
+    },
+    {
+      "docTypeId": "ops_incident_report",
+      "domainId": "ops",
+      "displayName": "Incident Report",
+      "description": "Operational incident report",
+      "structureSignatures": {
+        "headings": [
+          "Incident Summary",
+          "Timeline",
+          "Root Cause",
+          "Impact",
+          "Corrective Actions"
+        ],
+        "tableSignatures": [
+          "Timeline event table",
+          "Impact assessment matrix",
+          "Action items table"
+        ],
+        "layoutCues": [
+          "Severity indicator",
+          "Chronological entries",
+          "Resolution status"
+        ],
+        "metadataCues": [
+          "incident id",
+          "severity",
+          "date",
+          "reporter"
+        ]
+      }
+    },
+    {
+      "docTypeId": "ops_maintenance_log",
+      "domainId": "ops",
+      "displayName": "Maintenance Log",
+      "description": "Equipment maintenance record",
+      "structureSignatures": {
+        "headings": [
+          "Equipment",
+          "Maintenance History",
+          "Scheduled",
+          "Parts",
+          "Technician"
+        ],
+        "tableSignatures": [
+          "Maintenance schedule table",
+          "Parts used table",
+          "Cost summary"
+        ],
+        "layoutCues": [
+          "Equipment header",
+          "Chronological log",
+          "Status indicators"
+        ],
+        "metadataCues": [
+          "equipment id",
+          "maintenance date",
+          "technician",
+          "next due"
+        ]
+      }
+    },
+    {
+      "docTypeId": "ops_quality_report",
+      "domainId": "ops",
+      "displayName": "Quality Report",
+      "description": "Quality assurance inspection report",
+      "structureSignatures": {
+        "headings": [
+          "Product",
+          "Inspection",
+          "Defects",
+          "Pass/Fail",
+          "Recommendations"
+        ],
+        "tableSignatures": [
+          "Inspection checklist table",
+          "Defect tally",
+          "Control chart data"
+        ],
+        "layoutCues": [
+          "Pass/fail indicators",
+          "Specification comparison",
+          "Statistical displays"
+        ],
+        "metadataCues": [
+          "batch number",
+          "inspector",
+          "inspection date",
+          "standard reference"
+        ]
+      }
+    },
+    {
+      "docTypeId": "ops_shipping_manifest",
+      "domainId": "ops",
+      "displayName": "Shipping Manifest",
+      "description": "Cargo shipping manifest",
+      "structureSignatures": {
+        "headings": [
+          "Shipper",
+          "Consignee",
+          "Cargo",
+          "Route",
+          "Delivery"
+        ],
+        "tableSignatures": [
+          "Item/quantity/weight table",
+          "Package dimensions",
+          "Route details"
+        ],
+        "layoutCues": [
+          "Shipping label format",
+          "Barcode area",
+          "Hazmat indicators"
+        ],
+        "metadataCues": [
+          "tracking number",
+          "ship date",
+          "carrier",
+          "destination"
+        ]
+      }
+    },
+    {
+      "docTypeId": "ops_sla_report",
+      "domainId": "ops",
+      "displayName": "SLA Report",
+      "description": "Service level agreement compliance report",
+      "structureSignatures": {
+        "headings": [
+          "Service",
+          "Metrics",
+          "Targets",
+          "Actuals",
+          "Violations"
+        ],
+        "tableSignatures": [
+          "KPI vs target table",
+          "Violation log",
+          "Trend data"
+        ],
+        "layoutCues": [
+          "Dashboard layout",
+          "Red/green indicators",
+          "Trend charts"
+        ],
+        "metadataCues": [
+          "reporting period",
+          "service name",
+          "SLA version",
+          "customer"
+        ]
+      }
+    },
+    {
+      "docTypeId": "ops_work_order",
+      "domainId": "ops",
+      "displayName": "Work Order",
+      "description": "Maintenance or service work order",
+      "structureSignatures": {
+        "headings": [
+          "Request",
+          "Description",
+          "Assignment",
+          "Materials",
+          "Completion"
+        ],
+        "tableSignatures": [
+          "Task breakdown table",
+          "Materials list",
+          "Labor hours"
+        ],
+        "layoutCues": [
+          "Work order number header",
+          "Priority indicator",
+          "Status tracking"
+        ],
+        "metadataCues": [
+          "work order number",
+          "requestor",
+          "priority",
+          "due date"
+        ]
+      }
+    },
+    {
+      "docTypeId": "tax_assessment_notice",
+      "domainId": "tax",
+      "displayName": "Tax Assessment Notice",
+      "description": "Government tax assessment notification",
+      "structureSignatures": {
+        "headings": [
+          "Taxpayer",
+          "Assessment",
+          "Calculation",
+          "Due Date",
+          "Appeals"
+        ],
+        "tableSignatures": [
+          "Assessment calculation table",
+          "Tax rate application",
+          "Penalty computation"
+        ],
+        "layoutCues": [
+          "Government letterhead",
+          "Legal notice format",
+          "Appeal deadline highlight"
+        ],
+        "metadataCues": [
+          "tax id",
+          "assessment year",
+          "amount due",
+          "appeal deadline"
+        ]
+      }
+    },
+    {
+      "docTypeId": "tax_individual_income_return",
+      "domainId": "tax",
+      "displayName": "Individual Income Return",
+      "description": "Personal income tax return",
+      "structureSignatures": {
+        "headings": [
+          "Filer",
+          "Income",
+          "Adjustments",
+          "Deductions",
+          "Tax Computation"
+        ],
+        "tableSignatures": [
+          "Income sources table",
+          "Deduction itemization",
+          "Tax bracket computation"
+        ],
+        "layoutCues": [
+          "Form-style layout",
+          "Line number references",
+          "Filing status header"
+        ],
+        "metadataCues": [
+          "tax year",
+          "filing status",
+          "gross income",
+          "tax due/refund"
+        ]
+      }
+    },
+    {
+      "docTypeId": "tax_payment_slip",
+      "domainId": "tax",
+      "displayName": "Tax Payment Slip",
+      "description": "Tax payment voucher or boleto",
+      "structureSignatures": {
+        "headings": [
+          "Taxpayer",
+          "Tax Type",
+          "Amount",
+          "Due Date",
+          "Payment Code"
+        ],
+        "tableSignatures": [
+          "Payment detail table",
+          "Reference codes",
+          "Bank processing info"
+        ],
+        "layoutCues": [
+          "Barcode area",
+          "Payment amount highlight",
+          "Bank routing info"
+        ],
+        "metadataCues": [
+          "tax id",
+          "amount",
+          "due date",
+          "reference code"
+        ]
+      }
+    },
+    {
+      "docTypeId": "tax_property_tax_bill",
+      "domainId": "tax",
+      "displayName": "Property Tax Bill",
+      "description": "Real property tax bill",
+      "structureSignatures": {
+        "headings": [
+          "Property",
+          "Assessment",
+          "Tax Rate",
+          "Amount Due",
+          "Exemptions"
+        ],
+        "tableSignatures": [
+          "Assessment value table",
+          "Tax rate breakdown",
+          "Exemption detail"
+        ],
+        "layoutCues": [
+          "Parcel number header",
+          "Payment coupon",
+          "Installment options"
+        ],
+        "metadataCues": [
+          "parcel number",
+          "tax year",
+          "assessed value",
+          "total tax"
+        ]
+      }
+    },
+    {
+      "docTypeId": "travel_boarding_pass",
+      "domainId": "travel",
+      "displayName": "Boarding Pass",
+      "description": "Airline boarding pass",
+      "structureSignatures": {
+        "headings": [
+          "Passenger",
+          "Flight",
+          "Departure",
+          "Arrival",
+          "Seat"
+        ],
+        "tableSignatures": [
+          "Flight detail table",
+          "Baggage info"
+        ],
+        "layoutCues": [
+          "Barcode/QR code",
+          "Gate info display",
+          "Boarding group"
+        ],
+        "metadataCues": [
+          "passenger name",
+          "flight number",
+          "date",
+          "seat"
+        ]
+      }
+    },
+    {
+      "docTypeId": "travel_car_rental_agreement",
+      "domainId": "travel",
+      "displayName": "Car Rental Agreement",
+      "description": "Vehicle rental contract",
+      "structureSignatures": {
+        "headings": [
+          "Renter",
+          "Vehicle",
+          "Rental Period",
+          "Charges",
+          "Insurance"
+        ],
+        "tableSignatures": [
+          "Vehicle detail table",
+          "Charge breakdown",
+          "Insurance options"
+        ],
+        "layoutCues": [
+          "Contract format",
+          "Vehicle photo area",
+          "Damage diagram"
+        ],
+        "metadataCues": [
+          "rental agreement number",
+          "vehicle info",
+          "pickup/return dates",
+          "total cost"
+        ]
+      }
+    },
+    {
+      "docTypeId": "travel_hotel_booking_confirmation",
+      "domainId": "travel",
+      "displayName": "Hotel Booking Confirmation",
+      "description": "Hotel reservation confirmation",
+      "structureSignatures": {
+        "headings": [
+          "Guest",
+          "Hotel",
+          "Reservation",
+          "Room",
+          "Payment"
+        ],
+        "tableSignatures": [
+          "Room rate table",
+          "Stay summary",
+          "Payment detail"
+        ],
+        "layoutCues": [
+          "Hotel branding",
+          "Confirmation number highlight",
+          "Check-in/out display"
+        ],
+        "metadataCues": [
+          "confirmation number",
+          "guest name",
+          "dates",
+          "room type"
+        ]
+      }
+    },
+    {
+      "docTypeId": "travel_itinerary",
+      "domainId": "travel",
+      "displayName": "Travel Itinerary",
+      "description": "Trip itinerary with segments",
+      "structureSignatures": {
+        "headings": [
+          "Traveler",
+          "Overview",
+          "Flight Segments",
+          "Hotel",
+          "Activities"
+        ],
+        "tableSignatures": [
+          "Segment detail table",
+          "Daily schedule",
+          "Booking references"
+        ],
+        "layoutCues": [
+          "Timeline format",
+          "Segment blocks",
+          "Map references"
+        ],
+        "metadataCues": [
+          "booking reference",
+          "traveler",
+          "departure",
+          "return"
+        ]
+      }
+    },
+    {
+      "docTypeId": "travel_travel_insurance_policy",
+      "domainId": "travel",
+      "displayName": "Travel Insurance Policy",
+      "description": "Travel insurance coverage document",
+      "structureSignatures": {
+        "headings": [
+          "Insured",
+          "Trip Details",
+          "Medical Coverage",
+          "Cancellation",
+          "Claims"
+        ],
+        "tableSignatures": [
+          "Coverage limits table",
+          "Exclusion list",
+          "Claims procedure"
+        ],
+        "layoutCues": [
+          "Policy format",
+          "Coverage grid",
+          "Emergency contact block"
+        ],
+        "metadataCues": [
+          "policy number",
+          "trip dates",
+          "coverage limit",
+          "insured"
+        ]
+      }
+    },
+    {
+      "docTypeId": "travel_visa_application_receipt",
+      "domainId": "travel",
+      "displayName": "Visa Application Receipt",
+      "description": "Visa application submission receipt",
+      "structureSignatures": {
+        "headings": [
+          "Applicant",
+          "Application",
+          "Visa Type",
+          "Payment",
+          "Processing"
+        ],
+        "tableSignatures": [
+          "Application detail table",
+          "Fee breakdown",
+          "Required documents checklist"
+        ],
+        "layoutCues": [
+          "Receipt format",
+          "Application number highlight",
+          "Processing timeline"
+        ],
+        "metadataCues": [
+          "application number",
+          "applicant",
+          "visa category",
+          "submission date"
         ]
       }
     }

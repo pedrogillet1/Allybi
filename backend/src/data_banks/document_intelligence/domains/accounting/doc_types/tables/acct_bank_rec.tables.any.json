@@ -185,5 +185,10 @@
       "id invoice",
       "chave da nota"
     ]
+  },
+  "debitCreditConventions": {
+    "normalSign": "debit_positive",
+    "parenthesesMeaning": "credit_or_negative",
+    "drCrColumns": true
   }
 }

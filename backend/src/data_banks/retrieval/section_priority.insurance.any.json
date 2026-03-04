@@ -1,0 +1,221 @@
+{
+  "_meta": {
+    "id": "section_priority_insurance",
+    "version": "1.0.0",
+    "description": "Section-priority rules for insurance retrieval scanning order by intent and document type.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-04",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/retrieval/retrievalEngine.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "insurance",
+    "mode": "deterministic_scan_order",
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
+  },
+  "domain": "insurance",
+  "rules": [
+    {
+      "id": "insurance_advise_primary_sections",
+      "enabled": true,
+      "priority": 95,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "insurance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "policy_details",
+        "coverage_summary",
+        "benefits_explanation",
+        "claim_information",
+        "premium_details"
+      ],
+      "docTypes": [
+        "auto_declaration",
+        "claim_submission",
+        "dental_plan",
+        "disability",
+        "explanation_of_benefits",
+        "policy_document",
+        "premium_invoice",
+        "umbrella_policy"
+      ]
+    },
+    {
+      "id": "insurance_calculate_primary_sections",
+      "enabled": true,
+      "priority": 92,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "insurance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "premium_details",
+        "claim_information",
+        "coverage_summary",
+        "policy_details",
+        "benefits_explanation"
+      ],
+      "docTypes": [
+        "auto_declaration",
+        "claim_submission",
+        "dental_plan",
+        "disability",
+        "explanation_of_benefits",
+        "policy_document",
+        "premium_invoice",
+        "umbrella_policy"
+      ]
+    },
+    {
+      "id": "insurance_compare_primary_sections",
+      "enabled": true,
+      "priority": 90,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "insurance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "coverage_summary",
+        "policy_details",
+        "premium_details",
+        "benefits_explanation",
+        "claim_information"
+      ],
+      "docTypes": [
+        "auto_declaration",
+        "claim_submission",
+        "dental_plan",
+        "disability",
+        "explanation_of_benefits",
+        "policy_document",
+        "premium_invoice",
+        "umbrella_policy"
+      ]
+    },
+    {
+      "id": "insurance_extract_primary_sections",
+      "enabled": true,
+      "priority": 88,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "insurance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "policy_details",
+        "claim_information",
+        "coverage_summary",
+        "premium_details",
+        "benefits_explanation"
+      ],
+      "docTypes": [
+        "auto_declaration",
+        "claim_submission",
+        "dental_plan",
+        "disability",
+        "explanation_of_benefits",
+        "policy_document",
+        "premium_invoice",
+        "umbrella_policy"
+      ]
+    },
+    {
+      "id": "insurance_summarize_primary_sections",
+      "enabled": true,
+      "priority": 86,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "insurance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "coverage_summary",
+        "policy_details",
+        "benefits_explanation",
+        "premium_details",
+        "claim_information"
+      ],
+      "docTypes": [
+        "auto_declaration",
+        "claim_submission",
+        "dental_plan",
+        "disability",
+        "explanation_of_benefits",
+        "policy_document",
+        "premium_invoice",
+        "umbrella_policy"
+      ]
+    },
+    {
+      "id": "insurance_locate_primary_sections",
+      "enabled": true,
+      "priority": 85,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "insurance"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "policy_details",
+        "claim_information",
+        "coverage_summary",
+        "benefits_explanation",
+        "premium_details"
+      ],
+      "docTypes": [
+        "auto_declaration",
+        "claim_submission",
+        "dental_plan",
+        "disability",
+        "explanation_of_benefits",
+        "policy_document",
+        "premium_invoice",
+        "umbrella_policy"
+      ]
+    }
+  ]
+}

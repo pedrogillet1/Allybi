@@ -14,7 +14,7 @@
  * - Chunk indexes are made deterministic and de-duped to avoid unique conflicts.
  */
 
-import { randomUUID } from "crypto";
+import { randomUUID, createHash } from "crypto";
 import type { Prisma } from "@prisma/client";
 
 import prisma from "../../config/database";
@@ -72,14 +72,10 @@ function buildEmbeddingOperationId(documentId: string): string {
   return `op_${Date.now().toString(36)}_${compactDocId.slice(0, 12)}_${suffix}`;
 }
 
-let chunkEncryptionServicesSingleton:
-  | ChunkEncryptionServices
-  | null
-  | undefined;
+let chunkEncryptionServicesSingleton: ChunkEncryptionServices | null = null;
 
 function getChunkEncryptionServicesSafe(): ChunkEncryptionServices | null {
-  if (chunkEncryptionServicesSingleton !== undefined)
-    return chunkEncryptionServicesSingleton;
+  if (chunkEncryptionServicesSingleton) return chunkEncryptionServicesSingleton;
   try {
     const encryption = new EncryptionService();
     const envelope = new EnvelopeService(encryption);
@@ -92,10 +88,10 @@ function getChunkEncryptionServicesSafe(): ChunkEncryptionServices | null {
     );
     const docCrypto = new DocumentCryptoService(encryption);
     chunkEncryptionServicesSingleton = { docKeys, docCrypto };
+    return chunkEncryptionServicesSingleton;
   } catch {
-    chunkEncryptionServicesSingleton = null;
+    return null; // don't cache failure — allow retry on next call
   }
-  return chunkEncryptionServicesSingleton;
 }
 
 /**
@@ -349,11 +345,14 @@ export async function storeDocumentEmbeddings(
 
       const pineconeChunks = usableChunks.map((c) => ({
         chunkIndex: c.chunkIndex,
-        content: c.content,
+        content: encryptionMode === "encrypted_only" ? "" : c.content,
         embedding: c.embedding || [],
         metadata: {
           ...(c.metadata || {}),
           ...sharedIndexingMetadata,
+          ...(encryptionMode === "encrypted_only"
+            ? { contentHash: createHash("sha256").update(c.content).digest("hex") }
+            : {}),
         },
       }));
 
@@ -448,6 +447,16 @@ export async function storeDocumentEmbeddings(
           numericValue:
             typeof metadata.numericValue === "number"
               ? metadata.numericValue
+              : null,
+          chunkType: metadata.chunkType || null,
+          sectionLevel:
+            typeof metadata.sectionLevel === "number"
+              ? metadata.sectionLevel
+              : null,
+          sourceType: metadata.sourceType || null,
+          ocrConfidence:
+            typeof metadata.ocrConfidence === "number"
+              ? metadata.ocrConfidence
               : null,
           metadata: metadataJson,
         };

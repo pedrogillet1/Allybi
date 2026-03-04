@@ -10,6 +10,7 @@
     "owner": "navigation-patterning",
     "lastUpdated": "2026-03-03",
     "usedBy": [
+      "services/chat/turnRouter.service.ts",
       "services/chat/turnRoutePolicy.service.ts"
     ],
     "tests": [

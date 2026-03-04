@@ -241,7 +241,9 @@ export class TraceWriterService {
         : process.env.TELEMETRY_ENABLED !== "false");
     this.successSamplePercent = clampSamplePercent(
       config.successSamplePercent ??
-        process.env.OBS_TRACE_SUCCESS_SAMPLE_PERCENT,
+        process.env.TRACE_SAMPLE_RATE ??
+        process.env.OBS_TRACE_SUCCESS_SAMPLE_PERCENT ??
+        50,
     );
     this.maxBufferedTraces = Math.max(
       100,

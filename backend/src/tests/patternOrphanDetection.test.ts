@@ -21,41 +21,9 @@ const TARGET_FAMILIES: Record<string, string> = {
 };
 
 const PATTERN_BANK_ALLOWLIST = new Set<string>([
-  // Navigation families are intentionally in-progress with semantic orchestration tests only.
-  "nav_intents_en",
-  "nav_intents_pt",
-  "path_string_guardrails",
-  "open_disambiguation",
-  "nav_failure_recovery",
-
-  // Universal operators are exercised by operator runtime contracts; wiring is proven via service tests.
-  "operator_patterns_open",
-  "operator_patterns_close",
-  "operator_patterns_extract",
-  "operator_patterns_navigate",
-  "operator_patterns_locate",
-  "operator_patterns_validate",
-  "operator_patterns_advise",
-  "operator_patterns_evaluate",
-  "operator_patterns_compare",
-  "operator_patterns_calculate",
-  "operator_patterns_summarize",
-  "operator_patterns_monitor",
-
-  // Quality banks are new and validated through dedicated tests; allowlisted during migration.
-  "quality_ambiguity_triggers",
-  "quality_weak_evidence_triggers",
-  "quality_wrong_doc_risk_triggers",
-  "quality_numeric_integrity_triggers",
-  "quality_language_lock_triggers",
-  "quality_unsafe_operation_triggers",
-
-  // Medical domain family currently carries expanded pattern banks pending registry wiring.
-  "patterns_medical_encounter_timeline_patterns",
-  "patterns_medical_lab_panel_patterns",
-  "patterns_medical_red_flag_patterns",
-  "patterns_medical_safety_boundary_triggers",
-  "patterns_medical_unit_reference_patterns",
+  // All pattern banks are now wired to consumer services and registered in the manifest.
+  // This allowlist is intentionally empty — every bank must pass registry, dependency,
+  // and usedBy checks without exemptions.
 ]);
 
 function resolveDataBanksRoot(): string {

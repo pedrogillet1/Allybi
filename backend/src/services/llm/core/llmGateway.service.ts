@@ -30,6 +30,7 @@ import {
 } from "./tokenBudgetLimiter.service";
 import {
   computeCostUsd,
+  estimateCostUsd,
   toCostFamilyModel,
   type CostTable,
 } from "./llmCostCalculator";
@@ -80,12 +81,26 @@ interface GatewayClientResolver {
   resolve(provider: LLMProvider): LLMClient | null;
 }
 
-interface GatewayExecutionAttempt {
+export interface GatewayExecutionAttempt {
   provider: LLMProvider;
   model: string;
   status: "ok" | "fail";
   durationMs: number;
   errorCode?: string | null;
+}
+
+export class FallbackExhaustedError extends Error {
+  readonly code = "LLM_ALL_FALLBACKS_EXHAUSTED";
+  constructor(
+    public readonly attempts: GatewayExecutionAttempt[],
+    public readonly cause: unknown,
+  ) {
+    super(
+      `All LLM providers exhausted after ${attempts.length} attempt(s): ` +
+      attempts.map(a => `${a.provider}:${a.model}=${a.status}`).join(", "),
+    );
+    this.name = "FallbackExhaustedError";
+  }
 }
 
 type GatewayDisambiguation = {
@@ -139,6 +154,15 @@ function getSharedComposedFragmentCache(): BankRuntimeCache<ComposedCacheEntry> 
 /** Clear gateway caches (for test teardown). */
 export function clearGatewayCaches(): void {
   _composedFragmentCache = null;
+}
+
+/**
+ * Invalidate composed fragment cache entries.
+ * Call this when document content changes to prevent stale LLM responses.
+ * Currently clears entire cache (keys are hashed, no reverse index by docId).
+ */
+export function invalidateComposedCache(_docId?: string): void {
+  getSharedComposedFragmentCache().clear();
 }
 
 function clampText(input: string, maxChars: number): string {
@@ -392,12 +416,30 @@ export class LlmGatewayService {
     }
     // Token budget check (fail-open if bank not loaded)
     const userId = (params.meta?.userId as string) || params.userId || "system";
-    const estimatedInputTokens = Math.ceil(
-      prepared.request.messages.reduce((sum, m) => sum + (m.content?.length ?? 0), 0) / 4,
-    );
+    const charLen = prepared.request.messages.reduce((sum, m) => sum + (m.content?.length ?? 0), 0);
+    const estimatedInputTokens = Math.max(1, Math.ceil(charLen / 3));
     const budgetCheck = checkBudget(userId, estimatedInputTokens);
     if (!budgetCheck.allowed) {
       throw new TokenBudgetExceededError(userId, budgetCheck.window);
+    }
+
+    const costWarningThreshold = Number(process.env.LLM_COST_WARNING_THRESHOLD_USD || "0");
+    if (costWarningThreshold > 0) {
+      const estCost = estimateCostUsd(
+        String(prepared.route.provider),
+        String(prepared.route.model),
+        estimatedInputTokens,
+        prepared.request.sampling?.maxOutputTokens ?? 1024,
+        getOptionalBank<CostTable>("llm_cost_table"),
+      );
+      if (estCost > costWarningThreshold) {
+        console.warn("[LLM_COST_WARNING]", {
+          estimatedCostUsd: estCost,
+          threshold: costWarningThreshold,
+          provider: prepared.route.provider,
+          model: prepared.route.model,
+        });
+      }
     }
 
     const execution = await this.completeWithFallback(
@@ -448,6 +490,7 @@ export class LlmGatewayService {
       finishReason: response.finishReason || "unknown",
       usage: response.usage,
       costUsd: actualCost || null,
+      tokenEstimationMethod: "char_div_3",
       promptType: prepared.promptType,
       requestedMaxOutputTokens:
         prepared.request.sampling?.maxOutputTokens ?? null,
@@ -746,8 +789,8 @@ export class LlmGatewayService {
       }
     }
 
-    if (lastError) throw lastError;
-    throw new Error("LLM_CLIENT_NOT_CONFIGURED");
+    if (lastError) throw new FallbackExhaustedError(attempts, lastError);
+    throw new FallbackExhaustedError(attempts, new Error("LLM_CLIENT_NOT_CONFIGURED"));
   }
 
   private async streamWithFallback(
@@ -813,12 +856,22 @@ export class LlmGatewayService {
         },
       };
 
-      let wroteEvents = 0;
+      let wroteVisibleEvents = 0;
       let closeRequested = false;
       const retryableSink: StreamSink = {
         transport: sink.transport,
         write(event) {
-          wroteEvents += 1;
+          const eventName = String((event as { event?: unknown })?.event || "");
+          if (
+            eventName === "delta" ||
+            eventName === "marker" ||
+            eventName === "worklog" ||
+            eventName === "final" ||
+            eventName === "abort" ||
+            eventName === "error"
+          ) {
+            wroteVisibleEvents += 1;
+          }
           sink.write(event);
         },
         flush: sink.flush ? () => sink.flush!() : undefined,
@@ -864,14 +917,28 @@ export class LlmGatewayService {
           errorCode: LlmGatewayService.toErrorCode(err),
         });
 
-        // If any events were already sent (or close was requested), the stream is
-        // already externally observable. Retrying would duplicate/overlap events.
-        if (wroteEvents > 0 || closeRequested) throw err;
+        // Only avoid retry once visible content/state was emitted (or close was requested).
+        // Non-visible preamble events (start/progress/ping) are safe to retry.
+        if (wroteVisibleEvents > 0 || closeRequested) {
+          try {
+            sink.write({
+              event: "error",
+              data: {
+                code: "fallback_failed",
+                message: `Stream failed after ${wroteVisibleEvents} visible event(s); partial output is unreliable`,
+                t: Date.now(),
+              },
+            });
+          } catch {
+            // sink may already be closed
+          }
+          throw err;
+        }
       }
     }
 
-    if (lastError) throw lastError;
-    throw new Error("LLM_CLIENT_NOT_CONFIGURED");
+    if (lastError) throw new FallbackExhaustedError(attempts, lastError);
+    throw new FallbackExhaustedError(attempts, new Error("LLM_CLIENT_NOT_CONFIGURED"));
   }
 
   private buildComposeCacheKey(
@@ -926,6 +993,12 @@ export class LlmGatewayService {
       ...(parsed.semanticFlags || []),
     ];
 
+    const preRouteCharLen = params.messages.reduce(
+      (sum, m) => sum + (m.content?.length ?? 0),
+      0,
+    );
+    const preRouteEstTokens = Math.max(1, Math.ceil(preRouteCharLen / 3));
+
     const route = this.router.route({
       env: this.cfg.env,
       stage: routeStage,
@@ -936,6 +1009,7 @@ export class LlmGatewayService {
       reasonCodes: routeReasonCodes,
       requireStreaming: streaming,
       allowTools: false,
+      estimatedInputTokens: preRouteEstTokens,
     });
 
     const promptTask =

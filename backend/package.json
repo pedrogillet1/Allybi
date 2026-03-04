@@ -181,7 +181,6 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.65.0",
     "@aws-sdk/s3-request-presigner": "^3.937.0",
     "@cantoo/pdf-lib": "^2.5.3",
     "@formulajs/formulajs": "^4.5.4",
@@ -217,7 +216,6 @@
     "canvas": "^3.2.0",
     "cheerio": "^1.1.2",
     "cloudconvert": "^3.0.0",
-    "cohere-ai": "^7.19.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "docx": "^9.5.1",

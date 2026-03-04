@@ -12,6 +12,7 @@ export interface DocumentIntelligenceIntegrityResult {
   missingManifestBanks: string[];
   missingDependencyNodes: string[];
   orphanBankIds: string[];
+  domainOntologyMismatches: string[];
   mapRequiredCoreCount: number;
   mapOptionalCount: number;
 }
@@ -43,6 +44,7 @@ export class DocumentIntelligenceIntegrityService {
         missingManifestBanks: [],
         missingDependencyNodes: [],
         orphanBankIds: [],
+        domainOntologyMismatches: [],
         mapRequiredCoreCount: 0,
         mapOptionalCount: 0,
       };
@@ -191,6 +193,53 @@ export class DocumentIntelligenceIntegrityService {
       (id: string) => !isConsumed(id) && !isAllowlisted(id),
     );
 
+    // Cross-validate DI domain ontology against root domain ontology.
+    // Every domain ID declared in the DI enumeration must exist as a
+    // parent or subdomain ID in the root taxonomy (SSOT).
+    const domainOntologyMismatches: string[] = [];
+    const rootOntology = getOptionalBank<Record<string, unknown>>("domain_ontology");
+    const diOntology = getOptionalBank<Record<string, unknown>>("di_domain_ontology");
+
+    if (rootOntology && diOntology) {
+      // Collect all valid domain IDs from the root taxonomy (parents + subdomains).
+      const rootDomainIds = new Set<string>();
+      if (Array.isArray(rootOntology.parents)) {
+        for (const parent of rootOntology.parents as Record<string, unknown>[]) {
+          const parentId = String(parent?.id || "").trim();
+          if (parentId) rootDomainIds.add(parentId);
+        }
+      }
+      if (Array.isArray(rootOntology.subdomains)) {
+        for (const sub of rootOntology.subdomains as Record<string, unknown>[]) {
+          const subId = String(sub?.id || "").trim();
+          if (subId) rootDomainIds.add(subId);
+        }
+      }
+
+      // Extract DI domain IDs from config.canonicalDomainIds and domains[].id.
+      const diDomainIds = new Set<string>();
+      const diConfig = diOntology.config as Record<string, unknown> | undefined;
+      if (diConfig && Array.isArray(diConfig.canonicalDomainIds)) {
+        for (const id of diConfig.canonicalDomainIds) {
+          const trimmed = String(id || "").trim();
+          if (trimmed) diDomainIds.add(trimmed);
+        }
+      }
+      if (Array.isArray(diOntology.domains)) {
+        for (const domain of diOntology.domains as Record<string, unknown>[]) {
+          const domainId = String(domain?.id || "").trim();
+          if (domainId) diDomainIds.add(domainId);
+        }
+      }
+
+      // Every DI domain ID must exist in the root taxonomy.
+      for (const diId of diDomainIds) {
+        if (!rootDomainIds.has(diId)) {
+          domainOntologyMismatches.push(diId);
+        }
+      }
+    }
+
     return {
       ok:
         missingCoreBanks.length === 0 &&
@@ -198,7 +247,8 @@ export class DocumentIntelligenceIntegrityService {
         missingBankFiles.length === 0 &&
         missingManifestBanks.length === 0 &&
         missingDependencyNodes.length === 0 &&
-        orphanBankIds.length === 0,
+        orphanBankIds.length === 0 &&
+        domainOntologyMismatches.length === 0,
       missingMapBank: false,
       missingCoreBanks,
       missingRegistryEntries,
@@ -206,6 +256,7 @@ export class DocumentIntelligenceIntegrityService {
       missingManifestBanks,
       missingDependencyNodes,
       orphanBankIds,
+      domainOntologyMismatches,
       mapRequiredCoreCount: requiredCoreIds.length,
       mapOptionalCount: optionalIds.length,
     };

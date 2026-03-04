@@ -174,6 +174,9 @@ export class EmbeddingsService {
     const embedding = await this.callOpenAIEmbeddingWithRetry([
       processedText,
     ]).then((arr) => arr[0]);
+    if (!Array.isArray(embedding) || embedding.length === 0) {
+      throw new Error("OpenAI embeddings returned empty vector");
+    }
 
     if (this.cfg.enableCache) {
       await cacheService.cacheEmbedding(processedText, embedding, this.cfg.model, this.cfg.dimensions);
@@ -425,9 +428,9 @@ export class EmbeddingsService {
         });
 
         const out = res.data.map((d) => d.embedding);
-        // Basic sanity
-        if (!out.length || out.some((e) => !e || e.length === 0)) {
-          throw new Error("OpenAI embeddings returned empty vectors");
+        // Response integrity check; per-item empties are handled by callers.
+        if (!out.length || out.length !== cleaned.length) {
+          throw new Error("OpenAI embeddings returned mismatched vector count");
         }
         return out;
       } catch (err: any) {
@@ -451,6 +454,75 @@ export class EmbeddingsService {
   }
 }
 
-// Default singleton (DI/container preferred)
-const embeddingsService = new EmbeddingsService();
-export default embeddingsService;
+let embeddingsServiceSingleton: EmbeddingsService | null | undefined;
+
+/**
+ * Lazy safe accessor:
+ * - Returns service when OpenAI embeddings are configured.
+ * - Returns null when OPENAI_API_KEY is missing/unusable.
+ * This avoids import-time crashes in runtimes that don't use embeddings.
+ */
+export function getEmbeddingsServiceSafe(): EmbeddingsService | null {
+  if (embeddingsServiceSingleton !== undefined) return embeddingsServiceSingleton;
+  try {
+    embeddingsServiceSingleton = new EmbeddingsService();
+  } catch {
+    embeddingsServiceSingleton = null;
+  }
+  return embeddingsServiceSingleton;
+}
+
+/**
+ * Strict accessor:
+ * - Throws when embeddings are unavailable.
+ */
+export function getEmbeddingsService(): EmbeddingsService {
+  const svc = getEmbeddingsServiceSafe();
+  if (!svc) {
+    throw new Error("OPENAI_API_KEY is not configured");
+  }
+  return svc;
+}
+
+// Backward-compatible default export with lazy initialization.
+const embeddingService = {
+  getEmbeddingDimensions() {
+    return getEmbeddingsService().getEmbeddingDimensions();
+  },
+  getEmbeddingModel() {
+    return getEmbeddingsService().getEmbeddingModel();
+  },
+  getEmbeddingConfig() {
+    return getEmbeddingsService().getEmbeddingConfig();
+  },
+  async generateEmbedding(text: string, options?: EmbeddingOptions) {
+    return getEmbeddingsService().generateEmbedding(text, options);
+  },
+  async generateBatchEmbeddings(texts: string[], options?: EmbeddingOptions) {
+    return getEmbeddingsService().generateBatchEmbeddings(texts, options);
+  },
+  async generateQueryEmbedding(query: string) {
+    return getEmbeddingsService().generateQueryEmbedding(query);
+  },
+  async generateDocumentEmbedding(text: string, title?: string) {
+    return getEmbeddingsService().generateDocumentEmbedding(text, title);
+  },
+  calculateSimilarity(a: number[], b: number[]) {
+    return getEmbeddingsService().calculateSimilarity(a, b);
+  },
+  findTopKSimilar(
+    queryEmbedding: number[],
+    candidates: Array<{ id: string; embedding: number[]; metadata?: any }>,
+    k?: number,
+  ) {
+    return getEmbeddingsService().findTopKSimilar(queryEmbedding, candidates, k);
+  },
+  async clearCache() {
+    return getEmbeddingsService().clearCache();
+  },
+  async getCacheStats() {
+    return getEmbeddingsService().getCacheStats();
+  },
+};
+
+export default embeddingService;

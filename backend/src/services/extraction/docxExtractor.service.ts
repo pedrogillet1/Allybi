@@ -19,6 +19,8 @@ import type {
   DocxParagraphAnchor,
 } from "../../types/extraction.types";
 import { createDocxHeadingAnchor } from "../../types/extraction.types";
+import { logger } from "../../utils/logger";
+import type { ExtractedTable } from "../ingestion/extraction/extractionResult.types";
 
 // ============================================================================
 // Heading Detection
@@ -83,6 +85,7 @@ interface ParsedParagraph {
   styleName?: string;
   headingLevel: number | null;
   index: number;
+  hasPageBreak?: boolean;
 }
 
 /**
@@ -137,11 +140,11 @@ function extractParagraphText(pNode: any): string {
  * Walks w:tr -> w:tc -> w:p, reusing extractParagraphText for cell content.
  * The first row is treated as the header row with a --- separator line.
  */
-function extractTableText(tblNode: any): string {
+function extractTableText(tblNode: any): { markdown: string; rows2d: string[][] } {
   const rows: string[][] = [];
 
   const trNodes = tblNode["w:tr"];
-  if (!trNodes) return "";
+  if (!trNodes) return { markdown: "", rows2d: [] };
 
   const trArray = Array.isArray(trNodes) ? trNodes : [trNodes];
 
@@ -169,6 +172,18 @@ function extractTableText(tblNode: any): string {
       const gridSpanNode = tcPrNode?.["w:gridSpan"];
       const gridSpanVal = Array.isArray(gridSpanNode) ? gridSpanNode[0] : gridSpanNode;
       const gridSpan = parseInt(gridSpanVal?.$?.["w:val"] || "1", 10);
+
+      // Check for vMerge (vertical merged cells)
+      const vMergeNode = tcPrNode?.["w:vMerge"];
+      const vMergeVal = Array.isArray(vMergeNode) ? vMergeNode[0] : vMergeNode;
+      const isVMergeRestart = vMergeVal?.$?.["w:val"] === "restart";
+      const isVMergeContinue = vMergeVal !== undefined && !isVMergeRestart;
+
+      if (isVMergeContinue) {
+        cells.push(""); // Continuation cell — visually merged with cell above
+        for (let s = 1; s < gridSpan; s++) cells.push("");
+        continue;
+      }
 
       // Each cell can contain multiple w:p paragraphs
       const pNodes = tc["w:p"];
@@ -200,11 +215,11 @@ function extractTableText(tblNode: any): string {
     rows.push(cells);
   }
 
-  if (rows.length === 0) return "";
+  if (rows.length === 0) return { markdown: "", rows2d: [] };
 
   // Determine the max number of columns across all rows
   const maxCols = Math.max(...rows.map((r) => r.length));
-  if (maxCols === 0) return "";
+  if (maxCols === 0) return { markdown: "", rows2d: [] };
 
   // Normalize each row to have the same number of columns
   const normalized = rows.map((row) => {
@@ -229,7 +244,7 @@ function extractTableText(tblNode: any): string {
     lines.push("| " + normalized[i].map((c) => c || " ").join(" | ") + " |");
   }
 
-  return lines.join("\n");
+  return { markdown: lines.join("\n"), rows2d: normalized };
 }
 
 /**
@@ -265,11 +280,18 @@ function processParagraphNode(
   const styleName = getParagraphStyle(pNode);
   const headingLevel = detectHeadingLevel(styleName);
 
+  // Detect page break before this paragraph (w:pageBreakBefore in w:pPr)
+  const pPr = pNode["w:pPr"];
+  const pPrNode = Array.isArray(pPr) ? pPr[0] : pPr;
+  const pageBreakBefore = pPrNode?.["w:pageBreakBefore"];
+  const hasPageBreak = pageBreakBefore !== undefined;
+
   paragraphs.push({
     text,
     styleName,
     headingLevel,
     index,
+    ...(hasPageBreak ? { hasPageBreak: true } : {}),
   });
 }
 
@@ -281,16 +303,31 @@ function processTableNode(
   tblNode: any,
   index: number,
   paragraphs: ParsedParagraph[],
+  collectedTables?: ExtractedTable[],
+  tableCounter?: { count: number },
 ): void {
   if (!tblNode) return;
-  const tableText = extractTableText(tblNode);
-  if (tableText) {
+  const { markdown, rows2d } = extractTableText(tblNode);
+  if (markdown) {
     paragraphs.push({
-      text: tableText,
+      text: markdown,
       styleName: undefined,
       headingLevel: null,
       index,
     });
+    // Collect structured table data for cell-level indexing
+    if (collectedTables && rows2d.length > 0) {
+      const tIdx = tableCounter ? tableCounter.count++ : collectedTables.length;
+      collectedTables.push({
+        tableId: `docx:t${tIdx}`,
+        markdown,
+        rows: rows2d.map((row, rIdx) => ({
+          rowIndex: rIdx,
+          isHeader: rIdx === 0,
+          cells: row.map((text, cIdx) => ({ text, colIndex: cIdx })),
+        })),
+      });
+    }
   }
 }
 
@@ -305,6 +342,7 @@ function processTableNode(
  */
 async function parseParagraphs(
   documentXml: string,
+  collectedTables?: ExtractedTable[],
 ): Promise<ParsedParagraph[]> {
   const xml2js = require("xml2js");
   const parser = new xml2js.Parser({
@@ -328,6 +366,7 @@ async function parseParagraphs(
 
   // Try ordered children first (available with explicitChildren + preserveChildrenOrder)
   const orderedChildren: any[] | undefined = bodyContent["$$"];
+  const tableCounter = { count: 0 };
 
   if (orderedChildren && orderedChildren.length > 0) {
     let idx = 0;
@@ -337,7 +376,7 @@ async function parseParagraphs(
         processParagraphNode(child, idx, paragraphs);
         idx++;
       } else if (tagName === "w:tbl") {
-        processTableNode(child, idx, paragraphs);
+        processTableNode(child, idx, paragraphs, collectedTables, tableCounter);
         idx++;
       }
       // Other element types (w:sectPr, etc.) are silently skipped
@@ -357,7 +396,7 @@ async function parseParagraphs(
     const tblNodes = bodyContent["w:tbl"] || [];
     const tblArray = Array.isArray(tblNodes) ? tblNodes : [tblNodes];
     for (const tblNode of tblArray) {
-      processTableNode(tblNode, idx, paragraphs);
+      processTableNode(tblNode, idx, paragraphs, collectedTables, tableCounter);
       idx++;
     }
   }
@@ -513,9 +552,7 @@ function buildSectionTree(paragraphs: ParsedParagraph[]): {
 export async function extractDocxWithAnchors(
   buffer: Buffer,
 ): Promise<DocxExtractionResult> {
-  console.log(
-    `📝 [DOCX] Starting heading-based extraction (${buffer.length} bytes)...`,
-  );
+  logger.info("[DOCX] Starting heading-based extraction", { sizeBytes: buffer.length });
 
   const AdmZip = require("adm-zip");
 
@@ -525,11 +562,12 @@ export async function extractDocxWithAnchors(
     if (!entry) throw new Error("Invalid DOCX: missing word/document.xml");
     const documentXml = entry.getData().toString("utf8");
 
-    // Parse paragraphs
-    const paragraphs = await parseParagraphs(documentXml);
+    // Parse paragraphs (+ collect structured tables for cell-level indexing)
+    const docxExtractedTables: ExtractedTable[] = [];
+    const paragraphs = await parseParagraphs(documentXml, docxExtractedTables);
 
     if (paragraphs.length === 0) {
-      console.warn("⚠️ [DOCX] No paragraphs found");
+      logger.warn("[DOCX] No paragraphs found");
       return {
         sourceType: "docx",
         text: "",
@@ -589,9 +627,11 @@ export async function extractDocxWithAnchors(
 
     const wordCount = fullText.split(/\s+/).filter((w) => w.length > 0).length;
 
-    console.log(
-      `✅ [DOCX] Extracted ${paragraphs.length} paragraphs, ${headings.length} headings, ${wordCount} words`,
-    );
+    logger.info("[DOCX] Extraction complete", {
+      paragraphCount: paragraphs.length,
+      headingCount: headings.length,
+      wordCount,
+    });
 
     return {
       sourceType: "docx",
@@ -603,9 +643,10 @@ export async function extractDocxWithAnchors(
       documentTitle,
       wordCount,
       confidence: 1.0,
+      ...(docxExtractedTables.length > 0 ? { extractedTables: docxExtractedTables } : {}),
     };
   } catch (error: any) {
-    console.error("❌ [DOCX] Extraction failed:", error.message);
+    logger.error("[DOCX] Extraction failed", { error: error.message });
 
     if (
       error.message?.includes("zip file") ||

@@ -1,0 +1,63 @@
+{
+  "_meta": {
+    "id": "di_insurance_tables_ins_dental_plan",
+    "version": "2.0.0",
+    "description": "Table patterns for ins_dental_plan.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-04",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "insurance",
+    "docType": "ins_dental_plan"
+  },
+  "tables": [
+    {
+      "id": "benefit_schedule_table",
+      "name": {
+        "en": "Benefit Schedule Table",
+        "pt": "Tabela de Beneficios"
+      },
+      "section": "benefit_categories",
+      "expectedColumns": [
+        "service_category",
+        "coverage_pct",
+        "frequency_limit",
+        "copay"
+      ],
+      "keyRows": [
+        "preventive",
+        "basic",
+        "major",
+        "orthodontia"
+      ]
+    },
+    {
+      "id": "maximums_table",
+      "name": {
+        "en": "Maximums and Deductibles Table",
+        "pt": "Tabela de Maximos e Franquias"
+      },
+      "section": "annual_maximums",
+      "expectedColumns": [
+        "benefit_type",
+        "individual_limit",
+        "family_limit"
+      ],
+      "keyRows": [
+        "annual_maximum",
+        "deductible",
+        "orthodontia_lifetime"
+      ]
+    }
+  ]
+}

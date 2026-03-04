@@ -1,0 +1,62 @@
+{
+  "_meta": {
+    "id": "di_insurance_tables_ins_disability",
+    "version": "2.0.0",
+    "description": "Table patterns for ins_disability.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-04",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "insurance",
+    "docType": "ins_disability"
+  },
+  "tables": [
+    {
+      "id": "benefit_schedule_table",
+      "name": {
+        "en": "Benefit Schedule Table",
+        "pt": "Tabela de Beneficios"
+      },
+      "section": "benefit_details",
+      "expectedColumns": [
+        "benefit_type",
+        "monthly_amount",
+        "benefit_period",
+        "definition"
+      ],
+      "keyRows": [
+        "short_term",
+        "long_term",
+        "maximum_monthly"
+      ]
+    },
+    {
+      "id": "elimination_period_table",
+      "name": {
+        "en": "Elimination Period Table",
+        "pt": "Tabela de Periodo de Carencia"
+      },
+      "section": "elimination_period",
+      "expectedColumns": [
+        "condition",
+        "waiting_days",
+        "effective_date"
+      ],
+      "keyRows": [
+        "illness",
+        "injury",
+        "pre_existing"
+      ]
+    }
+  ]
+}

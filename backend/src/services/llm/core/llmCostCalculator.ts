@@ -143,3 +143,36 @@ export function computeCostUsd(
 
   return inputCost + outputCost;
 }
+
+/**
+ * Pre-execution cost estimate. Delegates to computeCostUsd with estimated token counts.
+ */
+export function estimateCostUsd(
+  provider: string,
+  model: string,
+  estimatedInputTokens: number,
+  estimatedOutputTokens: number,
+  costTable: CostTable | null | undefined,
+): number {
+  return computeCostUsd(provider, model, estimatedInputTokens, estimatedOutputTokens, costTable);
+}
+
+/**
+ * Diagnose whether a cost lookup will find a matching entry.
+ * Returns a warning string when the provider:model pair has no cost data.
+ */
+export function diagnoseCostLookup(
+  provider: string,
+  model: string,
+  costTable: CostTable | null | undefined,
+): { found: boolean; warning: string | null } {
+  if (!costTable?.models || !provider || !model) {
+    return { found: false, warning: null };
+  }
+  const lookup = lookupCostEntry(provider, model, costTable);
+  if (lookup.entry) return { found: true, warning: null };
+  return {
+    found: false,
+    warning: `Cost lookup returned no entry for ${provider}:${model}`,
+  };
+}

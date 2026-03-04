@@ -25,7 +25,7 @@
       "id": "header",
       "name": {
         "en": "Header",
-        "pt": "Cabecalho"
+        "pt": "Cabeçalho"
       },
       "required": true,
       "order": 1,
@@ -87,7 +87,7 @@
       "id": "root_cause_analysis",
       "name": {
         "en": "Root Cause Analysis",
-        "pt": "Analise de Causa Raiz"
+        "pt": "Análise de Causa Raiz"
       },
       "required": false,
       "order": 5,
@@ -132,7 +132,7 @@
       "id": "footer_metadata",
       "name": {
         "en": "Footer Metadata",
-        "pt": "Rodape e Metadados"
+        "pt": "Rodapé e Metadados"
       },
       "required": false,
       "order": 8,

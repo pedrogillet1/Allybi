@@ -27,34 +27,6 @@
         {
           "provider": "openai",
           "model": "gpt-5.2"
-        },
-        {
-          "provider": "openai",
-          "model": "gpt-5-mini"
-        },
-        {
-          "provider": "local",
-          "model": "local-default"
-        }
-      ]
-    },
-    {
-      "when": {
-        "provider": "openai",
-        "model": "gpt-5-mini"
-      },
-      "try": [
-        {
-          "provider": "openai",
-          "model": "gpt-5.2"
-        },
-        {
-          "provider": "gemini",
-          "model": "gemini-2.5-flash"
-        },
-        {
-          "provider": "local",
-          "model": "local-default"
         }
       ]
     },
@@ -66,25 +38,6 @@
         {
           "provider": "gemini",
           "model": "gemini-2.5-flash"
-        },
-        {
-          "provider": "local",
-          "model": "local-default"
-        }
-      ]
-    },
-    {
-      "when": {
-        "provider": "local"
-      },
-      "try": [
-        {
-          "provider": "gemini",
-          "model": "gemini-2.5-flash"
-        },
-        {
-          "provider": "openai",
-          "model": "gpt-5-mini"
         }
       ]
     }

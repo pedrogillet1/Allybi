@@ -25,11 +25,10 @@
       "id": "document_header",
       "name": {
         "en": "Document Header",
-        "pt": "Cabecalho do Documento"
+        "pt": "Cabeçalho do Documento"
       },
       "order": 1,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "rent",
         "receipt",
@@ -44,7 +43,6 @@
       },
       "order": 2,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "landlord",
         "tenant",
@@ -57,11 +55,10 @@
       "id": "lease_info",
       "name": {
         "en": "Lease Information",
-        "pt": "Informacoes de Contrato"
+        "pt": "Informações de Contrato"
       },
       "order": 3,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "lease",
         "contract",
@@ -72,11 +69,10 @@
       "id": "payment_period",
       "name": {
         "en": "Payment Period",
-        "pt": "Periodo de Pagamento"
+        "pt": "Período de Pagamento"
       },
       "order": 4,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "period",
         "referencia",
@@ -92,7 +88,6 @@
       },
       "order": 5,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "charges",
         "rent amount",
@@ -107,7 +102,6 @@
       },
       "order": 6,
       "required": false,
-      "mustHave": false,
       "headingAnchors": [
         "utilities",
         "agua",
@@ -123,7 +117,6 @@
       },
       "order": 7,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "payment",
         "paid",
@@ -139,7 +132,6 @@
       },
       "order": 8,
       "required": false,
-      "mustHave": false,
       "headingAnchors": [
         "late fee",
         "multa",
@@ -154,7 +146,6 @@
       },
       "order": 9,
       "required": false,
-      "mustHave": false,
       "headingAnchors": [
         "signature",
         "assinatura",

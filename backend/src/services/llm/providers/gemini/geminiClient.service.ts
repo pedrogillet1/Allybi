@@ -266,35 +266,13 @@ export class GeminiClientService implements LLMClient {
 
       if (!res.ok || !res.body) {
         const errText = await safeReadText(res);
-        this.emit(sink, {
-          event: "error",
-          data: {
+        throw new Error(
+          JSON.stringify({
             code: "LLM_PROVIDER_BAD_REQUEST",
-            message: JSON.stringify({
-              status: res.status,
-              body: truncate(errText, 2000),
-            }),
-            traceId: state.traceId,
-            t: Date.now(),
-          },
-        });
-        hooks?.onError?.(
-          {
-            code: "LLM_PROVIDER_BAD_REQUEST",
-            message: "provider_bad_request",
-            traceId: state.traceId,
-            t: Date.now(),
-          },
-          state,
+            status: res.status,
+            body: truncate(errText, 2000),
+          }),
         );
-        sink.close();
-        return {
-          traceId: req.traceId,
-          turnId: req.turnId,
-          model: req.model,
-          finalText: state.accumulatedText,
-          requestId,
-        };
       }
 
       state.phase = "preamble";
@@ -432,6 +410,9 @@ export class GeminiClientService implements LLMClient {
           finalText: state.accumulatedText,
         };
       }
+
+      // Let gateway-level fallback handle failures before any visible output.
+      if (!state.accumulatedText) throw e;
 
       const isAbort =
         e instanceof Error &&

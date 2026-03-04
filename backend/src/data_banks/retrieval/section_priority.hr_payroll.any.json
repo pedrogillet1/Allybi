@@ -1,0 +1,203 @@
+{
+  "_meta": {
+    "id": "section_priority_hr_payroll",
+    "version": "1.0.0",
+    "description": "Section-priority rules for hr_payroll retrieval scanning order by intent and document type.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-04",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/retrieval/retrievalEngine.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "hr_payroll",
+    "mode": "deterministic_scan_order",
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
+  },
+  "domain": "hr_payroll",
+  "rules": [
+    {
+      "id": "hr_payroll_advise_primary_sections",
+      "enabled": true,
+      "priority": 95,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "hr_payroll"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "employee_information",
+        "benefits_summary",
+        "compensation_details",
+        "time_records",
+        "expense_details"
+      ],
+      "docTypes": [
+        "benefits_enrollment_summary",
+        "employment_verification_letter",
+        "expense_report",
+        "pay_stub",
+        "timesheet"
+      ]
+    },
+    {
+      "id": "hr_payroll_calculate_primary_sections",
+      "enabled": true,
+      "priority": 92,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "hr_payroll"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "compensation_details",
+        "expense_details",
+        "time_records",
+        "benefits_summary",
+        "employee_information"
+      ],
+      "docTypes": [
+        "benefits_enrollment_summary",
+        "employment_verification_letter",
+        "expense_report",
+        "pay_stub",
+        "timesheet"
+      ]
+    },
+    {
+      "id": "hr_payroll_compare_primary_sections",
+      "enabled": true,
+      "priority": 90,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "hr_payroll"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "compensation_details",
+        "benefits_summary",
+        "time_records",
+        "expense_details",
+        "employee_information"
+      ],
+      "docTypes": [
+        "benefits_enrollment_summary",
+        "employment_verification_letter",
+        "expense_report",
+        "pay_stub",
+        "timesheet"
+      ]
+    },
+    {
+      "id": "hr_payroll_extract_primary_sections",
+      "enabled": true,
+      "priority": 88,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "hr_payroll"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "employee_information",
+        "compensation_details",
+        "time_records",
+        "expense_details",
+        "benefits_summary"
+      ],
+      "docTypes": [
+        "benefits_enrollment_summary",
+        "employment_verification_letter",
+        "expense_report",
+        "pay_stub",
+        "timesheet"
+      ]
+    },
+    {
+      "id": "hr_payroll_summarize_primary_sections",
+      "enabled": true,
+      "priority": 86,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "hr_payroll"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "employee_information",
+        "benefits_summary",
+        "compensation_details",
+        "expense_details",
+        "time_records"
+      ],
+      "docTypes": [
+        "benefits_enrollment_summary",
+        "employment_verification_letter",
+        "expense_report",
+        "pay_stub",
+        "timesheet"
+      ]
+    },
+    {
+      "id": "hr_payroll_locate_primary_sections",
+      "enabled": true,
+      "priority": 85,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "hr_payroll"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "employee_information",
+        "time_records",
+        "expense_details",
+        "compensation_details",
+        "benefits_summary"
+      ],
+      "docTypes": [
+        "benefits_enrollment_summary",
+        "employment_verification_letter",
+        "expense_report",
+        "pay_stub",
+        "timesheet"
+      ]
+    }
+  ]
+}

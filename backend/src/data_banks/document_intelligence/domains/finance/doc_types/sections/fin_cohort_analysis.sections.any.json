@@ -1,12 +1,12 @@
 {
   "_meta": {
     "id": "di_finance_sections_fin_cohort_analysis",
-    "version": "2.0.0",
+    "version": "3.0.0",
     "description": "Section map for fin_cohort_analysis.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28",
+    "lastUpdated": "2026-03-04",
     "owner": "data-bank-governance",
     "usedBy": [
       "services/core/banks/dataBankLoader.service.ts"
@@ -28,16 +28,23 @@
         "pt": "Resumo Executivo"
       },
       "required": true,
-      "order": 1
+      "order": 1,
+      "headingAnchors": [
+        "Executive Summary",
+        "Resumo Executivo"
+      ]
     },
     {
       "id": "period_scope",
       "name": {
-        "en": "Period and Scope",
-        "pt": "Periodo e Escopo"
+        "en": "Period Scope",
+        "pt": "Period Scope"
       },
       "required": true,
-      "order": 2
+      "order": 2,
+      "headingAnchors": [
+        "period scope"
+      ]
     },
     {
       "id": "assumptions",
@@ -46,52 +53,72 @@
         "pt": "Premissas"
       },
       "required": false,
-      "order": 3
+      "order": 3,
+      "headingAnchors": [
+        "Assumptions",
+        "Premissas"
+      ]
     },
     {
       "id": "tables_primary",
       "name": {
-        "en": "Primary Tables",
-        "pt": "Tabelas Principais"
+        "en": "Tables Primary",
+        "pt": "Tables Primary"
       },
       "required": true,
-      "order": 4
+      "order": 4,
+      "headingAnchors": [
+        "tables primary"
+      ]
     },
     {
       "id": "variance_and_drivers",
       "name": {
-        "en": "Variance and Drivers",
-        "pt": "Variacoes e Drivers"
+        "en": "Variance And Drivers",
+        "pt": "Variance And Drivers"
       },
       "required": false,
-      "order": 5
+      "order": 5,
+      "headingAnchors": [
+        "variance and drivers"
+      ]
     },
     {
       "id": "risks_and_constraints",
       "name": {
-        "en": "Risks and Constraints",
-        "pt": "Riscos e Restricoes"
+        "en": "Risks And Constraints",
+        "pt": "Risks And Constraints"
       },
       "required": false,
-      "order": 6
+      "order": 6,
+      "headingAnchors": [
+        "risks and constraints"
+      ]
     },
     {
       "id": "definitions",
       "name": {
         "en": "Definitions",
-        "pt": "Definicoes"
+        "pt": "Definitions"
       },
-      "required": true,
-      "order": 7
+      "required": false,
+      "order": 7,
+      "headingAnchors": [
+        "definitions"
+      ]
     },
     {
       "id": "appendix",
       "name": {
         "en": "Appendix",
-        "pt": "Anexos"
+        "pt": "Apêndice"
       },
       "required": false,
-      "order": 8
+      "order": 8,
+      "headingAnchors": [
+        "Appendix",
+        "Apêndice"
+      ]
     }
   ]
 }

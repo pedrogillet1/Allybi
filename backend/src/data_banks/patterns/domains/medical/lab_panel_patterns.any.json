@@ -13,6 +13,7 @@
       "non_diagnostic_policy"
     ],
     "usedBy": [
+      "services/core/retrieval/retrievalEngine.service.ts",
       "query_orchestrator",
       "safety_gate",
       "doc_extractor"

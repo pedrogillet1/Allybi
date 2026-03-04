@@ -13,6 +13,7 @@
       "timeline_parser"
     ],
     "usedBy": [
+      "services/core/retrieval/retrievalEngine.service.ts",
       "query_orchestrator",
       "doc_extractor",
       "safe_reasoning"

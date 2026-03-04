@@ -165,5 +165,10 @@
         "difference"
       ]
     }
-  ]
+  ],
+  "debitCreditConventions": {
+    "normalSign": "debit_positive",
+    "parenthesesMeaning": "credit_or_negative",
+    "drCrColumns": true
+  }
 }

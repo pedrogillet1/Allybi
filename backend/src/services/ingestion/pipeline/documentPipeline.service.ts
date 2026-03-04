@@ -18,6 +18,7 @@ import { clamp01, deriveTextQuality } from "./textQuality.service";
 import { runEncryptionStep } from "./encryptionStep.service";
 import fileValidator from "../fileValidator.service";
 import type { PipelineTimings, InputChunk } from "./pipelineTypes";
+import { recordIngestionTiming, recordExtractionAttempt } from "./pipelineMetrics.service";
 
 // Storage download concurrency limiter
 const pLimit = require("p-limit");
@@ -98,7 +99,20 @@ export async function processDocumentAsync(
     data: { fileHash },
   });
 
-  // 1c) Validate file integrity before extraction
+  // 1c) Resolve version info for document context
+  const versionInfo = await prisma.document.findUnique({
+    where: { id: documentId },
+    select: { parentVersionId: true },
+  });
+  const rootDocId = versionInfo?.parentVersionId || documentId;
+  const documentContext = {
+    documentId,
+    versionId: documentId,
+    rootDocumentId: rootDocId,
+    isLatestVersion: true, // freshly processed doc is latest by definition
+  };
+
+  // 1d) Validate file integrity before extraction
   const headerCheck = fileValidator.validateFileHeader(fileBuffer, mimeType, documentId);
   if (!headerCheck.isValid) {
     logger.warn("[Pipeline] File failed header validation", {
@@ -127,6 +141,7 @@ export async function processDocumentAsync(
       fileHash,
       skipped: true,
       skipReason: `${headerCheck.errorCode}: ${headerCheck.error}`,
+      skipCode: headerCheck.errorCode || "FILE_INVALID",
     };
   }
 
@@ -179,7 +194,24 @@ export async function processDocumentAsync(
       : []),
   ];
 
+  // Detect scanned PDF with no OCR applied — log structured warning for monitoring
+  if (
+    PDF_MIMES.includes(mimeType) &&
+    extraction.confidence !== undefined &&
+    extraction.confidence < 0.5 &&
+    !extractedOcrUsed
+  ) {
+    logger.warn("[Pipeline] Low-confidence PDF without OCR — likely scanned", {
+      documentId,
+      filename,
+      confidence: extraction.confidence,
+      textLength: fullText.length,
+    });
+  }
+
   if (!fullText || fullText.trim().length < 10) {
+    recordExtractionAttempt(false);
+
     const skipReason = wasSkipped
       ? (extraction as any).skipReason
       : "No extractable text content";
@@ -210,6 +242,7 @@ export async function processDocumentAsync(
       fileHash,
       skipped: true,
       skipReason,
+      skipCode: wasSkipped ? "IMAGE_VISUAL_ONLY" : "NO_TEXT_CONTENT",
     };
   }
 
@@ -218,6 +251,8 @@ export async function processDocumentAsync(
   let tEmbed = Date.now();
 
   if (fullText && fullText.trim().length >= 10) {
+    recordExtractionAttempt(true);
+
     logger.info("[Pipeline] Extracted text", {
       documentId,
       wordCount: extraction.wordCount || 0,
@@ -225,7 +260,7 @@ export async function processDocumentAsync(
     });
 
     // 3) Chunk
-    rawChunks = buildInputChunks(extraction, fullText);
+    rawChunks = buildInputChunks(extraction, fullText, undefined, documentContext);
     inputChunks = deduplicateChunks(rawChunks);
 
     // 4) Embed + store
@@ -272,9 +307,18 @@ export async function processDocumentAsync(
   else if (PPTX_MIMES.includes(mimeType)) extractionMethod = "pptx";
   else if (isOcr) extractionMethod = "ocr";
 
+  const extractionMs = tEmbed - tExtract;
+  const embeddingMs = Date.now() - tEmbed;
+
+  recordIngestionTiming({
+    extractionMs,
+    embeddingMs,
+    totalMs: Date.now() - tDownload,
+  });
+
   return {
     storageDownloadMs: tExtract - tDownload,
-    extractionMs: tEmbed - tExtract,
+    extractionMs,
     extractionMethod,
     ocrUsed: extractedOcrUsed,
     ocrSuccess: extractedOcrUsed ? fullText.trim().length > 0 : false,
@@ -287,7 +331,7 @@ export async function processDocumentAsync(
     textLength: fullText.length,
     rawChunkCount: rawChunks.length,
     chunkCount: inputChunks.length,
-    embeddingMs: Date.now() - tEmbed,
+    embeddingMs,
     pageCount:
       (extraction as any).pageCount ?? (extraction as any).slideCount ?? null,
     fileHash,

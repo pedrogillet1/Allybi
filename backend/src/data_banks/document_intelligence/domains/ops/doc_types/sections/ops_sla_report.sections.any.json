@@ -25,7 +25,7 @@
       "id": "header",
       "name": {
         "en": "Header",
-        "pt": "Cabecalho"
+        "pt": "Cabeçalho"
       },
       "required": true,
       "order": 1,
@@ -138,7 +138,7 @@
       "id": "footer_metadata",
       "name": {
         "en": "Footer Metadata",
-        "pt": "Rodape e Metadados"
+        "pt": "Rodapé e Metadados"
       },
       "required": false,
       "order": 8,

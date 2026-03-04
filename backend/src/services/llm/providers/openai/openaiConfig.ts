@@ -7,8 +7,7 @@
  *
  * Allybi strategy:
  *  - OpenAI is the precision finisher lane (final pass, strict correctness).
- *  - Draft model: gpt-5-mini
- *  - Final model: gpt-5.2
+ *  - Single model: gpt-5.2 (all OpenAI lanes)
  *
  * This file contains:
  *  - env-derived config with safe defaults
@@ -22,7 +21,6 @@
 import type { EnvName } from "../../types/llm.types";
 import {
   OPENAI_PRIMARY_MODEL,
-  OPENAI_DRAFT_MODEL,
   listOpenAIModels,
 } from "./openaiModels";
 
@@ -37,7 +35,7 @@ export interface OpenAIProviderConfig {
   timeoutMs: number;
 
   // Models
-  defaultModelDraft: string; // gpt-5-mini
+  defaultModelDraft: string; // gpt-5.2
   defaultModelFinal: string; // gpt-5.2
   allowedModels: string[];
   strictModelAllowlist: boolean;
@@ -68,7 +66,7 @@ export function loadOpenAIConfig(env: EnvName): OpenAIProviderConfig {
 
     timeoutMs: Number(process.env.OPENAI_TIMEOUT_MS || 30000),
 
-    defaultModelDraft: process.env.OPENAI_DRAFT_MODEL || OPENAI_DRAFT_MODEL,
+    defaultModelDraft: process.env.OPENAI_DRAFT_MODEL || OPENAI_PRIMARY_MODEL,
     defaultModelFinal: process.env.OPENAI_FINAL_MODEL || OPENAI_PRIMARY_MODEL,
     allowedModels: process.env.OPENAI_ALLOWED_MODELS
       ? process.env.OPENAI_ALLOWED_MODELS.split(",")

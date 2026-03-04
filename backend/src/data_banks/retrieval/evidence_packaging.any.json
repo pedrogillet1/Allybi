@@ -205,7 +205,7 @@
         ]
       },
       "when": {
-        "all": [
+        "any": [
           {
             "path": "signals.hasDocId",
             "op": "neq",

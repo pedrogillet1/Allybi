@@ -1,12 +1,12 @@
 {
   "_meta": {
     "id": "di_finance_sections_fin_8k",
-    "version": "2.1.0",
+    "version": "3.0.0",
     "description": "Sections mapping for 8-K Current Report.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-03-03",
+    "lastUpdated": "2026-03-04",
     "owner": "data-bank-governance",
     "usedBy": [
       "services/core/banks/dataBankLoader.service.ts"
@@ -22,1368 +22,148 @@
   },
   "sections": [
     {
-      "id": "material_transactions_1",
+      "id": "material_transactions",
       "name": {
-        "en": "Material Transactions Segment 1",
-        "pt": "Material Transactions segmento 1"
+        "en": "Material Transactions",
+        "pt": "Material Transactions"
       },
-      "mustHave": true,
+      "required": true,
       "order": 1,
       "headingAnchors": [
-        "Material Transactions 1",
-        "material_transactions 1",
-        "Material Transactions section",
-        "seção Material Transactions 1"
-      ],
-      "confidence": 0.81,
-      "fallbackPatterns": [
-        "\bmaterial_transactions\b",
-        "\bmaterial_transactions_1\b",
-        "\bmaterial_transactions section\b"
-      ],
-      "description": "Canonical section material_transactions for 8-K Current Report"
+        "material transactions"
+      ]
     },
     {
-      "id": "financial_impact_2",
+      "id": "financial_impact",
       "name": {
-        "en": "Financial Impact Segment 2",
-        "pt": "Financial Impact segmento 2"
+        "en": "Financial Impact",
+        "pt": "Financial Impact"
       },
-      "mustHave": true,
+      "required": true,
       "order": 2,
       "headingAnchors": [
-        "Financial Impact 2",
-        "financial_impact 2",
-        "Financial Impact section",
-        "seção Financial Impact 2"
-      ],
-      "confidence": 0.82,
-      "fallbackPatterns": [
-        "\bfinancial_impact\b",
-        "\bfinancial_impact_2\b",
-        "\bfinancial_impact section\b"
-      ],
-      "description": "Canonical section financial_impact for 8-K Current Report"
+        "financial impact"
+      ]
     },
     {
-      "id": "board_actions_3",
+      "id": "board_actions",
       "name": {
-        "en": "Board Actions Segment 3",
-        "pt": "Board Actions segmento 3"
+        "en": "Board Actions",
+        "pt": "Board Actions"
       },
-      "mustHave": true,
+      "required": true,
       "order": 3,
       "headingAnchors": [
-        "Board Actions 3",
-        "board_actions 3",
-        "Board Actions section",
-        "seção Board Actions 3"
-      ],
-      "confidence": 0.83,
-      "fallbackPatterns": [
-        "\bboard_actions\b",
-        "\bboard_actions_3\b",
-        "\bboard_actions section\b"
-      ],
-      "description": "Canonical section board_actions for 8-K Current Report"
+        "board actions"
+      ]
     },
     {
-      "id": "corporate_updates_4",
+      "id": "corporate_updates",
       "name": {
-        "en": "Corporate Updates Segment 4",
-        "pt": "Corporate Updates segmento 4"
+        "en": "Corporate Updates",
+        "pt": "Corporate Updates"
       },
-      "mustHave": true,
+      "required": true,
       "order": 4,
       "headingAnchors": [
-        "Corporate Updates 4",
-        "corporate_updates 4",
-        "Corporate Updates section",
-        "seção Corporate Updates 4"
-      ],
-      "confidence": 0.84,
-      "fallbackPatterns": [
-        "\bcorporate_updates\b",
-        "\bcorporate_updates_4\b",
-        "\bcorporate_updates section\b"
-      ],
-      "description": "Canonical section corporate_updates for 8-K Current Report"
+        "corporate updates"
+      ]
     },
     {
-      "id": "press_release_snapshot_5",
+      "id": "press_release_snapshot",
       "name": {
-        "en": "Press Release Snapshot Segment 5",
-        "pt": "Press Release Snapshot segmento 5"
+        "en": "Press Release Snapshot",
+        "pt": "Press Release Snapshot"
       },
-      "mustHave": true,
+      "required": true,
       "order": 5,
       "headingAnchors": [
-        "Press Release Snapshot 5",
-        "press_release_snapshot 5",
-        "Press Release Snapshot section",
-        "seção Press Release Snapshot 5"
-      ],
-      "confidence": 0.85,
-      "fallbackPatterns": [
-        "\bpress_release_snapshot\b",
-        "\bpress_release_snapshot_5\b",
-        "\bpress_release_snapshot section\b"
-      ],
-      "description": "Canonical section press_release_snapshot for 8-K Current Report"
+        "press release snapshot"
+      ]
     },
     {
-      "id": "risk_update_6",
+      "id": "risk_update",
       "name": {
-        "en": "Risk Update Segment 6",
-        "pt": "Risk Update segmento 6"
+        "en": "Risk Update",
+        "pt": "Risk Update"
       },
-      "mustHave": true,
+      "required": true,
       "order": 6,
       "headingAnchors": [
-        "Risk Update 6",
-        "risk_update 6",
-        "Risk Update section",
-        "seção Risk Update 6"
-      ],
-      "confidence": 0.86,
-      "fallbackPatterns": [
-        "\brisk_update\b",
-        "\brisk_update_6\b",
-        "\brisk_update section\b"
-      ],
-      "description": "Canonical section risk_update for 8-K Current Report"
+        "risk update"
+      ]
     },
     {
-      "id": "guidance_revision_7",
+      "id": "guidance_revision",
       "name": {
-        "en": "Guidance Revision Segment 7",
-        "pt": "Guidance Revision segmento 7"
+        "en": "Guidance Revision",
+        "pt": "Guidance Revision"
       },
-      "mustHave": true,
+      "required": true,
       "order": 7,
       "headingAnchors": [
-        "Guidance Revision 7",
-        "guidance_revision 7",
-        "Guidance Revision section",
-        "seção Guidance Revision 7"
-      ],
-      "confidence": 0.87,
-      "fallbackPatterns": [
-        "\bguidance_revision\b",
-        "\bguidance_revision_7\b",
-        "\bguidance_revision section\b"
-      ],
-      "description": "Canonical section guidance_revision for 8-K Current Report"
+        "guidance revision"
+      ]
     },
     {
-      "id": "financial_tables_8",
+      "id": "financial_tables",
       "name": {
-        "en": "Financial Tables Segment 8",
-        "pt": "Financial Tables segmento 8"
+        "en": "Financial Tables",
+        "pt": "Financial Tables"
       },
-      "mustHave": true,
+      "required": true,
       "order": 8,
       "headingAnchors": [
-        "Financial Tables 8",
-        "financial_tables 8",
-        "Financial Tables section",
-        "seção Financial Tables 8"
-      ],
-      "confidence": 0.88,
-      "fallbackPatterns": [
-        "\bfinancial_tables\b",
-        "\bfinancial_tables_8\b",
-        "\bfinancial_tables section\b"
-      ],
-      "description": "Canonical section financial_tables for 8-K Current Report"
+        "financial tables"
+      ]
     },
     {
-      "id": "legal_updates_9",
+      "id": "legal_updates",
       "name": {
-        "en": "Legal Updates Segment 9",
-        "pt": "Legal Updates segmento 9"
+        "en": "Legal Updates",
+        "pt": "Legal Updates"
       },
-      "mustHave": true,
+      "required": false,
       "order": 9,
       "headingAnchors": [
-        "Legal Updates 9",
-        "legal_updates 9",
-        "Legal Updates section",
-        "seção Legal Updates 9"
-      ],
-      "confidence": 0.89,
-      "fallbackPatterns": [
-        "\blegal_updates\b",
-        "\blegal_updates_9\b",
-        "\blegal_updates section\b"
-      ],
-      "description": "Canonical section legal_updates for 8-K Current Report"
+        "legal updates"
+      ]
     },
     {
-      "id": "signatures_10",
+      "id": "signatures",
       "name": {
-        "en": "Signatures Segment 10",
-        "pt": "Signatures segmento 10"
+        "en": "Signatures",
+        "pt": "Signatures"
       },
-      "mustHave": true,
+      "required": false,
       "order": 10,
       "headingAnchors": [
-        "Signatures 10",
-        "signatures 10",
-        "Signatures section",
-        "seção Signatures 10"
-      ],
-      "confidence": 0.9,
-      "fallbackPatterns": [
-        "\bsignatures\b",
-        "\bsignatures_10\b",
-        "\bsignatures section\b"
-      ],
-      "description": "Canonical section signatures for 8-K Current Report"
+        "signatures"
+      ]
     },
     {
-      "id": "annexes_11",
+      "id": "annexes",
       "name": {
-        "en": "Annexes Segment 11",
-        "pt": "Annexes segmento 11"
+        "en": "Annexes",
+        "pt": "Annexes"
       },
-      "mustHave": false,
+      "required": false,
       "order": 11,
       "headingAnchors": [
-        "Annexes 11",
-        "annexes 11",
-        "Annexes section",
-        "seção Annexes 11"
-      ],
-      "confidence": 0.91,
-      "fallbackPatterns": [
-        "\bannexes\b",
-        "\bannexes_11\b",
-        "\bannexes section\b"
-      ],
-      "description": "Canonical section annexes for 8-K Current Report"
+        "annexes"
+      ]
     },
     {
-      "id": "event_summary_12",
+      "id": "event_summary",
       "name": {
-        "en": "Event Summary Segment 12",
-        "pt": "Event Summary segmento 12"
+        "en": "Event Summary",
+        "pt": "Event Summary"
       },
-      "mustHave": false,
+      "required": false,
       "order": 12,
       "headingAnchors": [
-        "Event Summary 12",
-        "event_summary 12",
-        "Event Summary section",
-        "seção Event Summary 12"
-      ],
-      "confidence": 0.92,
-      "fallbackPatterns": [
-        "\bevent_summary\b",
-        "\bevent_summary_12\b",
-        "\bevent_summary section\b"
-      ],
-      "description": "Canonical section event_summary for 8-K Current Report"
-    },
-    {
-      "id": "material_transactions_13",
-      "name": {
-        "en": "Material Transactions Segment 13",
-        "pt": "Material Transactions segmento 13"
-      },
-      "mustHave": false,
-      "order": 13,
-      "headingAnchors": [
-        "Material Transactions 13",
-        "material_transactions 13",
-        "Material Transactions section",
-        "seção Material Transactions 13"
-      ],
-      "confidence": 0.93,
-      "fallbackPatterns": [
-        "\bmaterial_transactions\b",
-        "\bmaterial_transactions_13\b",
-        "\bmaterial_transactions section\b"
-      ],
-      "description": "Canonical section material_transactions for 8-K Current Report"
-    },
-    {
-      "id": "financial_impact_14",
-      "name": {
-        "en": "Financial Impact Segment 14",
-        "pt": "Financial Impact segmento 14"
-      },
-      "mustHave": false,
-      "order": 14,
-      "headingAnchors": [
-        "Financial Impact 14",
-        "financial_impact 14",
-        "Financial Impact section",
-        "seção Financial Impact 14"
-      ],
-      "confidence": 0.94,
-      "fallbackPatterns": [
-        "\bfinancial_impact\b",
-        "\bfinancial_impact_14\b",
-        "\bfinancial_impact section\b"
-      ],
-      "description": "Canonical section financial_impact for 8-K Current Report"
-    },
-    {
-      "id": "board_actions_15",
-      "name": {
-        "en": "Board Actions Segment 15",
-        "pt": "Board Actions segmento 15"
-      },
-      "mustHave": false,
-      "order": 15,
-      "headingAnchors": [
-        "Board Actions 15",
-        "board_actions 15",
-        "Board Actions section",
-        "seção Board Actions 15"
-      ],
-      "confidence": 0.8,
-      "fallbackPatterns": [
-        "\bboard_actions\b",
-        "\bboard_actions_15\b",
-        "\bboard_actions section\b"
-      ],
-      "description": "Canonical section board_actions for 8-K Current Report"
-    },
-    {
-      "id": "corporate_updates_16",
-      "name": {
-        "en": "Corporate Updates Segment 16",
-        "pt": "Corporate Updates segmento 16"
-      },
-      "mustHave": false,
-      "order": 16,
-      "headingAnchors": [
-        "Corporate Updates 16",
-        "corporate_updates 16",
-        "Corporate Updates section",
-        "seção Corporate Updates 16"
-      ],
-      "confidence": 0.81,
-      "fallbackPatterns": [
-        "\bcorporate_updates\b",
-        "\bcorporate_updates_16\b",
-        "\bcorporate_updates section\b"
-      ],
-      "description": "Canonical section corporate_updates for 8-K Current Report"
-    },
-    {
-      "id": "press_release_snapshot_17",
-      "name": {
-        "en": "Press Release Snapshot Segment 17",
-        "pt": "Press Release Snapshot segmento 17"
-      },
-      "mustHave": false,
-      "order": 17,
-      "headingAnchors": [
-        "Press Release Snapshot 17",
-        "press_release_snapshot 17",
-        "Press Release Snapshot section",
-        "seção Press Release Snapshot 17"
-      ],
-      "confidence": 0.82,
-      "fallbackPatterns": [
-        "\bpress_release_snapshot\b",
-        "\bpress_release_snapshot_17\b",
-        "\bpress_release_snapshot section\b"
-      ],
-      "description": "Canonical section press_release_snapshot for 8-K Current Report"
-    },
-    {
-      "id": "risk_update_18",
-      "name": {
-        "en": "Risk Update Segment 18",
-        "pt": "Risk Update segmento 18"
-      },
-      "mustHave": false,
-      "order": 18,
-      "headingAnchors": [
-        "Risk Update 18",
-        "risk_update 18",
-        "Risk Update section",
-        "seção Risk Update 18"
-      ],
-      "confidence": 0.83,
-      "fallbackPatterns": [
-        "\brisk_update\b",
-        "\brisk_update_18\b",
-        "\brisk_update section\b"
-      ],
-      "description": "Canonical section risk_update for 8-K Current Report"
-    },
-    {
-      "id": "guidance_revision_19",
-      "name": {
-        "en": "Guidance Revision Segment 19",
-        "pt": "Guidance Revision segmento 19"
-      },
-      "mustHave": false,
-      "order": 19,
-      "headingAnchors": [
-        "Guidance Revision 19",
-        "guidance_revision 19",
-        "Guidance Revision section",
-        "seção Guidance Revision 19"
-      ],
-      "confidence": 0.84,
-      "fallbackPatterns": [
-        "\bguidance_revision\b",
-        "\bguidance_revision_19\b",
-        "\bguidance_revision section\b"
-      ],
-      "description": "Canonical section guidance_revision for 8-K Current Report"
-    },
-    {
-      "id": "financial_tables_20",
-      "name": {
-        "en": "Financial Tables Segment 20",
-        "pt": "Financial Tables segmento 20"
-      },
-      "mustHave": false,
-      "order": 20,
-      "headingAnchors": [
-        "Financial Tables 20",
-        "financial_tables 20",
-        "Financial Tables section",
-        "seção Financial Tables 20"
-      ],
-      "confidence": 0.85,
-      "fallbackPatterns": [
-        "\bfinancial_tables\b",
-        "\bfinancial_tables_20\b",
-        "\bfinancial_tables section\b"
-      ],
-      "description": "Canonical section financial_tables for 8-K Current Report"
-    },
-    {
-      "id": "legal_updates_21",
-      "name": {
-        "en": "Legal Updates Segment 21",
-        "pt": "Legal Updates segmento 21"
-      },
-      "mustHave": false,
-      "order": 21,
-      "headingAnchors": [
-        "Legal Updates 21",
-        "legal_updates 21",
-        "Legal Updates section",
-        "seção Legal Updates 21"
-      ],
-      "confidence": 0.86,
-      "fallbackPatterns": [
-        "\blegal_updates\b",
-        "\blegal_updates_21\b",
-        "\blegal_updates section\b"
-      ],
-      "description": "Canonical section legal_updates for 8-K Current Report"
-    },
-    {
-      "id": "signatures_22",
-      "name": {
-        "en": "Signatures Segment 22",
-        "pt": "Signatures segmento 22"
-      },
-      "mustHave": false,
-      "order": 22,
-      "headingAnchors": [
-        "Signatures 22",
-        "signatures 22",
-        "Signatures section",
-        "seção Signatures 22"
-      ],
-      "confidence": 0.87,
-      "fallbackPatterns": [
-        "\bsignatures\b",
-        "\bsignatures_22\b",
-        "\bsignatures section\b"
-      ],
-      "description": "Canonical section signatures for 8-K Current Report"
-    },
-    {
-      "id": "annexes_23",
-      "name": {
-        "en": "Annexes Segment 23",
-        "pt": "Annexes segmento 23"
-      },
-      "mustHave": false,
-      "order": 23,
-      "headingAnchors": [
-        "Annexes 23",
-        "annexes 23",
-        "Annexes section",
-        "seção Annexes 23"
-      ],
-      "confidence": 0.88,
-      "fallbackPatterns": [
-        "\bannexes\b",
-        "\bannexes_23\b",
-        "\bannexes section\b"
-      ],
-      "description": "Canonical section annexes for 8-K Current Report"
-    },
-    {
-      "id": "event_summary_24",
-      "name": {
-        "en": "Event Summary Segment 24",
-        "pt": "Event Summary segmento 24"
-      },
-      "mustHave": false,
-      "order": 24,
-      "headingAnchors": [
-        "Event Summary 24",
-        "event_summary 24",
-        "Event Summary section",
-        "seção Event Summary 24"
-      ],
-      "confidence": 0.89,
-      "fallbackPatterns": [
-        "\bevent_summary\b",
-        "\bevent_summary_24\b",
-        "\bevent_summary section\b"
-      ],
-      "description": "Canonical section event_summary for 8-K Current Report"
-    },
-    {
-      "id": "material_transactions_25",
-      "name": {
-        "en": "Material Transactions Segment 25",
-        "pt": "Material Transactions segmento 25"
-      },
-      "mustHave": false,
-      "order": 25,
-      "headingAnchors": [
-        "Material Transactions 25",
-        "material_transactions 25",
-        "Material Transactions section",
-        "seção Material Transactions 25"
-      ],
-      "confidence": 0.9,
-      "fallbackPatterns": [
-        "\bmaterial_transactions\b",
-        "\bmaterial_transactions_25\b",
-        "\bmaterial_transactions section\b"
-      ],
-      "description": "Canonical section material_transactions for 8-K Current Report"
-    },
-    {
-      "id": "financial_impact_26",
-      "name": {
-        "en": "Financial Impact Segment 26",
-        "pt": "Financial Impact segmento 26"
-      },
-      "mustHave": false,
-      "order": 26,
-      "headingAnchors": [
-        "Financial Impact 26",
-        "financial_impact 26",
-        "Financial Impact section",
-        "seção Financial Impact 26"
-      ],
-      "confidence": 0.91,
-      "fallbackPatterns": [
-        "\bfinancial_impact\b",
-        "\bfinancial_impact_26\b",
-        "\bfinancial_impact section\b"
-      ],
-      "description": "Canonical section financial_impact for 8-K Current Report"
-    },
-    {
-      "id": "board_actions_27",
-      "name": {
-        "en": "Board Actions Segment 27",
-        "pt": "Board Actions segmento 27"
-      },
-      "mustHave": false,
-      "order": 27,
-      "headingAnchors": [
-        "Board Actions 27",
-        "board_actions 27",
-        "Board Actions section",
-        "seção Board Actions 27"
-      ],
-      "confidence": 0.92,
-      "fallbackPatterns": [
-        "\bboard_actions\b",
-        "\bboard_actions_27\b",
-        "\bboard_actions section\b"
-      ],
-      "description": "Canonical section board_actions for 8-K Current Report"
-    },
-    {
-      "id": "corporate_updates_28",
-      "name": {
-        "en": "Corporate Updates Segment 28",
-        "pt": "Corporate Updates segmento 28"
-      },
-      "mustHave": false,
-      "order": 28,
-      "headingAnchors": [
-        "Corporate Updates 28",
-        "corporate_updates 28",
-        "Corporate Updates section",
-        "seção Corporate Updates 28"
-      ],
-      "confidence": 0.93,
-      "fallbackPatterns": [
-        "\bcorporate_updates\b",
-        "\bcorporate_updates_28\b",
-        "\bcorporate_updates section\b"
-      ],
-      "description": "Canonical section corporate_updates for 8-K Current Report"
-    },
-    {
-      "id": "press_release_snapshot_29",
-      "name": {
-        "en": "Press Release Snapshot Segment 29",
-        "pt": "Press Release Snapshot segmento 29"
-      },
-      "mustHave": false,
-      "order": 29,
-      "headingAnchors": [
-        "Press Release Snapshot 29",
-        "press_release_snapshot 29",
-        "Press Release Snapshot section",
-        "seção Press Release Snapshot 29"
-      ],
-      "confidence": 0.94,
-      "fallbackPatterns": [
-        "\bpress_release_snapshot\b",
-        "\bpress_release_snapshot_29\b",
-        "\bpress_release_snapshot section\b"
-      ],
-      "description": "Canonical section press_release_snapshot for 8-K Current Report"
-    },
-    {
-      "id": "risk_update_30",
-      "name": {
-        "en": "Risk Update Segment 30",
-        "pt": "Risk Update segmento 30"
-      },
-      "mustHave": false,
-      "order": 30,
-      "headingAnchors": [
-        "Risk Update 30",
-        "risk_update 30",
-        "Risk Update section",
-        "seção Risk Update 30"
-      ],
-      "confidence": 0.8,
-      "fallbackPatterns": [
-        "\brisk_update\b",
-        "\brisk_update_30\b",
-        "\brisk_update section\b"
-      ],
-      "description": "Canonical section risk_update for 8-K Current Report"
-    },
-    {
-      "id": "guidance_revision_31",
-      "name": {
-        "en": "Guidance Revision Segment 31",
-        "pt": "Guidance Revision segmento 31"
-      },
-      "mustHave": false,
-      "order": 31,
-      "headingAnchors": [
-        "Guidance Revision 31",
-        "guidance_revision 31",
-        "Guidance Revision section",
-        "seção Guidance Revision 31"
-      ],
-      "confidence": 0.81,
-      "fallbackPatterns": [
-        "\bguidance_revision\b",
-        "\bguidance_revision_31\b",
-        "\bguidance_revision section\b"
-      ],
-      "description": "Canonical section guidance_revision for 8-K Current Report"
-    },
-    {
-      "id": "financial_tables_32",
-      "name": {
-        "en": "Financial Tables Segment 32",
-        "pt": "Financial Tables segmento 32"
-      },
-      "mustHave": false,
-      "order": 32,
-      "headingAnchors": [
-        "Financial Tables 32",
-        "financial_tables 32",
-        "Financial Tables section",
-        "seção Financial Tables 32"
-      ],
-      "confidence": 0.82,
-      "fallbackPatterns": [
-        "\bfinancial_tables\b",
-        "\bfinancial_tables_32\b",
-        "\bfinancial_tables section\b"
-      ],
-      "description": "Canonical section financial_tables for 8-K Current Report"
-    },
-    {
-      "id": "legal_updates_33",
-      "name": {
-        "en": "Legal Updates Segment 33",
-        "pt": "Legal Updates segmento 33"
-      },
-      "mustHave": false,
-      "order": 33,
-      "headingAnchors": [
-        "Legal Updates 33",
-        "legal_updates 33",
-        "Legal Updates section",
-        "seção Legal Updates 33"
-      ],
-      "confidence": 0.83,
-      "fallbackPatterns": [
-        "\blegal_updates\b",
-        "\blegal_updates_33\b",
-        "\blegal_updates section\b"
-      ],
-      "description": "Canonical section legal_updates for 8-K Current Report"
-    },
-    {
-      "id": "signatures_34",
-      "name": {
-        "en": "Signatures Segment 34",
-        "pt": "Signatures segmento 34"
-      },
-      "mustHave": false,
-      "order": 34,
-      "headingAnchors": [
-        "Signatures 34",
-        "signatures 34",
-        "Signatures section",
-        "seção Signatures 34"
-      ],
-      "confidence": 0.84,
-      "fallbackPatterns": [
-        "\bsignatures\b",
-        "\bsignatures_34\b",
-        "\bsignatures section\b"
-      ],
-      "description": "Canonical section signatures for 8-K Current Report"
-    },
-    {
-      "id": "annexes_35",
-      "name": {
-        "en": "Annexes Segment 35",
-        "pt": "Annexes segmento 35"
-      },
-      "mustHave": false,
-      "order": 35,
-      "headingAnchors": [
-        "Annexes 35",
-        "annexes 35",
-        "Annexes section",
-        "seção Annexes 35"
-      ],
-      "confidence": 0.85,
-      "fallbackPatterns": [
-        "\bannexes\b",
-        "\bannexes_35\b",
-        "\bannexes section\b"
-      ],
-      "description": "Canonical section annexes for 8-K Current Report"
-    },
-    {
-      "id": "event_summary_36",
-      "name": {
-        "en": "Event Summary Segment 36",
-        "pt": "Event Summary segmento 36"
-      },
-      "mustHave": false,
-      "order": 36,
-      "headingAnchors": [
-        "Event Summary 36",
-        "event_summary 36",
-        "Event Summary section",
-        "seção Event Summary 36"
-      ],
-      "confidence": 0.86,
-      "fallbackPatterns": [
-        "\bevent_summary\b",
-        "\bevent_summary_36\b",
-        "\bevent_summary section\b"
-      ],
-      "description": "Canonical section event_summary for 8-K Current Report"
-    },
-    {
-      "id": "material_transactions_37",
-      "name": {
-        "en": "Material Transactions Segment 37",
-        "pt": "Material Transactions segmento 37"
-      },
-      "mustHave": false,
-      "order": 37,
-      "headingAnchors": [
-        "Material Transactions 37",
-        "material_transactions 37",
-        "Material Transactions section",
-        "seção Material Transactions 37"
-      ],
-      "confidence": 0.87,
-      "fallbackPatterns": [
-        "\bmaterial_transactions\b",
-        "\bmaterial_transactions_37\b",
-        "\bmaterial_transactions section\b"
-      ],
-      "description": "Canonical section material_transactions for 8-K Current Report"
-    },
-    {
-      "id": "financial_impact_38",
-      "name": {
-        "en": "Financial Impact Segment 38",
-        "pt": "Financial Impact segmento 38"
-      },
-      "mustHave": false,
-      "order": 38,
-      "headingAnchors": [
-        "Financial Impact 38",
-        "financial_impact 38",
-        "Financial Impact section",
-        "seção Financial Impact 38"
-      ],
-      "confidence": 0.88,
-      "fallbackPatterns": [
-        "\bfinancial_impact\b",
-        "\bfinancial_impact_38\b",
-        "\bfinancial_impact section\b"
-      ],
-      "description": "Canonical section financial_impact for 8-K Current Report"
-    },
-    {
-      "id": "board_actions_39",
-      "name": {
-        "en": "Board Actions Segment 39",
-        "pt": "Board Actions segmento 39"
-      },
-      "mustHave": false,
-      "order": 39,
-      "headingAnchors": [
-        "Board Actions 39",
-        "board_actions 39",
-        "Board Actions section",
-        "seção Board Actions 39"
-      ],
-      "confidence": 0.89,
-      "fallbackPatterns": [
-        "\bboard_actions\b",
-        "\bboard_actions_39\b",
-        "\bboard_actions section\b"
-      ],
-      "description": "Canonical section board_actions for 8-K Current Report"
-    },
-    {
-      "id": "corporate_updates_40",
-      "name": {
-        "en": "Corporate Updates Segment 40",
-        "pt": "Corporate Updates segmento 40"
-      },
-      "mustHave": false,
-      "order": 40,
-      "headingAnchors": [
-        "Corporate Updates 40",
-        "corporate_updates 40",
-        "Corporate Updates section",
-        "seção Corporate Updates 40"
-      ],
-      "confidence": 0.9,
-      "fallbackPatterns": [
-        "\bcorporate_updates\b",
-        "\bcorporate_updates_40\b",
-        "\bcorporate_updates section\b"
-      ],
-      "description": "Canonical section corporate_updates for 8-K Current Report"
-    },
-    {
-      "id": "press_release_snapshot_41",
-      "name": {
-        "en": "Press Release Snapshot Segment 41",
-        "pt": "Press Release Snapshot segmento 41"
-      },
-      "mustHave": false,
-      "order": 41,
-      "headingAnchors": [
-        "Press Release Snapshot 41",
-        "press_release_snapshot 41",
-        "Press Release Snapshot section",
-        "seção Press Release Snapshot 41"
-      ],
-      "confidence": 0.91,
-      "fallbackPatterns": [
-        "\bpress_release_snapshot\b",
-        "\bpress_release_snapshot_41\b",
-        "\bpress_release_snapshot section\b"
-      ],
-      "description": "Canonical section press_release_snapshot for 8-K Current Report"
-    },
-    {
-      "id": "risk_update_42",
-      "name": {
-        "en": "Risk Update Segment 42",
-        "pt": "Risk Update segmento 42"
-      },
-      "mustHave": false,
-      "order": 42,
-      "headingAnchors": [
-        "Risk Update 42",
-        "risk_update 42",
-        "Risk Update section",
-        "seção Risk Update 42"
-      ],
-      "confidence": 0.92,
-      "fallbackPatterns": [
-        "\brisk_update\b",
-        "\brisk_update_42\b",
-        "\brisk_update section\b"
-      ],
-      "description": "Canonical section risk_update for 8-K Current Report"
-    },
-    {
-      "id": "guidance_revision_43",
-      "name": {
-        "en": "Guidance Revision Segment 43",
-        "pt": "Guidance Revision segmento 43"
-      },
-      "mustHave": false,
-      "order": 43,
-      "headingAnchors": [
-        "Guidance Revision 43",
-        "guidance_revision 43",
-        "Guidance Revision section",
-        "seção Guidance Revision 43"
-      ],
-      "confidence": 0.93,
-      "fallbackPatterns": [
-        "\bguidance_revision\b",
-        "\bguidance_revision_43\b",
-        "\bguidance_revision section\b"
-      ],
-      "description": "Canonical section guidance_revision for 8-K Current Report"
-    },
-    {
-      "id": "financial_tables_44",
-      "name": {
-        "en": "Financial Tables Segment 44",
-        "pt": "Financial Tables segmento 44"
-      },
-      "mustHave": false,
-      "order": 44,
-      "headingAnchors": [
-        "Financial Tables 44",
-        "financial_tables 44",
-        "Financial Tables section",
-        "seção Financial Tables 44"
-      ],
-      "confidence": 0.94,
-      "fallbackPatterns": [
-        "\bfinancial_tables\b",
-        "\bfinancial_tables_44\b",
-        "\bfinancial_tables section\b"
-      ],
-      "description": "Canonical section financial_tables for 8-K Current Report"
-    },
-    {
-      "id": "legal_updates_45",
-      "name": {
-        "en": "Legal Updates Segment 45",
-        "pt": "Legal Updates segmento 45"
-      },
-      "mustHave": false,
-      "order": 45,
-      "headingAnchors": [
-        "Legal Updates 45",
-        "legal_updates 45",
-        "Legal Updates section",
-        "seção Legal Updates 45"
-      ],
-      "confidence": 0.8,
-      "fallbackPatterns": [
-        "\blegal_updates\b",
-        "\blegal_updates_45\b",
-        "\blegal_updates section\b"
-      ],
-      "description": "Canonical section legal_updates for 8-K Current Report"
-    },
-    {
-      "id": "signatures_46",
-      "name": {
-        "en": "Signatures Segment 46",
-        "pt": "Signatures segmento 46"
-      },
-      "mustHave": false,
-      "order": 46,
-      "headingAnchors": [
-        "Signatures 46",
-        "signatures 46",
-        "Signatures section",
-        "seção Signatures 46"
-      ],
-      "confidence": 0.81,
-      "fallbackPatterns": [
-        "\bsignatures\b",
-        "\bsignatures_46\b",
-        "\bsignatures section\b"
-      ],
-      "description": "Canonical section signatures for 8-K Current Report"
-    },
-    {
-      "id": "annexes_47",
-      "name": {
-        "en": "Annexes Segment 47",
-        "pt": "Annexes segmento 47"
-      },
-      "mustHave": false,
-      "order": 47,
-      "headingAnchors": [
-        "Annexes 47",
-        "annexes 47",
-        "Annexes section",
-        "seção Annexes 47"
-      ],
-      "confidence": 0.82,
-      "fallbackPatterns": [
-        "\bannexes\b",
-        "\bannexes_47\b",
-        "\bannexes section\b"
-      ],
-      "description": "Canonical section annexes for 8-K Current Report"
-    },
-    {
-      "id": "event_summary_48",
-      "name": {
-        "en": "Event Summary Segment 48",
-        "pt": "Event Summary segmento 48"
-      },
-      "mustHave": false,
-      "order": 48,
-      "headingAnchors": [
-        "Event Summary 48",
-        "event_summary 48",
-        "Event Summary section",
-        "seção Event Summary 48"
-      ],
-      "confidence": 0.83,
-      "fallbackPatterns": [
-        "\bevent_summary\b",
-        "\bevent_summary_48\b",
-        "\bevent_summary section\b"
-      ],
-      "description": "Canonical section event_summary for 8-K Current Report"
-    },
-    {
-      "id": "material_transactions_49",
-      "name": {
-        "en": "Material Transactions Segment 49",
-        "pt": "Material Transactions segmento 49"
-      },
-      "mustHave": false,
-      "order": 49,
-      "headingAnchors": [
-        "Material Transactions 49",
-        "material_transactions 49",
-        "Material Transactions section",
-        "seção Material Transactions 49"
-      ],
-      "confidence": 0.84,
-      "fallbackPatterns": [
-        "\bmaterial_transactions\b",
-        "\bmaterial_transactions_49\b",
-        "\bmaterial_transactions section\b"
-      ],
-      "description": "Canonical section material_transactions for 8-K Current Report"
-    },
-    {
-      "id": "financial_impact_50",
-      "name": {
-        "en": "Financial Impact Segment 50",
-        "pt": "Financial Impact segmento 50"
-      },
-      "mustHave": false,
-      "order": 50,
-      "headingAnchors": [
-        "Financial Impact 50",
-        "financial_impact 50",
-        "Financial Impact section",
-        "seção Financial Impact 50"
-      ],
-      "confidence": 0.85,
-      "fallbackPatterns": [
-        "\bfinancial_impact\b",
-        "\bfinancial_impact_50\b",
-        "\bfinancial_impact section\b"
-      ],
-      "description": "Canonical section financial_impact for 8-K Current Report"
-    },
-    {
-      "id": "board_actions_51",
-      "name": {
-        "en": "Board Actions Segment 51",
-        "pt": "Board Actions segmento 51"
-      },
-      "mustHave": false,
-      "order": 51,
-      "headingAnchors": [
-        "Board Actions 51",
-        "board_actions 51",
-        "Board Actions section",
-        "seção Board Actions 51"
-      ],
-      "confidence": 0.86,
-      "fallbackPatterns": [
-        "\bboard_actions\b",
-        "\bboard_actions_51\b",
-        "\bboard_actions section\b"
-      ],
-      "description": "Canonical section board_actions for 8-K Current Report"
-    },
-    {
-      "id": "corporate_updates_52",
-      "name": {
-        "en": "Corporate Updates Segment 52",
-        "pt": "Corporate Updates segmento 52"
-      },
-      "mustHave": false,
-      "order": 52,
-      "headingAnchors": [
-        "Corporate Updates 52",
-        "corporate_updates 52",
-        "Corporate Updates section",
-        "seção Corporate Updates 52"
-      ],
-      "confidence": 0.87,
-      "fallbackPatterns": [
-        "\bcorporate_updates\b",
-        "\bcorporate_updates_52\b",
-        "\bcorporate_updates section\b"
-      ],
-      "description": "Canonical section corporate_updates for 8-K Current Report"
-    },
-    {
-      "id": "press_release_snapshot_53",
-      "name": {
-        "en": "Press Release Snapshot Segment 53",
-        "pt": "Press Release Snapshot segmento 53"
-      },
-      "mustHave": false,
-      "order": 53,
-      "headingAnchors": [
-        "Press Release Snapshot 53",
-        "press_release_snapshot 53",
-        "Press Release Snapshot section",
-        "seção Press Release Snapshot 53"
-      ],
-      "confidence": 0.88,
-      "fallbackPatterns": [
-        "\bpress_release_snapshot\b",
-        "\bpress_release_snapshot_53\b",
-        "\bpress_release_snapshot section\b"
-      ],
-      "description": "Canonical section press_release_snapshot for 8-K Current Report"
-    },
-    {
-      "id": "risk_update_54",
-      "name": {
-        "en": "Risk Update Segment 54",
-        "pt": "Risk Update segmento 54"
-      },
-      "mustHave": false,
-      "order": 54,
-      "headingAnchors": [
-        "Risk Update 54",
-        "risk_update 54",
-        "Risk Update section",
-        "seção Risk Update 54"
-      ],
-      "confidence": 0.89,
-      "fallbackPatterns": [
-        "\brisk_update\b",
-        "\brisk_update_54\b",
-        "\brisk_update section\b"
-      ],
-      "description": "Canonical section risk_update for 8-K Current Report"
-    },
-    {
-      "id": "guidance_revision_55",
-      "name": {
-        "en": "Guidance Revision Segment 55",
-        "pt": "Guidance Revision segmento 55"
-      },
-      "mustHave": false,
-      "order": 55,
-      "headingAnchors": [
-        "Guidance Revision 55",
-        "guidance_revision 55",
-        "Guidance Revision section",
-        "seção Guidance Revision 55"
-      ],
-      "confidence": 0.9,
-      "fallbackPatterns": [
-        "\bguidance_revision\b",
-        "\bguidance_revision_55\b",
-        "\bguidance_revision section\b"
-      ],
-      "description": "Canonical section guidance_revision for 8-K Current Report"
-    },
-    {
-      "id": "financial_tables_56",
-      "name": {
-        "en": "Financial Tables Segment 56",
-        "pt": "Financial Tables segmento 56"
-      },
-      "mustHave": false,
-      "order": 56,
-      "headingAnchors": [
-        "Financial Tables 56",
-        "financial_tables 56",
-        "Financial Tables section",
-        "seção Financial Tables 56"
-      ],
-      "confidence": 0.91,
-      "fallbackPatterns": [
-        "\bfinancial_tables\b",
-        "\bfinancial_tables_56\b",
-        "\bfinancial_tables section\b"
-      ],
-      "description": "Canonical section financial_tables for 8-K Current Report"
-    },
-    {
-      "id": "legal_updates_57",
-      "name": {
-        "en": "Legal Updates Segment 57",
-        "pt": "Legal Updates segmento 57"
-      },
-      "mustHave": false,
-      "order": 57,
-      "headingAnchors": [
-        "Legal Updates 57",
-        "legal_updates 57",
-        "Legal Updates section",
-        "seção Legal Updates 57"
-      ],
-      "confidence": 0.92,
-      "fallbackPatterns": [
-        "\blegal_updates\b",
-        "\blegal_updates_57\b",
-        "\blegal_updates section\b"
-      ],
-      "description": "Canonical section legal_updates for 8-K Current Report"
-    },
-    {
-      "id": "signatures_58",
-      "name": {
-        "en": "Signatures Segment 58",
-        "pt": "Signatures segmento 58"
-      },
-      "mustHave": false,
-      "order": 58,
-      "headingAnchors": [
-        "Signatures 58",
-        "signatures 58",
-        "Signatures section",
-        "seção Signatures 58"
-      ],
-      "confidence": 0.93,
-      "fallbackPatterns": [
-        "\bsignatures\b",
-        "\bsignatures_58\b",
-        "\bsignatures section\b"
-      ],
-      "description": "Canonical section signatures for 8-K Current Report"
-    },
-    {
-      "id": "annexes_59",
-      "name": {
-        "en": "Annexes Segment 59",
-        "pt": "Annexes segmento 59"
-      },
-      "mustHave": false,
-      "order": 59,
-      "headingAnchors": [
-        "Annexes 59",
-        "annexes 59",
-        "Annexes section",
-        "seção Annexes 59"
-      ],
-      "confidence": 0.94,
-      "fallbackPatterns": [
-        "\bannexes\b",
-        "\bannexes_59\b",
-        "\bannexes section\b"
-      ],
-      "description": "Canonical section annexes for 8-K Current Report"
-    },
-    {
-      "id": "event_summary_60",
-      "name": {
-        "en": "Event Summary Segment 60",
-        "pt": "Event Summary segmento 60"
-      },
-      "mustHave": false,
-      "order": 60,
-      "headingAnchors": [
-        "Event Summary 60",
-        "event_summary 60",
-        "Event Summary section",
-        "seção Event Summary 60"
-      ],
-      "confidence": 0.8,
-      "fallbackPatterns": [
-        "\bevent_summary\b",
-        "\bevent_summary_60\b",
-        "\bevent_summary section\b"
-      ],
-      "description": "Canonical section event_summary for 8-K Current Report"
-    },
-    {
-      "id": "material_transactions_61",
-      "name": {
-        "en": "Material Transactions Segment 61",
-        "pt": "Material Transactions segmento 61"
-      },
-      "mustHave": false,
-      "order": 61,
-      "headingAnchors": [
-        "Material Transactions 61",
-        "material_transactions 61",
-        "Material Transactions section",
-        "seção Material Transactions 61"
-      ],
-      "confidence": 0.81,
-      "fallbackPatterns": [
-        "\bmaterial_transactions\b",
-        "\bmaterial_transactions_61\b",
-        "\bmaterial_transactions section\b"
-      ],
-      "description": "Canonical section material_transactions for 8-K Current Report"
-    },
-    {
-      "id": "financial_impact_62",
-      "name": {
-        "en": "Financial Impact Segment 62",
-        "pt": "Financial Impact segmento 62"
-      },
-      "mustHave": false,
-      "order": 62,
-      "headingAnchors": [
-        "Financial Impact 62",
-        "financial_impact 62",
-        "Financial Impact section",
-        "seção Financial Impact 62"
-      ],
-      "confidence": 0.82,
-      "fallbackPatterns": [
-        "\bfinancial_impact\b",
-        "\bfinancial_impact_62\b",
-        "\bfinancial_impact section\b"
-      ],
-      "description": "Canonical section financial_impact for 8-K Current Report"
+        "event summary"
+      ]
     }
   ]
 }

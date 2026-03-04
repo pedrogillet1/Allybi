@@ -1,0 +1,245 @@
+{
+  "_meta": {
+    "id": "section_priority_everyday",
+    "version": "1.0.0",
+    "description": "Section-priority rules for everyday retrieval scanning order by intent and document type.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-04",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/retrieval/retrievalEngine.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday",
+    "mode": "deterministic_scan_order",
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
+  },
+  "domain": "everyday",
+  "rules": [
+    {
+      "id": "everyday_advise_primary_sections",
+      "enabled": true,
+      "priority": 95,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "everyday"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "account_profile",
+        "summary",
+        "payment_information",
+        "service_details",
+        "transaction_details"
+      ],
+      "docTypes": [
+        "bank_statement",
+        "electricity_bill",
+        "identity_document",
+        "insurance_claim",
+        "insurance_policy",
+        "internet_bill",
+        "invoice",
+        "phone_bill",
+        "rent_receipt",
+        "retail_receipt",
+        "tax_notice",
+        "tax_return"
+      ]
+    },
+    {
+      "id": "everyday_calculate_primary_sections",
+      "enabled": true,
+      "priority": 92,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "everyday"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "payment_information",
+        "transaction_details",
+        "summary",
+        "account_profile",
+        "service_details"
+      ],
+      "docTypes": [
+        "bank_statement",
+        "electricity_bill",
+        "identity_document",
+        "insurance_claim",
+        "insurance_policy",
+        "internet_bill",
+        "invoice",
+        "phone_bill",
+        "rent_receipt",
+        "retail_receipt",
+        "tax_notice",
+        "tax_return"
+      ]
+    },
+    {
+      "id": "everyday_compare_primary_sections",
+      "enabled": true,
+      "priority": 90,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "everyday"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "summary",
+        "payment_information",
+        "transaction_details",
+        "service_details",
+        "account_profile"
+      ],
+      "docTypes": [
+        "bank_statement",
+        "electricity_bill",
+        "identity_document",
+        "insurance_claim",
+        "insurance_policy",
+        "internet_bill",
+        "invoice",
+        "phone_bill",
+        "rent_receipt",
+        "retail_receipt",
+        "tax_notice",
+        "tax_return"
+      ]
+    },
+    {
+      "id": "everyday_extract_primary_sections",
+      "enabled": true,
+      "priority": 88,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "everyday"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "transaction_details",
+        "account_profile",
+        "service_details",
+        "payment_information",
+        "summary"
+      ],
+      "docTypes": [
+        "bank_statement",
+        "electricity_bill",
+        "identity_document",
+        "insurance_claim",
+        "insurance_policy",
+        "internet_bill",
+        "invoice",
+        "phone_bill",
+        "rent_receipt",
+        "retail_receipt",
+        "tax_notice",
+        "tax_return"
+      ]
+    },
+    {
+      "id": "everyday_summarize_primary_sections",
+      "enabled": true,
+      "priority": 86,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "everyday"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "summary",
+        "account_profile",
+        "payment_information",
+        "transaction_details",
+        "service_details"
+      ],
+      "docTypes": [
+        "bank_statement",
+        "electricity_bill",
+        "identity_document",
+        "insurance_claim",
+        "insurance_policy",
+        "internet_bill",
+        "invoice",
+        "phone_bill",
+        "rent_receipt",
+        "retail_receipt",
+        "tax_notice",
+        "tax_return"
+      ]
+    },
+    {
+      "id": "everyday_locate_primary_sections",
+      "enabled": true,
+      "priority": 85,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "everyday"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "service_details",
+        "account_profile",
+        "transaction_details",
+        "summary",
+        "payment_information"
+      ],
+      "docTypes": [
+        "bank_statement",
+        "electricity_bill",
+        "identity_document",
+        "insurance_claim",
+        "insurance_policy",
+        "internet_bill",
+        "invoice",
+        "phone_bill",
+        "rent_receipt",
+        "retail_receipt",
+        "tax_notice",
+        "tax_return"
+      ]
+    }
+  ]
+}

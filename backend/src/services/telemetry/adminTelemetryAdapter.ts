@@ -6,6 +6,7 @@
  */
 
 import type { PrismaClient } from "@prisma/client";
+import { getMetricsSummary } from "../ingestion/pipeline/pipelineMetrics.service";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -1775,7 +1776,6 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
           "pinecone",
           "s3",
           "google",
-          "anthropic",
         ];
         const [providers, errorCounts] = await Promise.all([
           prisma.aPIPerformanceLog.groupBy({
@@ -1819,6 +1819,10 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
         console.error("[adminTelemetryAdapter] externalProviders error:", err);
         return { items: [] };
       }
+    },
+
+    async ingestionMetrics() {
+      return getMetricsSummary();
     },
   };
 }

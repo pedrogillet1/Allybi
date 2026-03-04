@@ -25,11 +25,10 @@
       "id": "document_header",
       "name": {
         "en": "Header",
-        "pt": "Cabecalho"
+        "pt": "Cabeçalho"
       },
       "order": 1,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "insurance claim",
         "claim",
@@ -44,7 +43,6 @@
       },
       "order": 2,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "claim number",
         "policy number",
@@ -59,7 +57,6 @@
       },
       "order": 3,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "incident",
         "occurrence",
@@ -74,7 +71,6 @@
       },
       "order": 4,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "coverage",
         "eligibility",
@@ -89,7 +85,6 @@
       },
       "order": 5,
       "required": false,
-      "mustHave": false,
       "headingAnchors": [
         "damage",
         "evidence",
@@ -104,7 +99,6 @@
       },
       "order": 6,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "status",
         "payment",
@@ -120,7 +114,6 @@
       },
       "order": 7,
       "required": false,
-      "mustHave": false,
       "headingAnchors": [
         "attachment",
         "supporting",
@@ -135,7 +128,6 @@
       },
       "order": 8,
       "required": false,
-      "mustHave": false,
       "headingAnchors": [
         "adjustment",
         "revision",
@@ -150,7 +142,6 @@
       },
       "order": 9,
       "required": false,
-      "mustHave": false,
       "headingAnchors": [
         "decision",
         "outcome",

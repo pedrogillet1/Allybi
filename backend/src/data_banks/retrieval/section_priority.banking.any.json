@@ -1,0 +1,221 @@
+{
+  "_meta": {
+    "id": "section_priority_banking",
+    "version": "1.0.0",
+    "description": "Section-priority rules for banking retrieval scanning order by intent and document type.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-04",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/retrieval/retrievalEngine.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "banking",
+    "mode": "deterministic_scan_order",
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
+  },
+  "domain": "banking",
+  "rules": [
+    {
+      "id": "banking_advise_primary_sections",
+      "enabled": true,
+      "priority": 95,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "banking"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "account_summary",
+        "balance_summary",
+        "statement_details",
+        "interest_charges",
+        "transactions"
+      ],
+      "docTypes": [
+        "bank_statement",
+        "credit_card_statement",
+        "loan_statement",
+        "payment_receipt",
+        "brokerage_statement",
+        "cd_statement",
+        "investment_account_statement",
+        "wire_transfer_confirmation"
+      ]
+    },
+    {
+      "id": "banking_calculate_primary_sections",
+      "enabled": true,
+      "priority": 92,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "banking"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "balance_summary",
+        "interest_charges",
+        "transactions",
+        "statement_details",
+        "account_summary"
+      ],
+      "docTypes": [
+        "bank_statement",
+        "credit_card_statement",
+        "loan_statement",
+        "payment_receipt",
+        "brokerage_statement",
+        "cd_statement",
+        "investment_account_statement",
+        "wire_transfer_confirmation"
+      ]
+    },
+    {
+      "id": "banking_compare_primary_sections",
+      "enabled": true,
+      "priority": 90,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "banking"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "statement_details",
+        "balance_summary",
+        "interest_charges",
+        "account_summary",
+        "transactions"
+      ],
+      "docTypes": [
+        "bank_statement",
+        "credit_card_statement",
+        "loan_statement",
+        "payment_receipt",
+        "brokerage_statement",
+        "cd_statement",
+        "investment_account_statement",
+        "wire_transfer_confirmation"
+      ]
+    },
+    {
+      "id": "banking_extract_primary_sections",
+      "enabled": true,
+      "priority": 88,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "banking"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "transactions",
+        "statement_details",
+        "account_summary",
+        "interest_charges",
+        "balance_summary"
+      ],
+      "docTypes": [
+        "bank_statement",
+        "credit_card_statement",
+        "loan_statement",
+        "payment_receipt",
+        "brokerage_statement",
+        "cd_statement",
+        "investment_account_statement",
+        "wire_transfer_confirmation"
+      ]
+    },
+    {
+      "id": "banking_summarize_primary_sections",
+      "enabled": true,
+      "priority": 86,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "banking"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "account_summary",
+        "balance_summary",
+        "statement_details",
+        "transactions",
+        "interest_charges"
+      ],
+      "docTypes": [
+        "bank_statement",
+        "credit_card_statement",
+        "loan_statement",
+        "payment_receipt",
+        "brokerage_statement",
+        "cd_statement",
+        "investment_account_statement",
+        "wire_transfer_confirmation"
+      ]
+    },
+    {
+      "id": "banking_locate_primary_sections",
+      "enabled": true,
+      "priority": 85,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "banking"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "statement_details",
+        "account_summary",
+        "transactions",
+        "balance_summary",
+        "interest_charges"
+      ],
+      "docTypes": [
+        "bank_statement",
+        "credit_card_statement",
+        "loan_statement",
+        "payment_receipt",
+        "brokerage_statement",
+        "cd_statement",
+        "investment_account_statement",
+        "wire_transfer_confirmation"
+      ]
+    }
+  ]
+}

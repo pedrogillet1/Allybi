@@ -47,6 +47,7 @@ type ScopeAction = "allow" | "transform" | "route" | "block";
 type ScopeReasonCode =
   | "explicit_doc_required"
   | "needs_doc_choice"
+  | "needs_section_choice"
   | "scope_hard_constraints_empty"
   | "no_docs_indexed"
   | "wrong_doc_detected"
@@ -184,8 +185,17 @@ export interface ScopeDecision {
     rangeExplicit: boolean;
     activeRangeA1: string | null;
 
-    // disambiguation hint
+    // disambiguation hints
     needsDocChoice?: boolean;
+    activeSectionHint?: string | null;
+    needsSectionChoice?: boolean;
+
+    // period/unit slot extraction hints
+    periodHint?: string | null;
+    unitHint?: string | null;
+    currencyHint?: string | null;
+    comparisonModeHint?: string | null;
+    timeConstraintsPresent?: boolean;
   };
 
   scope: {
@@ -195,7 +205,7 @@ export interface ScopeDecision {
 
   // Optional disambiguation payload (no user-facing text)
   disambiguation?: {
-    candidateType: "document";
+    candidateType: "document" | "section" | "table";
     options: Array<{
       docId: string;
       score: number;
@@ -338,6 +348,11 @@ export class ScopeGateService {
           activeSheetName: null,
           rangeExplicit: false,
           activeRangeA1: null,
+          periodHint: null,
+          unitHint: null,
+          currencyHint: null,
+          comparisonModeHint: null,
+          timeConstraintsPresent: false,
         },
         scope: { candidateDocIds: [], scopeKey: this.scopeKey([]) },
         debug,
@@ -362,6 +377,17 @@ export class ScopeGateService {
     const stopwordsDocnames = this.safeGetBank<Record<string, unknown>>("stopwords_docnames");
     const ambiguityPolicies = this.safeGetBank<Record<string, unknown>>("disambiguation_policies");
     const rankFeatures = this.safeGetBank<Record<string, unknown>>("ambiguity_rank_features");
+
+    // Quality trigger banks (post-retrieval quality gates, loaded on-demand).
+    const qualityTriggers = {
+      ambiguity: this.safeGetBank<Record<string, unknown>>("quality_ambiguity_triggers"),
+      weakEvidence: this.safeGetBank<Record<string, unknown>>("quality_weak_evidence_triggers"),
+      wrongDocRisk: this.safeGetBank<Record<string, unknown>>("quality_wrong_doc_risk_triggers"),
+      numericIntegrity: this.safeGetBank<Record<string, unknown>>("quality_numeric_integrity_triggers"),
+      languageLock: this.safeGetBank<Record<string, unknown>>("quality_language_lock_triggers"),
+      unsafeOperation: this.safeGetBank<Record<string, unknown>>("quality_unsafe_operation_triggers"),
+    };
+
     const scopeResolutionEnabled = scopeResolutionBank?.config?.enabled !== false;
     const stageEnabled = (stage: string): boolean =>
       scopeResolutionEnabled &&
@@ -388,6 +414,11 @@ export class ScopeGateService {
           activeSheetName: null,
           rangeExplicit: false,
           activeRangeA1: null,
+          periodHint: null,
+          unitHint: null,
+          currencyHint: null,
+          comparisonModeHint: null,
+          timeConstraintsPresent: false,
         },
         scope: { candidateDocIds: [], scopeKey: this.scopeKey([]) },
         debug,
@@ -673,6 +704,66 @@ export class ScopeGateService {
       }
     }
 
+    // 11b) Section-level ambiguity: if doc is resolved but user referenced a section
+    // that matches multiple sections within the doc (section_disambiguation_policy)
+    let needsSectionChoice = false;
+    let activeSectionHint: string | null = null;
+    let sectionDisambiguationOptions: Array<{
+      docId: string;
+      score: number;
+      title?: string | null;
+      filename?: string | null;
+    }> = [];
+
+    if (activeDocId && !needsDocChoice) {
+      const sectionResult = this.extractSectionHint(qLower, activeDocId, docs);
+      if (sectionResult) {
+        activeSectionHint = sectionResult.candidates[0]?.label ?? null;
+
+        if (sectionResult.candidates.length >= 2) {
+          const topSectionScore = sectionResult.candidates[0].score;
+          const secondSectionScore = sectionResult.candidates[1].score;
+          const sectionGap = topSectionScore - secondSectionScore;
+
+          // Autopick if top section clearly wins
+          if (topSectionScore >= 0.9 && sectionGap >= 0.3) {
+            activeSectionHint = sectionResult.candidates[0].label;
+            debug.appliedRules.push("autopick_safe_section_choice");
+          } else {
+            needsSectionChoice = true;
+            sectionDisambiguationOptions = sectionResult.candidates.map((c) => ({
+              docId: activeDocId!,
+              score: c.score,
+              title: c.label,
+              filename: null,
+            }));
+            debug.appliedRules.push("needs_section_choice_ambiguous_ref");
+          }
+        } else if (sectionResult.candidates.length === 1) {
+          activeSectionHint = sectionResult.candidates[0].label;
+          debug.appliedRules.push("section_hint_single_match");
+        }
+      }
+    }
+
+    // 11b) Quality trigger gate awareness — record which quality banks are loaded.
+    const qualityGatesLoaded = Object.entries(qualityTriggers)
+      .filter(([, bank]) => bank?.config?.enabled !== false && bank != null)
+      .map(([key]) => key);
+    if (qualityGatesLoaded.length > 0) {
+      debug.notes.push(`quality_gates_loaded: ${qualityGatesLoaded.join(",")}`);
+    }
+
+    // 11c) Period/unit slot extraction
+    const periodUnitHints = this.extractPeriodUnitHints(qLower);
+    if (periodUnitHints.timeConstraintsPresent) {
+      debug.notes.push("time_constraints_present");
+    }
+    if (periodUnitHints.periodHint && !periodUnitHints.comparisonModeHint && !periodUnitHints.unitHint) {
+      // Time detected but scope ambiguous — emit reason code downstream
+      debug.notes.push("period_hint_without_comparison_or_unit");
+    }
+
     // 12) ScopeKey (cache key)
     const scopeKey = this.scopeKey(candidateDocIds, {
       activeDocId,
@@ -705,6 +796,14 @@ export class ScopeGateService {
           activeRangeA1: rangeA1,
 
           needsDocChoice: true,
+          activeSectionHint: null,
+          needsSectionChoice: false,
+
+          periodHint: periodUnitHints.periodHint,
+          unitHint: periodUnitHints.unitHint,
+          currencyHint: periodUnitHints.currencyHint,
+          comparisonModeHint: periodUnitHints.comparisonModeHint,
+          timeConstraintsPresent: periodUnitHints.timeConstraintsPresent,
         },
         scope: { candidateDocIds, scopeKey },
         disambiguation: {
@@ -718,6 +817,49 @@ export class ScopeGateService {
           maxOptions,
           maxQuestions: 1,
           reasonCode: "needs_doc_choice",
+        },
+        debug: isProd(input.env) ? undefined : debug,
+      });
+    }
+
+    // 13b) Section disambiguation routing
+    if (needsSectionChoice) {
+      const maxOptions = Number(ambiguityThresholds.maxOptions ?? 4);
+
+      return this.finish(state, input, {
+        action: "route",
+        severity: "warning",
+        reasonCodes: ["needs_section_choice"],
+        routeTo: "clarification_policy",
+        signals: {
+          hardScopeActive: true,
+          explicitDocRef: Boolean(explicitDocRef),
+          explicitDocLock: Boolean(hardDocLock),
+          activeDocId: activeDocId,
+          corpusSearchAllowed: corpusAllowed,
+
+          sheetHintPresent: Boolean(sheetHintPresent),
+          activeSheetName: sheetName,
+          rangeExplicit: Boolean(rangeExplicit),
+          activeRangeA1: rangeA1,
+
+          needsDocChoice: false,
+          activeSectionHint: activeSectionHint,
+          needsSectionChoice: true,
+
+          periodHint: periodUnitHints.periodHint,
+          unitHint: periodUnitHints.unitHint,
+          currencyHint: periodUnitHints.currencyHint,
+          comparisonModeHint: periodUnitHints.comparisonModeHint,
+          timeConstraintsPresent: periodUnitHints.timeConstraintsPresent,
+        },
+        scope: { candidateDocIds, scopeKey },
+        disambiguation: {
+          candidateType: "section",
+          options: sectionDisambiguationOptions.slice(0, maxOptions),
+          maxOptions,
+          maxQuestions: 1,
+          reasonCode: "needs_section_choice",
         },
         debug: isProd(input.env) ? undefined : debug,
       });
@@ -750,6 +892,15 @@ export class ScopeGateService {
         activeSheetName: sheetName,
         rangeExplicit: Boolean(rangeExplicit),
         activeRangeA1: rangeA1,
+
+        activeSectionHint: activeSectionHint,
+        needsSectionChoice: false,
+
+        periodHint: periodUnitHints.periodHint,
+        unitHint: periodUnitHints.unitHint,
+        currencyHint: periodUnitHints.currencyHint,
+        comparisonModeHint: periodUnitHints.comparisonModeHint,
+        timeConstraintsPresent: periodUnitHints.timeConstraintsPresent,
       },
       scope: { candidateDocIds, scopeKey },
       debug: isProd(input.env) ? undefined : debug,
@@ -976,6 +1127,161 @@ export class ScopeGateService {
     });
 
     return out;
+  }
+
+  // -----------------------------
+  // Section hint extraction
+  // -----------------------------
+
+  private extractSectionHint(
+    normalizedQuery: string,
+    activeDocId: string,
+    docs: DocMeta[],
+  ): { candidates: Array<{ sectionId: string; label: string; score: number }> } | null {
+    // Section keywords in EN, PT, ES
+    const sectionKeywords =
+      /\b(clause|section|part|article|cl[aá]usula|se[çc][aã]o|artigo)\b/i;
+    const match = normalizedQuery.match(sectionKeywords);
+    if (!match) return null;
+
+    // Extract the fragment following the keyword (e.g., "section 3.1" -> "3.1", "clause A" -> "A")
+    const keywordIndex = match.index ?? 0;
+    const afterKeyword = normalizedQuery
+      .slice(keywordIndex + match[0].length)
+      .trim();
+    // Capture a section identifier: digits, dots, letters (e.g., "3.1", "IV", "A", "12.3.4")
+    const identifierMatch = afterKeyword.match(
+      /^[\s:]*([A-Za-z0-9]+(?:\.[A-Za-z0-9]+)*)/,
+    );
+    if (!identifierMatch) return null;
+
+    const sectionRef = identifierMatch[1].toLowerCase();
+
+    // Find matching doc to inspect (we only look at the active doc)
+    const activeDoc = docs.find((d) => d.docId === activeDocId);
+    if (!activeDoc) return null;
+
+    // Build synthetic section candidates based on numeric/alpha proximity.
+    // Without a full section index, we generate plausible ambiguous candidates
+    // when the reference is short or could match multiple headings.
+    const candidates: Array<{ sectionId: string; label: string; score: number }> = [];
+
+    // If the reference is a bare number or short alpha, it may be ambiguous
+    // (e.g., "section 3" could match "3", "3.1", "3.2", etc.)
+    const isBareNumber = /^\d+$/.test(sectionRef);
+    const isBareAlpha = /^[a-z]$/i.test(sectionRef);
+
+    if (isBareNumber || isBareAlpha) {
+      // Generate candidate variants representing potential sub-sections
+      const base = sectionRef;
+      candidates.push({
+        sectionId: `${activeDocId}#${base}`,
+        label: `${match[0]} ${base}`,
+        score: 0.7,
+      });
+      // Add plausible sub-section candidates
+      for (let i = 1; i <= 3; i++) {
+        candidates.push({
+          sectionId: `${activeDocId}#${base}.${i}`,
+          label: `${match[0]} ${base}.${i}`,
+          score: clamp01(0.65 - i * 0.05),
+        });
+      }
+    } else {
+      // Specific enough reference (e.g., "3.1") -> single high-confidence candidate
+      candidates.push({
+        sectionId: `${activeDocId}#${sectionRef}`,
+        label: `${match[0]} ${sectionRef}`,
+        score: 0.95,
+      });
+    }
+
+    // Sort by score descending
+    candidates.sort((a, b) => b.score - a.score);
+
+    return candidates.length > 0 ? { candidates } : null;
+  }
+
+  // -----------------------------
+  // Period/unit slot extraction
+  // -----------------------------
+
+  private extractPeriodUnitHints(normalizedQuery: string): {
+    periodHint: string | null;
+    unitHint: string | null;
+    currencyHint: string | null;
+    comparisonModeHint: string | null;
+    timeConstraintsPresent: boolean;
+  } {
+    let periodHint: string | null = null;
+    let unitHint: string | null = null;
+    let currencyHint: string | null = null;
+    let comparisonModeHint: string | null = null;
+    let timeConstraintsPresent = false;
+
+    // Period detection
+    const fyMatch = normalizedQuery.match(
+      /\b(fy|fiscal\s*year|ano\s*fiscal)\s*\d{2,4}/i,
+    );
+    if (fyMatch) {
+      periodHint = fyMatch[0].trim();
+      timeConstraintsPresent = true;
+    }
+
+    if (!periodHint) {
+      const quarterMatch = normalizedQuery.match(
+        /\b(q[1-4]|quarter|trimestre)\b/i,
+      );
+      if (quarterMatch) {
+        periodHint = quarterMatch[0].trim();
+        timeConstraintsPresent = true;
+      }
+    }
+
+    if (!periodHint) {
+      const relativeMatch = normalizedQuery.match(
+        /\b(ytd|ttm|yoy|qoq|mom)\b/i,
+      );
+      if (relativeMatch) {
+        periodHint = relativeMatch[0].trim();
+        timeConstraintsPresent = true;
+      }
+    }
+
+    // Units detection
+    const unitMatch = normalizedQuery.match(
+      /\b(thousands?|millions?|billions?|milhares?|milh[oõ]es?|bilh[oõ]es?)\b/i,
+    );
+    if (unitMatch) {
+      unitHint = unitMatch[0].trim();
+    }
+
+    // Currency detection
+    const currencyMatch = normalizedQuery.match(
+      /\b(usd|eur|brl|gbp|jpy|cad|aud)\b/i,
+    );
+    if (currencyMatch) {
+      currencyHint = currencyMatch[0].trim().toUpperCase();
+    }
+
+    // Comparison mode detection
+    const comparisonMatch = normalizedQuery.match(
+      /\b(yoy|year[\-\s]over[\-\s]year|qoq|vs\.?\s*budget)\b/i,
+    );
+    if (comparisonMatch) {
+      comparisonModeHint = comparisonMatch[0].trim();
+      timeConstraintsPresent = true;
+    }
+
+    // Fallback time detection (years, months)
+    if (!timeConstraintsPresent) {
+      const timePresent = /\b(20[0-2]\d|19\d{2}|january|february|march|april|may|june|july|august|september|october|november|december|janeiro|fevereiro|março|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)\b/i;
+      if (timePresent.test(normalizedQuery)) {
+        timeConstraintsPresent = true;
+      }
+    }
+
+    return { periodHint, unitHint, currencyHint, comparisonModeHint, timeConstraintsPresent };
   }
 
   // -----------------------------

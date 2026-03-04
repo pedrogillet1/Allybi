@@ -13,6 +13,7 @@ import { extractPptxWithAnchors } from "../../extraction/pptxExtractor.service";
 import { getGoogleVisionOcrService } from "../../extraction/google-vision-ocr.service";
 import { extractWithTesseract } from "../../extraction/tesseractFallback.service";
 import type { DispatchedExtractionResult } from "./extractionResult.types";
+import { recordExtractorTiming, recordOcrUsage } from "../pipeline/pipelineMetrics.service";
 
 // ---------------------------------------------------------------------------
 // MIME constants
@@ -90,6 +91,19 @@ export function shouldSkipImageOcr(
 }
 
 // ---------------------------------------------------------------------------
+// Tesseract language detection
+// ---------------------------------------------------------------------------
+
+function detectTesseractLangs(filename?: string): string {
+  if (!filename) return "eng+por";
+  const lower = filename.toLowerCase();
+  if (lower.includes("_es") || lower.includes("_spa") || lower.includes(".es.") || lower.includes("spanish")) {
+    return "eng+spa";
+  }
+  return "eng+por";
+}
+
+// ---------------------------------------------------------------------------
 // Main dispatch
 // ---------------------------------------------------------------------------
 
@@ -98,7 +112,12 @@ export async function extractText(
   mimeType: string,
   filename?: string,
 ): Promise<DispatchedExtractionResult> {
+  const tStart = Date.now();
+  let extractor = "unknown";
+
+  try {
   if (PDF_MIMES.includes(mimeType)) {
+    extractor = "pdf";
     const result = await extractPdfWithAnchors(buffer);
     return { sourceType: "pdf", ...result } as unknown as DispatchedExtractionResult;
   }
@@ -109,6 +128,7 @@ export async function extractText(
         "Legacy .doc format is not supported. Please convert to .docx (File > Save As > .docx) and re-upload.",
       );
     }
+    extractor = "docx";
     const result = await extractDocxWithAnchors(buffer);
     return { sourceType: "docx", sections: [], ...result } as unknown as DispatchedExtractionResult;
   }
@@ -119,6 +139,7 @@ export async function extractText(
         "Legacy .xls format is not supported. Please convert to .xlsx (File > Save As > .xlsx) and re-upload.",
       );
     }
+    extractor = "xlsx";
     const result = await extractXlsxWithAnchors(buffer);
     return { sourceType: "xlsx", sheetCount: 0, sheets: [], ...result } as unknown as DispatchedExtractionResult;
   }
@@ -129,12 +150,14 @@ export async function extractText(
         "Legacy .ppt format is not supported. Please convert to .pptx (File > Save As > .pptx) and re-upload.",
       );
     }
+    extractor = "pptx";
     const result = await extractPptxWithAnchors(buffer);
     return { sourceType: "pptx", slideCount: 0, slides: [], ...result } as unknown as DispatchedExtractionResult;
   }
 
   // Plain text fallback
   if (mimeType.startsWith("text/")) {
+    extractor = "text";
     const text = buffer.toString("utf-8");
     return {
       sourceType: "text",
@@ -146,6 +169,7 @@ export async function extractText(
 
   // Image OCR via Google Cloud Vision
   if (mimeType.startsWith("image/")) {
+    extractor = "image_ocr";
     if (filename) {
       const skipCheck = shouldSkipImageOcr(filename, buffer.length);
       if (skipCheck.skip) {
@@ -173,8 +197,9 @@ export async function extractText(
         initError: visionService.getInitError(),
       });
 
-      const fallbackResult = await extractWithTesseract(buffer, "eng");
+      const fallbackResult = await extractWithTesseract(buffer, detectTesseractLangs(filename));
       if (fallbackResult.text && fallbackResult.text.trim().length > 0) {
+        recordOcrUsage("tesseract", true);
         logger.info("[OCR] Tesseract fallback succeeded", {
           filename,
           textLength: fallbackResult.text.length,
@@ -188,6 +213,7 @@ export async function extractText(
         };
       }
 
+      recordOcrUsage("tesseract", false);
       logger.warn("[OCR] Tesseract fallback produced no text, saving as visual-only", {
         filename,
         mimeType,
@@ -207,6 +233,7 @@ export async function extractText(
         mode: "document",
       });
       if (!ocrResult.text || ocrResult.text.trim().length === 0) {
+        recordOcrUsage("google_vision", false);
         logger.info("[OCR] Image OCR produced no text, saving as visual-only", {
           filename,
           mimeType,
@@ -220,6 +247,7 @@ export async function extractText(
           skipReason: "Image contains no text (visual-only)",
         };
       }
+      recordOcrUsage("google_vision", true);
       return {
         sourceType: "image",
         text: ocrResult.text,
@@ -227,6 +255,7 @@ export async function extractText(
         confidence: ocrResult.confidence ?? 0.8,
       };
     } catch (error) {
+      recordOcrUsage("google_vision", false);
       const reason = error instanceof Error ? error.message : String(error);
       logger.warn("[OCR] OCR processing failed, saving as visual-only", {
         filename,
@@ -245,4 +274,11 @@ export async function extractText(
   }
 
   throw new Error(`Unsupported mimeType for extraction: ${mimeType}`);
+  } finally {
+    const durationMs = Date.now() - tStart;
+    if (extractor !== "unknown") {
+      recordExtractorTiming(extractor, durationMs);
+      logger.info("[Extraction] Completed", { extractor, mimeType, durationMs, sizeBytes: buffer.length });
+    }
+  }
 }

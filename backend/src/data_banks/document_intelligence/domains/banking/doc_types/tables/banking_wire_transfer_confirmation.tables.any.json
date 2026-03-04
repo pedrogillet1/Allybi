@@ -1,0 +1,73 @@
+{
+  "_meta": {
+    "id": "di_banking_tables_banking_wire_transfer_confirmation",
+    "version": "1.0.0",
+    "description": "Expected table patterns for banking_wire_transfer_confirmation documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-04",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "banking",
+    "docType": "banking_wire_transfer_confirmation"
+  },
+  "tableHeaderSynonyms": {
+    "amount": [
+      "amount",
+      "transfer amount",
+      "valor"
+    ],
+    "reference": [
+      "reference",
+      "confirmation number",
+      "referencia"
+    ]
+  },
+  "tables": [
+    {
+      "id": "banking_wire_transfer_confirmation_details_table",
+      "name": {
+        "en": "Transfer Details Table",
+        "pt": "Tabela de Detalhes da Transferencia"
+      },
+      "section": "transfer_details",
+      "expectedColumns": [
+        "field",
+        "value"
+      ],
+      "keyRows": [
+        "amount",
+        "currency",
+        "value_date",
+        "reference_number"
+      ]
+    },
+    {
+      "id": "banking_wire_transfer_confirmation_fees_table",
+      "name": {
+        "en": "Fees Table",
+        "pt": "Tabela de Taxas"
+      },
+      "section": "transfer_details",
+      "expectedColumns": [
+        "fee_type",
+        "amount",
+        "currency"
+      ],
+      "keyRows": [
+        "wire_fee",
+        "intermediary_fee",
+        "total_fees"
+      ]
+    }
+  ]
+}

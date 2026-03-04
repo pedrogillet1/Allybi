@@ -1,12 +1,10 @@
 import { randomUUID } from "crypto";
-import { getBankLoaderInstance } from "../core/banks/bankLoader.service";
 import { logger } from "../../utils/logger";
-import { LLMClientFactory } from "../llm/core/llmClientFactory";
 import LlmGatewayService from "../llm/core/llmGateway.service";
-import { LlmRequestBuilderService } from "../llm/core/llmRequestBuilder.service";
-import { LlmRouterService } from "../llm/core/llmRouter.service";
-import { loadGeminiConfig } from "../llm/providers/gemini/geminiConfig";
-import { PromptRegistryService } from "../llm/prompts/promptRegistry.service";
+import {
+  buildGatewayRuntime,
+  resolveRuntimeEnvName,
+} from "../llm/core/llmGatewayRuntime.factory";
 import type { EditExecutionContext, EditPlan } from "./editing.types";
 
 type PromptTaskId =
@@ -594,7 +592,7 @@ export class EditingTextGenerationService {
       return {
         ok: false,
         error:
-          "LLM text generation is unavailable. Set GEMINI_API_KEY or GOOGLE_API_KEY.",
+          "LLM text generation is unavailable. Set GEMINI_API_KEY/GOOGLE_API_KEY or OPENAI_API_KEY.",
       };
     }
 
@@ -712,16 +710,10 @@ export class EditingTextGenerationService {
     EditingTextGenerationService.lastAttemptMs = Date.now();
 
     try {
-      const envName =
-        process.env.NODE_ENV === "production"
-          ? "production"
-          : process.env.NODE_ENV === "staging"
-            ? "staging"
-            : process.env.NODE_ENV === "test"
-              ? "dev"
-              : "local";
-      const geminiCfg = loadGeminiConfig(envName as any);
-      const hasGeminiKey = Boolean(String(geminiCfg.apiKey || "").trim());
+      const envName = resolveRuntimeEnvName(process.env.NODE_ENV);
+      const hasGeminiKey = Boolean(
+        String(process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || "").trim(),
+      );
       const hasOpenAIKey = Boolean(String(process.env.OPENAI_API_KEY || "").trim());
 
       if (!hasGeminiKey && !hasOpenAIKey) {
@@ -730,49 +722,8 @@ export class EditingTextGenerationService {
         return null;
       }
 
-      const factory = new LLMClientFactory({
-        defaultProvider: hasGeminiKey ? "google" : "openai",
-        providers: {
-          google: hasGeminiKey
-            ? {
-                enabled: true,
-                config: {
-                  apiKey: geminiCfg.apiKey,
-                  baseUrl:
-                    geminiCfg.baseUrl ||
-                    "https://generativelanguage.googleapis.com/v1beta",
-                  defaults: {
-                    gemini3: geminiCfg.models.defaultFinal,
-                    gemini3Flash: geminiCfg.models.defaultDraft,
-                  },
-                  timeoutMs: geminiCfg.timeoutMs,
-                },
-              }
-            : { enabled: false, config: {} as any },
-          openai: hasOpenAIKey
-            ? { enabled: true, config: {} }
-            : { enabled: false, config: {} },
-        },
-      });
-
-      const llmClient = factory.get();
-      const bankLoader = getBankLoaderInstance();
-      const promptRegistry = new PromptRegistryService(bankLoader);
-      const requestBuilder = new LlmRequestBuilderService(promptRegistry);
-      const router = new LlmRouterService(bankLoader);
-
-      EditingTextGenerationService.gateway = new LlmGatewayService(
-        llmClient,
-        router,
-        requestBuilder,
-        {
-          env: envName as any,
-          provider: llmClient.provider,
-          modelId: geminiCfg.models.defaultDraft,
-          defaultTemperature: 0.2,
-          defaultMaxOutputTokens: 900,
-        },
-      );
+      const runtime = buildGatewayRuntime({ envName });
+      EditingTextGenerationService.gateway = runtime.gateway;
       return EditingTextGenerationService.gateway;
     } catch (error) {
       const message =

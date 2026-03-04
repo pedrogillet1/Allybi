@@ -366,6 +366,7 @@ export class DataBankLoaderService {
       "evidence_packaging",
       "scope_resolution",
       "routing_priority",
+      "operator_collision_matrix",
       "memory_policy",
       "clarification_policy",
       "fallback_policy",

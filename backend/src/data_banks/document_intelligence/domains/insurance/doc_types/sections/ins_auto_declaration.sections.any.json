@@ -1,0 +1,95 @@
+{
+  "_meta": {
+    "id": "di_insurance_sections_ins_auto_declaration",
+    "version": "2.0.0",
+    "description": "Section map for ins_auto_declaration.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-04",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "insurance",
+    "docType": "ins_auto_declaration"
+  },
+  "sections": [
+    {
+      "id": "document_identification",
+      "name": {
+        "en": "Document Identification",
+        "pt": "Identificacao do Documento"
+      },
+      "required": true,
+      "order": 1,
+      "headingAnchors": ["Auto Declaration", "Declaração de Automóvel", "Vehicle Insurance", "Seguro Automotivo"]
+    },
+    {
+      "id": "policyholder_information",
+      "name": {
+        "en": "Policyholder Information",
+        "pt": "Informacoes do Segurado"
+      },
+      "required": true,
+      "order": 2,
+      "headingAnchors": ["Policyholder", "Segurado", "Named Insured", "Titular da Apólice"]
+    },
+    {
+      "id": "vehicle_details",
+      "name": {
+        "en": "Vehicle Details",
+        "pt": "Detalhes do Veiculo"
+      },
+      "required": true,
+      "order": 3,
+      "headingAnchors": ["Vehicle", "Veículo", "Make", "Model", "VIN", "Chassis"]
+    },
+    {
+      "id": "coverage_summary",
+      "name": {
+        "en": "Coverage Summary",
+        "pt": "Resumo de Coberturas"
+      },
+      "required": true,
+      "order": 4,
+      "headingAnchors": ["Coverage", "Cobertura", "Limits", "Limites"]
+    },
+    {
+      "id": "premium_breakdown",
+      "name": {
+        "en": "Premium Breakdown",
+        "pt": "Detalhamento do Premio"
+      },
+      "required": true,
+      "order": 5,
+      "headingAnchors": ["Premium", "Prêmio", "Rate", "Taxa"]
+    },
+    {
+      "id": "discounts_surcharges",
+      "name": {
+        "en": "Discounts and Surcharges",
+        "pt": "Descontos e Sobretaxas"
+      },
+      "required": false,
+      "order": 6,
+      "headingAnchors": ["Discounts", "Descontos", "Surcharges", "Sobretaxas"]
+    },
+    {
+      "id": "endorsements",
+      "name": {
+        "en": "Endorsements",
+        "pt": "Endossos"
+      },
+      "required": false,
+      "order": 7,
+      "headingAnchors": ["Endorsements", "Endossos", "Riders", "Adicionais"]
+    }
+  ]
+}

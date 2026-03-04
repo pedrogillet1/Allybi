@@ -25,11 +25,10 @@
       "id": "document_header",
       "name": {
         "en": "Receipt Header",
-        "pt": "Cabecalho do Recibo"
+        "pt": "Cabeçalho do Recibo"
       },
       "order": 1,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "receipt",
         "cupom",
@@ -44,7 +43,6 @@
       },
       "order": 2,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "merchant",
         "store",
@@ -60,7 +58,6 @@
       },
       "order": 3,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "item",
         "description",
@@ -76,7 +73,6 @@
       },
       "order": 4,
       "required": false,
-      "mustHave": false,
       "headingAnchors": [
         "discount",
         "tax",
@@ -91,7 +87,6 @@
       },
       "order": 5,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "total",
         "subtotal",
@@ -102,11 +97,10 @@
       "id": "payment_info",
       "name": {
         "en": "Payment Info",
-        "pt": "Informacoes de Pagamento"
+        "pt": "Informações de Pagamento"
       },
       "order": 6,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "payment",
         "card",
@@ -122,7 +116,6 @@
       },
       "order": 7,
       "required": false,
-      "mustHave": false,
       "headingAnchors": [
         "authorization",
         "qr",

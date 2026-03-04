@@ -25,11 +25,10 @@
       "id": "document_header",
       "name": {
         "en": "Header",
-        "pt": "Cabecalho"
+        "pt": "Cabeçalho"
       },
       "order": 1,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "insurance",
         "policy",
@@ -44,7 +43,6 @@
       },
       "order": 2,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "policy holder",
         "holder",
@@ -59,7 +57,6 @@
       },
       "order": 3,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "coverage",
         "scope",
@@ -74,7 +71,6 @@
       },
       "order": 4,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "premium",
         "amount",
@@ -89,7 +85,6 @@
       },
       "order": 5,
       "required": false,
-      "mustHave": false,
       "headingAnchors": [
         "benefits",
         "add-ons",
@@ -104,7 +99,6 @@
       },
       "order": 6,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "exclusions",
         "exclusion",
@@ -115,11 +109,10 @@
       "id": "renewal_terms",
       "name": {
         "en": "Renewal and Terms",
-        "pt": "Renovacao e Condicoes"
+        "pt": "Renovacao e Condições"
       },
       "order": 7,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "renewal",
         "term",
@@ -134,7 +127,6 @@
       },
       "order": 8,
       "required": false,
-      "mustHave": false,
       "headingAnchors": [
         "signature",
         "authorized",
@@ -149,7 +141,6 @@
       },
       "order": 9,
       "required": false,
-      "mustHave": false,
       "headingAnchors": [
         "claims",
         "sinistro",

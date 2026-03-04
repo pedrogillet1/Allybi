@@ -35,6 +35,31 @@ import type { ProgressEmitter } from "../../services/ingestion/pipeline/pipeline
 // Types
 // ---------------------------------------------------------------------------
 
+async function persistWithRetry(
+  label: string,
+  fn: () => Promise<unknown>,
+  retries = 1,
+): Promise<void> {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      await fn();
+      return;
+    } catch (err: any) {
+      if (attempt < retries) {
+        logger.warn(`[IngestionPipeline] ${label} failed, retrying`, {
+          attempt: attempt + 1,
+          error: err.message,
+        });
+        await new Promise((r) => setTimeout(r, 500));
+      } else {
+        logger.warn(`[IngestionPipeline] ${label} failed after retries`, {
+          error: err.message,
+        });
+      }
+    }
+  }
+}
+
 export interface IngestionPipelineOptions {
   /** Emit progress updates (e.g., BullMQ job.updateProgress) */
   emitProgress?: ProgressEmitter;
@@ -237,6 +262,33 @@ export async function runDocumentIngestionPipeline(
         durationMs: totalTime,
       });
 
+      // Persist skipped ingestion telemetry (fire-and-forget with retry)
+      persistWithRetry("Persist skipped telemetry", () =>
+        prisma.ingestionEvent.create({
+          data: {
+            userId,
+            documentId,
+            filename: filename || document.filename || "unknown",
+            mimeType: effectiveMimeType,
+            sizeBytes: document.fileSize || null,
+            status: "skipped",
+            extractionMethod: timings.extractionMethod || "unknown",
+            pages: timings.pageCount || null,
+            ocrUsed: timings.ocrUsed || false,
+            ocrConfidence: timings.ocrConfidence ?? null,
+            extractedTextLength: timings.textLength || null,
+            chunkCount: 0,
+            durationMs: totalTime,
+            at: new Date(),
+            meta: {
+              skipReason: reason,
+              skipCode: (timings as any).skipCode ?? null,
+              textQuality: timings.textQuality,
+            },
+          },
+        }),
+      );
+
       return {
         success: true,
         documentId,
@@ -290,24 +342,19 @@ export async function runDocumentIngestionPipeline(
       embeddingsCreated: timings.chunkCount,
       chunksCreated: timings.chunkCount,
     };
-    prisma.documentProcessingMetrics
-      .upsert({
+    persistWithRetry("Persist processing metrics", () =>
+      prisma.documentProcessingMetrics.upsert({
         where: { documentId },
         create: { documentId, ...metricsData },
         update: metricsData,
-      })
-      .catch((err: any) =>
-        logger.warn("[IngestionPipeline] Failed to persist processing metrics", {
-          documentId,
-          err: err.message,
-        }),
-      );
+      }),
+    );
 
     // -----------------------------------------------------------------------
-    // 9. Persist ingestion telemetry (fire-and-forget)
+    // 9. Persist ingestion telemetry (fire-and-forget with retry)
     // -----------------------------------------------------------------------
-    prisma.ingestionEvent
-      .create({
+    persistWithRetry("Persist ingestion telemetry", () =>
+      prisma.ingestionEvent.create({
         data: {
           userId,
           documentId,
@@ -321,7 +368,7 @@ export async function runDocumentIngestionPipeline(
           ocrConfidence: timings.ocrConfidence ?? null,
           extractedTextLength: timings.textLength || null,
           chunkCount: timings.chunkCount || null,
-          embeddingProvider: "openai",
+          embeddingProvider: process.env.EMBEDDING_PROVIDER || "openai",
           embeddingModel:
             process.env.OPENAI_EMBEDDING_MODEL || "text-embedding-3-small",
           durationMs: totalTime,
@@ -332,14 +379,13 @@ export async function runDocumentIngestionPipeline(
             textQuality: timings.textQuality,
             textQualityScore: timings.textQualityScore,
             extractionWarnings: timings.extractionWarnings.slice(0, 20),
+            tablesDetected: (timings as any).tablesDetected ?? null,
+            extractorDurationMs: (timings as any).extractorDurationMs ?? null,
+            fileHash: timings.fileHash ?? null,
           },
         },
-      })
-      .catch((err: any) =>
-        logger.warn("[IngestionPipeline] Failed to log ingestion telemetry", {
-          err: err.message,
-        }),
-      );
+      }),
+    );
 
     emitToUser(userId, "document-indexed", { documentId, filename });
 
@@ -412,21 +458,17 @@ export async function runDocumentIngestionPipeline(
       processingFailed: true,
       processingError: (error.message || "Unknown error").slice(0, 500),
     };
-    prisma.documentProcessingMetrics
-      .upsert({
+    persistWithRetry("Persist failure metrics", () =>
+      prisma.documentProcessingMetrics.upsert({
         where: { documentId },
         create: { documentId, ...failData },
         update: failData,
-      })
-      .catch((err: any) =>
-        logger.warn("[IngestionPipeline] Failed to persist failure metrics", {
-          err: err.message,
-        }),
-      );
+      }),
+    );
 
-    // Persist failure ingestion event (fire-and-forget)
-    prisma.ingestionEvent
-      .create({
+    // Persist failure ingestion event (fire-and-forget with retry)
+    persistWithRetry("Persist failure telemetry", () =>
+      prisma.ingestionEvent.create({
         data: {
           userId,
           documentId,
@@ -438,12 +480,8 @@ export async function runDocumentIngestionPipeline(
           durationMs: totalTime,
           at: new Date(),
         },
-      })
-      .catch((err: any) =>
-        logger.warn("[IngestionPipeline] Failed to log ingestion telemetry", {
-          err: err.message,
-        }),
-      );
+      }),
+    );
 
     emitProcessingUpdate({
       userId,

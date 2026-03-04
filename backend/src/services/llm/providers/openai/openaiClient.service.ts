@@ -5,8 +5,7 @@
  * -------------------------------------------------------
  * Role in Allybi (as agreed):
  *   - OpenAI is the *precision finisher* lane.
- *   - Draft model: gpt-5-mini
- *   - Final model: gpt-5.2
+ *   - Single model: gpt-5.2 (all OpenAI lanes)
  *   - Used when:
  *       - numeric integrity / quote strictness / hallucination guard / policy retry
  *       - final-pass “clean + correct” composition
@@ -35,6 +34,7 @@ import type {
   LlmProviderId,
   LlmModelId,
 } from "../../types/llm.types";
+import { toCostFamilyModel } from "../../core/llmCostCalculator";
 
 type OpenAIConfig = {
   apiKey: string;
@@ -46,7 +46,7 @@ type OpenAIConfig = {
   timeoutMs: number;
 
   // default models (Allybi plan)
-  defaultModelDraft: LlmModelId; // gpt-5-mini
+  defaultModelDraft: LlmModelId; // gpt-5.2
   defaultModelFinal: LlmModelId; // gpt-5.2
 
   // routing guardrails
@@ -68,10 +68,10 @@ const DEFAULT_CONFIG: OpenAIConfig = {
 
   timeoutMs: Number(process.env.OPENAI_TIMEOUT_MS || 30000),
 
-  defaultModelDraft: "gpt-5-mini",
+  defaultModelDraft: "gpt-5.2",
   defaultModelFinal: "gpt-5.2",
 
-  allowedModels: ["gpt-5-mini", "gpt-5.2"],
+  allowedModels: ["gpt-5.2"],
 
   includeUsageInStream: true,
   maxDeltaCharsSoft: 64,
@@ -98,10 +98,15 @@ function capDelta(text: string, maxChars: number): string[] {
   return out;
 }
 
-function pickModel(routeModel: string | undefined, cfg: OpenAIConfig): string {
+export function resolveOpenAIModel(
+  routeModel: string | undefined,
+  cfg: Pick<OpenAIConfig, "allowedModels" | "defaultModelFinal">,
+): string {
   const m = (routeModel || "").trim();
   if (!m) return cfg.defaultModelFinal;
   if ((cfg.allowedModels as string[]).includes(m)) return m;
+  const family = toCostFamilyModel(m);
+  if (family && (cfg.allowedModels as string[]).includes(family)) return m;
   // Deterministic fallback: default final
   return cfg.defaultModelFinal;
 }
@@ -203,7 +208,7 @@ function buildChatCompletionPayload(
   cfg: OpenAIConfig,
   streaming: boolean,
 ): Record<string, unknown> {
-  const model = pickModel(request.route?.model, cfg);
+  const model = resolveOpenAIModel(request.route?.model, cfg);
 
   const messages = toOpenAIChatMessages(request.messages);
 
@@ -575,6 +580,9 @@ export class OpenAILLMClientAdapter implements LLMClient {
         finishReason: "stop",
       };
     } catch (e) {
+      // Let gateway-level fallback handle failures before any visible output.
+      if (!state.accumulatedText) throw e;
+
       if (sink.isOpen()) {
         const isAbort = e instanceof Error && (e.name === "AbortError" || /abort/i.test(e.message));
         if (isAbort) {

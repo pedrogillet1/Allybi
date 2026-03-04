@@ -33,12 +33,21 @@ export async function runEncryptionStep(params: {
   const { userId, documentId, fullText, filename } = params;
   const hasEncryptionKey = !!process.env.KODA_MASTER_KEY_BASE64;
 
-  if (!hasEncryptionKey || (!fullText && !filename)) return;
-
   const encryptedOnly =
     String(process.env.INDEXING_ENCRYPTED_CHUNKS_ONLY || "")
       .trim()
       .toLowerCase() === "true";
+
+  if (!hasEncryptionKey) {
+    if (encryptedOnly) {
+      throw new Error(
+        `Encryption required (INDEXING_ENCRYPTED_CHUNKS_ONLY=true) but KODA_MASTER_KEY_BASE64 is not set for document ${documentId}`,
+      );
+    }
+    return; // plaintext mode — no key, nothing to encrypt
+  }
+
+  if (!fullText && !filename) return;
 
   try {
     const enc = new EncryptionService();
@@ -67,6 +76,12 @@ export async function runEncryptionStep(params: {
     ]);
 
     logger.info("[Pipeline] Encrypted extracted text stored", { documentId });
+
+    // Null out plaintext residue now that encrypted copy exists
+    await prisma.document.update({
+      where: { id: documentId },
+      data: { rawText: null, previewText: null },
+    });
   } catch (encErr: any) {
     if (encryptedOnly) {
       // In encrypted-only mode, encryption failure is fatal

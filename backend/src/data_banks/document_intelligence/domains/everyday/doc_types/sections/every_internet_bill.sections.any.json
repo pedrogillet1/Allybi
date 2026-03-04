@@ -25,11 +25,10 @@
       "id": "document_header",
       "name": {
         "en": "Document Header",
-        "pt": "Cabecalho do Documento"
+        "pt": "Cabeçalho do Documento"
       },
       "order": 1,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "internet bill",
         "fatura",
@@ -44,7 +43,6 @@
       },
       "order": 2,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "subscriber",
         "customer",
@@ -55,11 +53,10 @@
       "id": "service_period",
       "name": {
         "en": "Service Period",
-        "pt": "Periodo de Servico"
+        "pt": "Período de Servico"
       },
       "order": 3,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "period",
         "periodo",
@@ -74,7 +71,6 @@
       },
       "order": 4,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "plan",
         "package",
@@ -90,7 +86,6 @@
       },
       "order": 5,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "download",
         "upload",
@@ -106,7 +101,6 @@
       },
       "order": 6,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "charges",
         "fees",
@@ -122,7 +116,6 @@
       },
       "order": 7,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "total",
         "total amount",
@@ -137,7 +130,6 @@
       },
       "order": 8,
       "required": false,
-      "mustHave": false,
       "headingAnchors": [
         "discount",
         "promo",
@@ -152,7 +144,6 @@
       },
       "order": 9,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "payment",
         "pay",
@@ -168,7 +159,6 @@
       },
       "order": 10,
       "required": false,
-      "mustHave": false,
       "headingAnchors": [
         "notice",
         "warning",

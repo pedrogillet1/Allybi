@@ -3,6 +3,9 @@ import path from "path";
 import AdmZip from "adm-zip";
 import sharp from "sharp";
 import { uploadFile, getSignedUrl } from "../../config/storage";
+import { logger } from "../../utils/logger";
+import { extractWithTesseract } from "../extraction/tesseractFallback.service";
+import { config } from "../../config/env";
 
 interface ExtractedImage {
   slideNumber: number;
@@ -12,6 +15,7 @@ interface ExtractedImage {
   storagePath?: string; // Storage object key (not a signed URL)
   gcsPath?: string;
   imageUrl?: string | null; // ✅ FIX: Temporary signed URL (for backward compatibility)
+  ocrText?: string; // OCR text extracted from image via Tesseract
 }
 
 interface SlideWithImages {
@@ -24,6 +28,9 @@ interface SlideWithImages {
  * Extract images directly from PPTX file structure
  * This bypasses LibreOffice and extracts embedded images from the ZIP archive
  */
+/** Maximum number of images per document to run OCR on, to bound latency. */
+const PPTX_IMAGE_OCR_LIMIT = 10;
+
 export class PPTXImageExtractorService {
   /**
    * Extract all images from PPTX and organize by slide
@@ -43,7 +50,7 @@ export class PPTXImageExtractorService {
     error?: string;
   }> {
     try {
-      console.log("📸 [PPTX Image Extractor] Starting image extraction...");
+      logger.info("[PPTX Image Extractor] Starting image extraction");
 
       const {
         uploadToGCS = true,
@@ -64,7 +71,7 @@ export class PPTXImageExtractorService {
       }
 
       // 2. Extract PPTX (it's a ZIP file)
-      console.log("📦 [PPTX Image Extractor] Extracting PPTX archive...");
+      logger.debug("[PPTX Image Extractor] Extracting PPTX archive");
       const zip = new AdmZip(pptxFilePath);
       const zipEntries = zip.getEntries();
 
@@ -75,16 +82,17 @@ export class PPTXImageExtractorService {
           const filename = path.basename(entry.entryName);
           if (/\.(png|jpg|jpeg|gif|bmp|tiff|webp)$/i.test(filename)) {
             mediaImages[filename] = entry.getData();
-            console.log(
-              `   Found image: ${filename} (${entry.getData().length} bytes)`,
-            );
+            logger.debug("[PPTX Image Extractor] Found image", {
+              filename,
+              sizeBytes: entry.getData().length,
+            });
           }
         }
       });
 
-      console.log(
-        `✅ [PPTX Image Extractor] Found ${Object.keys(mediaImages).length} images in media folder`,
-      );
+      logger.info("[PPTX Image Extractor] Found images in media folder", {
+        imageCount: Object.keys(mediaImages).length,
+      });
 
       // 4. Parse slide relationships to map images to slides
       const slideImageMap = await this.mapImagesToSlides(zip);
@@ -102,9 +110,10 @@ export class PPTXImageExtractorService {
           const imageBuffer = mediaImages[imageRef];
 
           if (!imageBuffer) {
-            console.warn(
-              `⚠️  Image ${imageRef} referenced in slide ${slideNum} but not found in media`,
-            );
+            logger.warn("[PPTX Image Extractor] Image referenced but not found in media", {
+              imageRef,
+              slideNumber: slideNum,
+            });
             continue;
           }
 
@@ -133,13 +142,74 @@ export class PPTXImageExtractorService {
         }
       }
 
-      console.log(
-        `✅ [PPTX Image Extractor] Saved ${totalImagesSaved} images from ${slides.length} slides`,
-      );
+      logger.info("[PPTX Image Extractor] Saved images", {
+        totalImagesSaved,
+        slideCount: slides.length,
+      });
+
+      // 5b. Optionally run Tesseract OCR on extracted images
+      const ocrEnabled = config.PPTX_IMAGE_OCR_ENABLED === "true";
+      if (ocrEnabled) {
+        logger.info("[PPTX Image Extractor] Running Tesseract OCR on images", {
+          ocrEnabled: true,
+          limit: PPTX_IMAGE_OCR_LIMIT,
+        });
+
+        let ocrCount = 0;
+        for (const slide of slides) {
+          for (const image of slide.images) {
+            if (ocrCount >= PPTX_IMAGE_OCR_LIMIT) {
+              logger.debug("[PPTX Image Extractor] OCR limit reached", {
+                limit: PPTX_IMAGE_OCR_LIMIT,
+              });
+              break;
+            }
+
+            try {
+              const imageBuffer = await fs.promises.readFile(image.localPath);
+              const ocrResult = await extractWithTesseract(imageBuffer, "eng+por");
+
+              if (ocrResult.text.length > 10) {
+                image.ocrText = ocrResult.text;
+                logger.debug("[PPTX Image Extractor] OCR text extracted", {
+                  slideNumber: image.slideNumber,
+                  imageNumber: image.imageNumber,
+                  textLength: ocrResult.text.length,
+                  confidence: ocrResult.confidence,
+                });
+              } else {
+                logger.debug("[PPTX Image Extractor] OCR text too short, ignoring", {
+                  slideNumber: image.slideNumber,
+                  imageNumber: image.imageNumber,
+                  textLength: ocrResult.text.length,
+                });
+              }
+            } catch (ocrError) {
+              logger.warn("[PPTX Image Extractor] OCR failed for image", {
+                slideNumber: image.slideNumber,
+                imageNumber: image.imageNumber,
+                error: ocrError,
+              });
+            }
+
+            ocrCount++;
+          }
+
+          if (ocrCount >= PPTX_IMAGE_OCR_LIMIT) break;
+        }
+
+        logger.info("[PPTX Image Extractor] OCR pass complete", {
+          imagesProcessed: ocrCount,
+          imagesWithText: slides.reduce(
+            (sum, s) => sum + s.images.filter((img) => img.ocrText).length,
+            0,
+          ),
+        });
+      }
 
       // 6. Upload to GCS if requested
       if (uploadToGCS) {
-        console.log("☁️  [PPTX Image Extractor] Uploading images to GCS...");
+        logger.info("[PPTX Image Extractor] Uploading images to GCS");
 
         for (const slide of slides) {
           for (const image of slide.images) {
@@ -159,12 +229,12 @@ export class PPTXImageExtractorService {
                 storagePath,
                 signedUrlExpiration,
               );
-              console.log(`   ✅ Uploaded: ${storagePath}`);
+              logger.debug("[PPTX Image Extractor] Uploaded image", { storagePath });
             } catch (uploadError) {
-              console.error(
-                `   ❌ Failed to upload ${storagePath}:`,
-                uploadError,
-              );
+              logger.error("[PPTX Image Extractor] Failed to upload image", {
+                storagePath,
+                error: uploadError,
+              });
               // ✅ FIX: Set all fields to null/undefined on failure
               image.imageUrl = null;
               image.storagePath = undefined;
@@ -175,13 +245,13 @@ export class PPTXImageExtractorService {
       }
 
       // 6.5. Create composite images for slides with multiple images
-      console.log("🖼️  [PPTX Image Extractor] Creating composite images...");
+      logger.debug("[PPTX Image Extractor] Creating composite images");
       for (const slide of slides) {
         if (slide.images.length > 1) {
           try {
-            console.log(
-              `🖼️  Creating composite image for slide ${slide.slideNumber}...`,
-            );
+            logger.debug("[PPTX Image Extractor] Creating composite image", {
+              slideNumber: slide.slideNumber,
+            });
 
             // Load all images that were successfully uploaded
             const validImages = slide.images.filter(
@@ -189,9 +259,9 @@ export class PPTXImageExtractorService {
             );
 
             if (validImages.length === 0) {
-              console.warn(
-                `⚠️  No valid images for slide ${slide.slideNumber}`,
-              );
+              logger.warn("[PPTX Image Extractor] No valid images for slide", {
+                slideNumber: slide.slideNumber,
+              });
               continue;
             }
 
@@ -238,24 +308,23 @@ export class PPTXImageExtractorService {
                     compositeStoragePath,
                     signedUrlExpiration,
                   );
-                  console.log(
-                    `   ✅ Uploaded composite: ${compositeStoragePath}`,
-                  );
+                  logger.debug("[PPTX Image Extractor] Uploaded composite", {
+                    storagePath: compositeStoragePath,
+                  });
                 } catch (uploadError) {
-                  console.error(
-                    `   ❌ Failed to upload composite:`,
-                    uploadError,
-                  );
+                  logger.error("[PPTX Image Extractor] Failed to upload composite", {
+                    error: uploadError,
+                  });
                 }
               } else {
                 slide.compositeImageUrl = compositePath;
               }
             }
           } catch (compositeError) {
-            console.warn(
-              `⚠️  Failed to create composite for slide ${slide.slideNumber}:`,
-              compositeError,
-            );
+            logger.warn("[PPTX Image Extractor] Failed to create composite for slide", {
+              slideNumber: slide.slideNumber,
+              error: compositeError,
+            });
             // Non-critical error, continue
           }
         } else if (slide.images.length === 1) {
@@ -265,9 +334,9 @@ export class PPTXImageExtractorService {
         }
       }
 
-      console.log(
-        `✅ [PPTX Image Extractor] Created composites for ${slides.filter((s) => s.compositeImageUrl).length} slides`,
-      );
+      logger.info("[PPTX Image Extractor] Created composites", {
+        compositesCreated: slides.filter((s) => s.compositeImageUrl).length,
+      });
 
       // 7. Clean up temp directory
       if (!outputDir) {
@@ -280,7 +349,7 @@ export class PPTXImageExtractorService {
         totalImages: totalImagesSaved,
       };
     } catch (error: any) {
-      console.error("❌ [PPTX Image Extractor] Error:", error);
+      logger.error("[PPTX Image Extractor] Error during extraction", { error: error.message });
       return {
         success: false,
         error: error.message,
@@ -316,9 +385,9 @@ export class PPTXImageExtractorService {
         const relsEntry = zip.getEntry(relsPath);
 
         if (!relsEntry) {
-          console.warn(
-            `⚠️  No relationships file found for slide ${slideNumber}`,
-          );
+          logger.warn("[PPTX Image Extractor] No relationships file found for slide", {
+            slideNumber,
+          });
           continue;
         }
 
@@ -336,15 +405,18 @@ export class PPTXImageExtractorService {
 
         if (imageRefs.length > 0) {
           slideImageMap[slideNumber] = imageRefs;
-          console.log(`   Slide ${slideNumber}: ${imageRefs.length} images`);
+          logger.debug("[PPTX Image Extractor] Slide image mapping", {
+            slideNumber,
+            imageCount: imageRefs.length,
+          });
         }
       }
 
-      console.log(
-        `✅ [PPTX Image Extractor] Mapped images for ${Object.keys(slideImageMap).length} slides`,
-      );
+      logger.info("[PPTX Image Extractor] Mapped images to slides", {
+        slidesWithImages: Object.keys(slideImageMap).length,
+      });
     } catch (error) {
-      console.error("❌ Error parsing slide relationships:", error);
+      logger.error("[PPTX Image Extractor] Error parsing slide relationships", { error });
     }
 
     return slideImageMap;

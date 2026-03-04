@@ -54,6 +54,7 @@ import {
   sha256,
   stableLocationKey,
 } from "./retrievalEngine.utils";
+import { UNIT_PATTERNS } from "../../ingestion/pipeline/tableUnitNormalization.service";
 
 type EnvName = "production" | "staging" | "dev" | "local";
 type AnswerMode =
@@ -326,6 +327,14 @@ export interface EvidencePack {
 
   evidence: EvidenceItem[];
 
+  conflicts?: Array<{
+    metric: string;
+    docA: string;
+    valueA: number;
+    docB: string;
+    valueB: number;
+  }>;
+
   // Debug is *engine-side only*. Never print to user.
   debug?: {
     phases: Array<{ phaseId: string; candidates: number; note?: string }>;
@@ -336,6 +345,15 @@ export interface EvidencePack {
       valueA: number;
       docB: string;
       valueB: number;
+    }>;
+    candidateDecisions?: Array<{
+      chunkId: string;
+      docId: string;
+      scores: Record<string, number>;
+      boosts: Record<string, number>;
+      penalties: Record<string, number>;
+      filtered: boolean;
+      filterReason?: string;
     }>;
   };
 
@@ -534,6 +552,15 @@ export interface QueryNormalizer {
  * Main Service
  */
 export class RetrievalEngineService {
+  private _lastCandidateDecisions?: Array<{
+    chunkId: string;
+    docId: string;
+    scores: Record<string, number>;
+    boosts: Record<string, number>;
+    penalties: Record<string, number>;
+    filtered: boolean;
+  }>;
+
   constructor(
     private readonly bankLoader: BankLoader,
     private readonly docStore: DocStore,
@@ -637,6 +664,20 @@ export class RetrievalEngineService {
       : domain
         ? [domain]
         : [];
+    // Load domain-specific pattern banks on-demand for domain-aware retrieval.
+    if (domain === "medical") {
+      const medicalBankIds = [
+        "patterns_medical_encounter_timeline_patterns",
+        "patterns_medical_lab_panel_patterns",
+        "patterns_medical_red_flag_patterns",
+        "patterns_medical_safety_boundary_triggers",
+        "patterns_medical_unit_reference_patterns",
+      ];
+      for (const bankId of medicalBankIds) {
+        this.safeGetBank<Record<string, unknown>>(bankId);
+      }
+    }
+
     const ruleCtx: RuleMatchContext = {
       query: queryOriginal,
       normalizedQuery: queryNormalized,
@@ -1119,6 +1160,22 @@ export class RetrievalEngineService {
     }
 
     if (isProductionEnv(req.env)) {
+      // Persist debug data to structured log before stripping from response
+      if (pack.debug) {
+        try {
+          logger.info("[retrieval] debug trace", {
+            stepName: "retrieval_debug",
+            conversationId: req.signals.activeDocId ?? null,
+            phases: pack.debug.phases.length,
+            reasonCodes: pack.debug.reasonCodes,
+            conflictsCount: pack.debug.conflicts?.length ?? 0,
+            candidateDecisionsCount:
+              pack.debug.candidateDecisions?.length ?? 0,
+          });
+        } catch {
+          /* trace write failure must not break retrieval */
+        }
+      }
       delete pack.debug;
     }
 
@@ -2419,6 +2476,20 @@ export class RetrievalEngineService {
                 .map((value: unknown) => String(value || "").trim())
                 .filter(Boolean)
             : undefined,
+          unitAnnotation:
+            hit?.metadata?.unitRaw || hit?.metadata?.unitNormalized
+              ? {
+                  unitRaw: String(hit.metadata.unitRaw ?? ""),
+                  unitNormalized: String(hit.metadata.unitNormalized ?? ""),
+                }
+              : null,
+          scaleFactor:
+            hit?.scaleFactor ?? hit?.metadata?.scaleFactor ?? null,
+          footnotes: Array.isArray(hit?.footnotes)
+            ? hit.footnotes
+            : Array.isArray(hit?.metadata?.footnotes)
+              ? hit.metadata.footnotes
+              : null,
         };
       }
     }
@@ -3145,6 +3216,18 @@ export class RetrievalEngineService {
     return Math.max(0, ageMs / (1000 * 60 * 60 * 24));
   }
 
+  private applyNormCurve(value: number, curve: string): number {
+    const v = clamp01(value);
+    switch (curve) {
+      case "sqrt":
+        return Math.sqrt(v);
+      case "log":
+        return v > 0 ? Math.log1p(v) / Math.log1p(1) : 0;
+      default:
+        return v; // "linear" or unknown
+    }
+  }
+
   // -----------------------------
   // Ranking
   // -----------------------------
@@ -3171,10 +3254,15 @@ export class RetrievalEngineService {
       signals.intentFamily,
       routingPriorityBank,
     );
+    const normCfg = cfg?.normalization ?? {};
+    const semanticCurve = normCfg?.semanticScore?.curve ?? "linear";
+    const lexicalCurve = normCfg?.lexicalScore?.curve ?? "linear";
+    const structuralCurve = normCfg?.structuralScore?.curve ?? "linear";
+
     for (const c of candidates) {
-      const semantic = clamp01(c.scores.semantic ?? 0);
-      const lexical = clamp01(c.scores.lexical ?? 0);
-      const structural = clamp01(c.scores.structural ?? 0);
+      const semantic = this.applyNormCurve(c.scores.semantic ?? 0, semanticCurve);
+      const lexical = this.applyNormCurve(c.scores.lexical ?? 0, lexicalCurve);
+      const structural = this.applyNormCurve(c.scores.structural ?? 0, structuralCurve);
 
       const titleBoost = clamp01(
         (c.scores.titleBoost ?? 0) + (c.scores.keywordBoost ?? 0) * 0.5,
@@ -3210,16 +3298,63 @@ export class RetrievalEngineService {
       c.scores.final = final;
     }
 
-    // Stable sort: final desc, docId asc, locationKey asc, candidateId asc
+    // Tie-breaker sort from bank config
+    const tieBreakers: Array<{
+      type: string;
+      signal?: string;
+      component?: string;
+      direction?: string;
+    }> = cfg?.tieBreakers ?? [];
+    const confidenceGap = safeNumber(
+      cfg?.actionsContract?.thresholds?.tieBreakConfidenceGap,
+      0.02,
+    );
+
     candidates.sort((a, b) => {
       const fa = a.scores.final ?? 0;
       const fb = b.scores.final ?? 0;
+
+      // If scores differ by more than confidence gap, sort by score
+      if (Math.abs(fb - fa) > confidenceGap) return fb - fa;
+
+      // Apply tie-breakers when scores are within confidence gap
+      for (const tb of tieBreakers) {
+        let va: number, vb: number;
+        if (tb.type === "signal" && tb.signal) {
+          va = (a.signals as Record<string, unknown>)?.[tb.signal] ? 1 : 0;
+          vb = (b.signals as Record<string, unknown>)?.[tb.signal] ? 1 : 0;
+        } else if (tb.type === "score_component" && tb.component) {
+          va = (a.scores as Record<string, number>)?.[tb.component] ?? 0;
+          vb = (b.scores as Record<string, number>)?.[tb.component] ?? 0;
+        } else {
+          continue;
+        }
+        if (va !== vb) return tb.direction === "desc" ? vb - va : va - vb;
+      }
+
+      // Final stable sort fallback
       if (fb !== fa) return fb - fa;
       if (a.docId !== b.docId) return a.docId.localeCompare(b.docId);
       if (a.locationKey !== b.locationKey)
         return a.locationKey.localeCompare(b.locationKey);
       return a.candidateId.localeCompare(b.candidateId);
     });
+
+    // Collect per-candidate decisions for debug (non-production only)
+    this._lastCandidateDecisions = candidates.slice(0, 50).map((c) => ({
+      chunkId: c.candidateId,
+      docId: c.docId,
+      scores: { ...c.scores } as Record<string, number>,
+      boosts: {
+        titleBoost: c.scores.titleBoost ?? 0,
+        keywordBoost: c.scores.keywordBoost ?? 0,
+        typeBoost: c.scores.typeBoost ?? 0,
+        recencyBoost: c.scores.recencyBoost ?? 0,
+        diBoost: c.scores.documentIntelligenceBoost ?? 0,
+      },
+      penalties: { total: c.scores.penalties ?? 0 },
+      filtered: false,
+    }));
 
     return candidates;
   }
@@ -3369,7 +3504,23 @@ export class RetrievalEngineService {
       if (diversified.length >= maxTotalHard) break;
     }
 
-    return diversified;
+    // 3) Section spread cap
+    const maxPerSectionHard = safeNumber(
+      diversificationBank.config.actionsContract?.thresholds
+        ?.maxPerSectionHard,
+      5,
+    );
+    const perSectionCount = new Map<string, number>();
+    const sectionDiversified: CandidateChunk[] = [];
+    for (const c of diversified) {
+      const sectionKey = this.resolveSectionKey(c);
+      const n = perSectionCount.get(sectionKey) ?? 0;
+      if (n >= maxPerSectionHard) continue;
+      perSectionCount.set(sectionKey, n + 1);
+      sectionDiversified.push(c);
+    }
+
+    return sectionDiversified;
   }
 
   private dedupeNearDuplicates(
@@ -3398,6 +3549,17 @@ export class RetrievalEngineService {
     }
 
     return out;
+  }
+
+  private resolveSectionKey(c: CandidateChunk): string {
+    const loc = c.location as Record<string, unknown>;
+    const section =
+      loc?.sectionKey ??
+      loc?.sectionName ??
+      loc?.slideTitle ??
+      loc?.sheetName ??
+      (loc?.page != null ? `page:${loc.page}` : "unknown");
+    return `${c.docId}|${section}`;
   }
 
   private normalizeForNearDup(s: string): string {
@@ -3530,7 +3692,14 @@ export class RetrievalEngineService {
     let truncPoint = effectiveMax;
 
     if (opts.preserveNumericUnits) {
-      const numUnitPattern = /\d[\d.,]*\s*(?:R\$|\$|EUR|%|kg|months?|years?|days?|hours?)/gi;
+      // Build unit-preservation regex from canonical UNIT_PATTERNS
+      const unitAlts = UNIT_PATTERNS.flatMap((p) =>
+        p.patterns.map((r) => r.source),
+      ).join("|");
+      const numUnitPattern = new RegExp(
+        `\\d[\\d.,]*\\s*(?:${unitAlts})`,
+        "gi",
+      );
       let match: RegExpExecArray | null;
       while ((match = numUnitPattern.exec(snippet)) !== null) {
         const tokenStart = match.index;
@@ -3551,6 +3720,24 @@ export class RetrievalEngineService {
         if (hStart > truncPoint - 60 && hStart <= truncPoint && hEnd > truncPoint) {
           truncPoint = hEnd;
           break;
+        }
+      }
+    }
+
+    // SCP_005: Negation preservation — never truncate between a negation and its predicate
+    {
+      const negationPattern =
+        /\b(not|no|never|neither|nor|n't|without|excluding|zero|none|decline[ds]?|decrease[ds]?|loss|deficit|fell|dropped|failed)\b/gi;
+      let negMatch: RegExpExecArray | null;
+      while ((negMatch = negationPattern.exec(snippet)) !== null) {
+        const negStart = negMatch.index;
+        const negEnd = negStart + negMatch[0].length;
+        if (negStart < truncPoint && negStart > truncPoint - 60) {
+          const extendedEnd = Math.min(snippet.length, negEnd + 30);
+          if (extendedEnd > truncPoint) {
+            truncPoint = extendedEnd;
+            break;
+          }
         }
       }
     }
@@ -3940,6 +4127,18 @@ export class RetrievalEngineService {
         conflicts: this.detectEvidenceConflicts(evidence),
       },
     };
+
+    // Surface conflicts on pack so they survive production debug stripping
+    const detectedConflicts = pack.debug?.conflicts;
+    if (detectedConflicts && detectedConflicts.length > 0) {
+      pack.conflicts = detectedConflicts;
+    }
+
+    // Attach per-candidate decisions to debug packet
+    if (pack.debug && this._lastCandidateDecisions) {
+      pack.debug.candidateDecisions = this._lastCandidateDecisions;
+      this._lastCandidateDecisions = undefined;
+    }
 
     return pack;
   }

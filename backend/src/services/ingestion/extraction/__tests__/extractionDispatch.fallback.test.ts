@@ -39,7 +39,7 @@ describe("extractText image fallback", () => {
     const buffer = Buffer.alloc(20 * 1024); // > 10KB to pass size check
     const result = await extractText(buffer, "image/png", "document-scan.png");
 
-    expect(extractWithTesseract).toHaveBeenCalledWith(buffer, "eng");
+    expect(extractWithTesseract).toHaveBeenCalledWith(buffer, "eng+por");
     expect(result.text).toBe("Fallback OCR text");
     expect(result.sourceType).toBe("image");
   });
@@ -72,5 +72,49 @@ describe("extractText image fallback", () => {
 
     expect(extractWithTesseract).not.toHaveBeenCalled();
     expect((result as any).skipped).toBe(true);
+  });
+
+  describe("Tesseract multi-language support", () => {
+    it("uses eng+por by default when no filename is provided", async () => {
+      const buffer = Buffer.alloc(20 * 1024);
+      await extractText(buffer, "image/png");
+
+      expect(extractWithTesseract).toHaveBeenCalledWith(buffer, "eng+por");
+    });
+
+    it("uses eng+por for a regular filename without language hints", async () => {
+      const buffer = Buffer.alloc(20 * 1024);
+      await extractText(buffer, "image/png", "receipt-scan.png");
+
+      expect(extractWithTesseract).toHaveBeenCalledWith(buffer, "eng+por");
+    });
+
+    it("uses eng+spa when filename contains _es suffix", async () => {
+      const buffer = Buffer.alloc(20 * 1024);
+      await extractText(buffer, "image/png", "invoice_es.png");
+
+      expect(extractWithTesseract).toHaveBeenCalledWith(buffer, "eng+spa");
+    });
+
+    it("uses eng+spa when filename contains _spa suffix", async () => {
+      const buffer = Buffer.alloc(20 * 1024);
+      await extractText(buffer, "image/png", "contract_spa.png");
+
+      expect(extractWithTesseract).toHaveBeenCalledWith(buffer, "eng+spa");
+    });
+
+    it("uses eng+spa when filename contains .es. locale marker", async () => {
+      const buffer = Buffer.alloc(20 * 1024);
+      await extractText(buffer, "image/png", "report.es.png");
+
+      expect(extractWithTesseract).toHaveBeenCalledWith(buffer, "eng+spa");
+    });
+
+    it("uses eng+spa when filename contains 'spanish'", async () => {
+      const buffer = Buffer.alloc(20 * 1024);
+      await extractText(buffer, "image/png", "spanish-doc-scan.png");
+
+      expect(extractWithTesseract).toHaveBeenCalledWith(buffer, "eng+spa");
+    });
   });
 });

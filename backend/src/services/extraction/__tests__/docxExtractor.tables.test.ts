@@ -412,4 +412,123 @@ describe("DOCX table extraction (w:tbl support)", () => {
     // 2 real paragraphs + 1 table pseudo-paragraph = 3
     expect(result.paragraphCount).toBeGreaterThanOrEqual(3);
   });
+
+  // -------------------------------------------------------------------------
+  // Vertical merge (vMerge) — cell spanning 2 rows
+  // -------------------------------------------------------------------------
+
+  it("handles vMerge — cell spanning 2 rows vertically", async () => {
+    // Row 1: "Category" (vMerge restart) | "Q1"
+    // Row 2: (vMerge continue = empty)   | "Q2"
+    // Visually "Category" spans both rows, but markdown emits it only in row 1
+    const body = `
+      <w:tbl>
+        <w:tr>
+          <w:tc>
+            <w:tcPr><w:vMerge w:val="restart"/></w:tcPr>
+            <w:p><w:r><w:t>Category</w:t></w:r></w:p>
+          </w:tc>
+          <w:tc><w:p><w:r><w:t>Q1</w:t></w:r></w:p></w:tc>
+        </w:tr>
+        <w:tr>
+          <w:tc>
+            <w:tcPr><w:vMerge/></w:tcPr>
+            <w:p><w:r><w:t>ignored</w:t></w:r></w:p>
+          </w:tc>
+          <w:tc><w:p><w:r><w:t>Q2</w:t></w:r></w:p></w:tc>
+        </w:tr>
+      </w:tbl>
+    `;
+
+    const buf = buildDocx(body);
+    const result = await extractDocxWithAnchors(buf);
+
+    // "Category" should appear in the first row
+    expect(result.text).toContain("Category");
+    // "Q1" and "Q2" should both be present
+    expect(result.text).toContain("Q1");
+    expect(result.text).toContain("Q2");
+    // The continuation cell text ("ignored") should NOT appear — it's merged
+    expect(result.text).not.toContain("ignored");
+
+    // Check row structure: row 2 should have empty first column
+    const lines = result.text.split("\n");
+    const row1 = lines.find((l) => l.includes("Category"));
+    const row2 = lines.find((l) => l.includes("Q2"));
+    expect(row1).toBeTruthy();
+    expect(row2).toBeTruthy();
+
+    // Parse columns for row2: first column should be empty (space placeholder)
+    const row2Cols = row2!.split("|").map((c) => c.trim()).filter((_, i, a) => i > 0 && i < a.length - 1);
+    expect(row2Cols.length).toBe(2);
+    // First column of the continuation row should be empty (rendered as space in markdown)
+    expect(row2Cols[0]).toBe("");
+  });
+
+  // -------------------------------------------------------------------------
+  // Combined gridSpan + vMerge — cell spanning both directions
+  // -------------------------------------------------------------------------
+
+  it("handles combined gridSpan + vMerge — cell spanning columns and rows", async () => {
+    // 3 columns x 2 rows
+    // Row 1: "Title" (gridSpan=2, vMerge restart) | "Col3"
+    // Row 2: (gridSpan=2, vMerge continue)        | "Data3"
+    const body = `
+      <w:tbl>
+        <w:tr>
+          <w:tc>
+            <w:tcPr>
+              <w:gridSpan w:val="2"/>
+              <w:vMerge w:val="restart"/>
+            </w:tcPr>
+            <w:p><w:r><w:t>Title</w:t></w:r></w:p>
+          </w:tc>
+          <w:tc><w:p><w:r><w:t>Col3</w:t></w:r></w:p></w:tc>
+        </w:tr>
+        <w:tr>
+          <w:tc>
+            <w:tcPr>
+              <w:gridSpan w:val="2"/>
+              <w:vMerge/>
+            </w:tcPr>
+            <w:p><w:r><w:t>hidden</w:t></w:r></w:p>
+          </w:tc>
+          <w:tc><w:p><w:r><w:t>Data3</w:t></w:r></w:p></w:tc>
+        </w:tr>
+      </w:tbl>
+    `;
+
+    const buf = buildDocx(body);
+    const result = await extractDocxWithAnchors(buf);
+
+    // "Title" should appear (it's the restart cell)
+    expect(result.text).toContain("Title");
+    expect(result.text).toContain("Col3");
+    expect(result.text).toContain("Data3");
+    // The continuation cell text ("hidden") should NOT appear
+    expect(result.text).not.toContain("hidden");
+
+    // Check column structure
+    const lines = result.text.split("\n");
+    const row1 = lines.find((l) => l.includes("Title"));
+    const row2 = lines.find((l) => l.includes("Data3"));
+    expect(row1).toBeTruthy();
+    expect(row2).toBeTruthy();
+
+    // Both rows should have 3 columns (gridSpan=2 + 1 normal = 3)
+    const row1Cols = row1!.split("|").map((c) => c.trim()).filter((_, i, a) => i > 0 && i < a.length - 1);
+    const row2Cols = row2!.split("|").map((c) => c.trim()).filter((_, i, a) => i > 0 && i < a.length - 1);
+
+    expect(row1Cols.length).toBe(3);
+    expect(row2Cols.length).toBe(3);
+
+    // Row 1: ["Title", "", "Col3"] — gridSpan pads column 2
+    expect(row1Cols[0]).toBe("Title");
+    expect(row1Cols[2]).toBe("Col3");
+
+    // Row 2: ["", "", "Data3"] — vMerge continue + gridSpan padding
+    expect(row2Cols[0]).toBe("");
+    expect(row2Cols[1]).toBe("");
+    expect(row2Cols[2]).toBe("Data3");
+  });
 });

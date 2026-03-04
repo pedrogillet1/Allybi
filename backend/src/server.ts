@@ -35,17 +35,13 @@ import {
 } from "./app/workers";
 
 // LLM wiring
-import { LLMClientFactory } from "./services/llm/core/llmClientFactory";
 import { LLMChatEngine } from "./services/llm/core/llmChatEngine";
-import { loadGeminiConfig } from "./services/llm/providers/gemini/geminiConfig";
-import { loadOpenAIConfig } from "./services/llm/providers/openai/openaiConfig";
 import { TelemetryLLMClient } from "./services/llm/core/telemetryLlmClient.decorator";
-import type { LLMProvider } from "./services/llm/core/llmErrors.types";
-import { PromptRegistryService } from "./services/llm/prompts/promptRegistry.service";
-import { LlmRequestBuilderService } from "./services/llm/core/llmRequestBuilder.service";
-import { LlmRouterService } from "./services/llm/core/llmRouter.service";
-import { LlmGatewayService } from "./services/llm/core/llmGateway.service";
-import { getBankLoaderInstance } from "./services/core/banks/bankLoader.service";
+import {
+  buildGatewayRuntime,
+  buildLLMFactoryFromEnv,
+  resolveRuntimeEnvName,
+} from "./services/llm/core/llmGatewayRuntime.factory";
 
 // Security / encryption wiring
 import { EncryptionService } from "./services/security/encryption.service";
@@ -111,87 +107,24 @@ async function startServer() {
     // 4. Wire LLM client factory → TelemetryDecorator → ChatEngine → PrismaChatService
     let chatService: PrismaChatService;
     try {
-      const envName = (process.env.NODE_ENV as any) || "dev";
-      const llmFactory = buildLLMFactory();
+      const envName = resolveRuntimeEnvName(process.env.NODE_ENV);
+      const llmFactory = buildLLMFactoryFromEnv(envName);
       const configuredKeys = llmFactory.listConfigured();
-      const rawDefaultClient = llmFactory.get();
       console.log(
         `[Server] LLM factory ready — providers: ${configuredKeys.join(", ")}`,
       );
 
-      const telemetryClientCache = new Map<string, TelemetryLLMClient>();
-      const getTelemetryClientByKey = (
-        key: "openai" | "google" | "local",
-      ): TelemetryLLMClient | null => {
-        const existing = telemetryClientCache.get(key);
-        if (existing) return existing;
-        const raw = llmFactory.tryGet(key);
-        if (!raw) return null;
-        const wrapped = new TelemetryLLMClient(raw, telemetryService);
-        telemetryClientCache.set(key, wrapped);
-        return wrapped;
-      };
-
-      const defaultKey =
-        configuredKeys.find((k) => llmFactory.get(k) === rawDefaultClient) ||
-        configuredKeys[0];
-      const llmClient = getTelemetryClientByKey(defaultKey || "google");
-      if (!llmClient) {
-        throw new Error("Default LLM client is not configured");
-      }
+      const runtime = buildGatewayRuntime({
+        envName,
+        llmFactory,
+        wrapClient(client) {
+          return new TelemetryLLMClient(client, telemetryService);
+        },
+      });
+      const llmClient = runtime.defaultClient;
+      const defaultModelId = runtime.defaultModelId;
+      const llmGateway = runtime.gateway;
       console.log("[Server] LLM client wrapped with telemetry decorator");
-
-      const resolveFactoryKey = (
-        provider: LLMProvider,
-      ): "openai" | "google" | "local" | null => {
-        const normalized = String(provider || "")
-          .trim()
-          .toLowerCase();
-        if (!normalized) return null;
-        if (normalized === "openai") return "openai";
-        if (normalized === "google" || normalized === "gemini") return "google";
-        if (normalized === "local" || normalized === "ollama") return "local";
-        if (normalized === "unknown") return null;
-        return null;
-      };
-
-      const geminiCfg = loadGeminiConfig(envName);
-      const openaiCfg = loadOpenAIConfig(envName);
-      const defaultModelId =
-        llmClient.provider === "openai"
-          ? openaiCfg.defaultModelDraft
-          : llmClient.provider === "google"
-            ? geminiCfg.models.defaultDraft
-            : "local-default";
-      const bankLoader = getBankLoaderInstance();
-      const promptRegistry = new PromptRegistryService(bankLoader);
-      const requestBuilder = new LlmRequestBuilderService(promptRegistry);
-      const router = new LlmRouterService(bankLoader);
-      const llmGateway = new LlmGatewayService(
-        llmClient,
-        router,
-        requestBuilder,
-        {
-          env: (process.env.NODE_ENV === "production"
-            ? "production"
-            : process.env.NODE_ENV === "staging"
-              ? "staging"
-              : process.env.NODE_ENV === "test"
-                ? "dev"
-                : "local") as any,
-          provider: llmClient.provider,
-          modelId: defaultModelId,
-          defaultTemperature: 0.2,
-          defaultMaxOutputTokens: 900,
-        },
-        {
-          resolve(provider: LLMProvider) {
-            const key = resolveFactoryKey(provider);
-            if (!key) return null;
-            return getTelemetryClientByKey(key);
-          },
-        },
-      );
       const bankBackedChatEngine = new LLMChatEngine(llmGateway, {
         provider: llmClient.provider,
         modelId: defaultModelId,
@@ -224,13 +157,13 @@ async function startServer() {
       );
       const stubEngine = {
         generate: async () => ({
-          text: "LLM not configured. Set GEMINI_API_KEY or GOOGLE_API_KEY.",
+          text: "LLM not configured. Set GEMINI_API_KEY/GOOGLE_API_KEY or OPENAI_API_KEY.",
         }),
         stream: async (p: any) => {
           p.sink.close();
           return {
             finalText:
-              "LLM not configured. Set GEMINI_API_KEY or GOOGLE_API_KEY.",
+              "LLM not configured. Set GEMINI_API_KEY/GOOGLE_API_KEY or OPENAI_API_KEY.",
           };
         },
       };
@@ -466,63 +399,5 @@ async function startServer() {
   }
 }
 
-/**
- * Build LLMClientFactory from environment variables.
- * Gemini is the preferred provider; throws if no API key is found.
- */
-function buildLLMFactory(): LLMClientFactory {
-  const geminiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
-  const openaiKey = process.env.OPENAI_API_KEY;
-  const envName = (process.env.NODE_ENV as any) || "dev";
-
-  if (!geminiKey && !openaiKey) {
-    throw new Error(
-      "No LLM API key found. Set GEMINI_API_KEY or OPENAI_API_KEY.",
-    );
-  }
-
-  const geminiCfg = geminiKey ? loadGeminiConfig(envName) : null;
-  const openaiCfg = openaiKey ? loadOpenAIConfig(envName) : null;
-
-  return new LLMClientFactory({
-    defaultProvider: geminiKey ? "google" : "openai",
-    providers: {
-      google: geminiKey
-        ? {
-            enabled: true,
-            config: {
-              apiKey: geminiCfg!.apiKey,
-              baseUrl:
-                geminiCfg!.baseUrl ||
-                "https://generativelanguage.googleapis.com/v1beta",
-              defaults: {
-                gemini3: geminiCfg!.models.defaultFinal,
-                gemini3Flash: geminiCfg!.models.defaultDraft,
-              },
-              timeoutMs: geminiCfg!.timeoutMs,
-            },
-          }
-        : undefined,
-      openai: openaiCfg
-        ? {
-            enabled: true,
-            config: {
-              apiKey: openaiCfg.apiKey,
-              baseURL: openaiCfg.baseURL,
-              organization: openaiCfg.organization,
-              project: openaiCfg.project,
-              timeoutMs: openaiCfg.timeoutMs,
-              defaultModelDraft: openaiCfg.defaultModelDraft,
-              defaultModelFinal: openaiCfg.defaultModelFinal,
-              allowedModels: openaiCfg.allowedModels,
-              includeUsageInStream: openaiCfg.includeUsageInStream,
-              maxDeltaCharsSoft: openaiCfg.maxDeltaCharsSoft,
-              allowTools: openaiCfg.allowTools,
-            },
-          }
-        : undefined,
-    },
-  });
-}
-
 startServer();
+

@@ -1,5 +1,7 @@
 import {
   computeCostUsd,
+  diagnoseCostLookup,
+  estimateCostUsd,
   lookupCostEntry,
   toCostFamilyModel,
   type CostTable,
@@ -8,7 +10,6 @@ import {
 const mockCostTable: CostTable = {
   models: {
     "google:gemini-2.5-flash": { inputPer1M: 0.15, outputPer1M: 0.60 },
-    "openai:gpt-5-mini": { inputPer1M: 0.30, outputPer1M: 1.20 },
     "openai:gpt-5.2": { inputPer1M: 2.50, outputPer1M: 10.00 },
     "local:*": { inputPer1M: 0, outputPer1M: 0 },
   },
@@ -35,7 +36,7 @@ describe("computeCostUsd", () => {
   });
 
   it("should return 0 for unknown provider", () => {
-    const cost = computeCostUsd("anthropic", "claude", 1000, 1000, mockCostTable);
+    const cost = computeCostUsd("unknown_provider", "unknown_model", 1000, 1000, mockCostTable);
     expect(cost).toBe(0);
   });
 
@@ -89,9 +90,42 @@ describe("computeCostUsd", () => {
   });
 
   it("should normalize family model helper", () => {
-    expect(toCostFamilyModel("gpt-5-mini-2026-01-15")).toBe("gpt-5-mini");
+    expect(toCostFamilyModel("gpt-5.2-2026-01-15")).toBe("gpt-5.2");
     expect(toCostFamilyModel("gemini-2.5-flash-001")).toBe(
       "gemini-2.5-flash",
     );
+  });
+});
+
+describe("diagnoseCostLookup", () => {
+  it("returns warning for unknown provider with non-empty model", () => {
+    const result = diagnoseCostLookup("anthropic", "claude-4", mockCostTable);
+    expect(result.found).toBe(false);
+    expect(result.warning).toContain("anthropic:claude-4");
+  });
+
+  it("returns no warning for valid provider", () => {
+    const result = diagnoseCostLookup("openai", "gpt-5.2", mockCostTable);
+    expect(result.found).toBe(true);
+    expect(result.warning).toBeNull();
+  });
+
+  it("returns no warning for null cost table", () => {
+    const result = diagnoseCostLookup("openai", "gpt-5.2", null);
+    expect(result.found).toBe(false);
+    expect(result.warning).toBeNull();
+  });
+});
+
+describe("estimateCostUsd", () => {
+  it("returns same value as computeCostUsd", () => {
+    const estimate = estimateCostUsd("openai", "gpt-5.2", 10000, 2000, mockCostTable);
+    const actual = computeCostUsd("openai", "gpt-5.2", 10000, 2000, mockCostTable);
+    expect(estimate).toBe(actual);
+  });
+
+  it("returns 0 for null cost table", () => {
+    const estimate = estimateCostUsd("openai", "gpt-5.2", 10000, 2000, null);
+    expect(estimate).toBe(0);
   });
 });

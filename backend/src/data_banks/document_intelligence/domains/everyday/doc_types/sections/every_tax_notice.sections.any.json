@@ -25,11 +25,10 @@
       "id": "document_header",
       "name": {
         "en": "Document Header",
-        "pt": "Cabecalho do Documento"
+        "pt": "Cabeçalho do Documento"
       },
       "order": 1,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "tax notice",
         "notificacao",
@@ -44,7 +43,6 @@
       },
       "order": 2,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "notice number",
         "reference",
@@ -60,7 +58,6 @@
       },
       "order": 3,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "assessment",
         "summary",
@@ -76,7 +73,6 @@
       },
       "order": 4,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "assessed",
         "tax due",
@@ -92,7 +88,6 @@
       },
       "order": 5,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "penalty",
         "interest",
@@ -108,7 +103,6 @@
       },
       "order": 6,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "how to pay",
         "instructions",
@@ -124,7 +118,6 @@
       },
       "order": 7,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "due date",
         "expiry",
@@ -140,7 +133,6 @@
       },
       "order": 8,
       "required": false,
-      "mustHave": false,
       "headingAnchors": [
         "appeal",
         "contest",
@@ -156,7 +148,6 @@
       },
       "order": 9,
       "required": false,
-      "mustHave": false,
       "headingAnchors": [
         "attachments",
         "annexes",
@@ -172,7 +163,6 @@
       },
       "order": 10,
       "required": false,
-      "mustHave": false,
       "headingAnchors": [
         "contact",
         "office",

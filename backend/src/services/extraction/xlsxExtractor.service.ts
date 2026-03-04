@@ -22,6 +22,7 @@ import type {
 } from "../../types/extraction.types";
 import type { XlsxCellAnchor } from "../../types/extraction.types";
 import { createXlsxCellAnchor } from "../../types/extraction.types";
+import { logger } from "../../utils/logger";
 
 // ============================================================================
 // Constants
@@ -449,9 +450,7 @@ function processSheet(
 export async function extractXlsxWithAnchors(
   buffer: Buffer,
 ): Promise<XlsxExtractionResult> {
-  console.log(
-    `📊 [XLSX] Starting structured extraction (${buffer.length} bytes)...`,
-  );
+  logger.info("[XLSX] Starting structured extraction", { sizeBytes: buffer.length });
 
   try {
     // Read workbook
@@ -481,7 +480,7 @@ export async function extractXlsxWithAnchors(
       const sheet = workbook.Sheets[sheetName];
 
       if (!sheet) {
-        console.warn(`⚠️ [XLSX] Sheet "${sheetName}" is null`);
+        logger.warn("[XLSX] Sheet is null", { sheetName });
         continue;
       }
 
@@ -503,9 +502,11 @@ export async function extractXlsxWithAnchors(
       .split(/\s+/)
       .filter((w) => w.length > 0).length;
 
-    console.log(
-      `✅ [XLSX] Extracted ${sheetNames.length} sheets, ${allCellFacts.length} cell facts, ${isFinancial ? "financial" : "non-financial"}`,
-    );
+    logger.info("[XLSX] Extraction complete", {
+      sheetCount: sheetNames.length,
+      cellFactCount: allCellFacts.length,
+      isFinancial,
+    });
 
     return {
       sourceType: "xlsx",
@@ -521,7 +522,7 @@ export async function extractXlsxWithAnchors(
       confidence: 1.0,
     };
   } catch (error: any) {
-    console.error("❌ [XLSX] Extraction failed:", error.message);
+    logger.error("[XLSX] Extraction failed", { error: error.message });
 
     if (
       error.message?.includes("Unsupported file") ||

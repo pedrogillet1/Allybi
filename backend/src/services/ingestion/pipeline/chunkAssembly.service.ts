@@ -7,9 +7,11 @@
 import {
   deduplicateChunkRecords,
   splitTextIntoChunks,
+  splitTextIntoChunksWithOffsets,
 } from "../chunking.service";
+import type { ChunkingPolicy } from "../chunking.service";
 import { logger } from "../../../utils/logger";
-import type { DispatchedExtractionResult } from "../extraction/extractionResult.types";
+import type { DispatchedExtractionResult, ExtractedTable } from "../extraction/extractionResult.types";
 import {
   hasPagesArray,
   hasSlidesArray,
@@ -17,7 +19,67 @@ import {
   hasSheets,
 } from "../extraction/extractionResult.types";
 import type { InputChunk, InputChunkMetadata } from "./pipelineTypes";
-import { normalizeCellUnit } from "./tableUnitNormalization.service";
+import { normalizeCellUnit, checkRowUnitConsistency } from "./tableUnitNormalization.service";
+
+/**
+ * Infer a section heading from the first line of a PDF page.
+ * Heuristic: short (<120 chars), no trailing period/comma, not all-lowercase.
+ */
+/**
+ * Emit cell_fact chunks from structured extracted tables (PDF, DOCX, PPTX).
+ * Mirrors the XLSX cell_fact pattern for cross-format table cell indexing.
+ */
+function emitCellFactChunks(
+  tables: ExtractedTable[],
+  ctxMeta: InputChunkMetadata,
+  sourceType: string,
+  startIdx: number,
+): InputChunk[] {
+  const out: InputChunk[] = [];
+  let idx = startIdx;
+  for (const table of tables) {
+    for (const row of table.rows) {
+      for (const cell of row.cells) {
+        if (!cell.text.trim()) continue;
+        // Build headerPath from the first row (headers)
+        const headerRow = table.rows.find((r) => r.isHeader);
+        const colHeader = headerRow?.cells.find((c) => c.colIndex === cell.colIndex)?.text || "";
+        out.push({
+          chunkIndex: idx++,
+          content: `${row.isHeader ? "Header" : "Cell"}: ${cell.text}`,
+          pageNumber: table.pageOrSlide,
+          metadata: {
+            ...ctxMeta,
+            chunkType: "cell_fact",
+            tableChunkForm: "cell_centric",
+            tableId: table.tableId,
+            rowIndex: row.rowIndex,
+            columnIndex: cell.colIndex,
+            colHeader: colHeader || undefined,
+            headerPath: colHeader ? [colHeader] : undefined,
+            sourceType,
+          },
+        });
+      }
+    }
+  }
+  return out;
+}
+
+function inferPageHeading(pageText: string): string | undefined {
+  const firstLine = pageText.split("\n")[0]?.trim();
+  if (!firstLine) return undefined;
+  if (
+    firstLine.length > 0 &&
+    firstLine.length <= 120 &&
+    !firstLine.endsWith(".") &&
+    !firstLine.endsWith(",") &&
+    firstLine !== firstLine.toLowerCase()
+  ) {
+    return firstLine;
+  }
+  return undefined;
+}
 
 function parseCellRef(cellRef: string): {
   rowIndex: number | null;
@@ -46,10 +108,16 @@ function parseCellRef(cellRef: string): {
   };
 }
 
-function toHeaderPath(rowLabel: string, colHeader: string): string[] {
-  return [String(rowLabel || "").trim(), String(colHeader || "").trim()].filter(
-    Boolean,
-  );
+function toHeaderPath(
+  rowLabel: string,
+  colHeader: string,
+  headerHierarchy?: string[],
+): string[] {
+  const row = String(rowLabel || "").trim();
+  if (headerHierarchy && headerHierarchy.length > 0) {
+    return [row, ...headerHierarchy].filter(Boolean);
+  }
+  return [row, String(colHeader || "").trim()].filter(Boolean);
 }
 
 /**
@@ -59,7 +127,20 @@ function toHeaderPath(rowLabel: string, colHeader: string): string[] {
 export function buildInputChunks(
   extraction: DispatchedExtractionResult,
   fullText: string,
+  policyOverrides?: Partial<ChunkingPolicy>,
+  documentContext?: {
+    documentId?: string;
+    versionId?: string;
+    rootDocumentId?: string;
+    isLatestVersion?: boolean;
+  },
 ): InputChunk[] {
+  const ctxMeta: Partial<InputChunkMetadata> = {};
+  if (documentContext?.documentId) ctxMeta.documentId = documentContext.documentId;
+  if (documentContext?.versionId) ctxMeta.versionId = documentContext.versionId;
+  if (documentContext?.rootDocumentId) ctxMeta.rootDocumentId = documentContext.rootDocumentId;
+  if (documentContext?.isLatestVersion !== undefined) ctxMeta.isLatestVersion = documentContext.isLatestVersion;
+
   // DOCX: Section-boundary chunking
   if (hasSectionsArray(extraction) && extraction.sections.length > 0) {
     const out: InputChunk[] = [];
@@ -67,9 +148,10 @@ export function buildInputChunks(
     let charOffset = 0;
 
     const emitSection = (
-      section: { heading?: string; level?: number; content?: string; path?: string[] },
+      section: { heading?: string; level?: number; content?: string; path?: string[]; pageStart?: number },
       parentPath: string[],
     ) => {
+      const pageNumber = section.pageStart ?? undefined;
       const sectionName = section.heading || undefined;
       const sectionLevel = section.level ?? 1;
       const sectionPath = section.path ?? (sectionName ? [...parentPath, sectionName] : parentPath);
@@ -80,7 +162,9 @@ export function buildInputChunks(
         out.push({
           chunkIndex: idx++,
           content: headingContent,
+          pageNumber,
           metadata: {
+            ...ctxMeta,
             sectionName,
             sectionLevel,
             sectionPath,
@@ -96,23 +180,24 @@ export function buildInputChunks(
       // Section body text chunks
       const bodyText = (section.content || "").trim();
       if (bodyText) {
-        for (const segment of splitTextIntoChunks(bodyText)) {
-          const startChar = charOffset;
-          charOffset += segment.length;
+        for (const seg of splitTextIntoChunksWithOffsets(bodyText, charOffset, policyOverrides)) {
           out.push({
             chunkIndex: idx++,
-            content: segment,
+            content: seg.content,
+            pageNumber,
             metadata: {
+              ...ctxMeta,
               sectionName,
               sectionLevel,
               sectionPath,
               chunkType: "text",
-              startChar,
-              endChar: charOffset,
+              startChar: seg.startChar,
+              endChar: seg.endChar,
               sourceType: "docx",
             },
           });
         }
+        charOffset += bodyText.length;
       }
     };
 
@@ -122,12 +207,21 @@ export function buildInputChunks(
 
     // Fall back to plain-text split if sections yielded nothing
     if (out.length === 0) {
-      const segments = splitTextIntoChunks(fullText.trim());
-      return segments.map((content, i) => ({
+      const segments = splitTextIntoChunks(fullText.trim(), policyOverrides);
+      const fallback = segments.map((content, i) => ({
         chunkIndex: i,
         content,
-        metadata: { chunkType: "text" as const, sourceType: "docx" as const },
+        metadata: { ...ctxMeta, chunkType: "text" as const, sourceType: "docx" as const },
       }));
+      // Emit cell_fact chunks from structured tables even in fallback
+      if (extraction.extractedTables?.length) {
+        fallback.push(...emitCellFactChunks(extraction.extractedTables, ctxMeta, "docx", fallback.length));
+      }
+      return fallback;
+    }
+    // Emit cell_fact chunks from structured tables
+    if (extraction.extractedTables?.length) {
+      out.push(...emitCellFactChunks(extraction.extractedTables, ctxMeta, "docx", idx));
     }
     return out;
   }
@@ -145,11 +239,12 @@ export function buildInputChunks(
       // Sheet text content chunks
       const textContent = (sheet.textContent || "").trim();
       if (textContent) {
-        for (const segment of splitTextIntoChunks(textContent)) {
+        for (const segment of splitTextIntoChunks(textContent, policyOverrides)) {
           out.push({
             chunkIndex: idx++,
             content: segment,
             metadata: {
+              ...ctxMeta,
               sheetName,
               chunkType: "table",
               tableChunkForm: "table_summary",
@@ -164,6 +259,13 @@ export function buildInputChunks(
 
     // Cell facts: group by row label per sheet
     if (extraction.cellFacts && extraction.cellFacts.length > 0) {
+      // Build per-sheet isFinancial lookup
+      const sheetFinancialMap = new Map<string, boolean>();
+      for (const sheet of extraction.sheets) {
+        const name = sheet.sheetName || sheet.name || "Sheet";
+        sheetFinancialMap.set(name, sheet.isFinancial ?? extraction.isFinancial ?? false);
+      }
+
       const bySheetRow = new Map<string, typeof extraction.cellFacts>();
       for (const fact of extraction.cellFacts) {
         const key = `${fact.sheet}||${fact.rowLabel}`;
@@ -184,12 +286,13 @@ export function buildInputChunks(
           colHeader,
           rowLabel,
         });
-        const headerPath = toHeaderPath(rowLabel, colHeader);
+        const headerPath = toHeaderPath(rowLabel, colHeader, fact.headerHierarchy);
         const summaryLeft = headerPath.length
           ? headerPath.join(" / ")
           : cell || "Cell";
 
         const metadata: InputChunkMetadata = {
+          ...ctxMeta,
           sheetName,
           chunkType: "cell_fact",
           tableChunkForm: "cell_centric",
@@ -204,7 +307,7 @@ export function buildInputChunks(
           unitRaw: unit.unitRaw ?? undefined,
           unitNormalized: unit.unitNormalized ?? undefined,
           numericValue: unit.numericValue ?? undefined,
-          isFinancial: extraction.isFinancial ?? false,
+          isFinancial: sheetFinancialMap.get(sheetName) ?? extraction.isFinancial ?? false,
           sourceType: "xlsx",
         };
 
@@ -224,18 +327,53 @@ export function buildInputChunks(
           (f) => `${f.colHeader}: ${f.displayValue || f.value}`,
         );
         const content = `${rowLabel}: ${cellParts.join(" | ")}`;
+
+        // Aggregate dominant unit from row's cell facts
+        const unitCounts = new Map<string, number>();
+        let dominantUnit: { unitRaw?: string; unitNormalized?: string } = {};
+        for (const f of facts) {
+          const u = normalizeCellUnit({
+            value: String(f.displayValue || f.value || ""),
+            colHeader: String(f.colHeader || ""),
+            rowLabel: String(f.rowLabel || ""),
+          });
+          if (u.unitNormalized) {
+            const count = (unitCounts.get(u.unitNormalized) || 0) + 1;
+            unitCounts.set(u.unitNormalized, count);
+            if (!dominantUnit.unitNormalized || count > (unitCounts.get(dominantUnit.unitNormalized!) || 0)) {
+              dominantUnit = { unitRaw: u.unitRaw ?? undefined, unitNormalized: u.unitNormalized };
+            }
+          }
+        }
+
+        const cellUnits = facts.map((f) => {
+          const u = normalizeCellUnit({
+            value: String(f.displayValue || f.value || ""),
+            colHeader: String(f.colHeader || ""),
+            rowLabel: String(f.rowLabel || ""),
+          });
+          return { unitNormalized: u.unitNormalized, cellRef: String(f.cell || "") };
+        });
+        const consistency = checkRowUnitConsistency(cellUnits);
+
         out.push({
           chunkIndex: idx++,
           content,
           metadata: {
+            ...ctxMeta,
             sheetName,
             chunkType: "cell_fact",
             tableChunkForm: "row_aggregate",
             tableId,
             rowLabel,
             headerPath: rowLabel ? [rowLabel] : undefined,
-            isFinancial: extraction.isFinancial ?? false,
+            unitRaw: dominantUnit.unitRaw,
+            unitNormalized: dominantUnit.unitNormalized,
+            isFinancial: sheetFinancialMap.get(sheetName) ?? extraction.isFinancial ?? false,
             sourceType: "xlsx",
+            unitConsistencyWarning: consistency.consistent
+              ? undefined
+              : `mixed_units:${consistency.conflicts.map((c) => c.unit).join(",")}`,
           },
         });
       }
@@ -250,25 +388,59 @@ export function buildInputChunks(
     const out: InputChunk[] = [];
     let idx = 0;
     let charOffset = 0;
+
+    // Build a lookup from 0-based pageIndex to outline entries when available.
+    // outlines[].pageIndex is 0-based; extraction.pages[].page is 1-based.
+    const outlinesByPage = new Map<number, { title: string; level: number }>();
+    const outlines = (extraction as any).outlines as
+      | Array<{ title: string; level: number; pageIndex: number }>
+      | undefined;
+    if (outlines && outlines.length > 0) {
+      for (const entry of outlines) {
+        // Use the first (highest-level) outline entry per page
+        if (!outlinesByPage.has(entry.pageIndex)) {
+          outlinesByPage.set(entry.pageIndex, {
+            title: entry.title,
+            level: entry.level,
+          });
+        }
+      }
+    }
+
     for (const p of extraction.pages) {
       const pageText = (p.text || "").trim();
-      if (!pageText) continue;
-      for (const segment of splitTextIntoChunks(pageText)) {
-        const startChar = charOffset;
-        charOffset += segment.length;
+      if (!pageText) {
+        continue;
+      }
+
+      // Prefer outline-derived section name; fall back to heuristic heading
+      const pageIndex = p.page - 1; // convert 1-based page to 0-based index
+      const outlineEntry = outlinesByPage.get(pageIndex);
+      const sectionName = outlineEntry?.title ?? inferPageHeading(pageText);
+      const sectionLevel = outlineEntry?.level;
+
+      for (const seg of splitTextIntoChunksWithOffsets(pageText, charOffset, policyOverrides)) {
         out.push({
           chunkIndex: idx++,
-          content: segment,
+          content: seg.content,
           pageNumber: p.page,
           metadata: {
+            ...ctxMeta,
             chunkType: "text",
-            startChar,
-            endChar: charOffset,
+            sectionName,
+            ...(sectionLevel !== undefined ? { sectionLevel } : {}),
+            startChar: seg.startChar,
+            endChar: seg.endChar,
             ocrConfidence: extraction.ocrConfidence ?? undefined,
             sourceType: "pdf",
           },
         });
       }
+      charOffset += pageText.length + 1; // +1 for page separator
+    }
+    // Emit cell_fact chunks from structured tables
+    if (extraction.extractedTables?.length) {
+      out.push(...emitCellFactChunks(extraction.extractedTables, ctxMeta, "pdf", idx));
     }
     return out;
   }
@@ -277,6 +449,7 @@ export function buildInputChunks(
   if (hasSlidesArray(extraction) && extraction.slides.length > 0) {
     const out: InputChunk[] = [];
     let idx = 0;
+    let charOffset = 0;
     for (const s of extraction.slides) {
       const slideTitle = s.title || undefined;
 
@@ -287,59 +460,76 @@ export function buildInputChunks(
           content: slideTitle,
           pageNumber: s.slide,
           metadata: {
+            ...ctxMeta,
             chunkType: "heading",
             slideTitle,
+            startChar: charOffset,
+            endChar: charOffset + slideTitle.length,
             sourceType: "pptx",
           },
         });
+        charOffset += slideTitle.length + 1;
       }
 
       // Slide body text
       const bodyText = (s.text || "").trim();
       if (bodyText) {
-        for (const segment of splitTextIntoChunks(bodyText)) {
+        for (const seg of splitTextIntoChunksWithOffsets(bodyText, charOffset, policyOverrides)) {
           out.push({
             chunkIndex: idx++,
-            content: segment,
+            content: seg.content,
             pageNumber: s.slide,
             metadata: {
+              ...ctxMeta,
               chunkType: "text",
               slideTitle,
+              startChar: seg.startChar,
+              endChar: seg.endChar,
               sourceType: "pptx",
             },
           });
         }
+        charOffset += bodyText.length + 1;
       }
 
       // Slide notes as separate chunk
       if (s.notes) {
         const notesText = s.notes.trim();
         if (notesText) {
-          for (const segment of splitTextIntoChunks(`Notes: ${notesText}`)) {
+          const notesContent = `Notes: ${notesText}`;
+          for (const seg of splitTextIntoChunksWithOffsets(notesContent, charOffset, policyOverrides)) {
             out.push({
               chunkIndex: idx++,
-              content: segment,
+              content: seg.content,
               pageNumber: s.slide,
               metadata: {
+                ...ctxMeta,
                 chunkType: "notes",
                 slideTitle,
                 hasNotes: true,
+                startChar: seg.startChar,
+                endChar: seg.endChar,
                 sourceType: "pptx",
               },
             });
           }
+          charOffset += notesContent.length + 1;
         }
       }
+    }
+    // Emit cell_fact chunks from structured tables
+    if (extraction.extractedTables?.length) {
+      out.push(...emitCellFactChunks(extraction.extractedTables, ctxMeta, "pptx", idx));
     }
     return out;
   }
 
   // Fallback: For plain text / unknown formats
-  const segments = splitTextIntoChunks(fullText.trim());
+  const segments = splitTextIntoChunks(fullText.trim(), policyOverrides);
   return segments.map((content, idx) => ({
     chunkIndex: idx,
     content,
-    metadata: { chunkType: "text" as const, sourceType: "text" as const },
+    metadata: { ...ctxMeta, chunkType: "text" as const, sourceType: "text" as const },
   }));
 }
 

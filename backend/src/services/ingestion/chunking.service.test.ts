@@ -161,6 +161,26 @@ describe("chunking.service", () => {
     expect(deduped.map((row) => row.id)).toEqual(["a", "b"]);
   });
 
+  test("customAbbreviations prevents sentence break on domain terms", () => {
+    // "EBITDA." followed by lowercase should not split when ebitda is in custom list
+    const text =
+      "The company reported EBITDA. adjusted for one-time items the margin improved significantly over the prior year period. " +
+      "A".repeat(1500);
+
+    const withCustom = splitTextIntoChunks(text, {
+      targetChars: 200,
+      overlapChars: 20,
+      customAbbreviations: ["ebitda"],
+    });
+
+    // Without custom abbreviations, the abbreviation heuristic in isAbbreviationDot
+    // already catches this because lowercase follows. But let's verify the explicit path.
+    // The key invariant: "EBITDA." and "adjusted" must be in the same chunk.
+    const chunkWithEbitda = withCustom.find((c) => c.includes("EBITDA."));
+    expect(chunkWithEbitda).toBeDefined();
+    expect(chunkWithEbitda).toContain("adjusted");
+  });
+
   test("deduplicateChunkRecords: records without metadata use default namespace", () => {
     const rows = [
       { id: "a", content: "alpha beta gamma delta epsilon zeta eta theta" },

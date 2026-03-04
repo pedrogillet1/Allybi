@@ -1,0 +1,227 @@
+{
+  "_meta": {
+    "id": "section_priority_identity",
+    "version": "1.0.0",
+    "description": "Section-priority rules for identity retrieval scanning order by intent and document type.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-04",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/retrieval/retrievalEngine.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "identity",
+    "mode": "deterministic_scan_order",
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
+  },
+  "domain": "identity",
+  "rules": [
+    {
+      "id": "identity_advise_primary_sections",
+      "enabled": true,
+      "priority": 95,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "advise"
+      ],
+      "domains": [
+        "identity"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "personal_information",
+        "document_details",
+        "validity_information",
+        "issuing_authority",
+        "biometric_data"
+      ],
+      "docTypes": [
+        "birth_certificate",
+        "business_registration_certificate",
+        "driver_license",
+        "marriage_license",
+        "passport",
+        "proof_of_address",
+        "social_security_card",
+        "visa",
+        "voter_registration"
+      ]
+    },
+    {
+      "id": "identity_calculate_primary_sections",
+      "enabled": true,
+      "priority": 92,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "calculate"
+      ],
+      "domains": [
+        "identity"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "validity_information",
+        "document_details",
+        "issuing_authority",
+        "personal_information",
+        "biometric_data"
+      ],
+      "docTypes": [
+        "birth_certificate",
+        "business_registration_certificate",
+        "driver_license",
+        "marriage_license",
+        "passport",
+        "proof_of_address",
+        "social_security_card",
+        "visa",
+        "voter_registration"
+      ]
+    },
+    {
+      "id": "identity_compare_primary_sections",
+      "enabled": true,
+      "priority": 90,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "compare"
+      ],
+      "domains": [
+        "identity"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "document_details",
+        "personal_information",
+        "validity_information",
+        "issuing_authority",
+        "biometric_data"
+      ],
+      "docTypes": [
+        "birth_certificate",
+        "business_registration_certificate",
+        "driver_license",
+        "marriage_license",
+        "passport",
+        "proof_of_address",
+        "social_security_card",
+        "visa",
+        "voter_registration"
+      ]
+    },
+    {
+      "id": "identity_extract_primary_sections",
+      "enabled": true,
+      "priority": 88,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "extract"
+      ],
+      "domains": [
+        "identity"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "personal_information",
+        "document_details",
+        "biometric_data",
+        "validity_information",
+        "issuing_authority"
+      ],
+      "docTypes": [
+        "birth_certificate",
+        "business_registration_certificate",
+        "driver_license",
+        "marriage_license",
+        "passport",
+        "proof_of_address",
+        "social_security_card",
+        "visa",
+        "voter_registration"
+      ]
+    },
+    {
+      "id": "identity_summarize_primary_sections",
+      "enabled": true,
+      "priority": 86,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "summarize"
+      ],
+      "domains": [
+        "identity"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "personal_information",
+        "document_details",
+        "validity_information",
+        "issuing_authority",
+        "biometric_data"
+      ],
+      "docTypes": [
+        "birth_certificate",
+        "business_registration_certificate",
+        "driver_license",
+        "marriage_license",
+        "passport",
+        "proof_of_address",
+        "social_security_card",
+        "visa",
+        "voter_registration"
+      ]
+    },
+    {
+      "id": "identity_locate_primary_sections",
+      "enabled": true,
+      "priority": 85,
+      "intents": [
+        "documents"
+      ],
+      "operators": [
+        "locate"
+      ],
+      "domains": [
+        "identity"
+      ],
+      "requireDomainMatch": true,
+      "sections": [
+        "document_details",
+        "issuing_authority",
+        "personal_information",
+        "validity_information",
+        "biometric_data"
+      ],
+      "docTypes": [
+        "birth_certificate",
+        "business_registration_certificate",
+        "driver_license",
+        "marriage_license",
+        "passport",
+        "proof_of_address",
+        "social_security_card",
+        "visa",
+        "voter_registration"
+      ]
+    }
+  ]
+}

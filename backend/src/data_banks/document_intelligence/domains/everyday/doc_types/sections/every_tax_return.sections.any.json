@@ -25,11 +25,10 @@
       "id": "document_header",
       "name": {
         "en": "Document Header",
-        "pt": "Cabecalho do Documento"
+        "pt": "Cabeçalho do Documento"
       },
       "order": 1,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "return",
         "tax return",
@@ -45,7 +44,6 @@
       },
       "order": 2,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "taxpayer",
         "nome",
@@ -58,11 +56,10 @@
       "id": "filing_section",
       "name": {
         "en": "Filing Information",
-        "pt": "Informacoes de Entrega"
+        "pt": "Informações de Entrega"
       },
       "order": 3,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "fiscal year",
         "tax year",
@@ -78,7 +75,6 @@
       },
       "order": 4,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "income",
         "wages",
@@ -94,7 +90,6 @@
       },
       "order": 5,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "deduction",
         "dependents",
@@ -110,7 +105,6 @@
       },
       "order": 6,
       "required": false,
-      "mustHave": false,
       "headingAnchors": [
         "credits",
         "withholding",
@@ -126,7 +120,6 @@
       },
       "order": 7,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "tax summary",
         "total due",
@@ -142,7 +135,6 @@
       },
       "order": 8,
       "required": false,
-      "mustHave": false,
       "headingAnchors": [
         "refund",
         "payment",
@@ -158,7 +150,6 @@
       },
       "order": 9,
       "required": false,
-      "mustHave": false,
       "headingAnchors": [
         "signature",
         "authorized",
@@ -173,7 +164,6 @@
       },
       "order": 10,
       "required": false,
-      "mustHave": false,
       "headingAnchors": [
         "footnote",
         "annex",

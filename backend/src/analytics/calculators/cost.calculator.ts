@@ -225,9 +225,9 @@ export function calculateCostSeries(
 
 // Test vectors
 // Input: [
-//   { ts: "2024-01-15T10:00:00Z", provider: "openai", model: "gpt-4", inputTokens: 1000, outputTokens: 500, costUsd: 0.05, status: "ok" },
-//   { ts: "2024-01-15T10:01:00Z", provider: "openai", model: "gpt-4", inputTokens: 2000, outputTokens: 1000, costUsd: 0.10, status: "ok" },
-//   { ts: "2024-01-15T10:02:00Z", provider: "anthropic", model: "claude-3", inputTokens: 500, outputTokens: 200, costUsd: 0.02, status: "error" }
+//   { ts: "2024-01-15T10:00:00Z", provider: "openai", model: "gpt-5.2", inputTokens: 1000, outputTokens: 500, costUsd: 0.05, status: "ok" },
+//   { ts: "2024-01-15T10:01:00Z", provider: "openai", model: "gpt-5.2", inputTokens: 2000, outputTokens: 1000, costUsd: 0.10, status: "ok" },
+//   { ts: "2024-01-15T10:02:00Z", provider: "gemini", model: "gemini-2.5-flash", inputTokens: 500, outputTokens: 200, costUsd: 0.02, status: "error" }
 // ]
 // opts: { includeErrors: false }
 // Expected: totalCostUsd: 0.15, totalInputTokens: 3000, totalOutputTokens: 1500, totalCalls: 2

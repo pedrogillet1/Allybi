@@ -1,0 +1,59 @@
+{
+  "_meta": {
+    "id": "di_identity_tables_id_social_security_card",
+    "version": "2.0.0",
+    "description": "Table patterns for id_social_security_card.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-04",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "identity",
+    "docType": "id_social_security_card"
+  },
+  "tables": [
+    {
+      "id": "ssn_summary_table",
+      "name": {
+        "en": "SSN Summary Table",
+        "pt": "Tabela Resumo do SSN"
+      },
+      "section": "ssn_details",
+      "expectedColumns": [
+        "field",
+        "value"
+      ],
+      "keyRows": [
+        "ssn_number",
+        "full_name",
+        "card_type"
+      ]
+    },
+    {
+      "id": "cardholder_table",
+      "name": {
+        "en": "Cardholder Table",
+        "pt": "Tabela do Titular"
+      },
+      "section": "cardholder_information",
+      "expectedColumns": [
+        "field",
+        "value"
+      ],
+      "keyRows": [
+        "name",
+        "date_of_birth",
+        "issue_date"
+      ]
+    }
+  ]
+}

@@ -38,7 +38,7 @@ function createInput(
     env: "local" as any,
     route: {
       provider: "openai",
-      model: "gpt-5-mini",
+      model: "gpt-5.2",
       reason: "quality_finish",
       stage: "final",
       constraints: {},

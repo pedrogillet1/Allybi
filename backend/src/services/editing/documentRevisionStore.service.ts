@@ -34,6 +34,7 @@ import { looksLikeTruncatedSpanPayload } from "./docxSpanPayloadGuard";
 import SpreadsheetEngineService from "../spreadsheetEngine/spreadsheetEngine.service";
 import type { SpreadsheetEngineOp } from "../spreadsheetEngine/spreadsheetEngine.types";
 import { getRuntimeOperatorContract } from "./contracts";
+import { redisConnection } from "../../config/redis";
 
 function asString(v: unknown): string | null {
   return typeof v === "string" && v.trim() ? v.trim() : null;
@@ -71,7 +72,7 @@ function assertPptxMime(
 type EditingSaveMode = "overwrite" | "revision";
 
 function editingSaveMode(): EditingSaveMode {
-  const raw = String(process.env.KODA_EDITING_SAVE_MODE || "overwrite")
+  const raw = String(process.env.KODA_EDITING_SAVE_MODE || "revision")
     .trim()
     .toLowerCase();
   return raw === "revision" ? "revision" : "overwrite";
@@ -342,6 +343,8 @@ type EditOperatorLike =
   | "REWRITE_SLIDE_TEXT"
   | "REPLACE_SLIDE_IMAGE";
 
+const IDEMPOTENCY_TTL_SECONDS = 1800; // 30 minutes
+
 export class DocumentRevisionStoreService implements EditRevisionStore {
   private readonly idempotencyResults = new Map<
     string,
@@ -369,6 +372,62 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
     this.sheetsBridge = opts?.sheetsBridge ?? new SheetsBridgeService();
     this.spreadsheetEngine =
       opts?.spreadsheetEngine ?? new SpreadsheetEngineService();
+  }
+
+  /**
+   * Get idempotency result from L1 (in-memory) or L2 (Redis).
+   */
+  private async getIdempotencyResult(
+    key: string,
+  ): Promise<{ revisionId: string } | null> {
+    // L1: in-memory
+    const cached = this.idempotencyResults.get(key);
+    if (cached?.revisionId) return { revisionId: cached.revisionId };
+
+    // L2: Redis (graceful fallback)
+    if (redisConnection) {
+      try {
+        const redisKey = `idempotency:${key}`;
+        const val = await redisConnection.get<string>(redisKey);
+        if (val) {
+          // Promote to L1
+          this.idempotencyResults.set(key, {
+            revisionId: val,
+            createdAtMs: Date.now(),
+          });
+          return { revisionId: val };
+        }
+      } catch {
+        // Redis unavailable — fall through silently
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Set idempotency result in L1 (in-memory) + L2 (Redis).
+   */
+  private async setIdempotencyResult(
+    key: string,
+    revisionId: string,
+  ): Promise<void> {
+    // L1: in-memory
+    this.idempotencyResults.set(key, {
+      revisionId,
+      createdAtMs: Date.now(),
+    });
+
+    // L2: Redis with TTL (graceful fallback)
+    if (redisConnection) {
+      try {
+        const redisKey = `idempotency:${key}`;
+        await redisConnection.set(redisKey, revisionId, {
+          ex: IDEMPOTENCY_TTL_SECONDS,
+        });
+      } catch {
+        // Redis unavailable — L1 still works
+      }
+    }
   }
 
   private async reprocessEditedDocument(input: {
@@ -589,7 +648,7 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
     if (idempotencyKey) {
       this.sweepIdempotency();
       const dedupeKey = `${userId}:${docId}:${idempotencyKey}`;
-      const previous = this.idempotencyResults.get(dedupeKey);
+      const previous = await this.getIdempotencyResult(dedupeKey);
       if (previous?.revisionId) return { revisionId: previous.revisionId };
     }
 
@@ -1671,8 +1730,9 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
     // Default: overwrite the original stored file (no new document in the user's library).
     // "revision" mode keeps the old behavior for debugging/back-compat.
     if (editingSaveMode() === "overwrite") {
-      // Optional hidden backup so Undo works without creating visible library duplicates.
-      if (keepUndoHistory()) {
+      // Always create a backup before overwrite — destruction of the original
+      // must never proceed without a successful backup.
+      try {
         await this.revisionService.createRevision(
           {
             userId,
@@ -1696,9 +1756,16 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
             clientMessageId: input.clientMessageId,
           },
         );
+      } catch (backupErr) {
+        logger.error("[RevisionStore] Backup failed, aborting overwrite", {
+          documentId: docId,
+          operator: op,
+          error: backupErr instanceof Error ? backupErr.message : String(backupErr),
+        });
+        throw new Error(`BACKUP_FAILED: Cannot overwrite without backup.`);
       }
 
-      // Overwrite content at the same storage key.
+      // Only after backup confirmed: overwrite content at the same storage key.
       await uploadFile(
         doc.encryptedFilename,
         edited,
@@ -1878,10 +1945,7 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
 
       if (idempotencyKey) {
         const dedupeKey = `${userId}:${docId}:${idempotencyKey}`;
-        this.idempotencyResults.set(dedupeKey, {
-          revisionId: docId,
-          createdAtMs: Date.now(),
-        });
+        await this.setIdempotencyResult(dedupeKey, docId);
       }
       const applyMetrics =
         (meta as any).__applyMetrics &&
@@ -1921,10 +1985,7 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
 
     if (idempotencyKey) {
       const dedupeKey = `${userId}:${docId}:${idempotencyKey}`;
-      this.idempotencyResults.set(dedupeKey, {
-        revisionId: created.id,
-        createdAtMs: Date.now(),
-      });
+      await this.setIdempotencyResult(dedupeKey, created.id);
     }
     const applyMetrics =
       (meta as any).__applyMetrics &&
@@ -2142,8 +2203,9 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
       if (!restoreDoc?.encryptedFilename)
         throw new Error("Restore revision storage key missing.");
 
-      // Optional: backup current state before undo (kept hidden) so repeated undo doesn't destroy history.
-      if (keepUndoHistory()) {
+      // Always backup current state before undo — destruction of the original
+      // must never proceed without a successful backup.
+      try {
         await this.revisionService.createRevision(
           {
             userId,
@@ -2157,6 +2219,13 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
           },
           { userId },
         );
+      } catch (backupErr) {
+        logger.error("[RevisionStore] Undo backup failed, aborting restore", {
+          documentId: docId,
+          restoreFromId,
+          error: backupErr instanceof Error ? backupErr.message : String(backupErr),
+        });
+        throw new Error(`BACKUP_FAILED: Cannot undo without backup.`);
       }
 
       const bytes = await downloadFile(restoreDoc.encryptedFilename);

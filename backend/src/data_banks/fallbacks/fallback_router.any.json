@@ -156,7 +156,7 @@
       "do": {
         "action": "regen_with_stricter_model",
         "fallbackProvider": "openai",
-        "fallbackModelKey": "GPT_5_MINI",
+        "fallbackModelKey": "GPT_5_2",
         "telemetryReason": "WEAK_EVIDENCE"
       }
     },
@@ -189,7 +189,7 @@
       "do": {
         "action": "switch_provider",
         "fallbackProvider": "openai",
-        "fallbackModelKey": "GPT_5_MINI",
+        "fallbackModelKey": "GPT_5_2",
         "telemetryReason": "PROVIDER_DOWN"
       }
     },

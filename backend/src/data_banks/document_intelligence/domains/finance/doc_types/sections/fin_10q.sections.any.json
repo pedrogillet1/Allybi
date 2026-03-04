@@ -1,12 +1,12 @@
 {
   "_meta": {
     "id": "di_finance_sections_fin_10q",
-    "version": "2.1.0",
+    "version": "3.0.0",
     "description": "Sections mapping for 10-Q Quarterly Report.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-03-03",
+    "lastUpdated": "2026-03-04",
     "owner": "data-bank-governance",
     "usedBy": [
       "services/core/banks/dataBankLoader.service.ts"
@@ -22,1368 +22,175 @@
   },
   "sections": [
     {
-      "id": "period_changes_1",
+      "id": "period_changes",
       "name": {
-        "en": "Period Changes Segment 1",
-        "pt": "Period Changes segmento 1"
+        "en": "Period Changes",
+        "pt": "Period Changes"
       },
-      "mustHave": true,
+      "required": true,
       "order": 1,
       "headingAnchors": [
-        "Period Changes 1",
-        "period_changes 1",
-        "Period Changes section",
-        "seção Period Changes 1"
-      ],
-      "confidence": 0.81,
-      "fallbackPatterns": [
-        "\bperiod_changes\b",
-        "\bperiod_changes_1\b",
-        "\bperiod_changes section\b"
-      ],
-      "description": "Canonical section period_changes for 10-Q Quarterly Report"
+        "period changes"
+      ]
     },
     {
-      "id": "financial_statements_2",
+      "id": "financial_statements",
       "name": {
-        "en": "Financial Statements Segment 2",
-        "pt": "Financial Statements segmento 2"
+        "en": "Financial Statements",
+        "pt": "Demonstrações Financeiras"
       },
-      "mustHave": true,
+      "required": true,
       "order": 2,
       "headingAnchors": [
-        "Financial Statements 2",
-        "financial_statements 2",
-        "Financial Statements section",
-        "seção Financial Statements 2"
-      ],
-      "confidence": 0.82,
-      "fallbackPatterns": [
-        "\bfinancial_statements\b",
-        "\bfinancial_statements_2\b",
-        "\bfinancial_statements section\b"
-      ],
-      "description": "Canonical section financial_statements for 10-Q Quarterly Report"
+        "Financial Statements",
+        "Demonstrações Financeiras"
+      ]
     },
     {
-      "id": "income_statement_3",
+      "id": "income_statement",
       "name": {
-        "en": "Income Statement Segment 3",
-        "pt": "Income Statement segmento 3"
+        "en": "Income Statement",
+        "pt": "Demonstração de Resultado"
       },
-      "mustHave": true,
+      "required": true,
       "order": 3,
       "headingAnchors": [
-        "Income Statement 3",
-        "income_statement 3",
-        "Income Statement section",
-        "seção Income Statement 3"
-      ],
-      "confidence": 0.83,
-      "fallbackPatterns": [
-        "\bincome_statement\b",
-        "\bincome_statement_3\b",
-        "\bincome_statement section\b"
-      ],
-      "description": "Canonical section income_statement for 10-Q Quarterly Report"
+        "Income Statement",
+        "Demonstração de Resultado"
+      ]
     },
     {
-      "id": "cash_flow_4",
+      "id": "cash_flow",
       "name": {
-        "en": "Cash Flow Segment 4",
-        "pt": "Cash Flow segmento 4"
+        "en": "Cash Flow",
+        "pt": "Cash Flow"
       },
-      "mustHave": true,
+      "required": true,
       "order": 4,
       "headingAnchors": [
-        "Cash Flow 4",
-        "cash_flow 4",
-        "Cash Flow section",
-        "seção Cash Flow 4"
-      ],
-      "confidence": 0.84,
-      "fallbackPatterns": [
-        "\bcash_flow\b",
-        "\bcash_flow_4\b",
-        "\bcash_flow section\b"
-      ],
-      "description": "Canonical section cash_flow for 10-Q Quarterly Report"
+        "cash flow"
+      ]
     },
     {
-      "id": "cash_position_5",
+      "id": "cash_position",
       "name": {
-        "en": "Cash Position Segment 5",
-        "pt": "Cash Position segmento 5"
+        "en": "Cash Position",
+        "pt": "Cash Position"
       },
-      "mustHave": true,
+      "required": true,
       "order": 5,
       "headingAnchors": [
-        "Cash Position 5",
-        "cash_position 5",
-        "Cash Position section",
-        "seção Cash Position 5"
-      ],
-      "confidence": 0.85,
-      "fallbackPatterns": [
-        "\bcash_position\b",
-        "\bcash_position_5\b",
-        "\bcash_position section\b"
-      ],
-      "description": "Canonical section cash_position for 10-Q Quarterly Report"
+        "cash position"
+      ]
     },
     {
-      "id": "mdna_6",
+      "id": "mdna",
       "name": {
-        "en": "Mdna Segment 6",
-        "pt": "Mdna segmento 6"
+        "en": "Mdna",
+        "pt": "Mdna"
       },
-      "mustHave": true,
+      "required": true,
       "order": 6,
       "headingAnchors": [
-        "Mdna 6",
-        "mdna 6",
-        "Mdna section",
-        "seção Mdna 6"
-      ],
-      "confidence": 0.86,
-      "fallbackPatterns": [
-        "\bmdna\b",
-        "\bmdna_6\b",
-        "\bmdna section\b"
-      ],
-      "description": "Canonical section mdna for 10-Q Quarterly Report"
+        "mdna"
+      ]
     },
     {
-      "id": "risk_factors_7",
+      "id": "risk_factors",
       "name": {
-        "en": "Risk Factors Segment 7",
-        "pt": "Risk Factors segmento 7"
+        "en": "Risk Factors",
+        "pt": "Fatores de Risco"
       },
-      "mustHave": true,
+      "required": true,
       "order": 7,
       "headingAnchors": [
-        "Risk Factors 7",
-        "risk_factors 7",
-        "Risk Factors section",
-        "seção Risk Factors 7"
-      ],
-      "confidence": 0.87,
-      "fallbackPatterns": [
-        "\brisk_factors\b",
-        "\brisk_factors_7\b",
-        "\brisk_factors section\b"
-      ],
-      "description": "Canonical section risk_factors for 10-Q Quarterly Report"
+        "Risk Factors",
+        "Fatores de Risco"
+      ]
     },
     {
-      "id": "off_balance_sheet_8",
+      "id": "off_balance_sheet",
       "name": {
-        "en": "Off Balance Sheet Segment 8",
-        "pt": "Off Balance Sheet segmento 8"
+        "en": "Off Balance Sheet",
+        "pt": "Off Balance Sheet"
       },
-      "mustHave": true,
+      "required": true,
       "order": 8,
       "headingAnchors": [
-        "Off Balance Sheet 8",
-        "off_balance_sheet 8",
-        "Off Balance Sheet section",
-        "seção Off Balance Sheet 8"
-      ],
-      "confidence": 0.88,
-      "fallbackPatterns": [
-        "\boff_balance_sheet\b",
-        "\boff_balance_sheet_8\b",
-        "\boff_balance_sheet section\b"
-      ],
-      "description": "Canonical section off_balance_sheet for 10-Q Quarterly Report"
+        "off balance sheet"
+      ]
     },
     {
-      "id": "notes_to_financial_statements_9",
+      "id": "notes_to_financial_statements",
       "name": {
-        "en": "Notes To Financial Statements Segment 9",
-        "pt": "Notes To Financial Statements segmento 9"
+        "en": "Notes To Financial Statements",
+        "pt": "Notes To Financial Statements"
       },
-      "mustHave": true,
+      "required": true,
       "order": 9,
       "headingAnchors": [
-        "Notes To Financial Statements 9",
-        "notes_to_financial_statements 9",
-        "Notes To Financial Statements section",
-        "seção Notes To Financial Statements 9"
-      ],
-      "confidence": 0.89,
-      "fallbackPatterns": [
-        "\bnotes_to_financial_statements\b",
-        "\bnotes_to_financial_statements_9\b",
-        "\bnotes_to_financial_statements section\b"
-      ],
-      "description": "Canonical section notes_to_financial_statements for 10-Q Quarterly Report"
+        "notes to financial statements"
+      ]
     },
     {
-      "id": "segment_performance_10",
+      "id": "segment_performance",
       "name": {
-        "en": "Segment Performance Segment 10",
-        "pt": "Segment Performance segmento 10"
+        "en": "Segment Performance",
+        "pt": "Segment Performance"
       },
-      "mustHave": true,
+      "required": false,
       "order": 10,
       "headingAnchors": [
-        "Segment Performance 10",
-        "segment_performance 10",
-        "Segment Performance section",
-        "seção Segment Performance 10"
-      ],
-      "confidence": 0.9,
-      "fallbackPatterns": [
-        "\bsegment_performance\b",
-        "\bsegment_performance_10\b",
-        "\bsegment_performance section\b"
-      ],
-      "description": "Canonical section segment_performance for 10-Q Quarterly Report"
+        "segment performance"
+      ]
     },
     {
-      "id": "revenue_detail_11",
+      "id": "revenue_detail",
       "name": {
-        "en": "Revenue Detail Segment 11",
-        "pt": "Revenue Detail segmento 11"
+        "en": "Revenue Detail",
+        "pt": "Revenue Detail"
       },
-      "mustHave": false,
+      "required": false,
       "order": 11,
       "headingAnchors": [
-        "Revenue Detail 11",
-        "revenue_detail 11",
-        "Revenue Detail section",
-        "seção Revenue Detail 11"
-      ],
-      "confidence": 0.91,
-      "fallbackPatterns": [
-        "\brevenue_detail\b",
-        "\brevenue_detail_11\b",
-        "\brevenue_detail section\b"
-      ],
-      "description": "Canonical section revenue_detail for 10-Q Quarterly Report"
+        "revenue detail"
+      ]
     },
     {
-      "id": "guidance_update_12",
+      "id": "guidance_update",
       "name": {
-        "en": "Guidance Update Segment 12",
-        "pt": "Guidance Update segmento 12"
+        "en": "Guidance Update",
+        "pt": "Guidance Update"
       },
-      "mustHave": false,
+      "required": false,
       "order": 12,
       "headingAnchors": [
-        "Guidance Update 12",
-        "guidance_update 12",
-        "Guidance Update section",
-        "seção Guidance Update 12"
-      ],
-      "confidence": 0.92,
-      "fallbackPatterns": [
-        "\bguidance_update\b",
-        "\bguidance_update_12\b",
-        "\bguidance_update section\b"
-      ],
-      "description": "Canonical section guidance_update for 10-Q Quarterly Report"
+        "guidance update"
+      ]
     },
     {
-      "id": "management_commentary_13",
+      "id": "management_commentary",
       "name": {
-        "en": "Management Commentary Segment 13",
-        "pt": "Management Commentary segmento 13"
+        "en": "Management Commentary",
+        "pt": "Management Commentary"
       },
-      "mustHave": false,
+      "required": false,
       "order": 13,
       "headingAnchors": [
-        "Management Commentary 13",
-        "management_commentary 13",
-        "Management Commentary section",
-        "seção Management Commentary 13"
-      ],
-      "confidence": 0.93,
-      "fallbackPatterns": [
-        "\bmanagement_commentary\b",
-        "\bmanagement_commentary_13\b",
-        "\bmanagement_commentary section\b"
-      ],
-      "description": "Canonical section management_commentary for 10-Q Quarterly Report"
+        "management commentary"
+      ]
     },
     {
-      "id": "quarterly_summary_14",
+      "id": "quarterly_summary",
       "name": {
-        "en": "Quarterly Summary Segment 14",
-        "pt": "Quarterly Summary segmento 14"
+        "en": "Quarterly Summary",
+        "pt": "Quarterly Summary"
       },
-      "mustHave": false,
+      "required": false,
       "order": 14,
       "headingAnchors": [
-        "Quarterly Summary 14",
-        "quarterly_summary 14",
-        "Quarterly Summary section",
-        "seção Quarterly Summary 14"
-      ],
-      "confidence": 0.94,
-      "fallbackPatterns": [
-        "\bquarterly_summary\b",
-        "\bquarterly_summary_14\b",
-        "\bquarterly_summary section\b"
-      ],
-      "description": "Canonical section quarterly_summary for 10-Q Quarterly Report"
-    },
-    {
-      "id": "period_changes_15",
-      "name": {
-        "en": "Period Changes Segment 15",
-        "pt": "Period Changes segmento 15"
-      },
-      "mustHave": false,
-      "order": 15,
-      "headingAnchors": [
-        "Period Changes 15",
-        "period_changes 15",
-        "Period Changes section",
-        "seção Period Changes 15"
-      ],
-      "confidence": 0.8,
-      "fallbackPatterns": [
-        "\bperiod_changes\b",
-        "\bperiod_changes_15\b",
-        "\bperiod_changes section\b"
-      ],
-      "description": "Canonical section period_changes for 10-Q Quarterly Report"
-    },
-    {
-      "id": "financial_statements_16",
-      "name": {
-        "en": "Financial Statements Segment 16",
-        "pt": "Financial Statements segmento 16"
-      },
-      "mustHave": false,
-      "order": 16,
-      "headingAnchors": [
-        "Financial Statements 16",
-        "financial_statements 16",
-        "Financial Statements section",
-        "seção Financial Statements 16"
-      ],
-      "confidence": 0.81,
-      "fallbackPatterns": [
-        "\bfinancial_statements\b",
-        "\bfinancial_statements_16\b",
-        "\bfinancial_statements section\b"
-      ],
-      "description": "Canonical section financial_statements for 10-Q Quarterly Report"
-    },
-    {
-      "id": "income_statement_17",
-      "name": {
-        "en": "Income Statement Segment 17",
-        "pt": "Income Statement segmento 17"
-      },
-      "mustHave": false,
-      "order": 17,
-      "headingAnchors": [
-        "Income Statement 17",
-        "income_statement 17",
-        "Income Statement section",
-        "seção Income Statement 17"
-      ],
-      "confidence": 0.82,
-      "fallbackPatterns": [
-        "\bincome_statement\b",
-        "\bincome_statement_17\b",
-        "\bincome_statement section\b"
-      ],
-      "description": "Canonical section income_statement for 10-Q Quarterly Report"
-    },
-    {
-      "id": "cash_flow_18",
-      "name": {
-        "en": "Cash Flow Segment 18",
-        "pt": "Cash Flow segmento 18"
-      },
-      "mustHave": false,
-      "order": 18,
-      "headingAnchors": [
-        "Cash Flow 18",
-        "cash_flow 18",
-        "Cash Flow section",
-        "seção Cash Flow 18"
-      ],
-      "confidence": 0.83,
-      "fallbackPatterns": [
-        "\bcash_flow\b",
-        "\bcash_flow_18\b",
-        "\bcash_flow section\b"
-      ],
-      "description": "Canonical section cash_flow for 10-Q Quarterly Report"
-    },
-    {
-      "id": "cash_position_19",
-      "name": {
-        "en": "Cash Position Segment 19",
-        "pt": "Cash Position segmento 19"
-      },
-      "mustHave": false,
-      "order": 19,
-      "headingAnchors": [
-        "Cash Position 19",
-        "cash_position 19",
-        "Cash Position section",
-        "seção Cash Position 19"
-      ],
-      "confidence": 0.84,
-      "fallbackPatterns": [
-        "\bcash_position\b",
-        "\bcash_position_19\b",
-        "\bcash_position section\b"
-      ],
-      "description": "Canonical section cash_position for 10-Q Quarterly Report"
-    },
-    {
-      "id": "mdna_20",
-      "name": {
-        "en": "Mdna Segment 20",
-        "pt": "Mdna segmento 20"
-      },
-      "mustHave": false,
-      "order": 20,
-      "headingAnchors": [
-        "Mdna 20",
-        "mdna 20",
-        "Mdna section",
-        "seção Mdna 20"
-      ],
-      "confidence": 0.85,
-      "fallbackPatterns": [
-        "\bmdna\b",
-        "\bmdna_20\b",
-        "\bmdna section\b"
-      ],
-      "description": "Canonical section mdna for 10-Q Quarterly Report"
-    },
-    {
-      "id": "risk_factors_21",
-      "name": {
-        "en": "Risk Factors Segment 21",
-        "pt": "Risk Factors segmento 21"
-      },
-      "mustHave": false,
-      "order": 21,
-      "headingAnchors": [
-        "Risk Factors 21",
-        "risk_factors 21",
-        "Risk Factors section",
-        "seção Risk Factors 21"
-      ],
-      "confidence": 0.86,
-      "fallbackPatterns": [
-        "\brisk_factors\b",
-        "\brisk_factors_21\b",
-        "\brisk_factors section\b"
-      ],
-      "description": "Canonical section risk_factors for 10-Q Quarterly Report"
-    },
-    {
-      "id": "off_balance_sheet_22",
-      "name": {
-        "en": "Off Balance Sheet Segment 22",
-        "pt": "Off Balance Sheet segmento 22"
-      },
-      "mustHave": false,
-      "order": 22,
-      "headingAnchors": [
-        "Off Balance Sheet 22",
-        "off_balance_sheet 22",
-        "Off Balance Sheet section",
-        "seção Off Balance Sheet 22"
-      ],
-      "confidence": 0.87,
-      "fallbackPatterns": [
-        "\boff_balance_sheet\b",
-        "\boff_balance_sheet_22\b",
-        "\boff_balance_sheet section\b"
-      ],
-      "description": "Canonical section off_balance_sheet for 10-Q Quarterly Report"
-    },
-    {
-      "id": "notes_to_financial_statements_23",
-      "name": {
-        "en": "Notes To Financial Statements Segment 23",
-        "pt": "Notes To Financial Statements segmento 23"
-      },
-      "mustHave": false,
-      "order": 23,
-      "headingAnchors": [
-        "Notes To Financial Statements 23",
-        "notes_to_financial_statements 23",
-        "Notes To Financial Statements section",
-        "seção Notes To Financial Statements 23"
-      ],
-      "confidence": 0.88,
-      "fallbackPatterns": [
-        "\bnotes_to_financial_statements\b",
-        "\bnotes_to_financial_statements_23\b",
-        "\bnotes_to_financial_statements section\b"
-      ],
-      "description": "Canonical section notes_to_financial_statements for 10-Q Quarterly Report"
-    },
-    {
-      "id": "segment_performance_24",
-      "name": {
-        "en": "Segment Performance Segment 24",
-        "pt": "Segment Performance segmento 24"
-      },
-      "mustHave": false,
-      "order": 24,
-      "headingAnchors": [
-        "Segment Performance 24",
-        "segment_performance 24",
-        "Segment Performance section",
-        "seção Segment Performance 24"
-      ],
-      "confidence": 0.89,
-      "fallbackPatterns": [
-        "\bsegment_performance\b",
-        "\bsegment_performance_24\b",
-        "\bsegment_performance section\b"
-      ],
-      "description": "Canonical section segment_performance for 10-Q Quarterly Report"
-    },
-    {
-      "id": "revenue_detail_25",
-      "name": {
-        "en": "Revenue Detail Segment 25",
-        "pt": "Revenue Detail segmento 25"
-      },
-      "mustHave": false,
-      "order": 25,
-      "headingAnchors": [
-        "Revenue Detail 25",
-        "revenue_detail 25",
-        "Revenue Detail section",
-        "seção Revenue Detail 25"
-      ],
-      "confidence": 0.9,
-      "fallbackPatterns": [
-        "\brevenue_detail\b",
-        "\brevenue_detail_25\b",
-        "\brevenue_detail section\b"
-      ],
-      "description": "Canonical section revenue_detail for 10-Q Quarterly Report"
-    },
-    {
-      "id": "guidance_update_26",
-      "name": {
-        "en": "Guidance Update Segment 26",
-        "pt": "Guidance Update segmento 26"
-      },
-      "mustHave": false,
-      "order": 26,
-      "headingAnchors": [
-        "Guidance Update 26",
-        "guidance_update 26",
-        "Guidance Update section",
-        "seção Guidance Update 26"
-      ],
-      "confidence": 0.91,
-      "fallbackPatterns": [
-        "\bguidance_update\b",
-        "\bguidance_update_26\b",
-        "\bguidance_update section\b"
-      ],
-      "description": "Canonical section guidance_update for 10-Q Quarterly Report"
-    },
-    {
-      "id": "management_commentary_27",
-      "name": {
-        "en": "Management Commentary Segment 27",
-        "pt": "Management Commentary segmento 27"
-      },
-      "mustHave": false,
-      "order": 27,
-      "headingAnchors": [
-        "Management Commentary 27",
-        "management_commentary 27",
-        "Management Commentary section",
-        "seção Management Commentary 27"
-      ],
-      "confidence": 0.92,
-      "fallbackPatterns": [
-        "\bmanagement_commentary\b",
-        "\bmanagement_commentary_27\b",
-        "\bmanagement_commentary section\b"
-      ],
-      "description": "Canonical section management_commentary for 10-Q Quarterly Report"
-    },
-    {
-      "id": "quarterly_summary_28",
-      "name": {
-        "en": "Quarterly Summary Segment 28",
-        "pt": "Quarterly Summary segmento 28"
-      },
-      "mustHave": false,
-      "order": 28,
-      "headingAnchors": [
-        "Quarterly Summary 28",
-        "quarterly_summary 28",
-        "Quarterly Summary section",
-        "seção Quarterly Summary 28"
-      ],
-      "confidence": 0.93,
-      "fallbackPatterns": [
-        "\bquarterly_summary\b",
-        "\bquarterly_summary_28\b",
-        "\bquarterly_summary section\b"
-      ],
-      "description": "Canonical section quarterly_summary for 10-Q Quarterly Report"
-    },
-    {
-      "id": "period_changes_29",
-      "name": {
-        "en": "Period Changes Segment 29",
-        "pt": "Period Changes segmento 29"
-      },
-      "mustHave": false,
-      "order": 29,
-      "headingAnchors": [
-        "Period Changes 29",
-        "period_changes 29",
-        "Period Changes section",
-        "seção Period Changes 29"
-      ],
-      "confidence": 0.94,
-      "fallbackPatterns": [
-        "\bperiod_changes\b",
-        "\bperiod_changes_29\b",
-        "\bperiod_changes section\b"
-      ],
-      "description": "Canonical section period_changes for 10-Q Quarterly Report"
-    },
-    {
-      "id": "financial_statements_30",
-      "name": {
-        "en": "Financial Statements Segment 30",
-        "pt": "Financial Statements segmento 30"
-      },
-      "mustHave": false,
-      "order": 30,
-      "headingAnchors": [
-        "Financial Statements 30",
-        "financial_statements 30",
-        "Financial Statements section",
-        "seção Financial Statements 30"
-      ],
-      "confidence": 0.8,
-      "fallbackPatterns": [
-        "\bfinancial_statements\b",
-        "\bfinancial_statements_30\b",
-        "\bfinancial_statements section\b"
-      ],
-      "description": "Canonical section financial_statements for 10-Q Quarterly Report"
-    },
-    {
-      "id": "income_statement_31",
-      "name": {
-        "en": "Income Statement Segment 31",
-        "pt": "Income Statement segmento 31"
-      },
-      "mustHave": false,
-      "order": 31,
-      "headingAnchors": [
-        "Income Statement 31",
-        "income_statement 31",
-        "Income Statement section",
-        "seção Income Statement 31"
-      ],
-      "confidence": 0.81,
-      "fallbackPatterns": [
-        "\bincome_statement\b",
-        "\bincome_statement_31\b",
-        "\bincome_statement section\b"
-      ],
-      "description": "Canonical section income_statement for 10-Q Quarterly Report"
-    },
-    {
-      "id": "cash_flow_32",
-      "name": {
-        "en": "Cash Flow Segment 32",
-        "pt": "Cash Flow segmento 32"
-      },
-      "mustHave": false,
-      "order": 32,
-      "headingAnchors": [
-        "Cash Flow 32",
-        "cash_flow 32",
-        "Cash Flow section",
-        "seção Cash Flow 32"
-      ],
-      "confidence": 0.82,
-      "fallbackPatterns": [
-        "\bcash_flow\b",
-        "\bcash_flow_32\b",
-        "\bcash_flow section\b"
-      ],
-      "description": "Canonical section cash_flow for 10-Q Quarterly Report"
-    },
-    {
-      "id": "cash_position_33",
-      "name": {
-        "en": "Cash Position Segment 33",
-        "pt": "Cash Position segmento 33"
-      },
-      "mustHave": false,
-      "order": 33,
-      "headingAnchors": [
-        "Cash Position 33",
-        "cash_position 33",
-        "Cash Position section",
-        "seção Cash Position 33"
-      ],
-      "confidence": 0.83,
-      "fallbackPatterns": [
-        "\bcash_position\b",
-        "\bcash_position_33\b",
-        "\bcash_position section\b"
-      ],
-      "description": "Canonical section cash_position for 10-Q Quarterly Report"
-    },
-    {
-      "id": "mdna_34",
-      "name": {
-        "en": "Mdna Segment 34",
-        "pt": "Mdna segmento 34"
-      },
-      "mustHave": false,
-      "order": 34,
-      "headingAnchors": [
-        "Mdna 34",
-        "mdna 34",
-        "Mdna section",
-        "seção Mdna 34"
-      ],
-      "confidence": 0.84,
-      "fallbackPatterns": [
-        "\bmdna\b",
-        "\bmdna_34\b",
-        "\bmdna section\b"
-      ],
-      "description": "Canonical section mdna for 10-Q Quarterly Report"
-    },
-    {
-      "id": "risk_factors_35",
-      "name": {
-        "en": "Risk Factors Segment 35",
-        "pt": "Risk Factors segmento 35"
-      },
-      "mustHave": false,
-      "order": 35,
-      "headingAnchors": [
-        "Risk Factors 35",
-        "risk_factors 35",
-        "Risk Factors section",
-        "seção Risk Factors 35"
-      ],
-      "confidence": 0.85,
-      "fallbackPatterns": [
-        "\brisk_factors\b",
-        "\brisk_factors_35\b",
-        "\brisk_factors section\b"
-      ],
-      "description": "Canonical section risk_factors for 10-Q Quarterly Report"
-    },
-    {
-      "id": "off_balance_sheet_36",
-      "name": {
-        "en": "Off Balance Sheet Segment 36",
-        "pt": "Off Balance Sheet segmento 36"
-      },
-      "mustHave": false,
-      "order": 36,
-      "headingAnchors": [
-        "Off Balance Sheet 36",
-        "off_balance_sheet 36",
-        "Off Balance Sheet section",
-        "seção Off Balance Sheet 36"
-      ],
-      "confidence": 0.86,
-      "fallbackPatterns": [
-        "\boff_balance_sheet\b",
-        "\boff_balance_sheet_36\b",
-        "\boff_balance_sheet section\b"
-      ],
-      "description": "Canonical section off_balance_sheet for 10-Q Quarterly Report"
-    },
-    {
-      "id": "notes_to_financial_statements_37",
-      "name": {
-        "en": "Notes To Financial Statements Segment 37",
-        "pt": "Notes To Financial Statements segmento 37"
-      },
-      "mustHave": false,
-      "order": 37,
-      "headingAnchors": [
-        "Notes To Financial Statements 37",
-        "notes_to_financial_statements 37",
-        "Notes To Financial Statements section",
-        "seção Notes To Financial Statements 37"
-      ],
-      "confidence": 0.87,
-      "fallbackPatterns": [
-        "\bnotes_to_financial_statements\b",
-        "\bnotes_to_financial_statements_37\b",
-        "\bnotes_to_financial_statements section\b"
-      ],
-      "description": "Canonical section notes_to_financial_statements for 10-Q Quarterly Report"
-    },
-    {
-      "id": "segment_performance_38",
-      "name": {
-        "en": "Segment Performance Segment 38",
-        "pt": "Segment Performance segmento 38"
-      },
-      "mustHave": false,
-      "order": 38,
-      "headingAnchors": [
-        "Segment Performance 38",
-        "segment_performance 38",
-        "Segment Performance section",
-        "seção Segment Performance 38"
-      ],
-      "confidence": 0.88,
-      "fallbackPatterns": [
-        "\bsegment_performance\b",
-        "\bsegment_performance_38\b",
-        "\bsegment_performance section\b"
-      ],
-      "description": "Canonical section segment_performance for 10-Q Quarterly Report"
-    },
-    {
-      "id": "revenue_detail_39",
-      "name": {
-        "en": "Revenue Detail Segment 39",
-        "pt": "Revenue Detail segmento 39"
-      },
-      "mustHave": false,
-      "order": 39,
-      "headingAnchors": [
-        "Revenue Detail 39",
-        "revenue_detail 39",
-        "Revenue Detail section",
-        "seção Revenue Detail 39"
-      ],
-      "confidence": 0.89,
-      "fallbackPatterns": [
-        "\brevenue_detail\b",
-        "\brevenue_detail_39\b",
-        "\brevenue_detail section\b"
-      ],
-      "description": "Canonical section revenue_detail for 10-Q Quarterly Report"
-    },
-    {
-      "id": "guidance_update_40",
-      "name": {
-        "en": "Guidance Update Segment 40",
-        "pt": "Guidance Update segmento 40"
-      },
-      "mustHave": false,
-      "order": 40,
-      "headingAnchors": [
-        "Guidance Update 40",
-        "guidance_update 40",
-        "Guidance Update section",
-        "seção Guidance Update 40"
-      ],
-      "confidence": 0.9,
-      "fallbackPatterns": [
-        "\bguidance_update\b",
-        "\bguidance_update_40\b",
-        "\bguidance_update section\b"
-      ],
-      "description": "Canonical section guidance_update for 10-Q Quarterly Report"
-    },
-    {
-      "id": "management_commentary_41",
-      "name": {
-        "en": "Management Commentary Segment 41",
-        "pt": "Management Commentary segmento 41"
-      },
-      "mustHave": false,
-      "order": 41,
-      "headingAnchors": [
-        "Management Commentary 41",
-        "management_commentary 41",
-        "Management Commentary section",
-        "seção Management Commentary 41"
-      ],
-      "confidence": 0.91,
-      "fallbackPatterns": [
-        "\bmanagement_commentary\b",
-        "\bmanagement_commentary_41\b",
-        "\bmanagement_commentary section\b"
-      ],
-      "description": "Canonical section management_commentary for 10-Q Quarterly Report"
-    },
-    {
-      "id": "quarterly_summary_42",
-      "name": {
-        "en": "Quarterly Summary Segment 42",
-        "pt": "Quarterly Summary segmento 42"
-      },
-      "mustHave": false,
-      "order": 42,
-      "headingAnchors": [
-        "Quarterly Summary 42",
-        "quarterly_summary 42",
-        "Quarterly Summary section",
-        "seção Quarterly Summary 42"
-      ],
-      "confidence": 0.92,
-      "fallbackPatterns": [
-        "\bquarterly_summary\b",
-        "\bquarterly_summary_42\b",
-        "\bquarterly_summary section\b"
-      ],
-      "description": "Canonical section quarterly_summary for 10-Q Quarterly Report"
-    },
-    {
-      "id": "period_changes_43",
-      "name": {
-        "en": "Period Changes Segment 43",
-        "pt": "Period Changes segmento 43"
-      },
-      "mustHave": false,
-      "order": 43,
-      "headingAnchors": [
-        "Period Changes 43",
-        "period_changes 43",
-        "Period Changes section",
-        "seção Period Changes 43"
-      ],
-      "confidence": 0.93,
-      "fallbackPatterns": [
-        "\bperiod_changes\b",
-        "\bperiod_changes_43\b",
-        "\bperiod_changes section\b"
-      ],
-      "description": "Canonical section period_changes for 10-Q Quarterly Report"
-    },
-    {
-      "id": "financial_statements_44",
-      "name": {
-        "en": "Financial Statements Segment 44",
-        "pt": "Financial Statements segmento 44"
-      },
-      "mustHave": false,
-      "order": 44,
-      "headingAnchors": [
-        "Financial Statements 44",
-        "financial_statements 44",
-        "Financial Statements section",
-        "seção Financial Statements 44"
-      ],
-      "confidence": 0.94,
-      "fallbackPatterns": [
-        "\bfinancial_statements\b",
-        "\bfinancial_statements_44\b",
-        "\bfinancial_statements section\b"
-      ],
-      "description": "Canonical section financial_statements for 10-Q Quarterly Report"
-    },
-    {
-      "id": "income_statement_45",
-      "name": {
-        "en": "Income Statement Segment 45",
-        "pt": "Income Statement segmento 45"
-      },
-      "mustHave": false,
-      "order": 45,
-      "headingAnchors": [
-        "Income Statement 45",
-        "income_statement 45",
-        "Income Statement section",
-        "seção Income Statement 45"
-      ],
-      "confidence": 0.8,
-      "fallbackPatterns": [
-        "\bincome_statement\b",
-        "\bincome_statement_45\b",
-        "\bincome_statement section\b"
-      ],
-      "description": "Canonical section income_statement for 10-Q Quarterly Report"
-    },
-    {
-      "id": "cash_flow_46",
-      "name": {
-        "en": "Cash Flow Segment 46",
-        "pt": "Cash Flow segmento 46"
-      },
-      "mustHave": false,
-      "order": 46,
-      "headingAnchors": [
-        "Cash Flow 46",
-        "cash_flow 46",
-        "Cash Flow section",
-        "seção Cash Flow 46"
-      ],
-      "confidence": 0.81,
-      "fallbackPatterns": [
-        "\bcash_flow\b",
-        "\bcash_flow_46\b",
-        "\bcash_flow section\b"
-      ],
-      "description": "Canonical section cash_flow for 10-Q Quarterly Report"
-    },
-    {
-      "id": "cash_position_47",
-      "name": {
-        "en": "Cash Position Segment 47",
-        "pt": "Cash Position segmento 47"
-      },
-      "mustHave": false,
-      "order": 47,
-      "headingAnchors": [
-        "Cash Position 47",
-        "cash_position 47",
-        "Cash Position section",
-        "seção Cash Position 47"
-      ],
-      "confidence": 0.82,
-      "fallbackPatterns": [
-        "\bcash_position\b",
-        "\bcash_position_47\b",
-        "\bcash_position section\b"
-      ],
-      "description": "Canonical section cash_position for 10-Q Quarterly Report"
-    },
-    {
-      "id": "mdna_48",
-      "name": {
-        "en": "Mdna Segment 48",
-        "pt": "Mdna segmento 48"
-      },
-      "mustHave": false,
-      "order": 48,
-      "headingAnchors": [
-        "Mdna 48",
-        "mdna 48",
-        "Mdna section",
-        "seção Mdna 48"
-      ],
-      "confidence": 0.83,
-      "fallbackPatterns": [
-        "\bmdna\b",
-        "\bmdna_48\b",
-        "\bmdna section\b"
-      ],
-      "description": "Canonical section mdna for 10-Q Quarterly Report"
-    },
-    {
-      "id": "risk_factors_49",
-      "name": {
-        "en": "Risk Factors Segment 49",
-        "pt": "Risk Factors segmento 49"
-      },
-      "mustHave": false,
-      "order": 49,
-      "headingAnchors": [
-        "Risk Factors 49",
-        "risk_factors 49",
-        "Risk Factors section",
-        "seção Risk Factors 49"
-      ],
-      "confidence": 0.84,
-      "fallbackPatterns": [
-        "\brisk_factors\b",
-        "\brisk_factors_49\b",
-        "\brisk_factors section\b"
-      ],
-      "description": "Canonical section risk_factors for 10-Q Quarterly Report"
-    },
-    {
-      "id": "off_balance_sheet_50",
-      "name": {
-        "en": "Off Balance Sheet Segment 50",
-        "pt": "Off Balance Sheet segmento 50"
-      },
-      "mustHave": false,
-      "order": 50,
-      "headingAnchors": [
-        "Off Balance Sheet 50",
-        "off_balance_sheet 50",
-        "Off Balance Sheet section",
-        "seção Off Balance Sheet 50"
-      ],
-      "confidence": 0.85,
-      "fallbackPatterns": [
-        "\boff_balance_sheet\b",
-        "\boff_balance_sheet_50\b",
-        "\boff_balance_sheet section\b"
-      ],
-      "description": "Canonical section off_balance_sheet for 10-Q Quarterly Report"
-    },
-    {
-      "id": "notes_to_financial_statements_51",
-      "name": {
-        "en": "Notes To Financial Statements Segment 51",
-        "pt": "Notes To Financial Statements segmento 51"
-      },
-      "mustHave": false,
-      "order": 51,
-      "headingAnchors": [
-        "Notes To Financial Statements 51",
-        "notes_to_financial_statements 51",
-        "Notes To Financial Statements section",
-        "seção Notes To Financial Statements 51"
-      ],
-      "confidence": 0.86,
-      "fallbackPatterns": [
-        "\bnotes_to_financial_statements\b",
-        "\bnotes_to_financial_statements_51\b",
-        "\bnotes_to_financial_statements section\b"
-      ],
-      "description": "Canonical section notes_to_financial_statements for 10-Q Quarterly Report"
-    },
-    {
-      "id": "segment_performance_52",
-      "name": {
-        "en": "Segment Performance Segment 52",
-        "pt": "Segment Performance segmento 52"
-      },
-      "mustHave": false,
-      "order": 52,
-      "headingAnchors": [
-        "Segment Performance 52",
-        "segment_performance 52",
-        "Segment Performance section",
-        "seção Segment Performance 52"
-      ],
-      "confidence": 0.87,
-      "fallbackPatterns": [
-        "\bsegment_performance\b",
-        "\bsegment_performance_52\b",
-        "\bsegment_performance section\b"
-      ],
-      "description": "Canonical section segment_performance for 10-Q Quarterly Report"
-    },
-    {
-      "id": "revenue_detail_53",
-      "name": {
-        "en": "Revenue Detail Segment 53",
-        "pt": "Revenue Detail segmento 53"
-      },
-      "mustHave": false,
-      "order": 53,
-      "headingAnchors": [
-        "Revenue Detail 53",
-        "revenue_detail 53",
-        "Revenue Detail section",
-        "seção Revenue Detail 53"
-      ],
-      "confidence": 0.88,
-      "fallbackPatterns": [
-        "\brevenue_detail\b",
-        "\brevenue_detail_53\b",
-        "\brevenue_detail section\b"
-      ],
-      "description": "Canonical section revenue_detail for 10-Q Quarterly Report"
-    },
-    {
-      "id": "guidance_update_54",
-      "name": {
-        "en": "Guidance Update Segment 54",
-        "pt": "Guidance Update segmento 54"
-      },
-      "mustHave": false,
-      "order": 54,
-      "headingAnchors": [
-        "Guidance Update 54",
-        "guidance_update 54",
-        "Guidance Update section",
-        "seção Guidance Update 54"
-      ],
-      "confidence": 0.89,
-      "fallbackPatterns": [
-        "\bguidance_update\b",
-        "\bguidance_update_54\b",
-        "\bguidance_update section\b"
-      ],
-      "description": "Canonical section guidance_update for 10-Q Quarterly Report"
-    },
-    {
-      "id": "management_commentary_55",
-      "name": {
-        "en": "Management Commentary Segment 55",
-        "pt": "Management Commentary segmento 55"
-      },
-      "mustHave": false,
-      "order": 55,
-      "headingAnchors": [
-        "Management Commentary 55",
-        "management_commentary 55",
-        "Management Commentary section",
-        "seção Management Commentary 55"
-      ],
-      "confidence": 0.9,
-      "fallbackPatterns": [
-        "\bmanagement_commentary\b",
-        "\bmanagement_commentary_55\b",
-        "\bmanagement_commentary section\b"
-      ],
-      "description": "Canonical section management_commentary for 10-Q Quarterly Report"
-    },
-    {
-      "id": "quarterly_summary_56",
-      "name": {
-        "en": "Quarterly Summary Segment 56",
-        "pt": "Quarterly Summary segmento 56"
-      },
-      "mustHave": false,
-      "order": 56,
-      "headingAnchors": [
-        "Quarterly Summary 56",
-        "quarterly_summary 56",
-        "Quarterly Summary section",
-        "seção Quarterly Summary 56"
-      ],
-      "confidence": 0.91,
-      "fallbackPatterns": [
-        "\bquarterly_summary\b",
-        "\bquarterly_summary_56\b",
-        "\bquarterly_summary section\b"
-      ],
-      "description": "Canonical section quarterly_summary for 10-Q Quarterly Report"
-    },
-    {
-      "id": "period_changes_57",
-      "name": {
-        "en": "Period Changes Segment 57",
-        "pt": "Period Changes segmento 57"
-      },
-      "mustHave": false,
-      "order": 57,
-      "headingAnchors": [
-        "Period Changes 57",
-        "period_changes 57",
-        "Period Changes section",
-        "seção Period Changes 57"
-      ],
-      "confidence": 0.92,
-      "fallbackPatterns": [
-        "\bperiod_changes\b",
-        "\bperiod_changes_57\b",
-        "\bperiod_changes section\b"
-      ],
-      "description": "Canonical section period_changes for 10-Q Quarterly Report"
-    },
-    {
-      "id": "financial_statements_58",
-      "name": {
-        "en": "Financial Statements Segment 58",
-        "pt": "Financial Statements segmento 58"
-      },
-      "mustHave": false,
-      "order": 58,
-      "headingAnchors": [
-        "Financial Statements 58",
-        "financial_statements 58",
-        "Financial Statements section",
-        "seção Financial Statements 58"
-      ],
-      "confidence": 0.93,
-      "fallbackPatterns": [
-        "\bfinancial_statements\b",
-        "\bfinancial_statements_58\b",
-        "\bfinancial_statements section\b"
-      ],
-      "description": "Canonical section financial_statements for 10-Q Quarterly Report"
-    },
-    {
-      "id": "income_statement_59",
-      "name": {
-        "en": "Income Statement Segment 59",
-        "pt": "Income Statement segmento 59"
-      },
-      "mustHave": false,
-      "order": 59,
-      "headingAnchors": [
-        "Income Statement 59",
-        "income_statement 59",
-        "Income Statement section",
-        "seção Income Statement 59"
-      ],
-      "confidence": 0.94,
-      "fallbackPatterns": [
-        "\bincome_statement\b",
-        "\bincome_statement_59\b",
-        "\bincome_statement section\b"
-      ],
-      "description": "Canonical section income_statement for 10-Q Quarterly Report"
-    },
-    {
-      "id": "cash_flow_60",
-      "name": {
-        "en": "Cash Flow Segment 60",
-        "pt": "Cash Flow segmento 60"
-      },
-      "mustHave": false,
-      "order": 60,
-      "headingAnchors": [
-        "Cash Flow 60",
-        "cash_flow 60",
-        "Cash Flow section",
-        "seção Cash Flow 60"
-      ],
-      "confidence": 0.8,
-      "fallbackPatterns": [
-        "\bcash_flow\b",
-        "\bcash_flow_60\b",
-        "\bcash_flow section\b"
-      ],
-      "description": "Canonical section cash_flow for 10-Q Quarterly Report"
-    },
-    {
-      "id": "cash_position_61",
-      "name": {
-        "en": "Cash Position Segment 61",
-        "pt": "Cash Position segmento 61"
-      },
-      "mustHave": false,
-      "order": 61,
-      "headingAnchors": [
-        "Cash Position 61",
-        "cash_position 61",
-        "Cash Position section",
-        "seção Cash Position 61"
-      ],
-      "confidence": 0.81,
-      "fallbackPatterns": [
-        "\bcash_position\b",
-        "\bcash_position_61\b",
-        "\bcash_position section\b"
-      ],
-      "description": "Canonical section cash_position for 10-Q Quarterly Report"
-    },
-    {
-      "id": "mdna_62",
-      "name": {
-        "en": "Mdna Segment 62",
-        "pt": "Mdna segmento 62"
-      },
-      "mustHave": false,
-      "order": 62,
-      "headingAnchors": [
-        "Mdna 62",
-        "mdna 62",
-        "Mdna section",
-        "seção Mdna 62"
-      ],
-      "confidence": 0.82,
-      "fallbackPatterns": [
-        "\bmdna\b",
-        "\bmdna_62\b",
-        "\bmdna section\b"
-      ],
-      "description": "Canonical section mdna for 10-Q Quarterly Report"
+        "quarterly summary"
+      ]
     }
   ]
 }

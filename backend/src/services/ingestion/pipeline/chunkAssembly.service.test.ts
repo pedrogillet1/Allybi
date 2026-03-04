@@ -1,5 +1,5 @@
 import { describe, expect, test } from "@jest/globals";
-import { buildInputChunks } from "./chunkAssembly.service";
+import { buildInputChunks, deduplicateChunks } from "./chunkAssembly.service";
 
 describe("chunkAssembly.service — buildInputChunks", () => {
   // ---------------------------------------------------------------
@@ -28,6 +28,39 @@ describe("chunkAssembly.service — buildInputChunks", () => {
     expect(chunks[0].metadata?.ocrConfidence).toBe(0.85);
     expect(typeof chunks[0].metadata?.startChar).toBe("number");
     expect(typeof chunks[0].metadata?.endChar).toBe("number");
+  });
+
+  test("PDF chunks infer sectionName from heading-like first line", () => {
+    const extraction: any = {
+      sourceType: "pdf",
+      text: "Executive Summary\nThe company performed well.\nFinancial Overview\nRevenue grew 15%.",
+      pages: [
+        { page: 1, text: "Executive Summary\nThe company performed well." },
+        { page: 2, text: "Financial Overview\nRevenue grew 15%." },
+      ],
+    };
+
+    const chunks = buildInputChunks(extraction, extraction.text);
+
+    const page1Chunks = chunks.filter((c) => c.pageNumber === 1);
+    expect(page1Chunks.length).toBeGreaterThan(0);
+    expect(page1Chunks[0].metadata?.sectionName).toBe("Executive Summary");
+
+    const page2Chunks = chunks.filter((c) => c.pageNumber === 2);
+    expect(page2Chunks.length).toBeGreaterThan(0);
+    expect(page2Chunks[0].metadata?.sectionName).toBe("Financial Overview");
+  });
+
+  test("PDF does NOT infer section from long paragraph-like first lines", () => {
+    const longLine = "This is a very long first line that clearly is a paragraph and should not be treated as a heading because it exceeds our threshold and ends with a period.";
+    const extraction: any = {
+      sourceType: "pdf",
+      text: longLine,
+      pages: [{ page: 1, text: longLine }],
+    };
+
+    const chunks = buildInputChunks(extraction, extraction.text);
+    expect(chunks[0].metadata?.sectionName).toBeUndefined();
   });
 
   // ---------------------------------------------------------------
@@ -255,6 +288,275 @@ describe("chunkAssembly.service — buildInputChunks", () => {
   });
 
   // ---------------------------------------------------------------
+  // XLSX isFinancial + row-aggregate units
+  // ---------------------------------------------------------------
+  test("XLSX cell-centric uses per-sheet isFinancial, not extraction-level", () => {
+    const extraction: any = {
+      sourceType: "xlsx",
+      text: "data",
+      sheets: [
+        { sheetName: "Revenue", textContent: "", isFinancial: true },
+      ],
+      cellFacts: [
+        {
+          sheet: "Revenue",
+          cell: "B2",
+          rowLabel: "Q1",
+          colHeader: "Revenue (USD)",
+          value: "1500000",
+          displayValue: "$1.5M",
+        },
+      ],
+      isFinancial: false,
+    };
+    const chunks = buildInputChunks(extraction, extraction.text);
+    const cellChunk = chunks.find(
+      (c) => c.metadata?.tableChunkForm === "cell_centric",
+    );
+    expect(cellChunk).toBeDefined();
+    // Should use per-sheet isFinancial=true, not extraction.isFinancial=false
+    expect(cellChunk!.metadata?.isFinancial).toBe(true);
+  });
+
+  test("XLSX row-aggregate chunks include dominant unit metadata", () => {
+    const extraction: any = {
+      sourceType: "xlsx",
+      text: "data",
+      sheets: [
+        { sheetName: "Revenue", textContent: "", isFinancial: true },
+      ],
+      cellFacts: [
+        {
+          sheet: "Revenue",
+          cell: "B2",
+          rowLabel: "Q1",
+          colHeader: "Revenue (USD)",
+          value: "$1500000",
+          displayValue: "$1.5M",
+        },
+        {
+          sheet: "Revenue",
+          cell: "C2",
+          rowLabel: "Q1",
+          colHeader: "Growth",
+          value: "15%",
+          displayValue: "15%",
+        },
+      ],
+    };
+    const chunks = buildInputChunks(extraction, extraction.text);
+    const rowAgg = chunks.find(
+      (c) => c.metadata?.tableChunkForm === "row_aggregate",
+    );
+    expect(rowAgg).toBeDefined();
+    // Row aggregate should include unit info from dominant unit
+    expect(rowAgg!.metadata?.unitNormalized).toBeDefined();
+  });
+
+  // ---------------------------------------------------------------
+  // charOffset correctness
+  // ---------------------------------------------------------------
+  describe("charOffset correctness", () => {
+    test("PDF chunk offsets map back to correct fullText substrings", () => {
+      const pageText = "This is page content with enough words to trigger splitting. ".repeat(50);
+      const fullText = pageText + pageText;
+      const extraction: any = {
+        sourceType: "pdf",
+        text: fullText,
+        pages: [
+          { page: 1, text: pageText },
+          { page: 2, text: pageText },
+        ],
+      };
+      const chunks = buildInputChunks(extraction, fullText);
+
+      expect(chunks.length).toBeGreaterThan(2);
+
+      for (const chunk of chunks) {
+        const { startChar, endChar } = chunk.metadata!;
+        expect(startChar).toBeDefined();
+        expect(endChar).toBeDefined();
+        expect(endChar).toBeGreaterThan(startChar!);
+        // The chunk content should match the fullText at [startChar, endChar)
+        const expected = fullText.slice(startChar!, endChar!).trim();
+        expect(chunk.content).toBe(expected);
+      }
+    });
+
+    test("PPTX chunks have startChar and endChar", () => {
+      const extraction: any = {
+        sourceType: "pptx",
+        text: "Title\nSlide body text",
+        slides: [
+          { slide: 1, title: "Title", text: "Slide body text" },
+        ],
+      };
+      const chunks = buildInputChunks(extraction, extraction.text);
+      for (const chunk of chunks) {
+        expect(chunk.metadata?.startChar).toBeDefined();
+        expect(chunk.metadata?.endChar).toBeDefined();
+      }
+    });
+  });
+
+  // ---------------------------------------------------------------
+  // Edge cases
+  // ---------------------------------------------------------------
+  describe("edge cases", () => {
+    test("DOCX sections with empty content and no heading produce nothing", () => {
+      const extraction: any = {
+        sourceType: "docx",
+        text: "fallback text",
+        sections: [{ content: "", heading: "" }],
+      };
+      const chunks = buildInputChunks(extraction, extraction.text);
+      // Empty section yields nothing from emitSection → falls back to plain text
+      expect(chunks.length).toBeGreaterThan(0);
+      expect(chunks[0].metadata.sourceType).toBe("docx");
+    });
+
+    test("XLSX cellFacts with missing cell/rowLabel/colHeader use fallbacks", () => {
+      const extraction: any = {
+        sourceType: "xlsx",
+        text: "data",
+        sheets: [{ sheetName: "Sheet1", textContent: "" }],
+        cellFacts: [
+          {
+            sheet: "Sheet1",
+            cell: "",
+            rowLabel: "",
+            colHeader: "",
+            value: "42",
+            displayValue: "42",
+          },
+        ],
+      };
+      const chunks = buildInputChunks(extraction, extraction.text);
+      const cellCentric = chunks.find(
+        (c) => c.metadata?.tableChunkForm === "cell_centric",
+      );
+      expect(cellCentric).toBeDefined();
+      // When rowLabel and colHeader are empty, content should use "Cell" fallback
+      expect(cellCentric!.content).toContain("Cell");
+    });
+
+    test("XLSX empty cellFact values are skipped", () => {
+      const extraction: any = {
+        sourceType: "xlsx",
+        text: "data",
+        sheets: [{ sheetName: "Sheet1", textContent: "" }],
+        cellFacts: [
+          {
+            sheet: "Sheet1",
+            cell: "A1",
+            rowLabel: "Header",
+            colHeader: "Col",
+            value: "",
+            displayValue: "",
+          },
+        ],
+      };
+      const chunks = buildInputChunks(extraction, extraction.text);
+      const cellCentric = chunks.filter(
+        (c) => c.metadata?.tableChunkForm === "cell_centric",
+      );
+      // Empty value should be skipped (no cell-centric chunk emitted)
+      expect(cellCentric.length).toBe(0);
+    });
+
+    test("PPTX slides with notes but no title", () => {
+      const extraction: any = {
+        sourceType: "pptx",
+        text: "Some notes",
+        slides: [{ slide: 1, title: "", text: "", notes: "Important note" }],
+      };
+      const chunks = buildInputChunks(extraction, extraction.text);
+      const heading = chunks.find((c) => c.metadata?.chunkType === "heading");
+      expect(heading).toBeUndefined(); // No heading chunk for empty title
+      const notes = chunks.find((c) => c.metadata?.chunkType === "notes");
+      expect(notes).toBeDefined();
+      expect(notes!.content).toContain("Important note");
+    });
+
+    test("PPTX empty title string produces no heading chunk", () => {
+      const extraction: any = {
+        sourceType: "pptx",
+        text: "body",
+        slides: [{ slide: 1, title: "", text: "Some body text" }],
+      };
+      const chunks = buildInputChunks(extraction, extraction.text);
+      const heading = chunks.find((c) => c.metadata?.chunkType === "heading");
+      expect(heading).toBeUndefined();
+      const body = chunks.find((c) => c.metadata?.chunkType === "text");
+      expect(body).toBeDefined();
+    });
+
+    test("plain-text fallback with empty text returns empty array", () => {
+      const extraction: any = {
+        sourceType: "text",
+        text: "",
+      };
+      const chunks = buildInputChunks(extraction, "");
+      expect(chunks).toEqual([]);
+    });
+
+    test("deduplicateChunks integration: output of buildInputChunks through dedup", () => {
+      const extraction: any = {
+        sourceType: "pdf",
+        text: "Repeated content here. ".repeat(100),
+        pages: [
+          { page: 1, text: "Repeated content here. ".repeat(50) },
+          { page: 2, text: "Repeated content here. ".repeat(50) },
+        ],
+      };
+      const chunks = buildInputChunks(extraction, extraction.text);
+      const deduped = deduplicateChunks(chunks);
+      // Dedup should reduce count — many overlapping chunks with same content
+      expect(deduped.length).toBeLessThanOrEqual(chunks.length);
+      // All surviving chunks should still have metadata
+      for (const c of deduped) {
+        expect(c.metadata).toBeDefined();
+        expect(c.metadata.sourceType).toBe("pdf");
+      }
+    });
+
+    test("XLSX sheets with name but no sheetName property", () => {
+      const extraction: any = {
+        sourceType: "xlsx",
+        text: "data",
+        sheets: [{ name: "AltName", textContent: "Some data" }],
+      };
+      const chunks = buildInputChunks(extraction, extraction.text);
+      expect(chunks.length).toBeGreaterThan(0);
+      expect(chunks[0].metadata?.sheetName).toBe("AltName");
+    });
+  });
+
+  // ---------------------------------------------------------------
+  // Policy override passthrough
+  // ---------------------------------------------------------------
+  test("buildInputChunks accepts chunking policy override for target size", () => {
+    const extraction: any = {
+      sourceType: "pdf",
+      text: "A".repeat(500),
+      pages: [{ page: 1, text: "A".repeat(500) }],
+    };
+
+    // With a small targetChars, the text should be split into multiple chunks
+    const chunks = buildInputChunks(extraction, extraction.text, {
+      targetChars: 100,
+      overlapChars: 10,
+    });
+
+    expect(chunks.length).toBeGreaterThan(1);
+    // All chunks should still have PDF metadata
+    for (const chunk of chunks) {
+      expect(chunk.pageNumber).toBe(1);
+      expect(chunk.metadata?.sourceType).toBe("pdf");
+    }
+  });
+
+  // ---------------------------------------------------------------
   // Backward compatibility
   // ---------------------------------------------------------------
   test("chunks always have chunkIndex and content", () => {
@@ -274,5 +576,132 @@ describe("chunkAssembly.service — buildInputChunks", () => {
       expect(typeof chunk.content).toBe("string");
       expect(chunk.content.length).toBeGreaterThan(0);
     }
+  });
+
+  // ---------------------------------------------------------------
+  // DOCX pageStart → pageNumber passthrough
+  // ---------------------------------------------------------------
+  test("DOCX sections pass through pageStart as pageNumber", () => {
+    const extraction: any = {
+      sourceType: "docx",
+      text: "Introduction\nBody text.\nConclusion\nFinal text.",
+      sections: [
+        { heading: "Introduction", level: 1, content: "Body text.", path: ["Introduction"], pageStart: 1 },
+        { heading: "Conclusion", level: 1, content: "Final text.", path: ["Conclusion"], pageStart: 3 },
+      ],
+    };
+
+    const chunks = buildInputChunks(extraction, extraction.text);
+
+    const introChunks = chunks.filter((c) => c.metadata?.sectionName === "Introduction");
+    expect(introChunks.length).toBeGreaterThan(0);
+    expect(introChunks[0].pageNumber).toBe(1);
+
+    const conclusionChunks = chunks.filter((c) => c.metadata?.sectionName === "Conclusion");
+    expect(conclusionChunks.length).toBeGreaterThan(0);
+    expect(conclusionChunks[0].pageNumber).toBe(3);
+  });
+
+  test("DOCX without pageStart still works (pageNumber undefined)", () => {
+    const extraction: any = {
+      sourceType: "docx",
+      text: "Heading\nContent here.",
+      sections: [
+        { heading: "Heading", level: 1, content: "Content here.", path: ["Heading"] },
+      ],
+    };
+
+    const chunks = buildInputChunks(extraction, extraction.text);
+    expect(chunks[0].pageNumber).toBeUndefined();
+  });
+
+  // ---------------------------------------------------------------
+  // Multi-level headerPath
+  // ---------------------------------------------------------------
+  test("cell facts with headerHierarchy produce multi-level headerPath", () => {
+    const extraction: any = {
+      sourceType: "xlsx",
+      sheets: [{ sheetName: "Fin", textContent: "Fin" }],
+      cellFacts: [
+        {
+          sheet: "Fin",
+          cell: "C5",
+          rowLabel: "Revenue",
+          colHeader: "Q1 2024",
+          value: "100",
+          displayValue: "100",
+          headerHierarchy: ["Financial Statements", "Income Statement", "Q1 2024"],
+        },
+      ],
+    };
+
+    const chunks = buildInputChunks(extraction, "");
+    const cell = chunks.find((c) => c.metadata?.cellRef === "C5");
+    expect(cell?.metadata?.headerPath).toEqual([
+      "Revenue",
+      "Financial Statements",
+      "Income Statement",
+      "Q1 2024",
+    ]);
+  });
+
+  test("cell facts without headerHierarchy use 2-level [rowLabel, colHeader]", () => {
+    const extraction: any = {
+      sourceType: "xlsx",
+      sheets: [{ sheetName: "S", textContent: "S" }],
+      cellFacts: [
+        { sheet: "S", cell: "A1", rowLabel: "Cost", colHeader: "Q1", value: "50", displayValue: "50" },
+      ],
+    };
+
+    const chunks = buildInputChunks(extraction, "");
+    const cell = chunks.find((c) => c.metadata?.cellRef === "A1");
+    expect(cell?.metadata?.headerPath).toEqual(["Cost", "Q1"]);
+  });
+
+  // ---------------------------------------------------------------
+  // parseCellRef multi-letter column confirmation
+  // ---------------------------------------------------------------
+  test("cell facts with multi-letter columns (AA+) get correct columnIndex", () => {
+    const extraction: any = {
+      sourceType: "xlsx",
+      sheets: [{ sheetName: "Data", textContent: "Data" }],
+      cellFacts: [
+        { sheet: "Data", cell: "AA10", rowLabel: "Revenue", colHeader: "Jan", value: "100", displayValue: "100" },
+        { sheet: "Data", cell: "AZ5", rowLabel: "Cost", colHeader: "Feb", value: "200", displayValue: "200" },
+      ],
+    };
+
+    const chunks = buildInputChunks(extraction, "");
+    const cellChunks = chunks.filter((c) => c.metadata?.tableChunkForm === "cell_centric");
+
+    const aa10 = cellChunks.find((c) => c.metadata?.cellRef === "AA10");
+    expect(aa10).toBeDefined();
+    expect(aa10!.metadata?.columnIndex).toBe(27); // AA = 27
+
+    const az5 = cellChunks.find((c) => c.metadata?.cellRef === "AZ5");
+    expect(az5).toBeDefined();
+    expect(az5!.metadata?.columnIndex).toBe(52); // AZ = 52
+  });
+
+  // ---------------------------------------------------------------
+  // Unit consistency warnings
+  // ---------------------------------------------------------------
+  test("row_aggregate warns on mixed units across cells", () => {
+    const extraction: any = {
+      sourceType: "xlsx",
+      sheets: [{ sheetName: "Mix", textContent: "Mix" }],
+      cellFacts: [
+        { sheet: "Mix", cell: "A1", rowLabel: "Revenue", colHeader: "Q1", value: "$100", displayValue: "$100" },
+        { sheet: "Mix", cell: "B1", rowLabel: "Revenue", colHeader: "Growth", value: "15%", displayValue: "15%" },
+      ],
+    };
+
+    const chunks = buildInputChunks(extraction, "");
+    const rowAgg = chunks.find(
+      (c) => c.metadata?.tableChunkForm === "row_aggregate" && c.metadata?.rowLabel === "Revenue",
+    );
+    expect(rowAgg).toBeDefined();
+    expect(rowAgg!.metadata?.unitConsistencyWarning).toMatch(/mixed_units/);
   });
 });

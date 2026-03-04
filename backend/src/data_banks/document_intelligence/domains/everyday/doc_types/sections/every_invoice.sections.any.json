@@ -25,11 +25,10 @@
       "id": "document_header",
       "name": {
         "en": "Header",
-        "pt": "Cabecalho"
+        "pt": "Cabeçalho"
       },
       "order": 1,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "invoice",
         "fatura",
@@ -44,7 +43,6 @@
       },
       "order": 2,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "vendor",
         "supplier",
@@ -60,7 +58,6 @@
       },
       "order": 3,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "customer",
         "client",
@@ -75,7 +72,6 @@
       },
       "order": 4,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "item",
         "description",
@@ -91,7 +87,6 @@
       },
       "order": 5,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "subtotal",
         "discount",
@@ -106,7 +101,6 @@
       },
       "order": 6,
       "required": false,
-      "mustHave": false,
       "headingAnchors": [
         "tax",
         "vat",
@@ -121,7 +115,6 @@
       },
       "order": 7,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "total",
         "grand total",
@@ -132,11 +125,10 @@
       "id": "payment_terms",
       "name": {
         "en": "Payment Terms",
-        "pt": "Condicoes de Pagamento"
+        "pt": "Condições de Pagamento"
       },
       "order": 8,
       "required": true,
-      "mustHave": true,
       "headingAnchors": [
         "due date",
         "terms",
@@ -151,7 +143,6 @@
       },
       "order": 9,
       "required": false,
-      "mustHave": false,
       "headingAnchors": [
         "attachment",
         "annex",

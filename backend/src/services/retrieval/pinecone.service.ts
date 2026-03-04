@@ -1,4 +1,5 @@
 // src/services/retrieval/pinecone.service.ts
+import { createHash } from "crypto";
 import { Pinecone } from "@pinecone-database/pinecone";
 import {
   buildDocumentDeleteFilter,
@@ -193,6 +194,12 @@ export class PineconeService {
     const vectors: PineconeVector[] = [];
     let skipped = 0;
 
+    // When PINECONE_STRIP_PLAINTEXT=true OR INDEXING_ENCRYPTED_CHUNKS_ONLY=true,
+    // replace content with SHA-256 hash to avoid storing plaintext in Pinecone.
+    // The retrieval layer hydrates from Postgres when content is missing.
+    const encryptedOnly = String(process.env.INDEXING_ENCRYPTED_CHUNKS_ONLY || "").trim().toLowerCase() === "true";
+    const stripPlaintext = encryptedOnly || String(process.env.PINECONE_STRIP_PLAINTEXT || "").trim().toLowerCase() === "true";
+
     for (const c of chunks) {
       if (!c.embedding || !this.hasNonZero(c.embedding)) {
         skipped++;
@@ -201,8 +208,12 @@ export class PineconeService {
 
       this.assertVectorDim(c.embedding, `chunk ${c.chunkIndex}`);
 
-      // Keep content in metadata (for fast retrieval), but cap size
-      const content = (c.content || "").slice(0, 5000);
+      // Keep content in metadata (for fast retrieval), but cap size.
+      const rawContent = (c.content || "").slice(0, 5000);
+      const content = stripPlaintext ? undefined : rawContent;
+      const contentHash = stripPlaintext
+        ? createHash("sha256").update(rawContent).digest("hex")
+        : undefined;
 
       const meta = this.sanitizeMetadata({
         // scoping
@@ -229,6 +240,7 @@ export class PineconeService {
         // chunk metadata
         chunkIndex: c.chunkIndex,
         content,
+        contentHash,
 
         // embedding model tracking (for consistency verification)
         embeddingModel:
