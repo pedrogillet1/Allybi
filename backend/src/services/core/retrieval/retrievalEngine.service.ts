@@ -319,6 +319,7 @@ export interface EvidencePack {
     uniqueDocsInEvidence: number;
     topScore: number | null;
     scoreGap: number | null;
+    docLevelScores?: Record<string, number>;
   };
 
   evidence: EvidenceItem[];
@@ -3596,6 +3597,32 @@ export class RetrievalEngineService {
   // Packaging
   // -----------------------------
 
+  /**
+   * Compute aggregate doc-level score from all chunks belonging to a document.
+   * Formula: max(chunk scores) * 0.7 + mean(top-3 chunk scores) * 0.3
+   * This rewards documents with multiple strong chunks over single-chunk docs.
+   */
+  private computeDocLevelScores(
+    candidates: CandidateChunk[],
+  ): Map<string, number> {
+    const byDoc = new Map<string, number[]>();
+    for (const c of candidates) {
+      const scores = byDoc.get(c.docId) ?? [];
+      scores.push(c.scores.final ?? 0);
+      byDoc.set(c.docId, scores);
+    }
+
+    const result = new Map<string, number>();
+    for (const [docId, scores] of byDoc) {
+      scores.sort((a, b) => b - a);
+      const maxScore = scores[0] ?? 0;
+      const top3 = scores.slice(0, 3);
+      const meanTop3 = top3.reduce((a, b) => a + b, 0) / top3.length;
+      result.set(docId, maxScore * 0.7 + meanTop3 * 0.3);
+    }
+    return result;
+  }
+
   private packageEvidence(
     candidates: CandidateChunk[],
     req: RetrievalRequest,
@@ -3730,6 +3757,15 @@ export class RetrievalEngineService {
     // especially for Portuguese meta-questions whose tokens don't appear in
     // document text. Any evidence from attached docs is better than none.
     const scopedMinScore = ctx.scope.hardScopeActive ? 0 : minFinalScore;
+
+    // Doc-level aggregation: blend 5% doc score into chunk scores
+    const docScores = this.computeDocLevelScores(candidates);
+    for (const c of candidates) {
+      const docScore = docScores.get(c.docId) ?? 0;
+      const chunkScore = c.scores.final ?? 0;
+      c.scores.final = chunkScore * 0.95 + docScore * 0.05;
+    }
+    candidates.sort((a, b) => (b.scores.final ?? 0) - (a.scores.final ?? 0));
 
     const evidence: EvidenceItem[] = [];
     const perDoc = new Map<string, number>();
@@ -3958,6 +3994,7 @@ export class RetrievalEngineService {
         uniqueDocsInEvidence: uniqueDocs.size,
         topScore,
         scoreGap,
+        docLevelScores: Object.fromEntries(docScores),
       },
       evidence,
       conflicts: this.detectEvidenceConflicts(evidence),
