@@ -2375,6 +2375,13 @@ export class RetrievalEngineService {
     hit: any,
     req: RetrievalRequest,
   ): CandidateChunk["table"] {
+    // Read cap from table_render_policy bank, default 140
+    let maxRows = 140;
+    try {
+      const trp = this.safeGetBank<any>("table_render_policy");
+      maxRows = safeNumber(trp?.config?.maxRowsPerChunk, 140);
+    } catch { /* bank may not exist; use default */ }
+
     const explicitTable = hit?.table;
     if (explicitTable && typeof explicitTable === "object") {
       const header = Array.isArray(explicitTable.header)
@@ -2382,10 +2389,11 @@ export class RetrievalEngineService {
             .map((value: unknown) => String(value ?? "").trim())
             .filter(Boolean)
         : [];
+
       const rows = Array.isArray(explicitTable.rows)
         ? explicitTable.rows
             .filter((row: unknown) => Array.isArray(row))
-            .slice(0, 12)
+            .slice(0, maxRows)
             .map((row: any[]) =>
               row.map((value) =>
                 value == null
@@ -2444,7 +2452,7 @@ export class RetrievalEngineService {
       .filter((cells) => cells.length >= 2);
     if (parsed.length < 2) return null;
     const header = parsed[0];
-    const rows = parsed.slice(1, 9).map((row) =>
+    const rows = parsed.slice(1, maxRows + 1).map((row) =>
       row.map((cell) => {
         const numeric = Number(cell.replace(/[,$%]/g, ""));
         if (Number.isFinite(numeric) && cell.match(/[0-9]/)) return numeric;
