@@ -3438,6 +3438,22 @@ export class RetrievalEngineService {
   // Conflict Detection
   // -----------------------------
 
+  /**
+   * Parse a number string respecting both US (1,500.00) and BR (1.500,00) formats.
+   * Heuristic: if last separator is comma with 1-2 decimal digits after → BR format.
+   */
+  private parseLocaleNumber(raw: string): number {
+    const cleaned = raw.trim();
+    // Check for BR format: dots as thousands separators, comma as decimal
+    const brMatch = cleaned.match(/^([+-]?\d[\d.]*),(\d{1,2})$/);
+    if (brMatch) {
+      const intPart = brMatch[1].replace(/\./g, "");
+      return parseFloat(`${intPart}.${brMatch[2]}`);
+    }
+    // Default US: commas are thousands separators
+    return parseFloat(cleaned.replace(/,/g, ""));
+  }
+
   private detectEvidenceConflicts(
     evidence: EvidenceItem[],
   ): Array<{ metric: string; docA: string; valueA: number; docB: string; valueB: number }> {
@@ -3458,8 +3474,7 @@ export class RetrievalEngineService {
       let match: RegExpExecArray | null;
       while ((match = numPattern.exec(text)) !== null) {
         const fullMatch = match[0].trim();
-        const numStr = match[1].replace(/,/g, "");
-        const value = parseFloat(numStr);
+        const value = this.parseLocaleNumber(match[1]);
         if (!Number.isFinite(value)) continue;
         const words = fullMatch.replace(/[-+]?\d[\d.,]*/g, "").trim().toLowerCase();
         const metricKey = words.split(/\s+/).slice(-10).join(" ").trim();

@@ -181,3 +181,42 @@ describe("compressSnippet sentence boundary vs extensions", () => {
     expect(result).toMatch(/\.\.\.$/);
   });
 });
+
+describe("parseLocaleNumber", () => {
+  /**
+   * Standalone mirror of parseLocaleNumber for unit testing.
+   */
+  function parseLocaleNumber(raw: string): number {
+    const cleaned = raw.trim();
+    const brMatch = cleaned.match(/^([+-]?\d[\d.]*),(\d{1,2})$/);
+    if (brMatch) {
+      const intPart = brMatch[1].replace(/\./g, "");
+      return parseFloat(`${intPart}.${brMatch[2]}`);
+    }
+    return parseFloat(cleaned.replace(/,/g, ""));
+  }
+
+  test("parses US format 1,500,000 correctly", () => {
+    expect(parseLocaleNumber("1,500,000")).toBe(1500000);
+  });
+
+  test("parses Brazilian format 1.500,00 correctly", () => {
+    expect(parseLocaleNumber("1.500,00")).toBeCloseTo(1500, 0);
+  });
+
+  test("parses Brazilian format 2.500,00 correctly", () => {
+    expect(parseLocaleNumber("2.500,00")).toBeCloseTo(2500, 0);
+  });
+
+  test("parses simple integer", () => {
+    expect(parseLocaleNumber("42")).toBe(42);
+  });
+
+  test("parses US decimal 1,500.75", () => {
+    expect(parseLocaleNumber("1,500.75")).toBeCloseTo(1500.75, 2);
+  });
+
+  test("parses negative BR format -1.500,00", () => {
+    expect(parseLocaleNumber("-1.500,00")).toBeCloseTo(-1500, 0);
+  });
+});
