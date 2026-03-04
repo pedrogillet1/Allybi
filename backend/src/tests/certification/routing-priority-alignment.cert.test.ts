@@ -53,4 +53,36 @@ describe("routing-priority-alignment", () => {
         expect.any(Number));
     }
   });
+
+  test("numeric priority values match across routing_priority, intent_config, and operator_families", () => {
+    const mismatches: string[] = [];
+    for (const [familyId, rpPriority] of Object.entries(routingPriority.intentFamilyBasePriority) as [string, number][]) {
+      // Check intent_config
+      const icFamily = (intentConfig.intentFamilies as any[]).find((f: any) => f.id === familyId);
+      if (icFamily && icFamily.priority !== rpPriority) {
+        mismatches.push(`${familyId}: routing_priority=${rpPriority}, intent_config=${icFamily.priority}`);
+      }
+      // Check operator_families (map intentFamily back to family, skip doc_discovery sub-family)
+      const ofFamily = (operatorFamilies.families as any[]).find(
+        (f: any) => (f.intentFamily || f.id) === familyId && f.id !== "doc_discovery"
+      );
+      if (ofFamily && ofFamily.priority !== rpPriority) {
+        mismatches.push(`${familyId}: routing_priority=${rpPriority}, operator_families=${ofFamily.priority}`);
+      }
+    }
+    expect(mismatches).toEqual([]);
+  });
+
+  test("intent_patterns operators all have numeric priority (guard against accidental removal)", () => {
+    const intentPatterns = readJson("routing/intent_patterns.any.json");
+    const operators = intentPatterns.operators || {};
+    const missing: string[] = [];
+    for (const [id, def] of Object.entries(operators) as [string, any][]) {
+      if (id.startsWith("_")) continue;
+      if (typeof def.priority !== "number") {
+        missing.push(id);
+      }
+    }
+    expect(missing).toEqual([]);
+  });
 });

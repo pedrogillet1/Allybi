@@ -81,6 +81,11 @@ function attachRequestIdToMeta(
   if (requestId && !meta.requestId) {
     meta.requestId = requestId;
   }
+  // Always propagate the HTTP middleware requestId so the runtime can
+  // fall back to it when body meta.requestId is absent or invalid.
+  if (requestId) {
+    meta.httpRequestId = requestId;
+  }
 }
 
 const resolvePreferredLanguage = resolveChatPreferredLanguage;
@@ -306,13 +311,20 @@ router.post(
     delete (meta as any).viewerSelection;
     delete (meta as any).viewerHistory;
 
+    // Resolve the best-effort traceId for the response header.
+    // The runtime will use the same meta values so this will match unless
+    // both meta.requestId and meta.httpRequestId are missing/invalid.
+    const sseTraceId = String(meta.requestId || meta.httpRequestId || "").trim();
+
     // SSE headers (set before try so finally can always end)
-    res.writeHead(200, {
+    const sseHeaders: Record<string, string> = {
       "Content-Type": "text/event-stream; charset=utf-8",
       "Cache-Control": "no-cache, no-transform",
       Connection: "keep-alive",
       "X-Accel-Buffering": "no",
-    });
+    };
+    if (sseTraceId) sseHeaders["x-trace-id"] = sseTraceId;
+    res.writeHead(200, sseHeaders);
     res.flushHeaders();
 
     try {
@@ -476,6 +488,7 @@ router.post(
         meta,
         context,
       });
+      if (result.traceId) res.setHeader("x-trace-id", result.traceId);
       res.json(toChatHttpEnvelope(result));
     } catch (e: any) {
       if (isConversationNotFoundError(e)) {
@@ -728,6 +741,7 @@ router.post(
         connectorContext: connectorContext as any,
       });
 
+      if (result.traceId) res.setHeader("x-trace-id", result.traceId);
       const envelope = toChatHttpEnvelope(result);
       res.json({
         ...envelope,
@@ -811,6 +825,7 @@ router.post(
         connectorContext: connectorContext as any,
       });
 
+      if (result.traceId) res.setHeader("x-trace-id", result.traceId);
       const envelope = toChatHttpEnvelope(result);
       res.json({
         ...envelope,
@@ -879,6 +894,9 @@ router.post(
       res.setHeader("Cache-Control", "no-cache, no-transform");
       res.setHeader("Connection", "keep-alive");
       res.setHeader("X-Accel-Buffering", "no");
+      // Best-effort traceId header — matches what the runtime will resolve
+      const adaptiveTraceId = String(meta.requestId || meta.httpRequestId || "").trim();
+      if (adaptiveTraceId) res.setHeader("x-trace-id", adaptiveTraceId);
 
       res.write(
         `data: ${JSON.stringify({ type: "connected", conversationId })}\n\n`,
