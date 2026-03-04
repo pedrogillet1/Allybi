@@ -44,4 +44,13 @@ describe("routing-priority-alignment", () => {
       expect(priority).toBeGreaterThan(0);
     }
   });
+
+  test("intent_patterns.intentFamilies does not redefine priority (defers to routing_priority)", () => {
+    const intentPatterns = readJson("routing/intent_patterns.any.json");
+    const families = intentPatterns.intentFamilies || {};
+    for (const [id, def] of Object.entries(families) as [string, any][]) {
+      expect(def).not.toHaveProperty("priority",
+        expect.any(Number));
+    }
+  });
 });
