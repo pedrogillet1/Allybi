@@ -11,6 +11,7 @@ import { extractDocxWithAnchors } from "../../extraction/docxExtractor.service";
 import { extractXlsxWithAnchors } from "../../extraction/xlsxExtractor.service";
 import { extractPptxWithAnchors } from "../../extraction/pptxExtractor.service";
 import { getGoogleVisionOcrService } from "../../extraction/google-vision-ocr.service";
+import { extractWithTesseract } from "../../extraction/tesseractFallback.service";
 import type { DispatchedExtractionResult } from "./extractionResult.types";
 
 // ---------------------------------------------------------------------------
@@ -30,6 +31,17 @@ export const PPTX_MIMES = [
   "application/vnd.openxmlformats-officedocument.presentationml.presentation",
   "application/vnd.ms-powerpoint",
 ];
+
+// ---------------------------------------------------------------------------
+// OLE binary detection (legacy .doc / .xls / .ppt)
+// ---------------------------------------------------------------------------
+
+const OLE_MAGIC = [0xd0, 0xcf, 0x11, 0xe0];
+
+function isOleBinary(buffer: Buffer): boolean {
+  if (buffer.length < 4) return false;
+  return OLE_MAGIC.every((byte, i) => buffer[i] === byte);
+}
 
 /** Images are visual-first — they should remain visible even if OCR finds no text. */
 export function isImageMime(mime: string): boolean {
@@ -92,16 +104,31 @@ export async function extractText(
   }
 
   if (DOCX_MIMES.includes(mimeType)) {
+    if (isOleBinary(buffer)) {
+      throw new Error(
+        "Legacy .doc format is not supported. Please convert to .docx (File > Save As > .docx) and re-upload.",
+      );
+    }
     const result = await extractDocxWithAnchors(buffer);
     return { sourceType: "docx", sections: [], ...result } as unknown as DispatchedExtractionResult;
   }
 
   if (XLSX_MIMES.includes(mimeType)) {
+    if (isOleBinary(buffer)) {
+      throw new Error(
+        "Legacy .xls format is not supported. Please convert to .xlsx (File > Save As > .xlsx) and re-upload.",
+      );
+    }
     const result = await extractXlsxWithAnchors(buffer);
     return { sourceType: "xlsx", sheetCount: 0, sheets: [], ...result } as unknown as DispatchedExtractionResult;
   }
 
   if (PPTX_MIMES.includes(mimeType)) {
+    if (isOleBinary(buffer)) {
+      throw new Error(
+        "Legacy .ppt format is not supported. Please convert to .pptx (File > Save As > .pptx) and re-upload.",
+      );
+    }
     const result = await extractPptxWithAnchors(buffer);
     return { sourceType: "pptx", slideCount: 0, slides: [], ...result } as unknown as DispatchedExtractionResult;
   }
@@ -130,7 +157,7 @@ export async function extractText(
           sourceType: "image",
           text: "",
           wordCount: 0,
-          confidence: 1.0,
+          confidence: 0,
           skipped: true,
           skipReason: `Image saved as visual-only (${skipCheck.reason})`,
         };
@@ -139,11 +166,31 @@ export async function extractText(
 
     const visionService = getGoogleVisionOcrService();
     if (!visionService.isAvailable()) {
-      const reason = `Image OCR unavailable (Google Vision not initialized): ${visionService.getInitError() || "no credentials"}`;
-      logger.warn("[OCR] Provider unavailable, saving as visual-only", {
+      // Primary OCR unavailable — try Tesseract.js fallback
+      logger.info("[OCR] Google Vision unavailable, trying Tesseract fallback", {
         filename,
         mimeType,
-        reason,
+        initError: visionService.getInitError(),
+      });
+
+      const fallbackResult = await extractWithTesseract(buffer, "eng");
+      if (fallbackResult.text && fallbackResult.text.trim().length > 0) {
+        logger.info("[OCR] Tesseract fallback succeeded", {
+          filename,
+          textLength: fallbackResult.text.length,
+          confidence: fallbackResult.confidence,
+        });
+        return {
+          sourceType: "image",
+          text: fallbackResult.text,
+          wordCount: fallbackResult.text.split(/\s+/).length,
+          confidence: fallbackResult.confidence,
+        };
+      }
+
+      logger.warn("[OCR] Tesseract fallback produced no text, saving as visual-only", {
+        filename,
+        mimeType,
       });
       return {
         sourceType: "image",
@@ -151,7 +198,7 @@ export async function extractText(
         wordCount: 0,
         confidence: 0,
         skipped: true,
-        skipReason: `Image saved as visual-only (${reason})`,
+        skipReason: "Image saved as visual-only (Google Vision unavailable, Tesseract returned no text)",
       };
     }
 
@@ -168,7 +215,7 @@ export async function extractText(
           sourceType: "image",
           text: "",
           wordCount: 0,
-          confidence: 1.0,
+          confidence: 0,
           skipped: true,
           skipReason: "Image contains no text (visual-only)",
         };
