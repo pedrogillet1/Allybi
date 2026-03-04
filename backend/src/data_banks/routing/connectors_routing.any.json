@@ -1,23 +1,34 @@
 {
   "bankId": "connectors_routing",
   "version": "1.2.0",
-  "localeSupport": ["en", "pt"],
+  "localeSupport": [
+    "en",
+    "pt"
+  ],
   "description": "High-coverage routing rules for connector lifecycle (Gmail/Outlook/Slack). Enforces connect-before-sync/search and permission gates.",
   "updatedAt": "2026-02-28T00:00:00.000Z",
   "schemaVersion": 1,
-
   "_meta": {
     "id": "connectors_routing",
     "version": "1.2.0",
     "description": "Routing rules for connector lifecycle (Gmail, Outlook, Slack). Handles connect, sync, search, status, and disconnect intents in EN/PT.",
-    "languages": ["any", "en", "pt"],
-    "lastUpdated": "2026-02-28"
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-02-28",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
-
   "config": {
     "enabled": true,
     "strict": true,
-
     "matching": {
       "useRegex": true,
       "caseSensitive": false,
@@ -25,29 +36,32 @@
       "collapseWhitespace": true,
       "maxCandidates": 3
     },
-
     "defaults": {
       "intent": "CONNECTORS",
       "domain": "connectors",
       "scope": "connectors"
     },
-
     "thresholds": {
       "minConfidence": 0.57,
       "highConfidence": 0.87,
       "minDecisionMargin": 0.12,
       "forceClarificationMarginBelow": 0.06
     },
-
     "guardrails": {
       "requireConnectBeforeSyncOrSearch": true,
       "neverReadConnectorContentWithoutUserPermission": true,
       "disconnectAlwaysConfirm": true
-    }
+    },
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
-
   "providers": {
-    "allowed": ["gmail", "outlook", "slack"],
+    "allowed": [
+      "gmail",
+      "outlook",
+      "slack"
+    ],
     "aliases": {
       "google mail": "gmail",
       "google workspace mail": "gmail",
@@ -57,7 +71,6 @@
       "ms outlook": "outlook"
     }
   },
-
   "operators": {
     "canonical": [
       "CONNECT_START",
@@ -66,14 +79,18 @@
       "CONNECTOR_STATUS",
       "CONNECTOR_DISCONNECT"
     ],
-    "alwaysConfirm": ["CONNECTOR_DISCONNECT"]
+    "alwaysConfirm": [
+      "CONNECTOR_DISCONNECT"
+    ]
   },
-
   "rules": [
     {
       "ruleId": "CR_100_connect_start",
       "priority": 100,
-      "supportedLocales": ["en", "pt"],
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
       "when": {
         "any": [
           {
@@ -133,11 +150,13 @@
       "confidenceBoost": 0.2,
       "reasonCode": "connector_connect_requested"
     },
-
     {
       "ruleId": "CR_090_sync",
       "priority": 90,
-      "supportedLocales": ["en", "pt"],
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
       "when": {
         "any": [
           {
@@ -198,11 +217,13 @@
       "confidenceBoost": 0.16,
       "reasonCode": "connector_sync_requested"
     },
-
     {
       "ruleId": "CR_080_search",
       "priority": 80,
-      "supportedLocales": ["en", "pt"],
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
       "when": {
         "any": [
           {
@@ -251,11 +272,13 @@
       "confidenceBoost": 0.12,
       "reasonCode": "connector_search_requested"
     },
-
     {
       "ruleId": "CR_070_status",
       "priority": 70,
-      "supportedLocales": ["en", "pt"],
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
       "when": {
         "any": [
           {
@@ -311,11 +334,13 @@
       "confidenceBoost": 0.1,
       "reasonCode": "connector_status_requested"
     },
-
     {
       "ruleId": "CR_060_disconnect",
       "priority": 60,
-      "supportedLocales": ["en", "pt"],
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
       "when": {
         "any": [
           {
@@ -376,17 +401,23 @@
       "reasonCode": "connector_disconnect_requested"
     }
   ],
-
   "disambiguation": {
     "requiredWhen": {
-      "missingProviderForOperators": ["CONNECT_START", "CONNECTOR_SYNC", "CONNECTOR_SEARCH", "CONNECTOR_DISCONNECT"],
+      "missingProviderForOperators": [
+        "CONNECT_START",
+        "CONNECTOR_SYNC",
+        "CONNECTOR_SEARCH",
+        "CONNECTOR_DISCONNECT"
+      ],
       "confidenceBelow": 0.64,
       "decisionMarginBelow": 0.06
     },
-    "actions": ["pick_provider", "cancel"],
+    "actions": [
+      "pick_provider",
+      "cancel"
+    ],
     "uiBlock": "choices"
   },
-
   "outputContract": {
     "shape": {
       "intent": "CONNECTORS",
@@ -399,23 +430,37 @@
       "databanksUsed": "string[]"
     }
   },
-
   "tests": {
     "cases": [
       {
         "id": "CR_T_0001_connect_gmail_en",
-        "input": { "text": "connect gmail", "language": "en" },
-        "expect": { "operator": "CONNECT_START" }
+        "input": {
+          "text": "connect gmail",
+          "language": "en"
+        },
+        "expect": {
+          "operator": "CONNECT_START"
+        }
       },
       {
         "id": "CR_T_0002_sync_slack_pt",
-        "input": { "text": "sincronizar slack agora", "language": "pt" },
-        "expect": { "operator": "CONNECTOR_SYNC" }
+        "input": {
+          "text": "sincronizar slack agora",
+          "language": "pt"
+        },
+        "expect": {
+          "operator": "CONNECTOR_SYNC"
+        }
       },
       {
         "id": "CR_T_0003_search_outlook_en",
-        "input": { "text": "find the latest invoice email in outlook", "language": "en" },
-        "expect": { "operator": "CONNECTOR_SEARCH" }
+        "input": {
+          "text": "find the latest invoice email in outlook",
+          "language": "en"
+        },
+        "expect": {
+          "operator": "CONNECTOR_SEARCH"
+        }
       }
     ]
   }

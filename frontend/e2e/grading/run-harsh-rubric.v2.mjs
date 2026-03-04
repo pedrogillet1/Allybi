@@ -609,6 +609,63 @@ function assessProvenanceRichness(row) {
   return { sourceCount: records.length, richCount };
 }
 
+function hasSourceButtonsAttachment(rawAttachments) {
+  if (!Array.isArray(rawAttachments)) return false;
+  return rawAttachments.some(
+    (attachment) =>
+      attachment &&
+      typeof attachment === 'object' &&
+      attachment.type === 'source_buttons' &&
+      Array.isArray(attachment.buttons) &&
+      attachment.buttons.length > 0,
+  );
+}
+
+function validateArtifactIntegrity(normalized) {
+  const rows = Array.isArray(normalized?.rows) ? normalized.rows : [];
+  const stats = {
+    rows: rows.length,
+    rowsWithSources: 0,
+    rowsWithSourceButtons: 0,
+    sourceCount: 0,
+    richSourceCount: 0,
+    issues: [],
+  };
+  for (const row of rows) {
+    const records = collectSourceRecords(row);
+    if (records.length > 0) stats.rowsWithSources += 1;
+    if (hasSourceButtonsAttachment(row.rawAttachments)) {
+      stats.rowsWithSourceButtons += 1;
+    }
+    for (const source of records) {
+      stats.sourceCount += 1;
+      const hasTypedLocation =
+        (Number.isFinite(source.page) && source.page > 0) ||
+        (Number.isFinite(source.slide) && source.slide > 0) ||
+        Boolean(String(source.sheet || '').trim()) ||
+        Boolean(String(source.cell || '').trim()) ||
+        Boolean(String(source.section || '').trim()) ||
+        Boolean(String(source.locationLabel || '').trim());
+      const hasUsableLocationKey = Boolean(
+        source.locationKey && !String(source.locationKey).includes('|p:-1|'),
+      );
+      if (hasTypedLocation || hasUsableLocationKey) {
+        stats.richSourceCount += 1;
+      }
+    }
+  }
+  if (stats.rowsWithSources > 0 && stats.rowsWithSourceButtons === 0) {
+    stats.issues.push('SOURCE_BUTTONS_ATTACHMENT_MISSING_ACROSS_ALL_ROWS');
+  }
+  if (stats.sourceCount > 0 && stats.richSourceCount === 0) {
+    stats.issues.push('SOURCE_LOCATION_METADATA_MISSING_ACROSS_ALL_ROWS');
+  }
+  return {
+    ...stats,
+    ok: stats.issues.length === 0,
+  };
+}
+
 function isAnalyticalFormattingRequired(query, queryProfile) {
   if (String(queryProfile || '').toLowerCase() === 'analytical') return true;
   return /(how many|percentage|what share|rate|average|which|list|compare|top|breakdown|identify)/i.test(
@@ -1107,6 +1164,16 @@ function main() {
     );
     process.exit(1);
   }
+  const artifactIntegrity = validateArtifactIntegrity(normalized);
+  if (!artifactIntegrity.ok) {
+    console.error(
+      `[harsh-rubric] input artifact failed integrity checks: ${artifactIntegrity.issues.join(', ')}`,
+    );
+    console.error(
+      `[harsh-rubric] rowsWithSources=${artifactIntegrity.rowsWithSources} rowsWithSourceButtons=${artifactIntegrity.rowsWithSourceButtons} richSourceCount=${artifactIntegrity.richSourceCount}`,
+    );
+    process.exit(1);
+  }
 
   const scoredRows = normalized.rows.map((row) =>
     evaluateQuery(row, {
@@ -1136,6 +1203,7 @@ function main() {
       scopePolicyApplied: normalized.scopePolicyApplied,
       queryProfile: normalized.queryProfile,
       domainHint: normalized.domainHint,
+      artifactIntegrity,
     },
     summary,
     rows: scoredRows,

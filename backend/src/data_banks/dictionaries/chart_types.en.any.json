@@ -4,920 +4,2238 @@
     "version": "1.0.0",
     "description": "Comprehensive English chart type dictionary with synonyms, data shape requirements, and best-use guidance.",
     "lastUpdated": "2026-02-27",
-    "languages": ["en"]
+    "languages": [
+      "en"
+    ],
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
-  "config": { "enabled": true },
+  "config": {
+    "enabled": true
+  },
   "chartTypes": [
     {
       "id": "bar",
       "canonicalName": "Bar Chart",
-      "aliases": ["bar", "bar chart", "horizontal bar", "bar graph", "horizontal bar chart"],
+      "aliases": [
+        "bar",
+        "bar chart",
+        "horizontal bar",
+        "bar graph",
+        "horizontal bar chart"
+      ],
       "category": "comparison",
-      "dataShape": { "x": "categorical", "y": "numeric", "series": "optional" },
-      "bestFor": ["Comparing categories", "Ranking items"],
-      "avoidWhen": ["Time series data", "Too many categories (>15)"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "numeric",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Comparing categories",
+        "Ranking items"
+      ],
+      "avoidWhen": [
+        "Time series data",
+        "Too many categories (>15)"
+      ],
       "excelChartType": "bar",
       "matplotlibType": "barh"
     },
     {
       "id": "column",
       "canonicalName": "Column Chart",
-      "aliases": ["column", "column chart", "vertical bar", "vertical bar chart", "column graph"],
+      "aliases": [
+        "column",
+        "column chart",
+        "vertical bar",
+        "vertical bar chart",
+        "column graph"
+      ],
       "category": "comparison",
-      "dataShape": { "x": "categorical", "y": "numeric", "series": "optional" },
-      "bestFor": ["Comparing categories", "Showing changes over few periods"],
-      "avoidWhen": ["Too many categories (>12)", "Continuous time series"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "numeric",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Comparing categories",
+        "Showing changes over few periods"
+      ],
+      "avoidWhen": [
+        "Too many categories (>12)",
+        "Continuous time series"
+      ],
       "excelChartType": "column",
       "matplotlibType": "bar"
     },
     {
       "id": "line",
       "canonicalName": "Line Chart",
-      "aliases": ["line", "line chart", "line graph", "line plot", "trend line"],
+      "aliases": [
+        "line",
+        "line chart",
+        "line graph",
+        "line plot",
+        "trend line"
+      ],
       "category": "time_series",
-      "dataShape": { "x": "sequential", "y": "numeric", "series": "optional" },
-      "bestFor": ["Showing trends over time", "Comparing multiple series"],
-      "avoidWhen": ["Categorical data with no order", "Too many overlapping series (>7)"],
+      "dataShape": {
+        "x": "sequential",
+        "y": "numeric",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Showing trends over time",
+        "Comparing multiple series"
+      ],
+      "avoidWhen": [
+        "Categorical data with no order",
+        "Too many overlapping series (>7)"
+      ],
       "excelChartType": "line",
       "matplotlibType": "plot"
     },
     {
       "id": "area",
       "canonicalName": "Area Chart",
-      "aliases": ["area", "area chart", "area graph", "filled line"],
+      "aliases": [
+        "area",
+        "area chart",
+        "area graph",
+        "filled line"
+      ],
       "category": "time_series",
-      "dataShape": { "x": "sequential", "y": "numeric", "series": "optional" },
-      "bestFor": ["Showing volume over time", "Emphasizing magnitude of change"],
-      "avoidWhen": ["Multiple overlapping series that occlude each other", "Negative values"],
+      "dataShape": {
+        "x": "sequential",
+        "y": "numeric",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Showing volume over time",
+        "Emphasizing magnitude of change"
+      ],
+      "avoidWhen": [
+        "Multiple overlapping series that occlude each other",
+        "Negative values"
+      ],
       "excelChartType": "area",
       "matplotlibType": "fill_between"
     },
     {
       "id": "pie",
       "canonicalName": "Pie Chart",
-      "aliases": ["pie", "pie chart", "pie graph", "circle chart"],
+      "aliases": [
+        "pie",
+        "pie chart",
+        "pie graph",
+        "circle chart"
+      ],
       "category": "part_to_whole",
-      "dataShape": { "x": "categorical", "y": "numeric", "series": "none" },
-      "bestFor": ["Showing proportions of a whole", "Simple part-to-whole with few slices"],
-      "avoidWhen": ["More than 6 categories", "Comparing values across groups", "Values do not sum to a meaningful total"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "numeric",
+        "series": "none"
+      },
+      "bestFor": [
+        "Showing proportions of a whole",
+        "Simple part-to-whole with few slices"
+      ],
+      "avoidWhen": [
+        "More than 6 categories",
+        "Comparing values across groups",
+        "Values do not sum to a meaningful total"
+      ],
       "excelChartType": "pie",
       "matplotlibType": "pie"
     },
     {
       "id": "doughnut",
       "canonicalName": "Doughnut Chart",
-      "aliases": ["doughnut", "doughnut chart", "donut", "donut chart", "ring chart"],
+      "aliases": [
+        "doughnut",
+        "doughnut chart",
+        "donut",
+        "donut chart",
+        "ring chart"
+      ],
       "category": "part_to_whole",
-      "dataShape": { "x": "categorical", "y": "numeric", "series": "optional" },
-      "bestFor": ["Part-to-whole with a center label", "Comparing two ring-level breakdowns"],
-      "avoidWhen": ["More than 6 slices per ring", "Precise value comparison needed"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "numeric",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Part-to-whole with a center label",
+        "Comparing two ring-level breakdowns"
+      ],
+      "avoidWhen": [
+        "More than 6 slices per ring",
+        "Precise value comparison needed"
+      ],
       "excelChartType": "doughnut",
       "matplotlibType": "pie"
     },
     {
       "id": "scatter",
       "canonicalName": "Scatter Plot",
-      "aliases": ["scatter", "scatter plot", "scatter chart", "xy chart", "scatter diagram", "point cloud"],
+      "aliases": [
+        "scatter",
+        "scatter plot",
+        "scatter chart",
+        "xy chart",
+        "scatter diagram",
+        "point cloud"
+      ],
       "category": "relationship",
-      "dataShape": { "x": "numeric", "y": "numeric", "series": "optional" },
-      "bestFor": ["Identifying correlations", "Spotting outliers", "Showing distribution of two variables"],
-      "avoidWhen": ["Too many overlapping points without transparency", "Categorical axes"],
+      "dataShape": {
+        "x": "numeric",
+        "y": "numeric",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Identifying correlations",
+        "Spotting outliers",
+        "Showing distribution of two variables"
+      ],
+      "avoidWhen": [
+        "Too many overlapping points without transparency",
+        "Categorical axes"
+      ],
       "excelChartType": "scatter",
       "matplotlibType": "scatter"
     },
     {
       "id": "bubble",
       "canonicalName": "Bubble Chart",
-      "aliases": ["bubble", "bubble chart", "bubble plot", "sized scatter"],
+      "aliases": [
+        "bubble",
+        "bubble chart",
+        "bubble plot",
+        "sized scatter"
+      ],
       "category": "relationship",
-      "dataShape": { "x": "numeric", "y": "numeric", "size": "numeric", "series": "optional" },
-      "bestFor": ["Three-variable comparison", "Highlighting magnitude via bubble size"],
-      "avoidWhen": ["Too many overlapping bubbles", "Precise size comparison needed"],
+      "dataShape": {
+        "x": "numeric",
+        "y": "numeric",
+        "size": "numeric",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Three-variable comparison",
+        "Highlighting magnitude via bubble size"
+      ],
+      "avoidWhen": [
+        "Too many overlapping bubbles",
+        "Precise size comparison needed"
+      ],
       "excelChartType": "bubble",
       "matplotlibType": "scatter"
     },
     {
       "id": "histogram",
       "canonicalName": "Histogram",
-      "aliases": ["histogram", "frequency chart", "frequency distribution", "distribution chart"],
+      "aliases": [
+        "histogram",
+        "frequency chart",
+        "frequency distribution",
+        "distribution chart"
+      ],
       "category": "distribution",
-      "dataShape": { "x": "numeric", "y": "frequency", "series": "none" },
-      "bestFor": ["Showing data distribution", "Identifying skewness and modality"],
-      "avoidWhen": ["Categorical data", "Very small sample sizes (<20)"],
+      "dataShape": {
+        "x": "numeric",
+        "y": "frequency",
+        "series": "none"
+      },
+      "bestFor": [
+        "Showing data distribution",
+        "Identifying skewness and modality"
+      ],
+      "avoidWhen": [
+        "Categorical data",
+        "Very small sample sizes (<20)"
+      ],
       "excelChartType": "histogram",
       "matplotlibType": "hist"
     },
     {
       "id": "box_plot",
       "canonicalName": "Box Plot",
-      "aliases": ["box plot", "box and whisker", "box-and-whisker chart", "boxplot", "box chart"],
+      "aliases": [
+        "box plot",
+        "box and whisker",
+        "box-and-whisker chart",
+        "boxplot",
+        "box chart"
+      ],
       "category": "distribution",
-      "dataShape": { "x": "categorical", "y": "numeric", "series": "optional" },
-      "bestFor": ["Comparing distributions across groups", "Identifying outliers and spread"],
-      "avoidWhen": ["Audiences unfamiliar with statistics", "Very small sample sizes"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "numeric",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Comparing distributions across groups",
+        "Identifying outliers and spread"
+      ],
+      "avoidWhen": [
+        "Audiences unfamiliar with statistics",
+        "Very small sample sizes"
+      ],
       "excelChartType": "boxWhisker",
       "matplotlibType": "boxplot"
     },
     {
       "id": "stacked_bar",
       "canonicalName": "Stacked Bar Chart",
-      "aliases": ["stacked bar", "stacked bar chart", "stacked horizontal bar", "segmented bar"],
+      "aliases": [
+        "stacked bar",
+        "stacked bar chart",
+        "stacked horizontal bar",
+        "segmented bar"
+      ],
       "category": "comparison",
-      "dataShape": { "x": "categorical", "y": "numeric", "series": "required" },
-      "bestFor": ["Showing totals and their sub-components", "Part-to-whole within categories"],
-      "avoidWhen": ["Comparing individual segments across categories", "Too many series (>5)"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "numeric",
+        "series": "required"
+      },
+      "bestFor": [
+        "Showing totals and their sub-components",
+        "Part-to-whole within categories"
+      ],
+      "avoidWhen": [
+        "Comparing individual segments across categories",
+        "Too many series (>5)"
+      ],
       "excelChartType": "barStacked",
       "matplotlibType": "barh"
     },
     {
       "id": "stacked_column",
       "canonicalName": "Stacked Column Chart",
-      "aliases": ["stacked column", "stacked column chart", "stacked vertical bar"],
+      "aliases": [
+        "stacked column",
+        "stacked column chart",
+        "stacked vertical bar"
+      ],
       "category": "comparison",
-      "dataShape": { "x": "categorical", "y": "numeric", "series": "required" },
-      "bestFor": ["Comparing totals while showing composition", "Categorical composition over periods"],
-      "avoidWhen": ["Comparing individual sub-segments", "More than 5 stacked series"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "numeric",
+        "series": "required"
+      },
+      "bestFor": [
+        "Comparing totals while showing composition",
+        "Categorical composition over periods"
+      ],
+      "avoidWhen": [
+        "Comparing individual sub-segments",
+        "More than 5 stacked series"
+      ],
       "excelChartType": "columnStacked",
       "matplotlibType": "bar"
     },
     {
       "id": "stacked_area",
       "canonicalName": "Stacked Area Chart",
-      "aliases": ["stacked area", "stacked area chart", "cumulative area"],
+      "aliases": [
+        "stacked area",
+        "stacked area chart",
+        "cumulative area"
+      ],
       "category": "time_series",
-      "dataShape": { "x": "sequential", "y": "numeric", "series": "required" },
-      "bestFor": ["Showing cumulative totals over time", "Visualizing composition trends"],
-      "avoidWhen": ["Too many series that are hard to distinguish", "Negative values"],
+      "dataShape": {
+        "x": "sequential",
+        "y": "numeric",
+        "series": "required"
+      },
+      "bestFor": [
+        "Showing cumulative totals over time",
+        "Visualizing composition trends"
+      ],
+      "avoidWhen": [
+        "Too many series that are hard to distinguish",
+        "Negative values"
+      ],
       "excelChartType": "areaStacked",
       "matplotlibType": "stackplot"
     },
     {
       "id": "percent_stacked_bar",
       "canonicalName": "100% Stacked Bar Chart",
-      "aliases": ["percent stacked bar", "100% stacked bar", "proportional bar", "normalized bar"],
+      "aliases": [
+        "percent stacked bar",
+        "100% stacked bar",
+        "proportional bar",
+        "normalized bar"
+      ],
       "category": "part_to_whole",
-      "dataShape": { "x": "categorical", "y": "numeric", "series": "required" },
-      "bestFor": ["Comparing proportions across categories", "Showing relative composition"],
-      "avoidWhen": ["Absolute values matter", "Fewer than 3 categories"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "numeric",
+        "series": "required"
+      },
+      "bestFor": [
+        "Comparing proportions across categories",
+        "Showing relative composition"
+      ],
+      "avoidWhen": [
+        "Absolute values matter",
+        "Fewer than 3 categories"
+      ],
       "excelChartType": "barStacked100",
       "matplotlibType": "barh"
     },
     {
       "id": "percent_stacked_column",
       "canonicalName": "100% Stacked Column Chart",
-      "aliases": ["percent stacked column", "100% stacked column", "proportional column", "normalized column"],
+      "aliases": [
+        "percent stacked column",
+        "100% stacked column",
+        "proportional column",
+        "normalized column"
+      ],
       "category": "part_to_whole",
-      "dataShape": { "x": "categorical", "y": "numeric", "series": "required" },
-      "bestFor": ["Comparing proportions over time or across groups", "Normalizing unequal totals"],
-      "avoidWhen": ["Absolute magnitudes are important", "Too many series"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "numeric",
+        "series": "required"
+      },
+      "bestFor": [
+        "Comparing proportions over time or across groups",
+        "Normalizing unequal totals"
+      ],
+      "avoidWhen": [
+        "Absolute magnitudes are important",
+        "Too many series"
+      ],
       "excelChartType": "columnStacked100",
       "matplotlibType": "bar"
     },
     {
       "id": "percent_stacked_area",
       "canonicalName": "100% Stacked Area Chart",
-      "aliases": ["percent stacked area", "100% stacked area", "proportional area", "normalized area"],
+      "aliases": [
+        "percent stacked area",
+        "100% stacked area",
+        "proportional area",
+        "normalized area"
+      ],
       "category": "part_to_whole",
-      "dataShape": { "x": "sequential", "y": "numeric", "series": "required" },
-      "bestFor": ["Showing composition changes over time as percentages", "Comparing share trends"],
-      "avoidWhen": ["Absolute volumes matter", "Fewer than 3 series"],
+      "dataShape": {
+        "x": "sequential",
+        "y": "numeric",
+        "series": "required"
+      },
+      "bestFor": [
+        "Showing composition changes over time as percentages",
+        "Comparing share trends"
+      ],
+      "avoidWhen": [
+        "Absolute volumes matter",
+        "Fewer than 3 series"
+      ],
       "excelChartType": "areaStacked100",
       "matplotlibType": "stackplot"
     },
     {
       "id": "time_series_line",
       "canonicalName": "Time Series Line Chart",
-      "aliases": ["time series", "time series line", "temporal line", "date line chart", "timeline chart"],
+      "aliases": [
+        "time series",
+        "time series line",
+        "temporal line",
+        "date line chart",
+        "timeline chart"
+      ],
       "category": "time_series",
-      "dataShape": { "x": "datetime", "y": "numeric", "series": "optional" },
-      "bestFor": ["Tracking metrics over time", "Identifying long-term trends"],
-      "avoidWhen": ["Irregular time intervals without interpolation", "Categorical comparisons"],
+      "dataShape": {
+        "x": "datetime",
+        "y": "numeric",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Tracking metrics over time",
+        "Identifying long-term trends"
+      ],
+      "avoidWhen": [
+        "Irregular time intervals without interpolation",
+        "Categorical comparisons"
+      ],
       "excelChartType": "line",
       "matplotlibType": "plot"
     },
     {
       "id": "sparkline",
       "canonicalName": "Sparkline",
-      "aliases": ["sparkline", "spark line", "inline chart", "micro chart", "mini chart"],
+      "aliases": [
+        "sparkline",
+        "spark line",
+        "inline chart",
+        "micro chart",
+        "mini chart"
+      ],
       "category": "time_series",
-      "dataShape": { "x": "sequential", "y": "numeric", "series": "none" },
-      "bestFor": ["Compact trend display in tables", "Dashboard KPI indicators"],
-      "avoidWhen": ["Detailed analysis needed", "Axis labels are important"],
+      "dataShape": {
+        "x": "sequential",
+        "y": "numeric",
+        "series": "none"
+      },
+      "bestFor": [
+        "Compact trend display in tables",
+        "Dashboard KPI indicators"
+      ],
+      "avoidWhen": [
+        "Detailed analysis needed",
+        "Axis labels are important"
+      ],
       "excelChartType": "sparkline",
       "matplotlibType": "plot"
     },
     {
       "id": "step_line",
       "canonicalName": "Step Line Chart",
-      "aliases": ["step line", "step chart", "step graph", "staircase chart", "step function"],
+      "aliases": [
+        "step line",
+        "step chart",
+        "step graph",
+        "staircase chart",
+        "step function"
+      ],
       "category": "time_series",
-      "dataShape": { "x": "sequential", "y": "numeric", "series": "optional" },
-      "bestFor": ["Showing discrete changes", "Pricing tiers", "Status changes over time"],
-      "avoidWhen": ["Smooth continuous data", "Too many steps creating visual noise"],
+      "dataShape": {
+        "x": "sequential",
+        "y": "numeric",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Showing discrete changes",
+        "Pricing tiers",
+        "Status changes over time"
+      ],
+      "avoidWhen": [
+        "Smooth continuous data",
+        "Too many steps creating visual noise"
+      ],
       "excelChartType": "line",
       "matplotlibType": "step"
     },
     {
       "id": "area_with_trend",
       "canonicalName": "Area Chart with Trend Line",
-      "aliases": ["area with trend", "trended area", "area trendline", "area with regression"],
+      "aliases": [
+        "area with trend",
+        "trended area",
+        "area trendline",
+        "area with regression"
+      ],
       "category": "time_series",
-      "dataShape": { "x": "sequential", "y": "numeric", "series": "optional" },
-      "bestFor": ["Highlighting overall direction over noisy data", "Forecasting visual aid"],
-      "avoidWhen": ["Non-linear trends without proper fit", "Multiple conflicting trend lines"],
+      "dataShape": {
+        "x": "sequential",
+        "y": "numeric",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Highlighting overall direction over noisy data",
+        "Forecasting visual aid"
+      ],
+      "avoidWhen": [
+        "Non-linear trends without proper fit",
+        "Multiple conflicting trend lines"
+      ],
       "excelChartType": "area",
       "matplotlibType": "fill_between"
     },
     {
       "id": "moving_average",
       "canonicalName": "Moving Average Chart",
-      "aliases": ["moving average", "rolling average", "SMA chart", "smoothed line", "running mean"],
+      "aliases": [
+        "moving average",
+        "rolling average",
+        "SMA chart",
+        "smoothed line",
+        "running mean"
+      ],
       "category": "time_series",
-      "dataShape": { "x": "datetime", "y": "numeric", "window": "integer", "series": "optional" },
-      "bestFor": ["Smoothing noisy time series", "Identifying underlying trends"],
-      "avoidWhen": ["Short data series", "Real-time data where lag matters"],
+      "dataShape": {
+        "x": "datetime",
+        "y": "numeric",
+        "window": "integer",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Smoothing noisy time series",
+        "Identifying underlying trends"
+      ],
+      "avoidWhen": [
+        "Short data series",
+        "Real-time data where lag matters"
+      ],
       "excelChartType": "line",
       "matplotlibType": "plot"
     },
     {
       "id": "seasonal_decomposition",
       "canonicalName": "Seasonal Decomposition Chart",
-      "aliases": ["seasonal decomposition", "STL chart", "decomposition plot", "seasonal breakdown"],
+      "aliases": [
+        "seasonal decomposition",
+        "STL chart",
+        "decomposition plot",
+        "seasonal breakdown"
+      ],
       "category": "time_series",
-      "dataShape": { "x": "datetime", "y": "numeric", "series": "none" },
-      "bestFor": ["Separating trend, seasonal, and residual components", "Understanding cyclical patterns"],
-      "avoidWhen": ["Non-seasonal data", "Insufficient data for multiple cycles"],
+      "dataShape": {
+        "x": "datetime",
+        "y": "numeric",
+        "series": "none"
+      },
+      "bestFor": [
+        "Separating trend, seasonal, and residual components",
+        "Understanding cyclical patterns"
+      ],
+      "avoidWhen": [
+        "Non-seasonal data",
+        "Insufficient data for multiple cycles"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "subplot"
     },
     {
       "id": "candlestick",
       "canonicalName": "Candlestick Chart",
-      "aliases": ["candlestick", "candlestick chart", "OHLC candle", "Japanese candlestick", "candle chart"],
+      "aliases": [
+        "candlestick",
+        "candlestick chart",
+        "OHLC candle",
+        "Japanese candlestick",
+        "candle chart"
+      ],
       "category": "time_series",
-      "dataShape": { "x": "datetime", "open": "numeric", "high": "numeric", "low": "numeric", "close": "numeric" },
-      "bestFor": ["Financial price data", "Showing open-high-low-close in one glyph"],
-      "avoidWhen": ["Non-financial data", "Audiences unfamiliar with financial charts"],
+      "dataShape": {
+        "x": "datetime",
+        "open": "numeric",
+        "high": "numeric",
+        "low": "numeric",
+        "close": "numeric"
+      },
+      "bestFor": [
+        "Financial price data",
+        "Showing open-high-low-close in one glyph"
+      ],
+      "avoidWhen": [
+        "Non-financial data",
+        "Audiences unfamiliar with financial charts"
+      ],
       "excelChartType": "stockOHLC",
       "matplotlibType": "candlestick_ohlc"
     },
     {
       "id": "ohlc",
       "canonicalName": "OHLC Chart",
-      "aliases": ["ohlc", "OHLC chart", "open-high-low-close", "bar stock chart", "price bar chart"],
+      "aliases": [
+        "ohlc",
+        "OHLC chart",
+        "open-high-low-close",
+        "bar stock chart",
+        "price bar chart"
+      ],
       "category": "time_series",
-      "dataShape": { "x": "datetime", "open": "numeric", "high": "numeric", "low": "numeric", "close": "numeric" },
-      "bestFor": ["Financial price movement", "Denser view than candlestick for long periods"],
-      "avoidWhen": ["Non-financial data", "Small screens where tick marks are hard to read"],
+      "dataShape": {
+        "x": "datetime",
+        "open": "numeric",
+        "high": "numeric",
+        "low": "numeric",
+        "close": "numeric"
+      },
+      "bestFor": [
+        "Financial price movement",
+        "Denser view than candlestick for long periods"
+      ],
+      "avoidWhen": [
+        "Non-financial data",
+        "Small screens where tick marks are hard to read"
+      ],
       "excelChartType": "stockOHLC",
       "matplotlibType": "ohlc"
     },
     {
       "id": "density_plot",
       "canonicalName": "Density Plot",
-      "aliases": ["density plot", "density chart", "KDE plot", "kernel density", "probability density"],
+      "aliases": [
+        "density plot",
+        "density chart",
+        "KDE plot",
+        "kernel density",
+        "probability density"
+      ],
       "category": "distribution",
-      "dataShape": { "x": "numeric", "y": "density", "series": "optional" },
-      "bestFor": ["Smooth distribution visualization", "Comparing overlapping distributions"],
-      "avoidWhen": ["Small sample sizes", "Discrete or categorical data"],
+      "dataShape": {
+        "x": "numeric",
+        "y": "density",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Smooth distribution visualization",
+        "Comparing overlapping distributions"
+      ],
+      "avoidWhen": [
+        "Small sample sizes",
+        "Discrete or categorical data"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "kdeplot"
     },
     {
       "id": "violin",
       "canonicalName": "Violin Plot",
-      "aliases": ["violin", "violin plot", "violin chart", "density box plot"],
+      "aliases": [
+        "violin",
+        "violin plot",
+        "violin chart",
+        "density box plot"
+      ],
       "category": "distribution",
-      "dataShape": { "x": "categorical", "y": "numeric", "series": "optional" },
-      "bestFor": ["Showing distribution shape across groups", "Combining box plot and density information"],
-      "avoidWhen": ["Audiences unfamiliar with the format", "Very small sample sizes"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "numeric",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Showing distribution shape across groups",
+        "Combining box plot and density information"
+      ],
+      "avoidWhen": [
+        "Audiences unfamiliar with the format",
+        "Very small sample sizes"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "violinplot"
     },
     {
       "id": "bee_swarm",
       "canonicalName": "Bee Swarm Plot",
-      "aliases": ["bee swarm", "beeswarm", "swarm plot", "jitter plot"],
+      "aliases": [
+        "bee swarm",
+        "beeswarm",
+        "swarm plot",
+        "jitter plot"
+      ],
       "category": "distribution",
-      "dataShape": { "x": "categorical", "y": "numeric", "series": "optional" },
-      "bestFor": ["Showing every data point without overlap", "Small to medium datasets"],
-      "avoidWhen": ["Large datasets (>500 points per group)", "Need for summary statistics only"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "numeric",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Showing every data point without overlap",
+        "Small to medium datasets"
+      ],
+      "avoidWhen": [
+        "Large datasets (>500 points per group)",
+        "Need for summary statistics only"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "swarmplot"
     },
     {
       "id": "strip_plot",
       "canonicalName": "Strip Plot",
-      "aliases": ["strip plot", "strip chart", "jittered dot plot", "one-dimensional scatter"],
+      "aliases": [
+        "strip plot",
+        "strip chart",
+        "jittered dot plot",
+        "one-dimensional scatter"
+      ],
       "category": "distribution",
-      "dataShape": { "x": "categorical", "y": "numeric", "series": "optional" },
-      "bestFor": ["Showing individual observations across categories", "Quick distribution overview"],
-      "avoidWhen": ["Large datasets with heavy overplotting", "Need for precise density estimation"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "numeric",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Showing individual observations across categories",
+        "Quick distribution overview"
+      ],
+      "avoidWhen": [
+        "Large datasets with heavy overplotting",
+        "Need for precise density estimation"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "stripplot"
     },
     {
       "id": "ecdf",
       "canonicalName": "ECDF Plot",
-      "aliases": ["ecdf", "ECDF plot", "empirical CDF", "cumulative distribution", "step CDF"],
+      "aliases": [
+        "ecdf",
+        "ECDF plot",
+        "empirical CDF",
+        "cumulative distribution",
+        "step CDF"
+      ],
       "category": "distribution",
-      "dataShape": { "x": "numeric", "y": "cumulative_proportion", "series": "optional" },
-      "bestFor": ["Comparing distributions without binning", "Reading percentiles directly"],
-      "avoidWhen": ["Audiences unfamiliar with cumulative distributions", "Visual appeal is a priority"],
+      "dataShape": {
+        "x": "numeric",
+        "y": "cumulative_proportion",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Comparing distributions without binning",
+        "Reading percentiles directly"
+      ],
+      "avoidWhen": [
+        "Audiences unfamiliar with cumulative distributions",
+        "Visual appeal is a priority"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "ecdf"
     },
     {
       "id": "qq_plot",
       "canonicalName": "Q-Q Plot",
-      "aliases": ["qq plot", "Q-Q plot", "quantile-quantile plot", "quantile plot", "normal probability plot"],
+      "aliases": [
+        "qq plot",
+        "Q-Q plot",
+        "quantile-quantile plot",
+        "quantile plot",
+        "normal probability plot"
+      ],
       "category": "distribution",
-      "dataShape": { "x": "theoretical_quantiles", "y": "sample_quantiles", "series": "none" },
-      "bestFor": ["Checking normality", "Comparing sample distribution to a theoretical one"],
-      "avoidWhen": ["Non-statistical audiences", "Small samples where deviations are expected"],
+      "dataShape": {
+        "x": "theoretical_quantiles",
+        "y": "sample_quantiles",
+        "series": "none"
+      },
+      "bestFor": [
+        "Checking normality",
+        "Comparing sample distribution to a theoretical one"
+      ],
+      "avoidWhen": [
+        "Non-statistical audiences",
+        "Small samples where deviations are expected"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "scatter"
     },
     {
       "id": "probability_plot",
       "canonicalName": "Probability Plot",
-      "aliases": ["probability plot", "prob plot", "normal probability plot", "P-P plot"],
+      "aliases": [
+        "probability plot",
+        "prob plot",
+        "normal probability plot",
+        "P-P plot"
+      ],
       "category": "distribution",
-      "dataShape": { "x": "theoretical_probability", "y": "observed_probability", "series": "none" },
-      "bestFor": ["Assessing distributional fit", "Identifying deviations from expected distribution"],
-      "avoidWhen": ["General audiences", "Exploratory analysis where histograms suffice"],
+      "dataShape": {
+        "x": "theoretical_probability",
+        "y": "observed_probability",
+        "series": "none"
+      },
+      "bestFor": [
+        "Assessing distributional fit",
+        "Identifying deviations from expected distribution"
+      ],
+      "avoidWhen": [
+        "General audiences",
+        "Exploratory analysis where histograms suffice"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "probplot"
     },
     {
       "id": "grouped_bar",
       "canonicalName": "Grouped Bar Chart",
-      "aliases": ["grouped bar", "clustered bar", "side-by-side bar", "multi-series bar"],
+      "aliases": [
+        "grouped bar",
+        "clustered bar",
+        "side-by-side bar",
+        "multi-series bar"
+      ],
       "category": "comparison",
-      "dataShape": { "x": "categorical", "y": "numeric", "series": "required" },
-      "bestFor": ["Comparing sub-categories side by side", "Cross-group comparisons"],
-      "avoidWhen": ["Too many groups or series", "Part-to-whole relationships"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "numeric",
+        "series": "required"
+      },
+      "bestFor": [
+        "Comparing sub-categories side by side",
+        "Cross-group comparisons"
+      ],
+      "avoidWhen": [
+        "Too many groups or series",
+        "Part-to-whole relationships"
+      ],
       "excelChartType": "barClustered",
       "matplotlibType": "bar"
     },
     {
       "id": "lollipop",
       "canonicalName": "Lollipop Chart",
-      "aliases": ["lollipop", "lollipop chart", "stick chart", "pin chart"],
+      "aliases": [
+        "lollipop",
+        "lollipop chart",
+        "stick chart",
+        "pin chart"
+      ],
       "category": "comparison",
-      "dataShape": { "x": "categorical", "y": "numeric", "series": "none" },
-      "bestFor": ["Cleaner alternative to bar chart", "Ranking with less visual clutter"],
-      "avoidWhen": ["Multiple series", "Audiences expecting traditional bar charts"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "numeric",
+        "series": "none"
+      },
+      "bestFor": [
+        "Cleaner alternative to bar chart",
+        "Ranking with less visual clutter"
+      ],
+      "avoidWhen": [
+        "Multiple series",
+        "Audiences expecting traditional bar charts"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "stem"
     },
     {
       "id": "dot_plot",
       "canonicalName": "Dot Plot",
-      "aliases": ["dot plot", "dot chart", "Cleveland dot plot", "point chart"],
+      "aliases": [
+        "dot plot",
+        "dot chart",
+        "Cleveland dot plot",
+        "point chart"
+      ],
       "category": "comparison",
-      "dataShape": { "x": "numeric", "y": "categorical", "series": "optional" },
-      "bestFor": ["Precise value comparison across categories", "Clean alternative to bar chart"],
-      "avoidWhen": ["Multiple overlapping series", "Need to emphasize magnitude visually"],
+      "dataShape": {
+        "x": "numeric",
+        "y": "categorical",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Precise value comparison across categories",
+        "Clean alternative to bar chart"
+      ],
+      "avoidWhen": [
+        "Multiple overlapping series",
+        "Need to emphasize magnitude visually"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "scatter"
     },
     {
       "id": "dumbbell",
       "canonicalName": "Dumbbell Chart",
-      "aliases": ["dumbbell", "dumbbell chart", "dumbbell plot", "gap chart", "connected dot plot"],
+      "aliases": [
+        "dumbbell",
+        "dumbbell chart",
+        "dumbbell plot",
+        "gap chart",
+        "connected dot plot"
+      ],
       "category": "comparison",
-      "dataShape": { "x_start": "numeric", "x_end": "numeric", "y": "categorical", "series": "none" },
-      "bestFor": ["Showing change between two points", "Before-after comparisons"],
-      "avoidWhen": ["More than two comparison points", "Absolute values more important than gaps"],
+      "dataShape": {
+        "x_start": "numeric",
+        "x_end": "numeric",
+        "y": "categorical",
+        "series": "none"
+      },
+      "bestFor": [
+        "Showing change between two points",
+        "Before-after comparisons"
+      ],
+      "avoidWhen": [
+        "More than two comparison points",
+        "Absolute values more important than gaps"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "hlines"
     },
     {
       "id": "bullet",
       "canonicalName": "Bullet Chart",
-      "aliases": ["bullet", "bullet chart", "bullet graph", "Stephen Few bullet"],
+      "aliases": [
+        "bullet",
+        "bullet chart",
+        "bullet graph",
+        "Stephen Few bullet"
+      ],
       "category": "comparison",
-      "dataShape": { "x": "numeric", "target": "numeric", "ranges": "numeric_array" },
-      "bestFor": ["Comparing actual vs target", "Dashboard KPI gauges without circular gauges"],
-      "avoidWhen": ["Multiple dimensions", "Audiences unfamiliar with the format"],
+      "dataShape": {
+        "x": "numeric",
+        "target": "numeric",
+        "ranges": "numeric_array"
+      },
+      "bestFor": [
+        "Comparing actual vs target",
+        "Dashboard KPI gauges without circular gauges"
+      ],
+      "avoidWhen": [
+        "Multiple dimensions",
+        "Audiences unfamiliar with the format"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "barh"
     },
     {
       "id": "cleveland_dot",
       "canonicalName": "Cleveland Dot Plot",
-      "aliases": ["cleveland dot", "Cleveland dot plot", "ordered dot chart"],
+      "aliases": [
+        "cleveland dot",
+        "Cleveland dot plot",
+        "ordered dot chart"
+      ],
       "category": "comparison",
-      "dataShape": { "x": "numeric", "y": "categorical", "series": "optional" },
-      "bestFor": ["Ranking items with high precision", "Many categories in a compact space"],
-      "avoidWhen": ["Need to show distribution", "Very few categories where bar chart is simpler"],
+      "dataShape": {
+        "x": "numeric",
+        "y": "categorical",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Ranking items with high precision",
+        "Many categories in a compact space"
+      ],
+      "avoidWhen": [
+        "Need to show distribution",
+        "Very few categories where bar chart is simpler"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "scatter"
     },
     {
       "id": "back_to_back_bar",
       "canonicalName": "Back-to-Back Bar Chart",
-      "aliases": ["back to back bar", "population pyramid", "mirror bar", "butterfly chart", "opposed bar"],
+      "aliases": [
+        "back to back bar",
+        "population pyramid",
+        "mirror bar",
+        "butterfly chart",
+        "opposed bar"
+      ],
       "category": "comparison",
-      "dataShape": { "x_left": "numeric", "x_right": "numeric", "y": "categorical" },
-      "bestFor": ["Comparing two groups symmetrically", "Population pyramids", "Survey agree/disagree splits"],
-      "avoidWhen": ["More than two comparison groups", "Values with very different scales"],
+      "dataShape": {
+        "x_left": "numeric",
+        "x_right": "numeric",
+        "y": "categorical"
+      },
+      "bestFor": [
+        "Comparing two groups symmetrically",
+        "Population pyramids",
+        "Survey agree/disagree splits"
+      ],
+      "avoidWhen": [
+        "More than two comparison groups",
+        "Values with very different scales"
+      ],
       "excelChartType": "barClustered",
       "matplotlibType": "barh"
     },
     {
       "id": "diverging_bar",
       "canonicalName": "Diverging Bar Chart",
-      "aliases": ["diverging bar", "diverging bar chart", "divergent bar", "bipolar bar", "sentiment bar"],
+      "aliases": [
+        "diverging bar",
+        "diverging bar chart",
+        "divergent bar",
+        "bipolar bar",
+        "sentiment bar"
+      ],
       "category": "comparison",
-      "dataShape": { "x": "categorical", "y": "numeric_signed", "series": "none" },
-      "bestFor": ["Showing positive and negative deviations from a baseline", "Sentiment or survey data"],
-      "avoidWhen": ["All values are same sign", "Non-centered baselines"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "numeric_signed",
+        "series": "none"
+      },
+      "bestFor": [
+        "Showing positive and negative deviations from a baseline",
+        "Sentiment or survey data"
+      ],
+      "avoidWhen": [
+        "All values are same sign",
+        "Non-centered baselines"
+      ],
       "excelChartType": "barClustered",
       "matplotlibType": "barh"
     },
     {
       "id": "treemap",
       "canonicalName": "Treemap",
-      "aliases": ["treemap", "tree map", "rectangular partition", "nested rectangles"],
+      "aliases": [
+        "treemap",
+        "tree map",
+        "rectangular partition",
+        "nested rectangles"
+      ],
       "category": "part_to_whole",
-      "dataShape": { "x": "hierarchical", "y": "numeric", "series": "none" },
-      "bestFor": ["Hierarchical part-to-whole", "Showing relative sizes of nested categories"],
-      "avoidWhen": ["Too many small slices", "Precise comparison needed"],
+      "dataShape": {
+        "x": "hierarchical",
+        "y": "numeric",
+        "series": "none"
+      },
+      "bestFor": [
+        "Hierarchical part-to-whole",
+        "Showing relative sizes of nested categories"
+      ],
+      "avoidWhen": [
+        "Too many small slices",
+        "Precise comparison needed"
+      ],
       "excelChartType": "treemap",
       "matplotlibType": "treemap"
     },
     {
       "id": "sunburst",
       "canonicalName": "Sunburst Chart",
-      "aliases": ["sunburst", "sunburst chart", "multi-level pie", "radial treemap", "ring chart hierarchy"],
+      "aliases": [
+        "sunburst",
+        "sunburst chart",
+        "multi-level pie",
+        "radial treemap",
+        "ring chart hierarchy"
+      ],
       "category": "part_to_whole",
-      "dataShape": { "x": "hierarchical", "y": "numeric", "series": "none" },
-      "bestFor": ["Multi-level part-to-whole", "Drill-down hierarchies"],
-      "avoidWhen": ["More than 3 hierarchy levels", "Many small slices at outer rings"],
+      "dataShape": {
+        "x": "hierarchical",
+        "y": "numeric",
+        "series": "none"
+      },
+      "bestFor": [
+        "Multi-level part-to-whole",
+        "Drill-down hierarchies"
+      ],
+      "avoidWhen": [
+        "More than 3 hierarchy levels",
+        "Many small slices at outer rings"
+      ],
       "excelChartType": "sunburst",
       "matplotlibType": "sunburst"
     },
     {
       "id": "waffle",
       "canonicalName": "Waffle Chart",
-      "aliases": ["waffle", "waffle chart", "unit chart", "square pie", "grid chart"],
+      "aliases": [
+        "waffle",
+        "waffle chart",
+        "unit chart",
+        "square pie",
+        "grid chart"
+      ],
       "category": "part_to_whole",
-      "dataShape": { "x": "categorical", "y": "numeric_proportion", "series": "none" },
-      "bestFor": ["Showing percentages as filled units", "More intuitive than pie for exact proportions"],
-      "avoidWhen": ["Many categories", "Dynamic or real-time data"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "numeric_proportion",
+        "series": "none"
+      },
+      "bestFor": [
+        "Showing percentages as filled units",
+        "More intuitive than pie for exact proportions"
+      ],
+      "avoidWhen": [
+        "Many categories",
+        "Dynamic or real-time data"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "waffle"
     },
     {
       "id": "mosaic",
       "canonicalName": "Mosaic Plot",
-      "aliases": ["mosaic", "mosaic plot", "marimekko", "mekko chart", "variable-width bar"],
+      "aliases": [
+        "mosaic",
+        "mosaic plot",
+        "marimekko",
+        "mekko chart",
+        "variable-width bar"
+      ],
       "category": "part_to_whole",
-      "dataShape": { "x": "categorical", "y": "categorical", "size": "numeric" },
-      "bestFor": ["Two-way categorical data", "Showing joint distribution of two variables"],
-      "avoidWhen": ["More than two categorical dimensions", "Precise value reading needed"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "categorical",
+        "size": "numeric"
+      },
+      "bestFor": [
+        "Two-way categorical data",
+        "Showing joint distribution of two variables"
+      ],
+      "avoidWhen": [
+        "More than two categorical dimensions",
+        "Precise value reading needed"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "mosaic"
     },
     {
       "id": "icicle",
       "canonicalName": "Icicle Chart",
-      "aliases": ["icicle", "icicle chart", "icicle plot", "partition chart", "flame chart inverted"],
+      "aliases": [
+        "icicle",
+        "icicle chart",
+        "icicle plot",
+        "partition chart",
+        "flame chart inverted"
+      ],
       "category": "part_to_whole",
-      "dataShape": { "x": "hierarchical", "y": "numeric", "series": "none" },
-      "bestFor": ["Hierarchical breakdown with readable labels", "Alternative to sunburst without angular distortion"],
-      "avoidWhen": ["Non-hierarchical data", "Very deep hierarchies (>5 levels)"],
+      "dataShape": {
+        "x": "hierarchical",
+        "y": "numeric",
+        "series": "none"
+      },
+      "bestFor": [
+        "Hierarchical breakdown with readable labels",
+        "Alternative to sunburst without angular distortion"
+      ],
+      "avoidWhen": [
+        "Non-hierarchical data",
+        "Very deep hierarchies (>5 levels)"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "icicle"
     },
     {
       "id": "partition",
       "canonicalName": "Partition Chart",
-      "aliases": ["partition", "partition chart", "partition layout", "hierarchical partition"],
+      "aliases": [
+        "partition",
+        "partition chart",
+        "partition layout",
+        "hierarchical partition"
+      ],
       "category": "part_to_whole",
-      "dataShape": { "x": "hierarchical", "y": "numeric", "series": "none" },
-      "bestFor": ["Showing hierarchical size relationships", "Navigable drill-down visualizations"],
-      "avoidWhen": ["Flat non-hierarchical data", "Precise comparisons across non-sibling nodes"],
+      "dataShape": {
+        "x": "hierarchical",
+        "y": "numeric",
+        "series": "none"
+      },
+      "bestFor": [
+        "Showing hierarchical size relationships",
+        "Navigable drill-down visualizations"
+      ],
+      "avoidWhen": [
+        "Flat non-hierarchical data",
+        "Precise comparisons across non-sibling nodes"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "bar"
     },
     {
       "id": "nested_doughnut",
       "canonicalName": "Nested Doughnut Chart",
-      "aliases": ["nested doughnut", "nested donut", "multi-ring doughnut", "concentric doughnut"],
+      "aliases": [
+        "nested doughnut",
+        "nested donut",
+        "multi-ring doughnut",
+        "concentric doughnut"
+      ],
       "category": "part_to_whole",
-      "dataShape": { "x": "categorical", "y": "numeric", "series": "required" },
-      "bestFor": ["Comparing two levels of composition", "Compact multi-ring part-to-whole"],
-      "avoidWhen": ["More than 3 rings", "Many slices per ring"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "numeric",
+        "series": "required"
+      },
+      "bestFor": [
+        "Comparing two levels of composition",
+        "Compact multi-ring part-to-whole"
+      ],
+      "avoidWhen": [
+        "More than 3 rings",
+        "Many slices per ring"
+      ],
       "excelChartType": "doughnut",
       "matplotlibType": "pie"
     },
     {
       "id": "connected_scatter",
       "canonicalName": "Connected Scatter Plot",
-      "aliases": ["connected scatter", "connected scatter plot", "scatter line", "trajectory plot"],
+      "aliases": [
+        "connected scatter",
+        "connected scatter plot",
+        "scatter line",
+        "trajectory plot"
+      ],
       "category": "relationship",
-      "dataShape": { "x": "numeric", "y": "numeric", "order": "sequential", "series": "optional" },
-      "bestFor": ["Showing trajectory of two variables over time", "Revealing cyclical relationships"],
-      "avoidWhen": ["No meaningful sequence", "Too many crossing lines"],
+      "dataShape": {
+        "x": "numeric",
+        "y": "numeric",
+        "order": "sequential",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Showing trajectory of two variables over time",
+        "Revealing cyclical relationships"
+      ],
+      "avoidWhen": [
+        "No meaningful sequence",
+        "Too many crossing lines"
+      ],
       "excelChartType": "scatterLine",
       "matplotlibType": "plot"
     },
     {
       "id": "pair_plot",
       "canonicalName": "Pair Plot",
-      "aliases": ["pair plot", "pairplot", "scatter matrix", "SPLOM", "scatterplot matrix"],
+      "aliases": [
+        "pair plot",
+        "pairplot",
+        "scatter matrix",
+        "SPLOM",
+        "scatterplot matrix"
+      ],
       "category": "relationship",
-      "dataShape": { "x": "numeric_multi", "y": "numeric_multi", "series": "optional" },
-      "bestFor": ["Exploring pairwise relationships in multivariate data", "Initial data exploration"],
-      "avoidWhen": ["More than 8 variables", "Non-numeric data"],
+      "dataShape": {
+        "x": "numeric_multi",
+        "y": "numeric_multi",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Exploring pairwise relationships in multivariate data",
+        "Initial data exploration"
+      ],
+      "avoidWhen": [
+        "More than 8 variables",
+        "Non-numeric data"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "pairplot"
     },
     {
       "id": "correlogram",
       "canonicalName": "Correlogram",
-      "aliases": ["correlogram", "correlation heatmap", "correlation plot", "correlation chart"],
+      "aliases": [
+        "correlogram",
+        "correlation heatmap",
+        "correlation plot",
+        "correlation chart"
+      ],
       "category": "relationship",
-      "dataShape": { "x": "numeric_multi", "y": "numeric_multi", "series": "none" },
-      "bestFor": ["Visualizing correlation matrices", "Identifying strongly related variables"],
-      "avoidWhen": ["Non-numeric data", "Fewer than 4 variables"],
+      "dataShape": {
+        "x": "numeric_multi",
+        "y": "numeric_multi",
+        "series": "none"
+      },
+      "bestFor": [
+        "Visualizing correlation matrices",
+        "Identifying strongly related variables"
+      ],
+      "avoidWhen": [
+        "Non-numeric data",
+        "Fewer than 4 variables"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "heatmap"
     },
     {
       "id": "slope_chart",
       "canonicalName": "Slope Chart",
-      "aliases": ["slope chart", "slope graph", "slopegraph", "before-after line"],
+      "aliases": [
+        "slope chart",
+        "slope graph",
+        "slopegraph",
+        "before-after line"
+      ],
       "category": "relationship",
-      "dataShape": { "x_before": "numeric", "x_after": "numeric", "y": "categorical" },
-      "bestFor": ["Showing change between two time points", "Highlighting rank changes"],
-      "avoidWhen": ["More than two time points", "Too many overlapping lines (>15)"],
+      "dataShape": {
+        "x_before": "numeric",
+        "x_after": "numeric",
+        "y": "categorical"
+      },
+      "bestFor": [
+        "Showing change between two time points",
+        "Highlighting rank changes"
+      ],
+      "avoidWhen": [
+        "More than two time points",
+        "Too many overlapping lines (>15)"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "plot"
     },
     {
       "id": "regression_line",
       "canonicalName": "Regression Line Chart",
-      "aliases": ["regression line", "regression plot", "linear fit", "trend line scatter", "fitted line plot"],
+      "aliases": [
+        "regression line",
+        "regression plot",
+        "linear fit",
+        "trend line scatter",
+        "fitted line plot"
+      ],
       "category": "relationship",
-      "dataShape": { "x": "numeric", "y": "numeric", "series": "optional" },
-      "bestFor": ["Showing linear relationship", "Prediction and forecasting visuals"],
-      "avoidWhen": ["Non-linear relationships without appropriate model", "Heteroscedastic data"],
+      "dataShape": {
+        "x": "numeric",
+        "y": "numeric",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Showing linear relationship",
+        "Prediction and forecasting visuals"
+      ],
+      "avoidWhen": [
+        "Non-linear relationships without appropriate model",
+        "Heteroscedastic data"
+      ],
       "excelChartType": "scatter",
       "matplotlibType": "regplot"
     },
     {
       "id": "bubble_with_labels",
       "canonicalName": "Labeled Bubble Chart",
-      "aliases": ["labeled bubble", "bubble with labels", "annotated bubble", "named bubble chart"],
+      "aliases": [
+        "labeled bubble",
+        "bubble with labels",
+        "annotated bubble",
+        "named bubble chart"
+      ],
       "category": "relationship",
-      "dataShape": { "x": "numeric", "y": "numeric", "size": "numeric", "label": "text", "series": "optional" },
-      "bestFor": ["Three-variable comparison with entity identification", "Executive presentations"],
-      "avoidWhen": ["Too many bubbles causing label overlap", "Small display areas"],
+      "dataShape": {
+        "x": "numeric",
+        "y": "numeric",
+        "size": "numeric",
+        "label": "text",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Three-variable comparison with entity identification",
+        "Executive presentations"
+      ],
+      "avoidWhen": [
+        "Too many bubbles causing label overlap",
+        "Small display areas"
+      ],
       "excelChartType": "bubble",
       "matplotlibType": "scatter"
     },
     {
       "id": "waterfall",
       "canonicalName": "Waterfall Chart",
-      "aliases": ["waterfall", "waterfall chart", "bridge chart", "cascade chart", "Mario chart"],
+      "aliases": [
+        "waterfall",
+        "waterfall chart",
+        "bridge chart",
+        "cascade chart",
+        "Mario chart"
+      ],
       "category": "flow",
-      "dataShape": { "x": "categorical", "y": "numeric_delta", "series": "none" },
-      "bestFor": ["Showing cumulative effect of sequential values", "Financial reconciliation"],
-      "avoidWhen": ["Non-sequential data", "Too many steps (>20)"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "numeric_delta",
+        "series": "none"
+      },
+      "bestFor": [
+        "Showing cumulative effect of sequential values",
+        "Financial reconciliation"
+      ],
+      "avoidWhen": [
+        "Non-sequential data",
+        "Too many steps (>20)"
+      ],
       "excelChartType": "waterfall",
       "matplotlibType": "bar"
     },
     {
       "id": "funnel",
       "canonicalName": "Funnel Chart",
-      "aliases": ["funnel", "funnel chart", "sales funnel", "conversion funnel", "pipeline chart"],
+      "aliases": [
+        "funnel",
+        "funnel chart",
+        "sales funnel",
+        "conversion funnel",
+        "pipeline chart"
+      ],
       "category": "flow",
-      "dataShape": { "x": "categorical_ordered", "y": "numeric", "series": "none" },
-      "bestFor": ["Showing progressive reduction through stages", "Sales and conversion pipelines"],
-      "avoidWhen": ["Non-sequential stages", "Values that increase through stages"],
+      "dataShape": {
+        "x": "categorical_ordered",
+        "y": "numeric",
+        "series": "none"
+      },
+      "bestFor": [
+        "Showing progressive reduction through stages",
+        "Sales and conversion pipelines"
+      ],
+      "avoidWhen": [
+        "Non-sequential stages",
+        "Values that increase through stages"
+      ],
       "excelChartType": "funnel",
       "matplotlibType": "barh"
     },
     {
       "id": "sankey",
       "canonicalName": "Sankey Diagram",
-      "aliases": ["sankey", "sankey diagram", "flow diagram", "alluvial diagram", "energy flow"],
+      "aliases": [
+        "sankey",
+        "sankey diagram",
+        "flow diagram",
+        "alluvial diagram",
+        "energy flow"
+      ],
       "category": "flow",
-      "dataShape": { "source": "categorical", "target": "categorical", "value": "numeric" },
-      "bestFor": ["Showing flow quantities between nodes", "Energy, budget, or traffic flow"],
-      "avoidWhen": ["Too many nodes or links", "Simple two-stage flows where a bar chart suffices"],
+      "dataShape": {
+        "source": "categorical",
+        "target": "categorical",
+        "value": "numeric"
+      },
+      "bestFor": [
+        "Showing flow quantities between nodes",
+        "Energy, budget, or traffic flow"
+      ],
+      "avoidWhen": [
+        "Too many nodes or links",
+        "Simple two-stage flows where a bar chart suffices"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "sankey"
     },
     {
       "id": "bridge",
       "canonicalName": "Bridge Chart",
-      "aliases": ["bridge", "bridge chart", "variance bridge", "walk chart"],
+      "aliases": [
+        "bridge",
+        "bridge chart",
+        "variance bridge",
+        "walk chart"
+      ],
       "category": "flow",
-      "dataShape": { "x": "categorical", "y": "numeric_delta", "series": "none" },
-      "bestFor": ["Explaining variance from start to end", "Budget variance analysis"],
-      "avoidWhen": ["Non-additive components", "Too many intermediate steps"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "numeric_delta",
+        "series": "none"
+      },
+      "bestFor": [
+        "Explaining variance from start to end",
+        "Budget variance analysis"
+      ],
+      "avoidWhen": [
+        "Non-additive components",
+        "Too many intermediate steps"
+      ],
       "excelChartType": "waterfall",
       "matplotlibType": "bar"
     },
     {
       "id": "alluvial",
       "canonicalName": "Alluvial Diagram",
-      "aliases": ["alluvial", "alluvial diagram", "alluvial plot", "parallel sets", "flow between categories"],
+      "aliases": [
+        "alluvial",
+        "alluvial diagram",
+        "alluvial plot",
+        "parallel sets",
+        "flow between categories"
+      ],
       "category": "flow",
-      "dataShape": { "x": "categorical_multi", "y": "numeric", "series": "none" },
-      "bestFor": ["Showing how categorical memberships change across stages", "Voter migration, cohort flows"],
-      "avoidWhen": ["Too many categories per stage", "Static single-stage data"],
+      "dataShape": {
+        "x": "categorical_multi",
+        "y": "numeric",
+        "series": "none"
+      },
+      "bestFor": [
+        "Showing how categorical memberships change across stages",
+        "Voter migration, cohort flows"
+      ],
+      "avoidWhen": [
+        "Too many categories per stage",
+        "Static single-stage data"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "alluvial"
     },
     {
       "id": "dendrogram",
       "canonicalName": "Dendrogram",
-      "aliases": ["dendrogram", "tree diagram", "hierarchical cluster tree", "cluster dendrogram"],
+      "aliases": [
+        "dendrogram",
+        "tree diagram",
+        "hierarchical cluster tree",
+        "cluster dendrogram"
+      ],
       "category": "hierarchical",
-      "dataShape": { "x": "hierarchical", "y": "distance", "series": "none" },
-      "bestFor": ["Showing hierarchical clustering results", "Taxonomy visualization"],
-      "avoidWhen": ["Very large datasets (>100 leaves)", "Non-hierarchical relationships"],
+      "dataShape": {
+        "x": "hierarchical",
+        "y": "distance",
+        "series": "none"
+      },
+      "bestFor": [
+        "Showing hierarchical clustering results",
+        "Taxonomy visualization"
+      ],
+      "avoidWhen": [
+        "Very large datasets (>100 leaves)",
+        "Non-hierarchical relationships"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "dendrogram"
     },
     {
       "id": "radial_tree",
       "canonicalName": "Radial Tree",
-      "aliases": ["radial tree", "radial dendrogram", "circular tree", "polar tree"],
+      "aliases": [
+        "radial tree",
+        "radial dendrogram",
+        "circular tree",
+        "polar tree"
+      ],
       "category": "hierarchical",
-      "dataShape": { "x": "hierarchical", "y": "optional", "series": "none" },
-      "bestFor": ["Compact hierarchical display", "Organizational charts with many branches"],
-      "avoidWhen": ["Deep hierarchies with few branches", "Need for precise distance reading"],
+      "dataShape": {
+        "x": "hierarchical",
+        "y": "optional",
+        "series": "none"
+      },
+      "bestFor": [
+        "Compact hierarchical display",
+        "Organizational charts with many branches"
+      ],
+      "avoidWhen": [
+        "Deep hierarchies with few branches",
+        "Need for precise distance reading"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "polar"
     },
     {
       "id": "cluster_map",
       "canonicalName": "Cluster Map",
-      "aliases": ["cluster map", "clustermap", "heatmap with dendrograms", "clustered heatmap"],
+      "aliases": [
+        "cluster map",
+        "clustermap",
+        "heatmap with dendrograms",
+        "clustered heatmap"
+      ],
       "category": "hierarchical",
-      "dataShape": { "x": "categorical", "y": "categorical", "value": "numeric" },
-      "bestFor": ["Revealing patterns via row/column clustering", "Gene expression, survey response patterns"],
-      "avoidWhen": ["Non-numeric data", "Small matrices where a simple table suffices"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "categorical",
+        "value": "numeric"
+      },
+      "bestFor": [
+        "Revealing patterns via row/column clustering",
+        "Gene expression, survey response patterns"
+      ],
+      "avoidWhen": [
+        "Non-numeric data",
+        "Small matrices where a simple table suffices"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "clustermap"
     },
     {
       "id": "heatmap",
       "canonicalName": "Heatmap",
-      "aliases": ["heatmap", "heat map", "color matrix", "intensity map", "thermal map"],
+      "aliases": [
+        "heatmap",
+        "heat map",
+        "color matrix",
+        "intensity map",
+        "thermal map"
+      ],
       "category": "matrix",
-      "dataShape": { "x": "categorical", "y": "categorical", "value": "numeric" },
-      "bestFor": ["Identifying patterns in matrix data", "Time-of-day or day-of-week patterns"],
-      "avoidWhen": ["Too many cells to render legibly", "Precise value reading needed"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "categorical",
+        "value": "numeric"
+      },
+      "bestFor": [
+        "Identifying patterns in matrix data",
+        "Time-of-day or day-of-week patterns"
+      ],
+      "avoidWhen": [
+        "Too many cells to render legibly",
+        "Precise value reading needed"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "heatmap"
     },
     {
       "id": "correlation_matrix",
       "canonicalName": "Correlation Matrix",
-      "aliases": ["correlation matrix", "corr matrix", "correlation table", "r-value matrix"],
+      "aliases": [
+        "correlation matrix",
+        "corr matrix",
+        "correlation table",
+        "r-value matrix"
+      ],
       "category": "matrix",
-      "dataShape": { "x": "numeric_multi", "y": "numeric_multi", "value": "correlation" },
-      "bestFor": ["Summarizing pairwise correlations", "Feature selection in modeling"],
-      "avoidWhen": ["Non-numeric variables", "Fewer than 4 variables"],
+      "dataShape": {
+        "x": "numeric_multi",
+        "y": "numeric_multi",
+        "value": "correlation"
+      },
+      "bestFor": [
+        "Summarizing pairwise correlations",
+        "Feature selection in modeling"
+      ],
+      "avoidWhen": [
+        "Non-numeric variables",
+        "Fewer than 4 variables"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "heatmap"
     },
     {
       "id": "confusion_matrix",
       "canonicalName": "Confusion Matrix",
-      "aliases": ["confusion matrix", "error matrix", "classification matrix", "prediction matrix"],
+      "aliases": [
+        "confusion matrix",
+        "error matrix",
+        "classification matrix",
+        "prediction matrix"
+      ],
       "category": "matrix",
-      "dataShape": { "x": "categorical_predicted", "y": "categorical_actual", "value": "count" },
-      "bestFor": ["Evaluating classification model performance", "Identifying misclassification patterns"],
-      "avoidWhen": ["Regression models", "Non-classification tasks"],
+      "dataShape": {
+        "x": "categorical_predicted",
+        "y": "categorical_actual",
+        "value": "count"
+      },
+      "bestFor": [
+        "Evaluating classification model performance",
+        "Identifying misclassification patterns"
+      ],
+      "avoidWhen": [
+        "Regression models",
+        "Non-classification tasks"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "heatmap"
     },
     {
       "id": "tile_map",
       "canonicalName": "Tile Map",
-      "aliases": ["tile map", "cartogram", "grid map", "tile grid map", "hex tile map"],
+      "aliases": [
+        "tile map",
+        "cartogram",
+        "grid map",
+        "tile grid map",
+        "hex tile map"
+      ],
       "category": "geographic",
-      "dataShape": { "x": "geographic", "y": "geographic", "value": "numeric" },
-      "bestFor": ["Equal-area geographic comparison", "Avoiding distortion from region size"],
-      "avoidWhen": ["Precise geographic boundaries matter", "Audiences expecting traditional maps"],
+      "dataShape": {
+        "x": "geographic",
+        "y": "geographic",
+        "value": "numeric"
+      },
+      "bestFor": [
+        "Equal-area geographic comparison",
+        "Avoiding distortion from region size"
+      ],
+      "avoidWhen": [
+        "Precise geographic boundaries matter",
+        "Audiences expecting traditional maps"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "imshow"
     },
     {
       "id": "choropleth",
       "canonicalName": "Choropleth Map",
-      "aliases": ["choropleth", "choropleth map", "filled map", "geographic heatmap", "shaded map"],
+      "aliases": [
+        "choropleth",
+        "choropleth map",
+        "filled map",
+        "geographic heatmap",
+        "shaded map"
+      ],
       "category": "geographic",
-      "dataShape": { "x": "geographic_region", "value": "numeric", "series": "none" },
-      "bestFor": ["Showing regional data variation on a map", "Geographic distribution of a metric"],
-      "avoidWhen": ["Large regions dominating visual despite low values", "Non-geographic comparisons"],
+      "dataShape": {
+        "x": "geographic_region",
+        "value": "numeric",
+        "series": "none"
+      },
+      "bestFor": [
+        "Showing regional data variation on a map",
+        "Geographic distribution of a metric"
+      ],
+      "avoidWhen": [
+        "Large regions dominating visual despite low values",
+        "Non-geographic comparisons"
+      ],
       "excelChartType": "filledMap",
       "matplotlibType": "choropleth"
     },
     {
       "id": "error_bar",
       "canonicalName": "Error Bar Chart",
-      "aliases": ["error bar", "error bar chart", "confidence interval chart", "CI chart", "uncertainty chart"],
+      "aliases": [
+        "error bar",
+        "error bar chart",
+        "confidence interval chart",
+        "CI chart",
+        "uncertainty chart"
+      ],
       "category": "statistical",
-      "dataShape": { "x": "categorical", "y": "numeric", "error": "numeric", "series": "optional" },
-      "bestFor": ["Showing measurement uncertainty", "Comparing group means with confidence intervals"],
-      "avoidWhen": ["Audiences unfamiliar with error bars", "Asymmetric distributions shown as symmetric bars"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "numeric",
+        "error": "numeric",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Showing measurement uncertainty",
+        "Comparing group means with confidence intervals"
+      ],
+      "avoidWhen": [
+        "Audiences unfamiliar with error bars",
+        "Asymmetric distributions shown as symmetric bars"
+      ],
       "excelChartType": "barClustered",
       "matplotlibType": "errorbar"
     },
     {
       "id": "forest_plot",
       "canonicalName": "Forest Plot",
-      "aliases": ["forest plot", "blobbogram", "meta-analysis plot", "effect size plot"],
+      "aliases": [
+        "forest plot",
+        "blobbogram",
+        "meta-analysis plot",
+        "effect size plot"
+      ],
       "category": "statistical",
-      "dataShape": { "x": "numeric_estimate", "y": "categorical_study", "ci_lower": "numeric", "ci_upper": "numeric" },
-      "bestFor": ["Meta-analysis summaries", "Comparing effect sizes with confidence intervals across studies"],
-      "avoidWhen": ["Non-statistical audiences", "Single-study results"],
+      "dataShape": {
+        "x": "numeric_estimate",
+        "y": "categorical_study",
+        "ci_lower": "numeric",
+        "ci_upper": "numeric"
+      },
+      "bestFor": [
+        "Meta-analysis summaries",
+        "Comparing effect sizes with confidence intervals across studies"
+      ],
+      "avoidWhen": [
+        "Non-statistical audiences",
+        "Single-study results"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "errorbar"
     },
     {
       "id": "funnel_plot",
       "canonicalName": "Funnel Plot",
-      "aliases": ["funnel plot", "publication bias plot", "precision plot", "meta-analysis funnel"],
+      "aliases": [
+        "funnel plot",
+        "publication bias plot",
+        "precision plot",
+        "meta-analysis funnel"
+      ],
       "category": "statistical",
-      "dataShape": { "x": "numeric_effect", "y": "numeric_precision", "series": "none" },
-      "bestFor": ["Detecting publication bias in meta-analyses", "Assessing study heterogeneity"],
-      "avoidWhen": ["Non-meta-analysis contexts", "General audiences"],
+      "dataShape": {
+        "x": "numeric_effect",
+        "y": "numeric_precision",
+        "series": "none"
+      },
+      "bestFor": [
+        "Detecting publication bias in meta-analyses",
+        "Assessing study heterogeneity"
+      ],
+      "avoidWhen": [
+        "Non-meta-analysis contexts",
+        "General audiences"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "scatter"
     },
     {
       "id": "bland_altman",
       "canonicalName": "Bland-Altman Plot",
-      "aliases": ["bland altman", "Bland-Altman plot", "difference plot", "mean-difference plot", "Tukey mean-difference"],
+      "aliases": [
+        "bland altman",
+        "Bland-Altman plot",
+        "difference plot",
+        "mean-difference plot",
+        "Tukey mean-difference"
+      ],
       "category": "statistical",
-      "dataShape": { "x": "numeric_mean", "y": "numeric_difference", "series": "none" },
-      "bestFor": ["Assessing agreement between two measurement methods", "Clinical method comparison"],
-      "avoidWhen": ["Comparing more than two methods", "Non-paired data"],
+      "dataShape": {
+        "x": "numeric_mean",
+        "y": "numeric_difference",
+        "series": "none"
+      },
+      "bestFor": [
+        "Assessing agreement between two measurement methods",
+        "Clinical method comparison"
+      ],
+      "avoidWhen": [
+        "Comparing more than two methods",
+        "Non-paired data"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "scatter"
     },
     {
       "id": "control_chart",
       "canonicalName": "Control Chart",
-      "aliases": ["control chart", "Shewhart chart", "SPC chart", "process control chart", "X-bar chart"],
+      "aliases": [
+        "control chart",
+        "Shewhart chart",
+        "SPC chart",
+        "process control chart",
+        "X-bar chart"
+      ],
       "category": "statistical",
-      "dataShape": { "x": "sequential", "y": "numeric", "ucl": "numeric", "lcl": "numeric", "center": "numeric" },
-      "bestFor": ["Monitoring process stability", "Detecting out-of-control conditions"],
-      "avoidWhen": ["Non-process data", "Audiences unfamiliar with SPC"],
+      "dataShape": {
+        "x": "sequential",
+        "y": "numeric",
+        "ucl": "numeric",
+        "lcl": "numeric",
+        "center": "numeric"
+      },
+      "bestFor": [
+        "Monitoring process stability",
+        "Detecting out-of-control conditions"
+      ],
+      "avoidWhen": [
+        "Non-process data",
+        "Audiences unfamiliar with SPC"
+      ],
       "excelChartType": "line",
       "matplotlibType": "plot"
     },
     {
       "id": "residual_plot",
       "canonicalName": "Residual Plot",
-      "aliases": ["residual plot", "residuals chart", "residual scatter", "residual vs fitted"],
+      "aliases": [
+        "residual plot",
+        "residuals chart",
+        "residual scatter",
+        "residual vs fitted"
+      ],
       "category": "statistical",
-      "dataShape": { "x": "numeric_fitted", "y": "numeric_residual", "series": "none" },
-      "bestFor": ["Diagnosing regression model assumptions", "Detecting heteroscedasticity or non-linearity"],
-      "avoidWhen": ["Non-regression contexts", "General business audiences"],
+      "dataShape": {
+        "x": "numeric_fitted",
+        "y": "numeric_residual",
+        "series": "none"
+      },
+      "bestFor": [
+        "Diagnosing regression model assumptions",
+        "Detecting heteroscedasticity or non-linearity"
+      ],
+      "avoidWhen": [
+        "Non-regression contexts",
+        "General business audiences"
+      ],
       "excelChartType": "scatter",
       "matplotlibType": "scatter"
     },
     {
       "id": "bump_chart",
       "canonicalName": "Bump Chart",
-      "aliases": ["bump chart", "bump plot", "ranking chart", "rank change chart"],
+      "aliases": [
+        "bump chart",
+        "bump plot",
+        "ranking chart",
+        "rank change chart"
+      ],
       "category": "ranking",
-      "dataShape": { "x": "sequential", "y": "rank", "series": "required" },
-      "bestFor": ["Showing rank changes over time", "Comparing competitive positions"],
-      "avoidWhen": ["Too many entities (>15)", "Absolute values more important than ranks"],
+      "dataShape": {
+        "x": "sequential",
+        "y": "rank",
+        "series": "required"
+      },
+      "bestFor": [
+        "Showing rank changes over time",
+        "Comparing competitive positions"
+      ],
+      "avoidWhen": [
+        "Too many entities (>15)",
+        "Absolute values more important than ranks"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "plot"
     },
     {
       "id": "parallel_coordinates",
       "canonicalName": "Parallel Coordinates Plot",
-      "aliases": ["parallel coordinates", "parallel axes", "parallel coordinate plot", "multi-axis plot"],
+      "aliases": [
+        "parallel coordinates",
+        "parallel axes",
+        "parallel coordinate plot",
+        "multi-axis plot"
+      ],
       "category": "ranking",
-      "dataShape": { "x": "numeric_multi", "y": "axes", "series": "optional" },
-      "bestFor": ["Exploring multivariate data", "Identifying clusters and outliers across dimensions"],
-      "avoidWhen": ["Too many lines causing overplotting", "Fewer than 4 dimensions"],
+      "dataShape": {
+        "x": "numeric_multi",
+        "y": "axes",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Exploring multivariate data",
+        "Identifying clusters and outliers across dimensions"
+      ],
+      "avoidWhen": [
+        "Too many lines causing overplotting",
+        "Fewer than 4 dimensions"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "parallel_coordinates"
     },
     {
       "id": "slope_graph",
       "canonicalName": "Slope Graph",
-      "aliases": ["slope graph", "slopegraph", "two-point line", "comparative slope"],
+      "aliases": [
+        "slope graph",
+        "slopegraph",
+        "two-point line",
+        "comparative slope"
+      ],
       "category": "ranking",
-      "dataShape": { "x_start": "numeric", "x_end": "numeric", "y": "categorical" },
-      "bestFor": ["Comparing two time points or conditions", "Highlighting relative change"],
-      "avoidWhen": ["More than two comparison points", "Many lines causing clutter"],
+      "dataShape": {
+        "x_start": "numeric",
+        "x_end": "numeric",
+        "y": "categorical"
+      },
+      "bestFor": [
+        "Comparing two time points or conditions",
+        "Highlighting relative change"
+      ],
+      "avoidWhen": [
+        "More than two comparison points",
+        "Many lines causing clutter"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "plot"
     },
     {
       "id": "rank_plot",
       "canonicalName": "Rank Plot",
-      "aliases": ["rank plot", "ranking dot plot", "ordinal position chart", "ranked list chart"],
+      "aliases": [
+        "rank plot",
+        "ranking dot plot",
+        "ordinal position chart",
+        "ranked list chart"
+      ],
       "category": "ranking",
-      "dataShape": { "x": "numeric", "y": "categorical_ranked", "series": "optional" },
-      "bestFor": ["Displaying ordinal rankings with underlying values", "Sports or competition standings"],
-      "avoidWhen": ["No meaningful ranking", "Nominal categories"],
+      "dataShape": {
+        "x": "numeric",
+        "y": "categorical_ranked",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Displaying ordinal rankings with underlying values",
+        "Sports or competition standings"
+      ],
+      "avoidWhen": [
+        "No meaningful ranking",
+        "Nominal categories"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "scatter"
     },
     {
       "id": "bar_line_combo",
       "canonicalName": "Bar-Line Combo Chart",
-      "aliases": ["bar line combo", "combo chart", "bar and line", "mixed chart", "combination chart"],
+      "aliases": [
+        "bar line combo",
+        "combo chart",
+        "bar and line",
+        "mixed chart",
+        "combination chart"
+      ],
       "category": "combo",
-      "dataShape": { "x": "categorical", "y1": "numeric", "y2": "numeric", "series": "required" },
-      "bestFor": ["Showing volume (bar) with rate (line)", "Revenue and growth rate together"],
-      "avoidWhen": ["Both series have same unit and scale", "Audiences confused by dual encodings"],
+      "dataShape": {
+        "x": "categorical",
+        "y1": "numeric",
+        "y2": "numeric",
+        "series": "required"
+      },
+      "bestFor": [
+        "Showing volume (bar) with rate (line)",
+        "Revenue and growth rate together"
+      ],
+      "avoidWhen": [
+        "Both series have same unit and scale",
+        "Audiences confused by dual encodings"
+      ],
       "excelChartType": "combo",
       "matplotlibType": "bar"
     },
     {
       "id": "dual_axis",
       "canonicalName": "Dual Axis Chart",
-      "aliases": ["dual axis", "dual y-axis", "two-axis chart", "secondary axis", "double axis"],
+      "aliases": [
+        "dual axis",
+        "dual y-axis",
+        "two-axis chart",
+        "secondary axis",
+        "double axis"
+      ],
       "category": "combo",
-      "dataShape": { "x": "categorical", "y_left": "numeric", "y_right": "numeric", "series": "required" },
-      "bestFor": ["Comparing two series with different scales", "Showing related but differently-scaled metrics"],
-      "avoidWhen": ["Scales can mislead viewers", "More than two series"],
+      "dataShape": {
+        "x": "categorical",
+        "y_left": "numeric",
+        "y_right": "numeric",
+        "series": "required"
+      },
+      "bestFor": [
+        "Comparing two series with different scales",
+        "Showing related but differently-scaled metrics"
+      ],
+      "avoidWhen": [
+        "Scales can mislead viewers",
+        "More than two series"
+      ],
       "excelChartType": "combo",
       "matplotlibType": "twinx"
     },
     {
       "id": "stacked_bar_line",
       "canonicalName": "Stacked Bar with Line Chart",
-      "aliases": ["stacked bar line", "stacked bar with line", "stacked combo", "bar stack plus line"],
+      "aliases": [
+        "stacked bar line",
+        "stacked bar with line",
+        "stacked combo",
+        "bar stack plus line"
+      ],
       "category": "combo",
-      "dataShape": { "x": "categorical", "y_stack": "numeric_multi", "y_line": "numeric", "series": "required" },
-      "bestFor": ["Showing composition (stack) alongside a total or rate (line)", "Sales breakdown with trend overlay"],
-      "avoidWhen": ["Too many stacked series obscuring the line", "Simple data not requiring dual encoding"],
+      "dataShape": {
+        "x": "categorical",
+        "y_stack": "numeric_multi",
+        "y_line": "numeric",
+        "series": "required"
+      },
+      "bestFor": [
+        "Showing composition (stack) alongside a total or rate (line)",
+        "Sales breakdown with trend overlay"
+      ],
+      "avoidWhen": [
+        "Too many stacked series obscuring the line",
+        "Simple data not requiring dual encoding"
+      ],
       "excelChartType": "combo",
       "matplotlibType": "bar"
     },
     {
       "id": "area_line_combo",
       "canonicalName": "Area-Line Combo Chart",
-      "aliases": ["area line combo", "area with line", "filled area plus line", "area combo"],
+      "aliases": [
+        "area line combo",
+        "area with line",
+        "filled area plus line",
+        "area combo"
+      ],
       "category": "combo",
-      "dataShape": { "x": "sequential", "y_area": "numeric", "y_line": "numeric", "series": "required" },
-      "bestFor": ["Emphasizing volume (area) with a benchmark line", "Actual vs target over time"],
-      "avoidWhen": ["Line is completely hidden by area fill", "Too many overlapping elements"],
+      "dataShape": {
+        "x": "sequential",
+        "y_area": "numeric",
+        "y_line": "numeric",
+        "series": "required"
+      },
+      "bestFor": [
+        "Emphasizing volume (area) with a benchmark line",
+        "Actual vs target over time"
+      ],
+      "avoidWhen": [
+        "Line is completely hidden by area fill",
+        "Too many overlapping elements"
+      ],
       "excelChartType": "combo",
       "matplotlibType": "fill_between"
     },
     {
       "id": "faceted_line",
       "canonicalName": "Faceted Line Chart",
-      "aliases": ["faceted line", "small multiples line", "trellis line", "panel line chart"],
+      "aliases": [
+        "faceted line",
+        "small multiples line",
+        "trellis line",
+        "panel line chart"
+      ],
       "category": "small_multiples",
-      "dataShape": { "x": "sequential", "y": "numeric", "facet": "categorical", "series": "optional" },
-      "bestFor": ["Comparing trends across many groups without overlap", "Cleaner than many lines on one axis"],
-      "avoidWhen": ["Fewer than 3 facets", "Audiences unfamiliar with small multiples"],
+      "dataShape": {
+        "x": "sequential",
+        "y": "numeric",
+        "facet": "categorical",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Comparing trends across many groups without overlap",
+        "Cleaner than many lines on one axis"
+      ],
+      "avoidWhen": [
+        "Fewer than 3 facets",
+        "Audiences unfamiliar with small multiples"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "subplot"
     },
     {
       "id": "faceted_bar",
       "canonicalName": "Faceted Bar Chart",
-      "aliases": ["faceted bar", "small multiples bar", "trellis bar", "panel bar chart"],
+      "aliases": [
+        "faceted bar",
+        "small multiples bar",
+        "trellis bar",
+        "panel bar chart"
+      ],
       "category": "small_multiples",
-      "dataShape": { "x": "categorical", "y": "numeric", "facet": "categorical", "series": "optional" },
-      "bestFor": ["Comparing distributions across groups in separate panels", "Survey results by demographic"],
-      "avoidWhen": ["Fewer than 3 facets", "Simple comparison better served by grouped bar"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "numeric",
+        "facet": "categorical",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Comparing distributions across groups in separate panels",
+        "Survey results by demographic"
+      ],
+      "avoidWhen": [
+        "Fewer than 3 facets",
+        "Simple comparison better served by grouped bar"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "subplot"
     },
     {
       "id": "gauge",
       "canonicalName": "Gauge Chart",
-      "aliases": ["gauge", "gauge chart", "dial chart", "meter chart", "angular gauge"],
+      "aliases": [
+        "gauge",
+        "gauge chart",
+        "dial chart",
+        "meter chart",
+        "angular gauge"
+      ],
       "category": "gauge",
-      "dataShape": { "value": "numeric", "min": "numeric", "max": "numeric", "thresholds": "numeric_array" },
-      "bestFor": ["Single KPI progress display", "Dashboard performance meters"],
-      "avoidWhen": ["Comparing multiple metrics", "Precise value reading needed"],
+      "dataShape": {
+        "value": "numeric",
+        "min": "numeric",
+        "max": "numeric",
+        "thresholds": "numeric_array"
+      },
+      "bestFor": [
+        "Single KPI progress display",
+        "Dashboard performance meters"
+      ],
+      "avoidWhen": [
+        "Comparing multiple metrics",
+        "Precise value reading needed"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "pie"
     },
     {
       "id": "speedometer",
       "canonicalName": "Speedometer Chart",
-      "aliases": ["speedometer", "speedometer chart", "tachometer", "half gauge", "semi-circle gauge"],
+      "aliases": [
+        "speedometer",
+        "speedometer chart",
+        "tachometer",
+        "half gauge",
+        "semi-circle gauge"
+      ],
       "category": "gauge",
-      "dataShape": { "value": "numeric", "min": "numeric", "max": "numeric", "zones": "numeric_array" },
-      "bestFor": ["Real-time performance indicator", "Green-yellow-red zone display"],
-      "avoidWhen": ["Multiple simultaneous metrics", "Historical trend is more important than current state"],
+      "dataShape": {
+        "value": "numeric",
+        "min": "numeric",
+        "max": "numeric",
+        "zones": "numeric_array"
+      },
+      "bestFor": [
+        "Real-time performance indicator",
+        "Green-yellow-red zone display"
+      ],
+      "avoidWhen": [
+        "Multiple simultaneous metrics",
+        "Historical trend is more important than current state"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "pie"
     }

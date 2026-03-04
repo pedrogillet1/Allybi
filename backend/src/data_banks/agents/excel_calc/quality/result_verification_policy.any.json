@@ -3,8 +3,17 @@
     "id": "result_verification_policy",
     "version": "1.0.0",
     "description": "Verification policy requiring range summary, row counts, missing-data policy, and reproducible audit fields for every Excel calc agent computation.",
-    "languages": ["any"],
-    "lastUpdated": "2026-02-28"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -15,20 +24,68 @@
   },
   "resultEnvelope": {
     "requiredFields": [
-      { "field": "computationId", "type": "string", "description": "UUID for this computation run" },
-      { "field": "calcFamilyId", "type": "string", "description": "Recipe ID that was executed" },
-      { "field": "timestamp", "type": "string", "description": "ISO 8601 timestamp of execution" },
-      { "field": "pythonVersion", "type": "string", "description": "Python runtime version" },
-      { "field": "packageVersions", "type": "object", "description": "Dict of package name to version used" },
-      { "field": "randomSeed", "type": "integer|null", "description": "Random seed used, null if deterministic" },
-      { "field": "executionTimeMs", "type": "number", "description": "Wall-clock execution time in ms" },
-      { "field": "inputHash", "type": "string", "description": "SHA-256 hash of input data for reproducibility" },
-      { "field": "resultHash", "type": "string", "description": "SHA-256 hash of output data" }
+      {
+        "field": "computationId",
+        "type": "string",
+        "description": "UUID for this computation run"
+      },
+      {
+        "field": "calcFamilyId",
+        "type": "string",
+        "description": "Recipe ID that was executed"
+      },
+      {
+        "field": "timestamp",
+        "type": "string",
+        "description": "ISO 8601 timestamp of execution"
+      },
+      {
+        "field": "pythonVersion",
+        "type": "string",
+        "description": "Python runtime version"
+      },
+      {
+        "field": "packageVersions",
+        "type": "object",
+        "description": "Dict of package name to version used"
+      },
+      {
+        "field": "randomSeed",
+        "type": "integer|null",
+        "description": "Random seed used, null if deterministic"
+      },
+      {
+        "field": "executionTimeMs",
+        "type": "number",
+        "description": "Wall-clock execution time in ms"
+      },
+      {
+        "field": "inputHash",
+        "type": "string",
+        "description": "SHA-256 hash of input data for reproducibility"
+      },
+      {
+        "field": "resultHash",
+        "type": "string",
+        "description": "SHA-256 hash of output data"
+      }
     ],
     "optionalFields": [
-      { "field": "cacheHit", "type": "boolean", "description": "Whether the result was served from cache" },
-      { "field": "retryAttempt", "type": "integer", "description": "Retry number if computation was retried" },
-      { "field": "parentComputationId", "type": "string|null", "description": "Parent computation ID for chained operations" }
+      {
+        "field": "cacheHit",
+        "type": "boolean",
+        "description": "Whether the result was served from cache"
+      },
+      {
+        "field": "retryAttempt",
+        "type": "integer",
+        "description": "Retry number if computation was retried"
+      },
+      {
+        "field": "parentComputationId",
+        "type": "string|null",
+        "description": "Parent computation ID for chained operations"
+      }
     ],
     "validation": {
       "computationIdPattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
@@ -80,8 +137,8 @@
         "field": "missingCellPercentage",
         "type": "number",
         "description": "Percentage of all cells that are missing (0.0 to 100.0)",
-        "minValue": 0.0,
-        "maxValue": 100.0
+        "minValue": 0,
+        "maxValue": 100
       },
       {
         "field": "minValue",
@@ -113,24 +170,83 @@
     "perColumnSummary": {
       "description": "Per-column summary object required for each column in the input range.",
       "requiredFields": [
-        { "field": "columnName", "type": "string" },
-        { "field": "dtype", "type": "string", "enum": ["int64", "float64", "object", "bool", "datetime64", "category", "timedelta64"] },
-        { "field": "nonNullCount", "type": "integer" },
-        { "field": "nullCount", "type": "integer" },
-        { "field": "uniqueCount", "type": "integer" },
-        { "field": "topValue", "type": "any", "description": "Most frequent value" },
-        { "field": "topFrequency", "type": "integer", "description": "Frequency of the most frequent value" }
+        {
+          "field": "columnName",
+          "type": "string"
+        },
+        {
+          "field": "dtype",
+          "type": "string",
+          "enum": [
+            "int64",
+            "float64",
+            "object",
+            "bool",
+            "datetime64",
+            "category",
+            "timedelta64"
+          ]
+        },
+        {
+          "field": "nonNullCount",
+          "type": "integer"
+        },
+        {
+          "field": "nullCount",
+          "type": "integer"
+        },
+        {
+          "field": "uniqueCount",
+          "type": "integer"
+        },
+        {
+          "field": "topValue",
+          "type": "any",
+          "description": "Most frequent value"
+        },
+        {
+          "field": "topFrequency",
+          "type": "integer",
+          "description": "Frequency of the most frequent value"
+        }
       ],
       "numericExtras": [
-        { "field": "min", "type": "number" },
-        { "field": "max", "type": "number" },
-        { "field": "mean", "type": "number" },
-        { "field": "median", "type": "number" },
-        { "field": "std", "type": "number" },
-        { "field": "q25", "type": "number" },
-        { "field": "q75", "type": "number" },
-        { "field": "skewness", "type": "number" },
-        { "field": "kurtosis", "type": "number" }
+        {
+          "field": "min",
+          "type": "number"
+        },
+        {
+          "field": "max",
+          "type": "number"
+        },
+        {
+          "field": "mean",
+          "type": "number"
+        },
+        {
+          "field": "median",
+          "type": "number"
+        },
+        {
+          "field": "std",
+          "type": "number"
+        },
+        {
+          "field": "q25",
+          "type": "number"
+        },
+        {
+          "field": "q75",
+          "type": "number"
+        },
+        {
+          "field": "skewness",
+          "type": "number"
+        },
+        {
+          "field": "kurtosis",
+          "type": "number"
+        }
       ]
     }
   },
@@ -142,7 +258,10 @@
         "scenario": "allMissing",
         "condition": "missingCellPercentage == 100",
         "action": "FAIL",
-        "message": { "en": "Cannot compute: all cells in the selected range are empty or missing.", "pt": "Impossivel calcular: todas as celulas no intervalo selecionado estao vazias ou ausentes." },
+        "message": {
+          "en": "Cannot compute: all cells in the selected range are empty or missing.",
+          "pt": "Impossivel calcular: todas as celulas no intervalo selecionado estao vazias ou ausentes."
+        },
         "severity": "error"
       },
       {
@@ -150,7 +269,10 @@
         "scenario": "allColumnMissing",
         "condition": "any column has nullCount == rowCount",
         "action": "FAIL",
-        "message": { "en": "Cannot compute: column '{{columnName}}' is entirely empty.", "pt": "Impossivel calcular: a coluna '{{columnName}}' esta inteiramente vazia." },
+        "message": {
+          "en": "Cannot compute: column '{{columnName}}' is entirely empty.",
+          "pt": "Impossivel calcular: a coluna '{{columnName}}' esta inteiramente vazia."
+        },
         "severity": "error"
       },
       {
@@ -158,9 +280,15 @@
         "scenario": "majorityMissing",
         "condition": "missingCellPercentage > 50 AND missingCellPercentage < 100",
         "action": "ASK",
-        "message": { "en": "More than 50% of cells are missing ({{missingCellPercentage}}%). Proceed with available data or cancel?", "pt": "Mais de 50% das celulas estao ausentes ({{missingCellPercentage}}%). Prosseguir com os dados disponiveis ou cancelar?" },
+        "message": {
+          "en": "More than 50% of cells are missing ({{missingCellPercentage}}%). Proceed with available data or cancel?",
+          "pt": "Mais de 50% das celulas estao ausentes ({{missingCellPercentage}}%). Prosseguir com os dados disponiveis ou cancelar?"
+        },
         "severity": "warning",
-        "userChoices": ["proceed_with_available", "cancel"]
+        "userChoices": [
+          "proceed_with_available",
+          "cancel"
+        ]
       },
       {
         "id": "MISS_004",
@@ -168,7 +296,10 @@
         "condition": "column nullCount / rowCount > sparseThreshold",
         "action": "WARN_AND_EXCLUDE",
         "sparseThreshold": 0.7,
-        "message": { "en": "Column '{{columnName}}' is {{nullPercentage}}% missing and will be excluded from computation.", "pt": "A coluna '{{columnName}}' tem {{nullPercentage}}% de dados ausentes e sera excluida do calculo." },
+        "message": {
+          "en": "Column '{{columnName}}' is {{nullPercentage}}% missing and will be excluded from computation.",
+          "pt": "A coluna '{{columnName}}' tem {{nullPercentage}}% de dados ausentes e sera excluida do calculo."
+        },
         "severity": "warning"
       },
       {
@@ -176,7 +307,10 @@
         "scenario": "numericColumnMissingForStats",
         "condition": "numeric column nullCount > 0 AND method in [mean, median, std, variance, correlation, regression]",
         "action": "DROP_NA_AND_WARN",
-        "message": { "en": "Dropping {{nullCount}} missing values from '{{columnName}}' before computing {{method}}.", "pt": "Removendo {{nullCount}} valores ausentes de '{{columnName}}' antes de calcular {{method}}." },
+        "message": {
+          "en": "Dropping {{nullCount}} missing values from '{{columnName}}' before computing {{method}}.",
+          "pt": "Removendo {{nullCount}} valores ausentes de '{{columnName}}' antes de calcular {{method}}."
+        },
         "severity": "info"
       },
       {
@@ -185,7 +319,10 @@
         "condition": "categorical column nullCount > 0 AND method in [frequency, mode, pivot, groupby]",
         "action": "INCLUDE_AS_CATEGORY",
         "nullLabel": "(missing)",
-        "message": { "en": "Treating {{nullCount}} missing values in '{{columnName}}' as a '(missing)' category.", "pt": "Tratando {{nullCount}} valores ausentes em '{{columnName}}' como categoria '(missing)'." },
+        "message": {
+          "en": "Treating {{nullCount}} missing values in '{{columnName}}' as a '(missing)' category.",
+          "pt": "Tratando {{nullCount}} valores ausentes em '{{columnName}}' como categoria '(missing)'."
+        },
         "severity": "info"
       },
       {
@@ -194,7 +331,10 @@
         "condition": "method == correlation AND any column pair has < minPairwiseObs",
         "action": "FAIL_PAIR",
         "minPairwiseObs": 3,
-        "message": { "en": "Insufficient pairwise observations (< 3) between '{{colA}}' and '{{colB}}' for correlation.", "pt": "Observacoes pareadas insuficientes (< 3) entre '{{colA}}' e '{{colB}}' para correlacao." },
+        "message": {
+          "en": "Insufficient pairwise observations (< 3) between '{{colA}}' and '{{colB}}' for correlation.",
+          "pt": "Observacoes pareadas insuficientes (< 3) entre '{{colA}}' e '{{colB}}' para correlacao."
+        },
         "severity": "error"
       },
       {
@@ -204,7 +344,10 @@
         "action": "INTERPOLATE_AND_WARN",
         "interpolationMethod": "linear",
         "maxConsecutiveGaps": 5,
-        "message": { "en": "Detected {{gapCount}} time gaps. Interpolating up to {{maxConsecutiveGaps}} consecutive missing points.", "pt": "Detectadas {{gapCount}} lacunas temporais. Interpolando ate {{maxConsecutiveGaps}} pontos consecutivos ausentes." },
+        "message": {
+          "en": "Detected {{gapCount}} time gaps. Interpolating up to {{maxConsecutiveGaps}} consecutive missing points.",
+          "pt": "Detectadas {{gapCount}} lacunas temporais. Interpolando ate {{maxConsecutiveGaps}} pontos consecutivos ausentes."
+        },
         "severity": "warning"
       },
       {
@@ -212,7 +355,10 @@
         "scenario": "regressionMissing",
         "condition": "method in [linear_regression, polynomial_regression] AND any predictor column has nullCount > 0",
         "action": "DROP_ROWS_AND_WARN",
-        "message": { "en": "Dropping {{droppedRowCount}} rows with missing predictor values before regression. Remaining rows: {{remainingRowCount}}.", "pt": "Removendo {{droppedRowCount}} linhas com valores preditores ausentes antes da regressao. Linhas restantes: {{remainingRowCount}}." },
+        "message": {
+          "en": "Dropping {{droppedRowCount}} rows with missing predictor values before regression. Remaining rows: {{remainingRowCount}}.",
+          "pt": "Removendo {{droppedRowCount}} linhas com valores preditores ausentes antes da regressao. Linhas restantes: {{remainingRowCount}}."
+        },
         "severity": "warning"
       }
     ],
@@ -248,7 +394,10 @@
           "default": 1
         },
         "action": "FAIL",
-        "message": { "en": "Method '{{method}}' requires at least {{minRows}} rows but got {{actualRows}}.", "pt": "O metodo '{{method}}' requer pelo menos {{minRows}} linhas, mas recebeu {{actualRows}}." },
+        "message": {
+          "en": "Method '{{method}}' requires at least {{minRows}} rows but got {{actualRows}}.",
+          "pt": "O metodo '{{method}}' requer pelo menos {{minRows}} linhas, mas recebeu {{actualRows}}."
+        },
         "severity": "error"
       },
       {
@@ -259,8 +408,14 @@
         "softLimit": 500000,
         "softLimitAction": "WARN",
         "hardLimitAction": "FAIL",
-        "softMessage": { "en": "Large dataset ({{rowCount}} rows). Computation may be slow.", "pt": "Conjunto de dados grande ({{rowCount}} linhas). O calculo pode ser lento." },
-        "hardMessage": { "en": "Dataset exceeds maximum of 1,000,000 rows. Please reduce the range.", "pt": "O conjunto de dados excede o maximo de 1.000.000 linhas. Reduza o intervalo." },
+        "softMessage": {
+          "en": "Large dataset ({{rowCount}} rows). Computation may be slow.",
+          "pt": "Conjunto de dados grande ({{rowCount}} linhas). O calculo pode ser lento."
+        },
+        "hardMessage": {
+          "en": "Dataset exceeds maximum of 1,000,000 rows. Please reduce the range.",
+          "pt": "O conjunto de dados excede o maximo de 1.000.000 linhas. Reduza o intervalo."
+        },
         "severity": "error"
       },
       {
@@ -276,7 +431,10 @@
           "descriptive_stats": "outputRows >= 1"
         },
         "action": "FAIL",
-        "message": { "en": "Row count mismatch: expected {{expectedRule}} but output has {{outputRows}} rows (input had {{inputRows}}).", "pt": "Divergencia na contagem de linhas: esperado {{expectedRule}} mas a saida tem {{outputRows}} linhas (entrada tinha {{inputRows}})." },
+        "message": {
+          "en": "Row count mismatch: expected {{expectedRule}} but output has {{outputRows}} rows (input had {{inputRows}}).",
+          "pt": "Divergencia na contagem de linhas: esperado {{expectedRule}} mas a saida tem {{outputRows}} linhas (entrada tinha {{inputRows}})."
+        },
         "severity": "error"
       },
       {
@@ -284,18 +442,37 @@
         "rule": "emptyResult",
         "description": "Detects when a computation produces zero output rows.",
         "action": "WARN",
-        "message": { "en": "Computation produced an empty result (0 rows). This may indicate overly restrictive filters or no matching data.", "pt": "O calculo produziu um resultado vazio (0 linhas). Isso pode indicar filtros muito restritivos ou ausencia de dados correspondentes." },
+        "message": {
+          "en": "Computation produced an empty result (0 rows). This may indicate overly restrictive filters or no matching data.",
+          "pt": "O calculo produziu um resultado vazio (0 linhas). Isso pode indicar filtros muito restritivos ou ausencia de dados correspondentes."
+        },
         "severity": "warning",
         "allowEmpty": false,
-        "allowEmptyForMethods": ["count_if", "filter", "search"]
+        "allowEmptyForMethods": [
+          "count_if",
+          "filter",
+          "search"
+        ]
       },
       {
         "id": "ROW_005",
         "rule": "singleRowWarning",
         "description": "Warns when statistical methods receive only a single data row.",
-        "applicableMethods": ["std", "variance", "correlation", "regression", "t_test", "anova", "z_score", "moving_average"],
+        "applicableMethods": [
+          "std",
+          "variance",
+          "correlation",
+          "regression",
+          "t_test",
+          "anova",
+          "z_score",
+          "moving_average"
+        ],
         "action": "WARN",
-        "message": { "en": "Only 1 data row provided. Statistical results may be undefined or unreliable for '{{method}}'.", "pt": "Apenas 1 linha de dados fornecida. Resultados estatisticos podem ser indefinidos ou pouco confiaveis para '{{method}}'." },
+        "message": {
+          "en": "Only 1 data row provided. Statistical results may be undefined or unreliable for '{{method}}'.",
+          "pt": "Apenas 1 linha de dados fornecida. Resultados estatisticos podem ser indefinidos ou pouco confiaveis para '{{method}}'."
+        },
         "severity": "warning"
       },
       {
@@ -304,7 +481,10 @@
         "description": "Warns when a high percentage of rows are exact duplicates.",
         "threshold": 0.5,
         "action": "WARN",
-        "message": { "en": "{{duplicatePercentage}}% of rows are exact duplicates. Verify this is intentional.", "pt": "{{duplicatePercentage}}% das linhas sao duplicatas exatas. Verifique se isso e intencional." },
+        "message": {
+          "en": "{{duplicatePercentage}}% of rows are exact duplicates. Verify this is intentional.",
+          "pt": "{{duplicatePercentage}}% das linhas sao duplicatas exatas. Verifique se isso e intencional."
+        },
         "severity": "warning"
       },
       {
@@ -317,7 +497,10 @@
           "0.99": 30
         },
         "action": "WARN",
-        "message": { "en": "Sample size ({{rowCount}}) may be too small for {{confidenceLevel}} confidence level. Recommended minimum: {{recommendedMin}}.", "pt": "O tamanho da amostra ({{rowCount}}) pode ser muito pequeno para o nivel de confianca {{confidenceLevel}}. Minimo recomendado: {{recommendedMin}}." },
+        "message": {
+          "en": "Sample size ({{rowCount}}) may be too small for {{confidenceLevel}} confidence level. Recommended minimum: {{recommendedMin}}.",
+          "pt": "O tamanho da amostra ({{rowCount}}) pode ser muito pequeno para o nivel de confianca {{confidenceLevel}}. Minimo recomendado: {{recommendedMin}}."
+        },
         "severity": "warning"
       }
     ]
@@ -331,19 +514,32 @@
         "description": "All stochastic operations must use an explicit random seed.",
         "enforcement": "strict",
         "defaultSeed": 42,
-        "seedSources": ["numpy.random.seed", "random.seed", "sklearn random_state"],
+        "seedSources": [
+          "numpy.random.seed",
+          "random.seed",
+          "sklearn random_state"
+        ],
         "action": "INJECT_SEED",
-        "message": { "en": "Random seed set to {{seed}} for reproducibility.", "pt": "Semente aleatoria definida como {{seed}} para reprodutibilidade." }
+        "message": {
+          "en": "Random seed set to {{seed}} for reproducibility.",
+          "pt": "Semente aleatoria definida como {{seed}} para reprodutibilidade."
+        }
       },
       {
         "id": "REPRO_002",
         "rule": "floatPrecision",
         "description": "All floating-point results must be rounded to a configurable number of decimal places.",
         "defaultDecimals": 10,
-        "configurableRange": [1, 15],
+        "configurableRange": [
+          1,
+          15
+        ],
         "roundingMethod": "half_even",
         "action": "ROUND",
-        "message": { "en": "Rounding all floats to {{decimals}} decimal places.", "pt": "Arredondando todos os floats para {{decimals}} casas decimais." }
+        "message": {
+          "en": "Rounding all floats to {{decimals}} decimal places.",
+          "pt": "Arredondando todos os floats para {{decimals}} casas decimais."
+        }
       },
       {
         "id": "REPRO_003",
@@ -351,8 +547,15 @@
         "description": "Output must be sorted deterministically before hashing and return.",
         "sortStrategy": "lexicographic_by_all_columns",
         "tieBreaker": "original_row_index",
-        "applyTo": ["dataframe_results", "grouped_results", "pivot_results"],
-        "skipForMethods": ["timeseries_forecast", "moving_average"],
+        "applyTo": [
+          "dataframe_results",
+          "grouped_results",
+          "pivot_results"
+        ],
+        "skipForMethods": [
+          "timeseries_forecast",
+          "moving_average"
+        ],
         "action": "SORT"
       },
       {
@@ -364,7 +567,10 @@
         "hashAlgorithm": "SHA-256",
         "hashScope": "full_output_dataframe_serialized_as_csv",
         "onMismatch": "FAIL",
-        "message": { "en": "Determinism check failed: hash mismatch between run 1 ({{hash1}}) and run 2 ({{hash2}}).", "pt": "Verificacao de determinismo falhou: hashes divergentes entre execucao 1 ({{hash1}}) e execucao 2 ({{hash2}})." },
+        "message": {
+          "en": "Determinism check failed: hash mismatch between run 1 ({{hash1}}) and run 2 ({{hash2}}).",
+          "pt": "Verificacao de determinismo falhou: hashes divergentes entre execucao 1 ({{hash1}}) e execucao 2 ({{hash2}})."
+        },
         "severity": "error"
       },
       {
@@ -380,15 +586,29 @@
         },
         "enforcement": "record_and_warn",
         "action": "RECORD",
-        "message": { "en": "Package version mismatch: {{package}} is {{actual}} but policy expects {{expected}}.", "pt": "Versao de pacote divergente: {{package}} e {{actual}} mas a politica espera {{expected}}." },
+        "message": {
+          "en": "Package version mismatch: {{package}} is {{actual}} but policy expects {{expected}}.",
+          "pt": "Versao de pacote divergente: {{package}} e {{actual}} mas a politica espera {{expected}}."
+        },
         "severity": "warning"
       },
       {
         "id": "REPRO_006",
         "rule": "environmentSnapshot",
         "description": "Capture the full execution environment for audit replay.",
-        "captureFields": ["pythonVersion", "os", "architecture", "locale", "timezone", "envVarsWhitelist"],
-        "envVarsWhitelist": ["LANG", "LC_ALL", "TZ"],
+        "captureFields": [
+          "pythonVersion",
+          "os",
+          "architecture",
+          "locale",
+          "timezone",
+          "envVarsWhitelist"
+        ],
+        "envVarsWhitelist": [
+          "LANG",
+          "LC_ALL",
+          "TZ"
+        ],
         "action": "RECORD"
       },
       {
@@ -415,7 +635,10 @@
           "NUMEXPR_MAX_THREADS": "1"
         },
         "action": "SET_ENV",
-        "message": { "en": "Multi-threading disabled for deterministic computation.", "pt": "Multi-threading desabilitado para calculo deterministico." }
+        "message": {
+          "en": "Multi-threading disabled for deterministic computation.",
+          "pt": "Multi-threading desabilitado para calculo deterministico."
+        }
       },
       {
         "id": "REPRO_009",
@@ -434,15 +657,22 @@
         "rule": "significantDigits",
         "description": "Default number of significant digits for general numeric output.",
         "defaultDigits": 6,
-        "configurableRange": [1, 15],
-        "applyTo": ["floats", "computed_values", "percentages"]
+        "configurableRange": [
+          1,
+          15
+        ],
+        "applyTo": [
+          "floats",
+          "computed_values",
+          "percentages"
+        ]
       },
       {
         "id": "FMT_002",
         "rule": "scientificNotationThreshold",
         "description": "Switch to scientific notation for numbers beyond these thresholds.",
-        "upperThreshold": 1e12,
-        "lowerThreshold": 1e-4,
+        "upperThreshold": 1000000000000,
+        "lowerThreshold": 0.0001,
         "format": "E",
         "exampleOutput": "1.234568E+15"
       },
@@ -464,7 +694,13 @@
         "format": "{{symbol}}{{value}}",
         "decimalPlaces": 2,
         "thousandsSeparator": ",",
-        "symbols": { "USD": "$", "EUR": "€", "GBP": "£", "BRL": "R$", "JPY": "¥" },
+        "symbols": {
+          "USD": "$",
+          "EUR": "€",
+          "GBP": "£",
+          "BRL": "R$",
+          "JPY": "¥"
+        },
         "example": "$1,234.56"
       },
       {
@@ -493,7 +729,10 @@
         "negativeInfinity": "-Inf",
         "treatAsError": false,
         "warnOnPresence": true,
-        "message": { "en": "Output contains infinity values. Check for division by zero.", "pt": "A saida contem valores infinitos. Verifique divisao por zero." }
+        "message": {
+          "en": "Output contains infinity values. Check for division by zero.",
+          "pt": "A saida contem valores infinitos. Verifique divisao por zero."
+        }
       },
       {
         "id": "FMT_008",
@@ -502,7 +741,10 @@
         "display": "NaN",
         "treatDistinctFromNull": true,
         "warnOnPresence": true,
-        "message": { "en": "Output contains NaN values from undefined operations (e.g., 0/0).", "pt": "A saida contem valores NaN de operacoes indefinidas (ex., 0/0)." }
+        "message": {
+          "en": "Output contains NaN values from undefined operations (e.g., 0/0).",
+          "pt": "A saida contem valores NaN de operacoes indefinidas (ex., 0/0)."
+        }
       },
       {
         "id": "FMT_009",
@@ -532,7 +774,12 @@
         "absoluteTolerance": 1e-10,
         "relativeTolerance": 1e-9,
         "comparisonMethod": "numpy.allclose",
-        "applyTo": ["general_floats", "means", "medians", "std"]
+        "applyTo": [
+          "general_floats",
+          "means",
+          "medians",
+          "std"
+        ]
       },
       {
         "id": "TOL_002",
@@ -540,7 +787,11 @@
         "description": "Tolerance for comparing percentage values.",
         "absoluteTolerance": 1e-8,
         "relativeTolerance": 1e-7,
-        "applyTo": ["percentages", "rates", "proportions"]
+        "applyTo": [
+          "percentages",
+          "rates",
+          "proportions"
+        ]
       },
       {
         "id": "TOL_003",
@@ -548,7 +799,11 @@
         "description": "Tolerance for comparing p-values and statistical significance thresholds.",
         "absoluteTolerance": 1e-12,
         "relativeTolerance": 1e-10,
-        "applyTo": ["p_values", "significance_levels", "confidence_intervals"],
+        "applyTo": [
+          "p_values",
+          "significance_levels",
+          "confidence_intervals"
+        ],
         "note": "High precision needed because p-values near significance boundaries (e.g., 0.05) require exact comparison."
       },
       {
@@ -556,9 +811,13 @@
         "rule": "largeNumberComparison",
         "description": "Relative tolerance for very large numeric values where absolute differences may be misleading.",
         "absoluteTolerance": null,
-        "relativeTolerance": 1e-6,
+        "relativeTolerance": 0.000001,
         "applyWhen": "abs(value) > 1e6",
-        "applyTo": ["sums", "totals", "cumulative_values"]
+        "applyTo": [
+          "sums",
+          "totals",
+          "cumulative_values"
+        ]
       },
       {
         "id": "TOL_005",
@@ -568,7 +827,10 @@
         "relativeTolerance": null,
         "roundBeforeCompare": true,
         "decimalPlaces": 2,
-        "applyTo": ["currency_values", "financial_totals"]
+        "applyTo": [
+          "currency_values",
+          "financial_totals"
+        ]
       },
       {
         "id": "TOL_006",
@@ -576,7 +838,12 @@
         "description": "Integer values must match exactly with zero tolerance.",
         "absoluteTolerance": 0,
         "relativeTolerance": 0,
-        "applyTo": ["counts", "row_counts", "frequencies", "ranks"]
+        "applyTo": [
+          "counts",
+          "row_counts",
+          "frequencies",
+          "ranks"
+        ]
       },
       {
         "id": "TOL_007",
@@ -584,16 +851,27 @@
         "description": "Tolerance for comparing correlation coefficients bounded in [-1, 1].",
         "absoluteTolerance": 1e-8,
         "relativeTolerance": 1e-7,
-        "applyTo": ["pearson_r", "spearman_rho", "kendall_tau"],
-        "validRange": [-1.0, 1.0]
+        "applyTo": [
+          "pearson_r",
+          "spearman_rho",
+          "kendall_tau"
+        ],
+        "validRange": [
+          -1,
+          1
+        ]
       },
       {
         "id": "TOL_008",
         "rule": "chiSquareStatistic",
         "description": "Tolerance for comparing chi-square and F-statistics.",
-        "absoluteTolerance": 1e-6,
-        "relativeTolerance": 1e-5,
-        "applyTo": ["chi_square", "f_statistic", "t_statistic"]
+        "absoluteTolerance": 0.000001,
+        "relativeTolerance": 0.00001,
+        "applyTo": [
+          "chi_square",
+          "f_statistic",
+          "t_statistic"
+        ]
       }
     ]
   },
@@ -617,7 +895,14 @@
           "parameters": "object",
           "rowsAffected": "integer"
         },
-        "examples": ["dropna", "fillna", "astype", "sort_values", "filter", "normalize"]
+        "examples": [
+          "dropna",
+          "fillna",
+          "astype",
+          "sort_values",
+          "filter",
+          "normalize"
+        ]
       },
       {
         "field": "warningsEmitted",
@@ -676,25 +961,46 @@
         "field": "executionEnvironment",
         "type": "object",
         "description": "Snapshot of the runtime environment for reproducibility.",
-        "requiredSubfields": ["pythonVersion", "os", "architecture", "packageVersions", "randomSeed", "threadingConfig"]
+        "requiredSubfields": [
+          "pythonVersion",
+          "os",
+          "architecture",
+          "packageVersions",
+          "randomSeed",
+          "threadingConfig"
+        ]
       },
       {
         "field": "computationDuration",
         "type": "object",
         "description": "Timing breakdown of the computation phases.",
-        "requiredSubfields": ["totalMs", "inputValidationMs", "computeMs", "outputValidationMs", "hashComputeMs"]
+        "requiredSubfields": [
+          "totalMs",
+          "inputValidationMs",
+          "computeMs",
+          "outputValidationMs",
+          "hashComputeMs"
+        ]
       },
       {
         "field": "dataLineage",
         "type": "object",
         "description": "Provenance information linking this computation to its source data.",
-        "requiredSubfields": ["sourceFileId", "sourceSheetName", "sourceRange", "sourceRowCount", "sourceColumnCount"]
+        "requiredSubfields": [
+          "sourceFileId",
+          "sourceSheetName",
+          "sourceRange",
+          "sourceRowCount",
+          "sourceColumnCount"
+        ]
       }
     ],
     "retention": {
       "retainForDays": 90,
       "compressAfterDays": 7,
-      "purgeSensitiveFields": ["inputSnapshot"],
+      "purgeSensitiveFields": [
+        "inputSnapshot"
+      ],
       "purgeAfterDays": 30
     }
   },

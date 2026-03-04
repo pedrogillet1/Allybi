@@ -3,8 +3,17 @@
     "id": "di_everyday_tables_every_insurance_claim",
     "version": "1.0.0",
     "description": "Tables expected in every_insurance_claim.",
-    "languages": ["any"],
-    "lastUpdated": "2026-03-03"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -12,10 +21,29 @@
     "docType": "every_insurance_claim"
   },
   "tableHeaderSynonyms": {
-    "date": ["date", "data", "reported", "incidence date"],
-    "amount": ["amount", "valor", "quantia", "total"],
-    "description": ["description", "descricao", "narrative", "evento"],
-    "status": ["status", "state", "situation"]
+    "date": [
+      "date",
+      "data",
+      "reported",
+      "incidence date"
+    ],
+    "amount": [
+      "amount",
+      "valor",
+      "quantia",
+      "total"
+    ],
+    "description": [
+      "description",
+      "descricao",
+      "narrative",
+      "evento"
+    ],
+    "status": [
+      "status",
+      "state",
+      "situation"
+    ]
   },
   "tables": [
     {
@@ -25,14 +53,44 @@
         "pt": "Detalhes do Sinistro"
       },
       "section": "incident",
-      "signaturePatterns": ["\\bincident\\b", "\\boccurrence\\b", "\\bsinistro\\b"],
-      "requiredHeaders": ["incident_date", "loss_location", "description", "claim_number"],
-      "headerAliases": [["incident_date", "data do sinistro"], ["loss_location", "local"], ["description", "descricao"], ["claim_number", "numero"]],
+      "signaturePatterns": [
+        "\\bincident\\b",
+        "\\boccurrence\\b",
+        "\\bsinistro\\b"
+      ],
+      "requiredHeaders": [
+        "incident_date",
+        "loss_location",
+        "description",
+        "claim_number"
+      ],
+      "headerAliases": [
+        [
+          "incident_date",
+          "data do sinistro"
+        ],
+        [
+          "loss_location",
+          "local"
+        ],
+        [
+          "description",
+          "descricao"
+        ],
+        [
+          "claim_number",
+          "numero"
+        ]
+      ],
       "unitsAndScaling": {
-        "preferredScales": ["units"],
+        "preferredScales": [
+          "units"
+        ],
         "requiresScaleEvidence": false
       },
-      "footnotes": ["insurance_claim_fn_01"]
+      "footnotes": [
+        "insurance_claim_fn_01"
+      ]
     },
     {
       "id": "insurance_claim_damage_table",
@@ -41,14 +99,45 @@
         "pt": "Danos e Documentos"
       },
       "section": "damages_and_documents",
-      "signaturePatterns": ["\\bdamages\\b", "\\bdamage\\b", "\\bdocument\\b", "\\bdocuments\\b"],
-      "requiredHeaders": ["document_type", "reference", "description", "status"],
-      "headerAliases": [["document_type", "tipo"], ["reference", "referencia"], ["description", "descricao"], ["status", "status"]],
+      "signaturePatterns": [
+        "\\bdamages\\b",
+        "\\bdamage\\b",
+        "\\bdocument\\b",
+        "\\bdocuments\\b"
+      ],
+      "requiredHeaders": [
+        "document_type",
+        "reference",
+        "description",
+        "status"
+      ],
+      "headerAliases": [
+        [
+          "document_type",
+          "tipo"
+        ],
+        [
+          "reference",
+          "referencia"
+        ],
+        [
+          "description",
+          "descricao"
+        ],
+        [
+          "status",
+          "status"
+        ]
+      ],
       "unitsAndScaling": {
-        "preferredScales": ["units"],
+        "preferredScales": [
+          "units"
+        ],
         "requiresScaleEvidence": false
       },
-      "footnotes": ["insurance_claim_fn_02"]
+      "footnotes": [
+        "insurance_claim_fn_02"
+      ]
     },
     {
       "id": "insurance_claim_amount_table",
@@ -57,16 +146,48 @@
         "pt": "Valores de Cobertura e Reserva"
       },
       "section": "coverage_check",
-      "signaturePatterns": ["\\bloss\\b", "\\bcoverage\\b", "\\breserves\\b", "\\bestimated\\b"],
-      "requiredHeaders": ["estimated_loss_amount", "approved_loss_amount", "reserve_amount", "deductible"],
-      "headerAliases": [["estimated_loss_amount", "estimativa"], ["approved_loss_amount", "aprovado"], ["reserve_amount", "reserva"], ["deductible", "franquia"]],
+      "signaturePatterns": [
+        "\\bloss\\b",
+        "\\bcoverage\\b",
+        "\\breserves\\b",
+        "\\bestimated\\b"
+      ],
+      "requiredHeaders": [
+        "estimated_loss_amount",
+        "approved_loss_amount",
+        "reserve_amount",
+        "deductible"
+      ],
+      "headerAliases": [
+        [
+          "estimated_loss_amount",
+          "estimativa"
+        ],
+        [
+          "approved_loss_amount",
+          "aprovado"
+        ],
+        [
+          "reserve_amount",
+          "reserva"
+        ],
+        [
+          "deductible",
+          "franquia"
+        ]
+      ],
       "unitsAndScaling": {
-        "preferredScales": ["units", "thousands"],
+        "preferredScales": [
+          "units",
+          "thousands"
+        ],
         "currencyField": "currency",
         "requiresScaleEvidence": true,
         "mixedScaleHandling": "normalize_to_currency_base"
       },
-      "footnotes": ["insurance_claim_fn_03"]
+      "footnotes": [
+        "insurance_claim_fn_03"
+      ]
     },
     {
       "id": "insurance_claim_payments_table",
@@ -75,16 +196,53 @@
         "pt": "Pagamentos e Status"
       },
       "section": "payments_and_status",
-      "signaturePatterns": ["\\bpayment\\b", "\\bpaid\\b", "\\bstatus\\b", "\\boutstanding\\b"],
-      "requiredHeaders": ["status", "payment_date", "paid_amount", "outstanding_amount", "currency"],
-      "headerAliases": [["status", "situação"], ["payment_date", "data pagamento"], ["paid_amount", "pago"], ["outstanding_amount", "saldo"], ["currency", "moeda"]],
+      "signaturePatterns": [
+        "\\bpayment\\b",
+        "\\bpaid\\b",
+        "\\bstatus\\b",
+        "\\boutstanding\\b"
+      ],
+      "requiredHeaders": [
+        "status",
+        "payment_date",
+        "paid_amount",
+        "outstanding_amount",
+        "currency"
+      ],
+      "headerAliases": [
+        [
+          "status",
+          "situação"
+        ],
+        [
+          "payment_date",
+          "data pagamento"
+        ],
+        [
+          "paid_amount",
+          "pago"
+        ],
+        [
+          "outstanding_amount",
+          "saldo"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
       "unitsAndScaling": {
-        "preferredScales": ["units", "thousands"],
+        "preferredScales": [
+          "units",
+          "thousands"
+        ],
         "currencyField": "currency",
         "requiresScaleEvidence": true,
         "mixedScaleHandling": "normalize_to_currency_base"
       },
-      "footnotes": ["insurance_claim_fn_04"]
+      "footnotes": [
+        "insurance_claim_fn_04"
+      ]
     },
     {
       "id": "insurance_claim_history_table",
@@ -93,14 +251,44 @@
         "pt": "Historico de Ajustes"
       },
       "section": "adjustment_history",
-      "signaturePatterns": ["\\badjustment\\b", "\\bhistory\\b", "\\brevision\\b"],
-      "requiredHeaders": ["date", "action", "notes", "status"],
-      "headerAliases": [["date", "data"], ["action", "acao"], ["notes", "nota"], ["status", "status"]],
+      "signaturePatterns": [
+        "\\badjustment\\b",
+        "\\bhistory\\b",
+        "\\brevision\\b"
+      ],
+      "requiredHeaders": [
+        "date",
+        "action",
+        "notes",
+        "status"
+      ],
+      "headerAliases": [
+        [
+          "date",
+          "data"
+        ],
+        [
+          "action",
+          "acao"
+        ],
+        [
+          "notes",
+          "nota"
+        ],
+        [
+          "status",
+          "status"
+        ]
+      ],
       "unitsAndScaling": {
-        "preferredScales": ["units"],
+        "preferredScales": [
+          "units"
+        ],
         "requiresScaleEvidence": false
       },
-      "footnotes": ["insurance_claim_fn_05"]
+      "footnotes": [
+        "insurance_claim_fn_05"
+      ]
     }
   ]
 }

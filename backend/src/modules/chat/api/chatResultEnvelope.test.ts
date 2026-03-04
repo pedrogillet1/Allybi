@@ -76,4 +76,39 @@ describe("chatResultEnvelope", () => {
       },
     ]);
   });
+
+  test("derives rich sources from source_buttons when explicit sources are missing", () => {
+    const event = toChatFinalEvent({
+      conversationId: "conv-3",
+      userMessageId: "user-3",
+      assistantMessageId: "assistant-3",
+      assistantText: "ok",
+      answerMode: "doc_grounded_single",
+      attachmentsPayload: [
+        {
+          type: "source_buttons",
+          buttons: [
+            {
+              documentId: "doc-123",
+              title: "report.pdf",
+              locationKey: "d:doc-123|p:4|sec:chunk_4",
+              snippet: "Quoted evidence",
+            },
+          ],
+        },
+      ],
+    } as any);
+
+    expect((event as any).sources).toEqual([
+      expect.objectContaining({
+        documentId: "doc-123",
+        docId: "doc-123",
+        filename: "report.pdf",
+        locationKey: "d:doc-123|p:4|sec:chunk_4",
+        page: 4,
+        section: "chunk_4",
+        snippet: "Quoted evidence",
+      }),
+    ]);
+  });
 });

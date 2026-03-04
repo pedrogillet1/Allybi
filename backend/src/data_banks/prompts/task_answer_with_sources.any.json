@@ -3,8 +3,20 @@
     "id": "task_answer_with_sources",
     "version": "1.3.0",
     "description": "Task-level answer formatting with structured sources contract.",
-    "languages": ["any", "en", "pt", "es"],
-    "lastUpdated": "2026-03-02"
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-03-02",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true
@@ -13,7 +25,12 @@
     {
       "id": "answer_with_sources",
       "priority": 200,
-      "when": { "answerModes": ["doc_grounded_single", "doc_grounded_multi"] },
+      "when": {
+        "answerModes": [
+          "doc_grounded_single",
+          "doc_grounded_multi"
+        ]
+      },
       "messages": [
         {
           "role": "system",
@@ -26,7 +43,11 @@
     {
       "id": "answer_with_quote_sources",
       "priority": 220,
-      "when": { "answerModes": ["doc_grounded_quote"] },
+      "when": {
+        "answerModes": [
+          "doc_grounded_quote"
+        ]
+      },
       "messages": [
         {
           "role": "system",
@@ -39,7 +60,11 @@
     {
       "id": "answer_with_table_sources",
       "priority": 210,
-      "when": { "answerModes": ["doc_grounded_table"] },
+      "when": {
+        "answerModes": [
+          "doc_grounded_table"
+        ]
+      },
       "messages": [
         {
           "role": "system",
@@ -52,7 +77,11 @@
     {
       "id": "answer_help_steps_scoped",
       "priority": 205,
-      "when": { "answerModes": ["help_steps"] },
+      "when": {
+        "answerModes": [
+          "help_steps"
+        ]
+      },
       "messages": [
         {
           "role": "system",
@@ -65,7 +94,16 @@
     {
       "id": "answer_without_sources",
       "priority": 100,
-      "when": { "answerModes": ["general_answer", "action_receipt", "action_confirmation", "nav_pills", "rank_disambiguate", "rank_autopick"] },
+      "when": {
+        "answerModes": [
+          "general_answer",
+          "action_receipt",
+          "action_confirmation",
+          "nav_pills",
+          "rank_disambiguate",
+          "rank_autopick"
+        ]
+      },
       "messages": [
         {
           "role": "system",
@@ -145,7 +183,13 @@
         "expect": {
           "promptApplied": true,
           "respectsAnswerMode": true,
-          "validModes": ["doc_grounded_single", "doc_grounded_multi", "doc_grounded_quote", "doc_grounded_table", "general"]
+          "validModes": [
+            "doc_grounded_single",
+            "doc_grounded_multi",
+            "doc_grounded_quote",
+            "doc_grounded_table",
+            "general"
+          ]
         }
       },
       {

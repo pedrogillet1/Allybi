@@ -14,19 +14,9 @@
       "editor_router",
       "retrieval_router"
     ],
-    "tests": {
-      "positive": [
-        "locate between Revenue Recognition and Definitions",
-        "table under KPI section",
-        "paragraph starting with The company shall",
-        "under Payment Terms section"
-      ],
-      "negative": [
-        "list all files in the folder",
-        "apply formatting to row 10",
-        "summarize the report"
-      ]
-    },
+    "tests": [
+      "tests/patternDeterminism.test.ts"
+    ],
     "lastUpdated": "2026-03-03",
     "id": "patterns_editor_anchor_resolution_patterns",
     "description": "Anchor-resolution patterns for under/between/starting-with and table-relative navigation"

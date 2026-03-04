@@ -1,7 +1,9 @@
 /**
  * Stuck Document Sweeper
  *
- * Runs every minute, re-enqueues documents stuck in 'uploaded' or 'enriching'.
+ * Runs periodically, re-enqueues documents stuck in 'uploaded' or 'enriching'.
+ * Uses DocumentStateManager.resetToUploadedOrFail() so that documents exceeding
+ * max sweep resets are permanently failed instead of infinitely re-enqueued.
  */
 
 import { Worker, Job } from "bullmq";
@@ -12,15 +14,16 @@ import {
   isPubSubAvailable,
   publishExtractFanoutJobsBulk,
 } from "../../services/jobs/pubsubPublisher.service";
+import { documentStateManager } from "../../services/documents/documentStateManager.service";
 import { connection, QUEUE_PREFIX, documentQueue, stuckDocSweepQueue } from "../queueConfig";
 import { addDocumentJob } from "./jobHelpers.service";
 
 let stuckDocSweepWorker: Worker | null = null;
 
-const SWEEP_INTERVAL_MS = 60 * 1000; // 1 minute
-const UPLOADED_STUCK_THRESHOLD_MS = 2 * 60 * 1000; // 2 minutes
-const ENRICHING_STUCK_THRESHOLD_MS = 8 * 60 * 1000; // 8 minutes
-const SWEEP_BATCH_LIMIT = 50;
+const SWEEP_INTERVAL_MS = parseInt(process.env.SWEEP_INTERVAL_MS || "60000", 10);
+const UPLOADED_STUCK_THRESHOLD_MS = parseInt(process.env.UPLOADED_STUCK_THRESHOLD_MS || "120000", 10);
+const ENRICHING_STUCK_THRESHOLD_MS = parseInt(process.env.ENRICHING_STUCK_THRESHOLD_MS || "480000", 10);
+const SWEEP_BATCH_LIMIT = parseInt(process.env.SWEEP_BATCH_LIMIT || "50", 10);
 
 export async function startStuckDocSweeper() {
   if (stuckDocSweepWorker) {
@@ -73,19 +76,48 @@ export async function startStuckDocSweeper() {
         take: SWEEP_BATCH_LIMIT - stuckUploaded.length,
       });
 
-      if (stuckEnriching.length > 0) {
-        await prisma.document.updateMany({
-          where: { id: { in: stuckEnriching.map((d) => d.id) } },
-          data: {
-            status: "uploaded",
-            indexingState: "pending",
-            indexingError: null,
-            indexingUpdatedAt: new Date(),
-          },
+      // -----------------------------------------------------------------------
+      // Reset enriching docs via DocumentStateManager (with sweep cap)
+      // -----------------------------------------------------------------------
+      const permanentlyFailed: string[] = [];
+      const resetDocs: typeof stuckEnriching = [];
+
+      for (const doc of stuckEnriching) {
+        const result = await documentStateManager.resetToUploadedOrFail(doc.id);
+        if (result.toStatus === "failed") {
+          permanentlyFailed.push(doc.id);
+          // Log DLQ event
+          prisma.ingestionEvent
+            .create({
+              data: {
+                userId: doc.userId,
+                documentId: doc.id,
+                filename: doc.filename || "unknown",
+                mimeType: doc.mimeType || "unknown",
+                status: "dlq",
+                errorCode: "SWEEP_RESET_LIMIT",
+                at: new Date(),
+              },
+            })
+            .catch((e: any) =>
+              logger.warn("[StuckDocSweeper] DLQ event failed", {
+                error: e.message,
+              }),
+            );
+        } else {
+          resetDocs.push(doc);
+        }
+      }
+
+      if (permanentlyFailed.length > 0) {
+        logger.warn("[StuckDocSweeper] Permanently failed documents", {
+          count: permanentlyFailed.length,
+          documentIds: permanentlyFailed.map((id) => id.substring(0, 8)),
         });
       }
 
-      const allStuck = [...stuckUploaded, ...stuckEnriching];
+      // Only re-enqueue uploaded + successfully-reset docs (not permanently failed)
+      const allStuck = [...stuckUploaded, ...resetDocs];
       let requeued = 0;
 
       if (config.USE_GCP_WORKERS && isPubSubAvailable()) {
@@ -150,13 +182,18 @@ export async function startStuckDocSweeper() {
       }
 
       logger.info("[StuckDocSweeper] Sweep complete", {
-        found: allStuck.length,
+        found: allStuck.length + permanentlyFailed.length,
         stuckUploaded: stuckUploaded.length,
         stuckEnriching: stuckEnriching.length,
+        permanentlyFailed: permanentlyFailed.length,
         requeued,
       });
 
-      return { found: allStuck.length, requeued };
+      return {
+        found: allStuck.length + permanentlyFailed.length,
+        requeued,
+        permanentlyFailed: permanentlyFailed.length,
+      };
     },
     {
       connection,

@@ -3,10 +3,21 @@
     "id": "truncation_and_limits",
     "version": "2.0.0",
     "description": "Hard and soft character/element limits for Koda responses. Defines budgets by answer mode and profile, controls paragraph/bullet density, and ensures graceful truncation at semantic boundaries.",
-    "languages": ["any", "en", "pt", "es"],
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
     "lastUpdated": "2026-01-26",
     "owner": "koda-formatting",
-    "compat": ">=1.0.0"
+    "compat": ">=1.0.0",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -20,7 +31,10 @@
         "ifHardAndSoft": "hard_limit",
         "ifMultipleRules": "lowest_limit_wins"
       }
-    }
+    },
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "globalLimits": {
     "_comment": "Absolute maximums that override all other settings.",
@@ -184,14 +198,23 @@
   },
   "truncationRules": {
     "_comment": "How to truncate when limits are exceeded.",
-    "preferredBoundaries": ["sentence", "clause", "word"],
+    "preferredBoundaries": [
+      "sentence",
+      "clause",
+      "word"
+    ],
     "suffix": {
       "en": "...",
       "pt": "...",
       "es": "..."
     },
     "preserveLastSentence": true,
-    "neverTruncateMid": ["number", "currency", "percentage", "date"],
+    "neverTruncateMid": [
+      "number",
+      "currency",
+      "percentage",
+      "date"
+    ],
     "tableTruncation": {
       "strategy": "drop_rows_from_bottom",
       "showTruncationNote": true,
@@ -211,7 +234,9 @@
       "id": "profile_budget_enforcement",
       "scope": "global",
       "description": "Enforce character and element budgets based on selected profile.",
-      "appliesTo": ["all_answers"],
+      "appliesTo": [
+        "all_answers"
+      ],
       "action": {
         "type": "enforce_profile_budget",
         "source": "profileBudgets"
@@ -223,7 +248,9 @@
       "id": "answer_mode_override",
       "scope": "global",
       "description": "Answer mode limits override profile budgets when stricter.",
-      "appliesTo": ["all_answers"],
+      "appliesTo": [
+        "all_answers"
+      ],
       "action": {
         "type": "apply_mode_limits",
         "source": "answerModeLimits",
@@ -236,15 +263,24 @@
       "id": "graceful_truncation",
       "scope": "global",
       "description": "When truncation is needed, cut at semantic boundaries.",
-      "appliesTo": ["all_answers"],
+      "appliesTo": [
+        "all_answers"
+      ],
       "when": {
         "any": [
-          { "path": "metrics.totalChars", "op": "gt", "value": "{{budget.maxChars}}" }
+          {
+            "path": "metrics.totalChars",
+            "op": "gt",
+            "value": "{{budget.maxChars}}"
+          }
         ]
       },
       "action": {
         "type": "truncate_gracefully",
-        "boundaries": ["sentence", "clause"],
+        "boundaries": [
+          "sentence",
+          "clause"
+        ],
         "addSuffix": true
       },
       "reasonCode": "graceful_truncation",
@@ -255,36 +291,62 @@
     "cases": [
       {
         "id": "TRUNC_001_nav_pills_max_90",
-        "context": { "answerMode": "nav_pills" },
+        "context": {
+          "answerMode": "nav_pills"
+        },
         "input": "This is a very long sentence that exceeds the nav_pills character limit of 90 characters and should be truncated.",
-        "expect": { "outputCharsMax": 90 }
+        "expect": {
+          "outputCharsMax": 90
+        }
       },
       {
         "id": "TRUNC_002_profile_standard_4000",
-        "context": { "profile": "standard" },
-        "expect": { "maxChars": 4000, "maxBullets": 10 }
+        "context": {
+          "profile": "standard"
+        },
+        "expect": {
+          "maxChars": 4000,
+          "maxBullets": 10
+        }
       },
       {
         "id": "TRUNC_003_table_row_limit",
-        "context": { "answerMode": "doc_grounded_table" },
-        "input": { "tableRows": 30 },
-        "expect": { "rowsMax": 20, "truncationNoteShown": true }
+        "context": {
+          "answerMode": "doc_grounded_table"
+        },
+        "input": {
+          "tableRows": 30
+        },
+        "expect": {
+          "rowsMax": 20,
+          "truncationNoteShown": true
+        }
       },
       {
         "id": "TRUNC_004_graceful_sentence_boundary",
         "input": "First sentence. Second sentence. Third sentence that is very long.",
-        "context": { "maxChars": 50 },
-        "expect": { "endsAtSentenceBoundary": true }
+        "context": {
+          "maxChars": 50
+        },
+        "expect": {
+          "endsAtSentenceBoundary": true
+        }
       },
       {
         "id": "TRUNC_005_global_token_hard_cap",
         "context": {},
-        "expect": { "outputTokensHardMax": 8000 }
+        "expect": {
+          "outputTokensHardMax": 8000
+        }
       },
       {
         "id": "TRUNC_006_doc_grounded_multi_token_cap",
-        "context": { "answerMode": "doc_grounded_multi" },
-        "expect": { "maxOutputTokens": 3400 }
+        "context": {
+          "answerMode": "doc_grounded_multi"
+        },
+        "expect": {
+          "maxOutputTokens": 3400
+        }
       }
     ]
   }

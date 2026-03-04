@@ -1694,11 +1694,26 @@ export class QualityGateRunnerService {
 
     const scope: DocumentIntelligenceScope = {
       answerMode: normalizedMode,
-      context: mergeDeep(baseContext, ctx.diPolicyContext),
-      output: mergeDeep(baseOutput, ctx.diPolicyOutput),
-      attachments: mergeDeep(baseAttachments, ctx.diPolicyAttachments),
-      source: mergeDeep(baseSource, ctx.diPolicySource),
-      config: mergeDeep(baseConfig, ctx.diPolicyConfig),
+      context: mergeDeep(
+        baseContext,
+        ctx.diPolicyContext,
+      ) as Record<string, unknown>,
+      output: mergeDeep(baseOutput, ctx.diPolicyOutput) as Record<
+        string,
+        unknown
+      >,
+      attachments: mergeDeep(
+        baseAttachments,
+        ctx.diPolicyAttachments,
+      ) as Record<string, unknown>,
+      source: mergeDeep(baseSource, ctx.diPolicySource) as Record<
+        string,
+        unknown
+      >,
+      config: mergeDeep(baseConfig, ctx.diPolicyConfig) as Record<
+        string,
+        unknown
+      >,
     };
 
     return scope;
@@ -2044,7 +2059,7 @@ export class QualityGateRunnerService {
       const validationBank =
         this.documentIntelligenceBanks.getValidationPolicies(
           domain as ValidationDomainArg,
-        );
+        ) as any;
       if (
         validationBank?.config?.enabled &&
         Array.isArray(validationBank?.policies)
@@ -2097,7 +2112,7 @@ export class QualityGateRunnerService {
       const safetyBank =
         this.documentIntelligenceBanks.getRedactionAndSafetyRules(
           domain as SafetyDomainArg,
-        );
+        ) as any;
       if (
         safetyBank?.config?.enabled &&
         Array.isArray(safetyBank?.redactionRules)

@@ -3,8 +3,20 @@
     "id": "list_styles",
     "version": "1.0.0",
     "description": "List style primitives consumed by render policy and response contract enforcement.",
-    "languages": ["any", "en", "pt", "es"],
-    "lastUpdated": "2026-03-01"
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-03-01",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -12,7 +24,10 @@
     "indentSpaces": 2,
     "ensureSpaceAfterMarker": true,
     "convertAsteriskAndPlus": true,
-    "maxConsecutiveBullets": 7
+    "maxConsecutiveBullets": 7,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "rules": [
     {

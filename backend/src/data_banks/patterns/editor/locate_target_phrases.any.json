@@ -16,19 +16,9 @@
       "editor_target_resolver",
       "retrieval_router"
     ],
-    "tests": {
-      "positive": [
-        "jump to table Revenue",
-        "where is slide title Executive Summary",
-        "scroll to cell B2",
-        "open named range TotalRevenue"
-      ],
-      "negative": [
-        "summarize the file",
-        "extract values from report",
-        "send this by email"
-      ]
-    },
+    "tests": [
+      "tests/patternDeterminism.test.ts"
+    ],
     "lastUpdated": "2026-03-03",
     "id": "patterns_editor_locate_target_phrases",
     "description": "Target phrase lexicon for editor locate/highlight actions across document and table workflows"

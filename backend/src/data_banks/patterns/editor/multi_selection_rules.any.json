@@ -12,16 +12,9 @@
       "selection_dispatcher",
       "tests.patternDeterminism"
     ],
-    "tests": {
-      "positive": [
-        "select three tables and apply same edit",
-        "select all overdue cells and apply"
-      ],
-      "negative": [
-        "select conflicting ranges without consent",
-        "apply to mixed target classes without confirmation"
-      ]
-    },
+    "tests": [
+      "tests/patternDeterminism.test.ts"
+    ],
     "lastUpdated": "2026-03-03"
   },
   "config": {

@@ -17,18 +17,9 @@
       "tests.patternDeterminism",
       "folder_tree_viewer"
     ],
-    "tests": {
-      "positive": [
-        "show me what's in this folder",
-        "list all PDFs here",
-        "show folder tree in current folder"
-      ],
-      "negative": [
-        "summarize this folder content",
-        "open and read this doc",
-        "move these files now"
-      ]
-    },
+    "tests": [
+      "tests/patternDeterminism.test.ts"
+    ],
     "lastUpdated": "2026-03-03",
     "id": "patterns_files_folder_tree_en",
     "description": "English folder listing/tree discovery patterns for Allybi file organization"

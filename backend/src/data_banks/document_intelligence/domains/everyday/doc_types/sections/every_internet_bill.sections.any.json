@@ -6,7 +6,14 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-03-03"
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -14,15 +21,159 @@
     "docType": "every_internet_bill"
   },
   "sections": [
-    { "id": "document_header", "name": { "en": "Document Header", "pt": "Cabecalho do Documento" }, "order": 1, "required": true, "mustHave": true, "headingAnchors": ["internet bill", "fatura", "statement"] },
-    { "id": "subscriber_profile", "name": { "en": "Subscriber Profile", "pt": "Perfil do Assinante" }, "order": 2, "required": true, "mustHave": true, "headingAnchors": ["subscriber", "customer", "conta"] },
-    { "id": "service_period", "name": { "en": "Service Period", "pt": "Periodo de Servico" }, "order": 3, "required": true, "mustHave": true, "headingAnchors": ["period", "periodo", "reference period"] },
-    { "id": "plan_details", "name": { "en": "Plan Details", "pt": "Detalhes do Plano" }, "order": 4, "required": true, "mustHave": true, "headingAnchors": ["plan", "package", "speed", "bandwidth"] },
-    { "id": "traffic_summary", "name": { "en": "Traffic Summary", "pt": "Resumo de Uso" }, "order": 5, "required": true, "mustHave": true, "headingAnchors": ["download", "upload", "usage", "tráfego"] },
-    { "id": "charges_and_taxes", "name": { "en": "Charges and Taxes", "pt": "Cobrancas e Impostos" }, "order": 6, "required": true, "mustHave": true, "headingAnchors": ["charges", "fees", "taxes", "impostos"] },
-    { "id": "totals_and_due", "name": { "en": "Totals", "pt": "Totais" }, "order": 7, "required": true, "mustHave": true, "headingAnchors": ["total", "total amount", "vencimento"] },
-    { "id": "discounts_or_promotions", "name": { "en": "Discounts and Promotions", "pt": "Descontos e Promocoes" }, "order": 8, "required": false, "mustHave": false, "headingAnchors": ["discount", "promo", "concession"] },
-    { "id": "payment_options", "name": { "en": "Payment Options", "pt": "Opcoes de Pagamento" }, "order": 9, "required": true, "mustHave": true, "headingAnchors": ["payment", "pay", "barcode", "invoice"] },
-    { "id": "service_notices", "name": { "en": "Service Notices", "pt": "Avisos de Servico" }, "order": 10, "required": false, "mustHave": false, "headingAnchors": ["notice", "warning", "maintenance"] }
+    {
+      "id": "document_header",
+      "name": {
+        "en": "Document Header",
+        "pt": "Cabecalho do Documento"
+      },
+      "order": 1,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": [
+        "internet bill",
+        "fatura",
+        "statement"
+      ]
+    },
+    {
+      "id": "subscriber_profile",
+      "name": {
+        "en": "Subscriber Profile",
+        "pt": "Perfil do Assinante"
+      },
+      "order": 2,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": [
+        "subscriber",
+        "customer",
+        "conta"
+      ]
+    },
+    {
+      "id": "service_period",
+      "name": {
+        "en": "Service Period",
+        "pt": "Periodo de Servico"
+      },
+      "order": 3,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": [
+        "period",
+        "periodo",
+        "reference period"
+      ]
+    },
+    {
+      "id": "plan_details",
+      "name": {
+        "en": "Plan Details",
+        "pt": "Detalhes do Plano"
+      },
+      "order": 4,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": [
+        "plan",
+        "package",
+        "speed",
+        "bandwidth"
+      ]
+    },
+    {
+      "id": "traffic_summary",
+      "name": {
+        "en": "Traffic Summary",
+        "pt": "Resumo de Uso"
+      },
+      "order": 5,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": [
+        "download",
+        "upload",
+        "usage",
+        "tráfego"
+      ]
+    },
+    {
+      "id": "charges_and_taxes",
+      "name": {
+        "en": "Charges and Taxes",
+        "pt": "Cobrancas e Impostos"
+      },
+      "order": 6,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": [
+        "charges",
+        "fees",
+        "taxes",
+        "impostos"
+      ]
+    },
+    {
+      "id": "totals_and_due",
+      "name": {
+        "en": "Totals",
+        "pt": "Totais"
+      },
+      "order": 7,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": [
+        "total",
+        "total amount",
+        "vencimento"
+      ]
+    },
+    {
+      "id": "discounts_or_promotions",
+      "name": {
+        "en": "Discounts and Promotions",
+        "pt": "Descontos e Promocoes"
+      },
+      "order": 8,
+      "required": false,
+      "mustHave": false,
+      "headingAnchors": [
+        "discount",
+        "promo",
+        "concession"
+      ]
+    },
+    {
+      "id": "payment_options",
+      "name": {
+        "en": "Payment Options",
+        "pt": "Opcoes de Pagamento"
+      },
+      "order": 9,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": [
+        "payment",
+        "pay",
+        "barcode",
+        "invoice"
+      ]
+    },
+    {
+      "id": "service_notices",
+      "name": {
+        "en": "Service Notices",
+        "pt": "Avisos de Servico"
+      },
+      "order": 10,
+      "required": false,
+      "mustHave": false,
+      "headingAnchors": [
+        "notice",
+        "warning",
+        "maintenance"
+      ]
+    }
   ]
 }

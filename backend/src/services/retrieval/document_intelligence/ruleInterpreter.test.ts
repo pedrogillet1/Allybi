@@ -406,3 +406,244 @@ describe("ruleInterpreter", () => {
     expect(withContext.length).toBeGreaterThan(0);
   });
 });
+
+describe("applyBoostScoring multipliers and caps", () => {
+  test("standard mode uses 0.03 docType and 0.025 section multipliers", () => {
+    const ctx = baseCtx({ maxMatchedBoostRules: 1 });
+    const rules = matchBoostRules(ctx, [
+      {
+        id: "r1",
+        priority: 1,
+        weight: 1,
+        boostDocTypes: [{ docType: "budget_report", weight: 1 }],
+        boostSections: [{ section: "summary", weight: 1 }],
+      },
+    ]);
+
+    const candidates = [
+      {
+        candidateId: "c1",
+        docId: "doc-1",
+        docType: "budget_report",
+        location: { sectionKey: "summary" },
+        scores: { final: 0.5 },
+      },
+    ];
+
+    const rescored = applyBoostScoring(ctx, candidates, rules);
+    // First rule (i=0), diminishing = 1/1 = 1
+    // boost = (1 * 0.03 + 1 * 0.025) * 1 = 0.055
+    const boost = rescored[0].scores.documentIntelligenceBoost!;
+    expect(boost).toBeCloseTo(0.055, 5);
+    expect(rescored[0].scores.final).toBeCloseTo(0.555, 5);
+  });
+
+  test("maxDocumentIntelligenceBoost caps total boost (default 0.45)", () => {
+    const ctx = baseCtx({
+      maxMatchedBoostRules: 1,
+      maxDocumentIntelligenceBoost: 0.45,
+    });
+    const rules = matchBoostRules(ctx, [
+      {
+        id: "r1",
+        priority: 1,
+        weight: 20,
+        boostDocTypes: [{ docType: "budget_report", weight: 20 }],
+        boostSections: [{ section: "summary", weight: 20 }],
+      },
+    ]);
+
+    const candidates = [
+      {
+        candidateId: "c1",
+        docId: "doc-1",
+        docType: "budget_report",
+        location: { sectionKey: "summary" },
+        scores: { final: 0.3 },
+      },
+    ];
+
+    const rescored = applyBoostScoring(ctx, candidates, rules);
+    // Raw boost would be huge, but capped at 0.45
+    expect(rescored[0].scores.documentIntelligenceBoost).toBeLessThanOrEqual(
+      0.45,
+    );
+    expect(rescored[0].scores.documentIntelligenceBoost).toBeCloseTo(0.45, 5);
+  });
+
+  test("maxDocumentIntelligenceBoost=0.60 caps at 0.60", () => {
+    const ctx = baseCtx({
+      maxMatchedBoostRules: 1,
+      maxDocumentIntelligenceBoost: 0.60,
+    });
+    const rules = matchBoostRules(ctx, [
+      {
+        id: "r1",
+        priority: 1,
+        weight: 20,
+        boostDocTypes: [{ docType: "budget_report", weight: 20 }],
+        boostSections: [{ section: "summary", weight: 20 }],
+      },
+    ]);
+
+    const candidates = [
+      {
+        candidateId: "c1",
+        docId: "doc-1",
+        docType: "budget_report",
+        location: { sectionKey: "summary" },
+        scores: { final: 0.2 },
+      },
+    ];
+
+    const rescored = applyBoostScoring(ctx, candidates, rules);
+    expect(rescored[0].scores.documentIntelligenceBoost).toBeLessThanOrEqual(
+      0.60,
+    );
+    expect(rescored[0].scores.documentIntelligenceBoost).toBeCloseTo(0.60, 5);
+  });
+
+  test("diminishing returns on successive boost rules", () => {
+    const ctx = baseCtx({ maxMatchedBoostRules: 3 });
+    const rules = matchBoostRules(ctx, [
+      {
+        id: "r1",
+        priority: 3,
+        weight: 1,
+        boostDocTypes: [{ docType: "budget_report", weight: 1 }],
+      },
+      {
+        id: "r2",
+        priority: 2,
+        weight: 1,
+        boostDocTypes: [{ docType: "budget_report", weight: 1 }],
+      },
+      {
+        id: "r3",
+        priority: 1,
+        weight: 1,
+        boostDocTypes: [{ docType: "budget_report", weight: 1 }],
+      },
+    ]);
+
+    const candidates = [
+      {
+        candidateId: "c1",
+        docId: "doc-1",
+        docType: "budget_report",
+        location: {},
+        scores: { final: 0.5 },
+      },
+    ];
+
+    const rescored = applyBoostScoring(ctx, candidates, rules);
+    // Rule 1 (i=0): 1*0.03 * 1/1 = 0.03
+    // Rule 2 (i=1): 1*0.03 * 1/2 = 0.015
+    // Rule 3 (i=2): 1*0.03 * 1/3 = 0.01
+    // Total: ~0.055
+    const boost = rescored[0].scores.documentIntelligenceBoost!;
+    expect(boost).toBeCloseTo(0.03 + 0.015 + 0.01, 5);
+  });
+
+  test("disabled rules are skipped by matchBoostRules", () => {
+    const ctx = baseCtx();
+    const matched = matchBoostRules(ctx, [
+      {
+        id: "active",
+        enabled: true,
+        boostDocTypes: [{ docType: "budget_report", weight: 1 }],
+      },
+      {
+        id: "disabled",
+        enabled: false,
+        boostDocTypes: [{ docType: "budget_report", weight: 5 }],
+      },
+    ]);
+
+    expect(matched.map((r) => r.id)).toEqual(["active"]);
+  });
+
+  test("requireDomainMatch filters rules when domain does not match", () => {
+    const ctx = baseCtx({ domain: "finance" });
+    const matched = matchBoostRules(ctx, [
+      {
+        id: "legal_only",
+        requireDomainMatch: true,
+        conditions: { domains: ["legal"] },
+        boostDocTypes: [{ docType: "budget_report", weight: 1 }],
+      },
+      {
+        id: "finance_rule",
+        requireDomainMatch: true,
+        conditions: { domains: ["finance"] },
+        boostDocTypes: [{ docType: "budget_report", weight: 1 }],
+      },
+    ]);
+
+    expect(matched.map((r) => r.id)).toEqual(["finance_rule"]);
+  });
+
+  test("cross-doc policy blocks when single docLock and multiple candidates", () => {
+    const decision = enforceCrossDocPolicy(
+      baseCtx({
+        docLock: true,
+        explicitDocsCount: 1,
+        explicitDocIds: ["doc-a"],
+        candidateDocIds: ["doc-a", "doc-b", "doc-c"],
+      }),
+      {
+        config: { enabled: true },
+        retrievalPolicy: {
+          allowWhenDocLock: false,
+          maxSourceDocuments: 5,
+        },
+      },
+    );
+
+    expect(decision.allow).toBe(false);
+    expect(decision.reasonCode).toBe("cross_doc_blocked_doc_lock");
+    expect(decision.askDisambiguation).toBe(true);
+    expect(decision.allowedCandidateDocIds).toEqual(["doc-a"]);
+  });
+});
+
+describe("summarizeBoostRuleApplications", () => {
+  test("summary reflects per-rule delta contributions", () => {
+    const ctx = baseCtx({ maxMatchedBoostRules: 2 });
+    const rules = matchBoostRules(ctx, [
+      {
+        id: "r1",
+        priority: 2,
+        weight: 1,
+        boostDocTypes: [{ docType: "budget_report", weight: 2 }],
+      },
+      {
+        id: "r2",
+        priority: 1,
+        weight: 1,
+        boostSections: [{ section: "summary", weight: 3 }],
+      },
+    ]);
+
+    const candidates = [
+      {
+        candidateId: "c1",
+        docId: "doc-1",
+        docType: "budget_report",
+        location: { sectionKey: "summary" },
+        scores: { final: 0.5 },
+      },
+    ];
+
+    const { summarizeBoostRuleApplications } = require("./ruleInterpreter");
+    const summaries = summarizeBoostRuleApplications(ctx, candidates, rules);
+
+    expect(summaries.length).toBeGreaterThan(0);
+    for (const s of summaries) {
+      expect(s.candidateHits).toBeGreaterThanOrEqual(1);
+      expect(s.totalDelta).toBeGreaterThan(0);
+      expect(s.averageDelta).toBeGreaterThan(0);
+      expect(s.maxDelta).toBeGreaterThanOrEqual(s.averageDelta);
+    }
+  });
+});

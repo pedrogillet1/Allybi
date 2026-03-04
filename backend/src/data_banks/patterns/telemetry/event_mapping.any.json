@@ -13,15 +13,9 @@
       "event_bus",
       "tests.patternDeterminism"
     ],
-    "tests": {
-      "positive": [
-        "editor apply mapping should mark requiresConfirm true",
-        "navigation open mapping should include usesHighlight false when not needed"
-      ],
-      "negative": [
-        "unknown/other mode should route to fallback telemetry"
-      ]
-    },
+    "tests": [
+      "tests/patternDeterminism.test.ts"
+    ],
     "lastUpdated": "2026-03-03"
   },
   "config": {

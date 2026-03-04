@@ -3,13 +3,27 @@
     "id": "consistency_checks",
     "version": "1.0.0",
     "description": "Cross-field consistency and logical coherence checks before finalizing answers.",
-    "languages": ["any", "en", "pt"],
-    "lastUpdated": "2026-03-03"
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
     "maxInconsistencies": 3,
-    "requireDisagreementDisclosure": true
+    "requireDisagreementDisclosure": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "checks": [
     {

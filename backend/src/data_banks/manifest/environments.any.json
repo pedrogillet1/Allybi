@@ -3,21 +3,26 @@
     "id": "environments",
     "version": "1.0.0",
     "description": "Canonical environment configuration for Koda. Defines supported runtime environments, default strictness levels, feature gating behavior, logging/trace behavior, and boot policies used by the data bank loader and orchestrator.",
-    "languages": ["any"],
-    "lastUpdated": "2026-01-25"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-01-25",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
-
   "config": {
     "enabled": true,
-
     "_comment": "If an unknown env is provided at runtime, select a safe fallback.",
     "failOnUnknownEnv": true,
     "fallbackEnv": "local",
-
     "_comment2": "Central switch for whether data banks may apply env overrides.",
     "envOverridesEnabled": true
   },
-
   "supportedEnvironments": [
     {
       "id": "production",
@@ -116,7 +121,6 @@
       }
     }
   ],
-
   "defaults": {
     "_comment": "Fallback defaults used if env-specific consumers don't override.",
     "strictness": "medium",
@@ -139,20 +143,39 @@
       "maxLatencyMsHard": 10000
     }
   },
-
   "envMapping": {
     "_comment": "Optional mapping from runtime env strings to supported ids.",
     "aliases": [
-      { "from": "prod", "to": "production" },
-      { "from": "production", "to": "production" },
-      { "from": "stage", "to": "staging" },
-      { "from": "staging", "to": "staging" },
-      { "from": "development", "to": "dev" },
-      { "from": "dev", "to": "dev" },
-      { "from": "local", "to": "local" }
+      {
+        "from": "prod",
+        "to": "production"
+      },
+      {
+        "from": "production",
+        "to": "production"
+      },
+      {
+        "from": "stage",
+        "to": "staging"
+      },
+      {
+        "from": "staging",
+        "to": "staging"
+      },
+      {
+        "from": "development",
+        "to": "dev"
+      },
+      {
+        "from": "dev",
+        "to": "dev"
+      },
+      {
+        "from": "local",
+        "to": "local"
+      }
     ]
   },
-
   "tests": {
     "_comment": "Boot-time invariants.",
     "cases": [

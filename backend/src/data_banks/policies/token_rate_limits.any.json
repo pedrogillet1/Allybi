@@ -1,0 +1,54 @@
+{
+  "_meta": {
+    "id": "token_rate_limits",
+    "version": "1.0.0",
+    "description": "Per-user token budget rate limits for LLM usage",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-04",
+    "owner": "platform-security",
+    "reviewCadenceDays": 30,
+    "criticality": "high",
+    "changeLog": [
+      "Metadata governance baseline upgrade (2026-03-04)"
+    ],
+    "usedBy": [
+      "services/llm/core/llmRequestBuilder.service.ts"
+    ],
+    "tests": [
+      "tests/certification/prompt-mode-coverage.cert.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "configModeOnly": true
+  },
+  "limits": {
+    "perUserPerHour": {
+      "inputTokens": 500000,
+      "outputTokens": 100000,
+      "costUsd": 1
+    },
+    "perUserPerDay": {
+      "inputTokens": 2000000,
+      "outputTokens": 500000,
+      "costUsd": 5
+    }
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "TOKEN_RATE_LIMITS_T_001",
+        "input": {
+          "scope": "perUserPerHour"
+        },
+        "expect": {
+          "inputTokens": 500000,
+          "outputTokens": 100000,
+          "costUsd": 1
+        }
+      }
+    ]
+  }
+}

@@ -94,4 +94,85 @@ describe("chunking.service", () => {
 
     expect(deduped.map((row) => row.id)).toEqual(["a", "c"]);
   });
+
+  test("deduplicateChunkRecords: same text in different sections survives", () => {
+    const rows = [
+      {
+        id: "a",
+        content: "alpha beta gamma delta epsilon zeta eta theta",
+        metadata: { sectionName: "Introduction" },
+      },
+      {
+        id: "b",
+        content: "alpha beta gamma delta epsilon zeta eta theta",
+        metadata: { sectionName: "Conclusion" },
+      },
+    ];
+
+    const deduped = deduplicateChunkRecords(rows, {
+      dedupeSimilarityThreshold: 0.8,
+      dedupeMinWordLength: 3,
+    });
+
+    expect(deduped.map((row) => row.id)).toEqual(["a", "b"]);
+  });
+
+  test("deduplicateChunkRecords: same text in same section is deduped", () => {
+    const rows = [
+      {
+        id: "a",
+        content: "alpha beta gamma delta epsilon zeta eta theta",
+        metadata: { sectionName: "Introduction" },
+      },
+      {
+        id: "b",
+        content: "alpha beta gamma delta epsilon zeta eta theta",
+        metadata: { sectionName: "Introduction" },
+      },
+    ];
+
+    const deduped = deduplicateChunkRecords(rows, {
+      dedupeSimilarityThreshold: 0.8,
+      dedupeMinWordLength: 3,
+    });
+
+    expect(deduped.map((row) => row.id)).toEqual(["a"]);
+  });
+
+  test("deduplicateChunkRecords: same text in different sheets survives", () => {
+    const rows = [
+      {
+        id: "a",
+        content: "Revenue Total 1000 2000 3000 4000",
+        metadata: { sheetName: "Q1" },
+      },
+      {
+        id: "b",
+        content: "Revenue Total 1000 2000 3000 4000",
+        metadata: { sheetName: "Q2" },
+      },
+    ];
+
+    const deduped = deduplicateChunkRecords(rows, {
+      dedupeSimilarityThreshold: 0.8,
+      dedupeMinWordLength: 3,
+    });
+
+    expect(deduped.map((row) => row.id)).toEqual(["a", "b"]);
+  });
+
+  test("deduplicateChunkRecords: records without metadata use default namespace", () => {
+    const rows = [
+      { id: "a", content: "alpha beta gamma delta epsilon zeta eta theta" },
+      { id: "b", content: "alpha beta gamma delta epsilon zeta eta theta" },
+    ];
+
+    const deduped = deduplicateChunkRecords(rows, {
+      dedupeSimilarityThreshold: 0.8,
+      dedupeMinWordLength: 3,
+    });
+
+    // Same content, no metadata → same namespace → deduped
+    expect(deduped.map((row) => row.id)).toEqual(["a"]);
+  });
 });

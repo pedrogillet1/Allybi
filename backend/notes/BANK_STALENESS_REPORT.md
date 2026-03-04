@@ -1,30 +1,30 @@
 # Bank Staleness Report
 
-- Generated: 2026-03-03T02:58:26.775Z
-- Total banks scored: 1106
+- Generated: 2026-03-04T14:22:52.080Z
+- Total banks scored: 1480
 
 ## Top 20 banks to refresh
 
 | Rank | Bank ID | Category | Score | Age (days) | Size (KB) | Unused |
 |---:|---|---|---:|---:|---:|---:|
-| 1 | `di_section_ontology` | semantics | 0.655 | 4 | 566.0 | yes |
-| 2 | `di_entity_ontology` | semantics | 0.631 | 4 | 279.3 | yes |
-| 3 | `di_doc_type_ontology` | semantics | 0.575 | 4 | 231.3 | yes |
-| 4 | `di_metric_ontology` | semantics | 0.521 | 4 | 185.0 | yes |
-| 5 | `doc_aliases_housing` | semantics | 0.505 | 4 | 171.4 | yes |
-| 6 | `legal_clause_ontology` | semantics | 0.502 | 2 | 325.1 | yes |
-| 7 | `legal_risk_heuristics` | semantics | 0.502 | 2 | 301.3 | yes |
-| 8 | `medical_explanation_templates` | semantics | 0.502 | 2 | 763.0 | yes |
-| 9 | `medical_report_ontology` | semantics | 0.502 | 2 | 660.0 | yes |
-| 10 | `doc_aliases_banking` | semantics | 0.496 | 4 | 163.4 | yes |
-| 11 | `table_header_ontology_accounting` | semantics | 0.493 | 2 | 163.5 | yes |
-| 12 | `table_header_ontology_everyday` | semantics | 0.489 | 4 | 157.7 | yes |
-| 13 | `keyword_taxonomy_medical` | probes | 0.486 | 4 | 155.0 | yes |
-| 14 | `keyword_taxonomy_legal` | probes | 0.484 | 4 | 153.8 | yes |
-| 15 | `keyword_taxonomy_ops` | probes | 0.482 | 4 | 152.2 | yes |
-| 16 | `doc_aliases_billing` | semantics | 0.480 | 4 | 150.4 | yes |
-| 17 | `keyword_taxonomy_finance` | probes | 0.475 | 4 | 145.5 | yes |
-| 18 | `legal_reference_rules` | semantics | 0.473 | 2 | 275.0 | yes |
-| 19 | `di_unit_and_measurement_ontology` | semantics | 0.473 | 4 | 144.2 | yes |
-| 20 | `ops_kpi_ontology` | semantics | 0.440 | 2 | 246.4 | yes |
+| 1 | `di_section_ontology` | semantics | 0.656 | 5 | 566.0 | yes |
+| 2 | `di_table_ontology` | semantics | 0.651 | 1 | 921.4 | yes |
+| 3 | `marketing_pain_point_signals` | semantics | 0.651 | 1 | 329.8 | yes |
+| 4 | `marketing_query_templates` | semantics | 0.651 | 1 | 386.3 | yes |
+| 5 | `operator_patterns_advise` | semantics | 0.651 | 1 | 442.2 | yes |
+| 6 | `operator_patterns_calculate` | semantics | 0.651 | 1 | 442.5 | yes |
+| 7 | `operator_patterns_compare` | semantics | 0.651 | 1 | 445.7 | yes |
+| 8 | `operator_patterns_evaluate` | semantics | 0.651 | 1 | 447.8 | yes |
+| 9 | `operator_patterns_extract` | semantics | 0.651 | 1 | 436.0 | yes |
+| 10 | `operator_patterns_locate` | semantics | 0.651 | 1 | 435.3 | yes |
+| 11 | `operator_patterns_monitor` | semantics | 0.651 | 1 | 438.3 | yes |
+| 12 | `operator_patterns_navigate` | semantics | 0.651 | 1 | 444.7 | yes |
+| 13 | `operator_patterns_open` | semantics | 0.651 | 1 | 433.8 | yes |
+| 14 | `operator_patterns_summarize` | semantics | 0.651 | 1 | 447.0 | yes |
+| 15 | `operator_patterns_validate` | semantics | 0.651 | 1 | 439.2 | yes |
+| 16 | `patterns_editor_highlight_intents_en` | semantics | 0.651 | 1 | 563.4 | yes |
+| 17 | `patterns_editor_highlight_intents_pt` | semantics | 0.651 | 1 | 343.9 | yes |
+| 18 | `patterns_editor_locate_target_phrases` | semantics | 0.651 | 1 | 321.4 | yes |
+| 19 | `patterns_files_move_copy_rename_en` | semantics | 0.651 | 1 | 327.2 | yes |
+| 20 | `patterns_modes_mode_switch_en` | semantics | 0.651 | 1 | 722.5 | yes |
 

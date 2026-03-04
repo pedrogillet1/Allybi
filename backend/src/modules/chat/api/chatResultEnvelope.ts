@@ -1,5 +1,6 @@
 import type { ChatResult } from "../domain/chat.contracts";
 import { ContractNormalizer } from "../runtime/ContractNormalizer";
+import { stableLocationKey } from "../../../services/core/retrieval/retrievalEngine.utils";
 
 const normalizer = new ContractNormalizer();
 
@@ -44,6 +45,30 @@ function defaultWarnings() {
   return [];
 }
 
+function parseLocationFromLocationKey(rawValue: unknown): {
+  page: number | null;
+  slide: number | null;
+  sheet: string | null;
+  section: string | null;
+} {
+  const value = String(rawValue || "").trim();
+  if (!value) {
+    return { page: null, slide: null, sheet: null, section: null };
+  }
+  const pageMatch = value.match(/\|p:(-?\d+)/i);
+  const slideMatch = value.match(/\|sl:(-?\d+)/i);
+  const sheetMatch = value.match(/\|s:([^|]+)/i);
+  const sectionMatch = value.match(/\|sec:([^|]+)/i);
+  const page = pageMatch ? Number(pageMatch[1] || Number.NaN) : Number.NaN;
+  const slide = slideMatch ? Number(slideMatch[1] || Number.NaN) : Number.NaN;
+  return {
+    page: Number.isFinite(page) && page > 0 ? page : null,
+    slide: Number.isFinite(slide) && slide > 0 ? slide : null,
+    sheet: sheetMatch ? String(sheetMatch[1] || "").trim() || null : null,
+    section: sectionMatch ? String(sectionMatch[1] || "").trim() || null : null,
+  };
+}
+
 function deriveSourcesFromAttachments(attachments: unknown): Array<Record<string, unknown>> {
   if (!Array.isArray(attachments)) return [];
   const sourceAttachment = attachments.find((item) => {
@@ -69,34 +94,65 @@ function deriveSourcesFromAttachments(attachments: unknown): Array<Record<string
           : null;
       const locationType = String(location?.type || "").trim().toLowerCase();
       const locationValue = location?.value;
+      const locationKeyRaw = String(b.locationKey || "").trim();
+      let page: number | null = null;
+      let slide: number | null = null;
+      let sheet: string | null = null;
+      let cell: string | null = null;
+      let section: string | null = null;
+
+      if (locationType === "page" && Number.isFinite(Number(locationValue))) {
+        page = Number(locationValue);
+      }
+      if (locationType === "sheet" && String(locationValue || "").trim()) {
+        sheet = String(locationValue || "").trim();
+      }
+      if (locationType === "slide" && Number.isFinite(Number(locationValue))) {
+        slide = Number(locationValue);
+      }
+      if (locationType === "cell" && String(locationValue || "").trim()) {
+        cell = String(locationValue || "").trim();
+      }
+      if (locationType === "section" && String(locationValue || "").trim()) {
+        section = String(locationValue || "").trim();
+      }
+
+      const parsedFromKey = parseLocationFromLocationKey(locationKeyRaw);
+      if (!page && parsedFromKey.page) page = parsedFromKey.page;
+      if (!slide && parsedFromKey.slide) slide = parsedFromKey.slide;
+      if (!sheet && parsedFromKey.sheet) sheet = parsedFromKey.sheet;
+      if (!section && parsedFromKey.section) section = parsedFromKey.section;
+
+      const synthesizedLocationKey =
+        documentId && (page || slide || sheet || cell || section)
+          ? stableLocationKey(
+              documentId,
+              {
+                page: page ?? undefined,
+                slide: slide ?? undefined,
+                sheet: sheet ?? undefined,
+                sectionKey: cell || section || undefined,
+              },
+              "1",
+            )
+          : "";
+      const locationKey = locationKeyRaw || synthesizedLocationKey || "";
       const source: Record<string, unknown> = {
         documentId,
         docId: documentId,
         filename: title || null,
         mimeType: b.mimeType ?? null,
-        page: null,
+        page,
+        slide,
+        sheet,
+        cell,
+        section,
       };
-      const locationKey = String(b.locationKey || "").trim();
       const locationLabel = String(location?.label || "").trim();
       const snippet = String(b.snippet || "").trim();
       if (locationKey) source.locationKey = locationKey;
       if (locationLabel) source.locationLabel = locationLabel;
       if (snippet) source.snippet = snippet;
-      if (locationType === "page" && Number.isFinite(Number(locationValue))) {
-        source.page = Number(locationValue);
-      }
-      if (locationType === "sheet" && String(locationValue || "").trim()) {
-        source.sheet = String(locationValue || "").trim();
-      }
-      if (locationType === "slide" && Number.isFinite(Number(locationValue))) {
-        source.slide = Number(locationValue);
-      }
-      if (locationType === "cell" && String(locationValue || "").trim()) {
-        source.cell = String(locationValue || "").trim();
-      }
-      if (locationType === "section" && String(locationValue || "").trim()) {
-        source.section = String(locationValue || "").trim();
-      }
       return source;
     })
     .filter((item): item is Record<string, unknown> => Boolean(item));

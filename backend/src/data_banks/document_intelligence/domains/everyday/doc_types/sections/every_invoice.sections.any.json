@@ -6,7 +6,14 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-03-03"
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -14,14 +21,142 @@
     "docType": "every_invoice"
   },
   "sections": [
-    { "id": "document_header", "name": { "en": "Header", "pt": "Cabecalho" }, "order": 1, "required": true, "mustHave": true, "headingAnchors": ["invoice", "fatura", "factura"] },
-    { "id": "vendor_profile", "name": { "en": "Vendor Profile", "pt": "Perfil do Fornecedor" }, "order": 2, "required": true, "mustHave": true, "headingAnchors": ["vendor", "supplier", "empresa", "issuer"] },
-    { "id": "customer_profile", "name": { "en": "Customer Profile", "pt": "Perfil do Cliente" }, "order": 3, "required": true, "mustHave": true, "headingAnchors": ["customer", "client", "client_name"] },
-    { "id": "line_items", "name": { "en": "Line Items", "pt": "Itens" }, "order": 4, "required": true, "mustHave": true, "headingAnchors": ["item", "description", "quantity", "price"] },
-    { "id": "subtotal_and_discounts", "name": { "en": "Subtotals and Discounts", "pt": "Subtotais e Descontos" }, "order": 5, "required": true, "mustHave": true, "headingAnchors": ["subtotal", "discount", "subtotal"] },
-    { "id": "tax_summary", "name": { "en": "Tax Summary", "pt": "Resumo de Impostos" }, "order": 6, "required": false, "mustHave": false, "headingAnchors": ["tax", "vat", "impostos"] },
-    { "id": "totals", "name": { "en": "Totals", "pt": "Totais" }, "order": 7, "required": true, "mustHave": true, "headingAnchors": ["total", "grand total", "total amount"] },
-    { "id": "payment_terms", "name": { "en": "Payment Terms", "pt": "Condicoes de Pagamento" }, "order": 8, "required": true, "mustHave": true, "headingAnchors": ["due date", "terms", "due"] },
-    { "id": "attachments", "name": { "en": "Attachments", "pt": "Anexos" }, "order": 9, "required": false, "mustHave": false, "headingAnchors": ["attachment", "annex", "appendix"] }
+    {
+      "id": "document_header",
+      "name": {
+        "en": "Header",
+        "pt": "Cabecalho"
+      },
+      "order": 1,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": [
+        "invoice",
+        "fatura",
+        "factura"
+      ]
+    },
+    {
+      "id": "vendor_profile",
+      "name": {
+        "en": "Vendor Profile",
+        "pt": "Perfil do Fornecedor"
+      },
+      "order": 2,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": [
+        "vendor",
+        "supplier",
+        "empresa",
+        "issuer"
+      ]
+    },
+    {
+      "id": "customer_profile",
+      "name": {
+        "en": "Customer Profile",
+        "pt": "Perfil do Cliente"
+      },
+      "order": 3,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": [
+        "customer",
+        "client",
+        "client_name"
+      ]
+    },
+    {
+      "id": "line_items",
+      "name": {
+        "en": "Line Items",
+        "pt": "Itens"
+      },
+      "order": 4,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": [
+        "item",
+        "description",
+        "quantity",
+        "price"
+      ]
+    },
+    {
+      "id": "subtotal_and_discounts",
+      "name": {
+        "en": "Subtotals and Discounts",
+        "pt": "Subtotais e Descontos"
+      },
+      "order": 5,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": [
+        "subtotal",
+        "discount",
+        "subtotal"
+      ]
+    },
+    {
+      "id": "tax_summary",
+      "name": {
+        "en": "Tax Summary",
+        "pt": "Resumo de Impostos"
+      },
+      "order": 6,
+      "required": false,
+      "mustHave": false,
+      "headingAnchors": [
+        "tax",
+        "vat",
+        "impostos"
+      ]
+    },
+    {
+      "id": "totals",
+      "name": {
+        "en": "Totals",
+        "pt": "Totais"
+      },
+      "order": 7,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": [
+        "total",
+        "grand total",
+        "total amount"
+      ]
+    },
+    {
+      "id": "payment_terms",
+      "name": {
+        "en": "Payment Terms",
+        "pt": "Condicoes de Pagamento"
+      },
+      "order": 8,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": [
+        "due date",
+        "terms",
+        "due"
+      ]
+    },
+    {
+      "id": "attachments",
+      "name": {
+        "en": "Attachments",
+        "pt": "Anexos"
+      },
+      "order": 9,
+      "required": false,
+      "mustHave": false,
+      "headingAnchors": [
+        "attachment",
+        "annex",
+        "appendix"
+      ]
+    }
   ]
 }

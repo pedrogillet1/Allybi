@@ -11,7 +11,13 @@
     ],
     "lastUpdated": "2026-03-02",
     "owner": "koda-prompts",
-    "compat": ">=1.0.0"
+    "compat": ">=1.0.0",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -237,7 +243,11 @@
         },
         "expect": {
           "selectedTemplateId": "fallback_extraction_failed",
-          "mustSuggestNextSteps": ["re-upload cleaner file", "try another format", "narrow request"]
+          "mustSuggestNextSteps": [
+            "re-upload cleaner file",
+            "try another format",
+            "narrow request"
+          ]
         }
       },
       {

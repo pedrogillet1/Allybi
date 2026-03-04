@@ -14,17 +14,9 @@
       "query_orchestrator",
       "tests.patternDeterminism"
     ],
-    "tests": {
-      "positive": [
-        "selecionar apenas este parágrafo",
-        "selecionar a tabela sob o cabeçalho",
-        "selecionar todas as bullets desta seção"
-      ],
-      "negative": [
-        "resuma esta seção",
-        "explique os fatores de risco"
-      ]
-    },
+    "tests": [
+      "tests/patternDeterminism.test.ts"
+    ],
     "dependsOn": [
       "editor_runtime_state",
       "selection_scope_router"

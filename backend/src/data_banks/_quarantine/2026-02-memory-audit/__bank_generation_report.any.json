@@ -39,5 +39,17 @@
     "open_vs_locate_candidate_filters_aligned"
   ],
   "integrationHooksSatisfied": true,
-  "knownRisks": []
+  "knownRisks": [],
+  "_meta": {
+    "id": "quarantine_2026_02_memory_audit_bank_generation_report",
+    "version": "1.0.0",
+    "description": "Auto-registered bank payload for _quarantine/2026-02-memory-audit/__bank_generation_report.any.json",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true
+  }
 }

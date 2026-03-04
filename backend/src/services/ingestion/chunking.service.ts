@@ -150,24 +150,32 @@ function jaccardSimilarity(a: Set<string>, b: Set<string>): number {
   return intersection / union;
 }
 
-export function deduplicateChunkRecords<T extends { content: string }>(
+export function deduplicateChunkRecords<
+  T extends { content: string; metadata?: { sectionName?: string; sheetName?: string } },
+>(
   records: T[],
   overrides?: Partial<ChunkingPolicy>,
 ): T[] {
   const policy = resolvePolicy(overrides);
   if (!Array.isArray(records) || records.length <= 1) return records || [];
 
+  // Namespace dedup by section/sheet — same text in different sections survives
   const accepted: T[] = [];
-  const acceptedTokens: Set<string>[] = [];
+  const tokensByNamespace = new Map<string, Set<string>[]>();
 
   for (const record of records) {
+    const ns =
+      record.metadata?.sectionName ||
+      record.metadata?.sheetName ||
+      "__default__";
     const tokens = tokenizeForDedupe(
       record.content,
       policy.dedupeMinWordLength,
     );
     let duplicate = false;
 
-    for (const existing of acceptedTokens) {
+    const nsTokens = tokensByNamespace.get(ns) || [];
+    for (const existing of nsTokens) {
       if (
         jaccardSimilarity(tokens, existing) > policy.dedupeSimilarityThreshold
       ) {
@@ -178,7 +186,8 @@ export function deduplicateChunkRecords<T extends { content: string }>(
 
     if (!duplicate) {
       accepted.push(record);
-      acceptedTokens.push(tokens);
+      nsTokens.push(tokens);
+      tokensByNamespace.set(ns, nsTokens);
     }
   }
 

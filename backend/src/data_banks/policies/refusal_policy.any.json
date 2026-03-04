@@ -12,6 +12,12 @@
     "criticality": "critical",
     "changeLog": [
       "Metadata governance baseline upgrade (2026-03-03)"
+    ],
+    "usedBy": [
+      "services/llm/core/llmRequestBuilder.service.ts"
+    ],
+    "tests": [
+      "tests/certification/prompt-mode-coverage.cert.test.ts"
     ]
   },
   "config": {
@@ -33,7 +39,10 @@
       "clarificationBankId": "clarification_phrases",
       "privacyMinimalRulesBankId": "privacy_minimal_rules",
       "hallucinationGuardsBankId": "hallucination_guards"
-    }
+    },
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "taxonomy": {
     "_comment": "Normalized refusal categories used across the system.",

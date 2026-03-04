@@ -9,7 +9,13 @@
       "pt"
     ],
     "lastUpdated": "2026-03-03",
-    "description": "Expanded section ontology with 600+ canonical section signatures and family tags."
+    "description": "Expanded section ontology with 600+ canonical section signatures and family tags.",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true

@@ -6,7 +6,14 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-03-03"
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -14,17 +21,177 @@
     "docType": "every_tax_notice"
   },
   "hints": [
-    { "id": "every_tax_notice_hint_01", "entity": "notice_number", "anchors": ["notice number", "notificacao", "reference"], "location": "notice_reference", "extractionMethod": "heading_proximity", "whereItHides": ["header badge", "official letterhead"] },
-    { "id": "every_tax_notice_hint_02", "entity": "notice_date", "anchors": ["notice date", "data de emissao"], "location": "document_header", "extractionMethod": "regex_capture", "whereItHides": ["header area", "official seal"] },
-    { "id": "every_tax_notice_hint_03", "entity": "taxpayer_id", "anchors": ["cpf", "cnpj", "tin", "identificacao"], "location": "document_header", "extractionMethod": "table_row_match", "whereItHides": ["payer block"] },
-    { "id": "every_tax_notice_hint_04", "entity": "taxpayer_name", "anchors": ["taxpayer", "contribuinte", "nome"], "location": "document_header", "extractionMethod": "heading_proximity", "whereItHides": ["header block", "contact block"] },
-    { "id": "every_tax_notice_hint_05", "entity": "assessed_base", "anchors": ["assessed base", "base de calculo"], "location": "assessed_amounts", "extractionMethod": "table_row_match", "whereItHides": ["summary table", "computed rows"] },
-    { "id": "every_tax_notice_hint_06", "entity": "tax_due", "anchors": ["tax due", "imposto devido"], "location": "assessed_amounts", "extractionMethod": "table_row_match", "whereItHides": ["notice summary rows"] },
-    { "id": "every_tax_notice_hint_07", "entity": "penalty", "anchors": ["penalty", "multa", "fine"], "location": "penalties", "extractionMethod": "table_row_match", "whereItHides": ["penalties section"] },
-    { "id": "every_tax_notice_hint_08", "entity": "interest", "anchors": ["interest", "juros"], "location": "penalties", "extractionMethod": "regex_capture", "whereItHides": ["penalties section"] },
-    { "id": "every_tax_notice_hint_09", "entity": "amount_total", "anchors": ["total due", "valor total"], "location": "notice_summary", "extractionMethod": "table_row_match", "whereItHides": ["bold totals", "last row"] },
-    { "id": "every_tax_notice_hint_10", "entity": "payment_deadline", "anchors": ["due date", "deadline", "vencimento"], "location": "due_dates", "extractionMethod": "heading_proximity", "whereItHides": ["deadline section", "payment box"] },
-    { "id": "every_tax_notice_hint_11", "entity": "payment_instructions", "anchors": ["pay here", "instructions", "how to pay"], "location": "payment_instructions", "extractionMethod": "heading_proximity", "whereItHides": ["payment table", "notice body"] },
-    { "id": "every_tax_notice_hint_12", "entity": "appeal_deadline", "anchors": ["appeal", "objection", "recurso"], "location": "appeal_rights", "extractionMethod": "heading_proximity", "whereItHides": ["appeal notice", "rights and remedies"] }
+    {
+      "id": "every_tax_notice_hint_01",
+      "entity": "notice_number",
+      "anchors": [
+        "notice number",
+        "notificacao",
+        "reference"
+      ],
+      "location": "notice_reference",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "header badge",
+        "official letterhead"
+      ]
+    },
+    {
+      "id": "every_tax_notice_hint_02",
+      "entity": "notice_date",
+      "anchors": [
+        "notice date",
+        "data de emissao"
+      ],
+      "location": "document_header",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "header area",
+        "official seal"
+      ]
+    },
+    {
+      "id": "every_tax_notice_hint_03",
+      "entity": "taxpayer_id",
+      "anchors": [
+        "cpf",
+        "cnpj",
+        "tin",
+        "identificacao"
+      ],
+      "location": "document_header",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "payer block"
+      ]
+    },
+    {
+      "id": "every_tax_notice_hint_04",
+      "entity": "taxpayer_name",
+      "anchors": [
+        "taxpayer",
+        "contribuinte",
+        "nome"
+      ],
+      "location": "document_header",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "header block",
+        "contact block"
+      ]
+    },
+    {
+      "id": "every_tax_notice_hint_05",
+      "entity": "assessed_base",
+      "anchors": [
+        "assessed base",
+        "base de calculo"
+      ],
+      "location": "assessed_amounts",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "summary table",
+        "computed rows"
+      ]
+    },
+    {
+      "id": "every_tax_notice_hint_06",
+      "entity": "tax_due",
+      "anchors": [
+        "tax due",
+        "imposto devido"
+      ],
+      "location": "assessed_amounts",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "notice summary rows"
+      ]
+    },
+    {
+      "id": "every_tax_notice_hint_07",
+      "entity": "penalty",
+      "anchors": [
+        "penalty",
+        "multa",
+        "fine"
+      ],
+      "location": "penalties",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "penalties section"
+      ]
+    },
+    {
+      "id": "every_tax_notice_hint_08",
+      "entity": "interest",
+      "anchors": [
+        "interest",
+        "juros"
+      ],
+      "location": "penalties",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "penalties section"
+      ]
+    },
+    {
+      "id": "every_tax_notice_hint_09",
+      "entity": "amount_total",
+      "anchors": [
+        "total due",
+        "valor total"
+      ],
+      "location": "notice_summary",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "bold totals",
+        "last row"
+      ]
+    },
+    {
+      "id": "every_tax_notice_hint_10",
+      "entity": "payment_deadline",
+      "anchors": [
+        "due date",
+        "deadline",
+        "vencimento"
+      ],
+      "location": "due_dates",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "deadline section",
+        "payment box"
+      ]
+    },
+    {
+      "id": "every_tax_notice_hint_11",
+      "entity": "payment_instructions",
+      "anchors": [
+        "pay here",
+        "instructions",
+        "how to pay"
+      ],
+      "location": "payment_instructions",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "payment table",
+        "notice body"
+      ]
+    },
+    {
+      "id": "every_tax_notice_hint_12",
+      "entity": "appeal_deadline",
+      "anchors": [
+        "appeal",
+        "objection",
+        "recurso"
+      ],
+      "location": "appeal_rights",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "appeal notice",
+        "rights and remedies"
+      ]
+    }
   ]
 }

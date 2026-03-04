@@ -3,9 +3,19 @@
     "id": "allybi_formula_bank",
     "version": "1.0.0",
     "description": "Formula grammar, locale separators, and safe formula transformations for Allybi XLSX edits.",
-    "languages": ["any", "en", "pt"],
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
     "lastUpdated": "2026-02-12",
-    "owner": "allybi-editing"
+    "owner": "allybi-editing",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -28,7 +38,9 @@
   "grammar": {
     "basicPattern": "^=.+$",
     "maxFormulaLength": 8192,
-    "forbiddenPatterns": ["^=\\s*$"]
+    "forbiddenPatterns": [
+      "^=\\s*$"
+    ]
   },
   "safeTransforms": [
     "convert_formulas_to_values",

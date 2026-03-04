@@ -1,12 +1,19 @@
 {
   "_meta": {
-    "id": "legal_abbreviations_en",
+    "id": "legal_abbreviations_en_v9b6629e1",
     "version": "2.1.0",
     "description": "English legal abbreviations for contract clause extraction and retrieval.",
     "languages": [
       "en"
     ],
-    "lastUpdated": "2026-03-03"
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -15,73 +22,277 @@
   },
   "domain": "legal",
   "abbreviations": [
-    { "abbr": "AEO", "expansion": "Authorized Execution Order" },
-    { "abbr": "AML", "expansion": "Anti-Money Laundering" },
-    { "abbr": "AND", "expansion": "Applicable Negotiation Date" },
-    { "abbr": "AR", "expansion": "Accounts Receivable" },
-    { "abbr": "B2B", "expansion": "Business to Business" },
-    { "abbr": "B2C", "expansion": "Business to Consumer" },
-    { "abbr": "CAP", "expansion": "Cap" },
-    { "abbr": "CPA", "expansion": "Certified Public Accountant" },
-    { "abbr": "CIO", "expansion": "Chief Information Officer" },
-    { "abbr": "CPO", "expansion": "Chief Privacy Officer" },
-    { "abbr": "DPO", "expansion": "Data Protection Officer" },
-    { "abbr": "DPPA", "expansion": "Driver's Privacy Protection Act" },
-    { "abbr": "DPA", "expansion": "Data Processing Agreement" },
-    { "abbr": "DPO", "expansion": "Data Privacy Officer" },
-    { "abbr": "DSAR", "expansion": "Data Subject Access Request" },
-    { "abbr": "DSR", "expansion": "Data Subject Rights" },
-    { "abbr": "EULA", "expansion": "End User License Agreement" },
-    { "abbr": "FCA", "expansion": "Financial Conduct Authority" },
-    { "abbr": "FISMA", "expansion": "Federal Information Security Management Act" },
-    { "abbr": "GDPR", "expansion": "General Data Protection Regulation" },
-    { "abbr": "HIPAA", "expansion": "Health Insurance Portability and Accountability Act" },
-    { "abbr": "IP", "expansion": "Intellectual Property" },
-    { "abbr": "ISA", "expansion": "Information Security Agreement" },
-    { "abbr": "IT", "expansion": "Information Technology" },
-    { "abbr": "ITAR", "expansion": "International Traffic in Arms Regulations" },
-    { "abbr": "KPI", "expansion": "Key Performance Indicator" },
-    { "abbr": "KYC", "expansion": "Know Your Customer" },
-    { "abbr": "LGPD", "expansion": "Lei Geral de Protecao de Dados" },
-    { "abbr": "LTD", "expansion": "Limited" },
-    { "abbr": "NDA", "expansion": "Non-Disclosure Agreement" },
-    { "abbr": "NFR", "expansion": "Non-Functional Requirement" },
-    { "abbr": "NIST", "expansion": "National Institute of Standards and Technology" },
-    { "abbr": "NDAA", "expansion": "National Defense Authorization Act" },
-    { "abbr": "NMA", "expansion": "Non-Merger Agreement" },
-    { "abbr": "NPA", "expansion": "Non-Performance Agreement" },
-    { "abbr": "NSA", "expansion": "Non-Solicitation Agreement" },
-    { "abbr": "NTP", "expansion": "Notice to Proceed" },
-    { "abbr": "PIPL", "expansion": "Personal Information Protection Law" },
-    { "abbr": "POA", "expansion": "Power of Attorney" },
-    { "abbr": "POPIA", "expansion": "Protection of Personal Information Act" },
-    { "abbr": "QMS", "expansion": "Quality Management System" },
-    { "abbr": "RACI", "expansion": "Responsible Accountable Consulted Informed" },
-    { "abbr": "RFP", "expansion": "Request for Proposal" },
-    { "abbr": "RGA", "expansion": "Residual Goods Assignment" },
-    { "abbr": "SCC", "expansion": "Standard Contractual Clauses" },
-    { "abbr": "SLA", "expansion": "Service Level Agreement" },
-    { "abbr": "SOW", "expansion": "Statement of Work" },
-    { "abbr": "SOC", "expansion": "Service Organization Controls" },
-    { "abbr": "SOX", "expansion": "Sarbanes-Oxley Act" },
-    { "abbr": "MSA", "expansion": "Master Services Agreement" },
-    { "abbr": "MOU", "expansion": "Memorandum of Understanding" },
-    { "abbr": "AML", "expansion": "Anti-Money Laundering" },
-    { "abbr": "NIS2", "expansion": "Network and Information Security Directive 2" },
-    { "abbr": "CCPA", "expansion": "California Consumer Privacy Act" },
-    { "abbr": "CA", "expansion": "California" },
-    { "abbr": "PIPEDA", "expansion": "Personal Information Protection and Electronic Documents Act" },
-    { "abbr": "SAS", "expansion": "Statistical Analysis System" },
-    { "abbr": "SOWR", "expansion": "Statement of Work Revision" },
-    { "abbr": "SOWD", "expansion": "Statement of Work Deliverable" },
-    { "abbr": "SOWC", "expansion": "Statement of Work Change" },
-    { "abbr": "T&C", "expansion": "Terms and Conditions" },
-    { "abbr": "UETA", "expansion": "Uniform Electronic Transactions Act" },
-    { "abbr": "ULCA", "expansion": "United States Lawful Commercial Act" },
-    { "abbr": "VAT", "expansion": "Value Added Tax" },
-    { "abbr": "W&I", "expansion": "Warranty and Indemnity" },
-    { "abbr": "WON", "expansion": "Wider Obligations Notice" },
-    { "abbr": "WO", "expansion": "Work Order" },
-    { "abbr": "YC", "expansion": "Yearly Cap" }
+    {
+      "abbr": "AEO",
+      "expansion": "Authorized Execution Order"
+    },
+    {
+      "abbr": "AML",
+      "expansion": "Anti-Money Laundering"
+    },
+    {
+      "abbr": "AND",
+      "expansion": "Applicable Negotiation Date"
+    },
+    {
+      "abbr": "AR",
+      "expansion": "Accounts Receivable"
+    },
+    {
+      "abbr": "B2B",
+      "expansion": "Business to Business"
+    },
+    {
+      "abbr": "B2C",
+      "expansion": "Business to Consumer"
+    },
+    {
+      "abbr": "CAP",
+      "expansion": "Cap"
+    },
+    {
+      "abbr": "CPA",
+      "expansion": "Certified Public Accountant"
+    },
+    {
+      "abbr": "CIO",
+      "expansion": "Chief Information Officer"
+    },
+    {
+      "abbr": "CPO",
+      "expansion": "Chief Privacy Officer"
+    },
+    {
+      "abbr": "DPO",
+      "expansion": "Data Protection Officer"
+    },
+    {
+      "abbr": "DPPA",
+      "expansion": "Driver's Privacy Protection Act"
+    },
+    {
+      "abbr": "DPA",
+      "expansion": "Data Processing Agreement"
+    },
+    {
+      "abbr": "DPO",
+      "expansion": "Data Privacy Officer"
+    },
+    {
+      "abbr": "DSAR",
+      "expansion": "Data Subject Access Request"
+    },
+    {
+      "abbr": "DSR",
+      "expansion": "Data Subject Rights"
+    },
+    {
+      "abbr": "EULA",
+      "expansion": "End User License Agreement"
+    },
+    {
+      "abbr": "FCA",
+      "expansion": "Financial Conduct Authority"
+    },
+    {
+      "abbr": "FISMA",
+      "expansion": "Federal Information Security Management Act"
+    },
+    {
+      "abbr": "GDPR",
+      "expansion": "General Data Protection Regulation"
+    },
+    {
+      "abbr": "HIPAA",
+      "expansion": "Health Insurance Portability and Accountability Act"
+    },
+    {
+      "abbr": "IP",
+      "expansion": "Intellectual Property"
+    },
+    {
+      "abbr": "ISA",
+      "expansion": "Information Security Agreement"
+    },
+    {
+      "abbr": "IT",
+      "expansion": "Information Technology"
+    },
+    {
+      "abbr": "ITAR",
+      "expansion": "International Traffic in Arms Regulations"
+    },
+    {
+      "abbr": "KPI",
+      "expansion": "Key Performance Indicator"
+    },
+    {
+      "abbr": "KYC",
+      "expansion": "Know Your Customer"
+    },
+    {
+      "abbr": "LGPD",
+      "expansion": "Lei Geral de Protecao de Dados"
+    },
+    {
+      "abbr": "LTD",
+      "expansion": "Limited"
+    },
+    {
+      "abbr": "NDA",
+      "expansion": "Non-Disclosure Agreement"
+    },
+    {
+      "abbr": "NFR",
+      "expansion": "Non-Functional Requirement"
+    },
+    {
+      "abbr": "NIST",
+      "expansion": "National Institute of Standards and Technology"
+    },
+    {
+      "abbr": "NDAA",
+      "expansion": "National Defense Authorization Act"
+    },
+    {
+      "abbr": "NMA",
+      "expansion": "Non-Merger Agreement"
+    },
+    {
+      "abbr": "NPA",
+      "expansion": "Non-Performance Agreement"
+    },
+    {
+      "abbr": "NSA",
+      "expansion": "Non-Solicitation Agreement"
+    },
+    {
+      "abbr": "NTP",
+      "expansion": "Notice to Proceed"
+    },
+    {
+      "abbr": "PIPL",
+      "expansion": "Personal Information Protection Law"
+    },
+    {
+      "abbr": "POA",
+      "expansion": "Power of Attorney"
+    },
+    {
+      "abbr": "POPIA",
+      "expansion": "Protection of Personal Information Act"
+    },
+    {
+      "abbr": "QMS",
+      "expansion": "Quality Management System"
+    },
+    {
+      "abbr": "RACI",
+      "expansion": "Responsible Accountable Consulted Informed"
+    },
+    {
+      "abbr": "RFP",
+      "expansion": "Request for Proposal"
+    },
+    {
+      "abbr": "RGA",
+      "expansion": "Residual Goods Assignment"
+    },
+    {
+      "abbr": "SCC",
+      "expansion": "Standard Contractual Clauses"
+    },
+    {
+      "abbr": "SLA",
+      "expansion": "Service Level Agreement"
+    },
+    {
+      "abbr": "SOW",
+      "expansion": "Statement of Work"
+    },
+    {
+      "abbr": "SOC",
+      "expansion": "Service Organization Controls"
+    },
+    {
+      "abbr": "SOX",
+      "expansion": "Sarbanes-Oxley Act"
+    },
+    {
+      "abbr": "MSA",
+      "expansion": "Master Services Agreement"
+    },
+    {
+      "abbr": "MOU",
+      "expansion": "Memorandum of Understanding"
+    },
+    {
+      "abbr": "AML",
+      "expansion": "Anti-Money Laundering"
+    },
+    {
+      "abbr": "NIS2",
+      "expansion": "Network and Information Security Directive 2"
+    },
+    {
+      "abbr": "CCPA",
+      "expansion": "California Consumer Privacy Act"
+    },
+    {
+      "abbr": "CA",
+      "expansion": "California"
+    },
+    {
+      "abbr": "PIPEDA",
+      "expansion": "Personal Information Protection and Electronic Documents Act"
+    },
+    {
+      "abbr": "SAS",
+      "expansion": "Statistical Analysis System"
+    },
+    {
+      "abbr": "SOWR",
+      "expansion": "Statement of Work Revision"
+    },
+    {
+      "abbr": "SOWD",
+      "expansion": "Statement of Work Deliverable"
+    },
+    {
+      "abbr": "SOWC",
+      "expansion": "Statement of Work Change"
+    },
+    {
+      "abbr": "T&C",
+      "expansion": "Terms and Conditions"
+    },
+    {
+      "abbr": "UETA",
+      "expansion": "Uniform Electronic Transactions Act"
+    },
+    {
+      "abbr": "ULCA",
+      "expansion": "United States Lawful Commercial Act"
+    },
+    {
+      "abbr": "VAT",
+      "expansion": "Value Added Tax"
+    },
+    {
+      "abbr": "W&I",
+      "expansion": "Warranty and Indemnity"
+    },
+    {
+      "abbr": "WON",
+      "expansion": "Wider Obligations Notice"
+    },
+    {
+      "abbr": "WO",
+      "expansion": "Work Order"
+    },
+    {
+      "abbr": "YC",
+      "expansion": "Yearly Cap"
+    }
   ]
 }

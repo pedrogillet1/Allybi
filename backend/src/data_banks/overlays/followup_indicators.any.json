@@ -3,7 +3,12 @@
     "id": "followup_indicators",
     "version": "1.0.0",
     "description": "Deterministic follow-up detection overlays for Koda. Detects continuation cues, reference carryover, scope persistence, and correction patterns across turns. Enables ChatGPT-like continuity: keep the right doc/scope active, resolve pronouns safely, and avoid unnecessary re-clarification.",
-    "languages": ["any", "en", "pt", "es"],
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
     "lastUpdated": "2026-01-26",
     "owner": "koda-overlays",
     "compat": ">=1.0.0",
@@ -11,6 +16,12 @@
       "Added deterministic actionsContract for follow-up scoring and collision handling",
       "Added continuation, correction, and expansion cues with guarded application",
       "Expanded tests for multilingual follow-ups and regressions (doc drift, over-clarification)"
+    ],
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
     ]
   },
   "config": {
@@ -44,11 +55,15 @@
         "format_shift_marker": 0.2
       },
       "caps": {
-        "maxScore": 1.0
+        "maxScore": 1
       }
     },
     "integrationHooks": {
-      "dependsOn": ["scope_hints", "language_indicators", "stopwords_docnames"],
+      "dependsOn": [
+        "scope_hints",
+        "language_indicators",
+        "stopwords_docnames"
+      ],
       "emitsSignals": [
         "isFollowup",
         "followupStrength",
@@ -57,29 +72,51 @@
         "formatShiftRequested",
         "correctionRequested"
       ]
-    }
+    },
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "rules": [
     {
       "id": "pronoun_reference_followup",
       "scope": "global",
       "description": "Detect pronoun/placeholder references indicating continuation (it/this/that/there/here).",
-      "appliesTo": ["user_inputs"],
+      "appliesTo": [
+        "user_inputs"
+      ],
       "triggerPatterns": {
-        "en": ["\\b(it|this|that|those|here|there|same one)\\b"],
-        "pt": ["\\b(isso|isto|esse|essa|aqu[ií]|a[ií]|o mesmo)\\b"],
-        "es": ["\\b(eso|esto|ese|esa|aqu[ií]|all[ií]|el mismo)\\b"]
+        "en": [
+          "\\b(it|this|that|those|here|there|same one)\\b"
+        ],
+        "pt": [
+          "\\b(isso|isto|esse|essa|aqu[ií]|a[ií]|o mesmo)\\b"
+        ],
+        "es": [
+          "\\b(eso|esto|ese|esa|aqu[ií]|all[ií]|el mismo)\\b"
+        ]
       },
       "when": {
         "all": [
-          { "path": "signals.hasActiveDoc", "op": "eq", "value": true },
-          { "path": "signals.explicitDocRef", "op": "neq", "value": true }
+          {
+            "path": "signals.hasActiveDoc",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "signals.explicitDocRef",
+            "op": "neq",
+            "value": true
+          }
         ]
       },
       "action": {
         "type": "add_followup_score",
         "score": 0.35,
-        "emitSignals": ["carryoverDocScope", "carryoverQuestionTopic"]
+        "emitSignals": [
+          "carryoverDocScope",
+          "carryoverQuestionTopic"
+        ]
       },
       "reasonCode": "followup_pronoun_reference",
       "severity": "high"
@@ -88,16 +125,26 @@
       "id": "continuation_markers",
       "scope": "global",
       "description": "Detect continuation markers (and also/now/continue/next) indicating follow-up.",
-      "appliesTo": ["user_inputs"],
+      "appliesTo": [
+        "user_inputs"
+      ],
       "triggerPatterns": {
-        "en": ["\\b(and also|also|now|continue|next|then)\\b"],
-        "pt": ["\\b(e tamb[eé]m|tamb[eé]m|agora|continuar|pr[oó]ximo|ent[aã]o)\\b"],
-        "es": ["\\b(y tambi[eé]n|tambi[eé]n|ahora|continuar|siguiente|entonces)\\b"]
+        "en": [
+          "\\b(and also|also|now|continue|next|then)\\b"
+        ],
+        "pt": [
+          "\\b(e tamb[eé]m|tamb[eé]m|agora|continuar|pr[oó]ximo|ent[aã]o)\\b"
+        ],
+        "es": [
+          "\\b(y tambi[eé]n|tambi[eé]n|ahora|continuar|siguiente|entonces)\\b"
+        ]
       },
       "action": {
         "type": "add_followup_score",
         "score": 0.25,
-        "emitSignals": ["carryoverQuestionTopic"]
+        "emitSignals": [
+          "carryoverQuestionTopic"
+        ]
       },
       "reasonCode": "followup_continuation_marker",
       "severity": "medium"
@@ -106,21 +153,35 @@
       "id": "short_utterance_followup",
       "scope": "global",
       "description": "Treat very short utterances as potential follow-ups when prior context exists (e.g., 'and ROI?', 'what about capex?').",
-      "appliesTo": ["user_inputs"],
+      "appliesTo": [
+        "user_inputs"
+      ],
       "triggerPatterns": {
-        "en": ["^\\s*(and\\s+)?(what about|how about)?\\s*\\w+\\??\\s*$"],
-        "pt": ["^\\s*(e\\s+)?(e\\s+o|e\\s+a|e\\s+isso|e\\s+quanto a)?\\s*\\w+\\??\\s*$"],
-        "es": ["^\\s*(y\\s+)?(y\\s+qu[eé]|y\\s+qu[eé]\\s+tal)?\\s*\\w+\\??\\s*$"]
+        "en": [
+          "^\\s*(and\\s+)?(what about|how about)?\\s*\\w+\\??\\s*$"
+        ],
+        "pt": [
+          "^\\s*(e\\s+)?(e\\s+o|e\\s+a|e\\s+isso|e\\s+quanto a)?\\s*\\w+\\??\\s*$"
+        ],
+        "es": [
+          "^\\s*(y\\s+)?(y\\s+qu[eé]|y\\s+qu[eé]\\s+tal)?\\s*\\w+\\??\\s*$"
+        ]
       },
       "when": {
         "all": [
-          { "path": "signals.hasPriorTurn", "op": "eq", "value": true }
+          {
+            "path": "signals.hasPriorTurn",
+            "op": "eq",
+            "value": true
+          }
         ]
       },
       "action": {
         "type": "add_followup_score",
         "score": 0.2,
-        "emitSignals": ["carryoverQuestionTopic"]
+        "emitSignals": [
+          "carryoverQuestionTopic"
+        ]
       },
       "reasonCode": "followup_short_utterance",
       "severity": "medium"
@@ -129,16 +190,26 @@
       "id": "correction_markers",
       "scope": "global",
       "description": "Detect correction markers (no, I meant, actually, not that) indicating a corrective follow-up.",
-      "appliesTo": ["user_inputs"],
+      "appliesTo": [
+        "user_inputs"
+      ],
       "triggerPatterns": {
-        "en": ["\\b(no,?\\s+i meant|actually|not that|correction)\\b"],
-        "pt": ["\\b(n[aã]o,?\\s+eu quis dizer|na verdade|n[aã]o isso|corre[cç][aã]o)\\b"],
-        "es": ["\\b(no,?\\s+quise decir|en realidad|no eso|correcci[oó]n)\\b"]
+        "en": [
+          "\\b(no,?\\s+i meant|actually|not that|correction)\\b"
+        ],
+        "pt": [
+          "\\b(n[aã]o,?\\s+eu quis dizer|na verdade|n[aã]o isso|corre[cç][aã]o)\\b"
+        ],
+        "es": [
+          "\\b(no,?\\s+quise decir|en realidad|no eso|correcci[oó]n)\\b"
+        ]
       },
       "action": {
         "type": "add_followup_score",
         "score": 0.25,
-        "emitSignals": ["correctionRequested"]
+        "emitSignals": [
+          "correctionRequested"
+        ]
       },
       "reasonCode": "followup_correction_marker",
       "severity": "high"
@@ -147,16 +218,26 @@
       "id": "format_shift_markers",
       "scope": "global",
       "description": "Detect formatting shift requests (make it a table, bullet points, shorter, more detail) as follow-up transformations.",
-      "appliesTo": ["user_inputs"],
+      "appliesTo": [
+        "user_inputs"
+      ],
       "triggerPatterns": {
-        "en": ["\\b(in a table|as a table|bullet points|make it shorter|more detail|summarize again)\\b"],
-        "pt": ["\\b(em tabela|como tabela|em bullets|mais curto|mais detalhe|resumir de novo)\\b"],
-        "es": ["\\b(en tabla|como tabla|en vi[nñ]etas|m[aá]s corto|m[aá]s detalle|resumir de nuevo)\\b"]
+        "en": [
+          "\\b(in a table|as a table|bullet points|make it shorter|more detail|summarize again)\\b"
+        ],
+        "pt": [
+          "\\b(em tabela|como tabela|em bullets|mais curto|mais detalhe|resumir de novo)\\b"
+        ],
+        "es": [
+          "\\b(en tabla|como tabla|en vi[nñ]etas|m[aá]s corto|m[aá]s detalle|resumir de nuevo)\\b"
+        ]
       },
       "action": {
         "type": "add_followup_score",
         "score": 0.2,
-        "emitSignals": ["formatShiftRequested"]
+        "emitSignals": [
+          "formatShiftRequested"
+        ]
       },
       "reasonCode": "followup_format_shift",
       "severity": "medium"
@@ -165,11 +246,19 @@
       "id": "explicit_new_doc_ref_breaks_followup",
       "scope": "global",
       "description": "If the user explicitly references a new file/doc, treat as a new turn even if follow-up markers exist.",
-      "appliesTo": ["user_inputs"],
+      "appliesTo": [
+        "user_inputs"
+      ],
       "triggerPatterns": {
-        "en": ["\\b\\w[\\w\\-_. ]{0,160}\\.(pdf|docx?|xlsx?|pptx?|txt|csv)\\b"],
-        "pt": ["\\b\\w[\\w\\-_. ]{0,160}\\.(pdf|docx?|xlsx?|pptx?|txt|csv)\\b"],
-        "es": ["\\b\\w[\\w\\-_. ]{0,160}\\.(pdf|docx?|xlsx?|pptx?|txt|csv)\\b"]
+        "en": [
+          "\\b\\w[\\w\\-_. ]{0,160}\\.(pdf|docx?|xlsx?|pptx?|txt|csv)\\b"
+        ],
+        "pt": [
+          "\\b\\w[\\w\\-_. ]{0,160}\\.(pdf|docx?|xlsx?|pptx?|txt|csv)\\b"
+        ],
+        "es": [
+          "\\b\\w[\\w\\-_. ]{0,160}\\.(pdf|docx?|xlsx?|pptx?|txt|csv)\\b"
+        ]
       },
       "action": {
         "type": "set_followup_override",
@@ -182,17 +271,28 @@
       "id": "classify_followup",
       "scope": "global",
       "description": "Classify follow-up based on accumulated score and emit normalized followupStrength.",
-      "appliesTo": ["followup_scoring"],
+      "appliesTo": [
+        "followup_scoring"
+      ],
       "triggerPatterns": {
-        "en": [".+"],
-        "pt": [".+"],
-        "es": [".+"]
+        "en": [
+          ".+"
+        ],
+        "pt": [
+          ".+"
+        ],
+        "es": [
+          ".+"
+        ]
       },
       "action": {
         "type": "classify_followup",
         "minScore": 0.65,
         "strongScore": 0.85,
-        "emit": ["isFollowup", "followupStrength"]
+        "emit": [
+          "isFollowup",
+          "followupStrength"
+        ]
       },
       "reasonCode": "followup_classified",
       "severity": "high"
@@ -202,45 +302,95 @@
     "cases": [
       {
         "id": "FU_001_pronoun_followup_en",
-        "context": { "signals": { "hasActiveDoc": true, "explicitDocRef": false, "hasPriorTurn": true } },
+        "context": {
+          "signals": {
+            "hasActiveDoc": true,
+            "explicitDocRef": false,
+            "hasPriorTurn": true
+          }
+        },
         "input": "Summarize it",
-        "expect": { "isFollowup": true, "carryoverDocScope": true }
+        "expect": {
+          "isFollowup": true,
+          "carryoverDocScope": true
+        }
       },
       {
         "id": "FU_002_continuation_marker_pt",
-        "context": { "signals": { "hasPriorTurn": true } },
+        "context": {
+          "signals": {
+            "hasPriorTurn": true
+          }
+        },
         "input": "e também o ROI",
-        "expect": { "isFollowup": true }
+        "expect": {
+          "isFollowup": true
+        }
       },
       {
         "id": "FU_003_short_utterance_es",
-        "context": { "signals": { "hasPriorTurn": true } },
+        "context": {
+          "signals": {
+            "hasPriorTurn": true
+          }
+        },
         "input": "¿y capex?",
-        "expect": { "isFollowup": true }
+        "expect": {
+          "isFollowup": true
+        }
       },
       {
         "id": "FU_004_correction_marker_en",
-        "context": { "signals": { "hasPriorTurn": true } },
+        "context": {
+          "signals": {
+            "hasPriorTurn": true
+          }
+        },
         "input": "No, I meant the operating expenses",
-        "expect": { "isFollowup": true, "correctionRequested": true }
+        "expect": {
+          "isFollowup": true,
+          "correctionRequested": true
+        }
       },
       {
         "id": "FU_005_format_shift_marker",
-        "context": { "signals": { "hasPriorTurn": true } },
+        "context": {
+          "signals": {
+            "hasPriorTurn": true
+          }
+        },
         "input": "Put that in a table",
-        "expect": { "isFollowup": true, "formatShiftRequested": true }
+        "expect": {
+          "isFollowup": true,
+          "formatShiftRequested": true
+        }
       },
       {
         "id": "FU_006_new_doc_breaks_followup",
-        "context": { "signals": { "hasPriorTurn": true, "hasActiveDoc": true } },
+        "context": {
+          "signals": {
+            "hasPriorTurn": true,
+            "hasActiveDoc": true
+          }
+        },
         "input": "Now open report_Q4_2023.pdf",
-        "expect": { "followupOverride": "new_turn" }
+        "expect": {
+          "followupOverride": "new_turn"
+        }
       },
       {
         "id": "FU_007_regression_avoid_over_clarification",
-        "context": { "signals": { "hasActiveDoc": true, "hasPriorTurn": true } },
+        "context": {
+          "signals": {
+            "hasActiveDoc": true,
+            "hasPriorTurn": true
+          }
+        },
         "input": "and also the margin",
-        "expect": { "isFollowup": true, "noExtraClarification": true }
+        "expect": {
+          "isFollowup": true,
+          "noExtraClarification": true
+        }
       }
     ]
   }

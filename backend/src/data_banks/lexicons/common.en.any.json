@@ -6,6 +6,13 @@
     "lastUpdated": "2026-02-12",
     "languages": [
       "en"
+    ],
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
     ]
   },
   "config": {

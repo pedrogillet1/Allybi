@@ -1,12 +1,19 @@
 {
   "_meta": {
-    "id": "legal_lexicon_pt",
+    "id": "legal_lexicon_pt_v02671738",
     "version": "2.1.0",
     "description": "Portuguese legal lexicon for clause retrieval and obligation extraction.",
     "languages": [
       "pt"
     ],
-    "lastUpdated": "2026-03-03"
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -15,57 +22,581 @@
   },
   "domain": "legal",
   "terms": [
-    { "id": "legal_term_001", "canonical": "acordo", "synonyms": ["acordo", "contrato", "documento"], "display": "Acordo", "enRef": "legal_term_001" },
-    { "id": "legal_term_002", "canonical": "acordo de confidencialidade", "synonyms": ["NDA", "acordo confidencial", "termo de confidencialidade"], "display": "Acordo de Confidencialidade", "enRef": "legal_term_002" },
-    { "id": "legal_term_003", "canonical": "acordo mestre de servicos", "synonyms": ["MSA", "acordo mestre", "servicos", "acordo de servicos"], "display": "Acordo Mestre de Servicos", "enRef": "legal_term_003" },
-    { "id": "legal_term_004", "canonical": "statement of work", "synonyms": ["SOW", "declaracao de trabalho", "escopo do trabalho", "ordem de servico"], "display": "Declaracao de Trabalho", "enRef": "legal_term_004" },
-    { "id": "legal_term_005", "canonical": "acordo de tratamento de dados", "synonyms": ["DPA", "acordo de processador", "acordo de dados"], "display": "Acordo de Tratamento de Dados", "enRef": "legal_term_005" },
-    { "id": "legal_term_006", "canonical": "partes", "synonyms": ["parte", "contratantes", "parte contratante"], "display": "Partes", "enRef": "legal_term_006" },
-    { "id": "legal_term_007", "canonical": "lei aplicavel", "synonyms": ["lei aplicavel", "lei regente", "escolha da lei"], "display": "Lei Aplicavel", "enRef": "legal_term_007" },
-    { "id": "legal_term_008", "canonical": "foro", "synonyms": ["foro", "jurisdicao", "competencia"], "display": "Foro", "enRef": "legal_term_008" },
-    { "id": "legal_term_009", "canonical": "informacao confidencial", "synonyms": ["informacao confidencial", "informacao nao publica", "informacao proprietaria"], "display": "Informacao Confidencial", "enRef": "legal_term_009" },
-    { "id": "legal_term_010", "canonical": "confidencialidade", "synonyms": ["confidencialidade", "sigilo", "clausula de sigilo"], "display": "Confidencialidade", "enRef": "legal_term_010" },
-    { "id": "legal_term_011", "canonical": "vigencia", "synonyms": ["vigor", "prazo", "periodo de vigencia"], "display": "Vigencia", "enRef": "legal_term_011" },
-    { "id": "legal_term_012", "canonical": "rescisao", "synonyms": ["rescisao", "cancelamento", "termino"], "display": "Rescisao", "enRef": "legal_term_012" },
-    { "id": "legal_term_013", "canonical": "prazo para cura", "synonyms": ["prazo de cura", "periodo de cura", "tempo para regularizacao"], "display": "Prazo para Cura", "enRef": "legal_term_013" },
-    { "id": "legal_term_014", "canonical": "renovacao", "synonyms": ["renovacao", "prorrogacao", "prorrogacao automatica"], "display": "Renovacao", "enRef": "legal_term_014" },
-    { "id": "legal_term_015", "canonical": "multa contratual", "synonyms": ["multa", "encargo", "valor por rescisao"], "display": "Multa Contratual", "enRef": "legal_term_015" },
-    { "id": "legal_term_016", "canonical": "responsabilidade", "synonyms": ["responsabilidade", "responsabilidade civil", "responsabilidade contratual"], "display": "Responsabilidade", "enRef": "legal_term_016" },
-    { "id": "legal_term_017", "canonical": "indenizacao", "synonyms": ["indenizacao", "responsabilidade por danos", "indenizar"], "display": "Indenizacao", "enRef": "legal_term_017" },
-    { "id": "legal_term_018", "canonical": "limite de responsabilidade", "synonyms": ["limite de responsabilidade", "teto de responsabilidade", "exclusao de danos"], "display": "Limite de Responsabilidade", "enRef": "legal_term_018" },
-    { "id": "legal_term_019", "canonical": "exclusao de danos", "synonyms": ["exclusao de danos", "limite de danos", "danos consequenciais"], "display": "Exclusao de Danos", "enRef": "legal_term_019" },
-    { "id": "legal_term_020", "canonical": "garantia", "synonyms": ["garantia", "warranty", "representacao", "assuncao de garantia"], "display": "Garantia", "enRef": "legal_term_020" },
-    { "id": "legal_term_021", "canonical": "declaracao", "synonyms": ["declaracao", "representacao", "asseveracao"], "display": "Declaracao", "enRef": "legal_term_021" },
-    { "id": "legal_term_022", "canonical": "incumprimento", "synonyms": ["incumprimento", "violacao", "brecha contratual"], "display": "Incumprimento", "enRef": "legal_term_022" },
-    { "id": "legal_term_023", "canonical": "remedio", "synonyms": ["remedio", "medida de remedio", "solucao"], "display": "Remedio", "enRef": "legal_term_023" },
-    { "id": "legal_term_024", "canonical": "default", "synonyms": ["default", "evento de default", "incidente"], "display": "Default", "enRef": "legal_term_024" },
-    { "id": "legal_term_025", "canonical": "resolucao de conflitos", "synonyms": ["resolucao de conflitos", "arbitragem", "mediacao", "contencioso"], "display": "Resolucao de Conflitos", "enRef": "legal_term_025" },
-    { "id": "legal_term_026", "canonical": "notificacao", "synonyms": ["notificacao", "comunicacao formal", "aviso"], "display": "Notificacao", "enRef": "legal_term_026" },
-    { "id": "legal_term_027", "canonical": "prazo de aviso", "synonyms": ["prazo de aviso", "notificacao previa", "prazo de antecedencia"], "display": "Prazo de Aviso", "enRef": "legal_term_027" },
-    { "id": "legal_term_028", "canonical": "definicao", "synonyms": ["definicao", "termo definido", "para evitar duvida"], "display": "Definicao", "enRef": "legal_term_028" },
-    { "id": "legal_term_029", "canonical": "excecoes", "synonyms": ["excecoes", "clausula de excecao", "excluicoes"], "display": "Excecoes", "enRef": "legal_term_029" },
-    { "id": "legal_term_030", "canonical": "controlador", "synonyms": ["controlador", "controlador de dados"], "display": "Controlador", "enRef": "legal_term_030" },
-    { "id": "legal_term_031", "canonical": "operador", "synonyms": ["processador", "operador de dados", "subcontratado"], "display": "Operador", "enRef": "legal_term_031" },
-    { "id": "legal_term_032", "canonical": "dados pessoais", "synonyms": ["dados pessoais", "informacao pessoal", "dados sensiveis"], "display": "Dados Pessoais", "enRef": "legal_term_032" },
-    { "id": "legal_term_033", "canonical": "seguranca da informacao", "synonyms": ["seguranca", "seguranca da informacao", "ciberseguranca"], "display": "Seguranca da Informacao", "enRef": "legal_term_033" },
-    { "id": "legal_term_034", "canonical": "incidente de seguranca", "synonyms": ["incidente", "violacao de dados", "vazamento"], "display": "Incidente de Seguranca", "enRef": "legal_term_034" },
-    { "id": "legal_term_035", "canonical": "suboperador", "synonyms": ["suboperador", "sub-processador", "subcontratado"], "display": "Suboperador", "enRef": "legal_term_035" },
-    { "id": "legal_term_036", "canonical": "forca maior", "synonyms": ["forca maior", "fatos da natureza", "fato extraordinario"], "display": "Forca Maior", "enRef": "legal_term_037" },
-    { "id": "legal_term_037", "canonical": "direito de auditoria", "synonyms": ["direito de auditoria", "auditoria", "auditar"], "display": "Direito de Auditoria", "enRef": "legal_term_038" },
-    { "id": "legal_term_038", "canonical": "conformidade", "synonyms": ["conformidade", "cumprimento regulatorio", "atendimento normativo"], "display": "Conformidade", "enRef": "legal_term_039" },
-    { "id": "legal_term_039", "canonical": "cessao", "synonyms": ["cessao", "transferencia", "substituicao de parte"], "display": "Cessao", "enRef": "legal_term_041" },
-    { "id": "legal_term_040", "canonical": "alteracao", "synonyms": ["alteracao", "modificacao", "addendo"], "display": "Alteracao", "enRef": "legal_term_042" },
-    { "id": "legal_term_041", "canonical": "aditivo", "synonyms": ["aditivo", "addendum", "anexo de alteracao"], "display": "Aditivo", "enRef": "legal_term_043" },
-    { "id": "legal_term_042", "canonical": "propriedade intelectual", "synonyms": ["propriedade intelectual", "direitos autorais", "propriedade industrial"], "display": "Propriedade Intelectual", "enRef": "legal_term_045" },
-    { "id": "legal_term_043", "canonical": "licenca", "synonyms": ["licenca", "concessao", "direito de uso"], "display": "Licenca", "enRef": "legal_term_046" },
-    { "id": "legal_term_044", "canonical": "escopo de servicos", "synonyms": ["escopo", "escopo de servicos", "atividade"], "display": "Escopo de Servicos", "enRef": "legal_term_048" },
-    { "id": "legal_term_045", "canonical": "taxas", "synonyms": ["taxas", "remuneracao", "preco", "custo"], "display": "Taxas", "enRef": "legal_term_050" },
-    { "id": "legal_term_046", "canonical": "condicoes de pagamento", "synonyms": ["condicoes de pagamento", "prazo de pagamento", "condicoes fiscais"], "display": "Condicoes de Pagamento", "enRef": "legal_term_050" },
-    { "id": "legal_term_047", "canonical": "sobrevivencia", "synonyms": ["sobrevivencia", "sobrevivem", "validade apos rescisao"], "display": "Sobrevivencia", "enRef": "legal_term_054" },
-    { "id": "legal_term_048", "canonical": "acordo integral", "synonyms": ["acordo integral", "integralidade", "disposicao completa"], "display": "Acordo Integral", "enRef": "legal_term_056" },
-    { "id": "legal_term_049", "canonical": "severabilidade", "synonyms": ["severabilidade", "separabilidade", "clausula separavel"], "display": "Severabilidade", "enRef": "legal_term_057" },
-    { "id": "legal_term_050", "canonical": "renuncia", "synonyms": ["renuncia", "waiver", "perdao"], "display": "Renuncia", "enRef": "legal_term_058" },
-    { "id": "legal_term_051", "canonical": "contrapartes", "synonyms": ["contrapartes", "assinatura em varias vias", "exemplar"], "display": "Contrapartes", "enRef": "legal_term_059" },
-    { "id": "legal_term_052", "canonical": "transferencia", "synonyms": ["transferencia", "cessao", "mudanca de parte"], "display": "Transferencia", "enRef": "legal_term_060" }
+    {
+      "id": "legal_term_001",
+      "canonical": "acordo",
+      "synonyms": [
+        "acordo",
+        "contrato",
+        "documento"
+      ],
+      "display": "Acordo",
+      "enRef": "legal_term_001"
+    },
+    {
+      "id": "legal_term_002",
+      "canonical": "acordo de confidencialidade",
+      "synonyms": [
+        "NDA",
+        "acordo confidencial",
+        "termo de confidencialidade"
+      ],
+      "display": "Acordo de Confidencialidade",
+      "enRef": "legal_term_002"
+    },
+    {
+      "id": "legal_term_003",
+      "canonical": "acordo mestre de servicos",
+      "synonyms": [
+        "MSA",
+        "acordo mestre",
+        "servicos",
+        "acordo de servicos"
+      ],
+      "display": "Acordo Mestre de Servicos",
+      "enRef": "legal_term_003"
+    },
+    {
+      "id": "legal_term_004",
+      "canonical": "statement of work",
+      "synonyms": [
+        "SOW",
+        "declaracao de trabalho",
+        "escopo do trabalho",
+        "ordem de servico"
+      ],
+      "display": "Declaracao de Trabalho",
+      "enRef": "legal_term_004"
+    },
+    {
+      "id": "legal_term_005",
+      "canonical": "acordo de tratamento de dados",
+      "synonyms": [
+        "DPA",
+        "acordo de processador",
+        "acordo de dados"
+      ],
+      "display": "Acordo de Tratamento de Dados",
+      "enRef": "legal_term_005"
+    },
+    {
+      "id": "legal_term_006",
+      "canonical": "partes",
+      "synonyms": [
+        "parte",
+        "contratantes",
+        "parte contratante"
+      ],
+      "display": "Partes",
+      "enRef": "legal_term_006"
+    },
+    {
+      "id": "legal_term_007",
+      "canonical": "lei aplicavel",
+      "synonyms": [
+        "lei aplicavel",
+        "lei regente",
+        "escolha da lei"
+      ],
+      "display": "Lei Aplicavel",
+      "enRef": "legal_term_007"
+    },
+    {
+      "id": "legal_term_008",
+      "canonical": "foro",
+      "synonyms": [
+        "foro",
+        "jurisdicao",
+        "competencia"
+      ],
+      "display": "Foro",
+      "enRef": "legal_term_008"
+    },
+    {
+      "id": "legal_term_009",
+      "canonical": "informacao confidencial",
+      "synonyms": [
+        "informacao confidencial",
+        "informacao nao publica",
+        "informacao proprietaria"
+      ],
+      "display": "Informacao Confidencial",
+      "enRef": "legal_term_009"
+    },
+    {
+      "id": "legal_term_010",
+      "canonical": "confidencialidade",
+      "synonyms": [
+        "confidencialidade",
+        "sigilo",
+        "clausula de sigilo"
+      ],
+      "display": "Confidencialidade",
+      "enRef": "legal_term_010"
+    },
+    {
+      "id": "legal_term_011",
+      "canonical": "vigencia",
+      "synonyms": [
+        "vigor",
+        "prazo",
+        "periodo de vigencia"
+      ],
+      "display": "Vigencia",
+      "enRef": "legal_term_011"
+    },
+    {
+      "id": "legal_term_012",
+      "canonical": "rescisao",
+      "synonyms": [
+        "rescisao",
+        "cancelamento",
+        "termino"
+      ],
+      "display": "Rescisao",
+      "enRef": "legal_term_012"
+    },
+    {
+      "id": "legal_term_013",
+      "canonical": "prazo para cura",
+      "synonyms": [
+        "prazo de cura",
+        "periodo de cura",
+        "tempo para regularizacao"
+      ],
+      "display": "Prazo para Cura",
+      "enRef": "legal_term_013"
+    },
+    {
+      "id": "legal_term_014",
+      "canonical": "renovacao",
+      "synonyms": [
+        "renovacao",
+        "prorrogacao",
+        "prorrogacao automatica"
+      ],
+      "display": "Renovacao",
+      "enRef": "legal_term_014"
+    },
+    {
+      "id": "legal_term_015",
+      "canonical": "multa contratual",
+      "synonyms": [
+        "multa",
+        "encargo",
+        "valor por rescisao"
+      ],
+      "display": "Multa Contratual",
+      "enRef": "legal_term_015"
+    },
+    {
+      "id": "legal_term_016",
+      "canonical": "responsabilidade",
+      "synonyms": [
+        "responsabilidade",
+        "responsabilidade civil",
+        "responsabilidade contratual"
+      ],
+      "display": "Responsabilidade",
+      "enRef": "legal_term_016"
+    },
+    {
+      "id": "legal_term_017",
+      "canonical": "indenizacao",
+      "synonyms": [
+        "indenizacao",
+        "responsabilidade por danos",
+        "indenizar"
+      ],
+      "display": "Indenizacao",
+      "enRef": "legal_term_017"
+    },
+    {
+      "id": "legal_term_018",
+      "canonical": "limite de responsabilidade",
+      "synonyms": [
+        "limite de responsabilidade",
+        "teto de responsabilidade",
+        "exclusao de danos"
+      ],
+      "display": "Limite de Responsabilidade",
+      "enRef": "legal_term_018"
+    },
+    {
+      "id": "legal_term_019",
+      "canonical": "exclusao de danos",
+      "synonyms": [
+        "exclusao de danos",
+        "limite de danos",
+        "danos consequenciais"
+      ],
+      "display": "Exclusao de Danos",
+      "enRef": "legal_term_019"
+    },
+    {
+      "id": "legal_term_020",
+      "canonical": "garantia",
+      "synonyms": [
+        "garantia",
+        "warranty",
+        "representacao",
+        "assuncao de garantia"
+      ],
+      "display": "Garantia",
+      "enRef": "legal_term_020"
+    },
+    {
+      "id": "legal_term_021",
+      "canonical": "declaracao",
+      "synonyms": [
+        "declaracao",
+        "representacao",
+        "asseveracao"
+      ],
+      "display": "Declaracao",
+      "enRef": "legal_term_021"
+    },
+    {
+      "id": "legal_term_022",
+      "canonical": "incumprimento",
+      "synonyms": [
+        "incumprimento",
+        "violacao",
+        "brecha contratual"
+      ],
+      "display": "Incumprimento",
+      "enRef": "legal_term_022"
+    },
+    {
+      "id": "legal_term_023",
+      "canonical": "remedio",
+      "synonyms": [
+        "remedio",
+        "medida de remedio",
+        "solucao"
+      ],
+      "display": "Remedio",
+      "enRef": "legal_term_023"
+    },
+    {
+      "id": "legal_term_024",
+      "canonical": "default",
+      "synonyms": [
+        "default",
+        "evento de default",
+        "incidente"
+      ],
+      "display": "Default",
+      "enRef": "legal_term_024"
+    },
+    {
+      "id": "legal_term_025",
+      "canonical": "resolucao de conflitos",
+      "synonyms": [
+        "resolucao de conflitos",
+        "arbitragem",
+        "mediacao",
+        "contencioso"
+      ],
+      "display": "Resolucao de Conflitos",
+      "enRef": "legal_term_025"
+    },
+    {
+      "id": "legal_term_026",
+      "canonical": "notificacao",
+      "synonyms": [
+        "notificacao",
+        "comunicacao formal",
+        "aviso"
+      ],
+      "display": "Notificacao",
+      "enRef": "legal_term_026"
+    },
+    {
+      "id": "legal_term_027",
+      "canonical": "prazo de aviso",
+      "synonyms": [
+        "prazo de aviso",
+        "notificacao previa",
+        "prazo de antecedencia"
+      ],
+      "display": "Prazo de Aviso",
+      "enRef": "legal_term_027"
+    },
+    {
+      "id": "legal_term_028",
+      "canonical": "definicao",
+      "synonyms": [
+        "definicao",
+        "termo definido",
+        "para evitar duvida"
+      ],
+      "display": "Definicao",
+      "enRef": "legal_term_028"
+    },
+    {
+      "id": "legal_term_029",
+      "canonical": "excecoes",
+      "synonyms": [
+        "excecoes",
+        "clausula de excecao",
+        "excluicoes"
+      ],
+      "display": "Excecoes",
+      "enRef": "legal_term_029"
+    },
+    {
+      "id": "legal_term_030",
+      "canonical": "controlador",
+      "synonyms": [
+        "controlador",
+        "controlador de dados"
+      ],
+      "display": "Controlador",
+      "enRef": "legal_term_030"
+    },
+    {
+      "id": "legal_term_031",
+      "canonical": "operador",
+      "synonyms": [
+        "processador",
+        "operador de dados",
+        "subcontratado"
+      ],
+      "display": "Operador",
+      "enRef": "legal_term_031"
+    },
+    {
+      "id": "legal_term_032",
+      "canonical": "dados pessoais",
+      "synonyms": [
+        "dados pessoais",
+        "informacao pessoal",
+        "dados sensiveis"
+      ],
+      "display": "Dados Pessoais",
+      "enRef": "legal_term_032"
+    },
+    {
+      "id": "legal_term_033",
+      "canonical": "seguranca da informacao",
+      "synonyms": [
+        "seguranca",
+        "seguranca da informacao",
+        "ciberseguranca"
+      ],
+      "display": "Seguranca da Informacao",
+      "enRef": "legal_term_033"
+    },
+    {
+      "id": "legal_term_034",
+      "canonical": "incidente de seguranca",
+      "synonyms": [
+        "incidente",
+        "violacao de dados",
+        "vazamento"
+      ],
+      "display": "Incidente de Seguranca",
+      "enRef": "legal_term_034"
+    },
+    {
+      "id": "legal_term_035",
+      "canonical": "suboperador",
+      "synonyms": [
+        "suboperador",
+        "sub-processador",
+        "subcontratado"
+      ],
+      "display": "Suboperador",
+      "enRef": "legal_term_035"
+    },
+    {
+      "id": "legal_term_036",
+      "canonical": "forca maior",
+      "synonyms": [
+        "forca maior",
+        "fatos da natureza",
+        "fato extraordinario"
+      ],
+      "display": "Forca Maior",
+      "enRef": "legal_term_037"
+    },
+    {
+      "id": "legal_term_037",
+      "canonical": "direito de auditoria",
+      "synonyms": [
+        "direito de auditoria",
+        "auditoria",
+        "auditar"
+      ],
+      "display": "Direito de Auditoria",
+      "enRef": "legal_term_038"
+    },
+    {
+      "id": "legal_term_038",
+      "canonical": "conformidade",
+      "synonyms": [
+        "conformidade",
+        "cumprimento regulatorio",
+        "atendimento normativo"
+      ],
+      "display": "Conformidade",
+      "enRef": "legal_term_039"
+    },
+    {
+      "id": "legal_term_039",
+      "canonical": "cessao",
+      "synonyms": [
+        "cessao",
+        "transferencia",
+        "substituicao de parte"
+      ],
+      "display": "Cessao",
+      "enRef": "legal_term_041"
+    },
+    {
+      "id": "legal_term_040",
+      "canonical": "alteracao",
+      "synonyms": [
+        "alteracao",
+        "modificacao",
+        "addendo"
+      ],
+      "display": "Alteracao",
+      "enRef": "legal_term_042"
+    },
+    {
+      "id": "legal_term_041",
+      "canonical": "aditivo",
+      "synonyms": [
+        "aditivo",
+        "addendum",
+        "anexo de alteracao"
+      ],
+      "display": "Aditivo",
+      "enRef": "legal_term_043"
+    },
+    {
+      "id": "legal_term_042",
+      "canonical": "propriedade intelectual",
+      "synonyms": [
+        "propriedade intelectual",
+        "direitos autorais",
+        "propriedade industrial"
+      ],
+      "display": "Propriedade Intelectual",
+      "enRef": "legal_term_045"
+    },
+    {
+      "id": "legal_term_043",
+      "canonical": "licenca",
+      "synonyms": [
+        "licenca",
+        "concessao",
+        "direito de uso"
+      ],
+      "display": "Licenca",
+      "enRef": "legal_term_046"
+    },
+    {
+      "id": "legal_term_044",
+      "canonical": "escopo de servicos",
+      "synonyms": [
+        "escopo",
+        "escopo de servicos",
+        "atividade"
+      ],
+      "display": "Escopo de Servicos",
+      "enRef": "legal_term_048"
+    },
+    {
+      "id": "legal_term_045",
+      "canonical": "taxas",
+      "synonyms": [
+        "taxas",
+        "remuneracao",
+        "preco",
+        "custo"
+      ],
+      "display": "Taxas",
+      "enRef": "legal_term_050"
+    },
+    {
+      "id": "legal_term_046",
+      "canonical": "condicoes de pagamento",
+      "synonyms": [
+        "condicoes de pagamento",
+        "prazo de pagamento",
+        "condicoes fiscais"
+      ],
+      "display": "Condicoes de Pagamento",
+      "enRef": "legal_term_050"
+    },
+    {
+      "id": "legal_term_047",
+      "canonical": "sobrevivencia",
+      "synonyms": [
+        "sobrevivencia",
+        "sobrevivem",
+        "validade apos rescisao"
+      ],
+      "display": "Sobrevivencia",
+      "enRef": "legal_term_054"
+    },
+    {
+      "id": "legal_term_048",
+      "canonical": "acordo integral",
+      "synonyms": [
+        "acordo integral",
+        "integralidade",
+        "disposicao completa"
+      ],
+      "display": "Acordo Integral",
+      "enRef": "legal_term_056"
+    },
+    {
+      "id": "legal_term_049",
+      "canonical": "severabilidade",
+      "synonyms": [
+        "severabilidade",
+        "separabilidade",
+        "clausula separavel"
+      ],
+      "display": "Severabilidade",
+      "enRef": "legal_term_057"
+    },
+    {
+      "id": "legal_term_050",
+      "canonical": "renuncia",
+      "synonyms": [
+        "renuncia",
+        "waiver",
+        "perdao"
+      ],
+      "display": "Renuncia",
+      "enRef": "legal_term_058"
+    },
+    {
+      "id": "legal_term_051",
+      "canonical": "contrapartes",
+      "synonyms": [
+        "contrapartes",
+        "assinatura em varias vias",
+        "exemplar"
+      ],
+      "display": "Contrapartes",
+      "enRef": "legal_term_059"
+    },
+    {
+      "id": "legal_term_052",
+      "canonical": "transferencia",
+      "synonyms": [
+        "transferencia",
+        "cessao",
+        "mudanca de parte"
+      ],
+      "display": "Transferencia",
+      "enRef": "legal_term_060"
+    }
   ]
 }

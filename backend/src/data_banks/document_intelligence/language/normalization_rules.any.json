@@ -9,12 +9,21 @@
       "pt"
     ],
     "lastUpdated": "2026-03-03",
-    "description": "Expanded real-text normalization: quotes, punctuation, diacritics, and locale number formats."
+    "description": "Expanded real-text normalization: quotes, punctuation, diacritics, and locale number formats.",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
     "caseInsensitive": true,
-    "applyOrder": "sequential"
+    "applyOrder": "sequential",
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "rules": [
     {

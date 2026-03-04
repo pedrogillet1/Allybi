@@ -3,8 +3,17 @@
     "id": "di_accounting_retrieval_strategies_v2",
     "version": "2.0.0",
     "description": "Section, table, and evidence-driven retrieval with explicit section/table boost logic for accounting workflows.",
-    "languages": ["any"],
-    "lastUpdated": "2026-03-03"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -15,77 +24,278 @@
   },
   "domain": "accounting",
   "sectionPriority": [
-    { "section": "general_ledger_detail", "weight": 3.4, "operators": ["extract", "validate", "locate", "calculate"] },
-    { "section": "trial_balance_summary", "weight": 3.6, "operators": ["validate", "extract", "calculate"] },
-    { "section": "journal_entry_detail", "weight": 3.2, "operators": ["extract", "locate", "validate"] },
-    { "section": "journal_entry_support", "weight": 3.0, "operators": ["extract", "evaluate", "validate"] },
-    { "section": "bank_reconciliation_summary", "weight": 3.5, "operators": ["validate", "compare", "evaluate"] },
-    { "section": "bank_reconciliation_detail", "weight": 3.2, "operators": ["extract", "validate", "calculate"] },
-    { "section": "cashbook_reconciliation", "weight": 3.0, "operators": ["compare", "validate"] },
-    { "section": "aging_schedule", "weight": 3.0, "operators": ["extract", "monitor", "evaluate"] },
-    { "section": "ar_aging", "weight": 2.8, "operators": ["extract", "monitor"] },
-    { "section": "ap_aging", "weight": 2.8, "operators": ["extract", "monitor"] },
-    { "section": "controls_matrix", "weight": 2.6, "operators": ["evaluate", "validate"] },
-    { "section": "audit_workpaper", "weight": 2.2, "operators": ["summarize", "evaluate", "validate"] },
-    { "section": "fixed_asset_register", "weight": 2.4, "operators": ["extract", "validate"] },
-    { "section": "depreciation_rollforward", "weight": 2.4, "operators": ["extract", "calculate"] },
-    { "section": "subledger_detail", "weight": 2.5, "operators": ["extract", "compare"] },
-    { "section": "summary_financials", "weight": 2.0, "operators": ["summarize", "extract"] }
+    {
+      "section": "general_ledger_detail",
+      "weight": 3.4,
+      "operators": [
+        "extract",
+        "validate",
+        "locate",
+        "calculate"
+      ]
+    },
+    {
+      "section": "trial_balance_summary",
+      "weight": 3.6,
+      "operators": [
+        "validate",
+        "extract",
+        "calculate"
+      ]
+    },
+    {
+      "section": "journal_entry_detail",
+      "weight": 3.2,
+      "operators": [
+        "extract",
+        "locate",
+        "validate"
+      ]
+    },
+    {
+      "section": "journal_entry_support",
+      "weight": 3,
+      "operators": [
+        "extract",
+        "evaluate",
+        "validate"
+      ]
+    },
+    {
+      "section": "bank_reconciliation_summary",
+      "weight": 3.5,
+      "operators": [
+        "validate",
+        "compare",
+        "evaluate"
+      ]
+    },
+    {
+      "section": "bank_reconciliation_detail",
+      "weight": 3.2,
+      "operators": [
+        "extract",
+        "validate",
+        "calculate"
+      ]
+    },
+    {
+      "section": "cashbook_reconciliation",
+      "weight": 3,
+      "operators": [
+        "compare",
+        "validate"
+      ]
+    },
+    {
+      "section": "aging_schedule",
+      "weight": 3,
+      "operators": [
+        "extract",
+        "monitor",
+        "evaluate"
+      ]
+    },
+    {
+      "section": "ar_aging",
+      "weight": 2.8,
+      "operators": [
+        "extract",
+        "monitor"
+      ]
+    },
+    {
+      "section": "ap_aging",
+      "weight": 2.8,
+      "operators": [
+        "extract",
+        "monitor"
+      ]
+    },
+    {
+      "section": "controls_matrix",
+      "weight": 2.6,
+      "operators": [
+        "evaluate",
+        "validate"
+      ]
+    },
+    {
+      "section": "audit_workpaper",
+      "weight": 2.2,
+      "operators": [
+        "summarize",
+        "evaluate",
+        "validate"
+      ]
+    },
+    {
+      "section": "fixed_asset_register",
+      "weight": 2.4,
+      "operators": [
+        "extract",
+        "validate"
+      ]
+    },
+    {
+      "section": "depreciation_rollforward",
+      "weight": 2.4,
+      "operators": [
+        "extract",
+        "calculate"
+      ]
+    },
+    {
+      "section": "subledger_detail",
+      "weight": 2.5,
+      "operators": [
+        "extract",
+        "compare"
+      ]
+    },
+    {
+      "section": "summary_financials",
+      "weight": 2,
+      "operators": [
+        "summarize",
+        "extract"
+      ]
+    }
   ],
   "tableBoostRules": [
     {
       "id": "acct_table_001_tb_tieout",
       "priority": 96,
-      "operators": ["validate", "calculate", "compare"],
+      "operators": [
+        "validate",
+        "calculate",
+        "compare"
+      ],
       "weight": 3.8,
       "condition": "query requests trial balance totals, debit, credit, or balance ties",
-      "tableSignatures": ["debit", "credit", "trial balance", "saldo"],
-      "boostSections": ["trial_balance_summary"]
+      "tableSignatures": [
+        "debit",
+        "credit",
+        "trial balance",
+        "saldo"
+      ],
+      "boostSections": [
+        "trial_balance_summary"
+      ]
     },
     {
       "id": "acct_table_002_gl_postings",
       "priority": 95,
-      "operators": ["locate", "extract", "compare"],
+      "operators": [
+        "locate",
+        "extract",
+        "compare"
+      ],
       "weight": 3.4,
       "condition": "query references GL account, movement, posting, or ledger balance trend",
-      "tableSignatures": ["account", "account name", "date", "debit", "credit", "balance"],
-      "boostSections": ["general_ledger_detail", "subledger_detail"]
+      "tableSignatures": [
+        "account",
+        "account name",
+        "date",
+        "debit",
+        "credit",
+        "balance"
+      ],
+      "boostSections": [
+        "general_ledger_detail",
+        "subledger_detail"
+      ]
     },
     {
       "id": "acct_table_003_je_support",
       "priority": 94,
-      "operators": ["locate", "validate", "extract"],
+      "operators": [
+        "locate",
+        "validate",
+        "extract"
+      ],
       "weight": 3.4,
       "condition": "query traces one or more transactions, voucher, reference, or source doc",
-      "tableSignatures": ["journal", "entry", "reference", "approved", "debit account", "credit account"],
-      "boostSections": ["journal_entry_detail", "journal_entry_support"]
+      "tableSignatures": [
+        "journal",
+        "entry",
+        "reference",
+        "approved",
+        "debit account",
+        "credit account"
+      ],
+      "boostSections": [
+        "journal_entry_detail",
+        "journal_entry_support"
+      ]
     },
     {
       "id": "acct_table_004_rec_tieout",
       "priority": 93,
-      "operators": ["validate", "compare", "calculate"],
+      "operators": [
+        "validate",
+        "compare",
+        "calculate"
+      ],
       "weight": 3.6,
       "condition": "query asks for reconciling items or bank-cash tie-out",
-      "tableSignatures": ["book balance", "statement balance", "outstanding", "transit", "adjustments"],
-      "boostSections": ["bank_reconciliation_summary", "bank_reconciliation_detail", "cashbook_reconciliation"]
+      "tableSignatures": [
+        "book balance",
+        "statement balance",
+        "outstanding",
+        "transit",
+        "adjustments"
+      ],
+      "boostSections": [
+        "bank_reconciliation_summary",
+        "bank_reconciliation_detail",
+        "cashbook_reconciliation"
+      ]
     },
     {
       "id": "acct_table_005_aging",
       "priority": 92,
-      "operators": ["extract", "monitor", "evaluate"],
-      "weight": 3.0,
+      "operators": [
+        "extract",
+        "monitor",
+        "evaluate"
+      ],
+      "weight": 3,
       "condition": "query involves delinquencies, concentration, or allowance",
-      "tableSignatures": ["current", "1-30", "31-60", "61-90", "90+", "aging"],
-      "boostSections": ["aging_schedule", "ar_aging", "ap_aging"]
+      "tableSignatures": [
+        "current",
+        "1-30",
+        "31-60",
+        "61-90",
+        "90+",
+        "aging"
+      ],
+      "boostSections": [
+        "aging_schedule",
+        "ar_aging",
+        "ap_aging"
+      ]
     },
     {
       "id": "acct_table_006_controls",
       "priority": 89,
-      "operators": ["evaluate", "validate"],
+      "operators": [
+        "evaluate",
+        "validate"
+      ],
       "weight": 2.4,
       "condition": "query asks whether control is designed/operating effectively",
-      "tableSignatures": ["control", "frequency", "owner", "evidence", "test", "result"],
-      "boostSections": ["controls_matrix"]
+      "tableSignatures": [
+        "control",
+        "frequency",
+        "owner",
+        "evidence",
+        "test",
+        "result"
+      ],
+      "boostSections": [
+        "controls_matrix"
+      ]
     }
   ],
   "boostRules": [
@@ -93,51 +303,161 @@
       "id": "acct_boost_001_gl_account_lookup",
       "priority": 97,
       "weight": 2.6,
-      "operators": ["extract", "locate", "validate"],
+      "operators": [
+        "extract",
+        "locate",
+        "validate"
+      ],
       "condition": "query references a specific GL account number or account name",
-      "boostSections": ["general_ledger_detail", "trial_balance_summary", "journal_entry_detail"]
+      "boostSections": [
+        "general_ledger_detail",
+        "trial_balance_summary",
+        "journal_entry_detail"
+      ]
     },
     {
       "id": "acct_boost_002_reconciliation_diff",
       "priority": 96,
       "weight": 2.8,
-      "operators": ["validate", "compare", "evaluate"],
+      "operators": [
+        "validate",
+        "compare",
+        "evaluate"
+      ],
       "condition": "query asks about unmatched, missing, or unreconciled items",
-      "boostSections": ["bank_reconciliation_summary", "bank_reconciliation_detail"]
+      "boostSections": [
+        "bank_reconciliation_summary",
+        "bank_reconciliation_detail"
+      ]
     },
     {
       "id": "acct_boost_003_journal_trace",
       "priority": 95,
       "weight": 2.5,
-      "operators": ["locate", "validate", "extract"],
+      "operators": [
+        "locate",
+        "validate",
+        "extract"
+      ],
       "condition": "query requires transaction trail from source document to GL",
-      "boostSections": ["journal_entry_detail", "journal_entry_support", "general_ledger_detail"]
+      "boostSections": [
+        "journal_entry_detail",
+        "journal_entry_support",
+        "general_ledger_detail"
+      ]
     },
     {
       "id": "acct_boost_004_audit_procedure",
       "priority": 90,
       "weight": 2.2,
-      "operators": ["evaluate", "summarize", "validate"],
+      "operators": [
+        "evaluate",
+        "summarize",
+        "validate"
+      ],
       "condition": "query mentions audit procedures, testing evidence, findings, or PBC",
-      "boostSections": ["audit_workpaper", "controls_matrix", "audit_trail"]
+      "boostSections": [
+        "audit_workpaper",
+        "controls_matrix",
+        "audit_trail"
+      ]
     },
     {
       "id": "acct_boost_005_aging_concentration",
       "priority": 90,
-      "weight": 2.0,
-      "operators": ["monitor", "evaluate", "extract"],
+      "weight": 2,
+      "operators": [
+        "monitor",
+        "evaluate",
+        "extract"
+      ],
       "condition": "query asks for 30/60/90-day trend or concentration by bucket",
-      "boostSections": ["aging_schedule", "ar_aging", "ap_aging"]
+      "boostSections": [
+        "aging_schedule",
+        "ar_aging",
+        "ap_aging"
+      ]
     }
   ],
   "queryExpansion": [
-    { "trigger": "\\bGL\\b", "expansions": ["general ledger", "ledger detail", "razão geral", "livro razão"], "evidence": "section:general_ledger_detail" },
-    { "trigger": "\\bTB\\b", "expansions": ["trial balance", "balancete", "balancete de verificação"], "evidence": "section:trial_balance_summary" },
-    { "trigger": "\\bJE\\b", "expansions": ["journal entry", "journal entries", "lançamento contábil", "apoio de lançamento"], "evidence": "section:journal_entry_detail" },
-    { "trigger": "reconciliation", "expansions": ["bank reconciliation", "bank rec", "reconciliação bancária", "tie-out", "reconcile"], "evidence": "section:bank_reconciliation_summary" },
-    { "trigger": "aging", "expansions": ["aging report", "aging schedule", "inadimplência", "relatório de vencimento"], "evidence": "section:aging_schedule" },
-    { "trigger": "accrual", "expansions": ["accrual basis", "accrued", "competência", "accrual entry"], "evidence": "section:journal_entry_detail" },
-    { "trigger": "cash basis", "expansions": ["cash basis accounting", "caixa", "competência vs caixa"], "evidence": "section:summary_financials" },
-    { "trigger": "controls", "expansions": ["internal controls", "controles internos", "segregation of duties", "SOD"], "evidence": "section:controls_matrix" }
+    {
+      "trigger": "\\bGL\\b",
+      "expansions": [
+        "general ledger",
+        "ledger detail",
+        "razão geral",
+        "livro razão"
+      ],
+      "evidence": "section:general_ledger_detail"
+    },
+    {
+      "trigger": "\\bTB\\b",
+      "expansions": [
+        "trial balance",
+        "balancete",
+        "balancete de verificação"
+      ],
+      "evidence": "section:trial_balance_summary"
+    },
+    {
+      "trigger": "\\bJE\\b",
+      "expansions": [
+        "journal entry",
+        "journal entries",
+        "lançamento contábil",
+        "apoio de lançamento"
+      ],
+      "evidence": "section:journal_entry_detail"
+    },
+    {
+      "trigger": "reconciliation",
+      "expansions": [
+        "bank reconciliation",
+        "bank rec",
+        "reconciliação bancária",
+        "tie-out",
+        "reconcile"
+      ],
+      "evidence": "section:bank_reconciliation_summary"
+    },
+    {
+      "trigger": "aging",
+      "expansions": [
+        "aging report",
+        "aging schedule",
+        "inadimplência",
+        "relatório de vencimento"
+      ],
+      "evidence": "section:aging_schedule"
+    },
+    {
+      "trigger": "accrual",
+      "expansions": [
+        "accrual basis",
+        "accrued",
+        "competência",
+        "accrual entry"
+      ],
+      "evidence": "section:journal_entry_detail"
+    },
+    {
+      "trigger": "cash basis",
+      "expansions": [
+        "cash basis accounting",
+        "caixa",
+        "competência vs caixa"
+      ],
+      "evidence": "section:summary_financials"
+    },
+    {
+      "trigger": "controls",
+      "expansions": [
+        "internal controls",
+        "controles internos",
+        "segregation of duties",
+        "SOD"
+      ],
+      "evidence": "section:controls_matrix"
+    }
   ]
 }

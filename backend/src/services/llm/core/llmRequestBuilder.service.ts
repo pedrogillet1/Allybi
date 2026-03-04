@@ -37,6 +37,12 @@ import type {
   LlmRoutePlan,
   EnvName,
 } from "../types/llm.types";
+import type {
+  PromptBundle as RegistryPromptBundle,
+  PromptContext as RegistryPromptContext,
+  PromptKind as RegistryPromptKind,
+} from "../prompts/promptRegistry.service";
+import { toCostFamilyModel } from "./llmCostCalculator";
 
 import { BRAND_NAME } from "../../../config/brand";
 import { resolveOutputTokenBudget } from "../../core/enforcement/tokenBudget.service";
@@ -54,28 +60,9 @@ export interface BankLoader {
  */
 export interface PromptRegistryService {
   buildPrompt(
-    promptId:
-      | "system"
-      | "retrieval"
-      | "compose_answer"
-      | "disambiguation"
-      | "fallback"
-      | "tool",
-    ctx: Record<string, unknown>,
-  ): {
-    id?: string;
-    messages: Array<{ role: "system" | "developer" | "user"; content: string }>;
-    trace?: {
-      orderedPrompts?: Array<{
-        bankId: string;
-        version: string;
-        templateId: string;
-        hash: string;
-      }>;
-      appliedGuards?: string[];
-      slotsFilled?: string[];
-    };
-  };
+    promptId: RegistryPromptKind,
+    ctx: RegistryPromptContext,
+  ): RegistryPromptBundle;
 }
 
 /**
@@ -615,6 +602,22 @@ export class LlmRequestBuilderService {
       finalMaxOutputTokens,
     };
 
+    // Input token budget guard: estimate total prompt tokens and truncate evidence
+    // if we approach the provider's input token limit.
+    const estimatedInputTokens = estimateTokensFromChars(promptCharCount);
+    const maxInputTokens = this.resolveMaxInputTokens(input);
+    if (maxInputTokens > 0 && estimatedInputTokens > maxInputTokens * 0.95) {
+      const overageTokens = estimatedInputTokens - Math.floor(maxInputTokens * 0.90);
+      const overageChars = overageTokens * 4;
+      const lastMessage = messages[messages.length - 1];
+      if (lastMessage?.content && lastMessage.content.length > overageChars) {
+        lastMessage.content = lastMessage.content.slice(
+          0,
+          lastMessage.content.length - overageChars,
+        );
+      }
+    }
+
     return {
       route: input.route,
       messages,
@@ -1029,16 +1032,14 @@ export class LlmRequestBuilderService {
     let itemsIncluded = 0;
     for (const e of top) {
       const title = e.title || e.filename || e.docId;
-      const loc =
-        e.location?.page != null
-          ? `p.${e.location.page}`
-          : e.location?.slide != null
-            ? `s.${e.location.slide}`
-            : e.location?.sheet
-              ? `sheet:${e.location.sheet}`
-              : e.location?.sectionKey
-                ? `sec:${e.location.sectionKey}`
-                : "";
+      const locParts: string[] = [];
+      if (e.location?.page != null) locParts.push(`p.${e.location.page}`);
+      if (e.location?.slide != null) locParts.push(`s.${e.location.slide}`);
+      if (e.location?.sheet) locParts.push(`sheet:${e.location.sheet}`);
+      if (e.location?.sectionKey && !e.location.sectionKey.startsWith("chunk_")) {
+        locParts.push(`sec:${e.location.sectionKey}`);
+      }
+      const loc = locParts.join(",");
       const locationKey = String(
         e.locationKey || loc || `${e.docId}:${e.evidenceType || "text"}`,
       ).trim();
@@ -1122,6 +1123,57 @@ export class LlmRequestBuilderService {
 
     // Keep short to avoid huge keys
     return core;
+  }
+
+  /**
+   * Resolve max input tokens from provider capabilities bank.
+   * Defaults: 1M for Gemini, 128K for OpenAI.
+   */
+  private resolveMaxInputTokens(input: BuildRequestInput): number {
+    try {
+      const bank =
+        getOptionalBank<Record<string, unknown>>("provider_capabilities") ??
+        getOptionalBank<Record<string, unknown>>("providerCapabilities");
+      if (!bank) return 0;
+      const providers = bank.providers as Record<string, Record<string, unknown>> | undefined;
+      if (!providers) return 0;
+      const providerKey =
+        input.route.provider === "openai"
+          ? "openai"
+          : input.route.provider === "local"
+            ? "local"
+            : "gemini";
+      const models = providers[providerKey]?.models as Record<string, Record<string, unknown>> | undefined;
+      if (!models) return 0;
+      const routeModel = String(input.route.model || "").trim();
+      if (!routeModel) return 0;
+
+      const exactEntry = models[routeModel];
+      if (exactEntry && typeof exactEntry.maxInputTokens === "number") {
+        return exactEntry.maxInputTokens;
+      }
+
+      const familyModel = toCostFamilyModel(routeModel);
+      if (familyModel && familyModel !== routeModel) {
+        const familyEntry = models[familyModel];
+        if (familyEntry && typeof familyEntry.maxInputTokens === "number") {
+          return familyEntry.maxInputTokens;
+        }
+      }
+
+      for (const [pattern, entry] of Object.entries(models)) {
+        if (!pattern.includes("*")) continue;
+        const regex = new RegExp(
+          `^${pattern.replace(/[.+?^${}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*")}$`,
+        );
+        if (regex.test(routeModel) && typeof entry.maxInputTokens === "number") {
+          return entry.maxInputTokens;
+        }
+      }
+    } catch {
+      // fail-open
+    }
+    return 0;
   }
 
   private normalizeDisambiguationSignal(

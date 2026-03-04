@@ -3,32 +3,39 @@
     "id": "languages",
     "version": "1.0.0",
     "description": "Canonical language support configuration for Koda. Defines supported languages, normalization rules, UI microcopy defaults, fallback behavior, and language lock guarantees across the routing → retrieval → composition pipeline.",
-    "languages": ["any"],
-    "lastUpdated": "2026-01-25"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-01-25",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
-
   "config": {
     "enabled": true,
-
     "_comment": "If language detection is uncertain, use this default for output microcopy + formatting.",
     "defaultLanguage": "en",
-
     "_comment2": "If user explicitly chooses a language, lock it for the session unless they switch again.",
     "lockPolicy": {
       "lockWhenUserExplicitlySets": true,
       "lockWhenStrongDetection": true,
-      "strongDetectionMinConfidence": 0.70,
+      "strongDetectionMinConfidence": 0.7,
       "unlockOnExplicitSwitch": true,
       "maxMinorMixingPercent": 0.12
     },
-
     "_comment3": "How to behave if a bank is missing translations. Never block; fall back cleanly.",
     "fallbackPolicy": {
-      "fallbackOrder": ["user_language", "en"],
+      "fallbackOrder": [
+        "user_language",
+        "en"
+      ],
       "missingKeyBehavior": "fallback_then_strip_placeholder",
       "missingKeyReplacement": ""
     },
-
     "_comment4": "Normalization used for language-detection signals and bank matching.",
     "normalization": {
       "stripDiacritics": true,
@@ -36,7 +43,6 @@
       "caseInsensitive": true
     }
   },
-
   "supported": [
     {
       "id": "en",
@@ -99,22 +105,47 @@
       }
     }
   ],
-
   "acceptLanguageMapping": {
     "_comment": "Maps browser Accept-Language or user profile locale to supported ids.",
     "examples": [
-      { "from": "en", "to": "en" },
-      { "from": "en-US", "to": "en" },
-      { "from": "en-GB", "to": "en" },
-      { "from": "pt", "to": "pt" },
-      { "from": "pt-BR", "to": "pt" },
-      { "from": "pt-PT", "to": "pt" },
-      { "from": "es", "to": "es" },
-      { "from": "es-ES", "to": "es" },
-      { "from": "es-MX", "to": "es" }
+      {
+        "from": "en",
+        "to": "en"
+      },
+      {
+        "from": "en-US",
+        "to": "en"
+      },
+      {
+        "from": "en-GB",
+        "to": "en"
+      },
+      {
+        "from": "pt",
+        "to": "pt"
+      },
+      {
+        "from": "pt-BR",
+        "to": "pt"
+      },
+      {
+        "from": "pt-PT",
+        "to": "pt"
+      },
+      {
+        "from": "es",
+        "to": "es"
+      },
+      {
+        "from": "es-ES",
+        "to": "es"
+      },
+      {
+        "from": "es-MX",
+        "to": "es"
+      }
     ]
   },
-
   "bankTranslationRequirements": {
     "_comment": "Which bank categories MUST include en/pt/es strings for UX parity.",
     "mustTranslateCategories": [
@@ -137,7 +168,6 @@
       "probes"
     ]
   },
-
   "tests": {
     "_comment": "Boot-time invariants.",
     "cases": [

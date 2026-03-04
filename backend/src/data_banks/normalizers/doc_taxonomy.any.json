@@ -1,12 +1,19 @@
 {
   "_meta": {
-    "id": "doc_taxonomy",
+    "id": "doc_taxonomy_vd13afef0",
     "version": "2.1.0",
     "description": "Canonical document-type taxonomy used by legacy identity banks for finance, legal, medical, accounting and everyday documents.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-03-03"
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,

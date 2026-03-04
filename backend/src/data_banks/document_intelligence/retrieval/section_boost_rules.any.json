@@ -8,12 +8,22 @@
       "en",
       "pt"
     ],
-    "lastUpdated": "2026-03-03"
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
     "maxSectionBoost": 0.22,
-    "maxSectionPenalty": 0.12
+    "maxSectionPenalty": 0.12,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "rules": [
     {

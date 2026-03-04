@@ -53,6 +53,7 @@ function parseArgs() {
   const out = {
     scope: "runtime",
     owner: "data-bank-governance",
+    lastUpdated: new Date().toISOString().slice(0, 10),
     write: false,
   };
   for (let i = 0; i < args.length; i += 1) {
@@ -60,6 +61,7 @@ function parseArgs() {
     const next = String(args[i + 1] || "");
     if (token === "--scope" && next) out.scope = next;
     if (token === "--owner" && next) out.owner = next;
+    if (token === "--last-updated" && next) out.lastUpdated = next;
     if (token === "--write") out.write = true;
   }
   if (!["runtime", "all"].includes(out.scope)) {
@@ -110,6 +112,32 @@ function isPatternStyleBank(bank) {
   );
 }
 
+function inferLanguages(relPath) {
+  const normalized = String(relPath || "").toLowerCase();
+  if (
+    normalized.includes(".pt.") ||
+    normalized.includes("/pt/") ||
+    normalized.endsWith(".pt.json")
+  ) {
+    return ["pt"];
+  }
+  if (
+    normalized.includes(".es.") ||
+    normalized.includes("/es/") ||
+    normalized.endsWith(".es.json")
+  ) {
+    return ["es"];
+  }
+  if (
+    normalized.includes(".en.") ||
+    normalized.includes("/en/") ||
+    normalized.endsWith(".en.json")
+  ) {
+    return ["en"];
+  }
+  return ["en"];
+}
+
 function main() {
   const args = parseArgs();
   const allFiles = walkJson(DATA_BANKS_ROOT).map((filePath) => path.resolve(filePath));
@@ -130,6 +158,8 @@ function main() {
   let ownerBackfilled = 0;
   let usedByBackfilled = 0;
   let testsBackfilled = 0;
+  let languagesBackfilled = 0;
+  let lastUpdatedBackfilled = 0;
   let deterministicBackfilled = 0;
   let dedupeBackfilled = 0;
   let sortByBackfilled = 0;
@@ -184,6 +214,16 @@ function main() {
       testsBackfilled += 1;
       changed = true;
     }
+    if (!Array.isArray(bank._meta.languages) || bank._meta.languages.length === 0) {
+      bank._meta.languages = inferLanguages(relPath);
+      languagesBackfilled += 1;
+      changed = true;
+    }
+    if (!String(bank._meta.lastUpdated || "").trim()) {
+      bank._meta.lastUpdated = String(args.lastUpdated || "").trim();
+      lastUpdatedBackfilled += 1;
+      changed = true;
+    }
 
     if (isPatternStyleBank(bank)) {
       if (bank.config.deterministic !== true) {
@@ -222,6 +262,8 @@ function main() {
     ownerBackfilled,
     usedByBackfilled,
     testsBackfilled,
+    languagesBackfilled,
+    lastUpdatedBackfilled,
     deterministicBackfilled,
     dedupeBackfilled,
     sortByBackfilled,

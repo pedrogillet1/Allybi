@@ -3,7 +3,12 @@
     "id": "language_triggers",
     "version": "1.0.0",
     "description": "Deterministic language trigger rules for Koda. Detects explicit user language requests and strong language cues to set or bias processing language (en/pt/es) without forcing a language when ambiguous. Complements language_indicators by handling explicit directives (\"respond in Portuguese\") and mixed-language cases safely.",
-    "languages": ["any", "en", "pt", "es"],
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
     "lastUpdated": "2026-01-26",
     "owner": "koda-triggers",
     "compat": ">=1.0.0",
@@ -11,6 +16,12 @@
       "Added explicit language directive triggers (respond in X / em X / en X)",
       "Added guarded implicit cues and mixed-language handling (do not force when ambiguous)",
       "Added tests for multilingual directives and ambiguity regressions"
+    ],
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
     ]
   },
   "config": {
@@ -35,24 +46,42 @@
         "ifMixedLanguageDetected": "return_any_unless_explicit"
       }
     },
-    "emitsSignals": ["languageRequested", "languageSelected", "mixedLanguageDetected"]
+    "emitsSignals": [
+      "languageRequested",
+      "languageSelected",
+      "mixedLanguageDetected"
+    ],
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "rules": [
     {
       "id": "explicit_request_portuguese",
       "scope": "global",
       "description": "Detect explicit request to respond in Portuguese.",
-      "appliesTo": ["user_inputs"],
+      "appliesTo": [
+        "user_inputs"
+      ],
       "triggerPatterns": {
-        "en": ["\\b(reply|respond|answer)\\s+(in)\\s+(portuguese|pt-br|pt)\\b"],
-        "pt": ["\\b(responda|responder|resposta)\\s+(em)\\s+(portugu[eê]s|pt-br|pt)\\b"],
-        "es": ["\\b(responde|responder)\\s+(en)\\s+(portugu[eê]s|pt-br|pt)\\b"]
+        "en": [
+          "\\b(reply|respond|answer)\\s+(in)\\s+(portuguese|pt-br|pt)\\b"
+        ],
+        "pt": [
+          "\\b(responda|responder|resposta)\\s+(em)\\s+(portugu[eê]s|pt-br|pt)\\b"
+        ],
+        "es": [
+          "\\b(responde|responder)\\s+(en)\\s+(portugu[eê]s|pt-br|pt)\\b"
+        ]
       },
       "action": {
         "type": "set_language",
         "language": "pt",
         "confidence": 0.95,
-        "emitSignals": ["languageRequested", "languageSelected"]
+        "emitSignals": [
+          "languageRequested",
+          "languageSelected"
+        ]
       },
       "reasonCode": "language_directive_pt",
       "severity": "high"
@@ -61,17 +90,28 @@
       "id": "explicit_request_english",
       "scope": "global",
       "description": "Detect explicit request to respond in English.",
-      "appliesTo": ["user_inputs"],
+      "appliesTo": [
+        "user_inputs"
+      ],
       "triggerPatterns": {
-        "en": ["\\b(reply|respond|answer)\\s+(in)\\s+(english|en)\\b"],
-        "pt": ["\\b(responda|responder|resposta)\\s+(em)\\s+(ingl[eê]s|en)\\b"],
-        "es": ["\\b(responde|responder)\\s+(en)\\s+(ingl[eé]s|english|en)\\b"]
+        "en": [
+          "\\b(reply|respond|answer)\\s+(in)\\s+(english|en)\\b"
+        ],
+        "pt": [
+          "\\b(responda|responder|resposta)\\s+(em)\\s+(ingl[eê]s|en)\\b"
+        ],
+        "es": [
+          "\\b(responde|responder)\\s+(en)\\s+(ingl[eé]s|english|en)\\b"
+        ]
       },
       "action": {
         "type": "set_language",
         "language": "en",
         "confidence": 0.95,
-        "emitSignals": ["languageRequested", "languageSelected"]
+        "emitSignals": [
+          "languageRequested",
+          "languageSelected"
+        ]
       },
       "reasonCode": "language_directive_en",
       "severity": "high"
@@ -80,17 +120,28 @@
       "id": "explicit_request_spanish",
       "scope": "global",
       "description": "Detect explicit request to respond in Spanish.",
-      "appliesTo": ["user_inputs"],
+      "appliesTo": [
+        "user_inputs"
+      ],
       "triggerPatterns": {
-        "en": ["\\b(reply|respond|answer)\\s+(in)\\s+(spanish|es)\\b"],
-        "pt": ["\\b(responda|responder|resposta)\\s+(em)\\s+(espanhol|es)\\b"],
-        "es": ["\\b(responde|responder)\\s+(en)\\s+(espa[nñ]ol|es)\\b"]
+        "en": [
+          "\\b(reply|respond|answer)\\s+(in)\\s+(spanish|es)\\b"
+        ],
+        "pt": [
+          "\\b(responda|responder|resposta)\\s+(em)\\s+(espanhol|es)\\b"
+        ],
+        "es": [
+          "\\b(responde|responder)\\s+(en)\\s+(espa[nñ]ol|es)\\b"
+        ]
       },
       "action": {
         "type": "set_language",
         "language": "es",
         "confidence": 0.95,
-        "emitSignals": ["languageRequested", "languageSelected"]
+        "emitSignals": [
+          "languageRequested",
+          "languageSelected"
+        ]
       },
       "reasonCode": "language_directive_es",
       "severity": "high"
@@ -99,15 +150,27 @@
       "id": "implicit_strong_pt_cues",
       "scope": "global",
       "description": "Detect strong Portuguese cues to bias language when no explicit directive exists.",
-      "appliesTo": ["user_inputs"],
+      "appliesTo": [
+        "user_inputs"
+      ],
       "triggerPatterns": {
-        "en": ["\\b(você|não|ação|página|relatório|trimestre|receita|despesa)\\b"],
-        "pt": ["\\b(você|não|ação|página|relatório|trimestre|receita|despesa)\\b"],
-        "es": ["\\b(você|não|ação|página|relatório|trimestre|receita|despesa)\\b"]
+        "en": [
+          "\\b(você|não|ação|página|relatório|trimestre|receita|despesa)\\b"
+        ],
+        "pt": [
+          "\\b(você|não|ação|página|relatório|trimestre|receita|despesa)\\b"
+        ],
+        "es": [
+          "\\b(você|não|ação|página|relatório|trimestre|receita|despesa)\\b"
+        ]
       },
       "when": {
         "all": [
-          { "path": "signals.languageRequested", "op": "neq", "value": true }
+          {
+            "path": "signals.languageRequested",
+            "op": "neq",
+            "value": true
+          }
         ]
       },
       "action": {
@@ -122,15 +185,27 @@
       "id": "implicit_strong_es_cues",
       "scope": "global",
       "description": "Detect strong Spanish cues to bias language when no explicit directive exists.",
-      "appliesTo": ["user_inputs"],
+      "appliesTo": [
+        "user_inputs"
+      ],
       "triggerPatterns": {
-        "en": ["\\b(¿|¡|dónde|qué|cuánto|ingresos|gastos|página)\\b"],
-        "pt": ["\\b(¿|¡|dónde|qué|cuánto|ingresos|gastos|página)\\b"],
-        "es": ["\\b(¿|¡|dónde|qué|cuánto|ingresos|gastos|página)\\b"]
+        "en": [
+          "\\b(¿|¡|dónde|qué|cuánto|ingresos|gastos|página)\\b"
+        ],
+        "pt": [
+          "\\b(¿|¡|dónde|qué|cuánto|ingresos|gastos|página)\\b"
+        ],
+        "es": [
+          "\\b(¿|¡|dónde|qué|cuánto|ingresos|gastos|página)\\b"
+        ]
       },
       "when": {
         "all": [
-          { "path": "signals.languageRequested", "op": "neq", "value": true }
+          {
+            "path": "signals.languageRequested",
+            "op": "neq",
+            "value": true
+          }
         ]
       },
       "action": {
@@ -145,15 +220,27 @@
       "id": "implicit_strong_en_cues",
       "scope": "global",
       "description": "Detect strong English cues to bias language when no explicit directive exists.",
-      "appliesTo": ["user_inputs"],
+      "appliesTo": [
+        "user_inputs"
+      ],
       "triggerPatterns": {
-        "en": ["\\b(the|and|could you|would you|please|summary|revenue|expenses)\\b"],
-        "pt": ["\\b(the|and|could you|would you|please|summary|revenue|expenses)\\b"],
-        "es": ["\\b(the|and|could you|would you|please|summary|revenue|expenses)\\b"]
+        "en": [
+          "\\b(the|and|could you|would you|please|summary|revenue|expenses)\\b"
+        ],
+        "pt": [
+          "\\b(the|and|could you|would you|please|summary|revenue|expenses)\\b"
+        ],
+        "es": [
+          "\\b(the|and|could you|would you|please|summary|revenue|expenses)\\b"
+        ]
       },
       "when": {
         "all": [
-          { "path": "signals.languageRequested", "op": "neq", "value": true }
+          {
+            "path": "signals.languageRequested",
+            "op": "neq",
+            "value": true
+          }
         ]
       },
       "action": {
@@ -168,22 +255,41 @@
       "id": "mixed_language_detection",
       "scope": "global",
       "description": "Detect mixed-language inputs and avoid forcing a language unless explicit directive exists.",
-      "appliesTo": ["language_detection"],
+      "appliesTo": [
+        "language_detection"
+      ],
       "triggerPatterns": {
-        "en": [".+"],
-        "pt": [".+"],
-        "es": [".+"]
+        "en": [
+          ".+"
+        ],
+        "pt": [
+          ".+"
+        ],
+        "es": [
+          ".+"
+        ]
       },
       "when": {
         "all": [
-          { "path": "metrics.detectedLanguageCount", "op": "gte", "value": 2 },
-          { "path": "signals.languageRequested", "op": "neq", "value": true }
+          {
+            "path": "metrics.detectedLanguageCount",
+            "op": "gte",
+            "value": 2
+          },
+          {
+            "path": "signals.languageRequested",
+            "op": "neq",
+            "value": true
+          }
         ]
       },
       "action": {
         "type": "set_language",
         "language": "any",
-        "emitSignals": ["mixedLanguageDetected", "languageSelected"]
+        "emitSignals": [
+          "mixedLanguageDetected",
+          "languageSelected"
+        ]
       },
       "reasonCode": "language_mixed_any",
       "severity": "high"
@@ -194,28 +300,57 @@
       {
         "id": "LTG_0001_explicit_pt",
         "input": "Please respond in Portuguese",
-        "expect": { "languageSelected": "pt", "signalsAny": ["languageRequested"] }
+        "expect": {
+          "languageSelected": "pt",
+          "signalsAny": [
+            "languageRequested"
+          ]
+        }
       },
       {
         "id": "LTG_0002_explicit_es",
         "input": "Responde en español",
-        "expect": { "languageSelected": "es", "signalsAny": ["languageRequested"] }
+        "expect": {
+          "languageSelected": "es",
+          "signalsAny": [
+            "languageRequested"
+          ]
+        }
       },
       {
         "id": "LTG_0003_explicit_en",
         "input": "Responda em inglês",
-        "expect": { "languageSelected": "en", "signalsAny": ["languageRequested"] }
+        "expect": {
+          "languageSelected": "en",
+          "signalsAny": [
+            "languageRequested"
+          ]
+        }
       },
       {
         "id": "LTG_0004_implicit_pt_bias",
         "input": "Você pode resumir o relatório?",
-        "expect": { "languageBias": "pt" }
+        "expect": {
+          "languageBias": "pt"
+        }
       },
       {
         "id": "LTG_0005_mixed_language_any",
-        "context": { "metrics": { "detectedLanguageCount": 2 }, "signals": { "languageRequested": false } },
+        "context": {
+          "metrics": {
+            "detectedLanguageCount": 2
+          },
+          "signals": {
+            "languageRequested": false
+          }
+        },
         "input": "por favor open the file",
-        "expect": { "languageSelected": "any", "signalsAny": ["mixedLanguageDetected"] }
+        "expect": {
+          "languageSelected": "any",
+          "signalsAny": [
+            "mixedLanguageDetected"
+          ]
+        }
       }
     ]
   }

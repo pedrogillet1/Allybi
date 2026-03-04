@@ -3,9 +3,19 @@
     "id": "slot_extraction_cases",
     "version": "1.0.0",
     "description": "Golden test cases for intent slot extraction: validates that the slot fill stage correctly extracts typed slots (COLOR, FONT_SIZE, SCOPE, TEXT_CASE, etc.) from user instructions.",
-    "languages": ["any", "en", "pt"],
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
     "lastUpdated": "2026-02-26",
-    "owner": "allybi-editing"
+    "owner": "allybi-editing",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -17,7 +27,12 @@
       "language": "en",
       "instruction": "make the title red",
       "expected": {
-        "slots": [{ "type": "COLOR", "value": "red" }]
+        "slots": [
+          {
+            "type": "COLOR",
+            "value": "red"
+          }
+        ]
       }
     },
     {
@@ -25,7 +40,12 @@
       "language": "en",
       "instruction": "change font size to 14",
       "expected": {
-        "slots": [{ "type": "FONT_SIZE", "value": "14" }]
+        "slots": [
+          {
+            "type": "FONT_SIZE",
+            "value": "14"
+          }
+        ]
       }
     },
     {
@@ -33,7 +53,12 @@
       "language": "en",
       "instruction": "bold all headings",
       "expected": {
-        "slots": [{ "type": "SCOPE", "value": "headings" }]
+        "slots": [
+          {
+            "type": "SCOPE",
+            "value": "headings"
+          }
+        ]
       }
     },
     {
@@ -41,7 +66,12 @@
       "language": "en",
       "instruction": "convert to uppercase",
       "expected": {
-        "slots": [{ "type": "TEXT_CASE", "value": "upper" }]
+        "slots": [
+          {
+            "type": "TEXT_CASE",
+            "value": "upper"
+          }
+        ]
       }
     },
     {
@@ -49,7 +79,12 @@
       "language": "pt",
       "instruction": "mude o titulo para vermelho",
       "expected": {
-        "slots": [{ "type": "COLOR", "value": "vermelho" }]
+        "slots": [
+          {
+            "type": "COLOR",
+            "value": "vermelho"
+          }
+        ]
       }
     },
     {
@@ -58,8 +93,14 @@
       "instruction": "make the title bold and red",
       "expected": {
         "slots": [
-          { "type": "SCOPE", "value": "title" },
-          { "type": "COLOR", "value": "red" }
+          {
+            "type": "SCOPE",
+            "value": "title"
+          },
+          {
+            "type": "COLOR",
+            "value": "red"
+          }
         ]
       }
     },
@@ -68,7 +109,12 @@
       "language": "en",
       "instruction": "convert to numbered list",
       "expected": {
-        "slots": [{ "type": "LIST_TYPE", "value": "numbered" }]
+        "slots": [
+          {
+            "type": "LIST_TYPE",
+            "value": "numbered"
+          }
+        ]
       }
     },
     {
@@ -76,7 +122,12 @@
       "language": "en",
       "instruction": "move paragraph up",
       "expected": {
-        "slots": [{ "type": "DIRECTION", "value": "up" }]
+        "slots": [
+          {
+            "type": "DIRECTION",
+            "value": "up"
+          }
+        ]
       }
     }
   ]

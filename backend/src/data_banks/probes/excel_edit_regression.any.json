@@ -3,9 +3,19 @@
     "id": "excel_edit_regression",
     "version": "1.0.0",
     "description": "Dev-only regression probes for deterministic Excel edit planning and routing.",
-    "languages": ["any", "en", "pt"],
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
     "lastUpdated": "2026-02-13",
-    "owner": "allybi-editing"
+    "owner": "allybi-editing",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -17,9 +27,15 @@
       "language": "en",
       "docType": "xlsx",
       "prompt": "set all selected cells to 0",
-      "selection": { "ranges": ["SUMMARY 1!D35:D48"] },
+      "selection": {
+        "ranges": [
+          "SUMMARY 1!D35:D48"
+        ]
+      },
       "expected": {
-        "operators": ["XLSX_SET_RANGE_VALUES"],
+        "operators": [
+          "XLSX_SET_RANGE_VALUES"
+        ],
         "selectionAuthoritative": true
       }
     },
@@ -27,10 +43,16 @@
       "id": "EXR_002_pt_set_selected_zero",
       "language": "pt",
       "docType": "xlsx",
-      "prompt": "mude todas as c\u00e9lulas selecionadas para 0",
-      "selection": { "ranges": ["SUMMARY 1!D35:D48"] },
+      "prompt": "mude todas as células selecionadas para 0",
+      "selection": {
+        "ranges": [
+          "SUMMARY 1!D35:D48"
+        ]
+      },
       "expected": {
-        "operators": ["XLSX_SET_RANGE_VALUES"],
+        "operators": [
+          "XLSX_SET_RANGE_VALUES"
+        ],
         "selectionAuthoritative": true
       }
     },
@@ -39,9 +61,17 @@
       "language": "en",
       "docType": "xlsx",
       "prompt": "convert selected cells to numbers, then apply currency and bold",
-      "selection": { "ranges": ["SUMMARY 1!D35:D48"] },
+      "selection": {
+        "ranges": [
+          "SUMMARY 1!D35:D48"
+        ]
+      },
       "expected": {
-        "operators": ["XLSX_SET_RANGE_VALUES", "XLSX_SET_NUMBER_FORMAT", "XLSX_FORMAT_RANGE"],
+        "operators": [
+          "XLSX_SET_RANGE_VALUES",
+          "XLSX_SET_NUMBER_FORMAT",
+          "XLSX_FORMAT_RANGE"
+        ],
         "ordered": true
       }
     },
@@ -50,7 +80,11 @@
       "language": "en",
       "docType": "xlsx",
       "prompt": "set SUMMARY 1!D35:D48 to 0",
-      "selection": { "ranges": ["SUMMARY 1!A1:A2"] },
+      "selection": {
+        "ranges": [
+          "SUMMARY 1!A1:A2"
+        ]
+      },
       "expected": {
         "targetHint": "SUMMARY 1!D35:D48"
       }

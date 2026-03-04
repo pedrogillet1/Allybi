@@ -208,6 +208,7 @@ model Document {
   indexingOperationId        String?                    @map("indexing_operation_id")
   indexingError              String?                    @map("indexing_error")
   indexingUpdatedAt          DateTime?                  @map("indexing_updated_at")
+  sweepResetCount            Int                        @default(0) @map("sweep_reset_count")
   error                      String?
   displayTitle               String?
   rawText                    String?
@@ -241,6 +242,7 @@ model Document {
   @@index([uploadSessionId])
   @@index([indexingState])
   @@index([userId, indexingState])
+  @@index([sweepResetCount])
   @@map("documents")
 }
 
@@ -302,6 +304,19 @@ model DocumentChunk {
   startChar     Int?
   endChar       Int?
   embedding     Bytes?
+  sectionName   String?  @map("section_name")
+  sheetName     String?  @map("sheet_name")
+  tableChunkForm String? @map("table_chunk_form")
+  tableId       String?  @map("table_id")
+  rowIndex      Int?     @map("row_index")
+  columnIndex   Int?     @map("column_index")
+  rowLabel      String?  @map("row_label")
+  colHeader     String?  @map("col_header")
+  valueRaw      String?  @map("value_raw")
+  unitRaw       String?  @map("unit_raw")
+  unitNormalized String? @map("unit_normalized")
+  numericValue  Float?   @map("numeric_value")
+  metadata      Json?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   document      Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
@@ -309,6 +324,10 @@ model DocumentChunk {
   @@index([documentId])
   @@index([documentId, chunkIndex])
   @@index([documentId, page])
+  @@index([documentId, sectionName])
+  @@index([documentId, sheetName])
+  @@index([documentId, tableChunkForm])
+  @@index([documentId, rowLabel, colHeader])
   @@unique([documentId, chunkIndex])
   @@map("document_chunks")
 }

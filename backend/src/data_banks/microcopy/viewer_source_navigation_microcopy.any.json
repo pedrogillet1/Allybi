@@ -3,9 +3,19 @@
     "id": "viewer_source_navigation_microcopy",
     "version": "1.0.0",
     "description": "Viewer source-navigation microcopy for Ask Allybi citation jumps.",
-    "languages": ["en", "pt", "es"],
+    "languages": [
+      "en",
+      "pt",
+      "es"
+    ],
     "lastUpdated": "2026-03-02",
-    "owner": "allybi-viewer"
+    "owner": "allybi-viewer",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true

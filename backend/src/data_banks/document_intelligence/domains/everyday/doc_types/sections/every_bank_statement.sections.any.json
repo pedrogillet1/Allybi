@@ -6,7 +6,14 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-03-03"
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -14,14 +21,145 @@
     "docType": "every_bank_statement"
   },
   "sections": [
-    { "id": "document_header", "name": { "en": "Header", "pt": "Cabecalho" }, "order": 1, "required": true, "mustHave": true, "headingAnchors": ["bank statement", "extrato", "statement"] },
-    { "id": "account_profile", "name": { "en": "Account Profile", "pt": "Perfil da Conta" }, "order": 2, "required": true, "mustHave": true, "headingAnchors": ["account", "bank", "agencia", "conta"] },
-    { "id": "statement_period", "name": { "en": "Statement Period", "pt": "Periodo do Extrato" }, "order": 3, "required": true, "mustHave": true, "headingAnchors": ["period", "from", "to", "de", "a"] },
-    { "id": "opening_and_closing", "name": { "en": "Opening and Closing", "pt": "Saldo Inicial e Final" }, "order": 4, "required": true, "mustHave": true, "headingAnchors": ["opening balance", "closing balance", "saldo inicial", "saldo final"] },
-    { "id": "transactions", "name": { "en": "Transactions", "pt": "Transacoes" }, "order": 5, "required": true, "mustHave": true, "headingAnchors": ["transactions", "deposits", "withdrawals", "lancamentos"] },
-    { "id": "charges_and_interest", "name": { "en": "Charges and Interest", "pt": "Tarifas e Juros" }, "order": 6, "required": false, "mustHave": false, "headingAnchors": ["interest", "fees", "tarifas"] },
-    { "id": "cash_flow_summary", "name": { "en": "Cash Flow Summary", "pt": "Resumo Financeiro" }, "order": 7, "required": true, "mustHave": true, "headingAnchors": ["debit", "credit", "net change"] },
-    { "id": "foreign_or_card_transactions", "name": { "en": "Card and Transfer Rows", "pt": "Transacoes de Cartao e Transferencias" }, "order": 8, "required": false, "mustHave": false, "headingAnchors": ["transfer", "card", "fatura"] },
-    { "id": "footer", "name": { "en": "Footer", "pt": "Rodape" }, "order": 9, "required": false, "mustHave": false, "headingAnchors": ["contact", "notice", "bank name"] }
+    {
+      "id": "document_header",
+      "name": {
+        "en": "Header",
+        "pt": "Cabecalho"
+      },
+      "order": 1,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": [
+        "bank statement",
+        "extrato",
+        "statement"
+      ]
+    },
+    {
+      "id": "account_profile",
+      "name": {
+        "en": "Account Profile",
+        "pt": "Perfil da Conta"
+      },
+      "order": 2,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": [
+        "account",
+        "bank",
+        "agencia",
+        "conta"
+      ]
+    },
+    {
+      "id": "statement_period",
+      "name": {
+        "en": "Statement Period",
+        "pt": "Periodo do Extrato"
+      },
+      "order": 3,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": [
+        "period",
+        "from",
+        "to",
+        "de",
+        "a"
+      ]
+    },
+    {
+      "id": "opening_and_closing",
+      "name": {
+        "en": "Opening and Closing",
+        "pt": "Saldo Inicial e Final"
+      },
+      "order": 4,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": [
+        "opening balance",
+        "closing balance",
+        "saldo inicial",
+        "saldo final"
+      ]
+    },
+    {
+      "id": "transactions",
+      "name": {
+        "en": "Transactions",
+        "pt": "Transacoes"
+      },
+      "order": 5,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": [
+        "transactions",
+        "deposits",
+        "withdrawals",
+        "lancamentos"
+      ]
+    },
+    {
+      "id": "charges_and_interest",
+      "name": {
+        "en": "Charges and Interest",
+        "pt": "Tarifas e Juros"
+      },
+      "order": 6,
+      "required": false,
+      "mustHave": false,
+      "headingAnchors": [
+        "interest",
+        "fees",
+        "tarifas"
+      ]
+    },
+    {
+      "id": "cash_flow_summary",
+      "name": {
+        "en": "Cash Flow Summary",
+        "pt": "Resumo Financeiro"
+      },
+      "order": 7,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": [
+        "debit",
+        "credit",
+        "net change"
+      ]
+    },
+    {
+      "id": "foreign_or_card_transactions",
+      "name": {
+        "en": "Card and Transfer Rows",
+        "pt": "Transacoes de Cartao e Transferencias"
+      },
+      "order": 8,
+      "required": false,
+      "mustHave": false,
+      "headingAnchors": [
+        "transfer",
+        "card",
+        "fatura"
+      ]
+    },
+    {
+      "id": "footer",
+      "name": {
+        "en": "Footer",
+        "pt": "Rodape"
+      },
+      "order": 9,
+      "required": false,
+      "mustHave": false,
+      "headingAnchors": [
+        "contact",
+        "notice",
+        "bank name"
+      ]
+    }
   ]
 }

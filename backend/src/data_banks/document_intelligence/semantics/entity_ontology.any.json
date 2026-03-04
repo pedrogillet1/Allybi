@@ -9,7 +9,13 @@
       "pt"
     ],
     "lastUpdated": "2026-03-03",
-    "description": "Expanded universal entity ontology with normalization rules and EN/PT examples."
+    "description": "Expanded universal entity ontology with normalization rules and EN/PT examples.",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true

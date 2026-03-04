@@ -3,22 +3,42 @@
     "id": "locale_numeric_date_rules",
     "version": "1.0.0",
     "description": "Locale-aware numeric and date parsing/formatting rules for PT-BR and EN spreadsheet environments, covering separators, currency, percentage, date order, and coercion safety.",
-    "languages": ["any", "en", "pt"],
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
     "lastUpdated": "2026-02-28",
-    "owner": "excel-calc-agent"
+    "owner": "excel-calc-agent",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
     "defaultLocale": "en-US",
-    "supportedLocales": ["en-US", "en-GB", "pt-BR", "pt-PT"],
+    "supportedLocales": [
+      "en-US",
+      "en-GB",
+      "pt-BR",
+      "pt-PT"
+    ],
     "strictParsing": false,
-    "allowAutoDetect": true
+    "allowAutoDetect": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "rules": [
     {
       "id": "coerce_text_to_date",
       "category": "coercion",
-      "locale": ["*"],
+      "locale": [
+        "*"
+      ],
       "priority": 30,
       "description": {
         "en": "Attempt to coerce text-formatted date cells to proper date type using locale-aware parsing cascade.",
@@ -30,19 +50,36 @@
         "from": "text",
         "to": "date",
         "strategy": "cascade",
-        "parsingOrder": ["iso_8601", "locale_default", "month_name", "relative"],
+        "parsingOrder": [
+          "iso_8601",
+          "locale_default",
+          "month_name",
+          "relative"
+        ],
         "fallback": "keep_text"
       },
       "examples": {
-        "input": ["2024-03-15", "15/03/2024", "March 15, 2024", "hoje"],
-        "output": ["2024-03-15T00:00:00Z", "2024-03-15T00:00:00Z", "2024-03-15T00:00:00Z", "<dynamic_today>"]
+        "input": [
+          "2024-03-15",
+          "15/03/2024",
+          "March 15, 2024",
+          "hoje"
+        ],
+        "output": [
+          "2024-03-15T00:00:00Z",
+          "2024-03-15T00:00:00Z",
+          "2024-03-15T00:00:00Z",
+          "<dynamic_today>"
+        ]
       },
       "collisionNotes": "May conflict with numeric coercion if the text looks like a number (e.g., '20240315'). Date coercion should run after numeric coercion fails."
     },
     {
       "id": "coerce_text_to_number",
       "category": "coercion",
-      "locale": ["*"],
+      "locale": [
+        "*"
+      ],
       "priority": 35,
       "description": {
         "en": "Attempt to coerce text-formatted number cells to numeric type, stripping whitespace and applying locale-aware parsing.",
@@ -58,15 +95,27 @@
         "fallback": "keep_text"
       },
       "examples": {
-        "input": [" 1,234.56 ", " 1.234,56 ", "  42  ", "abc"],
-        "output": [1234.56, 1234.56, 42, "abc"]
+        "input": [
+          " 1,234.56 ",
+          " 1.234,56 ",
+          "  42  ",
+          "abc"
+        ],
+        "output": [
+          1234.56,
+          1234.56,
+          42,
+          "abc"
+        ]
       },
       "collisionNotes": "Must run locale detection first to correctly interpret separator convention. Ambiguous single-separator values (e.g., '1,234') require column-level context."
     },
     {
       "id": "currency_brl_format",
       "category": "currency",
-      "locale": ["pt-BR"],
+      "locale": [
+        "pt-BR"
+      ],
       "priority": 80,
       "description": {
         "en": "Format numeric value as Brazilian Real: R$ 1.234,56 with PT-BR separators.",
@@ -81,15 +130,27 @@
         "negativeFormat": "-R$ {value}"
       },
       "examples": {
-        "input": [1234.56, -1234.56, 0, 1000000],
-        "output": ["R$ 1.234,56", "-R$ 1.234,56", "R$ 0,00", "R$ 1.000.000,00"]
+        "input": [
+          1234.56,
+          -1234.56,
+          0,
+          1000000
+        ],
+        "output": [
+          "R$ 1.234,56",
+          "-R$ 1.234,56",
+          "R$ 0,00",
+          "R$ 1.000.000,00"
+        ]
       },
       "collisionNotes": "Ensure currency formatting runs after numeric calculation, not before. Outputting R$ prefix prevents re-parsing unless stripped."
     },
     {
       "id": "currency_brl_parse",
       "category": "currency",
-      "locale": ["pt-BR"],
+      "locale": [
+        "pt-BR"
+      ],
       "priority": 85,
       "description": {
         "en": "Parse R$ prefix and PT-BR number format: 'R$ 1.234,56' = 1234.56.",
@@ -99,18 +160,31 @@
       "transform": {
         "stripPrefix": "R$",
         "removeSeparator": ".",
-        "replaceDecimal": { ",": "." }
+        "replaceDecimal": {
+          ",": "."
+        }
       },
       "examples": {
-        "input": ["R$ 1.234,56", "R$ 10.000,00", "R$ 0,99"],
-        "output": [1234.56, 10000.00, 0.99]
+        "input": [
+          "R$ 1.234,56",
+          "R$ 10.000,00",
+          "R$ 0,99"
+        ],
+        "output": [
+          1234.56,
+          10000,
+          0.99
+        ]
       },
       "collisionNotes": "R$ prefix is unambiguous. No collision with other currency symbols."
     },
     {
       "id": "currency_eur_format",
       "category": "currency",
-      "locale": ["pt-PT", "en-GB"],
+      "locale": [
+        "pt-PT",
+        "en-GB"
+      ],
       "priority": 78,
       "description": {
         "en": "Format numeric value as Euro with locale-appropriate separators. PT-PT uses comma decimal; EN-GB uses dot decimal.",
@@ -126,90 +200,135 @@
           "pt-PT": " EUR",
           "en-GB": ""
         },
-        "symbol": "\u20ac",
+        "symbol": "€",
         "symbolPosition": {
           "pt-PT": "suffix",
           "en-GB": "prefix"
         },
-        "thousandsSeparator": { "pt-PT": ".", "en-GB": "," },
-        "decimalSeparator": { "pt-PT": ",", "en-GB": "." },
+        "thousandsSeparator": {
+          "pt-PT": ".",
+          "en-GB": ","
+        },
+        "decimalSeparator": {
+          "pt-PT": ",",
+          "en-GB": "."
+        },
         "decimalPlaces": 2
       },
       "examples": {
-        "input": [1234.56, 1234.56],
-        "output": ["1.234,56 \u20ac", "\u00a31,234.56"]
+        "input": [
+          1234.56,
+          1234.56
+        ],
+        "output": [
+          "1.234,56 €",
+          "£1,234.56"
+        ]
       },
       "collisionNotes": "Euro symbol position varies by locale. Always check locale before formatting to avoid misplacement."
     },
     {
       "id": "currency_eur_parse",
       "category": "currency",
-      "locale": ["pt-PT", "en-GB"],
+      "locale": [
+        "pt-PT",
+        "en-GB"
+      ],
       "priority": 83,
       "description": {
-        "en": "Parse Euro symbol (\u20ac) prefix or suffix with locale detection for separator convention.",
-        "pt": "Faz parsing do simbolo Euro (\u20ac) como prefixo ou sufixo com deteccao de locale para convencao de separadores."
+        "en": "Parse Euro symbol (€) prefix or suffix with locale detection for separator convention.",
+        "pt": "Faz parsing do simbolo Euro (€) como prefixo ou sufixo com deteccao de locale para convencao de separadores."
       },
       "pattern": "^(\\u20ac\\s*-?[\\d.,]+|-?[\\d.,]+\\s*\\u20ac)$",
       "transform": {
-        "stripSymbol": "\u20ac",
+        "stripSymbol": "€",
         "detectLocale": true,
         "fallbackLocale": "pt-PT"
       },
       "examples": {
-        "input": ["\u20ac1,234.56", "1.234,56 \u20ac", "\u20ac999.99"],
-        "output": [1234.56, 1234.56, 999.99]
+        "input": [
+          "€1,234.56",
+          "1.234,56 €",
+          "€999.99"
+        ],
+        "output": [
+          1234.56,
+          1234.56,
+          999.99
+        ]
       },
       "collisionNotes": "Euro can appear as prefix (EN) or suffix (PT). Symbol position can hint at locale but is not reliable alone; combine with separator analysis."
     },
     {
       "id": "currency_gbp_format",
       "category": "currency",
-      "locale": ["en-GB"],
+      "locale": [
+        "en-GB"
+      ],
       "priority": 78,
       "description": {
-        "en": "Format numeric value as British Pounds: \u00a31,234.56 with EN separators.",
-        "pt": "Formata valor numerico como Libra esterlina: \u00a31,234.56 com separadores EN."
+        "en": "Format numeric value as British Pounds: £1,234.56 with EN separators.",
+        "pt": "Formata valor numerico como Libra esterlina: £1,234.56 com separadores EN."
       },
       "pattern": null,
       "transform": {
-        "prefix": "\u00a3",
+        "prefix": "£",
         "thousandsSeparator": ",",
         "decimalSeparator": ".",
         "decimalPlaces": 2,
-        "negativeFormat": "-\u00a3{value}"
+        "negativeFormat": "-£{value}"
       },
       "examples": {
-        "input": [1234.56, -500.00, 0],
-        "output": ["\u00a31,234.56", "-\u00a3500.00", "\u00a30.00"]
+        "input": [
+          1234.56,
+          -500,
+          0
+        ],
+        "output": [
+          "£1,234.56",
+          "-£500.00",
+          "£0.00"
+        ]
       },
       "collisionNotes": "No collision with other currency symbols. GBP always uses EN separator convention."
     },
     {
       "id": "currency_gbp_parse",
       "category": "currency",
-      "locale": ["en-GB"],
+      "locale": [
+        "en-GB"
+      ],
       "priority": 83,
       "description": {
-        "en": "Parse British Pound symbol (\u00a3) prefix and EN number format.",
-        "pt": "Faz parsing do simbolo Libra (\u00a3) como prefixo e formato numerico EN."
+        "en": "Parse British Pound symbol (£) prefix and EN number format.",
+        "pt": "Faz parsing do simbolo Libra (£) como prefixo e formato numerico EN."
       },
       "pattern": "^\\u00a3\\s*-?\\d{1,3}(,\\d{3})*(\\.\\d+)?$",
       "transform": {
-        "stripPrefix": "\u00a3",
+        "stripPrefix": "£",
         "removeSeparator": ",",
         "decimalSeparator": "."
       },
       "examples": {
-        "input": ["\u00a31,234.56", "\u00a3500", "\u00a30.99"],
-        "output": [1234.56, 500, 0.99]
+        "input": [
+          "£1,234.56",
+          "£500",
+          "£0.99"
+        ],
+        "output": [
+          1234.56,
+          500,
+          0.99
+        ]
       },
       "collisionNotes": "Pound symbol is unambiguous. Always assumes EN separator convention."
     },
     {
       "id": "currency_usd_format",
       "category": "currency",
-      "locale": ["en-US"],
+      "locale": [
+        "en-US"
+      ],
       "priority": 80,
       "description": {
         "en": "Format numeric value as US Dollar: $1,234.56 with EN separators.",
@@ -224,15 +343,27 @@
         "negativeFormat": "($${value})"
       },
       "examples": {
-        "input": [1234.56, -1234.56, 0, 1000000],
-        "output": ["$1,234.56", "($1,234.56)", "$0.00", "$1,000,000.00"]
+        "input": [
+          1234.56,
+          -1234.56,
+          0,
+          1000000
+        ],
+        "output": [
+          "$1,234.56",
+          "($1,234.56)",
+          "$0.00",
+          "$1,000,000.00"
+        ]
       },
       "collisionNotes": "Dollar sign ($) is also used by other currencies (CAD, AUD). Context or explicit currency code needed for disambiguation."
     },
     {
       "id": "currency_usd_parse",
       "category": "currency",
-      "locale": ["en-US"],
+      "locale": [
+        "en-US"
+      ],
       "priority": 85,
       "description": {
         "en": "Parse $ prefix and EN number format: '$1,234.56' = 1234.56. Also handles accounting parentheses.",
@@ -246,15 +377,29 @@
         "handleParens": true
       },
       "examples": {
-        "input": ["$1,234.56", "($1,234.56)", "$0.99", "$10,000"],
-        "output": [1234.56, -1234.56, 0.99, 10000]
+        "input": [
+          "$1,234.56",
+          "($1,234.56)",
+          "$0.99",
+          "$10,000"
+        ],
+        "output": [
+          1234.56,
+          -1234.56,
+          0.99,
+          10000
+        ]
       },
       "collisionNotes": "Dollar sign ambiguity with other dollar-denominated currencies. Accounting parens format must be detected before generic negative sign parsing."
     },
     {
       "id": "date_fmt_dd_mm_yyyy",
       "category": "date_formatting",
-      "locale": ["pt-BR", "pt-PT", "en-GB"],
+      "locale": [
+        "pt-BR",
+        "pt-PT",
+        "en-GB"
+      ],
       "priority": 75,
       "description": {
         "en": "Format date as DD/MM/YYYY for PT-BR, PT-PT, and EN-GB locales.",
@@ -267,15 +412,25 @@
         "zeroPad": true
       },
       "examples": {
-        "input": ["2024-03-15", "2024-01-05", "2024-12-31"],
-        "output": ["15/03/2024", "05/01/2024", "31/12/2024"]
+        "input": [
+          "2024-03-15",
+          "2024-01-05",
+          "2024-12-31"
+        ],
+        "output": [
+          "15/03/2024",
+          "05/01/2024",
+          "31/12/2024"
+        ]
       },
       "collisionNotes": "Output is ambiguous with MM/DD/YYYY when day <= 12. Always pair with locale metadata."
     },
     {
       "id": "date_fmt_iso_8601",
       "category": "date_formatting",
-      "locale": ["*"],
+      "locale": [
+        "*"
+      ],
       "priority": 95,
       "description": {
         "en": "Format date as YYYY-MM-DD (ISO 8601). Universal unambiguous format for data interchange.",
@@ -288,15 +443,24 @@
         "zeroPad": true
       },
       "examples": {
-        "input": ["2024-03-15", "2024-01-05"],
-        "output": ["2024-03-15", "2024-01-05"]
+        "input": [
+          "2024-03-15",
+          "2024-01-05"
+        ],
+        "output": [
+          "2024-03-15",
+          "2024-01-05"
+        ]
       },
       "collisionNotes": "No ambiguity. Preferred format for internal storage and cross-locale data transfer."
     },
     {
       "id": "date_fmt_long_en",
       "category": "date_formatting",
-      "locale": ["en-US", "en-GB"],
+      "locale": [
+        "en-US",
+        "en-GB"
+      ],
       "priority": 60,
       "description": {
         "en": "Format date in EN long form: 'January 15, 2024'.",
@@ -305,18 +469,42 @@
       "pattern": null,
       "transform": {
         "format": "MMMM D, YYYY",
-        "monthNames": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+        "monthNames": [
+          "January",
+          "February",
+          "March",
+          "April",
+          "May",
+          "June",
+          "July",
+          "August",
+          "September",
+          "October",
+          "November",
+          "December"
+        ]
       },
       "examples": {
-        "input": ["2024-03-15", "2024-01-01", "2024-12-25"],
-        "output": ["March 15, 2024", "January 1, 2024", "December 25, 2024"]
+        "input": [
+          "2024-03-15",
+          "2024-01-01",
+          "2024-12-25"
+        ],
+        "output": [
+          "March 15, 2024",
+          "January 1, 2024",
+          "December 25, 2024"
+        ]
       },
       "collisionNotes": "Unambiguous due to full month name. No collision risk."
     },
     {
       "id": "date_fmt_long_pt",
       "category": "date_formatting",
-      "locale": ["pt-BR", "pt-PT"],
+      "locale": [
+        "pt-BR",
+        "pt-PT"
+      ],
       "priority": 60,
       "description": {
         "en": "Format date in PT long form: '15 de janeiro de 2024'.",
@@ -325,18 +513,41 @@
       "pattern": null,
       "transform": {
         "format": "D 'de' MMMM 'de' YYYY",
-        "monthNames": ["janeiro", "fevereiro", "marco", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"]
+        "monthNames": [
+          "janeiro",
+          "fevereiro",
+          "marco",
+          "abril",
+          "maio",
+          "junho",
+          "julho",
+          "agosto",
+          "setembro",
+          "outubro",
+          "novembro",
+          "dezembro"
+        ]
       },
       "examples": {
-        "input": ["2024-03-15", "2024-01-01", "2024-12-25"],
-        "output": ["15 de marco de 2024", "1 de janeiro de 2024", "25 de dezembro de 2024"]
+        "input": [
+          "2024-03-15",
+          "2024-01-01",
+          "2024-12-25"
+        ],
+        "output": [
+          "15 de marco de 2024",
+          "1 de janeiro de 2024",
+          "25 de dezembro de 2024"
+        ]
       },
       "collisionNotes": "Unambiguous due to full month name and 'de' preposition. No collision risk."
     },
     {
       "id": "date_fmt_mm_dd_yyyy",
       "category": "date_formatting",
-      "locale": ["en-US"],
+      "locale": [
+        "en-US"
+      ],
       "priority": 75,
       "description": {
         "en": "Format date as MM/DD/YYYY for EN-US locale.",
@@ -349,15 +560,25 @@
         "zeroPad": true
       },
       "examples": {
-        "input": ["2024-03-15", "2024-01-05", "2024-12-31"],
-        "output": ["03/15/2024", "01/05/2024", "12/31/2024"]
+        "input": [
+          "2024-03-15",
+          "2024-01-05",
+          "2024-12-31"
+        ],
+        "output": [
+          "03/15/2024",
+          "01/05/2024",
+          "12/31/2024"
+        ]
       },
       "collisionNotes": "Ambiguous with DD/MM/YYYY when day <= 12. Only safe when locale is known to be EN-US."
     },
     {
       "id": "date_fmt_month_year",
       "category": "date_formatting",
-      "locale": ["*"],
+      "locale": [
+        "*"
+      ],
       "priority": 50,
       "description": {
         "en": "Format date as month-year only: 'Jan 2024' (EN) or 'jan/2024' (PT).",
@@ -372,15 +593,29 @@
         "dropDay": true
       },
       "examples": {
-        "input": ["2024-03-15", "2024-01-05"],
-        "output": { "en": ["Mar 2024", "Jan 2024"], "pt": ["mar/2024", "jan/2024"] }
+        "input": [
+          "2024-03-15",
+          "2024-01-05"
+        ],
+        "output": {
+          "en": [
+            "Mar 2024",
+            "Jan 2024"
+          ],
+          "pt": [
+            "mar/2024",
+            "jan/2024"
+          ]
+        }
       },
       "collisionNotes": "Day information is lost. Not invertible; should only be used for display, not for round-trip data."
     },
     {
       "id": "date_fmt_quarter",
       "category": "date_formatting",
-      "locale": ["*"],
+      "locale": [
+        "*"
+      ],
       "priority": 45,
       "description": {
         "en": "Format date as quarter: 'Q1 2024' (EN) or '1T 2024' (PT).",
@@ -395,15 +630,32 @@
         "quarterCalc": "ceil(month / 3)"
       },
       "examples": {
-        "input": ["2024-03-15", "2024-07-01", "2024-10-31"],
-        "output": { "en": ["Q1 2024", "Q3 2024", "Q4 2024"], "pt": ["1T 2024", "3T 2024", "4T 2024"] }
+        "input": [
+          "2024-03-15",
+          "2024-07-01",
+          "2024-10-31"
+        ],
+        "output": {
+          "en": [
+            "Q1 2024",
+            "Q3 2024",
+            "Q4 2024"
+          ],
+          "pt": [
+            "1T 2024",
+            "3T 2024",
+            "4T 2024"
+          ]
+        }
       },
       "collisionNotes": "Day and month precision are lost. Quarter boundaries: Q1=Jan-Mar, Q2=Apr-Jun, Q3=Jul-Sep, Q4=Oct-Dec."
     },
     {
       "id": "date_fmt_relative",
       "category": "date_formatting",
-      "locale": ["*"],
+      "locale": [
+        "*"
+      ],
       "priority": 40,
       "description": {
         "en": "Format date as relative time: '3 days ago' (EN) or 'ha 3 dias' (PT).",
@@ -412,26 +664,62 @@
       "pattern": null,
       "transform": {
         "type": "relative",
-        "units": ["days", "weeks", "months", "years"],
+        "units": [
+          "days",
+          "weeks",
+          "months",
+          "years"
+        ],
         "templates": {
-          "en": { "past": "{n} {unit} ago", "future": "in {n} {unit}" },
-          "pt": { "past": "ha {n} {unit}", "future": "em {n} {unit}" }
+          "en": {
+            "past": "{n} {unit} ago",
+            "future": "in {n} {unit}"
+          },
+          "pt": {
+            "past": "ha {n} {unit}",
+            "future": "em {n} {unit}"
+          }
         },
         "unitNames": {
-          "en": { "days": "days", "weeks": "weeks", "months": "months", "years": "years" },
-          "pt": { "days": "dias", "weeks": "semanas", "months": "meses", "years": "anos" }
+          "en": {
+            "days": "days",
+            "weeks": "weeks",
+            "months": "months",
+            "years": "years"
+          },
+          "pt": {
+            "days": "dias",
+            "weeks": "semanas",
+            "months": "meses",
+            "years": "anos"
+          }
         }
       },
       "examples": {
-        "input": ["2024-03-12", "2024-02-15"],
-        "output": { "en": ["3 days ago", "4 weeks ago"], "pt": ["ha 3 dias", "ha 4 semanas"] }
+        "input": [
+          "2024-03-12",
+          "2024-02-15"
+        ],
+        "output": {
+          "en": [
+            "3 days ago",
+            "4 weeks ago"
+          ],
+          "pt": [
+            "ha 3 dias",
+            "ha 4 semanas"
+          ]
+        }
       },
       "collisionNotes": "Output depends on current date. Not stable for caching or comparison. Use only for UI display."
     },
     {
       "id": "date_fmt_short_en",
       "category": "date_formatting",
-      "locale": ["en-US", "en-GB"],
+      "locale": [
+        "en-US",
+        "en-GB"
+      ],
       "priority": 65,
       "description": {
         "en": "Format date in EN short form: 'Jan 15, 2024'.",
@@ -440,18 +728,42 @@
       "pattern": null,
       "transform": {
         "format": "MMM D, YYYY",
-        "monthAbbreviations": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+        "monthAbbreviations": [
+          "Jan",
+          "Feb",
+          "Mar",
+          "Apr",
+          "May",
+          "Jun",
+          "Jul",
+          "Aug",
+          "Sep",
+          "Oct",
+          "Nov",
+          "Dec"
+        ]
       },
       "examples": {
-        "input": ["2024-03-15", "2024-01-01", "2024-12-25"],
-        "output": ["Mar 15, 2024", "Jan 1, 2024", "Dec 25, 2024"]
+        "input": [
+          "2024-03-15",
+          "2024-01-01",
+          "2024-12-25"
+        ],
+        "output": [
+          "Mar 15, 2024",
+          "Jan 1, 2024",
+          "Dec 25, 2024"
+        ]
       },
       "collisionNotes": "Unambiguous due to abbreviated month name. Safe for display."
     },
     {
       "id": "date_fmt_short_pt",
       "category": "date_formatting",
-      "locale": ["pt-BR", "pt-PT"],
+      "locale": [
+        "pt-BR",
+        "pt-PT"
+      ],
       "priority": 65,
       "description": {
         "en": "Format date in PT short form: '15/jan/2024'.",
@@ -460,18 +772,43 @@
       "pattern": null,
       "transform": {
         "format": "DD/mmm/YYYY",
-        "monthAbbreviations": ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"]
+        "monthAbbreviations": [
+          "jan",
+          "fev",
+          "mar",
+          "abr",
+          "mai",
+          "jun",
+          "jul",
+          "ago",
+          "set",
+          "out",
+          "nov",
+          "dez"
+        ]
       },
       "examples": {
-        "input": ["2024-03-15", "2024-01-01", "2024-12-25"],
-        "output": ["15/mar/2024", "01/jan/2024", "25/dez/2024"]
+        "input": [
+          "2024-03-15",
+          "2024-01-01",
+          "2024-12-25"
+        ],
+        "output": [
+          "15/mar/2024",
+          "01/jan/2024",
+          "25/dez/2024"
+        ]
       },
       "collisionNotes": "Unambiguous due to abbreviated month name. Safe for display and re-parsing."
     },
     {
       "id": "date_parse_dd_mm_yyyy",
       "category": "date_parsing",
-      "locale": ["pt-BR", "pt-PT", "en-GB"],
+      "locale": [
+        "pt-BR",
+        "pt-PT",
+        "en-GB"
+      ],
       "priority": 80,
       "description": {
         "en": "Parse DD/MM/YYYY format (PT-BR and EN-GB default). Separators: / - .",
@@ -484,15 +821,25 @@
         "yearIndex": 2
       },
       "examples": {
-        "input": ["15/03/2024", "01-01-2024", "31.12.2024"],
-        "output": ["2024-03-15", "2024-01-01", "2024-12-31"]
+        "input": [
+          "15/03/2024",
+          "01-01-2024",
+          "31.12.2024"
+        ],
+        "output": [
+          "2024-03-15",
+          "2024-01-01",
+          "2024-12-31"
+        ]
       },
       "collisionNotes": "Ambiguous with MM/DD/YYYY when day <= 12. Locale context required for correct parsing."
     },
     {
       "id": "date_parse_dd_mon_yyyy",
       "category": "date_parsing",
-      "locale": ["*"],
+      "locale": [
+        "*"
+      ],
       "priority": 70,
       "description": {
         "en": "Parse '15 Jan 2024' or '15 jan 2024' with abbreviated month name in any supported language.",
@@ -504,20 +851,57 @@
         "monthIndex": 1,
         "yearIndex": 2,
         "monthMap": {
-          "en": { "Jan": 1, "Feb": 2, "Mar": 3, "Apr": 4, "May": 5, "Jun": 6, "Jul": 7, "Aug": 8, "Sep": 9, "Oct": 10, "Nov": 11, "Dec": 12 },
-          "pt": { "jan": 1, "fev": 2, "mar": 3, "abr": 4, "mai": 5, "jun": 6, "jul": 7, "ago": 8, "set": 9, "out": 10, "nov": 11, "dez": 12 }
+          "en": {
+            "Jan": 1,
+            "Feb": 2,
+            "Mar": 3,
+            "Apr": 4,
+            "May": 5,
+            "Jun": 6,
+            "Jul": 7,
+            "Aug": 8,
+            "Sep": 9,
+            "Oct": 10,
+            "Nov": 11,
+            "Dec": 12
+          },
+          "pt": {
+            "jan": 1,
+            "fev": 2,
+            "mar": 3,
+            "abr": 4,
+            "mai": 5,
+            "jun": 6,
+            "jul": 7,
+            "ago": 8,
+            "set": 9,
+            "out": 10,
+            "nov": 11,
+            "dez": 12
+          }
         }
       },
       "examples": {
-        "input": ["15 Jan 2024", "1 fev 2024", "25 Dec 2024"],
-        "output": ["2024-01-15", "2024-02-01", "2024-12-25"]
+        "input": [
+          "15 Jan 2024",
+          "1 fev 2024",
+          "25 Dec 2024"
+        ],
+        "output": [
+          "2024-01-15",
+          "2024-02-01",
+          "2024-12-25"
+        ]
       },
       "collisionNotes": "Month abbreviation 'mai' (PT May) overlaps with no EN abbreviation. 'mar' is shared between EN and PT."
     },
     {
       "id": "date_parse_dd_month_yyyy_en",
       "category": "date_parsing",
-      "locale": ["en-US", "en-GB"],
+      "locale": [
+        "en-US",
+        "en-GB"
+      ],
       "priority": 65,
       "description": {
         "en": "Parse EN long date format: 'January 15, 2024' or 'March 1, 2024'.",
@@ -528,18 +912,42 @@
         "monthIndex": 0,
         "dayIndex": 1,
         "yearIndex": 2,
-        "monthMap": { "January": 1, "February": 2, "March": 3, "April": 4, "May": 5, "June": 6, "July": 7, "August": 8, "September": 9, "October": 10, "November": 11, "December": 12 }
+        "monthMap": {
+          "January": 1,
+          "February": 2,
+          "March": 3,
+          "April": 4,
+          "May": 5,
+          "June": 6,
+          "July": 7,
+          "August": 8,
+          "September": 9,
+          "October": 10,
+          "November": 11,
+          "December": 12
+        }
       },
       "examples": {
-        "input": ["January 15, 2024", "March 1, 2024", "December 25 2024"],
-        "output": ["2024-01-15", "2024-03-01", "2024-12-25"]
+        "input": [
+          "January 15, 2024",
+          "March 1, 2024",
+          "December 25 2024"
+        ],
+        "output": [
+          "2024-01-15",
+          "2024-03-01",
+          "2024-12-25"
+        ]
       },
       "collisionNotes": "No collision. Full EN month names are unambiguous."
     },
     {
       "id": "date_parse_dd_month_yyyy_pt",
       "category": "date_parsing",
-      "locale": ["pt-BR", "pt-PT"],
+      "locale": [
+        "pt-BR",
+        "pt-PT"
+      ],
       "priority": 65,
       "description": {
         "en": "Parse PT long date format: '15 de janeiro de 2024'.",
@@ -550,18 +958,41 @@
         "dayIndex": 0,
         "monthIndex": 1,
         "yearIndex": 2,
-        "monthMap": { "janeiro": 1, "fevereiro": 2, "marco": 3, "abril": 4, "maio": 5, "junho": 6, "julho": 7, "agosto": 8, "setembro": 9, "outubro": 10, "novembro": 11, "dezembro": 12 }
+        "monthMap": {
+          "janeiro": 1,
+          "fevereiro": 2,
+          "marco": 3,
+          "abril": 4,
+          "maio": 5,
+          "junho": 6,
+          "julho": 7,
+          "agosto": 8,
+          "setembro": 9,
+          "outubro": 10,
+          "novembro": 11,
+          "dezembro": 12
+        }
       },
       "examples": {
-        "input": ["15 de janeiro de 2024", "1 de marco de 2024", "25 de dezembro de 2024"],
-        "output": ["2024-01-15", "2024-03-01", "2024-12-25"]
+        "input": [
+          "15 de janeiro de 2024",
+          "1 de marco de 2024",
+          "25 de dezembro de 2024"
+        ],
+        "output": [
+          "2024-01-15",
+          "2024-03-01",
+          "2024-12-25"
+        ]
       },
       "collisionNotes": "No collision. 'de' preposition and PT month names are unambiguous."
     },
     {
       "id": "date_parse_excel_serial",
       "category": "date_parsing",
-      "locale": ["*"],
+      "locale": [
+        "*"
+      ],
       "priority": 95,
       "description": {
         "en": "Parse Excel serial date number to ISO date. Excel epoch: 1900-01-01 = 1 (with Lotus 1-2-3 leap year bug for day 60).",
@@ -575,15 +1006,27 @@
         "adjustForBug": true
       },
       "examples": {
-        "input": [1, 45366, 60, 61],
-        "output": ["1900-01-01", "2024-03-15", "1900-02-29", "1900-03-01"]
+        "input": [
+          1,
+          45366,
+          60,
+          61
+        ],
+        "output": [
+          "1900-01-01",
+          "2024-03-15",
+          "1900-02-29",
+          "1900-03-01"
+        ]
       },
       "collisionNotes": "Small integers (1-5) may be actual numeric values, not dates. Use column context or header hints to distinguish."
     },
     {
       "id": "date_parse_iso_8601",
       "category": "date_parsing",
-      "locale": ["*"],
+      "locale": [
+        "*"
+      ],
       "priority": 100,
       "description": {
         "en": "Parse ISO 8601 date format: YYYY-MM-DD. Highest priority as it is universally unambiguous.",
@@ -596,15 +1039,25 @@
         "dayIndex": 2
       },
       "examples": {
-        "input": ["2024-03-15", "2024-01-01", "2024-12-31"],
-        "output": ["2024-03-15", "2024-01-01", "2024-12-31"]
+        "input": [
+          "2024-03-15",
+          "2024-01-01",
+          "2024-12-31"
+        ],
+        "output": [
+          "2024-03-15",
+          "2024-01-01",
+          "2024-12-31"
+        ]
       },
       "collisionNotes": "No ambiguity. Year-first format is universally unambiguous. Always try this parser first."
     },
     {
       "id": "date_parse_mm_dd_yyyy",
       "category": "date_parsing",
-      "locale": ["en-US"],
+      "locale": [
+        "en-US"
+      ],
       "priority": 80,
       "description": {
         "en": "Parse MM/DD/YYYY format (EN-US default). Separators: / - .",
@@ -617,15 +1070,26 @@
         "yearIndex": 2
       },
       "examples": {
-        "input": ["03/15/2024", "01-01-2024", "12.31.2024"],
-        "output": ["2024-03-15", "2024-01-01", "2024-12-31"]
+        "input": [
+          "03/15/2024",
+          "01-01-2024",
+          "12.31.2024"
+        ],
+        "output": [
+          "2024-03-15",
+          "2024-01-01",
+          "2024-12-31"
+        ]
       },
       "collisionNotes": "Ambiguous with DD/MM/YYYY when day <= 12. Must rely on locale context. If locale unknown, flag as ambiguous."
     },
     {
       "id": "date_parse_month_abbrev_en",
       "category": "date_parsing",
-      "locale": ["en-US", "en-GB"],
+      "locale": [
+        "en-US",
+        "en-GB"
+      ],
       "priority": 60,
       "description": {
         "en": "Map EN month abbreviations to month numbers: Jan=1, Feb=2, ..., Dec=12.",
@@ -633,18 +1097,42 @@
       },
       "pattern": "^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)$",
       "transform": {
-        "monthMap": { "Jan": 1, "Feb": 2, "Mar": 3, "Apr": 4, "May": 5, "Jun": 6, "Jul": 7, "Aug": 8, "Sep": 9, "Oct": 10, "Nov": 11, "Dec": 12 }
+        "monthMap": {
+          "Jan": 1,
+          "Feb": 2,
+          "Mar": 3,
+          "Apr": 4,
+          "May": 5,
+          "Jun": 6,
+          "Jul": 7,
+          "Aug": 8,
+          "Sep": 9,
+          "Oct": 10,
+          "Nov": 11,
+          "Dec": 12
+        }
       },
       "examples": {
-        "input": ["Jan", "Mar", "Dec"],
-        "output": [1, 3, 12]
+        "input": [
+          "Jan",
+          "Mar",
+          "Dec"
+        ],
+        "output": [
+          1,
+          3,
+          12
+        ]
       },
       "collisionNotes": "'Mar' is the same abbreviation in EN and PT. Context is needed to determine language."
     },
     {
       "id": "date_parse_month_abbrev_pt",
       "category": "date_parsing",
-      "locale": ["pt-BR", "pt-PT"],
+      "locale": [
+        "pt-BR",
+        "pt-PT"
+      ],
       "priority": 60,
       "description": {
         "en": "Map PT month abbreviations to month numbers: jan=1, fev=2, ..., dez=12.",
@@ -652,18 +1140,41 @@
       },
       "pattern": "^(jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)$",
       "transform": {
-        "monthMap": { "jan": 1, "fev": 2, "mar": 3, "abr": 4, "mai": 5, "jun": 6, "jul": 7, "ago": 8, "set": 9, "out": 10, "nov": 11, "dez": 12 }
+        "monthMap": {
+          "jan": 1,
+          "fev": 2,
+          "mar": 3,
+          "abr": 4,
+          "mai": 5,
+          "jun": 6,
+          "jul": 7,
+          "ago": 8,
+          "set": 9,
+          "out": 10,
+          "nov": 11,
+          "dez": 12
+        }
       },
       "examples": {
-        "input": ["jan", "mar", "dez"],
-        "output": [1, 3, 12]
+        "input": [
+          "jan",
+          "mar",
+          "dez"
+        ],
+        "output": [
+          1,
+          3,
+          12
+        ]
       },
       "collisionNotes": "'mar' overlaps with EN 'Mar'. PT abbreviations are typically lowercase which helps disambiguation."
     },
     {
       "id": "date_parse_month_year_only",
       "category": "date_parsing",
-      "locale": ["*"],
+      "locale": [
+        "*"
+      ],
       "priority": 55,
       "description": {
         "en": "Parse month-year without day: 'Jan 2024', 'janeiro/2024', '03/2024'. Day defaults to 1.",
@@ -677,15 +1188,25 @@
         "acceptNumericMonth": true
       },
       "examples": {
-        "input": ["Jan 2024", "janeiro/2024", "03/2024"],
-        "output": ["2024-01-01", "2024-01-01", "2024-03-01"]
+        "input": [
+          "Jan 2024",
+          "janeiro/2024",
+          "03/2024"
+        ],
+        "output": [
+          "2024-01-01",
+          "2024-01-01",
+          "2024-03-01"
+        ]
       },
       "collisionNotes": "Numeric format '03/2024' is ambiguous outside context; could be confused with incomplete date. Requires column-level heuristics."
     },
     {
       "id": "date_parse_quarter_format",
       "category": "date_parsing",
-      "locale": ["*"],
+      "locale": [
+        "*"
+      ],
       "priority": 50,
       "description": {
         "en": "Parse quarter format: 'Q1 2024' (EN) or '1T 2024' (PT). Maps to first day of quarter.",
@@ -693,20 +1214,37 @@
       },
       "pattern": "^(Q[1-4]|[1-4]T)\\s*(\\d{4})$",
       "transform": {
-        "quarterToMonth": { "1": 1, "2": 4, "3": 7, "4": 10 },
+        "quarterToMonth": {
+          "1": 1,
+          "2": 4,
+          "3": 7,
+          "4": 10
+        },
         "dayDefault": 1,
         "extractQuarter": "Q(\\d)|^(\\d)T"
       },
       "examples": {
-        "input": ["Q1 2024", "Q3 2024", "1T 2024", "4T 2024"],
-        "output": ["2024-01-01", "2024-07-01", "2024-01-01", "2024-10-01"]
+        "input": [
+          "Q1 2024",
+          "Q3 2024",
+          "1T 2024",
+          "4T 2024"
+        ],
+        "output": [
+          "2024-01-01",
+          "2024-07-01",
+          "2024-01-01",
+          "2024-10-01"
+        ]
       },
       "collisionNotes": "'1T' could theoretically match other patterns. The T suffix is specific to PT quarter notation."
     },
     {
       "id": "date_parse_relative_days",
       "category": "date_parsing",
-      "locale": ["*"],
+      "locale": [
+        "*"
+      ],
       "priority": 45,
       "description": {
         "en": "Parse relative date keywords: 'today', 'yesterday', 'tomorrow' (EN) and 'hoje', 'ontem', 'amanha' (PT).",
@@ -725,15 +1263,27 @@
         "relativeTo": "currentDate"
       },
       "examples": {
-        "input": ["today", "yesterday", "hoje", "ontem"],
-        "output": ["<current_date>", "<current_date - 1>", "<current_date>", "<current_date - 1>"]
+        "input": [
+          "today",
+          "yesterday",
+          "hoje",
+          "ontem"
+        ],
+        "output": [
+          "<current_date>",
+          "<current_date - 1>",
+          "<current_date>",
+          "<current_date - 1>"
+        ]
       },
       "collisionNotes": "Output is dynamic and depends on evaluation date. Not suitable for cached or static contexts."
     },
     {
       "id": "date_parse_week_number",
       "category": "date_parsing",
-      "locale": ["*"],
+      "locale": [
+        "*"
+      ],
       "priority": 40,
       "description": {
         "en": "Parse ISO week number format: 'W05' or 'Sem 05'. Maps to Monday of that ISO week.",
@@ -746,15 +1296,27 @@
         "yearFallback": "currentYear"
       },
       "examples": {
-        "input": ["W05", "W05 2024", "Sem 12", "Sem 52 2024"],
-        "output": ["<monday_of_week_5>", "2024-01-29", "<monday_of_week_12>", "2024-12-23"]
+        "input": [
+          "W05",
+          "W05 2024",
+          "Sem 12",
+          "Sem 52 2024"
+        ],
+        "output": [
+          "<monday_of_week_5>",
+          "2024-01-29",
+          "<monday_of_week_12>",
+          "2024-12-23"
+        ]
       },
       "collisionNotes": "Week number without year is ambiguous. 'Sem' may collide with Portuguese word 'sem' (without) in text cells."
     },
     {
       "id": "date_parse_year_only",
       "category": "date_parsing",
-      "locale": ["*"],
+      "locale": [
+        "*"
+      ],
       "priority": 35,
       "description": {
         "en": "Parse standalone 4-digit year (e.g., '2024'). Maps to January 1 of that year.",
@@ -766,15 +1328,26 @@
         "dayDefault": 1
       },
       "examples": {
-        "input": ["2024", "1999", "2000"],
-        "output": ["2024-01-01", "1999-01-01", "2000-01-01"]
+        "input": [
+          "2024",
+          "1999",
+          "2000"
+        ],
+        "output": [
+          "2024-01-01",
+          "1999-01-01",
+          "2000-01-01"
+        ]
       },
       "collisionNotes": "4-digit numbers in range 1900-2099 could be actual numeric values. Use column header context to determine if year or number."
     },
     {
       "id": "num_fmt_accounting_en",
       "category": "number_formatting",
-      "locale": ["en-US", "en-GB"],
+      "locale": [
+        "en-US",
+        "en-GB"
+      ],
       "priority": 75,
       "description": {
         "en": "EN accounting format: currency-aligned with parentheses for negatives, e.g., '$ 1,234.56' and '$(1,234.56)'.",
@@ -791,15 +1364,25 @@
         "zeroPad": true
       },
       "examples": {
-        "input": [1234.56, -1234.56, 0],
-        "output": ["$ 1,234.56", "$(1,234.56)", "$ 0.00"]
+        "input": [
+          1234.56,
+          -1234.56,
+          0
+        ],
+        "output": [
+          "$ 1,234.56",
+          "$(1,234.56)",
+          "$ 0.00"
+        ]
       },
       "collisionNotes": "Accounting format is distinct from plain currency format by alignment and spacing. Parentheses negatives must be parsed before generic number parsing."
     },
     {
       "id": "num_fmt_accounting_pt",
       "category": "number_formatting",
-      "locale": ["pt-BR"],
+      "locale": [
+        "pt-BR"
+      ],
       "priority": 75,
       "description": {
         "en": "PT-BR accounting format: R$ with dot thousands and comma decimal, e.g., 'R$ 1.234,56'.",
@@ -816,15 +1399,26 @@
         "zeroPad": true
       },
       "examples": {
-        "input": [1234.56, -1234.56, 0],
-        "output": ["R$ 1.234,56", "-R$ 1.234,56", "R$ 0,00"]
+        "input": [
+          1234.56,
+          -1234.56,
+          0
+        ],
+        "output": [
+          "R$ 1.234,56",
+          "-R$ 1.234,56",
+          "R$ 0,00"
+        ]
       },
       "collisionNotes": "PT-BR does not typically use parentheses for negatives in accounting. Uses minus sign prefix instead."
     },
     {
       "id": "num_fmt_comma_decimal_pt",
       "category": "number_formatting",
-      "locale": ["pt-BR", "pt-PT"],
+      "locale": [
+        "pt-BR",
+        "pt-PT"
+      ],
       "priority": 85,
       "description": {
         "en": "Format number with comma as decimal separator and dot as thousands for PT-BR/PT-PT output.",
@@ -836,15 +1430,25 @@
         "decimalSeparator": ","
       },
       "examples": {
-        "input": [1234.56, 10000, 0.5],
-        "output": ["1.234,56", "10.000", "0,5"]
+        "input": [
+          1234.56,
+          10000,
+          0.5
+        ],
+        "output": [
+          "1.234,56",
+          "10.000",
+          "0,5"
+        ]
       },
       "collisionNotes": "Ensure this formatter is only applied to PT locale output contexts. Applying to EN data will produce incorrect results."
     },
     {
       "id": "num_fmt_compact_k_m_b",
       "category": "number_formatting",
-      "locale": ["*"],
+      "locale": [
+        "*"
+      ],
       "priority": 40,
       "description": {
         "en": "Format large numbers in compact notation: K (thousands), M (millions), B (billions). E.g., 1200000 = '1.2M'.",
@@ -853,23 +1457,47 @@
       "pattern": null,
       "transform": {
         "thresholds": [
-          { "min": 1000000000, "suffix": "B", "divisor": 1000000000 },
-          { "min": 1000000, "suffix": "M", "divisor": 1000000 },
-          { "min": 1000, "suffix": "K", "divisor": 1000 }
+          {
+            "min": 1000000000,
+            "suffix": "B",
+            "divisor": 1000000000
+          },
+          {
+            "min": 1000000,
+            "suffix": "M",
+            "divisor": 1000000
+          },
+          {
+            "min": 1000,
+            "suffix": "K",
+            "divisor": 1000
+          }
         ],
         "decimalPlaces": 1,
         "decimalSeparator": "locale"
       },
       "examples": {
-        "input": [1200000, 3500000000, 45000, 999],
-        "output": ["1.2M", "3.5B", "45K", "999"]
+        "input": [
+          1200000,
+          3500000000,
+          45000,
+          999
+        ],
+        "output": [
+          "1.2M",
+          "3.5B",
+          "45K",
+          "999"
+        ]
       },
       "collisionNotes": "Compact notation loses precision. Not suitable for financial or exact-value contexts. Suffix letters may conflict with cell content."
     },
     {
       "id": "num_fmt_decimal_places",
       "category": "number_formatting",
-      "locale": ["*"],
+      "locale": [
+        "*"
+      ],
       "priority": 70,
       "description": {
         "en": "Enforce a specific number of decimal places via rounding. Configurable from 0 to 10.",
@@ -884,15 +1512,35 @@
         "maxPlaces": 10
       },
       "examples": {
-        "input": [{ "value": 3.14159, "places": 2 }, { "value": 100, "places": 2 }, { "value": 2.5, "places": 0 }],
-        "output": [3.14, 100.00, 3]
+        "input": [
+          {
+            "value": 3.14159,
+            "places": 2
+          },
+          {
+            "value": 100,
+            "places": 2
+          },
+          {
+            "value": 2.5,
+            "places": 0
+          }
+        ],
+        "output": [
+          3.14,
+          100,
+          3
+        ]
       },
       "collisionNotes": "Rounding mode affects values at exact midpoints (e.g., 2.5). 'halfUp' rounds 2.5 to 3; 'halfEven' (banker's rounding) rounds to 2."
     },
     {
       "id": "num_fmt_dot_decimal_en",
       "category": "number_formatting",
-      "locale": ["en-US", "en-GB"],
+      "locale": [
+        "en-US",
+        "en-GB"
+      ],
       "priority": 85,
       "description": {
         "en": "Format number with dot as decimal separator and comma as thousands for EN output.",
@@ -904,15 +1552,26 @@
         "decimalSeparator": "."
       },
       "examples": {
-        "input": [1234.56, 10000, 0.5],
-        "output": ["1,234.56", "10,000", "0.5"]
+        "input": [
+          1234.56,
+          10000,
+          0.5
+        ],
+        "output": [
+          "1,234.56",
+          "10,000",
+          "0.5"
+        ]
       },
       "collisionNotes": "Ensure this formatter is only applied to EN locale output contexts. Applying to PT data will produce incorrect results."
     },
     {
       "id": "num_fmt_negative_parens",
       "category": "number_formatting",
-      "locale": ["en-US", "en-GB"],
+      "locale": [
+        "en-US",
+        "en-GB"
+      ],
       "priority": 65,
       "description": {
         "en": "Format negative numbers using parentheses instead of minus sign: (1,234.56).",
@@ -924,15 +1583,25 @@
         "stripMinus": true
       },
       "examples": {
-        "input": [-1234.56, -0.5, 100],
-        "output": ["(1,234.56)", "(0.5)", "100"]
+        "input": [
+          -1234.56,
+          -0.5,
+          100
+        ],
+        "output": [
+          "(1,234.56)",
+          "(0.5)",
+          "100"
+        ]
       },
       "collisionNotes": "Parentheses notation is primarily an accounting convention in EN locales. Not standard in PT-BR formatting."
     },
     {
       "id": "num_fmt_negative_red",
       "category": "number_formatting",
-      "locale": ["*"],
+      "locale": [
+        "*"
+      ],
       "priority": 55,
       "description": {
         "en": "Format negative numbers in red color. Applied as a cell style, not text transformation.",
@@ -942,19 +1611,41 @@
       "transform": {
         "type": "style",
         "condition": "value < 0",
-        "style": { "color": "#FF0000", "fontWeight": "normal" },
+        "style": {
+          "color": "#FF0000",
+          "fontWeight": "normal"
+        },
         "excelFormat": "[Red]"
       },
       "examples": {
-        "input": [-100, 50, 0],
-        "output": [{ "value": -100, "style": "red" }, { "value": 50, "style": "default" }, { "value": 0, "style": "default" }]
+        "input": [
+          -100,
+          50,
+          0
+        ],
+        "output": [
+          {
+            "value": -100,
+            "style": "red"
+          },
+          {
+            "value": 50,
+            "style": "default"
+          },
+          {
+            "value": 0,
+            "style": "default"
+          }
+        ]
       },
       "collisionNotes": "Red formatting is a visual style only. It does not affect the numeric value. May conflict with conditional formatting rules."
     },
     {
       "id": "num_fmt_percentage",
       "category": "number_formatting",
-      "locale": ["*"],
+      "locale": [
+        "*"
+      ],
       "priority": 70,
       "description": {
         "en": "Format number as percentage with specified decimal places. Input is expected as decimal (0.45 = 45%).",
@@ -968,15 +1659,25 @@
         "decimalSeparator": "locale"
       },
       "examples": {
-        "input": [0.4567, 0.01, 1.0],
-        "output": ["45.67%", "1%", "100%"]
+        "input": [
+          0.4567,
+          0.01,
+          1
+        ],
+        "output": [
+          "45.67%",
+          "1%",
+          "100%"
+        ]
       },
       "collisionNotes": "Input scale matters: 0.45 vs 45 both could represent 45%. Use pct_normalize rules to determine input scale."
     },
     {
       "id": "num_fmt_scientific",
       "category": "number_formatting",
-      "locale": ["*"],
+      "locale": [
+        "*"
+      ],
       "priority": 35,
       "description": {
         "en": "Format number in scientific notation: 1.23E+04. Used for very large or very small values.",
@@ -990,15 +1691,26 @@
         "signAlways": true
       },
       "examples": {
-        "input": [12345, 0.00123, -9876543],
-        "output": ["1.23E+04", "1.23E-03", "-9.88E+06"]
+        "input": [
+          12345,
+          0.00123,
+          -9876543
+        ],
+        "output": [
+          "1.23E+04",
+          "1.23E-03",
+          "-9.88E+06"
+        ]
       },
       "collisionNotes": "Scientific notation may be misinterpreted as text by downstream consumers. Mark cells formatted this way with appropriate metadata."
     },
     {
       "id": "num_parse_accounting_parens",
       "category": "number_parsing",
-      "locale": ["en-US", "en-GB"],
+      "locale": [
+        "en-US",
+        "en-GB"
+      ],
       "priority": 88,
       "description": {
         "en": "Parse accounting-style parentheses as negative numbers: '(1,234.56)' = -1234.56.",
@@ -1012,15 +1724,26 @@
         "decimalSeparator": "."
       },
       "examples": {
-        "input": ["(1,234.56)", "(500.00)", "(0.99)"],
-        "output": [-1234.56, -500.00, -0.99]
+        "input": [
+          "(1,234.56)",
+          "(500.00)",
+          "(0.99)"
+        ],
+        "output": [
+          -1234.56,
+          -500,
+          -0.99
+        ]
       },
       "collisionNotes": "Parentheses wrapping is a convention in EN accounting. Must be checked before generic number parsing to avoid treating parens as text."
     },
     {
       "id": "num_parse_comma_decimal_pt",
       "category": "number_parsing",
-      "locale": ["pt-BR", "pt-PT"],
+      "locale": [
+        "pt-BR",
+        "pt-PT"
+      ],
       "priority": 90,
       "description": {
         "en": "In PT-BR, comma is decimal separator: '1.234,56' = 1234.56.",
@@ -1029,18 +1752,31 @@
       "pattern": "^-?\\d{1,3}(\\.\\d{3})*(,\\d+)?$",
       "transform": {
         "removeSeparator": ".",
-        "replaceDecimal": { ",": "." }
+        "replaceDecimal": {
+          ",": "."
+        }
       },
       "examples": {
-        "input": ["1.234,56", "10.000,00", "999,99"],
-        "output": [1234.56, 10000.00, 999.99]
+        "input": [
+          "1.234,56",
+          "10.000,00",
+          "999,99"
+        ],
+        "output": [
+          1234.56,
+          10000,
+          999.99
+        ]
       },
       "collisionNotes": "Ambiguous with EN thousands format when only one separator present (e.g., '1,234' could be PT decimal or EN thousands)."
     },
     {
       "id": "num_parse_comma_thousands_en",
       "category": "number_parsing",
-      "locale": ["en-US", "en-GB"],
+      "locale": [
+        "en-US",
+        "en-GB"
+      ],
       "priority": 90,
       "description": {
         "en": "In EN, comma is thousands separator: '1,234,567' = 1234567.",
@@ -1052,15 +1788,25 @@
         "decimalSeparator": "."
       },
       "examples": {
-        "input": ["1,234,567", "1,234.56", "10,000"],
-        "output": [1234567, 1234.56, 10000]
+        "input": [
+          "1,234,567",
+          "1,234.56",
+          "10,000"
+        ],
+        "output": [
+          1234567,
+          1234.56,
+          10000
+        ]
       },
       "collisionNotes": "Ambiguous with PT-BR decimal when only one comma present (e.g., '1,234' could be EN thousands or PT value 1.234)."
     },
     {
       "id": "num_parse_currency_prefix",
       "category": "number_parsing",
-      "locale": ["*"],
+      "locale": [
+        "*"
+      ],
       "priority": 92,
       "description": {
         "en": "Strip currency prefix symbols ($, R$, EUR, GBP) before numeric parsing.",
@@ -1068,25 +1814,42 @@
       },
       "pattern": "^(R?\\$|\\u20ac|\\u00a3)\\s*-?[\\d.,\\s]+$",
       "transform": {
-        "stripPrefix": ["$", "R$", "\u20ac", "\u00a3"],
+        "stripPrefix": [
+          "$",
+          "R$",
+          "€",
+          "£"
+        ],
         "trimWhitespace": true,
         "detectLocaleFromSymbol": {
           "$": "en-US",
           "R$": "pt-BR",
-          "\u20ac": "auto",
-          "\u00a3": "en-GB"
+          "€": "auto",
+          "£": "en-GB"
         }
       },
       "examples": {
-        "input": ["$1,234.56", "R$ 1.234,56", "\u20ac999.99", "\u00a3500"],
-        "output": ["1,234.56", "1.234,56", "999.99", "500"]
+        "input": [
+          "$1,234.56",
+          "R$ 1.234,56",
+          "€999.99",
+          "£500"
+        ],
+        "output": [
+          "1,234.56",
+          "1.234,56",
+          "999.99",
+          "500"
+        ]
       },
       "collisionNotes": "After stripping, the remaining string still needs locale-aware numeric parsing. Currency symbol provides a strong locale hint."
     },
     {
       "id": "num_parse_currency_suffix",
       "category": "number_parsing",
-      "locale": ["*"],
+      "locale": [
+        "*"
+      ],
       "priority": 91,
       "description": {
         "en": "Strip currency code suffix (BRL, USD, EUR, GBP) before numeric parsing.",
@@ -1094,7 +1857,12 @@
       },
       "pattern": "^-?[\\d.,\\s]+\\s*(BRL|USD|EUR|GBP)$",
       "transform": {
-        "stripSuffix": ["BRL", "USD", "EUR", "GBP"],
+        "stripSuffix": [
+          "BRL",
+          "USD",
+          "EUR",
+          "GBP"
+        ],
         "trimWhitespace": true,
         "detectLocaleFromCode": {
           "USD": "en-US",
@@ -1104,15 +1872,25 @@
         }
       },
       "examples": {
-        "input": ["1,234.56 USD", "1.234,56 BRL", "999.99 EUR"],
-        "output": ["1,234.56", "1.234,56", "999.99"]
+        "input": [
+          "1,234.56 USD",
+          "1.234,56 BRL",
+          "999.99 EUR"
+        ],
+        "output": [
+          "1,234.56",
+          "1.234,56",
+          "999.99"
+        ]
       },
       "collisionNotes": "Currency code suffixes are unambiguous (ISO 4217). They provide a reliable locale hint for subsequent numeric parsing."
     },
     {
       "id": "num_parse_dash_as_zero",
       "category": "number_parsing",
-      "locale": ["*"],
+      "locale": [
+        "*"
+      ],
       "priority": 70,
       "description": {
         "en": "Treat a dash or hyphen cell ('-' or '--') as numeric zero. Common in financial spreadsheets for empty/zero values.",
@@ -1123,15 +1901,26 @@
         "replaceWith": 0
       },
       "examples": {
-        "input": ["-", "--", " - "],
-        "output": [0, 0, 0]
+        "input": [
+          "-",
+          "--",
+          " - "
+        ],
+        "output": [
+          0,
+          0,
+          0
+        ]
       },
       "collisionNotes": "A single dash could be a text placeholder, not necessarily zero. Use column context (numeric column with other numbers) to validate."
     },
     {
       "id": "num_parse_dot_decimal_en",
       "category": "number_parsing",
-      "locale": ["en-US", "en-GB"],
+      "locale": [
+        "en-US",
+        "en-GB"
+      ],
       "priority": 90,
       "description": {
         "en": "In EN, dot is decimal separator: '1234.56' = 1234.56.",
@@ -1142,15 +1931,26 @@
         "decimalSeparator": "."
       },
       "examples": {
-        "input": ["1234.56", "0.99", "100.00"],
-        "output": [1234.56, 0.99, 100.00]
+        "input": [
+          "1234.56",
+          "0.99",
+          "100.00"
+        ],
+        "output": [
+          1234.56,
+          0.99,
+          100
+        ]
       },
       "collisionNotes": "No thousands separator in this pattern. A value like '1.234' could be EN decimal 1.234 or start of PT thousands notation."
     },
     {
       "id": "num_parse_dot_thousands_pt",
       "category": "number_parsing",
-      "locale": ["pt-BR", "pt-PT"],
+      "locale": [
+        "pt-BR",
+        "pt-PT"
+      ],
       "priority": 90,
       "description": {
         "en": "In PT-BR, dot is thousands separator: '1.234.567' = 1234567.",
@@ -1161,15 +1961,25 @@
         "removeSeparator": "."
       },
       "examples": {
-        "input": ["1.234", "1.234.567", "10.000"],
-        "output": [1234, 1234567, 10000]
+        "input": [
+          "1.234",
+          "1.234.567",
+          "10.000"
+        ],
+        "output": [
+          1234,
+          1234567,
+          10000
+        ]
       },
       "collisionNotes": "A value like '1.234' is ambiguous: PT thousands (1234) vs EN decimal (1.234). Multiple dot groups (1.234.567) are unambiguous PT thousands."
     },
     {
       "id": "num_parse_mixed_separator_detect",
       "category": "number_parsing",
-      "locale": ["*"],
+      "locale": [
+        "*"
+      ],
       "priority": 95,
       "description": {
         "en": "Auto-detect separator convention by analyzing column data. If a column has both '1,234.56' and '1.234,56', flag as mixed and require locale resolution.",
@@ -1184,15 +1994,37 @@
         "fallback": "use_config_locale"
       },
       "examples": {
-        "input": [["1,234.56", "2,345.67", "3,456.78"], ["1.234,56", "2.345,67", "1,234.56"]],
-        "output": [{ "detectedLocale": "en", "confidence": 1.0 }, { "detectedLocale": "ambiguous", "confidence": 0.67 }]
+        "input": [
+          [
+            "1,234.56",
+            "2,345.67",
+            "3,456.78"
+          ],
+          [
+            "1.234,56",
+            "2.345,67",
+            "1,234.56"
+          ]
+        ],
+        "output": [
+          {
+            "detectedLocale": "en",
+            "confidence": 1
+          },
+          {
+            "detectedLocale": "ambiguous",
+            "confidence": 0.67
+          }
+        ]
       },
       "collisionNotes": "Mixed-locale columns are a data quality issue. Always flag to the user rather than silently choosing one convention."
     },
     {
       "id": "num_parse_no_separator",
       "category": "number_parsing",
-      "locale": ["*"],
+      "locale": [
+        "*"
+      ],
       "priority": 85,
       "description": {
         "en": "Parse plain integer or decimal without any thousands separator: '12345' or '123.45' / '123,45'.",
@@ -1204,15 +2036,25 @@
         "fallbackDecimal": "."
       },
       "examples": {
-        "input": ["12345", "123.45", "123,45"],
-        "output": [12345, 123.45, 123.45]
+        "input": [
+          "12345",
+          "123.45",
+          "123,45"
+        ],
+        "output": [
+          12345,
+          123.45,
+          123.45
+        ]
       },
       "collisionNotes": "Single separator is ambiguous without locale context. '123,45' is PT decimal; '123.45' is EN decimal. Both produce 123.45 but for different locale reasons."
     },
     {
       "id": "num_parse_percentage_symbol",
       "category": "number_parsing",
-      "locale": ["*"],
+      "locale": [
+        "*"
+      ],
       "priority": 88,
       "description": {
         "en": "Strip '%' symbol and divide by 100 to get decimal representation: '45.6%' = 0.456.",
@@ -1225,15 +2067,27 @@
         "parseNumericFirst": true
       },
       "examples": {
-        "input": ["45.6%", "100%", "0.5%", "12,5%"],
-        "output": [0.456, 1.0, 0.005, 0.125]
+        "input": [
+          "45.6%",
+          "100%",
+          "0.5%",
+          "12,5%"
+        ],
+        "output": [
+          0.456,
+          1,
+          0.005,
+          0.125
+        ]
       },
       "collisionNotes": "The numeric part before % still requires locale-aware parsing (e.g., '12,5%' is PT for 12.5%). Always parse the number after stripping %."
     },
     {
       "id": "num_parse_space_thousands",
       "category": "number_parsing",
-      "locale": ["*"],
+      "locale": [
+        "*"
+      ],
       "priority": 75,
       "description": {
         "en": "Parse space as thousands separator: '1 234 567' = 1234567. Used in some European and ISO formats.",
@@ -1245,15 +2099,25 @@
         "detectDecimalByLocale": true
       },
       "examples": {
-        "input": ["1 234 567", "10 000,50", "1 234.56"],
-        "output": [1234567, 10000.50, 1234.56]
+        "input": [
+          "1 234 567",
+          "10 000,50",
+          "1 234.56"
+        ],
+        "output": [
+          1234567,
+          10000.5,
+          1234.56
+        ]
       },
       "collisionNotes": "Space-separated numbers are less common in Excel but appear in imported data. Regular spaces and non-breaking spaces should both be handled."
     },
     {
       "id": "pct_detect_column",
       "category": "percentage",
-      "locale": ["*"],
+      "locale": [
+        "*"
+      ],
       "priority": 60,
       "description": {
         "en": "Detect percentage column from header keywords (e.g., 'rate', 'margin', 'growth', '%') or presence of '%' symbol in data values.",
@@ -1263,8 +2127,26 @@
       "action": {
         "type": "column_detection",
         "headerKeywords": {
-          "en": ["rate", "margin", "growth", "percentage", "pct", "%", "share", "ratio"],
-          "pt": ["taxa", "margem", "crescimento", "porcentagem", "pct", "%", "participacao", "razao"]
+          "en": [
+            "rate",
+            "margin",
+            "growth",
+            "percentage",
+            "pct",
+            "%",
+            "share",
+            "ratio"
+          ],
+          "pt": [
+            "taxa",
+            "margem",
+            "crescimento",
+            "porcentagem",
+            "pct",
+            "%",
+            "participacao",
+            "razao"
+          ]
         },
         "dataScan": {
           "checkSymbol": "%",
@@ -1272,15 +2154,31 @@
         }
       },
       "examples": {
-        "input": [{ "header": "Growth Rate", "values": ["15.2%", "8.7%", "-2.1%"] }],
-        "output": [{ "isPercentage": true, "confidence": 0.95 }]
+        "input": [
+          {
+            "header": "Growth Rate",
+            "values": [
+              "15.2%",
+              "8.7%",
+              "-2.1%"
+            ]
+          }
+        ],
+        "output": [
+          {
+            "isPercentage": true,
+            "confidence": 0.95
+          }
+        ]
       },
       "collisionNotes": "Header keywords like 'rate' could refer to interest rates (which may already be in decimal form). Combine header and data analysis."
     },
     {
       "id": "pct_normalize_0_to_1",
       "category": "percentage",
-      "locale": ["*"],
+      "locale": [
+        "*"
+      ],
       "priority": 65,
       "description": {
         "en": "Normalize percentage from 0-100 display scale to 0-1 calculation scale: 45.6 -> 0.456.",
@@ -1295,15 +2193,27 @@
         "divisor": 100
       },
       "examples": {
-        "input": [45.6, 100, 0, -10.5],
-        "output": [0.456, 1.0, 0.0, -0.105]
+        "input": [
+          45.6,
+          100,
+          0,
+          -10.5
+        ],
+        "output": [
+          0.456,
+          1,
+          0,
+          -0.105
+        ]
       },
       "collisionNotes": "Must determine input scale before normalizing. A value of 0.45 could already be in 0-1 scale; dividing again would produce 0.0045."
     },
     {
       "id": "pct_normalize_0_to_100",
       "category": "percentage",
-      "locale": ["*"],
+      "locale": [
+        "*"
+      ],
       "priority": 65,
       "description": {
         "en": "Normalize percentage from 0-1 calculation scale to 0-100 display scale: 0.456 -> 45.6.",
@@ -1318,15 +2228,27 @@
         "multiplier": 100
       },
       "examples": {
-        "input": [0.456, 1.0, 0.0, -0.105],
-        "output": [45.6, 100, 0, -10.5]
+        "input": [
+          0.456,
+          1,
+          0,
+          -0.105
+        ],
+        "output": [
+          45.6,
+          100,
+          0,
+          -10.5
+        ]
       },
       "collisionNotes": "Must determine input scale before normalizing. A value of 45 could already be in 0-100 scale; multiplying again would produce 4500."
     },
     {
       "id": "pct_parse_with_symbol",
       "category": "percentage",
-      "locale": ["*"],
+      "locale": [
+        "*"
+      ],
       "priority": 80,
       "description": {
         "en": "Parse percentage value with % symbol, respecting locale decimal separator: '45.6%' (EN) or '45,6%' (PT).",
@@ -1339,15 +2261,27 @@
         "outputScale": "0-100"
       },
       "examples": {
-        "input": ["45.6%", "45,6%", "100%", "-5.2%"],
-        "output": [45.6, 45.6, 100, -5.2]
+        "input": [
+          "45.6%",
+          "45,6%",
+          "100%",
+          "-5.2%"
+        ],
+        "output": [
+          45.6,
+          45.6,
+          100,
+          -5.2
+        ]
       },
       "collisionNotes": "Decimal separator ambiguity applies: '45,6%' is 45.6% in PT but would be invalid in EN. Use locale context."
     },
     {
       "id": "sep_detect_by_column",
       "category": "separator",
-      "locale": ["*"],
+      "locale": [
+        "*"
+      ],
       "priority": 85,
       "description": {
         "en": "Analyze full column values to determine separator convention. Majority vote across all numeric cells in the column.",
@@ -1359,18 +2293,36 @@
         "strategy": "majority_vote",
         "minimumSampleSize": 3,
         "ignoreAmbiguous": true,
-        "outputFields": ["detectedLocale", "confidence", "sampleSize"]
+        "outputFields": [
+          "detectedLocale",
+          "confidence",
+          "sampleSize"
+        ]
       },
       "examples": {
-        "input": [["1,234.56", "2,345.67", "999.00"]],
-        "output": [{ "detectedLocale": "en", "confidence": 1.0, "sampleSize": 3 }]
+        "input": [
+          [
+            "1,234.56",
+            "2,345.67",
+            "999.00"
+          ]
+        ],
+        "output": [
+          {
+            "detectedLocale": "en",
+            "confidence": 1,
+            "sampleSize": 3
+          }
+        ]
       },
       "collisionNotes": "Columns with few values or only ambiguous values may produce low confidence. Combine with other detection methods."
     },
     {
       "id": "sep_detect_by_frequency",
       "category": "separator",
-      "locale": ["*"],
+      "locale": [
+        "*"
+      ],
       "priority": 80,
       "description": {
         "en": "Use frequency analysis of '.' and ',' in numeric cells to detect locale. EN: more commas as thousands; PT: more dots as thousands.",
@@ -1379,20 +2331,43 @@
       "pattern": null,
       "action": {
         "type": "frequency_analysis",
-        "targets": [".", ","],
+        "targets": [
+          ".",
+          ","
+        ],
         "heuristic": "If comma count > dot count in non-decimal positions, likely EN. If dot count > comma count, likely PT.",
         "minimumOccurrences": 2
       },
       "examples": {
-        "input": [{ "dots": 5, "commas": 1 }, { "dots": 1, "commas": 5 }],
-        "output": [{ "likelyLocale": "pt", "confidence": 0.83 }, { "likelyLocale": "en", "confidence": 0.83 }]
+        "input": [
+          {
+            "dots": 5,
+            "commas": 1
+          },
+          {
+            "dots": 1,
+            "commas": 5
+          }
+        ],
+        "output": [
+          {
+            "likelyLocale": "pt",
+            "confidence": 0.83
+          },
+          {
+            "likelyLocale": "en",
+            "confidence": 0.83
+          }
+        ]
       },
       "collisionNotes": "Frequency analysis is a heuristic and can fail with small samples. Best used as a tiebreaker alongside other methods."
     },
     {
       "id": "sep_detect_by_locale_hint",
       "category": "separator",
-      "locale": ["*"],
+      "locale": [
+        "*"
+      ],
       "priority": 90,
       "description": {
         "en": "Use the sheet's locale setting, OS locale, or explicit user preference as the primary separator convention hint.",
@@ -1401,25 +2376,61 @@
       "pattern": null,
       "action": {
         "type": "locale_lookup",
-        "sources": ["sheet_locale", "os_locale", "user_preference", "config_default"],
+        "sources": [
+          "sheet_locale",
+          "os_locale",
+          "user_preference",
+          "config_default"
+        ],
         "priority": "first_available",
         "mapping": {
-          "en-US": { "thousands": ",", "decimal": "." },
-          "en-GB": { "thousands": ",", "decimal": "." },
-          "pt-BR": { "thousands": ".", "decimal": "," },
-          "pt-PT": { "thousands": ".", "decimal": "," }
+          "en-US": {
+            "thousands": ",",
+            "decimal": "."
+          },
+          "en-GB": {
+            "thousands": ",",
+            "decimal": "."
+          },
+          "pt-BR": {
+            "thousands": ".",
+            "decimal": ","
+          },
+          "pt-PT": {
+            "thousands": ".",
+            "decimal": ","
+          }
         }
       },
       "examples": {
-        "input": [{ "sheetLocale": "pt-BR" }, { "osLocale": "en-US", "sheetLocale": null }],
-        "output": [{ "thousands": ".", "decimal": "," }, { "thousands": ",", "decimal": "." }]
+        "input": [
+          {
+            "sheetLocale": "pt-BR"
+          },
+          {
+            "osLocale": "en-US",
+            "sheetLocale": null
+          }
+        ],
+        "output": [
+          {
+            "thousands": ".",
+            "decimal": ","
+          },
+          {
+            "thousands": ",",
+            "decimal": "."
+          }
+        ]
       },
       "collisionNotes": "Locale hints can be wrong if the data was created in a different locale than the current environment. Always validate against actual data."
     },
     {
       "id": "sep_detect_by_position",
       "category": "separator",
-      "locale": ["*"],
+      "locale": [
+        "*"
+      ],
       "priority": 82,
       "description": {
         "en": "Use digit grouping position to disambiguate: groups of exactly 3 digits after separator indicate thousands. E.g., '1,234' has 3-digit group = thousands.",
@@ -1429,19 +2440,52 @@
       "action": {
         "type": "positional_analysis",
         "rules": [
-          { "condition": "exactly 3 digits after last separator", "inference": "separator is thousands" },
-          { "condition": "1-2 digits after last separator", "inference": "separator is decimal" },
-          { "condition": "more than 3 digits after separator", "inference": "separator is decimal" },
-          { "condition": "multiple same separators with 3-digit groups", "inference": "separator is thousands" }
+          {
+            "condition": "exactly 3 digits after last separator",
+            "inference": "separator is thousands"
+          },
+          {
+            "condition": "1-2 digits after last separator",
+            "inference": "separator is decimal"
+          },
+          {
+            "condition": "more than 3 digits after separator",
+            "inference": "separator is decimal"
+          },
+          {
+            "condition": "multiple same separators with 3-digit groups",
+            "inference": "separator is thousands"
+          }
         ]
       },
       "examples": {
-        "input": ["1,234", "1,23", "1,2345", "1,234,567"],
+        "input": [
+          "1,234",
+          "1,23",
+          "1,2345",
+          "1,234,567"
+        ],
         "output": [
-          { "separator": ",", "type": "ambiguous_thousands_or_3decimal", "confidence": 0.7 },
-          { "separator": ",", "type": "decimal", "confidence": 0.95 },
-          { "separator": ",", "type": "decimal", "confidence": 0.95 },
-          { "separator": ",", "type": "thousands", "confidence": 1.0 }
+          {
+            "separator": ",",
+            "type": "ambiguous_thousands_or_3decimal",
+            "confidence": 0.7
+          },
+          {
+            "separator": ",",
+            "type": "decimal",
+            "confidence": 0.95
+          },
+          {
+            "separator": ",",
+            "type": "decimal",
+            "confidence": 0.95
+          },
+          {
+            "separator": ",",
+            "type": "thousands",
+            "confidence": 1
+          }
         ]
       },
       "collisionNotes": "The 3-digit rule fails for exactly 3 decimal places (e.g., '1.234' could be EN decimal 1.234 or PT thousands 1234). Combine with other methods."
@@ -1449,7 +2493,9 @@
     {
       "id": "validate_date_range",
       "category": "validation",
-      "locale": ["*"],
+      "locale": [
+        "*"
+      ],
       "priority": 50,
       "description": {
         "en": "Reject dates outside reasonable range 1900-2100. Prevents nonsensical dates from serial number miscalculation.",
@@ -1464,15 +2510,38 @@
         "severity": "medium"
       },
       "examples": {
-        "input": ["2024-03-15", "1899-12-31", "2101-01-01", "0001-01-01"],
-        "output": [{ "valid": true }, { "valid": false, "reason": "year < 1900" }, { "valid": false, "reason": "year > 2100" }, { "valid": false, "reason": "year < 1900" }]
+        "input": [
+          "2024-03-15",
+          "1899-12-31",
+          "2101-01-01",
+          "0001-01-01"
+        ],
+        "output": [
+          {
+            "valid": true
+          },
+          {
+            "valid": false,
+            "reason": "year < 1900"
+          },
+          {
+            "valid": false,
+            "reason": "year > 2100"
+          },
+          {
+            "valid": false,
+            "reason": "year < 1900"
+          }
+        ]
       },
       "collisionNotes": "The 1900 lower bound matches Excel's epoch. Dates before 1900 cannot be represented as Excel serial numbers."
     },
     {
       "id": "validate_negative_context",
       "category": "validation",
-      "locale": ["*"],
+      "locale": [
+        "*"
+      ],
       "priority": 40,
       "description": {
         "en": "Warn when negative values appear in columns that typically hold non-negative data (e.g., quantities, counts, ages).",
@@ -1483,22 +2552,57 @@
         "type": "semantic_check",
         "condition": "value < 0",
         "headerKeywords": {
-          "en": ["quantity", "count", "qty", "units", "age", "population", "headcount"],
-          "pt": ["quantidade", "contagem", "qtd", "unidades", "idade", "populacao", "efetivo"]
+          "en": [
+            "quantity",
+            "count",
+            "qty",
+            "units",
+            "age",
+            "population",
+            "headcount"
+          ],
+          "pt": [
+            "quantidade",
+            "contagem",
+            "qtd",
+            "unidades",
+            "idade",
+            "populacao",
+            "efetivo"
+          ]
         },
         "onViolation": "warn",
         "severity": "low"
       },
       "examples": {
-        "input": [{ "header": "Quantity", "value": -5 }, { "header": "Profit", "value": -100 }],
-        "output": [{ "warn": true, "reason": "negative value in quantity column" }, { "warn": false }]
+        "input": [
+          {
+            "header": "Quantity",
+            "value": -5
+          },
+          {
+            "header": "Profit",
+            "value": -100
+          }
+        ],
+        "output": [
+          {
+            "warn": true,
+            "reason": "negative value in quantity column"
+          },
+          {
+            "warn": false
+          }
+        ]
       },
       "collisionNotes": "Some domains allow negative quantities (e.g., inventory adjustments, returns). This is a soft warning, not a hard rejection."
     },
     {
       "id": "validate_numeric_overflow",
       "category": "validation",
-      "locale": ["*"],
+      "locale": [
+        "*"
+      ],
       "priority": 55,
       "description": {
         "en": "Detect values exceeding Excel's maximum precision of 15 significant digits. Values beyond this are silently rounded by Excel.",
@@ -1513,11 +2617,26 @@
         "maxSafeInteger": 9007199254740991
       },
       "examples": {
-        "input": [1234567890123456, 12345678901234.5, 123456789012345],
+        "input": [
+          1234567890123456,
+          12345678901234.5,
+          123456789012345
+        ],
         "output": [
-          { "valid": false, "significantDigits": 16, "reason": "exceeds 15-digit precision" },
-          { "valid": false, "significantDigits": 16, "reason": "exceeds 15-digit precision" },
-          { "valid": true, "significantDigits": 15 }
+          {
+            "valid": false,
+            "significantDigits": 16,
+            "reason": "exceeds 15-digit precision"
+          },
+          {
+            "valid": false,
+            "significantDigits": 16,
+            "reason": "exceeds 15-digit precision"
+          },
+          {
+            "valid": true,
+            "significantDigits": 15
+          }
         ]
       },
       "collisionNotes": "This is especially critical for ID columns (e.g., credit card numbers, CPF/CNPJ) which may lose trailing digits when treated as numbers."
@@ -1525,7 +2644,9 @@
     {
       "id": "validate_type_consistency",
       "category": "validation",
-      "locale": ["*"],
+      "locale": [
+        "*"
+      ],
       "priority": 45,
       "description": {
         "en": "Warn when a column contains mixed numeric and text values, indicating potential data quality issues.",
@@ -1542,8 +2663,25 @@
         "excludeHeaders": true
       },
       "examples": {
-        "input": [{ "values": [100, 200, "N/A", 400, 500] }],
-        "output": [{ "consistent": false, "numericRatio": 0.8, "textRatio": 0.2, "reason": "20% text values in numeric column" }]
+        "input": [
+          {
+            "values": [
+              100,
+              200,
+              "N/A",
+              400,
+              500
+            ]
+          }
+        ],
+        "output": [
+          {
+            "consistent": false,
+            "numericRatio": 0.8,
+            "textRatio": 0.2,
+            "reason": "20% text values in numeric column"
+          }
+        ]
       },
       "collisionNotes": "Some mixed columns are intentional (e.g., 'N/A', '-', 'TBD' as placeholders). Consider coercion rules before flagging."
     }

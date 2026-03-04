@@ -6,13 +6,23 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-03-03"
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
     "domain": "legal",
     "minCitationsPerClaim": 1,
-    "maxClaimsWithoutEvidence": 0
+    "maxClaimsWithoutEvidence": 0,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "domain": "legal",
   "evidenceHierarchy": [

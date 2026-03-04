@@ -3,8 +3,17 @@
     "id": "di_accounting_redaction_and_safety_rules_v2",
     "version": "2.0.0",
     "description": "Safety and redaction policy for accounting documents.",
-    "languages": ["any"],
-    "lastUpdated": "2026-03-03"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -12,14 +21,62 @@
   },
   "domain": "accounting",
   "redactionRules": [
-    { "id": "acct_redact_001_ssn", "dataType": "SSN", "pattern": "\\b\\d{3}-\\d{2}-\\d{4}\\b", "action": "REDACT", "replacement": "[SSN REDACTED]" },
-    { "id": "acct_redact_002_tax_id", "dataType": "tax_id", "pattern": "\\b\\d{2}-\\d{3}-\\d{3}\\/\\d{4}-\\d{2}\\b", "action": "REDACT", "replacement": "[TAX_ID REDACTED]" },
-    { "id": "acct_redact_003_cpf", "dataType": "cpf", "pattern": "\\b\\d{3}\\.?\\d{3}\\.?\\d{3}-?\\d{2}\\b", "action": "REDACT", "replacement": "[CPF REDACTED]" },
-    { "id": "acct_redact_004_cnpj", "dataType": "cnpj", "pattern": "\\b\\d{2}\\.?\\d{3}\\.?\\d{3}\\/?\\d{4}-?\\d{2}\\b", "action": "REDACT", "replacement": "[CNPJ REDACTED]" },
-    { "id": "acct_redact_005_bank_account", "dataType": "bank_account_number", "pattern": "\\b(?:acct|account|conta|accountno|a\\.?c\\.?o?\\.?|no|nº|#)\\s*:?\\s*\\d{6,20}\\b", "action": "REDACT", "replacement": "[BANK_ACCOUNT REDACTED]" },
-    { "id": "acct_redact_006_routing", "dataType": "bank_routing", "pattern": "\\b(?:routing|route)\\s*(?:no|number|nº|#)?\\s*:?\\s*\\d{8,12}\\b", "action": "REDACT", "replacement": "[ROUTING REDACTED]" },
-    { "id": "acct_redact_007_card_number", "dataType": "card_number", "pattern": "\\b(?:\\d{4}[ -]?){3}\\d{4}\\b", "action": "REDACT", "replacement": "[CARD_NUMBER REDACTED]" },
-    { "id": "acct_redact_008_salary", "dataType": "salary", "pattern": "\\b(?:gross\\s+pay|net\\s+pay|sal[aá]rio|compensation)\\b[\\s\\S]{0,25}\\$?[0-9][0-9\\.,]{4,}", "action": "MASK", "replacement": "[SALARY REDACTED]" }
+    {
+      "id": "acct_redact_001_ssn",
+      "dataType": "SSN",
+      "pattern": "\\b\\d{3}-\\d{2}-\\d{4}\\b",
+      "action": "REDACT",
+      "replacement": "[SSN REDACTED]"
+    },
+    {
+      "id": "acct_redact_002_tax_id",
+      "dataType": "tax_id",
+      "pattern": "\\b\\d{2}-\\d{3}-\\d{3}\\/\\d{4}-\\d{2}\\b",
+      "action": "REDACT",
+      "replacement": "[TAX_ID REDACTED]"
+    },
+    {
+      "id": "acct_redact_003_cpf",
+      "dataType": "cpf",
+      "pattern": "\\b\\d{3}\\.?\\d{3}\\.?\\d{3}-?\\d{2}\\b",
+      "action": "REDACT",
+      "replacement": "[CPF REDACTED]"
+    },
+    {
+      "id": "acct_redact_004_cnpj",
+      "dataType": "cnpj",
+      "pattern": "\\b\\d{2}\\.?\\d{3}\\.?\\d{3}\\/?\\d{4}-?\\d{2}\\b",
+      "action": "REDACT",
+      "replacement": "[CNPJ REDACTED]"
+    },
+    {
+      "id": "acct_redact_005_bank_account",
+      "dataType": "bank_account_number",
+      "pattern": "\\b(?:acct|account|conta|accountno|a\\.?c\\.?o?\\.?|no|nº|#)\\s*:?\\s*\\d{6,20}\\b",
+      "action": "REDACT",
+      "replacement": "[BANK_ACCOUNT REDACTED]"
+    },
+    {
+      "id": "acct_redact_006_routing",
+      "dataType": "bank_routing",
+      "pattern": "\\b(?:routing|route)\\s*(?:no|number|nº|#)?\\s*:?\\s*\\d{8,12}\\b",
+      "action": "REDACT",
+      "replacement": "[ROUTING REDACTED]"
+    },
+    {
+      "id": "acct_redact_007_card_number",
+      "dataType": "card_number",
+      "pattern": "\\b(?:\\d{4}[ -]?){3}\\d{4}\\b",
+      "action": "REDACT",
+      "replacement": "[CARD_NUMBER REDACTED]"
+    },
+    {
+      "id": "acct_redact_008_salary",
+      "dataType": "salary",
+      "pattern": "\\b(?:gross\\s+pay|net\\s+pay|sal[aá]rio|compensation)\\b[\\s\\S]{0,25}\\$?[0-9][0-9\\.,]{4,}",
+      "action": "MASK",
+      "replacement": "[SALARY REDACTED]"
+    }
   ],
   "safetyRules": [
     {

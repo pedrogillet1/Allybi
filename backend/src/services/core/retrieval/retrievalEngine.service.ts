@@ -196,6 +196,8 @@ export interface ChunkLocation {
   sheet?: string | null;
   slide?: number | null;
   sectionKey?: string | null;
+  versionId?: string | null;
+  rootDocumentId?: string | null;
   bbox?: { x: number; y: number; w: number; h: number } | null;
 }
 
@@ -274,10 +276,22 @@ export interface EvidenceItem {
   };
 
   warnings?: string[];
-  extractionHints?: Array<Record<string, unknown>>;
+  extractionHints?: Array<Record<string, any>>;
+}
+
+export type RetrievalRuntimeStatus = "ok" | "degraded" | "failed";
+
+export interface RetrievalRuntimeError {
+  code: string;
+  message: string;
+  retryable: boolean;
+  details?: Record<string, any>;
 }
 
 export interface EvidencePack {
+  runtimeStatus?: RetrievalRuntimeStatus;
+  runtimeError?: RetrievalRuntimeError;
+
   query: {
     original: string;
     normalized: string;
@@ -346,7 +360,7 @@ export type RetrievalRuleTelemetryEventName =
 
 export interface RetrievalRuleTelemetryEvent {
   event: RetrievalRuleTelemetryEventName;
-  payload: Record<string, unknown>;
+  payload: Record<string, any>;
 }
 
 interface DocumentClassificationResult {
@@ -377,6 +391,15 @@ interface RetrievalQueryVariant {
   weight: number;
   sourceRuleId: string;
   reason: string;
+}
+
+interface RetrievalPhaseResult {
+  phaseId: string;
+  source: CandidateSource;
+  hits: unknown[];
+  status: "ok" | "failed" | "timed_out";
+  failureCode?: string;
+  note?: string;
 }
 
 type ScopeInvariantStage =
@@ -547,11 +570,11 @@ export class RetrievalEngineService {
     // 1) Load banks (single source of truth)
     const semanticCfg = this.getRequiredBank<any>("semantic_search_config");
     const rankerCfg = this.getRequiredBank<any>("retrieval_ranker_config");
-    const boostsKeyword = this.safeGetBank<Record<string, unknown>>("keyword_boost_rules");
-    const boostsTitle = this.safeGetBank<Record<string, unknown>>("doc_title_boost_rules");
-    const boostsType = this.safeGetBank<Record<string, unknown>>("doc_type_boost_rules");
-    const boostsRecency = this.safeGetBank<Record<string, unknown>>("recency_boost_rules");
-    const routingPriority = this.safeGetBank<Record<string, unknown>>("routing_priority");
+    const boostsKeyword = this.safeGetBank<Record<string, any>>("keyword_boost_rules");
+    const boostsTitle = this.safeGetBank<Record<string, any>>("doc_title_boost_rules");
+    const boostsType = this.safeGetBank<Record<string, any>>("doc_type_boost_rules");
+    const boostsRecency = this.safeGetBank<Record<string, any>>("recency_boost_rules");
+    const routingPriority = this.safeGetBank<Record<string, any>>("routing_priority");
     const diversification = this.getRequiredBank<any>("diversification_rules");
     const negatives = this.getRequiredBank<any>("retrieval_negatives");
     const packaging = this.getRequiredBank<any>("evidence_packaging");
@@ -632,7 +655,7 @@ export class RetrievalEngineService {
     let crossDocGatedReason: string | null = null;
     const emitRuleEvent = (
       event: RetrievalRuleTelemetryEventName,
-      payload: Record<string, unknown>,
+      payload: Record<string, any>,
     ) => {
       retrievalRuleEvents.push({ event, payload });
     };
@@ -996,7 +1019,7 @@ export class RetrievalEngineService {
       req,
       signals,
       rankerCfg,
-      routingPriority,
+      routingPriority || undefined,
     );
 
     // 10) Diversify (doc/section spread + near-dup control) unless disabled by overrides/lock policy
@@ -1041,6 +1064,36 @@ export class RetrievalEngineService {
       crossDocGatedReason,
       classification,
     });
+    const phaseFailureReasonCodes = Array.from(
+      new Set(
+        phaseResults
+          .map((phase) => phase.failureCode)
+          .filter((code): code is string => Boolean(code)),
+      ),
+    );
+    const phaseFailureNotes = phaseResults
+      .filter((phase) => phase.status !== "ok")
+      .map((phase) => ({
+        phaseId: phase.phaseId,
+        candidates: phase.hits.length,
+        note: phase.note,
+      }));
+    if (phaseFailureReasonCodes.length > 0 || phaseFailureNotes.length > 0) {
+      if (!pack.debug) {
+        pack.debug = { phases: [], reasonCodes: [] };
+      }
+      for (const reasonCode of phaseFailureReasonCodes) {
+        if (!pack.debug.reasonCodes.includes(reasonCode)) {
+          pack.debug.reasonCodes.push(reasonCode);
+        }
+      }
+      const seenPhaseIds = new Set(pack.debug.phases.map((phase) => phase.phaseId));
+      for (const phase of phaseFailureNotes) {
+        if (seenPhaseIds.has(phase.phaseId)) continue;
+        pack.debug.phases.push(phase);
+        seenPhaseIds.add(phase.phaseId);
+      }
+    }
     this.enforceScopeInvariant(
       pack.evidence.map((evidence) => evidence.docId),
       scope,
@@ -1109,7 +1162,7 @@ export class RetrievalEngineService {
   private async resolveScope(
     req: RetrievalRequest,
     signals: RetrievalRequest["signals"],
-    semanticCfg: Record<string, unknown>,
+    semanticCfg: Record<string, any>,
     docsInput?: DocMeta[],
   ): Promise<{
     candidateDocIds: string[];
@@ -1241,7 +1294,7 @@ export class RetrievalEngineService {
   private computeExpansionPolicy(
     req: RetrievalRequest,
     signals: RetrievalRequest["signals"],
-    semanticCfg: Record<string, unknown>,
+    semanticCfg: Record<string, any>,
   ): { enabled: boolean } {
     const policy = semanticCfg?.config?.queryExpansionPolicy;
     const enabledByBank = Boolean(policy?.enabled);
@@ -1276,7 +1329,7 @@ export class RetrievalEngineService {
     normalizedQuery: string,
     signals: RetrievalRequest["signals"],
   ): string[] {
-    const synonymBank = this.safeGetBank<Record<string, unknown>>("synonym_expansion");
+    const synonymBank = this.safeGetBank<Record<string, any>>("synonym_expansion");
     if (!synonymBank?.config?.enabled || !synonymBank?.groups) {
       return [normalizedQuery];
     }
@@ -1490,7 +1543,7 @@ export class RetrievalEngineService {
       "travel",
     ];
     try {
-      const provider = this.documentIntelligenceBanks as Record<string, unknown>;
+      const provider = this.documentIntelligenceBanks as Record<string, any>;
       const domains =
         typeof provider.getDocumentIntelligenceDomains === "function"
           ? provider.getDocumentIntelligenceDomains()
@@ -1517,7 +1570,7 @@ export class RetrievalEngineService {
     score: number;
     reasons: string[];
   } | null {
-    const provider = this.documentIntelligenceBanks as Record<string, unknown>;
+    const provider = this.documentIntelligenceBanks as Record<string, any>;
     const catalog =
       typeof provider.getDocTypeCatalog === "function"
         ? provider.getDocTypeCatalog(domain)
@@ -1595,7 +1648,7 @@ export class RetrievalEngineService {
       }> = [];
 
       for (const candidateDomain of domains) {
-        const provider = this.documentIntelligenceBanks as Record<string, unknown>;
+        const provider = this.documentIntelligenceBanks as Record<string, any>;
         const bank =
           typeof provider.getDomainDetectionRules === "function"
             ? provider.getDomainDetectionRules(candidateDomain)
@@ -1676,7 +1729,7 @@ export class RetrievalEngineService {
     // Fallback: infer domain from doc type if domain score was inconclusive.
     if (!domain && docTypeId) {
       for (const candidateDomain of domains) {
-        const provider = this.documentIntelligenceBanks as Record<string, unknown>;
+        const provider = this.documentIntelligenceBanks as Record<string, any>;
         const catalog =
           typeof provider.getDocTypeCatalog === "function"
             ? provider.getDocTypeCatalog(candidateDomain)
@@ -1685,7 +1738,7 @@ export class RetrievalEngineService {
           ? catalog.docTypes
           : [];
         const hasDocType = docTypes.some(
-          (entry: unknown) => this.normalizeDocType((entry as Record<string, unknown>)?.id) === docTypeId,
+          (entry: unknown) => this.normalizeDocType((entry as Record<string, any>)?.id) === docTypeId,
         );
         if (hasDocType) {
           domain = candidateDomain;
@@ -1720,7 +1773,7 @@ export class RetrievalEngineService {
     const normalizedDocType = this.normalizeDocType(docTypeId);
     if (!normalizedDocType) return null;
 
-    const provider = this.documentIntelligenceBanks as Record<string, unknown>;
+    const provider = this.documentIntelligenceBanks as Record<string, any>;
     const sectionsBank =
       typeof provider.getDocTypeSections === "function"
         ? provider.getDocTypeSections(domain, normalizedDocType)
@@ -1739,12 +1792,12 @@ export class RetrievalEngineService {
 
     const sectionAnchors: string[] = sections
       .map((section: unknown): { order: number; values: string[] } => {
-        const sec = section as Record<string, unknown>;
+        const sec = section as Record<string, any>;
         const order = safeNumber(sec?.order, 9999);
         const sectionId = String(sec?.id || "")
           .trim()
           .toLowerCase();
-        const nameRecord = sec?.name as Record<string, unknown> | undefined;
+        const nameRecord = sec?.name as Record<string, any> | undefined;
         const en = String(nameRecord?.en || "")
           .trim()
           .toLowerCase();
@@ -1761,7 +1814,7 @@ export class RetrievalEngineService {
 
     const tableAnchors: string[] = [
       ...tableMappings.flatMap((mapping: unknown) => {
-        const m = mapping as Record<string, unknown>;
+        const m = mapping as Record<string, any>;
         return [
           String(m?.canonicalHeader || "")
             .trim()
@@ -1950,17 +2003,11 @@ export class RetrievalEngineService {
   private async runPhases(opts: {
     queryVariants: RetrievalQueryVariant[];
     scopeDocIds: string[];
-    semanticCfg: Record<string, unknown>;
+    semanticCfg: Record<string, any>;
     additionalStructuralAnchors?: string[];
-  }): Promise<
-    Array<{ phaseId: string; source: CandidateSource; hits: unknown[] }>
-  > {
+  }): Promise<RetrievalPhaseResult[]> {
     const phases = opts.semanticCfg?.config?.hybridPhases ?? [];
-    const results: Array<{
-      phaseId: string;
-      source: CandidateSource;
-      hits: unknown[];
-    }> = [];
+    const results: RetrievalPhaseResult[] = [];
 
     const variants =
       Array.isArray(opts.queryVariants) && opts.queryVariants.length
@@ -1992,16 +2039,45 @@ export class RetrievalEngineService {
       operation: Promise<T>,
       fallback: T,
       label: string,
-    ): Promise<T> => {
+    ): Promise<{
+      output: T;
+      status: "ok" | "failed" | "timed_out";
+      note?: string;
+    }> => {
       let timer: NodeJS.Timeout | null = null;
-      const guarded = operation.catch((err) => {
-        logger.warn("[retrieval-engine] %s failed", label, { error: err?.message || String(err) });
-        return fallback;
-      });
-      const timed = new Promise<T>((resolve) => {
+      const guarded = operation
+        .then((value) => ({
+          output: value,
+          status: "ok" as const,
+        }))
+        .catch((err) => {
+          const errorMessage =
+            err instanceof Error ? err.message : String(err || "unknown_error");
+          logger.warn("[retrieval-engine] retrieval phase failed", {
+            label,
+            error: errorMessage,
+          });
+          return {
+            output: fallback,
+            status: "failed" as const,
+            note: `${label} failed: ${errorMessage}`,
+          };
+        });
+      const timed = new Promise<{
+        output: T;
+        status: "ok" | "failed" | "timed_out";
+        note?: string;
+      }>((resolve) => {
         timer = setTimeout(() => {
-          logger.warn("[retrieval-engine] %s timed out after %dms", label, perCallTimeoutMs);
-          resolve(fallback);
+          logger.warn("[retrieval-engine] retrieval phase timed out", {
+            label,
+            timeoutMs: perCallTimeoutMs,
+          });
+          resolve({
+            output: fallback,
+            status: "timed_out",
+            note: `${label} timed out after ${perCallTimeoutMs}ms`,
+          });
         }, perCallTimeoutMs);
       });
       const output = await Promise.race([guarded, timed]);
@@ -2033,7 +2109,7 @@ export class RetrievalEngineService {
 
         if (phase.type === "semantic") {
           const k = safeNumber(phase.k, 80);
-          const hits = await runWithTimeout(
+          const semanticResult = await runWithTimeout<unknown[]>(
             this.semanticIndex.search({
               query: variant.text,
               docIds: opts.scopeDocIds,
@@ -2045,14 +2121,30 @@ export class RetrievalEngineService {
           results.push({
             phaseId: `${phase.id ?? "phase_semantic"}::${variant.sourceRuleId}`,
             source: "semantic" as CandidateSource,
-            hits: hits.map((hit) => ({
-              ...hit,
-              score: clamp01(safeNumber(hit.score, 0) * variant.weight),
-            })),
+            status: semanticResult.status,
+            failureCode:
+              semanticResult.status === "ok"
+                ? undefined
+                : semanticResult.status === "timed_out"
+                  ? "semantic_search_timed_out"
+                  : "semantic_search_failed",
+            note: semanticResult.note,
+            hits: semanticResult.output.map((hit) => {
+              const normalizedHit =
+                hit && typeof hit === "object"
+                  ? (hit as Record<string, unknown>)
+                  : {};
+              return {
+                ...normalizedHit,
+                score: clamp01(
+                  safeNumber(normalizedHit.score, 0) * variant.weight,
+                ),
+              };
+            }),
           });
         } else if (phase.type === "lexical") {
           const k = safeNumber(phase.k, 120);
-          const hits = await runWithTimeout(
+          const lexicalResult = await runWithTimeout<unknown[]>(
             this.lexicalIndex.search({
               query: variant.text,
               docIds: opts.scopeDocIds,
@@ -2064,10 +2156,26 @@ export class RetrievalEngineService {
           results.push({
             phaseId: `${phase.id ?? "phase_lexical"}::${variant.sourceRuleId}`,
             source: "lexical" as CandidateSource,
-            hits: hits.map((hit) => ({
-              ...hit,
-              score: clamp01(safeNumber(hit.score, 0) * variant.weight),
-            })),
+            status: lexicalResult.status,
+            failureCode:
+              lexicalResult.status === "ok"
+                ? undefined
+                : lexicalResult.status === "timed_out"
+                  ? "lexical_search_timed_out"
+                  : "lexical_search_failed",
+            note: lexicalResult.note,
+            hits: lexicalResult.output.map((hit) => {
+              const normalizedHit =
+                hit && typeof hit === "object"
+                  ? (hit as Record<string, unknown>)
+                  : {};
+              return {
+                ...normalizedHit,
+                score: clamp01(
+                  safeNumber(normalizedHit.score, 0) * variant.weight,
+                ),
+              };
+            }),
           });
         } else if (phase.type === "structural") {
           const k = safeNumber(phase.k, 60);
@@ -2082,7 +2190,7 @@ export class RetrievalEngineService {
                 : []),
             ]),
           ).slice(0, 24);
-          const hits = await runWithTimeout(
+          const structuralResult = await runWithTimeout<unknown[]>(
             this.structuralIndex.search({
               query: variant.text,
               docIds: opts.scopeDocIds,
@@ -2095,10 +2203,26 @@ export class RetrievalEngineService {
           results.push({
             phaseId: `${phase.id ?? "phase_structural"}::${variant.sourceRuleId}`,
             source: "structural" as CandidateSource,
-            hits: hits.map((hit) => ({
-              ...hit,
-              score: clamp01(safeNumber(hit.score, 0) * variant.weight),
-            })),
+            status: structuralResult.status,
+            failureCode:
+              structuralResult.status === "ok"
+                ? undefined
+                : structuralResult.status === "timed_out"
+                  ? "structural_search_timed_out"
+                  : "structural_search_failed",
+            note: structuralResult.note,
+            hits: structuralResult.output.map((hit) => {
+              const normalizedHit =
+                hit && typeof hit === "object"
+                  ? (hit as Record<string, unknown>)
+                  : {};
+              return {
+                ...normalizedHit,
+                score: clamp01(
+                  safeNumber(normalizedHit.score, 0) * variant.weight,
+                ),
+              };
+            }),
           });
         }
       }
@@ -2108,11 +2232,7 @@ export class RetrievalEngineService {
   }
 
   private mergePhaseCandidates(
-    phaseResults: Array<{
-      phaseId: string;
-      source: CandidateSource;
-      hits: unknown[];
-    }>,
+    phaseResults: RetrievalPhaseResult[],
     scope: {
       candidateDocIds: string[];
       hardScopeActive: boolean;
@@ -2126,7 +2246,7 @@ export class RetrievalEngineService {
 
     for (const phase of phaseResults) {
       for (let i = 0; i < phase.hits.length; i++) {
-        const hit = phase.hits[i];
+        const hit = phase.hits[i] as Record<string, any>;
         const docId = String(hit.docId);
         const score = clamp01(safeNumber(hit.score, 0));
         const loc: ChunkLocation = hit.location ?? {};
@@ -2187,9 +2307,9 @@ export class RetrievalEngineService {
           docId,
           docType:
             this.normalizeDocType(
-              (hit as Record<string, unknown>).docType ??
-                (hit as Record<string, unknown>).documentType ??
-                (hit as Record<string, unknown>).mimeType,
+              (hit as Record<string, any>).docType ??
+                (hit as Record<string, any>).documentType ??
+                (hit as Record<string, any>).mimeType,
             ) ?? null,
           title: hit.title ?? null,
           filename: hit.filename ?? null,
@@ -2353,7 +2473,7 @@ export class RetrievalEngineService {
       sheetName?: string | null;
       rangeA1?: string | null;
     },
-    negativesBank: Record<string, unknown> | null,
+    negativesBank: Record<string, any> | null,
     scopeMetrics?: RetrievalScopeMetrics,
   ): CandidateChunk[] {
     if (!negativesBank?.config?.enabled) return candidates;
@@ -2379,7 +2499,7 @@ export class RetrievalEngineService {
         a.toLowerCase(),
       );
       // Load ontology for broader anchor coverage
-      const ontology = this.safeGetBank<Record<string, unknown>>("entity_role_ontology");
+      const ontology = this.safeGetBank<Record<string, any>>("entity_role_ontology");
       if (ontology?.roles) {
         for (const forbiddenRoleId of slotContract.forbidden) {
           const role = ontology.roles.find(
@@ -2398,7 +2518,7 @@ export class RetrievalEngineService {
         }
       }
       // Ranker config for slot extraction penalties
-      const rankerCfg = this.safeGetBank<Record<string, unknown>>("retrieval_ranker_config");
+      const rankerCfg = this.safeGetBank<Record<string, any>>("retrieval_ranker_config");
       confusionPenaltyDefault = safeNumber(
         rankerCfg?.config?.slotExtraction?.forbiddenRolePenalty,
         0.25,
@@ -2449,7 +2569,7 @@ export class RetrievalEngineService {
           );
         } else if (hasTarget) {
           // Boost chunks containing target role anchors
-          const rankerCfg = this.safeGetBank<Record<string, unknown>>("retrieval_ranker_config");
+          const rankerCfg = this.safeGetBank<Record<string, any>>("retrieval_ranker_config");
           const anchorBoost = safeNumber(
             rankerCfg?.config?.slotExtraction?.roleAnchorBoost,
             0.15,
@@ -2475,10 +2595,10 @@ export class RetrievalEngineService {
     req: RetrievalRequest,
     signals: RetrievalRequest["signals"],
     banks: {
-      boostsKeyword: Record<string, unknown> | null;
-      boostsTitle: Record<string, unknown> | null;
-      boostsType: Record<string, unknown> | null;
-      boostsRecency: Record<string, unknown> | null;
+      boostsKeyword: Record<string, any> | null;
+      boostsTitle: Record<string, any> | null;
+      boostsType: Record<string, any> | null;
+      boostsRecency: Record<string, any> | null;
     },
     docMetaById?: Map<string, DocMeta>,
   ): CandidateChunk[] {
@@ -2756,10 +2876,10 @@ export class RetrievalEngineService {
     const locationTargets = Array.isArray(retrievalPlan.locationTargets)
       ? retrievalPlan.locationTargets
           .map((target) => {
-            const rawType = String((target as Record<string, unknown>)?.type || "")
+            const rawType = String((target as Record<string, any>)?.type || "")
               .trim()
               .toLowerCase();
-            const rawValue = String((target as Record<string, unknown>)?.value || "")
+            const rawValue = String((target as Record<string, any>)?.value || "")
               .trim()
               .toLowerCase();
             if (!rawType || !rawValue) return null;
@@ -3020,8 +3140,8 @@ export class RetrievalEngineService {
     candidates: CandidateChunk[],
     req: RetrievalRequest,
     signals: RetrievalRequest["signals"],
-    rankerCfg: Record<string, unknown>,
-    routingPriorityBank?: Record<string, unknown>,
+    rankerCfg: Record<string, any>,
+    routingPriorityBank?: Record<string, any>,
   ): CandidateChunk[] {
     const cfg = rankerCfg?.config;
     const weights = cfg?.weights ?? {
@@ -3093,7 +3213,7 @@ export class RetrievalEngineService {
 
   private resolveIntentFamilyPriorityBoost(
     intentFamily: string | null | undefined,
-    routingPriorityBank: Record<string, unknown>,
+    routingPriorityBank?: Record<string, any>,
   ): number {
     if (!routingPriorityBank?.config?.enabled) return 0;
     const priorities =
@@ -3128,7 +3248,7 @@ export class RetrievalEngineService {
   }
 
   private resolveRoutingStageWeight(
-    routingPriorityBank: Record<string, unknown>,
+    routingPriorityBank: Record<string, any>,
     stageId: string,
   ): number {
     const stages = Array.isArray(routingPriorityBank?.tiebreakStages)
@@ -3186,7 +3306,7 @@ export class RetrievalEngineService {
     candidates: CandidateChunk[],
     req: RetrievalRequest,
     signals: RetrievalRequest["signals"],
-    diversificationBank: Record<string, unknown> | null,
+    diversificationBank: Record<string, any> | null,
   ): CandidateChunk[] {
     if (!diversificationBank?.config?.enabled) return candidates;
 
@@ -3282,7 +3402,7 @@ export class RetrievalEngineService {
   private lookupExtractionHints(
     domain: string | null,
     docType: string | null,
-  ): Array<Record<string, unknown>> {
+  ): Array<Record<string, any>> {
     if (!domain || !docType) return [];
     try {
       if (typeof this.documentIntelligenceBanks.getDocTypeExtractionHints !== "function") {
@@ -3299,7 +3419,7 @@ export class RetrievalEngineService {
           ? hints.hints
           : [];
       return fields.slice(0, 5).map((f: unknown) =>
-        f && typeof f === "object" ? (f as Record<string, unknown>) : { hint: String(f) },
+        f && typeof f === "object" ? (f as Record<string, any>) : { hint: String(f) },
       );
     } catch {
       return [];
@@ -3441,7 +3561,7 @@ export class RetrievalEngineService {
     candidates: CandidateChunk[],
     req: RetrievalRequest,
     signals: RetrievalRequest["signals"],
-    packagingBank: Record<string, unknown>,
+    packagingBank: Record<string, any>,
     ctx: {
       queryOriginal: string;
       queryNormalized: string;
@@ -3461,10 +3581,10 @@ export class RetrievalEngineService {
     },
   ): EvidencePack {
     const cfg = packagingBank?.config ?? {};
-    const scpBank = this.safeGetBank<Record<string, unknown>>(
+    const scpBank = this.safeGetBank<Record<string, any>>(
       "snippet_compression_policy",
     );
-    const scpConfig = (scpBank as Record<string, unknown>)?.config ?? {};
+    const scpConfig = (scpBank as Record<string, any>)?.config ?? {};
     const maxSnippetChars = safeNumber(scpConfig.maxSnippetChars, 2200);
     const preserveNumericUnits = scpConfig.preserveNumericUnits !== false;
     const preserveHeadings = scpConfig.preserveHeadings !== false;
@@ -3558,7 +3678,7 @@ export class RetrievalEngineService {
         : null;
     let extractionMinScore = minFinalScore;
     if (isExtraction) {
-      const rankerCfg = this.safeGetBank<Record<string, unknown>>("retrieval_ranker_config");
+      const rankerCfg = this.safeGetBank<Record<string, any>>("retrieval_ranker_config");
       extractionMinScore = safeNumber(
         rankerCfg?.config?.slotExtraction?.scopedMinFinalScoreOverride,
         0.45,
@@ -3692,8 +3812,10 @@ export class RetrievalEngineService {
       if (evidence.length >= maxEvidenceHard) break;
     }
 
-    // PACK_004 — Sort by doc then location for coherent reading order
+    // PACK_004 — Preserve ranking priority; stabilize ties for coherent reading order
     evidence.sort((a, b) => {
+      const scoreDelta = (b.score?.finalScore ?? 0) - (a.score?.finalScore ?? 0);
+      if (scoreDelta !== 0) return scoreDelta;
       if (a.docId !== b.docId) return a.docId < b.docId ? -1 : 1;
       const pageA = Number(a.location?.page ?? 0);
       const pageB = Number(b.location?.page ?? 0);
@@ -3744,7 +3866,7 @@ export class RetrievalEngineService {
     // Per-doc cap from bank config
     {
       const packMaxPerDoc = safeNumber(
-        (this.safeGetBank<Record<string, unknown>>("evidence_packaging_policy") as Record<string, unknown>)
+        (this.safeGetBank<Record<string, any>>("evidence_packaging_policy") as Record<string, any>)
           ?.config?.maxPerDoc,
         maxPerDocHard,
       );
@@ -3771,6 +3893,7 @@ export class RetrievalEngineService {
         : null;
 
     const pack: EvidencePack = {
+      runtimeStatus: "ok",
       query: {
         original: ctx.queryOriginal,
         normalized: ctx.queryNormalized,
@@ -4066,6 +4189,7 @@ export class RetrievalEngineService {
     telemetry?: EvidencePack["telemetry"],
   ): EvidencePack {
     return {
+      runtimeStatus: "ok",
       query: { original: req.query, normalized: (req.query ?? "").trim() },
       scope: {
         activeDocId: req.signals.activeDocId ?? null,

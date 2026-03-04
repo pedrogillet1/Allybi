@@ -9,7 +9,13 @@
       "pt"
     ],
     "lastUpdated": "2026-03-03",
-    "description": "Locale number format grammar, parsing heuristics, and PT-BR vs EN-US disambiguation rules for retrieval-safe extraction."
+    "description": "Locale number format grammar, parsing heuristics, and PT-BR vs EN-US disambiguation rules for retrieval-safe extraction.",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,

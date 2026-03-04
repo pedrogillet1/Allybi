@@ -7,7 +7,14 @@
       "any"
     ],
     "lastUpdated": "2026-02-28",
-    "schemaId": "doc_identity_schema"
+    "schemaId": "doc_identity_schema",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,

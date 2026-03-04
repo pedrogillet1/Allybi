@@ -3,8 +3,20 @@
     "id": "no_docs_messages",
     "version": "4.0.0",
     "description": "Combinatorial microcopy (no full prewritten messages). Builds unique, ChatGPT-like no-docs responses from fragments + assembly rules. Goal: never output 'no relevant information found'. Always provide a concrete next action. Uses seeded variation + anti-repetition.",
-    "languages": ["any", "en", "pt", "es"],
-    "lastUpdated": "2026-01-26"
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-01-26",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -53,8 +65,15 @@
     },
     "assembly": {
       "_comment": "A response is built by selecting fragments from parts and stitching them into 1–3 sentences.",
-      "partsOrder": ["ack", "cause", "detail", "action"],
-      "optionalParts": ["detail"],
+      "partsOrder": [
+        "ack",
+        "cause",
+        "detail",
+        "action"
+      ],
+      "optionalParts": [
+        "detail"
+      ],
       "maxPartsUsed": 3,
       "sentenceStrategy": {
         "_comment": "How to split into short paragraphs/sentences.",
@@ -90,208 +109,625 @@
       "weight": 0.25,
       "parts": {
         "ack": [
-          { "id": "g_ack_01_en", "lang": "en", "t": "Right now I don't have usable document content." },
-          { "id": "g_ack_02_en", "lang": "en", "t": "I don't have readable document content available yet." },
-          { "id": "g_ack_03_en", "lang": "en", "t": "I can't ground this in documents at the moment." },
-
-          { "id": "g_ack_01_pt", "lang": "pt", "t": "No momento eu não tenho conteúdo utilizável de documentos." },
-          { "id": "g_ack_02_pt", "lang": "pt", "t": "Ainda não há conteúdo legível de documentos disponível." },
-          { "id": "g_ack_03_pt", "lang": "pt", "t": "Eu não consigo basear isso em documentos agora." },
-
-          { "id": "g_ack_01_es", "lang": "es", "t": "Ahora mismo no tengo contenido usable de documentos." },
-          { "id": "g_ack_02_es", "lang": "es", "t": "Aún no hay contenido legible de documentos disponible." },
-          { "id": "g_ack_03_es", "lang": "es", "t": "No puedo basar esto en documentos en este momento." }
+          {
+            "id": "g_ack_01_en",
+            "lang": "en",
+            "t": "Right now I don't have usable document content."
+          },
+          {
+            "id": "g_ack_02_en",
+            "lang": "en",
+            "t": "I don't have readable document content available yet."
+          },
+          {
+            "id": "g_ack_03_en",
+            "lang": "en",
+            "t": "I can't ground this in documents at the moment."
+          },
+          {
+            "id": "g_ack_01_pt",
+            "lang": "pt",
+            "t": "No momento eu não tenho conteúdo utilizável de documentos."
+          },
+          {
+            "id": "g_ack_02_pt",
+            "lang": "pt",
+            "t": "Ainda não há conteúdo legível de documentos disponível."
+          },
+          {
+            "id": "g_ack_03_pt",
+            "lang": "pt",
+            "t": "Eu não consigo basear isso em documentos agora."
+          },
+          {
+            "id": "g_ack_01_es",
+            "lang": "es",
+            "t": "Ahora mismo no tengo contenido usable de documentos."
+          },
+          {
+            "id": "g_ack_02_es",
+            "lang": "es",
+            "t": "Aún no hay contenido legible de documentos disponible."
+          },
+          {
+            "id": "g_ack_03_es",
+            "lang": "es",
+            "t": "No puedo basar esto en documentos en este momento."
+          }
         ],
         "cause": [
-          { "id": "g_cause_01_en", "lang": "en", "t": "There may be no indexed files, or indexing isn't finished." },
-          { "id": "g_cause_02_en", "lang": "en", "t": "The document index might be empty or unavailable." },
-
-          { "id": "g_cause_01_pt", "lang": "pt", "t": "Pode ser que não haja arquivos indexados, ou a indexação ainda não terminou." },
-          { "id": "g_cause_02_pt", "lang": "pt", "t": "O índice de documentos pode estar vazio ou indisponível." },
-
-          { "id": "g_cause_01_es", "lang": "es", "t": "Puede que no haya archivos indexados o que la indexación no haya terminado." },
-          { "id": "g_cause_02_es", "lang": "es", "t": "El índice de documentos puede estar vacío o no disponible." }
+          {
+            "id": "g_cause_01_en",
+            "lang": "en",
+            "t": "There may be no indexed files, or indexing isn't finished."
+          },
+          {
+            "id": "g_cause_02_en",
+            "lang": "en",
+            "t": "The document index might be empty or unavailable."
+          },
+          {
+            "id": "g_cause_01_pt",
+            "lang": "pt",
+            "t": "Pode ser que não haja arquivos indexados, ou a indexação ainda não terminou."
+          },
+          {
+            "id": "g_cause_02_pt",
+            "lang": "pt",
+            "t": "O índice de documentos pode estar vazio ou indisponível."
+          },
+          {
+            "id": "g_cause_01_es",
+            "lang": "es",
+            "t": "Puede que no haya archivos indexados o que la indexación no haya terminado."
+          },
+          {
+            "id": "g_cause_02_es",
+            "lang": "es",
+            "t": "El índice de documentos puede estar vacío o no disponible."
+          }
         ],
         "detail": [
-          { "id": "g_detail_01_en", "lang": "en", "t": "{{reasonShort}}", "useOnlyIfProvided": true },
-          { "id": "g_detail_02_en", "lang": "en", "t": "Supported types: {{expectedDocTypes}}.", "useOnlyIfProvided": true },
-
-          { "id": "g_detail_01_pt", "lang": "pt", "t": "{{reasonShort}}", "useOnlyIfProvided": true },
-          { "id": "g_detail_02_pt", "lang": "pt", "t": "Tipos suportados: {{expectedDocTypes}}.", "useOnlyIfProvided": true },
-
-          { "id": "g_detail_01_es", "lang": "es", "t": "{{reasonShort}}", "useOnlyIfProvided": true },
-          { "id": "g_detail_02_es", "lang": "es", "t": "Tipos compatibles: {{expectedDocTypes}}.", "useOnlyIfProvided": true }
+          {
+            "id": "g_detail_01_en",
+            "lang": "en",
+            "t": "{{reasonShort}}",
+            "useOnlyIfProvided": true
+          },
+          {
+            "id": "g_detail_02_en",
+            "lang": "en",
+            "t": "Supported types: {{expectedDocTypes}}.",
+            "useOnlyIfProvided": true
+          },
+          {
+            "id": "g_detail_01_pt",
+            "lang": "pt",
+            "t": "{{reasonShort}}",
+            "useOnlyIfProvided": true
+          },
+          {
+            "id": "g_detail_02_pt",
+            "lang": "pt",
+            "t": "Tipos suportados: {{expectedDocTypes}}.",
+            "useOnlyIfProvided": true
+          },
+          {
+            "id": "g_detail_01_es",
+            "lang": "es",
+            "t": "{{reasonShort}}",
+            "useOnlyIfProvided": true
+          },
+          {
+            "id": "g_detail_02_es",
+            "lang": "es",
+            "t": "Tipos compatibles: {{expectedDocTypes}}.",
+            "useOnlyIfProvided": true
+          }
         ],
         "action": [
-          { "id": "g_act_01_en", "lang": "en", "t": "Upload a file in the knowledge hub and ask again." },
-          { "id": "g_act_02_en", "lang": "en", "t": "If you paste the relevant excerpt here, I can answer immediately." },
-
-          { "id": "g_act_01_pt", "lang": "pt", "t": "Envie um arquivo no hub de conhecimento e pergunte de novo." },
-          { "id": "g_act_02_pt", "lang": "pt", "t": "Se você colar o trecho relevante aqui, eu respondo na hora." },
-
-          { "id": "g_act_01_es", "lang": "es", "t": "Sube un archivo al hub de conocimiento y vuelve a preguntar." },
-          { "id": "g_act_02_es", "lang": "es", "t": "Si pegas aquí el fragmento relevante, respondo al instante." }
+          {
+            "id": "g_act_01_en",
+            "lang": "en",
+            "t": "Upload a file in the knowledge hub and ask again."
+          },
+          {
+            "id": "g_act_02_en",
+            "lang": "en",
+            "t": "If you paste the relevant excerpt here, I can answer immediately."
+          },
+          {
+            "id": "g_act_01_pt",
+            "lang": "pt",
+            "t": "Envie um arquivo no hub de conhecimento e pergunte de novo."
+          },
+          {
+            "id": "g_act_02_pt",
+            "lang": "pt",
+            "t": "Se você colar o trecho relevante aqui, eu respondo na hora."
+          },
+          {
+            "id": "g_act_01_es",
+            "lang": "es",
+            "t": "Sube un archivo al hub de conocimiento y vuelve a preguntar."
+          },
+          {
+            "id": "g_act_02_es",
+            "lang": "es",
+            "t": "Si pegas aquí el fragmento relevante, respondo al instante."
+          }
         ]
       }
     },
-
     "empty": {
       "weight": 0.35,
       "parts": {
         "ack": [
-          { "id": "e_ack_01_en", "lang": "en", "t": "I don't see any indexed documents yet." },
-          { "id": "e_ack_02_en", "lang": "en", "t": "Your knowledge base looks empty right now." },
-          { "id": "e_ack_03_en", "lang": "en", "t": "There aren't any documents loaded for me to use." },
-
-          { "id": "e_ack_01_pt", "lang": "pt", "t": "Ainda não vejo documentos indexados." },
-          { "id": "e_ack_02_pt", "lang": "pt", "t": "Sua base de conhecimento parece vazia agora." },
-          { "id": "e_ack_03_pt", "lang": "pt", "t": "Não há documentos carregados para eu usar." },
-
-          { "id": "e_ack_01_es", "lang": "es", "t": "Aún no veo documentos indexados." },
-          { "id": "e_ack_02_es", "lang": "es", "t": "Tu base de conocimiento parece vacía ahora." },
-          { "id": "e_ack_03_es", "lang": "es", "t": "No hay documentos cargados para que los use." }
+          {
+            "id": "e_ack_01_en",
+            "lang": "en",
+            "t": "I don't see any indexed documents yet."
+          },
+          {
+            "id": "e_ack_02_en",
+            "lang": "en",
+            "t": "Your knowledge base looks empty right now."
+          },
+          {
+            "id": "e_ack_03_en",
+            "lang": "en",
+            "t": "There aren't any documents loaded for me to use."
+          },
+          {
+            "id": "e_ack_01_pt",
+            "lang": "pt",
+            "t": "Ainda não vejo documentos indexados."
+          },
+          {
+            "id": "e_ack_02_pt",
+            "lang": "pt",
+            "t": "Sua base de conhecimento parece vazia agora."
+          },
+          {
+            "id": "e_ack_03_pt",
+            "lang": "pt",
+            "t": "Não há documentos carregados para eu usar."
+          },
+          {
+            "id": "e_ack_01_es",
+            "lang": "es",
+            "t": "Aún no veo documentos indexados."
+          },
+          {
+            "id": "e_ack_02_es",
+            "lang": "es",
+            "t": "Tu base de conocimiento parece vacía ahora."
+          },
+          {
+            "id": "e_ack_03_es",
+            "lang": "es",
+            "t": "No hay documentos cargados para que los use."
+          }
         ],
         "detail": [
-          { "id": "e_detail_01_en", "lang": "en", "t": "You can upload: {{expectedDocTypes}}.", "useOnlyIfProvided": true },
-          { "id": "e_detail_02_en", "lang": "en", "t": "Upload limit: {{uploadLimit}}.", "useOnlyIfProvided": true },
-
-          { "id": "e_detail_01_pt", "lang": "pt", "t": "Você pode enviar: {{expectedDocTypes}}.", "useOnlyIfProvided": true },
-          { "id": "e_detail_02_pt", "lang": "pt", "t": "Limite de upload: {{uploadLimit}}.", "useOnlyIfProvided": true },
-
-          { "id": "e_detail_01_es", "lang": "es", "t": "Puedes subir: {{expectedDocTypes}}.", "useOnlyIfProvided": true },
-          { "id": "e_detail_02_es", "lang": "es", "t": "Límite de carga: {{uploadLimit}}.", "useOnlyIfProvided": true }
+          {
+            "id": "e_detail_01_en",
+            "lang": "en",
+            "t": "You can upload: {{expectedDocTypes}}.",
+            "useOnlyIfProvided": true
+          },
+          {
+            "id": "e_detail_02_en",
+            "lang": "en",
+            "t": "Upload limit: {{uploadLimit}}.",
+            "useOnlyIfProvided": true
+          },
+          {
+            "id": "e_detail_01_pt",
+            "lang": "pt",
+            "t": "Você pode enviar: {{expectedDocTypes}}.",
+            "useOnlyIfProvided": true
+          },
+          {
+            "id": "e_detail_02_pt",
+            "lang": "pt",
+            "t": "Limite de upload: {{uploadLimit}}.",
+            "useOnlyIfProvided": true
+          },
+          {
+            "id": "e_detail_01_es",
+            "lang": "es",
+            "t": "Puedes subir: {{expectedDocTypes}}.",
+            "useOnlyIfProvided": true
+          },
+          {
+            "id": "e_detail_02_es",
+            "lang": "es",
+            "t": "Límite de carga: {{uploadLimit}}.",
+            "useOnlyIfProvided": true
+          }
         ],
         "action": [
-          { "id": "e_act_01_en", "lang": "en", "t": "Upload the file you want me to use, then ask your question again." },
-          { "id": "e_act_02_en", "lang": "en", "t": "If you already uploaded it, try refreshing the index and retry." },
-
-          { "id": "e_act_01_pt", "lang": "pt", "t": "Envie o arquivo que você quer que eu use e pergunte de novo." },
-          { "id": "e_act_02_pt", "lang": "pt", "t": "Se você já enviou, tente atualizar o índice e tentar novamente." },
-
-          { "id": "e_act_01_es", "lang": "es", "t": "Sube el archivo que quieres que use y vuelve a preguntar." },
-          { "id": "e_act_02_es", "lang": "es", "t": "Si ya lo subiste, intenta actualizar el índice y vuelve a probar." }
+          {
+            "id": "e_act_01_en",
+            "lang": "en",
+            "t": "Upload the file you want me to use, then ask your question again."
+          },
+          {
+            "id": "e_act_02_en",
+            "lang": "en",
+            "t": "If you already uploaded it, try refreshing the index and retry."
+          },
+          {
+            "id": "e_act_01_pt",
+            "lang": "pt",
+            "t": "Envie o arquivo que você quer que eu use e pergunte de novo."
+          },
+          {
+            "id": "e_act_02_pt",
+            "lang": "pt",
+            "t": "Se você já enviou, tente atualizar o índice e tentar novamente."
+          },
+          {
+            "id": "e_act_01_es",
+            "lang": "es",
+            "t": "Sube el archivo que quieres que use y vuelve a preguntar."
+          },
+          {
+            "id": "e_act_02_es",
+            "lang": "es",
+            "t": "Si ya lo subiste, intenta actualizar el índice y vuelve a probar."
+          }
         ]
       }
     },
-
     "processing": {
       "weight": 0.25,
       "parts": {
         "ack": [
-          { "id": "p_ack_01_en", "lang": "en", "t": "Your files are still processing." },
-          { "id": "p_ack_02_en", "lang": "en", "t": "Indexing is running, so I can't reference the content yet." },
-          { "id": "p_ack_03_en", "lang": "en", "t": "The document content isn't ready to query yet." },
-
-          { "id": "p_ack_01_pt", "lang": "pt", "t": "Seus arquivos ainda estão sendo processados." },
-          { "id": "p_ack_02_pt", "lang": "pt", "t": "A indexação está rodando, então eu ainda não consigo citar o conteúdo." },
-          { "id": "p_ack_03_pt", "lang": "pt", "t": "O conteúdo do documento ainda não está pronto para busca." },
-
-          { "id": "p_ack_01_es", "lang": "es", "t": "Tus archivos todavía se están procesando." },
-          { "id": "p_ack_02_es", "lang": "es", "t": "La indexación está en curso, así que aún no puedo citar el contenido." },
-          { "id": "p_ack_03_es", "lang": "es", "t": "El contenido del documento aún no está listo para buscar." }
+          {
+            "id": "p_ack_01_en",
+            "lang": "en",
+            "t": "Your files are still processing."
+          },
+          {
+            "id": "p_ack_02_en",
+            "lang": "en",
+            "t": "Indexing is running, so I can't reference the content yet."
+          },
+          {
+            "id": "p_ack_03_en",
+            "lang": "en",
+            "t": "The document content isn't ready to query yet."
+          },
+          {
+            "id": "p_ack_01_pt",
+            "lang": "pt",
+            "t": "Seus arquivos ainda estão sendo processados."
+          },
+          {
+            "id": "p_ack_02_pt",
+            "lang": "pt",
+            "t": "A indexação está rodando, então eu ainda não consigo citar o conteúdo."
+          },
+          {
+            "id": "p_ack_03_pt",
+            "lang": "pt",
+            "t": "O conteúdo do documento ainda não está pronto para busca."
+          },
+          {
+            "id": "p_ack_01_es",
+            "lang": "es",
+            "t": "Tus archivos todavía se están procesando."
+          },
+          {
+            "id": "p_ack_02_es",
+            "lang": "es",
+            "t": "La indexación está en curso, así que aún no puedo citar el contenido."
+          },
+          {
+            "id": "p_ack_03_es",
+            "lang": "es",
+            "t": "El contenido del documento aún no está listo para buscar."
+          }
         ],
         "detail": [
-          { "id": "p_detail_01_en", "lang": "en", "t": "Index: {{indexName}}.", "useOnlyIfProvided": true },
-          { "id": "p_detail_01_pt", "lang": "pt", "t": "Índice: {{indexName}}.", "useOnlyIfProvided": true },
-          { "id": "p_detail_01_es", "lang": "es", "t": "Índice: {{indexName}}.", "useOnlyIfProvided": true }
+          {
+            "id": "p_detail_01_en",
+            "lang": "en",
+            "t": "Index: {{indexName}}.",
+            "useOnlyIfProvided": true
+          },
+          {
+            "id": "p_detail_01_pt",
+            "lang": "pt",
+            "t": "Índice: {{indexName}}.",
+            "useOnlyIfProvided": true
+          },
+          {
+            "id": "p_detail_01_es",
+            "lang": "es",
+            "t": "Índice: {{indexName}}.",
+            "useOnlyIfProvided": true
+          }
         ],
         "action": [
-          { "id": "p_act_01_en", "lang": "en", "t": "Try again in a moment." },
-          { "id": "p_act_02_en", "lang": "en", "t": "If it looks stuck, re-uploading usually fixes it." },
-
-          { "id": "p_act_01_pt", "lang": "pt", "t": "Tente novamente em alguns instantes." },
-          { "id": "p_act_02_pt", "lang": "pt", "t": "Se parecer travado, reenviar o arquivo geralmente resolve." },
-
-          { "id": "p_act_01_es", "lang": "es", "t": "Inténtalo de nuevo en un momento." },
-          { "id": "p_act_02_es", "lang": "es", "t": "Si parece atascado, volver a subir el archivo suele resolverlo." }
+          {
+            "id": "p_act_01_en",
+            "lang": "en",
+            "t": "Try again in a moment."
+          },
+          {
+            "id": "p_act_02_en",
+            "lang": "en",
+            "t": "If it looks stuck, re-uploading usually fixes it."
+          },
+          {
+            "id": "p_act_01_pt",
+            "lang": "pt",
+            "t": "Tente novamente em alguns instantes."
+          },
+          {
+            "id": "p_act_02_pt",
+            "lang": "pt",
+            "t": "Se parecer travado, reenviar o arquivo geralmente resolve."
+          },
+          {
+            "id": "p_act_01_es",
+            "lang": "es",
+            "t": "Inténtalo de nuevo en un momento."
+          },
+          {
+            "id": "p_act_02_es",
+            "lang": "es",
+            "t": "Si parece atascado, volver a subir el archivo suele resolverlo."
+          }
         ]
       }
     },
-
     "failed_extraction": {
       "weight": 0.25,
       "parts": {
         "ack": [
-          { "id": "fx_ack_01_en", "lang": "en", "t": "The file is there, but text extraction didn't produce usable content." },
-          { "id": "fx_ack_02_en", "lang": "en", "t": "I can't read that upload yet because extraction failed." },
-
-          { "id": "fx_ack_01_pt", "lang": "pt", "t": "O arquivo existe, mas a extração não gerou conteúdo utilizável." },
-          { "id": "fx_ack_02_pt", "lang": "pt", "t": "Eu ainda não consigo ler esse upload porque a extração falhou." },
-
-          { "id": "fx_ack_01_es", "lang": "es", "t": "El archivo está, pero la extracción no generó contenido utilizable." },
-          { "id": "fx_ack_02_es", "lang": "es", "t": "Aún no puedo leer esa carga porque falló la extracción." }
+          {
+            "id": "fx_ack_01_en",
+            "lang": "en",
+            "t": "The file is there, but text extraction didn't produce usable content."
+          },
+          {
+            "id": "fx_ack_02_en",
+            "lang": "en",
+            "t": "I can't read that upload yet because extraction failed."
+          },
+          {
+            "id": "fx_ack_01_pt",
+            "lang": "pt",
+            "t": "O arquivo existe, mas a extração não gerou conteúdo utilizável."
+          },
+          {
+            "id": "fx_ack_02_pt",
+            "lang": "pt",
+            "t": "Eu ainda não consigo ler esse upload porque a extração falhou."
+          },
+          {
+            "id": "fx_ack_01_es",
+            "lang": "es",
+            "t": "El archivo está, pero la extracción no generó contenido utilizable."
+          },
+          {
+            "id": "fx_ack_02_es",
+            "lang": "es",
+            "t": "Aún no puedo leer esa carga porque falló la extracción."
+          }
         ],
         "detail": [
-          { "id": "fx_detail_01_en", "lang": "en", "t": "Scans often fail if the image is blurry or low contrast." },
-          { "id": "fx_detail_01_pt", "lang": "pt", "t": "Scans costumam falhar se a imagem estiver borrada ou com pouco contraste." },
-          { "id": "fx_detail_01_es", "lang": "es", "t": "Los escaneos suelen fallar si la imagen está borrosa o con poco contraste." }
+          {
+            "id": "fx_detail_01_en",
+            "lang": "en",
+            "t": "Scans often fail if the image is blurry or low contrast."
+          },
+          {
+            "id": "fx_detail_01_pt",
+            "lang": "pt",
+            "t": "Scans costumam falhar se a imagem estiver borrada ou com pouco contraste."
+          },
+          {
+            "id": "fx_detail_01_es",
+            "lang": "es",
+            "t": "Los escaneos suelen fallar si la imagen está borrosa o con poco contraste."
+          }
         ],
         "action": [
-          { "id": "fx_act_01_en", "lang": "en", "t": "Try re-uploading a clearer copy, or export the PDF with selectable text." },
-          { "id": "fx_act_02_en", "lang": "en", "t": "If you paste the key section here, I can answer without indexing." },
-
-          { "id": "fx_act_01_pt", "lang": "pt", "t": "Reenvie uma cópia mais nítida, ou exporte o PDF com texto selecionável." },
-          { "id": "fx_act_02_pt", "lang": "pt", "t": "Se você colar a parte principal aqui, eu respondo sem depender do índice." },
-
-          { "id": "fx_act_01_es", "lang": "es", "t": "Vuelve a subir una copia más clara, o exporta el PDF con texto seleccionable." },
-          { "id": "fx_act_02_es", "lang": "es", "t": "Si pegas aquí la parte clave, respondo sin depender del índice." }
+          {
+            "id": "fx_act_01_en",
+            "lang": "en",
+            "t": "Try re-uploading a clearer copy, or export the PDF with selectable text."
+          },
+          {
+            "id": "fx_act_02_en",
+            "lang": "en",
+            "t": "If you paste the key section here, I can answer without indexing."
+          },
+          {
+            "id": "fx_act_01_pt",
+            "lang": "pt",
+            "t": "Reenvie uma cópia mais nítida, ou exporte o PDF com texto selecionável."
+          },
+          {
+            "id": "fx_act_02_pt",
+            "lang": "pt",
+            "t": "Se você colar a parte principal aqui, eu respondo sem depender do índice."
+          },
+          {
+            "id": "fx_act_01_es",
+            "lang": "es",
+            "t": "Vuelve a subir una copia más clara, o exporta el PDF con texto seleccionable."
+          },
+          {
+            "id": "fx_act_02_es",
+            "lang": "es",
+            "t": "Si pegas aquí la parte clave, respondo sin depender del índice."
+          }
         ]
       }
     },
-
     "permissions": {
       "weight": 0.15,
       "parts": {
         "ack": [
-          { "id": "perm_ack_01_en", "lang": "en", "t": "I can't access the documents in this context." },
-          { "id": "perm_ack_02_en", "lang": "en", "t": "Those files aren't readable from this workspace/session." },
-
-          { "id": "perm_ack_01_pt", "lang": "pt", "t": "Eu não consigo acessar os documentos neste contexto." },
-          { "id": "perm_ack_02_pt", "lang": "pt", "t": "Esses arquivos não estão acessíveis nesta sessão/workspace." },
-
-          { "id": "perm_ack_01_es", "lang": "es", "t": "No puedo acceder a los documentos en este contexto." },
-          { "id": "perm_ack_02_es", "lang": "es", "t": "Esos archivos no son accesibles desde esta sesión/espacio." }
+          {
+            "id": "perm_ack_01_en",
+            "lang": "en",
+            "t": "I can't access the documents in this context."
+          },
+          {
+            "id": "perm_ack_02_en",
+            "lang": "en",
+            "t": "Those files aren't readable from this workspace/session."
+          },
+          {
+            "id": "perm_ack_01_pt",
+            "lang": "pt",
+            "t": "Eu não consigo acessar os documentos neste contexto."
+          },
+          {
+            "id": "perm_ack_02_pt",
+            "lang": "pt",
+            "t": "Esses arquivos não estão acessíveis nesta sessão/workspace."
+          },
+          {
+            "id": "perm_ack_01_es",
+            "lang": "es",
+            "t": "No puedo acceder a los documentos en este contexto."
+          },
+          {
+            "id": "perm_ack_02_es",
+            "lang": "es",
+            "t": "Esos archivos no son accesibles desde esta sesión/espacio."
+          }
         ],
         "detail": [
-          { "id": "perm_detail_01_en", "lang": "en", "t": "This can happen if the upload was done in a different account/workspace." },
-          { "id": "perm_detail_01_pt", "lang": "pt", "t": "Isso pode acontecer se o upload foi feito em outra conta/workspace." },
-          { "id": "perm_detail_01_es", "lang": "es", "t": "Esto puede pasar si la carga se hizo en otra cuenta/espacio." }
+          {
+            "id": "perm_detail_01_en",
+            "lang": "en",
+            "t": "This can happen if the upload was done in a different account/workspace."
+          },
+          {
+            "id": "perm_detail_01_pt",
+            "lang": "pt",
+            "t": "Isso pode acontecer se o upload foi feito em outra conta/workspace."
+          },
+          {
+            "id": "perm_detail_01_es",
+            "lang": "es",
+            "t": "Esto puede pasar si la carga se hizo en otra cuenta/espacio."
+          }
         ],
         "action": [
-          { "id": "perm_act_01_en", "lang": "en", "t": "Upload the file here, or paste the excerpt you want me to use." },
-          { "id": "perm_act_01_pt", "lang": "pt", "t": "Envie o arquivo aqui, ou cole o trecho que você quer que eu use." },
-          { "id": "perm_act_01_es", "lang": "es", "t": "Sube el archivo aquí, o pega el fragmento que quieres que use." }
+          {
+            "id": "perm_act_01_en",
+            "lang": "en",
+            "t": "Upload the file here, or paste the excerpt you want me to use."
+          },
+          {
+            "id": "perm_act_01_pt",
+            "lang": "pt",
+            "t": "Envie o arquivo aqui, ou cole o trecho que você quer que eu use."
+          },
+          {
+            "id": "perm_act_01_es",
+            "lang": "es",
+            "t": "Sube el archivo aquí, o pega el fragmento que quieres que use."
+          }
         ]
       }
     },
-
     "scope_excluded": {
-      "weight": 0.20,
+      "weight": 0.2,
       "parts": {
         "ack": [
-          { "id": "sc_ack_01_en", "lang": "en", "t": "Your current scope doesn't include any usable documents for this." },
-          { "id": "sc_ack_02_en", "lang": "en", "t": "The current filters exclude the documents I would need." },
-
-          { "id": "sc_ack_01_pt", "lang": "pt", "t": "O escopo atual não inclui documentos utilizáveis para isso." },
-          { "id": "sc_ack_02_pt", "lang": "pt", "t": "Os filtros atuais excluem os documentos que eu precisaria." },
-
-          { "id": "sc_ack_01_es", "lang": "es", "t": "Tu alcance actual no incluye documentos utilizables para esto." },
-          { "id": "sc_ack_02_es", "lang": "es", "t": "Los filtros actuales excluyen los documentos que necesitaría." }
+          {
+            "id": "sc_ack_01_en",
+            "lang": "en",
+            "t": "Your current scope doesn't include any usable documents for this."
+          },
+          {
+            "id": "sc_ack_02_en",
+            "lang": "en",
+            "t": "The current filters exclude the documents I would need."
+          },
+          {
+            "id": "sc_ack_01_pt",
+            "lang": "pt",
+            "t": "O escopo atual não inclui documentos utilizáveis para isso."
+          },
+          {
+            "id": "sc_ack_02_pt",
+            "lang": "pt",
+            "t": "Os filtros atuais excluem os documentos que eu precisaria."
+          },
+          {
+            "id": "sc_ack_01_es",
+            "lang": "es",
+            "t": "Tu alcance actual no incluye documentos utilizables para esto."
+          },
+          {
+            "id": "sc_ack_02_es",
+            "lang": "es",
+            "t": "Los filtros actuales excluyen los documentos que necesitaría."
+          }
         ],
         "detail": [
-          { "id": "sc_detail_01_en", "lang": "en", "t": "Scope: {{scopeName}}.", "useOnlyIfProvided": true },
-          { "id": "sc_detail_01_pt", "lang": "pt", "t": "Escopo: {{scopeName}}.", "useOnlyIfProvided": true },
-          { "id": "sc_detail_01_es", "lang": "es", "t": "Alcance: {{scopeName}}.", "useOnlyIfProvided": true }
+          {
+            "id": "sc_detail_01_en",
+            "lang": "en",
+            "t": "Scope: {{scopeName}}.",
+            "useOnlyIfProvided": true
+          },
+          {
+            "id": "sc_detail_01_pt",
+            "lang": "pt",
+            "t": "Escopo: {{scopeName}}.",
+            "useOnlyIfProvided": true
+          },
+          {
+            "id": "sc_detail_01_es",
+            "lang": "es",
+            "t": "Alcance: {{scopeName}}.",
+            "useOnlyIfProvided": true
+          }
         ],
         "action": [
-          { "id": "sc_act_01_en", "lang": "en", "t": "Remove the filter, or tell me which document/collection to use." },
-          { "id": "sc_act_02_en", "lang": "en", "t": "If you name the file, I'll target it directly." },
-
-          { "id": "sc_act_01_pt", "lang": "pt", "t": "Remova o filtro, ou me diga qual documento/coleção usar." },
-          { "id": "sc_act_02_pt", "lang": "pt", "t": "Se você disser o nome do arquivo, eu miro nele diretamente." },
-
-          { "id": "sc_act_01_es", "lang": "es", "t": "Quita el filtro, o dime qué documento/colección usar." },
-          { "id": "sc_act_02_es", "lang": "es", "t": "Si dices el nombre del archivo, lo apunto directamente." }
+          {
+            "id": "sc_act_01_en",
+            "lang": "en",
+            "t": "Remove the filter, or tell me which document/collection to use."
+          },
+          {
+            "id": "sc_act_02_en",
+            "lang": "en",
+            "t": "If you name the file, I'll target it directly."
+          },
+          {
+            "id": "sc_act_01_pt",
+            "lang": "pt",
+            "t": "Remova o filtro, ou me diga qual documento/coleção usar."
+          },
+          {
+            "id": "sc_act_02_pt",
+            "lang": "pt",
+            "t": "Se você disser o nome do arquivo, eu miro nele diretamente."
+          },
+          {
+            "id": "sc_act_01_es",
+            "lang": "es",
+            "t": "Quita el filtro, o dime qué documento/colección usar."
+          },
+          {
+            "id": "sc_act_02_es",
+            "lang": "es",
+            "t": "Si dices el nombre del archivo, lo apunto directamente."
+          }
         ]
       }
     }
@@ -300,18 +736,40 @@
     "cases": [
       {
         "id": "ND_0001_never_says_no_relevant_info",
-        "input": { "state": "empty_index", "lang": "en" },
-        "expect": { "mustNotContainAny": ["no relevant information found", "nothing found"] }
+        "input": {
+          "state": "empty_index",
+          "lang": "en"
+        },
+        "expect": {
+          "mustNotContainAny": [
+            "no relevant information found",
+            "nothing found"
+          ]
+        }
       },
       {
         "id": "ND_0002_has_action",
-        "input": { "state": "processing", "lang": "en" },
-        "expect": { "mustContainAny": ["Upload", "Try again", "paste"] }
+        "input": {
+          "state": "processing",
+          "lang": "en"
+        },
+        "expect": {
+          "mustContainAny": [
+            "Upload",
+            "Try again",
+            "paste"
+          ]
+        }
       },
       {
         "id": "ND_0003_max_3_sentences",
-        "input": { "state": "failed_extraction", "lang": "en" },
-        "expect": { "sentenceCountLte": 3 }
+        "input": {
+          "state": "failed_extraction",
+          "lang": "en"
+        },
+        "expect": {
+          "sentenceCountLte": 3
+        }
       }
     ]
   }

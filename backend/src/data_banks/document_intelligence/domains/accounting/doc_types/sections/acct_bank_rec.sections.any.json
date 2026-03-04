@@ -1,13 +1,125 @@
 {
-  "_meta": { "id": "di_accounting_sections_acct_bank_rec", "version": "1.0.0", "description": "Section map for bank reconciliation documents.", "languages": ["any"], "lastUpdated": "2026-02-27" },
-  "config": { "enabled": true, "domain": "accounting", "docType": "acct_bank_rec" },
+  "_meta": {
+    "id": "di_accounting_sections_acct_bank_rec",
+    "version": "1.0.0",
+    "description": "Section map for bank reconciliation documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "accounting",
+    "docType": "acct_bank_rec"
+  },
   "sections": [
-    { "id": "header", "name": { "en": "Reconciliation Header", "pt": "Cabeçalho da Conciliação" }, "required": true, "order": 1, "headingAnchors": ["Bank Reconciliation", "Conciliação Bancária"] },
-    { "id": "book_balance", "name": { "en": "Balance per Books", "pt": "Saldo Contábil" }, "required": true, "order": 2, "headingAnchors": ["Balance per Books", "Book Balance", "Saldo Contábil", "GL Balance"] },
-    { "id": "bank_balance", "name": { "en": "Balance per Bank", "pt": "Saldo Bancário" }, "required": true, "order": 3, "headingAnchors": ["Balance per Bank", "Bank Balance", "Saldo Bancário", "Statement Balance"] },
-    { "id": "outstanding_checks", "name": { "en": "Outstanding Checks", "pt": "Cheques Pendentes" }, "required": true, "order": 4, "headingAnchors": ["Outstanding Checks", "Unpresented Checks", "Cheques Pendentes"] },
-    { "id": "deposits_in_transit", "name": { "en": "Deposits in Transit", "pt": "Depósitos em Trânsito" }, "required": true, "order": 5, "headingAnchors": ["Deposits in Transit", "Uncleared Deposits", "Depósitos em Trânsito"] },
-    { "id": "other_adjustments", "name": { "en": "Other Reconciling Items", "pt": "Outros Itens de Conciliação" }, "required": false, "order": 6, "headingAnchors": ["Other", "Adjustments", "Bank Charges", "Errors"] },
-    { "id": "adjusted_balances", "name": { "en": "Adjusted Balances", "pt": "Saldos Ajustados" }, "required": true, "order": 7, "headingAnchors": ["Adjusted Balance", "Reconciled Balance", "Saldo Ajustado"] }
+    {
+      "id": "header",
+      "name": {
+        "en": "Reconciliation Header",
+        "pt": "Cabeçalho da Conciliação"
+      },
+      "required": true,
+      "order": 1,
+      "headingAnchors": [
+        "Bank Reconciliation",
+        "Conciliação Bancária"
+      ]
+    },
+    {
+      "id": "book_balance",
+      "name": {
+        "en": "Balance per Books",
+        "pt": "Saldo Contábil"
+      },
+      "required": true,
+      "order": 2,
+      "headingAnchors": [
+        "Balance per Books",
+        "Book Balance",
+        "Saldo Contábil",
+        "GL Balance"
+      ]
+    },
+    {
+      "id": "bank_balance",
+      "name": {
+        "en": "Balance per Bank",
+        "pt": "Saldo Bancário"
+      },
+      "required": true,
+      "order": 3,
+      "headingAnchors": [
+        "Balance per Bank",
+        "Bank Balance",
+        "Saldo Bancário",
+        "Statement Balance"
+      ]
+    },
+    {
+      "id": "outstanding_checks",
+      "name": {
+        "en": "Outstanding Checks",
+        "pt": "Cheques Pendentes"
+      },
+      "required": true,
+      "order": 4,
+      "headingAnchors": [
+        "Outstanding Checks",
+        "Unpresented Checks",
+        "Cheques Pendentes"
+      ]
+    },
+    {
+      "id": "deposits_in_transit",
+      "name": {
+        "en": "Deposits in Transit",
+        "pt": "Depósitos em Trânsito"
+      },
+      "required": true,
+      "order": 5,
+      "headingAnchors": [
+        "Deposits in Transit",
+        "Uncleared Deposits",
+        "Depósitos em Trânsito"
+      ]
+    },
+    {
+      "id": "other_adjustments",
+      "name": {
+        "en": "Other Reconciling Items",
+        "pt": "Outros Itens de Conciliação"
+      },
+      "required": false,
+      "order": 6,
+      "headingAnchors": [
+        "Other",
+        "Adjustments",
+        "Bank Charges",
+        "Errors"
+      ]
+    },
+    {
+      "id": "adjusted_balances",
+      "name": {
+        "en": "Adjusted Balances",
+        "pt": "Saldos Ajustados"
+      },
+      "required": true,
+      "order": 7,
+      "headingAnchors": [
+        "Adjusted Balance",
+        "Reconciled Balance",
+        "Saldo Ajustado"
+      ]
+    }
   ]
 }

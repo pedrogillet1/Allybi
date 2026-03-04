@@ -3,8 +3,17 @@
     "id": "unused_bank_lifecycle",
     "version": "1.1.0",
     "description": "Lifecycle policy for banks that static code scanning marks as unused. Used by governance audits to classify keep/deprecate/remove intent without mutating runtime loading behavior.",
-    "languages": ["any"],
-    "lastUpdated": "2026-02-28"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true

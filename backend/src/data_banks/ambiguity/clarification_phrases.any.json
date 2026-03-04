@@ -3,7 +3,12 @@
     "id": "clarification_phrases",
     "version": "1.1.0",
     "description": "Deterministic clarification prompt policy for Koda ambiguity. Controls when clarification is allowed, enforces single-question behavior, prevents apology/policy leakage, and prioritizes concrete choices. Does not hardcode sentences; it constrains semantic prompt intent and uniqueness via tokenized UI copy layers.",
-    "languages": ["any", "en", "pt", "es"],
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
     "lastUpdated": "2026-01-26",
     "owner": "koda-ambiguity",
     "compat": ">=1.0.0",
@@ -11,6 +16,12 @@
       "Added explicit actionsContract for clarify vs autopick precedence",
       "Added two-tier handling: clarify only when blocked; otherwise autopick when safe",
       "Expanded tests for multilingual, collisions, and regression on multi-question prompts"
+    ],
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
     ]
   },
   "config": {
@@ -44,30 +55,58 @@
     },
     "uniquenessControl": {
       "enabled": true,
-      "dedupeBy": ["reasonCode", "promptIntent"],
+      "dedupeBy": [
+        "reasonCode",
+        "promptIntent"
+      ],
       "cooldownTurns": 3,
       "entropyWindow": 6
     },
     "integrationHooks": {
-      "dependsOn": ["ui_contracts", "render_policy"],
-      "emitsSignals": ["clarificationQuestionAllowed", "clarificationPromptIntent"]
-    }
+      "dependsOn": [
+        "ui_contracts",
+        "render_policy"
+      ],
+      "emitsSignals": [
+        "clarificationQuestionAllowed",
+        "clarificationPromptIntent"
+      ]
+    },
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "rules": [
     {
       "id": "clarify_only_when_blocked",
       "scope": "global",
       "description": "Allow clarification only when the system is truly blocked and autopick is not safe.",
-      "appliesTo": ["clarification_decision"],
+      "appliesTo": [
+        "clarification_decision"
+      ],
       "triggerPatterns": {
-        "en": [".+"],
-        "pt": [".+"],
-        "es": [".+"]
+        "en": [
+          ".+"
+        ],
+        "pt": [
+          ".+"
+        ],
+        "es": [
+          ".+"
+        ]
       },
       "when": {
         "all": [
-          { "path": "signals.isBlocked", "op": "eq", "value": true },
-          { "path": "signals.hasSafeAutopick", "op": "neq", "value": true }
+          {
+            "path": "signals.isBlocked",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "signals.hasSafeAutopick",
+            "op": "neq",
+            "value": true
+          }
         ]
       },
       "action": {
@@ -81,21 +120,39 @@
       "id": "autopick_over_clarify_when_safe",
       "scope": "global",
       "description": "Prefer autopick when top score and margin are high; suppress clarification.",
-      "appliesTo": ["clarification_decision"],
+      "appliesTo": [
+        "clarification_decision"
+      ],
       "triggerPatterns": {
-        "en": [".+"],
-        "pt": [".+"],
-        "es": [".+"]
+        "en": [
+          ".+"
+        ],
+        "pt": [
+          ".+"
+        ],
+        "es": [
+          ".+"
+        ]
       },
       "when": {
         "all": [
-          { "path": "metrics.topScore", "op": "gte", "value": 0.85 },
-          { "path": "metrics.scoreGap", "op": "gte", "value": 0.25 }
+          {
+            "path": "metrics.topScore",
+            "op": "gte",
+            "value": 0.85
+          },
+          {
+            "path": "metrics.scoreGap",
+            "op": "gte",
+            "value": 0.25
+          }
         ]
       },
       "action": {
         "type": "suppress_clarification",
-        "emitSignals": ["autopickPreferred"]
+        "emitSignals": [
+          "autopickPreferred"
+        ]
       },
       "reasonCode": "autopick_over_clarify",
       "severity": "high"
@@ -104,15 +161,27 @@
       "id": "single_question_enforced",
       "scope": "global",
       "description": "Always enforce single-question limit; block multi-question prompts.",
-      "appliesTo": ["clarification_rendering"],
+      "appliesTo": [
+        "clarification_rendering"
+      ],
       "triggerPatterns": {
-        "en": ["\\?"],
-        "pt": ["\\?"],
-        "es": ["\\?"]
+        "en": [
+          "\\?"
+        ],
+        "pt": [
+          "\\?"
+        ],
+        "es": [
+          "\\?"
+        ]
       },
       "when": {
         "all": [
-          { "path": "metrics.clarificationQuestionCount", "op": "gt", "value": 1 }
+          {
+            "path": "metrics.clarificationQuestionCount",
+            "op": "gt",
+            "value": 1
+          }
         ]
       },
       "action": {
@@ -125,15 +194,27 @@
       "id": "use_options_when_available",
       "scope": "global",
       "description": "When concrete options exist, require option-based clarification rather than open-ended questioning.",
-      "appliesTo": ["clarification_rendering"],
+      "appliesTo": [
+        "clarification_rendering"
+      ],
       "triggerPatterns": {
-        "en": [".+"],
-        "pt": [".+"],
-        "es": [".+"]
+        "en": [
+          ".+"
+        ],
+        "pt": [
+          ".+"
+        ],
+        "es": [
+          ".+"
+        ]
       },
       "when": {
         "all": [
-          { "path": "signals.hasConcreteOptions", "op": "eq", "value": true }
+          {
+            "path": "signals.hasConcreteOptions",
+            "op": "eq",
+            "value": true
+          }
         ]
       },
       "action": {
@@ -147,11 +228,19 @@
       "id": "no_apology_no_policy_leak",
       "scope": "global",
       "description": "Suppress apology tone and policy mentions in clarification prompts.",
-      "appliesTo": ["clarification_rendering"],
+      "appliesTo": [
+        "clarification_rendering"
+      ],
       "triggerPatterns": {
-        "en": ["\\b(sorry|policy|rules)\\b"],
-        "pt": ["\\b(desculpa|pol[ií]tica|regras)\\b"],
-        "es": ["\\b(perd[oó]n|pol[ií]tica|reglas)\\b"]
+        "en": [
+          "\\b(sorry|policy|rules)\\b"
+        ],
+        "pt": [
+          "\\b(desculpa|pol[ií]tica|regras)\\b"
+        ],
+        "es": [
+          "\\b(perd[oó]n|pol[ií]tica|reglas)\\b"
+        ]
       },
       "action": {
         "type": "suppress_disallowed_language"
@@ -164,34 +253,74 @@
     "cases": [
       {
         "id": "CLP_0001_allow_only_when_blocked",
-        "context": { "signals": { "isBlocked": true, "hasSafeAutopick": false } },
-        "expect": { "clarificationAllowed": true, "promptIntent": "ui_clarification_question" }
+        "context": {
+          "signals": {
+            "isBlocked": true,
+            "hasSafeAutopick": false
+          }
+        },
+        "expect": {
+          "clarificationAllowed": true,
+          "promptIntent": "ui_clarification_question"
+        }
       },
       {
         "id": "CLP_0002_autopick_suppresses_clarification",
-        "context": { "metrics": { "topScore": 0.9, "scoreGap": 0.3 } },
-        "expect": { "clarificationSuppressed": true, "emitSignalsAny": ["autopickPreferred"] }
+        "context": {
+          "metrics": {
+            "topScore": 0.9,
+            "scoreGap": 0.3
+          }
+        },
+        "expect": {
+          "clarificationSuppressed": true,
+          "emitSignalsAny": [
+            "autopickPreferred"
+          ]
+        }
       },
       {
         "id": "CLP_0003_single_question_only",
-        "context": { "metrics": { "clarificationQuestionCount": 2 } },
-        "expect": { "blocked": true, "reasonCode": "single_clarification_question" }
+        "context": {
+          "metrics": {
+            "clarificationQuestionCount": 2
+          }
+        },
+        "expect": {
+          "blocked": true,
+          "reasonCode": "single_clarification_question"
+        }
       },
       {
         "id": "CLP_0004_options_required_when_available",
-        "context": { "signals": { "hasConcreteOptions": true } },
-        "expect": { "requiresOptionPrompt": true, "promptIntent": "ui_variant_confirmation_prompt" }
+        "context": {
+          "signals": {
+            "hasConcreteOptions": true
+          }
+        },
+        "expect": {
+          "requiresOptionPrompt": true,
+          "promptIntent": "ui_variant_confirmation_prompt"
+        }
       },
       {
         "id": "CLP_0005_no_apology_no_policy",
         "input": "Sorry, which one? This is policy.",
-        "expect": { "disallowedLanguageSuppressed": true }
+        "expect": {
+          "disallowedLanguageSuppressed": true
+        }
       },
       {
         "id": "CLP_0006_multilingual_pt_block_multi_question",
-        "context": { "metrics": { "clarificationQuestionCount": 3 } },
+        "context": {
+          "metrics": {
+            "clarificationQuestionCount": 3
+          }
+        },
         "input": "Qual? E qual deles?",
-        "expect": { "blocked": true }
+        "expect": {
+          "blocked": true
+        }
       }
     ]
   }

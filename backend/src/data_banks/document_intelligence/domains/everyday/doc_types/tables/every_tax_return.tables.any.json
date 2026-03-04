@@ -6,7 +6,14 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-03-03"
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -14,11 +21,34 @@
     "docType": "every_tax_return"
   },
   "tableHeaderSynonyms": {
-    "amount": ["amount", "valor", "total", "value"],
-    "period": ["period", "fiscal year", "ano", "month"],
-    "code": ["code", "code number", "tipo", "item"],
-    "status": ["status", "state", "situation"],
-    "unit": ["unit", "scale", "unit of measure"]
+    "amount": [
+      "amount",
+      "valor",
+      "total",
+      "value"
+    ],
+    "period": [
+      "period",
+      "fiscal year",
+      "ano",
+      "month"
+    ],
+    "code": [
+      "code",
+      "code number",
+      "tipo",
+      "item"
+    ],
+    "status": [
+      "status",
+      "state",
+      "situation"
+    ],
+    "unit": [
+      "unit",
+      "scale",
+      "unit of measure"
+    ]
   },
   "tables": [
     {
@@ -33,20 +63,48 @@
         "\\bwages\\b",
         "\\brendimentos"
       ],
-      "requiredHeaders": ["code", "description", "amount", "unit"],
+      "requiredHeaders": [
+        "code",
+        "description",
+        "amount",
+        "unit"
+      ],
       "headerAliases": [
-        ["code", "codigo", "item"],
-        ["description", "descricao", "title"],
-        ["amount", "valor", "value", "quantia"],
-        ["unit", "unidade", "moeda"]
+        [
+          "code",
+          "codigo",
+          "item"
+        ],
+        [
+          "description",
+          "descricao",
+          "title"
+        ],
+        [
+          "amount",
+          "valor",
+          "value",
+          "quantia"
+        ],
+        [
+          "unit",
+          "unidade",
+          "moeda"
+        ]
       ],
       "unitsAndScaling": {
-        "preferredScales": ["units", "thousands"],
+        "preferredScales": [
+          "units",
+          "thousands"
+        ],
         "currencyField": "currency",
         "requiresScaleEvidence": false,
         "mixedScaleHandling": "normalize_to_currency_base"
       },
-      "footnotes": ["tax_return_note_001", "tax_return_note_002"],
+      "footnotes": [
+        "tax_return_note_001",
+        "tax_return_note_002"
+      ],
       "extractionNotes": "Use table headers to extract numeric income and deduction subtotals."
     },
     {
@@ -60,20 +118,45 @@
         "\\bdeduction\\b",
         "\\bdeducoes\\b"
       ],
-      "requiredHeaders": ["code", "description", "amount", "unit"],
+      "requiredHeaders": [
+        "code",
+        "description",
+        "amount",
+        "unit"
+      ],
       "headerAliases": [
-        ["code", "codigo", "class"],
-        ["description", "descricao", "rubro"],
-        ["amount", "valor", "amount"],
-        ["unit", "escala", "unidade"]
+        [
+          "code",
+          "codigo",
+          "class"
+        ],
+        [
+          "description",
+          "descricao",
+          "rubro"
+        ],
+        [
+          "amount",
+          "valor",
+          "amount"
+        ],
+        [
+          "unit",
+          "escala",
+          "unidade"
+        ]
       ],
       "unitsAndScaling": {
-        "preferredScales": ["units"],
+        "preferredScales": [
+          "units"
+        ],
         "currencyField": "currency",
         "requiresScaleEvidence": false,
         "mixedScaleHandling": "normalize_to_currency_base"
       },
-      "footnotes": ["tax_return_note_003"],
+      "footnotes": [
+        "tax_return_note_003"
+      ],
       "extractionNotes": "Cross-check deductions against filing summary."
     },
     {
@@ -87,20 +170,49 @@
         "\\btax\\s+summary\\b",
         "\\bresumo\\s+imposto\\b"
       ],
-      "requiredHeaders": ["metric", "value", "period", "unit"],
+      "requiredHeaders": [
+        "metric",
+        "value",
+        "period",
+        "unit"
+      ],
       "headerAliases": [
-        ["metric", "item", "descricao"],
-        ["value", "valor", "amount"],
-        ["period", "periodo", "reference period"],
-        ["unit", "unidade", "moeda"]
+        [
+          "metric",
+          "item",
+          "descricao"
+        ],
+        [
+          "value",
+          "valor",
+          "amount"
+        ],
+        [
+          "period",
+          "periodo",
+          "reference period"
+        ],
+        [
+          "unit",
+          "unidade",
+          "moeda"
+        ]
       ],
       "unitsAndScaling": {
-        "preferredScales": ["units", "thousands", "millions"],
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
         "currencyField": "currency",
         "requiresScaleEvidence": true,
         "mixedScaleHandling": "normalize_to_smallest_common_scale"
       },
-      "footnotes": ["tax_return_note_004", "tax_return_note_005", "tax_return_note_006"],
+      "footnotes": [
+        "tax_return_note_004",
+        "tax_return_note_005",
+        "tax_return_note_006"
+      ],
       "extractionNotes": "Numeric claims require this table plus period and currency context."
     }
   ]

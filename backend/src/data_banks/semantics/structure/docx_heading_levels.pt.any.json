@@ -6,7 +6,14 @@
     "languages": [
       "pt"
     ],
-    "lastUpdated": "2026-03-01"
+    "lastUpdated": "2026-03-01",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,

@@ -98,6 +98,11 @@ function lower(value: string): string {
     .replace(/[\u0300-\u036f]/g, "");
 }
 
+function asObject(value: unknown): Record<string, unknown> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  return value as Record<string, unknown>;
+}
+
 function splitDocReferenceCandidates(rawPhrase: string): string[] {
   const phrase = String(rawPhrase || "").trim();
   if (!phrase) return [];
@@ -152,7 +157,10 @@ function resolveConfig(): ResolverConfig {
   const memoryPolicy = loader.getBank<Record<string, unknown>>("memory_policy");
   const docAliases = documentIntelligenceBanks.getMergedDocAliasesBank();
   const aliasThresholds = documentIntelligenceBanks.getDocAliasThresholds();
-  const runtime = memoryPolicy?.config?.runtimeTuning?.scopeRuntime || {};
+  const runtime = asObject(
+    asObject(asObject(memoryPolicy?.config).runtimeTuning).scopeRuntime,
+  );
+  const runtimeCandidatePatterns = asObject(runtime.candidatePatterns);
 
   const tokenMinLength = Number(runtime.tokenMinLength);
   const docNameMinLength = Number(runtime.docNameMinLength);
@@ -171,15 +179,15 @@ function resolveConfig(): ResolverConfig {
   );
 
   const filenamePatterns = parseRegexList(
-    runtime?.candidatePatterns?.filename,
+    runtimeCandidatePatterns.filename,
     [DEFAULT_FILENAME_PATTERN],
   );
   const docReferencePatterns = parseRegexList(
-    runtime?.candidatePatterns?.docReferencePhrase,
+    runtimeCandidatePatterns.docReferencePhrase,
     DEFAULT_DOC_REF_PATTERNS,
   );
 
-  const bankStopWords = Array.isArray(runtime?.docStopWords)
+  const bankStopWords = Array.isArray(runtime.docStopWords)
     ? runtime.docStopWords.map((v: unknown) => lower(String(v || "")))
     : [];
   const stopWords = new Set(

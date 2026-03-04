@@ -19,17 +19,9 @@
       "composition",
       "retrieval"
     ],
-    "tests": {
-      "positive": [
-        "What is EBITDA versus budget for Q4 in USD?",
-        "Compare YoY NOI trend for the last 3 years and validate variance",
-        "Qual é o RevPAR anual consolidado em milhões?"
-      ],
-      "negative": [
-        "What is the trial balance ledger sequence?",
-        "Show me random spreadsheet formatting notes"
-      ]
-    },
+    "tests": [
+      "tests/patternDeterminism.test.ts"
+    ],
     "lastUpdated": "2026-03-03",
     "id": "patterns_domains_finance_statement_structures",
     "description": "Auto-registered bank payload for patterns/domains/finance/statement_structures.any.json"
@@ -15517,6 +15509,9 @@
     }
   ],
   "config": {
-    "enabled": true
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   }
 }

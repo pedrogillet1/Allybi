@@ -3,11 +3,23 @@
     "id": "privacy_minimal_rules",
     "version": "1.0.0",
     "description": "Privacy-minimal output rules for quality enforcement.",
-    "languages": ["any"],
-    "lastUpdated": "2026-03-01"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
-    "enabled": true
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "rules": [
     {

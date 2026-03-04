@@ -28,6 +28,17 @@ const storageDownloadLimit = pLimit(storageDownloadConcurrency) as <T>(
   fn: () => Promise<T>,
 ) => Promise<T>;
 
+// Memory-based backpressure: wait before downloading if RSS is above threshold
+const MAX_RSS_BYTES =
+  parseInt(process.env.PIPELINE_MAX_RSS_MB || "1024", 10) * 1024 * 1024;
+
+async function waitForMemory(): Promise<void> {
+  const deadline = Date.now() + 60_000;
+  while (process.memoryUsage().rss > MAX_RSS_BYTES && Date.now() < deadline) {
+    await new Promise((r) => setTimeout(r, 500));
+  }
+}
+
 /**
  * Run the full document processing pipeline.
  */
@@ -45,7 +56,8 @@ export async function processDocumentAsync(
     );
   }
 
-  // 1) Download from storage
+  // 1) Download from storage (with memory backpressure)
+  await waitForMemory();
   const tDownload = Date.now();
   logger.info("[Pipeline] Downloading from storage", {
     documentId,

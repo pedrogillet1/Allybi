@@ -8,13 +8,23 @@
       "en",
       "pt"
     ],
-    "lastUpdated": "2026-03-03"
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
     "requireEvidenceTypeForTabularBoost": true,
     "maxTableBoost": 0.24,
-    "maxColumnTypeWeight": 0.18
+    "maxColumnTypeWeight": 0.18,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "rules": [
     {

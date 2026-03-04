@@ -118,6 +118,11 @@ function safeRegExpList(patterns: unknown): RegExp[] {
   return out;
 }
 
+function asObject(value: unknown): Record<string, unknown> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  return value as Record<string, unknown>;
+}
+
 function countMatches(res: RegExp[], text: string, maxPerRule = 5): number {
   let count = 0;
   for (const r of res) {
@@ -356,7 +361,8 @@ export class LanguageDetectorService {
       pt: 0,
       es: 0,
     };
-    const triggerConfig = triggersBank?.config as Record<string, unknown> | undefined;
+    const triggersBankRecord = asObject(triggersBank);
+    const triggerConfig = asObject(triggersBankRecord.config);
     if (!triggerConfig?.enabled) {
       return {
         languageRequested: false,
@@ -366,7 +372,9 @@ export class LanguageDetectorService {
       };
     }
 
-    const rules = Array.isArray(triggersBank.rules) ? (triggersBank.rules as Array<Record<string, unknown>>) : [];
+    const rules = Array.isArray(triggersBankRecord.rules)
+      ? (triggersBankRecord.rules as Array<Record<string, unknown>>)
+      : [];
     let bestExplicit: { lang: Exclude<LangCode, "any">; conf: number } | null =
       null;
     let mixedLanguageHint = false;
@@ -454,7 +462,8 @@ export class LanguageDetectorService {
     // Default: neutral scores
     const scores: Record<"en" | "pt" | "es", number> = { en: 0, pt: 0, es: 0 };
 
-    const indBankConfig = indicatorsBank?.config as Record<string, unknown> | undefined;
+    const indicatorsBankRecord = asObject(indicatorsBank);
+    const indBankConfig = asObject(indicatorsBankRecord.config);
     if (!indBankConfig?.enabled) {
       // fallback heuristic: basic cues
       scores.en = /\b(the|and|please|summary)\b/.test(normalized) ? 0.7 : 0.4;
@@ -473,8 +482,8 @@ export class LanguageDetectorService {
       };
     }
 
-    const rules = Array.isArray(indicatorsBank.rules)
-      ? (indicatorsBank.rules as Array<Record<string, unknown>>)
+    const rules = Array.isArray(indicatorsBankRecord.rules)
+      ? (indicatorsBankRecord.rules as Array<Record<string, unknown>>)
       : [];
 
     // Evaluate rule patterns. We interpret actions.score_language with weight.

@@ -15,21 +15,9 @@
       "mutation_guard",
       "tests.patternDeterminism"
     ],
-    "tests": {
-      "positive": [
-        "só explicar no documento",
-        "não modifique nada na planilha",
-        "na verdade altere isso no editor",
-        "mostre um rascunho primeiro",
-        "faça para mim no arquivo",
-        "calcular o total na planilha"
-      ],
-      "negative": [
-        "formate a tabela, não calcular",
-        "destaque a cláusula, não resumir",
-        "exportar arquivo, não enviar email"
-      ]
-    },
+    "tests": [
+      "tests/patternDeterminism.test.ts"
+    ],
     "dependsOn": [
       "patterns_editor_apply_undo_intents_en",
       "patterns_editor_apply_undo_intents_pt"

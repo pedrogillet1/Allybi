@@ -3,7 +3,12 @@
     "id": "scope_hints",
     "version": "1.0.0",
     "description": "Deterministic scope hint overlays for Koda. Extracts and prioritizes scope constraints from user input (explicit doc/file refs, active doc locks, doc types, sheets/tabs, pages/slides/sections, ranges, and domain anchors). Prevents wrong-doc drift and over-broad retrieval by converting natural language into explicit scope signals used by scope_resolution and retrieval.",
-    "languages": ["any", "en", "pt", "es"],
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
     "lastUpdated": "2026-01-26",
     "owner": "koda-overlays",
     "compat": ">=1.0.0",
@@ -11,6 +16,12 @@
       "Added deterministic actionsContract for scope-hint precedence and collision handling",
       "Added guarded extraction of file/sheet/page/section/range scope signals",
       "Expanded tests for multilingual, collision, and regression (doc drift, nav pills, over-scope)"
+    ],
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
     ]
   },
   "config": {
@@ -74,18 +85,29 @@
         "domain_ontology",
         "document_intelligence_bank_map"
       ]
-    }
+    },
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "rules": [
     {
       "id": "explicit_filename_hint",
       "scope": "global",
       "description": "Extract explicit filename references (with extension) as hard doc scope hints.",
-      "appliesTo": ["user_inputs"],
+      "appliesTo": [
+        "user_inputs"
+      ],
       "triggerPatterns": {
-        "en": ["\\b\\w[\\w\\-_. ]{0,160}\\.(pdf|docx?|xlsx?|pptx?|txt|csv|png|jpe?g|webp)\\b"],
-        "pt": ["\\b\\w[\\w\\-_. ]{0,160}\\.(pdf|docx?|xlsx?|pptx?|txt|csv|png|jpe?g|webp)\\b"],
-        "es": ["\\b\\w[\\w\\-_. ]{0,160}\\.(pdf|docx?|xlsx?|pptx?|txt|csv|png|jpe?g|webp)\\b"]
+        "en": [
+          "\\b\\w[\\w\\-_. ]{0,160}\\.(pdf|docx?|xlsx?|pptx?|txt|csv|png|jpe?g|webp)\\b"
+        ],
+        "pt": [
+          "\\b\\w[\\w\\-_. ]{0,160}\\.(pdf|docx?|xlsx?|pptx?|txt|csv|png|jpe?g|webp)\\b"
+        ],
+        "es": [
+          "\\b\\w[\\w\\-_. ]{0,160}\\.(pdf|docx?|xlsx?|pptx?|txt|csv|png|jpe?g|webp)\\b"
+        ]
       },
       "action": {
         "type": "emit_scope_hint",
@@ -93,7 +115,10 @@
         "hard": true,
         "confidence": 0.95,
         "source": "explicit_filename",
-        "emitSignals": ["explicitDocRef", "explicitDocLockCandidate"]
+        "emitSignals": [
+          "explicitDocRef",
+          "explicitDocLockCandidate"
+        ]
       },
       "reasonCode": "scope_hint_filename",
       "severity": "critical"
@@ -102,15 +127,30 @@
       "id": "explicit_doc_title_or_alias_hint",
       "scope": "global",
       "description": "Extract explicit doc title/alias references and emit doc scope hints via doc_aliases resolution (guarded).",
-      "appliesTo": ["user_inputs"],
+      "appliesTo": [
+        "user_inputs"
+      ],
       "triggerPatterns": {
-        "en": ["\\b(this file|this document|the document called|the file named)\\b", "\\bopen\\b.{0,60}"],
-        "pt": ["\\b(este arquivo|este documento|o documento chamado|o arquivo chamado)\\b", "\\babrir\\b.{0,60}"],
-        "es": ["\\b(este archivo|este documento|el documento llamado|el archivo llamado)\\b", "\\babrir\\b.{0,60}"]
+        "en": [
+          "\\b(this file|this document|the document called|the file named)\\b",
+          "\\bopen\\b.{0,60}"
+        ],
+        "pt": [
+          "\\b(este arquivo|este documento|o documento chamado|o arquivo chamado)\\b",
+          "\\babrir\\b.{0,60}"
+        ],
+        "es": [
+          "\\b(este archivo|este documento|el documento llamado|el archivo llamado)\\b",
+          "\\babrir\\b.{0,60}"
+        ]
       },
       "when": {
         "all": [
-          { "path": "signals.docAliasesAvailable", "op": "eq", "value": true }
+          {
+            "path": "signals.docAliasesAvailable",
+            "op": "eq",
+            "value": true
+          }
         ]
       },
       "action": {
@@ -119,7 +159,9 @@
         "hard": true,
         "confidence": 0.85,
         "source": "doc_aliases",
-        "emitSignals": ["explicitDocRef"]
+        "emitSignals": [
+          "explicitDocRef"
+        ]
       },
       "reasonCode": "scope_hint_doc_alias",
       "severity": "high"
@@ -128,11 +170,19 @@
       "id": "sheet_or_tab_hint",
       "scope": "global",
       "description": "Extract explicit spreadsheet sheet/tab references as sheet scope hints.",
-      "appliesTo": ["user_inputs"],
+      "appliesTo": [
+        "user_inputs"
+      ],
       "triggerPatterns": {
-        "en": ["\\b(sheet|tab)\\s*[:#]?\\s*([A-Za-z0-9 _\\-]{1,40})\\b"],
-        "pt": ["\\b(aba|guia|folha)\\s*[:#]?\\s*([A-Za-z0-9 _\\-]{1,40})\\b"],
-        "es": ["\\b(hoja|pestaña)\\s*[:#]?\\s*([A-Za-z0-9 _\\-]{1,40})\\b"]
+        "en": [
+          "\\b(sheet|tab)\\s*[:#]?\\s*([A-Za-z0-9 _\\-]{1,40})\\b"
+        ],
+        "pt": [
+          "\\b(aba|guia|folha)\\s*[:#]?\\s*([A-Za-z0-9 _\\-]{1,40})\\b"
+        ],
+        "es": [
+          "\\b(hoja|pestaña)\\s*[:#]?\\s*([A-Za-z0-9 _\\-]{1,40})\\b"
+        ]
       },
       "action": {
         "type": "emit_scope_hint",
@@ -140,7 +190,9 @@
         "hard": true,
         "confidence": 0.85,
         "source": "explicit_sheet",
-        "emitSignals": ["explicitSheetRef"]
+        "emitSignals": [
+          "explicitSheetRef"
+        ]
       },
       "reasonCode": "scope_hint_sheet",
       "severity": "high"
@@ -149,11 +201,20 @@
       "id": "page_reference_hint",
       "scope": "global",
       "description": "Extract explicit PDF page references and emit page scope hints without guessing page numbers.",
-      "appliesTo": ["user_inputs"],
+      "appliesTo": [
+        "user_inputs"
+      ],
       "triggerPatterns": {
-        "en": ["\\bpage\\s*(\\d{1,5})\\b", "\\bp\\.\\s*(\\d{1,5})\\b"],
-        "pt": ["\\b(p[aá]gina|p[aá]g\\.)\\s*(\\d{1,5})\\b"],
-        "es": ["\\b(p[aá]gina|p[áa]g\\.)\\s*(\\d{1,5})\\b"]
+        "en": [
+          "\\bpage\\s*(\\d{1,5})\\b",
+          "\\bp\\.\\s*(\\d{1,5})\\b"
+        ],
+        "pt": [
+          "\\b(p[aá]gina|p[aá]g\\.)\\s*(\\d{1,5})\\b"
+        ],
+        "es": [
+          "\\b(p[aá]gina|p[áa]g\\.)\\s*(\\d{1,5})\\b"
+        ]
       },
       "action": {
         "type": "emit_scope_hint",
@@ -161,7 +222,9 @@
         "hard": false,
         "confidence": 0.9,
         "source": "explicit_page",
-        "emitSignals": ["pageRefPresent"]
+        "emitSignals": [
+          "pageRefPresent"
+        ]
       },
       "reasonCode": "scope_hint_page",
       "severity": "medium"
@@ -170,11 +233,19 @@
       "id": "slide_reference_hint",
       "scope": "global",
       "description": "Extract explicit slide references and emit slide scope hints.",
-      "appliesTo": ["user_inputs"],
+      "appliesTo": [
+        "user_inputs"
+      ],
       "triggerPatterns": {
-        "en": ["\\bslide\\s*(\\d{1,5})\\b"],
-        "pt": ["\\bslide\\s*(\\d{1,5})\\b"],
-        "es": ["\\b(diapositiva|slide)\\s*(\\d{1,5})\\b"]
+        "en": [
+          "\\bslide\\s*(\\d{1,5})\\b"
+        ],
+        "pt": [
+          "\\bslide\\s*(\\d{1,5})\\b"
+        ],
+        "es": [
+          "\\b(diapositiva|slide)\\s*(\\d{1,5})\\b"
+        ]
       },
       "action": {
         "type": "emit_scope_hint",
@@ -182,7 +253,9 @@
         "hard": false,
         "confidence": 0.85,
         "source": "explicit_slide",
-        "emitSignals": ["slideRefPresent"]
+        "emitSignals": [
+          "slideRefPresent"
+        ]
       },
       "reasonCode": "scope_hint_slide",
       "severity": "medium"
@@ -191,11 +264,19 @@
       "id": "section_heading_hint",
       "scope": "global",
       "description": "Extract explicit section/heading references and emit structural scope hints (does not assume the section exists).",
-      "appliesTo": ["user_inputs"],
+      "appliesTo": [
+        "user_inputs"
+      ],
       "triggerPatterns": {
-        "en": ["\\b(section|heading|chapter|appendix)\\b\\s*[:#]?\\s*([A-Za-z0-9 _\\-]{1,60})\\b"],
-        "pt": ["\\b(se[cç][aã]o|t[ií]tulo|cap[ií]tulo|anexo)\\b\\s*[:#]?\\s*([A-Za-z0-9 _\\-]{1,60})\\b"],
-        "es": ["\\b(secci[oó]n|t[ií]tulo|cap[ií]tulo|anexo)\\b\\s*[:#]?\\s*([A-Za-z0-9 _\\-]{1,60})\\b"]
+        "en": [
+          "\\b(section|heading|chapter|appendix)\\b\\s*[:#]?\\s*([A-Za-z0-9 _\\-]{1,60})\\b"
+        ],
+        "pt": [
+          "\\b(se[cç][aã]o|t[ií]tulo|cap[ií]tulo|anexo)\\b\\s*[:#]?\\s*([A-Za-z0-9 _\\-]{1,60})\\b"
+        ],
+        "es": [
+          "\\b(secci[oó]n|t[ií]tulo|cap[ií]tulo|anexo)\\b\\s*[:#]?\\s*([A-Za-z0-9 _\\-]{1,60})\\b"
+        ]
       },
       "action": {
         "type": "emit_scope_hint",
@@ -203,7 +284,9 @@
         "hard": false,
         "confidence": 0.8,
         "source": "explicit_section",
-        "emitSignals": ["sectionRefPresent"]
+        "emitSignals": [
+          "sectionRefPresent"
+        ]
       },
       "reasonCode": "scope_hint_section",
       "severity": "medium"
@@ -212,11 +295,19 @@
       "id": "explicit_cell_range_hint",
       "scope": "global",
       "description": "Extract explicit spreadsheet A1 ranges and emit range scope hints; do not infer ranges.",
-      "appliesTo": ["user_inputs"],
+      "appliesTo": [
+        "user_inputs"
+      ],
       "triggerPatterns": {
-        "en": ["\\b[A-Z]{1,3}\\d{1,7}\\s*:\\s*[A-Z]{1,3}\\d{1,7}\\b"],
-        "pt": ["\\b[A-Z]{1,3}\\d{1,7}\\s*:\\s*[A-Z]{1,3}\\d{1,7}\\b"],
-        "es": ["\\b[A-Z]{1,3}\\d{1,7}\\s*:\\s*[A-Z]{1,3}\\d{1,7}\\b"]
+        "en": [
+          "\\b[A-Z]{1,3}\\d{1,7}\\s*:\\s*[A-Z]{1,3}\\d{1,7}\\b"
+        ],
+        "pt": [
+          "\\b[A-Z]{1,3}\\d{1,7}\\s*:\\s*[A-Z]{1,3}\\d{1,7}\\b"
+        ],
+        "es": [
+          "\\b[A-Z]{1,3}\\d{1,7}\\s*:\\s*[A-Z]{1,3}\\d{1,7}\\b"
+        ]
       },
       "action": {
         "type": "emit_scope_hint",
@@ -224,7 +315,9 @@
         "hard": true,
         "confidence": 0.9,
         "source": "explicit_range",
-        "emitSignals": ["rangeExplicit"]
+        "emitSignals": [
+          "rangeExplicit"
+        ]
       },
       "reasonCode": "scope_hint_range",
       "severity": "high"
@@ -233,11 +326,19 @@
       "id": "doc_type_hint",
       "scope": "global",
       "description": "Extract doc type hints (pdf/spreadsheet/slides/image) to guide retrieval type boosting without excluding other types.",
-      "appliesTo": ["user_inputs"],
+      "appliesTo": [
+        "user_inputs"
+      ],
       "triggerPatterns": {
-        "en": ["\\b(pdf|spreadsheet|xlsx|csv|slides|pptx|image|png|jpg|jpeg)\\b"],
-        "pt": ["\\b(pdf|planilha|xlsx|csv|slides|pptx|imagem|png|jpg|jpeg)\\b"],
-        "es": ["\\b(pdf|hoja|xlsx|csv|diapositivas|pptx|imagen|png|jpg|jpeg)\\b"]
+        "en": [
+          "\\b(pdf|spreadsheet|xlsx|csv|slides|pptx|image|png|jpg|jpeg)\\b"
+        ],
+        "pt": [
+          "\\b(pdf|planilha|xlsx|csv|slides|pptx|imagem|png|jpg|jpeg)\\b"
+        ],
+        "es": [
+          "\\b(pdf|hoja|xlsx|csv|diapositivas|pptx|imagen|png|jpg|jpeg)\\b"
+        ]
       },
       "action": {
         "type": "emit_scope_hint",
@@ -245,7 +346,9 @@
         "hard": false,
         "confidence": 0.8,
         "source": "explicit_doc_type",
-        "emitSignals": ["docTypeHintPresent"]
+        "emitSignals": [
+          "docTypeHintPresent"
+        ]
       },
       "reasonCode": "scope_hint_doc_type",
       "severity": "low"
@@ -254,16 +357,32 @@
       "id": "implicit_pronoun_reference_soft",
       "scope": "global",
       "description": "Tag pronoun-based references (it/this/that) as soft scope hints to maintain continuity, without overriding explicit refs.",
-      "appliesTo": ["user_inputs"],
+      "appliesTo": [
+        "user_inputs"
+      ],
       "triggerPatterns": {
-        "en": ["\\b(it|this|that|here)\\b"],
-        "pt": ["\\b(isso|isto|esse|essa|aqui)\\b"],
-        "es": ["\\b(eso|esto|ese|esa|aqu[ií])\\b"]
+        "en": [
+          "\\b(it|this|that|here)\\b"
+        ],
+        "pt": [
+          "\\b(isso|isto|esse|essa|aqui)\\b"
+        ],
+        "es": [
+          "\\b(eso|esto|ese|esa|aqu[ií])\\b"
+        ]
       },
       "when": {
         "all": [
-          { "path": "signals.hasActiveDoc", "op": "eq", "value": true },
-          { "path": "signals.explicitDocRef", "op": "neq", "value": true }
+          {
+            "path": "signals.hasActiveDoc",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "signals.explicitDocRef",
+            "op": "neq",
+            "value": true
+          }
         ]
       },
       "action": {
@@ -272,7 +391,9 @@
         "hard": false,
         "confidence": 0.75,
         "source": "pronoun_continuity",
-        "emitSignals": ["followupContinuity"]
+        "emitSignals": [
+          "followupContinuity"
+        ]
       },
       "reasonCode": "scope_hint_pronoun",
       "severity": "low"
@@ -283,40 +404,78 @@
       {
         "id": "SH_001_filename_hard_scope",
         "input": "Open report_Q4_2023.pdf",
-        "expect": { "hintType": "doc_ref", "hard": true, "emitSignalsAny": ["explicitDocRef"] }
+        "expect": {
+          "hintType": "doc_ref",
+          "hard": true,
+          "emitSignalsAny": [
+            "explicitDocRef"
+          ]
+        }
       },
       {
         "id": "SH_002_sheet_hint_pt",
         "input": "Na aba Caixa, some os valores",
-        "expect": { "hintType": "sheet_ref", "hard": true }
+        "expect": {
+          "hintType": "sheet_ref",
+          "hard": true
+        }
       },
       {
         "id": "SH_003_page_hint_es",
         "input": "En la página 10, ¿dónde se menciona NOI?",
-        "expect": { "hintType": "page_ref", "hard": false }
+        "expect": {
+          "hintType": "page_ref",
+          "hard": false
+        }
       },
       {
         "id": "SH_004_range_hint",
         "input": "Sum A1:B20",
-        "expect": { "hintType": "range_ref", "hard": true }
+        "expect": {
+          "hintType": "range_ref",
+          "hard": true
+        }
       },
       {
         "id": "SH_005_pronoun_continuity_only_when_active_doc",
-        "context": { "signals": { "hasActiveDoc": true, "explicitDocRef": false } },
+        "context": {
+          "signals": {
+            "hasActiveDoc": true,
+            "explicitDocRef": false
+          }
+        },
         "input": "Summarize it",
-        "expect": { "hintType": "pronoun_ref", "emitSignalsAny": ["followupContinuity"] }
+        "expect": {
+          "hintType": "pronoun_ref",
+          "emitSignalsAny": [
+            "followupContinuity"
+          ]
+        }
       },
       {
         "id": "SH_006_collision_explicit_doc_wins_over_pronoun",
-        "context": { "signals": { "hasActiveDoc": true } },
+        "context": {
+          "signals": {
+            "hasActiveDoc": true
+          }
+        },
         "input": "Summarize it — in report_Q4_2023.pdf",
-        "expect": { "explicitDocRefPreferred": true }
+        "expect": {
+          "explicitDocRefPreferred": true
+        }
       },
       {
         "id": "SH_007_regression_no_wrong_doc_drift_after_lock",
-        "context": { "signals": { "explicitDocLock": true, "intentFamily": "documents" } },
+        "context": {
+          "signals": {
+            "explicitDocLock": true,
+            "intentFamily": "documents"
+          }
+        },
         "input": "Now summarize it",
-        "expect": { "scopeRestrictedToLockedDoc": true }
+        "expect": {
+          "scopeRestrictedToLockedDoc": true
+        }
       }
     ]
   }

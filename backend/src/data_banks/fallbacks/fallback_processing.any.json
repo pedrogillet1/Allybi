@@ -12,7 +12,13 @@
     "lastUpdated": "2026-03-01",
     "owner": "koda-fallbacks",
     "compat": ">=1.0.0",
-    "linkedMicrocopy": "processing_messages"
+    "linkedMicrocopy": "processing_messages",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -40,7 +46,10 @@
         "reasonCode",
         "fallbackType"
       ]
-    }
+    },
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "rules": [
     {

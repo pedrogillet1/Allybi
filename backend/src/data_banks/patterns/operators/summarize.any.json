@@ -12,7 +12,13 @@
     "dependsOn": [
       "operator_families"
     ],
-    "lastUpdated": "2026-03-03"
+    "lastUpdated": "2026-03-03",
+    "usedBy": [
+      "services/chat/turnRoutePolicy.service.ts"
+    ],
+    "tests": [
+      "tests/patternDeterminism.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -20,7 +26,8 @@
     "dedupe": true,
     "requiresUniversalOperatorsOnly": true,
     "minPatterns": 250,
-    "maxPatterns": 600
+    "maxPatterns": 600,
+    "sortBy": "id"
   },
   "patterns": [
     {

@@ -50,6 +50,11 @@ export class ChatKernelService {
         operator: intentDecision.operatorId,
         domain: intentDecision.domainId,
         domainId: intentDecision.domainId,
+        requiresClarification: intentDecision.requiresClarification === true,
+        clarifyReason:
+          typeof intentDecision.clarifyReason === "string"
+            ? intentDecision.clarifyReason
+            : null,
       },
       context: {
         ...context,
@@ -58,6 +63,32 @@ export class ChatKernelService {
           lastRoutingDecision: intentDecision.persistable,
           activeDomain: intentDecision.domainId,
         },
+      },
+    };
+  }
+
+  private enforceClarificationResult(result: ChatResult): ChatResult {
+    if (result.status === "blocked" || result.status === "failed") {
+      return result;
+    }
+    const fallbackText = "Can you clarify what you want me to do next?";
+    const assistantText =
+      String(result.assistantText || "").trim() || fallbackText;
+    const missingSlots = Array.isArray(result.completion?.missingSlots)
+      ? [...result.completion!.missingSlots]
+      : [];
+    if (!missingSlots.includes("intent")) missingSlots.push("intent");
+    return {
+      ...result,
+      assistantText,
+      status: "clarification_required",
+      failureCode: result.failureCode || "INTENT_NEEDS_CLARIFICATION",
+      completion: {
+        answered: false,
+        missingSlots,
+        nextAction:
+          result.completion?.nextAction ||
+          "Clarify the document or action you want.",
       },
     };
   }
@@ -116,7 +147,10 @@ export class ChatKernelService {
     })();
 
     try {
-      const result = await op;
+      let result = await op;
+      if (route === "CLARIFY") {
+        result = this.enforceClarificationResult(result);
+      }
       normalizeTurnSuccess(result);
       return result;
     } catch (error) {

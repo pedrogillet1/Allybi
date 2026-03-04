@@ -22,6 +22,7 @@ import {
   DataBankLoaderService,
   DataBankLoaderOptions,
   DataBankError,
+  type BankRegistryEntry,
 } from "./dataBankLoader.service";
 import { getBankTierPolicyInstance } from "./bankTierPolicy.service";
 import {
@@ -287,7 +288,7 @@ export class BankLoaderService {
   /**
    * Get registry metadata for a bank (if registry is loaded).
    */
-  getRegistryEntry(bankId: string): Record<string, unknown> | null {
+  getRegistryEntry(bankId: string): BankRegistryEntry | null {
     this.assertReady();
     return this.loader!.getRegistryEntry(bankId);
   }

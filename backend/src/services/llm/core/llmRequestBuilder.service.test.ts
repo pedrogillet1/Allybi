@@ -1,9 +1,18 @@
-import { describe, expect, test, jest } from "@jest/globals";
+import { beforeEach, describe, expect, test, jest } from "@jest/globals";
+import { getOptionalBank } from "../../core/banks/bankLoader.service";
 import {
   LlmRequestBuilderService,
   type PromptRegistryService,
 } from "./llmRequestBuilder.service";
 import type { BuildRequestInput } from "./llmRequestBuilder.service";
+
+jest.mock("../../core/banks/bankLoader.service", () => ({
+  getOptionalBank: jest.fn(),
+}));
+
+const mockedGetOptionalBank = getOptionalBank as jest.MockedFunction<
+  typeof getOptionalBank
+>;
 
 function createInput(
   overrides?: Partial<BuildRequestInput>,
@@ -45,6 +54,11 @@ describe("LlmRequestBuilderService", () => {
       messages: [{ role: "system", content: "Answer with evidence." }],
     }),
   };
+
+  beforeEach(() => {
+    mockedGetOptionalBank.mockReset();
+    mockedGetOptionalBank.mockReturnValue(null);
+  });
 
   test("applies a doc-grounded token floor when not explicitly short", () => {
     const builder = new LlmRequestBuilderService(prompts);
@@ -252,6 +266,64 @@ describe("LlmRequestBuilderService", () => {
     expect(meta?.resolvedTokenPolicy?.finalMaxOutputTokens).toBe(1200);
   });
 
+  test("combines page and section in evidence location", () => {
+    const builder = new LlmRequestBuilderService(prompts);
+    const req = builder.build(
+      createInput({
+        signals: {
+          ...createInput().signals,
+          answerMode: "doc_grounded_single",
+        },
+        evidencePack: {
+          evidence: [
+            {
+              docId: "doc_1",
+              locationKey: "loc_1",
+              snippet: "Revenue grew 18% year-over-year driven by subscription expansion.",
+              evidenceType: "text" as const,
+              title: "Annual Report",
+              location: { page: 3, sectionKey: "Revenue Analysis" },
+            },
+          ],
+        },
+      }),
+    );
+
+    const userMessage = req.messages.find((msg) => msg.role === "user");
+    const content = userMessage?.content || "";
+    // Should combine page and section: "p.3,sec:Revenue Analysis"
+    expect(content).toContain("p.3");
+    expect(content).toContain("sec:Revenue Analysis");
+  });
+
+  test("excludes chunk_ prefixed sectionKey from evidence location", () => {
+    const builder = new LlmRequestBuilderService(prompts);
+    const req = builder.build(
+      createInput({
+        signals: {
+          ...createInput().signals,
+          answerMode: "doc_grounded_single",
+        },
+        evidencePack: {
+          evidence: [
+            {
+              docId: "doc_1",
+              locationKey: "loc_1",
+              snippet: "Some evidence text for testing location formatting output.",
+              evidenceType: "text" as const,
+              location: { page: 5, sectionKey: "chunk_42" },
+            },
+          ],
+        },
+      }),
+    );
+
+    const userMessage = req.messages.find((msg) => msg.role === "user");
+    const content = userMessage?.content || "";
+    expect(content).toContain("p.5");
+    expect(content).not.toContain("sec:chunk_42");
+  });
+
   test("caps payload sections and reports payload stats", () => {
     const builder = new LlmRequestBuilderService(prompts);
     const req = builder.build(
@@ -283,5 +355,61 @@ describe("LlmRequestBuilderService", () => {
     expect(payloadStats?.evidenceItemsIncluded).toBeLessThanOrEqual(14);
     expect(payloadStats?.evidenceCharsIncluded).toBeLessThanOrEqual(5600);
     expect(payloadStats?.estimatedPromptTokens).toBeGreaterThan(0);
+  });
+
+  test("resolves max input tokens for pinned OpenAI model versions via family key", () => {
+    mockedGetOptionalBank.mockImplementation((bankId: string) => {
+      if (bankId === "provider_capabilities") {
+        return {
+          providers: {
+            openai: {
+              models: {
+                "gpt-5.2": { maxInputTokens: 128000 },
+              },
+            },
+          },
+        } as unknown as ReturnType<typeof getOptionalBank>;
+      }
+      return null;
+    });
+    const builder = new LlmRequestBuilderService(prompts);
+    const maxTokens = (builder as any).resolveMaxInputTokens(
+      createInput({
+        route: {
+          ...createInput().route,
+          provider: "openai",
+          model: "gpt-5.2-2026-01-15",
+        },
+      }),
+    );
+    expect(maxTokens).toBe(128000);
+  });
+
+  test("resolves max input tokens using wildcard model rules", () => {
+    mockedGetOptionalBank.mockImplementation((bankId: string) => {
+      if (bankId === "provider_capabilities") {
+        return {
+          providers: {
+            local: {
+              models: {
+                "ollama:*": { maxInputTokens: 8192 },
+              },
+            },
+          },
+        } as unknown as ReturnType<typeof getOptionalBank>;
+      }
+      return null;
+    });
+    const builder = new LlmRequestBuilderService(prompts);
+    const maxTokens = (builder as any).resolveMaxInputTokens(
+      createInput({
+        route: {
+          ...createInput().route,
+          provider: "local",
+          model: "ollama:phi4",
+        },
+      }),
+    );
+    expect(maxTokens).toBe(8192);
   });
 });

@@ -14,17 +14,9 @@
       "query_orchestrator",
       "tests.patternDeterminism"
     ],
-    "tests": {
-      "positive": [
-        "select only this paragraph",
-        "select the table under the header",
-        "select all bullets in this section"
-      ],
-      "negative": [
-        "summarize this section",
-        "explain why revenue increased"
-      ]
-    },
+    "tests": [
+      "tests/patternDeterminism.test.ts"
+    ],
     "dependsOn": [
       "editor_runtime_state",
       "selection_scope_router"

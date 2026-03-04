@@ -3,12 +3,26 @@
     "id": "table_cell_evidence_rules",
     "version": "1.0.0",
     "description": "Context guarantees before using individual table cell values in responses.",
-    "languages": ["any", "en", "pt"],
-    "lastUpdated": "2026-03-03"
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
-    "requireHeaderAndRowContext": true
+    "requireHeaderAndRowContext": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "rules": [
     {

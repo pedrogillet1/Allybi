@@ -17,17 +17,9 @@
       "docint_router",
       "compose"
     ],
-    "tests": {
-      "positive": [
-        "What is the exact wording of the termination clause?",
-        "Cite the indemnity clause verbatim with line numbers.",
-        "Onde está a cláusula de confidencialidade and which section does it cite?"
-      ],
-      "negative": [
-        "Tell me a weather summary",
-        "Translate this poem to Portuguese"
-      ]
-    },
+    "tests": [
+      "tests/patternDeterminism.test.ts"
+    ],
     "lastUpdated": "2026-03-03",
     "id": "patterns_domains_legal_clause_patterns",
     "description": "Auto-registered bank payload for patterns/domains/legal/clause_patterns.any.json"
@@ -18035,6 +18027,9 @@
     }
   ],
   "config": {
-    "enabled": true
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   }
 }

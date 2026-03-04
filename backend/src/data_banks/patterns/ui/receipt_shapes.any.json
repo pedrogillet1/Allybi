@@ -13,16 +13,9 @@
       "response_contract_validator",
       "tests.patternDeterminism"
     ],
-    "tests": {
-      "positive": [
-        "extract intent in editor should include diff and citations",
-        "compare in navigation should include source buttons and selection summary"
-      ],
-      "negative": [
-        "navigation mode without selection should fail closed for apply-like contracts",
-        "highlight-only response must not omit computedResults when operator is calculate"
-      ]
-    },
+    "tests": [
+      "tests/patternDeterminism.test.ts"
+    ],
     "lastUpdated": "2026-03-03"
   },
   "config": {

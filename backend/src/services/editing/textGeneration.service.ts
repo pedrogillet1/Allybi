@@ -337,6 +337,10 @@ function inferTask(plan: EditPlan, beforeText: string): GenerationTask {
 export class EditingTextGenerationService {
   private static gateway: LlmGatewayService | null = null;
   private static attempted = false;
+  private static lastAttemptMs = 0;
+
+  /** Allow re-initialization after transient failures (retry after 30s). */
+  private static readonly RETRY_INTERVAL_MS = 30_000;
 
   async generateProposedText(input: {
     context: EditExecutionContext;
@@ -694,10 +698,18 @@ export class EditingTextGenerationService {
   }
 
   private getGateway(): LlmGatewayService | null {
-    if (EditingTextGenerationService.attempted) {
+    if (EditingTextGenerationService.gateway) {
       return EditingTextGenerationService.gateway;
     }
+    // Allow retry after transient failures instead of permanent lockout
+    if (
+      EditingTextGenerationService.attempted &&
+      Date.now() - EditingTextGenerationService.lastAttemptMs < EditingTextGenerationService.RETRY_INTERVAL_MS
+    ) {
+      return null;
+    }
     EditingTextGenerationService.attempted = true;
+    EditingTextGenerationService.lastAttemptMs = Date.now();
 
     try {
       const envName =
@@ -710,29 +722,36 @@ export class EditingTextGenerationService {
               : "local";
       const geminiCfg = loadGeminiConfig(envName as any);
       const hasGeminiKey = Boolean(String(geminiCfg.apiKey || "").trim());
-      if (!hasGeminiKey) {
+      const hasOpenAIKey = Boolean(String(process.env.OPENAI_API_KEY || "").trim());
+
+      if (!hasGeminiKey && !hasOpenAIKey) {
         logger.warn("[EditingTextGeneration] gateway_disabled_no_api_key");
         EditingTextGenerationService.gateway = null;
         return null;
       }
 
       const factory = new LLMClientFactory({
-        defaultProvider: "google",
+        defaultProvider: hasGeminiKey ? "google" : "openai",
         providers: {
-          google: {
-            enabled: true,
-            config: {
-              apiKey: geminiCfg.apiKey,
-              baseUrl:
-                geminiCfg.baseUrl ||
-                "https://generativelanguage.googleapis.com/v1beta",
-              defaults: {
-                gemini3: geminiCfg.models.defaultFinal,
-                gemini3Flash: geminiCfg.models.defaultDraft,
-              },
-              timeoutMs: geminiCfg.timeoutMs,
-            },
-          },
+          google: hasGeminiKey
+            ? {
+                enabled: true,
+                config: {
+                  apiKey: geminiCfg.apiKey,
+                  baseUrl:
+                    geminiCfg.baseUrl ||
+                    "https://generativelanguage.googleapis.com/v1beta",
+                  defaults: {
+                    gemini3: geminiCfg.models.defaultFinal,
+                    gemini3Flash: geminiCfg.models.defaultDraft,
+                  },
+                  timeoutMs: geminiCfg.timeoutMs,
+                },
+              }
+            : { enabled: false, config: {} as any },
+          openai: hasOpenAIKey
+            ? { enabled: true, config: {} }
+            : { enabled: false, config: {} },
         },
       });
 

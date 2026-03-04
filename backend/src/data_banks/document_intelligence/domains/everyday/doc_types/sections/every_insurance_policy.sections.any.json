@@ -6,7 +6,14 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-03-03"
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -14,14 +21,140 @@
     "docType": "every_insurance_policy"
   },
   "sections": [
-    { "id": "document_header", "name": { "en": "Header", "pt": "Cabecalho" }, "order": 1, "required": true, "mustHave": true, "headingAnchors": ["insurance", "policy", "apolice"] },
-    { "id": "policy_holder", "name": { "en": "Policy Holder", "pt": "Titular da Apolice" }, "order": 2, "required": true, "mustHave": true, "headingAnchors": ["policy holder", "holder", "tomador"] },
-    { "id": "coverage_details", "name": { "en": "Coverage Details", "pt": "Detalhes da Cobertura" }, "order": 3, "required": true, "mustHave": true, "headingAnchors": ["coverage", "scope", "cobertura"] },
-    { "id": "premium_schedule", "name": { "en": "Premium Schedule", "pt": "Cronograma de Premio" }, "order": 4, "required": true, "mustHave": true, "headingAnchors": ["premium", "amount", "premio"] },
-    { "id": "benefits_or_addons", "name": { "en": "Benefits and Addons", "pt": "Beneficios e Coberturas Adicionais" }, "order": 5, "required": false, "mustHave": false, "headingAnchors": ["benefits", "add-ons", "coverage"] },
-    { "id": "exclusions", "name": { "en": "Exclusions", "pt": "Exclusoes" }, "order": 6, "required": true, "mustHave": true, "headingAnchors": ["exclusions", "exclusion", "not covered"] },
-    { "id": "renewal_terms", "name": { "en": "Renewal and Terms", "pt": "Renovacao e Condicoes" }, "order": 7, "required": true, "mustHave": true, "headingAnchors": ["renewal", "term", "validity"] },
-    { "id": "signatures_or_authorization", "name": { "en": "Authorization", "pt": "Autorizacao" }, "order": 8, "required": false, "mustHave": false, "headingAnchors": ["signature", "authorized", "signature"] },
-    { "id": "claim_reference", "name": { "en": "Claim Notes", "pt": "Nota de Sinistro" }, "order": 9, "required": false, "mustHave": false, "headingAnchors": ["claims", "sinistro", "claim"] }
+    {
+      "id": "document_header",
+      "name": {
+        "en": "Header",
+        "pt": "Cabecalho"
+      },
+      "order": 1,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": [
+        "insurance",
+        "policy",
+        "apolice"
+      ]
+    },
+    {
+      "id": "policy_holder",
+      "name": {
+        "en": "Policy Holder",
+        "pt": "Titular da Apolice"
+      },
+      "order": 2,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": [
+        "policy holder",
+        "holder",
+        "tomador"
+      ]
+    },
+    {
+      "id": "coverage_details",
+      "name": {
+        "en": "Coverage Details",
+        "pt": "Detalhes da Cobertura"
+      },
+      "order": 3,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": [
+        "coverage",
+        "scope",
+        "cobertura"
+      ]
+    },
+    {
+      "id": "premium_schedule",
+      "name": {
+        "en": "Premium Schedule",
+        "pt": "Cronograma de Premio"
+      },
+      "order": 4,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": [
+        "premium",
+        "amount",
+        "premio"
+      ]
+    },
+    {
+      "id": "benefits_or_addons",
+      "name": {
+        "en": "Benefits and Addons",
+        "pt": "Beneficios e Coberturas Adicionais"
+      },
+      "order": 5,
+      "required": false,
+      "mustHave": false,
+      "headingAnchors": [
+        "benefits",
+        "add-ons",
+        "coverage"
+      ]
+    },
+    {
+      "id": "exclusions",
+      "name": {
+        "en": "Exclusions",
+        "pt": "Exclusoes"
+      },
+      "order": 6,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": [
+        "exclusions",
+        "exclusion",
+        "not covered"
+      ]
+    },
+    {
+      "id": "renewal_terms",
+      "name": {
+        "en": "Renewal and Terms",
+        "pt": "Renovacao e Condicoes"
+      },
+      "order": 7,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": [
+        "renewal",
+        "term",
+        "validity"
+      ]
+    },
+    {
+      "id": "signatures_or_authorization",
+      "name": {
+        "en": "Authorization",
+        "pt": "Autorizacao"
+      },
+      "order": 8,
+      "required": false,
+      "mustHave": false,
+      "headingAnchors": [
+        "signature",
+        "authorized",
+        "signature"
+      ]
+    },
+    {
+      "id": "claim_reference",
+      "name": {
+        "en": "Claim Notes",
+        "pt": "Nota de Sinistro"
+      },
+      "order": 9,
+      "required": false,
+      "mustHave": false,
+      "headingAnchors": [
+        "claims",
+        "sinistro",
+        "claim"
+      ]
+    }
   ]
 }

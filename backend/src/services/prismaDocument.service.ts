@@ -7,6 +7,7 @@ import { randomUUID } from "crypto";
 import prisma from "../config/database";
 import { downloadFile, getSignedUrl, uploadFile } from "../config/storage";
 import { addDocumentJob } from "../queues/document.queue";
+import { documentQueue } from "../queues/queueConfig";
 import { env } from "../config/env";
 import {
   isPubSubAvailable,
@@ -339,6 +340,102 @@ export class PrismaDocumentService implements DocumentService {
       kind: "text",
       content: content || "(No preview available)",
     };
+  }
+
+  async reindex(input: {
+    userId: string;
+    documentId: string;
+  }): Promise<{ status: "queued" | "started" }> {
+    const requested = await prisma.document.findFirst({
+      where: { id: input.documentId, userId: input.userId },
+      select: {
+        id: true,
+        parentVersionId: true,
+        filename: true,
+        mimeType: true,
+        encryptedFilename: true,
+      },
+    });
+    if (!requested) throw new Error("Document not found");
+
+    const rootDocumentId = requested.parentVersionId || requested.id;
+    const latest = await prisma.document.findFirst({
+      where: {
+        userId: input.userId,
+        OR: [{ id: rootDocumentId }, { parentVersionId: rootDocumentId }],
+        status: {
+          in: [
+            "uploading",
+            "uploaded",
+            "enriching",
+            "indexed",
+            "ready",
+            "failed",
+            "skipped",
+            "available",
+            "completed",
+          ],
+        },
+      },
+      select: {
+        id: true,
+        filename: true,
+        mimeType: true,
+        encryptedFilename: true,
+      },
+      orderBy: [
+        { createdAt: "desc" },
+        { id: "desc" },
+      ],
+    });
+    const target = latest || requested;
+    if (!target.encryptedFilename) {
+      throw new Error("Document has no storage key");
+    }
+
+    await prisma.document.update({
+      where: { id: target.id },
+      data: {
+        status: "uploaded",
+        indexingState: "pending",
+        indexingOperationId: null,
+        indexingError: null,
+        indexingUpdatedAt: new Date(),
+        embeddingsGenerated: false,
+        chunksCount: 0,
+        error: null,
+      },
+    });
+
+    const filename = target.filename || "unknown";
+    const mimeType = target.mimeType || "application/octet-stream";
+
+    if (env.USE_GCP_WORKERS && isPubSubAvailable()) {
+      await publishExtractJob(
+        target.id,
+        input.userId,
+        target.encryptedFilename,
+        mimeType,
+        filename,
+      );
+      return { status: "queued" };
+    }
+
+    await documentQueue.add(
+      "process-document",
+      {
+        documentId: target.id,
+        userId: input.userId,
+        filename,
+        mimeType,
+        encryptedFilename: target.encryptedFilename,
+      },
+      {
+        jobId: `doc-${target.id}-reindex-${Date.now()}`,
+      },
+    );
+
+    return { status: "queued" };
   }
 
   async streamFile(input: {

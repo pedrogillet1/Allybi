@@ -12,16 +12,9 @@
       "selection_router",
       "tests.patternDeterminism"
     ],
-    "tests": {
-      "positive": [
-        "select range and then apply",
-        "no selection but explicit heading target"
-      ],
-      "negative": [
-        "apply to random area",
-        "resolve without clarifying missing scope"
-      ]
-    },
+    "tests": [
+      "tests/patternDeterminism.test.ts"
+    ],
     "lastUpdated": "2026-03-03"
   },
   "config": {

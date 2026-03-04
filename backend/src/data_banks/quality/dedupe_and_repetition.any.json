@@ -3,12 +3,24 @@
     "id": "dedupe_and_repetition",
     "version": "1.0.0",
     "description": "Dedupe and repetition controls for quality gates.",
-    "languages": ["any"],
-    "lastUpdated": "2026-03-01"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
-    "maxDuplicateSentences": 0
+    "maxDuplicateSentences": 0,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "bannedPhrases": [
     "no relevant information found",

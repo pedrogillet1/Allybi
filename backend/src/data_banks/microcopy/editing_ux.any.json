@@ -3,8 +3,19 @@
     "id": "editing_ux",
     "version": "1.0.0",
     "description": "UX clarification prompts for editing flows — selection, range, and ambiguity resolution.",
-    "languages": ["any", "en", "pt"],
-    "lastUpdated": "2026-02-27"
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-02-27",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,

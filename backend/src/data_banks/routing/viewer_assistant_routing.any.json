@@ -3,14 +3,25 @@
     "id": "viewer_assistant_routing",
     "version": "1.0.0",
     "description": "Routing contract for Ask Allybi inside document viewer mode. Enforces qa_locked behavior, single-document scope, and deterministic source-jump intent handling.",
-    "languages": ["any"],
+    "languages": [
+      "any"
+    ],
     "lastUpdated": "2026-03-02",
-    "owner": "allybi-viewer"
+    "owner": "allybi-viewer",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
     "failOpen": false,
-    "defaultViewerIntent": "qa_locked"
+    "defaultViewerIntent": "qa_locked",
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "rules": [
     {

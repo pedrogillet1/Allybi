@@ -9,7 +9,13 @@
       "pt"
     ],
     "lastUpdated": "2026-03-03",
-    "description": "Expanded cross-domain metric ontology with 200+ metrics, aliases, and table headers."
+    "description": "Expanded cross-domain metric ontology with 200+ metrics, aliases, and table headers.",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true

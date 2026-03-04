@@ -258,6 +258,11 @@ function lower(s: string): string {
   return normSpace(s).toLowerCase();
 }
 
+function asObject(value: unknown): Record<string, unknown> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  return value as Record<string, unknown>;
+}
+
 function isProd(env: EnvName): boolean {
   return env === "production";
 }
@@ -490,17 +495,18 @@ export class ScopeGateService {
     // - Otherwise retain existing lock unless topic shift (topic shift does NOT auto-unlock; it only reduces continuity)
     let hardDocLock = stateHardDocLock;
     let activeDocId = stateActiveDocId;
+    const scopeResolutionConfig = asObject(scopeResolutionBank?.config);
+    const scopeResolutionPolicy = asObject(scopeResolutionConfig.policy);
+    const scopeResolutionThresholds = asObject(scopeResolutionConfig.thresholds);
     const preferExplicitDocRefOverState =
-      scopeResolutionBank?.config?.policy?.preferExplicitDocRefOverState !==
-      false;
+      scopeResolutionPolicy.preferExplicitDocRefOverState !== false;
     const explicitDocConfidenceFloor = clamp01(
       Number(
         explicitResolved.method === "filename"
-          ? scopeResolutionBank?.config?.thresholds?.explicitFilenameHardMin ?? 0.8
+          ? scopeResolutionThresholds.explicitFilenameHardMin ?? 0.8
           : explicitResolved.method === "upstream"
-            ? scopeResolutionBank?.config?.thresholds?.explicitDocIdHardMin ?? 0.85
-            : scopeResolutionBank?.config?.thresholds?.minToApplyHardConstraint ??
-                0.74,
+            ? scopeResolutionThresholds.explicitDocIdHardMin ?? 0.85
+            : scopeResolutionThresholds.minToApplyHardConstraint ?? 0.74,
       ),
     );
     const explicitDocResolvedHard =
@@ -515,10 +521,20 @@ export class ScopeGateService {
     } else if (
       stageEnabled("apply_user_choice") &&
       !explicitResolved.docId &&
-      String((state as Record<string, unknown> & { lastDisambiguation?: { chosenDocumentId?: string } })?.lastDisambiguation?.chosenDocumentId || "").trim()
+      String(
+        (
+          state as unknown as Record<string, unknown> & {
+            lastDisambiguation?: { chosenDocumentId?: string };
+          }
+        )?.lastDisambiguation?.chosenDocumentId || "",
+      ).trim()
     ) {
       activeDocId = String(
-        (state as Record<string, unknown> & { lastDisambiguation?: { chosenDocumentId?: string } })?.lastDisambiguation?.chosenDocumentId || "",
+        (
+          state as unknown as Record<string, unknown> & {
+            lastDisambiguation?: { chosenDocumentId?: string };
+          }
+        )?.lastDisambiguation?.chosenDocumentId || "",
       ).trim();
       hardDocLock = true;
       debug.appliedRules.push("scope_resolution_apply_user_choice");
@@ -616,6 +632,11 @@ export class ScopeGateService {
     // We only disambiguate when blocked:
     // - user attempted to open/reference a file (explicitDocRef true) AND no resolved docId AND not discovery
     // - or user explicitly asked for a doc by ambiguous alias tokens
+    const ambiguityPolicyConfig = asObject(ambiguityPolicies?.config);
+    const ambiguityActionsContract = asObject(
+      ambiguityPolicyConfig.actionsContract,
+    );
+    const ambiguityThresholds = asObject(ambiguityActionsContract.thresholds);
     let needsDocChoice = false;
     let disambiguationOptions: ScopeCandidate[] = [];
 
@@ -632,16 +653,14 @@ export class ScopeGateService {
       );
 
       // Apply policy thresholds (autopick vs disambiguate)
-      const policy =
-        ambiguityPolicies?.config?.actionsContract?.thresholds ?? {};
       const topScore = disambiguationOptions[0]?.score ?? 0;
       const gap =
         disambiguationOptions.length >= 2
           ? topScore - (disambiguationOptions[1].score ?? 0)
           : 1;
 
-      const autopickTop = Number(policy.autopickTopScore ?? 0.85);
-      const autopickGap = Number(policy.autopickGap ?? 0.25);
+      const autopickTop = Number(ambiguityThresholds.autopickTopScore ?? 0.85);
+      const autopickGap = Number(ambiguityThresholds.autopickGap ?? 0.25);
 
       const topDoc = disambiguationOptions[0]?.docId ?? null;
       if (topDoc && topScore >= autopickTop && gap >= autopickGap) {
@@ -666,9 +685,7 @@ export class ScopeGateService {
 
     // 13) Build decision
     if (needsDocChoice) {
-      const maxOptions = Number(
-        ambiguityPolicies?.config?.actionsContract?.thresholds?.maxOptions ?? 4,
-      );
+      const maxOptions = Number(ambiguityThresholds.maxOptions ?? 4);
 
       return this.finish(state, input, {
         action: "route",
@@ -749,7 +766,7 @@ export class ScopeGateService {
     filenameToken: string | null;
     upstreamResolvedDocId: string | null;
     disableDocAliasMatching: boolean;
-    docAliasesBank: Record<string, unknown> | null;
+    docAliasesBank: { config?: Record<string, unknown> } | null;
     stopwordsDocnames: Record<string, unknown> | null;
   }): Promise<{
     docId: string | null;
@@ -799,7 +816,8 @@ export class ScopeGateService {
       if (!best || score > best.score) best = { docId: d.docId, score };
     }
 
-    const min = Number(args.docAliasesBank?.config?.minAliasConfidence ?? 0.75);
+    const docAliasesConfig = asObject(args.docAliasesBank?.config);
+    const min = Number(docAliasesConfig.minAliasConfidence ?? 0.75);
     if (best && best.score >= min)
       return {
         docId: best.docId,
@@ -883,7 +901,7 @@ export class ScopeGateService {
     const taxonomyTokens = Array.isArray(taxonomyBank?.typeDefinitions)
       ? (taxonomyBank.typeDefinitions as Array<Record<string, unknown>>)
           .flatMap((entry: Record<string, unknown>) => [
-            lower(entry?.id),
+            lower(String(entry?.id ?? "")),
             ...(Array.isArray(entry?.aliases)
               ? entry.aliases.map((alias: unknown) =>
                   lower(String(alias ?? "")),

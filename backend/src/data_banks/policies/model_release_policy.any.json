@@ -12,13 +12,22 @@
     "criticality": "high",
     "changeLog": [
       "Initial model release gate policy bank"
+    ],
+    "usedBy": [
+      "services/llm/core/llmRequestBuilder.service.ts"
+    ],
+    "tests": [
+      "tests/certification/prompt-mode-coverage.cert.test.ts"
     ]
   },
   "config": {
     "enabled": true,
     "strict": true,
     "failClosedInProd": false,
-    "defaultAction": "hold"
+    "defaultAction": "hold",
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "gates": {
     "minRegressionPassRate": 0.98,

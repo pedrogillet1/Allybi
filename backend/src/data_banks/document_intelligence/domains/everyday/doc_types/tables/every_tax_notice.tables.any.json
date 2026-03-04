@@ -6,7 +6,14 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-03-03"
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -14,10 +21,29 @@
     "docType": "every_tax_notice"
   },
   "tableHeaderSynonyms": {
-    "amount": ["amount", "valor", "total", "quantia"],
-    "date": ["date", "data", "vencimento", "due date"],
-    "type": ["type", "tipo", "class"],
-    "reference": ["reference", "referencia", "notice id", "protocolo"]
+    "amount": [
+      "amount",
+      "valor",
+      "total",
+      "quantia"
+    ],
+    "date": [
+      "date",
+      "data",
+      "vencimento",
+      "due date"
+    ],
+    "type": [
+      "type",
+      "tipo",
+      "class"
+    ],
+    "reference": [
+      "reference",
+      "referencia",
+      "notice id",
+      "protocolo"
+    ]
   },
   "tables": [
     {
@@ -27,16 +53,52 @@
         "pt": "Tabela de Resumo"
       },
       "section": "notice_summary",
-      "signaturePatterns": ["\\bnotice\\s+summary\\b", "\\bresumo\\b"],
-      "requiredHeaders": ["type", "base", "rate", "amount", "unit"],
-      "headerAliases": [["type", "tipo"], ["base", "base de calculo"], ["rate", "aliquota"], ["amount", "valor"], ["unit", "moeda"]],
+      "signaturePatterns": [
+        "\\bnotice\\s+summary\\b",
+        "\\bresumo\\b"
+      ],
+      "requiredHeaders": [
+        "type",
+        "base",
+        "rate",
+        "amount",
+        "unit"
+      ],
+      "headerAliases": [
+        [
+          "type",
+          "tipo"
+        ],
+        [
+          "base",
+          "base de calculo"
+        ],
+        [
+          "rate",
+          "aliquota"
+        ],
+        [
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "moeda"
+        ]
+      ],
       "unitsAndScaling": {
-        "preferredScales": ["units", "thousands"],
+        "preferredScales": [
+          "units",
+          "thousands"
+        ],
         "currencyField": "currency",
         "requiresScaleEvidence": true,
         "mixedScaleHandling": "normalize_to_currency_base"
       },
-      "footnotes": ["tax_notice_note_a", "tax_notice_note_b"]
+      "footnotes": [
+        "tax_notice_note_a",
+        "tax_notice_note_b"
+      ]
     },
     {
       "id": "tax_notice_penalty_table",
@@ -45,16 +107,48 @@
         "pt": "Tabela de Multa e Juros"
       },
       "section": "penalties",
-      "signaturePatterns": ["\\bpenalty\\b", "\\binterest\\b", "\\bmulta\\b", "\\bjuros\\b"],
-      "requiredHeaders": ["description", "amount", "rate", "unit"],
-      "headerAliases": [["description", "descricao"], ["amount", "valor"], ["rate", "aliquota"], ["unit", "moeda"]],
+      "signaturePatterns": [
+        "\\bpenalty\\b",
+        "\\binterest\\b",
+        "\\bmulta\\b",
+        "\\bjuros\\b"
+      ],
+      "requiredHeaders": [
+        "description",
+        "amount",
+        "rate",
+        "unit"
+      ],
+      "headerAliases": [
+        [
+          "description",
+          "descricao"
+        ],
+        [
+          "amount",
+          "valor"
+        ],
+        [
+          "rate",
+          "aliquota"
+        ],
+        [
+          "unit",
+          "moeda"
+        ]
+      ],
       "unitsAndScaling": {
-        "preferredScales": ["units", "percent"],
+        "preferredScales": [
+          "units",
+          "percent"
+        ],
         "currencyField": "currency",
         "requiresScaleEvidence": true,
         "mixedScaleHandling": "normalize_to_currency_base"
       },
-      "footnotes": ["tax_notice_note_c"]
+      "footnotes": [
+        "tax_notice_note_c"
+      ]
     },
     {
       "id": "tax_notice_payment_table",
@@ -63,14 +157,49 @@
         "pt": "Tabela de Pagamento"
       },
       "section": "payment_instructions",
-      "signaturePatterns": ["\\bpayment\\b", "\\bpay\\b", "\\bpagamento\\b"],
-      "requiredHeaders": ["method", "bank", "account", "due_date", "barcode"],
-      "headerAliases": [["method", "forma"], ["bank", "banco"], ["account", "conta"], ["due_date", "vencimento"], ["barcode", "linha digitavel"]],
+      "signaturePatterns": [
+        "\\bpayment\\b",
+        "\\bpay\\b",
+        "\\bpagamento\\b"
+      ],
+      "requiredHeaders": [
+        "method",
+        "bank",
+        "account",
+        "due_date",
+        "barcode"
+      ],
+      "headerAliases": [
+        [
+          "method",
+          "forma"
+        ],
+        [
+          "bank",
+          "banco"
+        ],
+        [
+          "account",
+          "conta"
+        ],
+        [
+          "due_date",
+          "vencimento"
+        ],
+        [
+          "barcode",
+          "linha digitavel"
+        ]
+      ],
       "unitsAndScaling": {
-        "preferredScales": ["units"],
+        "preferredScales": [
+          "units"
+        ],
         "requiresScaleEvidence": false
       },
-      "footnotes": ["tax_notice_note_d"]
+      "footnotes": [
+        "tax_notice_note_d"
+      ]
     }
   ]
 }

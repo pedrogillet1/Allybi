@@ -8,14 +8,24 @@
       "en",
       "pt"
     ],
-    "lastUpdated": "2026-03-03"
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
     "requireCitationsForClaims": true,
     "defaultCitationFormat": "inline",
     "maxCitationsPerClaim": 3,
-    "allowFootnotes": false
+    "allowFootnotes": false,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "formats": {
     "inline": "[{{doc}} p.{{page}} {{section}}]",

@@ -13,17 +13,9 @@
       "mutation_router",
       "tests.patternDeterminism"
     ],
-    "tests": {
-      "positive": [
-        "apply the edits",
-        "don't apply yet",
-        "undo last step"
-      ],
-      "negative": [
-        "summarize the edits",
-        "explain the diff only"
-      ]
-    },
+    "tests": [
+      "tests/patternDeterminism.test.ts"
+    ],
     "dependsOn": [
       "editor_mutation_engine",
       "confirmation_flow_v1"

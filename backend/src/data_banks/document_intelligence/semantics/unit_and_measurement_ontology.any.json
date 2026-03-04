@@ -9,7 +9,13 @@
       "pt"
     ],
     "lastUpdated": "2026-03-03",
-    "description": "Expanded unit and measurement ontology with conversions and formatting constraints, including %/bps/mg/dL/mmHg."
+    "description": "Expanded unit and measurement ontology with conversions and formatting constraints, including %/bps/mg/dL/mmHg.",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true

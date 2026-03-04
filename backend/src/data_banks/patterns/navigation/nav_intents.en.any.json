@@ -8,7 +8,13 @@
       "any"
     ],
     "owner": "navigation-patterning",
-    "lastUpdated": "2026-03-03"
+    "lastUpdated": "2026-03-03",
+    "usedBy": [
+      "services/chat/turnRoutePolicy.service.ts"
+    ],
+    "tests": [
+      "tests/patternDeterminism.test.ts"
+    ]
   },
   "config": {
     "enabled": true,

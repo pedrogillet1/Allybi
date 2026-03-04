@@ -6,7 +6,14 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-03-03"
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -17,106 +24,212 @@
     {
       "id": "every_rent_receipt_hint_01",
       "entity": "landlord_name",
-      "anchors": ["landlord", "locador", "lessor", "owner"],
+      "anchors": [
+        "landlord",
+        "locador",
+        "lessor",
+        "owner"
+      ],
       "location": "property_and_parties",
       "extractionMethod": "heading_proximity",
-      "whereItHides": ["top header", "signature panel", "party box"]
+      "whereItHides": [
+        "top header",
+        "signature panel",
+        "party box"
+      ]
     },
     {
       "id": "every_rent_receipt_hint_02",
       "entity": "tenant_name",
-      "anchors": ["tenant", "locatario", "renter"],
+      "anchors": [
+        "tenant",
+        "locatario",
+        "renter"
+      ],
       "location": "property_and_parties",
       "extractionMethod": "heading_proximity",
-      "whereItHides": ["party box", "center block", "payment section"]
+      "whereItHides": [
+        "party box",
+        "center block",
+        "payment section"
+      ]
     },
     {
       "id": "every_rent_receipt_hint_03",
       "entity": "property_address",
-      "anchors": ["property", "address", "unit", "endereco"],
+      "anchors": [
+        "property",
+        "address",
+        "unit",
+        "endereco"
+      ],
       "location": "property_and_parties",
       "extractionMethod": "table_row_match",
-      "whereItHides": ["property section", "letterhead lines"]
+      "whereItHides": [
+        "property section",
+        "letterhead lines"
+      ]
     },
     {
       "id": "every_rent_receipt_hint_04",
       "entity": "lease_start_date",
-      "anchors": ["lease start", "contract start", "inicio", "inicio do contrato"],
+      "anchors": [
+        "lease start",
+        "contract start",
+        "inicio",
+        "inicio do contrato"
+      ],
       "location": "lease_info",
       "extractionMethod": "regex_capture",
-      "whereItHides": ["small print", "lease details"]
+      "whereItHides": [
+        "small print",
+        "lease details"
+      ]
     },
     {
       "id": "every_rent_receipt_hint_05",
       "entity": "lease_end_date",
-      "anchors": ["lease end", "contract end", "termino", "vence"],
+      "anchors": [
+        "lease end",
+        "contract end",
+        "termino",
+        "vence"
+      ],
       "location": "lease_info",
       "extractionMethod": "regex_capture",
-      "whereItHides": ["small print", "lease details"]
+      "whereItHides": [
+        "small print",
+        "lease details"
+      ]
     },
     {
       "id": "every_rent_receipt_hint_06",
       "entity": "payment_period_start",
-      "anchors": ["period start", "reference", "from"],
+      "anchors": [
+        "period start",
+        "reference",
+        "from"
+      ],
       "location": "payment_period",
       "extractionMethod": "date_range_parse",
-      "whereItHides": ["period table", "header row"]
+      "whereItHides": [
+        "period table",
+        "header row"
+      ]
     },
     {
       "id": "every_rent_receipt_hint_07",
       "entity": "payment_period_end",
-      "anchors": ["period end", "to", "reference"],
+      "anchors": [
+        "period end",
+        "to",
+        "reference"
+      ],
       "location": "payment_period",
       "extractionMethod": "date_range_parse",
-      "whereItHides": ["period table", "header row"]
+      "whereItHides": [
+        "period table",
+        "header row"
+      ]
     },
     {
       "id": "every_rent_receipt_hint_08",
       "entity": "rent_amount",
-      "anchors": ["rent", "base rent", "aluguel", "valor do aluguel"],
+      "anchors": [
+        "rent",
+        "base rent",
+        "aluguel",
+        "valor do aluguel"
+      ],
       "location": "charges_breakdown",
       "extractionMethod": "table_row_match",
-      "whereItHides": ["charge lines", "totals block"]
+      "whereItHides": [
+        "charge lines",
+        "totals block"
+      ]
     },
     {
       "id": "every_rent_receipt_hint_09",
       "entity": "utilities_amount",
-      "anchors": ["utilities", "agua", "luz", "condominio", "servicos"],
+      "anchors": [
+        "utilities",
+        "agua",
+        "luz",
+        "condominio",
+        "servicos"
+      ],
       "location": "utilities_or_services",
       "extractionMethod": "table_row_match",
-      "whereItHides": ["utility section", "additional charges"]
+      "whereItHides": [
+        "utility section",
+        "additional charges"
+      ]
     },
     {
       "id": "every_rent_receipt_hint_10",
       "entity": "late_fee_amount",
-      "anchors": ["late fee", "multa", "juros", "atraso"],
+      "anchors": [
+        "late fee",
+        "multa",
+        "juros",
+        "atraso"
+      ],
       "location": "late_fees",
       "extractionMethod": "table_row_match",
-      "whereItHides": ["penalty section", "footnote row"]
+      "whereItHides": [
+        "penalty section",
+        "footnote row"
+      ]
     },
     {
       "id": "every_rent_receipt_hint_11",
       "entity": "total_amount_due",
-      "anchors": ["total", "valor total", "total a pagar", "total due"],
+      "anchors": [
+        "total",
+        "valor total",
+        "total a pagar",
+        "total due"
+      ],
       "location": "payment_confirmation",
       "extractionMethod": "heading_proximity",
-      "whereItHides": ["totals line", "bold amount box"]
+      "whereItHides": [
+        "totals line",
+        "bold amount box"
+      ]
     },
     {
       "id": "every_rent_receipt_hint_12",
       "entity": "payment_method",
-      "anchors": ["payment", "payment method", "pix", "transfer", "boleto", "cash"],
+      "anchors": [
+        "payment",
+        "payment method",
+        "pix",
+        "transfer",
+        "boleto",
+        "cash"
+      ],
       "location": "payment_confirmation",
       "extractionMethod": "regex_capture",
-      "whereItHides": ["payment block", "receipt footer"]
+      "whereItHides": [
+        "payment block",
+        "receipt footer"
+      ]
     },
     {
       "id": "every_rent_receipt_hint_13",
       "entity": "receipt_number",
-      "anchors": ["receipt no", "recibo", "document", "comprovante"],
+      "anchors": [
+        "receipt no",
+        "recibo",
+        "document",
+        "comprovante"
+      ],
       "location": "document_header",
       "extractionMethod": "regex_capture",
-      "whereItHides": ["header stamp", "print metadata"]
+      "whereItHides": [
+        "header stamp",
+        "print metadata"
+      ]
     }
   ]
 }

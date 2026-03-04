@@ -11,9 +11,11 @@ import type { ResponseContractContext } from "./responseContractEnforcer.v2.serv
 
 export function resolveSoftTokenLimit(ctx: ResponseContractContext): number {
   const enforcer = getResponseContractEnforcer();
-  return (enforcer as { [key: string]: (c: ResponseContractContext) => number })[
-    "resolveSoftTokenLimitInternal"
-  ](ctx);
+  return (
+    enforcer as unknown as {
+      [key: string]: (c: ResponseContractContext) => number;
+    }
+  )["resolveSoftTokenLimitInternal"](ctx);
 }
 
 export function resolveHardTokenLimit(
@@ -21,7 +23,7 @@ export function resolveHardTokenLimit(
   softLimit: number,
 ): number {
   const enforcer = getResponseContractEnforcer();
-  return (enforcer as {
+  return (enforcer as unknown as {
     [key: string]: (c: ResponseContractContext, s: number) => number;
   })["resolveHardTokenLimitInternal"](
     ctx,
@@ -31,7 +33,9 @@ export function resolveHardTokenLimit(
 
 export function resolveHardCharLimit(ctx: ResponseContractContext): number {
   const enforcer = getResponseContractEnforcer();
-  return (enforcer as { [key: string]: (c: ResponseContractContext) => number })[
-    "resolveHardCharLimitInternal"
-  ](ctx);
+  return (
+    enforcer as unknown as {
+      [key: string]: (c: ResponseContractContext) => number;
+    }
+  )["resolveHardCharLimitInternal"](ctx);
 }

@@ -3,11 +3,25 @@
     "id": "synonym_expansion",
     "version": "2.0.0",
     "description": "Synonym expansion for Koda query rewriting and retrieval. Group-based structure for deterministic expansion of user phrasing into canonical domain terms. Supports US and Brazil document types with multilingual coverage.",
-    "languages": ["any", "en", "pt", "es"],
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
     "lastUpdated": "2026-01-26",
     "owner": "koda-normalizers",
     "compat": ">=1.0.0",
-    "integrates": ["abbreviations", "domain_detection"]
+    "integrates": [
+      "abbreviations",
+      "domain_detection"
+    ],
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -32,10 +46,40 @@
       "lang": "en",
       "domain": "any",
       "synonyms": [
-        { "canonical": "document", "variants": ["doc", "file", "paper", "paperwork"] },
-        { "canonical": "attachment", "variants": ["attached file", "enclosed file", "enclosure"] },
-        { "canonical": "summary", "variants": ["overview", "synopsis", "brief", "executive summary"] },
-        { "canonical": "report", "variants": ["analysis", "review", "assessment"] }
+        {
+          "canonical": "document",
+          "variants": [
+            "doc",
+            "file",
+            "paper",
+            "paperwork"
+          ]
+        },
+        {
+          "canonical": "attachment",
+          "variants": [
+            "attached file",
+            "enclosed file",
+            "enclosure"
+          ]
+        },
+        {
+          "canonical": "summary",
+          "variants": [
+            "overview",
+            "synopsis",
+            "brief",
+            "executive summary"
+          ]
+        },
+        {
+          "canonical": "report",
+          "variants": [
+            "analysis",
+            "review",
+            "assessment"
+          ]
+        }
       ]
     },
     {
@@ -43,10 +87,37 @@
       "lang": "pt",
       "domain": "any",
       "synonyms": [
-        { "canonical": "documento", "variants": ["arquivo", "papel", "papelada"] },
-        { "canonical": "anexo", "variants": ["arquivo anexo", "anexado"] },
-        { "canonical": "resumo", "variants": ["visão geral", "síntese", "sumário executivo"] },
-        { "canonical": "relatório", "variants": ["análise", "revisão", "avaliação"] }
+        {
+          "canonical": "documento",
+          "variants": [
+            "arquivo",
+            "papel",
+            "papelada"
+          ]
+        },
+        {
+          "canonical": "anexo",
+          "variants": [
+            "arquivo anexo",
+            "anexado"
+          ]
+        },
+        {
+          "canonical": "resumo",
+          "variants": [
+            "visão geral",
+            "síntese",
+            "sumário executivo"
+          ]
+        },
+        {
+          "canonical": "relatório",
+          "variants": [
+            "análise",
+            "revisão",
+            "avaliação"
+          ]
+        }
       ]
     },
     {
@@ -54,12 +125,54 @@
       "lang": "en",
       "domain": "banking",
       "synonyms": [
-        { "canonical": "bank statement", "variants": ["statement", "account statement", "monthly statement"] },
-        { "canonical": "balance", "variants": ["account balance", "current balance", "available balance"] },
-        { "canonical": "transaction", "variants": ["activity", "movement", "entry"] },
-        { "canonical": "deposit", "variants": ["credit", "incoming transfer", "payment received"] },
-        { "canonical": "withdrawal", "variants": ["debit", "outgoing transfer", "payment made"] },
-        { "canonical": "transfer", "variants": ["wire", "wire transfer", "bank transfer"] }
+        {
+          "canonical": "bank statement",
+          "variants": [
+            "statement",
+            "account statement",
+            "monthly statement"
+          ]
+        },
+        {
+          "canonical": "balance",
+          "variants": [
+            "account balance",
+            "current balance",
+            "available balance"
+          ]
+        },
+        {
+          "canonical": "transaction",
+          "variants": [
+            "activity",
+            "movement",
+            "entry"
+          ]
+        },
+        {
+          "canonical": "deposit",
+          "variants": [
+            "credit",
+            "incoming transfer",
+            "payment received"
+          ]
+        },
+        {
+          "canonical": "withdrawal",
+          "variants": [
+            "debit",
+            "outgoing transfer",
+            "payment made"
+          ]
+        },
+        {
+          "canonical": "transfer",
+          "variants": [
+            "wire",
+            "wire transfer",
+            "bank transfer"
+          ]
+        }
       ]
     },
     {
@@ -67,12 +180,54 @@
       "lang": "pt",
       "domain": "banking",
       "synonyms": [
-        { "canonical": "extrato bancário", "variants": ["extrato", "extrato de conta", "movimentação"] },
-        { "canonical": "saldo", "variants": ["saldo disponível", "saldo atual", "saldo em conta"] },
-        { "canonical": "transação", "variants": ["movimentação", "lançamento", "operação"] },
-        { "canonical": "depósito", "variants": ["crédito", "entrada", "recebimento"] },
-        { "canonical": "saque", "variants": ["débito", "saída", "retirada"] },
-        { "canonical": "transferência", "variants": ["TED", "PIX", "DOC"] }
+        {
+          "canonical": "extrato bancário",
+          "variants": [
+            "extrato",
+            "extrato de conta",
+            "movimentação"
+          ]
+        },
+        {
+          "canonical": "saldo",
+          "variants": [
+            "saldo disponível",
+            "saldo atual",
+            "saldo em conta"
+          ]
+        },
+        {
+          "canonical": "transação",
+          "variants": [
+            "movimentação",
+            "lançamento",
+            "operação"
+          ]
+        },
+        {
+          "canonical": "depósito",
+          "variants": [
+            "crédito",
+            "entrada",
+            "recebimento"
+          ]
+        },
+        {
+          "canonical": "saque",
+          "variants": [
+            "débito",
+            "saída",
+            "retirada"
+          ]
+        },
+        {
+          "canonical": "transferência",
+          "variants": [
+            "TED",
+            "PIX",
+            "DOC"
+          ]
+        }
       ]
     },
     {
@@ -80,12 +235,52 @@
       "lang": "en",
       "domain": "credit_card",
       "synonyms": [
-        { "canonical": "credit card statement", "variants": ["card statement", "credit statement", "cc statement"] },
-        { "canonical": "minimum payment", "variants": ["min payment", "minimum due", "min due"] },
-        { "canonical": "credit limit", "variants": ["limit", "available credit", "credit line"] },
-        { "canonical": "APR", "variants": ["interest rate", "annual percentage rate"] },
-        { "canonical": "balance due", "variants": ["amount due", "total due", "outstanding balance"] },
-        { "canonical": "payment due date", "variants": ["due date", "payment date"] }
+        {
+          "canonical": "credit card statement",
+          "variants": [
+            "card statement",
+            "credit statement",
+            "cc statement"
+          ]
+        },
+        {
+          "canonical": "minimum payment",
+          "variants": [
+            "min payment",
+            "minimum due",
+            "min due"
+          ]
+        },
+        {
+          "canonical": "credit limit",
+          "variants": [
+            "limit",
+            "available credit",
+            "credit line"
+          ]
+        },
+        {
+          "canonical": "APR",
+          "variants": [
+            "interest rate",
+            "annual percentage rate"
+          ]
+        },
+        {
+          "canonical": "balance due",
+          "variants": [
+            "amount due",
+            "total due",
+            "outstanding balance"
+          ]
+        },
+        {
+          "canonical": "payment due date",
+          "variants": [
+            "due date",
+            "payment date"
+          ]
+        }
       ]
     },
     {
@@ -93,12 +288,50 @@
       "lang": "pt",
       "domain": "credit_card",
       "synonyms": [
-        { "canonical": "fatura do cartão", "variants": ["fatura", "extrato do cartão", "conta do cartão"] },
-        { "canonical": "pagamento mínimo", "variants": ["mínimo", "valor mínimo"] },
-        { "canonical": "limite de crédito", "variants": ["limite", "crédito disponível", "limite disponível"] },
-        { "canonical": "juros", "variants": ["taxa de juros", "encargos"] },
-        { "canonical": "valor total", "variants": ["total da fatura", "saldo devedor"] },
-        { "canonical": "data de vencimento", "variants": ["vencimento", "prazo"] }
+        {
+          "canonical": "fatura do cartão",
+          "variants": [
+            "fatura",
+            "extrato do cartão",
+            "conta do cartão"
+          ]
+        },
+        {
+          "canonical": "pagamento mínimo",
+          "variants": [
+            "mínimo",
+            "valor mínimo"
+          ]
+        },
+        {
+          "canonical": "limite de crédito",
+          "variants": [
+            "limite",
+            "crédito disponível",
+            "limite disponível"
+          ]
+        },
+        {
+          "canonical": "juros",
+          "variants": [
+            "taxa de juros",
+            "encargos"
+          ]
+        },
+        {
+          "canonical": "valor total",
+          "variants": [
+            "total da fatura",
+            "saldo devedor"
+          ]
+        },
+        {
+          "canonical": "data de vencimento",
+          "variants": [
+            "vencimento",
+            "prazo"
+          ]
+        }
       ]
     },
     {
@@ -106,12 +339,51 @@
       "lang": "en",
       "domain": "invoices",
       "synonyms": [
-        { "canonical": "invoice", "variants": ["bill", "billing statement", "inv"] },
-        { "canonical": "receipt", "variants": ["payment receipt", "proof of payment"] },
-        { "canonical": "purchase order", "variants": ["PO", "order"] },
-        { "canonical": "amount due", "variants": ["total due", "balance due", "outstanding amount"] },
-        { "canonical": "due date", "variants": ["payment due", "pay by"] },
-        { "canonical": "line item", "variants": ["item", "product", "service"] }
+        {
+          "canonical": "invoice",
+          "variants": [
+            "bill",
+            "billing statement",
+            "inv"
+          ]
+        },
+        {
+          "canonical": "receipt",
+          "variants": [
+            "payment receipt",
+            "proof of payment"
+          ]
+        },
+        {
+          "canonical": "purchase order",
+          "variants": [
+            "PO",
+            "order"
+          ]
+        },
+        {
+          "canonical": "amount due",
+          "variants": [
+            "total due",
+            "balance due",
+            "outstanding amount"
+          ]
+        },
+        {
+          "canonical": "due date",
+          "variants": [
+            "payment due",
+            "pay by"
+          ]
+        },
+        {
+          "canonical": "line item",
+          "variants": [
+            "item",
+            "product",
+            "service"
+          ]
+        }
       ]
     },
     {
@@ -119,14 +391,66 @@
       "lang": "pt",
       "domain": "invoices",
       "synonyms": [
-        { "canonical": "nota fiscal", "variants": ["NF", "NF-e", "NFe", "nota", "invoice"] },
-        { "canonical": "nota fiscal de serviço", "variants": ["NFS-e", "NFSe", "nota de serviço"] },
-        { "canonical": "DANFE", "variants": ["documento auxiliar", "espelho da nota"] },
-        { "canonical": "recibo", "variants": ["comprovante de pagamento", "prova de pagamento"] },
-        { "canonical": "pedido de compra", "variants": ["OC", "ordem de compra"] },
-        { "canonical": "valor total", "variants": ["total da nota", "valor a pagar"] },
-        { "canonical": "CFOP", "variants": ["código fiscal", "operação fiscal"] },
-        { "canonical": "ICMS", "variants": ["imposto estadual", "tributo estadual"] }
+        {
+          "canonical": "nota fiscal",
+          "variants": [
+            "NF",
+            "NF-e",
+            "NFe",
+            "nota",
+            "invoice"
+          ]
+        },
+        {
+          "canonical": "nota fiscal de serviço",
+          "variants": [
+            "NFS-e",
+            "NFSe",
+            "nota de serviço"
+          ]
+        },
+        {
+          "canonical": "DANFE",
+          "variants": [
+            "documento auxiliar",
+            "espelho da nota"
+          ]
+        },
+        {
+          "canonical": "recibo",
+          "variants": [
+            "comprovante de pagamento",
+            "prova de pagamento"
+          ]
+        },
+        {
+          "canonical": "pedido de compra",
+          "variants": [
+            "OC",
+            "ordem de compra"
+          ]
+        },
+        {
+          "canonical": "valor total",
+          "variants": [
+            "total da nota",
+            "valor a pagar"
+          ]
+        },
+        {
+          "canonical": "CFOP",
+          "variants": [
+            "código fiscal",
+            "operação fiscal"
+          ]
+        },
+        {
+          "canonical": "ICMS",
+          "variants": [
+            "imposto estadual",
+            "tributo estadual"
+          ]
+        }
       ]
     },
     {
@@ -134,13 +458,56 @@
       "lang": "en",
       "domain": "tax",
       "synonyms": [
-        { "canonical": "tax return", "variants": ["return", "filing", "tax filing"] },
-        { "canonical": "W-2", "variants": ["wage statement", "employer wage form"] },
-        { "canonical": "1099", "variants": ["contractor income", "misc income form"] },
-        { "canonical": "deduction", "variants": ["tax deduction", "write-off"] },
-        { "canonical": "refund", "variants": ["tax refund", "return amount"] },
-        { "canonical": "AGI", "variants": ["adjusted gross income", "gross income"] },
-        { "canonical": "withholding", "variants": ["tax withheld", "federal withholding"] }
+        {
+          "canonical": "tax return",
+          "variants": [
+            "return",
+            "filing",
+            "tax filing"
+          ]
+        },
+        {
+          "canonical": "W-2",
+          "variants": [
+            "wage statement",
+            "employer wage form"
+          ]
+        },
+        {
+          "canonical": "1099",
+          "variants": [
+            "contractor income",
+            "misc income form"
+          ]
+        },
+        {
+          "canonical": "deduction",
+          "variants": [
+            "tax deduction",
+            "write-off"
+          ]
+        },
+        {
+          "canonical": "refund",
+          "variants": [
+            "tax refund",
+            "return amount"
+          ]
+        },
+        {
+          "canonical": "AGI",
+          "variants": [
+            "adjusted gross income",
+            "gross income"
+          ]
+        },
+        {
+          "canonical": "withholding",
+          "variants": [
+            "tax withheld",
+            "federal withholding"
+          ]
+        }
       ]
     },
     {
@@ -148,12 +515,50 @@
       "lang": "pt",
       "domain": "tax",
       "synonyms": [
-        { "canonical": "declaração de imposto", "variants": ["declaração", "IRPF", "imposto de renda"] },
-        { "canonical": "DARF", "variants": ["guia de pagamento", "documento de arrecadação"] },
-        { "canonical": "dedução", "variants": ["abatimento", "desconto"] },
-        { "canonical": "restituição", "variants": ["devolução", "valor a restituir"] },
-        { "canonical": "rendimentos", "variants": ["renda", "ganhos", "receitas"] },
-        { "canonical": "retenção na fonte", "variants": ["IRRF", "imposto retido"] }
+        {
+          "canonical": "declaração de imposto",
+          "variants": [
+            "declaração",
+            "IRPF",
+            "imposto de renda"
+          ]
+        },
+        {
+          "canonical": "DARF",
+          "variants": [
+            "guia de pagamento",
+            "documento de arrecadação"
+          ]
+        },
+        {
+          "canonical": "dedução",
+          "variants": [
+            "abatimento",
+            "desconto"
+          ]
+        },
+        {
+          "canonical": "restituição",
+          "variants": [
+            "devolução",
+            "valor a restituir"
+          ]
+        },
+        {
+          "canonical": "rendimentos",
+          "variants": [
+            "renda",
+            "ganhos",
+            "receitas"
+          ]
+        },
+        {
+          "canonical": "retenção na fonte",
+          "variants": [
+            "IRRF",
+            "imposto retido"
+          ]
+        }
       ]
     },
     {
@@ -161,12 +566,51 @@
       "lang": "en",
       "domain": "insurance",
       "synonyms": [
-        { "canonical": "insurance policy", "variants": ["policy", "coverage", "insurance plan"] },
-        { "canonical": "premium", "variants": ["monthly premium", "insurance payment", "policy cost"] },
-        { "canonical": "deductible", "variants": ["out of pocket", "self-pay amount"] },
-        { "canonical": "claim", "variants": ["insurance claim", "filed claim"] },
-        { "canonical": "coverage limit", "variants": ["limit", "max coverage", "policy limit"] },
-        { "canonical": "beneficiary", "variants": ["insured", "covered person"] }
+        {
+          "canonical": "insurance policy",
+          "variants": [
+            "policy",
+            "coverage",
+            "insurance plan"
+          ]
+        },
+        {
+          "canonical": "premium",
+          "variants": [
+            "monthly premium",
+            "insurance payment",
+            "policy cost"
+          ]
+        },
+        {
+          "canonical": "deductible",
+          "variants": [
+            "out of pocket",
+            "self-pay amount"
+          ]
+        },
+        {
+          "canonical": "claim",
+          "variants": [
+            "insurance claim",
+            "filed claim"
+          ]
+        },
+        {
+          "canonical": "coverage limit",
+          "variants": [
+            "limit",
+            "max coverage",
+            "policy limit"
+          ]
+        },
+        {
+          "canonical": "beneficiary",
+          "variants": [
+            "insured",
+            "covered person"
+          ]
+        }
       ]
     },
     {
@@ -174,12 +618,49 @@
       "lang": "pt",
       "domain": "insurance",
       "synonyms": [
-        { "canonical": "apólice de seguro", "variants": ["apólice", "seguro", "plano de seguro"] },
-        { "canonical": "prêmio", "variants": ["mensalidade", "valor do seguro"] },
-        { "canonical": "franquia", "variants": ["participação", "valor da franquia"] },
-        { "canonical": "sinistro", "variants": ["reclamação", "ocorrência"] },
-        { "canonical": "cobertura", "variants": ["limite de cobertura", "valor coberto"] },
-        { "canonical": "beneficiário", "variants": ["segurado", "titular"] }
+        {
+          "canonical": "apólice de seguro",
+          "variants": [
+            "apólice",
+            "seguro",
+            "plano de seguro"
+          ]
+        },
+        {
+          "canonical": "prêmio",
+          "variants": [
+            "mensalidade",
+            "valor do seguro"
+          ]
+        },
+        {
+          "canonical": "franquia",
+          "variants": [
+            "participação",
+            "valor da franquia"
+          ]
+        },
+        {
+          "canonical": "sinistro",
+          "variants": [
+            "reclamação",
+            "ocorrência"
+          ]
+        },
+        {
+          "canonical": "cobertura",
+          "variants": [
+            "limite de cobertura",
+            "valor coberto"
+          ]
+        },
+        {
+          "canonical": "beneficiário",
+          "variants": [
+            "segurado",
+            "titular"
+          ]
+        }
       ]
     },
     {
@@ -187,12 +668,49 @@
       "lang": "en",
       "domain": "housing",
       "synonyms": [
-        { "canonical": "lease agreement", "variants": ["lease", "rental agreement", "tenancy agreement"] },
-        { "canonical": "rent", "variants": ["monthly rent", "rental payment"] },
-        { "canonical": "security deposit", "variants": ["deposit", "rental deposit"] },
-        { "canonical": "landlord", "variants": ["property owner", "lessor"] },
-        { "canonical": "tenant", "variants": ["renter", "lessee"] },
-        { "canonical": "eviction", "variants": ["notice to vacate", "termination notice"] }
+        {
+          "canonical": "lease agreement",
+          "variants": [
+            "lease",
+            "rental agreement",
+            "tenancy agreement"
+          ]
+        },
+        {
+          "canonical": "rent",
+          "variants": [
+            "monthly rent",
+            "rental payment"
+          ]
+        },
+        {
+          "canonical": "security deposit",
+          "variants": [
+            "deposit",
+            "rental deposit"
+          ]
+        },
+        {
+          "canonical": "landlord",
+          "variants": [
+            "property owner",
+            "lessor"
+          ]
+        },
+        {
+          "canonical": "tenant",
+          "variants": [
+            "renter",
+            "lessee"
+          ]
+        },
+        {
+          "canonical": "eviction",
+          "variants": [
+            "notice to vacate",
+            "termination notice"
+          ]
+        }
       ]
     },
     {
@@ -200,12 +718,48 @@
       "lang": "pt",
       "domain": "housing",
       "synonyms": [
-        { "canonical": "contrato de aluguel", "variants": ["contrato de locação", "locação"] },
-        { "canonical": "aluguel", "variants": ["valor do aluguel", "mensalidade"] },
-        { "canonical": "caução", "variants": ["depósito", "garantia"] },
-        { "canonical": "proprietário", "variants": ["locador", "dono do imóvel"] },
-        { "canonical": "inquilino", "variants": ["locatário", "arrendatário"] },
-        { "canonical": "despejo", "variants": ["notificação de despejo", "ordem de desocupação"] }
+        {
+          "canonical": "contrato de aluguel",
+          "variants": [
+            "contrato de locação",
+            "locação"
+          ]
+        },
+        {
+          "canonical": "aluguel",
+          "variants": [
+            "valor do aluguel",
+            "mensalidade"
+          ]
+        },
+        {
+          "canonical": "caução",
+          "variants": [
+            "depósito",
+            "garantia"
+          ]
+        },
+        {
+          "canonical": "proprietário",
+          "variants": [
+            "locador",
+            "dono do imóvel"
+          ]
+        },
+        {
+          "canonical": "inquilino",
+          "variants": [
+            "locatário",
+            "arrendatário"
+          ]
+        },
+        {
+          "canonical": "despejo",
+          "variants": [
+            "notificação de despejo",
+            "ordem de desocupação"
+          ]
+        }
       ]
     },
     {
@@ -213,13 +767,60 @@
       "lang": "en",
       "domain": "medical",
       "synonyms": [
-        { "canonical": "lab results", "variants": ["blood work", "test results", "laboratory results"] },
-        { "canonical": "prescription", "variants": ["Rx", "medication order", "med list"] },
-        { "canonical": "diagnosis", "variants": ["Dx", "assessment", "finding"] },
-        { "canonical": "treatment", "variants": ["Tx", "therapy", "care plan"] },
-        { "canonical": "vital signs", "variants": ["vitals", "VS"] },
-        { "canonical": "medical record", "variants": ["health record", "chart", "patient record"] },
-        { "canonical": "referral", "variants": ["specialist referral", "consultation request"] }
+        {
+          "canonical": "lab results",
+          "variants": [
+            "blood work",
+            "test results",
+            "laboratory results"
+          ]
+        },
+        {
+          "canonical": "prescription",
+          "variants": [
+            "Rx",
+            "medication order",
+            "med list"
+          ]
+        },
+        {
+          "canonical": "diagnosis",
+          "variants": [
+            "Dx",
+            "assessment",
+            "finding"
+          ]
+        },
+        {
+          "canonical": "treatment",
+          "variants": [
+            "Tx",
+            "therapy",
+            "care plan"
+          ]
+        },
+        {
+          "canonical": "vital signs",
+          "variants": [
+            "vitals",
+            "VS"
+          ]
+        },
+        {
+          "canonical": "medical record",
+          "variants": [
+            "health record",
+            "chart",
+            "patient record"
+          ]
+        },
+        {
+          "canonical": "referral",
+          "variants": [
+            "specialist referral",
+            "consultation request"
+          ]
+        }
       ]
     },
     {
@@ -227,13 +828,57 @@
       "lang": "pt",
       "domain": "medical",
       "synonyms": [
-        { "canonical": "exames laboratoriais", "variants": ["exames de sangue", "resultados de exame", "laudos"] },
-        { "canonical": "receita médica", "variants": ["prescrição", "receita", "medicamentos"] },
-        { "canonical": "diagnóstico", "variants": ["avaliação", "conclusão médica"] },
-        { "canonical": "tratamento", "variants": ["terapia", "plano de tratamento"] },
-        { "canonical": "sinais vitais", "variants": ["pressão arterial", "frequência cardíaca"] },
-        { "canonical": "prontuário", "variants": ["histórico médico", "ficha médica"] },
-        { "canonical": "encaminhamento", "variants": ["guia", "solicitação de especialista"] }
+        {
+          "canonical": "exames laboratoriais",
+          "variants": [
+            "exames de sangue",
+            "resultados de exame",
+            "laudos"
+          ]
+        },
+        {
+          "canonical": "receita médica",
+          "variants": [
+            "prescrição",
+            "receita",
+            "medicamentos"
+          ]
+        },
+        {
+          "canonical": "diagnóstico",
+          "variants": [
+            "avaliação",
+            "conclusão médica"
+          ]
+        },
+        {
+          "canonical": "tratamento",
+          "variants": [
+            "terapia",
+            "plano de tratamento"
+          ]
+        },
+        {
+          "canonical": "sinais vitais",
+          "variants": [
+            "pressão arterial",
+            "frequência cardíaca"
+          ]
+        },
+        {
+          "canonical": "prontuário",
+          "variants": [
+            "histórico médico",
+            "ficha médica"
+          ]
+        },
+        {
+          "canonical": "encaminhamento",
+          "variants": [
+            "guia",
+            "solicitação de especialista"
+          ]
+        }
       ]
     },
     {
@@ -241,17 +886,83 @@
       "lang": "en",
       "domain": "finance",
       "synonyms": [
-        { "canonical": "income statement", "variants": ["P&L", "profit and loss", "operating statement"] },
-        { "canonical": "balance sheet", "variants": ["statement of financial position", "BS"] },
-        { "canonical": "cash flow", "variants": ["cash flow statement", "CF"] },
-        { "canonical": "net operating income", "variants": ["NOI", "operating income"] },
-        { "canonical": "gross operating profit", "variants": ["GOP", "gross profit"] },
-        { "canonical": "EBITDA", "variants": ["earnings before interest taxes depreciation amortization"] },
-        { "canonical": "return on investment", "variants": ["ROI", "investment return"] },
-        { "canonical": "internal rate of return", "variants": ["IRR"] },
-        { "canonical": "net present value", "variants": ["NPV"] },
-        { "canonical": "revenue", "variants": ["sales", "top line", "income"] },
-        { "canonical": "expenses", "variants": ["costs", "expenditures", "outflows"] }
+        {
+          "canonical": "income statement",
+          "variants": [
+            "P&L",
+            "profit and loss",
+            "operating statement"
+          ]
+        },
+        {
+          "canonical": "balance sheet",
+          "variants": [
+            "statement of financial position",
+            "BS"
+          ]
+        },
+        {
+          "canonical": "cash flow",
+          "variants": [
+            "cash flow statement",
+            "CF"
+          ]
+        },
+        {
+          "canonical": "net operating income",
+          "variants": [
+            "NOI",
+            "operating income"
+          ]
+        },
+        {
+          "canonical": "gross operating profit",
+          "variants": [
+            "GOP",
+            "gross profit"
+          ]
+        },
+        {
+          "canonical": "EBITDA",
+          "variants": [
+            "earnings before interest taxes depreciation amortization"
+          ]
+        },
+        {
+          "canonical": "return on investment",
+          "variants": [
+            "ROI",
+            "investment return"
+          ]
+        },
+        {
+          "canonical": "internal rate of return",
+          "variants": [
+            "IRR"
+          ]
+        },
+        {
+          "canonical": "net present value",
+          "variants": [
+            "NPV"
+          ]
+        },
+        {
+          "canonical": "revenue",
+          "variants": [
+            "sales",
+            "top line",
+            "income"
+          ]
+        },
+        {
+          "canonical": "expenses",
+          "variants": [
+            "costs",
+            "expenditures",
+            "outflows"
+          ]
+        }
       ]
     },
     {
@@ -259,17 +970,86 @@
       "lang": "pt",
       "domain": "finance",
       "synonyms": [
-        { "canonical": "demonstração de resultado", "variants": ["DRE", "demonstrativo de resultado", "P&L"] },
-        { "canonical": "balanço patrimonial", "variants": ["balanço", "posição patrimonial"] },
-        { "canonical": "fluxo de caixa", "variants": ["cash flow", "demonstração de fluxo de caixa"] },
-        { "canonical": "resultado operacional líquido", "variants": ["NOI", "lucro operacional"] },
-        { "canonical": "lucro operacional bruto", "variants": ["GOP", "lucro bruto"] },
-        { "canonical": "EBITDA", "variants": ["LAJIDA", "lucro antes de juros impostos depreciação amortização"] },
-        { "canonical": "retorno sobre investimento", "variants": ["ROI", "retorno do investimento"] },
-        { "canonical": "taxa interna de retorno", "variants": ["TIR", "IRR"] },
-        { "canonical": "valor presente líquido", "variants": ["VPL", "NPV"] },
-        { "canonical": "receita", "variants": ["faturamento", "vendas", "receita bruta"] },
-        { "canonical": "despesas", "variants": ["custos", "gastos", "desembolsos"] }
+        {
+          "canonical": "demonstração de resultado",
+          "variants": [
+            "DRE",
+            "demonstrativo de resultado",
+            "P&L"
+          ]
+        },
+        {
+          "canonical": "balanço patrimonial",
+          "variants": [
+            "balanço",
+            "posição patrimonial"
+          ]
+        },
+        {
+          "canonical": "fluxo de caixa",
+          "variants": [
+            "cash flow",
+            "demonstração de fluxo de caixa"
+          ]
+        },
+        {
+          "canonical": "resultado operacional líquido",
+          "variants": [
+            "NOI",
+            "lucro operacional"
+          ]
+        },
+        {
+          "canonical": "lucro operacional bruto",
+          "variants": [
+            "GOP",
+            "lucro bruto"
+          ]
+        },
+        {
+          "canonical": "EBITDA",
+          "variants": [
+            "LAJIDA",
+            "lucro antes de juros impostos depreciação amortização"
+          ]
+        },
+        {
+          "canonical": "retorno sobre investimento",
+          "variants": [
+            "ROI",
+            "retorno do investimento"
+          ]
+        },
+        {
+          "canonical": "taxa interna de retorno",
+          "variants": [
+            "TIR",
+            "IRR"
+          ]
+        },
+        {
+          "canonical": "valor presente líquido",
+          "variants": [
+            "VPL",
+            "NPV"
+          ]
+        },
+        {
+          "canonical": "receita",
+          "variants": [
+            "faturamento",
+            "vendas",
+            "receita bruta"
+          ]
+        },
+        {
+          "canonical": "despesas",
+          "variants": [
+            "custos",
+            "gastos",
+            "desembolsos"
+          ]
+        }
       ]
     },
     {
@@ -277,14 +1057,61 @@
       "lang": "en",
       "domain": "legal",
       "synonyms": [
-        { "canonical": "contract", "variants": ["agreement", "legal agreement"] },
-        { "canonical": "non-disclosure agreement", "variants": ["NDA", "confidentiality agreement"] },
-        { "canonical": "master services agreement", "variants": ["MSA", "services agreement"] },
-        { "canonical": "statement of work", "variants": ["SOW", "scope of work"] },
-        { "canonical": "service level agreement", "variants": ["SLA"] },
-        { "canonical": "termination clause", "variants": ["termination", "cancellation clause"] },
-        { "canonical": "governing law", "variants": ["applicable law", "jurisdiction"] },
-        { "canonical": "indemnification", "variants": ["indemnity", "hold harmless"] }
+        {
+          "canonical": "contract",
+          "variants": [
+            "agreement",
+            "legal agreement"
+          ]
+        },
+        {
+          "canonical": "non-disclosure agreement",
+          "variants": [
+            "NDA",
+            "confidentiality agreement"
+          ]
+        },
+        {
+          "canonical": "master services agreement",
+          "variants": [
+            "MSA",
+            "services agreement"
+          ]
+        },
+        {
+          "canonical": "statement of work",
+          "variants": [
+            "SOW",
+            "scope of work"
+          ]
+        },
+        {
+          "canonical": "service level agreement",
+          "variants": [
+            "SLA"
+          ]
+        },
+        {
+          "canonical": "termination clause",
+          "variants": [
+            "termination",
+            "cancellation clause"
+          ]
+        },
+        {
+          "canonical": "governing law",
+          "variants": [
+            "applicable law",
+            "jurisdiction"
+          ]
+        },
+        {
+          "canonical": "indemnification",
+          "variants": [
+            "indemnity",
+            "hold harmless"
+          ]
+        }
       ]
     },
     {
@@ -292,14 +1119,62 @@
       "lang": "pt",
       "domain": "legal",
       "synonyms": [
-        { "canonical": "contrato", "variants": ["acordo", "instrumento contratual"] },
-        { "canonical": "acordo de confidencialidade", "variants": ["NDA", "termo de sigilo"] },
-        { "canonical": "contrato de prestação de serviços", "variants": ["MSA", "acordo de serviços"] },
-        { "canonical": "escopo de trabalho", "variants": ["SOW", "escopo do projeto"] },
-        { "canonical": "acordo de nível de serviço", "variants": ["SLA", "ANS"] },
-        { "canonical": "cláusula de rescisão", "variants": ["rescisão", "término"] },
-        { "canonical": "foro", "variants": ["jurisdição", "lei aplicável"] },
-        { "canonical": "indenização", "variants": ["responsabilidade", "reparação"] }
+        {
+          "canonical": "contrato",
+          "variants": [
+            "acordo",
+            "instrumento contratual"
+          ]
+        },
+        {
+          "canonical": "acordo de confidencialidade",
+          "variants": [
+            "NDA",
+            "termo de sigilo"
+          ]
+        },
+        {
+          "canonical": "contrato de prestação de serviços",
+          "variants": [
+            "MSA",
+            "acordo de serviços"
+          ]
+        },
+        {
+          "canonical": "escopo de trabalho",
+          "variants": [
+            "SOW",
+            "escopo do projeto"
+          ]
+        },
+        {
+          "canonical": "acordo de nível de serviço",
+          "variants": [
+            "SLA",
+            "ANS"
+          ]
+        },
+        {
+          "canonical": "cláusula de rescisão",
+          "variants": [
+            "rescisão",
+            "término"
+          ]
+        },
+        {
+          "canonical": "foro",
+          "variants": [
+            "jurisdição",
+            "lei aplicável"
+          ]
+        },
+        {
+          "canonical": "indenização",
+          "variants": [
+            "responsabilidade",
+            "reparação"
+          ]
+        }
       ]
     },
     {
@@ -307,9 +1182,31 @@
       "lang": "any",
       "domain": "finance",
       "synonyms": [
-        { "canonical": "payback period", "variants": ["payback", "break-even time", "recovery period", "tempo de retorno"] },
-        { "canonical": "break-even", "variants": ["break even point", "ponto de equilíbrio", "BE"] },
-        { "canonical": "investment return", "variants": ["return", "retorno", "ganho"] }
+        {
+          "canonical": "payback period",
+          "variants": [
+            "payback",
+            "break-even time",
+            "recovery period",
+            "tempo de retorno"
+          ]
+        },
+        {
+          "canonical": "break-even",
+          "variants": [
+            "break even point",
+            "ponto de equilíbrio",
+            "BE"
+          ]
+        },
+        {
+          "canonical": "investment return",
+          "variants": [
+            "return",
+            "retorno",
+            "ganho"
+          ]
+        }
       ]
     }
   ],
@@ -318,52 +1215,96 @@
       {
         "id": "SE_001_bank_statement_en",
         "input": "Show my monthly statement balance",
-        "expect": { "expandsToIncludeAny": ["bank statement", "account balance"] }
+        "expect": {
+          "expandsToIncludeAny": [
+            "bank statement",
+            "account balance"
+          ]
+        }
       },
       {
         "id": "SE_002_bank_statement_pt",
         "input": "Mostre o saldo do extrato",
-        "expect": { "expandsToIncludeAny": ["extrato bancário", "saldo"] }
+        "expect": {
+          "expandsToIncludeAny": [
+            "extrato bancário",
+            "saldo"
+          ]
+        }
       },
       {
         "id": "SE_003_invoice_nfe",
         "input": "Valor total da NF-e",
-        "expect": { "expandsToIncludeAny": ["nota fiscal"] }
+        "expect": {
+          "expandsToIncludeAny": [
+            "nota fiscal"
+          ]
+        }
       },
       {
         "id": "SE_004_finance_dre",
         "input": "Receita no DRE",
-        "expect": { "expandsToIncludeAny": ["demonstração de resultado"] }
+        "expect": {
+          "expandsToIncludeAny": [
+            "demonstração de resultado"
+          ]
+        }
       },
       {
         "id": "SE_005_finance_pnl",
         "input": "Show me the P&L revenue",
-        "expect": { "expandsToIncludeAny": ["income statement"] }
+        "expect": {
+          "expandsToIncludeAny": [
+            "income statement"
+          ]
+        }
       },
       {
         "id": "SE_006_legal_nda",
         "input": "NDA confidentiality terms",
-        "expect": { "expandsToIncludeAny": ["non-disclosure agreement"] }
+        "expect": {
+          "expandsToIncludeAny": [
+            "non-disclosure agreement"
+          ]
+        }
       },
       {
         "id": "SE_007_medical_rx",
         "input": "Check the Rx dosage",
-        "expect": { "expandsToIncludeAny": ["prescription"] }
+        "expect": {
+          "expandsToIncludeAny": [
+            "prescription"
+          ]
+        }
       },
       {
         "id": "SE_008_tax_w2",
         "input": "W-2 wage statement",
-        "expect": { "expandsToIncludeAny": ["W-2"] }
+        "expect": {
+          "expandsToIncludeAny": [
+            "W-2"
+          ]
+        }
       },
       {
         "id": "SE_009_housing_lease",
         "input": "Rental agreement deposit",
-        "expect": { "expandsToIncludeAny": ["lease agreement", "security deposit"] }
+        "expect": {
+          "expandsToIncludeAny": [
+            "lease agreement",
+            "security deposit"
+          ]
+        }
       },
       {
         "id": "SE_010_payback_any",
         "input": "What's the payback period?",
-        "expect": { "expandsToIncludeAny": ["payback period", "break-even time"] }
+        "expect": {
+          "expandsToIncludeAny": [
+            "payback period",
+            "break-even time"
+          ]
+        }
       }
     ]
   }

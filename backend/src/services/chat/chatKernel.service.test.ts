@@ -130,4 +130,45 @@ describe("ChatKernelService intent metadata propagation", () => {
       "legal",
     );
   });
+
+  test("enforces clarification contract when router decides CLARIFY", async () => {
+    const executor = {
+      chat: jest.fn(async () => makeResult()),
+      streamChat: jest.fn(async () => makeResult()),
+    };
+    const kernel = new ChatKernelService(executor);
+    (kernel as any).router = {
+      decideWithIntent: () => ({
+        route: "CLARIFY",
+        intentDecision: {
+          intentId: "documents",
+          intentFamily: "documents",
+          operatorId: "extract",
+          domainId: "general",
+          confidence: 0.62,
+          requiresClarification: true,
+          clarifyReason: "ambiguous_margin",
+          decisionNotes: ["test"],
+          persistable: {
+            intentId: "documents",
+            operatorId: "extract",
+            intentFamily: "documents",
+            domainId: "general",
+            confidence: 0.62,
+          },
+        },
+      }),
+    };
+
+    const result = await kernel.handleTurn(makeRequest());
+
+    expect(result.status).toBe("clarification_required");
+    expect(result.failureCode).toBe("INTENT_NEEDS_CLARIFICATION");
+    expect(result.completion?.answered).toBe(false);
+    expect(result.completion?.missingSlots).toContain("intent");
+
+    const forwardedReq = executor.chat.mock.calls[0][0] as ChatRequest;
+    expect((forwardedReq.meta || {}).requiresClarification).toBe(true);
+    expect((forwardedReq.meta || {}).clarifyReason).toBe("ambiguous_margin");
+  });
 });

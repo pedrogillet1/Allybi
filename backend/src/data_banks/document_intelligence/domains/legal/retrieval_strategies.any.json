@@ -6,7 +6,14 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-03-03"
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -76,7 +83,7 @@
     {
       "id": "legal_priority_signatures",
       "section": "signatures",
-      "weight": 3.0,
+      "weight": 3,
       "operators": [
         "extract",
         "validate",

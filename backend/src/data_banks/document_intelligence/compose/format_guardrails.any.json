@@ -3,13 +3,27 @@
     "id": "format_guardrails",
     "version": "1.0.0",
     "description": "Output-format controls for concise, safe, and complete rendering.",
-    "languages": ["any", "en", "pt"],
-    "lastUpdated": "2026-03-03"
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
     "maxRowsPerTableChunk": 140,
-    "allowMarkdown": true
+    "allowMarkdown": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "rules": [
     {

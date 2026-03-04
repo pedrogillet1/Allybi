@@ -3,7 +3,12 @@
     "id": "ui_contracts",
     "version": "1.0.0",
     "description": "Deterministic UI behavior contracts for Koda. Defines output-mode constraints (nav_pills, doc-grounded, help, conversation), attachment/button policies, and forbidden UI artifacts. Prevents non-ChatGPT UI regressions such as 'Sources:' headers in nav mode, action hallucinations, multi-question clarifications, and inconsistent message shapes.",
-    "languages": ["any", "en", "pt", "es"],
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
     "lastUpdated": "2026-01-26",
     "owner": "koda-overlays",
     "compat": ">=1.0.0",
@@ -11,6 +16,12 @@
       "Added strict nav_pills contract (single intro sentence, no sources label, no actions)",
       "Added output-shape compatibility rules per answer mode",
       "Added regression tests for known UI failures"
+    ],
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
     ]
   },
   "config": {
@@ -43,10 +54,20 @@
         "maxIntroChars": 90,
         "noSourcesHeader": true,
         "noInlineCitations": true,
-        "allowedOutputShapes": ["button_only"],
-        "allowedAttachments": ["source_buttons"],
-        "disallowedAttachments": ["actions"],
-        "disallowedTextPatterns": ["\\bSources?:\\b", "\\bFontes?:\\b", "\\bFuentes?:\\b"]
+        "allowedOutputShapes": [
+          "button_only"
+        ],
+        "allowedAttachments": [
+          "source_buttons"
+        ],
+        "disallowedAttachments": [
+          "actions"
+        ],
+        "disallowedTextPatterns": [
+          "\\bSources?:\\b",
+          "\\bFontes?:\\b",
+          "\\bFuentes?:\\b"
+        ]
       },
       "doc_grounded": {
         "bodyPolicy": "structured",
@@ -54,32 +75,60 @@
         "requireConclusion": true,
         "paragraphSentencesSoft": 2,
         "paragraphSentencesHard": 4,
-        "allowedOutputShapes": ["paragraph", "bullets", "table", "quote", "breadcrumbs"],
+        "allowedOutputShapes": [
+          "paragraph",
+          "bullets",
+          "table",
+          "quote",
+          "breadcrumbs"
+        ],
         "citationsPolicy": "evidence_based_no_sources_header",
-        "disallowedTextPatterns": ["\\bNo relevant information found\\b"]
+        "disallowedTextPatterns": [
+          "\\bNo relevant information found\\b"
+        ]
       },
       "conversation": {
         "bodyPolicy": "minimal",
         "maxSentences": 1,
-        "allowedOutputShapes": ["paragraph"],
-        "disallowedAttachments": ["source_buttons", "actions"]
+        "allowedOutputShapes": [
+          "paragraph"
+        ],
+        "disallowedAttachments": [
+          "source_buttons",
+          "actions"
+        ]
       }
-    }
+    },
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "rules": [
     {
       "id": "nav_pills_terminal_contract",
       "scope": "operator_specific",
       "description": "Enforce nav_pills contract for terminal navigation operators (open/locate_file/locate_docs).",
-      "appliesTo": ["render_pipeline"],
+      "appliesTo": [
+        "render_pipeline"
+      ],
       "triggerPatterns": {
-        "en": [".+"],
-        "pt": [".+"],
-        "es": [".+"]
+        "en": [
+          ".+"
+        ],
+        "pt": [
+          ".+"
+        ],
+        "es": [
+          ".+"
+        ]
       },
       "when": {
         "all": [
-          { "path": "answerMode", "op": "eq", "value": "nav_pills" }
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "nav_pills"
+          }
         ]
       },
       "action": {
@@ -95,15 +144,27 @@
       "id": "no_sources_header_anywhere_in_nav_pills",
       "scope": "operator_specific",
       "description": "Hard-block any output containing a Sources header in nav_pills mode.",
-      "appliesTo": ["render_output"],
+      "appliesTo": [
+        "render_output"
+      ],
       "triggerPatterns": {
-        "en": ["\\bSources?:\\b"],
-        "pt": ["\\bFontes?:\\b"],
-        "es": ["\\bFuentes?:\\b"]
+        "en": [
+          "\\bSources?:\\b"
+        ],
+        "pt": [
+          "\\bFontes?:\\b"
+        ],
+        "es": [
+          "\\bFuentes?:\\b"
+        ]
       },
       "when": {
         "all": [
-          { "path": "answerMode", "op": "eq", "value": "nav_pills" }
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "nav_pills"
+          }
         ]
       },
       "action": {
@@ -116,15 +177,27 @@
       "id": "no_action_hallucination_without_execution",
       "scope": "global",
       "description": "Prevent language implying actions were executed when only offered or not supported.",
-      "appliesTo": ["render_output"],
+      "appliesTo": [
+        "render_output"
+      ],
       "triggerPatterns": {
-        "en": ["\\b(i (opened|deleted|moved|renamed)|done|completed)\\b"],
-        "pt": ["\\b(eu (abri|apaguei|movi|renomeei)|feito|conclu[ií]do)\\b"],
-        "es": ["\\b(he (abierto|eliminado|movido|renombrado)|hecho|completado)\\b"]
+        "en": [
+          "\\b(i (opened|deleted|moved|renamed)|done|completed)\\b"
+        ],
+        "pt": [
+          "\\b(eu (abri|apaguei|movi|renomeei)|feito|conclu[ií]do)\\b"
+        ],
+        "es": [
+          "\\b(he (abierto|eliminado|movido|renombrado)|hecho|completado)\\b"
+        ]
       },
       "when": {
         "all": [
-          { "path": "signals.toolExecuted", "op": "neq", "value": true }
+          {
+            "path": "signals.toolExecuted",
+            "op": "neq",
+            "value": true
+          }
         ]
       },
       "action": {
@@ -137,15 +210,27 @@
       "id": "single_question_clarification_enforced",
       "scope": "global",
       "description": "Enforce single clarification question maximum.",
-      "appliesTo": ["render_output"],
+      "appliesTo": [
+        "render_output"
+      ],
       "triggerPatterns": {
-        "en": ["\\?"],
-        "pt": ["\\?"],
-        "es": ["\\?"]
+        "en": [
+          "\\?"
+        ],
+        "pt": [
+          "\\?"
+        ],
+        "es": [
+          "\\?"
+        ]
       },
       "when": {
         "all": [
-          { "path": "metrics.clarificationQuestionCount", "op": "gt", "value": 1 }
+          {
+            "path": "metrics.clarificationQuestionCount",
+            "op": "gt",
+            "value": 1
+          }
         ]
       },
       "action": {
@@ -159,25 +244,48 @@
     "cases": [
       {
         "id": "UI_001_nav_pills_intro_only",
-        "context": { "answerMode": "nav_pills" },
-        "expect": { "maxIntroSentences": 1, "allowedOutputShapes": ["button_only"] }
+        "context": {
+          "answerMode": "nav_pills"
+        },
+        "expect": {
+          "maxIntroSentences": 1,
+          "allowedOutputShapes": [
+            "button_only"
+          ]
+        }
       },
       {
         "id": "UI_002_nav_pills_no_sources_label",
-        "context": { "answerMode": "nav_pills" },
+        "context": {
+          "answerMode": "nav_pills"
+        },
         "input": "Sources:\n- file.pdf",
-        "expect": { "blocked": true }
+        "expect": {
+          "blocked": true
+        }
       },
       {
         "id": "UI_003_no_action_hallucination",
-        "context": { "signals": { "toolExecuted": false } },
+        "context": {
+          "signals": {
+            "toolExecuted": false
+          }
+        },
         "input": "Done — I opened the file.",
-        "expect": { "actionLanguageSuppressed": true }
+        "expect": {
+          "actionLanguageSuppressed": true
+        }
       },
       {
         "id": "UI_004_single_clarification_question",
-        "context": { "metrics": { "clarificationQuestionCount": 2 } },
-        "expect": { "blocked": true }
+        "context": {
+          "metrics": {
+            "clarificationQuestionCount": 2
+          }
+        },
+        "expect": {
+          "blocked": true
+        }
       }
     ]
   }

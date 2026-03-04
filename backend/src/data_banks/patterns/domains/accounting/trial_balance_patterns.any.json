@@ -17,17 +17,9 @@
       "retrieval",
       "compose"
     ],
-    "tests": {
-      "positive": [
-        "Show trial balance by account with debit and credit totals and tie-out to general ledger.",
-        "Reconcile GL export to trial balance at period close.",
-        "Extrair aging de contas a receber com as of date para clientes vencidos."
-      ],
-      "negative": [
-        "Tell me a sales forecast narrative",
-        "Summarize executive legal text from the latest document"
-      ]
-    },
+    "tests": [
+      "tests/patternDeterminism.test.ts"
+    ],
     "lastUpdated": "2026-03-03",
     "bankId": "trial_balance_patterns",
     "id": "patterns_domains_accounting_trial_balance_patterns",
@@ -12836,6 +12828,9 @@
     }
   ],
   "config": {
-    "enabled": true
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   }
 }

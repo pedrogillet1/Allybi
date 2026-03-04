@@ -3,23 +3,43 @@
     "id": "voice_personality_profiles",
     "version": "1.0.0",
     "description": "Cross-domain personality profiles for tone and phrasing.",
-    "languages": ["any", "en", "pt"],
-    "lastUpdated": "2026-03-03"
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
-    "defaultProfile": "balanced"
+    "defaultProfile": "balanced",
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "profiles": [
     {
       "id": "balanced",
       "tone": "balanced",
-      "traits": ["direct", "evidence_first"]
+      "traits": [
+        "direct",
+        "evidence_first"
+      ]
     },
     {
       "id": "supportive",
       "tone": "supportive",
-      "traits": ["empathetic", "careful"]
+      "traits": [
+        "empathetic",
+        "careful"
+      ]
     }
   ],
   "rules": [

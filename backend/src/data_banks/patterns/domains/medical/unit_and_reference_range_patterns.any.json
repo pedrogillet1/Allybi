@@ -19,7 +19,10 @@
     ],
     "lastUpdated": "2026-03-03",
     "id": "patterns_medical_unit_reference_patterns",
-    "description": "Patterns for units, conversion and reference range cues in medical documents with strict non-diagnostic handling."
+    "description": "Patterns for units, conversion and reference range cues in medical documents with strict non-diagnostic handling.",
+    "tests": [
+      "tests/patternDeterminism.test.ts"
+    ]
   },
   "config": {
     "deterministic": true,
@@ -27,7 +30,8 @@
     "requiresNavigationMode": true,
     "minPatterns": 200,
     "maxPatterns": 500,
-    "enabled": true
+    "enabled": true,
+    "sortBy": "id"
   },
   "patterns": [
     {

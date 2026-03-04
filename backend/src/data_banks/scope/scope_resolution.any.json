@@ -3,18 +3,34 @@
     "id": "scope_resolution",
     "version": "2.2.0",
     "description": "ChatGPT-style scope resolution for Koda. Converts query_rewrite hints + conversation state into hard/soft retrieval constraints. PRIMARY GOAL: explicit doc references (doc:id or exact filename) MUST become hard constraints (doc allowlist) so Koda never answers from the wrong document after the user explicitly switches files.",
-    "languages": ["any"],
-    "lastUpdated": "2026-01-25"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-01-25",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
-
   "config": {
     "enabled": true,
-
     "pipelinePlacement": {
-      "runAfter": ["followup_detection", "query_rewrite", "entity_resolution_rules", "negation_and_exclusions"],
-      "runBefore": ["semantic_search_config", "candidate_filters", "ambiguity_rank_features", "answer_mode_router"]
+      "runAfter": [
+        "followup_detection",
+        "query_rewrite",
+        "entity_resolution_rules",
+        "negation_and_exclusions"
+      ],
+      "runBefore": [
+        "semantic_search_config",
+        "candidate_filters",
+        "ambiguity_rank_features",
+        "answer_mode_router"
+      ]
     },
-
     "integrationHooks": {
       "queryRewriteBankId": "query_rewrites_schema",
       "conversationStateSchemaBankId": "memory_policy",
@@ -27,15 +43,12 @@
       "docAliasesBankId": "doc_aliases",
       "stopwordsDocnamesBankId": "stopwords_docnames"
     },
-
     "policy": {
       "_comment": "ChatGPT-like: reuse active doc on followups; only switch docs when explicit docRef appears or user chooses a candidate.",
       "preferActiveDocOnFollowup": true,
       "preferExplicitDocRefOverState": true,
       "preferUserChoiceOverAutopick": true,
-
       "maxScopeQuestions": 1,
-
       "hardConstraintPrecedence": [
         "explicit_doc_id",
         "explicit_filename",
@@ -43,26 +56,21 @@
         "active_doc_state"
       ]
     },
-
     "thresholds": {
       "_comment": "Confidence thresholds to decide hard vs soft constraints.",
       "minToEmit": 0.55,
       "minToApplySoftConstraint": 0.64,
       "minToApplyHardConstraint": 0.74,
-
-      "explicitFilenameHardMin": 0.80,
+      "explicitFilenameHardMin": 0.8,
       "explicitDocIdHardMin": 0.85,
-
-      "activeDocSoftMin": 0.60
+      "activeDocSoftMin": 0.6
     },
-
     "limits": {
       "maxDocAllowlist": 8,
       "maxDocDenylist": 24,
       "maxTokenExclusions": 30
     }
   },
-
   "signals": {
     "_comment": "Inputs scope_resolution expects from upstream runtime.",
     "inputs": {
@@ -73,7 +81,6 @@
       "negatives": "negation_and_exclusions output"
     }
   },
-
   "resolution": {
     "_comment": "Resolution stages in order. Each stage can add constraints. IMPORTANT: explicit doc refs come BEFORE hard locked doc to allow switching.",
     "ordered": [
@@ -86,30 +93,24 @@
       "apply_negatives",
       "finalize"
     ],
-
     "apply_explicit_doc_refs": {
       "_comment": "HIGHEST PRIORITY: If user explicitly referenced a docId or filename, create a hard doc allowlist. This prevents wrong-doc answers AND allows explicit switching.",
       "enabled": true,
-
       "docId": {
         "ifPresent": "emit_doc_id_allowlist_hard",
         "confidence": 0.95
       },
-
       "filename": {
         "_comment": "Resolve filename to docId if possible using docAliases. Otherwise keep a hard filename constraint.",
         "ifPresent": "emit_filename_constraint_hard",
-        "confidence": 0.90,
-
+        "confidence": 0.9,
         "resolveToDocIdUsing": "doc_aliases",
         "ifResolvedToDocId": "emit_doc_id_allowlist_hard",
         "ifNotResolved": "emit_filename_must_contain_hard",
-
         "normalizeFilename": true,
         "stripExtensionForMatching": true
       }
     },
-
     "apply_user_choice": {
       "_comment": "If user selected a doc during disambiguation, treat it as hard allowlist for a while.",
       "enabled": true,
@@ -117,116 +118,122 @@
       "emit": "doc_id_allowlist_hard",
       "confidence": 0.92
     },
-
     "apply_hard_locked_doc": {
       "_comment": "If activeDocRef.lockType == 'hard', enforce strict single-doc scope. ONLY applies when no explicit doc refs and not a discovery query.",
       "enabled": true,
-
       "onlyIf": {
         "noExplicitDocRefs": true,
         "notDiscoveryQuery": true
       },
-
       "when": {
         "activeDocRef.lockType": "hard",
         "activeDocRef.documentId": "exists"
       },
-
       "emit": "doc_id_allowlist_hard",
       "confidence": 0.99,
-
       "enforcement": {
         "strictSingleDoc": true,
         "blockOtherDocs": true,
         "overrideFollowupScope": true,
-        "notes": ["hard_lock_enforced", "scope_restricted_to_locked_doc"]
+        "notes": [
+          "hard_lock_enforced",
+          "scope_restricted_to_locked_doc"
+        ]
       }
     },
-
     "apply_lock_request": {
       "_comment": "If user requested 'keep it active / don't switch', convert current active doc into a HARD allowlist. Triggered by signals.lockDocRequested from set_active_doc operator.",
       "enabled": true,
-
       "onlyIf": {
         "signal": "lockDocRequested",
         "noExplicitDocRefs": true
       },
-
       "stateKey": "state.activeDocRef.documentId",
       "emit": "doc_id_allowlist_hard",
-      "confidence": 0.90,
-
-      "notes": ["user_requested_lock", "active_doc_promoted_to_hard"]
+      "confidence": 0.9,
+      "notes": [
+        "user_requested_lock",
+        "active_doc_promoted_to_hard"
+      ]
     },
-
     "apply_followup_active_doc": {
       "_comment": "If this is a follow-up and no explicit docRef exists, reuse activeDoc as a soft constraint.",
       "enabled": true,
-
       "onlyIf": {
         "isFollowup": true,
         "noExplicitDocRefs": true
       },
-
       "stateKey": "state.activeDocRef.documentId",
       "emit": "doc_id_allowlist_soft",
-      "confidence": 0.80
+      "confidence": 0.8
     },
-
     "apply_entities_and_time": {
       "_comment": "Translate entity/time hints into soft constraints. Doc selection remains dominated by explicit doc refs and state.",
       "enabled": true,
-
       "timeHint": {
-        "emit": ["time_scope_hint"],
+        "emit": [
+          "time_scope_hint"
+        ],
         "softMin": 0.64,
         "hardMin": 0.74
       },
-
       "metricHints": {
-        "emit": ["metric_hint"],
+        "emit": [
+          "metric_hint"
+        ],
         "softMin": 0.64
       },
-
       "entityHints": {
-        "emit": ["entity_hint"],
+        "emit": [
+          "entity_hint"
+        ],
         "softMin": 0.64
       },
-
       "typeHints": {
-        "emit": ["doc_type_allow_soft"],
+        "emit": [
+          "doc_type_allow_soft"
+        ],
         "softMin": 0.64
       }
     },
-
     "apply_negatives": {
       "_comment": "Apply exclusion directives (not budget, exclude 2024). Negatives should not override explicit filename/docId constraints.",
       "enabled": true,
-
       "behavior": {
         "hardNegation": "drop_candidate",
         "softNegation": "downrank"
       },
-
-      "emit": ["exclude_tokens", "exclude_doc_ids", "exclude_doc_types"],
-
+      "emit": [
+        "exclude_tokens",
+        "exclude_doc_ids",
+        "exclude_doc_types"
+      ],
       "doNotOverrideHardAllowlist": true
     },
-
     "finalize": {
       "_comment": "Finalize constraint object for retrieval and ranking.",
       "enabled": true,
-
       "packaging": {
-        "hard": ["docIdAllowlist", "filenameMustContain", "docTypeAllowlist", "docIdDenylist"],
-        "soft": ["docIdAllowlist", "timeHint", "metricHint", "entityHint", "docTypePreference"],
-        "exclusions": ["excludeTokens"]
+        "hard": [
+          "docIdAllowlist",
+          "filenameMustContain",
+          "docTypeAllowlist",
+          "docIdDenylist"
+        ],
+        "soft": [
+          "docIdAllowlist",
+          "timeHint",
+          "metricHint",
+          "entityHint",
+          "docTypePreference"
+        ],
+        "exclusions": [
+          "excludeTokens"
+        ]
       },
-
       "_note": "When both hard.docIdAllowlist and soft.docIdAllowlist exist, downstream MUST treat hard as dominant."
     }
   },
-
   "outputContract": {
     "_comment": "This object is consumed by semantic_search_config and candidate_filters.",
     "shape": {
@@ -253,28 +260,53 @@
       }
     }
   },
-
   "tests": {
     "_comment": "These tests cover your exact failure: explicit filename switch must not drift to other docs.",
     "cases": [
       {
         "id": "SC_0001_explicit_filename_hard_lock",
         "input": {
-          "queryHints": { "docRefs": { "filenames": ["Lone Mountain Ranch P&L 2025 (Budget).xlsx"] } },
-          "followup": { "isFollowup": false },
-          "state": { "activeDocRef": { "documentId": "doc:other", "lockType": "hard" } }
+          "queryHints": {
+            "docRefs": {
+              "filenames": [
+                "Lone Mountain Ranch P&L 2025 (Budget).xlsx"
+              ]
+            }
+          },
+          "followup": {
+            "isFollowup": false
+          },
+          "state": {
+            "activeDocRef": {
+              "documentId": "doc:other",
+              "lockType": "hard"
+            }
+          }
         },
         "expect": {
           "hard.docIdAllowlist_or_filenameMustContain": true,
-          "notesMustIncludeAny": ["explicit_filename"]
+          "notesMustIncludeAny": [
+            "explicit_filename"
+          ]
         }
       },
       {
         "id": "SC_0002_followup_reuses_active_doc",
         "input": {
-          "queryHints": { "docRefs": { "filenames": [], "docIds": [] } },
-          "followup": { "isFollowup": true },
-          "state": { "activeDocRef": { "documentId": "doc:lmr_pl_2025" } }
+          "queryHints": {
+            "docRefs": {
+              "filenames": [],
+              "docIds": []
+            }
+          },
+          "followup": {
+            "isFollowup": true
+          },
+          "state": {
+            "activeDocRef": {
+              "documentId": "doc:lmr_pl_2025"
+            }
+          }
         },
         "expect": {
           "soft.docIdAllowlist": true
@@ -283,21 +315,47 @@
       {
         "id": "SC_0003_negatives_do_not_override_hard_allowlist",
         "input": {
-          "queryHints": { "docRefs": { "filenames": ["LMR Improvement Plan 202503 ($63m PIP).xlsx"] } },
-          "negatives": { "excludeTokens": ["pip"] }
+          "queryHints": {
+            "docRefs": {
+              "filenames": [
+                "LMR Improvement Plan 202503 ($63m PIP).xlsx"
+              ]
+            }
+          },
+          "negatives": {
+            "excludeTokens": [
+              "pip"
+            ]
+          }
         },
         "expect": {
           "hard.filenameMustContain": true,
-          "notesMustIncludeAny": ["doNotOverrideHardAllowlist"]
+          "notesMustIncludeAny": [
+            "doNotOverrideHardAllowlist"
+          ]
         }
       },
       {
         "id": "SC_0004_explicit_switch_overrides_hard_lock",
         "_comment": "Explicit filename switch beats existing hard lock",
         "input": {
-          "queryHints": { "docRefs": { "filenames": ["NewFile.xlsx"], "docIds": [] } },
-          "followup": { "isFollowup": true },
-          "state": { "activeDocRef": { "documentId": "doc:old", "lockType": "hard" } }
+          "queryHints": {
+            "docRefs": {
+              "filenames": [
+                "NewFile.xlsx"
+              ],
+              "docIds": []
+            }
+          },
+          "followup": {
+            "isFollowup": true
+          },
+          "state": {
+            "activeDocRef": {
+              "documentId": "doc:old",
+              "lockType": "hard"
+            }
+          }
         },
         "expect": {
           "hard.filenameMustContain_contains": "NewFile.xlsx"
@@ -307,10 +365,22 @@
         "id": "SC_0005_discovery_ignores_hard_lock",
         "_comment": "Discovery queries should search corpus-wide, ignoring hard lock",
         "input": {
-          "queryHints": { "docRefs": { "filenames": [], "docIds": [] } },
-          "signals": { "discoveryQuery": true },
+          "queryHints": {
+            "docRefs": {
+              "filenames": [],
+              "docIds": []
+            }
+          },
+          "signals": {
+            "discoveryQuery": true
+          },
           "operator": "locate_docs",
-          "state": { "activeDocRef": { "documentId": "doc:locked", "lockType": "hard" } }
+          "state": {
+            "activeDocRef": {
+              "documentId": "doc:locked",
+              "lockType": "hard"
+            }
+          }
         },
         "expect": {
           "hard.docIdAllowlist": null,

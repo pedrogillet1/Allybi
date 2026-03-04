@@ -3,13 +3,25 @@
     "id": "hallucination_guards",
     "version": "1.0.0",
     "description": "Hallucination risk guardrails used by quality gates for evidence-first response safety.",
-    "languages": ["any"],
-    "lastUpdated": "2026-03-01"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
     "highRiskRequiresBlock": true,
-    "requireEvidenceInGroundedModes": true
+    "requireEvidenceInGroundedModes": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "rules": [
     {

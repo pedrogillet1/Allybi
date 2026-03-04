@@ -3,10 +3,21 @@
     "id": "recency_boost_rules",
     "version": "1.0.0",
     "description": "Deterministic recency boost rules for Koda retrieval. Applies small, controlled freshness preference to recently uploaded/modified documents without overriding relevance. Includes safeguards to prevent recency bias from causing wrong-doc drift and supports time-filtered queries correctly.",
-    "languages": ["any", "en", "pt", "es"],
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
     "lastUpdated": "2026-01-26",
     "owner": "koda-retrieval",
-    "compat": ">=1.0.0"
+    "compat": ">=1.0.0",
+    "usedBy": [
+      "services/core/retrieval/retrievalEngine.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -40,22 +51,37 @@
       "enabled": true,
       "reduceFactorWhenTimeConstraintsPresent": 0.5,
       "disableWhenExplicitYearOrQuarterComparison": true
-    }
+    },
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "rules": [
     {
       "id": "disable_recency_when_doc_locked",
       "scope": "global",
       "description": "Disable recency boosts entirely when explicit doc lock is active.",
-      "appliesTo": ["doc_candidates"],
+      "appliesTo": [
+        "doc_candidates"
+      ],
       "triggerPatterns": {
-        "en": [".+"],
-        "pt": [".+"],
-        "es": [".+"]
+        "en": [
+          ".+"
+        ],
+        "pt": [
+          ".+"
+        ],
+        "es": [
+          ".+"
+        ]
       },
       "when": {
         "all": [
-          { "path": "signals.explicitDocLock", "op": "eq", "value": true }
+          {
+            "path": "signals.explicitDocLock",
+            "op": "eq",
+            "value": true
+          }
         ]
       },
       "action": {
@@ -68,15 +94,27 @@
       "id": "strong_recency_boost",
       "scope": "global",
       "description": "Apply strong recency boost for very recent documents (<= 7 days).",
-      "appliesTo": ["doc_candidates"],
+      "appliesTo": [
+        "doc_candidates"
+      ],
       "triggerPatterns": {
-        "en": [".+"],
-        "pt": [".+"],
-        "es": [".+"]
+        "en": [
+          ".+"
+        ],
+        "pt": [
+          ".+"
+        ],
+        "es": [
+          ".+"
+        ]
       },
       "when": {
         "all": [
-          { "path": "metrics.docAgeDays", "op": "lte", "value": 7 }
+          {
+            "path": "metrics.docAgeDays",
+            "op": "lte",
+            "value": 7
+          }
         ]
       },
       "action": {
@@ -90,16 +128,32 @@
       "id": "medium_recency_boost",
       "scope": "global",
       "description": "Apply medium recency boost for documents up to 30 days old.",
-      "appliesTo": ["doc_candidates"],
+      "appliesTo": [
+        "doc_candidates"
+      ],
       "triggerPatterns": {
-        "en": [".+"],
-        "pt": [".+"],
-        "es": [".+"]
+        "en": [
+          ".+"
+        ],
+        "pt": [
+          ".+"
+        ],
+        "es": [
+          ".+"
+        ]
       },
       "when": {
         "all": [
-          { "path": "metrics.docAgeDays", "op": "gt", "value": 7 },
-          { "path": "metrics.docAgeDays", "op": "lte", "value": 30 }
+          {
+            "path": "metrics.docAgeDays",
+            "op": "gt",
+            "value": 7
+          },
+          {
+            "path": "metrics.docAgeDays",
+            "op": "lte",
+            "value": 30
+          }
         ]
       },
       "action": {
@@ -113,16 +167,32 @@
       "id": "light_recency_boost",
       "scope": "global",
       "description": "Apply light recency boost for documents up to 90 days old.",
-      "appliesTo": ["doc_candidates"],
+      "appliesTo": [
+        "doc_candidates"
+      ],
       "triggerPatterns": {
-        "en": [".+"],
-        "pt": [".+"],
-        "es": [".+"]
+        "en": [
+          ".+"
+        ],
+        "pt": [
+          ".+"
+        ],
+        "es": [
+          ".+"
+        ]
       },
       "when": {
         "all": [
-          { "path": "metrics.docAgeDays", "op": "gt", "value": 30 },
-          { "path": "metrics.docAgeDays", "op": "lte", "value": 90 }
+          {
+            "path": "metrics.docAgeDays",
+            "op": "gt",
+            "value": 30
+          },
+          {
+            "path": "metrics.docAgeDays",
+            "op": "lte",
+            "value": 90
+          }
         ]
       },
       "action": {
@@ -136,16 +206,32 @@
       "id": "reduce_recency_when_time_constraints_present",
       "scope": "cross_family",
       "description": "Reduce recency effect when user query has explicit time constraints (year/quarter/month) to avoid biasing toward newest.",
-      "appliesTo": ["doc_candidates"],
+      "appliesTo": [
+        "doc_candidates"
+      ],
       "triggerPatterns": {
-        "en": [".+"],
-        "pt": [".+"],
-        "es": [".+"]
+        "en": [
+          ".+"
+        ],
+        "pt": [
+          ".+"
+        ],
+        "es": [
+          ".+"
+        ]
       },
       "when": {
         "any": [
-          { "path": "signals.timeConstraintsPresent", "op": "eq", "value": true },
-          { "path": "signals.explicitYearOrQuarterComparison", "op": "eq", "value": true }
+          {
+            "path": "signals.timeConstraintsPresent",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "signals.explicitYearOrQuarterComparison",
+            "op": "eq",
+            "value": true
+          }
         ]
       },
       "action": {
@@ -159,11 +245,19 @@
       "id": "cap_total_recency_boost",
       "scope": "global",
       "description": "Cap total recency boost to keep relevance dominant.",
-      "appliesTo": ["doc_candidates"],
+      "appliesTo": [
+        "doc_candidates"
+      ],
       "triggerPatterns": {
-        "en": [".+"],
-        "pt": [".+"],
-        "es": [".+"]
+        "en": [
+          ".+"
+        ],
+        "pt": [
+          ".+"
+        ],
+        "es": [
+          ".+"
+        ]
       },
       "action": {
         "type": "cap_boost",
@@ -177,39 +271,92 @@
     "cases": [
       {
         "id": "REC_001_disable_when_doc_locked",
-        "context": { "signals": { "explicitDocLock": true }, "metrics": { "docAgeDays": 2 } },
-        "expect": { "recencyBoostApplied": false }
+        "context": {
+          "signals": {
+            "explicitDocLock": true
+          },
+          "metrics": {
+            "docAgeDays": 2
+          }
+        },
+        "expect": {
+          "recencyBoostApplied": false
+        }
       },
       {
         "id": "REC_002_strong_recency",
-        "context": { "metrics": { "docAgeDays": 3 } },
-        "expect": { "recencyBoost": 0.05 }
+        "context": {
+          "metrics": {
+            "docAgeDays": 3
+          }
+        },
+        "expect": {
+          "recencyBoost": 0.05
+        }
       },
       {
         "id": "REC_003_medium_recency",
-        "context": { "metrics": { "docAgeDays": 20 } },
-        "expect": { "recencyBoost": 0.03 }
+        "context": {
+          "metrics": {
+            "docAgeDays": 20
+          }
+        },
+        "expect": {
+          "recencyBoost": 0.03
+        }
       },
       {
         "id": "REC_004_light_recency",
-        "context": { "metrics": { "docAgeDays": 60 } },
-        "expect": { "recencyBoost": 0.015 }
+        "context": {
+          "metrics": {
+            "docAgeDays": 60
+          }
+        },
+        "expect": {
+          "recencyBoost": 0.015
+        }
       },
       {
         "id": "REC_005_reduce_when_time_constraints",
-        "context": { "signals": { "timeConstraintsPresent": true }, "metrics": { "docAgeDays": 3, "rawRecencyBoost": 0.05 } },
-        "expect": { "scaledFactor": 0.5 }
+        "context": {
+          "signals": {
+            "timeConstraintsPresent": true
+          },
+          "metrics": {
+            "docAgeDays": 3,
+            "rawRecencyBoost": 0.05
+          }
+        },
+        "expect": {
+          "scaledFactor": 0.5
+        }
       },
       {
         "id": "REC_006_cap_total_recency",
-        "context": { "metrics": { "totalRecencyBoostBeforeCap": 0.2 } },
-        "expect": { "totalRecencyBoostAfterCapAtOrBelow": 0.08 }
+        "context": {
+          "metrics": {
+            "totalRecencyBoostBeforeCap": 0.2
+          }
+        },
+        "expect": {
+          "totalRecencyBoostAfterCapAtOrBelow": 0.08
+        }
       },
       {
         "id": "REC_007_multilingual_es_time_constraints",
-        "context": { "signals": { "timeConstraintsPresent": true }, "metrics": { "docAgeDays": 5, "rawRecencyBoost": 0.05 } },
+        "context": {
+          "signals": {
+            "timeConstraintsPresent": true
+          },
+          "metrics": {
+            "docAgeDays": 5,
+            "rawRecencyBoost": 0.05
+          }
+        },
         "input": "comparar 2022 vs 2023",
-        "expect": { "scaledFactor": 0.5 }
+        "expect": {
+          "scaledFactor": 0.5
+        }
       }
     ]
   }

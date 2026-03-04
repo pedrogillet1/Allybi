@@ -11,50 +11,56 @@ import {
   normalizeRange,
 } from "../../services/admin/_shared/rangeWindow";
 import { getGoogleMetrics } from "../../services/admin/googleMetrics.service";
+import { getOptionalBank } from "../../services/core/banks/bankLoader.service";
+import {
+  computeCostUsd,
+  lookupCostEntry,
+  type CostTable,
+} from "../../services/llm/core/llmCostCalculator";
+import { canonicalizeProviderWithUnknown } from "../../services/llm/core/providerNormalization";
 
 const router = Router();
 
-/**
- * LLM Pricing Table (USD per 1M tokens)
- * Based on Google AI pricing as of 2024
- */
-const LLM_PRICING: Record<string, { input: number; output: number }> = {
-  // Gemini 2.0 Flash (context <= 128k)
-  "gemini-2.0-flash": { input: 0.1, output: 0.4 },
-  "gemini-2.0-flash-exp": { input: 0.1, output: 0.4 },
-  "gemini-2.0-flash-001": { input: 0.1, output: 0.4 },
-  // Gemini 1.5 Flash (context <= 128k)
-  "gemini-1.5-flash": { input: 0.075, output: 0.3 },
-  "gemini-1.5-flash-latest": { input: 0.075, output: 0.3 },
-  "gemini-1.5-flash-001": { input: 0.075, output: 0.3 },
-  "gemini-1.5-flash-002": { input: 0.075, output: 0.3 },
-  // Gemini 1.5 Pro (context <= 128k)
-  "gemini-1.5-pro": { input: 1.25, output: 5.0 },
-  "gemini-1.5-pro-latest": { input: 1.25, output: 5.0 },
-  "gemini-1.5-pro-001": { input: 1.25, output: 5.0 },
-  "gemini-1.5-pro-002": { input: 1.25, output: 5.0 },
-  // Gemini 1.0 Pro
-  "gemini-1.0-pro": { input: 0.5, output: 1.5 },
-  "gemini-pro": { input: 0.5, output: 1.5 },
-  // OpenAI (for reference if used)
-  "gpt-4o": { input: 2.5, output: 10.0 },
-  "gpt-4o-mini": { input: 0.15, output: 0.6 },
-  "gpt-4-turbo": { input: 10.0, output: 30.0 },
-  "gpt-3.5-turbo": { input: 0.5, output: 1.5 },
+type CostDiagnostics = {
+  pricedCalls: number;
+  callsWithUsage: number;
+  familyMatchedCalls: number;
+  unpricedModelKeys: Set<string>;
 };
 
-/**
- * Calculate cost for a single LLM call
- */
 function calculateCallCost(
+  provider: string,
   model: string,
   promptTokens: number | null,
   completionTokens: number | null,
+  costTable: CostTable | null,
+  diagnostics?: CostDiagnostics,
 ): number {
-  const pricing = LLM_PRICING[model] || LLM_PRICING["gemini-1.5-flash"]; // Default fallback
-  const inputCost = ((promptTokens || 0) / 1_000_000) * pricing.input;
-  const outputCost = ((completionTokens || 0) / 1_000_000) * pricing.output;
-  return inputCost + outputCost;
+  const canonicalProvider = canonicalizeProviderWithUnknown(provider);
+  const pricedProvider = canonicalProvider === "unknown" ? String(provider || "") : canonicalProvider;
+
+  const usagePresent = (promptTokens ?? 0) > 0 || (completionTokens ?? 0) > 0;
+  if (usagePresent && diagnostics) diagnostics.callsWithUsage += 1;
+
+  const lookup = lookupCostEntry(
+    pricedProvider,
+    model,
+    costTable,
+  );
+  if (usagePresent && lookup.entry && diagnostics) {
+    diagnostics.pricedCalls += 1;
+    if (lookup.matchedBy === "family") diagnostics.familyMatchedCalls += 1;
+  } else if (usagePresent && !lookup.entry && diagnostics) {
+    diagnostics.unpricedModelKeys.add(`${pricedProvider}:${model}`);
+  }
+
+  return computeCostUsd(
+    pricedProvider,
+    model,
+    promptTokens,
+    completionTokens,
+    costTable,
+  );
 }
 
 /**
@@ -66,6 +72,14 @@ router.get("/", async (req: Request, res: Response) => {
     const range = (req.query.range as string) || "7d";
     const rangeKey = normalizeRange(range, "7d");
     const window = parseRange(rangeKey);
+
+    const costTable = getOptionalBank<CostTable>("llm_cost_table");
+    const pricingSource = costTable
+      ? String(
+          (costTable as unknown as { _meta?: { version?: string } })._meta
+            ?.version || "unknown",
+        )
+      : "missing";
 
     const [result, google] = await Promise.all([
       getLlmSummary(prisma, { range: rangeKey }),
@@ -81,12 +95,25 @@ router.get("/", async (req: Request, res: Response) => {
     // Calculate total cost and cost per model
     let totalCostUsd = 0;
     const modelCosts = new Map<string, { tokens: number; cost: number }>();
+    const costDiagnostics: CostDiagnostics = {
+      pricedCalls: 0,
+      callsWithUsage: 0,
+      familyMatchedCalls: 0,
+      unpricedModelKeys: new Set<string>(),
+    };
+    const laneStats = new Map<
+      string,
+      { calls: number; fallbackCalls: number }
+    >();
 
     for (const call of recentCalls.items) {
       const cost = calculateCallCost(
+        call.provider,
         call.model,
         call.promptTokens,
         call.completionTokens,
+        costTable,
+        costDiagnostics,
       );
       totalCostUsd += cost;
 
@@ -94,6 +121,18 @@ router.get("/", async (req: Request, res: Response) => {
       existing.tokens += call.totalTokens || 0;
       existing.cost += cost;
       modelCosts.set(call.model, existing);
+
+      const meta =
+        call.meta && typeof call.meta === "object"
+          ? (call.meta as Record<string, unknown>)
+          : {};
+      const lane = String(meta.routeLane || "unknown");
+      const fallbackUsed =
+        meta.fallbackUsed === true || Number(meta.fallbackRank ?? 0) > 0;
+      const laneEntry = laneStats.get(lane) || { calls: 0, fallbackCalls: 0 };
+      laneEntry.calls += 1;
+      if (fallbackUsed) laneEntry.fallbackCalls += 1;
+      laneStats.set(lane, laneEntry);
     }
 
     // Transform byModel to chart format for frontend with actual costs
@@ -109,6 +148,23 @@ router.get("/", async (req: Request, res: Response) => {
     const recentErrors = recentCalls.items.filter(
       (c) => c.status === "fail",
     ).length;
+    const compositionLaneBreakdown = Array.from(laneStats.entries())
+      .map(([lane, stats]) => ({
+        lane,
+        calls: stats.calls,
+        fallbackCalls: stats.fallbackCalls,
+        fallbackRate:
+          stats.calls > 0
+            ? Math.round((stats.fallbackCalls / stats.calls) * 10000) / 10000
+            : 0,
+      }))
+      .sort((a, b) => b.calls - a.calls);
+    const fallbackByLane = compositionLaneBreakdown.map((row) => ({
+      lane: row.lane,
+      fallbackCalls: row.fallbackCalls,
+      totalCalls: row.calls,
+      fallbackRate: row.fallbackRate,
+    }));
 
     res.json({
       ok: true,
@@ -130,12 +186,35 @@ router.get("/", async (req: Request, res: Response) => {
           tokensPerDay: [],
           costByModel,
         },
+        pricingSource,
+        costCoverage:
+          costDiagnostics.callsWithUsage > 0
+            ? Math.round(
+                (costDiagnostics.pricedCalls / costDiagnostics.callsWithUsage) *
+                  10000,
+              ) / 10000
+            : 1,
+        pinnedFamilyCoverage:
+          costDiagnostics.callsWithUsage > 0
+            ? Math.round(
+                (costDiagnostics.familyMatchedCalls /
+                  costDiagnostics.callsWithUsage) *
+                  10000,
+              ) / 10000
+            : 0,
+        unpricedModelKeys: Array.from(costDiagnostics.unpricedModelKeys).sort(
+          (a, b) => a.localeCompare(b),
+        ),
+        compositionLaneBreakdown,
+        fallbackByLane,
         calls: recentCalls.items.slice(0, 50).map((c) => ({
           ...c,
           costUsd: calculateCallCost(
+            c.provider,
             c.model,
             c.promptTokens,
             c.completionTokens,
+            costTable,
           ),
         })),
         google: { gemini: google.gemini },
@@ -177,14 +256,17 @@ router.get("/calls", async (req: Request, res: Response) => {
       model,
       stage,
     });
+    const costTable = getOptionalBank<CostTable>("llm_cost_table");
 
     // Add cost to each call
     const callsWithCost = result.items.map((call) => ({
       ...call,
       costUsd: calculateCallCost(
+        call.provider,
         call.model,
         call.promptTokens,
         call.completionTokens,
+        costTable,
       ),
     }));
 

@@ -6,7 +6,14 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-03-03"
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -14,15 +21,147 @@
     "docType": "every_internet_bill"
   },
   "hints": [
-    { "id": "hint_01", "entity": "subscriber_name", "anchors": ["subscriber", "customer", "cliente"], "location": "subscriber_profile", "extractionMethod": "heading_proximity", "whereItHides": ["statement header", "top right"] },
-    { "id": "hint_02", "entity": "subscriber_id", "anchors": ["account", "conta", "id"], "location": "subscriber_profile", "extractionMethod": "table_row_match", "whereItHides": ["account section", "profile block"] },
-    { "id": "hint_03", "entity": "billing_period_start", "anchors": ["period start", "de"], "location": "service_period", "extractionMethod": "regex_capture", "whereItHides": ["period row", "small print"] },
-    { "id": "hint_04", "entity": "billing_period_end", "anchors": ["period end", "ate"], "location": "service_period", "extractionMethod": "regex_capture", "whereItHides": ["period row", "small print"] },
-    { "id": "hint_05", "entity": "plan_name", "anchors": ["plan", "bandwidth", "speed"], "location": "plan_details", "extractionMethod": "heading_proximity", "whereItHides": ["plan box", "contract note"] },
-    { "id": "hint_06", "entity": "download_gb", "anchors": ["download", "downloaded"], "location": "traffic_summary", "extractionMethod": "table_row_match", "whereItHides": ["traffic table", "usage breakdown"] },
-    { "id": "hint_07", "entity": "upload_gb", "anchors": ["upload", "uploaded"], "location": "traffic_summary", "extractionMethod": "table_row_match", "whereItHides": ["traffic table", "usage breakdown"] },
-    { "id": "hint_08", "entity": "subtotal_amount", "anchors": ["subtotal", "subtotal amount"], "location": "charges_and_taxes", "extractionMethod": "table_row_match", "whereItHides": ["charge table", "section totals"] },
-    { "id": "hint_09", "entity": "total_amount", "anchors": ["total", "total amount"], "location": "totals_and_due", "extractionMethod": "table_row_match", "whereItHides": ["bottom of invoice", "statement summary"] },
-    { "id": "hint_10", "entity": "due_date", "anchors": ["due date", "vencimento"], "location": "totals_and_due", "extractionMethod": "heading_proximity", "whereItHides": ["totals section"] }
+    {
+      "id": "hint_01",
+      "entity": "subscriber_name",
+      "anchors": [
+        "subscriber",
+        "customer",
+        "cliente"
+      ],
+      "location": "subscriber_profile",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "statement header",
+        "top right"
+      ]
+    },
+    {
+      "id": "hint_02",
+      "entity": "subscriber_id",
+      "anchors": [
+        "account",
+        "conta",
+        "id"
+      ],
+      "location": "subscriber_profile",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "account section",
+        "profile block"
+      ]
+    },
+    {
+      "id": "hint_03",
+      "entity": "billing_period_start",
+      "anchors": [
+        "period start",
+        "de"
+      ],
+      "location": "service_period",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "period row",
+        "small print"
+      ]
+    },
+    {
+      "id": "hint_04",
+      "entity": "billing_period_end",
+      "anchors": [
+        "period end",
+        "ate"
+      ],
+      "location": "service_period",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "period row",
+        "small print"
+      ]
+    },
+    {
+      "id": "hint_05",
+      "entity": "plan_name",
+      "anchors": [
+        "plan",
+        "bandwidth",
+        "speed"
+      ],
+      "location": "plan_details",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "plan box",
+        "contract note"
+      ]
+    },
+    {
+      "id": "hint_06",
+      "entity": "download_gb",
+      "anchors": [
+        "download",
+        "downloaded"
+      ],
+      "location": "traffic_summary",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "traffic table",
+        "usage breakdown"
+      ]
+    },
+    {
+      "id": "hint_07",
+      "entity": "upload_gb",
+      "anchors": [
+        "upload",
+        "uploaded"
+      ],
+      "location": "traffic_summary",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "traffic table",
+        "usage breakdown"
+      ]
+    },
+    {
+      "id": "hint_08",
+      "entity": "subtotal_amount",
+      "anchors": [
+        "subtotal",
+        "subtotal amount"
+      ],
+      "location": "charges_and_taxes",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "charge table",
+        "section totals"
+      ]
+    },
+    {
+      "id": "hint_09",
+      "entity": "total_amount",
+      "anchors": [
+        "total",
+        "total amount"
+      ],
+      "location": "totals_and_due",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "bottom of invoice",
+        "statement summary"
+      ]
+    },
+    {
+      "id": "hint_10",
+      "entity": "due_date",
+      "anchors": [
+        "due date",
+        "vencimento"
+      ],
+      "location": "totals_and_due",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "totals section"
+      ]
+    }
   ]
 }

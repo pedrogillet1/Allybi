@@ -3,8 +3,17 @@
     "id": "di_everyday_tables_every_invoice",
     "version": "1.0.0",
     "description": "Tables expected in every_invoice.",
-    "languages": ["any"],
-    "lastUpdated": "2026-03-03"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -12,11 +21,35 @@
     "docType": "every_invoice"
   },
   "tableHeaderSynonyms": {
-    "description": ["description", "descricao", "item", "service"],
-    "quantity": ["quantity", "qtd", "qty", "un"],
-    "price": ["price", "unit price", "unit", "preco"],
-    "amount": ["amount", "valor", "total", "montante"],
-    "total": ["total", "subtotal", "grand total"]
+    "description": [
+      "description",
+      "descricao",
+      "item",
+      "service"
+    ],
+    "quantity": [
+      "quantity",
+      "qtd",
+      "qty",
+      "un"
+    ],
+    "price": [
+      "price",
+      "unit price",
+      "unit",
+      "preco"
+    ],
+    "amount": [
+      "amount",
+      "valor",
+      "total",
+      "montante"
+    ],
+    "total": [
+      "total",
+      "subtotal",
+      "grand total"
+    ]
   },
   "tables": [
     {
@@ -26,14 +59,49 @@
         "pt": "Cabecalho da Fatura"
       },
       "section": "document_header",
-      "signaturePatterns": ["\\binvoice\\b", "\\bfatura\\b", "\\binvoice number\\b"],
-      "requiredHeaders": ["invoice_number", "issue_date", "vendor", "customer", "currency"],
-      "headerAliases": [["invoice_number", "numero"], ["issue_date", "data"], ["vendor", "fornecedor"], ["customer", "cliente"], ["currency", "moeda"]],
+      "signaturePatterns": [
+        "\\binvoice\\b",
+        "\\bfatura\\b",
+        "\\binvoice number\\b"
+      ],
+      "requiredHeaders": [
+        "invoice_number",
+        "issue_date",
+        "vendor",
+        "customer",
+        "currency"
+      ],
+      "headerAliases": [
+        [
+          "invoice_number",
+          "numero"
+        ],
+        [
+          "issue_date",
+          "data"
+        ],
+        [
+          "vendor",
+          "fornecedor"
+        ],
+        [
+          "customer",
+          "cliente"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
       "unitsAndScaling": {
-        "preferredScales": ["units"],
+        "preferredScales": [
+          "units"
+        ],
         "requiresScaleEvidence": false
       },
-      "footnotes": ["invoice_fn_01"]
+      "footnotes": [
+        "invoice_fn_01"
+      ]
     },
     {
       "id": "invoice_items_table",
@@ -42,16 +110,52 @@
         "pt": "Tabela de Itens"
       },
       "section": "line_items",
-      "signaturePatterns": ["\\bitem\\b", "\\bdescription\\b", "\\bline\\s+item\\b"],
-      "requiredHeaders": ["description", "quantity", "unit", "unit_price", "amount"],
-      "headerAliases": [["description", "descricao"], ["quantity", "qtd"], ["unit", "un"], ["unit_price", "preco"], ["amount", "valor"]],
+      "signaturePatterns": [
+        "\\bitem\\b",
+        "\\bdescription\\b",
+        "\\bline\\s+item\\b"
+      ],
+      "requiredHeaders": [
+        "description",
+        "quantity",
+        "unit",
+        "unit_price",
+        "amount"
+      ],
+      "headerAliases": [
+        [
+          "description",
+          "descricao"
+        ],
+        [
+          "quantity",
+          "qtd"
+        ],
+        [
+          "unit",
+          "un"
+        ],
+        [
+          "unit_price",
+          "preco"
+        ],
+        [
+          "amount",
+          "valor"
+        ]
+      ],
       "unitsAndScaling": {
-        "preferredScales": ["units", "thousands"],
+        "preferredScales": [
+          "units",
+          "thousands"
+        ],
         "currencyField": "currency",
         "requiresScaleEvidence": true,
         "mixedScaleHandling": "normalize_to_currency_base"
       },
-      "footnotes": ["invoice_fn_02"]
+      "footnotes": [
+        "invoice_fn_02"
+      ]
     },
     {
       "id": "invoice_subtotal_table",
@@ -60,16 +164,47 @@
         "pt": "Tabela de Subtotais e Descontos"
       },
       "section": "subtotal_and_discounts",
-      "signaturePatterns": ["\\bsubtotal\\b", "\\bdiscount\\b", "\\bdesconto\\b"],
-      "requiredHeaders": ["description", "base", "value", "currency"],
-      "headerAliases": [["description", "descricao"], ["base", "base"], ["value", "valor"], ["currency", "moeda"]],
+      "signaturePatterns": [
+        "\\bsubtotal\\b",
+        "\\bdiscount\\b",
+        "\\bdesconto\\b"
+      ],
+      "requiredHeaders": [
+        "description",
+        "base",
+        "value",
+        "currency"
+      ],
+      "headerAliases": [
+        [
+          "description",
+          "descricao"
+        ],
+        [
+          "base",
+          "base"
+        ],
+        [
+          "value",
+          "valor"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
       "unitsAndScaling": {
-        "preferredScales": ["units", "thousands"],
+        "preferredScales": [
+          "units",
+          "thousands"
+        ],
         "currencyField": "currency",
         "requiresScaleEvidence": true,
         "mixedScaleHandling": "normalize_to_currency_base"
       },
-      "footnotes": ["invoice_fn_03"]
+      "footnotes": [
+        "invoice_fn_03"
+      ]
     },
     {
       "id": "invoice_tax_summary_table",
@@ -78,16 +213,53 @@
         "pt": "Resumo de Impostos"
       },
       "section": "tax_summary",
-      "signaturePatterns": ["\\btax\\b", "\\bvat\\b", "\\bimpostos\\b"],
-      "requiredHeaders": ["tax_type", "rate", "base", "amount", "currency"],
-      "headerAliases": [["tax_type", "tipo"], ["rate", "aliquota"], ["base", "base"], ["amount", "valor"], ["currency", "moeda"]],
+      "signaturePatterns": [
+        "\\btax\\b",
+        "\\bvat\\b",
+        "\\bimpostos\\b"
+      ],
+      "requiredHeaders": [
+        "tax_type",
+        "rate",
+        "base",
+        "amount",
+        "currency"
+      ],
+      "headerAliases": [
+        [
+          "tax_type",
+          "tipo"
+        ],
+        [
+          "rate",
+          "aliquota"
+        ],
+        [
+          "base",
+          "base"
+        ],
+        [
+          "amount",
+          "valor"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
       "unitsAndScaling": {
-        "preferredScales": ["percent", "units", "thousands"],
+        "preferredScales": [
+          "percent",
+          "units",
+          "thousands"
+        ],
         "currencyField": "currency",
         "requiresScaleEvidence": true,
         "mixedScaleHandling": "normalize_to_currency_base"
       },
-      "footnotes": ["invoice_fn_04"]
+      "footnotes": [
+        "invoice_fn_04"
+      ]
     },
     {
       "id": "invoice_totals_table",
@@ -96,16 +268,47 @@
         "pt": "Tabela de Totais"
       },
       "section": "totals",
-      "signaturePatterns": ["\\btotal\\b", "\\bgrand total\\b", "\\bvalor total\\b"],
-      "requiredHeaders": ["label", "amount", "currency", "status"],
-      "headerAliases": [["label", "descricao"], ["amount", "valor"], ["currency", "moeda"], ["status", "status"]],
+      "signaturePatterns": [
+        "\\btotal\\b",
+        "\\bgrand total\\b",
+        "\\bvalor total\\b"
+      ],
+      "requiredHeaders": [
+        "label",
+        "amount",
+        "currency",
+        "status"
+      ],
+      "headerAliases": [
+        [
+          "label",
+          "descricao"
+        ],
+        [
+          "amount",
+          "valor"
+        ],
+        [
+          "currency",
+          "moeda"
+        ],
+        [
+          "status",
+          "status"
+        ]
+      ],
       "unitsAndScaling": {
-        "preferredScales": ["units", "thousands"],
+        "preferredScales": [
+          "units",
+          "thousands"
+        ],
         "currencyField": "currency",
         "requiresScaleEvidence": true,
         "mixedScaleHandling": "normalize_to_currency_base"
       },
-      "footnotes": ["invoice_fn_05"]
+      "footnotes": [
+        "invoice_fn_05"
+      ]
     }
   ]
 }

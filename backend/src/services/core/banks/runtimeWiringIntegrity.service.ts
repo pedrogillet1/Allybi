@@ -11,6 +11,7 @@ import {
 export interface RuntimeWiringIntegrityResult {
   ok: boolean;
   missingBanks: string[];
+  missingLlmRoutingPolicyBanks: string[];
   missingRuntimePolicyConsumers: string[];
   runtimePolicyEnvGaps: string[];
   missingOperatorContracts: string[];
@@ -88,6 +89,17 @@ export const RUNTIME_REQUIRED_BANKS = [
   "logging_policy",
   "rate_limit_policy",
   "refusal_policy",
+  "provider_capabilities",
+  "provider_fallbacks",
+  "llm_cost_table",
+  "composition_lane_policy",
+] as const;
+
+export const RUNTIME_REQUIRED_LLM_ROUTING_BANKS = [
+  "provider_capabilities",
+  "provider_fallbacks",
+  "llm_cost_table",
+  "composition_lane_policy",
 ] as const;
 
 export const RUNTIME_REQUIRED_POLICIES = [
@@ -148,6 +160,11 @@ function collectRenderPolicyHookBankIds(bank: Record<string, unknown> | null): s
 
 function asTrimmedString(value: unknown): string {
   return String(value || "").trim();
+}
+
+function asRecord(value: unknown): Record<string, unknown> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  return value as Record<string, unknown>;
 }
 
 function normalizeLower(value: unknown): string {
@@ -535,11 +552,10 @@ function collectRawConsoleRuntimeUsage(): string[] {
     ),
   ];
   const loggingPolicy = getOptionalBank<Record<string, unknown>>("logging_policy");
-  const policyEnabled = loggingPolicy?.config?.enabled !== false;
-  const policyPaths = Array.isArray(
-    loggingPolicy?.config?.runtimePathsNoRawConsole,
-  )
-    ? loggingPolicy.config.runtimePathsNoRawConsole
+  const loggingConfig = asRecord(loggingPolicy?.config);
+  const policyEnabled = loggingConfig.enabled !== false;
+  const policyPaths = Array.isArray(loggingConfig.runtimePathsNoRawConsole)
+    ? loggingConfig.runtimePathsNoRawConsole
         .map((value: unknown) => asTrimmedString(value))
         .filter(Boolean)
     : [];
@@ -906,6 +922,9 @@ export class RuntimeWiringIntegrityService {
       new Set<string>([...RUNTIME_REQUIRED_BANKS, ...hookRequiredBanks]),
     );
     const missingBanks = requiredBanks.filter((id) => !getOptionalBank(id));
+    const missingLlmRoutingPolicyBanks = RUNTIME_REQUIRED_LLM_ROUTING_BANKS.filter(
+      (id) => !getOptionalBank(id),
+    );
     const missingRuntimePolicyConsumers = collectMissingRuntimePolicyConsumers();
     const runtimePolicyEnvGaps = collectRuntimePolicyEnvGaps();
 
@@ -1009,6 +1028,7 @@ export class RuntimeWiringIntegrityService {
     return {
       ok:
         missingBanks.length === 0 &&
+        missingLlmRoutingPolicyBanks.length === 0 &&
         missingRuntimePolicyConsumers.length === 0 &&
         runtimePolicyEnvGaps.length === 0 &&
         missingOperatorContracts.length === 0 &&
@@ -1032,6 +1052,7 @@ export class RuntimeWiringIntegrityService {
         answerModeContractDrift.length === 0 &&
         productHelpRuntimeUsageMissing.length === 0,
       missingBanks,
+      missingLlmRoutingPolicyBanks,
       missingRuntimePolicyConsumers,
       runtimePolicyEnvGaps,
       missingOperatorContracts,

@@ -12,7 +12,13 @@
     "lastUpdated": "2026-03-01",
     "owner": "koda-microcopy",
     "compat": ">=1.0.0",
-    "linkedPolicy": "fallback_processing"
+    "linkedPolicy": "fallback_processing",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,

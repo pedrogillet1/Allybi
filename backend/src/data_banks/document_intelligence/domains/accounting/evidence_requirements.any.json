@@ -3,136 +3,353 @@
     "id": "di_accounting_evidence_requirements_v2",
     "version": "2.0.0",
     "description": "Evidence policy for accounting extraction and validation with reconciliation and tie-out guardrails.",
-    "languages": ["any"],
-    "lastUpdated": "2026-03-03"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
     "domain": "accounting",
     "minCitationsPerClaim": 1,
-    "maxClaimsWithoutEvidence": 0
+    "maxClaimsWithoutEvidence": 0,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "domain": "accounting",
   "evidenceHierarchy": [
-    { "rank": 1, "type": "general_ledger_posting", "label": { "en": "General ledger posting", "pt": "Lançamento no razão geral" }, "trustLevel": "high" },
-    { "rank": 2, "type": "trial_balance", "label": { "en": "Trial balance", "pt": "Balancete de verificação" }, "trustLevel": "high" },
-    { "rank": 3, "type": "bank_statement", "label": { "en": "Bank statement", "pt": "Extrato bancário" }, "trustLevel": "high" },
-    { "rank": 4, "type": "journal_entry", "label": { "en": "Journal entry", "pt": "Lançamento contábil" }, "trustLevel": "high" },
-    { "rank": 5, "type": "subledger_detail", "label": { "en": "Subledger detail", "pt": "Razão auxiliar" }, "trustLevel": "medium" },
-    { "rank": 6, "type": "aging_table", "label": { "en": "Aging table", "pt": "Tabela de vencimento" }, "trustLevel": "medium" },
-    { "rank": 7, "type": "reconciliation_workpaper", "label": { "en": "Reconciliation workpaper", "pt": "Papel de trabalho de conciliação" }, "trustLevel": "medium" },
-    { "rank": 8, "type": "workpaper", "label": { "en": "Workpaper", "pt": "Papel de trabalho" }, "trustLevel": "medium" },
-    { "rank": 9, "type": "source_contract", "label": { "en": "Supporting contract/invoice", "pt": "Contrato/fatura" }, "trustLevel": "medium" }
+    {
+      "rank": 1,
+      "type": "general_ledger_posting",
+      "label": {
+        "en": "General ledger posting",
+        "pt": "Lançamento no razão geral"
+      },
+      "trustLevel": "high"
+    },
+    {
+      "rank": 2,
+      "type": "trial_balance",
+      "label": {
+        "en": "Trial balance",
+        "pt": "Balancete de verificação"
+      },
+      "trustLevel": "high"
+    },
+    {
+      "rank": 3,
+      "type": "bank_statement",
+      "label": {
+        "en": "Bank statement",
+        "pt": "Extrato bancário"
+      },
+      "trustLevel": "high"
+    },
+    {
+      "rank": 4,
+      "type": "journal_entry",
+      "label": {
+        "en": "Journal entry",
+        "pt": "Lançamento contábil"
+      },
+      "trustLevel": "high"
+    },
+    {
+      "rank": 5,
+      "type": "subledger_detail",
+      "label": {
+        "en": "Subledger detail",
+        "pt": "Razão auxiliar"
+      },
+      "trustLevel": "medium"
+    },
+    {
+      "rank": 6,
+      "type": "aging_table",
+      "label": {
+        "en": "Aging table",
+        "pt": "Tabela de vencimento"
+      },
+      "trustLevel": "medium"
+    },
+    {
+      "rank": 7,
+      "type": "reconciliation_workpaper",
+      "label": {
+        "en": "Reconciliation workpaper",
+        "pt": "Papel de trabalho de conciliação"
+      },
+      "trustLevel": "medium"
+    },
+    {
+      "rank": 8,
+      "type": "workpaper",
+      "label": {
+        "en": "Workpaper",
+        "pt": "Papel de trabalho"
+      },
+      "trustLevel": "medium"
+    },
+    {
+      "rank": 9,
+      "type": "source_contract",
+      "label": {
+        "en": "Supporting contract/invoice",
+        "pt": "Contrato/fatura"
+      },
+      "trustLevel": "medium"
+    }
   ],
   "rules": [
     {
       "id": "acct_ev_001_tb_claim",
-      "applies": ["extract", "calculate", "validate"],
+      "applies": [
+        "extract",
+        "calculate",
+        "validate"
+      ],
       "description": "Trial balance answer must include report date, account code, and debit/credit context.",
       "minEvidence": 1,
-      "requiredTypes": ["trial_balance"],
-      "requiredFields": ["period", "account_code", "debit_or_credit"],
+      "requiredTypes": [
+        "trial_balance"
+      ],
+      "requiredFields": [
+        "period",
+        "account_code",
+        "debit_or_credit"
+      ],
       "requireStructuredCitation": true
     },
     {
       "id": "acct_ev_002_gl_claim",
-      "applies": ["extract", "locate", "compare"],
+      "applies": [
+        "extract",
+        "locate",
+        "compare"
+      ],
       "description": "GL balance claim must cite source section/table and page with opening/closing balance context.",
       "minEvidence": 1,
-      "requiredTypes": ["general_ledger_posting"],
-      "requiredFields": ["account_code", "period", "opening_balance", "closing_balance", "running_balance"],
+      "requiredTypes": [
+        "general_ledger_posting"
+      ],
+      "requiredFields": [
+        "account_code",
+        "period",
+        "opening_balance",
+        "closing_balance",
+        "running_balance"
+      ],
       "requireStructuredCitation": true
     },
     {
       "id": "acct_ev_003_je_claim",
-      "applies": ["extract", "locate", "validate"],
+      "applies": [
+        "extract",
+        "locate",
+        "validate"
+      ],
       "description": "Journal entry claims must cite JE id, posting date, line amount, and debit/credit classification.",
       "minEvidence": 2,
-      "requiredTypes": ["journal_entry"],
-      "requiredFields": ["je_id", "posting_date", "debit_credit"],
+      "requiredTypes": [
+        "journal_entry"
+      ],
+      "requiredFields": [
+        "je_id",
+        "posting_date",
+        "debit_credit"
+      ],
       "requireDualSource": true,
       "requireStructuredCitation": true
     },
     {
       "id": "acct_ev_004_recon_bucket_sum",
-      "applies": ["extract", "validate", "compare"],
+      "applies": [
+        "extract",
+        "validate",
+        "compare"
+      ],
       "description": "Aging claim must include bucket totals and total source check; if percentage/concentration is reported, bucket sum proof is required.",
       "minEvidence": 1,
-      "requiredTypes": ["aging_table"],
-      "requiredFields": ["bucket_breakdown", "total_balance", "as_of_date"],
+      "requiredTypes": [
+        "aging_table"
+      ],
+      "requiredFields": [
+        "bucket_breakdown",
+        "total_balance",
+        "as_of_date"
+      ],
       "requireStructuredCitation": true
     },
     {
       "id": "acct_ev_005_reconciliation_tieout",
-      "applies": ["validate", "compare"],
+      "applies": [
+        "validate",
+        "compare"
+      ],
       "description": "Numeric reconciliation answers require all three: unit, period, and table-header context; and must show Book balance, adjustments, and Reconciled balance line items from same table family.",
       "minEvidence": 2,
-      "requiredTypes": ["bank_statement", "reconciliation_workpaper", "general_ledger_posting"],
-      "requiredFields": ["unit", "period", "table_header", "book_balance", "adjustments", "reconciled_balance"],
+      "requiredTypes": [
+        "bank_statement",
+        "reconciliation_workpaper",
+        "general_ledger_posting"
+      ],
+      "requiredFields": [
+        "unit",
+        "period",
+        "table_header",
+        "book_balance",
+        "adjustments",
+        "reconciled_balance"
+      ],
       "tieOutRequired": true,
       "requireStructuredCitation": true
     },
     {
       "id": "acct_ev_006_reconciled_items",
-      "applies": ["extract", "validate"],
+      "applies": [
+        "extract",
+        "validate"
+      ],
       "description": "Reconciling items or exceptions must cite both book and external source rows from the same reconciliation heading.",
       "minEvidence": 2,
-      "requiredTypes": ["reconciliation_workpaper", "bank_statement", "general_ledger_posting"],
-      "requiredFields": ["reconciling_item_id", "source_table_header", "source_system"],
+      "requiredTypes": [
+        "reconciliation_workpaper",
+        "bank_statement",
+        "general_ledger_posting"
+      ],
+      "requiredFields": [
+        "reconciling_item_id",
+        "source_table_header",
+        "source_system"
+      ],
       "requireDualSource": true
     },
     {
       "id": "acct_ev_007_controls_assertion",
-      "applies": ["evaluate", "validate"],
+      "applies": [
+        "evaluate",
+        "validate"
+      ],
       "description": "Control assertions require control matrix plus testing evidence (sample, test result, owner, frequency).",
       "minEvidence": 1,
-      "requiredTypes": ["controls_matrix", "workpaper"],
-      "requiredFields": ["control_name", "control_owner", "testing_sample", "result"],
+      "requiredTypes": [
+        "controls_matrix",
+        "workpaper"
+      ],
+      "requiredFields": [
+        "control_name",
+        "control_owner",
+        "testing_sample",
+        "result"
+      ],
       "requireStructuredCitation": true
     },
     {
       "id": "acct_ev_008_subledger_tieout",
-      "applies": ["compare", "validate"],
+      "applies": [
+        "compare",
+        "validate"
+      ],
       "description": "AR/AP rollups must provide document/date context and source subledger header names for tie-out to GL control accounts.",
       "minEvidence": 2,
-      "requiredTypes": ["subledger_detail", "general_ledger_posting"],
-      "requiredFields": ["subledger_type", "control_account_code", "tieout_delta", "period", "table_header"],
+      "requiredTypes": [
+        "subledger_detail",
+        "general_ledger_posting"
+      ],
+      "requiredFields": [
+        "subledger_type",
+        "control_account_code",
+        "tieout_delta",
+        "period",
+        "table_header"
+      ],
       "requireDualSource": true
     },
     {
       "id": "acct_ev_009_sign_convention",
-      "applies": ["extract", "calculate", "validate"],
+      "applies": [
+        "extract",
+        "calculate",
+        "validate"
+      ],
       "description": "Any debit-credit numeric interpretation must include explicit sign-convention evidence and source of convention declaration.",
       "minEvidence": 1,
-      "requiredTypes": ["general_ledger_posting", "journal_entry"],
-      "requiredFields": ["sign_convention", "convention_source"],
+      "requiredTypes": [
+        "general_ledger_posting",
+        "journal_entry"
+      ],
+      "requiredFields": [
+        "sign_convention",
+        "convention_source"
+      ],
       "requireStructuredCitation": true
     },
     {
       "id": "acct_ev_010_audit_trail",
-      "applies": ["extract", "evaluate", "validate"],
+      "applies": [
+        "extract",
+        "evaluate",
+        "validate"
+      ],
       "description": "Tracing from source to GL must include source document id and ledger posting mapping.",
       "minEvidence": 2,
-      "requiredTypes": ["journal_entry", "general_ledger_posting"],
-      "requiredFields": ["source_document_id", "ledger_source_reference", "posting_entry_link"],
+      "requiredTypes": [
+        "journal_entry",
+        "general_ledger_posting"
+      ],
+      "requiredFields": [
+        "source_document_id",
+        "ledger_source_reference",
+        "posting_entry_link"
+      ],
       "requireDualSource": true
     },
     {
       "id": "acct_ev_011_depr_sched",
-      "applies": ["extract", "calculate"],
+      "applies": [
+        "extract",
+        "calculate"
+      ],
       "description": "Depreciation schedule numeric claims require asset id, method, rate/period and table total basis.",
       "minEvidence": 1,
-      "requiredTypes": ["workpaper"],
-      "requiredFields": ["asset_id", "depr_method", "rate", "period"],
+      "requiredTypes": [
+        "workpaper"
+      ],
+      "requiredFields": [
+        "asset_id",
+        "depr_method",
+        "rate",
+        "period"
+      ],
       "requireStructuredCitation": true
     },
     {
       "id": "acct_ev_012_cash_vs_accrual",
-      "applies": ["extract", "compare", "evaluate"],
+      "applies": [
+        "extract",
+        "compare",
+        "evaluate"
+      ],
       "description": "Cash vs accrual comparisons must state basis and map amounts to period header used in source table.",
       "minEvidence": 1,
-      "requiredTypes": ["journal_entry", "trial_balance"],
-      "requiredFields": ["basis", "period", "table_header", "comparison_operator"],
+      "requiredTypes": [
+        "journal_entry",
+        "trial_balance"
+      ],
+      "requiredFields": [
+        "basis",
+        "period",
+        "table_header",
+        "comparison_operator"
+      ],
       "requireStructuredCitation": true
     }
   ]

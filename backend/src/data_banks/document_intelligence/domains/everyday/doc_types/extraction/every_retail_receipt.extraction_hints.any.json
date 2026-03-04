@@ -3,8 +3,17 @@
     "id": "di_everyday_extraction_every_retail_receipt",
     "version": "1.0.0",
     "description": "Extraction hints for every_retail_receipt.",
-    "languages": ["any"],
-    "lastUpdated": "2026-03-03"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -15,82 +24,161 @@
     {
       "id": "every_retail_receipt_hint_01",
       "entity": "merchant_name",
-      "anchors": ["merchant", "store", "retail", "estabelecimento"],
+      "anchors": [
+        "merchant",
+        "store",
+        "retail",
+        "estabelecimento"
+      ],
       "location": "merchant_profile",
       "extractionMethod": "heading_proximity",
-      "whereItHides": ["top logo area", "footer", "header block"]
+      "whereItHides": [
+        "top logo area",
+        "footer",
+        "header block"
+      ]
     },
     {
       "id": "every_retail_receipt_hint_02",
       "entity": "receipt_number",
-      "anchors": ["receipt", "cupom", "document", "numero do cupom"],
+      "anchors": [
+        "receipt",
+        "cupom",
+        "document",
+        "numero do cupom"
+      ],
       "location": "document_header",
       "extractionMethod": "regex_capture",
-      "whereItHides": ["header banner", "barcode area"]
+      "whereItHides": [
+        "header banner",
+        "barcode area"
+      ]
     },
     {
       "id": "every_retail_receipt_hint_03",
       "entity": "transaction_datetime",
-      "anchors": ["date", "time", "hora", "date/time"],
+      "anchors": [
+        "date",
+        "time",
+        "hora",
+        "date/time"
+      ],
       "location": "document_header",
       "extractionMethod": "date_parse",
-      "whereItHides": ["timestamp line", "small print"]
+      "whereItHides": [
+        "timestamp line",
+        "small print"
+      ]
     },
     {
       "id": "every_retail_receipt_hint_04",
       "entity": "item_count",
-      "anchors": ["item", "qtd", "quantity"],
+      "anchors": [
+        "item",
+        "qtd",
+        "quantity"
+      ],
       "location": "transaction_lines",
       "extractionMethod": "table_row_match",
-      "whereItHides": ["itemized list", "tiny font area"]
+      "whereItHides": [
+        "itemized list",
+        "tiny font area"
+      ]
     },
     {
       "id": "every_retail_receipt_hint_05",
       "entity": "subtotal_amount",
-      "anchors": ["subtotal", "sub-total", "subtotal amount"],
+      "anchors": [
+        "subtotal",
+        "sub-total",
+        "subtotal amount"
+      ],
       "location": "totals_block",
       "extractionMethod": "table_row_match",
-      "whereItHides": ["totals line", "right aligned amount"]
+      "whereItHides": [
+        "totals line",
+        "right aligned amount"
+      ]
     },
     {
       "id": "every_retail_receipt_hint_06",
       "entity": "discount_amount",
-      "anchors": ["discount", "desconto", "reducao"],
+      "anchors": [
+        "discount",
+        "desconto",
+        "reducao"
+      ],
       "location": "discounts_taxes",
       "extractionMethod": "table_row_match",
-      "whereItHides": ["discount rows", "promotions section"]
+      "whereItHides": [
+        "discount rows",
+        "promotions section"
+      ]
     },
     {
       "id": "every_retail_receipt_hint_07",
       "entity": "tax_amount",
-      "anchors": ["tax", "icms", "vat", "impostos"],
+      "anchors": [
+        "tax",
+        "icms",
+        "vat",
+        "impostos"
+      ],
       "location": "discounts_taxes",
       "extractionMethod": "table_row_match",
-      "whereItHides": ["tax block", "small tax lines"]
+      "whereItHides": [
+        "tax block",
+        "small tax lines"
+      ]
     },
     {
       "id": "every_retail_receipt_hint_08",
       "entity": "total_amount",
-      "anchors": ["total", "valor total", "total a pagar"],
+      "anchors": [
+        "total",
+        "valor total",
+        "total a pagar"
+      ],
       "location": "totals_block",
       "extractionMethod": "heading_proximity",
-      "whereItHides": ["final row", "bold amount block"]
+      "whereItHides": [
+        "final row",
+        "bold amount block"
+      ]
     },
     {
       "id": "every_retail_receipt_hint_09",
       "entity": "payment_method",
-      "anchors": ["payment", "card", "cash", "pix", "credito", "debito"],
+      "anchors": [
+        "payment",
+        "card",
+        "cash",
+        "pix",
+        "credito",
+        "debito"
+      ],
       "location": "payment_info",
       "extractionMethod": "regex_capture",
-      "whereItHides": ["payment footer", "receipt strip"]
+      "whereItHides": [
+        "payment footer",
+        "receipt strip"
+      ]
     },
     {
       "id": "every_retail_receipt_hint_10",
       "entity": "invoice_qr_code",
-      "anchors": ["qr", "qrcode", "barcode", "codigo de barras"],
+      "anchors": [
+        "qr",
+        "qrcode",
+        "barcode",
+        "codigo de barras"
+      ],
       "location": "security_code",
       "extractionMethod": "ocr_text",
-      "whereItHides": ["lower-right corner", "security strip"]
+      "whereItHides": [
+        "lower-right corner",
+        "security strip"
+      ]
     }
   ]
 }

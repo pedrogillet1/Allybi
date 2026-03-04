@@ -1,0 +1,39 @@
+{
+  "_meta": {
+    "id": "llm_cost_table",
+    "version": "1.0.0",
+    "description": "Per-model cost rates for LLM usage tracking (USD per 1M tokens)",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ],
+    "languages": [
+      "en"
+    ],
+    "lastUpdated": "2026-03-04"
+  },
+  "config": {
+    "enabled": true
+  },
+  "models": {
+    "google:gemini-2.5-flash": {
+      "inputPer1M": 0.15,
+      "outputPer1M": 0.6
+    },
+    "openai:gpt-5-mini": {
+      "inputPer1M": 0.3,
+      "outputPer1M": 1.2
+    },
+    "openai:gpt-5.2": {
+      "inputPer1M": 2.5,
+      "outputPer1M": 10
+    },
+    "local:*": {
+      "inputPer1M": 0,
+      "outputPer1M": 0
+    }
+  }
+}

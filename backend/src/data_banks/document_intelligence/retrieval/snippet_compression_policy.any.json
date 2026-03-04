@@ -8,7 +8,14 @@
       "en",
       "pt"
     ],
-    "lastUpdated": "2026-03-03"
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -17,7 +24,10 @@
     "preserveContextWindowChars": 240,
     "maxSnippetChars": 2200,
     "maxTablePreviewChars": 2600,
-    "fallbackMode": "expand_if_ambiguous"
+    "fallbackMode": "expand_if_ambiguous",
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "modes": {
     "extract": {

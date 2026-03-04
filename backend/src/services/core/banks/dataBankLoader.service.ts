@@ -147,9 +147,15 @@ function safeParseJson<T>(raw: string, fileHint: string): T {
   }
 }
 
-function requireFields(obj: Record<string, unknown>, fields: string[], fileHint: string) {
+function asObject(value: unknown): Record<string, unknown> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  return value as Record<string, unknown>;
+}
+
+function requireFields(obj: unknown, fields: string[], fileHint: string) {
+  const record = asObject(obj);
   for (const f of fields) {
-    if (!(f in obj))
+    if (!(f in record))
       throw new DataBankError(`Missing required field '${f}' in ${fileHint}`, {
         fileHint,
         field: f,
@@ -169,14 +175,15 @@ function ensureEnvMap(map: unknown, fileHint: string): Record<EnvName, boolean> 
     local: false,
   };
   if (!map) return out;
-  for (const k of Object.keys(map)) {
+  const mapRecord = asObject(map);
+  for (const k of Object.keys(mapRecord)) {
     if (!isEnvName(k)) {
       throw new DataBankError(
         `Invalid env key '${k}' in ${fileHint}. Must be production|staging|dev|local`,
         { fileHint, key: k },
       );
     }
-    out[k] = Boolean(map[k]);
+    out[k] = Boolean(mapRecord[k]);
   }
   return out;
 }
@@ -204,16 +211,18 @@ function toStringList(values: unknown): string[] {
  * Minimal bank-level contract checks (schema-lite).
  * Real schema validation can be enabled via AJV if present.
  */
-function validateMinimalBankContract(bank: Record<string, unknown>, fileHint: string) {
-  requireFields(bank, ["_meta", "config"], fileHint);
-  requireFields(bank._meta, ["id", "version", "description"], fileHint);
-  if (typeof bank._meta.id !== "string" || bank._meta.id.length < 1) {
+function validateMinimalBankContract(bank: unknown, fileHint: string) {
+  const bankRecord = asObject(bank);
+  requireFields(bankRecord, ["_meta", "config"], fileHint);
+  const meta = asObject(bankRecord._meta);
+  const config = asObject(bankRecord.config);
+  requireFields(meta, ["id", "version", "description"], fileHint);
+  if (typeof meta.id !== "string" || meta.id.length < 1) {
     throw new DataBankError(`Invalid _meta.id in ${fileHint}`, { fileHint });
   }
   if (
-    bank.config &&
-    typeof bank.config.enabled !== "undefined" &&
-    typeof bank.config.enabled !== "boolean"
+    typeof config.enabled !== "undefined" &&
+    typeof config.enabled !== "boolean"
   ) {
     throw new DataBankError(
       `Invalid config.enabled in ${fileHint} (must be boolean)`,
@@ -221,8 +230,9 @@ function validateMinimalBankContract(bank: Record<string, unknown>, fileHint: st
     );
   }
   // Default config.enabled to true if missing
-  if (bank.config && typeof bank.config.enabled === "undefined") {
-    bank.config.enabled = true;
+  if (typeof config.enabled === "undefined") {
+    config.enabled = true;
+    bankRecord.config = config;
   }
 }
 
@@ -281,7 +291,7 @@ export class DataBankLoaderService {
   private readonly tierPolicy = getBankTierPolicyInstance();
 
   // AJV instance if available and enabled
-  private ajv: unknown | null = null;
+  private ajv: any = null;
 
   constructor(options: DataBankLoaderOptions) {
     this.opts = options;
@@ -426,6 +436,14 @@ export class DataBankLoaderService {
 
     for (const entry of entries) {
       if (!this.isEnabledInEnv(entry)) continue;
+      const relPath = normalizeRegistryPath(String(entry.path || ""));
+      if (relPath.startsWith("_deprecated/")) {
+        this.logger.warn("Skipping deprecated bank path", {
+          id: entry.id,
+          path: relPath,
+        });
+        continue;
+      }
       if (this.bankCache.has(entry.id)) continue;
 
       const filePath = path.join(
@@ -858,10 +876,10 @@ export class DataBankLoaderService {
 
       const p = normalizeRegistryPath(b.path);
       if (p.startsWith("_deprecated/")) {
-        throw new DataBankError(
-          `Registry entry points to deprecated bank path: ${p}`,
-          { entry: b },
-        );
+        this.logger.warn("Registry includes deprecated bank path (will skip)", {
+          id: b.id,
+          path: p,
+        });
       }
 
       if (ids.has(b.id))
@@ -950,12 +968,13 @@ export class DataBankLoaderService {
     try {
       const raw = fsSync.readFileSync(manifestPath, "utf8");
       const parsed = safeParseJson<Record<string, unknown>>(raw, "manifest/bank_manifest.any.json");
+      const parsedConfig = asObject(parsed?.config);
       const allowedCategories = new Set(
         toStringList(parsed?.allowedCategoryIds).map((v) => String(v).trim()),
       );
       return {
-        strictCategories: parsed?.config?.strictCategories === true,
-        failOnUnknownCategory: parsed?.config?.failOnUnknownCategory === true,
+        strictCategories: parsedConfig.strictCategories === true,
+        failOnUnknownCategory: parsedConfig.failOnUnknownCategory === true,
         allowedCategories,
       };
     } catch {
@@ -1340,11 +1359,12 @@ export class DataBankLoaderService {
       }
     }
 
+    const schemaRegistryConfig = asObject(schemaRegistry?.config);
     const failOnMissing = Boolean(
-      schemaRegistry?.config?.failOnMissingAssignmentsInStrict,
+      schemaRegistryConfig.failOnMissingAssignmentsInStrict,
     );
     const failOnMismatch = Boolean(
-      schemaRegistry?.config?.failOnSchemaMismatchInStrict,
+      schemaRegistryConfig.failOnSchemaMismatchInStrict,
     );
 
     if (missingAssignments.length > 0) {
@@ -1481,7 +1501,8 @@ export class DataBankLoaderService {
     );
     if (orphans.length === 0) return;
 
-    const failOnOrphan = Boolean(usageBank?.config?.failOnOrphanInStrict);
+    const usageBankConfig = asObject(usageBank?.config);
+    const failOnOrphan = Boolean(usageBankConfig.failOnOrphanInStrict);
     const details = {
       orphanBankIds: orphans.sort((a, b) => a.localeCompare(b)),
     };
@@ -1650,37 +1671,36 @@ export class DataBankLoaderService {
     // We support two common patterns:
     //  1) schemaBank.schema is a JSON Schema object
     //  2) schemaBank.action.schema is a JSON Schema object
+    const schemaBankRecord = asObject(schemaBank);
+    const schemaBankAction = asObject(schemaBankRecord.action);
+    const schemaBankConfig = asObject(schemaBankRecord.config);
     let schemaObj =
-      schemaBank.schema ??
-      schemaBank?.action?.schema ??
-      schemaBank?.config?.schema ??
+      schemaBankRecord.schema ??
+      schemaBankAction.schema ??
+      schemaBankConfig.schema ??
       null;
     if (
       !schemaObj &&
-      schemaBank &&
-      typeof schemaBank === "object" &&
-      (schemaBank.$schema || schemaBank.type || schemaBank.properties)
+      (schemaBankRecord.$schema ||
+        schemaBankRecord.type ||
+        schemaBankRecord.properties)
     ) {
-      const { _meta, config, tests, ...schemaCandidate } = schemaBank;
+      const { _meta, config, tests, ...schemaCandidate } = schemaBankRecord;
       void _meta;
       void config;
       void tests;
+      const schemaCandidateRecord = asObject(schemaCandidate);
       if (
-        schemaCandidate &&
-        typeof schemaCandidate === "object" &&
-        (schemaCandidate.$schema ||
-          schemaCandidate.type ||
-          schemaCandidate.properties)
+        schemaCandidateRecord.$schema ||
+        schemaCandidateRecord.type ||
+        schemaCandidateRecord.properties
       ) {
-        schemaObj = schemaCandidate;
+        schemaObj = schemaCandidateRecord;
       }
     }
 
     if (this.ajv && schemaObj && typeof schemaObj === "object") {
-      const schemaForAjv =
-        schemaObj && typeof schemaObj === "object"
-          ? { ...schemaObj }
-          : schemaObj;
+      const schemaForAjv = { ...(schemaObj as Record<string, unknown>) };
       if (
         schemaForAjv &&
         typeof schemaForAjv === "object" &&

@@ -194,6 +194,50 @@ export class GcsStorageService {
   }
 
   // ===========================================================================
+  // FILE LISTING
+  // ===========================================================================
+
+  /**
+   * List files in the bucket with optional prefix filter and pagination.
+   */
+  async listFiles(params?: {
+    prefix?: string;
+    maxResults?: number;
+    pageToken?: string;
+  }): Promise<{
+    files: Array<{ name: string; size?: number; updated?: Date }>;
+    nextPageToken?: string;
+  }> {
+    try {
+      const opts: Record<string, unknown> = {
+        autoPaginate: false,
+      };
+      if (params?.prefix) opts.prefix = params.prefix;
+      if (params?.maxResults) opts.maxResults = params.maxResults;
+      if (params?.pageToken) opts.pageToken = params.pageToken;
+
+      const [files, , apiResponse] = await this.bucket().getFiles(opts);
+
+      return {
+        files: files.map((f) => ({
+          name: f.name,
+          size: f.metadata?.size ? Number(f.metadata.size) : undefined,
+          updated: f.metadata?.updated
+            ? new Date(f.metadata.updated as string)
+            : undefined,
+        })),
+        nextPageToken: (apiResponse as any)?.nextPageToken || undefined,
+      };
+    } catch (err) {
+      throw new GcsStorageError(
+        "GCS_HEAD_FAILED",
+        `Failed to list files in GCS bucket.`,
+        err,
+      );
+    }
+  }
+
+  // ===========================================================================
   // SIGNED URLS (V4)
   // ===========================================================================
 

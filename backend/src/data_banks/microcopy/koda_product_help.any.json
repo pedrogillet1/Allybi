@@ -3,9 +3,20 @@
     "id": "koda_product_help",
     "version": "1.1.0",
     "description": "Deterministic product-help bank aligned to capabilities_catalog and allybi_capabilities.",
-    "languages": ["any", "en", "pt", "es"],
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
     "lastUpdated": "2026-03-01",
-    "owner": "koda-product"
+    "owner": "koda-product",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -23,7 +34,12 @@
         "pt": "Suporta perguntas e respostas em documentos, navegacao, edicao de DOCX, edicao de XLSX e acoes de conectores/email quando disponiveis.",
         "es": "Admite preguntas y respuestas sobre documentos, navegacion, edicion de DOCX, edicion de XLSX y acciones de conectores/email cuando esten disponibles."
       },
-      "sourceGroups": ["docs_qa", "search_nav", "editing", "connectors_email"]
+      "sourceGroups": [
+        "docs_qa",
+        "search_nav",
+        "editing",
+        "connectors_email"
+      ]
     },
     "by_domain_capabilities": {
       "docs_qa": {
@@ -169,20 +185,87 @@
     }
   },
   "editableOperationClaims": [
-    { "id": "docx_rewrite_paragraph", "operators": ["DOCX_REWRITE_PARAGRAPH"] },
-    { "id": "docx_replace_span", "operators": ["DOCX_REPLACE_SPAN"] },
-    { "id": "docx_structure_edit", "operators": ["DOCX_INSERT_AFTER", "DOCX_INSERT_BEFORE", "DOCX_DELETE_PARAGRAPH"] },
-    { "id": "docx_formatting_edit", "operators": ["DOCX_SET_RUN_STYLE", "DOCX_SET_ALIGNMENT"] },
-    { "id": "xlsx_values_ranges", "operators": ["XLSX_SET_CELL_VALUE", "XLSX_SET_RANGE_VALUES"] },
-    { "id": "xlsx_formulas", "operators": ["XLSX_SET_CELL_FORMULA", "XLSX_SET_RANGE_FORMULAS"] },
-    { "id": "xlsx_table_sort_filter", "operators": ["XLSX_TABLE_CREATE", "XLSX_SORT_RANGE", "XLSX_FILTER_APPLY"] },
-    { "id": "xlsx_chart_ops", "operators": ["XLSX_CHART_CREATE", "XLSX_CHART_SET_SERIES", "XLSX_CHART_SET_TITLES", "XLSX_CHART_SET_AXES", "XLSX_CHART_MOVE_RESIZE", "XLSX_CHART_DELETE"] }
+    {
+      "id": "docx_rewrite_paragraph",
+      "operators": [
+        "DOCX_REWRITE_PARAGRAPH"
+      ]
+    },
+    {
+      "id": "docx_replace_span",
+      "operators": [
+        "DOCX_REPLACE_SPAN"
+      ]
+    },
+    {
+      "id": "docx_structure_edit",
+      "operators": [
+        "DOCX_INSERT_AFTER",
+        "DOCX_INSERT_BEFORE",
+        "DOCX_DELETE_PARAGRAPH"
+      ]
+    },
+    {
+      "id": "docx_formatting_edit",
+      "operators": [
+        "DOCX_SET_RUN_STYLE",
+        "DOCX_SET_ALIGNMENT"
+      ]
+    },
+    {
+      "id": "xlsx_values_ranges",
+      "operators": [
+        "XLSX_SET_CELL_VALUE",
+        "XLSX_SET_RANGE_VALUES"
+      ]
+    },
+    {
+      "id": "xlsx_formulas",
+      "operators": [
+        "XLSX_SET_CELL_FORMULA",
+        "XLSX_SET_RANGE_FORMULAS"
+      ]
+    },
+    {
+      "id": "xlsx_table_sort_filter",
+      "operators": [
+        "XLSX_TABLE_CREATE",
+        "XLSX_SORT_RANGE",
+        "XLSX_FILTER_APPLY"
+      ]
+    },
+    {
+      "id": "xlsx_chart_ops",
+      "operators": [
+        "XLSX_CHART_CREATE",
+        "XLSX_CHART_SET_SERIES",
+        "XLSX_CHART_SET_TITLES",
+        "XLSX_CHART_SET_AXES",
+        "XLSX_CHART_MOVE_RESIZE",
+        "XLSX_CHART_DELETE"
+      ]
+    }
   ],
   "tests": {
     "examples": [
-      { "id": "help_overview_en", "query": "What can you do?", "expectedTopic": "capabilities_overview", "language": "en" },
-      { "id": "help_docx_pt", "query": "Quais edicoes em DOCX voce faz?", "expectedTopic": "docx_editing", "language": "pt" },
-      { "id": "help_xlsx_es", "query": "Puedes editar formulas y graficos en Excel?", "expectedTopic": "xlsx_editing", "language": "es" }
+      {
+        "id": "help_overview_en",
+        "query": "What can you do?",
+        "expectedTopic": "capabilities_overview",
+        "language": "en"
+      },
+      {
+        "id": "help_docx_pt",
+        "query": "Quais edicoes em DOCX voce faz?",
+        "expectedTopic": "docx_editing",
+        "language": "pt"
+      },
+      {
+        "id": "help_xlsx_es",
+        "query": "Puedes editar formulas y graficos en Excel?",
+        "expectedTopic": "xlsx_editing",
+        "language": "es"
+      }
     ],
     "editableOperatorConsistency": {
       "description": "Every editable claim maps to real allybi_capabilities operators.",
@@ -192,11 +275,28 @@
   "topics": [
     {
       "id": "capabilities_overview",
-      "aliases": ["capabilities", "features", "overview", "help"],
+      "aliases": [
+        "capabilities",
+        "features",
+        "overview",
+        "help"
+      ],
       "triggers": {
-        "en": ["what can you do", "capabilities", "help"],
-        "pt": ["o que voce pode fazer", "capacidades", "ajuda"],
-        "es": ["que puedes hacer", "capacidades", "ayuda"]
+        "en": [
+          "what can you do",
+          "capabilities",
+          "help"
+        ],
+        "pt": [
+          "o que voce pode fazer",
+          "capacidades",
+          "ajuda"
+        ],
+        "es": [
+          "que puedes hacer",
+          "capacidades",
+          "ayuda"
+        ]
       },
       "snippets": {
         "en": "Supports document Q&A, navigation, DOCX/XLSX editing, and connector/email actions when available.",
@@ -206,8 +306,17 @@
     },
     {
       "id": "docx_editing",
-      "aliases": ["docx", "word", "rewrite", "format"],
-      "operatorHints": ["DOCX_REWRITE_PARAGRAPH", "DOCX_REPLACE_SPAN", "DOCX_SET_RUN_STYLE"],
+      "aliases": [
+        "docx",
+        "word",
+        "rewrite",
+        "format"
+      ],
+      "operatorHints": [
+        "DOCX_REWRITE_PARAGRAPH",
+        "DOCX_REPLACE_SPAN",
+        "DOCX_SET_RUN_STYLE"
+      ],
       "snippets": {
         "en": "DOCX editing supports rewrite/replace, structure edits, and formatting with preview before apply.",
         "pt": "A edicao de DOCX suporta reescrita/substituicao, edicoes estruturais e formatacao com previa antes de aplicar.",
@@ -216,8 +325,18 @@
     },
     {
       "id": "xlsx_editing",
-      "aliases": ["xlsx", "excel", "formula", "table", "chart"],
-      "operatorHints": ["XLSX_SET_CELL_VALUE", "XLSX_SET_RANGE_FORMULAS", "XLSX_CHART_CREATE"],
+      "aliases": [
+        "xlsx",
+        "excel",
+        "formula",
+        "table",
+        "chart"
+      ],
+      "operatorHints": [
+        "XLSX_SET_CELL_VALUE",
+        "XLSX_SET_RANGE_FORMULAS",
+        "XLSX_CHART_CREATE"
+      ],
       "snippets": {
         "en": "XLSX editing supports values/ranges, formulas, tables, and chart edits (charts require sheets bridge runtime).",
         "pt": "A edicao de XLSX suporta valores/intervalos, formulas, tabelas e edicoes de graficos (graficos exigem sheets bridge).",
@@ -226,7 +345,12 @@
     },
     {
       "id": "connectors_email",
-      "aliases": ["connector", "connectors", "email", "slack"],
+      "aliases": [
+        "connector",
+        "connectors",
+        "email",
+        "slack"
+      ],
       "snippets": {
         "en": "Connector/email actions require active connector and permissions.",
         "pt": "Acoes de conector/email exigem conector ativo e permissoes.",
@@ -235,7 +359,13 @@
     },
     {
       "id": "navigation",
-      "aliases": ["find", "open", "folders", "files", "navigation"],
+      "aliases": [
+        "find",
+        "open",
+        "folders",
+        "files",
+        "navigation"
+      ],
       "snippets": {
         "en": "Can locate files, open results, and list folders/files.",
         "pt": "Pode localizar arquivos, abrir resultados e listar pastas/arquivos.",
@@ -244,7 +374,12 @@
     },
     {
       "id": "limitations_memory_scope",
-      "aliases": ["memory", "context", "limitations", "scope"],
+      "aliases": [
+        "memory",
+        "context",
+        "limitations",
+        "scope"
+      ],
       "snippets": {
         "en": "Context is finite in each chat; old turns can drop. New chats do not automatically carry full prior state.",
         "pt": "O contexto e finito em cada chat; turnos antigos podem sair da janela. Novos chats nao carregam automaticamente todo o estado anterior.",

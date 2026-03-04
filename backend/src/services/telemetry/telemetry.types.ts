@@ -172,6 +172,8 @@ export interface ModelCallCreate {
 
   retries?: number | null;
 
+  costUsd?: number | null;
+
   at: Date;
 
   meta?: Record<string, unknown> | null;

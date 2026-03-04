@@ -12,11 +12,20 @@
     "criticality": "medium",
     "changeLog": [
       "Added machine-actionable rules for everyday domain"
+    ],
+    "usedBy": [
+      "services/llm/core/llmRequestBuilder.service.ts"
+    ],
+    "tests": [
+      "tests/certification/prompt-mode-coverage.cert.test.ts"
     ]
   },
   "config": {
     "enabled": true,
-    "domain": "everyday"
+    "domain": "everyday",
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "domain": "everyday",
   "rules": [

@@ -1929,9 +1929,30 @@ function buildSourceLabel(button: Record<string, unknown>): string {
   return locationLabel ? `${title} | ${locationLabel}` : title;
 }
 
+function analyticalSynthesisLine(language: "en" | "pt" | "es"): string {
+  if (language === "pt") {
+    return "Em resumo, esta resposta está limitada às evidências citadas nos documentos.";
+  }
+  if (language === "es") {
+    return "En resumen, esta respuesta está limitada a la evidencia citada en los documentos.";
+  }
+  return "In summary, this answer is constrained to the cited document evidence.";
+}
+
+function analyticalFollowupLine(language: "en" | "pt" | "es"): string {
+  if (language === "pt") {
+    return "Se quiser, também posso detalhar isso por seção do documento.";
+  }
+  if (language === "es") {
+    return "Si quieres, también puedo desglosarlo por sección del documento.";
+  }
+  return "If you'd like, I can also break this down by document section.";
+}
+
 function enforceAnalyticalStructuredTemplate(
   text: string,
   attachments: Attachment[],
+  language: "en" | "pt" | "es",
 ): string {
   const normalizedText = String(text || "").trim();
   const directMatch = normalizedText.match(
@@ -1985,6 +2006,8 @@ function enforceAnalyticalStructuredTemplate(
     ...evidenceLines.map((line) => `- ${line}`),
     "Sources used:",
     ...sourceLines.map((line) => `- ${line}`),
+    analyticalSynthesisLine(language),
+    analyticalFollowupLine(language),
   ].join("\n");
 }
 
@@ -2702,6 +2725,7 @@ export class ResponseContractEnforcerService {
         const structured = enforceAnalyticalStructuredTemplate(
           content,
           attachments,
+          ctx.language,
         );
         if (structured !== content) {
           repairs.push("ANALYTICAL_STRUCTURE_ENFORCED");

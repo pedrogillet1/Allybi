@@ -68,6 +68,8 @@ export interface TransitionOptions {
   chunksCount?: number;
   /** Skip CAS check — only use for initial creation or sweeper resets */
   force?: boolean;
+  /** Atomically increment sweepResetCount by 1 */
+  incrementSweepResetCount?: boolean;
 }
 
 export interface TransitionResult {
@@ -141,6 +143,11 @@ class DocumentStateManagerService {
     // Set chunks count when transitioning to indexed
     if (opts.chunksCount !== undefined) {
       data.chunksCount = opts.chunksCount;
+    }
+
+    // Atomically increment sweepResetCount
+    if (opts.incrementSweepResetCount) {
+      data.sweepResetCount = { increment: 1 };
     }
 
     // Atomic CAS: only update if current status matches fromStatus
@@ -237,6 +244,49 @@ class DocumentStateManagerService {
    */
   async resetToUploaded(documentId: string): Promise<TransitionResult> {
     return this.transition(documentId, "enriching", "uploaded");
+  }
+
+  /**
+   * Reset an enriching document to uploaded, or fail permanently if sweep limit exceeded.
+   *
+   * Reads the current sweepResetCount and either:
+   * - Increments it and transitions enriching → uploaded (for re-enqueue)
+   * - Transitions enriching → failed if MAX_SWEEP_RESETS reached
+   */
+  async resetToUploadedOrFail(documentId: string): Promise<TransitionResult> {
+    const maxResets = parseInt(process.env.SWEEP_MAX_RESETS || "5", 10);
+
+    const doc = await prisma.document.findUnique({
+      where: { id: documentId },
+      select: { sweepResetCount: true, status: true },
+    });
+
+    if (!doc) {
+      return {
+        success: false,
+        documentId,
+        fromStatus: "enriching",
+        toStatus: "failed",
+        reason: "Document not found",
+      };
+    }
+
+    if (doc.sweepResetCount >= maxResets) {
+      return this.transition(documentId, "enriching", "failed", {
+        error: `Permanent failure: exceeded max sweep resets (${maxResets})`,
+      });
+    }
+
+    return this.transition(documentId, "enriching", "uploaded", {
+      incrementSweepResetCount: true,
+    });
+  }
+
+  /**
+   * Mark a document as ready without content (e.g., XLSX / image with 0 chunks).
+   */
+  async markReadyWithoutContent(documentId: string): Promise<TransitionResult> {
+    return this.transition(documentId, "enriching", "ready", { chunksCount: 0 });
   }
 }
 

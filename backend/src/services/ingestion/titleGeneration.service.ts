@@ -9,26 +9,65 @@
  * Uses Gemini 3.0 Flash for fast, cost-effective title generation.
  */
 
-// Lazy import: geminiGateway resolves at runtime from LLM layer
-let _geminiGateway: any = null;
-const geminiGateway: {
-  quickGenerate: (prompt: string, opts?: any) => Promise<string>;
-} = {
-  async quickGenerate(prompt: string, opts?: any): Promise<string> {
-    if (!_geminiGateway) {
-      try {
-        // Variable path prevents tsc from following the import into the WIP LLM folder
-        const modPath = "../llm/providers/gemini/geminiGateway.service";
-        const mod = await import(/* @vite-ignore */ modPath);
-        _geminiGateway = new mod.GeminiGatewayService();
-      } catch {
-        console.warn("[TitleGen] GeminiGateway not available");
-        return "";
-      }
-    }
-    return _geminiGateway.quickGenerate(prompt, opts);
-  },
-};
+import { randomUUID } from "crypto";
+
+/**
+ * Minimal interface for LLM gateway integration.
+ * Matches LlmGatewayService.generate() signature.
+ */
+export interface TitleGenGateway {
+  generate(params: {
+    traceId: string;
+    userId: string;
+    conversationId: string;
+    messages: Array<{ role: "system" | "user" | "assistant"; content: string }>;
+    meta?: Record<string, unknown>;
+  }): Promise<{ text: string }>;
+}
+
+let _titleGenGateway: TitleGenGateway | null = null;
+
+/**
+ * Set the LLM gateway for title generation.
+ * Call this during bootstrap to inject the shared LlmGatewayService.
+ */
+export function setTitleGenGateway(gateway: TitleGenGateway): void {
+  _titleGenGateway = gateway;
+}
+
+/**
+ * Quick-generate wrapper using the injected gateway.
+ * Falls back to empty string if no gateway is available.
+ */
+async function quickGenerate(prompt: string): Promise<string> {
+  if (!_titleGenGateway) {
+    console.warn("[TitleGen] No LLM gateway configured");
+    return "";
+  }
+  try {
+    const result = await _titleGenGateway.generate({
+      traceId: randomUUID(),
+      userId: "system",
+      conversationId: "title-gen",
+      messages: [{ role: "user", content: prompt }],
+      meta: { operator: "title_generation", operatorFamily: "system" },
+    });
+    return result.text || "";
+  } catch (err) {
+    console.warn("[TitleGen] Gateway generate failed:", err instanceof Error ? err.message : "unknown");
+    return "";
+  }
+}
+
+/**
+ * Sanitize user-provided text before embedding in prompts.
+ * Strips angle brackets to prevent XML/tag injection and enforces char limits.
+ */
+function sanitizeForPrompt(text: string, maxChars: number): string {
+  return text
+    .replace(/[<>]/g, "")
+    .slice(0, maxChars);
+}
 
 export type TitleMode =
   | "chat_title"
@@ -128,20 +167,16 @@ Examples in English:
 
 LANG=${language}
 
-USER_MESSAGE:
-"${userMessage}"
+<user_message>${sanitizeForPrompt(userMessage, 2000)}</user_message>
 
-${assistantPreview ? `ASSISTANT_PREVIEW:\n"${assistantPreview.substring(0, 200)}..."` : ""}
+${assistantPreview ? `<assistant_preview>${sanitizeForPrompt(assistantPreview, 500)}</assistant_preview>` : ""}
 
 TASK:
 Generate a short, engaging conversation title following the rules above.
 Output: return **ONLY** the title text, nothing else.`;
 
   try {
-    const title = await geminiGateway.quickGenerate(prompt, {
-      temperature: 0.7,
-      maxTokens: 30,
-    });
+    const title = await quickGenerate(prompt);
 
     if (!title) return "New Conversation";
 
@@ -195,20 +230,16 @@ Examples in English:
 
 LANG=${language}
 
-USER_QUESTION:
-"${userMessage}"
+<user_question>${sanitizeForPrompt(userMessage, 2000)}</user_question>
 
-${answerDraft ? `ANSWER_PREVIEW:\n"${answerDraft.substring(0, 300)}..."` : ""}
+${answerDraft ? `<answer_preview>${sanitizeForPrompt(answerDraft, 500)}</answer_preview>` : ""}
 
 TASK:
 Generate a clear, engaging H1 title for this answer.
 Output: return **ONLY** the title text.`;
 
   try {
-    const title = await geminiGateway.quickGenerate(prompt, {
-      temperature: 0.7,
-      maxTokens: 40,
-    });
+    const title = await quickGenerate(prompt);
 
     if (!title) return "Answer";
 
@@ -258,34 +289,41 @@ Examples in English:
 LANG=${language}
 ${domainHint ? `DOMAIN=${domainHint}` : ""}
 
-USER_QUESTION:
-"${userMessage}"
+<user_question>${sanitizeForPrompt(userMessage, 2000)}</user_question>
 
-ANSWER_DRAFT:
-"${answerDraft.substring(0, 500)}..."
+<answer_draft>${sanitizeForPrompt(answerDraft, 500)}</answer_draft>
 
 TASK:
 Generate 2-5 clear section headings for this answer.
 Output: return **ONLY** a JSON object like {"headings": ["...", "..."]}`;
 
   try {
-    const content = await geminiGateway.quickGenerate(prompt, {
-      temperature: 0.7,
-      maxTokens: 150,
-    });
+    const content = await quickGenerate(prompt);
 
     if (!content) return [];
 
-    const parsed = JSON.parse(content);
-    const headings = parsed.headings || parsed.sections || [];
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(content);
+    } catch {
+      console.warn("[TitleGen] Failed to parse section headings JSON:", content.slice(0, 200));
+      return [];
+    }
 
-    // Clean up headings
-    return headings.map((h: string) =>
-      h
-        .replace(/^#+\s*/, "")
-        .replace(/^["']|["']$/g, "")
-        .trim(),
-    );
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return [];
+    const raw = (parsed as Record<string, unknown>).headings ?? (parsed as Record<string, unknown>).sections;
+    if (!Array.isArray(raw)) return [];
+
+    // Clean up headings — only keep string entries
+    return raw
+      .filter((h: unknown): h is string => typeof h === "string")
+      .map((h: string) =>
+        h
+          .replace(/^#+\s*/, "")
+          .replace(/^["']|["']$/g, "")
+          .trim(),
+      )
+      .filter(Boolean);
   } catch (error) {
     console.error("[TitleGen] Failed to generate section headings:", error);
     return [];
@@ -335,19 +373,16 @@ Examples in English:
 
 LANG=${language}
 
-${filename ? `FILENAME: ${filename}` : ""}
+${filename ? `FILENAME: ${sanitizeForPrompt(filename, 500)}` : ""}
 
-${documentText ? `DOCUMENT_EXCERPT:\n${documentText.substring(0, 2000)}` : ""}
+${documentText ? `<document_excerpt>${sanitizeForPrompt(documentText, 2000)}</document_excerpt>` : ""}
 
 TASK:
 Generate a short, descriptive title for this document.
 Output: return **ONLY** the title text.`;
 
   try {
-    const title = await geminiGateway.quickGenerate(prompt, {
-      temperature: 0.7,
-      maxTokens: 30,
-    });
+    const title = await quickGenerate(prompt);
 
     if (!title) return filename || "Untitled Document";
 

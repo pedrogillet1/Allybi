@@ -3,10 +3,21 @@
     "id": "bullet_rules",
     "version": "1.0.0",
     "description": "Deterministic bullet list construction rules for Koda. Controls when bullets are allowed, how many may appear, per-bullet density, and prevents wall-of-bullets or paragraph-bullets that break ChatGPT-like readability.",
-    "languages": ["any", "en", "pt", "es"],
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
     "lastUpdated": "2026-01-26",
     "owner": "koda-formatting",
-    "compat": ">=1.0.0"
+    "compat": ">=1.0.0",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -27,17 +38,26 @@
         "ifHardAndSoft": "hard_limit",
         "ifMultipleRules": "lowest_limit_wins"
       }
-    }
+    },
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "rules": [
     {
       "id": "bullets_only_when_listing",
       "scope": "global",
       "description": "Allow bullet lists only when the intent is explicitly list-like.",
-      "appliesTo": ["all_answers"],
+      "appliesTo": [
+        "all_answers"
+      ],
       "when": {
         "all": [
-          { "path": "signals.isListIntent", "op": "eq", "value": true }
+          {
+            "path": "signals.isListIntent",
+            "op": "eq",
+            "value": true
+          }
         ]
       },
       "action": {
@@ -50,10 +70,16 @@
       "id": "no_bullets_for_single_fact",
       "scope": "global",
       "description": "Suppress bullets when the answer contains a single fact or value.",
-      "appliesTo": ["all_answers"],
+      "appliesTo": [
+        "all_answers"
+      ],
       "when": {
         "all": [
-          { "path": "metrics.factCount", "op": "lte", "value": 1 }
+          {
+            "path": "metrics.factCount",
+            "op": "lte",
+            "value": 1
+          }
         ]
       },
       "action": {
@@ -66,7 +92,9 @@
       "id": "bullet_density_control",
       "scope": "global",
       "description": "Limit bullet count and per-bullet density to avoid walls of bullets.",
-      "appliesTo": ["all_answers"],
+      "appliesTo": [
+        "all_answers"
+      ],
       "action": {
         "type": "enforce_bullet_limits",
         "maxBulletsSoft": 5,
@@ -83,11 +111,22 @@
       "id": "doc_grounded_bullet_preference",
       "scope": "cross_family",
       "description": "Prefer bullets for enumerations in doc-grounded answers when multiple distinct facts are present.",
-      "appliesTo": ["doc_grounded_single", "doc_grounded_multi"],
+      "appliesTo": [
+        "doc_grounded_single",
+        "doc_grounded_multi"
+      ],
       "when": {
         "all": [
-          { "path": "signals.hasEvidence", "op": "eq", "value": true },
-          { "path": "metrics.factCount", "op": "gte", "value": 3 }
+          {
+            "path": "signals.hasEvidence",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "metrics.factCount",
+            "op": "gte",
+            "value": 3
+          }
         ]
       },
       "action": {
@@ -100,10 +139,16 @@
       "id": "nav_pills_no_bullets",
       "scope": "operator_specific",
       "description": "Suppress bullets entirely in nav_pills mode.",
-      "appliesTo": ["nav_pills"],
+      "appliesTo": [
+        "nav_pills"
+      ],
       "when": {
         "all": [
-          { "path": "answerMode", "op": "eq", "value": "nav_pills" }
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "nav_pills"
+          }
         ]
       },
       "action": {
@@ -117,27 +162,52 @@
     "cases": [
       {
         "id": "BUL_001_list_intent_allows_bullets",
-        "context": { "signals": { "isListIntent": true } },
-        "expect": { "bulletsAllowed": true }
+        "context": {
+          "signals": {
+            "isListIntent": true
+          }
+        },
+        "expect": {
+          "bulletsAllowed": true
+        }
       },
       {
         "id": "BUL_002_single_fact_no_bullets",
-        "context": { "metrics": { "factCount": 1 } },
-        "expect": { "bulletsSuppressed": true }
+        "context": {
+          "metrics": {
+            "factCount": 1
+          }
+        },
+        "expect": {
+          "bulletsSuppressed": true
+        }
       },
       {
         "id": "BUL_003_bullet_caps_enforced",
         "input": {
           "bullets": [
-            "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight"
+            "One",
+            "Two",
+            "Three",
+            "Four",
+            "Five",
+            "Six",
+            "Seven",
+            "Eight"
           ]
         },
-        "expect": { "bulletCountMax": 7 }
+        "expect": {
+          "bulletCountMax": 7
+        }
       },
       {
         "id": "BUL_004_nav_pills_no_bullets",
-        "context": { "answerMode": "nav_pills" },
-        "expect": { "bulletsSuppressed": true }
+        "context": {
+          "answerMode": "nav_pills"
+        },
+        "expect": {
+          "bulletsSuppressed": true
+        }
       }
     ]
   }

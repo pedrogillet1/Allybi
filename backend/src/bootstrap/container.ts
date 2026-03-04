@@ -129,6 +129,7 @@ class KodaV3Container {
             const env = coerceEnvName(process.env.NODE_ENV);
             const strict = env === "production" || env === "staging";
             const criticalFields = [
+              wiring.missingLlmRoutingPolicyBanks,
               wiring.missingOperatorContracts,
               wiring.missingOperatorOutputShapes,
               wiring.missingEditingCatalogOperators,
@@ -146,6 +147,7 @@ class KodaV3Container {
             );
             const details = {
               missingBanks: wiring.missingBanks,
+              missingLlmRoutingPolicyBanks: wiring.missingLlmRoutingPolicyBanks,
               missingOperatorContracts: wiring.missingOperatorContracts,
               missingOperatorOutputShapes: wiring.missingOperatorOutputShapes,
               missingEditingCatalogOperators:

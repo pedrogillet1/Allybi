@@ -16,16 +16,9 @@
       "doc_intent_router",
       "doc_scope_resolver"
     ],
-    "tests": {
-      "positive": [
-        "Compare the latest tax return with the earlier notice",
-        "Puxa o recibo de aluguel e o pagamento mais recente"
-      ],
-      "negative": [
-        "How much is the exchange rate?",
-        "Tell me jokes"
-      ]
-    },
+    "tests": [
+      "tests/patternDeterminism.test.ts"
+    ],
     "lastUpdated": "2026-03-03",
     "id": "patterns_doc_refs_doc_ref_phrases_everyday",
     "description": "Auto-registered bank payload for patterns/doc_refs/doc_ref_phrases.everyday.any.json"
@@ -9273,6 +9266,9 @@
     }
   ],
   "config": {
-    "enabled": true
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   }
 }

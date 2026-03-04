@@ -14,6 +14,12 @@
       "query_parser.v1",
       "safety_gate",
       "fallback_router_v1"
+    ],
+    "usedBy": [
+      "services/chat/turnRoutePolicy.service.ts"
+    ],
+    "tests": [
+      "tests/patternDeterminism.test.ts"
     ]
   },
   "config": {
@@ -21,7 +27,8 @@
     "dedupe": true,
     "minPatterns": 100,
     "maxPatterns": 250,
-    "enabled": true
+    "enabled": true,
+    "sortBy": "id"
   },
   "patterns": [
     {

@@ -1,23 +1,34 @@
 {
   "bankId": "email_routing",
   "version": "1.0.0",
-  "localeSupport": ["en", "pt"],
+  "localeSupport": [
+    "en",
+    "pt"
+  ],
   "description": "Bank-driven routing rules for email actions and email+document fusion (Gmail/Outlook).",
   "updatedAt": "2026-02-09T00:00:00.000Z",
   "schemaVersion": 1,
-
   "_meta": {
     "id": "email_routing",
     "version": "1.0.0",
     "description": "Routing rules for email read/explain/draft/send and email+document fusion.",
-    "languages": ["any", "en", "pt"],
-    "lastUpdated": "2026-02-09"
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-02-09",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
-
   "config": {
     "enabled": true,
     "strict": true,
-
     "matching": {
       "useRegex": true,
       "caseSensitive": false,
@@ -25,23 +36,27 @@
       "collapseWhitespace": true,
       "maxCandidates": 3
     },
-
     "defaults": {
       "intent": "EMAIL",
       "domain": "email",
       "scope": "email"
     },
-
     "thresholds": {
       "minConfidence": 0.58,
       "highConfidence": 0.87,
       "minDecisionMargin": 0.12,
       "forceClarificationMarginBelow": 0.06
-    }
+    },
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
-
   "providers": {
-    "allowed": ["gmail", "outlook", "email"],
+    "allowed": [
+      "gmail",
+      "outlook",
+      "email"
+    ],
     "aliases": {
       "google mail": "gmail",
       "office365": "outlook",
@@ -49,7 +64,6 @@
       "microsoft outlook": "outlook"
     }
   },
-
   "operators": {
     "canonical": [
       "EMAIL_LATEST",
@@ -59,14 +73,18 @@
       "EMAIL_SEND",
       "EMAIL_DOC_FUSION"
     ],
-    "alwaysConfirm": ["EMAIL_SEND"]
+    "alwaysConfirm": [
+      "EMAIL_SEND"
+    ]
   },
-
   "rules": [
     {
       "ruleId": "ER_110_email_explain_latest",
       "priority": 110,
-      "supportedLocales": ["en", "pt"],
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
       "when": {
         "any": [
           {
@@ -92,7 +110,10 @@
         "operator": "EMAIL_EXPLAIN_LATEST",
         "domain": "email",
         "scope": "email",
-        "defaultEntities": { "provider": "email", "count": 1 }
+        "defaultEntities": {
+          "provider": "email",
+          "count": 1
+        }
       },
       "confidenceBoost": 0.16,
       "reasonCode": "email_explain_latest"
@@ -100,7 +121,10 @@
     {
       "ruleId": "ER_100_email_latest",
       "priority": 100,
-      "supportedLocales": ["en", "pt"],
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
       "when": {
         "any": [
           {
@@ -126,7 +150,10 @@
         "operator": "EMAIL_LATEST",
         "domain": "email",
         "scope": "email",
-        "defaultEntities": { "provider": "email", "count": 1 }
+        "defaultEntities": {
+          "provider": "email",
+          "count": 1
+        }
       },
       "confidenceBoost": 0.1,
       "reasonCode": "email_latest"
@@ -134,7 +161,10 @@
     {
       "ruleId": "ER_090_email_summarize_previous",
       "priority": 90,
-      "supportedLocales": ["en", "pt"],
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
       "when": {
         "any": [
           {
@@ -167,7 +197,10 @@
     {
       "ruleId": "ER_080_email_send",
       "priority": 80,
-      "supportedLocales": ["en", "pt"],
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
       "when": {
         "any": [
           {
@@ -202,7 +235,10 @@
     {
       "ruleId": "ER_070_email_draft",
       "priority": 70,
-      "supportedLocales": ["en", "pt"],
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
       "when": {
         "any": [
           {
@@ -235,7 +271,10 @@
     {
       "ruleId": "ER_060_email_doc_fusion",
       "priority": 60,
-      "supportedLocales": ["en", "pt"],
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
       "when": {
         "any": [
           {
@@ -270,7 +309,6 @@
       "reasonCode": "email_doc_fusion"
     }
   ],
-
   "disambiguation": {
     "requiredWhen": {
       "missingProviderForOperators": [
@@ -283,10 +321,12 @@
       "confidenceBelow": 0.64,
       "decisionMarginBelow": 0.06
     },
-    "actions": ["pick_provider", "cancel"],
+    "actions": [
+      "pick_provider",
+      "cancel"
+    ],
     "uiBlock": "choices"
   },
-
   "outputContract": {
     "shape": {
       "intent": "EMAIL",
@@ -299,33 +339,57 @@
       "databanksUsed": "string[]"
     }
   },
-
   "tests": {
     "cases": [
       {
         "id": "ER_T_0001_latest_email_en",
-        "input": { "text": "show my latest email", "language": "en" },
-        "expect": { "operator": "EMAIL_LATEST" }
+        "input": {
+          "text": "show my latest email",
+          "language": "en"
+        },
+        "expect": {
+          "operator": "EMAIL_LATEST"
+        }
       },
       {
         "id": "ER_T_0002_explain_latest_email_pt",
-        "input": { "text": "explique meu ultimo email", "language": "pt" },
-        "expect": { "operator": "EMAIL_EXPLAIN_LATEST" }
+        "input": {
+          "text": "explique meu ultimo email",
+          "language": "pt"
+        },
+        "expect": {
+          "operator": "EMAIL_EXPLAIN_LATEST"
+        }
       },
       {
         "id": "ER_T_0003_summarize_previous_en",
-        "input": { "text": "summarize this email", "language": "en" },
-        "expect": { "operator": "EMAIL_SUMMARIZE_PREVIOUS" }
+        "input": {
+          "text": "summarize this email",
+          "language": "en"
+        },
+        "expect": {
+          "operator": "EMAIL_SUMMARIZE_PREVIOUS"
+        }
       },
       {
         "id": "ER_T_0004_send_email_en",
-        "input": { "text": "send an email to alice@example.com", "language": "en" },
-        "expect": { "operator": "EMAIL_SEND" }
+        "input": {
+          "text": "send an email to alice@example.com",
+          "language": "en"
+        },
+        "expect": {
+          "operator": "EMAIL_SEND"
+        }
       },
       {
         "id": "ER_T_0005_doc_fusion_en",
-        "input": { "text": "use this email and the contract.pdf to draft a response", "language": "en" },
-        "expect": { "operator": "EMAIL_DOC_FUSION" }
+        "input": {
+          "text": "use this email and the contract.pdf to draft a response",
+          "language": "en"
+        },
+        "expect": {
+          "operator": "EMAIL_DOC_FUSION"
+        }
       }
     ]
   }

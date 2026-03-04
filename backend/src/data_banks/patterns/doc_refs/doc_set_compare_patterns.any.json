@@ -16,16 +16,9 @@
       "doc_intent_router",
       "doc_scope_resolver"
     ],
-    "tests": {
-      "positive": [
-        "compare the latest vs prior version",
-        "compare doc A with doc B"
-      ],
-      "negative": [
-        "single document extraction only",
-        "not a comparison query"
-      ]
-    },
+    "tests": [
+      "tests/patternDeterminism.test.ts"
+    ],
     "lastUpdated": "2026-03-03",
     "id": "patterns_doc_refs_doc_set_compare_patterns",
     "description": "Auto-registered bank payload for patterns/doc_refs/doc_set_compare_patterns.any.json"
@@ -2643,6 +2636,9 @@
     }
   ],
   "config": {
-    "enabled": true
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   }
 }

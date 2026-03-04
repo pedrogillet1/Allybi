@@ -3,9 +3,18 @@
     "id": "di_accounting_lexicon_pt_v2",
     "version": "2.0.0",
     "description": "Portuguese accounting lexicon with rich terms including balancete, razao, conciliacao, competencia versus caixa.",
-    "languages": ["pt"],
+    "languages": [
+      "pt"
+    ],
     "domain": "accounting",
-    "lastUpdated": "2026-03-03"
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -14,55 +23,506 @@
   },
   "domain": "accounting",
   "terms": [
-    { "id": "acct_term_pt_001", "canonical": "balancete", "synonyms": ["balancete de verificacao", "balancete"], "display": "Balancete", "enRef": "acct_term_003" },
-    { "id": "acct_term_pt_002", "canonical": "razao geral", "synonyms": ["livro razao", "razao contabil"], "display": "Razao Geral", "enRef": "acct_term_004" },
-    { "id": "acct_term_pt_003", "canonical": "plano de contas", "synonyms": ["plano contabel", "lista de contas"], "display": "Plano de Contas", "enRef": "acct_term_005" },
-    { "id": "acct_term_pt_004", "canonical": "lancamento contabeis", "synonyms": ["partida contabel", "registro contabel"], "display": "Lancamento Contabil", "enRef": "acct_term_006" },
-    { "id": "acct_term_pt_005", "canonical": "debito", "synonyms": ["DR", "D"], "display": "Debito", "enRef": "acct_term_007" },
-    { "id": "acct_term_pt_006", "canonical": "credito", "synonyms": ["CR", "C"], "display": "Credito", "enRef": "acct_term_008" },
-    { "id": "acct_term_pt_007", "canonical": "conciliacao bancaria", "synonyms": ["conciliacao", "conciliacao de banco"], "display": "Conciliacao Bancaria", "enRef": "acct_term_009" },
-    { "id": "acct_term_pt_008", "canonical": "vencimento", "synonyms": ["aging", "inadimplencia", "tabela de vencimento"], "display": "Vencimento", "enRef": "acct_term_010" },
-    { "id": "acct_term_pt_009", "canonical": "razao auxiliar", "synonyms": ["subledger", "controle auxiliar"], "display": "Razao Auxiliar", "enRef": "acct_term_011" },
-    { "id": "acct_term_pt_010", "canonical": "item de conciliacao", "synonyms": ["pendencia", "ajuste pendente"], "display": "Item de Conciliacao", "enRef": "acct_term_012" },
-    { "id": "acct_term_pt_011", "canonical": "conta de controle", "synonyms": ["conta sintetica", "conta controle"], "display": "Conta de Controle", "enRef": "acct_term_013" },
-    { "id": "acct_term_pt_012", "canonical": "materialidade", "synonyms": ["limiar", "relevancia"], "display": "Materialidade", "enRef": "acct_term_014" },
-    { "id": "acct_term_pt_013", "canonical": "ativo imobilizado", "synonyms": ["imobilizado", "PPE"], "display": "Ativo Imobilizado", "enRef": "acct_term_015" },
-    { "id": "acct_term_pt_014", "canonical": "depreciacao", "synonyms": ["despesa de depreciacao", "depreciacao acumulada"], "display": "Depreciacao", "enRef": "acct_term_016" },
-    { "id": "acct_term_pt_015", "canonical": "amortizacao", "synonyms": ["despesa de amortizacao", "intangiveis"], "display": "Amortizacao", "enRef": "acct_term_017" },
-    { "id": "acct_term_pt_016", "canonical": "provisao", "synonyms": ["provisao para perdas", "provisao para credito"], "display": "Provisao", "enRef": "acct_term_018" },
-    { "id": "acct_term_pt_017", "canonical": "corte", "synonyms": ["fechamento", "periodo"], "display": "Corte", "enRef": "acct_term_021" },
-    { "id": "acct_term_pt_018", "canonical": "lancamento de ajuste", "synonyms": ["ajuste", "lancamento contabel de ajuste"], "display": "Lancamento de Ajuste", "enRef": "acct_term_022" },
-    { "id": "acct_term_pt_019", "canonical": "estorno", "synonyms": ["reversao", "reversing entry"], "display": "Estorno", "enRef": "acct_term_023" },
-    { "id": "acct_term_pt_020", "canonical": "encerramento", "synonyms": ["lancamento de encerramento", "fechamento contabel"], "display": "Encerramento", "enRef": "acct_term_024" },
-    { "id": "acct_term_pt_021", "canonical": "papel de trabalho", "synonyms": ["folha de trabalho", "working paper"], "display": "Papel de Trabalho", "enRef": "acct_term_025" },
-    { "id": "acct_term_pt_022", "canonical": "controles internos", "synonyms": ["controle interno", "controle de risco"], "display": "Controles Internos", "enRef": "acct_term_027" },
-    { "id": "acct_term_pt_023", "canonical": "segregacao de funcoes", "synonyms": ["SOD", "separacao de funcoes"], "display": "Segregacao de Funcoes", "enRef": "acct_term_028" },
-    { "id": "acct_term_pt_024", "canonical": "comprovacao", "synonyms": ["evidencia", "documento de suporte"], "display": "Comprovacao", "enRef": "acct_term_039" },
-    { "id": "acct_term_pt_025", "canonical": "competencia", "synonyms": ["regime de competencia", "accrual"], "display": "Competencia", "enRef": "acct_term_001" },
-    { "id": "acct_term_pt_026", "canonical": "caixa", "synonyms": ["base caixa", "regime de caixa"], "display": "Caixa", "enRef": "acct_term_002" },
-    { "id": "acct_term_pt_027", "canonical": "receita", "synonyms": ["faturamento", "vendas"], "display": "Receita", "enRef": "acct_term_049" },
-    { "id": "acct_term_pt_028", "canonical": "despesa", "synonyms": ["custo", "gasto"], "display": "Despesa", "enRef": "acct_term_050" },
-    { "id": "acct_term_pt_029", "canonical": "fluxo de caixa", "synonyms": ["DFC", "fluxo operacional"], "display": "Fluxo de Caixa", "enRef": "acct_term_040" },
-    { "id": "acct_term_pt_030", "canonical": "contas a receber", "synonyms": ["AR", "clientes"], "display": "Contas a Receber", "enRef": "acct_term_046" },
-    { "id": "acct_term_pt_031", "canonical": "contas a pagar", "synonyms": ["AP", "fornecedores"], "display": "Contas a Pagar", "enRef": "acct_term_045" },
-    { "id": "acct_term_pt_032", "canonical": "estoque", "synonyms": ["inventario", "estoque medio"], "display": "Estoque", "enRef": "acct_term_043" },
-    { "id": "acct_term_pt_033", "canonical": "valor", "synonyms": ["montante", "quantia"], "display": "Valor", "enRef": "acct_term_050" },
-    { "id": "acct_term_pt_034", "canonical": "moeda", "synonyms": ["divisa", "cambio"], "display": "Moeda", "enRef": "acct_term_041" },
-    { "id": "acct_term_pt_035", "canonical": "salto", "synonyms": ["diferenca", "desvio"], "display": "Diferenca", "enRef": "acct_term_033" },
-    { "id": "acct_term_pt_036", "canonical": "taxa", "synonyms": ["percentual", "imposto"], "display": "Taxa", "enRef": "acct_term_040" },
-    { "id": "acct_term_pt_037", "canonical": "patrimonio liquido", "synonyms": ["PL", "capital"], "display": "Patrimonio Liquido", "enRef": "acct_term_047" },
-    { "id": "acct_term_pt_038", "canonical": "passivo", "synonyms": ["obriga", "divida"], "display": "Passivo", "enRef": "acct_term_048" },
-    { "id": "acct_term_pt_039", "canonical": "ativo", "synonyms": ["bem", "item do ativo"], "display": "Ativo", "enRef": "acct_term_015" },
-    { "id": "acct_term_pt_040", "canonical": "custo de mercadorias", "synonyms": ["CMV", "custo vendido"], "display": "CMV", "enRef": "acct_term_044" },
-    { "id": "acct_term_pt_041", "canonical": "recebiveis", "synonyms": ["contas a receber", "clientes"], "display": "Recebiveis", "enRef": "acct_term_046" },
-    { "id": "acct_term_pt_042", "canonical": "pagaveis", "synonyms": ["contas a pagar", "fornecedores"], "display": "Pagaveis", "enRef": "acct_term_045" },
-    { "id": "acct_term_pt_043", "canonical": "analise de saldo", "synonyms": ["analise de diferenca", "comparacao"], "display": "Analise de Saldo", "enRef": "acct_term_002" },
-    { "id": "acct_term_pt_044", "canonical": "periodo", "synonyms": ["mes", "exercicio"], "display": "Periodo", "enRef": "acct_term_021" },
-    { "id": "acct_term_pt_045", "canonical": "dado de reconciliacao", "synonyms": ["evidencia", "documento"], "display": "Evidencia de Concil", "enRef": "acct_term_012" },
-    { "id": "acct_term_pt_046", "canonical": "resultado", "synonyms": ["DRE", "lucro"], "display": "Resultado", "enRef": "acct_term_049" },
-    { "id": "acct_term_pt_047", "canonical": "orcamento", "synonyms": ["budget", "previsao"], "display": "Orcamento", "enRef": "acct_term_035" },
-    { "id": "acct_term_pt_048", "canonical": "previsao", "synonyms": ["forecast", "cenario"], "display": "Previsao", "enRef": "acct_term_036" },
-    { "id": "acct_term_pt_049", "canonical": "variacao", "synonyms": ["diferenca", "osc"], "display": "Variacao", "enRef": "acct_term_033" },
-    { "id": "acct_term_pt_050", "canonical": "taxa de lucro", "synonyms": ["margem", "rentabilidade"], "display": "Margem", "enRef": "acct_term_046" }
+    {
+      "id": "acct_term_pt_001",
+      "canonical": "balancete",
+      "synonyms": [
+        "balancete de verificacao",
+        "balancete"
+      ],
+      "display": "Balancete",
+      "enRef": "acct_term_003"
+    },
+    {
+      "id": "acct_term_pt_002",
+      "canonical": "razao geral",
+      "synonyms": [
+        "livro razao",
+        "razao contabil"
+      ],
+      "display": "Razao Geral",
+      "enRef": "acct_term_004"
+    },
+    {
+      "id": "acct_term_pt_003",
+      "canonical": "plano de contas",
+      "synonyms": [
+        "plano contabel",
+        "lista de contas"
+      ],
+      "display": "Plano de Contas",
+      "enRef": "acct_term_005"
+    },
+    {
+      "id": "acct_term_pt_004",
+      "canonical": "lancamento contabeis",
+      "synonyms": [
+        "partida contabel",
+        "registro contabel"
+      ],
+      "display": "Lancamento Contabil",
+      "enRef": "acct_term_006"
+    },
+    {
+      "id": "acct_term_pt_005",
+      "canonical": "debito",
+      "synonyms": [
+        "DR",
+        "D"
+      ],
+      "display": "Debito",
+      "enRef": "acct_term_007"
+    },
+    {
+      "id": "acct_term_pt_006",
+      "canonical": "credito",
+      "synonyms": [
+        "CR",
+        "C"
+      ],
+      "display": "Credito",
+      "enRef": "acct_term_008"
+    },
+    {
+      "id": "acct_term_pt_007",
+      "canonical": "conciliacao bancaria",
+      "synonyms": [
+        "conciliacao",
+        "conciliacao de banco"
+      ],
+      "display": "Conciliacao Bancaria",
+      "enRef": "acct_term_009"
+    },
+    {
+      "id": "acct_term_pt_008",
+      "canonical": "vencimento",
+      "synonyms": [
+        "aging",
+        "inadimplencia",
+        "tabela de vencimento"
+      ],
+      "display": "Vencimento",
+      "enRef": "acct_term_010"
+    },
+    {
+      "id": "acct_term_pt_009",
+      "canonical": "razao auxiliar",
+      "synonyms": [
+        "subledger",
+        "controle auxiliar"
+      ],
+      "display": "Razao Auxiliar",
+      "enRef": "acct_term_011"
+    },
+    {
+      "id": "acct_term_pt_010",
+      "canonical": "item de conciliacao",
+      "synonyms": [
+        "pendencia",
+        "ajuste pendente"
+      ],
+      "display": "Item de Conciliacao",
+      "enRef": "acct_term_012"
+    },
+    {
+      "id": "acct_term_pt_011",
+      "canonical": "conta de controle",
+      "synonyms": [
+        "conta sintetica",
+        "conta controle"
+      ],
+      "display": "Conta de Controle",
+      "enRef": "acct_term_013"
+    },
+    {
+      "id": "acct_term_pt_012",
+      "canonical": "materialidade",
+      "synonyms": [
+        "limiar",
+        "relevancia"
+      ],
+      "display": "Materialidade",
+      "enRef": "acct_term_014"
+    },
+    {
+      "id": "acct_term_pt_013",
+      "canonical": "ativo imobilizado",
+      "synonyms": [
+        "imobilizado",
+        "PPE"
+      ],
+      "display": "Ativo Imobilizado",
+      "enRef": "acct_term_015"
+    },
+    {
+      "id": "acct_term_pt_014",
+      "canonical": "depreciacao",
+      "synonyms": [
+        "despesa de depreciacao",
+        "depreciacao acumulada"
+      ],
+      "display": "Depreciacao",
+      "enRef": "acct_term_016"
+    },
+    {
+      "id": "acct_term_pt_015",
+      "canonical": "amortizacao",
+      "synonyms": [
+        "despesa de amortizacao",
+        "intangiveis"
+      ],
+      "display": "Amortizacao",
+      "enRef": "acct_term_017"
+    },
+    {
+      "id": "acct_term_pt_016",
+      "canonical": "provisao",
+      "synonyms": [
+        "provisao para perdas",
+        "provisao para credito"
+      ],
+      "display": "Provisao",
+      "enRef": "acct_term_018"
+    },
+    {
+      "id": "acct_term_pt_017",
+      "canonical": "corte",
+      "synonyms": [
+        "fechamento",
+        "periodo"
+      ],
+      "display": "Corte",
+      "enRef": "acct_term_021"
+    },
+    {
+      "id": "acct_term_pt_018",
+      "canonical": "lancamento de ajuste",
+      "synonyms": [
+        "ajuste",
+        "lancamento contabel de ajuste"
+      ],
+      "display": "Lancamento de Ajuste",
+      "enRef": "acct_term_022"
+    },
+    {
+      "id": "acct_term_pt_019",
+      "canonical": "estorno",
+      "synonyms": [
+        "reversao",
+        "reversing entry"
+      ],
+      "display": "Estorno",
+      "enRef": "acct_term_023"
+    },
+    {
+      "id": "acct_term_pt_020",
+      "canonical": "encerramento",
+      "synonyms": [
+        "lancamento de encerramento",
+        "fechamento contabel"
+      ],
+      "display": "Encerramento",
+      "enRef": "acct_term_024"
+    },
+    {
+      "id": "acct_term_pt_021",
+      "canonical": "papel de trabalho",
+      "synonyms": [
+        "folha de trabalho",
+        "working paper"
+      ],
+      "display": "Papel de Trabalho",
+      "enRef": "acct_term_025"
+    },
+    {
+      "id": "acct_term_pt_022",
+      "canonical": "controles internos",
+      "synonyms": [
+        "controle interno",
+        "controle de risco"
+      ],
+      "display": "Controles Internos",
+      "enRef": "acct_term_027"
+    },
+    {
+      "id": "acct_term_pt_023",
+      "canonical": "segregacao de funcoes",
+      "synonyms": [
+        "SOD",
+        "separacao de funcoes"
+      ],
+      "display": "Segregacao de Funcoes",
+      "enRef": "acct_term_028"
+    },
+    {
+      "id": "acct_term_pt_024",
+      "canonical": "comprovacao",
+      "synonyms": [
+        "evidencia",
+        "documento de suporte"
+      ],
+      "display": "Comprovacao",
+      "enRef": "acct_term_039"
+    },
+    {
+      "id": "acct_term_pt_025",
+      "canonical": "competencia",
+      "synonyms": [
+        "regime de competencia",
+        "accrual"
+      ],
+      "display": "Competencia",
+      "enRef": "acct_term_001"
+    },
+    {
+      "id": "acct_term_pt_026",
+      "canonical": "caixa",
+      "synonyms": [
+        "base caixa",
+        "regime de caixa"
+      ],
+      "display": "Caixa",
+      "enRef": "acct_term_002"
+    },
+    {
+      "id": "acct_term_pt_027",
+      "canonical": "receita",
+      "synonyms": [
+        "faturamento",
+        "vendas"
+      ],
+      "display": "Receita",
+      "enRef": "acct_term_049"
+    },
+    {
+      "id": "acct_term_pt_028",
+      "canonical": "despesa",
+      "synonyms": [
+        "custo",
+        "gasto"
+      ],
+      "display": "Despesa",
+      "enRef": "acct_term_050"
+    },
+    {
+      "id": "acct_term_pt_029",
+      "canonical": "fluxo de caixa",
+      "synonyms": [
+        "DFC",
+        "fluxo operacional"
+      ],
+      "display": "Fluxo de Caixa",
+      "enRef": "acct_term_040"
+    },
+    {
+      "id": "acct_term_pt_030",
+      "canonical": "contas a receber",
+      "synonyms": [
+        "AR",
+        "clientes"
+      ],
+      "display": "Contas a Receber",
+      "enRef": "acct_term_046"
+    },
+    {
+      "id": "acct_term_pt_031",
+      "canonical": "contas a pagar",
+      "synonyms": [
+        "AP",
+        "fornecedores"
+      ],
+      "display": "Contas a Pagar",
+      "enRef": "acct_term_045"
+    },
+    {
+      "id": "acct_term_pt_032",
+      "canonical": "estoque",
+      "synonyms": [
+        "inventario",
+        "estoque medio"
+      ],
+      "display": "Estoque",
+      "enRef": "acct_term_043"
+    },
+    {
+      "id": "acct_term_pt_033",
+      "canonical": "valor",
+      "synonyms": [
+        "montante",
+        "quantia"
+      ],
+      "display": "Valor",
+      "enRef": "acct_term_050"
+    },
+    {
+      "id": "acct_term_pt_034",
+      "canonical": "moeda",
+      "synonyms": [
+        "divisa",
+        "cambio"
+      ],
+      "display": "Moeda",
+      "enRef": "acct_term_041"
+    },
+    {
+      "id": "acct_term_pt_035",
+      "canonical": "salto",
+      "synonyms": [
+        "diferenca",
+        "desvio"
+      ],
+      "display": "Diferenca",
+      "enRef": "acct_term_033"
+    },
+    {
+      "id": "acct_term_pt_036",
+      "canonical": "taxa",
+      "synonyms": [
+        "percentual",
+        "imposto"
+      ],
+      "display": "Taxa",
+      "enRef": "acct_term_040"
+    },
+    {
+      "id": "acct_term_pt_037",
+      "canonical": "patrimonio liquido",
+      "synonyms": [
+        "PL",
+        "capital"
+      ],
+      "display": "Patrimonio Liquido",
+      "enRef": "acct_term_047"
+    },
+    {
+      "id": "acct_term_pt_038",
+      "canonical": "passivo",
+      "synonyms": [
+        "obriga",
+        "divida"
+      ],
+      "display": "Passivo",
+      "enRef": "acct_term_048"
+    },
+    {
+      "id": "acct_term_pt_039",
+      "canonical": "ativo",
+      "synonyms": [
+        "bem",
+        "item do ativo"
+      ],
+      "display": "Ativo",
+      "enRef": "acct_term_015"
+    },
+    {
+      "id": "acct_term_pt_040",
+      "canonical": "custo de mercadorias",
+      "synonyms": [
+        "CMV",
+        "custo vendido"
+      ],
+      "display": "CMV",
+      "enRef": "acct_term_044"
+    },
+    {
+      "id": "acct_term_pt_041",
+      "canonical": "recebiveis",
+      "synonyms": [
+        "contas a receber",
+        "clientes"
+      ],
+      "display": "Recebiveis",
+      "enRef": "acct_term_046"
+    },
+    {
+      "id": "acct_term_pt_042",
+      "canonical": "pagaveis",
+      "synonyms": [
+        "contas a pagar",
+        "fornecedores"
+      ],
+      "display": "Pagaveis",
+      "enRef": "acct_term_045"
+    },
+    {
+      "id": "acct_term_pt_043",
+      "canonical": "analise de saldo",
+      "synonyms": [
+        "analise de diferenca",
+        "comparacao"
+      ],
+      "display": "Analise de Saldo",
+      "enRef": "acct_term_002"
+    },
+    {
+      "id": "acct_term_pt_044",
+      "canonical": "periodo",
+      "synonyms": [
+        "mes",
+        "exercicio"
+      ],
+      "display": "Periodo",
+      "enRef": "acct_term_021"
+    },
+    {
+      "id": "acct_term_pt_045",
+      "canonical": "dado de reconciliacao",
+      "synonyms": [
+        "evidencia",
+        "documento"
+      ],
+      "display": "Evidencia de Concil",
+      "enRef": "acct_term_012"
+    },
+    {
+      "id": "acct_term_pt_046",
+      "canonical": "resultado",
+      "synonyms": [
+        "DRE",
+        "lucro"
+      ],
+      "display": "Resultado",
+      "enRef": "acct_term_049"
+    },
+    {
+      "id": "acct_term_pt_047",
+      "canonical": "orcamento",
+      "synonyms": [
+        "budget",
+        "previsao"
+      ],
+      "display": "Orcamento",
+      "enRef": "acct_term_035"
+    },
+    {
+      "id": "acct_term_pt_048",
+      "canonical": "previsao",
+      "synonyms": [
+        "forecast",
+        "cenario"
+      ],
+      "display": "Previsao",
+      "enRef": "acct_term_036"
+    },
+    {
+      "id": "acct_term_pt_049",
+      "canonical": "variacao",
+      "synonyms": [
+        "diferenca",
+        "osc"
+      ],
+      "display": "Variacao",
+      "enRef": "acct_term_033"
+    },
+    {
+      "id": "acct_term_pt_050",
+      "canonical": "taxa de lucro",
+      "synonyms": [
+        "margem",
+        "rentabilidade"
+      ],
+      "display": "Margem",
+      "enRef": "acct_term_046"
+    }
   ]
 }

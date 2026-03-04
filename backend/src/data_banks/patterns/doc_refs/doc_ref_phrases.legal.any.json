@@ -16,17 +16,9 @@
       "doc_intent_router",
       "doc_scope_resolver"
     ],
-    "tests": {
-      "positive": [
-        "Compare the latest 10-K against the prior 10-K filing",
-        "Puxa o resumo do NDA recente",
-        "No documento de orçamento, use only the signed version"
-      ],
-      "negative": [
-        "What is the weather tomorrow?",
-        "Tell me how to cook pasta"
-      ]
-    },
+    "tests": [
+      "tests/patternDeterminism.test.ts"
+    ],
     "lastUpdated": "2026-03-03",
     "id": "patterns_doc_refs_doc_ref_phrases_legal",
     "description": "Auto-registered bank payload for patterns/doc_refs/doc_ref_phrases.legal.any.json"
@@ -8720,6 +8712,9 @@
     }
   ],
   "config": {
-    "enabled": true
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   }
 }

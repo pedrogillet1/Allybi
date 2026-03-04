@@ -3,9 +3,17 @@
     "id": "docint_eval_suite_registry",
     "version": "3.2.0",
     "description": "Registry for document-intelligence evaluation suites with CI/nightly assignments and minimum case thresholds.",
-    "languages": ["any"],
+    "languages": [
+      "any"
+    ],
     "lastUpdated": "2026-03-03",
-    "owner": "docint-eval"
+    "owner": "docint-eval",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -116,71 +124,141 @@
       "id": "retrieval_precision_core",
       "path": "document_intelligence/eval/retrieval_precision.qa.jsonl",
       "minimumCases": 280,
-      "domains": ["finance", "legal", "medical", "accounting", "everyday"],
-      "requiredLangs": ["en", "pt"]
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "accounting",
+        "everyday"
+      ],
+      "requiredLangs": [
+        "en",
+        "pt"
+      ]
     },
     {
       "id": "section_detection_core",
       "path": "document_intelligence/eval/section_detection.qa.jsonl",
       "minimumCases": 280,
-      "domains": ["finance", "legal", "medical", "accounting", "everyday"],
-      "requiredLangs": ["en", "pt"]
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "accounting",
+        "everyday"
+      ],
+      "requiredLangs": [
+        "en",
+        "pt"
+      ]
     },
     {
       "id": "abbreviation_resolution_core",
       "path": "document_intelligence/eval/abbreviation_resolution.qa.jsonl",
       "minimumCases": 240,
-      "domains": ["finance", "legal", "medical", "accounting", "everyday"],
-      "requiredLangs": ["en", "pt"]
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "accounting",
+        "everyday"
+      ],
+      "requiredLangs": [
+        "en",
+        "pt"
+      ]
     },
     {
       "id": "answer_format_core",
       "path": "document_intelligence/eval/answer_format.qa.jsonl",
       "minimumCases": 240,
-      "domains": ["finance", "legal", "medical", "accounting", "everyday"],
-      "requiredLangs": ["en", "pt"]
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "accounting",
+        "everyday"
+      ],
+      "requiredLangs": [
+        "en",
+        "pt"
+      ]
     },
     {
       "id": "crossdoc_core",
       "path": "document_intelligence/eval/crossdoc.qa.jsonl",
       "minimumCases": 190,
-      "domains": ["finance", "legal", "medical", "accounting", "everyday"],
-      "requiredLangs": ["en", "pt"]
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "accounting",
+        "everyday"
+      ],
+      "requiredLangs": [
+        "en",
+        "pt"
+      ]
     },
     {
       "id": "finance_core_suite",
       "path": "document_intelligence/eval/domain_specific/finance/finance_core.qa.jsonl",
       "minimumCases": 320,
-      "domains": ["finance"],
-      "requiredLangs": ["en", "pt"]
+      "domains": [
+        "finance"
+      ],
+      "requiredLangs": [
+        "en",
+        "pt"
+      ]
     },
     {
       "id": "legal_core_suite",
       "path": "document_intelligence/eval/domain_specific/legal/legal_core.qa.jsonl",
       "minimumCases": 320,
-      "domains": ["legal"],
-      "requiredLangs": ["en", "pt"]
+      "domains": [
+        "legal"
+      ],
+      "requiredLangs": [
+        "en",
+        "pt"
+      ]
     },
     {
       "id": "medical_core_suite",
       "path": "document_intelligence/eval/domain_specific/medical/medical_core.qa.jsonl",
       "minimumCases": 320,
-      "domains": ["medical"],
-      "requiredLangs": ["en", "pt"]
+      "domains": [
+        "medical"
+      ],
+      "requiredLangs": [
+        "en",
+        "pt"
+      ]
     },
     {
       "id": "accounting_core_suite",
       "path": "document_intelligence/eval/domain_specific/accounting/accounting_core.qa.jsonl",
       "minimumCases": 320,
-      "domains": ["accounting"],
-      "requiredLangs": ["en", "pt"]
+      "domains": [
+        "accounting"
+      ],
+      "requiredLangs": [
+        "en",
+        "pt"
+      ]
     },
     {
       "id": "everyday_core_suite",
       "path": "document_intelligence/eval/domain_specific/everyday/everyday_core.qa.jsonl",
       "minimumCases": 340,
-      "domains": ["everyday"],
-      "requiredLangs": ["en", "pt"]
+      "domains": [
+        "everyday"
+      ],
+      "requiredLangs": [
+        "en",
+        "pt"
+      ]
     }
   ],
   "suite_stats": {

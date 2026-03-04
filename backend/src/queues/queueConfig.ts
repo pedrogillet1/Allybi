@@ -110,6 +110,15 @@ export const previewGenerationQueue = new Queue(
   },
 );
 
+export const documentDlqQueue = new Queue(`${QUEUE_PREFIX}document-dlq`, {
+  connection,
+  defaultJobOptions: {
+    attempts: 1,
+    removeOnComplete: { count: 500, age: 30 * 24 * 3600 },
+    removeOnFail: { count: 500, age: 30 * 24 * 3600 },
+  },
+});
+
 export const stuckDocSweepQueue = new Queue(`${QUEUE_PREFIX}stuck-doc-sweep`, {
   connection,
   defaultJobOptions: {

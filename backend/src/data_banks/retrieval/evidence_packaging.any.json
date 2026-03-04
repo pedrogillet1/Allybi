@@ -11,7 +11,13 @@
     ],
     "lastUpdated": "2026-02-19",
     "owner": "koda-retrieval",
-    "compat": ">=1.0.0"
+    "compat": ">=1.0.0",
+    "usedBy": [
+      "services/core/retrieval/retrievalEngine.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -39,7 +45,7 @@
         "maxNearDuplicatesExploratoryPerDocPackaging": 2,
         "maxNearDuplicatesPerDoc": 3,
         "nearDuplicateWindowChars": 280,
-        "minChunkRelevance": 0.20,
+        "minChunkRelevance": 0.2,
         "minFinalScore": 0.28,
         "minProvenanceFields": 3
       },
@@ -113,17 +119,7 @@
       ],
       "attachDocSummarySignals": true
     },
-    "dedupe": {
-      "enabled": true,
-      "dedupeBy": [
-        "docId",
-        "locationKey",
-        "normalizedSnippetHash"
-      ],
-      "nearDuplicateWindowChars": 280,
-      "maxNearDuplicatesPerDoc": 3,
-      "preferHigherScore": true
-    },
+    "dedupe": true,
     "numericIntegrity": {
       "enabled": true,
       "attachWarnings": true,
@@ -147,7 +143,9 @@
         "locationKey",
         "score.finalScore"
       ]
-    }
+    },
+    "deterministic": true,
+    "sortBy": "id"
   },
   "rules": [
     {

@@ -6,7 +6,14 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-03-03"
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -14,15 +21,156 @@
     "docType": "every_phone_bill"
   },
   "hints": [
-    { "id": "hint_01", "entity": "subscriber_name", "anchors": ["subscriber", "titular", "customer"], "location": "subscriber_profile", "extractionMethod": "heading_proximity", "whereItHides": ["front matter", "customer header"] },
-    { "id": "hint_02", "entity": "subscriber_id", "anchors": ["account", "acct", "id", "conta"], "location": "subscriber_profile", "extractionMethod": "table_row_match", "whereItHides": ["profile box", "top-right"] },
-    { "id": "hint_03", "entity": "mobile_number", "anchors": ["msisdn", "mobile", "line"], "location": "subscriber_profile", "extractionMethod": "regex_capture", "whereItHides": ["header", "account summary"] },
-    { "id": "hint_04", "entity": "billing_period_start", "anchors": ["period start", "from", "de"], "location": "billing_period", "extractionMethod": "regex_capture", "whereItHides": ["period bar", "small print"] },
-    { "id": "hint_05", "entity": "billing_period_end", "anchors": ["period end", "to", "ate"], "location": "billing_period", "extractionMethod": "regex_capture", "whereItHides": ["period bar", "small print"] },
-    { "id": "hint_06", "entity": "plan_name", "anchors": ["plan", "package", "data package"], "location": "plan_and_features", "extractionMethod": "heading_proximity", "whereItHides": ["plan section", "small plan header"] },
-    { "id": "hint_07", "entity": "minutes_used", "anchors": ["minutes", "voz", "minutes used"], "location": "line_usage", "extractionMethod": "table_row_match", "whereItHides": ["usage table", "item row"] },
-    { "id": "hint_08", "entity": "sms_used", "anchors": ["sms", "text", "messages"], "location": "line_usage", "extractionMethod": "table_row_match", "whereItHides": ["usage table", "item row"] },
-    { "id": "hint_09", "entity": "data_used_gb", "anchors": ["data", "gb", "mb"], "location": "line_usage", "extractionMethod": "regex_capture", "whereItHides": ["usage table", "plan details line"] },
-    { "id": "hint_10", "entity": "total_due", "anchors": ["total", "amount due", "amount"], "location": "totals_and_due", "extractionMethod": "table_row_match", "whereItHides": ["totals block", "bold amount"] }
+    {
+      "id": "hint_01",
+      "entity": "subscriber_name",
+      "anchors": [
+        "subscriber",
+        "titular",
+        "customer"
+      ],
+      "location": "subscriber_profile",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "front matter",
+        "customer header"
+      ]
+    },
+    {
+      "id": "hint_02",
+      "entity": "subscriber_id",
+      "anchors": [
+        "account",
+        "acct",
+        "id",
+        "conta"
+      ],
+      "location": "subscriber_profile",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "profile box",
+        "top-right"
+      ]
+    },
+    {
+      "id": "hint_03",
+      "entity": "mobile_number",
+      "anchors": [
+        "msisdn",
+        "mobile",
+        "line"
+      ],
+      "location": "subscriber_profile",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "header",
+        "account summary"
+      ]
+    },
+    {
+      "id": "hint_04",
+      "entity": "billing_period_start",
+      "anchors": [
+        "period start",
+        "from",
+        "de"
+      ],
+      "location": "billing_period",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "period bar",
+        "small print"
+      ]
+    },
+    {
+      "id": "hint_05",
+      "entity": "billing_period_end",
+      "anchors": [
+        "period end",
+        "to",
+        "ate"
+      ],
+      "location": "billing_period",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "period bar",
+        "small print"
+      ]
+    },
+    {
+      "id": "hint_06",
+      "entity": "plan_name",
+      "anchors": [
+        "plan",
+        "package",
+        "data package"
+      ],
+      "location": "plan_and_features",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "plan section",
+        "small plan header"
+      ]
+    },
+    {
+      "id": "hint_07",
+      "entity": "minutes_used",
+      "anchors": [
+        "minutes",
+        "voz",
+        "minutes used"
+      ],
+      "location": "line_usage",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "usage table",
+        "item row"
+      ]
+    },
+    {
+      "id": "hint_08",
+      "entity": "sms_used",
+      "anchors": [
+        "sms",
+        "text",
+        "messages"
+      ],
+      "location": "line_usage",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "usage table",
+        "item row"
+      ]
+    },
+    {
+      "id": "hint_09",
+      "entity": "data_used_gb",
+      "anchors": [
+        "data",
+        "gb",
+        "mb"
+      ],
+      "location": "line_usage",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "usage table",
+        "plan details line"
+      ]
+    },
+    {
+      "id": "hint_10",
+      "entity": "total_due",
+      "anchors": [
+        "total",
+        "amount due",
+        "amount"
+      ],
+      "location": "totals_and_due",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "totals block",
+        "bold amount"
+      ]
+    }
   ]
 }

@@ -4,7 +4,16 @@
     "version": "1.0.0",
     "description": "Python chart rendering recipes for NanoBanana: deterministic, safe, matplotlib-based chart generation templates.",
     "lastUpdated": "2026-02-27",
-    "languages": ["any"]
+    "languages": [
+      "any"
+    ],
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -13,1226 +22,2701 @@
     "defaultDPI": 150,
     "maxWidth": 1200,
     "maxHeight": 900,
-    "defaultFigSize": [10, 6],
+    "defaultFigSize": [
+      10,
+      6
+    ],
     "fontFamily": "sans-serif",
-    "colorPalette": ["#2563EB", "#DC2626", "#059669", "#D97706", "#7C3AED", "#DB2777", "#0891B2", "#65A30D"]
+    "colorPalette": [
+      "#2563EB",
+      "#DC2626",
+      "#059669",
+      "#D97706",
+      "#7C3AED",
+      "#DB2777",
+      "#0891B2",
+      "#65A30D"
+    ]
   },
   "recipes": [
     {
       "id": "bar_vertical",
       "chartType": "bar",
       "variant": "vertical",
-      "name": { "en": "Vertical Bar Chart", "pt": "Gráfico de Barras Vertical" },
+      "name": {
+        "en": "Vertical Bar Chart",
+        "pt": "Gráfico de Barras Vertical"
+      },
       "dataShape": {
-        "required": ["categories", "values"],
-        "optional": ["series", "colors", "labels"],
+        "required": [
+          "categories",
+          "values"
+        ],
+        "optional": [
+          "series",
+          "colors",
+          "labels"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[] | number[][]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nax.bar($categories, $values, color=$colors)\nax.set_xlabel($xLabel)\nax.set_ylabel($yLabel)\nax.set_title($title)\nplt.xticks(rotation=$xRotation)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [10, 6],
+      "recommendedSize": [
+        10,
+        6
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "bar_horizontal",
       "chartType": "bar",
       "variant": "horizontal",
-      "name": { "en": "Horizontal Bar Chart", "pt": "Gráfico de Barras Horizontal" },
+      "name": {
+        "en": "Horizontal Bar Chart",
+        "pt": "Gráfico de Barras Horizontal"
+      },
       "dataShape": {
-        "required": ["categories", "values"],
-        "optional": ["colors", "labels"],
+        "required": [
+          "categories",
+          "values"
+        ],
+        "optional": [
+          "colors",
+          "labels"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nax.barh($categories, $values, color=$colors)\nax.set_xlabel($xLabel)\nax.set_ylabel($yLabel)\nax.set_title($title)\nax.invert_yaxis()\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [10, 6],
+      "recommendedSize": [
+        10,
+        6
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "bar_grouped",
       "chartType": "bar",
       "variant": "grouped",
-      "name": { "en": "Grouped Bar Chart", "pt": "Gráfico de Barras Agrupadas" },
+      "name": {
+        "en": "Grouped Bar Chart",
+        "pt": "Gráfico de Barras Agrupadas"
+      },
       "dataShape": {
-        "required": ["categories", "series", "values"],
-        "optional": ["colors", "labels"],
+        "required": [
+          "categories",
+          "series",
+          "values"
+        ],
+        "optional": [
+          "colors",
+          "labels"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[][]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nx = np.arange(len($categories))\nn = len($series)\nwidth = 0.8 / n\nfor i, (s, v) in enumerate(zip($series, $values)):\n    ax.bar(x + i * width - (n - 1) * width / 2, v, width, label=s, color=$colors[i % len($colors)])\nax.set_xticks(x)\nax.set_xticklabels($categories, rotation=$xRotation)\nax.set_xlabel($xLabel)\nax.set_ylabel($yLabel)\nax.set_title($title)\nax.legend()\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [12, 6],
+      "recommendedSize": [
+        12,
+        6
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "bar_stacked",
       "chartType": "bar",
       "variant": "stacked",
-      "name": { "en": "Stacked Bar Chart", "pt": "Gráfico de Barras Empilhadas" },
+      "name": {
+        "en": "Stacked Bar Chart",
+        "pt": "Gráfico de Barras Empilhadas"
+      },
       "dataShape": {
-        "required": ["categories", "series", "values"],
-        "optional": ["colors", "labels"],
+        "required": [
+          "categories",
+          "series",
+          "values"
+        ],
+        "optional": [
+          "colors",
+          "labels"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[][]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nbottom = np.zeros(len($categories))\nfor i, (s, v) in enumerate(zip($series, $values)):\n    ax.bar($categories, v, bottom=bottom, label=s, color=$colors[i % len($colors)])\n    bottom += np.array(v)\nax.set_xlabel($xLabel)\nax.set_ylabel($yLabel)\nax.set_title($title)\nax.legend()\nplt.xticks(rotation=$xRotation)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [10, 6],
+      "recommendedSize": [
+        10,
+        6
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "bar_stacked_100",
       "chartType": "bar",
       "variant": "stacked_100_percent",
-      "name": { "en": "100% Stacked Bar Chart", "pt": "Gráfico de Barras Empilhadas 100%" },
+      "name": {
+        "en": "100% Stacked Bar Chart",
+        "pt": "Gráfico de Barras Empilhadas 100%"
+      },
       "dataShape": {
-        "required": ["categories", "series", "values"],
-        "optional": ["colors", "labels"],
+        "required": [
+          "categories",
+          "series",
+          "values"
+        ],
+        "optional": [
+          "colors",
+          "labels"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[][]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nvals = np.array($values, dtype=float)\ntotals = vals.sum(axis=0)\ntotals[totals == 0] = 1\npcts = vals / totals * 100\nbottom = np.zeros(len($categories))\nfor i, s in enumerate($series):\n    ax.bar($categories, pcts[i], bottom=bottom, label=s, color=$colors[i % len($colors)])\n    bottom += pcts[i]\nax.set_xlabel($xLabel)\nax.set_ylabel('Percentage')\nax.set_title($title)\nax.set_ylim(0, 100)\nax.legend()\nplt.xticks(rotation=$xRotation)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [10, 6],
+      "recommendedSize": [
+        10,
+        6
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "bar_diverging",
       "chartType": "bar",
       "variant": "diverging",
-      "name": { "en": "Diverging Bar Chart", "pt": "Gráfico de Barras Divergentes" },
+      "name": {
+        "en": "Diverging Bar Chart",
+        "pt": "Gráfico de Barras Divergentes"
+      },
       "dataShape": {
-        "required": ["categories", "values"],
-        "optional": ["colors", "labels", "baseline"],
+        "required": [
+          "categories",
+          "values"
+        ],
+        "optional": [
+          "colors",
+          "labels",
+          "baseline"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nvals = np.array($values)\ncolors_mapped = [$colors[0] if v >= 0 else $colors[1] for v in vals]\nax.barh($categories, vals, color=colors_mapped)\nax.axvline(0, color='black', linewidth=0.8)\nax.set_xlabel($xLabel)\nax.set_title($title)\nax.invert_yaxis()\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [10, 7],
+      "recommendedSize": [
+        10,
+        7
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "column_basic",
       "chartType": "column",
       "variant": "basic",
-      "name": { "en": "Basic Column Chart", "pt": "Gráfico de Colunas Básico" },
+      "name": {
+        "en": "Basic Column Chart",
+        "pt": "Gráfico de Colunas Básico"
+      },
       "dataShape": {
-        "required": ["categories", "values"],
-        "optional": ["colors", "labels"],
+        "required": [
+          "categories",
+          "values"
+        ],
+        "optional": [
+          "colors",
+          "labels"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nax.bar($categories, $values, color=$colors, edgecolor='white', linewidth=0.5)\nax.set_xlabel($xLabel)\nax.set_ylabel($yLabel)\nax.set_title($title)\nax.spines['top'].set_visible(False)\nax.spines['right'].set_visible(False)\nplt.xticks(rotation=$xRotation)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [10, 6],
+      "recommendedSize": [
+        10,
+        6
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "column_grouped",
       "chartType": "column",
       "variant": "grouped",
-      "name": { "en": "Grouped Column Chart", "pt": "Gráfico de Colunas Agrupadas" },
+      "name": {
+        "en": "Grouped Column Chart",
+        "pt": "Gráfico de Colunas Agrupadas"
+      },
       "dataShape": {
-        "required": ["categories", "series", "values"],
-        "optional": ["colors", "labels"],
+        "required": [
+          "categories",
+          "series",
+          "values"
+        ],
+        "optional": [
+          "colors",
+          "labels"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[][]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nx = np.arange(len($categories))\nn = len($series)\nwidth = 0.8 / n\nfor i, (s, v) in enumerate(zip($series, $values)):\n    ax.bar(x + i * width - (n - 1) * width / 2, v, width, label=s, color=$colors[i % len($colors)])\nax.set_xticks(x)\nax.set_xticklabels($categories, rotation=$xRotation)\nax.set_xlabel($xLabel)\nax.set_ylabel($yLabel)\nax.set_title($title)\nax.spines['top'].set_visible(False)\nax.spines['right'].set_visible(False)\nax.legend()\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [12, 6],
+      "recommendedSize": [
+        12,
+        6
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "column_stacked",
       "chartType": "column",
       "variant": "stacked",
-      "name": { "en": "Stacked Column Chart", "pt": "Gráfico de Colunas Empilhadas" },
+      "name": {
+        "en": "Stacked Column Chart",
+        "pt": "Gráfico de Colunas Empilhadas"
+      },
       "dataShape": {
-        "required": ["categories", "series", "values"],
-        "optional": ["colors", "labels"],
+        "required": [
+          "categories",
+          "series",
+          "values"
+        ],
+        "optional": [
+          "colors",
+          "labels"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[][]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nbottom = np.zeros(len($categories))\nfor i, (s, v) in enumerate(zip($series, $values)):\n    ax.bar($categories, v, bottom=bottom, label=s, color=$colors[i % len($colors)], edgecolor='white', linewidth=0.5)\n    bottom += np.array(v)\nax.set_xlabel($xLabel)\nax.set_ylabel($yLabel)\nax.set_title($title)\nax.spines['top'].set_visible(False)\nax.spines['right'].set_visible(False)\nax.legend()\nplt.xticks(rotation=$xRotation)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [10, 6],
+      "recommendedSize": [
+        10,
+        6
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "column_stacked_100",
       "chartType": "column",
       "variant": "stacked_100_percent",
-      "name": { "en": "100% Stacked Column Chart", "pt": "Gráfico de Colunas Empilhadas 100%" },
+      "name": {
+        "en": "100% Stacked Column Chart",
+        "pt": "Gráfico de Colunas Empilhadas 100%"
+      },
       "dataShape": {
-        "required": ["categories", "series", "values"],
-        "optional": ["colors", "labels"],
+        "required": [
+          "categories",
+          "series",
+          "values"
+        ],
+        "optional": [
+          "colors",
+          "labels"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[][]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nvals = np.array($values, dtype=float)\ntotals = vals.sum(axis=0)\ntotals[totals == 0] = 1\npcts = vals / totals * 100\nbottom = np.zeros(len($categories))\nfor i, s in enumerate($series):\n    ax.bar($categories, pcts[i], bottom=bottom, label=s, color=$colors[i % len($colors)], edgecolor='white', linewidth=0.5)\n    bottom += pcts[i]\nax.set_xlabel($xLabel)\nax.set_ylabel('Percentage')\nax.set_title($title)\nax.set_ylim(0, 100)\nax.spines['top'].set_visible(False)\nax.spines['right'].set_visible(False)\nax.legend()\nplt.xticks(rotation=$xRotation)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [10, 6],
+      "recommendedSize": [
+        10,
+        6
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "line_basic",
       "chartType": "line",
       "variant": "basic",
-      "name": { "en": "Basic Line Chart", "pt": "Gráfico de Linhas Básico" },
+      "name": {
+        "en": "Basic Line Chart",
+        "pt": "Gráfico de Linhas Básico"
+      },
       "dataShape": {
-        "required": ["categories", "values"],
-        "optional": ["colors", "labels"],
+        "required": [
+          "categories",
+          "values"
+        ],
+        "optional": [
+          "colors",
+          "labels"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nax.plot($categories, $values, color=$colors[0], linewidth=2)\nax.set_xlabel($xLabel)\nax.set_ylabel($yLabel)\nax.set_title($title)\nax.spines['top'].set_visible(False)\nax.spines['right'].set_visible(False)\nplt.xticks(rotation=$xRotation)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [10, 6],
+      "recommendedSize": [
+        10,
+        6
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "line_multi_series",
       "chartType": "line",
       "variant": "multi_series",
-      "name": { "en": "Multi-Series Line Chart", "pt": "Gráfico de Linhas Multi-Série" },
+      "name": {
+        "en": "Multi-Series Line Chart",
+        "pt": "Gráfico de Linhas Multi-Série"
+      },
       "dataShape": {
-        "required": ["categories", "series", "values"],
-        "optional": ["colors", "labels"],
+        "required": [
+          "categories",
+          "series",
+          "values"
+        ],
+        "optional": [
+          "colors",
+          "labels"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[][]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nfor i, (s, v) in enumerate(zip($series, $values)):\n    ax.plot($categories, v, label=s, color=$colors[i % len($colors)], linewidth=2)\nax.set_xlabel($xLabel)\nax.set_ylabel($yLabel)\nax.set_title($title)\nax.spines['top'].set_visible(False)\nax.spines['right'].set_visible(False)\nax.legend()\nplt.xticks(rotation=$xRotation)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [10, 6],
+      "recommendedSize": [
+        10,
+        6
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "line_area",
       "chartType": "line",
       "variant": "area",
-      "name": { "en": "Area Line Chart", "pt": "Gráfico de Linha com Área" },
+      "name": {
+        "en": "Area Line Chart",
+        "pt": "Gráfico de Linha com Área"
+      },
       "dataShape": {
-        "required": ["categories", "values"],
-        "optional": ["colors", "labels"],
+        "required": [
+          "categories",
+          "values"
+        ],
+        "optional": [
+          "colors",
+          "labels"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nx = range(len($categories))\nax.plot(x, $values, color=$colors[0], linewidth=2)\nax.fill_between(x, $values, alpha=0.3, color=$colors[0])\nax.set_xticks(x)\nax.set_xticklabels($categories, rotation=$xRotation)\nax.set_xlabel($xLabel)\nax.set_ylabel($yLabel)\nax.set_title($title)\nax.spines['top'].set_visible(False)\nax.spines['right'].set_visible(False)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [10, 6],
+      "recommendedSize": [
+        10,
+        6
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "line_step",
       "chartType": "line",
       "variant": "step",
-      "name": { "en": "Step Line Chart", "pt": "Gráfico de Linhas em Degrau" },
+      "name": {
+        "en": "Step Line Chart",
+        "pt": "Gráfico de Linhas em Degrau"
+      },
       "dataShape": {
-        "required": ["categories", "values"],
-        "optional": ["colors", "labels"],
+        "required": [
+          "categories",
+          "values"
+        ],
+        "optional": [
+          "colors",
+          "labels"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nax.step($categories, $values, where='mid', color=$colors[0], linewidth=2)\nax.set_xlabel($xLabel)\nax.set_ylabel($yLabel)\nax.set_title($title)\nax.spines['top'].set_visible(False)\nax.spines['right'].set_visible(False)\nplt.xticks(rotation=$xRotation)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [10, 6],
+      "recommendedSize": [
+        10,
+        6
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "line_sparkline",
       "chartType": "line",
       "variant": "sparkline",
-      "name": { "en": "Sparkline", "pt": "Sparkline" },
+      "name": {
+        "en": "Sparkline",
+        "pt": "Sparkline"
+      },
       "dataShape": {
-        "required": ["values"],
-        "optional": ["colors"],
+        "required": [
+          "values"
+        ],
+        "optional": [
+          "colors"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=(3, 0.8))\nax.plot(range(len($values)), $values, color=$colors[0], linewidth=1.2)\nax.fill_between(range(len($values)), $values, alpha=0.15, color=$colors[0])\nax.axis('off')\nax.margins(x=0, y=0.1)\nplt.tight_layout(pad=0)\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight', transparent=True)\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [3, 0.8],
+      "recommendedSize": [
+        3,
+        0.8
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "inline_cell", "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "inline_cell",
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "line_with_markers",
       "chartType": "line",
       "variant": "markers",
-      "name": { "en": "Line Chart with Markers", "pt": "Gráfico de Linhas com Marcadores" },
+      "name": {
+        "en": "Line Chart with Markers",
+        "pt": "Gráfico de Linhas com Marcadores"
+      },
       "dataShape": {
-        "required": ["categories", "values"],
-        "optional": ["colors", "labels"],
+        "required": [
+          "categories",
+          "values"
+        ],
+        "optional": [
+          "colors",
+          "labels"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nax.plot($categories, $values, color=$colors[0], linewidth=2, marker='o', markersize=6, markerfacecolor='white', markeredgecolor=$colors[0], markeredgewidth=2)\nax.set_xlabel($xLabel)\nax.set_ylabel($yLabel)\nax.set_title($title)\nax.spines['top'].set_visible(False)\nax.spines['right'].set_visible(False)\nplt.xticks(rotation=$xRotation)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [10, 6],
+      "recommendedSize": [
+        10,
+        6
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "area_basic",
       "chartType": "area",
       "variant": "basic",
-      "name": { "en": "Basic Area Chart", "pt": "Gráfico de Área Básico" },
+      "name": {
+        "en": "Basic Area Chart",
+        "pt": "Gráfico de Área Básico"
+      },
       "dataShape": {
-        "required": ["categories", "values"],
-        "optional": ["colors", "labels"],
+        "required": [
+          "categories",
+          "values"
+        ],
+        "optional": [
+          "colors",
+          "labels"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nx = range(len($categories))\nax.fill_between(x, $values, alpha=0.5, color=$colors[0])\nax.plot(x, $values, color=$colors[0], linewidth=1.5)\nax.set_xticks(x)\nax.set_xticklabels($categories, rotation=$xRotation)\nax.set_xlabel($xLabel)\nax.set_ylabel($yLabel)\nax.set_title($title)\nax.spines['top'].set_visible(False)\nax.spines['right'].set_visible(False)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [10, 6],
+      "recommendedSize": [
+        10,
+        6
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "area_stacked",
       "chartType": "area",
       "variant": "stacked",
-      "name": { "en": "Stacked Area Chart", "pt": "Gráfico de Área Empilhada" },
+      "name": {
+        "en": "Stacked Area Chart",
+        "pt": "Gráfico de Área Empilhada"
+      },
       "dataShape": {
-        "required": ["categories", "series", "values"],
-        "optional": ["colors", "labels"],
+        "required": [
+          "categories",
+          "series",
+          "values"
+        ],
+        "optional": [
+          "colors",
+          "labels"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[][]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nx = range(len($categories))\nax.stackplot(x, *$values, labels=$series, colors=$colors[:len($series)], alpha=0.7)\nax.set_xticks(x)\nax.set_xticklabels($categories, rotation=$xRotation)\nax.set_xlabel($xLabel)\nax.set_ylabel($yLabel)\nax.set_title($title)\nax.legend(loc='upper left')\nax.spines['top'].set_visible(False)\nax.spines['right'].set_visible(False)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [10, 6],
+      "recommendedSize": [
+        10,
+        6
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "area_stacked_100",
       "chartType": "area",
       "variant": "stacked_100_percent",
-      "name": { "en": "100% Stacked Area Chart", "pt": "Gráfico de Área Empilhada 100%" },
+      "name": {
+        "en": "100% Stacked Area Chart",
+        "pt": "Gráfico de Área Empilhada 100%"
+      },
       "dataShape": {
-        "required": ["categories", "series", "values"],
-        "optional": ["colors", "labels"],
+        "required": [
+          "categories",
+          "series",
+          "values"
+        ],
+        "optional": [
+          "colors",
+          "labels"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[][]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nvals = np.array($values, dtype=float)\ntotals = vals.sum(axis=0)\ntotals[totals == 0] = 1\npcts = vals / totals * 100\nx = range(len($categories))\nax.stackplot(x, *pcts, labels=$series, colors=$colors[:len($series)], alpha=0.7)\nax.set_xticks(x)\nax.set_xticklabels($categories, rotation=$xRotation)\nax.set_xlabel($xLabel)\nax.set_ylabel('Percentage')\nax.set_title($title)\nax.set_ylim(0, 100)\nax.legend(loc='upper left')\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [10, 6],
+      "recommendedSize": [
+        10,
+        6
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "area_filled_between",
       "chartType": "area",
       "variant": "filled_between",
-      "name": { "en": "Filled Area Between Two Lines", "pt": "Área Preenchida entre Duas Linhas" },
+      "name": {
+        "en": "Filled Area Between Two Lines",
+        "pt": "Área Preenchida entre Duas Linhas"
+      },
       "dataShape": {
-        "required": ["categories", "valuesUpper", "valuesLower"],
-        "optional": ["colors", "labels"],
+        "required": [
+          "categories",
+          "valuesUpper",
+          "valuesLower"
+        ],
+        "optional": [
+          "colors",
+          "labels"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nx = range(len($categories))\nax.plot(x, $valuesUpper, color=$colors[0], linewidth=1.5, label=$labels[0] if $labels else 'Upper')\nax.plot(x, $valuesLower, color=$colors[1], linewidth=1.5, label=$labels[1] if $labels else 'Lower')\nax.fill_between(x, $valuesLower, $valuesUpper, alpha=0.25, color=$colors[0])\nax.set_xticks(x)\nax.set_xticklabels($categories, rotation=$xRotation)\nax.set_xlabel($xLabel)\nax.set_ylabel($yLabel)\nax.set_title($title)\nax.legend()\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [10, 6],
+      "recommendedSize": [
+        10,
+        6
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "pie_basic",
       "chartType": "pie",
       "variant": "basic",
-      "name": { "en": "Basic Pie Chart", "pt": "Gráfico de Pizza Básico" },
+      "name": {
+        "en": "Basic Pie Chart",
+        "pt": "Gráfico de Pizza Básico"
+      },
       "dataShape": {
-        "required": ["categories", "values"],
-        "optional": ["colors", "labels"],
+        "required": [
+          "categories",
+          "values"
+        ],
+        "optional": [
+          "colors",
+          "labels"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nwedges, texts, autotexts = ax.pie($values, labels=$categories, colors=$colors[:len($categories)], autopct='%1.1f%%', startangle=90)\nfor t in autotexts:\n    t.set_fontsize(9)\nax.set_title($title)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [8, 8],
+      "recommendedSize": [
+        8,
+        8
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "pie_doughnut",
       "chartType": "pie",
       "variant": "doughnut",
-      "name": { "en": "Doughnut Chart", "pt": "Gráfico de Rosca" },
+      "name": {
+        "en": "Doughnut Chart",
+        "pt": "Gráfico de Rosca"
+      },
       "dataShape": {
-        "required": ["categories", "values"],
-        "optional": ["colors", "labels"],
+        "required": [
+          "categories",
+          "values"
+        ],
+        "optional": [
+          "colors",
+          "labels"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nwedges, texts, autotexts = ax.pie($values, labels=$categories, colors=$colors[:len($categories)], autopct='%1.1f%%', startangle=90, pctdistance=0.8, wedgeprops=dict(width=0.4, edgecolor='white'))\nfor t in autotexts:\n    t.set_fontsize(8)\nax.set_title($title)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [8, 8],
+      "recommendedSize": [
+        8,
+        8
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "pie_exploded",
       "chartType": "pie",
       "variant": "exploded",
-      "name": { "en": "Exploded Pie Chart", "pt": "Gráfico de Pizza Explodido" },
+      "name": {
+        "en": "Exploded Pie Chart",
+        "pt": "Gráfico de Pizza Explodido"
+      },
       "dataShape": {
-        "required": ["categories", "values"],
-        "optional": ["colors", "labels", "explodeIndex"],
+        "required": [
+          "categories",
+          "values"
+        ],
+        "optional": [
+          "colors",
+          "labels",
+          "explodeIndex"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nexplode = [0.05] * len($categories)\nif $explodeIndex is not None and $explodeIndex < len(explode):\n    explode[$explodeIndex] = 0.15\nwedges, texts, autotexts = ax.pie($values, labels=$categories, colors=$colors[:len($categories)], autopct='%1.1f%%', startangle=90, explode=explode)\nfor t in autotexts:\n    t.set_fontsize(9)\nax.set_title($title)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [8, 8],
+      "recommendedSize": [
+        8,
+        8
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "pie_nested_doughnut",
       "chartType": "pie",
       "variant": "nested_doughnut",
-      "name": { "en": "Nested Doughnut Chart", "pt": "Gráfico de Rosca Aninhada" },
+      "name": {
+        "en": "Nested Doughnut Chart",
+        "pt": "Gráfico de Rosca Aninhada"
+      },
       "dataShape": {
-        "required": ["categoriesOuter", "valuesOuter", "categoriesInner", "valuesInner"],
-        "optional": ["colors", "labels"],
+        "required": [
+          "categoriesOuter",
+          "valuesOuter",
+          "categoriesInner",
+          "valuesInner"
+        ],
+        "optional": [
+          "colors",
+          "labels"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nsize = 0.3\nouter_colors = $colors[:len($categoriesOuter)]\ninner_colors = $colors[:len($categoriesInner)]\nax.pie($valuesOuter, radius=1, colors=outer_colors, labels=$categoriesOuter, wedgeprops=dict(width=size, edgecolor='white'), labeldistance=1.1)\nax.pie($valuesInner, radius=1 - size, colors=inner_colors, labels=$categoriesInner, wedgeprops=dict(width=size, edgecolor='white'), labeldistance=0.7, textprops={'fontsize': 8})\nax.set_title($title)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [8, 8],
+      "recommendedSize": [
+        8,
+        8
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "scatter_basic",
       "chartType": "scatter",
       "variant": "basic",
-      "name": { "en": "Basic Scatter Plot", "pt": "Gráfico de Dispersão Básico" },
+      "name": {
+        "en": "Basic Scatter Plot",
+        "pt": "Gráfico de Dispersão Básico"
+      },
       "dataShape": {
-        "required": ["xValues", "yValues"],
-        "optional": ["colors", "labels"],
+        "required": [
+          "xValues",
+          "yValues"
+        ],
+        "optional": [
+          "colors",
+          "labels"
+        ],
         "categoriesType": "number[]",
         "valuesType": "number[]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nax.scatter($xValues, $yValues, color=$colors[0], alpha=0.7, edgecolors='white', linewidth=0.5)\nax.set_xlabel($xLabel)\nax.set_ylabel($yLabel)\nax.set_title($title)\nax.spines['top'].set_visible(False)\nax.spines['right'].set_visible(False)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [10, 6],
+      "recommendedSize": [
+        10,
+        6
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "scatter_trendline",
       "chartType": "scatter",
       "variant": "trendline",
-      "name": { "en": "Scatter Plot with Trend Line", "pt": "Dispersão com Linha de Tendência" },
+      "name": {
+        "en": "Scatter Plot with Trend Line",
+        "pt": "Dispersão com Linha de Tendência"
+      },
       "dataShape": {
-        "required": ["xValues", "yValues"],
-        "optional": ["colors", "labels", "polyDegree"],
+        "required": [
+          "xValues",
+          "yValues"
+        ],
+        "optional": [
+          "colors",
+          "labels",
+          "polyDegree"
+        ],
         "categoriesType": "number[]",
         "valuesType": "number[]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nax.scatter($xValues, $yValues, color=$colors[0], alpha=0.6, edgecolors='white', linewidth=0.5)\nxs = np.array($xValues, dtype=float)\nys = np.array($yValues, dtype=float)\nz = np.polyfit(xs, ys, $polyDegree if $polyDegree else 1)\np = np.poly1d(z)\nx_line = np.linspace(xs.min(), xs.max(), 200)\nax.plot(x_line, p(x_line), color=$colors[1], linewidth=2, linestyle='--')\nax.set_xlabel($xLabel)\nax.set_ylabel($yLabel)\nax.set_title($title)\nax.spines['top'].set_visible(False)\nax.spines['right'].set_visible(False)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [10, 6],
+      "recommendedSize": [
+        10,
+        6
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "scatter_bubble",
       "chartType": "scatter",
       "variant": "bubble",
-      "name": { "en": "Bubble Chart", "pt": "Gráfico de Bolhas" },
+      "name": {
+        "en": "Bubble Chart",
+        "pt": "Gráfico de Bolhas"
+      },
       "dataShape": {
-        "required": ["xValues", "yValues", "sizes"],
-        "optional": ["colors", "labels", "categories"],
+        "required": [
+          "xValues",
+          "yValues",
+          "sizes"
+        ],
+        "optional": [
+          "colors",
+          "labels",
+          "categories"
+        ],
         "categoriesType": "number[]",
         "valuesType": "number[]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nsizes_scaled = np.array($sizes, dtype=float)\nsizes_scaled = (sizes_scaled / sizes_scaled.max()) * 1000\nax.scatter($xValues, $yValues, s=sizes_scaled, color=$colors[0], alpha=0.5, edgecolors=$colors[0], linewidth=1)\nif $labels:\n    for i, lbl in enumerate($labels):\n        ax.annotate(lbl, ($xValues[i], $yValues[i]), fontsize=7, ha='center')\nax.set_xlabel($xLabel)\nax.set_ylabel($yLabel)\nax.set_title($title)\nax.spines['top'].set_visible(False)\nax.spines['right'].set_visible(False)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [10, 6],
+      "recommendedSize": [
+        10,
+        6
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "scatter_connected",
       "chartType": "scatter",
       "variant": "connected",
-      "name": { "en": "Connected Scatter Plot", "pt": "Dispersão Conectada" },
+      "name": {
+        "en": "Connected Scatter Plot",
+        "pt": "Dispersão Conectada"
+      },
       "dataShape": {
-        "required": ["xValues", "yValues"],
-        "optional": ["colors", "labels"],
+        "required": [
+          "xValues",
+          "yValues"
+        ],
+        "optional": [
+          "colors",
+          "labels"
+        ],
         "categoriesType": "number[]",
         "valuesType": "number[]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nax.plot($xValues, $yValues, color=$colors[0], linewidth=1.5, alpha=0.6)\nax.scatter($xValues, $yValues, color=$colors[0], s=40, zorder=5, edgecolors='white', linewidth=1)\nax.set_xlabel($xLabel)\nax.set_ylabel($yLabel)\nax.set_title($title)\nax.spines['top'].set_visible(False)\nax.spines['right'].set_visible(False)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [10, 6],
+      "recommendedSize": [
+        10,
+        6
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "dist_histogram",
       "chartType": "distribution",
       "variant": "histogram",
-      "name": { "en": "Histogram", "pt": "Histograma" },
+      "name": {
+        "en": "Histogram",
+        "pt": "Histograma"
+      },
       "dataShape": {
-        "required": ["values"],
-        "optional": ["bins", "colors", "labels"],
+        "required": [
+          "values"
+        ],
+        "optional": [
+          "bins",
+          "colors",
+          "labels"
+        ],
         "categoriesType": "number[]",
         "valuesType": "number[]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nax.hist($values, bins=$bins if $bins else 'auto', color=$colors[0], edgecolor='white', linewidth=0.8, alpha=0.8)\nax.set_xlabel($xLabel)\nax.set_ylabel('Frequency')\nax.set_title($title)\nax.spines['top'].set_visible(False)\nax.spines['right'].set_visible(False)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [10, 6],
+      "recommendedSize": [
+        10,
+        6
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "dist_kde",
       "chartType": "distribution",
       "variant": "kde",
-      "name": { "en": "Density / KDE Plot", "pt": "Gráfico de Densidade / KDE" },
+      "name": {
+        "en": "Density / KDE Plot",
+        "pt": "Gráfico de Densidade / KDE"
+      },
       "dataShape": {
-        "required": ["values"],
-        "optional": ["colors", "labels", "bandwidth"],
+        "required": [
+          "values"
+        ],
+        "optional": [
+          "colors",
+          "labels",
+          "bandwidth"
+        ],
         "categoriesType": "number[]",
         "valuesType": "number[]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\nfrom scipy.stats import gaussian_kde\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\ndata = np.array($values, dtype=float)\nkde = gaussian_kde(data)\nx_range = np.linspace(data.min() - data.std(), data.max() + data.std(), 300)\nax.plot(x_range, kde(x_range), color=$colors[0], linewidth=2)\nax.fill_between(x_range, kde(x_range), alpha=0.25, color=$colors[0])\nax.set_xlabel($xLabel)\nax.set_ylabel('Density')\nax.set_title($title)\nax.spines['top'].set_visible(False)\nax.spines['right'].set_visible(False)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [10, 6],
+      "recommendedSize": [
+        10,
+        6
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy", "scipy.stats"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy",
+        "scipy.stats"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "dist_boxplot",
       "chartType": "distribution",
       "variant": "boxplot",
-      "name": { "en": "Box Plot", "pt": "Gráfico de Caixa" },
+      "name": {
+        "en": "Box Plot",
+        "pt": "Gráfico de Caixa"
+      },
       "dataShape": {
-        "required": ["groups", "values"],
-        "optional": ["colors", "labels"],
+        "required": [
+          "groups",
+          "values"
+        ],
+        "optional": [
+          "colors",
+          "labels"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[][]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nbp = ax.boxplot($values, labels=$groups, patch_artist=True, medianprops=dict(color='black', linewidth=1.5))\nfor i, patch in enumerate(bp['boxes']):\n    patch.set_facecolor($colors[i % len($colors)])\n    patch.set_alpha(0.7)\nax.set_xlabel($xLabel)\nax.set_ylabel($yLabel)\nax.set_title($title)\nax.spines['top'].set_visible(False)\nax.spines['right'].set_visible(False)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [10, 6],
+      "recommendedSize": [
+        10,
+        6
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "dist_violin",
       "chartType": "distribution",
       "variant": "violin",
-      "name": { "en": "Violin Plot", "pt": "Gráfico de Violino" },
+      "name": {
+        "en": "Violin Plot",
+        "pt": "Gráfico de Violino"
+      },
       "dataShape": {
-        "required": ["groups", "values"],
-        "optional": ["colors", "labels"],
+        "required": [
+          "groups",
+          "values"
+        ],
+        "optional": [
+          "colors",
+          "labels"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[][]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nparts = ax.violinplot($values, showmeans=True, showmedians=True)\nfor i, pc in enumerate(parts['bodies']):\n    pc.set_facecolor($colors[i % len($colors)])\n    pc.set_alpha(0.7)\nax.set_xticks(range(1, len($groups) + 1))\nax.set_xticklabels($groups)\nax.set_xlabel($xLabel)\nax.set_ylabel($yLabel)\nax.set_title($title)\nax.spines['top'].set_visible(False)\nax.spines['right'].set_visible(False)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [10, 6],
+      "recommendedSize": [
+        10,
+        6
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "dist_strip",
       "chartType": "distribution",
       "variant": "strip",
-      "name": { "en": "Strip / Swarm Plot", "pt": "Gráfico de Faixa / Enxame" },
+      "name": {
+        "en": "Strip / Swarm Plot",
+        "pt": "Gráfico de Faixa / Enxame"
+      },
       "dataShape": {
-        "required": ["groups", "values"],
-        "optional": ["colors", "labels"],
+        "required": [
+          "groups",
+          "values"
+        ],
+        "optional": [
+          "colors",
+          "labels"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[][]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nfor i, (g, v) in enumerate(zip($groups, $values)):\n    jitter = np.random.normal(0, 0.04, size=len(v))\n    ax.scatter(np.full(len(v), i) + jitter, v, color=$colors[i % len($colors)], alpha=0.6, s=20, edgecolors='white', linewidth=0.3)\nax.set_xticks(range(len($groups)))\nax.set_xticklabels($groups)\nax.set_xlabel($xLabel)\nax.set_ylabel($yLabel)\nax.set_title($title)\nax.spines['top'].set_visible(False)\nax.spines['right'].set_visible(False)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [10, 6],
+      "recommendedSize": [
+        10,
+        6
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "dist_ecdf",
       "chartType": "distribution",
       "variant": "ecdf",
-      "name": { "en": "ECDF Plot", "pt": "Gráfico ECDF" },
+      "name": {
+        "en": "ECDF Plot",
+        "pt": "Gráfico ECDF"
+      },
       "dataShape": {
-        "required": ["values"],
-        "optional": ["colors", "labels"],
+        "required": [
+          "values"
+        ],
+        "optional": [
+          "colors",
+          "labels"
+        ],
         "categoriesType": "number[]",
         "valuesType": "number[]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\ndata = np.sort(np.array($values, dtype=float))\necdf = np.arange(1, len(data) + 1) / len(data)\nax.step(data, ecdf, color=$colors[0], linewidth=2, where='post')\nax.set_xlabel($xLabel)\nax.set_ylabel('Cumulative Probability')\nax.set_title($title)\nax.set_ylim(0, 1.05)\nax.spines['top'].set_visible(False)\nax.spines['right'].set_visible(False)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [10, 6],
+      "recommendedSize": [
+        10,
+        6
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "stat_errorbar",
       "chartType": "statistical",
       "variant": "errorbar",
-      "name": { "en": "Error Bar Chart", "pt": "Gráfico com Barras de Erro" },
+      "name": {
+        "en": "Error Bar Chart",
+        "pt": "Gráfico com Barras de Erro"
+      },
       "dataShape": {
-        "required": ["categories", "values", "errors"],
-        "optional": ["colors", "labels"],
+        "required": [
+          "categories",
+          "values",
+          "errors"
+        ],
+        "optional": [
+          "colors",
+          "labels"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nax.bar($categories, $values, yerr=$errors, color=$colors[0], capsize=5, edgecolor='white', linewidth=0.5, error_kw=dict(ecolor='gray', linewidth=1.5))\nax.set_xlabel($xLabel)\nax.set_ylabel($yLabel)\nax.set_title($title)\nax.spines['top'].set_visible(False)\nax.spines['right'].set_visible(False)\nplt.xticks(rotation=$xRotation)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [10, 6],
+      "recommendedSize": [
+        10,
+        6
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "stat_confidence_band",
       "chartType": "statistical",
       "variant": "confidence_band",
-      "name": { "en": "Confidence Band Chart", "pt": "Gráfico com Banda de Confiança" },
+      "name": {
+        "en": "Confidence Band Chart",
+        "pt": "Gráfico com Banda de Confiança"
+      },
       "dataShape": {
-        "required": ["xValues", "yValues", "yLower", "yUpper"],
-        "optional": ["colors", "labels"],
+        "required": [
+          "xValues",
+          "yValues",
+          "yLower",
+          "yUpper"
+        ],
+        "optional": [
+          "colors",
+          "labels"
+        ],
         "categoriesType": "number[]",
         "valuesType": "number[]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nax.plot($xValues, $yValues, color=$colors[0], linewidth=2, label=$labels[0] if $labels else 'Mean')\nax.fill_between($xValues, $yLower, $yUpper, color=$colors[0], alpha=0.2, label='95% CI')\nax.set_xlabel($xLabel)\nax.set_ylabel($yLabel)\nax.set_title($title)\nax.legend()\nax.spines['top'].set_visible(False)\nax.spines['right'].set_visible(False)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [10, 6],
+      "recommendedSize": [
+        10,
+        6
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "stat_funnel",
       "chartType": "statistical",
       "variant": "funnel",
-      "name": { "en": "Funnel Chart", "pt": "Gráfico de Funil" },
+      "name": {
+        "en": "Funnel Chart",
+        "pt": "Gráfico de Funil"
+      },
       "dataShape": {
-        "required": ["categories", "values"],
-        "optional": ["colors", "labels"],
+        "required": [
+          "categories",
+          "values"
+        ],
+        "optional": [
+          "colors",
+          "labels"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nvals = np.array($values, dtype=float)\nmax_val = vals.max()\nwidths = vals / max_val\nfor i, (cat, w, v) in enumerate(zip($categories, widths, vals)):\n    ax.barh(i, w, height=0.7, left=(1 - w) / 2, color=$colors[i % len($colors)], edgecolor='white')\n    ax.text(0.5, i, f'{cat}: {v:,.0f}', ha='center', va='center', fontsize=10, fontweight='bold', color='white')\nax.set_xlim(0, 1)\nax.set_yticks([])\nax.set_title($title)\nax.axis('off')\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [10, 7],
+      "recommendedSize": [
+        10,
+        7
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "stat_forest",
       "chartType": "statistical",
       "variant": "forest",
-      "name": { "en": "Forest Plot", "pt": "Gráfico Florestal" },
+      "name": {
+        "en": "Forest Plot",
+        "pt": "Gráfico Florestal"
+      },
       "dataShape": {
-        "required": ["categories", "values", "ciLower", "ciUpper"],
-        "optional": ["colors", "labels"],
+        "required": [
+          "categories",
+          "values",
+          "ciLower",
+          "ciUpper"
+        ],
+        "optional": [
+          "colors",
+          "labels"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\ny_pos = range(len($categories))\nxerr_lower = np.array($values) - np.array($ciLower)\nxerr_upper = np.array($ciUpper) - np.array($values)\nax.errorbar($values, y_pos, xerr=[xerr_lower, xerr_upper], fmt='o', color=$colors[0], ecolor='gray', elinewidth=1.5, capsize=4, markersize=6)\nax.axvline(0, color='black', linewidth=0.8, linestyle='--')\nax.set_yticks(y_pos)\nax.set_yticklabels($categories)\nax.set_xlabel($xLabel)\nax.set_title($title)\nax.invert_yaxis()\nax.spines['top'].set_visible(False)\nax.spines['right'].set_visible(False)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [10, 7],
+      "recommendedSize": [
+        10,
+        7
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "heatmap_basic",
       "chartType": "heatmap",
       "variant": "basic",
-      "name": { "en": "Basic Heatmap", "pt": "Mapa de Calor Básico" },
+      "name": {
+        "en": "Basic Heatmap",
+        "pt": "Mapa de Calor Básico"
+      },
       "dataShape": {
-        "required": ["matrix", "xLabels", "yLabels"],
-        "optional": ["colormap", "labels"],
+        "required": [
+          "matrix",
+          "xLabels",
+          "yLabels"
+        ],
+        "optional": [
+          "colormap",
+          "labels"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[][]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\ndata = np.array($matrix)\nim = ax.imshow(data, cmap=$colormap if $colormap else 'YlOrRd', aspect='auto')\nax.set_xticks(range(len($xLabels)))\nax.set_xticklabels($xLabels, rotation=$xRotation)\nax.set_yticks(range(len($yLabels)))\nax.set_yticklabels($yLabels)\nax.set_title($title)\nplt.colorbar(im, ax=ax, shrink=0.8)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [10, 8],
+      "recommendedSize": [
+        10,
+        8
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "heatmap_correlation",
       "chartType": "heatmap",
       "variant": "correlation",
-      "name": { "en": "Correlation Matrix", "pt": "Matriz de Correlação" },
+      "name": {
+        "en": "Correlation Matrix",
+        "pt": "Matriz de Correlação"
+      },
       "dataShape": {
-        "required": ["matrix", "labels"],
-        "optional": ["colormap"],
+        "required": [
+          "matrix",
+          "labels"
+        ],
+        "optional": [
+          "colormap"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[][]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\ndata = np.array($matrix)\nmask = np.triu(np.ones_like(data, dtype=bool), k=1)\nmasked = np.ma.array(data, mask=mask)\nim = ax.imshow(masked, cmap=$colormap if $colormap else 'RdBu_r', vmin=-1, vmax=1, aspect='auto')\nax.set_xticks(range(len($labels)))\nax.set_xticklabels($labels, rotation=45, ha='right')\nax.set_yticks(range(len($labels)))\nax.set_yticklabels($labels)\nfor i in range(len($labels)):\n    for j in range(len($labels)):\n        if not mask[i, j]:\n            ax.text(j, i, f'{data[i, j]:.2f}', ha='center', va='center', fontsize=8)\nax.set_title($title)\nplt.colorbar(im, ax=ax, shrink=0.8)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [10, 8],
+      "recommendedSize": [
+        10,
+        8
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "heatmap_annotated",
       "chartType": "heatmap",
       "variant": "annotated",
-      "name": { "en": "Annotated Heatmap", "pt": "Mapa de Calor Anotado" },
+      "name": {
+        "en": "Annotated Heatmap",
+        "pt": "Mapa de Calor Anotado"
+      },
       "dataShape": {
-        "required": ["matrix", "xLabels", "yLabels"],
-        "optional": ["colormap", "labels", "fmt"],
+        "required": [
+          "matrix",
+          "xLabels",
+          "yLabels"
+        ],
+        "optional": [
+          "colormap",
+          "labels",
+          "fmt"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[][]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\ndata = np.array($matrix)\nim = ax.imshow(data, cmap=$colormap if $colormap else 'Blues', aspect='auto')\nax.set_xticks(range(len($xLabels)))\nax.set_xticklabels($xLabels, rotation=$xRotation)\nax.set_yticks(range(len($yLabels)))\nax.set_yticklabels($yLabels)\nthresh = (data.max() + data.min()) / 2\nfor i in range(data.shape[0]):\n    for j in range(data.shape[1]):\n        color = 'white' if data[i, j] > thresh else 'black'\n        ax.text(j, i, f'{data[i, j]:.1f}', ha='center', va='center', fontsize=8, color=color)\nax.set_title($title)\nplt.colorbar(im, ax=ax, shrink=0.8)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [10, 8],
+      "recommendedSize": [
+        10,
+        8
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "heatmap_clustered",
       "chartType": "heatmap",
       "variant": "clustered",
-      "name": { "en": "Clustered Heatmap", "pt": "Mapa de Calor Clusterizado" },
+      "name": {
+        "en": "Clustered Heatmap",
+        "pt": "Mapa de Calor Clusterizado"
+      },
       "dataShape": {
-        "required": ["matrix", "xLabels", "yLabels"],
-        "optional": ["colormap", "labels"],
+        "required": [
+          "matrix",
+          "xLabels",
+          "yLabels"
+        ],
+        "optional": [
+          "colormap",
+          "labels"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[][]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\nfrom scipy.cluster.hierarchy import dendrogram, linkage\nfrom scipy.spatial.distance import pdist\n\nfig = plt.figure(figsize=($figWidth, $figHeight))\ndata = np.array($matrix, dtype=float)\nrow_link = linkage(pdist(data), method='ward')\ncol_link = linkage(pdist(data.T), method='ward')\nrow_order = dendrogram(row_link, no_plot=True)['leaves']\ncol_order = dendrogram(col_link, no_plot=True)['leaves']\nordered = data[row_order][:, col_order]\nax = fig.add_subplot(111)\nim = ax.imshow(ordered, cmap=$colormap if $colormap else 'viridis', aspect='auto')\nrow_labels = [($yLabels)[i] for i in row_order]\ncol_labels = [($xLabels)[i] for i in col_order]\nax.set_xticks(range(len(col_labels)))\nax.set_xticklabels(col_labels, rotation=45, ha='right', fontsize=8)\nax.set_yticks(range(len(row_labels)))\nax.set_yticklabels(row_labels, fontsize=8)\nax.set_title($title)\nplt.colorbar(im, ax=ax, shrink=0.8)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [10, 8],
+      "recommendedSize": [
+        10,
+        8
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy", "scipy.cluster.hierarchy", "scipy.spatial.distance"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy",
+        "scipy.cluster.hierarchy",
+        "scipy.spatial.distance"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "ts_candlestick",
       "chartType": "timeseries",
       "variant": "candlestick",
-      "name": { "en": "Candlestick Chart", "pt": "Gráfico de Candlestick" },
+      "name": {
+        "en": "Candlestick Chart",
+        "pt": "Gráfico de Candlestick"
+      },
       "dataShape": {
-        "required": ["dates", "open", "high", "low", "close"],
-        "optional": ["colors"],
+        "required": [
+          "dates",
+          "open",
+          "high",
+          "low",
+          "close"
+        ],
+        "optional": [
+          "colors"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nfor i in range(len($dates)):\n    o, h, l, c = $open[i], $high[i], $low[i], $close[i]\n    color = $colors[0] if c >= o else $colors[1]\n    ax.plot([i, i], [l, h], color=color, linewidth=1)\n    body_bottom = min(o, c)\n    body_height = abs(c - o)\n    ax.bar(i, body_height, bottom=body_bottom, width=0.6, color=color, edgecolor=color)\nstep = max(1, len($dates) // 10)\nax.set_xticks(range(0, len($dates), step))\nax.set_xticklabels([($dates)[i] for i in range(0, len($dates), step)], rotation=45, ha='right')\nax.set_xlabel($xLabel)\nax.set_ylabel($yLabel)\nax.set_title($title)\nax.spines['top'].set_visible(False)\nax.spines['right'].set_visible(False)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [12, 6],
+      "recommendedSize": [
+        12,
+        6
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "ts_ohlc",
       "chartType": "timeseries",
       "variant": "ohlc",
-      "name": { "en": "OHLC Chart", "pt": "Gráfico OHLC" },
+      "name": {
+        "en": "OHLC Chart",
+        "pt": "Gráfico OHLC"
+      },
       "dataShape": {
-        "required": ["dates", "open", "high", "low", "close"],
-        "optional": ["colors"],
+        "required": [
+          "dates",
+          "open",
+          "high",
+          "low",
+          "close"
+        ],
+        "optional": [
+          "colors"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nfor i in range(len($dates)):\n    o, h, l, c = $open[i], $high[i], $low[i], $close[i]\n    color = $colors[0] if c >= o else $colors[1]\n    ax.plot([i, i], [l, h], color=color, linewidth=1)\n    ax.plot([i - 0.2, i], [o, o], color=color, linewidth=1.5)\n    ax.plot([i, i + 0.2], [c, c], color=color, linewidth=1.5)\nstep = max(1, len($dates) // 10)\nax.set_xticks(range(0, len($dates), step))\nax.set_xticklabels([($dates)[i] for i in range(0, len($dates), step)], rotation=45, ha='right')\nax.set_xlabel($xLabel)\nax.set_ylabel($yLabel)\nax.set_title($title)\nax.spines['top'].set_visible(False)\nax.spines['right'].set_visible(False)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [12, 6],
+      "recommendedSize": [
+        12,
+        6
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "ts_events",
       "chartType": "timeseries",
       "variant": "events",
-      "name": { "en": "Time Series with Events", "pt": "Série Temporal com Eventos" },
+      "name": {
+        "en": "Time Series with Events",
+        "pt": "Série Temporal com Eventos"
+      },
       "dataShape": {
-        "required": ["dates", "values", "eventDates", "eventLabels"],
-        "optional": ["colors", "labels"],
+        "required": [
+          "dates",
+          "values",
+          "eventDates",
+          "eventLabels"
+        ],
+        "optional": [
+          "colors",
+          "labels"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nx = range(len($dates))\nax.plot(x, $values, color=$colors[0], linewidth=2)\ndate_list = list($dates)\nfor ed, el in zip($eventDates, $eventLabels):\n    if ed in date_list:\n        idx = date_list.index(ed)\n        ax.axvline(idx, color=$colors[1], linewidth=1, linestyle='--', alpha=0.7)\n        ax.annotate(el, (idx, $values[idx]), textcoords='offset points', xytext=(5, 10), fontsize=8, color=$colors[1])\nstep = max(1, len($dates) // 8)\nax.set_xticks(range(0, len($dates), step))\nax.set_xticklabels([($dates)[i] for i in range(0, len($dates), step)], rotation=45, ha='right')\nax.set_xlabel($xLabel)\nax.set_ylabel($yLabel)\nax.set_title($title)\nax.spines['top'].set_visible(False)\nax.spines['right'].set_visible(False)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [12, 6],
+      "recommendedSize": [
+        12,
+        6
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "ts_dual_axis",
       "chartType": "timeseries",
       "variant": "dual_axis",
-      "name": { "en": "Dual Axis Time Series", "pt": "Série Temporal com Dois Eixos" },
+      "name": {
+        "en": "Dual Axis Time Series",
+        "pt": "Série Temporal com Dois Eixos"
+      },
       "dataShape": {
-        "required": ["dates", "values1", "values2"],
-        "optional": ["colors", "labels"],
+        "required": [
+          "dates",
+          "values1",
+          "values2"
+        ],
+        "optional": [
+          "colors",
+          "labels"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax1 = plt.subplots(figsize=($figWidth, $figHeight))\nx = range(len($dates))\nax1.plot(x, $values1, color=$colors[0], linewidth=2, label=$labels[0] if $labels else 'Series 1')\nax1.set_xlabel($xLabel)\nax1.set_ylabel($labels[0] if $labels else 'Series 1', color=$colors[0])\nax1.tick_params(axis='y', labelcolor=$colors[0])\nax2 = ax1.twinx()\nax2.plot(x, $values2, color=$colors[1], linewidth=2, label=$labels[1] if len($labels) > 1 else 'Series 2')\nax2.set_ylabel($labels[1] if len($labels) > 1 else 'Series 2', color=$colors[1])\nax2.tick_params(axis='y', labelcolor=$colors[1])\nstep = max(1, len($dates) // 8)\nax1.set_xticks(range(0, len($dates), step))\nax1.set_xticklabels([($dates)[i] for i in range(0, len($dates), step)], rotation=45, ha='right')\nfig.suptitle($title)\nfig.legend(loc='upper right', bbox_to_anchor=(0.95, 0.95))\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [12, 6],
+      "recommendedSize": [
+        12,
+        6
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "ts_seasonal_decomposition",
       "chartType": "timeseries",
       "variant": "seasonal_decomposition",
-      "name": { "en": "Seasonal Decomposition", "pt": "Decomposição Sazonal" },
+      "name": {
+        "en": "Seasonal Decomposition",
+        "pt": "Decomposição Sazonal"
+      },
       "dataShape": {
-        "required": ["values", "period"],
-        "optional": ["colors", "labels"],
+        "required": [
+          "values",
+          "period"
+        ],
+        "optional": [
+          "colors",
+          "labels"
+        ],
         "categoriesType": "number[]",
         "valuesType": "number[]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, axes = plt.subplots(4, 1, figsize=($figWidth, 10), sharex=True)\ndata = np.array($values, dtype=float)\nn = len(data)\nperiod = $period\nkernel = np.ones(period) / period\ntrend = np.convolve(data, kernel, mode='same')\ndetrended = data - trend\nseasonal = np.zeros(n)\nfor i in range(period):\n    seasonal[i::period] = np.nanmean(detrended[i::period])\nresidual = data - trend - seasonal\naxes[0].plot(data, color=$colors[0], linewidth=1.5)\naxes[0].set_ylabel('Observed')\naxes[1].plot(trend, color=$colors[1] if len($colors) > 1 else $colors[0], linewidth=1.5)\naxes[1].set_ylabel('Trend')\naxes[2].plot(seasonal, color=$colors[2] if len($colors) > 2 else $colors[0], linewidth=1.5)\naxes[2].set_ylabel('Seasonal')\naxes[3].plot(residual, color=$colors[3] if len($colors) > 3 else $colors[0], linewidth=1, alpha=0.7)\naxes[3].set_ylabel('Residual')\nfig.suptitle($title)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [12, 10],
+      "recommendedSize": [
+        12,
+        10
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "ts_moving_average",
       "chartType": "timeseries",
       "variant": "moving_average",
-      "name": { "en": "Moving Average Overlay", "pt": "Série com Média Móvel" },
+      "name": {
+        "en": "Moving Average Overlay",
+        "pt": "Série com Média Móvel"
+      },
       "dataShape": {
-        "required": ["dates", "values", "window"],
-        "optional": ["colors", "labels"],
+        "required": [
+          "dates",
+          "values",
+          "window"
+        ],
+        "optional": [
+          "colors",
+          "labels"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nx = range(len($dates))\ndata = np.array($values, dtype=float)\nax.plot(x, data, color=$colors[0], linewidth=1, alpha=0.5, label='Raw')\nwindow = $window\nma = np.convolve(data, np.ones(window) / window, mode='valid')\noffset = window // 2\nax.plot(range(offset, offset + len(ma)), ma, color=$colors[1], linewidth=2.5, label=f'{window}-period MA')\nstep = max(1, len($dates) // 8)\nax.set_xticks(range(0, len($dates), step))\nax.set_xticklabels([($dates)[i] for i in range(0, len($dates), step)], rotation=45, ha='right')\nax.set_xlabel($xLabel)\nax.set_ylabel($yLabel)\nax.set_title($title)\nax.legend()\nax.spines['top'].set_visible(False)\nax.spines['right'].set_visible(False)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [12, 6],
+      "recommendedSize": [
+        12,
+        6
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "hier_treemap",
       "chartType": "hierarchical",
       "variant": "treemap",
-      "name": { "en": "Treemap", "pt": "Mapa de Árvore" },
+      "name": {
+        "en": "Treemap",
+        "pt": "Mapa de Árvore"
+      },
       "dataShape": {
-        "required": ["categories", "values"],
-        "optional": ["colors", "labels"],
+        "required": [
+          "categories",
+          "values"
+        ],
+        "optional": [
+          "colors",
+          "labels"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\nimport squarify\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\ncolors_list = [$colors[i % len($colors)] for i in range(len($categories))]\nsquarify.plot(sizes=$values, label=$categories, color=colors_list, alpha=0.8, ax=ax, text_kwargs={'fontsize': 9, 'fontweight': 'bold', 'color': 'white'})\nax.set_title($title)\nax.axis('off')\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [10, 7],
+      "recommendedSize": [
+        10,
+        7
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy", "squarify"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy",
+        "squarify"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "hier_sunburst",
       "chartType": "hierarchical",
       "variant": "sunburst",
-      "name": { "en": "Sunburst Chart", "pt": "Gráfico Sunburst" },
+      "name": {
+        "en": "Sunburst Chart",
+        "pt": "Gráfico Sunburst"
+      },
       "dataShape": {
-        "required": ["labelsInner", "valuesInner", "labelsOuter", "valuesOuter"],
-        "optional": ["colors", "parentMap"],
+        "required": [
+          "labelsInner",
+          "valuesInner",
+          "labelsOuter",
+          "valuesOuter"
+        ],
+        "optional": [
+          "colors",
+          "parentMap"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight), subplot_kw=dict(polar=True))\ninner_vals = np.array($valuesInner, dtype=float)\nouter_vals = np.array($valuesOuter, dtype=float)\ninner_total = inner_vals.sum()\nouter_total = outer_vals.sum()\ninner_angles = inner_vals / inner_total * 2 * np.pi\nouter_angles = outer_vals / outer_total * 2 * np.pi\ninner_starts = np.cumsum(np.concatenate([[0], inner_angles[:-1]]))\nouter_starts = np.cumsum(np.concatenate([[0], outer_angles[:-1]]))\nfor i, (s, a) in enumerate(zip(inner_starts, inner_angles)):\n    ax.bar(s + a / 2, 1, width=a, bottom=0.3, color=$colors[i % len($colors)], edgecolor='white', linewidth=1)\n    if a > 0.2:\n        ax.text(s + a / 2, 0.8, $labelsInner[i], ha='center', va='center', fontsize=8, fontweight='bold')\nfor i, (s, a) in enumerate(zip(outer_starts, outer_angles)):\n    pidx = $parentMap[i] if $parentMap else i % len($colors)\n    ax.bar(s + a / 2, 0.8, width=a, bottom=1.3, color=$colors[pidx % len($colors)], edgecolor='white', linewidth=1, alpha=0.7)\n    if a > 0.15:\n        ax.text(s + a / 2, 1.7, $labelsOuter[i], ha='center', va='center', fontsize=7)\nax.set_ylim(0, 2.5)\nax.axis('off')\nax.set_title($title, y=1.05)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [8, 8],
+      "recommendedSize": [
+        8,
+        8
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "hier_icicle",
       "chartType": "hierarchical",
       "variant": "icicle",
-      "name": { "en": "Icicle Chart", "pt": "Gráfico Icicle" },
+      "name": {
+        "en": "Icicle Chart",
+        "pt": "Gráfico Icicle"
+      },
       "dataShape": {
-        "required": ["labels", "values", "parents", "levels"],
-        "optional": ["colors"],
+        "required": [
+          "labels",
+          "values",
+          "parents",
+          "levels"
+        ],
+        "optional": [
+          "colors"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nlabels = $labels\nvalues = np.array($values, dtype=float)\nlevels = $levels\nmax_level = max(levels)\nfor level in range(max_level + 1):\n    items = [(i, labels[i], values[i]) for i in range(len(labels)) if levels[i] == level]\n    total = sum(v for _, _, v in items)\n    x_pos = 0\n    for idx, lbl, val in items:\n        width = val / total if total > 0 else 0\n        color = $colors[idx % len($colors)]\n        ax.barh(level, width, left=x_pos, height=0.8, color=color, edgecolor='white', linewidth=1)\n        if width > 0.05:\n            ax.text(x_pos + width / 2, level, lbl, ha='center', va='center', fontsize=8, color='white', fontweight='bold')\n        x_pos += width\nax.set_yticks(range(max_level + 1))\nax.set_yticklabels([f'Level {i}' for i in range(max_level + 1)])\nax.invert_yaxis()\nax.set_title($title)\nax.set_xlim(0, 1)\nax.spines['top'].set_visible(False)\nax.spines['right'].set_visible(False)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [12, 6],
+      "recommendedSize": [
+        12,
+        6
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "hier_dendrogram",
       "chartType": "hierarchical",
       "variant": "dendrogram",
-      "name": { "en": "Dendrogram", "pt": "Dendrograma" },
+      "name": {
+        "en": "Dendrogram",
+        "pt": "Dendrograma"
+      },
       "dataShape": {
-        "required": ["matrix", "labels"],
-        "optional": ["colors", "method"],
+        "required": [
+          "matrix",
+          "labels"
+        ],
+        "optional": [
+          "colors",
+          "method"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[][]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\nfrom scipy.cluster.hierarchy import dendrogram, linkage\nfrom scipy.spatial.distance import pdist\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\ndata = np.array($matrix, dtype=float)\ndist = pdist(data)\nmethod = $method if $method else 'ward'\nZ = linkage(dist, method=method)\ndendrogram(Z, labels=$labels, ax=ax, leaf_rotation=90, leaf_font_size=9)\nax.set_title($title)\nax.set_ylabel('Distance')\nax.spines['top'].set_visible(False)\nax.spines['right'].set_visible(False)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [12, 7],
+      "recommendedSize": [
+        12,
+        7
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy", "scipy.cluster.hierarchy", "scipy.spatial.distance"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy",
+        "scipy.cluster.hierarchy",
+        "scipy.spatial.distance"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "flow_waterfall",
       "chartType": "flow",
       "variant": "waterfall",
-      "name": { "en": "Waterfall Chart", "pt": "Gráfico de Cascata" },
+      "name": {
+        "en": "Waterfall Chart",
+        "pt": "Gráfico de Cascata"
+      },
       "dataShape": {
-        "required": ["categories", "values"],
-        "optional": ["colors", "labels"],
+        "required": [
+          "categories",
+          "values"
+        ],
+        "optional": [
+          "colors",
+          "labels"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nvals = np.array($values, dtype=float)\ncumulative = np.cumsum(vals)\ncumulative = np.insert(cumulative, 0, 0)\nfor i in range(len(vals)):\n    color = $colors[0] if vals[i] >= 0 else $colors[1]\n    bottom = cumulative[i] if vals[i] >= 0 else cumulative[i + 1]\n    ax.bar($categories[i], abs(vals[i]), bottom=bottom, color=color, edgecolor='white', linewidth=0.5)\n    if i < len(vals) - 1:\n        ax.plot([i - 0.4, i + 1.4], [cumulative[i + 1], cumulative[i + 1]], color='gray', linewidth=0.8)\nax.set_xlabel($xLabel)\nax.set_ylabel($yLabel)\nax.set_title($title)\nax.spines['top'].set_visible(False)\nax.spines['right'].set_visible(False)\nplt.xticks(rotation=$xRotation)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [12, 6],
+      "recommendedSize": [
+        12,
+        6
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "flow_sankey",
       "chartType": "flow",
       "variant": "sankey",
-      "name": { "en": "Sankey Diagram", "pt": "Diagrama de Sankey" },
+      "name": {
+        "en": "Sankey Diagram",
+        "pt": "Diagrama de Sankey"
+      },
       "dataShape": {
-        "required": ["flows", "labels", "orientations"],
-        "optional": ["colors"],
+        "required": [
+          "flows",
+          "labels",
+          "orientations"
+        ],
+        "optional": [
+          "colors"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\nfrom matplotlib.sankey import Sankey\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nsankey = Sankey(ax=ax, unit='', format='%.0f', gap=0.25, radius=0.1)\nsankey.add(flows=$flows, labels=$labels, orientations=$orientations, facecolor=$colors[0], edgecolor='white')\nsankey.finish()\nax.set_title($title)\nax.axis('off')\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [12, 7],
+      "recommendedSize": [
+        12,
+        7
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy", "matplotlib.sankey"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy",
+        "matplotlib.sankey"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "flow_funnel",
       "chartType": "flow",
       "variant": "funnel",
-      "name": { "en": "Funnel Flow Chart", "pt": "Gráfico de Funil de Fluxo" },
+      "name": {
+        "en": "Funnel Flow Chart",
+        "pt": "Gráfico de Funil de Fluxo"
+      },
       "dataShape": {
-        "required": ["stages", "values"],
-        "optional": ["colors", "labels"],
+        "required": [
+          "stages",
+          "values"
+        ],
+        "optional": [
+          "colors",
+          "labels"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nvals = np.array($values, dtype=float)\nmax_val = vals.max()\nn = len($stages)\nfor i, (stage, val) in enumerate(zip($stages, vals)):\n    width = val / max_val\n    left = (1 - width) / 2\n    color = $colors[i % len($colors)]\n    ax.barh(n - 1 - i, width, left=left, height=0.7, color=color, edgecolor='white', linewidth=1.5)\n    ax.text(0.5, n - 1 - i, f'{stage}\\n{val:,.0f}', ha='center', va='center', fontsize=10, fontweight='bold', color='white')\nax.set_xlim(0, 1)\nax.set_ylim(-0.5, n - 0.5)\nax.set_title($title)\nax.axis('off')\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [10, 7],
+      "recommendedSize": [
+        10,
+        7
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "rank_lollipop",
       "chartType": "ranking",
       "variant": "lollipop",
-      "name": { "en": "Lollipop Chart", "pt": "Gráfico Pirulito" },
+      "name": {
+        "en": "Lollipop Chart",
+        "pt": "Gráfico Pirulito"
+      },
       "dataShape": {
-        "required": ["categories", "values"],
-        "optional": ["colors", "labels"],
+        "required": [
+          "categories",
+          "values"
+        ],
+        "optional": [
+          "colors",
+          "labels"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\ny_pos = range(len($categories))\nax.hlines(y_pos, 0, $values, color=$colors[0], linewidth=1.5)\nax.scatter($values, y_pos, color=$colors[0], s=60, zorder=5)\nax.set_yticks(y_pos)\nax.set_yticklabels($categories)\nax.set_xlabel($xLabel)\nax.set_title($title)\nax.invert_yaxis()\nax.spines['top'].set_visible(False)\nax.spines['right'].set_visible(False)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [10, 7],
+      "recommendedSize": [
+        10,
+        7
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "rank_bullet",
       "chartType": "ranking",
       "variant": "bullet",
-      "name": { "en": "Bullet Chart", "pt": "Gráfico Bullet" },
+      "name": {
+        "en": "Bullet Chart",
+        "pt": "Gráfico Bullet"
+      },
       "dataShape": {
-        "required": ["categories", "values", "targets", "ranges"],
-        "optional": ["colors", "labels"],
+        "required": [
+          "categories",
+          "values",
+          "targets",
+          "ranges"
+        ],
+        "optional": [
+          "colors",
+          "labels"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, axes = plt.subplots(len($categories), 1, figsize=($figWidth, max(2, len($categories) * 1.2)), sharex=True)\nif len($categories) == 1:\n    axes = [axes]\nfor i, (ax, cat, val, tgt, rng) in enumerate(zip(axes, $categories, $values, $targets, $ranges)):\n    sorted_rng = sorted(rng, reverse=True)\n    grays = ['#e0e0e0', '#c0c0c0', '#a0a0a0']\n    for j, r_val in enumerate(sorted_rng):\n        ax.barh(0, r_val, height=0.6, color=grays[j % len(grays)])\n    ax.barh(0, val, height=0.3, color=$colors[0])\n    ax.axvline(tgt, color='black', linewidth=2.5, ymin=0.15, ymax=0.85)\n    ax.set_yticks([0])\n    ax.set_yticklabels([cat])\n    ax.spines['top'].set_visible(False)\n    ax.spines['right'].set_visible(False)\n    ax.spines['left'].set_visible(False)\naxes[-1].set_xlabel($xLabel)\nfig.suptitle($title)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [10, 6],
+      "recommendedSize": [
+        10,
+        6
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "rank_gauge",
       "chartType": "ranking",
       "variant": "gauge",
-      "name": { "en": "Gauge / Speedometer Chart", "pt": "Gráfico de Velocímetro" },
+      "name": {
+        "en": "Gauge / Speedometer Chart",
+        "pt": "Gráfico de Velocímetro"
+      },
       "dataShape": {
-        "required": ["value", "minVal", "maxVal"],
-        "optional": ["colors", "labels", "thresholds"],
+        "required": [
+          "value",
+          "minVal",
+          "maxVal"
+        ],
+        "optional": [
+          "colors",
+          "labels",
+          "thresholds"
+        ],
         "categoriesType": "number",
         "valuesType": "number"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\nfrom matplotlib.patches import Wedge\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight))\nmin_val = $minVal\nmax_val = $maxVal\nvalue = $value\nthresholds = $thresholds if $thresholds else [max_val * 0.33, max_val * 0.66, max_val]\nzone_colors = [$colors[2] if len($colors) > 2 else '#059669', $colors[3] if len($colors) > 3 else '#D97706', $colors[1]]\nranges_list = [min_val] + list(thresholds)\nfor i in range(len(ranges_list) - 1):\n    start_angle = 180 - (ranges_list[i] - min_val) / (max_val - min_val) * 180\n    end_angle = 180 - (ranges_list[i + 1] - min_val) / (max_val - min_val) * 180\n    wedge = Wedge((0.5, 0), 0.4, end_angle, start_angle, width=0.12, facecolor=zone_colors[i % len(zone_colors)], edgecolor='white')\n    ax.add_patch(wedge)\nneedle_angle = np.radians(180 - (value - min_val) / (max_val - min_val) * 180)\nnx = 0.5 + 0.32 * np.cos(needle_angle)\nny = 0.32 * np.sin(needle_angle)\nax.annotate('', xy=(nx, ny), xytext=(0.5, 0), arrowprops=dict(arrowstyle='->', color='black', lw=2.5))\nax.text(0.5, -0.08, f'{value:,.0f}', ha='center', va='center', fontsize=18, fontweight='bold')\nax.set_xlim(0, 1)\nax.set_ylim(-0.15, 0.5)\nax.set_aspect('equal')\nax.set_title($title, y=1.0)\nax.axis('off')\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [8, 5],
+      "recommendedSize": [
+        8,
+        5
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy", "matplotlib.patches"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy",
+        "matplotlib.patches"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "rank_radar",
       "chartType": "ranking",
       "variant": "radar",
-      "name": { "en": "Radar / Spider Chart", "pt": "Gráfico Radar / Aranha" },
+      "name": {
+        "en": "Radar / Spider Chart",
+        "pt": "Gráfico Radar / Aranha"
+      },
       "dataShape": {
-        "required": ["categories", "values"],
-        "optional": ["colors", "labels", "series"],
+        "required": [
+          "categories",
+          "values"
+        ],
+        "optional": [
+          "colors",
+          "labels",
+          "series"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[] | number[][]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots(figsize=($figWidth, $figHeight), subplot_kw=dict(polar=True))\ncats = $categories\nn = len(cats)\nangles = np.linspace(0, 2 * np.pi, n, endpoint=False).tolist()\nangles += angles[:1]\nif isinstance($values[0], list):\n    for i, (s, v) in enumerate(zip($series, $values)):\n        vals = v + v[:1]\n        ax.plot(angles, vals, 'o-', linewidth=2, label=s, color=$colors[i % len($colors)])\n        ax.fill(angles, vals, alpha=0.1, color=$colors[i % len($colors)])\nelse:\n    vals = list($values) + [$values[0]]\n    ax.plot(angles, vals, 'o-', linewidth=2, color=$colors[0])\n    ax.fill(angles, vals, alpha=0.2, color=$colors[0])\nax.set_xticks(angles[:-1])\nax.set_xticklabels(cats, fontsize=9)\nax.set_title($title, y=1.08)\nif isinstance($values[0], list):\n    ax.legend(loc='upper right', bbox_to_anchor=(1.3, 1.1))\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [8, 8],
+      "recommendedSize": [
+        8,
+        8
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "combo_bar_line",
       "chartType": "combo",
       "variant": "bar_line",
-      "name": { "en": "Bar + Line Combo Chart", "pt": "Gráfico Combinado Barra + Linha" },
+      "name": {
+        "en": "Bar + Line Combo Chart",
+        "pt": "Gráfico Combinado Barra + Linha"
+      },
       "dataShape": {
-        "required": ["categories", "barValues", "lineValues"],
-        "optional": ["colors", "labels"],
+        "required": [
+          "categories",
+          "barValues",
+          "lineValues"
+        ],
+        "optional": [
+          "colors",
+          "labels"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax1 = plt.subplots(figsize=($figWidth, $figHeight))\nx = np.arange(len($categories))\nax1.bar(x, $barValues, color=$colors[0], alpha=0.7, label=$labels[0] if $labels else 'Bar')\nax1.set_xlabel($xLabel)\nax1.set_ylabel($labels[0] if $labels else 'Bar', color=$colors[0])\nax1.tick_params(axis='y', labelcolor=$colors[0])\nax2 = ax1.twinx()\nax2.plot(x, $lineValues, color=$colors[1], linewidth=2.5, marker='o', markersize=5, label=$labels[1] if len($labels) > 1 else 'Line')\nax2.set_ylabel($labels[1] if len($labels) > 1 else 'Line', color=$colors[1])\nax2.tick_params(axis='y', labelcolor=$colors[1])\nax1.set_xticks(x)\nax1.set_xticklabels($categories, rotation=$xRotation)\nfig.suptitle($title)\nlines1, labels1 = ax1.get_legend_handles_labels()\nlines2, labels2 = ax2.get_legend_handles_labels()\nax1.legend(lines1 + lines2, labels1 + labels2, loc='upper left')\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [12, 6],
+      "recommendedSize": [
+        12,
+        6
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "combo_dual_axis",
       "chartType": "combo",
       "variant": "dual_axis",
-      "name": { "en": "Dual Axis Combo Chart", "pt": "Gráfico Combinado com Dois Eixos" },
+      "name": {
+        "en": "Dual Axis Combo Chart",
+        "pt": "Gráfico Combinado com Dois Eixos"
+      },
       "dataShape": {
-        "required": ["categories", "values1", "values2"],
-        "optional": ["colors", "labels", "chartTypes"],
+        "required": [
+          "categories",
+          "values1",
+          "values2"
+        ],
+        "optional": [
+          "colors",
+          "labels",
+          "chartTypes"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax1 = plt.subplots(figsize=($figWidth, $figHeight))\nx = np.arange(len($categories))\nct = $chartTypes if $chartTypes else ['bar', 'line']\nif ct[0] == 'bar':\n    ax1.bar(x, $values1, color=$colors[0], alpha=0.7, label=$labels[0] if $labels else 'Series 1')\nelse:\n    ax1.plot(x, $values1, color=$colors[0], linewidth=2, label=$labels[0] if $labels else 'Series 1')\nax1.set_xlabel($xLabel)\nax1.set_ylabel($labels[0] if $labels else 'Left Axis', color=$colors[0])\nax1.tick_params(axis='y', labelcolor=$colors[0])\nax2 = ax1.twinx()\nif ct[1] == 'bar':\n    ax2.bar(x + 0.3, $values2, width=0.3, color=$colors[1], alpha=0.7, label=$labels[1] if len($labels) > 1 else 'Series 2')\nelse:\n    ax2.plot(x, $values2, color=$colors[1], linewidth=2, marker='s', label=$labels[1] if len($labels) > 1 else 'Series 2')\nax2.set_ylabel($labels[1] if len($labels) > 1 else 'Right Axis', color=$colors[1])\nax2.tick_params(axis='y', labelcolor=$colors[1])\nax1.set_xticks(x)\nax1.set_xticklabels($categories, rotation=$xRotation)\nfig.suptitle($title)\nlines1, labels1 = ax1.get_legend_handles_labels()\nlines2, labels2 = ax2.get_legend_handles_labels()\nax1.legend(lines1 + lines2, labels1 + labels2, loc='upper left')\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [12, 6],
+      "recommendedSize": [
+        12,
+        6
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "combo_stacked_bar_line",
       "chartType": "combo",
       "variant": "stacked_bar_line",
-      "name": { "en": "Stacked Bar + Line Combo", "pt": "Gráfico Combinado Barras Empilhadas + Linha" },
+      "name": {
+        "en": "Stacked Bar + Line Combo",
+        "pt": "Gráfico Combinado Barras Empilhadas + Linha"
+      },
       "dataShape": {
-        "required": ["categories", "series", "barValues", "lineValues"],
-        "optional": ["colors", "labels"],
+        "required": [
+          "categories",
+          "series",
+          "barValues",
+          "lineValues"
+        ],
+        "optional": [
+          "colors",
+          "labels"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[][]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax1 = plt.subplots(figsize=($figWidth, $figHeight))\nx = np.arange(len($categories))\nbottom = np.zeros(len($categories))\nfor i, (s, v) in enumerate(zip($series, $barValues)):\n    ax1.bar(x, v, bottom=bottom, label=s, color=$colors[i % len($colors)], edgecolor='white', linewidth=0.5)\n    bottom += np.array(v)\nax1.set_xlabel($xLabel)\nax1.set_ylabel($labels[0] if $labels else 'Value')\nax2 = ax1.twinx()\nline_label = $labels[1] if len($labels) > 1 else 'Trend'\nax2.plot(x, $lineValues, color='black', linewidth=2.5, marker='o', markersize=5, label=line_label)\nax2.set_ylabel(line_label)\nax1.set_xticks(x)\nax1.set_xticklabels($categories, rotation=$xRotation)\nfig.suptitle($title)\nlines1, labels1 = ax1.get_legend_handles_labels()\nlines2, labels2 = ax2.get_legend_handles_labels()\nax1.legend(lines1 + lines2, labels1 + labels2, loc='upper left')\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [12, 6],
+      "recommendedSize": [
+        12,
+        6
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "facet_line",
       "chartType": "small_multiples",
       "variant": "faceted_line",
-      "name": { "en": "Faceted Line Chart", "pt": "Gráfico de Linhas Facetado" },
+      "name": {
+        "en": "Faceted Line Chart",
+        "pt": "Gráfico de Linhas Facetado"
+      },
       "dataShape": {
-        "required": ["categories", "series", "values"],
-        "optional": ["colors", "labels", "cols"],
+        "required": [
+          "categories",
+          "series",
+          "values"
+        ],
+        "optional": [
+          "colors",
+          "labels",
+          "cols"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[][]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nn_series = len($series)\ncols = $cols if $cols else min(3, n_series)\nrows = int(np.ceil(n_series / cols))\nfig, axes = plt.subplots(rows, cols, figsize=($figWidth, 4 * rows), sharex=True, sharey=True)\nif rows * cols == 1:\n    axes = np.array([[axes]])\nelif rows == 1:\n    axes = axes.reshape(1, -1)\nelif cols == 1:\n    axes = axes.reshape(-1, 1)\nfor i, (s, v) in enumerate(zip($series, $values)):\n    r_idx, c_idx = divmod(i, cols)\n    ax = axes[r_idx][c_idx]\n    ax.plot($categories, v, color=$colors[i % len($colors)], linewidth=2)\n    ax.set_title(s, fontsize=10)\n    ax.tick_params(axis='x', rotation=45)\n    ax.spines['top'].set_visible(False)\n    ax.spines['right'].set_visible(False)\nfor i in range(n_series, rows * cols):\n    r_idx, c_idx = divmod(i, cols)\n    axes[r_idx][c_idx].set_visible(False)\nfig.suptitle($title, fontsize=14)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [12, 8],
+      "recommendedSize": [
+        12,
+        8
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     },
     {
       "id": "facet_bar",
       "chartType": "small_multiples",
       "variant": "faceted_bar",
-      "name": { "en": "Faceted Bar Chart", "pt": "Gráfico de Barras Facetado" },
+      "name": {
+        "en": "Faceted Bar Chart",
+        "pt": "Gráfico de Barras Facetado"
+      },
       "dataShape": {
-        "required": ["categories", "series", "values"],
-        "optional": ["colors", "labels", "cols"],
+        "required": [
+          "categories",
+          "series",
+          "values"
+        ],
+        "optional": [
+          "colors",
+          "labels",
+          "cols"
+        ],
         "categoriesType": "string[]",
         "valuesType": "number[][]"
       },
       "pythonTemplate": "import matplotlib.pyplot as plt\nimport numpy as np\n\nn_series = len($series)\ncols = $cols if $cols else min(3, n_series)\nrows = int(np.ceil(n_series / cols))\nfig, axes = plt.subplots(rows, cols, figsize=($figWidth, 4 * rows), sharex=True, sharey=True)\nif rows * cols == 1:\n    axes = np.array([[axes]])\nelif rows == 1:\n    axes = axes.reshape(1, -1)\nelif cols == 1:\n    axes = axes.reshape(-1, 1)\nfor i, (s, v) in enumerate(zip($series, $values)):\n    r_idx, c_idx = divmod(i, cols)\n    ax = axes[r_idx][c_idx]\n    ax.bar($categories, v, color=$colors[i % len($colors)], edgecolor='white', linewidth=0.5)\n    ax.set_title(s, fontsize=10)\n    ax.tick_params(axis='x', rotation=45)\n    ax.spines['top'].set_visible(False)\n    ax.spines['right'].set_visible(False)\nfor i in range(n_series, rows * cols):\n    r_idx, c_idx = divmod(i, cols)\n    axes[r_idx][c_idx].set_visible(False)\nfig.suptitle($title, fontsize=14)\nplt.tight_layout()\nplt.savefig($outputPath, dpi=$dpi, bbox_inches='tight')\nplt.close()",
       "outputFormat": "png",
-      "recommendedSize": [12, 8],
+      "recommendedSize": [
+        12,
+        8
+      ],
       "embeddingStrategy": "xlsx_image_anchor",
-      "embeddingHints": { "placement": "below_data", "offsetRows": 2, "scaleToFit": true },
-      "requiredImports": ["matplotlib.pyplot", "numpy"],
-      "safetyNotes": ["No network calls", "No filesystem access outside sandbox"]
+      "embeddingHints": {
+        "placement": "below_data",
+        "offsetRows": 2,
+        "scaleToFit": true
+      },
+      "requiredImports": [
+        "matplotlib.pyplot",
+        "numpy"
+      ],
+      "safetyNotes": [
+        "No network calls",
+        "No filesystem access outside sandbox"
+      ]
     }
   ]
 }

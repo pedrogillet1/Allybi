@@ -85,7 +85,9 @@ export class DocumentIntelligenceIntegrityService {
         continue;
       }
 
-      const relPath = String((entry as Record<string, unknown>)?.path || "").trim();
+      const relPath = String(
+        (entry as unknown as Record<string, unknown>)?.path || "",
+      ).trim();
       if (!relPath) {
         missingBankFiles.push(id);
         continue;

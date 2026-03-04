@@ -3,13 +3,24 @@
     "id": "editing_routing",
     "version": "1.0.0",
     "description": "Data-driven guardrails and tiebreaker rules for editing operator routing. Each rule has a unique id, match conditions, and an enforcement action. Consumed by operatorPlanner (pre-filters) and operatorValidator (post-guards).",
-    "languages": ["any"],
+    "languages": [
+      "any"
+    ],
     "lastUpdated": "2026-02-27",
-    "owner": "allybi-editing"
+    "owner": "allybi-editing",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
-    "failOpen": false
+    "failOpen": false,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "guardrails": [
     {
@@ -40,7 +51,11 @@
       "description": "Heading/bulk resolvers must not override an explicit selection unless the user says 'entire document', 'todo o documento', or equivalent whole-doc phrase.",
       "condition": {
         "hasSelection": true,
-        "resolvedScopeKind_in": ["document", "all_headings", "all_paragraphs"],
+        "resolvedScopeKind_in": [
+          "document",
+          "all_headings",
+          "all_paragraphs"
+        ],
         "userSaysEntireDocument": false
       },
       "action": "block",
@@ -68,7 +83,10 @@
       "description": "Formatting intents (bold, italic, font, color, size, alignment) must never be routed to rewrite operators (REWRITE_PARAGRAPH, REWRITE_SECTION, REPLACE_SPAN). They must go to SET_RUN_STYLE / FORMAT_RANGE.",
       "condition": {
         "isFormattingIntent": true,
-        "operatorMatches": ["REWRITE", "REPLACE_SPAN"]
+        "operatorMatches": [
+          "REWRITE",
+          "REPLACE_SPAN"
+        ]
       },
       "action": "block",
       "blockCode": "ROUTING_FORMATTING_REWRITE_BLOCKED",
@@ -89,8 +107,16 @@
       "phase": "post",
       "description": "Structural intents (insert, delete, merge, split, list operations, TOC) must never fall back to DOCX_REWRITE_PARAGRAPH or DOCX_REPLACE_SPAN.",
       "condition": {
-        "operatorClassIn": ["doc_feature", "list_numbering", "table", "xlsx_structural"],
-        "operatorMatches": ["REWRITE_PARAGRAPH", "REPLACE_SPAN"]
+        "operatorClassIn": [
+          "doc_feature",
+          "list_numbering",
+          "table",
+          "xlsx_structural"
+        ],
+        "operatorMatches": [
+          "REWRITE_PARAGRAPH",
+          "REPLACE_SPAN"
+        ]
       },
       "action": "block",
       "blockCode": "ROUTING_STRUCTURAL_REWRITE_BLOCKED",
@@ -113,7 +139,10 @@
       "condition": {
         "multiIntent": true,
         "sameTarget": true,
-        "operatorPairIncludes": ["REWRITE", "TRANSLATE"]
+        "operatorPairIncludes": [
+          "REWRITE",
+          "TRANSLATE"
+        ]
       },
       "action": "require_confirmation",
       "confirmCode": "ROUTING_REWRITE_TRANSLATE_CONFLICT",
@@ -135,9 +164,17 @@
       "description": "Destructive operations always require explicit user confirmation before execution.",
       "condition": {
         "operatorMatchesAny": [
-          "DELETE_ROW", "DELETE_COLUMN", "DELETE_PARAGRAPH", "DELETE_SECTION",
-          "DELETE_SHEET", "DELETE_TABLE", "DELETE_COMMENT", "REMOVE_COMMENT",
-          "CLEAR_RANGE", "DELETE_RANGE", "REMOVE_ALL_COMMENTS"
+          "DELETE_ROW",
+          "DELETE_COLUMN",
+          "DELETE_PARAGRAPH",
+          "DELETE_SECTION",
+          "DELETE_SHEET",
+          "DELETE_TABLE",
+          "DELETE_COMMENT",
+          "REMOVE_COMMENT",
+          "CLEAR_RANGE",
+          "DELETE_RANGE",
+          "REMOVE_ALL_COMMENTS"
         ]
       },
       "action": "require_confirmation",
@@ -194,14 +231,38 @@
         "pt": "Esta operação não é suportada pelo mecanismo de documento atual."
       },
       "capabilityMap": {
-        "XLSX_CHART_CREATE": { "requiresDomain": "sheets", "requiresEngine": "xlsx" },
-        "XLSX_CHART_UPDATE": { "requiresDomain": "sheets", "requiresEngine": "xlsx" },
-        "XLSX_PIVOT_CREATE": { "requiresDomain": "sheets", "requiresEngine": "xlsx" },
-        "DOCX_UPDATE_TOC": { "requiresDomain": "docx", "requiresEngine": "docx" },
-        "DOCX_INSERT_COVER_PAGE": { "requiresDomain": "docx", "requiresEngine": "docx" },
-        "DOCX_ADD_WATERMARK": { "requiresDomain": "docx", "requiresEngine": "docx" },
-        "DOCX_INSERT_HEADER": { "requiresDomain": "docx", "requiresEngine": "docx" },
-        "DOCX_INSERT_FOOTER": { "requiresDomain": "docx", "requiresEngine": "docx" }
+        "XLSX_CHART_CREATE": {
+          "requiresDomain": "sheets",
+          "requiresEngine": "xlsx"
+        },
+        "XLSX_CHART_UPDATE": {
+          "requiresDomain": "sheets",
+          "requiresEngine": "xlsx"
+        },
+        "XLSX_PIVOT_CREATE": {
+          "requiresDomain": "sheets",
+          "requiresEngine": "xlsx"
+        },
+        "DOCX_UPDATE_TOC": {
+          "requiresDomain": "docx",
+          "requiresEngine": "docx"
+        },
+        "DOCX_INSERT_COVER_PAGE": {
+          "requiresDomain": "docx",
+          "requiresEngine": "docx"
+        },
+        "DOCX_ADD_WATERMARK": {
+          "requiresDomain": "docx",
+          "requiresEngine": "docx"
+        },
+        "DOCX_INSERT_HEADER": {
+          "requiresDomain": "docx",
+          "requiresEngine": "docx"
+        },
+        "DOCX_INSERT_FOOTER": {
+          "requiresDomain": "docx",
+          "requiresEngine": "docx"
+        }
       },
       "examples": [
         {

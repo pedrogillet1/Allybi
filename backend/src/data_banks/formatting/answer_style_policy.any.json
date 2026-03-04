@@ -3,19 +3,28 @@
     "id": "answer_style_policy",
     "version": "6.1.0",
     "description": "ChatGPT-like adaptive answer style policy for Koda (non-coding). Enforces: short paragraphs, intro+conclusion for doc-grounded answers, bullet hygiene (1–3 sentences per bullet), adaptive structure by operator/signals, and JSON denial (map to table/bullets/paragraph). v6.1: Adds explicit per-format style contract, nav_pills/body suppression rules, and per-block paragraph/bullet splitting instructions for the composer + renderers.",
-    "languages": ["any", "en", "pt", "es"],
-    "lastUpdated": "2026-01-26"
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-01-26",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
-
   "config": {
     "enabled": true,
-
     "integrationHooks": {
       "truncationBankId": "truncation_and_limits",
       "bannedPhrasesBankId": "banned_phrases",
       "renderPolicyBankId": "render_policy"
     },
-
     "globalRules": {
       "_comment": "Global ChatGPT-parity rules applied to every response unless answerMode forbids content.",
       "noJsonOutput": true,
@@ -27,7 +36,6 @@
       "avoidOverApologizing": true,
       "neverClaimFileActionsPerformed": true,
       "neverAnswerFromWrongDocIfExplicitRef": true,
-
       "answerModeOverrides": {
         "_comment": "Some answer modes are not content-heavy; the UI does the work.",
         "nav_pills": {
@@ -66,22 +74,24 @@
           "maxQuestions": 0
         }
       },
-
       "requireIntroForAllDocGrounded": true,
       "requireConclusionForNonMicro": true,
-
       "paragraphRules": {
         "_comment": "Hard readability rule: short paragraphs only (ChatGPT-like).",
         "maxSentencesPerParagraph": 2,
         "maxCharsPerParagraph": 260,
         "splitLongParagraphs": true,
         "splitStrategy": "sentence_boundary_then_length",
-        "preserveBlocks": ["table", "quote", "list", "code"],
+        "preserveBlocks": [
+          "table",
+          "quote",
+          "list",
+          "code"
+        ],
         "neverMergeParagraphs": true,
         "normalizeSentenceSpacing": true,
         "enforceBlankLineBetweenParagraphs": true
       },
-
       "bulletItemRules": {
         "_comment": "Hard bullet hygiene: 1–3 sentences per bullet; never walls; never multi-idea bullets.",
         "maxSentencesPerBullet": 3,
@@ -94,7 +104,6 @@
         "preferOneIdeaPerBullet": true,
         "disallowRunOnBullets": true
       },
-
       "tableRules": {
         "_comment": "Tables must be clean GFM and kept readable. Do NOT cram paragraphs inside cells.",
         "maxSentencesPerCell": 2,
@@ -106,7 +115,6 @@
         "requireHeaderRow": false,
         "requireSeparatorRow": false
       },
-
       "conclusionRules": {
         "_comment": "ChatGPT-like wrap-up: 1–2 sentences. No new section headers or filler.",
         "maxSentences": 2,
@@ -115,7 +123,6 @@
         "noNewInformation": true,
         "noCallsToActionUnlessNeeded": true
       },
-
       "formatContracts": {
         "_comment": "This is the 'correct answer style for all formats' contract.",
         "paragraph": {
@@ -153,7 +160,6 @@
         }
       }
     },
-
     "jsonRequestMapping": {
       "enabled": true,
       "denyJsonOutput": true,
@@ -169,41 +175,105 @@
       }
     }
   },
-
   "profiles": {
     "_comment": "Profiles define output budgets. Composer chooses one per turn.",
     "micro": {
       "name": "Micro",
-      "budget": { "maxChars": 260, "maxParagraphs": 1, "maxBullets": 4, "maxTableRows": 10, "maxQuoteLines": 5, "maxQuestions": 0 },
-      "behavior": { "intro": "never", "conclusion": "never", "allowFollowup": false }
+      "budget": {
+        "maxChars": 260,
+        "maxParagraphs": 1,
+        "maxBullets": 4,
+        "maxTableRows": 10,
+        "maxQuoteLines": 5,
+        "maxQuestions": 0
+      },
+      "behavior": {
+        "intro": "never",
+        "conclusion": "never",
+        "allowFollowup": false
+      }
     },
     "brief": {
       "name": "Brief",
-      "budget": { "maxChars": 520, "maxParagraphs": 2, "maxBullets": 5, "maxTableRows": 14, "maxQuoteLines": 6, "maxQuestions": 1 },
-      "behavior": { "intro": "always", "conclusion": "always", "allowFollowup": true }
+      "budget": {
+        "maxChars": 520,
+        "maxParagraphs": 2,
+        "maxBullets": 5,
+        "maxTableRows": 14,
+        "maxQuoteLines": 6,
+        "maxQuestions": 1
+      },
+      "behavior": {
+        "intro": "always",
+        "conclusion": "always",
+        "allowFollowup": true
+      }
     },
     "concise": {
       "name": "Concise",
-      "budget": { "maxChars": 850, "maxParagraphs": 3, "maxBullets": 7, "maxTableRows": 18, "maxQuoteLines": 6, "maxQuestions": 1 },
-      "behavior": { "intro": "always", "conclusion": "always", "allowFollowup": true }
+      "budget": {
+        "maxChars": 850,
+        "maxParagraphs": 3,
+        "maxBullets": 7,
+        "maxTableRows": 18,
+        "maxQuoteLines": 6,
+        "maxQuestions": 1
+      },
+      "behavior": {
+        "intro": "always",
+        "conclusion": "always",
+        "allowFollowup": true
+      }
     },
     "standard": {
       "name": "Standard",
-      "budget": { "maxChars": 4000, "maxParagraphs": 6, "maxBullets": 10, "maxTableRows": 22, "maxQuoteLines": 7, "maxQuestions": 1 },
-      "behavior": { "intro": "always", "conclusion": "always", "allowFollowup": true }
+      "budget": {
+        "maxChars": 4000,
+        "maxParagraphs": 6,
+        "maxBullets": 10,
+        "maxTableRows": 22,
+        "maxQuoteLines": 7,
+        "maxQuestions": 1
+      },
+      "behavior": {
+        "intro": "always",
+        "conclusion": "always",
+        "allowFollowup": true
+      }
     },
     "detailed": {
       "name": "Detailed",
-      "budget": { "maxChars": 6000, "maxParagraphs": 8, "maxBullets": 12, "maxTableRows": 25, "maxQuoteLines": 8, "maxQuestions": 1 },
-      "behavior": { "intro": "always", "conclusion": "always", "allowFollowup": true }
+      "budget": {
+        "maxChars": 6000,
+        "maxParagraphs": 8,
+        "maxBullets": 12,
+        "maxTableRows": 25,
+        "maxQuoteLines": 8,
+        "maxQuestions": 1
+      },
+      "behavior": {
+        "intro": "always",
+        "conclusion": "always",
+        "allowFollowup": true
+      }
     },
     "deep": {
       "name": "Deep",
-      "budget": { "maxChars": 8000, "maxParagraphs": 10, "maxBullets": 14, "maxTableRows": 25, "maxQuoteLines": 10, "maxQuestions": 1 },
-      "behavior": { "intro": "always", "conclusion": "always", "allowFollowup": true }
+      "budget": {
+        "maxChars": 8000,
+        "maxParagraphs": 10,
+        "maxBullets": 14,
+        "maxTableRows": 25,
+        "maxQuoteLines": 10,
+        "maxQuestions": 1
+      },
+      "behavior": {
+        "intro": "always",
+        "conclusion": "always",
+        "allowFollowup": true
+      }
     }
   },
-
   "profileSelection": {
     "_comment": "Rules evaluated top-down; first match wins.",
     "treatAsTieIfGapLt": 0.04,
@@ -225,250 +295,646 @@
     "rules": {
       "nav_or_open": {
         "_comment": "Navigation answers: body is concise; UI pills complement the text.",
-        "whenAny": ["answerModeIs:nav_pills", "operatorIs:open", "operatorIs:locate_file", "signals.navQuery"],
+        "whenAny": [
+          "answerModeIs:nav_pills",
+          "operatorIs:open",
+          "operatorIs:locate_file",
+          "signals.navQuery"
+        ],
         "choose": "brief",
-        "forceConstraints": { "maxSentences": 3, "maxChars": 800, "skipBullets": false }
+        "forceConstraints": {
+          "maxSentences": 3,
+          "maxChars": 800,
+          "skipBullets": false
+        }
       },
       "user_requests_micro": {
-        "whenAny": ["signals.justAnswer", "signals.tldr"],
+        "whenAny": [
+          "signals.justAnswer",
+          "signals.tldr"
+        ],
         "choose": "micro"
       },
       "user_requests_short_overview": {
         "_comment": "Short overview / 2–3 sentences.",
-        "whenAny": ["signals.userRequestedShort", "signals.shortOverview", "constraints.maxSentencesLte3"],
+        "whenAny": [
+          "signals.userRequestedShort",
+          "signals.shortOverview",
+          "constraints.maxSentencesLte3"
+        ],
         "choose": "brief",
-        "forceConstraints": { "maxSentences": 3, "maxChars": 420, "skipBullets": true }
+        "forceConstraints": {
+          "maxSentences": 3,
+          "maxChars": 420,
+          "skipBullets": true
+        }
       },
       "single_value_answer": {
-        "whenAll": ["signals.looksLikeSingleValueQuery", "signals.numericIntent"],
+        "whenAll": [
+          "signals.looksLikeSingleValueQuery",
+          "signals.numericIntent"
+        ],
         "choose": "micro"
       },
       "quote_request": {
-        "whenAny": ["signals.userAskedForQuote", "operatorIs:quote"],
+        "whenAny": [
+          "signals.userAskedForQuote",
+          "operatorIs:quote"
+        ],
         "choose": "brief"
       },
       "discovery_request": {
-        "whenAny": ["signals.discoveryQuery", "operatorIs:locate_docs"],
+        "whenAny": [
+          "signals.discoveryQuery",
+          "operatorIs:locate_docs"
+        ],
         "choose": "brief"
       },
       "table_or_numeric_request": {
-        "whenAny": ["signals.userAskedForTable", "signals.numericIntentStrong", "signals.userAskedForJson"],
+        "whenAny": [
+          "signals.userAskedForTable",
+          "signals.numericIntentStrong",
+          "signals.userAskedForJson"
+        ],
         "choose": "concise"
       },
       "compare_request": {
-        "whenAny": ["signals.compareRequested", "operatorIs:compare"],
+        "whenAny": [
+          "signals.compareRequested",
+          "operatorIs:compare"
+        ],
         "choose": "detailed"
       },
       "multi_part_query": {
-        "whenAny": ["signals.multiPartQuery", "signals.hasMultipleAsks"],
+        "whenAny": [
+          "signals.multiPartQuery",
+          "signals.hasMultipleAsks"
+        ],
         "choose": "detailed"
       },
       "explain_why_how": {
-        "whenAny": ["signals.explainWhyHow", "operatorIs:explain", "operatorIs:analyze"],
+        "whenAny": [
+          "signals.explainWhyHow",
+          "operatorIs:explain",
+          "operatorIs:analyze"
+        ],
         "choose": "detailed"
       },
       "low_evidence_or_ocr_low": {
         "_comment": "Keep brief if evidence is weak to avoid speculation.",
-        "whenAny": ["signals.groundingFailSoft", "signals.lowEvidence", "signals.ocrLowConfidence"],
+        "whenAny": [
+          "signals.groundingFailSoft",
+          "signals.lowEvidence",
+          "signals.ocrLowConfidence"
+        ],
         "choose": "brief"
       },
       "user_requests_detailed": {
-        "whenAny": ["signals.userRequestedDetailed", "signals.goDeep", "signals.fullBreakdown"],
+        "whenAny": [
+          "signals.userRequestedDetailed",
+          "signals.goDeep",
+          "signals.fullBreakdown"
+        ],
         "choose": "deep"
       },
       "default_standard": {
-        "whenAny": ["always"],
+        "whenAny": [
+          "always"
+        ],
         "choose": "standard"
       }
     }
   },
-
   "blockPlanner": {
     "_comment": "Defines block sequences. Composer can trim by budget, but must preserve intro/conclusion rules.",
-    "blocks": ["intro", "answer_direct", "explain_1", "bullets_key_points", "table", "quote", "explain_2", "caveats", "next_steps", "conclusion", "one_followup"],
-
+    "blocks": [
+      "intro",
+      "answer_direct",
+      "explain_1",
+      "bullets_key_points",
+      "table",
+      "quote",
+      "explain_2",
+      "caveats",
+      "next_steps",
+      "conclusion",
+      "one_followup"
+    ],
     "plansByProfile": {
-      "micro": { "default": ["answer_direct"] },
-      "brief": { "default": ["intro", "answer_direct", "conclusion"] },
-      "concise": { "default": ["intro", "explain_1", "bullets_key_points", "conclusion"] },
-      "standard": { "default": ["intro", "explain_1", "bullets_key_points", "explain_2", "conclusion"] },
-      "detailed": { "default": ["intro", "explain_1", "bullets_key_points", "explain_2", "caveats", "conclusion"] },
-      "deep": { "default": ["intro", "explain_1", "bullets_key_points", "explain_2", "caveats", "next_steps", "conclusion"] }
+      "micro": {
+        "default": [
+          "answer_direct"
+        ]
+      },
+      "brief": {
+        "default": [
+          "intro",
+          "answer_direct",
+          "conclusion"
+        ]
+      },
+      "concise": {
+        "default": [
+          "intro",
+          "explain_1",
+          "bullets_key_points",
+          "conclusion"
+        ]
+      },
+      "standard": {
+        "default": [
+          "intro",
+          "explain_1",
+          "bullets_key_points",
+          "explain_2",
+          "conclusion"
+        ]
+      },
+      "detailed": {
+        "default": [
+          "intro",
+          "explain_1",
+          "bullets_key_points",
+          "explain_2",
+          "caveats",
+          "conclusion"
+        ]
+      },
+      "deep": {
+        "default": [
+          "intro",
+          "explain_1",
+          "bullets_key_points",
+          "explain_2",
+          "caveats",
+          "next_steps",
+          "conclusion"
+        ]
+      }
     },
-
     "operatorOverrides": {
       "_comment": "Operator-level preferences (still adaptive by profile).",
       "summarize": {
-        "micro": ["answer_direct"],
-        "brief": ["intro", "answer_direct", "conclusion"],
-        "concise": ["intro", "bullets_key_points", "explain_2", "conclusion"],
-        "standard": ["intro", "explain_1", "bullets_key_points", "explain_2", "conclusion"],
-        "detailed": ["intro", "explain_1", "bullets_key_points", "explain_2", "caveats", "conclusion"],
-        "deep": ["intro", "explain_1", "bullets_key_points", "explain_2", "caveats", "next_steps", "conclusion"]
+        "micro": [
+          "answer_direct"
+        ],
+        "brief": [
+          "intro",
+          "answer_direct",
+          "conclusion"
+        ],
+        "concise": [
+          "intro",
+          "bullets_key_points",
+          "explain_2",
+          "conclusion"
+        ],
+        "standard": [
+          "intro",
+          "explain_1",
+          "bullets_key_points",
+          "explain_2",
+          "conclusion"
+        ],
+        "detailed": [
+          "intro",
+          "explain_1",
+          "bullets_key_points",
+          "explain_2",
+          "caveats",
+          "conclusion"
+        ],
+        "deep": [
+          "intro",
+          "explain_1",
+          "bullets_key_points",
+          "explain_2",
+          "caveats",
+          "next_steps",
+          "conclusion"
+        ]
       },
       "extract": {
-        "micro": ["answer_direct"],
-        "brief": ["intro", "answer_direct", "conclusion"],
-        "concise": ["intro", "answer_direct", "bullets_key_points", "conclusion"],
-        "standard": ["intro", "answer_direct", "bullets_key_points", "conclusion"],
-        "detailed": ["intro", "answer_direct", "explain_1", "bullets_key_points", "conclusion"],
-        "deep": ["intro", "answer_direct", "explain_1", "bullets_key_points", "caveats", "conclusion"]
+        "micro": [
+          "answer_direct"
+        ],
+        "brief": [
+          "intro",
+          "answer_direct",
+          "conclusion"
+        ],
+        "concise": [
+          "intro",
+          "answer_direct",
+          "bullets_key_points",
+          "conclusion"
+        ],
+        "standard": [
+          "intro",
+          "answer_direct",
+          "bullets_key_points",
+          "conclusion"
+        ],
+        "detailed": [
+          "intro",
+          "answer_direct",
+          "explain_1",
+          "bullets_key_points",
+          "conclusion"
+        ],
+        "deep": [
+          "intro",
+          "answer_direct",
+          "explain_1",
+          "bullets_key_points",
+          "caveats",
+          "conclusion"
+        ]
       },
       "compute": {
-        "micro": ["answer_direct"],
-        "brief": ["intro", "answer_direct", "conclusion"],
-        "concise": ["intro", "table", "explain_1", "conclusion"],
-        "standard": ["intro", "table", "explain_1", "conclusion"],
-        "detailed": ["intro", "table", "explain_1", "explain_2", "conclusion"],
-        "deep": ["intro", "table", "explain_1", "explain_2", "caveats", "conclusion"]
+        "micro": [
+          "answer_direct"
+        ],
+        "brief": [
+          "intro",
+          "answer_direct",
+          "conclusion"
+        ],
+        "concise": [
+          "intro",
+          "table",
+          "explain_1",
+          "conclusion"
+        ],
+        "standard": [
+          "intro",
+          "table",
+          "explain_1",
+          "conclusion"
+        ],
+        "detailed": [
+          "intro",
+          "table",
+          "explain_1",
+          "explain_2",
+          "conclusion"
+        ],
+        "deep": [
+          "intro",
+          "table",
+          "explain_1",
+          "explain_2",
+          "caveats",
+          "conclusion"
+        ]
       },
       "compare": {
-        "micro": ["answer_direct"],
-        "brief": ["intro", "table", "conclusion"],
-        "concise": ["intro", "table", "explain_1", "conclusion"],
-        "standard": ["intro", "table", "explain_1", "explain_2", "conclusion"],
-        "detailed": ["intro", "table", "bullets_key_points", "explain_2", "conclusion"],
-        "deep": ["intro", "table", "bullets_key_points", "explain_2", "caveats", "conclusion"]
+        "micro": [
+          "answer_direct"
+        ],
+        "brief": [
+          "intro",
+          "table",
+          "conclusion"
+        ],
+        "concise": [
+          "intro",
+          "table",
+          "explain_1",
+          "conclusion"
+        ],
+        "standard": [
+          "intro",
+          "table",
+          "explain_1",
+          "explain_2",
+          "conclusion"
+        ],
+        "detailed": [
+          "intro",
+          "table",
+          "bullets_key_points",
+          "explain_2",
+          "conclusion"
+        ],
+        "deep": [
+          "intro",
+          "table",
+          "bullets_key_points",
+          "explain_2",
+          "caveats",
+          "conclusion"
+        ]
       },
       "quote": {
-        "micro": ["quote"],
-        "brief": ["intro", "quote", "explain_1"],
-        "concise": ["intro", "quote", "explain_1"],
-        "standard": ["intro", "quote", "explain_1"],
-        "detailed": ["intro", "quote", "explain_1"],
-        "deep": ["intro", "quote", "explain_1"]
+        "micro": [
+          "quote"
+        ],
+        "brief": [
+          "intro",
+          "quote",
+          "explain_1"
+        ],
+        "concise": [
+          "intro",
+          "quote",
+          "explain_1"
+        ],
+        "standard": [
+          "intro",
+          "quote",
+          "explain_1"
+        ],
+        "detailed": [
+          "intro",
+          "quote",
+          "explain_1"
+        ],
+        "deep": [
+          "intro",
+          "quote",
+          "explain_1"
+        ]
       },
       "help": {
-        "micro": ["answer_direct"],
-        "brief": ["intro", "bullets_key_points", "conclusion"],
-        "concise": ["intro", "explain_1", "bullets_key_points", "conclusion"],
-        "standard": ["intro", "explain_1", "bullets_key_points", "explain_2", "conclusion"],
-        "detailed": ["intro", "explain_1", "bullets_key_points", "explain_2", "next_steps", "conclusion"],
-        "deep": ["intro", "explain_1", "bullets_key_points", "explain_2", "next_steps", "conclusion"]
+        "micro": [
+          "answer_direct"
+        ],
+        "brief": [
+          "intro",
+          "bullets_key_points",
+          "conclusion"
+        ],
+        "concise": [
+          "intro",
+          "explain_1",
+          "bullets_key_points",
+          "conclusion"
+        ],
+        "standard": [
+          "intro",
+          "explain_1",
+          "bullets_key_points",
+          "explain_2",
+          "conclusion"
+        ],
+        "detailed": [
+          "intro",
+          "explain_1",
+          "bullets_key_points",
+          "explain_2",
+          "next_steps",
+          "conclusion"
+        ],
+        "deep": [
+          "intro",
+          "explain_1",
+          "bullets_key_points",
+          "explain_2",
+          "next_steps",
+          "conclusion"
+        ]
       }
     },
-
     "formatConstraints": {
-      "ifUserAsksForTable": { "forceInclude": ["table"], "preferExclude": ["bullets_key_points"] },
-      "ifUserAsksForBullets": { "forceInclude": ["bullets_key_points"], "preferExclude": ["table"] },
-      "ifUserAsksForSteps": { "forceInclude": ["bullets_key_points"], "renderBulletsAsNumbered": true },
-      "ifUserAsksForJson": { "denyJson": true, "mapTo": { "numeric": "table", "nonNumeric": "bullets" } }
+      "ifUserAsksForTable": {
+        "forceInclude": [
+          "table"
+        ],
+        "preferExclude": [
+          "bullets_key_points"
+        ]
+      },
+      "ifUserAsksForBullets": {
+        "forceInclude": [
+          "bullets_key_points"
+        ],
+        "preferExclude": [
+          "table"
+        ]
+      },
+      "ifUserAsksForSteps": {
+        "forceInclude": [
+          "bullets_key_points"
+        ],
+        "renderBulletsAsNumbered": true
+      },
+      "ifUserAsksForJson": {
+        "denyJson": true,
+        "mapTo": {
+          "numeric": "table",
+          "nonNumeric": "bullets"
+        }
+      }
     }
   },
-
   "blockRules": {
     "_comment": "Constraints on each block (mirrors ChatGPT rhythm).",
-
     "intro": {
       "maxSentences": 2,
       "maxChars": 220,
-      "skipIf": ["profileIs:micro", "answerIsSingleValue", "modeIs:disambiguation", "answerModeIs:nav_pills"]
+      "skipIf": [
+        "profileIs:micro",
+        "answerIsSingleValue",
+        "modeIs:disambiguation",
+        "answerModeIs:nav_pills"
+      ]
     },
-
     "answer_direct": {
       "maxSentencesMicro": 1,
       "maxSentencesNonMicro": 2,
       "maxCharsNonMicro": 360
     },
-
     "explain_1": {
       "maxParagraphs": 2,
-      "skipIf": ["profileIs:micro", "modeIs:quote", "answerIsSingleValue", "answerModeIs:nav_pills"],
+      "skipIf": [
+        "profileIs:micro",
+        "modeIs:quote",
+        "answerIsSingleValue",
+        "answerModeIs:nav_pills"
+      ],
       "paragraphRulesOverride": {
         "maxSentencesPerParagraph": 2,
         "maxCharsPerParagraph": 260
       }
     },
-
     "bullets_key_points": {
       "bulletMarker": "-",
       "minBullets": 2,
-      "maxBulletsByProfile": { "micro": 4, "brief": 5, "concise": 7, "standard": 8, "detailed": 10, "deep": 12 },
+      "maxBulletsByProfile": {
+        "micro": 4,
+        "brief": 5,
+        "concise": 7,
+        "standard": 8,
+        "detailed": 10,
+        "deep": 12
+      },
       "minWordsPerBullet": 6,
       "maxSentencesPerBullet": 3,
       "maxCharsPerBullet": 320,
       "splitLongBullets": true,
       "splitIntoMultipleBulletsIfOverLimit": true,
       "requireLeadIn": false,
-      "skipIf": ["modeIs:quote", "answerModeIs:nav_pills"]
+      "skipIf": [
+        "modeIs:quote",
+        "answerModeIs:nav_pills"
+      ]
     },
-
     "table": {
       "strictGfm": true,
       "requireLeadIn": true,
-      "maxRowsByProfile": { "micro": 10, "brief": 14, "concise": 18, "standard": 22, "detailed": 25, "deep": 25 },
+      "maxRowsByProfile": {
+        "micro": 10,
+        "brief": 14,
+        "concise": 18,
+        "standard": 22,
+        "detailed": 25,
+        "deep": 25
+      },
       "cellRulesOverride": {
         "maxSentencesPerCell": 2,
         "maxCharsPerCell": 200
       },
-      "skipIf": ["modeIs:quote", "userAskedForBulletsOnly", "answerModeIs:nav_pills"]
+      "skipIf": [
+        "modeIs:quote",
+        "userAskedForBulletsOnly",
+        "answerModeIs:nav_pills"
+      ]
     },
-
     "quote": {
       "requireAttribution": true,
       "attributionStyle": "inline_doc_and_page",
-      "maxLinesByProfile": { "micro": 5, "brief": 6, "concise": 6, "standard": 7, "detailed": 8, "deep": 10 },
-      "skipIf": ["userDisallowedQuotes", "answerModeIs:nav_pills"]
+      "maxLinesByProfile": {
+        "micro": 5,
+        "brief": 6,
+        "concise": 6,
+        "standard": 7,
+        "detailed": 8,
+        "deep": 10
+      },
+      "skipIf": [
+        "userDisallowedQuotes",
+        "answerModeIs:nav_pills"
+      ]
     },
-
     "explain_2": {
       "maxParagraphs": 2,
-      "skipIf": ["profileIn:micro,brief", "lowEvidence", "modeIs:quote", "answerModeIs:nav_pills"],
+      "skipIf": [
+        "profileIn:micro,brief",
+        "lowEvidence",
+        "modeIs:quote",
+        "answerModeIs:nav_pills"
+      ],
       "paragraphRulesOverride": {
         "maxSentencesPerParagraph": 2,
         "maxCharsPerParagraph": 260
       }
     },
-
     "caveats": {
       "maxSentences": 1,
-      "onlyIf": ["numericIntent", "groundingPassWithWarning"]
+      "onlyIf": [
+        "numericIntent",
+        "groundingPassWithWarning"
+      ]
     },
-
     "next_steps": {
       "maxBullets": 3,
-      "onlyIf": ["profileIn:detailed,deep", "userRequestedDetailed"]
+      "onlyIf": [
+        "profileIn:detailed,deep",
+        "userRequestedDetailed"
+      ]
     },
-
     "conclusion": {
       "maxSentences": 2,
       "maxChars": 260,
-      "skipIf": ["profileIs:micro", "answerIsSingleValue", "modeIs:disambiguation", "answerModeIs:nav_pills"]
+      "skipIf": [
+        "profileIs:micro",
+        "answerIsSingleValue",
+        "modeIs:disambiguation",
+        "answerModeIs:nav_pills"
+      ]
     },
-
     "one_followup": {
       "maxQuestions": 1,
-      "onlyIf": ["discoveryQuery", "truncationApplied", "groundingFailSoft"],
-      "neverIf": ["userSaidNoFollowups", "alreadyAskedQuestion", "answerModeIs:nav_pills"]
+      "onlyIf": [
+        "discoveryQuery",
+        "truncationApplied",
+        "groundingFailSoft"
+      ],
+      "neverIf": [
+        "userSaidNoFollowups",
+        "alreadyAskedQuestion",
+        "answerModeIs:nav_pills"
+      ]
     }
   },
-
   "tests": {
     "cases": [
       {
         "id": "ASP6_1001_nav_pills_suppresses_blocks",
-        "input": { "answerMode": "nav_pills", "profile": "micro" },
-        "expect": { "planContainsOnlyAny": [["answer_direct"], ["intro"], ["answer_direct", "intro"]] }
+        "input": {
+          "answerMode": "nav_pills",
+          "profile": "micro"
+        },
+        "expect": {
+          "planContainsOnlyAny": [
+            [
+              "answer_direct"
+            ],
+            [
+              "intro"
+            ],
+            [
+              "answer_direct",
+              "intro"
+            ]
+          ]
+        }
       },
       {
         "id": "ASP6_1002_doc_grounded_requires_intro_conclusion_non_micro",
-        "input": { "answerMode": "doc_grounded_single", "profile": "standard" },
-        "expect": { "mustInclude": ["intro", "conclusion"] }
+        "input": {
+          "answerMode": "doc_grounded_single",
+          "profile": "standard"
+        },
+        "expect": {
+          "mustInclude": [
+            "intro",
+            "conclusion"
+          ]
+        }
       },
       {
         "id": "ASP6_1003_bullets_sentence_cap",
-        "input": { "block": "bullets_key_points" },
-        "expect": { "maxSentencesPerBullet": 3 }
+        "input": {
+          "block": "bullets_key_points"
+        },
+        "expect": {
+          "maxSentencesPerBullet": 3
+        }
       },
       {
         "id": "ASP6_1004_table_cell_caps",
-        "input": { "block": "table" },
-        "expect": { "maxSentencesPerCell": 2, "maxCharsPerCell": 120 }
+        "input": {
+          "block": "table"
+        },
+        "expect": {
+          "maxSentencesPerCell": 2,
+          "maxCharsPerCell": 120
+        }
       },
       {
         "id": "ASP6_1005_json_request_maps_to_table_or_bullets",
-        "input": { "signals": { "userAskedForJson": true, "numericIntentStrong": true } },
-        "expect": { "noJsonOutput": true, "mappedFormat": "table" }
+        "input": {
+          "signals": {
+            "userAskedForJson": true,
+            "numericIntentStrong": true
+          }
+        },
+        "expect": {
+          "noJsonOutput": true,
+          "mappedFormat": "table"
+        }
       }
     ]
   }

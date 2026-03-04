@@ -12,13 +12,22 @@
     "criticality": "critical",
     "changeLog": [
       "Initial access control runtime policy bank"
+    ],
+    "usedBy": [
+      "services/llm/core/llmRequestBuilder.service.ts"
+    ],
+    "tests": [
+      "tests/certification/prompt-mode-coverage.cert.test.ts"
     ]
   },
   "config": {
     "enabled": true,
     "strict": true,
     "failClosedInProd": true,
-    "defaultAction": "deny"
+    "defaultAction": "deny",
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "rules": [
     {

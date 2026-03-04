@@ -15,6 +15,12 @@
     "derivedFrom": [
       "operators/operator_contracts.any.json",
       "semantics/allybi_capabilities.any.json"
+    ],
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
     ]
   },
   "config": {

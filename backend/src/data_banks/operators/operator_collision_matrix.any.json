@@ -3,14 +3,28 @@
     "id": "operator_collision_matrix",
     "version": "1.0.0",
     "description": "Collision-prevention matrix for operator disambiguation. Guards against routing content questions into file actions and other high-risk operator confusions.",
-    "languages": ["any", "en", "pt", "es"],
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
     "lastUpdated": "2026-03-01",
-    "owner": "koda-routing"
+    "owner": "koda-routing",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
     "strict": false,
-    "defaultAction": "allow"
+    "defaultAction": "allow",
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "rules": [
     {
@@ -90,7 +104,9 @@
       "action": "suppress_candidate",
       "reasonCode": "doc_location_question_not_open_action",
       "when": {
-        "operators": ["open"],
+        "operators": [
+          "open"
+        ],
         "queryRegexAny": {
           "en": [
             "\\bwhere\\s+is\\s+the\\s+clause\\b",
@@ -114,10 +130,21 @@
       "reasonCode": "retrieval_question_not_edit_action",
       "when": {
         "operators": [
-          "insert_row", "delete_row", "set_cell", "add_column",
-          "delete_column", "merge_cells", "replace_text", "insert_paragraph"
+          "insert_row",
+          "delete_row",
+          "set_cell",
+          "add_column",
+          "delete_column",
+          "merge_cells",
+          "replace_text",
+          "insert_paragraph"
         ],
-        "signals": ["question_mark", "what_is", "how_much", "show_me"]
+        "signals": [
+          "question_mark",
+          "what_is",
+          "how_much",
+          "show_me"
+        ]
       }
     },
     {
@@ -126,8 +153,17 @@
       "action": "suppress_candidate",
       "reasonCode": "summarize_request_not_compute",
       "when": {
-        "operators": ["compute", "python_calc", "excel_formula"],
-        "signals": ["summarize", "summary", "describe", "explain"]
+        "operators": [
+          "compute",
+          "python_calc",
+          "excel_formula"
+        ],
+        "signals": [
+          "summarize",
+          "summary",
+          "describe",
+          "explain"
+        ]
       }
     },
     {
@@ -172,8 +208,14 @@
       "action": "suppress_candidate",
       "reasonCode": "help_question_not_greeting",
       "when": {
-        "operators": ["greeting"],
-        "signals": ["how_do_i", "can_you", "help_me"]
+        "operators": [
+          "greeting"
+        ],
+        "signals": [
+          "how_do_i",
+          "can_you",
+          "help_me"
+        ]
       }
     },
     {
@@ -218,8 +260,18 @@
       "action": "suppress_candidate",
       "reasonCode": "pure_calculation_not_chart",
       "when": {
-        "operators": ["insert_chart", "create_chart", "chart_update"],
-        "signals": ["calculate", "compute", "sum", "average", "total"]
+        "operators": [
+          "insert_chart",
+          "create_chart",
+          "chart_update"
+        ],
+        "signals": [
+          "calculate",
+          "compute",
+          "sum",
+          "average",
+          "total"
+        ]
       }
     },
     {
@@ -229,10 +281,16 @@
       "reasonCode": "file_type_mismatch",
       "when": {
         "operators": [
-          "slide_insert", "slide_delete", "slide_duplicate",
-          "insert_paragraph", "replace_text", "delete_paragraph"
+          "slide_insert",
+          "slide_delete",
+          "slide_duplicate",
+          "insert_paragraph",
+          "replace_text",
+          "delete_paragraph"
         ],
-        "signals": ["active_file_type_mismatch"]
+        "signals": [
+          "active_file_type_mismatch"
+        ]
       }
     }
   ],

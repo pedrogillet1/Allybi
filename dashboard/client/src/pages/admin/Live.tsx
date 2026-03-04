@@ -57,7 +57,7 @@ const generateMockEvent = (id: number): LiveEvent => {
     },
     llm_call: {
       message: "LLM call completed",
-      details: { provider: "gemini", model: "gemini-2.0-flash", tokens: 856, cost: "$0.0012" },
+      details: { provider: "gemini", model: "gemini-2.5-flash", tokens: 856, cost: "$0.0012" },
       severity: "info",
     },
   };

@@ -1907,7 +1907,10 @@ export class CentralizedChatRuntimeDelegate {
           retrievalRuleSummary:
             params.retrievalPack?.telemetry?.summary || null,
           bankSelection:
-            asObject((params.retrievalPack as Record<string, unknown>)?.bankSelection) ||
+            asObject(
+              (params.retrievalPack as unknown as Record<string, unknown>)
+                ?.bankSelection,
+            ) ||
             null,
           fallbackPolicy:
             Object.keys(fallbackPolicyMeta).length > 0

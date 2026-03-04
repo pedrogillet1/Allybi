@@ -6,13 +6,23 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-02-28",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
     "domain": "tax",
     "minScore": 0.65,
-    "maxRulesPerDocument": 64
+    "maxRulesPerDocument": 64,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "domain": "tax",
   "rules": [

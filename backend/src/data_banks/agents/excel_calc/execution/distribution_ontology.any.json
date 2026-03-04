@@ -3,18 +3,39 @@
     "id": "distribution_ontology",
     "version": "1.0.0",
     "description": "Ontology of probability distributions with parameters, support, and typical usage for the Excel calc agent.",
-    "languages": ["any"],
-    "lastUpdated": "2026-02-28"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
-  "config": { "enabled": true },
+  "config": {
+    "enabled": true
+  },
   "distributions": [
     {
       "distId": "normal",
       "displayName": "Normal (Gaussian)",
       "family": "continuous",
       "parameters": [
-        { "name": "mean", "symbol": "μ", "constraints": "μ ∈ ℝ", "defaultValue": 0 },
-        { "name": "standardDeviation", "symbol": "σ", "constraints": "σ > 0", "defaultValue": 1 }
+        {
+          "name": "mean",
+          "symbol": "μ",
+          "constraints": "μ ∈ ℝ",
+          "defaultValue": 0
+        },
+        {
+          "name": "standardDeviation",
+          "symbol": "σ",
+          "constraints": "σ > 0",
+          "defaultValue": 1
+        }
       ],
       "support": "(-∞, +∞)",
       "moments": {
@@ -28,7 +49,12 @@
         "Central limit theorem applications",
         "Natural phenomena with symmetric variation"
       ],
-      "relatedDistributions": ["standard-normal", "log-normal", "truncated-normal", "half-normal"],
+      "relatedDistributions": [
+        "standard-normal",
+        "log-normal",
+        "truncated-normal",
+        "half-normal"
+      ],
       "fittingMethod": "MLE via scipy.stats.norm.fit",
       "pythonClass": "scipy.stats.norm",
       "testForFit": "Shapiro-Wilk test (scipy.stats.shapiro)"
@@ -50,7 +76,11 @@
         "Hypothesis testing",
         "Building block for other distributions"
       ],
-      "relatedDistributions": ["normal", "chi-squared", "student-t"],
+      "relatedDistributions": [
+        "normal",
+        "chi-squared",
+        "student-t"
+      ],
       "fittingMethod": "Not fitted; used as reference distribution",
       "pythonClass": "scipy.stats.norm",
       "testForFit": "Shapiro-Wilk test (scipy.stats.shapiro)"
@@ -60,8 +90,18 @@
       "displayName": "Log-Normal",
       "family": "continuous",
       "parameters": [
-        { "name": "mu", "symbol": "μ", "constraints": "μ ∈ ℝ", "defaultValue": 0 },
-        { "name": "sigma", "symbol": "σ", "constraints": "σ > 0", "defaultValue": 1 }
+        {
+          "name": "mu",
+          "symbol": "μ",
+          "constraints": "μ ∈ ℝ",
+          "defaultValue": 0
+        },
+        {
+          "name": "sigma",
+          "symbol": "σ",
+          "constraints": "σ > 0",
+          "defaultValue": 1
+        }
       ],
       "support": "(0, +∞)",
       "moments": {
@@ -75,7 +115,11 @@
         "Income distributions",
         "Particle sizes and biological variables"
       ],
-      "relatedDistributions": ["normal", "gamma", "weibull"],
+      "relatedDistributions": [
+        "normal",
+        "gamma",
+        "weibull"
+      ],
       "fittingMethod": "MLE via scipy.stats.lognorm.fit",
       "pythonClass": "scipy.stats.lognorm",
       "testForFit": "Anderson-Darling test on log-transformed data"
@@ -85,7 +129,12 @@
       "displayName": "Exponential",
       "family": "continuous",
       "parameters": [
-        { "name": "rate", "symbol": "λ", "constraints": "λ > 0", "defaultValue": 1 }
+        {
+          "name": "rate",
+          "symbol": "λ",
+          "constraints": "λ > 0",
+          "defaultValue": 1
+        }
       ],
       "support": "[0, +∞)",
       "moments": {
@@ -99,7 +148,11 @@
         "Survival analysis and reliability",
         "Memoryless waiting times"
       ],
-      "relatedDistributions": ["gamma", "poisson", "weibull"],
+      "relatedDistributions": [
+        "gamma",
+        "poisson",
+        "weibull"
+      ],
       "fittingMethod": "MLE via scipy.stats.expon.fit",
       "pythonClass": "scipy.stats.expon",
       "testForFit": "Lilliefors test for exponentiality"
@@ -109,8 +162,18 @@
       "displayName": "Gamma",
       "family": "continuous",
       "parameters": [
-        { "name": "shape", "symbol": "α", "constraints": "α > 0", "defaultValue": 1 },
-        { "name": "rate", "symbol": "β", "constraints": "β > 0", "defaultValue": 1 }
+        {
+          "name": "shape",
+          "symbol": "α",
+          "constraints": "α > 0",
+          "defaultValue": 1
+        },
+        {
+          "name": "rate",
+          "symbol": "β",
+          "constraints": "β > 0",
+          "defaultValue": 1
+        }
       ],
       "support": "(0, +∞)",
       "moments": {
@@ -124,7 +187,12 @@
         "Rainfall and insurance claims",
         "Bayesian conjugate prior for Poisson rate"
       ],
-      "relatedDistributions": ["exponential", "chi-squared", "inverse-gaussian", "beta"],
+      "relatedDistributions": [
+        "exponential",
+        "chi-squared",
+        "inverse-gaussian",
+        "beta"
+      ],
       "fittingMethod": "MLE via scipy.stats.gamma.fit",
       "pythonClass": "scipy.stats.gamma",
       "testForFit": "Anderson-Darling test (scipy.stats.anderson)"
@@ -134,8 +202,18 @@
       "displayName": "Beta",
       "family": "continuous",
       "parameters": [
-        { "name": "alpha", "symbol": "α", "constraints": "α > 0", "defaultValue": 2 },
-        { "name": "beta", "symbol": "β", "constraints": "β > 0", "defaultValue": 5 }
+        {
+          "name": "alpha",
+          "symbol": "α",
+          "constraints": "α > 0",
+          "defaultValue": 2
+        },
+        {
+          "name": "beta",
+          "symbol": "β",
+          "constraints": "β > 0",
+          "defaultValue": 5
+        }
       ],
       "support": "[0, 1]",
       "moments": {
@@ -149,7 +227,13 @@
         "Bayesian conjugate prior for Bernoulli/binomial",
         "Project completion percentages"
       ],
-      "relatedDistributions": ["uniform", "bernoulli", "beta-binomial", "kumaraswamy", "beta-prime"],
+      "relatedDistributions": [
+        "uniform",
+        "bernoulli",
+        "beta-binomial",
+        "kumaraswamy",
+        "beta-prime"
+      ],
       "fittingMethod": "MLE via scipy.stats.beta.fit",
       "pythonClass": "scipy.stats.beta",
       "testForFit": "Kolmogorov-Smirnov test (scipy.stats.kstest)"
@@ -159,8 +243,18 @@
       "displayName": "Continuous Uniform",
       "family": "continuous",
       "parameters": [
-        { "name": "lower", "symbol": "a", "constraints": "a ∈ ℝ", "defaultValue": 0 },
-        { "name": "upper", "symbol": "b", "constraints": "b > a", "defaultValue": 1 }
+        {
+          "name": "lower",
+          "symbol": "a",
+          "constraints": "a ∈ ℝ",
+          "defaultValue": 0
+        },
+        {
+          "name": "upper",
+          "symbol": "b",
+          "constraints": "b > a",
+          "defaultValue": 1
+        }
       ],
       "support": "[a, b]",
       "moments": {
@@ -174,7 +268,11 @@
         "Random number generation",
         "Non-informative prior in Bayesian analysis"
       ],
-      "relatedDistributions": ["beta", "discrete-uniform", "triangular"],
+      "relatedDistributions": [
+        "beta",
+        "discrete-uniform",
+        "triangular"
+      ],
       "fittingMethod": "MLE: a = min(x), b = max(x)",
       "pythonClass": "scipy.stats.uniform",
       "testForFit": "Kolmogorov-Smirnov test (scipy.stats.kstest)"
@@ -184,8 +282,18 @@
       "displayName": "Cauchy (Lorentz)",
       "family": "continuous",
       "parameters": [
-        { "name": "location", "symbol": "x₀", "constraints": "x₀ ∈ ℝ", "defaultValue": 0 },
-        { "name": "scale", "symbol": "γ", "constraints": "γ > 0", "defaultValue": 1 }
+        {
+          "name": "location",
+          "symbol": "x₀",
+          "constraints": "x₀ ∈ ℝ",
+          "defaultValue": 0
+        },
+        {
+          "name": "scale",
+          "symbol": "γ",
+          "constraints": "γ > 0",
+          "defaultValue": 1
+        }
       ],
       "support": "(-∞, +∞)",
       "moments": {
@@ -199,7 +307,11 @@
         "Heavy-tailed phenomena",
         "Ratio of two independent standard normals"
       ],
-      "relatedDistributions": ["student-t", "normal", "laplace"],
+      "relatedDistributions": [
+        "student-t",
+        "normal",
+        "laplace"
+      ],
       "fittingMethod": "MLE via scipy.stats.cauchy.fit",
       "pythonClass": "scipy.stats.cauchy",
       "testForFit": "Kolmogorov-Smirnov test (scipy.stats.kstest)"
@@ -209,7 +321,12 @@
       "displayName": "Student's t",
       "family": "continuous",
       "parameters": [
-        { "name": "degreesOfFreedom", "symbol": "ν", "constraints": "ν > 0", "defaultValue": 5 }
+        {
+          "name": "degreesOfFreedom",
+          "symbol": "ν",
+          "constraints": "ν > 0",
+          "defaultValue": 5
+        }
       ],
       "support": "(-∞, +∞)",
       "moments": {
@@ -223,7 +340,12 @@
         "Robust regression with heavy tails",
         "Confidence intervals when σ is unknown"
       ],
-      "relatedDistributions": ["normal", "cauchy", "f", "chi-squared"],
+      "relatedDistributions": [
+        "normal",
+        "cauchy",
+        "f",
+        "chi-squared"
+      ],
       "fittingMethod": "MLE via scipy.stats.t.fit",
       "pythonClass": "scipy.stats.t",
       "testForFit": "Kolmogorov-Smirnov test (scipy.stats.kstest)"
@@ -233,7 +355,12 @@
       "displayName": "Chi-Squared",
       "family": "continuous",
       "parameters": [
-        { "name": "degreesOfFreedom", "symbol": "k", "constraints": "k ∈ ℤ⁺", "defaultValue": 2 }
+        {
+          "name": "degreesOfFreedom",
+          "symbol": "k",
+          "constraints": "k ∈ ℤ⁺",
+          "defaultValue": 2
+        }
       ],
       "support": "[0, +∞)",
       "moments": {
@@ -247,7 +374,12 @@
         "Test of independence in contingency tables",
         "Sum of squared standard normals"
       ],
-      "relatedDistributions": ["gamma", "normal", "f", "student-t"],
+      "relatedDistributions": [
+        "gamma",
+        "normal",
+        "f",
+        "student-t"
+      ],
       "fittingMethod": "MLE via scipy.stats.chi2.fit",
       "pythonClass": "scipy.stats.chi2",
       "testForFit": "Anderson-Darling test (scipy.stats.anderson)"
@@ -257,8 +389,18 @@
       "displayName": "F (Fisher-Snedecor)",
       "family": "continuous",
       "parameters": [
-        { "name": "d1", "symbol": "d₁", "constraints": "d₁ ∈ ℤ⁺", "defaultValue": 5 },
-        { "name": "d2", "symbol": "d₂", "constraints": "d₂ ∈ ℤ⁺", "defaultValue": 10 }
+        {
+          "name": "d1",
+          "symbol": "d₁",
+          "constraints": "d₁ ∈ ℤ⁺",
+          "defaultValue": 5
+        },
+        {
+          "name": "d2",
+          "symbol": "d₂",
+          "constraints": "d₂ ∈ ℤ⁺",
+          "defaultValue": 10
+        }
       ],
       "support": "[0, +∞)",
       "moments": {
@@ -272,7 +414,11 @@
         "Comparing two sample variances",
         "Regression model significance tests"
       ],
-      "relatedDistributions": ["chi-squared", "student-t", "beta"],
+      "relatedDistributions": [
+        "chi-squared",
+        "student-t",
+        "beta"
+      ],
       "fittingMethod": "MLE via scipy.stats.f.fit",
       "pythonClass": "scipy.stats.f",
       "testForFit": "Kolmogorov-Smirnov test (scipy.stats.kstest)"
@@ -282,8 +428,18 @@
       "displayName": "Weibull",
       "family": "continuous",
       "parameters": [
-        { "name": "shape", "symbol": "k", "constraints": "k > 0", "defaultValue": 1.5 },
-        { "name": "scale", "symbol": "λ", "constraints": "λ > 0", "defaultValue": 1 }
+        {
+          "name": "shape",
+          "symbol": "k",
+          "constraints": "k > 0",
+          "defaultValue": 1.5
+        },
+        {
+          "name": "scale",
+          "symbol": "λ",
+          "constraints": "λ > 0",
+          "defaultValue": 1
+        }
       ],
       "support": "[0, +∞)",
       "moments": {
@@ -297,7 +453,12 @@
         "Wind speed modeling",
         "Survival analysis"
       ],
-      "relatedDistributions": ["exponential", "rayleigh", "gamma", "gumbel"],
+      "relatedDistributions": [
+        "exponential",
+        "rayleigh",
+        "gamma",
+        "gumbel"
+      ],
       "fittingMethod": "MLE via scipy.stats.weibull_min.fit",
       "pythonClass": "scipy.stats.weibull_min",
       "testForFit": "Anderson-Darling test for Weibull"
@@ -307,8 +468,18 @@
       "displayName": "Pareto (Type I)",
       "family": "continuous",
       "parameters": [
-        { "name": "shape", "symbol": "α", "constraints": "α > 0", "defaultValue": 3 },
-        { "name": "scale", "symbol": "xₘ", "constraints": "xₘ > 0", "defaultValue": 1 }
+        {
+          "name": "shape",
+          "symbol": "α",
+          "constraints": "α > 0",
+          "defaultValue": 3
+        },
+        {
+          "name": "scale",
+          "symbol": "xₘ",
+          "constraints": "xₘ > 0",
+          "defaultValue": 1
+        }
       ],
       "support": "[xₘ, +∞)",
       "moments": {
@@ -322,7 +493,12 @@
         "City population sizes",
         "Insurance claim sizes"
       ],
-      "relatedDistributions": ["exponential", "log-normal", "burr", "dagum"],
+      "relatedDistributions": [
+        "exponential",
+        "log-normal",
+        "burr",
+        "dagum"
+      ],
       "fittingMethod": "MLE via scipy.stats.pareto.fit",
       "pythonClass": "scipy.stats.pareto",
       "testForFit": "Kolmogorov-Smirnov test (scipy.stats.kstest)"
@@ -332,7 +508,12 @@
       "displayName": "Rayleigh",
       "family": "continuous",
       "parameters": [
-        { "name": "scale", "symbol": "σ", "constraints": "σ > 0", "defaultValue": 1 }
+        {
+          "name": "scale",
+          "symbol": "σ",
+          "constraints": "σ > 0",
+          "defaultValue": 1
+        }
       ],
       "support": "[0, +∞)",
       "moments": {
@@ -346,7 +527,12 @@
         "Magnitude of 2D random vectors",
         "Communication signal processing"
       ],
-      "relatedDistributions": ["weibull", "rice", "chi-squared", "nakagami"],
+      "relatedDistributions": [
+        "weibull",
+        "rice",
+        "chi-squared",
+        "nakagami"
+      ],
       "fittingMethod": "MLE via scipy.stats.rayleigh.fit",
       "pythonClass": "scipy.stats.rayleigh",
       "testForFit": "Kolmogorov-Smirnov test (scipy.stats.kstest)"
@@ -356,8 +542,18 @@
       "displayName": "Laplace (Double Exponential)",
       "family": "continuous",
       "parameters": [
-        { "name": "location", "symbol": "μ", "constraints": "μ ∈ ℝ", "defaultValue": 0 },
-        { "name": "scale", "symbol": "b", "constraints": "b > 0", "defaultValue": 1 }
+        {
+          "name": "location",
+          "symbol": "μ",
+          "constraints": "μ ∈ ℝ",
+          "defaultValue": 0
+        },
+        {
+          "name": "scale",
+          "symbol": "b",
+          "constraints": "b > 0",
+          "defaultValue": 1
+        }
       ],
       "support": "(-∞, +∞)",
       "moments": {
@@ -371,7 +567,12 @@
         "L1 regularization (LASSO) prior",
         "Finance: modeling returns with heavy tails"
       ],
-      "relatedDistributions": ["normal", "exponential", "cauchy", "logistic"],
+      "relatedDistributions": [
+        "normal",
+        "exponential",
+        "cauchy",
+        "logistic"
+      ],
       "fittingMethod": "MLE via scipy.stats.laplace.fit",
       "pythonClass": "scipy.stats.laplace",
       "testForFit": "Kolmogorov-Smirnov test (scipy.stats.kstest)"
@@ -381,8 +582,18 @@
       "displayName": "Logistic",
       "family": "continuous",
       "parameters": [
-        { "name": "location", "symbol": "μ", "constraints": "μ ∈ ℝ", "defaultValue": 0 },
-        { "name": "scale", "symbol": "s", "constraints": "s > 0", "defaultValue": 1 }
+        {
+          "name": "location",
+          "symbol": "μ",
+          "constraints": "μ ∈ ℝ",
+          "defaultValue": 0
+        },
+        {
+          "name": "scale",
+          "symbol": "s",
+          "constraints": "s > 0",
+          "defaultValue": 1
+        }
       ],
       "support": "(-∞, +∞)",
       "moments": {
@@ -396,7 +607,11 @@
         "Growth curves and saturation models",
         "Similar to normal but heavier tails"
       ],
-      "relatedDistributions": ["normal", "laplace", "gumbel"],
+      "relatedDistributions": [
+        "normal",
+        "laplace",
+        "gumbel"
+      ],
       "fittingMethod": "MLE via scipy.stats.logistic.fit",
       "pythonClass": "scipy.stats.logistic",
       "testForFit": "Kolmogorov-Smirnov test (scipy.stats.kstest)"
@@ -406,8 +621,18 @@
       "displayName": "Gumbel (Type I Extreme Value)",
       "family": "continuous",
       "parameters": [
-        { "name": "location", "symbol": "μ", "constraints": "μ ∈ ℝ", "defaultValue": 0 },
-        { "name": "scale", "symbol": "β", "constraints": "β > 0", "defaultValue": 1 }
+        {
+          "name": "location",
+          "symbol": "μ",
+          "constraints": "μ ∈ ℝ",
+          "defaultValue": 0
+        },
+        {
+          "name": "scale",
+          "symbol": "β",
+          "constraints": "β > 0",
+          "defaultValue": 1
+        }
       ],
       "support": "(-∞, +∞)",
       "moments": {
@@ -421,7 +646,11 @@
         "Flood and earthquake magnitudes",
         "Maximum daily temperatures"
       ],
-      "relatedDistributions": ["frechet", "weibull", "logistic"],
+      "relatedDistributions": [
+        "frechet",
+        "weibull",
+        "logistic"
+      ],
       "fittingMethod": "MLE via scipy.stats.gumbel_r.fit",
       "pythonClass": "scipy.stats.gumbel_r",
       "testForFit": "Anderson-Darling test (scipy.stats.anderson)"
@@ -431,9 +660,24 @@
       "displayName": "Frechet (Type II Extreme Value)",
       "family": "continuous",
       "parameters": [
-        { "name": "shape", "symbol": "α", "constraints": "α > 0", "defaultValue": 3 },
-        { "name": "scale", "symbol": "s", "constraints": "s > 0", "defaultValue": 1 },
-        { "name": "location", "symbol": "m", "constraints": "m ∈ ℝ", "defaultValue": 0 }
+        {
+          "name": "shape",
+          "symbol": "α",
+          "constraints": "α > 0",
+          "defaultValue": 3
+        },
+        {
+          "name": "scale",
+          "symbol": "s",
+          "constraints": "s > 0",
+          "defaultValue": 1
+        },
+        {
+          "name": "location",
+          "symbol": "m",
+          "constraints": "m ∈ ℝ",
+          "defaultValue": 0
+        }
       ],
       "support": "(m, +∞)",
       "moments": {
@@ -447,7 +691,11 @@
         "Maximum wind speeds",
         "Peak financial losses"
       ],
-      "relatedDistributions": ["gumbel", "weibull", "pareto"],
+      "relatedDistributions": [
+        "gumbel",
+        "weibull",
+        "pareto"
+      ],
       "fittingMethod": "MLE via scipy.stats.invweibull.fit",
       "pythonClass": "scipy.stats.invweibull",
       "testForFit": "Kolmogorov-Smirnov test (scipy.stats.kstest)"
@@ -457,8 +705,18 @@
       "displayName": "Gompertz",
       "family": "continuous",
       "parameters": [
-        { "name": "shape", "symbol": "η", "constraints": "η > 0", "defaultValue": 1 },
-        { "name": "scale", "symbol": "b", "constraints": "b > 0", "defaultValue": 1 }
+        {
+          "name": "shape",
+          "symbol": "η",
+          "constraints": "η > 0",
+          "defaultValue": 1
+        },
+        {
+          "name": "scale",
+          "symbol": "b",
+          "constraints": "b > 0",
+          "defaultValue": 1
+        }
       ],
       "support": "[0, +∞)",
       "moments": {
@@ -472,7 +730,11 @@
         "Biological growth curves",
         "Customer churn and adoption rates"
       ],
-      "relatedDistributions": ["exponential", "gumbel", "weibull"],
+      "relatedDistributions": [
+        "exponential",
+        "gumbel",
+        "weibull"
+      ],
       "fittingMethod": "MLE via scipy.stats.gompertz.fit",
       "pythonClass": "scipy.stats.gompertz",
       "testForFit": "Kolmogorov-Smirnov test (scipy.stats.kstest)"
@@ -482,8 +744,18 @@
       "displayName": "Inverse Gaussian (Wald)",
       "family": "continuous",
       "parameters": [
-        { "name": "mean", "symbol": "μ", "constraints": "μ > 0", "defaultValue": 1 },
-        { "name": "shape", "symbol": "λ", "constraints": "λ > 0", "defaultValue": 1 }
+        {
+          "name": "mean",
+          "symbol": "μ",
+          "constraints": "μ > 0",
+          "defaultValue": 1
+        },
+        {
+          "name": "shape",
+          "symbol": "λ",
+          "constraints": "λ > 0",
+          "defaultValue": 1
+        }
       ],
       "support": "(0, +∞)",
       "moments": {
@@ -497,7 +769,11 @@
         "Reliability and lifetime data",
         "Modeling positively skewed data"
       ],
-      "relatedDistributions": ["gamma", "log-normal", "normal"],
+      "relatedDistributions": [
+        "gamma",
+        "log-normal",
+        "normal"
+      ],
       "fittingMethod": "MLE via scipy.stats.invgauss.fit",
       "pythonClass": "scipy.stats.invgauss",
       "testForFit": "Kolmogorov-Smirnov test (scipy.stats.kstest)"
@@ -507,8 +783,18 @@
       "displayName": "Nakagami",
       "family": "continuous",
       "parameters": [
-        { "name": "shape", "symbol": "m", "constraints": "m ≥ 0.5", "defaultValue": 1 },
-        { "name": "spread", "symbol": "Ω", "constraints": "Ω > 0", "defaultValue": 1 }
+        {
+          "name": "shape",
+          "symbol": "m",
+          "constraints": "m ≥ 0.5",
+          "defaultValue": 1
+        },
+        {
+          "name": "spread",
+          "symbol": "Ω",
+          "constraints": "Ω > 0",
+          "defaultValue": 1
+        }
       ],
       "support": "(0, +∞)",
       "moments": {
@@ -522,7 +808,11 @@
         "Radio propagation modeling",
         "Ultrasound imaging"
       ],
-      "relatedDistributions": ["rayleigh", "rice", "gamma"],
+      "relatedDistributions": [
+        "rayleigh",
+        "rice",
+        "gamma"
+      ],
       "fittingMethod": "MLE via scipy.stats.nakagami.fit",
       "pythonClass": "scipy.stats.nakagami",
       "testForFit": "Kolmogorov-Smirnov test (scipy.stats.kstest)"
@@ -532,8 +822,18 @@
       "displayName": "Rice (Rician)",
       "family": "continuous",
       "parameters": [
-        { "name": "nonCentrality", "symbol": "ν", "constraints": "ν ≥ 0", "defaultValue": 1 },
-        { "name": "scale", "symbol": "σ", "constraints": "σ > 0", "defaultValue": 1 }
+        {
+          "name": "nonCentrality",
+          "symbol": "ν",
+          "constraints": "ν ≥ 0",
+          "defaultValue": 1
+        },
+        {
+          "name": "scale",
+          "symbol": "σ",
+          "constraints": "σ > 0",
+          "defaultValue": 1
+        }
       ],
       "support": "[0, +∞)",
       "moments": {
@@ -547,7 +847,11 @@
         "Radar and sonar signal processing",
         "Wireless fading with line-of-sight component"
       ],
-      "relatedDistributions": ["rayleigh", "nakagami", "normal"],
+      "relatedDistributions": [
+        "rayleigh",
+        "nakagami",
+        "normal"
+      ],
       "fittingMethod": "MLE via scipy.stats.rice.fit",
       "pythonClass": "scipy.stats.rice",
       "testForFit": "Kolmogorov-Smirnov test (scipy.stats.kstest)"
@@ -557,8 +861,18 @@
       "displayName": "Von Mises",
       "family": "continuous",
       "parameters": [
-        { "name": "mean", "symbol": "μ", "constraints": "μ ∈ [-π, π]", "defaultValue": 0 },
-        { "name": "concentration", "symbol": "κ", "constraints": "κ ≥ 0", "defaultValue": 1 }
+        {
+          "name": "mean",
+          "symbol": "μ",
+          "constraints": "μ ∈ [-π, π]",
+          "defaultValue": 0
+        },
+        {
+          "name": "concentration",
+          "symbol": "κ",
+          "constraints": "κ ≥ 0",
+          "defaultValue": 1
+        }
       ],
       "support": "[-π, π]",
       "moments": {
@@ -572,7 +886,10 @@
         "Time-of-day analysis",
         "Angular measurements in biology"
       ],
-      "relatedDistributions": ["normal", "uniform"],
+      "relatedDistributions": [
+        "normal",
+        "uniform"
+      ],
       "fittingMethod": "MLE via scipy.stats.vonmises.fit",
       "pythonClass": "scipy.stats.vonmises",
       "testForFit": "Rayleigh test for circular uniformity"
@@ -582,7 +899,12 @@
       "displayName": "Half-Normal",
       "family": "continuous",
       "parameters": [
-        { "name": "scale", "symbol": "σ", "constraints": "σ > 0", "defaultValue": 1 }
+        {
+          "name": "scale",
+          "symbol": "σ",
+          "constraints": "σ > 0",
+          "defaultValue": 1
+        }
       ],
       "support": "[0, +∞)",
       "moments": {
@@ -596,7 +918,11 @@
         "Absolute value of normal variables",
         "Measurement error magnitudes"
       ],
-      "relatedDistributions": ["normal", "truncated-normal", "rayleigh"],
+      "relatedDistributions": [
+        "normal",
+        "truncated-normal",
+        "rayleigh"
+      ],
       "fittingMethod": "MLE via scipy.stats.halfnorm.fit",
       "pythonClass": "scipy.stats.halfnorm",
       "testForFit": "Kolmogorov-Smirnov test (scipy.stats.kstest)"
@@ -606,10 +932,30 @@
       "displayName": "Truncated Normal",
       "family": "continuous",
       "parameters": [
-        { "name": "mean", "symbol": "μ", "constraints": "μ ∈ ℝ", "defaultValue": 0 },
-        { "name": "standardDeviation", "symbol": "σ", "constraints": "σ > 0", "defaultValue": 1 },
-        { "name": "lower", "symbol": "a", "constraints": "a ∈ ℝ", "defaultValue": -2 },
-        { "name": "upper", "symbol": "b", "constraints": "b > a", "defaultValue": 2 }
+        {
+          "name": "mean",
+          "symbol": "μ",
+          "constraints": "μ ∈ ℝ",
+          "defaultValue": 0
+        },
+        {
+          "name": "standardDeviation",
+          "symbol": "σ",
+          "constraints": "σ > 0",
+          "defaultValue": 1
+        },
+        {
+          "name": "lower",
+          "symbol": "a",
+          "constraints": "a ∈ ℝ",
+          "defaultValue": -2
+        },
+        {
+          "name": "upper",
+          "symbol": "b",
+          "constraints": "b > a",
+          "defaultValue": 2
+        }
       ],
       "support": "[a, b]",
       "moments": {
@@ -623,7 +969,11 @@
         "Modeling bounded measurement errors",
         "Truncated survey data"
       ],
-      "relatedDistributions": ["normal", "half-normal", "uniform"],
+      "relatedDistributions": [
+        "normal",
+        "half-normal",
+        "uniform"
+      ],
       "fittingMethod": "MLE via scipy.stats.truncnorm.fit",
       "pythonClass": "scipy.stats.truncnorm",
       "testForFit": "Kolmogorov-Smirnov test (scipy.stats.kstest)"
@@ -633,9 +983,24 @@
       "displayName": "Triangular",
       "family": "continuous",
       "parameters": [
-        { "name": "lower", "symbol": "a", "constraints": "a ∈ ℝ", "defaultValue": 0 },
-        { "name": "mode", "symbol": "c", "constraints": "a ≤ c ≤ b", "defaultValue": 0.5 },
-        { "name": "upper", "symbol": "b", "constraints": "b > a", "defaultValue": 1 }
+        {
+          "name": "lower",
+          "symbol": "a",
+          "constraints": "a ∈ ℝ",
+          "defaultValue": 0
+        },
+        {
+          "name": "mode",
+          "symbol": "c",
+          "constraints": "a ≤ c ≤ b",
+          "defaultValue": 0.5
+        },
+        {
+          "name": "upper",
+          "symbol": "b",
+          "constraints": "b > a",
+          "defaultValue": 1
+        }
       ],
       "support": "[a, b]",
       "moments": {
@@ -649,7 +1014,10 @@
         "Subjective prior when only min, mode, max known",
         "Monte Carlo simulation inputs"
       ],
-      "relatedDistributions": ["uniform", "beta"],
+      "relatedDistributions": [
+        "uniform",
+        "beta"
+      ],
       "fittingMethod": "MLE via scipy.stats.triang.fit",
       "pythonClass": "scipy.stats.triang",
       "testForFit": "Kolmogorov-Smirnov test (scipy.stats.kstest)"
@@ -659,8 +1027,18 @@
       "displayName": "Kumaraswamy",
       "family": "continuous",
       "parameters": [
-        { "name": "a", "symbol": "a", "constraints": "a > 0", "defaultValue": 2 },
-        { "name": "b", "symbol": "b", "constraints": "b > 0", "defaultValue": 5 }
+        {
+          "name": "a",
+          "symbol": "a",
+          "constraints": "a > 0",
+          "defaultValue": 2
+        },
+        {
+          "name": "b",
+          "symbol": "b",
+          "constraints": "b > 0",
+          "defaultValue": 5
+        }
       ],
       "support": "(0, 1)",
       "moments": {
@@ -674,7 +1052,10 @@
         "Hydrological modeling",
         "Simulation when inverse CDF sampling is needed"
       ],
-      "relatedDistributions": ["beta", "uniform"],
+      "relatedDistributions": [
+        "beta",
+        "uniform"
+      ],
       "fittingMethod": "MLE via custom implementation (no scipy built-in)",
       "pythonClass": "scipy.stats.kumaraswamy",
       "testForFit": "Kolmogorov-Smirnov test (scipy.stats.kstest)"
@@ -684,8 +1065,18 @@
       "displayName": "Beta Prime (Inverted Beta)",
       "family": "continuous",
       "parameters": [
-        { "name": "alpha", "symbol": "α", "constraints": "α > 0", "defaultValue": 2 },
-        { "name": "beta", "symbol": "β", "constraints": "β > 0", "defaultValue": 5 }
+        {
+          "name": "alpha",
+          "symbol": "α",
+          "constraints": "α > 0",
+          "defaultValue": 2
+        },
+        {
+          "name": "beta",
+          "symbol": "β",
+          "constraints": "β > 0",
+          "defaultValue": 5
+        }
       ],
       "support": "(0, +∞)",
       "moments": {
@@ -699,7 +1090,11 @@
         "Modeling positive continuous data with heavy tails",
         "Prior distributions in hierarchical models"
       ],
-      "relatedDistributions": ["beta", "f", "gamma"],
+      "relatedDistributions": [
+        "beta",
+        "f",
+        "gamma"
+      ],
       "fittingMethod": "MLE via scipy.stats.betaprime.fit",
       "pythonClass": "scipy.stats.betaprime",
       "testForFit": "Kolmogorov-Smirnov test (scipy.stats.kstest)"
@@ -709,9 +1104,24 @@
       "displayName": "Dagum",
       "family": "continuous",
       "parameters": [
-        { "name": "p", "symbol": "p", "constraints": "p > 0", "defaultValue": 2 },
-        { "name": "a", "symbol": "a", "constraints": "a > 0", "defaultValue": 3 },
-        { "name": "scale", "symbol": "b", "constraints": "b > 0", "defaultValue": 1 }
+        {
+          "name": "p",
+          "symbol": "p",
+          "constraints": "p > 0",
+          "defaultValue": 2
+        },
+        {
+          "name": "a",
+          "symbol": "a",
+          "constraints": "a > 0",
+          "defaultValue": 3
+        },
+        {
+          "name": "scale",
+          "symbol": "b",
+          "constraints": "b > 0",
+          "defaultValue": 1
+        }
       ],
       "support": "(0, +∞)",
       "moments": {
@@ -725,7 +1135,11 @@
         "Size distributions in economics",
         "Alternative to log-normal for heavy-tailed positive data"
       ],
-      "relatedDistributions": ["burr", "pareto", "log-normal"],
+      "relatedDistributions": [
+        "burr",
+        "pareto",
+        "log-normal"
+      ],
       "fittingMethod": "MLE via scipy.stats.mielke.fit",
       "pythonClass": "scipy.stats.mielke",
       "testForFit": "Kolmogorov-Smirnov test (scipy.stats.kstest)"
@@ -735,9 +1149,24 @@
       "displayName": "Burr (Type XII)",
       "family": "continuous",
       "parameters": [
-        { "name": "c", "symbol": "c", "constraints": "c > 0", "defaultValue": 3 },
-        { "name": "k", "symbol": "k", "constraints": "k > 0", "defaultValue": 1 },
-        { "name": "scale", "symbol": "λ", "constraints": "λ > 0", "defaultValue": 1 }
+        {
+          "name": "c",
+          "symbol": "c",
+          "constraints": "c > 0",
+          "defaultValue": 3
+        },
+        {
+          "name": "k",
+          "symbol": "k",
+          "constraints": "k > 0",
+          "defaultValue": 1
+        },
+        {
+          "name": "scale",
+          "symbol": "λ",
+          "constraints": "λ > 0",
+          "defaultValue": 1
+        }
       ],
       "support": "(0, +∞)",
       "moments": {
@@ -751,7 +1180,12 @@
         "Income distribution analysis",
         "Flexible heavy-tailed survival modeling"
       ],
-      "relatedDistributions": ["pareto", "dagum", "log-logistic", "weibull"],
+      "relatedDistributions": [
+        "pareto",
+        "dagum",
+        "log-logistic",
+        "weibull"
+      ],
       "fittingMethod": "MLE via scipy.stats.burr.fit",
       "pythonClass": "scipy.stats.burr",
       "testForFit": "Kolmogorov-Smirnov test (scipy.stats.kstest)"
@@ -761,7 +1195,12 @@
       "displayName": "Bernoulli",
       "family": "discrete",
       "parameters": [
-        { "name": "probability", "symbol": "p", "constraints": "0 ≤ p ≤ 1", "defaultValue": 0.5 }
+        {
+          "name": "probability",
+          "symbol": "p",
+          "constraints": "0 ≤ p ≤ 1",
+          "defaultValue": 0.5
+        }
       ],
       "support": "{0, 1}",
       "moments": {
@@ -775,7 +1214,11 @@
         "Success/failure indicators",
         "Building block for binomial distribution"
       ],
-      "relatedDistributions": ["binomial", "beta", "geometric"],
+      "relatedDistributions": [
+        "binomial",
+        "beta",
+        "geometric"
+      ],
       "fittingMethod": "MLE: p̂ = sample mean",
       "pythonClass": "scipy.stats.bernoulli",
       "testForFit": "Chi-squared goodness-of-fit test"
@@ -785,8 +1228,18 @@
       "displayName": "Binomial",
       "family": "discrete",
       "parameters": [
-        { "name": "trials", "symbol": "n", "constraints": "n ∈ ℤ⁺", "defaultValue": 10 },
-        { "name": "probability", "symbol": "p", "constraints": "0 ≤ p ≤ 1", "defaultValue": 0.5 }
+        {
+          "name": "trials",
+          "symbol": "n",
+          "constraints": "n ∈ ℤ⁺",
+          "defaultValue": 10
+        },
+        {
+          "name": "probability",
+          "symbol": "p",
+          "constraints": "0 ≤ p ≤ 1",
+          "defaultValue": 0.5
+        }
       ],
       "support": "{0, 1, 2, ..., n}",
       "moments": {
@@ -800,7 +1253,13 @@
         "Quality control sampling",
         "Clinical trial outcomes"
       ],
-      "relatedDistributions": ["bernoulli", "poisson", "normal", "negative-binomial", "beta-binomial"],
+      "relatedDistributions": [
+        "bernoulli",
+        "poisson",
+        "normal",
+        "negative-binomial",
+        "beta-binomial"
+      ],
       "fittingMethod": "MLE: p̂ = x̄/n",
       "pythonClass": "scipy.stats.binom",
       "testForFit": "Chi-squared goodness-of-fit test"
@@ -810,7 +1269,12 @@
       "displayName": "Poisson",
       "family": "discrete",
       "parameters": [
-        { "name": "rate", "symbol": "λ", "constraints": "λ > 0", "defaultValue": 5 }
+        {
+          "name": "rate",
+          "symbol": "λ",
+          "constraints": "λ > 0",
+          "defaultValue": 5
+        }
       ],
       "support": "{0, 1, 2, ...}",
       "moments": {
@@ -824,7 +1288,13 @@
         "Number of arrivals per hour",
         "Rare event modeling"
       ],
-      "relatedDistributions": ["exponential", "binomial", "negative-binomial", "zero-inflated-poisson", "conway-maxwell-poisson"],
+      "relatedDistributions": [
+        "exponential",
+        "binomial",
+        "negative-binomial",
+        "zero-inflated-poisson",
+        "conway-maxwell-poisson"
+      ],
       "fittingMethod": "MLE: λ̂ = sample mean",
       "pythonClass": "scipy.stats.poisson",
       "testForFit": "Chi-squared goodness-of-fit test"
@@ -834,7 +1304,12 @@
       "displayName": "Geometric",
       "family": "discrete",
       "parameters": [
-        { "name": "probability", "symbol": "p", "constraints": "0 < p ≤ 1", "defaultValue": 0.3 }
+        {
+          "name": "probability",
+          "symbol": "p",
+          "constraints": "0 < p ≤ 1",
+          "defaultValue": 0.3
+        }
       ],
       "support": "{1, 2, 3, ...}",
       "moments": {
@@ -848,7 +1323,11 @@
         "Waiting time for first event",
         "Coupon collector problems"
       ],
-      "relatedDistributions": ["negative-binomial", "exponential", "bernoulli"],
+      "relatedDistributions": [
+        "negative-binomial",
+        "exponential",
+        "bernoulli"
+      ],
       "fittingMethod": "MLE: p̂ = 1 / x̄",
       "pythonClass": "scipy.stats.geom",
       "testForFit": "Chi-squared goodness-of-fit test"
@@ -858,8 +1337,18 @@
       "displayName": "Negative Binomial",
       "family": "discrete",
       "parameters": [
-        { "name": "successes", "symbol": "r", "constraints": "r > 0", "defaultValue": 5 },
-        { "name": "probability", "symbol": "p", "constraints": "0 < p ≤ 1", "defaultValue": 0.5 }
+        {
+          "name": "successes",
+          "symbol": "r",
+          "constraints": "r > 0",
+          "defaultValue": 5
+        },
+        {
+          "name": "probability",
+          "symbol": "p",
+          "constraints": "0 < p ≤ 1",
+          "defaultValue": 0.5
+        }
       ],
       "support": "{0, 1, 2, ...}",
       "moments": {
@@ -873,7 +1362,11 @@
         "Number of failures before r-th success",
         "Modeling insurance claim counts"
       ],
-      "relatedDistributions": ["geometric", "poisson", "binomial"],
+      "relatedDistributions": [
+        "geometric",
+        "poisson",
+        "binomial"
+      ],
       "fittingMethod": "MLE via scipy.stats.nbinom.fit or method of moments",
       "pythonClass": "scipy.stats.nbinom",
       "testForFit": "Chi-squared goodness-of-fit test"
@@ -883,9 +1376,24 @@
       "displayName": "Hypergeometric",
       "family": "discrete",
       "parameters": [
-        { "name": "populationSize", "symbol": "N", "constraints": "N ∈ ℤ⁺", "defaultValue": 50 },
-        { "name": "successStates", "symbol": "K", "constraints": "0 ≤ K ≤ N", "defaultValue": 10 },
-        { "name": "draws", "symbol": "n", "constraints": "0 ≤ n ≤ N", "defaultValue": 5 }
+        {
+          "name": "populationSize",
+          "symbol": "N",
+          "constraints": "N ∈ ℤ⁺",
+          "defaultValue": 50
+        },
+        {
+          "name": "successStates",
+          "symbol": "K",
+          "constraints": "0 ≤ K ≤ N",
+          "defaultValue": 10
+        },
+        {
+          "name": "draws",
+          "symbol": "n",
+          "constraints": "0 ≤ n ≤ N",
+          "defaultValue": 5
+        }
       ],
       "support": "{max(0, n+K-N), ..., min(n, K)}",
       "moments": {
@@ -899,7 +1407,10 @@
         "Quality control lot sampling",
         "Fisher's exact test"
       ],
-      "relatedDistributions": ["binomial", "multinomial"],
+      "relatedDistributions": [
+        "binomial",
+        "multinomial"
+      ],
       "fittingMethod": "Method of moments",
       "pythonClass": "scipy.stats.hypergeom",
       "testForFit": "Chi-squared goodness-of-fit test"
@@ -909,8 +1420,18 @@
       "displayName": "Multinomial",
       "family": "multivariate",
       "parameters": [
-        { "name": "trials", "symbol": "n", "constraints": "n ∈ ℤ⁺", "defaultValue": 10 },
-        { "name": "probabilities", "symbol": "p", "constraints": "pᵢ ≥ 0, Σpᵢ = 1", "defaultValue": null }
+        {
+          "name": "trials",
+          "symbol": "n",
+          "constraints": "n ∈ ℤ⁺",
+          "defaultValue": 10
+        },
+        {
+          "name": "probabilities",
+          "symbol": "p",
+          "constraints": "pᵢ ≥ 0, Σpᵢ = 1",
+          "defaultValue": null
+        }
       ],
       "support": "{(x₁,...,xₖ) : xᵢ ∈ ℤ≥0, Σxᵢ = n}",
       "moments": {
@@ -924,7 +1445,10 @@
         "Text classification (bag of words)",
         "Dice rolling outcomes"
       ],
-      "relatedDistributions": ["binomial", "dirichlet"],
+      "relatedDistributions": [
+        "binomial",
+        "dirichlet"
+      ],
       "fittingMethod": "MLE: p̂ᵢ = xᵢ / n",
       "pythonClass": "scipy.stats.multinomial",
       "testForFit": "Chi-squared goodness-of-fit test"
@@ -934,7 +1458,12 @@
       "displayName": "Zipf (Zeta)",
       "family": "discrete",
       "parameters": [
-        { "name": "exponent", "symbol": "s", "constraints": "s > 1", "defaultValue": 2 }
+        {
+          "name": "exponent",
+          "symbol": "s",
+          "constraints": "s > 1",
+          "defaultValue": 2
+        }
       ],
       "support": "{1, 2, 3, ...}",
       "moments": {
@@ -948,7 +1477,11 @@
         "City population rankings",
         "Website popularity distributions"
       ],
-      "relatedDistributions": ["logarithmic", "pareto", "discrete-uniform"],
+      "relatedDistributions": [
+        "logarithmic",
+        "pareto",
+        "discrete-uniform"
+      ],
       "fittingMethod": "MLE via scipy.stats.zipf.fit",
       "pythonClass": "scipy.stats.zipf",
       "testForFit": "Chi-squared goodness-of-fit test"
@@ -958,7 +1491,12 @@
       "displayName": "Logarithmic (Log-Series)",
       "family": "discrete",
       "parameters": [
-        { "name": "p", "symbol": "p", "constraints": "0 < p < 1", "defaultValue": 0.5 }
+        {
+          "name": "p",
+          "symbol": "p",
+          "constraints": "0 < p < 1",
+          "defaultValue": 0.5
+        }
       ],
       "support": "{1, 2, 3, ...}",
       "moments": {
@@ -972,7 +1510,11 @@
         "Number of items purchased",
         "Modeling count data with mode at 1"
       ],
-      "relatedDistributions": ["zipf", "negative-binomial", "poisson"],
+      "relatedDistributions": [
+        "zipf",
+        "negative-binomial",
+        "poisson"
+      ],
       "fittingMethod": "MLE via scipy.stats.logser.fit",
       "pythonClass": "scipy.stats.logser",
       "testForFit": "Chi-squared goodness-of-fit test"
@@ -982,8 +1524,18 @@
       "displayName": "Boltzmann (Truncated Discrete Exponential)",
       "family": "discrete",
       "parameters": [
-        { "name": "lambda", "symbol": "λ", "constraints": "λ > 0", "defaultValue": 1 },
-        { "name": "N", "symbol": "N", "constraints": "N ∈ ℤ⁺", "defaultValue": 10 }
+        {
+          "name": "lambda",
+          "symbol": "λ",
+          "constraints": "λ > 0",
+          "defaultValue": 1
+        },
+        {
+          "name": "N",
+          "symbol": "N",
+          "constraints": "N ∈ ℤ⁺",
+          "defaultValue": 10
+        }
       ],
       "support": "{0, 1, 2, ..., N-1}",
       "moments": {
@@ -997,7 +1549,10 @@
         "Simulated annealing optimization",
         "Softmax probability modeling"
       ],
-      "relatedDistributions": ["discrete-uniform", "geometric"],
+      "relatedDistributions": [
+        "discrete-uniform",
+        "geometric"
+      ],
       "fittingMethod": "MLE via scipy.stats.boltzmann.fit",
       "pythonClass": "scipy.stats.boltzmann",
       "testForFit": "Chi-squared goodness-of-fit test"
@@ -1007,8 +1562,18 @@
       "displayName": "Discrete Uniform",
       "family": "discrete",
       "parameters": [
-        { "name": "lower", "symbol": "a", "constraints": "a ∈ ℤ", "defaultValue": 1 },
-        { "name": "upper", "symbol": "b", "constraints": "b ∈ ℤ, b ≥ a", "defaultValue": 6 }
+        {
+          "name": "lower",
+          "symbol": "a",
+          "constraints": "a ∈ ℤ",
+          "defaultValue": 1
+        },
+        {
+          "name": "upper",
+          "symbol": "b",
+          "constraints": "b ∈ ℤ, b ≥ a",
+          "defaultValue": 6
+        }
       ],
       "support": "{a, a+1, ..., b}",
       "moments": {
@@ -1022,7 +1587,10 @@
         "Random integer generation",
         "Non-informative discrete prior"
       ],
-      "relatedDistributions": ["uniform", "bernoulli"],
+      "relatedDistributions": [
+        "uniform",
+        "bernoulli"
+      ],
       "fittingMethod": "MLE: a = min(x), b = max(x)",
       "pythonClass": "scipy.stats.randint",
       "testForFit": "Chi-squared goodness-of-fit test"
@@ -1032,9 +1600,24 @@
       "displayName": "Beta-Binomial",
       "family": "discrete",
       "parameters": [
-        { "name": "trials", "symbol": "n", "constraints": "n ∈ ℤ⁺", "defaultValue": 10 },
-        { "name": "alpha", "symbol": "α", "constraints": "α > 0", "defaultValue": 2 },
-        { "name": "beta", "symbol": "β", "constraints": "β > 0", "defaultValue": 5 }
+        {
+          "name": "trials",
+          "symbol": "n",
+          "constraints": "n ∈ ℤ⁺",
+          "defaultValue": 10
+        },
+        {
+          "name": "alpha",
+          "symbol": "α",
+          "constraints": "α > 0",
+          "defaultValue": 2
+        },
+        {
+          "name": "beta",
+          "symbol": "β",
+          "constraints": "β > 0",
+          "defaultValue": 5
+        }
       ],
       "support": "{0, 1, 2, ..., n}",
       "moments": {
@@ -1048,7 +1631,11 @@
         "Bayesian compound distribution (binomial with beta prior on p)",
         "Modeling heterogeneity in success probabilities"
       ],
-      "relatedDistributions": ["binomial", "beta", "negative-binomial"],
+      "relatedDistributions": [
+        "binomial",
+        "beta",
+        "negative-binomial"
+      ],
       "fittingMethod": "MLE via scipy.stats.betabinom.fit",
       "pythonClass": "scipy.stats.betabinom",
       "testForFit": "Chi-squared goodness-of-fit test"
@@ -1058,8 +1645,18 @@
       "displayName": "Conway-Maxwell-Poisson (COM-Poisson)",
       "family": "discrete",
       "parameters": [
-        { "name": "lambda", "symbol": "λ", "constraints": "λ > 0", "defaultValue": 5 },
-        { "name": "nu", "symbol": "ν", "constraints": "ν ≥ 0", "defaultValue": 1 }
+        {
+          "name": "lambda",
+          "symbol": "λ",
+          "constraints": "λ > 0",
+          "defaultValue": 5
+        },
+        {
+          "name": "nu",
+          "symbol": "ν",
+          "constraints": "ν ≥ 0",
+          "defaultValue": 1
+        }
       ],
       "support": "{0, 1, 2, ...}",
       "moments": {
@@ -1073,7 +1670,11 @@
         "Flexible alternative to Poisson",
         "Linguistic word frequency modeling"
       ],
-      "relatedDistributions": ["poisson", "geometric", "bernoulli"],
+      "relatedDistributions": [
+        "poisson",
+        "geometric",
+        "bernoulli"
+      ],
       "fittingMethod": "MLE via custom implementation or compoinger package",
       "pythonClass": "custom (not in scipy.stats)",
       "testForFit": "Chi-squared goodness-of-fit test"
@@ -1083,8 +1684,18 @@
       "displayName": "Zero-Inflated Poisson (ZIP)",
       "family": "discrete",
       "parameters": [
-        { "name": "rate", "symbol": "λ", "constraints": "λ > 0", "defaultValue": 5 },
-        { "name": "zeroProbability", "symbol": "π", "constraints": "0 ≤ π ≤ 1", "defaultValue": 0.3 }
+        {
+          "name": "rate",
+          "symbol": "λ",
+          "constraints": "λ > 0",
+          "defaultValue": 5
+        },
+        {
+          "name": "zeroProbability",
+          "symbol": "π",
+          "constraints": "0 ≤ π ≤ 1",
+          "defaultValue": 0.3
+        }
       ],
       "support": "{0, 1, 2, ...}",
       "moments": {
@@ -1098,7 +1709,11 @@
         "Insurance claims (many zero-claim policies)",
         "Ecological species count data"
       ],
-      "relatedDistributions": ["poisson", "negative-binomial", "bernoulli"],
+      "relatedDistributions": [
+        "poisson",
+        "negative-binomial",
+        "bernoulli"
+      ],
       "fittingMethod": "MLE via statsmodels ZeroInflatedPoisson",
       "pythonClass": "statsmodels.discrete.count_model.ZeroInflatedPoisson",
       "testForFit": "Vuong test comparing ZIP vs. Poisson"
@@ -1108,8 +1723,18 @@
       "displayName": "Skellam",
       "family": "discrete",
       "parameters": [
-        { "name": "mu1", "symbol": "μ₁", "constraints": "μ₁ > 0", "defaultValue": 5 },
-        { "name": "mu2", "symbol": "μ₂", "constraints": "μ₂ > 0", "defaultValue": 3 }
+        {
+          "name": "mu1",
+          "symbol": "μ₁",
+          "constraints": "μ₁ > 0",
+          "defaultValue": 5
+        },
+        {
+          "name": "mu2",
+          "symbol": "μ₂",
+          "constraints": "μ₂ > 0",
+          "defaultValue": 3
+        }
       ],
       "support": "{..., -2, -1, 0, 1, 2, ...}",
       "moments": {
@@ -1123,7 +1748,10 @@
         "Sports score differentials",
         "Net migration modeling"
       ],
-      "relatedDistributions": ["poisson", "normal"],
+      "relatedDistributions": [
+        "poisson",
+        "normal"
+      ],
       "fittingMethod": "Method of moments: μ̂₁ = (s² + x̄)/2, μ̂₂ = (s² - x̄)/2",
       "pythonClass": "scipy.stats.skellam",
       "testForFit": "Chi-squared goodness-of-fit test"
@@ -1133,8 +1761,18 @@
       "displayName": "Multivariate Normal (Gaussian)",
       "family": "multivariate",
       "parameters": [
-        { "name": "meanVector", "symbol": "μ", "constraints": "μ ∈ ℝᵏ", "defaultValue": null },
-        { "name": "covarianceMatrix", "symbol": "Σ", "constraints": "Σ positive semi-definite, k×k", "defaultValue": null }
+        {
+          "name": "meanVector",
+          "symbol": "μ",
+          "constraints": "μ ∈ ℝᵏ",
+          "defaultValue": null
+        },
+        {
+          "name": "covarianceMatrix",
+          "symbol": "Σ",
+          "constraints": "Σ positive semi-definite, k×k",
+          "defaultValue": null
+        }
       ],
       "support": "ℝᵏ",
       "moments": {
@@ -1148,7 +1786,11 @@
         "Gaussian process regression",
         "Portfolio returns in finance"
       ],
-      "relatedDistributions": ["normal", "multivariate-t", "wishart"],
+      "relatedDistributions": [
+        "normal",
+        "multivariate-t",
+        "wishart"
+      ],
       "fittingMethod": "MLE: μ̂ = sample mean, Σ̂ = sample covariance",
       "pythonClass": "scipy.stats.multivariate_normal",
       "testForFit": "Mardia's test for multivariate normality"
@@ -1158,7 +1800,12 @@
       "displayName": "Dirichlet",
       "family": "multivariate",
       "parameters": [
-        { "name": "concentrationVector", "symbol": "α", "constraints": "αᵢ > 0 for all i", "defaultValue": null }
+        {
+          "name": "concentrationVector",
+          "symbol": "α",
+          "constraints": "αᵢ > 0 for all i",
+          "defaultValue": null
+        }
       ],
       "support": "{(x₁,...,xₖ) : xᵢ ≥ 0, Σxᵢ = 1}",
       "moments": {
@@ -1172,7 +1819,10 @@
         "Topic modeling (LDA)",
         "Compositional data analysis"
       ],
-      "relatedDistributions": ["beta", "multinomial"],
+      "relatedDistributions": [
+        "beta",
+        "multinomial"
+      ],
       "fittingMethod": "MLE via fixed-point iteration or Newton-Raphson",
       "pythonClass": "scipy.stats.dirichlet",
       "testForFit": "Energy-based test or bootstrap"
@@ -1182,8 +1832,18 @@
       "displayName": "Wishart",
       "family": "multivariate",
       "parameters": [
-        { "name": "degreesOfFreedom", "symbol": "n", "constraints": "n ≥ p (dimension)", "defaultValue": null },
-        { "name": "scaleMatrix", "symbol": "V", "constraints": "V positive definite, p×p", "defaultValue": null }
+        {
+          "name": "degreesOfFreedom",
+          "symbol": "n",
+          "constraints": "n ≥ p (dimension)",
+          "defaultValue": null
+        },
+        {
+          "name": "scaleMatrix",
+          "symbol": "V",
+          "constraints": "V positive definite, p×p",
+          "defaultValue": null
+        }
       ],
       "support": "p×p positive semi-definite matrices",
       "moments": {
@@ -1197,7 +1857,11 @@
         "Multivariate analysis of variance",
         "Random matrix theory"
       ],
-      "relatedDistributions": ["chi-squared", "multivariate-normal", "lkj"],
+      "relatedDistributions": [
+        "chi-squared",
+        "multivariate-normal",
+        "lkj"
+      ],
       "fittingMethod": "MLE: n̂V̂ = sample sum of outer products",
       "pythonClass": "scipy.stats.wishart",
       "testForFit": "Likelihood ratio test"
@@ -1207,9 +1871,24 @@
       "displayName": "Multivariate Student's t",
       "family": "multivariate",
       "parameters": [
-        { "name": "locationVector", "symbol": "μ", "constraints": "μ ∈ ℝᵏ", "defaultValue": null },
-        { "name": "shapeMatrix", "symbol": "Σ", "constraints": "Σ positive definite, k×k", "defaultValue": null },
-        { "name": "degreesOfFreedom", "symbol": "ν", "constraints": "ν > 0", "defaultValue": 5 }
+        {
+          "name": "locationVector",
+          "symbol": "μ",
+          "constraints": "μ ∈ ℝᵏ",
+          "defaultValue": null
+        },
+        {
+          "name": "shapeMatrix",
+          "symbol": "Σ",
+          "constraints": "Σ positive definite, k×k",
+          "defaultValue": null
+        },
+        {
+          "name": "degreesOfFreedom",
+          "symbol": "ν",
+          "constraints": "ν > 0",
+          "defaultValue": 5
+        }
       ],
       "support": "ℝᵏ",
       "moments": {
@@ -1223,7 +1902,11 @@
         "Financial risk modeling with tail dependence",
         "Small-sample multivariate inference"
       ],
-      "relatedDistributions": ["multivariate-normal", "student-t", "cauchy"],
+      "relatedDistributions": [
+        "multivariate-normal",
+        "student-t",
+        "cauchy"
+      ],
       "fittingMethod": "MLE via EM algorithm",
       "pythonClass": "scipy.stats.multivariate_t",
       "testForFit": "Mardia's test or energy-based test"
@@ -1233,8 +1916,18 @@
       "displayName": "LKJ (Lewandowski-Kurowicka-Joe)",
       "family": "multivariate",
       "parameters": [
-        { "name": "eta", "symbol": "η", "constraints": "η > 0", "defaultValue": 1 },
-        { "name": "dimension", "symbol": "d", "constraints": "d ∈ ℤ, d ≥ 2", "defaultValue": 3 }
+        {
+          "name": "eta",
+          "symbol": "η",
+          "constraints": "η > 0",
+          "defaultValue": 1
+        },
+        {
+          "name": "dimension",
+          "symbol": "d",
+          "constraints": "d ∈ ℤ, d ≥ 2",
+          "defaultValue": 3
+        }
       ],
       "support": "d×d positive definite correlation matrices",
       "moments": {
@@ -1248,7 +1941,10 @@
         "Hierarchical multivariate models (Stan, PyMC)",
         "Regularizing covariance estimation"
       ],
-      "relatedDistributions": ["wishart", "multivariate-normal"],
+      "relatedDistributions": [
+        "wishart",
+        "multivariate-normal"
+      ],
       "fittingMethod": "Bayesian posterior sampling (MCMC)",
       "pythonClass": "pymc.LKJCorr or stan equivalent (not in scipy)",
       "testForFit": "Posterior predictive check"
@@ -1258,8 +1954,18 @@
       "displayName": "Log-Logistic (Fisk)",
       "family": "continuous",
       "parameters": [
-        { "name": "scale", "symbol": "α", "constraints": "α > 0", "defaultValue": 1 },
-        { "name": "shape", "symbol": "β", "constraints": "β > 0", "defaultValue": 3 }
+        {
+          "name": "scale",
+          "symbol": "α",
+          "constraints": "α > 0",
+          "defaultValue": 1
+        },
+        {
+          "name": "shape",
+          "symbol": "β",
+          "constraints": "β > 0",
+          "defaultValue": 3
+        }
       ],
       "support": "[0, +∞)",
       "moments": {
@@ -1273,7 +1979,12 @@
         "Income and wealth distributions",
         "Hydrology stream-flow modeling"
       ],
-      "relatedDistributions": ["logistic", "log-normal", "burr", "pareto"],
+      "relatedDistributions": [
+        "logistic",
+        "log-normal",
+        "burr",
+        "pareto"
+      ],
       "fittingMethod": "MLE via scipy.stats.fisk.fit",
       "pythonClass": "scipy.stats.fisk",
       "testForFit": "Kolmogorov-Smirnov test (scipy.stats.kstest)"

@@ -3,6 +3,7 @@ import prisma from "../config/database";
 import { Pinecone } from "@pinecone-database/pinecone";
 import { UPLOAD_CONFIG } from "../config/upload.config";
 import { logger } from "../utils/logger";
+import { GcsStorageService } from "../services/retrieval/gcsStorage.service";
 
 /**
  * Orphan Cleanup Scheduler
@@ -77,23 +78,43 @@ async function cleanOrphanedPineconeVectors(): Promise<
       count: validDocIds.size,
     });
 
-    // Query Pinecone for vectors (sample up to 10000)
-    const dummyVector = new Array(1536).fill(0); // OpenAI dimensions
-    const queryResponse = await index.query({
-      vector: dummyVector,
-      topK: 10000,
-      includeMetadata: true,
-    });
-
-    // Find orphaned vectors
+    // Enumerate ALL vector IDs via listPaginated (no 10k cap)
     const orphanedVectorIds: string[] = [];
     const orphanedDocIds = new Set<string>();
 
-    for (const match of queryResponse.matches || []) {
-      const docId = match.metadata?.documentId as string;
-      if (docId && !validDocIds.has(docId)) {
-        orphanedVectorIds.push(match.id);
-        orphanedDocIds.add(docId);
+    try {
+      let paginationToken: string | undefined;
+      do {
+        const page = await index.listPaginated(
+          paginationToken ? { paginationToken } : {},
+        );
+        for (const vec of page.vectors || []) {
+          if (!vec.id) continue;
+          const docId = vec.id.split("#")[0];
+          if (docId && !validDocIds.has(docId)) {
+            orphanedVectorIds.push(vec.id);
+            orphanedDocIds.add(docId);
+          }
+        }
+        paginationToken = page.pagination?.next;
+      } while (paginationToken);
+    } catch (listErr: any) {
+      // Fallback to zero-vector query for pod-based indexes without listPaginated
+      logger.warn("[OrphanCleanup] listPaginated failed, falling back to zero-vector query", {
+        error: listErr.message,
+      });
+      const dummyVector = new Array(1536).fill(0);
+      const queryResponse = await index.query({
+        vector: dummyVector,
+        topK: 10000,
+        includeMetadata: true,
+      });
+      for (const match of queryResponse.matches || []) {
+        const docId = match.metadata?.documentId as string;
+        if (docId && !validDocIds.has(docId)) {
+          orphanedVectorIds.push(match.id);
+          orphanedDocIds.add(docId);
+        }
       }
     }
 
@@ -155,9 +176,78 @@ async function cleanOrphanedStorageFiles(): Promise<CleanupReport["storage"]> {
     errors: [] as string[],
   };
 
-  // Storage file listing not implemented in current storage abstraction.
-  // The critical fix is that document/folder deletion now properly deletes uploaded files.
-  logger.info("[OrphanCleanup] Cloud storage file listing not implemented, skipping storage cleanup");
+  const dryRun = process.env.ORPHAN_CLEANUP_DRY_RUN === "true";
+  const MAX_DELETES_PER_RUN = 500;
+  const MIN_AGE_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+  if (!process.env.GCS_BUCKET_NAME) {
+    logger.info("[OrphanCleanup] GCS not configured, skipping storage cleanup");
+    return result;
+  }
+
+  try {
+    logger.info("[OrphanCleanup] Scanning GCS for orphaned files", { dryRun });
+
+    const gcs = new GcsStorageService();
+
+    // Get all valid encryptedFilenames from the database
+    const validDocs = await prisma.document.findMany({
+      select: { encryptedFilename: true },
+    });
+    const validFilenames = new Set(validDocs.map((d) => d.encryptedFilename));
+
+    const orphanedFiles: string[] = [];
+    let pageToken: string | undefined;
+    const now = Date.now();
+
+    // Paginate through all GCS files
+    do {
+      const page = await gcs.listFiles({ maxResults: 1000, pageToken });
+      for (const file of page.files) {
+        // Skip files younger than 24 hours (may be in-flight uploads)
+        if (file.updated && now - file.updated.getTime() < MIN_AGE_MS) {
+          continue;
+        }
+        if (!validFilenames.has(file.name)) {
+          orphanedFiles.push(file.name);
+        }
+      }
+      pageToken = page.nextPageToken;
+    } while (pageToken);
+
+    result.orphanedFiles = orphanedFiles.length;
+
+    if (orphanedFiles.length > 0) {
+      logger.warn("[OrphanCleanup] Found orphaned GCS files", {
+        count: orphanedFiles.length,
+        dryRun,
+      });
+
+      if (!dryRun) {
+        const toDelete = orphanedFiles.slice(0, MAX_DELETES_PER_RUN);
+        for (const filename of toDelete) {
+          try {
+            await gcs.deleteFile({ key: filename });
+            result.deletedFiles++;
+          } catch (err: any) {
+            result.errors.push(`Delete ${filename}: ${err.message}`);
+          }
+        }
+        if (orphanedFiles.length > MAX_DELETES_PER_RUN) {
+          logger.info("[OrphanCleanup] Capped at max deletes per run", {
+            remaining: orphanedFiles.length - MAX_DELETES_PER_RUN,
+          });
+        }
+      }
+    } else {
+      logger.info("[OrphanCleanup] No orphaned GCS files found");
+    }
+  } catch (error: any) {
+    result.errors.push(`Storage cleanup failed: ${error.message}`);
+    logger.error("[OrphanCleanup] Storage cleanup error", {
+      error: error.message,
+    });
+  }
 
   return result;
 }

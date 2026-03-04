@@ -692,6 +692,58 @@ describe("ChatRuntimeOrchestrator", () => {
       ).rejects.toThrow("Conversation not found for this account.");
     });
 
+    test("persists only valid user-owned scope IDs when attachment scope is provided", async () => {
+      mockPrismaDocument.mockResolvedValue([{ id: "doc-1" }]);
+      delegate.chat.mockResolvedValue(
+        makeChatResult({
+          conversationId: "conv-1",
+          sources: [],
+        }),
+      );
+
+      await orchestrator.chat(
+        makeChatRequest({
+          conversationId: "conv-1",
+          message: "hello there",
+          attachedDocumentIds: ["doc-1", "doc-missing"],
+        }),
+      );
+
+      expect(mockPrismaConversationUpdateMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            scopeDocumentIds: ["doc-1"],
+          }),
+        }),
+      );
+    });
+
+    test("drops invalid scope IDs and persists empty scope when none are valid", async () => {
+      mockPrismaDocument.mockResolvedValue([]);
+      delegate.chat.mockResolvedValue(
+        makeChatResult({
+          conversationId: "conv-1",
+          sources: [],
+        }),
+      );
+
+      await orchestrator.chat(
+        makeChatRequest({
+          conversationId: "conv-1",
+          message: "hello there",
+          attachedDocumentIds: ["doc-ghost"],
+        }),
+      );
+
+      expect(mockPrismaConversationUpdateMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            scopeDocumentIds: [],
+          }),
+        }),
+      );
+    });
+
     test("enforces scope — sources from out-of-scope document are stripped", async () => {
       // Conversation has scope locked to doc-allowed
       mockPrismaConversationFindFirst.mockResolvedValue({

@@ -19,7 +19,10 @@
     ],
     "lastUpdated": "2026-03-03",
     "id": "patterns_medical_safety_boundary_triggers",
-    "description": "Safety-boundary triggers that prevent diagnostic language and escalate only to non-diagnostic actions."
+    "description": "Safety-boundary triggers that prevent diagnostic language and escalate only to non-diagnostic actions.",
+    "tests": [
+      "tests/patternDeterminism.test.ts"
+    ]
   },
   "config": {
     "deterministic": true,
@@ -27,7 +30,8 @@
     "requiresNavigationMode": true,
     "minPatterns": 150,
     "maxPatterns": 400,
-    "enabled": true
+    "enabled": true,
+    "sortBy": "id"
   },
   "patterns": [
     {

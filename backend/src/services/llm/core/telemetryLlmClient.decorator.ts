@@ -23,15 +23,19 @@ import type {
   LLMProviderKey,
   PipelineStage,
 } from "../../telemetry/telemetry.types";
+import { computeCostUsd, type CostTable } from "./llmCostCalculator";
+import { getOptionalBank } from "../../core/banks/bankLoader.service";
+import { canonicalizeProviderWithUnknown } from "./providerNormalization";
+
+let costTableCache: CostTable | null | undefined;
+function getCostTable(): CostTable | null {
+  if (costTableCache !== undefined) return costTableCache;
+  costTableCache = getOptionalBank<CostTable>("llm_cost_table") ?? null;
+  return costTableCache;
+}
 
 function mapProvider(p: LLMProvider): LLMProviderKey {
-  if (typeof p === "string") {
-    const lower = p.toLowerCase();
-    if (lower.includes("google") || lower.includes("gemini")) return "google";
-    if (lower.includes("openai") || lower.includes("gpt")) return "openai";
-    if (lower.includes("local")) return "local";
-  }
-  return "unknown";
+  return canonicalizeProviderWithUnknown(p);
 }
 
 function mapStage(purpose?: string): PipelineStage {
@@ -58,6 +62,45 @@ function extractErrorCode(err: unknown): string {
     if (typeof e.message === "string") return e.message.slice(0, 100);
   }
   return "UNKNOWN";
+}
+
+function asRecord(value: unknown): Record<string, unknown> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  return value as Record<string, unknown>;
+}
+
+function asString(value: unknown): string | null {
+  const text = String(value ?? "").trim();
+  return text ? text : null;
+}
+
+function asNumber(value: unknown): number | null {
+  const num = Number(value);
+  if (!Number.isFinite(num)) return null;
+  return num;
+}
+
+function buildModelCallMeta(rawMeta: unknown): Record<string, unknown> | null {
+  const meta = asRecord(rawMeta);
+  const route = asRecord(meta.route);
+  const eventMeta: Record<string, unknown> = {
+    promptType: asString(meta.promptType),
+    routeLane: asString(meta.routeLane) ?? asString(route.lane),
+    qualityReason:
+      asString(meta.qualityReason) ?? asString(route.qualityReason),
+    policyRuleId: asString(meta.policyRuleId) ?? asString(route.policyRuleId),
+    modelFamily: asString(meta.modelFamily) ?? asString(route.modelFamily),
+    pinnedModel: asString(meta.pinnedModel),
+    fallbackRank: asNumber(meta.fallbackRank),
+    fallbackPolicyRuleId: asString(meta.fallbackPolicyRuleId),
+    routedProvider: asString(route.provider),
+    routedModel: asString(route.model),
+  };
+
+  const normalized = Object.fromEntries(
+    Object.entries(eventMeta).filter(([, value]) => value !== null),
+  );
+  return Object.keys(normalized).length > 0 ? normalized : null;
 }
 
 export class TelemetryLLMClient implements LLMClient {
@@ -111,8 +154,16 @@ export class TelemetryLLMClient implements LLMClient {
         totalTokens: response?.usage?.totalTokens ?? null,
         firstTokenMs: null,
         durationMs,
-        retries: null,
+        retries: (response as Record<string, unknown> | undefined)?.__retryAttempts as number ?? null,
+        costUsd: computeCostUsd(
+          mapProvider(req.model.provider),
+          req.model.model,
+          response?.usage?.promptTokens,
+          response?.usage?.completionTokens,
+          getCostTable(),
+        ) || null,
         at: new Date(),
+        meta: buildModelCallMeta(req.meta),
       });
     }
   }
@@ -177,8 +228,16 @@ export class TelemetryLLMClient implements LLMClient {
         totalTokens: response?.usage?.totalTokens ?? null,
         firstTokenMs,
         durationMs,
-        retries: null,
+        retries: (response as Record<string, unknown> | undefined)?.__retryAttempts as number ?? null,
+        costUsd: computeCostUsd(
+          mapProvider(params.req.model.provider),
+          params.req.model.model,
+          response?.usage?.promptTokens,
+          response?.usage?.completionTokens,
+          getCostTable(),
+        ) || null,
         at: new Date(),
+        meta: buildModelCallMeta(params.req.meta),
       });
     }
   }

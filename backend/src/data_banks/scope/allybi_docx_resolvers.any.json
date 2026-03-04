@@ -3,9 +3,19 @@
     "id": "allybi_docx_resolvers",
     "version": "1.0.0",
     "description": "DOCX target resolver priority for selection-first deterministic editing.",
-    "languages": ["any", "en", "pt"],
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
     "lastUpdated": "2026-02-12",
-    "owner": "allybi-editing"
+    "owner": "allybi-editing",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -49,15 +59,23 @@
   },
   "resolvers": {
     "frozen_selection": {
-      "requires": ["selection"],
+      "requires": [
+        "selection"
+      ],
       "confidence": 1
     },
     "live_selection": {
-      "requires": ["selection"],
+      "requires": [
+        "selection"
+      ],
       "confidence": 0.98
     },
     "explicit_anchor": {
-      "patterns": ["Section\\s+[0-9.]+", "under\\s+['\"].+['\"]", "paragraph\\s+starting\\s+with"],
+      "patterns": [
+        "Section\\s+[0-9.]+",
+        "under\\s+['\"].+['\"]",
+        "paragraph\\s+starting\\s+with"
+      ],
       "confidence": 0.92
     },
     "structural_resolver": {

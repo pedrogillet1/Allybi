@@ -179,7 +179,7 @@ describe("DataBankLoaderService hardening", () => {
     );
   });
 
-  test("rejects registry entries that point to _deprecated paths", async () => {
+  test("skips registry entries that point to _deprecated paths", async () => {
     const root = fs.mkdtempSync(
       path.join(os.tmpdir(), "koda-banks-deprecated-"),
     );
@@ -218,7 +218,8 @@ describe("DataBankLoaderService hardening", () => {
       allowEmptyChecksumsInNonProd: true,
     });
 
-    await expect(loader.loadAll()).rejects.toThrow(/deprecated bank path/i);
+    await expect(loader.loadAll()).resolves.toBeUndefined();
+    expect(loader.listLoadedIds()).toHaveLength(0);
   });
 
   test("uses top-level schema bank payload for validation", async () => {

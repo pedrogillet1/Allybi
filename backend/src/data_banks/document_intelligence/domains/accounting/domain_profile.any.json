@@ -3,8 +3,18 @@
     "id": "di_accounting_domain_profile_v2",
     "version": "2.0.0",
     "description": "Accounting domain profile for books-of-record review: ledgers, reconciliations, subledgers, and control testing.",
-    "languages": ["en", "pt"],
-    "lastUpdated": "2026-03-03"
+    "languages": [
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,

@@ -50,16 +50,16 @@ const mockProviderBreakdown = [
 
 const mockModelUsage = [
   { id: "m_001", provider: "OpenAI", model: "gpt-5.2", tokens: 850000, cost: 21.25, calls: 1850, avgLatency: 312 },
-  { id: "m_002", provider: "Gemini", model: "3.0-flash", tokens: 980000, cost: 9.80, calls: 2800, avgLatency: 198 },
+  { id: "m_002", provider: "Gemini", model: "gemini-2.5-flash", tokens: 980000, cost: 9.80, calls: 2800, avgLatency: 198 },
   { id: "m_003", provider: "OpenAI", model: "text-embedding-3-small", tokens: 350000, cost: 3.50, calls: 600, avgLatency: 45 },
-  { id: "m_004", provider: "Gemini", model: "3.0-pro", tokens: 120000, cost: 2.50, calls: 400, avgLatency: 456 },
-  { id: "m_005", provider: "OpenAI", model: "gpt-5.2-mini", tokens: 280000, cost: 3.75, calls: 890, avgLatency: 189 },
+  { id: "m_004", provider: "Gemini", model: "gemini-2.5-flash", tokens: 120000, cost: 2.50, calls: 400, avgLatency: 456 },
+  { id: "m_005", provider: "OpenAI", model: "gpt-5-mini", tokens: 280000, cost: 3.75, calls: 890, avgLatency: 189 },
   { id: "m_006", provider: "Local", model: "llama-3.2-8b", tokens: 150000, cost: 2.07, calls: 450, avgLatency: 234 },
 ];
 
 const mockErrors = [
   { id: "e_001", timestamp: "2025-01-27 14:32:15", provider: "OpenAI", model: "gpt-5.2", error: "Rate limit exceeded", count: 3 },
-  { id: "e_002", timestamp: "2025-01-27 14:28:45", provider: "Gemini", model: "3.0-flash", error: "Context length exceeded", count: 1 },
+  { id: "e_002", timestamp: "2025-01-27 14:28:45", provider: "Gemini", model: "gemini-2.5-flash", error: "Context length exceeded", count: 1 },
   { id: "e_003", timestamp: "2025-01-27 14:20:33", provider: "OpenAI", model: "gpt-5.2", error: "Timeout (30s)", count: 2 },
   { id: "e_004", timestamp: "2025-01-27 13:45:22", provider: "Local", model: "llama-3.2-8b", error: "Model unavailable", count: 1 },
 ];

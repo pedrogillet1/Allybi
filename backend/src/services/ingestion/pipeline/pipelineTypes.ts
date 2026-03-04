@@ -52,10 +52,44 @@ export function isPipelineSkipped(
 // InputChunk — used throughout the pipeline
 // ---------------------------------------------------------------------------
 
+export interface InputChunkMetadata {
+  sectionName?: string;
+  sectionLevel?: number;
+  sectionPath?: string[];
+  chunkType?: "text" | "heading" | "table" | "cell_fact" | "slide" | "notes";
+  tableChunkForm?:
+    | "table_summary"
+    | "row_aggregate"
+    | "cell_centric";
+  tableId?: string;
+  rowIndex?: number;
+  columnIndex?: number;
+  headerPath?: string[];
+  unitRaw?: string;
+  unitNormalized?: string;
+  numericValue?: number;
+  startChar?: number;
+  endChar?: number;
+  sheetName?: string;
+  isFinancial?: boolean;
+  cellRef?: string;
+  rowLabel?: string;
+  colHeader?: string;
+  valueRaw?: string;
+  slideTitle?: string;
+  hasNotes?: boolean;
+  ocrConfidence?: number;
+  sourceType?: "pdf" | "docx" | "xlsx" | "pptx" | "text" | "image";
+  versionId?: string;
+  rootDocumentId?: string;
+  isLatestVersion?: boolean;
+}
+
 export interface InputChunk {
   chunkIndex: number;
   content: string;
   pageNumber?: number;
+  metadata?: InputChunkMetadata;
 }
 
 // ---------------------------------------------------------------------------

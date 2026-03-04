@@ -320,8 +320,12 @@ export type LlmRouteReason =
 export interface LlmRoutePlan {
   provider: LlmProviderId;
   model: LlmModelId;
+  modelFamily?: string;
 
   reason: LlmRouteReason;
+  lane?: string;
+  policyRuleId?: string;
+  qualityReason?: string;
 
   /**
    * Optional stage tag for orchestration:

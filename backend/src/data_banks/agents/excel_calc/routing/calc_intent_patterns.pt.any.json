@@ -26,7 +26,10 @@
     "deterministicSort": true,
     "caseInsensitiveDedupe": true,
     "domain": "excel_calc",
-    "locale": "pt"
+    "locale": "pt",
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "patterns": [
     {

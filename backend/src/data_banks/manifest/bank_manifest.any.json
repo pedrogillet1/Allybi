@@ -6,7 +6,14 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-03-01"
+    "lastUpdated": "2026-03-01",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -46,7 +53,8 @@
     "ambiguity",
     "probes",
     "templates",
-    "tests"
+    "tests",
+    "llm"
   ],
   "loadOrder": [
     "manifest",
@@ -72,7 +80,8 @@
     "ambiguity",
     "probes",
     "templates",
-    "tests"
+    "tests",
+    "llm"
   ],
   "categories": [
     {
@@ -640,6 +649,27 @@
         "formatting",
         "quality",
         "prompts"
+      ],
+      "requiredInEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      }
+    },
+    {
+      "id": "llm",
+      "folder": "llm",
+      "description": "LLM cost tables, model configs, and routing policies.",
+      "schemaId": "bank_schema",
+      "policy": {
+        "strictLoad": false,
+        "failOnMissingRequired": false,
+        "allowOptionalSkip": true
+      },
+      "dependsOnCategories": [
+        "manifest",
+        "schemas"
       ],
       "requiredInEnv": {
         "production": false,

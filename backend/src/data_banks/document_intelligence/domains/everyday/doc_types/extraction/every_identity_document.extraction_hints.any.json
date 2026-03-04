@@ -3,8 +3,17 @@
     "id": "di_everyday_extraction_every_identity_document",
     "version": "1.0.0",
     "description": "Extraction hints for every_identity_document.",
-    "languages": ["any"],
-    "lastUpdated": "2026-03-03"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -15,90 +24,183 @@
     {
       "id": "every_identity_document_hint_01",
       "entity": "document_type",
-      "anchors": ["passport", "identity card", "drivers license", "rg", "document"],
+      "anchors": [
+        "passport",
+        "identity card",
+        "drivers license",
+        "rg",
+        "document"
+      ],
       "location": "document_header",
       "extractionMethod": "heading_proximity",
-      "whereItHides": ["front cover", "header"]
+      "whereItHides": [
+        "front cover",
+        "header"
+      ]
     },
     {
       "id": "every_identity_document_hint_02",
       "entity": "document_number",
-      "anchors": ["document number", "id number", "numero", "número", "nr"],
+      "anchors": [
+        "document number",
+        "id number",
+        "numero",
+        "número",
+        "nr"
+      ],
       "location": "identity_fields",
       "extractionMethod": "regex_capture",
-      "whereItHides": ["identity box", "front id block"]
+      "whereItHides": [
+        "identity box",
+        "front id block"
+      ]
     },
     {
       "id": "every_identity_document_hint_03",
       "entity": "full_name",
-      "anchors": ["name", "nome", "full name", "nome completo"],
+      "anchors": [
+        "name",
+        "nome",
+        "full name",
+        "nome completo"
+      ],
       "location": "identity_fields",
       "extractionMethod": "heading_proximity",
-      "whereItHides": ["identity block", "face fields"]
+      "whereItHides": [
+        "identity block",
+        "face fields"
+      ]
     },
     {
       "id": "every_identity_document_hint_04",
       "entity": "date_of_birth",
-      "anchors": ["date of birth", "born", "nascimento", "birth date"],
+      "anchors": [
+        "date of birth",
+        "born",
+        "nascimento",
+        "birth date"
+      ],
       "location": "identity_fields",
       "extractionMethod": "date_parse",
-      "whereItHides": ["birth line", "date row"]
+      "whereItHides": [
+        "birth line",
+        "date row"
+      ]
     },
     {
       "id": "every_identity_document_hint_05",
       "entity": "issue_date",
-      "anchors": ["issued", "issue date", "emissao", "emitido em"],
+      "anchors": [
+        "issued",
+        "issue date",
+        "emissao",
+        "emitido em"
+      ],
       "location": "issuer_and_validity",
       "extractionMethod": "date_parse",
-      "whereItHides": ["bottom left corner", "issuer area"]
+      "whereItHides": [
+        "bottom left corner",
+        "issuer area"
+      ]
     },
     {
       "id": "every_identity_document_hint_06",
       "entity": "expiry_date",
-      "anchors": ["expiry", "valid until", "validade", "vence", "expira"],
+      "anchors": [
+        "expiry",
+        "valid until",
+        "validade",
+        "vence",
+        "expira"
+      ],
       "location": "issuer_and_validity",
       "extractionMethod": "date_parse",
-      "whereItHides": ["bottom right corner", "validity line"]
+      "whereItHides": [
+        "bottom right corner",
+        "validity line"
+      ]
     },
     {
       "id": "every_identity_document_hint_07",
       "entity": "issuing_authority",
-      "anchors": ["authority", "orgao", "issuing authority", "orgao expedidor"],
+      "anchors": [
+        "authority",
+        "orgao",
+        "issuing authority",
+        "orgao expedidor"
+      ],
       "location": "issuer_and_validity",
       "extractionMethod": "heading_proximity",
-      "whereItHides": ["issuer block", "stamp area"]
+      "whereItHides": [
+        "issuer block",
+        "stamp area"
+      ]
     },
     {
       "id": "every_identity_document_hint_08",
       "entity": "photo_present",
-      "anchors": ["photo", "foto", "image", "photo field"],
+      "anchors": [
+        "photo",
+        "foto",
+        "image",
+        "photo field"
+      ],
       "location": "photograph_or_biometric",
       "extractionMethod": "ocr_image_region",
-      "whereItHides": ["portrait area", "top left/right"]
+      "whereItHides": [
+        "portrait area",
+        "top left/right"
+      ]
     },
     {
       "id": "every_identity_document_hint_09",
       "entity": "biometric_present",
-      "anchors": ["biometric", "fingerprint", "facial", "iris", "biometria"],
+      "anchors": [
+        "biometric",
+        "fingerprint",
+        "facial",
+        "iris",
+        "biometria"
+      ],
       "location": "photograph_or_biometric",
       "extractionMethod": "heading_proximity",
-      "whereItHides": ["biometric panel", "scan area"]
+      "whereItHides": [
+        "biometric panel",
+        "scan area"
+      ]
     },
     {
       "id": "every_identity_document_hint_10",
       "entity": "mrz_line",
-      "anchors": ["mrz", "machine readable", "linha mrz", "icao"],
+      "anchors": [
+        "mrz",
+        "machine readable",
+        "linha mrz",
+        "icao"
+      ],
       "location": "photograph_or_biometric",
       "extractionMethod": "ocr_text",
-      "whereItHides": ["lower strip", "bottom row"]
+      "whereItHides": [
+        "lower strip",
+        "bottom row"
+      ]
     },
     {
       "id": "every_identity_document_hint_11",
       "entity": "security_features",
-      "anchors": ["hologram", "watermark", "barcode", "security"],
+      "anchors": [
+        "hologram",
+        "watermark",
+        "barcode",
+        "security"
+      ],
       "location": "security_features",
       "extractionMethod": "heading_proximity",
-      "whereItHides": ["security strip", "microprint section", "small symbols"]
+      "whereItHides": [
+        "security strip",
+        "microprint section",
+        "small symbols"
+      ]
     }
   ]
 }

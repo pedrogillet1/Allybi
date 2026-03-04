@@ -197,6 +197,15 @@ async function startServer() {
         modelId: defaultModelId,
       });
 
+      // Wire shared gateway into title generation service (Phase 4: shadow path consolidation)
+      try {
+        const { setTitleGenGateway } = await import("./services/ingestion/titleGeneration.service");
+        setTitleGenGateway(llmGateway);
+        console.log("[Server] Title generation wired with shared LLM gateway");
+      } catch {
+        console.warn("[Server] Title generation gateway wiring skipped");
+      }
+
       chatService = new PrismaChatService(bankBackedChatEngine, {
         conversationMemory: sharedConversationMemory || undefined,
       });

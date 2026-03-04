@@ -3,8 +3,19 @@
     "id": "openers",
     "version": "1.0.0",
     "description": "Openers for natural, grounded responses.",
-    "languages": ["any", "en", "pt"],
-    "lastUpdated": "2026-03-03"
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true

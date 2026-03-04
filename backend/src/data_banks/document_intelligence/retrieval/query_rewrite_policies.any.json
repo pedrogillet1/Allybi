@@ -3,13 +3,27 @@
     "id": "query_rewrite_policies",
     "version": "1.0.0",
     "description": "Canonical rewriting rules for malformed or shorthand queries.",
-    "languages": ["any", "en", "pt"],
-    "lastUpdated": "2026-03-03"
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
     "applySafeRewrite": true,
-    "maxRewritesPerQuery": 2
+    "maxRewritesPerQuery": 2,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "rewrites": [
     {

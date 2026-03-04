@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "id": "followup_suggestions",
+    "id": "followup_suggestions_v1c6269cc",
     "version": "1.0.0",
     "description": "Deep follow-up suggestions for document intelligence flows.",
     "languages": [
@@ -8,12 +8,22 @@
       "en",
       "pt"
     ],
-    "lastUpdated": "2026-03-03"
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
     "maxCount": 4,
-    "suppressInNav": true
+    "suppressInNav": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "suggestions": [
     {

@@ -206,7 +206,7 @@ export function selectTemplate(
     if (out.length) {
       return {
         templateId: `${safeStr(bankMeta?.id || kind)}:templates.${localized.key}`,
-        messages: out,
+        messages: out as unknown as Array<Record<string, unknown>>,
       };
     }
   }

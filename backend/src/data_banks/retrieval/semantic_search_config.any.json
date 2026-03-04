@@ -16,6 +16,12 @@
       "Added deterministic actionsContract and phase ordering for semantic retrieval",
       "Added scope-aware gating, expansion policy, and negative constraints integration points",
       "Added multilingual query normalization hooks and regression-focused tests"
+    ],
+    "usedBy": [
+      "services/core/retrieval/retrievalEngine.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
     ]
   },
   "config": {
@@ -187,7 +193,10 @@
       "globalScopeRequiresUnlockSignal": true,
       "staleContextPenalty": 0.12,
       "continuityBoost": 0.12
-    }
+    },
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "rules": [
     {

@@ -8,7 +8,14 @@
       "en",
       "pt"
     ],
-    "lastUpdated": "2026-03-03"
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -17,7 +24,10 @@
     "useLowercase": true,
     "caseSensitive": false,
     "defaultOperator": "extract",
-    "defaultAnswerMode": "doc_grounded"
+    "defaultAnswerMode": "doc_grounded",
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "operators": {
     "locate_docs": {

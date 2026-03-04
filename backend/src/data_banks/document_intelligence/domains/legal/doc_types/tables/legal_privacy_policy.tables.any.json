@@ -1,12 +1,19 @@
 {
   "_meta": {
-    "id": "legal_privacy_policy_tables",
+    "id": "legal_privacy_policy_tables_v113ccc0c",
     "version": "1.0.0",
     "description": "Expected table patterns for Privacy Policy.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-02-28",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,

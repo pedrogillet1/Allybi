@@ -3,10 +3,25 @@
     "id": "numeric_integrity_rules",
     "version": "1.0.0",
     "description": "Strict numeric integrity rules with machine actions for the Excel calc agent quality gate.",
-    "languages": ["any"],
-    "lastUpdated": "2026-02-28"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
-  "config": { "enabled": true, "strictMode": true },
+  "config": {
+    "enabled": true,
+    "strictMode": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
+  },
   "rules": [
     {
       "ruleId": "division-by-zero",
@@ -17,7 +32,9 @@
       "machineAction": "FAIL",
       "userMessage": "Cannot divide by zero. The denominator in your calculation is zero.",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "log-of-non-positive",
@@ -28,7 +45,9 @@
       "machineAction": "FAIL",
       "userMessage": "Logarithm is undefined for zero and negative numbers. Found value: {value}.",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "sqrt-of-negative",
@@ -39,7 +58,9 @@
       "machineAction": "FAIL",
       "userMessage": "Square root is undefined for negative numbers in the real domain. Found value: {value}.",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "modulo-by-zero",
@@ -50,7 +71,9 @@
       "machineAction": "FAIL",
       "userMessage": "Modulo by zero is undefined. The divisor must be non-zero.",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "integer-overflow-64bit",
@@ -61,7 +84,9 @@
       "machineAction": "FAIL",
       "userMessage": "Result exceeds the 64-bit integer range (±9.2×10¹⁸). Consider using arbitrary-precision arithmetic.",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "power-overflow",
@@ -72,7 +97,9 @@
       "machineAction": "FAIL",
       "userMessage": "Exponentiation overflow: {base}^{exponent} exceeds representable range.",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "negative-exponent-integer-base",
@@ -83,7 +110,9 @@
       "machineAction": "WARN_AND_CONTINUE",
       "userMessage": "Negative exponent on integer base produces a float. Result: {result}.",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "non-numeric-in-numeric-column",
@@ -94,7 +123,9 @@
       "machineAction": "ASK_CLARIFY_ONE",
       "userMessage": "Column '{column_name}' contains non-numeric values ({count} found). Should I coerce them to numbers or exclude them?",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "mixed-types-in-column",
@@ -105,7 +136,9 @@
       "machineAction": "ASK_CLARIFY_ONE",
       "userMessage": "Column '{column_name}' has mixed types: {types_found}. Should I unify to a single type?",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "boolean-as-numeric",
@@ -116,7 +149,9 @@
       "machineAction": "WARN_AND_CONTINUE",
       "userMessage": "Boolean values detected in numeric column '{column_name}'. Treating True=1, False=0.",
       "autoFix": "coerce_bool_to_int",
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "date-as-numeric",
@@ -127,7 +162,9 @@
       "machineAction": "REQUIRE_UNIT",
       "userMessage": "Column '{column_name}' contains dates. Which component should I extract for calculation? (year, month, day, epoch_seconds, ordinal)",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "string-number-coercion",
@@ -138,7 +175,9 @@
       "machineAction": "AUTO_COERCE",
       "userMessage": "Auto-coercing string values to numbers (stripping currency symbols and formatting).",
       "autoFix": "strip_formatting_and_cast_float",
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "percentage-out-of-bounds",
@@ -149,7 +188,9 @@
       "machineAction": "REQUIRE_RANGE_CONTEXT",
       "userMessage": "Column '{column_name}' contains values in both 0–1 and >1 ranges. Are these percentages in 0–1 or 0–100 scale?",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "negative-count",
@@ -160,7 +201,9 @@
       "machineAction": "FAIL",
       "userMessage": "Column '{column_name}' represents a count but contains negative values. Counts must be non-negative.",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "probability-out-of-bounds",
@@ -171,7 +214,9 @@
       "machineAction": "FAIL",
       "userMessage": "Probability values must be between 0 and 1. Found out-of-range values in '{column_name}'.",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "negative-variance",
@@ -182,7 +227,9 @@
       "machineAction": "FAIL",
       "userMessage": "Variance cannot be negative. Computed value {result} indicates a calculation error.",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "correlation-out-of-bounds",
@@ -193,7 +240,9 @@
       "machineAction": "FAIL",
       "userMessage": "Correlation coefficient must be between -1 and 1. Computed value {result} indicates a calculation error.",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "ratio-negative-denominator",
@@ -204,7 +253,9 @@
       "machineAction": "REQUIRE_RANGE_CONTEXT",
       "userMessage": "The denominator in your ratio is negative ({denominator}). This may invert the expected sign of the result. Is this intentional?",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "floating-point-comparison",
@@ -215,7 +266,9 @@
       "machineAction": "WARN_AND_CONTINUE",
       "userMessage": "Floating-point equality comparison detected. Using np.isclose(a, b, rtol=1e-9) instead of a == b.",
       "autoFix": "use_np_isclose",
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "excessive-decimal-places",
@@ -226,7 +279,9 @@
       "machineAction": "AUTO_COERCE",
       "userMessage": "Result has excessive decimal places. Rounding to 10 significant digits.",
       "autoFix": "round_to_10_sigfigs",
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "catastrophic-cancellation",
@@ -237,7 +292,9 @@
       "machineAction": "WARN_AND_CONTINUE",
       "userMessage": "Catastrophic cancellation detected: subtracting two nearly equal large numbers ({a} - {b}). Result may have lost significant precision.",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "subnormal-float",
@@ -248,7 +305,9 @@
       "machineAction": "WARN_AND_CONTINUE",
       "userMessage": "Subnormal float detected ({value}). Precision is degraded below the normal floating-point minimum.",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "precision-loss-large-sum",
@@ -259,7 +318,9 @@
       "machineAction": "WARN_AND_CONTINUE",
       "userMessage": "Summing {count} values with large magnitudes. Using Kahan compensated summation to reduce rounding error.",
       "autoFix": "use_kahan_summation",
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "all-values-missing",
@@ -270,7 +331,9 @@
       "machineAction": "FAIL",
       "userMessage": "All values in '{column_name}' are missing. Cannot perform any calculation.",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "majority-missing",
@@ -281,7 +344,9 @@
       "machineAction": "ASK_CLARIFY_ONE",
       "userMessage": "More than 50% of values in '{column_name}' are missing ({pct_missing}%). Should I proceed with available data or stop?",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "missing-in-denominator",
@@ -292,7 +357,9 @@
       "machineAction": "FAIL",
       "userMessage": "The denominator contains missing values. Cannot compute division with NaN/None divisor.",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "nan-propagation",
@@ -303,7 +370,9 @@
       "machineAction": "WARN_AND_CONTINUE",
       "userMessage": "NaN values are propagating through the calculation chain. {nan_count} intermediate results are NaN.",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "inf-in-output",
@@ -314,7 +383,9 @@
       "machineAction": "FAIL",
       "userMessage": "Result contains infinite values. This typically indicates division by zero or overflow in intermediate steps.",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "single-non-missing-value",
@@ -325,7 +396,9 @@
       "machineAction": "ASK_CLARIFY_ONE",
       "userMessage": "Only 1 non-missing value in '{column_name}'. Statistical calculations require at least 2 data points. Proceed anyway?",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "mixed-currency-symbols",
@@ -336,7 +409,9 @@
       "machineAction": "REQUIRE_UNIT",
       "userMessage": "Multiple currency symbols detected in '{column_name}': {symbols}. Please specify which currency to use or provide exchange rates.",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "mixed-percentage-formats",
@@ -347,7 +422,9 @@
       "machineAction": "REQUIRE_RANGE_CONTEXT",
       "userMessage": "Column '{column_name}' mixes decimal (e.g., 0.05) and percentage (e.g., 5%) formats. Which scale should I normalize to?",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "ambiguous-date-format",
@@ -358,7 +435,9 @@
       "machineAction": "ASK_CLARIFY_ONE",
       "userMessage": "Ambiguous date format detected (e.g., '{sample_value}'). Is this DD/MM/YYYY or MM/DD/YYYY?",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "mixed-measurement-units",
@@ -369,7 +448,9 @@
       "machineAction": "REQUIRE_UNIT",
       "userMessage": "Mixed measurement units detected in '{column_name}': {units}. Please specify a target unit for normalization.",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "sample-size-below-minimum",
@@ -380,7 +461,9 @@
       "machineAction": "ASK_CLARIFY_ONE",
       "userMessage": "Sample size is {n}, below the recommended minimum of 30 for '{operation}'. Results may not be statistically reliable. Proceed anyway?",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "zero-variance-column",
@@ -391,7 +474,9 @@
       "machineAction": "FAIL",
       "userMessage": "Column '{column_name}' has zero variance (all values are identical: {constant_value}). Cannot compute {operation}.",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "singular-matrix",
@@ -402,7 +487,9 @@
       "machineAction": "FAIL",
       "userMessage": "The matrix is singular or near-singular (condition number: {cond}). Inversion and regression solutions are unreliable.",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "multicollinearity-detected",
@@ -413,7 +500,9 @@
       "machineAction": "WARN_AND_CONTINUE",
       "userMessage": "High multicollinearity detected (VIF > 10 for columns: {collinear_columns}). Regression coefficients may be unstable.",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "non-convergence",
@@ -424,7 +513,9 @@
       "machineAction": "FAIL",
       "userMessage": "Algorithm did not converge after {iterations} iterations (residual: {residual}, tolerance: {tolerance}).",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "degrees-of-freedom-zero",
@@ -435,7 +526,9 @@
       "machineAction": "FAIL",
       "userMessage": "Degrees of freedom is {df} (must be > 0). The model has too many parameters for the available data.",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "result-is-nan",
@@ -446,7 +539,9 @@
       "machineAction": "FAIL",
       "userMessage": "The computation result is NaN (Not a Number). This indicates an undefined operation in the calculation chain.",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "result-is-inf",
@@ -457,7 +552,9 @@
       "machineAction": "FAIL",
       "userMessage": "The computation result is infinite ({result}). This typically indicates overflow or division by near-zero values.",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "result-array-empty",
@@ -468,7 +565,9 @@
       "machineAction": "FAIL",
       "userMessage": "The computation returned an empty result. All rows may have been filtered out or the input was empty.",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "result-exceeds-input-magnitude",
@@ -479,7 +578,9 @@
       "machineAction": "WARN_AND_CONTINUE",
       "userMessage": "The result ({result}) is more than 10⁶× larger than any input value. Please verify the calculation is correct.",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "result-type-mismatch",
@@ -490,7 +591,9 @@
       "machineAction": "FAIL",
       "userMessage": "Expected result type '{expected_type}' but got '{actual_type}'. The calculation pipeline may have a type error.",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "result-negative-for-absolute-metric",
@@ -501,7 +604,9 @@
       "machineAction": "FAIL",
       "userMessage": "{operation} cannot be negative. Computed value {result} indicates a calculation error.",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "float-overflow-to-inf",
@@ -512,7 +617,9 @@
       "machineAction": "FAIL",
       "userMessage": "Floating-point overflow: intermediate value exceeds ±1.8×10³⁰⁸. Consider rescaling inputs.",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "underflow-to-zero",
@@ -523,7 +630,9 @@
       "machineAction": "WARN_AND_CONTINUE",
       "userMessage": "Floating-point underflow: a non-zero value was rounded to zero. Result precision may be compromised.",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "input-column-not-found",
@@ -534,7 +643,9 @@
       "machineAction": "FAIL",
       "userMessage": "Column '{column_name}' not found in the data. Available columns: {available_columns}.",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "input-empty-dataframe",
@@ -545,7 +656,9 @@
       "machineAction": "FAIL",
       "userMessage": "The input data is empty (0 rows). Cannot perform any calculations.",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     },
     {
       "ruleId": "input-duplicate-column-names",
@@ -556,7 +669,9 @@
       "machineAction": "ASK_CLARIFY_ONE",
       "userMessage": "Duplicate column names detected: {duplicates}. Which instance should I use for the calculation?",
       "autoFix": null,
-      "appliesTo": ["*"]
+      "appliesTo": [
+        "*"
+      ]
     }
   ]
 }

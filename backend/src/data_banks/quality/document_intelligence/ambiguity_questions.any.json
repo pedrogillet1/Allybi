@@ -6,10 +6,20 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-27"
+    "lastUpdated": "2026-02-27",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/retrieval/retrievalEngine.service.ts"
+    ],
+    "tests": [
+      "tests/document-intelligence/docint-bank-integrity.test.ts"
+    ]
   },
   "config": {
-    "enabled": true
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "rules": [
     {

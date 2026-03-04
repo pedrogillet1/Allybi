@@ -3,8 +3,17 @@
     "id": "di_accounting_validation_policies_v2",
     "version": "2.0.0",
     "description": "Validation rules for accounting including reconciliation tie-out, subledger and sign-convention checks.",
-    "languages": ["any"],
-    "lastUpdated": "2026-03-03"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -12,21 +21,192 @@
   },
   "domain": "accounting",
   "policies": [
-    { "id": "acct_val_001_debit_credit_equal", "severity": "error", "applies": ["extract", "validate", "calculate"], "check": "debit_credit_equality", "description": "For every JE block and TB report, debit total must equal credit total when both are present.", "failureAction": "BLOCK_AND_FLAG" },
-    { "id": "acct_val_002_tb_balanced", "severity": "error", "applies": ["validate", "compare"], "check": "trial_balance_balance", "description": "Trial balance is invalid when aggregate debit != aggregate credit within same period and currency.", "failureAction": "BLOCK_AND_FLAG" },
-    { "id": "acct_val_003_je_cutoff", "severity": "error", "applies": ["validate", "extract"], "check": "posting_period_cutoff", "description": "Posting date must be within selected period boundaries unless explicitly flagged as adjusting/reclassifying prior period.", "failureAction": "WARN_AND_EXPLAIN" },
-    { "id": "acct_val_004_je_dr_cr", "severity": "error", "applies": ["validate", "extract"], "check": "dr_cr_presence", "description": "Each journal entry requires balanced DR/CR and nonzero amount on at least one side.", "failureAction": "BLOCK_AND_FLAG" },
-    { "id": "acct_val_005_tieout_bank", "severity": "error", "applies": ["validate", "compare"], "check": "reconciliation_tie_out", "description": "Bank reconciliation must satisfy adjusted book balance = adjusted bank balance.", "failureAction": "BLOCK_AND_FLAG", "requires": {"fields": ["book_balance", "external_balance", "adjustments"]} },
-    { "id": "acct_val_006_subledger_tieout", "severity": "warning", "applies": ["validate", "compare"], "check": "subledger_gl_tie_out", "description": "AR/AP subledger totals should tie to GL control account and be within tolerance for same period.", "failureAction": "WARN_AND_EXPLAIN", "tolerance": 0.01 },
-    { "id": "acct_val_007_aging_bucket_sum", "severity": "error", "applies": ["validate", "extract"], "check": "aging_bucket_sum", "description": "Aging totals by bucket must equal report total for same header and period.", "failureAction": "BLOCK_AND_FLAG" },
-    { "id": "acct_val_008_reclassification_valid", "severity": "warning", "applies": ["validate", "evaluate"], "check": "reclassification_accounting", "description": "Reclassification entries should identify source and target accounts and include narrative basis.", "failureAction": "WARN_AND_EXPLAIN" },
-    { "id": "acct_val_009_sign_convention", "severity": "error", "applies": ["validate", "calculate"], "check": "sign_convention_consistency", "description": "Tables using signed amounts must keep one sign convention per table and avoid mixed direction without legend.", "failureAction": "BLOCK_AND_FLAG" },
-    { "id": "acct_val_010_control_authority", "severity": "warning", "applies": ["validate", "evaluate"], "check": "control_authorization", "description": "Journal entries above threshold need authorization metadata when not generated automatically.", "failureAction": "ANNOTATE" },
-    { "id": "acct_val_011_materiality_threshold", "severity": "warning", "applies": ["calculate", "evaluate"], "check": "materiality", "description": "Flag unusual balances exceeding materiality threshold and identify basis used.", "failureAction": "WARN_AND_EXPLAIN", "defaultThreshold": 10000 },
-    { "id": "acct_val_012_normal_balance", "severity": "warning", "applies": ["validate", "compare"], "check": "normal_balance", "description": "Asset/Liability and equity balance signs should follow normal debit/credit orientation unless explanatory disclosure exists.", "failureAction": "WARN_AND_EXPLAIN" },
-    { "id": "acct_val_013_rollforward", "severity": "warning", "applies": ["validate", "calculate"], "check": "balance_rollforward", "description": "Opening + net movement = closing should hold for every analyzed account, period and unit.", "failureAction": "WARN_AND_EXPLAIN" },
-    { "id": "acct_val_014_tolerance_rounding", "severity": "warning", "applies": ["calculate", "compare"], "check": "rounding_tolerance", "description": "Apply two-decimal rounding before comparison; tolerate minor pennies if disclosed.", "failureAction": "WARN_AND_EXPLAIN", "tolerance": 0.02 },
-    { "id": "acct_val_015_ledger_404", "severity": "info", "applies": ["extract", "locate"], "check": "missing_ledger_pages", "description": "If referenced GL period spans multiple files/pages, mark incomplete tie to avoid false confidence.", "failureAction": "ANNOTATE" },
-    { "id": "acct_val_016_cash_accrual", "severity": "warning", "applies": ["evaluate", "compare"], "check": "cash_vs_accrual_mix", "description": "Do not combine cash and accrual numbers without explicit basis declaration.", "failureAction": "WARN_AND_EXPLAIN" }
+    {
+      "id": "acct_val_001_debit_credit_equal",
+      "severity": "error",
+      "applies": [
+        "extract",
+        "validate",
+        "calculate"
+      ],
+      "check": "debit_credit_equality",
+      "description": "For every JE block and TB report, debit total must equal credit total when both are present.",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "acct_val_002_tb_balanced",
+      "severity": "error",
+      "applies": [
+        "validate",
+        "compare"
+      ],
+      "check": "trial_balance_balance",
+      "description": "Trial balance is invalid when aggregate debit != aggregate credit within same period and currency.",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "acct_val_003_je_cutoff",
+      "severity": "error",
+      "applies": [
+        "validate",
+        "extract"
+      ],
+      "check": "posting_period_cutoff",
+      "description": "Posting date must be within selected period boundaries unless explicitly flagged as adjusting/reclassifying prior period.",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "acct_val_004_je_dr_cr",
+      "severity": "error",
+      "applies": [
+        "validate",
+        "extract"
+      ],
+      "check": "dr_cr_presence",
+      "description": "Each journal entry requires balanced DR/CR and nonzero amount on at least one side.",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "acct_val_005_tieout_bank",
+      "severity": "error",
+      "applies": [
+        "validate",
+        "compare"
+      ],
+      "check": "reconciliation_tie_out",
+      "description": "Bank reconciliation must satisfy adjusted book balance = adjusted bank balance.",
+      "failureAction": "BLOCK_AND_FLAG",
+      "requires": {
+        "fields": [
+          "book_balance",
+          "external_balance",
+          "adjustments"
+        ]
+      }
+    },
+    {
+      "id": "acct_val_006_subledger_tieout",
+      "severity": "warning",
+      "applies": [
+        "validate",
+        "compare"
+      ],
+      "check": "subledger_gl_tie_out",
+      "description": "AR/AP subledger totals should tie to GL control account and be within tolerance for same period.",
+      "failureAction": "WARN_AND_EXPLAIN",
+      "tolerance": 0.01
+    },
+    {
+      "id": "acct_val_007_aging_bucket_sum",
+      "severity": "error",
+      "applies": [
+        "validate",
+        "extract"
+      ],
+      "check": "aging_bucket_sum",
+      "description": "Aging totals by bucket must equal report total for same header and period.",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "acct_val_008_reclassification_valid",
+      "severity": "warning",
+      "applies": [
+        "validate",
+        "evaluate"
+      ],
+      "check": "reclassification_accounting",
+      "description": "Reclassification entries should identify source and target accounts and include narrative basis.",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "acct_val_009_sign_convention",
+      "severity": "error",
+      "applies": [
+        "validate",
+        "calculate"
+      ],
+      "check": "sign_convention_consistency",
+      "description": "Tables using signed amounts must keep one sign convention per table and avoid mixed direction without legend.",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "acct_val_010_control_authority",
+      "severity": "warning",
+      "applies": [
+        "validate",
+        "evaluate"
+      ],
+      "check": "control_authorization",
+      "description": "Journal entries above threshold need authorization metadata when not generated automatically.",
+      "failureAction": "ANNOTATE"
+    },
+    {
+      "id": "acct_val_011_materiality_threshold",
+      "severity": "warning",
+      "applies": [
+        "calculate",
+        "evaluate"
+      ],
+      "check": "materiality",
+      "description": "Flag unusual balances exceeding materiality threshold and identify basis used.",
+      "failureAction": "WARN_AND_EXPLAIN",
+      "defaultThreshold": 10000
+    },
+    {
+      "id": "acct_val_012_normal_balance",
+      "severity": "warning",
+      "applies": [
+        "validate",
+        "compare"
+      ],
+      "check": "normal_balance",
+      "description": "Asset/Liability and equity balance signs should follow normal debit/credit orientation unless explanatory disclosure exists.",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "acct_val_013_rollforward",
+      "severity": "warning",
+      "applies": [
+        "validate",
+        "calculate"
+      ],
+      "check": "balance_rollforward",
+      "description": "Opening + net movement = closing should hold for every analyzed account, period and unit.",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "acct_val_014_tolerance_rounding",
+      "severity": "warning",
+      "applies": [
+        "calculate",
+        "compare"
+      ],
+      "check": "rounding_tolerance",
+      "description": "Apply two-decimal rounding before comparison; tolerate minor pennies if disclosed.",
+      "failureAction": "WARN_AND_EXPLAIN",
+      "tolerance": 0.02
+    },
+    {
+      "id": "acct_val_015_ledger_404",
+      "severity": "info",
+      "applies": [
+        "extract",
+        "locate"
+      ],
+      "check": "missing_ledger_pages",
+      "description": "If referenced GL period spans multiple files/pages, mark incomplete tie to avoid false confidence.",
+      "failureAction": "ANNOTATE"
+    },
+    {
+      "id": "acct_val_016_cash_accrual",
+      "severity": "warning",
+      "applies": [
+        "evaluate",
+        "compare"
+      ],
+      "check": "cash_vs_accrual_mix",
+      "description": "Do not combine cash and accrual numbers without explicit basis declaration.",
+      "failureAction": "WARN_AND_EXPLAIN"
+    }
   ]
 }

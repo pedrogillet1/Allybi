@@ -3,8 +3,20 @@
     "id": "quote_styles",
     "version": "1.0.0",
     "description": "Quote rendering constraints for doc-grounded quote outputs.",
-    "languages": ["any", "en", "pt", "es"],
-    "lastUpdated": "2026-03-01"
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-03-01",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -14,7 +26,10 @@
       "en": "Source:",
       "pt": "Fonte:",
       "es": "Fuente:"
-    }
+    },
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "rules": [
     {

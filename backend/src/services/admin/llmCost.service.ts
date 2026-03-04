@@ -25,6 +25,7 @@ export interface AdminLLMRow {
   durationMs: number | null;
   traceId: string;
   turnId: string | null;
+  meta?: Record<string, unknown> | null;
 }
 
 export interface LLMListResult {
@@ -133,6 +134,7 @@ export async function listLlmCalls(
       durationMs: true,
       traceId: true,
       turnId: true,
+      meta: true,
     },
   });
 
@@ -153,6 +155,10 @@ export async function listLlmCalls(
     durationMs: c.durationMs,
     traceId: c.traceId,
     turnId: c.turnId,
+    meta:
+      c.meta && typeof c.meta === "object"
+        ? (c.meta as Record<string, unknown>)
+        : null,
   }));
 
   return {

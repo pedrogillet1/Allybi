@@ -6,7 +6,14 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-03-03"
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -23,7 +30,11 @@
       "order": 1,
       "required": true,
       "mustHave": true,
-      "headingAnchors": ["tax notice", "notificacao", "notice of assessment"]
+      "headingAnchors": [
+        "tax notice",
+        "notificacao",
+        "notice of assessment"
+      ]
     },
     {
       "id": "notice_reference",
@@ -34,7 +45,12 @@
       "order": 2,
       "required": true,
       "mustHave": true,
-      "headingAnchors": ["notice number", "reference", "notice id", "protocolo"]
+      "headingAnchors": [
+        "notice number",
+        "reference",
+        "notice id",
+        "protocolo"
+      ]
     },
     {
       "id": "notice_summary",
@@ -45,7 +61,12 @@
       "order": 3,
       "required": true,
       "mustHave": true,
-      "headingAnchors": ["assessment", "summary", "resumo", "total assessed"]
+      "headingAnchors": [
+        "assessment",
+        "summary",
+        "resumo",
+        "total assessed"
+      ]
     },
     {
       "id": "assessed_amounts",
@@ -56,7 +77,12 @@
       "order": 4,
       "required": true,
       "mustHave": true,
-      "headingAnchors": ["assessed", "tax due", "amount due", "base"]
+      "headingAnchors": [
+        "assessed",
+        "tax due",
+        "amount due",
+        "base"
+      ]
     },
     {
       "id": "penalties",
@@ -67,7 +93,12 @@
       "order": 5,
       "required": true,
       "mustHave": true,
-      "headingAnchors": ["penalty", "interest", "late fee", "juros"]
+      "headingAnchors": [
+        "penalty",
+        "interest",
+        "late fee",
+        "juros"
+      ]
     },
     {
       "id": "payment_instructions",
@@ -78,7 +109,12 @@
       "order": 6,
       "required": true,
       "mustHave": true,
-      "headingAnchors": ["how to pay", "instructions", "pay here", "pagamento"]
+      "headingAnchors": [
+        "how to pay",
+        "instructions",
+        "pay here",
+        "pagamento"
+      ]
     },
     {
       "id": "due_dates",
@@ -89,7 +125,12 @@
       "order": 7,
       "required": true,
       "mustHave": true,
-      "headingAnchors": ["due date", "expiry", "deadline", "vencimento"]
+      "headingAnchors": [
+        "due date",
+        "expiry",
+        "deadline",
+        "vencimento"
+      ]
     },
     {
       "id": "appeal_rights",
@@ -100,7 +141,12 @@
       "order": 8,
       "required": false,
       "mustHave": false,
-      "headingAnchors": ["appeal", "contest", "recurso", "objection"]
+      "headingAnchors": [
+        "appeal",
+        "contest",
+        "recurso",
+        "objection"
+      ]
     },
     {
       "id": "supporting_docs",
@@ -111,7 +157,12 @@
       "order": 9,
       "required": false,
       "mustHave": false,
-      "headingAnchors": ["attachments", "annexes", "supporting documents", "anexos"]
+      "headingAnchors": [
+        "attachments",
+        "annexes",
+        "supporting documents",
+        "anexos"
+      ]
     },
     {
       "id": "contact_office",
@@ -122,7 +173,12 @@
       "order": 10,
       "required": false,
       "mustHave": false,
-      "headingAnchors": ["contact", "office", "atendimento", "tax office"]
+      "headingAnchors": [
+        "contact",
+        "office",
+        "atendimento",
+        "tax office"
+      ]
     }
   ]
 }

@@ -3,15 +3,27 @@
     "id": "di_accounting_domain_detection_rules_v2",
     "version": "2.0.0",
     "description": "Accounting domain detection rules with high-precision discrimination for trial balance, general ledger, and journal-entry support docs.",
-    "languages": ["any"],
-    "lastUpdated": "2026-03-03"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
     "domain": "accounting",
     "minScore": 0.66,
     "maxRulesPerDocument": 28,
-    "aggregation": "weighted_max"
+    "aggregation": "weighted_max",
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "domain": "accounting",
   "rules": [
@@ -26,8 +38,15 @@
         "\\bbalancete\\s+de\\s+verifica(?:c|ç)[aã]o\\b",
         "\\bbalancete\\b"
       ],
-      "docTypeHint": ["acct_trial_balance"],
-      "negativeContext": ["\\bgeneral\\s+ledger\\b", "\\brazao\\s+geral\\b", "\\bjournal\\s+entry\\b", "\\bjournal\\s+entries?\\b"],
+      "docTypeHint": [
+        "acct_trial_balance"
+      ],
+      "negativeContext": [
+        "\\bgeneral\\s+ledger\\b",
+        "\\brazao\\s+geral\\b",
+        "\\bjournal\\s+entry\\b",
+        "\\bjournal\\s+entries?\\b"
+      ],
       "description": "Strong explicit trial balance indicator."
     },
     {
@@ -65,8 +84,14 @@
         "\\blivro\\s+razao\\b",
         "\\braz[aã]o\\s+geral\\b"
       ],
-      "docTypeHint": ["acct_general_ledger", "acct_gl_export"],
-      "negativeContext": ["\\btrial\\s+balance\\b", "\\bbalancete\\b"],
+      "docTypeHint": [
+        "acct_general_ledger",
+        "acct_gl_export"
+      ],
+      "negativeContext": [
+        "\\btrial\\s+balance\\b",
+        "\\bbalancete\\b"
+      ],
       "description": "General ledger indicators requiring ledger-style context."
     },
     {
@@ -110,8 +135,14 @@
         "\\blan[cç]amento(?:s)?\\s+cont[aá]beis?\\b",
         "\\blan[cç]amento\\s+cont[aá]bil\\b"
       ],
-      "docTypeHint": ["acct_journal_entry_support", "acct_journal_entry_adjusting"],
-      "negativeContext": ["\\bbalancete\\b", "\\bstatement\\s+of\\s+cash\\s+flows\\b"],
+      "docTypeHint": [
+        "acct_journal_entry_support",
+        "acct_journal_entry_adjusting"
+      ],
+      "negativeContext": [
+        "\\bbalancete\\b",
+        "\\bstatement\\s+of\\s+cash\\s+flows\\b"
+      ],
       "description": "Journal entry support signals."
     },
     {
@@ -152,13 +183,16 @@
         "\\breconcilia[cç][aã]o\\s+banc[áa]ria\\b",
         "\\breconcilia[cç][aã]o\\s+financeira\\b"
       ],
-      "docTypeHint": ["acct_bank_reconciliation", "acct_cashbook"],
+      "docTypeHint": [
+        "acct_bank_reconciliation",
+        "acct_cashbook"
+      ],
       "description": "Bank reconciliation indicator."
     },
     {
       "id": "acct_detect_rec_002_stmts",
       "priority": 90,
-      "weight": 3.0,
+      "weight": 3,
       "signal": "content",
       "patterns": [
         "\\bstatement\\s+balance\\b",
@@ -181,7 +215,10 @@
         "\\bvencimento\\b",
         "\\bandamento\\s+de\\s+inadimplencia\\b"
       ],
-      "docTypeHint": ["acct_ar_aging", "acct_ap_aging"],
+      "docTypeHint": [
+        "acct_ar_aging",
+        "acct_ap_aging"
+      ],
       "description": "Aging reports for AR/AP schedules."
     },
     {
@@ -210,7 +247,7 @@
     {
       "id": "acct_detect_controls",
       "priority": 82,
-      "weight": 2.0,
+      "weight": 2,
       "signal": "content",
       "patterns": [
         "\\binternal\\s+controls?\\b",
@@ -230,7 +267,7 @@
         "\\bcompetencia\\b",
         "\\bcaixa\\b"
       ],
-      "description": "Discriminates accrual vs cash review context." 
+      "description": "Discriminates accrual vs cash review context."
     },
     {
       "id": "acct_detect_audit_workpaper",

@@ -1,12 +1,19 @@
 {
   "_meta": {
-    "id": "legal_msa_sections",
+    "id": "legal_msa_sections_v24b4aa70",
     "version": "1.0.0",
     "description": "Section map for Master Service Agreement.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-02-28",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,

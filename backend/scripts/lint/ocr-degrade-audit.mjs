@@ -4,9 +4,11 @@ import path from "node:path";
 
 const STRICT = process.argv.includes("--strict");
 const CWD = process.cwd();
-const BACKEND_ROOT = fs.existsSync(path.resolve(CWD, "backend/src"))
-  ? path.resolve(CWD, "backend")
-  : CWD;
+const BACKEND_ROOT = fs.existsSync(path.resolve(CWD, "src"))
+  ? CWD
+  : fs.existsSync(path.resolve(CWD, "backend/src"))
+    ? path.resolve(CWD, "backend")
+    : CWD;
 const SRC = path.resolve(BACKEND_ROOT, "src");
 
 function read(relPath) {
@@ -21,32 +23,47 @@ function has(text, pattern) {
   return pattern.test(text);
 }
 
-const queuePath = "src/queues/document.queue.ts";
+const extractionDispatchPath =
+  "src/services/ingestion/extraction/extractionDispatch.service.ts";
+const pipelinePath = "src/queues/workers/documentIngestionPipeline.service.ts";
 const extractionIndexPath = "src/services/extraction/index.ts";
 const visionPath = "src/services/extraction/google-vision-ocr.service.ts";
 const ocrCleanupPath = "src/services/extraction/ocrCleanup.service.ts";
 
-const queueSrc = exists(queuePath) ? read(queuePath) : "";
+const extractionDispatchSrc = exists(extractionDispatchPath)
+  ? read(extractionDispatchPath)
+  : "";
+const pipelineSrc = exists(pipelinePath) ? read(pipelinePath) : "";
 const extractionIndexSrc = exists(extractionIndexPath)
   ? read(extractionIndexPath)
   : "";
 const visionSrc = exists(visionPath) ? read(visionPath) : "";
 
 const gracefulImageProviderUnavailable =
-  has(queueSrc, /Provider unavailable, saving as visual-only/) &&
-  has(queueSrc, /skipReason:\s*`Image saved as visual-only/) &&
-  !has(
-    queueSrc,
-    /throw new Error\(\s*`Image OCR unavailable \(Google Vision not initialized\):/,
-  );
+  has(
+    extractionDispatchSrc,
+    /\[OCR\]\s*Provider unavailable,\s*saving as visual-only/,
+  ) &&
+  has(extractionDispatchSrc, /skipReason:\s*`Image saved as visual-only/) &&
+  has(extractionDispatchSrc, /visionService\.isAvailable\(\)/);
 
 const gracefulImageOcrRuntimeFailure =
-  has(queueSrc, /OCR processing failed, saving as visual-only/) &&
-  has(queueSrc, /skipReason:\s*`Image saved as visual-only \(ocr_error:/);
+  has(
+    extractionDispatchSrc,
+    /\[OCR\]\s*OCR processing failed,\s*saving as visual-only/,
+  ) &&
+  has(
+    extractionDispatchSrc,
+    /skipReason:\s*`Image saved as visual-only \(ocr_error:/,
+  );
 
 const imageSkipMarkedReady =
-  has(queueSrc, /const keepVisibleWithoutText\s*=\s*[\s\S]*isImageMime\(effectiveMimeType\)/) &&
-  has(queueSrc, /status:\s*keepVisibleWithoutText \? "ready" : "skipped"/);
+  has(
+    pipelineSrc,
+    /const keepVisibleWithoutText\s*=\s*[\s\S]*isImageMime\(effectiveMimeType\)/,
+  ) &&
+  has(pipelineSrc, /markReadyWithoutContent\(documentId\)/) &&
+  has(pipelineSrc, /markSkipped\(documentId,\s*reason\)/);
 
 const visionRetryPresent =
   has(visionSrc, /async extractTextWithRetry\(/) &&

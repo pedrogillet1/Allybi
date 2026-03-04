@@ -1,12 +1,23 @@
+import type { DocumentStatus } from "@prisma/client";
 import prisma from "../../../config/database";
 import { getBankLoaderInstance } from "../../../services/core/banks/bankLoader.service";
 import type { ChatRequest } from "../domain/chat.contracts";
 import { ConversationNotFoundError } from "../domain/chat.contracts";
+import { logger } from "../../../utils/logger";
 
 type ScopeRuntimeConfig = {
   maxScopeDocs: number;
   clearScopeRegex: RegExp[];
+  docStatusesAllowed: DocumentStatus[];
 };
+
+const KNOWN_DOCUMENT_STATUSES: ReadonlySet<DocumentStatus> = new Set([
+  "ready",
+  "indexed",
+  "enriching",
+  "available",
+  "completed",
+]);
 
 function resolveScopeRuntimeConfig(): ScopeRuntimeConfig {
   const policyBank = getBankLoaderInstance().getBank<any>("memory_policy");
@@ -47,9 +58,27 @@ function resolveScopeRuntimeConfig(): ScopeRuntimeConfig {
     }
   });
 
+  const docStatusesAllowed = (
+    Array.isArray(runtime.docStatusesAllowed) ? runtime.docStatusesAllowed : []
+  )
+    .map((status: unknown) =>
+      String(status || "")
+        .trim()
+        .toLowerCase(),
+    )
+    .filter((status: string): status is DocumentStatus =>
+      KNOWN_DOCUMENT_STATUSES.has(status as DocumentStatus),
+    );
+  if (docStatusesAllowed.length === 0) {
+    throw new Error(
+      "memory_policy.config.runtimeTuning.scopeRuntime.docStatusesAllowed is required",
+    );
+  }
+
   return {
     maxScopeDocs: Math.floor(maxScopeDocs),
     clearScopeRegex,
+    docStatusesAllowed,
   };
 }
 
@@ -88,7 +117,16 @@ export class ScopeService {
     conversationId: string,
     docIds: string[],
   ): Promise<void> {
-    const normalized = this.normalizeDocIds(docIds);
+    const requested = this.normalizeDocIds(docIds);
+    const normalized = await this.getValidatedScopeDocIds(userId, requested);
+    if (requested.length > normalized.length) {
+      logger.warn("[scope-service] dropped invalid scope document ids", {
+        userId,
+        conversationId,
+        requested: requested.length,
+        accepted: normalized.length,
+      });
+    }
     const updated = await prisma.conversation.updateMany({
       where: { id: conversationId, userId, isDeleted: false },
       data: { scopeDocumentIds: normalized, updatedAt: new Date() },
@@ -98,6 +136,28 @@ export class ScopeService {
         "Conversation not found for this account.",
       );
     }
+  }
+
+  private async getValidatedScopeDocIds(
+    userId: string,
+    docIds: string[],
+  ): Promise<string[]> {
+    const normalized = this.normalizeDocIds(docIds);
+    if (normalized.length === 0) return [];
+    const rows = await prisma.document.findMany({
+      where: {
+        userId,
+        id: { in: normalized },
+        status: { in: this.runtimeConfig.docStatusesAllowed },
+      },
+      select: { id: true },
+    });
+    const allowed = new Set(
+      rows
+        .map((row) => String(row.id || "").trim())
+        .filter((id): id is string => id.length > 0),
+    );
+    return normalized.filter((id) => allowed.has(id));
   }
 
   async clearConversationScope(

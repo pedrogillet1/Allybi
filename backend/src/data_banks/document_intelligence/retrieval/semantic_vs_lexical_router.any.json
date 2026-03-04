@@ -3,25 +3,45 @@
     "id": "semantic_vs_lexical_router",
     "version": "1.0.0",
     "description": "Policy for semantic vs lexical retrieval routing.",
-    "languages": ["any", "en", "pt"],
-    "lastUpdated": "2026-03-03"
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
     "defaultMode": "blended",
     "semanticFloor": 0.25,
-    "lexicalFloor": 0.2
+    "lexicalFloor": 0.2,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "routes": [
     {
       "id": "SVL_001",
       "mode": "lexical",
-      "conditions": ["query.hasExactTokens == true", "query.hasNumericUnits == true"]
+      "conditions": [
+        "query.hasExactTokens == true",
+        "query.hasNumericUnits == true"
+      ]
     },
     {
       "id": "SVL_002",
       "mode": "semantic",
-      "conditions": ["query.semanticSimilarity > 0.62", "query.hasExactTokens == false"]
+      "conditions": [
+        "query.semanticSimilarity > 0.62",
+        "query.hasExactTokens == false"
+      ]
     }
   ],
   "weights": {

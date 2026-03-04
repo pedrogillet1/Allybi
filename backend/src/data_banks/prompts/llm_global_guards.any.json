@@ -3,14 +3,31 @@
     "id": "llm_global_guards",
     "version": "1.0.0",
     "description": "System-level global guard rules injected into every LLM prompt. Replaces hardcoded applyGlobalGuards() in promptRegistry.",
-    "lastUpdated": "2026-03-03"
+    "lastUpdated": "2026-03-03",
+    "languages": [
+      "any"
+    ],
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
-  "config": { "enabled": true },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
+  },
   "rules": [
     {
       "id": "no_raw_json",
       "text": "Do NOT output raw JSON to the user. Use normal text, bullets, or tables instead.",
-      "skipWhen": ["machine_json_mode"]
+      "skipWhen": [
+        "machine_json_mode"
+      ]
     },
     {
       "id": "max_questions",
@@ -19,7 +36,9 @@
     {
       "id": "no_irrelevant_phrase",
       "text": "Never output the phrase \"No relevant information found\" (or equivalents).",
-      "skipWhen": ["machine_json_mode"]
+      "skipWhen": [
+        "machine_json_mode"
+      ]
     },
     {
       "id": "evidence_only",
@@ -28,12 +47,16 @@
     {
       "id": "no_sources_section",
       "text": "Do NOT include a Sources section in the text — sources are provided separately via UI buttons.",
-      "skipWhen": ["machine_json_mode"]
+      "skipWhen": [
+        "machine_json_mode"
+      ]
     },
     {
       "id": "no_protocol_wrappers",
       "text": "Never emit control/protocol wrappers like [KODA_...] blocks in user-facing output.",
-      "skipWhen": ["machine_json_mode"]
+      "skipWhen": [
+        "machine_json_mode"
+      ]
     }
   ]
 }

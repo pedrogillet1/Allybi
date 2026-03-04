@@ -3,9 +3,17 @@
     "id": "viewer_source_navigation",
     "version": "1.0.0",
     "description": "Location parsing and navigation behavior for source pills/citations in document viewer mode.",
-    "languages": ["any"],
+    "languages": [
+      "any"
+    ],
     "lastUpdated": "2026-03-02",
-    "owner": "allybi-viewer"
+    "owner": "allybi-viewer",
+    "usedBy": [
+      "services/core/retrieval/retrievalEngine.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -22,20 +30,43 @@
       "snippet"
     ],
     "pdf": {
-      "primary": ["page", "locationKey:p"],
-      "fallback": ["snippet"]
+      "primary": [
+        "page",
+        "locationKey:p"
+      ],
+      "fallback": [
+        "snippet"
+      ]
     },
     "powerpoint": {
-      "primary": ["slide", "locationKey:slide", "locationKey:p"],
-      "fallback": ["snippet"]
+      "primary": [
+        "slide",
+        "locationKey:slide",
+        "locationKey:p"
+      ],
+      "fallback": [
+        "snippet"
+      ]
     },
     "excel": {
-      "primary": ["sheet+cell", "sheet+section", "locationKey"],
-      "fallback": ["snippet"]
+      "primary": [
+        "sheet+cell",
+        "sheet+section",
+        "locationKey"
+      ],
+      "fallback": [
+        "snippet"
+      ]
     },
     "word": {
-      "primary": ["section", "locationKey:section", "locationKey:paragraph"],
-      "fallback": ["snippet"]
+      "primary": [
+        "section",
+        "locationKey:section",
+        "locationKey:paragraph"
+      ],
+      "fallback": [
+        "snippet"
+      ]
     }
   },
   "animation": {

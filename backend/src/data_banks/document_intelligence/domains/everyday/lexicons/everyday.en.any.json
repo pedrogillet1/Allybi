@@ -6,7 +6,14 @@
     "languages": [
       "en"
     ],
-    "lastUpdated": "2026-03-03"
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -18,193 +25,322 @@
     {
       "id": "every_lex_account",
       "canonical": "account number",
-      "synonyms": ["account id", "acct", "account"],
+      "synonyms": [
+        "account id",
+        "acct",
+        "account"
+      ],
       "display": "Account Number"
     },
     {
       "id": "every_lex_amount_due",
       "canonical": "amount due",
-      "synonyms": ["balance due", "total due", "due amount"],
+      "synonyms": [
+        "balance due",
+        "total due",
+        "due amount"
+      ],
       "display": "Amount Due"
     },
     {
       "id": "every_lex_billing_period",
       "canonical": "billing period",
-      "synonyms": ["statement period", "invoice period", "billing cycle"],
+      "synonyms": [
+        "statement period",
+        "invoice period",
+        "billing cycle"
+      ],
       "display": "Billing Period"
     },
     {
       "id": "every_lex_currency",
       "canonical": "currency",
-      "synonyms": ["currency code", "iso currency", "moeda"],
+      "synonyms": [
+        "currency code",
+        "iso currency",
+        "moeda"
+      ],
       "display": "Currency"
     },
     {
       "id": "every_lex_due_date",
       "canonical": "due date",
-      "synonyms": ["payment due", "payment deadline", "deadline"],
+      "synonyms": [
+        "payment due",
+        "payment deadline",
+        "deadline"
+      ],
       "display": "Due Date"
     },
     {
       "id": "every_lex_tax_notice",
       "canonical": "tax notice",
-      "synonyms": ["assessment notice", "tax bill", "notice de lancamento"],
+      "synonyms": [
+        "assessment notice",
+        "tax bill",
+        "notice de lancamento"
+      ],
       "display": "Tax Notice"
     },
     {
       "id": "every_lex_tax_return",
       "canonical": "tax return",
-      "synonyms": ["income return", "annual return", "federal return"],
+      "synonyms": [
+        "income return",
+        "annual return",
+        "federal return"
+      ],
       "display": "Tax Return"
     },
     {
       "id": "every_lex_claim_number",
       "canonical": "claim number",
-      "synonyms": ["claim id", "claim ref", "claim case"],
+      "synonyms": [
+        "claim id",
+        "claim ref",
+        "claim case"
+      ],
       "display": "Claim Number"
     },
     {
       "id": "every_lex_policy_number",
       "canonical": "policy number",
-      "synonyms": ["insurance policy id", "policy id", "coverage id"],
+      "synonyms": [
+        "insurance policy id",
+        "policy id",
+        "coverage id"
+      ],
       "display": "Policy Number"
     },
     {
       "id": "every_lex_renewal",
       "canonical": "renewal",
-      "synonyms": ["renewal date", "policy renewal", "renew"],
+      "synonyms": [
+        "renewal date",
+        "policy renewal",
+        "renew"
+      ],
       "display": "Renewal"
     },
     {
       "id": "every_lex_premium",
       "canonical": "premium",
-      "synonyms": ["insurance premium", "monthly premium", "annual premium"],
+      "synonyms": [
+        "insurance premium",
+        "monthly premium",
+        "annual premium"
+      ],
       "display": "Premium"
     },
     {
       "id": "every_lex_coverage",
       "canonical": "coverage",
-      "synonyms": ["coverage limit", "coverage amount", "insurance coverage"],
+      "synonyms": [
+        "coverage limit",
+        "coverage amount",
+        "insurance coverage"
+      ],
       "display": "Coverage"
     },
     {
       "id": "every_lex_identity",
       "canonical": "identity document",
-      "synonyms": ["id document", "identification", "identity card"],
+      "synonyms": [
+        "id document",
+        "identification",
+        "identity card"
+      ],
       "display": "Identity Document"
     },
     {
       "id": "every_lex_receipt",
       "canonical": "receipt",
-      "synonyms": ["cashier receipt", "purchase receipt", "sales receipt"],
+      "synonyms": [
+        "cashier receipt",
+        "purchase receipt",
+        "sales receipt"
+      ],
       "display": "Receipt"
     },
     {
       "id": "every_lex_invoice",
       "canonical": "invoice",
-      "synonyms": ["factura", "billing invoice", "invoice number"],
+      "synonyms": [
+        "factura",
+        "billing invoice",
+        "invoice number"
+      ],
       "display": "Invoice"
     },
     {
       "id": "every_lex_invoice_total",
       "canonical": "invoice total",
-      "synonyms": ["total", "grand total", "invoice amount"],
+      "synonyms": [
+        "total",
+        "grand total",
+        "invoice amount"
+      ],
       "display": "Invoice Total"
     },
     {
       "id": "every_lex_bank_statement",
       "canonical": "bank statement",
-      "synonyms": ["statement", "account statement", "transaction statement"],
+      "synonyms": [
+        "statement",
+        "account statement",
+        "transaction statement"
+      ],
       "display": "Bank Statement"
     },
     {
       "id": "every_lex_installment",
       "canonical": "installment",
-      "synonyms": ["installment amount", "parcel", "payment installment"],
+      "synonyms": [
+        "installment amount",
+        "parcel",
+        "payment installment"
+      ],
       "display": "Installment"
     },
     {
       "id": "every_lex_late_fee",
       "canonical": "late fee",
-      "synonyms": ["penalty fee", "late charge", "fine"],
+      "synonyms": [
+        "penalty fee",
+        "late charge",
+        "fine"
+      ],
       "display": "Late Fee"
     },
     {
       "id": "every_lex_interest",
       "canonical": "interest",
-      "synonyms": ["interest charge", "interest amount", "interest accrued"],
+      "synonyms": [
+        "interest charge",
+        "interest amount",
+        "interest accrued"
+      ],
       "display": "Interest"
     },
     {
       "id": "every_lex_meter_reading",
       "canonical": "meter reading",
-      "synonyms": ["kwh reading", "consumption reading", "meter"],
+      "synonyms": [
+        "kwh reading",
+        "consumption reading",
+        "meter"
+      ],
       "display": "Meter Reading"
     },
     {
       "id": "every_lex_usage",
       "canonical": "usage",
-      "synonyms": ["usage summary", "consumption", "traffic", "minutes"],
+      "synonyms": [
+        "usage summary",
+        "consumption",
+        "traffic",
+        "minutes"
+      ],
       "display": "Usage"
     },
     {
       "id": "every_lex_signature",
       "canonical": "signature",
-      "synonyms": ["signed by", "signature line", "assinatura"],
+      "synonyms": [
+        "signed by",
+        "signature line",
+        "assinatura"
+      ],
       "display": "Signature"
     },
     {
       "id": "every_lex_tenant",
       "canonical": "tenant",
-      "synonyms": ["renter", "lessee", "tenant name"],
+      "synonyms": [
+        "renter",
+        "lessee",
+        "tenant name"
+      ],
       "display": "Tenant"
     },
     {
       "id": "every_lex_landlord",
       "canonical": "landlord",
-      "synonyms": ["owner", "lessor", "property owner"],
+      "synonyms": [
+        "owner",
+        "lessor",
+        "property owner"
+      ],
       "display": "Landlord"
     },
     {
       "id": "every_lex_exclusions",
       "canonical": "exclusions",
-      "synonyms": ["not covered", "coverage exclusions", "policy exclusions"],
+      "synonyms": [
+        "not covered",
+        "coverage exclusions",
+        "policy exclusions"
+      ],
       "display": "Exclusions"
     },
     {
       "id": "every_lex_period_start",
       "canonical": "period start",
-      "synonyms": ["from date", "start date", "period from"],
+      "synonyms": [
+        "from date",
+        "start date",
+        "period from"
+      ],
       "display": "Period Start"
     },
     {
       "id": "every_lex_period_end",
       "canonical": "period end",
-      "synonyms": ["to date", "end date", "period to"],
+      "synonyms": [
+        "to date",
+        "end date",
+        "period to"
+      ],
       "display": "Period End"
     },
     {
       "id": "every_lex_payment_status",
       "canonical": "payment status",
-      "synonyms": ["status", "payment state", "settlement status"],
+      "synonyms": [
+        "status",
+        "payment state",
+        "settlement status"
+      ],
       "display": "Payment Status"
     },
     {
       "id": "every_lex_attachments",
       "canonical": "attachments",
-      "synonyms": ["annex", "appendix", "appendix schedule"],
+      "synonyms": [
+        "annex",
+        "appendix",
+        "appendix schedule"
+      ],
       "display": "Attachments"
     },
     {
       "id": "every_lex_notices",
       "canonical": "notice",
-      "synonyms": ["terms", "important notice", "warning notice"],
+      "synonyms": [
+        "terms",
+        "important notice",
+        "warning notice"
+      ],
       "display": "Notice"
     },
     {
       "id": "every_lex_dispute",
       "canonical": "dispute",
-      "synonyms": ["dispute section", "claim dispute", "billing dispute"],
+      "synonyms": [
+        "dispute section",
+        "claim dispute",
+        "billing dispute"
+      ],
       "display": "Dispute"
     }
   ]

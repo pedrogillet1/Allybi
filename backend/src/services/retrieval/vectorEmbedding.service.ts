@@ -15,6 +15,7 @@
  */
 
 import { randomUUID } from "crypto";
+import type { Prisma } from "@prisma/client";
 
 import prisma from "../../config/database";
 import { logger } from "../../utils/logger";
@@ -25,17 +26,15 @@ import { EnvelopeService } from "../security/envelope.service";
 import { TenantKeyService } from "../security/tenantKey.service";
 import embeddingService from "./embedding.service";
 import pineconeService from "./pinecone.service";
+import type { InputChunk as PipelineInputChunk } from "../ingestion/pipeline/pipelineTypes";
 
 type JsonPrimitive = string | number | boolean | null;
 type PineconeMetaValue = JsonPrimitive | string[];
 
-export interface InputChunk {
-  chunkIndex?: number;
-  pageNumber?: number;
-  content?: string;
+export interface InputChunk extends Omit<PipelineInputChunk, "metadata"> {
   text?: string;
   embedding?: number[];
-  metadata?: Record<string, any>;
+  metadata?: PipelineInputChunk["metadata"] & Record<string, any>;
 }
 
 export interface StoreEmbeddingsOptions {
@@ -162,6 +161,36 @@ function dedupeByChunkIndex<T extends { chunkIndex: number }>(items: T[]): T[] {
   return out;
 }
 
+function pickMostRecentDocId(
+  docs: Array<{ id: string; createdAt: Date }>,
+  fallbackId: string,
+): string {
+  if (!docs.length) return fallbackId;
+  const sorted = [...docs].sort((a, b) => {
+    const createdDelta = b.createdAt.getTime() - a.createdAt.getTime();
+    if (createdDelta !== 0) return createdDelta;
+    return b.id.localeCompare(a.id);
+  });
+  return sorted[0]?.id || fallbackId;
+}
+
+async function resolveRootDocumentId(documentId: string): Promise<string> {
+  let currentId: string | null = String(documentId || "").trim();
+  let depth = 0;
+  while (currentId && depth < 20) {
+    depth += 1;
+    const row: { id: string; parentVersionId: string | null } | null =
+      await prisma.document.findUnique({
+      where: { id: currentId },
+      select: { id: true, parentVersionId: true },
+      });
+    if (!row) return String(documentId || "").trim();
+    if (!row.parentVersionId) return row.id;
+    currentId = row.parentVersionId;
+  }
+  return String(documentId || "").trim();
+}
+
 export async function generateEmbedding(text: string): Promise<number[]> {
   const result = await embeddingService.generateEmbedding(text);
   return result.embedding;
@@ -221,6 +250,27 @@ export async function storeDocumentEmbeddings(
   );
   const operationId = buildEmbeddingOperationId(documentId);
   const indexedAtMs = Date.now();
+  const rootDocumentId = await resolveRootDocumentId(document.id);
+  const familyDocs = await prisma.document.findMany({
+    where: {
+      userId: document.userId,
+      OR: [{ id: rootDocumentId }, { parentVersionId: rootDocumentId }],
+    },
+    select: {
+      id: true,
+      createdAt: true,
+    },
+  });
+  const latestVersionId = pickMostRecentDocId(familyDocs, document.id);
+  const isLatestVersion = latestVersionId === document.id;
+  const sharedIndexingMetadata = {
+    operationId,
+    indexedAtMs,
+    versionId: document.id,
+    rootDocumentId,
+    parentVersionId: document.parentVersionId || undefined,
+    isLatestVersion,
+  };
 
   await prisma.document.update({
     where: { id: documentId },
@@ -303,8 +353,7 @@ export async function storeDocumentEmbeddings(
         embedding: c.embedding || [],
         metadata: {
           ...(c.metadata || {}),
-          operationId,
-          indexedAtMs,
+          ...sharedIndexingMetadata,
         },
       }));
 
@@ -330,10 +379,10 @@ export async function storeDocumentEmbeddings(
         chunkText: c.content.slice(0, 4000),
         metadata: JSON.stringify({
           ...(c.metadata || {}),
-          operationId,
-          indexedAtMs,
+          ...sharedIndexingMetadata,
         }),
         chunkType: c.metadata?.chunkType || null,
+        sectionName: c.metadata?.sectionName || c.metadata?.tableId || null,
         embeddingModel:
           process.env.OPENAI_EMBEDDING_MODEL || "text-embedding-3-small",
         updatedAt: new Date(indexedAtMs),
@@ -358,6 +407,10 @@ export async function storeDocumentEmbeddings(
       const chunkRecords = usableChunks.map((c) => {
         const id = randomUUID();
         const plaintext = c.content;
+        const metadata = c.metadata || {};
+        const metadataJson = JSON.parse(
+          JSON.stringify(metadata || {}),
+        ) as Prisma.InputJsonValue;
         const textEncrypted =
           encryptionMode === "encrypted_only"
             ? chunkEncryptors!.docCrypto.encryptChunkText(
@@ -377,6 +430,26 @@ export async function storeDocumentEmbeddings(
           page: c.pageNumber ?? c.metadata?.pageNumber ?? null,
           startChar: c.metadata?.startChar ?? null,
           endChar: c.metadata?.endChar ?? null,
+          sectionName: metadata.sectionName || null,
+          sheetName: metadata.sheetName || null,
+          tableChunkForm: metadata.tableChunkForm || null,
+          tableId: metadata.tableId || null,
+          rowIndex:
+            typeof metadata.rowIndex === "number" ? metadata.rowIndex : null,
+          columnIndex:
+            typeof metadata.columnIndex === "number"
+              ? metadata.columnIndex
+              : null,
+          rowLabel: metadata.rowLabel || null,
+          colHeader: metadata.colHeader || null,
+          valueRaw: metadata.valueRaw || null,
+          unitRaw: metadata.unitRaw || null,
+          unitNormalized: metadata.unitNormalized || null,
+          numericValue:
+            typeof metadata.numericValue === "number"
+              ? metadata.numericValue
+              : null,
+          metadata: metadataJson,
         };
       });
 
@@ -476,7 +549,7 @@ export async function storeDocumentEmbeddings(
       await prisma.document.update({
         where: { id: documentId },
         data: {
-          status: "indexed",
+          // DO NOT set status — pipeline handles it via DocumentStateManager
           chunksCount: usableChunks.length,
           embeddingsGenerated: true,
           indexingState: "indexed",
@@ -549,8 +622,8 @@ export async function storeDocumentEmbeddings(
     indexingOperationId: operationId,
     indexingError: terminalMessage.slice(0, 500),
     indexingUpdatedAt: new Date(),
+    // DO NOT set status — pipeline handles it via DocumentStateManager
   };
-  if (strictFailClosed) failureData.status = "failed";
   try {
     await prisma.document.update({
       where: { id: documentId },

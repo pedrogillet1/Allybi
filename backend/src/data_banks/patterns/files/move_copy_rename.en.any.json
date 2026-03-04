@@ -16,21 +16,9 @@
       "runtime.telemetry",
       "tests.patternDeterminism"
     ],
-    "tests": {
-      "positive": [
-        "move this contract to the Marketing folder",
-        "show me what’s in this folder",
-        "move all PDFs here",
-        "rename these to include the date",
-        "move all old invoices to archive"
-      ],
-      "negative": [
-        "summarize folder contents",
-        "explain what was changed in the file",
-        "open and summarize the report",
-        "edit the paragraph in this report"
-      ]
-    },
+    "tests": [
+      "tests/patternDeterminism.test.ts"
+    ],
     "lastUpdated": "2026-03-03",
     "id": "patterns_files_move_copy_rename_en",
     "description": "English file organization patterns for move/copy/rename/archive actions with collision guards."

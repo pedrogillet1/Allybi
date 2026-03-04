@@ -3,8 +3,20 @@
     "id": "table_rules",
     "version": "1.0.0",
     "description": "ChatGPT-like table rules for Koda. Enforces strict GFM tables, black/white rendering assumptions, safe column limits, numeric alignment, and automatic repair strategy when tables are malformed. Used by markdownNormalizer + render_policy + composer.",
-    "languages": ["any", "en", "pt", "es"],
-    "lastUpdated": "2026-01-26"
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-01-26",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -109,17 +121,25 @@
       {
         "id": "TRT_0001_missing_separator_repaired",
         "input": "| A | B |\n| 1 | 2 |",
-        "expect": { "shouldInsertSeparator": true }
+        "expect": {
+          "shouldInsertSeparator": true
+        }
       },
       {
         "id": "TRT_0002_inline_table_moved_to_newline",
         "input": "Here is data: | A | B |\n| --- | --- |\n| 1 | 2 |",
-        "expect": { "tableStartsOnNewLine": true }
+        "expect": {
+          "tableStartsOnNewLine": true
+        }
       },
       {
         "id": "TRT_0003_too_wide_falls_back_to_kv",
-        "inputMeta": { "columns": 9 },
-        "expect": { "fallback": "kv_lines" }
+        "inputMeta": {
+          "columns": 9
+        },
+        "expect": {
+          "fallback": "kv_lines"
+        }
       }
     ]
   }

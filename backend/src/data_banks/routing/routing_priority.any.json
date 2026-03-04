@@ -3,8 +3,17 @@
     "id": "routing_priority",
     "version": "1.0.0",
     "description": "Deterministic intent family base priorities and tie-break pipeline for centralized routing.",
-    "languages": ["any"],
-    "lastUpdated": "2026-02-26"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-26",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true
@@ -19,10 +28,25 @@
     "general": 10
   },
   "tiebreakStages": [
-    { "id": "locked_scope_first", "weight": 100 },
-    { "id": "explicit_document_reference", "weight": 95 },
-    { "id": "operator_confidence", "weight": 90 },
-    { "id": "intent_family_priority", "weight": 80 },
-    { "id": "recency_and_followup", "weight": 60 }
+    {
+      "id": "locked_scope_first",
+      "weight": 100
+    },
+    {
+      "id": "explicit_document_reference",
+      "weight": 95
+    },
+    {
+      "id": "operator_confidence",
+      "weight": 90
+    },
+    {
+      "id": "intent_family_priority",
+      "weight": 80
+    },
+    {
+      "id": "recency_and_followup",
+      "weight": 60
+    }
   ]
 }

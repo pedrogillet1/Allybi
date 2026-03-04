@@ -3,8 +3,17 @@
     "id": "di_everyday_extraction_every_invoice",
     "version": "1.0.0",
     "description": "Extraction hints for every_invoice.",
-    "languages": ["any"],
-    "lastUpdated": "2026-03-03"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -15,82 +24,158 @@
     {
       "id": "every_invoice_hint_01",
       "entity": "invoice_number",
-      "anchors": ["invoice number", "fatura", "número", "num"],
+      "anchors": [
+        "invoice number",
+        "fatura",
+        "número",
+        "num"
+      ],
       "location": "document_header",
       "extractionMethod": "regex_capture",
-      "whereItHides": ["header area", "document stamp"]
+      "whereItHides": [
+        "header area",
+        "document stamp"
+      ]
     },
     {
       "id": "every_invoice_hint_02",
       "entity": "vendor_name",
-      "anchors": ["vendor", "supplier", "supplier name", "empresa"],
+      "anchors": [
+        "vendor",
+        "supplier",
+        "supplier name",
+        "empresa"
+      ],
       "location": "vendor_profile",
       "extractionMethod": "heading_proximity",
-      "whereItHides": ["issuer box", "logo block"]
+      "whereItHides": [
+        "issuer box",
+        "logo block"
+      ]
     },
     {
       "id": "every_invoice_hint_03",
       "entity": "customer_name",
-      "anchors": ["customer", "client", "bill to", "cliente"],
+      "anchors": [
+        "customer",
+        "client",
+        "bill to",
+        "cliente"
+      ],
       "location": "customer_profile",
       "extractionMethod": "heading_proximity",
-      "whereItHides": ["customer section", "address panel"]
+      "whereItHides": [
+        "customer section",
+        "address panel"
+      ]
     },
     {
       "id": "every_invoice_hint_04",
       "entity": "issue_date",
-      "anchors": ["issue date", "emission date", "data de emissao"],
+      "anchors": [
+        "issue date",
+        "emission date",
+        "data de emissao"
+      ],
       "location": "document_header",
       "extractionMethod": "date_parse",
-      "whereItHides": ["date line", "header"]
+      "whereItHides": [
+        "date line",
+        "header"
+      ]
     },
     {
       "id": "every_invoice_hint_05",
       "entity": "due_date",
-      "anchors": ["due date", "vencimento", "due"],
-           "location": "payment_terms",
+      "anchors": [
+        "due date",
+        "vencimento",
+        "due"
+      ],
+      "location": "payment_terms",
       "extractionMethod": "date_parse",
-      "whereItHides": ["terms section", "payment clause"]
+      "whereItHides": [
+        "terms section",
+        "payment clause"
+      ]
     },
     {
       "id": "every_invoice_hint_06",
       "entity": "subtotal_amount",
-      "anchors": ["subtotal", "sub-total", "subtotal amount"],
+      "anchors": [
+        "subtotal",
+        "sub-total",
+        "subtotal amount"
+      ],
       "location": "subtotal_and_discounts",
       "extractionMethod": "table_row_match",
-      "whereItHides": ["subtotal block", "calculation row"]
+      "whereItHides": [
+        "subtotal block",
+        "calculation row"
+      ]
     },
     {
       "id": "every_invoice_hint_07",
       "entity": "discount_amount",
-      "anchors": ["discount", "desconto", "abatement"],
+      "anchors": [
+        "discount",
+        "desconto",
+        "abatement"
+      ],
       "location": "subtotal_and_discounts",
       "extractionMethod": "table_row_match",
-      "whereItHides": ["discount line", "promotion row"]
+      "whereItHides": [
+        "discount line",
+        "promotion row"
+      ]
     },
     {
       "id": "every_invoice_hint_08",
       "entity": "tax_amount",
-      "anchors": ["tax", "vat", "imposto", "icms", "iss"],
+      "anchors": [
+        "tax",
+        "vat",
+        "imposto",
+        "icms",
+        "iss"
+      ],
       "location": "tax_summary",
       "extractionMethod": "table_row_match",
-      "whereItHides": ["tax rows", "tax breakdown section"]
+      "whereItHides": [
+        "tax rows",
+        "tax breakdown section"
+      ]
     },
     {
       "id": "every_invoice_hint_09",
       "entity": "total_amount",
-      "anchors": ["total", "grand total", "total amount", "valor total"],
+      "anchors": [
+        "total",
+        "grand total",
+        "total amount",
+        "valor total"
+      ],
       "location": "totals",
       "extractionMethod": "table_row_match",
-      "whereItHides": ["bottom total row", "large bold total"]
+      "whereItHides": [
+        "bottom total row",
+        "large bold total"
+      ]
     },
     {
       "id": "every_invoice_hint_10",
       "entity": "payment_terms",
-      "anchors": ["payment terms", "terms", "condicoes de pagamento"],
+      "anchors": [
+        "payment terms",
+        "terms",
+        "condicoes de pagamento"
+      ],
       "location": "payment_terms",
       "extractionMethod": "heading_proximity",
-      "whereItHides": ["footer section", "terms field"]
+      "whereItHides": [
+        "footer section",
+        "terms field"
+      ]
     }
   ]
 }

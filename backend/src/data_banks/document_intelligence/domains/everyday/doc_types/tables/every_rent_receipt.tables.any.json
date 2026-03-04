@@ -6,7 +6,14 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-03-03"
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -14,10 +21,31 @@
     "docType": "every_rent_receipt"
   },
   "tableHeaderSynonyms": {
-    "date": ["date", "data", "period", "reference"],
-    "amount": ["amount", "valor", "total", "montante", "quantia"],
-    "description": ["description", "descricao", "item", "desdobramento"],
-    "party": ["landlord", "tenant", "locador", "locatario"]
+    "date": [
+      "date",
+      "data",
+      "period",
+      "reference"
+    ],
+    "amount": [
+      "amount",
+      "valor",
+      "total",
+      "montante",
+      "quantia"
+    ],
+    "description": [
+      "description",
+      "descricao",
+      "item",
+      "desdobramento"
+    ],
+    "party": [
+      "landlord",
+      "tenant",
+      "locador",
+      "locatario"
+    ]
   },
   "tables": [
     {
@@ -27,16 +55,52 @@
         "pt": "Tabela de Cabecalho"
       },
       "section": "document_header",
-      "signaturePatterns": ["\\brent receipt\\b", "\\brent payment\\b", "\\brecibo\\b"],
-      "requiredHeaders": ["description", "value", "date", "receipt_number", "currency"],
-      "headerAliases": [["description", "descricao"], ["value", "valor"], ["date", "data"], ["receipt_number", "documento"], ["currency", "moeda"]],
+      "signaturePatterns": [
+        "\\brent receipt\\b",
+        "\\brent payment\\b",
+        "\\brecibo\\b"
+      ],
+      "requiredHeaders": [
+        "description",
+        "value",
+        "date",
+        "receipt_number",
+        "currency"
+      ],
+      "headerAliases": [
+        [
+          "description",
+          "descricao"
+        ],
+        [
+          "value",
+          "valor"
+        ],
+        [
+          "date",
+          "data"
+        ],
+        [
+          "receipt_number",
+          "documento"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
       "unitsAndScaling": {
-        "preferredScales": ["units", "thousands"],
+        "preferredScales": [
+          "units",
+          "thousands"
+        ],
         "currencyField": "receipt_currency",
         "requiresScaleEvidence": true,
         "mixedScaleHandling": "normalize_to_currency_base"
       },
-      "footnotes": ["rent_receipt_fn_01"]
+      "footnotes": [
+        "rent_receipt_fn_01"
+      ]
     },
     {
       "id": "rent_receipt_parties_table",
@@ -45,14 +109,49 @@
         "pt": "Tabela de Partes"
       },
       "section": "property_and_parties",
-      "signaturePatterns": ["\\blandlord\\b", "\\btenant\\b", "\\bproperty\\b"],
-      "requiredHeaders": ["party", "name", "tax_id", "address", "unit"],
-      "headerAliases": [["party", "parte"], ["name", "nome"], ["tax_id", "cpf/cnpj"], ["address", "endereco"], ["unit", "unidade"]],
+      "signaturePatterns": [
+        "\\blandlord\\b",
+        "\\btenant\\b",
+        "\\bproperty\\b"
+      ],
+      "requiredHeaders": [
+        "party",
+        "name",
+        "tax_id",
+        "address",
+        "unit"
+      ],
+      "headerAliases": [
+        [
+          "party",
+          "parte"
+        ],
+        [
+          "name",
+          "nome"
+        ],
+        [
+          "tax_id",
+          "cpf/cnpj"
+        ],
+        [
+          "address",
+          "endereco"
+        ],
+        [
+          "unit",
+          "unidade"
+        ]
+      ],
       "unitsAndScaling": {
-        "preferredScales": ["units"],
+        "preferredScales": [
+          "units"
+        ],
         "requiresScaleEvidence": false
       },
-      "footnotes": ["rent_receipt_fn_02"]
+      "footnotes": [
+        "rent_receipt_fn_02"
+      ]
     },
     {
       "id": "rent_receipt_payment_period_table",
@@ -61,14 +160,45 @@
         "pt": "Tabela do Periodo"
       },
       "section": "payment_period",
-      "signaturePatterns": ["\\bperiod\\b", "\\bfrom\\b", "\\bto\\b", "\\bperiodo\\b"],
-      "requiredHeaders": ["period_start", "period_end", "days", "description"],
-      "headerAliases": [["period_start", "inicio"], ["period_end", "fim"], ["days", "dias"], ["description", "referencia"]],
+      "signaturePatterns": [
+        "\\bperiod\\b",
+        "\\bfrom\\b",
+        "\\bto\\b",
+        "\\bperiodo\\b"
+      ],
+      "requiredHeaders": [
+        "period_start",
+        "period_end",
+        "days",
+        "description"
+      ],
+      "headerAliases": [
+        [
+          "period_start",
+          "inicio"
+        ],
+        [
+          "period_end",
+          "fim"
+        ],
+        [
+          "days",
+          "dias"
+        ],
+        [
+          "description",
+          "referencia"
+        ]
+      ],
       "unitsAndScaling": {
-        "preferredScales": ["units"],
+        "preferredScales": [
+          "units"
+        ],
         "requiresScaleEvidence": false
       },
-      "footnotes": ["rent_receipt_fn_03"]
+      "footnotes": [
+        "rent_receipt_fn_03"
+      ]
     },
     {
       "id": "rent_receipt_charges_table",
@@ -77,16 +207,48 @@
         "pt": "Tabela de Custos"
       },
       "section": "charges_breakdown",
-      "signaturePatterns": ["\\brent\\b", "\\bcharge\\b", "\\bfee\\b", "\\baluguel\\b"],
-      "requiredHeaders": ["description", "amount", "currency", "period"],
-      "headerAliases": [["description", "descricao"], ["amount", "valor"], ["currency", "moeda"], ["period", "referencia"]],
+      "signaturePatterns": [
+        "\\brent\\b",
+        "\\bcharge\\b",
+        "\\bfee\\b",
+        "\\baluguel\\b"
+      ],
+      "requiredHeaders": [
+        "description",
+        "amount",
+        "currency",
+        "period"
+      ],
+      "headerAliases": [
+        [
+          "description",
+          "descricao"
+        ],
+        [
+          "amount",
+          "valor"
+        ],
+        [
+          "currency",
+          "moeda"
+        ],
+        [
+          "period",
+          "referencia"
+        ]
+      ],
       "unitsAndScaling": {
-        "preferredScales": ["units", "thousands"],
+        "preferredScales": [
+          "units",
+          "thousands"
+        ],
         "currencyField": "receipt_currency",
         "requiresScaleEvidence": true,
         "mixedScaleHandling": "normalize_to_currency_base"
       },
-      "footnotes": ["rent_receipt_fn_04"]
+      "footnotes": [
+        "rent_receipt_fn_04"
+      ]
     },
     {
       "id": "rent_receipt_utilities_table",
@@ -95,16 +257,48 @@
         "pt": "Tabela de Utilidades"
       },
       "section": "utilities_or_services",
-      "signaturePatterns": ["\\butilities\\b", "\\bwater\\b", "\\belectric\\b", "\\bcondominio\\b"],
-      "requiredHeaders": ["description", "amount", "billing_reference", "currency"],
-      "headerAliases": [["description", "servico"], ["amount", "valor"], ["billing_reference", "fatura"], ["currency", "moeda"]],
+      "signaturePatterns": [
+        "\\butilities\\b",
+        "\\bwater\\b",
+        "\\belectric\\b",
+        "\\bcondominio\\b"
+      ],
+      "requiredHeaders": [
+        "description",
+        "amount",
+        "billing_reference",
+        "currency"
+      ],
+      "headerAliases": [
+        [
+          "description",
+          "servico"
+        ],
+        [
+          "amount",
+          "valor"
+        ],
+        [
+          "billing_reference",
+          "fatura"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
       "unitsAndScaling": {
-        "preferredScales": ["units", "thousands"],
+        "preferredScales": [
+          "units",
+          "thousands"
+        ],
         "currencyField": "receipt_currency",
         "requiresScaleEvidence": true,
         "mixedScaleHandling": "normalize_to_currency_base"
       },
-      "footnotes": ["rent_receipt_fn_05"]
+      "footnotes": [
+        "rent_receipt_fn_05"
+      ]
     }
   ]
 }

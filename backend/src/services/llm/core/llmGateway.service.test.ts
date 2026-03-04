@@ -499,7 +499,11 @@ describe("LlmGatewayService retrieval-plan producer", () => {
       route: jest.fn(() => ({
         provider: "openai",
         model: "gpt-5.2",
+        modelFamily: "gpt-5.2",
         reason: "quality_finish",
+        lane: "final_authority_default",
+        policyRuleId: "final_authority_default",
+        qualityReason: "quality_finish",
         stage: "final",
         constraints: {},
       })),
@@ -558,6 +562,10 @@ describe("LlmGatewayService retrieval-plan producer", () => {
     expect(out.telemetry?.fallbackUsed).toBe(true);
     expect(out.telemetry?.executedProvider).toBe("google");
     expect(out.telemetry?.executedModel).toBe("gemini-2.5-flash");
+    expect(out.telemetry?.routeLane).toBe("final_authority_default");
+    expect(out.telemetry?.fallbackRank).toBe(1);
+    expect(out.telemetry?.fallbackPolicyRuleId).toBe("provider_fallbacks");
+    expect(out.telemetry?.modelFamily).toBe("gemini-2.5-flash");
     expect(out.telemetry?.attemptCount).toBe(2);
   });
 

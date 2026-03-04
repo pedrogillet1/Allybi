@@ -12,13 +12,22 @@
     "criticality": "medium",
     "changeLog": [
       "Initial policy exception governance bank"
+    ],
+    "usedBy": [
+      "services/llm/core/llmRequestBuilder.service.ts"
+    ],
+    "tests": [
+      "tests/certification/prompt-mode-coverage.cert.test.ts"
     ]
   },
   "config": {
     "enabled": true,
     "strict": true,
     "failClosedInProd": false,
-    "defaultAction": "deny_exception"
+    "defaultAction": "deny_exception",
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "constraints": {
     "maxDurationDays": 30,

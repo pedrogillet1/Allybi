@@ -22,9 +22,10 @@
  *  - choose a LlmRoutePlan (provider/model/reason/stage/constraints)
  *  - apply fallback policies if selected model is unavailable
  *
- * Banks used (optional; soft-fallback if missing):
- *  - llm/policy/providerCapabilities.any.json
- *  - llm/policy/providerFallbacks.any.json
+ * Banks used:
+ *  - data_banks/llm/provider_capabilities.any.json (id: provider_capabilities)
+ *  - data_banks/llm/provider_fallbacks.any.json (id: provider_fallbacks)
+ *  - data_banks/llm/composition_lane_policy.any.json (id: composition_lane_policy)
  *  - data_banks/manifest/feature_flags.any.json
  *
  * Required types:
@@ -38,6 +39,7 @@ import type {
   LlmRoutePlan,
   LlmRouteReason,
 } from "../types/llm.types";
+import { toCostFamilyModel } from "./llmCostCalculator";
 
 export interface BankLoader {
   getBank<T = unknown>(bankId: string): T;
@@ -108,6 +110,7 @@ type CapModel = {
   supportsTools?: boolean;
   maxOutputTokens?: number;
   maxInputTokens?: number;
+  pinnedVersion?: string;
 };
 
 type CapProvider = {
@@ -140,6 +143,27 @@ type ProviderFallbacksBank = {
       needTools?: boolean;
     };
     try: Array<{ provider: LlmProviderId; model: LlmModelId }>;
+  }>;
+};
+
+type CompositionLanePolicyBank = {
+  _meta?: Record<string, unknown>;
+  config?: { enabled?: boolean };
+  lanes?: Array<{
+    id?: string;
+    when?: {
+      stage?: "draft" | "final";
+      reasons?: LlmRouteReason[];
+      answerModes?: string[];
+      answerModePrefixes?: string[];
+    };
+    route?: {
+      provider?: LlmProviderId;
+      model?: LlmModelId;
+      modelFamily?: string;
+    };
+    qualityReason?: string;
+    policyRuleId?: string;
   }>;
 };
 
@@ -187,6 +211,16 @@ export interface RouterLogger {
   warn(msg: string, meta?: Record<string, unknown>): void;
 }
 
+type PrimaryTarget = {
+  provider: LlmProviderId;
+  model: LlmModelId;
+  stage: "draft" | "final";
+  lane?: string;
+  modelFamily?: string;
+  policyRuleId?: string;
+  qualityReason?: string;
+};
+
 export class LlmRouterService {
   private bankMissCount = 0;
   private lastBankMiss: string | null = null;
@@ -215,8 +249,10 @@ export class LlmRouterService {
     requireStreaming?: boolean;
     allowTools?: boolean;
   }): Array<{ provider: LlmProviderId; model: LlmModelId }> {
-    const fallbacks =
-      this.safeGetBank<ProviderFallbacksBank>("providerFallbacks");
+    const fallbacks = this.safeGetBankMulti<ProviderFallbacksBank>([
+      "provider_fallbacks",
+      "providerFallbacks",
+    ]);
     const flags = this.safeGetBank<FeatureFlagsBank>("feature_flags");
     const feature = flags?.flags ?? {};
     const enableMultiProvider = feature.enable_multi_provider !== false;
@@ -236,10 +272,15 @@ export class LlmRouterService {
   route(ctx: RouteContext): LlmRoutePlan {
     // 0) Forced override (admin/dev/testing)
     if (ctx.force?.provider && ctx.force?.model) {
+      const forcedModel = String(ctx.force.model);
       return {
         provider: ctx.force.provider,
         model: ctx.force.model,
+        modelFamily: toCostFamilyModel(forcedModel) ?? forcedModel,
         reason: "unknown",
+        lane: "forced_override",
+        policyRuleId: "forced_override",
+        qualityReason: "forced_override",
         stage: ctx.stage,
         constraints: {
           requireStreaming: bool(ctx.requireStreaming),
@@ -251,11 +292,18 @@ export class LlmRouterService {
     }
 
     // 1) Load optional banks
-    const caps = this.safeGetBank<ProviderCapabilitiesBank>(
+    const caps = this.safeGetBankMulti<ProviderCapabilitiesBank>([
+      "provider_capabilities",
       "providerCapabilities",
-    );
-    const fallbacks =
-      this.safeGetBank<ProviderFallbacksBank>("providerFallbacks");
+    ]);
+    const fallbacks = this.safeGetBankMulti<ProviderFallbacksBank>([
+      "provider_fallbacks",
+      "providerFallbacks",
+    ]);
+    const lanePolicy = this.safeGetBankMulti<CompositionLanePolicyBank>([
+      "composition_lane_policy",
+      "compositionLanePolicy",
+    ]);
     const flags = this.safeGetBank<FeatureFlagsBank>("feature_flags");
 
     const feature = flags?.flags ?? {};
@@ -266,9 +314,15 @@ export class LlmRouterService {
     const reason = this.computeRouteReason(ctx);
 
     // 3) Choose a primary target (provider/model) using bank defaults + Allybi heuristics
-    const primary = this.choosePrimaryTarget(ctx, reason, caps, {
-      preferLocalInDev,
-    });
+    const primary = this.choosePrimaryTarget(
+      ctx,
+      reason,
+      caps,
+      lanePolicy,
+      {
+        preferLocalInDev,
+      },
+    );
 
     // 4) Validate capability constraints and provider health
     const needStreaming = bool(ctx.requireStreaming);
@@ -284,18 +338,14 @@ export class LlmRouterService {
       ) && pickHealth(ctx.providerHealth, primary.provider, primary.model).ok;
 
     if (okPrimary) {
-      return {
-        provider: primary.provider,
-        model: primary.model,
+      return this.toRoutePlan(
+        primary,
+        caps,
         reason,
-        stage: primary.stage,
-        constraints: {
-          requireStreaming: needStreaming,
-          disallowTools: !needTools,
-          disallowImages: true,
-          maxLatencyMs: ctx.latencyBudgetMs,
-        },
-      };
+        needStreaming,
+        needTools,
+        ctx.latencyBudgetMs,
+      );
     }
 
     // 5) Fallback chain (bank-driven if present, else deterministic default)
@@ -318,34 +368,34 @@ export class LlmRouterService {
         ) && pickHealth(ctx.providerHealth, cand.provider, cand.model).ok;
 
       if (supported) {
-        return {
-          provider: cand.provider,
-          model: cand.model,
-          reason,
-          stage: primary.stage,
-          constraints: {
-            requireStreaming: needStreaming,
-            disallowTools: !needTools,
-            disallowImages: true,
-            maxLatencyMs: ctx.latencyBudgetMs,
+        return this.toRoutePlan(
+          {
+            provider: cand.provider,
+            model: cand.model,
+            stage: primary.stage,
+            lane: primary.lane,
+            modelFamily: toCostFamilyModel(cand.model) ?? cand.model,
+            policyRuleId: "provider_fallbacks",
+            qualityReason: primary.qualityReason ?? reason,
           },
-        };
+          caps,
+          reason,
+          needStreaming,
+          needTools,
+          ctx.latencyBudgetMs,
+        );
       }
     }
 
     // 6) Last resort: return primary even if unsupported (caller can error) – deterministic
-    return {
-      provider: primary.provider,
-      model: primary.model,
+    return this.toRoutePlan(
+      primary,
+      caps,
       reason,
-      stage: primary.stage,
-      constraints: {
-        requireStreaming: needStreaming,
-        disallowTools: !needTools,
-        disallowImages: true,
-        maxLatencyMs: ctx.latencyBudgetMs,
-      },
-    };
+      needStreaming,
+      needTools,
+      ctx.latencyBudgetMs,
+    );
   }
 
   // -----------------------------
@@ -395,8 +445,9 @@ export class LlmRouterService {
     ctx: RouteContext,
     reason: LlmRouteReason,
     caps: ProviderCapabilitiesBank | null,
+    lanePolicy: CompositionLanePolicyBank | null,
     opts: { preferLocalInDev: boolean },
-  ): { provider: LlmProviderId; model: LlmModelId; stage: "draft" | "final" } {
+  ): PrimaryTarget {
     // Bank defaults if present
     const bankDraft = caps?.defaults?.draft;
     const bankFinal = caps?.defaults?.final;
@@ -429,39 +480,77 @@ export class LlmRouterService {
         ? "final"
         : ctx.stage;
 
-    // Tight latency budget: downgrade final to draft
-    const tightBudget = typeof ctx.latencyBudgetMs === "number" && ctx.latencyBudgetMs > 0 && ctx.latencyBudgetMs < 3000;
-    if (tightBudget && stage === "final") {
-      const chosen = bankDraft ?? DEFAULT_DRAFT;
-      return { ...chosen, stage: "draft" };
-    }
-
     if (stage === "final") {
+      const laneTarget = this.selectLanePolicyTarget(
+        ctx,
+        reason,
+        stage,
+        lanePolicy,
+      );
+      if (laneTarget) return laneTarget;
+
       if ((ctx.answerMode ?? "") === "doc_grounded_quote") {
         return {
           provider: "openai" as LlmProviderId,
           model: "gpt-5.2" as LlmModelId,
           stage: "final",
+          lane: "final_quote_authority_builtin",
+          modelFamily: "gpt-5.2",
+          policyRuleId: "router_builtin_doc_grounded_quote",
+          qualityReason: "quote_strict",
         };
       }
       if (reason === "quality_finish") {
+        const chosen = bankFinal ?? DEFAULT_FINAL;
         return {
-          provider: "openai" as LlmProviderId,
-          model: "gpt-5-mini" as LlmModelId,
+          ...chosen,
           stage: "final",
+          lane: "final_authority_default_builtin",
+          modelFamily: toCostFamilyModel(chosen.model) ?? chosen.model,
+          policyRuleId: "router_builtin_final_default",
+          qualityReason: "quality_finish",
         };
       }
       const chosen = bankFinal ?? DEFAULT_FINAL;
-      return { ...chosen, stage: "final" };
+      return {
+        ...chosen,
+        stage: "final",
+        lane: "final_guarded_builtin",
+        modelFamily: toCostFamilyModel(chosen.model) ?? chosen.model,
+        policyRuleId: "router_builtin_final_guarded",
+        qualityReason: reason,
+      };
     }
 
     // stage === draft
     if ((ctx.env === "dev" || ctx.env === "local") && opts.preferLocalInDev) {
-      return { ...localDraft, stage: "draft" };
+      return {
+        ...localDraft,
+        stage: "draft",
+        lane: "draft_local_dev",
+        modelFamily: toCostFamilyModel(localDraft.model) ?? localDraft.model,
+        policyRuleId: "router_builtin_local_dev",
+        qualityReason: "fast_path",
+      };
     }
 
+    const laneTarget = this.selectLanePolicyTarget(
+      ctx,
+      reason,
+      stage,
+      lanePolicy,
+    );
+    if (laneTarget) return laneTarget;
+
     const chosen = bankDraft ?? DEFAULT_DRAFT;
-    return { ...chosen, stage: "draft" };
+    return {
+      ...chosen,
+      stage: "draft",
+      lane: "draft_fast_default_builtin",
+      modelFamily: toCostFamilyModel(chosen.model) ?? chosen.model,
+      policyRuleId: "router_builtin_draft_default",
+      qualityReason: "fast_path",
+    };
   }
 
   // -----------------------------
@@ -546,24 +635,146 @@ export class LlmRouterService {
 
     if (enableMultiProvider) {
       if (primary.provider === "gemini") {
-        add("openai", "gpt-5-mini");
-        add("openai", "gpt-5.2");
-        add("gemini", "gemini-2.5-flash");
+        if (primary.stage === "final") {
+          add("openai", "gpt-5.2");
+          add("openai", "gpt-5-mini");
+        } else {
+          add("openai", "gpt-5-mini");
+          add("openai", "gpt-5.2");
+        }
         add("local", "local-default");
       } else if (primary.provider === "openai") {
-        add("gemini", "gemini-2.5-flash");
-        add("openai", "gpt-5-mini");
-        add("openai", "gpt-5.2");
+        if (primary.model === "gpt-5-mini") {
+          add("openai", "gpt-5.2");
+          add("gemini", "gemini-2.5-flash");
+        } else {
+          add("gemini", "gemini-2.5-flash");
+          add("openai", "gpt-5-mini");
+        }
         add("local", "local-default");
       } else {
         // local primary
-        add("gemini", "gemini-2.5-flash");
-        add("openai", "gpt-5-mini");
-        add("openai", "gpt-5.2");
+        if (primary.stage === "final") {
+          add("openai", "gpt-5.2");
+          add("gemini", "gemini-2.5-flash");
+          add("openai", "gpt-5-mini");
+        } else {
+          add("gemini", "gemini-2.5-flash");
+          add("openai", "gpt-5-mini");
+          add("openai", "gpt-5.2");
+        }
       }
     }
 
     return out;
+  }
+
+  // -----------------------------
+  // Model version pinning
+  // -----------------------------
+
+  private resolvePinnedVersion(
+    provider: LlmProviderId,
+    model: LlmModelId,
+    caps: ProviderCapabilitiesBank | null,
+  ): LlmModelId {
+    const p = caps?.providers?.[String(provider)];
+    const m = p?.models?.[String(model)];
+    return (m?.pinnedVersion as LlmModelId) || model;
+  }
+
+  private selectLanePolicyTarget(
+    ctx: RouteContext,
+    reason: LlmRouteReason,
+    stage: "draft" | "final",
+    lanePolicy: CompositionLanePolicyBank | null,
+  ): PrimaryTarget | null {
+    const enabled = lanePolicy?.config?.enabled !== false;
+    const lanes = enabled && Array.isArray(lanePolicy?.lanes) ? lanePolicy.lanes : [];
+    if (!lanes.length) return null;
+
+    const answerMode = String(ctx.answerMode || "").trim();
+
+    for (const lane of lanes) {
+      const route = lane.route ?? {};
+      if (!route.provider || !route.model) continue;
+      const when = lane.when ?? {};
+
+      if (when.stage && when.stage !== stage) continue;
+      if (
+        Array.isArray(when.reasons) &&
+        when.reasons.length > 0 &&
+        !when.reasons.includes(reason)
+      ) {
+        continue;
+      }
+      if (
+        Array.isArray(when.answerModes) &&
+        when.answerModes.length > 0 &&
+        !when.answerModes.includes(answerMode)
+      ) {
+        continue;
+      }
+      if (
+        Array.isArray(when.answerModePrefixes) &&
+        when.answerModePrefixes.length > 0 &&
+        !when.answerModePrefixes.some((prefix) => answerMode.startsWith(String(prefix || "")))
+      ) {
+        continue;
+      }
+
+      const modelText = String(route.model);
+      return {
+        provider: route.provider,
+        model: route.model,
+        stage,
+        lane: String(lane.id || "").trim() || "composition_lane_policy",
+        modelFamily: route.modelFamily || toCostFamilyModel(modelText) || modelText,
+        policyRuleId:
+          String(lane.policyRuleId || "").trim() ||
+          (String(lane.id || "").trim() || "composition_lane_policy"),
+        qualityReason: String(lane.qualityReason || "").trim() || reason,
+      };
+    }
+
+    return null;
+  }
+
+  private toRoutePlan(
+    target: PrimaryTarget,
+    caps: ProviderCapabilitiesBank | null,
+    reason: LlmRouteReason,
+    needStreaming: boolean,
+    needTools: boolean,
+    maxLatencyMs: number | undefined,
+  ): LlmRoutePlan {
+    const resolvedModel = this.resolvePinnedVersion(
+      target.provider,
+      target.model,
+      caps,
+    );
+    const modelFamily =
+      target.modelFamily ||
+      toCostFamilyModel(resolvedModel) ||
+      toCostFamilyModel(target.model) ||
+      String(target.model);
+
+    return {
+      provider: target.provider,
+      model: resolvedModel,
+      modelFamily,
+      reason,
+      lane: target.lane,
+      policyRuleId: target.policyRuleId,
+      qualityReason: target.qualityReason || reason,
+      stage: target.stage,
+      constraints: {
+        requireStreaming: needStreaming,
+        disallowTools: !needTools,
+        disallowImages: true,
+        maxLatencyMs,
+      },
+    };
   }
 
   // -----------------------------
@@ -579,6 +790,23 @@ export class LlmRouterService {
       this.logger?.warn("Bank miss in router", { bankId, missCount: this.bankMissCount });
       return null;
     }
+  }
+
+  private safeGetBankMulti<T = unknown>(bankIds: string[]): T | null {
+    for (const bankId of bankIds) {
+      try {
+        return this.bankLoader.getBank<T>(bankId);
+      } catch {
+        // continue
+      }
+    }
+    this.bankMissCount++;
+    this.lastBankMiss = bankIds.join("|");
+    this.logger?.warn("Bank miss in router", {
+      bankIds,
+      missCount: this.bankMissCount,
+    });
+    return null;
   }
 }
 

@@ -19,5 +19,17 @@
       "filePath": "/Users/pg/Desktop/koda-webapp/backend/src/data_banks/.compiled/table_header_hash_index.any.json",
       "checksumSha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
     }
-  ]
+  ],
+  "_meta": {
+    "id": "compiled_compiled_manifest",
+    "version": "1.0.0",
+    "description": "Auto-registered bank payload for .compiled/compiled_manifest.any.json",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true
+  }
 }

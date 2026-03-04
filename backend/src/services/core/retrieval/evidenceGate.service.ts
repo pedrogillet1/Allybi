@@ -109,16 +109,23 @@ function compileRegexMap(
 
 function resolveEvidenceGateRuntimeConfig(): EvidenceGateRuntimeConfig {
   const policyBank = getBankLoaderInstance().getBank<Record<string, unknown>>("memory_policy");
-  const gate = policyBank?.config?.runtimeTuning?.evidenceGate;
+  const policyConfig = (policyBank?.config ?? {}) as Record<string, unknown>;
+  const runtimeTuning = (policyConfig.runtimeTuning ?? {}) as Record<
+    string,
+    unknown
+  >;
+  const gate = runtimeTuning.evidenceGate;
   if (!gate || typeof gate !== "object") {
     throw new Error(
       "memory_policy.config.runtimeTuning.evidenceGate is required",
     );
   }
+  const gateRecord = gate as Record<string, unknown>;
 
   const factPatternsRaw =
-    gate.factRequiringPatterns && typeof gate.factRequiringPatterns === "object"
-      ? gate.factRequiringPatterns
+    gateRecord.factRequiringPatterns &&
+    typeof gateRecord.factRequiringPatterns === "object"
+      ? (gateRecord.factRequiringPatterns as Record<string, unknown>)
       : null;
   if (!factPatternsRaw) {
     throw new Error(
@@ -136,24 +143,27 @@ function resolveEvidenceGateRuntimeConfig(): EvidenceGateRuntimeConfig {
 
   const narrativeRiskPatterns = compileRegexList(
     "narrativeRiskPatterns",
-    gate.narrativeRiskPatterns,
+    gateRecord.narrativeRiskPatterns,
     "i",
   );
   const evidenceKeywords = compileRegexMap(
     "evidenceKeywords",
-    gate.evidenceKeywords,
+    gateRecord.evidenceKeywords,
     "i",
   );
 
-  const richContentMinWords = Number(gate.richContentMinWords);
+  const richContentMinWords = Number(gateRecord.richContentMinWords);
   if (!Number.isFinite(richContentMinWords) || richContentMinWords <= 0) {
     throw new Error(
       "memory_policy.config.runtimeTuning.evidenceGate.richContentMinWords is required",
     );
   }
 
-  const strongThreshold = Number(gate?.strengthThresholds?.strong);
-  const moderateThreshold = Number(gate?.strengthThresholds?.moderate);
+  const strengthThresholds = gateRecord.strengthThresholds as
+    | Record<string, unknown>
+    | undefined;
+  const strongThreshold = Number(strengthThresholds?.strong);
+  const moderateThreshold = Number(strengthThresholds?.moderate);
   if (
     !Number.isFinite(strongThreshold) ||
     !Number.isFinite(moderateThreshold) ||
@@ -167,12 +177,13 @@ function resolveEvidenceGateRuntimeConfig(): EvidenceGateRuntimeConfig {
     );
   }
 
-  const copy = gate.copy;
+  const copy = gateRecord.copy;
   if (!copy || typeof copy !== "object") {
     throw new Error(
       "memory_policy.config.runtimeTuning.evidenceGate.copy is required",
     );
   }
+  const copyRecord = copy as Record<string, unknown>;
 
   return {
     factPatterns,
@@ -182,9 +193,13 @@ function resolveEvidenceGateRuntimeConfig(): EvidenceGateRuntimeConfig {
     strongThreshold,
     moderateThreshold,
     copy: {
-      clarifyQuestion: copy.clarifyQuestion || {},
-      hedgePrefixWeak: copy.hedgePrefixWeak || {},
-      hedgePrefixModerateNarrative: copy.hedgePrefixModerateNarrative || {},
+      clarifyQuestion:
+        (copyRecord.clarifyQuestion as Record<string, string>) || {},
+      hedgePrefixWeak:
+        (copyRecord.hedgePrefixWeak as Record<string, string>) || {},
+      hedgePrefixModerateNarrative:
+        (copyRecord.hedgePrefixModerateNarrative as Record<string, string>) ||
+        {},
     },
   };
 }

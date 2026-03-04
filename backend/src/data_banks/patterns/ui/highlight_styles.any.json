@@ -12,17 +12,9 @@
       "editor_highlight_runtime",
       "tests.patternDeterminism"
     ],
-    "tests": {
-      "positive": [
-        "paragraph uses yellow underline style",
-        "cell highlights include border overlay fallback",
-        "unsupported target uses selectionTint"
-      ],
-      "negative": [
-        "too many target highlights should fail",
-        "color-only highlight without non-color cue should fail"
-      ]
-    },
+    "tests": [
+      "tests/patternDeterminism.test.ts"
+    ],
     "lastUpdated": "2026-03-03"
   },
   "config": {

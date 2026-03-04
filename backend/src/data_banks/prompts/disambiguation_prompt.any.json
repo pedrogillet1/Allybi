@@ -3,8 +3,20 @@
     "id": "disambiguation_prompt",
     "version": "1.0.0",
     "description": "LLM prompt used to produce a single, crisp disambiguation question when multiple documents are close matches. Output must be user-facing text only (no JSON), with 2–5 concrete options derived from candidates. Matches clarification_phrases + render_policy (question rendered as text, not pills).",
-    "languages": ["any", "en", "pt", "es"],
-    "lastUpdated": "2026-01-26"
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-01-26",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -18,7 +30,13 @@
     "neverAskForInfoAlreadyKnown": true,
     "noJsonOutput": true,
     "neverMentionInternalIdsUnlessAllowed": true,
-    "allowedOptionFields": ["docTitle", "fileName", "docType", "recencyHint", "docId"],
+    "allowedOptionFields": [
+      "docTitle",
+      "fileName",
+      "docType",
+      "recencyHint",
+      "docId"
+    ],
     "privacy": {
       "doNotEchoSensitiveSnippets": true,
       "allowDocIdOnlyIfUserHasSeenIt": true
@@ -169,18 +187,39 @@
     "cases": [
       {
         "id": "DP_0001_one_question_only",
-        "input": { "candidateCount": 3, "language": "en" },
-        "expect": { "maxQuestions": 1, "maxSentences": 2 }
+        "input": {
+          "candidateCount": 3,
+          "language": "en"
+        },
+        "expect": {
+          "maxQuestions": 1,
+          "maxSentences": 2
+        }
       },
       {
         "id": "DP_0002_options_between_2_and_5",
-        "input": { "candidateCount": 7, "language": "en" },
-        "expect": { "optionsCountLte": 5, "optionsCountGte": 2 }
+        "input": {
+          "candidateCount": 7,
+          "language": "en"
+        },
+        "expect": {
+          "optionsCountLte": 5,
+          "optionsCountGte": 2
+        }
       },
       {
         "id": "DP_0003_no_sources_no_json",
-        "input": { "language": "en" },
-        "expect": { "mustNotContain": ["Sources:", "```json", "{", "["] }
+        "input": {
+          "language": "en"
+        },
+        "expect": {
+          "mustNotContain": [
+            "Sources:",
+            "```json",
+            "{",
+            "["
+          ]
+        }
       }
     ]
   }

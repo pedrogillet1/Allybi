@@ -15,6 +15,7 @@
  * - File actions: NO content, ONLY source_buttons attachment
  */
 import { getOptionalBank } from "../banks/bankLoader.service";
+import { stableLocationKey } from "./retrievalEngine.utils";
 
 // =============================================================================
 // TYPES
@@ -370,7 +371,20 @@ export class SourceButtonsService {
         String(source.cellReference || "").trim().toLowerCase(),
         String(source.sectionTitle || "").trim().toLowerCase(),
       ].join("|");
-      const dedupeKey = `${source.documentId}|${locationFingerprint}`;
+      const hasLocationFingerprint = Boolean(
+        locationKey ||
+          source.pageNumber ||
+          source.slideNumber ||
+          String(source.sheetName || "").trim() ||
+          String(source.cellReference || "").trim() ||
+          String(source.sectionTitle || "").trim(),
+      );
+      const snippetFingerprint = String(source.snippet || "")
+        .trim()
+        .toLowerCase();
+      const dedupeKey = hasLocationFingerprint
+        ? `${source.documentId}|${locationFingerprint}`
+        : `${source.documentId}|snippet:${snippetFingerprint || "__none__"}`;
       const existing = seen.get(dedupeKey);
       if (!existing || (source.score ?? 0) > (existing.score ?? 0)) {
         seen.set(dedupeKey, source);
@@ -384,7 +398,11 @@ export class SourceButtonsService {
    * Convert raw source to SourceButton.
    */
   private rawToButton(source: RawSource): SourceButton {
-    const fallbackLocation = this.parseLocationKeyFallback(source.locationKey);
+    const inferredLocationKey =
+      String(source.locationKey || "").trim() ||
+      this.buildStableLocationKeyFromSource(source) ||
+      undefined;
+    const fallbackLocation = this.parseLocationKeyFallback(inferredLocationKey);
     const pageNumber = source.pageNumber ?? fallbackLocation.pageNumber ?? undefined;
     const sectionTitle =
       source.sectionTitle ||
@@ -397,7 +415,7 @@ export class SourceButtonsService {
       mimeType: source.mimeType,
       folderPath: source.folderPath,
       folderSegments: source.folderSegments,
-      locationKey: source.locationKey,
+      locationKey: inferredLocationKey,
       snippet: source.snippet,
     };
 
@@ -435,6 +453,39 @@ export class SourceButtonsService {
     }
 
     return button;
+  }
+
+  private buildStableLocationKeyFromSource(source: RawSource): string | null {
+    const pageNumber =
+      typeof source.pageNumber === "number" && Number.isFinite(source.pageNumber)
+        ? Math.trunc(source.pageNumber)
+        : null;
+    const slideNumber =
+      typeof source.slideNumber === "number" && Number.isFinite(source.slideNumber)
+        ? Math.trunc(source.slideNumber)
+        : null;
+    const sheetName = String(source.sheetName || "").trim() || null;
+    const cellReference = String(source.cellReference || "").trim() || null;
+    const sectionTitle = String(source.sectionTitle || "").trim() || null;
+    if (
+      !pageNumber &&
+      !slideNumber &&
+      !sheetName &&
+      !cellReference &&
+      !sectionTitle
+    ) {
+      return null;
+    }
+    return stableLocationKey(
+      source.documentId,
+      {
+        page: pageNumber,
+        sheet: sheetName,
+        slide: slideNumber,
+        sectionKey: cellReference || sectionTitle,
+      },
+      "1",
+    );
   }
 
   private toPositiveInt(value: unknown): number | null {

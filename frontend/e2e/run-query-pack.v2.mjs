@@ -242,6 +242,9 @@ function streamChat(body) {
                 item.section = String(locationValue || '').trim();
               }
               if (!item.page && fromLocationKey.page) item.page = fromLocationKey.page;
+              if (!item.slide && fromLocationKey.slide) item.slide = fromLocationKey.slide;
+              if (!item.sheet && fromLocationKey.sheet) item.sheet = fromLocationKey.sheet;
+              if (!item.section && fromLocationKey.section) item.section = fromLocationKey.section;
               if (!item.section && fromLocationKey.chunk !== null) {
                 item.section = `chunk_${fromLocationKey.chunk}`;
               }
@@ -266,8 +269,8 @@ function streamChat(body) {
               (docId && locationKey ? byDocAndLocation.get(`${docId}|${locationKey}`) : null) ||
               (docId ? byDocOnly.get(docId) : null) ||
               null;
-            if (!fallback) return source;
-            return {
+            if (!fallback) return normalizeSourceLocation(source);
+            return normalizeSourceLocation({
               ...fallback,
               ...source,
               documentId: source.documentId || source.docId || source.id || fallback.documentId,
@@ -280,7 +283,7 @@ function streamChat(body) {
               cell: source.cell ?? fallback.cell ?? null,
               section: source.section ?? fallback.section ?? null,
               snippet: source.snippet || fallback.snippet || null,
-            };
+            });
           });
         };
         const effectiveSources =
@@ -326,14 +329,113 @@ function normalizeName(v) {
 
 function parseLocationFromLocationKey(rawValue) {
   const value = String(rawValue || '').trim();
-  if (!value) return { page: null, chunk: null };
+  if (!value) {
+    return { page: null, chunk: null, slide: null, sheet: null, section: null };
+  }
   const pageMatch = value.match(/\|p:(-?\d+)/i);
   const chunkMatch = value.match(/\|c:(-?\d+)/i);
+  const slideMatch = value.match(/\|sl:(-?\d+)/i);
+  const sheetMatch = value.match(/\|s:([^|]+)/i);
+  const sectionMatch = value.match(/\|sec:([^|]+)/i);
   const page = pageMatch ? Number(pageMatch[1]) : null;
   const chunk = chunkMatch ? Number(chunkMatch[1]) : null;
+  const slide = slideMatch ? Number(slideMatch[1]) : null;
   return {
     page: Number.isFinite(page) && page > 0 ? page : null,
     chunk: Number.isFinite(chunk) && chunk >= 0 ? chunk : null,
+    slide: Number.isFinite(slide) && slide > 0 ? slide : null,
+    sheet: sheetMatch ? String(sheetMatch[1] || '').trim() || null : null,
+    section: sectionMatch ? String(sectionMatch[1] || '').trim() || null : null,
+  };
+}
+
+function normalizeSourceLocation(rawSource) {
+  if (!rawSource || typeof rawSource !== 'object') return rawSource;
+  const locationKey = String(rawSource.locationKey || '').trim() || null;
+  const fromLocationKey = parseLocationFromLocationKey(locationKey);
+  const page = Number.isFinite(Number(rawSource.page))
+    ? Number(rawSource.page)
+    : fromLocationKey.page;
+  const slide = Number.isFinite(Number(rawSource.slide))
+    ? Number(rawSource.slide)
+    : fromLocationKey.slide;
+  const sheet = String(rawSource.sheet || '').trim() || fromLocationKey.sheet || null;
+  const cell = String(rawSource.cell || '').trim() || null;
+  let section = String(rawSource.section || '').trim() || fromLocationKey.section || null;
+  if (!section && fromLocationKey.chunk !== null) {
+    section = `chunk_${fromLocationKey.chunk}`;
+  }
+  const locationLabel = String(rawSource.locationLabel || '').trim() || null;
+  return {
+    ...rawSource,
+    locationKey,
+    page: page ?? null,
+    slide: slide ?? null,
+    sheet,
+    cell,
+    section,
+    locationLabel,
+  };
+}
+
+function hasRichSourceLocation(rawSource) {
+  const source = normalizeSourceLocation(rawSource);
+  if (!source || typeof source !== 'object') return false;
+  const locationKey = String(source.locationKey || '').trim();
+  const hasTypedLocation =
+    (Number.isFinite(Number(source.page)) && Number(source.page) > 0) ||
+    (Number.isFinite(Number(source.slide)) && Number(source.slide) > 0) ||
+    Boolean(String(source.sheet || '').trim()) ||
+    Boolean(String(source.cell || '').trim()) ||
+    Boolean(String(source.section || '').trim()) ||
+    Boolean(String(source.locationLabel || '').trim());
+  const hasUsableLocationKey = Boolean(
+    locationKey && !locationKey.includes('|p:-1|'),
+  );
+  return hasTypedLocation || hasUsableLocationKey;
+}
+
+function hasSourceButtonsAttachment(attachments) {
+  if (!Array.isArray(attachments)) return false;
+  return attachments.some(
+    (attachment) =>
+      attachment &&
+      typeof attachment === 'object' &&
+      attachment.type === 'source_buttons' &&
+      Array.isArray(attachment.buttons) &&
+      attachment.buttons.length > 0,
+  );
+}
+
+function assessArtifactIntegrity(results) {
+  const rows = Array.isArray(results) ? results : [];
+  const stats = {
+    rows: rows.length,
+    rowsWithSources: 0,
+    rowsWithSourceButtons: 0,
+    sourceCount: 0,
+    richSourceCount: 0,
+    issues: [],
+  };
+  for (const row of rows) {
+    const sources = Array.isArray(row?.sources) ? row.sources : [];
+    const attachments = Array.isArray(row?.attachments) ? row.attachments : [];
+    if (sources.length > 0) stats.rowsWithSources += 1;
+    if (hasSourceButtonsAttachment(attachments)) stats.rowsWithSourceButtons += 1;
+    for (const source of sources) {
+      stats.sourceCount += 1;
+      if (hasRichSourceLocation(source)) stats.richSourceCount += 1;
+    }
+  }
+  if (stats.rowsWithSources > 0 && stats.rowsWithSourceButtons === 0) {
+    stats.issues.push('SOURCE_BUTTONS_ATTACHMENT_MISSING_ACROSS_ALL_ROWS');
+  }
+  if (stats.sourceCount > 0 && stats.richSourceCount === 0) {
+    stats.issues.push('SOURCE_LOCATION_METADATA_MISSING_ACROSS_ALL_ROWS');
+  }
+  return {
+    ...stats,
+    ok: stats.issues.length === 0,
   };
 }
 
@@ -802,7 +904,9 @@ async function main() {
         }
       : null;
 
-    const responseSources = Array.isArray(response.sources) ? response.sources : [];
+    const responseSources = Array.isArray(response.sources)
+      ? response.sources.map((source) => normalizeSourceLocation(source))
+      : [];
     const rawResponseText = String(response.fullText || '').trim();
     const normalizedTruncation =
       response.truncation ||
@@ -844,6 +948,7 @@ async function main() {
     }
 
     const mergedResults = [...resultsByIndex.values()].sort((a, b) => Number(a.index) - Number(b.index));
+    const artifactIntegrity = assessArtifactIntegrity(mergedResults);
     fs.mkdirSync(path.dirname(OUT_FILE), { recursive: true });
     fs.writeFileSync(OUT_FILE, JSON.stringify({
       meta: {
@@ -866,17 +971,26 @@ async function main() {
         selectedCount: queryRows.length,
         conversationId: conversationId || null,
         appendMode: APPEND_MODE,
+        artifactIntegrity,
       },
       results: mergedResults,
     }, null, 2));
   }
 
   const chunkErrors = chunkResults.filter((r) => r.status !== 'ok').length;
+  const finalResults = [...resultsByIndex.values()].sort((a, b) => Number(a.index) - Number(b.index));
+  const artifactIntegrity = assessArtifactIntegrity(finalResults);
   if (!QUIET) {
     console.log(
       `Completed chunk. ok=${chunkResults.length - chunkErrors} error=${chunkErrors} output=${OUT_FILE} conversationId=${conversationId || 'none'}`,
     );
+    if (!artifactIntegrity.ok) {
+      console.warn(
+        `[run-query-pack] artifact integrity failed: ${artifactIntegrity.issues.join(', ')}`,
+      );
+    }
   }
+  if (!artifactIntegrity.ok) process.exit(3);
   if (chunkErrors > 0) process.exit(2);
 }
 

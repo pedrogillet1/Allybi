@@ -181,13 +181,12 @@ describe("TurnRouterService.decide()", () => {
   });
 
   // -------------------------------------------------------------------------
-  // 5. Fallback → GENERAL (no docs, no viewer, no connector, intentConfig returns null)
+  // 5. Default behavior is fail-closed when intentConfig throws in non-strict env
   // -------------------------------------------------------------------------
-  test("returns GENERAL as fallback when no docs, no viewer mode, and no connector", () => {
+  test("throws when intentConfig is unavailable and fail-open flag is disabled", () => {
     const routePolicy = {
       isConnectorTurn: jest.fn<() => boolean>().mockReturnValue(false),
     };
-    // Returning null forces the router to fall through to the docsAvailable branch
     const intentConfig = {
       decide: jest.fn(() => {
         throw new Error("intentConfig unavailable");
@@ -195,10 +194,32 @@ describe("TurnRouterService.decide()", () => {
     };
 
     const router = new TurnRouterService(routePolicy, intentConfig);
-    // No attachedDocuments, no activeDocument, no viewer, no connector
     const ctx = makeCtx({ messageText: "what is the weather?" });
 
-    expect(router.decide(ctx)).toBe("GENERAL");
+    expect(() => router.decide(ctx)).toThrow("intentConfig unavailable");
+  });
+
+  test("returns GENERAL as fallback when fail-open flag is enabled", () => {
+    const prev = process.env.TURN_ROUTER_FAIL_OPEN;
+    process.env.TURN_ROUTER_FAIL_OPEN = "true";
+    try {
+      const routePolicy = {
+        isConnectorTurn: jest.fn<() => boolean>().mockReturnValue(false),
+      };
+      const intentConfig = {
+        decide: jest.fn(() => {
+          throw new Error("intentConfig unavailable");
+        }),
+      };
+
+      const router = new TurnRouterService(routePolicy, intentConfig);
+      const ctx = makeCtx({ messageText: "what is the weather?" });
+
+      expect(router.decide(ctx)).toBe("GENERAL");
+    } finally {
+      if (typeof prev === "string") process.env.TURN_ROUTER_FAIL_OPEN = prev;
+      else delete process.env.TURN_ROUTER_FAIL_OPEN;
+    }
   });
 
   // -------------------------------------------------------------------------
@@ -264,6 +285,24 @@ describe("TurnRouterService.decide()", () => {
     });
 
     expect(router.decide(ctx)).toBe("KNOWLEDGE");
+  });
+
+  test("maps clarification-required intent decision to CLARIFY route", () => {
+    const routePolicy = {
+      isConnectorTurn: jest.fn<() => boolean>().mockReturnValue(false),
+    };
+    const intentConfig = {
+      decide: jest.fn<() => IntentDecisionOutput>().mockReturnValue({
+        ...makeDecisionOutput("documents"),
+        requiresClarification: true,
+        clarifyReason: "ambiguous_margin",
+      }),
+    };
+    const router = new TurnRouterService(routePolicy, intentConfig);
+
+    expect(router.decide(makeCtx({ messageText: "can you check it?" }))).toBe(
+      "CLARIFY",
+    );
   });
 
   // -------------------------------------------------------------------------
@@ -560,6 +599,44 @@ describe("TurnRouterService.decide()", () => {
 
     expect(router.decide(ctx)).toBe("KNOWLEDGE");
     expect(intentConfig.decide).toHaveBeenCalled();
+  });
+
+  test("does not mark generic 'file' wording as explicit document reference", () => {
+    const routePolicy = {
+      isConnectorTurn: jest.fn<() => boolean>().mockReturnValue(false),
+    };
+    const intentConfig = {
+      decide: jest.fn(
+        (input: { signals?: { hasExplicitDocRef?: boolean } }) => {
+          expect(input.signals?.hasExplicitDocRef).toBe(false);
+          return makeDecisionOutput("help");
+        },
+      ),
+    };
+    const router = new TurnRouterService(routePolicy, intentConfig as any);
+
+    expect(
+      router.decide(makeCtx({ messageText: "how to open file menu in excel?" })),
+    ).toBe("GENERAL");
+  });
+
+  test("marks explicit filename mention as explicit document reference", () => {
+    const routePolicy = {
+      isConnectorTurn: jest.fn<() => boolean>().mockReturnValue(false),
+    };
+    const intentConfig = {
+      decide: jest.fn(
+        (input: { signals?: { hasExplicitDocRef?: boolean } }) => {
+          expect(input.signals?.hasExplicitDocRef).toBe(true);
+          return makeDecisionOutput("documents");
+        },
+      ),
+    };
+    const router = new TurnRouterService(routePolicy, intentConfig as any);
+
+    expect(
+      router.decide(makeCtx({ messageText: "summarize quarterly_report.pdf" })),
+    ).toBe("KNOWLEDGE");
   });
 
   test("passes connector context into route policy decision call", () => {

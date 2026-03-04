@@ -121,6 +121,18 @@ export function resolveDocScopeLockFromSignals(
     });
   }
 
+  if (signals?.explicitDocRef && signals?.resolvedDocId) {
+    const singleDocId = String(signals.resolvedDocId || "").trim();
+    if (singleDocId) {
+      return {
+        mode: "single_doc",
+        allowedDocumentIds: [singleDocId],
+        activeDocumentId: singleDocId,
+        source: "user_explicit",
+      };
+    }
+  }
+
   const allowedFromSignals = normalizeDocIds(signals?.allowedDocumentIds);
   if (allowedFromSignals.length > 1) {
     return {
@@ -136,18 +148,6 @@ export function resolveDocScopeLockFromSignals(
       activeDocumentId: allowedFromSignals[0],
       source: "system",
     };
-  }
-
-  if (signals?.explicitDocRef && signals?.resolvedDocId) {
-    const singleDocId = String(signals.resolvedDocId || "").trim();
-    if (singleDocId) {
-      return {
-        mode: "single_doc",
-        allowedDocumentIds: [singleDocId],
-        activeDocumentId: singleDocId,
-        source: "user_explicit",
-      };
-    }
   }
 
   if (signals?.explicitDocLock && signals?.activeDocId) {

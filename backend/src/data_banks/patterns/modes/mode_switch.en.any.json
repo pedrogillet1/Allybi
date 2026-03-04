@@ -15,21 +15,9 @@
       "mutation_guard",
       "tests.patternDeterminism"
     ],
-    "tests": {
-      "positive": [
-        "just explain in the document",
-        "don't modify anything in the spreadsheet",
-        "actually change it in the editor",
-        "show me a draft first",
-        "do it for me in the file",
-        "calculate the total in the spreadsheet"
-      ],
-      "negative": [
-        "format this table, do not calculate",
-        "highlight the clause, do not summarize",
-        "export file, do not send email"
-      ]
-    },
+    "tests": [
+      "tests/patternDeterminism.test.ts"
+    ],
     "dependsOn": [
       "patterns_editor_apply_undo_intents_en",
       "patterns_editor_apply_undo_intents_pt"

@@ -18,7 +18,13 @@
       "Added guards against redundant clarifications and follow-up continuity breaks"
     ],
     "reviewCadenceDays": 30,
-    "criticality": "medium"
+    "criticality": "medium",
+    "usedBy": [
+      "services/llm/core/llmRequestBuilder.service.ts"
+    ],
+    "tests": [
+      "tests/certification/prompt-mode-coverage.cert.test.ts"
+    ]
   },
   "config": {
     "enabled": true,

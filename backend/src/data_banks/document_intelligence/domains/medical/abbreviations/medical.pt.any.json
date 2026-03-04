@@ -1,12 +1,19 @@
 {
   "_meta": {
-    "id": "medical_abbreviations_pt",
+    "id": "medical_abbreviations_pt_v5a704629",
     "version": "1.0.0",
     "description": "Portuguese abbreviations for medical domain.",
     "languages": [
       "pt"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-02-28",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,

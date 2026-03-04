@@ -27,6 +27,7 @@ import type { LocalProviderConfig, LocalConfig } from "../providers/local/localC
 import { ResilienceLLMClient } from "../resilience/resilienceLlmClient.decorator";
 import { Semaphore } from "../resilience/semaphore";
 import { CircuitBreaker } from "../resilience/circuitBreaker";
+import { isRetryableError } from "../resilience/retry";
 
 export type LLMClientKey = "openai" | "google" | "local";
 
@@ -59,6 +60,12 @@ function wrapWithResilience(raw: LLMClient, name: string, concurrency: number): 
   return new ResilienceLLMClient(raw, {
     semaphore: new Semaphore(concurrency),
     circuitBreaker: new CircuitBreaker(`llm:${name}`),
+    retry: {
+      maxRetries: envInt(`${name.toUpperCase()}_RETRY_MAX`, 2),
+      baseDelayMs: envInt(`${name.toUpperCase()}_RETRY_BASE_DELAY_MS`, 500),
+      maxDelayMs: envInt(`${name.toUpperCase()}_RETRY_MAX_DELAY_MS`, 8000),
+      shouldRetry: isRetryableError,
+    },
   });
 }
 

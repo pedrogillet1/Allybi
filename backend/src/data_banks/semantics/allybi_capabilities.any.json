@@ -3,9 +3,19 @@
     "id": "allybi_capabilities",
     "version": "2.0.0",
     "description": "Canonical Allybi capability matrix for deterministic DOCX/XLSX editing behavior.",
-    "languages": ["any", "en", "pt"],
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
     "lastUpdated": "2026-02-12",
-    "owner": "allybi-editing"
+    "owner": "allybi-editing",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -30,100 +40,617 @@
         "maxChartsPerSheet": 50
       }
     },
-    "pptx": { "enabled": true },
-    "pdf": { "enabled": true },
-    "image": { "enabled": false }
+    "pptx": {
+      "enabled": true
+    },
+    "pdf": {
+      "enabled": true
+    },
+    "image": {
+      "enabled": false
+    }
   },
   "operators": {
-    "DOCX_GET_TARGETS":          { "supported": true,  "filetype": "docx", "runtimeOperator": "EDIT_DOCX_BUNDLE", "engine": "local", "renderCard": "target_resolution" },
-    "DOCX_LOCK_TARGETS":         { "supported": true,  "filetype": "docx", "runtimeOperator": "EDIT_DOCX_BUNDLE", "engine": "local", "renderCard": "target_resolution" },
-    "DOCX_CLEAR_LOCK":           { "supported": true,  "filetype": "docx", "runtimeOperator": "EDIT_DOCX_BUNDLE", "engine": "local", "renderCard": "target_resolution" },
-    "DOCX_REPLACE_SPAN":         { "supported": true,  "filetype": "docx", "runtimeOperator": "EDIT_SPAN",        "engine": "local", "renderCard": "docx_text_diff" },
-    "DOCX_REWRITE_PARAGRAPH":    { "supported": true,  "filetype": "docx", "runtimeOperator": "EDIT_PARAGRAPH",   "engine": "local", "renderCard": "docx_text_diff" },
-    "DOCX_REWRITE_SECTION":      { "supported": true,  "filetype": "docx", "runtimeOperator": "EDIT_DOCX_BUNDLE", "engine": "local", "renderCard": "docx_text_diff" },
-    "DOCX_INSERT_AFTER":         { "supported": true,  "filetype": "docx", "runtimeOperator": "ADD_PARAGRAPH",    "engine": "local", "renderCard": "docx_structural_diff" },
-    "DOCX_INSERT_BEFORE":        { "supported": true,  "filetype": "docx", "runtimeOperator": "ADD_PARAGRAPH",    "engine": "local", "renderCard": "docx_structural_diff" },
-    "DOCX_DELETE_PARAGRAPH":     { "supported": true,  "filetype": "docx", "runtimeOperator": "EDIT_DOCX_BUNDLE", "engine": "local", "renderCard": "docx_structural_diff" },
-    "DOCX_MERGE_PARAGRAPHS":     { "supported": true,  "filetype": "docx", "runtimeOperator": "EDIT_DOCX_BUNDLE", "engine": "local", "renderCard": "docx_structural_diff" },
-    "DOCX_SPLIT_PARAGRAPH":      { "supported": true,  "filetype": "docx", "runtimeOperator": "EDIT_DOCX_BUNDLE", "engine": "local", "renderCard": "docx_structural_diff" },
-    "DOCX_SET_RUN_STYLE":        { "supported": true,  "filetype": "docx", "runtimeOperator": "EDIT_DOCX_BUNDLE", "engine": "local", "renderCard": "docx_inline_format_diff" },
-    "DOCX_CLEAR_RUN_STYLE":      { "supported": true,  "filetype": "docx", "runtimeOperator": "EDIT_DOCX_BUNDLE", "engine": "local", "renderCard": "docx_inline_format_diff" },
-    "DOCX_SET_PARAGRAPH_STYLE":  { "supported": true,  "filetype": "docx", "runtimeOperator": "EDIT_DOCX_BUNDLE", "engine": "local", "renderCard": "docx_format_diff" },
-    "DOCX_SET_ALIGNMENT":        { "supported": true,  "filetype": "docx", "runtimeOperator": "EDIT_DOCX_BUNDLE", "engine": "local", "renderCard": "docx_format_diff" },
-    "DOCX_SET_INDENTATION":      { "supported": true,  "filetype": "docx", "runtimeOperator": "EDIT_DOCX_BUNDLE", "engine": "local", "renderCard": "docx_format_diff" },
-    "DOCX_SET_LINE_SPACING":     { "supported": true,  "filetype": "docx", "runtimeOperator": "EDIT_DOCX_BUNDLE", "engine": "local", "renderCard": "docx_format_diff" },
-    "DOCX_SET_PARAGRAPH_SPACING":{ "supported": true,  "filetype": "docx", "runtimeOperator": "EDIT_DOCX_BUNDLE", "engine": "local", "renderCard": "docx_format_diff" },
-    "DOCX_LIST_APPLY_BULLETS":   { "supported": true,  "filetype": "docx", "runtimeOperator": "EDIT_DOCX_BUNDLE", "engine": "local", "renderCard": "docx_structural_diff" },
-    "DOCX_LIST_APPLY_NUMBERING": { "supported": true,  "filetype": "docx", "runtimeOperator": "EDIT_DOCX_BUNDLE", "engine": "local", "renderCard": "docx_structural_diff" },
-    "DOCX_LIST_REMOVE":          { "supported": true,  "filetype": "docx", "runtimeOperator": "EDIT_DOCX_BUNDLE", "engine": "local", "renderCard": "docx_structural_diff" },
-    "DOCX_LIST_PROMOTE_DEMOTE":  { "supported": true,  "filetype": "docx", "runtimeOperator": "EDIT_DOCX_BUNDLE", "engine": "local", "renderCard": "docx_structural_diff" },
-    "DOCX_LIST_RESTART_NUMBERING":{ "supported": true, "filetype": "docx", "runtimeOperator": "EDIT_DOCX_BUNDLE", "engine": "local", "renderCard": "docx_structural_diff" },
-    "DOCX_NUMBERING_REPAIR":     { "supported": false, "filetype": "docx", "reason": "planned_not_yet_implemented" },
-    "DOCX_SET_TEXT_CASE":        { "supported": true,  "filetype": "docx", "runtimeOperator": "EDIT_DOCX_BUNDLE", "engine": "local", "renderCard": "docx_text_diff" },
-    "DOCX_TRANSLATE_SCOPE":      { "supported": true,  "filetype": "docx", "runtimeOperator": "EDIT_PARAGRAPH",   "engine": "local", "renderCard": "docx_text_diff" },
-    "DOCX_FIND_REPLACE":         { "supported": true,  "filetype": "docx", "runtimeOperator": "EDIT_DOCX_BUNDLE", "engine": "local", "renderCard": "docx_text_diff" },
-    "DOCX_UPDATE_TOC":           { "supported": true,  "filetype": "docx", "runtimeOperator": "EDIT_DOCX_BUNDLE", "engine": "local", "renderCard": "docx_structural_diff" },
-    "DOCX_ENRICH_FROM_SOURCES":  { "supported": true,  "filetype": "docx", "runtimeOperator": "EDIT_DOCX_BUNDLE", "engine": "local", "renderCard": "docx_text_diff" },
-    "DOCX_SET_HEADING_LEVEL":    { "supported": true,  "filetype": "docx", "runtimeOperator": "EDIT_DOCX_BUNDLE", "engine": "local", "renderCard": "docx_structural_diff" },
-    "DOCX_PAGE_BREAK":           { "supported": true,  "filetype": "docx", "runtimeOperator": "EDIT_DOCX_BUNDLE", "engine": "local", "renderCard": "docx_structural_diff" },
-    "DOCX_SECTION_BREAK":        { "supported": true,  "filetype": "docx", "runtimeOperator": "EDIT_DOCX_BUNDLE", "engine": "local", "renderCard": "docx_structural_diff" },
-    "DOCX_CREATE_TABLE":         { "supported": true,  "filetype": "docx", "runtimeOperator": "EDIT_DOCX_BUNDLE", "engine": "local", "renderCard": "docx_structural_diff" },
-    "DOCX_ADD_TABLE_ROW":        { "supported": true,  "filetype": "docx", "runtimeOperator": "EDIT_DOCX_BUNDLE", "engine": "local", "renderCard": "docx_structural_diff" },
-    "DOCX_DELETE_TABLE_ROW":     { "supported": true,  "filetype": "docx", "runtimeOperator": "EDIT_DOCX_BUNDLE", "engine": "local", "renderCard": "docx_structural_diff" },
-    "DOCX_SET_TABLE_CELL":       { "supported": true,  "filetype": "docx", "runtimeOperator": "EDIT_DOCX_BUNDLE", "engine": "local", "renderCard": "docx_structural_diff" },
-
-    "XLSX_SET_CELL_VALUE":       { "supported": true,  "filetype": "xlsx", "runtimeOperator": "EDIT_CELL",      "engine": "local", "renderCard": "xlsx_cell_diff" },
-    "XLSX_SET_RANGE_VALUES":     { "supported": true,  "filetype": "xlsx", "runtimeOperator": "EDIT_RANGE",     "engine": "local", "renderCard": "xlsx_range_diff" },
-    "XLSX_SET_CELL_FORMULA":     { "supported": true,  "filetype": "xlsx", "runtimeOperator": "COMPUTE_BUNDLE", "engine": "local", "renderCard": "xlsx_formula_diff" },
-    "XLSX_SET_RANGE_FORMULAS":   { "supported": true,  "filetype": "xlsx", "runtimeOperator": "COMPUTE_BUNDLE", "engine": "local", "renderCard": "xlsx_formula_diff" },
-    "XLSX_FILL_DOWN":            { "supported": true,  "filetype": "xlsx", "runtimeOperator": "COMPUTE_BUNDLE", "engine": "local", "renderCard": "xlsx_range_diff" },
-    "XLSX_FILL_RIGHT":           { "supported": true,  "filetype": "xlsx", "runtimeOperator": "COMPUTE_BUNDLE", "engine": "local", "renderCard": "xlsx_range_diff" },
-    "XLSX_FILL_SERIES":          { "supported": true,  "filetype": "xlsx", "runtimeOperator": "COMPUTE_BUNDLE", "engine": "local", "renderCard": "xlsx_range_diff" },
-    "XLSX_FORMAT_RANGE":         { "supported": true,  "filetype": "xlsx", "runtimeOperator": "COMPUTE_BUNDLE", "engine": "local", "renderCard": "xlsx_format_diff" },
-    "XLSX_SET_NUMBER_FORMAT":    { "supported": true,  "filetype": "xlsx", "runtimeOperator": "COMPUTE_BUNDLE", "engine": "local", "renderCard": "xlsx_format_diff" },
-    "XLSX_MERGE_CELLS":          { "supported": true,  "filetype": "xlsx", "runtimeOperator": "COMPUTE_BUNDLE", "engine": "local", "renderCard": "xlsx_structural_diff" },
-    "XLSX_WRAP_TEXT":             { "supported": true,  "filetype": "xlsx", "runtimeOperator": "COMPUTE_BUNDLE", "engine": "local", "renderCard": "xlsx_format_diff" },
-    "XLSX_AUTO_FIT":             { "supported": true,  "filetype": "xlsx", "runtimeOperator": "COMPUTE_BUNDLE", "engine": "local", "renderCard": "xlsx_structural_diff" },
-    "XLSX_COND_FORMAT_DATA_BARS":{ "supported": true,  "filetype": "xlsx", "runtimeOperator": "COMPUTE_BUNDLE", "engine": "local", "renderCard": "xlsx_format_diff" },
-    "XLSX_COND_FORMAT_COLOR_SCALE":{ "supported": true,"filetype": "xlsx", "runtimeOperator": "COMPUTE_BUNDLE", "engine": "local", "renderCard": "xlsx_format_diff" },
-    "XLSX_COND_FORMAT_TOP_N":    { "supported": true,  "filetype": "xlsx", "runtimeOperator": "COMPUTE_BUNDLE", "engine": "local", "renderCard": "xlsx_format_diff" },
-    "XLSX_SORT_RANGE":           { "supported": true,  "filetype": "xlsx", "runtimeOperator": "COMPUTE_BUNDLE", "engine": "local", "renderCard": "xlsx_structural_diff" },
-    "XLSX_FILTER_APPLY":         { "supported": true,  "filetype": "xlsx", "runtimeOperator": "COMPUTE_BUNDLE", "engine": "local", "renderCard": "xlsx_structural_diff" },
-    "XLSX_FILTER_CLEAR":         { "supported": true,  "filetype": "xlsx", "runtimeOperator": "COMPUTE_BUNDLE", "engine": "local", "renderCard": "xlsx_structural_diff" },
-    "XLSX_TABLE_CREATE":         { "supported": true,  "filetype": "xlsx", "runtimeOperator": "COMPUTE_BUNDLE", "engine": "local", "renderCard": "xlsx_structural_diff" },
-    "XLSX_DATA_VALIDATION_SET":  { "supported": true,  "filetype": "xlsx", "runtimeOperator": "COMPUTE_BUNDLE", "engine": "local", "renderCard": "xlsx_format_diff" },
-    "XLSX_FREEZE_PANES":         { "supported": true,  "filetype": "xlsx", "runtimeOperator": "COMPUTE_BUNDLE", "engine": "local", "renderCard": "xlsx_structural_diff" },
-    "XLSX_HIDE_ROWS_COLS":       { "supported": true,  "filetype": "xlsx", "runtimeOperator": "COMPUTE_BUNDLE", "engine": "local", "renderCard": "xlsx_structural_diff" },
-    "XLSX_SHOW_ROWS_COLS":       { "supported": true,  "filetype": "xlsx", "runtimeOperator": "COMPUTE_BUNDLE", "engine": "local", "renderCard": "xlsx_structural_diff" },
-    "XLSX_INSERT_ROWS":          { "supported": true,  "filetype": "xlsx", "runtimeOperator": "COMPUTE_BUNDLE", "engine": "local", "renderCard": "xlsx_structural_diff" },
-    "XLSX_DELETE_ROWS":          { "supported": true,  "filetype": "xlsx", "runtimeOperator": "COMPUTE_BUNDLE", "engine": "local", "renderCard": "xlsx_structural_diff" },
-    "XLSX_INSERT_COLUMNS":       { "supported": true,  "filetype": "xlsx", "runtimeOperator": "COMPUTE_BUNDLE", "engine": "local", "renderCard": "xlsx_structural_diff" },
-    "XLSX_DELETE_COLUMNS":       { "supported": true,  "filetype": "xlsx", "runtimeOperator": "COMPUTE_BUNDLE", "engine": "local", "renderCard": "xlsx_structural_diff" },
-    "XLSX_ADD_SHEET":            { "supported": true,  "filetype": "xlsx", "runtimeOperator": "ADD_SHEET",      "engine": "local", "renderCard": "xlsx_structural_diff" },
-    "XLSX_RENAME_SHEET":         { "supported": true,  "filetype": "xlsx", "runtimeOperator": "RENAME_SHEET",   "engine": "local", "renderCard": "xlsx_structural_diff" },
-    "XLSX_DELETE_SHEET":         { "supported": true,  "filetype": "xlsx", "runtimeOperator": "DELETE_SHEET",   "engine": "local", "renderCard": "xlsx_structural_diff" },
-    "XLSX_AGGREGATION":          { "supported": true,  "filetype": "xlsx", "runtimeOperator": "COMPUTE_BUNDLE", "engine": "local", "renderCard": "xlsx_formula_diff" },
-    "XLSX_CHART_CREATE":         { "supported": true,  "filetype": "xlsx", "runtimeOperator": "CREATE_CHART",   "engine": "sheets_bridge_required", "renderCard": "xlsx_chart_diff" },
-    "XLSX_CHART_SET_SERIES":     { "supported": true,  "filetype": "xlsx", "runtimeOperator": "CREATE_CHART",   "engine": "sheets_bridge_required", "renderCard": "xlsx_chart_diff" },
-    "XLSX_CHART_SET_TITLES":     { "supported": true,  "filetype": "xlsx", "runtimeOperator": "CREATE_CHART",   "engine": "sheets_bridge_required", "renderCard": "xlsx_chart_diff" },
-    "XLSX_CHART_SET_AXES":       { "supported": true,  "filetype": "xlsx", "runtimeOperator": "CREATE_CHART",   "engine": "sheets_bridge_required", "renderCard": "xlsx_chart_diff" },
-    "XLSX_CHART_MOVE_RESIZE":    { "supported": true,  "filetype": "xlsx", "runtimeOperator": "CREATE_CHART",   "engine": "sheets_bridge_required", "renderCard": "xlsx_chart_diff" },
-    "XLSX_CHART_DELETE":         { "supported": true,  "filetype": "xlsx", "runtimeOperator": "CREATE_CHART",   "engine": "sheets_bridge_required", "renderCard": "xlsx_chart_diff" },
-
-    "XLSX_REMOVE_DUPLICATES":    { "supported": true,  "filetype": "xlsx", "runtimeOperator": "COMPUTE_BUNDLE", "engine": "local", "renderCard": "xlsx_structural_diff" },
-    "XLSX_TRIM_WHITESPACE":      { "supported": true,  "filetype": "xlsx", "runtimeOperator": "COMPUTE_BUNDLE", "engine": "local", "renderCard": "xlsx_format_diff" },
-    "XLSX_NORMALIZE_VALUES":     { "supported": true,  "filetype": "xlsx", "runtimeOperator": "COMPUTE_BUNDLE", "engine": "local", "renderCard": "xlsx_format_diff" },
-    "XLSX_SET_PROTECTION":       { "supported": true,  "filetype": "xlsx", "runtimeOperator": "COMPUTE_BUNDLE", "engine": "local", "renderCard": "xlsx_security_diff" },
-    "XLSX_LOCK_CELLS":           { "supported": true,  "filetype": "xlsx", "runtimeOperator": "COMPUTE_BUNDLE", "engine": "local", "renderCard": "xlsx_security_diff" },
-
-    "PY_TIME_SERIES_FORECAST":    { "supported": true,  "filetype": "excel", "runtimeOperator": "PY_COMPUTE",   "engine": "python_bridge_required", "renderCard": "python_compute_diff" },
-    "PY_STATS_DESCRIPTIVE":       { "supported": true,  "filetype": "excel", "runtimeOperator": "PY_COMPUTE",   "engine": "python_bridge_required", "renderCard": "python_compute_diff" },
-    "PY_STATS_REGRESSION":        { "supported": true,  "filetype": "excel", "runtimeOperator": "PY_COMPUTE",   "engine": "python_bridge_required", "renderCard": "python_compute_diff" },
-    "PY_CALC_DERIVE_COLUMN":      { "supported": true,  "filetype": "excel", "runtimeOperator": "PY_COMPUTE",   "engine": "python_bridge_required", "renderCard": "python_compute_diff" },
-    "PY_CLEAN_MISSING_VALUES":    { "supported": true,  "filetype": "excel", "runtimeOperator": "PY_COMPUTE",   "engine": "python_bridge_required", "renderCard": "python_compute_diff" },
-    "PY_OUTLIER_DETECT":          { "supported": true,  "filetype": "excel", "runtimeOperator": "PY_COMPUTE",   "engine": "python_bridge_required", "renderCard": "python_compute_diff" },
-    "PY_PIVOT_TABLE":            { "supported": true,  "filetype": "excel", "runtimeOperator": "PY_COMPUTE",   "engine": "python_bridge_required", "renderCard": "python_compute_diff" },
-    "PY_BINNING":                { "supported": true,  "filetype": "excel", "runtimeOperator": "PY_COMPUTE",   "engine": "python_bridge_required", "renderCard": "python_compute_diff" }
+    "DOCX_GET_TARGETS": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "engine": "local",
+      "renderCard": "target_resolution"
+    },
+    "DOCX_LOCK_TARGETS": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "engine": "local",
+      "renderCard": "target_resolution"
+    },
+    "DOCX_CLEAR_LOCK": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "engine": "local",
+      "renderCard": "target_resolution"
+    },
+    "DOCX_REPLACE_SPAN": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "EDIT_SPAN",
+      "engine": "local",
+      "renderCard": "docx_text_diff"
+    },
+    "DOCX_REWRITE_PARAGRAPH": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "EDIT_PARAGRAPH",
+      "engine": "local",
+      "renderCard": "docx_text_diff"
+    },
+    "DOCX_REWRITE_SECTION": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "engine": "local",
+      "renderCard": "docx_text_diff"
+    },
+    "DOCX_INSERT_AFTER": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "ADD_PARAGRAPH",
+      "engine": "local",
+      "renderCard": "docx_structural_diff"
+    },
+    "DOCX_INSERT_BEFORE": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "ADD_PARAGRAPH",
+      "engine": "local",
+      "renderCard": "docx_structural_diff"
+    },
+    "DOCX_DELETE_PARAGRAPH": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "engine": "local",
+      "renderCard": "docx_structural_diff"
+    },
+    "DOCX_MERGE_PARAGRAPHS": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "engine": "local",
+      "renderCard": "docx_structural_diff"
+    },
+    "DOCX_SPLIT_PARAGRAPH": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "engine": "local",
+      "renderCard": "docx_structural_diff"
+    },
+    "DOCX_SET_RUN_STYLE": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "engine": "local",
+      "renderCard": "docx_inline_format_diff"
+    },
+    "DOCX_CLEAR_RUN_STYLE": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "engine": "local",
+      "renderCard": "docx_inline_format_diff"
+    },
+    "DOCX_SET_PARAGRAPH_STYLE": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "engine": "local",
+      "renderCard": "docx_format_diff"
+    },
+    "DOCX_SET_ALIGNMENT": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "engine": "local",
+      "renderCard": "docx_format_diff"
+    },
+    "DOCX_SET_INDENTATION": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "engine": "local",
+      "renderCard": "docx_format_diff"
+    },
+    "DOCX_SET_LINE_SPACING": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "engine": "local",
+      "renderCard": "docx_format_diff"
+    },
+    "DOCX_SET_PARAGRAPH_SPACING": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "engine": "local",
+      "renderCard": "docx_format_diff"
+    },
+    "DOCX_LIST_APPLY_BULLETS": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "engine": "local",
+      "renderCard": "docx_structural_diff"
+    },
+    "DOCX_LIST_APPLY_NUMBERING": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "engine": "local",
+      "renderCard": "docx_structural_diff"
+    },
+    "DOCX_LIST_REMOVE": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "engine": "local",
+      "renderCard": "docx_structural_diff"
+    },
+    "DOCX_LIST_PROMOTE_DEMOTE": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "engine": "local",
+      "renderCard": "docx_structural_diff"
+    },
+    "DOCX_LIST_RESTART_NUMBERING": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "engine": "local",
+      "renderCard": "docx_structural_diff"
+    },
+    "DOCX_NUMBERING_REPAIR": {
+      "supported": false,
+      "filetype": "docx",
+      "reason": "planned_not_yet_implemented"
+    },
+    "DOCX_SET_TEXT_CASE": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "engine": "local",
+      "renderCard": "docx_text_diff"
+    },
+    "DOCX_TRANSLATE_SCOPE": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "EDIT_PARAGRAPH",
+      "engine": "local",
+      "renderCard": "docx_text_diff"
+    },
+    "DOCX_FIND_REPLACE": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "engine": "local",
+      "renderCard": "docx_text_diff"
+    },
+    "DOCX_UPDATE_TOC": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "engine": "local",
+      "renderCard": "docx_structural_diff"
+    },
+    "DOCX_ENRICH_FROM_SOURCES": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "engine": "local",
+      "renderCard": "docx_text_diff"
+    },
+    "DOCX_SET_HEADING_LEVEL": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "engine": "local",
+      "renderCard": "docx_structural_diff"
+    },
+    "DOCX_PAGE_BREAK": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "engine": "local",
+      "renderCard": "docx_structural_diff"
+    },
+    "DOCX_SECTION_BREAK": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "engine": "local",
+      "renderCard": "docx_structural_diff"
+    },
+    "DOCX_CREATE_TABLE": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "engine": "local",
+      "renderCard": "docx_structural_diff"
+    },
+    "DOCX_ADD_TABLE_ROW": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "engine": "local",
+      "renderCard": "docx_structural_diff"
+    },
+    "DOCX_DELETE_TABLE_ROW": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "engine": "local",
+      "renderCard": "docx_structural_diff"
+    },
+    "DOCX_SET_TABLE_CELL": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "engine": "local",
+      "renderCard": "docx_structural_diff"
+    },
+    "XLSX_SET_CELL_VALUE": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "EDIT_CELL",
+      "engine": "local",
+      "renderCard": "xlsx_cell_diff"
+    },
+    "XLSX_SET_RANGE_VALUES": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "EDIT_RANGE",
+      "engine": "local",
+      "renderCard": "xlsx_range_diff"
+    },
+    "XLSX_SET_CELL_FORMULA": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "engine": "local",
+      "renderCard": "xlsx_formula_diff"
+    },
+    "XLSX_SET_RANGE_FORMULAS": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "engine": "local",
+      "renderCard": "xlsx_formula_diff"
+    },
+    "XLSX_FILL_DOWN": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "engine": "local",
+      "renderCard": "xlsx_range_diff"
+    },
+    "XLSX_FILL_RIGHT": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "engine": "local",
+      "renderCard": "xlsx_range_diff"
+    },
+    "XLSX_FILL_SERIES": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "engine": "local",
+      "renderCard": "xlsx_range_diff"
+    },
+    "XLSX_FORMAT_RANGE": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "engine": "local",
+      "renderCard": "xlsx_format_diff"
+    },
+    "XLSX_SET_NUMBER_FORMAT": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "engine": "local",
+      "renderCard": "xlsx_format_diff"
+    },
+    "XLSX_MERGE_CELLS": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "engine": "local",
+      "renderCard": "xlsx_structural_diff"
+    },
+    "XLSX_WRAP_TEXT": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "engine": "local",
+      "renderCard": "xlsx_format_diff"
+    },
+    "XLSX_AUTO_FIT": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "engine": "local",
+      "renderCard": "xlsx_structural_diff"
+    },
+    "XLSX_COND_FORMAT_DATA_BARS": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "engine": "local",
+      "renderCard": "xlsx_format_diff"
+    },
+    "XLSX_COND_FORMAT_COLOR_SCALE": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "engine": "local",
+      "renderCard": "xlsx_format_diff"
+    },
+    "XLSX_COND_FORMAT_TOP_N": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "engine": "local",
+      "renderCard": "xlsx_format_diff"
+    },
+    "XLSX_SORT_RANGE": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "engine": "local",
+      "renderCard": "xlsx_structural_diff"
+    },
+    "XLSX_FILTER_APPLY": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "engine": "local",
+      "renderCard": "xlsx_structural_diff"
+    },
+    "XLSX_FILTER_CLEAR": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "engine": "local",
+      "renderCard": "xlsx_structural_diff"
+    },
+    "XLSX_TABLE_CREATE": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "engine": "local",
+      "renderCard": "xlsx_structural_diff"
+    },
+    "XLSX_DATA_VALIDATION_SET": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "engine": "local",
+      "renderCard": "xlsx_format_diff"
+    },
+    "XLSX_FREEZE_PANES": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "engine": "local",
+      "renderCard": "xlsx_structural_diff"
+    },
+    "XLSX_HIDE_ROWS_COLS": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "engine": "local",
+      "renderCard": "xlsx_structural_diff"
+    },
+    "XLSX_SHOW_ROWS_COLS": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "engine": "local",
+      "renderCard": "xlsx_structural_diff"
+    },
+    "XLSX_INSERT_ROWS": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "engine": "local",
+      "renderCard": "xlsx_structural_diff"
+    },
+    "XLSX_DELETE_ROWS": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "engine": "local",
+      "renderCard": "xlsx_structural_diff"
+    },
+    "XLSX_INSERT_COLUMNS": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "engine": "local",
+      "renderCard": "xlsx_structural_diff"
+    },
+    "XLSX_DELETE_COLUMNS": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "engine": "local",
+      "renderCard": "xlsx_structural_diff"
+    },
+    "XLSX_ADD_SHEET": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "ADD_SHEET",
+      "engine": "local",
+      "renderCard": "xlsx_structural_diff"
+    },
+    "XLSX_RENAME_SHEET": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "RENAME_SHEET",
+      "engine": "local",
+      "renderCard": "xlsx_structural_diff"
+    },
+    "XLSX_DELETE_SHEET": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "DELETE_SHEET",
+      "engine": "local",
+      "renderCard": "xlsx_structural_diff"
+    },
+    "XLSX_AGGREGATION": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "engine": "local",
+      "renderCard": "xlsx_formula_diff"
+    },
+    "XLSX_CHART_CREATE": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "CREATE_CHART",
+      "engine": "sheets_bridge_required",
+      "renderCard": "xlsx_chart_diff"
+    },
+    "XLSX_CHART_SET_SERIES": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "CREATE_CHART",
+      "engine": "sheets_bridge_required",
+      "renderCard": "xlsx_chart_diff"
+    },
+    "XLSX_CHART_SET_TITLES": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "CREATE_CHART",
+      "engine": "sheets_bridge_required",
+      "renderCard": "xlsx_chart_diff"
+    },
+    "XLSX_CHART_SET_AXES": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "CREATE_CHART",
+      "engine": "sheets_bridge_required",
+      "renderCard": "xlsx_chart_diff"
+    },
+    "XLSX_CHART_MOVE_RESIZE": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "CREATE_CHART",
+      "engine": "sheets_bridge_required",
+      "renderCard": "xlsx_chart_diff"
+    },
+    "XLSX_CHART_DELETE": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "CREATE_CHART",
+      "engine": "sheets_bridge_required",
+      "renderCard": "xlsx_chart_diff"
+    },
+    "XLSX_REMOVE_DUPLICATES": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "engine": "local",
+      "renderCard": "xlsx_structural_diff"
+    },
+    "XLSX_TRIM_WHITESPACE": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "engine": "local",
+      "renderCard": "xlsx_format_diff"
+    },
+    "XLSX_NORMALIZE_VALUES": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "engine": "local",
+      "renderCard": "xlsx_format_diff"
+    },
+    "XLSX_SET_PROTECTION": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "engine": "local",
+      "renderCard": "xlsx_security_diff"
+    },
+    "XLSX_LOCK_CELLS": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "engine": "local",
+      "renderCard": "xlsx_security_diff"
+    },
+    "PY_TIME_SERIES_FORECAST": {
+      "supported": true,
+      "filetype": "excel",
+      "runtimeOperator": "PY_COMPUTE",
+      "engine": "python_bridge_required",
+      "renderCard": "python_compute_diff"
+    },
+    "PY_STATS_DESCRIPTIVE": {
+      "supported": true,
+      "filetype": "excel",
+      "runtimeOperator": "PY_COMPUTE",
+      "engine": "python_bridge_required",
+      "renderCard": "python_compute_diff"
+    },
+    "PY_STATS_REGRESSION": {
+      "supported": true,
+      "filetype": "excel",
+      "runtimeOperator": "PY_COMPUTE",
+      "engine": "python_bridge_required",
+      "renderCard": "python_compute_diff"
+    },
+    "PY_CALC_DERIVE_COLUMN": {
+      "supported": true,
+      "filetype": "excel",
+      "runtimeOperator": "PY_COMPUTE",
+      "engine": "python_bridge_required",
+      "renderCard": "python_compute_diff"
+    },
+    "PY_CLEAN_MISSING_VALUES": {
+      "supported": true,
+      "filetype": "excel",
+      "runtimeOperator": "PY_COMPUTE",
+      "engine": "python_bridge_required",
+      "renderCard": "python_compute_diff"
+    },
+    "PY_OUTLIER_DETECT": {
+      "supported": true,
+      "filetype": "excel",
+      "runtimeOperator": "PY_COMPUTE",
+      "engine": "python_bridge_required",
+      "renderCard": "python_compute_diff"
+    },
+    "PY_PIVOT_TABLE": {
+      "supported": true,
+      "filetype": "excel",
+      "runtimeOperator": "PY_COMPUTE",
+      "engine": "python_bridge_required",
+      "renderCard": "python_compute_diff"
+    },
+    "PY_BINNING": {
+      "supported": true,
+      "filetype": "excel",
+      "runtimeOperator": "PY_COMPUTE",
+      "engine": "python_bridge_required",
+      "renderCard": "python_compute_diff"
+    }
   },
   "alwaysConfirmOperators": [
     "DOCX_FIND_REPLACE",

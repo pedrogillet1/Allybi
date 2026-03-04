@@ -3,13 +3,27 @@
     "id": "numeric_reconciliation_rules",
     "version": "1.0.0",
     "description": "Numeric reconciliation and tie-out requirements for answer safety.",
-    "languages": ["any", "en", "pt"],
-    "lastUpdated": "2026-03-03"
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
     "defaultReconcileTolerance": 0.01,
-    "requiredEvidenceDensity": 0.85
+    "requiredEvidenceDensity": 0.85,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "reconciliationModes": [
     "balance_tie_out",

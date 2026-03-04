@@ -3,9 +3,19 @@
     "id": "allybi_xlsx_resolvers",
     "version": "1.0.0",
     "description": "XLSX target resolver priority for selection-first deterministic editing.",
-    "languages": ["any", "en", "pt"],
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
     "lastUpdated": "2026-02-12",
-    "owner": "allybi-editing"
+    "owner": "allybi-editing",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -20,15 +30,23 @@
   ],
   "resolvers": {
     "frozen_selection": {
-      "requires": ["rangeA1"],
+      "requires": [
+        "rangeA1"
+      ],
       "confidence": 1
     },
     "live_selection": {
-      "requires": ["rangeA1"],
+      "requires": [
+        "rangeA1"
+      ],
       "confidence": 0.98
     },
     "explicit_range_or_anchor": {
-      "patterns": ["[A-Z]+[0-9]+:[A-Z]+[0-9]+", "named range", "table\\s+name"],
+      "patterns": [
+        "[A-Z]+[0-9]+:[A-Z]+[0-9]+",
+        "named range",
+        "table\\s+name"
+      ],
       "confidence": 0.93
     },
     "structural_resolver": {

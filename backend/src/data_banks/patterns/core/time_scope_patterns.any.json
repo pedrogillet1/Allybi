@@ -17,16 +17,9 @@
       "intent_router",
       "question_parser"
     ],
-    "tests": {
-      "positive": [
-        "I need a summary of Q4 revenue and expense trends by region",
-        "Quais foram os custos em novembro e também a variação de margem?"
-      ],
-      "negative": [
-        "Tell me random text",
-        "Can you send weather details for tomorrow"
-      ]
-    },
+    "tests": [
+      "tests/patternDeterminism.test.ts"
+    ],
     "lastUpdated": "2026-03-03",
     "id": "patterns_core_time_scope_patterns",
     "description": "Auto-registered bank payload for patterns/core/time_scope_patterns.any.json"
@@ -4964,6 +4957,9 @@
     }
   ],
   "config": {
-    "enabled": true
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   }
 }

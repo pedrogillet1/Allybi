@@ -14,20 +14,9 @@
       "editor_mode",
       "retrieval_router"
     ],
-    "tests": {
-      "positive": [
-        "onde fala isso?",
-        "me mostra o trecho do termo de pagamento",
-        "destaca o gráfico margem",
-        "leva pra slide 3"
-      ],
-      "negative": [
-        "resume o documento",
-        "extrair dados",
-        "aplicar edição",
-        "desfazer ação"
-      ]
-    },
+    "tests": [
+      "tests/patternDeterminism.test.ts"
+    ],
     "lastUpdated": "2026-03-03",
     "id": "patterns_editor_highlight_intents_pt",
     "description": "Padrões de português para destacar e localizar no editor em DOCX/XLSX/slides"

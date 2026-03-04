@@ -3,8 +3,20 @@
     "id": "tool_prompts",
     "version": "1.0.0",
     "description": "Central prompt bank for tool-style behaviors in Koda. Covers: nav_pills (open/where/discover), file list 'show more' routing, locate_content (page/slide/sheet/cell), extraction helpers, and safe clarifications. Outputs are ALWAYS user-facing text (no JSON) and must obey render_policy + answer_style_policy contracts.",
-    "languages": ["any", "en", "pt", "es"],
-    "lastUpdated": "2026-01-26"
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-01-26",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -16,7 +28,11 @@
     "style": {
       "avoidGreetings": true,
       "avoidApologiesByDefault": true,
-      "avoidMetaPhrases": ["as an ai", "as a language model", "i can't access"],
+      "avoidMetaPhrases": [
+        "as an ai",
+        "as a language model",
+        "i can't access"
+      ],
       "preferActionableNextStep": true,
       "preferShortParagraphs": true,
       "maxSentencesPerParagraph": 2,
@@ -42,7 +58,12 @@
       }
     },
     "placeholders": {
-      "required": ["{{language}}", "{{userQuery}}", "{{operator}}", "{{intentFamily}}"],
+      "required": [
+        "{{language}}",
+        "{{userQuery}}",
+        "{{operator}}",
+        "{{intentFamily}}"
+      ],
       "optional": [
         "{{answerMode}}",
         "{{navType}}",
@@ -61,13 +82,19 @@
     {
       "id": "nav_pills_open",
       "appliesTo": {
-        "operators": ["open"],
+        "operators": [
+          "open"
+        ],
         "answerMode": "nav_pills"
       },
       "constraints": {
         "maxSentences": 1,
         "maxChars": 90,
-        "mustNotContain": ["Sources:", "Fontes:", "Fuentes:"],
+        "mustNotContain": [
+          "Sources:",
+          "Fontes:",
+          "Fuentes:"
+        ],
         "mustNotContainPatterns": [
           "\\.pdf\\b",
           "\\.xlsx?\\b",
@@ -109,15 +136,24 @@
         ]
       },
       "outputExamples": {
-        "en": ["Here it is:"],
-        "pt": ["Aqui está:"],
-        "es": ["Aquí está:"]
+        "en": [
+          "Here it is:"
+        ],
+        "pt": [
+          "Aqui está:"
+        ],
+        "es": [
+          "Aquí está:"
+        ]
       }
     },
     {
       "id": "nav_pills_where",
       "appliesTo": {
-        "operators": ["locate_file", "where"],
+        "operators": [
+          "locate_file",
+          "where"
+        ],
         "answerMode": "nav_pills"
       },
       "constraints": {
@@ -144,15 +180,24 @@
         ]
       },
       "outputExamples": {
-        "en": ["Here's the file location:"],
-        "pt": ["Aqui está a localização do arquivo:"],
-        "es": ["Aquí está la ubicación del archivo:"]
+        "en": [
+          "Here's the file location:"
+        ],
+        "pt": [
+          "Aqui está a localização do arquivo:"
+        ],
+        "es": [
+          "Aquí está la ubicación del archivo:"
+        ]
       }
     },
     {
       "id": "nav_pills_discover",
       "appliesTo": {
-        "operators": ["locate_docs", "discover"],
+        "operators": [
+          "locate_docs",
+          "discover"
+        ],
         "answerMode": "nav_pills"
       },
       "constraints": {
@@ -178,15 +223,27 @@
         ]
       },
       "outputExamples": {
-        "en": ["These files look relevant:"],
-        "pt": ["Estes arquivos parecem relevantes:"],
-        "es": ["Estos archivos parecen relevantes:"]
+        "en": [
+          "These files look relevant:"
+        ],
+        "pt": [
+          "Estes arquivos parecem relevantes:"
+        ],
+        "es": [
+          "Estos archivos parecen relevantes:"
+        ]
       }
     },
     {
       "id": "file_list_show_more_entrypoint",
       "appliesTo": {
-        "operators": ["list", "filter", "sort", "group", "search"],
+        "operators": [
+          "list",
+          "filter",
+          "sort",
+          "group",
+          "search"
+        ],
         "intentFamily": "file_actions"
       },
       "constraints": {
@@ -243,16 +300,24 @@
         ]
       },
       "outputExamples": {
-        "en": ["Here are the matching files. Tap **See all** to browse the full list."],
-        "pt": ["Aqui estão os arquivos correspondentes. Toque em **Ver todos** para ver a lista completa."],
-        "es": ["Aquí están los archivos coincidentes. Toca **Ver todo** para ver la lista completa."]
+        "en": [
+          "Here are the matching files. Tap **See all** to browse the full list."
+        ],
+        "pt": [
+          "Aqui estão os arquivos correspondentes. Toque em **Ver todos** para ver a lista completa."
+        ],
+        "es": [
+          "Aquí están los archivos coincidentes. Toca **Ver todo** para ver la lista completa."
+        ]
       }
     },
     {
       "id": "file_list_screen_title_generator",
       "appliesTo": {
         "uiSurface": "files_screen",
-        "usedBy": ["show_more_button"]
+        "usedBy": [
+          "show_more_button"
+        ]
       },
       "constraints": {
         "maxChars": 42,
@@ -300,7 +365,9 @@
     {
       "id": "locate_content_breadcrumbs",
       "appliesTo": {
-        "operators": ["locate_content"],
+        "operators": [
+          "locate_content"
+        ],
         "intentFamily": "documents"
       },
       "constraints": {
@@ -364,8 +431,15 @@
     {
       "id": "extract_micro_value_helper",
       "appliesTo": {
-        "operators": ["extract", "compute"],
-        "signalsAny": ["microValue", "singleCellLookup", "exactValueRequest"]
+        "operators": [
+          "extract",
+          "compute"
+        ],
+        "signalsAny": [
+          "microValue",
+          "singleCellLookup",
+          "exactValueRequest"
+        ]
       },
       "constraints": {
         "maxSentences": 3,
@@ -414,18 +488,42 @@
     "cases": [
       {
         "id": "TP_0001_nav_pills_open_one_line",
-        "input": { "toolId": "nav_pills_open", "language": "en" },
-        "expect": { "maxSentences": 1, "mustNotContain": ["Sources:"] }
+        "input": {
+          "toolId": "nav_pills_open",
+          "language": "en"
+        },
+        "expect": {
+          "maxSentences": 1,
+          "mustNotContain": [
+            "Sources:"
+          ]
+        }
       },
       {
         "id": "TP_0002_file_list_no_inline_filenames",
-        "input": { "toolId": "file_list_show_more_entrypoint", "language": "en" },
-        "expect": { "mustNotContainPatterns": ["\\.pdf\\b", "\\.xlsx?\\b"] }
+        "input": {
+          "toolId": "file_list_show_more_entrypoint",
+          "language": "en"
+        },
+        "expect": {
+          "mustNotContainPatterns": [
+            "\\.pdf\\b",
+            "\\.xlsx?\\b"
+          ]
+        }
       },
       {
         "id": "TP_0003_locate_content_uses_bullets",
-        "input": { "toolId": "locate_content_breadcrumbs", "language": "en" },
-        "expect": { "mustIncludeAny": ["- "], "maxBulletsLte": 6 }
+        "input": {
+          "toolId": "locate_content_breadcrumbs",
+          "language": "en"
+        },
+        "expect": {
+          "mustIncludeAny": [
+            "- "
+          ],
+          "maxBulletsLte": 6
+        }
       }
     ]
   }

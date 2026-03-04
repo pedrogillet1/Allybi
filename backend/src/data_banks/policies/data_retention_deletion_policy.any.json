@@ -12,12 +12,21 @@
     "criticality": "high",
     "changeLog": [
       "Initial retention/deletion runtime policy bank"
+    ],
+    "usedBy": [
+      "services/llm/core/llmRequestBuilder.service.ts"
+    ],
+    "tests": [
+      "tests/certification/prompt-mode-coverage.cert.test.ts"
     ]
   },
   "config": {
     "enabled": true,
     "strict": true,
-    "failClosedInProd": false
+    "failClosedInProd": false,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "retentionClasses": {
     "chat_message": {

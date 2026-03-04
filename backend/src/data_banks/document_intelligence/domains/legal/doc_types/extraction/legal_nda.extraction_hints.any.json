@@ -1,12 +1,19 @@
 {
   "_meta": {
-    "id": "legal_nda_extraction_hints",
+    "id": "legal_nda_extraction_hints_v94b17eb1",
     "version": "1.0.0",
     "description": "Extraction hints for Non-Disclosure Agreement.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-02-28",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,

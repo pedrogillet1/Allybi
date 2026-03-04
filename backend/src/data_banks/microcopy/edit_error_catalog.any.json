@@ -3,8 +3,18 @@
     "id": "edit_error_catalog",
     "version": "1.0.0",
     "description": "Typed, localized edit error messages for DOCX/XLSX editing flows. Replaces generic fallback strings with specific, actionable copy.",
-    "languages": ["en", "pt"],
-    "lastUpdated": "2026-02-17"
+    "languages": [
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-02-17",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,

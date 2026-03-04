@@ -17,18 +17,9 @@
       "tests.patternDeterminism",
       "folder_tree_viewer"
     ],
-    "tests": {
-      "positive": [
-        "mostra a pasta atual",
-        "lista todos os PDFs aqui",
-        "mostra a estrutura da pasta"
-      ],
-      "negative": [
-        "resumir os arquivos desta pasta",
-        "abrir e ler o documento",
-        "mover estes arquivos"
-      ]
-    },
+    "tests": [
+      "tests/patternDeterminism.test.ts"
+    ],
     "lastUpdated": "2026-03-03",
     "id": "patterns_files_folder_tree_pt",
     "description": "Padrões PT para listagem e árvore de pastas com foco em organização documental"

@@ -18,10 +18,12 @@ import type { LLMProvider } from "../core/llmErrors.types";
 import type { LLMStreamingConfig, StreamSink, StreamState, StreamingHooks } from "../types/llmStreaming.types";
 import { CircuitBreaker, CircuitOpenError } from "./circuitBreaker";
 import { Semaphore } from "./semaphore";
+import { withRetry, type RetryConfig } from "./retry";
 
 export interface ResilienceConfig {
   semaphore: Semaphore;
   circuitBreaker: CircuitBreaker;
+  retry?: RetryConfig;
 }
 
 export class ResilienceLLMClient implements LLMClient {
@@ -51,8 +53,14 @@ export class ResilienceLLMClient implements LLMClient {
 
     await semaphore.acquire();
     try {
-      const result = await this.inner.complete(req, signal);
+      const retryConfig = this.resilience.retry ?? { maxRetries: 0 };
+      const { result, attempts } = await withRetry(
+        () => this.inner.complete(req, signal),
+        retryConfig,
+      );
       circuitBreaker.recordSuccess();
+      // Attach retry attempts for telemetry
+      (result as unknown as Record<string, unknown>).__retryAttempts = attempts;
       return result;
     } catch (err) {
       circuitBreaker.recordFailure();
@@ -91,8 +99,38 @@ export class ResilienceLLMClient implements LLMClient {
 
     await semaphore.acquire();
     try {
-      const result = await this.inner.stream(params);
+      // For streaming, only retry if no events have been emitted yet.
+      // Track whether the sink received any writes.
+      let eventsEmitted = false;
+      const originalWrite = params.sink.write.bind(params.sink);
+      const guardedSink: StreamSink = {
+        ...params.sink,
+        write(event) {
+          eventsEmitted = true;
+          originalWrite(event);
+        },
+        isOpen: params.sink.isOpen.bind(params.sink),
+        close: params.sink.close.bind(params.sink),
+        flush: params.sink.flush?.bind(params.sink),
+        transport: params.sink.transport,
+      };
+
+      const retryConfig = this.resilience.retry ?? { maxRetries: 0 };
+      const streamRetryConfig: RetryConfig = {
+        ...retryConfig,
+        shouldRetry: (err, attempt) => {
+          // Don't retry after events have been emitted to the sink
+          if (eventsEmitted) return false;
+          return retryConfig.shouldRetry?.(err, attempt) ?? true;
+        },
+      };
+
+      const { result, attempts } = await withRetry(
+        () => this.inner.stream({ ...params, sink: guardedSink }),
+        streamRetryConfig,
+      );
       circuitBreaker.recordSuccess();
+      (result as unknown as Record<string, unknown>).__retryAttempts = attempts;
       return result;
     } catch (err) {
       circuitBreaker.recordFailure();

@@ -63,7 +63,7 @@ const mockDomains = [
 
 const mockCosts = [
   { id: "c_001", provider: "OpenAI", model: "gpt-5.2", tokens: 125000, cost: 12.50, calls: 89 },
-  { id: "c_002", provider: "Gemini", model: "3.0-flash", tokens: 450000, cost: 4.50, calls: 312 },
+  { id: "c_002", provider: "Gemini", model: "gemini-2.5-flash", tokens: 450000, cost: 4.50, calls: 312 },
   { id: "c_003", provider: "OpenAI", model: "text-embedding-3-small", tokens: 890000, cost: 0.89, calls: 156 },
 ];
 

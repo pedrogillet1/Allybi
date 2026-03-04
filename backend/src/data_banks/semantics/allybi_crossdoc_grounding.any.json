@@ -9,13 +9,22 @@
       "pt"
     ],
     "lastUpdated": "2026-02-28",
-    "owner": "allybi-editing"
+    "owner": "allybi-editing",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
     "editorModeActiveDocumentWritable": true,
     "compareRequiresExplicitResolvedDocs": true,
-    "requireDisambiguationWhenAmbiguous": true
+    "requireDisambiguationWhenAmbiguous": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "retrievalPolicy": {
     "allowedInEditorMode": true,

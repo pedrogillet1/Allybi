@@ -6,7 +6,14 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-03-03"
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -14,14 +21,141 @@
     "docType": "every_insurance_claim"
   },
   "sections": [
-    { "id": "document_header", "name": { "en": "Header", "pt": "Cabecalho" }, "order": 1, "required": true, "mustHave": true, "headingAnchors": ["insurance claim", "claim", "sinistro"] },
-    { "id": "claim_identity", "name": { "en": "Claim Identity", "pt": "Identidade do Sinistro" }, "order": 2, "required": true, "mustHave": true, "headingAnchors": ["claim number", "policy number", "filed"] },
-    { "id": "incident", "name": { "en": "Incident and Date", "pt": "Ocorrencia e Data" }, "order": 3, "required": true, "mustHave": true, "headingAnchors": ["incident", "occurrence", "date"] },
-    { "id": "coverage_check", "name": { "en": "Coverage and Eligibility", "pt": "Cobertura e Elegibilidade" }, "order": 4, "required": true, "mustHave": true, "headingAnchors": ["coverage", "eligibility", "coverage check"] },
-    { "id": "damages_and_documents", "name": { "en": "Damage and Documents", "pt": "Danos e Documentos" }, "order": 5, "required": false, "mustHave": false, "headingAnchors": ["damage", "evidence", "documents"] },
-    { "id": "payments_and_status", "name": { "en": "Payments and Status", "pt": "Pagamentos e Status" }, "order": 6, "required": true, "mustHave": true, "headingAnchors": ["status", "payment", "reserve", "pago"] },
-    { "id": "supporting_docs", "name": { "en": "Supporting Documents", "pt": "Documentos Suporte" }, "order": 7, "required": false, "mustHave": false, "headingAnchors": ["attachment", "supporting", "annex"] },
-    { "id": "adjustment_history", "name": { "en": "Adjustment History", "pt": "Historico de Ajustes" }, "order": 8, "required": false, "mustHave": false, "headingAnchors": ["adjustment", "revision", "history"] },
-    { "id": "disposition", "name": { "en": "Disposition", "pt": "Decisao" }, "order": 9, "required": false, "mustHave": false, "headingAnchors": ["decision", "outcome", "denial"] }
+    {
+      "id": "document_header",
+      "name": {
+        "en": "Header",
+        "pt": "Cabecalho"
+      },
+      "order": 1,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": [
+        "insurance claim",
+        "claim",
+        "sinistro"
+      ]
+    },
+    {
+      "id": "claim_identity",
+      "name": {
+        "en": "Claim Identity",
+        "pt": "Identidade do Sinistro"
+      },
+      "order": 2,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": [
+        "claim number",
+        "policy number",
+        "filed"
+      ]
+    },
+    {
+      "id": "incident",
+      "name": {
+        "en": "Incident and Date",
+        "pt": "Ocorrencia e Data"
+      },
+      "order": 3,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": [
+        "incident",
+        "occurrence",
+        "date"
+      ]
+    },
+    {
+      "id": "coverage_check",
+      "name": {
+        "en": "Coverage and Eligibility",
+        "pt": "Cobertura e Elegibilidade"
+      },
+      "order": 4,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": [
+        "coverage",
+        "eligibility",
+        "coverage check"
+      ]
+    },
+    {
+      "id": "damages_and_documents",
+      "name": {
+        "en": "Damage and Documents",
+        "pt": "Danos e Documentos"
+      },
+      "order": 5,
+      "required": false,
+      "mustHave": false,
+      "headingAnchors": [
+        "damage",
+        "evidence",
+        "documents"
+      ]
+    },
+    {
+      "id": "payments_and_status",
+      "name": {
+        "en": "Payments and Status",
+        "pt": "Pagamentos e Status"
+      },
+      "order": 6,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": [
+        "status",
+        "payment",
+        "reserve",
+        "pago"
+      ]
+    },
+    {
+      "id": "supporting_docs",
+      "name": {
+        "en": "Supporting Documents",
+        "pt": "Documentos Suporte"
+      },
+      "order": 7,
+      "required": false,
+      "mustHave": false,
+      "headingAnchors": [
+        "attachment",
+        "supporting",
+        "annex"
+      ]
+    },
+    {
+      "id": "adjustment_history",
+      "name": {
+        "en": "Adjustment History",
+        "pt": "Historico de Ajustes"
+      },
+      "order": 8,
+      "required": false,
+      "mustHave": false,
+      "headingAnchors": [
+        "adjustment",
+        "revision",
+        "history"
+      ]
+    },
+    {
+      "id": "disposition",
+      "name": {
+        "en": "Disposition",
+        "pt": "Decisao"
+      },
+      "order": 9,
+      "required": false,
+      "mustHave": false,
+      "headingAnchors": [
+        "decision",
+        "outcome",
+        "denial"
+      ]
+    }
   ]
 }

@@ -3,10 +3,20 @@
     "id": "domain_ontology",
     "version": "3.0.0",
     "description": "Canonical domain taxonomy + behavior contract for Koda. Defines stable parent/child domain ids, alias coverage, related-domain graph, doc-type affinities, retrieval/formatting profiles, and terminology hooks. Must stay aligned with domain_detection + terminology_domains.",
-    "languages": ["any", "en", "pt"],
-    "lastUpdated": "2026-01-26"
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-01-26",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
-
   "config": {
     "enabled": true,
     "strictDomainIds": true,
@@ -22,95 +32,282 @@
       "treatHyphenUnderscoreAsSpace": true
     }
   },
-
   "terminologyHooks": {
     "_comment": "Keys into terminology_domains.any.json (lexicon) and synonym_expansion.any.json (expansion).",
     "lexiconBankId": "terminology_domains",
     "synonymsBankId": "synonym_expansion",
     "abbreviationsBankId": "abbreviations"
   },
-
   "retrievalProfiles": {
     "_comment": "Matches semantic_search_config profiles; used as a hint to retrieval engine.",
-    "balanced": { "weights": { "lexical": 0.45, "semantic": 0.45, "structure": 0.10 } },
-    "numbers_first": { "weights": { "lexical": 0.55, "semantic": 0.30, "structure": 0.15 } },
-    "numeric_strict": { "weights": { "lexical": 0.58, "semantic": 0.27, "structure": 0.15 } },
-    "structure_first": { "weights": { "lexical": 0.50, "semantic": 0.25, "structure": 0.25 } },
-    "ocr_tolerant": { "weights": { "lexical": 0.55, "semantic": 0.35, "structure": 0.10 } },
-    "field_extraction": { "weights": { "lexical": 0.58, "semantic": 0.30, "structure": 0.12 } },
-    "quote_friendly": { "weights": { "lexical": 0.50, "semantic": 0.40, "structure": 0.10 } },
-    "payments_lexical": { "weights": { "lexical": 0.60, "semantic": 0.28, "structure": 0.12 } }
+    "balanced": {
+      "weights": {
+        "lexical": 0.45,
+        "semantic": 0.45,
+        "structure": 0.1
+      }
+    },
+    "numbers_first": {
+      "weights": {
+        "lexical": 0.55,
+        "semantic": 0.3,
+        "structure": 0.15
+      }
+    },
+    "numeric_strict": {
+      "weights": {
+        "lexical": 0.58,
+        "semantic": 0.27,
+        "structure": 0.15
+      }
+    },
+    "structure_first": {
+      "weights": {
+        "lexical": 0.5,
+        "semantic": 0.25,
+        "structure": 0.25
+      }
+    },
+    "ocr_tolerant": {
+      "weights": {
+        "lexical": 0.55,
+        "semantic": 0.35,
+        "structure": 0.1
+      }
+    },
+    "field_extraction": {
+      "weights": {
+        "lexical": 0.58,
+        "semantic": 0.3,
+        "structure": 0.12
+      }
+    },
+    "quote_friendly": {
+      "weights": {
+        "lexical": 0.5,
+        "semantic": 0.4,
+        "structure": 0.1
+      }
+    },
+    "payments_lexical": {
+      "weights": {
+        "lexical": 0.6,
+        "semantic": 0.28,
+        "structure": 0.12
+      }
+    }
   },
-
   "formattingProfiles": {
     "_comment": "Hints for answer_style_policy / render_policy selection.",
-    "default": { "prefer": ["short_paragraphs"], "tables": "allow", "quotes": "allow" },
-    "fields_first": { "prefer": ["bullets", "key_value"], "tables": "allow", "quotes": "avoid_if_not_requested" },
-    "numbers_first": { "prefer": ["table", "bullets"], "tables": "prefer", "quotes": "allow" },
-    "tables_first": { "prefer": ["table"], "tables": "prefer", "quotes": "avoid_if_not_requested" },
-    "bullets_first": { "prefer": ["bullets"], "tables": "allow", "quotes": "allow" }
+    "default": {
+      "prefer": [
+        "short_paragraphs"
+      ],
+      "tables": "allow",
+      "quotes": "allow"
+    },
+    "fields_first": {
+      "prefer": [
+        "bullets",
+        "key_value"
+      ],
+      "tables": "allow",
+      "quotes": "avoid_if_not_requested"
+    },
+    "numbers_first": {
+      "prefer": [
+        "table",
+        "bullets"
+      ],
+      "tables": "prefer",
+      "quotes": "allow"
+    },
+    "tables_first": {
+      "prefer": [
+        "table"
+      ],
+      "tables": "prefer",
+      "quotes": "avoid_if_not_requested"
+    },
+    "bullets_first": {
+      "prefer": [
+        "bullets"
+      ],
+      "tables": "allow",
+      "quotes": "allow"
+    }
   },
-
   "parents": [
     {
       "id": "personal_docs",
-      "label": { "en": "Personal Documents", "pt": "Documentos Pessoais" },
-      "children": ["identity_docs", "address_proof", "vehicle_docs", "housing_rent_mortgage", "utilities_bills"],
-      "relatedParents": ["billing", "banking", "insurance", "legal"],
+      "label": {
+        "en": "Personal Documents",
+        "pt": "Documentos Pessoais"
+      },
+      "children": [
+        "identity_docs",
+        "address_proof",
+        "vehicle_docs",
+        "housing_rent_mortgage",
+        "utilities_bills"
+      ],
+      "relatedParents": [
+        "billing",
+        "banking",
+        "insurance",
+        "legal"
+      ],
       "defaultChild": "identity_docs"
     },
     {
       "id": "banking",
-      "label": { "en": "Banking", "pt": "Bancos" },
-      "children": ["banking_statements", "banking_transfers", "banking_fees_fraud", "banking_reconciliation"],
-      "relatedParents": ["billing", "accounting", "finance", "personal_docs"],
+      "label": {
+        "en": "Banking",
+        "pt": "Bancos"
+      },
+      "children": [
+        "banking_statements",
+        "banking_transfers",
+        "banking_fees_fraud",
+        "banking_reconciliation"
+      ],
+      "relatedParents": [
+        "billing",
+        "accounting",
+        "finance",
+        "personal_docs"
+      ],
       "defaultChild": "banking_statements"
     },
     {
       "id": "billing",
-      "label": { "en": "Billing / Invoices", "pt": "Cobrança / Faturas" },
-      "children": ["invoices_billing", "receipts_proof_of_payment", "subscriptions_recurring", "taxes_property_fees"],
-      "relatedParents": ["banking", "accounting", "finance", "personal_docs"],
+      "label": {
+        "en": "Billing / Invoices",
+        "pt": "Cobrança / Faturas"
+      },
+      "children": [
+        "invoices_billing",
+        "receipts_proof_of_payment",
+        "subscriptions_recurring",
+        "taxes_property_fees"
+      ],
+      "relatedParents": [
+        "banking",
+        "accounting",
+        "finance",
+        "personal_docs"
+      ],
       "defaultChild": "invoices_billing"
     },
     {
       "id": "insurance",
-      "label": { "en": "Insurance", "pt": "Seguros" },
-      "children": ["insurance_health", "insurance_auto", "insurance_home_property", "insurance_life_disability", "insurance_commercial", "insurance_billing_admin"],
-      "relatedParents": ["medical", "personal_docs", "billing", "legal"],
+      "label": {
+        "en": "Insurance",
+        "pt": "Seguros"
+      },
+      "children": [
+        "insurance_health",
+        "insurance_auto",
+        "insurance_home_property",
+        "insurance_life_disability",
+        "insurance_commercial",
+        "insurance_billing_admin"
+      ],
+      "relatedParents": [
+        "medical",
+        "personal_docs",
+        "billing",
+        "legal"
+      ],
       "defaultChild": "insurance_health"
     },
     {
       "id": "medical",
-      "label": { "en": "Medical", "pt": "Saúde" },
-      "children": ["medical_labs", "medical_imaging", "medical_clinical", "medical_insurance", "medical_admin"],
-      "relatedParents": ["insurance", "personal_docs", "billing"],
+      "label": {
+        "en": "Medical",
+        "pt": "Saúde"
+      },
+      "children": [
+        "medical_labs",
+        "medical_imaging",
+        "medical_clinical",
+        "medical_insurance",
+        "medical_admin"
+      ],
+      "relatedParents": [
+        "insurance",
+        "personal_docs",
+        "billing"
+      ],
       "defaultChild": "medical_clinical"
     },
     {
       "id": "legal",
-      "label": { "en": "Legal", "pt": "Jurídico" },
-      "children": ["legal_contracts", "legal_compliance", "legal_disputes"],
-      "relatedParents": ["personal_docs", "billing", "insurance", "finance"],
+      "label": {
+        "en": "Legal",
+        "pt": "Jurídico"
+      },
+      "children": [
+        "legal_contracts",
+        "legal_compliance",
+        "legal_disputes"
+      ],
+      "relatedParents": [
+        "personal_docs",
+        "billing",
+        "insurance",
+        "finance"
+      ],
       "defaultChild": "legal_contracts"
     },
     {
       "id": "excel",
-      "label": { "en": "Excel / Spreadsheets", "pt": "Excel / Planilhas" },
-      "children": ["excel_modeling", "excel_audit_tracing", "excel_reporting", "excel_functions_formulas", "excel_automation"],
-      "relatedParents": ["finance", "accounting", "banking", "billing"],
+      "label": {
+        "en": "Excel / Spreadsheets",
+        "pt": "Excel / Planilhas"
+      },
+      "children": [
+        "excel_modeling",
+        "excel_audit_tracing",
+        "excel_reporting",
+        "excel_functions_formulas",
+        "excel_automation"
+      ],
+      "relatedParents": [
+        "finance",
+        "accounting",
+        "banking",
+        "billing"
+      ],
       "defaultChild": "excel_modeling"
     },
     {
       "id": "accounting",
-      "label": { "en": "Accounting", "pt": "Contabilidade" },
-      "children": ["accounting_gl", "accounting_ap", "accounting_ar", "accounting_tax_us", "accounting_tax_br", "accounting_audit"],
-      "relatedParents": ["finance", "banking", "billing"],
+      "label": {
+        "en": "Accounting",
+        "pt": "Contabilidade"
+      },
+      "children": [
+        "accounting_gl",
+        "accounting_ap",
+        "accounting_ar",
+        "accounting_tax_us",
+        "accounting_tax_br",
+        "accounting_audit"
+      ],
+      "relatedParents": [
+        "finance",
+        "banking",
+        "billing"
+      ],
       "defaultChild": "accounting_gl"
     },
     {
       "id": "finance",
-      "label": { "en": "Finance", "pt": "Finanças" },
+      "label": {
+        "en": "Finance",
+        "pt": "Finanças"
+      },
       "children": [
         "finance_fpna",
         "finance_unit_economics",
@@ -128,23 +325,51 @@
         "finance_payments_us",
         "tax_income"
       ],
-      "relatedParents": ["accounting", "excel", "banking", "billing", "legal"],
+      "relatedParents": [
+        "accounting",
+        "excel",
+        "banking",
+        "billing",
+        "legal"
+      ],
       "defaultChild": "finance_fpna"
     },
     {
       "id": "general",
-      "label": { "en": "General", "pt": "Geral" },
-      "children": ["general"],
-      "relatedParents": ["finance", "accounting", "excel", "legal", "medical", "insurance", "personal_docs", "banking", "billing"],
+      "label": {
+        "en": "General",
+        "pt": "Geral"
+      },
+      "children": [
+        "general"
+      ],
+      "relatedParents": [
+        "finance",
+        "accounting",
+        "excel",
+        "legal",
+        "medical",
+        "insurance",
+        "personal_docs",
+        "banking",
+        "billing"
+      ],
       "defaultChild": "general"
     }
   ],
-
   "subdomains": [
     {
       "id": "identity_docs",
       "parentId": "personal_docs",
-      "docAffinity": { "preferredDocTypes": ["pdf", "jpg", "jpeg", "png"], "ocrTolerance": "high" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "pdf",
+          "jpg",
+          "jpeg",
+          "png"
+        ],
+        "ocrTolerance": "high"
+      },
       "retrievalProfile": "field_extraction",
       "formattingProfile": "fields_first",
       "terminologyKey": "identity_personal"
@@ -152,7 +377,15 @@
     {
       "id": "address_proof",
       "parentId": "personal_docs",
-      "docAffinity": { "preferredDocTypes": ["pdf", "jpg", "jpeg", "png"], "ocrTolerance": "high" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "pdf",
+          "jpg",
+          "jpeg",
+          "png"
+        ],
+        "ocrTolerance": "high"
+      },
       "retrievalProfile": "field_extraction",
       "formattingProfile": "fields_first",
       "terminologyKey": "identity_personal"
@@ -160,7 +393,15 @@
     {
       "id": "vehicle_docs",
       "parentId": "personal_docs",
-      "docAffinity": { "preferredDocTypes": ["pdf", "jpg", "jpeg", "png"], "ocrTolerance": "high" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "pdf",
+          "jpg",
+          "jpeg",
+          "png"
+        ],
+        "ocrTolerance": "high"
+      },
       "retrievalProfile": "field_extraction",
       "formattingProfile": "fields_first",
       "terminologyKey": "identity_personal"
@@ -168,7 +409,16 @@
     {
       "id": "housing_rent_mortgage",
       "parentId": "personal_docs",
-      "docAffinity": { "preferredDocTypes": ["pdf", "docx", "jpg", "jpeg", "png"], "ocrTolerance": "medium" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "pdf",
+          "docx",
+          "jpg",
+          "jpeg",
+          "png"
+        ],
+        "ocrTolerance": "medium"
+      },
       "retrievalProfile": "balanced",
       "formattingProfile": "bullets_first",
       "terminologyKey": "housing_property"
@@ -176,16 +426,30 @@
     {
       "id": "utilities_bills",
       "parentId": "personal_docs",
-      "docAffinity": { "preferredDocTypes": ["pdf", "jpg", "jpeg", "png"], "ocrTolerance": "high" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "pdf",
+          "jpg",
+          "jpeg",
+          "png"
+        ],
+        "ocrTolerance": "high"
+      },
       "retrievalProfile": "payments_lexical",
       "formattingProfile": "fields_first",
       "terminologyKey": "invoices_billing"
     },
-
     {
       "id": "banking_statements",
       "parentId": "banking",
-      "docAffinity": { "preferredDocTypes": ["pdf", "xlsx", "csv"], "ocrTolerance": "medium" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "pdf",
+          "xlsx",
+          "csv"
+        ],
+        "ocrTolerance": "medium"
+      },
       "retrievalProfile": "numbers_first",
       "formattingProfile": "numbers_first",
       "terminologyKey": "banking_statements"
@@ -193,7 +457,15 @@
     {
       "id": "banking_transfers",
       "parentId": "banking",
-      "docAffinity": { "preferredDocTypes": ["pdf", "jpg", "jpeg", "png"], "ocrTolerance": "high" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "pdf",
+          "jpg",
+          "jpeg",
+          "png"
+        ],
+        "ocrTolerance": "high"
+      },
       "retrievalProfile": "payments_lexical",
       "formattingProfile": "fields_first",
       "terminologyKey": "banking_statements"
@@ -201,7 +473,14 @@
     {
       "id": "banking_fees_fraud",
       "parentId": "banking",
-      "docAffinity": { "preferredDocTypes": ["pdf", "xlsx", "csv"], "ocrTolerance": "medium" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "pdf",
+          "xlsx",
+          "csv"
+        ],
+        "ocrTolerance": "medium"
+      },
       "retrievalProfile": "balanced",
       "formattingProfile": "bullets_first",
       "terminologyKey": "banking_statements"
@@ -209,16 +488,31 @@
     {
       "id": "banking_reconciliation",
       "parentId": "banking",
-      "docAffinity": { "preferredDocTypes": ["xlsx", "csv", "pdf"], "ocrTolerance": "low" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "xlsx",
+          "csv",
+          "pdf"
+        ],
+        "ocrTolerance": "low"
+      },
       "retrievalProfile": "numeric_strict",
       "formattingProfile": "tables_first",
       "terminologyKey": "accounting"
     },
-
     {
       "id": "invoices_billing",
       "parentId": "billing",
-      "docAffinity": { "preferredDocTypes": ["pdf", "jpg", "jpeg", "png", "xlsx"], "ocrTolerance": "high" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "pdf",
+          "jpg",
+          "jpeg",
+          "png",
+          "xlsx"
+        ],
+        "ocrTolerance": "high"
+      },
       "retrievalProfile": "field_extraction",
       "formattingProfile": "fields_first",
       "terminologyKey": "invoices_billing"
@@ -226,7 +520,15 @@
     {
       "id": "receipts_proof_of_payment",
       "parentId": "billing",
-      "docAffinity": { "preferredDocTypes": ["pdf", "jpg", "jpeg", "png"], "ocrTolerance": "high" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "pdf",
+          "jpg",
+          "jpeg",
+          "png"
+        ],
+        "ocrTolerance": "high"
+      },
       "retrievalProfile": "payments_lexical",
       "formattingProfile": "fields_first",
       "terminologyKey": "invoices_billing"
@@ -234,7 +536,13 @@
     {
       "id": "subscriptions_recurring",
       "parentId": "billing",
-      "docAffinity": { "preferredDocTypes": ["pdf", "docx"], "ocrTolerance": "medium" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "pdf",
+          "docx"
+        ],
+        "ocrTolerance": "medium"
+      },
       "retrievalProfile": "balanced",
       "formattingProfile": "bullets_first",
       "terminologyKey": "invoices_billing"
@@ -242,16 +550,31 @@
     {
       "id": "taxes_property_fees",
       "parentId": "billing",
-      "docAffinity": { "preferredDocTypes": ["pdf", "jpg", "jpeg", "png"], "ocrTolerance": "high" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "pdf",
+          "jpg",
+          "jpeg",
+          "png"
+        ],
+        "ocrTolerance": "high"
+      },
       "retrievalProfile": "payments_lexical",
       "formattingProfile": "fields_first",
       "terminologyKey": "tax_income"
     },
-
     {
       "id": "insurance_health",
       "parentId": "insurance",
-      "docAffinity": { "preferredDocTypes": ["pdf", "jpg", "jpeg", "png"], "ocrTolerance": "high" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "pdf",
+          "jpg",
+          "jpeg",
+          "png"
+        ],
+        "ocrTolerance": "high"
+      },
       "retrievalProfile": "field_extraction",
       "formattingProfile": "fields_first",
       "terminologyKey": "insurance"
@@ -259,7 +582,15 @@
     {
       "id": "insurance_auto",
       "parentId": "insurance",
-      "docAffinity": { "preferredDocTypes": ["pdf", "jpg", "jpeg", "png"], "ocrTolerance": "high" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "pdf",
+          "jpg",
+          "jpeg",
+          "png"
+        ],
+        "ocrTolerance": "high"
+      },
       "retrievalProfile": "field_extraction",
       "formattingProfile": "fields_first",
       "terminologyKey": "insurance"
@@ -267,7 +598,16 @@
     {
       "id": "insurance_home_property",
       "parentId": "insurance",
-      "docAffinity": { "preferredDocTypes": ["pdf", "docx", "jpg", "jpeg", "png"], "ocrTolerance": "high" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "pdf",
+          "docx",
+          "jpg",
+          "jpeg",
+          "png"
+        ],
+        "ocrTolerance": "high"
+      },
       "retrievalProfile": "field_extraction",
       "formattingProfile": "fields_first",
       "terminologyKey": "insurance"
@@ -275,7 +615,13 @@
     {
       "id": "insurance_life_disability",
       "parentId": "insurance",
-      "docAffinity": { "preferredDocTypes": ["pdf", "docx"], "ocrTolerance": "medium" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "pdf",
+          "docx"
+        ],
+        "ocrTolerance": "medium"
+      },
       "retrievalProfile": "field_extraction",
       "formattingProfile": "fields_first",
       "terminologyKey": "insurance"
@@ -283,7 +629,13 @@
     {
       "id": "insurance_commercial",
       "parentId": "insurance",
-      "docAffinity": { "preferredDocTypes": ["pdf", "docx"], "ocrTolerance": "medium" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "pdf",
+          "docx"
+        ],
+        "ocrTolerance": "medium"
+      },
       "retrievalProfile": "balanced",
       "formattingProfile": "bullets_first",
       "terminologyKey": "insurance"
@@ -291,16 +643,29 @@
     {
       "id": "insurance_billing_admin",
       "parentId": "insurance",
-      "docAffinity": { "preferredDocTypes": ["pdf", "docx"], "ocrTolerance": "medium" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "pdf",
+          "docx"
+        ],
+        "ocrTolerance": "medium"
+      },
       "retrievalProfile": "balanced",
       "formattingProfile": "bullets_first",
       "terminologyKey": "insurance"
     },
-
     {
       "id": "medical_labs",
       "parentId": "medical",
-      "docAffinity": { "preferredDocTypes": ["pdf", "jpg", "jpeg", "png"], "ocrTolerance": "high" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "pdf",
+          "jpg",
+          "jpeg",
+          "png"
+        ],
+        "ocrTolerance": "high"
+      },
       "retrievalProfile": "ocr_tolerant",
       "formattingProfile": "fields_first",
       "terminologyKey": "medical_health"
@@ -308,7 +673,15 @@
     {
       "id": "medical_imaging",
       "parentId": "medical",
-      "docAffinity": { "preferredDocTypes": ["pdf", "jpg", "jpeg", "png"], "ocrTolerance": "high" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "pdf",
+          "jpg",
+          "jpeg",
+          "png"
+        ],
+        "ocrTolerance": "high"
+      },
       "retrievalProfile": "ocr_tolerant",
       "formattingProfile": "bullets_first",
       "terminologyKey": "medical_health"
@@ -316,7 +689,16 @@
     {
       "id": "medical_clinical",
       "parentId": "medical",
-      "docAffinity": { "preferredDocTypes": ["pdf", "docx", "jpg", "jpeg", "png"], "ocrTolerance": "high" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "pdf",
+          "docx",
+          "jpg",
+          "jpeg",
+          "png"
+        ],
+        "ocrTolerance": "high"
+      },
       "retrievalProfile": "field_extraction",
       "formattingProfile": "fields_first",
       "terminologyKey": "medical_health"
@@ -324,7 +706,15 @@
     {
       "id": "medical_insurance",
       "parentId": "medical",
-      "docAffinity": { "preferredDocTypes": ["pdf", "jpg", "jpeg", "png"], "ocrTolerance": "high" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "pdf",
+          "jpg",
+          "jpeg",
+          "png"
+        ],
+        "ocrTolerance": "high"
+      },
       "retrievalProfile": "field_extraction",
       "formattingProfile": "fields_first",
       "terminologyKey": "insurance"
@@ -332,16 +722,27 @@
     {
       "id": "medical_admin",
       "parentId": "medical",
-      "docAffinity": { "preferredDocTypes": ["pdf", "docx"], "ocrTolerance": "medium" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "pdf",
+          "docx"
+        ],
+        "ocrTolerance": "medium"
+      },
       "retrievalProfile": "balanced",
       "formattingProfile": "bullets_first",
       "terminologyKey": "medical_health"
     },
-
     {
       "id": "legal_contracts",
       "parentId": "legal",
-      "docAffinity": { "preferredDocTypes": ["pdf", "docx"], "ocrTolerance": "medium" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "pdf",
+          "docx"
+        ],
+        "ocrTolerance": "medium"
+      },
       "retrievalProfile": "quote_friendly",
       "formattingProfile": "bullets_first",
       "terminologyKey": "legal_contracts"
@@ -349,7 +750,13 @@
     {
       "id": "legal_compliance",
       "parentId": "legal",
-      "docAffinity": { "preferredDocTypes": ["pdf", "docx"], "ocrTolerance": "medium" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "pdf",
+          "docx"
+        ],
+        "ocrTolerance": "medium"
+      },
       "retrievalProfile": "quote_friendly",
       "formattingProfile": "bullets_first",
       "terminologyKey": "legal_contracts"
@@ -357,16 +764,28 @@
     {
       "id": "legal_disputes",
       "parentId": "legal",
-      "docAffinity": { "preferredDocTypes": ["pdf", "docx"], "ocrTolerance": "medium" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "pdf",
+          "docx"
+        ],
+        "ocrTolerance": "medium"
+      },
       "retrievalProfile": "quote_friendly",
       "formattingProfile": "bullets_first",
       "terminologyKey": "legal_contracts"
     },
-
     {
       "id": "excel_modeling",
       "parentId": "excel",
-      "docAffinity": { "preferredDocTypes": ["xlsx", "xls", "csv"], "ocrTolerance": "low" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "xlsx",
+          "xls",
+          "csv"
+        ],
+        "ocrTolerance": "low"
+      },
       "retrievalProfile": "structure_first",
       "formattingProfile": "tables_first",
       "terminologyKey": "excel"
@@ -374,7 +793,13 @@
     {
       "id": "excel_audit_tracing",
       "parentId": "excel",
-      "docAffinity": { "preferredDocTypes": ["xlsx", "xls"], "ocrTolerance": "low" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "xlsx",
+          "xls"
+        ],
+        "ocrTolerance": "low"
+      },
       "retrievalProfile": "structure_first",
       "formattingProfile": "bullets_first",
       "terminologyKey": "excel"
@@ -382,7 +807,14 @@
     {
       "id": "excel_reporting",
       "parentId": "excel",
-      "docAffinity": { "preferredDocTypes": ["xlsx", "xls", "csv"], "ocrTolerance": "low" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "xlsx",
+          "xls",
+          "csv"
+        ],
+        "ocrTolerance": "low"
+      },
       "retrievalProfile": "structure_first",
       "formattingProfile": "tables_first",
       "terminologyKey": "excel"
@@ -390,7 +822,13 @@
     {
       "id": "excel_functions_formulas",
       "parentId": "excel",
-      "docAffinity": { "preferredDocTypes": ["xlsx", "xls"], "ocrTolerance": "low" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "xlsx",
+          "xls"
+        ],
+        "ocrTolerance": "low"
+      },
       "retrievalProfile": "structure_first",
       "formattingProfile": "bullets_first",
       "terminologyKey": "excel"
@@ -398,16 +836,28 @@
     {
       "id": "excel_automation",
       "parentId": "excel",
-      "docAffinity": { "preferredDocTypes": ["xlsx", "xlsm"], "ocrTolerance": "low" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "xlsx",
+          "xlsm"
+        ],
+        "ocrTolerance": "low"
+      },
       "retrievalProfile": "structure_first",
       "formattingProfile": "bullets_first",
       "terminologyKey": "excel"
     },
-
     {
       "id": "accounting_gl",
       "parentId": "accounting",
-      "docAffinity": { "preferredDocTypes": ["xlsx", "csv", "pdf"], "ocrTolerance": "medium" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "xlsx",
+          "csv",
+          "pdf"
+        ],
+        "ocrTolerance": "medium"
+      },
       "retrievalProfile": "numeric_strict",
       "formattingProfile": "numbers_first",
       "terminologyKey": "accounting"
@@ -415,7 +865,14 @@
     {
       "id": "accounting_ap",
       "parentId": "accounting",
-      "docAffinity": { "preferredDocTypes": ["xlsx", "csv", "pdf"], "ocrTolerance": "medium" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "xlsx",
+          "csv",
+          "pdf"
+        ],
+        "ocrTolerance": "medium"
+      },
       "retrievalProfile": "numeric_strict",
       "formattingProfile": "numbers_first",
       "terminologyKey": "accounting"
@@ -423,7 +880,14 @@
     {
       "id": "accounting_ar",
       "parentId": "accounting",
-      "docAffinity": { "preferredDocTypes": ["xlsx", "csv", "pdf"], "ocrTolerance": "medium" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "xlsx",
+          "csv",
+          "pdf"
+        ],
+        "ocrTolerance": "medium"
+      },
       "retrievalProfile": "numeric_strict",
       "formattingProfile": "numbers_first",
       "terminologyKey": "accounting"
@@ -431,7 +895,14 @@
     {
       "id": "accounting_tax_us",
       "parentId": "accounting",
-      "docAffinity": { "preferredDocTypes": ["pdf", "xlsx", "csv"], "ocrTolerance": "medium" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "pdf",
+          "xlsx",
+          "csv"
+        ],
+        "ocrTolerance": "medium"
+      },
       "retrievalProfile": "numbers_first",
       "formattingProfile": "numbers_first",
       "terminologyKey": "tax_income"
@@ -439,7 +910,14 @@
     {
       "id": "accounting_tax_br",
       "parentId": "accounting",
-      "docAffinity": { "preferredDocTypes": ["pdf", "xlsx", "csv"], "ocrTolerance": "medium" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "pdf",
+          "xlsx",
+          "csv"
+        ],
+        "ocrTolerance": "medium"
+      },
       "retrievalProfile": "numbers_first",
       "formattingProfile": "numbers_first",
       "terminologyKey": "tax_income"
@@ -447,25 +925,44 @@
     {
       "id": "accounting_audit",
       "parentId": "accounting",
-      "docAffinity": { "preferredDocTypes": ["xlsx", "pdf", "docx"], "ocrTolerance": "medium" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "xlsx",
+          "pdf",
+          "docx"
+        ],
+        "ocrTolerance": "medium"
+      },
       "retrievalProfile": "balanced",
       "formattingProfile": "bullets_first",
       "terminologyKey": "accounting"
     },
-
     {
       "id": "tax_income",
       "parentId": "finance",
-      "docAffinity": { "preferredDocTypes": ["pdf", "xlsx"], "ocrTolerance": "medium" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "pdf",
+          "xlsx"
+        ],
+        "ocrTolerance": "medium"
+      },
       "retrievalProfile": "numbers_first",
       "formattingProfile": "numbers_first",
       "terminologyKey": "tax_income"
     },
-
     {
       "id": "finance_fpna",
       "parentId": "finance",
-      "docAffinity": { "preferredDocTypes": ["xlsx", "csv", "pdf", "docx"], "ocrTolerance": "medium" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "xlsx",
+          "csv",
+          "pdf",
+          "docx"
+        ],
+        "ocrTolerance": "medium"
+      },
       "retrievalProfile": "numbers_first",
       "formattingProfile": "numbers_first",
       "terminologyKey": "finance_real_estate_investing"
@@ -473,7 +970,14 @@
     {
       "id": "finance_unit_economics",
       "parentId": "finance",
-      "docAffinity": { "preferredDocTypes": ["xlsx", "csv", "pdf"], "ocrTolerance": "medium" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "xlsx",
+          "csv",
+          "pdf"
+        ],
+        "ocrTolerance": "medium"
+      },
       "retrievalProfile": "numeric_strict",
       "formattingProfile": "numbers_first",
       "terminologyKey": "finance_real_estate_investing"
@@ -481,7 +985,13 @@
     {
       "id": "finance_valuation",
       "parentId": "finance",
-      "docAffinity": { "preferredDocTypes": ["xlsx", "pdf"], "ocrTolerance": "medium" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "xlsx",
+          "pdf"
+        ],
+        "ocrTolerance": "medium"
+      },
       "retrievalProfile": "numeric_strict",
       "formattingProfile": "numbers_first",
       "terminologyKey": "finance_real_estate_investing"
@@ -489,7 +999,14 @@
     {
       "id": "finance_re_hospitality",
       "parentId": "finance",
-      "docAffinity": { "preferredDocTypes": ["xlsx", "pdf", "docx"], "ocrTolerance": "medium" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "xlsx",
+          "pdf",
+          "docx"
+        ],
+        "ocrTolerance": "medium"
+      },
       "retrievalProfile": "numbers_first",
       "formattingProfile": "numbers_first",
       "terminologyKey": "finance_real_estate_investing"
@@ -497,7 +1014,13 @@
     {
       "id": "finance_re_multifamily",
       "parentId": "finance",
-      "docAffinity": { "preferredDocTypes": ["xlsx", "pdf"], "ocrTolerance": "medium" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "xlsx",
+          "pdf"
+        ],
+        "ocrTolerance": "medium"
+      },
       "retrievalProfile": "numbers_first",
       "formattingProfile": "numbers_first",
       "terminologyKey": "finance_real_estate_investing"
@@ -505,7 +1028,13 @@
     {
       "id": "finance_re_commercial",
       "parentId": "finance",
-      "docAffinity": { "preferredDocTypes": ["xlsx", "pdf"], "ocrTolerance": "medium" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "xlsx",
+          "pdf"
+        ],
+        "ocrTolerance": "medium"
+      },
       "retrievalProfile": "numbers_first",
       "formattingProfile": "numbers_first",
       "terminologyKey": "finance_real_estate_investing"
@@ -513,7 +1042,14 @@
     {
       "id": "finance_re_development",
       "parentId": "finance",
-      "docAffinity": { "preferredDocTypes": ["xlsx", "pdf", "docx"], "ocrTolerance": "medium" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "xlsx",
+          "pdf",
+          "docx"
+        ],
+        "ocrTolerance": "medium"
+      },
       "retrievalProfile": "numeric_strict",
       "formattingProfile": "numbers_first",
       "terminologyKey": "finance_real_estate_investing"
@@ -521,7 +1057,14 @@
     {
       "id": "finance_markets_brokerage",
       "parentId": "finance",
-      "docAffinity": { "preferredDocTypes": ["pdf", "xlsx", "csv"], "ocrTolerance": "medium" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "pdf",
+          "xlsx",
+          "csv"
+        ],
+        "ocrTolerance": "medium"
+      },
       "retrievalProfile": "numbers_first",
       "formattingProfile": "tables_first",
       "terminologyKey": "banking_statements"
@@ -529,7 +1072,14 @@
     {
       "id": "finance_markets_securities",
       "parentId": "finance",
-      "docAffinity": { "preferredDocTypes": ["pdf", "xlsx", "csv"], "ocrTolerance": "medium" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "pdf",
+          "xlsx",
+          "csv"
+        ],
+        "ocrTolerance": "medium"
+      },
       "retrievalProfile": "balanced",
       "formattingProfile": "bullets_first",
       "terminologyKey": "finance_real_estate_investing"
@@ -537,7 +1087,13 @@
     {
       "id": "finance_markets_filings",
       "parentId": "finance",
-      "docAffinity": { "preferredDocTypes": ["pdf", "docx"], "ocrTolerance": "medium" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "pdf",
+          "docx"
+        ],
+        "ocrTolerance": "medium"
+      },
       "retrievalProfile": "quote_friendly",
       "formattingProfile": "bullets_first",
       "terminologyKey": "finance_real_estate_investing"
@@ -545,7 +1101,13 @@
     {
       "id": "finance_loans_mortgage",
       "parentId": "finance",
-      "docAffinity": { "preferredDocTypes": ["pdf", "xlsx"], "ocrTolerance": "medium" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "pdf",
+          "xlsx"
+        ],
+        "ocrTolerance": "medium"
+      },
       "retrievalProfile": "numbers_first",
       "formattingProfile": "numbers_first",
       "terminologyKey": "housing_property"
@@ -553,7 +1115,14 @@
     {
       "id": "finance_loans_commercial",
       "parentId": "finance",
-      "docAffinity": { "preferredDocTypes": ["pdf", "xlsx", "docx"], "ocrTolerance": "medium" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "pdf",
+          "xlsx",
+          "docx"
+        ],
+        "ocrTolerance": "medium"
+      },
       "retrievalProfile": "numeric_strict",
       "formattingProfile": "numbers_first",
       "terminologyKey": "finance_real_estate_investing"
@@ -561,7 +1130,15 @@
     {
       "id": "finance_payments_br",
       "parentId": "finance",
-      "docAffinity": { "preferredDocTypes": ["pdf", "jpg", "jpeg", "png"], "ocrTolerance": "high" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "pdf",
+          "jpg",
+          "jpeg",
+          "png"
+        ],
+        "ocrTolerance": "high"
+      },
       "retrievalProfile": "payments_lexical",
       "formattingProfile": "fields_first",
       "terminologyKey": "invoices_billing"
@@ -569,29 +1146,83 @@
     {
       "id": "finance_payments_us",
       "parentId": "finance",
-      "docAffinity": { "preferredDocTypes": ["pdf", "jpg", "jpeg", "png"], "ocrTolerance": "high" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "pdf",
+          "jpg",
+          "jpeg",
+          "png"
+        ],
+        "ocrTolerance": "high"
+      },
       "retrievalProfile": "payments_lexical",
       "formattingProfile": "fields_first",
       "terminologyKey": "banking_statements"
     },
-
     {
       "id": "general",
       "parentId": "general",
-      "docAffinity": { "preferredDocTypes": ["pdf", "docx", "pptx", "txt"], "ocrTolerance": "medium" },
+      "docAffinity": {
+        "preferredDocTypes": [
+          "pdf",
+          "docx",
+          "pptx",
+          "txt"
+        ],
+        "ocrTolerance": "medium"
+      },
       "retrievalProfile": "balanced",
       "formattingProfile": "default",
       "terminologyKey": "general"
     }
   ],
-
   "tests": {
     "cases": [
-      { "id": "DO_0001", "input": { "domainId": "excel_reporting" }, "expect": { "parentId": "excel" } },
-      { "id": "DO_0002", "input": { "domainId": "insurance_health" }, "expect": { "parentId": "insurance" } },
-      { "id": "DO_0003", "input": { "domainId": "banking_statements" }, "expect": { "parentId": "banking" } },
-      { "id": "DO_0004", "input": { "domainId": "invoices_billing" }, "expect": { "parentId": "billing" } },
-      { "id": "DO_0005", "input": { "domainId": "tax_income" }, "expect": { "parentId": "finance" } }
+      {
+        "id": "DO_0001",
+        "input": {
+          "domainId": "excel_reporting"
+        },
+        "expect": {
+          "parentId": "excel"
+        }
+      },
+      {
+        "id": "DO_0002",
+        "input": {
+          "domainId": "insurance_health"
+        },
+        "expect": {
+          "parentId": "insurance"
+        }
+      },
+      {
+        "id": "DO_0003",
+        "input": {
+          "domainId": "banking_statements"
+        },
+        "expect": {
+          "parentId": "banking"
+        }
+      },
+      {
+        "id": "DO_0004",
+        "input": {
+          "domainId": "invoices_billing"
+        },
+        "expect": {
+          "parentId": "billing"
+        }
+      },
+      {
+        "id": "DO_0005",
+        "input": {
+          "domainId": "tax_income"
+        },
+        "expect": {
+          "parentId": "finance"
+        }
+      }
     ]
   }
 }

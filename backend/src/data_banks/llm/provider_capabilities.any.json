@@ -3,21 +3,44 @@
     "id": "provider_capabilities",
     "version": "1.0.0",
     "description": "Provider capability matrix for Allybi routing, tool-calling, streaming, and safety behavior. Bank-driven, deterministic, no user-facing copy.",
-    "languages": ["any"],
-    "lastUpdated": "2026-01-27"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-01-27",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
     "actionsContract": {
       "purpose": "Routing + feature gating based on provider/model capabilities",
-      "inputs": ["provider", "model", "mode"],
-      "outputs": ["capabilities", "limits", "featureFlags"],
+      "inputs": [
+        "provider",
+        "model",
+        "mode"
+      ],
+      "outputs": [
+        "capabilities",
+        "limits",
+        "featureFlags"
+      ],
       "determinism": "Pure lookup; no runtime heuristics"
     }
   },
   "defaults": {
-    "draft": { "provider": "gemini", "model": "gemini-2.5-flash" },
-    "final": { "provider": "openai", "model": "gpt-5.2" }
+    "draft": {
+      "provider": "gemini",
+      "model": "gemini-2.5-flash"
+    },
+    "final": {
+      "provider": "openai",
+      "model": "gpt-5.2"
+    }
   },
   "providers": {
     "gemini": {
@@ -43,6 +66,7 @@
       "models": {
         "gemini-2.5-flash": {
           "tier": "flash",
+          "pinnedVersion": "gemini-2.5-flash-001",
           "supportsStreaming": true,
           "supportsTools": true,
           "maxOutputTokens": 8192,
@@ -85,6 +109,7 @@
       "models": {
         "gpt-5.2": {
           "tier": "authority",
+          "pinnedVersion": "gpt-5.2-2026-01-15",
           "supportsStreaming": true,
           "supportsTools": true,
           "maxOutputTokens": 16384,
@@ -102,6 +127,7 @@
         },
         "gpt-5-mini": {
           "tier": "precision",
+          "pinnedVersion": "gpt-5-mini-2026-01-15",
           "supportsStreaming": true,
           "supportsTools": true,
           "maxOutputTokens": 16384,
@@ -140,7 +166,11 @@
         "ollama:*": {
           "tier": "local",
           "capabilities": {
-            "bestFor": ["offline_mode", "low_cost_fallback", "simple_summaries"]
+            "bestFor": [
+              "offline_mode",
+              "low_cost_fallback",
+              "simple_summaries"
+            ]
           }
         }
       }
@@ -156,25 +186,45 @@
   "tests": [
     {
       "name": "google_flash_has_streaming_and_toolcalling",
-      "input": { "provider": "google", "model": "gemini-2.5-flash", "mode": "answer" },
+      "input": {
+        "provider": "gemini",
+        "model": "gemini-2.5-flash",
+        "mode": "answer"
+      },
       "expect": {
-        "capabilities": { "streaming": true, "toolCalling": true },
-        "providers.google.models.gemini-2.5-flash.tier": "flash"
+        "capabilities": {
+          "streaming": true,
+          "toolCalling": true
+        },
+        "providers.gemini.models.gemini-2.5-flash.tier": "flash"
       }
     },
     {
       "name": "openai_gpt52_is_authority",
-      "input": { "provider": "openai", "model": "gpt-5.2", "mode": "answer" },
+      "input": {
+        "provider": "openai",
+        "model": "gpt-5.2",
+        "mode": "answer"
+      },
       "expect": {
         "providers.openai.models.gpt-5.2.tier": "authority",
-        "capabilities": { "jsonMode": true, "toolCalling": true }
+        "capabilities": {
+          "jsonMode": true,
+          "toolCalling": true
+        }
       }
     },
     {
       "name": "local_has_no_toolcalling",
-      "input": { "provider": "local", "model": "ollama:gemma2", "mode": "answer" },
+      "input": {
+        "provider": "local",
+        "model": "ollama:gemma2",
+        "mode": "answer"
+      },
       "expect": {
-        "capabilities": { "toolCalling": false },
+        "capabilities": {
+          "toolCalling": false
+        },
         "limits.maxToolsPerTurnDefault": 0
       }
     }

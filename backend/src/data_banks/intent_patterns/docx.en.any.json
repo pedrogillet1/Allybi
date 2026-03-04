@@ -7,10 +7,20 @@
     "lastUpdated": "2026-03-02",
     "languages": [
       "en"
+    ],
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
     ]
   },
   "config": {
-    "enabled": true
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "patterns": [
     {
@@ -6867,7 +6877,7 @@
       "priority": 79,
       "triggers": {
         "regex_any": [
-          "\\b(?:create|insert|add)\\b.*\\b(?:table)\\b",
+          "\\b(?:create|insert|add)\\b.*\\b(?:table)(?!\\s+of\\s+contents?)\\b",
           "\\b(?:table)\\b.*\\b(?:with)\\b.*\\b(?:rows?|columns?|cols?)\\b"
         ],
         "tokens_any": [
@@ -6881,7 +6891,8 @@
           "translate",
           "summarize",
           "toc",
-          "table of contents"
+          "table of contents",
+          "table of content"
         ]
       },
       "slotExtractors": [

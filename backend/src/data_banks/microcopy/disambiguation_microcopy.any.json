@@ -3,10 +3,21 @@
     "id": "disambiguation_microcopy",
     "version": "1.0.0",
     "description": "Adaptive microcopy rules for disambiguation prompts in Koda. Governs tone, brevity, option presentation, and follow-up handling to resolve ambiguity without user frustration.",
-    "languages": ["any", "en", "pt", "es"],
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
     "lastUpdated": "2026-01-26",
     "owner": "koda-microcopy",
-    "compat": ">=1.0.0"
+    "compat": ">=1.0.0",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -23,14 +34,19 @@
       "conflictResolution": {
         "ifMultipleRules": "operator_specific_over_global"
       }
-    }
+    },
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "rules": [
     {
       "id": "single_question_only",
       "scope": "global",
       "description": "Ensure disambiguation asks only one concise question.",
-      "appliesTo": ["all_disambiguations"],
+      "appliesTo": [
+        "all_disambiguations"
+      ],
       "action": {
         "type": "enforce_single_question"
       },
@@ -41,7 +57,9 @@
       "id": "limited_option_count",
       "scope": "global",
       "description": "Limit the number of options presented to avoid cognitive overload.",
-      "appliesTo": ["all_disambiguations"],
+      "appliesTo": [
+        "all_disambiguations"
+      ],
       "action": {
         "type": "limit_options",
         "min": 2,
@@ -54,10 +72,16 @@
       "id": "prefer_specific_labels",
       "scope": "cross_family",
       "description": "Prefer concrete identifiers (file names, dates, types) over vague labels.",
-      "appliesTo": ["all_disambiguations"],
+      "appliesTo": [
+        "all_disambiguations"
+      ],
       "when": {
         "all": [
-          { "path": "signals.hasConcreteOptions", "op": "eq", "value": true }
+          {
+            "path": "signals.hasConcreteOptions",
+            "op": "eq",
+            "value": true
+          }
         ]
       },
       "action": {
@@ -70,7 +94,9 @@
       "id": "no_apology_tone",
       "scope": "global",
       "description": "Avoid apology language during disambiguation to reduce friction.",
-      "appliesTo": ["all_disambiguations"],
+      "appliesTo": [
+        "all_disambiguations"
+      ],
       "action": {
         "type": "suppress_apology_language"
       },
@@ -81,11 +107,21 @@
       "id": "autopick_when_confident",
       "scope": "global",
       "description": "Automatically pick the most likely option when confidence margin is high.",
-      "appliesTo": ["all_disambiguations"],
+      "appliesTo": [
+        "all_disambiguations"
+      ],
       "when": {
         "all": [
-          { "path": "metrics.topConfidence", "op": "gte", "value": 0.85 },
-          { "path": "metrics.confidenceGap", "op": "gte", "value": 0.25 }
+          {
+            "path": "metrics.topConfidence",
+            "op": "gte",
+            "value": 0.85
+          },
+          {
+            "path": "metrics.confidenceGap",
+            "op": "gte",
+            "value": 0.25
+          }
         ]
       },
       "action": {
@@ -100,24 +136,37 @@
     "cases": [
       {
         "id": "DIS_001_single_question_enforced",
-        "expect": { "questionCountMax": 1 }
+        "expect": {
+          "questionCountMax": 1
+        }
       },
       {
         "id": "DIS_002_option_limit",
-        "context": { "options": 6 },
-        "expect": { "optionsMax": 4 }
+        "context": {
+          "options": 6
+        },
+        "expect": {
+          "optionsMax": 4
+        }
       },
       {
         "id": "DIS_003_autopick_when_confident",
         "context": {
-          "metrics": { "topConfidence": 0.9, "confidenceGap": 0.3 }
+          "metrics": {
+            "topConfidence": 0.9,
+            "confidenceGap": 0.3
+          }
         },
-        "expect": { "autoSelected": true }
+        "expect": {
+          "autoSelected": true
+        }
       },
       {
         "id": "DIS_004_no_apology_language",
         "input": "Sorry, which one did you mean?",
-        "expect": { "apologySuppressed": true }
+        "expect": {
+          "apologySuppressed": true
+        }
       }
     ]
   }

@@ -285,6 +285,8 @@ describe("ResponseContractEnforcerService nav_pills contract", () => {
     expect(out.content).toContain("Key evidence:");
     expect(out.content).toContain("Sources used:");
     expect(out.content).toContain("Page 14");
+    expect(out.content).toContain("In summary,");
+    expect(out.content).toContain("If you'd like,");
   });
 
   test("enforces analytical template when enforceStructuredAnswer=true", async () => {
@@ -308,6 +310,8 @@ describe("ResponseContractEnforcerService nav_pills contract", () => {
     expect(out.enforcement.repairs).toContain("ANALYTICAL_STRUCTURE_ENFORCED");
     expect(out.content).toContain("Direct answer:");
     expect(out.content).toContain("Sources used:");
+    expect(out.content).toContain("In summary,");
+    expect(out.content).toContain("If you'd like,");
   });
 
   test("applies banned phrase stripping from patterns schema", async () => {

@@ -6,7 +6,14 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-03-03"
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -83,10 +90,18 @@
         "di_everyday_domain_detection_rules"
       ],
       "packRefs": {
-        "sections": ["di_everyday_sections_every_tax_notice"],
-        "entities": ["di_everyday_entities_every_tax_notice"],
-        "tables": ["di_everyday_tables_every_tax_notice"],
-        "extraction": ["di_everyday_extraction_every_tax_notice"]
+        "sections": [
+          "di_everyday_sections_every_tax_notice"
+        ],
+        "entities": [
+          "di_everyday_entities_every_tax_notice"
+        ],
+        "tables": [
+          "di_everyday_tables_every_tax_notice"
+        ],
+        "extraction": [
+          "di_everyday_extraction_every_tax_notice"
+        ]
       },
       "kpiOntologyRefs": [
         "assessed_amount",
@@ -123,10 +138,18 @@
         "di_everyday_domain_detection_rules"
       ],
       "packRefs": {
-        "sections": ["di_everyday_sections_every_phone_bill"],
-        "entities": ["di_everyday_entities_every_phone_bill"],
-        "tables": ["di_everyday_tables_every_phone_bill"],
-        "extraction": ["di_everyday_extraction_every_phone_bill"]
+        "sections": [
+          "di_everyday_sections_every_phone_bill"
+        ],
+        "entities": [
+          "di_everyday_entities_every_phone_bill"
+        ],
+        "tables": [
+          "di_everyday_tables_every_phone_bill"
+        ],
+        "extraction": [
+          "di_everyday_extraction_every_phone_bill"
+        ]
       },
       "kpiOntologyRefs": [
         "subscriber",
@@ -164,10 +187,18 @@
         "di_everyday_domain_detection_rules"
       ],
       "packRefs": {
-        "sections": ["di_everyday_sections_every_electricity_bill"],
-        "entities": ["di_everyday_entities_every_electricity_bill"],
-        "tables": ["di_everyday_tables_every_electricity_bill"],
-        "extraction": ["di_everyday_extraction_every_electricity_bill"]
+        "sections": [
+          "di_everyday_sections_every_electricity_bill"
+        ],
+        "entities": [
+          "di_everyday_entities_every_electricity_bill"
+        ],
+        "tables": [
+          "di_everyday_tables_every_electricity_bill"
+        ],
+        "extraction": [
+          "di_everyday_extraction_every_electricity_bill"
+        ]
       },
       "kpiOntologyRefs": [
         "meter_reading",
@@ -204,10 +235,18 @@
         "di_everyday_domain_detection_rules"
       ],
       "packRefs": {
-        "sections": ["di_everyday_sections_every_internet_bill"],
-        "entities": ["di_everyday_entities_every_internet_bill"],
-        "tables": ["di_everyday_tables_every_internet_bill"],
-        "extraction": ["di_everyday_extraction_every_internet_bill"]
+        "sections": [
+          "di_everyday_sections_every_internet_bill"
+        ],
+        "entities": [
+          "di_everyday_entities_every_internet_bill"
+        ],
+        "tables": [
+          "di_everyday_tables_every_internet_bill"
+        ],
+        "extraction": [
+          "di_everyday_extraction_every_internet_bill"
+        ]
       },
       "kpiOntologyRefs": [
         "bandwidth_used",
@@ -244,10 +283,18 @@
         "di_everyday_domain_detection_rules"
       ],
       "packRefs": {
-        "sections": ["di_everyday_sections_every_rent_receipt"],
-        "entities": ["di_everyday_entities_every_rent_receipt"],
-        "tables": ["di_everyday_tables_every_rent_receipt"],
-        "extraction": ["di_everyday_extraction_every_rent_receipt"]
+        "sections": [
+          "di_everyday_sections_every_rent_receipt"
+        ],
+        "entities": [
+          "di_everyday_entities_every_rent_receipt"
+        ],
+        "tables": [
+          "di_everyday_tables_every_rent_receipt"
+        ],
+        "extraction": [
+          "di_everyday_extraction_every_rent_receipt"
+        ]
       },
       "kpiOntologyRefs": [
         "rent_amount",
@@ -284,10 +331,18 @@
         "di_everyday_domain_detection_rules"
       ],
       "packRefs": {
-        "sections": ["di_everyday_sections_every_retail_receipt"],
-        "entities": ["di_everyday_entities_every_retail_receipt"],
-        "tables": ["di_everyday_tables_every_retail_receipt"],
-        "extraction": ["di_everyday_extraction_every_retail_receipt"]
+        "sections": [
+          "di_everyday_sections_every_retail_receipt"
+        ],
+        "entities": [
+          "di_everyday_entities_every_retail_receipt"
+        ],
+        "tables": [
+          "di_everyday_tables_every_retail_receipt"
+        ],
+        "extraction": [
+          "di_everyday_extraction_every_retail_receipt"
+        ]
       },
       "kpiOntologyRefs": [
         "subtotal",
@@ -324,10 +379,18 @@
         "di_everyday_domain_detection_rules"
       ],
       "packRefs": {
-        "sections": ["di_everyday_sections_every_invoice"],
-        "entities": ["di_everyday_entities_every_invoice"],
-        "tables": ["di_everyday_tables_every_invoice"],
-        "extraction": ["di_everyday_extraction_every_invoice"]
+        "sections": [
+          "di_everyday_sections_every_invoice"
+        ],
+        "entities": [
+          "di_everyday_entities_every_invoice"
+        ],
+        "tables": [
+          "di_everyday_tables_every_invoice"
+        ],
+        "extraction": [
+          "di_everyday_extraction_every_invoice"
+        ]
       },
       "kpiOntologyRefs": [
         "invoice_number",
@@ -365,10 +428,18 @@
         "di_everyday_domain_detection_rules"
       ],
       "packRefs": {
-        "sections": ["di_everyday_sections_every_bank_statement"],
-        "entities": ["di_everyday_entities_every_bank_statement"],
-        "tables": ["di_everyday_tables_every_bank_statement"],
-        "extraction": ["di_everyday_extraction_every_bank_statement"]
+        "sections": [
+          "di_everyday_sections_every_bank_statement"
+        ],
+        "entities": [
+          "di_everyday_entities_every_bank_statement"
+        ],
+        "tables": [
+          "di_everyday_tables_every_bank_statement"
+        ],
+        "extraction": [
+          "di_everyday_extraction_every_bank_statement"
+        ]
       },
       "kpiOntologyRefs": [
         "opening_balance",
@@ -405,10 +476,18 @@
         "di_everyday_domain_detection_rules"
       ],
       "packRefs": {
-        "sections": ["di_everyday_sections_every_insurance_policy"],
-        "entities": ["di_everyday_entities_every_insurance_policy"],
-        "tables": ["di_everyday_tables_every_insurance_policy"],
-        "extraction": ["di_everyday_extraction_every_insurance_policy"]
+        "sections": [
+          "di_everyday_sections_every_insurance_policy"
+        ],
+        "entities": [
+          "di_everyday_entities_every_insurance_policy"
+        ],
+        "tables": [
+          "di_everyday_tables_every_insurance_policy"
+        ],
+        "extraction": [
+          "di_everyday_extraction_every_insurance_policy"
+        ]
       },
       "kpiOntologyRefs": [
         "policy_number",
@@ -446,10 +525,18 @@
         "di_everyday_domain_detection_rules"
       ],
       "packRefs": {
-        "sections": ["di_everyday_sections_every_insurance_claim"],
-        "entities": ["di_everyday_entities_every_insurance_claim"],
-        "tables": ["di_everyday_tables_every_insurance_claim"],
-        "extraction": ["di_everyday_extraction_every_insurance_claim"]
+        "sections": [
+          "di_everyday_sections_every_insurance_claim"
+        ],
+        "entities": [
+          "di_everyday_entities_every_insurance_claim"
+        ],
+        "tables": [
+          "di_everyday_tables_every_insurance_claim"
+        ],
+        "extraction": [
+          "di_everyday_extraction_every_insurance_claim"
+        ]
       },
       "kpiOntologyRefs": [
         "claim_number",
@@ -487,10 +574,18 @@
         "di_everyday_domain_detection_rules"
       ],
       "packRefs": {
-        "sections": ["di_everyday_sections_every_identity_document"],
-        "entities": ["di_everyday_entities_every_identity_document"],
-        "tables": ["di_everyday_tables_every_identity_document"],
-        "extraction": ["di_everyday_extraction_every_identity_document"]
+        "sections": [
+          "di_everyday_sections_every_identity_document"
+        ],
+        "entities": [
+          "di_everyday_entities_every_identity_document"
+        ],
+        "tables": [
+          "di_everyday_tables_every_identity_document"
+        ],
+        "extraction": [
+          "di_everyday_extraction_every_identity_document"
+        ]
       },
       "kpiOntologyRefs": [
         "document_number",

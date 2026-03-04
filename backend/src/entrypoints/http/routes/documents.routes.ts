@@ -212,6 +212,117 @@ router.get(
   (req, res) => ctrl(req).list(req, res),
 );
 router.get("/:id", rateLimitMiddleware, (req, res) => ctrl(req).get(req, res));
+router.post("/:id/reindex", rateLimitMiddleware, (req, res) =>
+  ctrl(req).reindex(req, res),
+);
+
+/**
+ * POST /:id/version — Upload a new document revision and enqueue indexing.
+ */
+router.post(
+  "/:id/version",
+  uploadMultiple,
+  rateLimitMiddleware,
+  async (req: any, res: Response): Promise<void> => {
+    const userId = req.user?.id;
+    if (!userId) {
+      res.status(401).json({ error: "Not authenticated" });
+      return;
+    }
+
+    try {
+      const file = Array.isArray(req.files) ? req.files[0] : null;
+      if (!file || !Buffer.isBuffer(file.buffer)) {
+        res.status(400).json({ error: "No file uploaded" });
+        return;
+      }
+
+      const revisionService = new RevisionService();
+      const created = await revisionService.createRevision(
+        {
+          userId,
+          sourceDocumentId: String(req.params.id || ""),
+          contentBuffer: file.buffer,
+          mimeType: file.mimetype,
+          filename: file.originalname,
+          reason: "manual_version_upload",
+        },
+        {
+          userId,
+          correlationId: req.headers["x-correlation-id"] as
+            | string
+            | undefined,
+        },
+      );
+
+      res.status(201).json({
+        ok: true,
+        data: { revision: created },
+      });
+    } catch (e: any) {
+      const message = String(e?.message || "Failed to create version");
+      const status = /not found/i.test(message)
+        ? 404
+        : /required|invalid/i.test(message)
+          ? 400
+          : 500;
+      const code =
+        status === 404
+          ? "DOCUMENT_NOT_FOUND"
+          : status === 400
+            ? "INVALID_INPUT"
+            : "VERSION_CREATE_FAILED";
+      res.status(status).json({
+        ok: false,
+        error: { code, message },
+      });
+    }
+  },
+);
+
+/**
+ * GET /:id/versions — List all revisions in this document family.
+ */
+router.get(
+  "/:id/versions",
+  rateLimitMiddleware,
+  async (req: any, res: Response): Promise<void> => {
+    const userId = req.user?.id;
+    if (!userId) {
+      res.status(401).json({ error: "Not authenticated" });
+      return;
+    }
+
+    try {
+      const revisionService = new RevisionService();
+      const result = await revisionService.listRevisions(
+        userId,
+        String(req.params.id || ""),
+      );
+      res.json({
+        ok: true,
+        data: result,
+      });
+    } catch (e: any) {
+      const message = String(e?.message || "Failed to list versions");
+      const status = /not found/i.test(message)
+        ? 404
+        : /required|invalid/i.test(message)
+          ? 400
+          : 500;
+      const code =
+        status === 404
+          ? "DOCUMENT_NOT_FOUND"
+          : status === 400
+            ? "INVALID_INPUT"
+            : "VERSIONS_LIST_FAILED";
+      res.status(status).json({
+        ok: false,
+        error: { code, message },
+      });
+    }
+  },
+);
 
 // PPTX Studio (Canva-like editor backed by Google Slides import/export)
 router.use("/:id/studio/slides", slidesStudioRouter);

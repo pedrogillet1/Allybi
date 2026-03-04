@@ -3,10 +3,21 @@
     "id": "language_indicators",
     "version": "2.0.0",
     "description": "Weighted language detection indicators for Koda. Uses high-signal lexical markers, stopwords, and morphological patterns to detect query language with confidence scoring. Supports confidence thresholds and multi-language mixed input detection.",
-    "languages": ["any", "en", "pt", "es"],
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
     "lastUpdated": "2026-01-26",
     "owner": "koda-normalizers",
-    "compat": ">=1.0.0"
+    "compat": ">=1.0.0",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -18,7 +29,11 @@
     "emitConfidenceScores": true,
     "caseInsensitive": true,
     "stripDiacriticsForMatching": false,
-    "usedBy": ["languageDetector.service", "router.service", "answerComposer.service"]
+    "usedBy": [
+      "languageDetector.service",
+      "router.service",
+      "answerComposer.service"
+    ]
   },
   "policy": {
     "_comment": "Detection behavior and fallback rules.",
@@ -34,187 +49,642 @@
     "stopwords": {
       "_comment": "High-frequency words that strongly indicate language. Weight: 0.08-0.12 each.",
       "en": [
-        { "term": "the", "weight": 0.12 },
-        { "term": "is", "weight": 0.10 },
-        { "term": "are", "weight": 0.10 },
-        { "term": "was", "weight": 0.09 },
-        { "term": "were", "weight": 0.09 },
-        { "term": "have", "weight": 0.09 },
-        { "term": "has", "weight": 0.09 },
-        { "term": "been", "weight": 0.08 },
-        { "term": "being", "weight": 0.08 },
-        { "term": "this", "weight": 0.08 },
-        { "term": "that", "weight": 0.08 },
-        { "term": "with", "weight": 0.08 },
-        { "term": "from", "weight": 0.08 },
-        { "term": "they", "weight": 0.08 },
-        { "term": "would", "weight": 0.08 }
+        {
+          "term": "the",
+          "weight": 0.12
+        },
+        {
+          "term": "is",
+          "weight": 0.1
+        },
+        {
+          "term": "are",
+          "weight": 0.1
+        },
+        {
+          "term": "was",
+          "weight": 0.09
+        },
+        {
+          "term": "were",
+          "weight": 0.09
+        },
+        {
+          "term": "have",
+          "weight": 0.09
+        },
+        {
+          "term": "has",
+          "weight": 0.09
+        },
+        {
+          "term": "been",
+          "weight": 0.08
+        },
+        {
+          "term": "being",
+          "weight": 0.08
+        },
+        {
+          "term": "this",
+          "weight": 0.08
+        },
+        {
+          "term": "that",
+          "weight": 0.08
+        },
+        {
+          "term": "with",
+          "weight": 0.08
+        },
+        {
+          "term": "from",
+          "weight": 0.08
+        },
+        {
+          "term": "they",
+          "weight": 0.08
+        },
+        {
+          "term": "would",
+          "weight": 0.08
+        }
       ],
       "pt": [
-        { "term": "o", "weight": 0.10 },
-        { "term": "a", "weight": 0.10 },
-        { "term": "os", "weight": 0.10 },
-        { "term": "as", "weight": 0.10 },
-        { "term": "é", "weight": 0.12 },
-        { "term": "são", "weight": 0.11 },
-        { "term": "foi", "weight": 0.10 },
-        { "term": "foram", "weight": 0.10 },
-        { "term": "tem", "weight": 0.09 },
-        { "term": "têm", "weight": 0.10 },
-        { "term": "está", "weight": 0.10 },
-        { "term": "estão", "weight": 0.10 },
-        { "term": "esse", "weight": 0.09 },
-        { "term": "essa", "weight": 0.09 },
-        { "term": "isso", "weight": 0.09 }
+        {
+          "term": "o",
+          "weight": 0.1
+        },
+        {
+          "term": "a",
+          "weight": 0.1
+        },
+        {
+          "term": "os",
+          "weight": 0.1
+        },
+        {
+          "term": "as",
+          "weight": 0.1
+        },
+        {
+          "term": "é",
+          "weight": 0.12
+        },
+        {
+          "term": "são",
+          "weight": 0.11
+        },
+        {
+          "term": "foi",
+          "weight": 0.1
+        },
+        {
+          "term": "foram",
+          "weight": 0.1
+        },
+        {
+          "term": "tem",
+          "weight": 0.09
+        },
+        {
+          "term": "têm",
+          "weight": 0.1
+        },
+        {
+          "term": "está",
+          "weight": 0.1
+        },
+        {
+          "term": "estão",
+          "weight": 0.1
+        },
+        {
+          "term": "esse",
+          "weight": 0.09
+        },
+        {
+          "term": "essa",
+          "weight": 0.09
+        },
+        {
+          "term": "isso",
+          "weight": 0.09
+        }
       ],
       "es": [
-        { "term": "el", "weight": 0.11 },
-        { "term": "la", "weight": 0.11 },
-        { "term": "los", "weight": 0.10 },
-        { "term": "las", "weight": 0.10 },
-        { "term": "es", "weight": 0.11 },
-        { "term": "son", "weight": 0.10 },
-        { "term": "fue", "weight": 0.10 },
-        { "term": "fueron", "weight": 0.10 },
-        { "term": "tiene", "weight": 0.09 },
-        { "term": "tienen", "weight": 0.09 },
-        { "term": "está", "weight": 0.09 },
-        { "term": "están", "weight": 0.09 },
-        { "term": "este", "weight": 0.09 },
-        { "term": "esta", "weight": 0.09 },
-        { "term": "esto", "weight": 0.09 }
+        {
+          "term": "el",
+          "weight": 0.11
+        },
+        {
+          "term": "la",
+          "weight": 0.11
+        },
+        {
+          "term": "los",
+          "weight": 0.1
+        },
+        {
+          "term": "las",
+          "weight": 0.1
+        },
+        {
+          "term": "es",
+          "weight": 0.11
+        },
+        {
+          "term": "son",
+          "weight": 0.1
+        },
+        {
+          "term": "fue",
+          "weight": 0.1
+        },
+        {
+          "term": "fueron",
+          "weight": 0.1
+        },
+        {
+          "term": "tiene",
+          "weight": 0.09
+        },
+        {
+          "term": "tienen",
+          "weight": 0.09
+        },
+        {
+          "term": "está",
+          "weight": 0.09
+        },
+        {
+          "term": "están",
+          "weight": 0.09
+        },
+        {
+          "term": "este",
+          "weight": 0.09
+        },
+        {
+          "term": "esta",
+          "weight": 0.09
+        },
+        {
+          "term": "esto",
+          "weight": 0.09
+        }
       ]
     },
     "questionWords": {
       "_comment": "Question words are strong language indicators. Weight: 0.15-0.20 each.",
       "en": [
-        { "term": "what", "weight": 0.18 },
-        { "term": "where", "weight": 0.18 },
-        { "term": "when", "weight": 0.18 },
-        { "term": "why", "weight": 0.18 },
-        { "term": "how", "weight": 0.17 },
-        { "term": "which", "weight": 0.17 },
-        { "term": "who", "weight": 0.17 },
-        { "term": "whose", "weight": 0.16 }
+        {
+          "term": "what",
+          "weight": 0.18
+        },
+        {
+          "term": "where",
+          "weight": 0.18
+        },
+        {
+          "term": "when",
+          "weight": 0.18
+        },
+        {
+          "term": "why",
+          "weight": 0.18
+        },
+        {
+          "term": "how",
+          "weight": 0.17
+        },
+        {
+          "term": "which",
+          "weight": 0.17
+        },
+        {
+          "term": "who",
+          "weight": 0.17
+        },
+        {
+          "term": "whose",
+          "weight": 0.16
+        }
       ],
       "pt": [
-        { "term": "qual", "weight": 0.20 },
-        { "term": "quais", "weight": 0.20 },
-        { "term": "onde", "weight": 0.19 },
-        { "term": "quando", "weight": 0.19 },
-        { "term": "como", "weight": 0.18 },
-        { "term": "porque", "weight": 0.18 },
-        { "term": "por que", "weight": 0.18 },
-        { "term": "quem", "weight": 0.18 },
-        { "term": "quanto", "weight": 0.17 },
-        { "term": "quanta", "weight": 0.17 }
+        {
+          "term": "qual",
+          "weight": 0.2
+        },
+        {
+          "term": "quais",
+          "weight": 0.2
+        },
+        {
+          "term": "onde",
+          "weight": 0.19
+        },
+        {
+          "term": "quando",
+          "weight": 0.19
+        },
+        {
+          "term": "como",
+          "weight": 0.18
+        },
+        {
+          "term": "porque",
+          "weight": 0.18
+        },
+        {
+          "term": "por que",
+          "weight": 0.18
+        },
+        {
+          "term": "quem",
+          "weight": 0.18
+        },
+        {
+          "term": "quanto",
+          "weight": 0.17
+        },
+        {
+          "term": "quanta",
+          "weight": 0.17
+        }
       ],
       "es": [
-        { "term": "qué", "weight": 0.20 },
-        { "term": "cuál", "weight": 0.20 },
-        { "term": "cuáles", "weight": 0.20 },
-        { "term": "dónde", "weight": 0.19 },
-        { "term": "cuándo", "weight": 0.19 },
-        { "term": "cómo", "weight": 0.18 },
-        { "term": "por qué", "weight": 0.18 },
-        { "term": "quién", "weight": 0.18 },
-        { "term": "cuánto", "weight": 0.17 },
-        { "term": "cuánta", "weight": 0.17 }
+        {
+          "term": "qué",
+          "weight": 0.2
+        },
+        {
+          "term": "cuál",
+          "weight": 0.2
+        },
+        {
+          "term": "cuáles",
+          "weight": 0.2
+        },
+        {
+          "term": "dónde",
+          "weight": 0.19
+        },
+        {
+          "term": "cuándo",
+          "weight": 0.19
+        },
+        {
+          "term": "cómo",
+          "weight": 0.18
+        },
+        {
+          "term": "por qué",
+          "weight": 0.18
+        },
+        {
+          "term": "quién",
+          "weight": 0.18
+        },
+        {
+          "term": "cuánto",
+          "weight": 0.17
+        },
+        {
+          "term": "cuánta",
+          "weight": 0.17
+        }
       ]
     },
     "imperatives": {
       "_comment": "Command words for action queries. Weight: 0.14-0.18 each.",
       "en": [
-        { "term": "show", "weight": 0.16 },
-        { "term": "find", "weight": 0.16 },
-        { "term": "get", "weight": 0.15 },
-        { "term": "list", "weight": 0.15 },
-        { "term": "summarize", "weight": 0.18 },
-        { "term": "explain", "weight": 0.17 },
-        { "term": "compare", "weight": 0.17 },
-        { "term": "calculate", "weight": 0.17 },
-        { "term": "open", "weight": 0.14 },
-        { "term": "search", "weight": 0.15 }
+        {
+          "term": "show",
+          "weight": 0.16
+        },
+        {
+          "term": "find",
+          "weight": 0.16
+        },
+        {
+          "term": "get",
+          "weight": 0.15
+        },
+        {
+          "term": "list",
+          "weight": 0.15
+        },
+        {
+          "term": "summarize",
+          "weight": 0.18
+        },
+        {
+          "term": "explain",
+          "weight": 0.17
+        },
+        {
+          "term": "compare",
+          "weight": 0.17
+        },
+        {
+          "term": "calculate",
+          "weight": 0.17
+        },
+        {
+          "term": "open",
+          "weight": 0.14
+        },
+        {
+          "term": "search",
+          "weight": 0.15
+        }
       ],
       "pt": [
-        { "term": "mostra", "weight": 0.17 },
-        { "term": "mostre", "weight": 0.17 },
-        { "term": "encontra", "weight": 0.16 },
-        { "term": "encontre", "weight": 0.16 },
-        { "term": "lista", "weight": 0.16 },
-        { "term": "liste", "weight": 0.16 },
-        { "term": "resume", "weight": 0.18 },
-        { "term": "resuma", "weight": 0.18 },
-        { "term": "explica", "weight": 0.17 },
-        { "term": "explique", "weight": 0.17 },
-        { "term": "compara", "weight": 0.17 },
-        { "term": "compare", "weight": 0.17 },
-        { "term": "calcula", "weight": 0.17 },
-        { "term": "calcule", "weight": 0.17 },
-        { "term": "abre", "weight": 0.15 },
-        { "term": "abra", "weight": 0.15 }
+        {
+          "term": "mostra",
+          "weight": 0.17
+        },
+        {
+          "term": "mostre",
+          "weight": 0.17
+        },
+        {
+          "term": "encontra",
+          "weight": 0.16
+        },
+        {
+          "term": "encontre",
+          "weight": 0.16
+        },
+        {
+          "term": "lista",
+          "weight": 0.16
+        },
+        {
+          "term": "liste",
+          "weight": 0.16
+        },
+        {
+          "term": "resume",
+          "weight": 0.18
+        },
+        {
+          "term": "resuma",
+          "weight": 0.18
+        },
+        {
+          "term": "explica",
+          "weight": 0.17
+        },
+        {
+          "term": "explique",
+          "weight": 0.17
+        },
+        {
+          "term": "compara",
+          "weight": 0.17
+        },
+        {
+          "term": "compare",
+          "weight": 0.17
+        },
+        {
+          "term": "calcula",
+          "weight": 0.17
+        },
+        {
+          "term": "calcule",
+          "weight": 0.17
+        },
+        {
+          "term": "abre",
+          "weight": 0.15
+        },
+        {
+          "term": "abra",
+          "weight": 0.15
+        }
       ],
       "es": [
-        { "term": "muestra", "weight": 0.17 },
-        { "term": "muéstrame", "weight": 0.18 },
-        { "term": "encuentra", "weight": 0.16 },
-        { "term": "busca", "weight": 0.16 },
-        { "term": "lista", "weight": 0.16 },
-        { "term": "resume", "weight": 0.18 },
-        { "term": "explica", "weight": 0.17 },
-        { "term": "compara", "weight": 0.17 },
-        { "term": "calcula", "weight": 0.17 },
-        { "term": "abre", "weight": 0.15 }
+        {
+          "term": "muestra",
+          "weight": 0.17
+        },
+        {
+          "term": "muéstrame",
+          "weight": 0.18
+        },
+        {
+          "term": "encuentra",
+          "weight": 0.16
+        },
+        {
+          "term": "busca",
+          "weight": 0.16
+        },
+        {
+          "term": "lista",
+          "weight": 0.16
+        },
+        {
+          "term": "resume",
+          "weight": 0.18
+        },
+        {
+          "term": "explica",
+          "weight": 0.17
+        },
+        {
+          "term": "compara",
+          "weight": 0.17
+        },
+        {
+          "term": "calcula",
+          "weight": 0.17
+        },
+        {
+          "term": "abre",
+          "weight": 0.15
+        }
       ]
     },
     "morphological": {
       "_comment": "Language-specific morphological patterns (suffixes, prefixes). Weight: 0.06-0.10 each.",
       "en": [
-        { "pattern": "\\b\\w+ing\\b", "weight": 0.08, "description": "Present participle -ing" },
-        { "pattern": "\\b\\w+tion\\b", "weight": 0.07, "description": "Nominalization -tion" },
-        { "pattern": "\\b\\w+ness\\b", "weight": 0.07, "description": "Abstract noun -ness" },
-        { "pattern": "\\b\\w+ly\\b", "weight": 0.06, "description": "Adverb -ly" }
+        {
+          "pattern": "\\b\\w+ing\\b",
+          "weight": 0.08,
+          "description": "Present participle -ing"
+        },
+        {
+          "pattern": "\\b\\w+tion\\b",
+          "weight": 0.07,
+          "description": "Nominalization -tion"
+        },
+        {
+          "pattern": "\\b\\w+ness\\b",
+          "weight": 0.07,
+          "description": "Abstract noun -ness"
+        },
+        {
+          "pattern": "\\b\\w+ly\\b",
+          "weight": 0.06,
+          "description": "Adverb -ly"
+        }
       ],
       "pt": [
-        { "pattern": "\\b\\w+ção\\b", "weight": 0.10, "description": "Nominalization -ção" },
-        { "pattern": "\\b\\w+mente\\b", "weight": 0.09, "description": "Adverb -mente" },
-        { "pattern": "\\b\\w+ando\\b", "weight": 0.08, "description": "Gerund -ando" },
-        { "pattern": "\\b\\w+endo\\b", "weight": 0.08, "description": "Gerund -endo" },
-        { "pattern": "\\b\\w+indo\\b", "weight": 0.08, "description": "Gerund -indo" },
-        { "pattern": "\\b\\w+ões\\b", "weight": 0.09, "description": "Plural -ões" }
+        {
+          "pattern": "\\b\\w+ção\\b",
+          "weight": 0.1,
+          "description": "Nominalization -ção"
+        },
+        {
+          "pattern": "\\b\\w+mente\\b",
+          "weight": 0.09,
+          "description": "Adverb -mente"
+        },
+        {
+          "pattern": "\\b\\w+ando\\b",
+          "weight": 0.08,
+          "description": "Gerund -ando"
+        },
+        {
+          "pattern": "\\b\\w+endo\\b",
+          "weight": 0.08,
+          "description": "Gerund -endo"
+        },
+        {
+          "pattern": "\\b\\w+indo\\b",
+          "weight": 0.08,
+          "description": "Gerund -indo"
+        },
+        {
+          "pattern": "\\b\\w+ões\\b",
+          "weight": 0.09,
+          "description": "Plural -ões"
+        }
       ],
       "es": [
-        { "pattern": "\\b\\w+ción\\b", "weight": 0.10, "description": "Nominalization -ción" },
-        { "pattern": "\\b\\w+mente\\b", "weight": 0.09, "description": "Adverb -mente" },
-        { "pattern": "\\b\\w+ando\\b", "weight": 0.08, "description": "Gerund -ando" },
-        { "pattern": "\\b\\w+iendo\\b", "weight": 0.08, "description": "Gerund -iendo" },
-        { "pattern": "\\b\\w+iones\\b", "weight": 0.09, "description": "Plural -iones" }
+        {
+          "pattern": "\\b\\w+ción\\b",
+          "weight": 0.1,
+          "description": "Nominalization -ción"
+        },
+        {
+          "pattern": "\\b\\w+mente\\b",
+          "weight": 0.09,
+          "description": "Adverb -mente"
+        },
+        {
+          "pattern": "\\b\\w+ando\\b",
+          "weight": 0.08,
+          "description": "Gerund -ando"
+        },
+        {
+          "pattern": "\\b\\w+iendo\\b",
+          "weight": 0.08,
+          "description": "Gerund -iendo"
+        },
+        {
+          "pattern": "\\b\\w+iones\\b",
+          "weight": 0.09,
+          "description": "Plural -iones"
+        }
       ]
     },
     "exclusiveMarkers": {
       "_comment": "Words/patterns that exist only in one language. Highest confidence. Weight: 0.25-0.35 each.",
       "en": [
-        { "term": "of the", "weight": 0.28, "description": "English genitive pattern" },
-        { "term": "in the", "weight": 0.26, "description": "English locative" },
-        { "term": "it is", "weight": 0.25, "description": "English subject-verb" }
+        {
+          "term": "of the",
+          "weight": 0.28,
+          "description": "English genitive pattern"
+        },
+        {
+          "term": "in the",
+          "weight": 0.26,
+          "description": "English locative"
+        },
+        {
+          "term": "it is",
+          "weight": 0.25,
+          "description": "English subject-verb"
+        }
       ],
       "pt": [
-        { "term": "não", "weight": 0.32, "description": "Portuguese negation" },
-        { "term": "você", "weight": 0.30, "description": "Portuguese 'you'" },
-        { "term": "também", "weight": 0.28, "description": "Portuguese 'also'" },
-        { "term": "já", "weight": 0.28, "description": "Portuguese 'already'" },
-        { "term": "mais", "weight": 0.25, "description": "Portuguese 'more'" },
-        { "term": "muito", "weight": 0.25, "description": "Portuguese 'very/much'" },
-        { "term": "ainda", "weight": 0.26, "description": "Portuguese 'still/yet'" }
+        {
+          "term": "não",
+          "weight": 0.32,
+          "description": "Portuguese negation"
+        },
+        {
+          "term": "você",
+          "weight": 0.3,
+          "description": "Portuguese 'you'"
+        },
+        {
+          "term": "também",
+          "weight": 0.28,
+          "description": "Portuguese 'also'"
+        },
+        {
+          "term": "já",
+          "weight": 0.28,
+          "description": "Portuguese 'already'"
+        },
+        {
+          "term": "mais",
+          "weight": 0.25,
+          "description": "Portuguese 'more'"
+        },
+        {
+          "term": "muito",
+          "weight": 0.25,
+          "description": "Portuguese 'very/much'"
+        },
+        {
+          "term": "ainda",
+          "weight": 0.26,
+          "description": "Portuguese 'still/yet'"
+        }
       ],
       "es": [
-        { "term": "no", "weight": 0.20, "description": "Spanish negation (shared, lower weight)" },
-        { "term": "usted", "weight": 0.32, "description": "Spanish formal 'you'" },
-        { "term": "también", "weight": 0.28, "description": "Spanish 'also'" },
-        { "term": "ya", "weight": 0.26, "description": "Spanish 'already'" },
-        { "term": "más", "weight": 0.25, "description": "Spanish 'more'" },
-        { "term": "muy", "weight": 0.28, "description": "Spanish 'very'" },
-        { "term": "todavía", "weight": 0.28, "description": "Spanish 'still/yet'" }
+        {
+          "term": "no",
+          "weight": 0.2,
+          "description": "Spanish negation (shared, lower weight)"
+        },
+        {
+          "term": "usted",
+          "weight": 0.32,
+          "description": "Spanish formal 'you'"
+        },
+        {
+          "term": "también",
+          "weight": 0.28,
+          "description": "Spanish 'also'"
+        },
+        {
+          "term": "ya",
+          "weight": 0.26,
+          "description": "Spanish 'already'"
+        },
+        {
+          "term": "más",
+          "weight": 0.25,
+          "description": "Spanish 'more'"
+        },
+        {
+          "term": "muy",
+          "weight": 0.28,
+          "description": "Spanish 'very'"
+        },
+        {
+          "term": "todavía",
+          "weight": 0.28,
+          "description": "Spanish 'still/yet'"
+        }
       ]
     }
   },
@@ -222,9 +692,40 @@
     "_comment": "Rules for distinguishing between similar languages (pt vs es).",
     "ptVsEs": {
       "description": "Portuguese and Spanish share many cognates. Use these decisive markers.",
-      "ptOnly": ["você", "não", "muito", "também", "já", "ainda", "têm", "são", "foram", "onde", "quem"],
-      "esOnly": ["usted", "muy", "también", "ya", "todavía", "tienen", "fueron", "dónde", "quién"],
-      "sharedAmbiguous": ["como", "total", "para", "por", "que", "con", "sin", "pero"]
+      "ptOnly": [
+        "você",
+        "não",
+        "muito",
+        "também",
+        "já",
+        "ainda",
+        "têm",
+        "são",
+        "foram",
+        "onde",
+        "quem"
+      ],
+      "esOnly": [
+        "usted",
+        "muy",
+        "también",
+        "ya",
+        "todavía",
+        "tienen",
+        "fueron",
+        "dónde",
+        "quién"
+      ],
+      "sharedAmbiguous": [
+        "como",
+        "total",
+        "para",
+        "por",
+        "que",
+        "con",
+        "sin",
+        "pero"
+      ]
     }
   },
   "scoring": {
@@ -236,10 +737,22 @@
       "marginRequired": 0.05
     },
     "confidenceBands": {
-      "high": { "min": 0.80, "label": "high_confidence" },
-      "medium": { "min": 0.60, "label": "medium_confidence" },
-      "low": { "min": 0.40, "label": "low_confidence" },
-      "uncertain": { "min": 0.0, "label": "uncertain" }
+      "high": {
+        "min": 0.8,
+        "label": "high_confidence"
+      },
+      "medium": {
+        "min": 0.6,
+        "label": "medium_confidence"
+      },
+      "low": {
+        "min": 0.4,
+        "label": "low_confidence"
+      },
+      "uncertain": {
+        "min": 0,
+        "label": "uncertain"
+      }
     }
   },
   "outputs": {
@@ -258,42 +771,66 @@
       {
         "id": "LI_0001_clear_english",
         "input": "What is the total revenue for 2024?",
-        "expect": { "detectedLanguage": "en", "confidenceMin": 0.70 }
+        "expect": {
+          "detectedLanguage": "en",
+          "confidenceMin": 0.7
+        }
       },
       {
         "id": "LI_0002_clear_portuguese",
         "input": "Qual é o total de receita em 2024?",
-        "expect": { "detectedLanguage": "pt", "confidenceMin": 0.75 }
+        "expect": {
+          "detectedLanguage": "pt",
+          "confidenceMin": 0.75
+        }
       },
       {
         "id": "LI_0003_clear_spanish",
         "input": "¿Cuál es el total de ingresos en 2024?",
-        "expect": { "detectedLanguage": "es", "confidenceMin": 0.75 }
+        "expect": {
+          "detectedLanguage": "es",
+          "confidenceMin": 0.75
+        }
       },
       {
         "id": "LI_0004_short_query_english",
         "input": "show revenue",
-        "expect": { "detectedLanguage": "en", "confidenceMin": 0.50 }
+        "expect": {
+          "detectedLanguage": "en",
+          "confidenceMin": 0.5
+        }
       },
       {
         "id": "LI_0005_short_query_portuguese",
         "input": "mostra receita",
-        "expect": { "detectedLanguage": "pt", "confidenceMin": 0.50 }
+        "expect": {
+          "detectedLanguage": "pt",
+          "confidenceMin": 0.5
+        }
       },
       {
         "id": "LI_0006_ambiguous_fallback",
         "input": "total 2024",
-        "expect": { "detectedLanguage": "en", "confidenceBand": "uncertain" }
+        "expect": {
+          "detectedLanguage": "en",
+          "confidenceBand": "uncertain"
+        }
       },
       {
         "id": "LI_0007_pt_vs_es_disambiguation",
         "input": "você pode mostrar o relatório?",
-        "expect": { "detectedLanguage": "pt", "notEqual": "es" }
+        "expect": {
+          "detectedLanguage": "pt",
+          "notEqual": "es"
+        }
       },
       {
         "id": "LI_0008_es_vs_pt_disambiguation",
         "input": "¿puede usted mostrar el informe?",
-        "expect": { "detectedLanguage": "es", "notEqual": "pt" }
+        "expect": {
+          "detectedLanguage": "es",
+          "notEqual": "pt"
+        }
       }
     ]
   }

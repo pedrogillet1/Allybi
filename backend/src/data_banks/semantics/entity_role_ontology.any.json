@@ -1,63 +1,315 @@
 {
-  "_meta": { "id": "entity_role_ontology", "version": "1.0.0", "description": "Defines entity roles, anchor labels, confusion graph, and proximity rules for contract field extraction.", "languages": ["any", "en", "pt"], "lastUpdated": "2026-02-20", "owner": "koda-retrieval", "compat": ">=1.0.0" },
-  "config": { "enabled": true, "proximityWindowChars": 200, "anchorMatchMinLength": 3 },
+  "_meta": {
+    "id": "entity_role_ontology",
+    "version": "1.0.0",
+    "description": "Defines entity roles, anchor labels, confusion graph, and proximity rules for contract field extraction.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-02-20",
+    "owner": "koda-retrieval",
+    "compat": ">=1.0.0",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "proximityWindowChars": 200,
+    "anchorMatchMinLength": 3
+  },
   "roles": [
     {
       "id": "owner",
-      "anchors": { "en": ["owner", "proprietor", "landlord", "lessor", "property owner"], "pt": ["proprietário", "dono", "locador", "senhorio"] },
-      "confusesWith": ["signatory", "guarantor"],
-      "contextClues": { "en": ["hereby agrees as owner", "the owner of the property", "owner herein"], "pt": ["proprietário do imóvel", "na qualidade de proprietário"] }
+      "anchors": {
+        "en": [
+          "owner",
+          "proprietor",
+          "landlord",
+          "lessor",
+          "property owner"
+        ],
+        "pt": [
+          "proprietário",
+          "dono",
+          "locador",
+          "senhorio"
+        ]
+      },
+      "confusesWith": [
+        "signatory",
+        "guarantor"
+      ],
+      "contextClues": {
+        "en": [
+          "hereby agrees as owner",
+          "the owner of the property",
+          "owner herein"
+        ],
+        "pt": [
+          "proprietário do imóvel",
+          "na qualidade de proprietário"
+        ]
+      }
     },
     {
       "id": "signatory",
-      "anchors": { "en": ["signatory", "signed by", "signer", "subscriber", "undersigned"], "pt": ["signatário", "assinado por", "assinante", "subscritor", "abaixo assinado"] },
-      "confusesWith": ["owner", "witness"],
-      "contextClues": { "en": ["signed on this date", "in witness whereof", "the undersigned"], "pt": ["assinado nesta data", "em testemunho do qual"] }
+      "anchors": {
+        "en": [
+          "signatory",
+          "signed by",
+          "signer",
+          "subscriber",
+          "undersigned"
+        ],
+        "pt": [
+          "signatário",
+          "assinado por",
+          "assinante",
+          "subscritor",
+          "abaixo assinado"
+        ]
+      },
+      "confusesWith": [
+        "owner",
+        "witness"
+      ],
+      "contextClues": {
+        "en": [
+          "signed on this date",
+          "in witness whereof",
+          "the undersigned"
+        ],
+        "pt": [
+          "assinado nesta data",
+          "em testemunho do qual"
+        ]
+      }
     },
     {
       "id": "witness",
-      "anchors": { "en": ["witness", "attested by", "witnessed by", "in the presence of"], "pt": ["testemunha", "atestado por", "presenciado por", "na presença de"] },
-      "confusesWith": ["signatory"],
-      "contextClues": { "en": ["as witness", "witness to the execution", "attesting witness"], "pt": ["como testemunha", "testemunha da execução"] }
+      "anchors": {
+        "en": [
+          "witness",
+          "attested by",
+          "witnessed by",
+          "in the presence of"
+        ],
+        "pt": [
+          "testemunha",
+          "atestado por",
+          "presenciado por",
+          "na presença de"
+        ]
+      },
+      "confusesWith": [
+        "signatory"
+      ],
+      "contextClues": {
+        "en": [
+          "as witness",
+          "witness to the execution",
+          "attesting witness"
+        ],
+        "pt": [
+          "como testemunha",
+          "testemunha da execução"
+        ]
+      }
     },
     {
       "id": "guarantor",
-      "anchors": { "en": ["guarantor", "surety", "co-signer", "guarantee", "bail"], "pt": ["fiador", "avalista", "garantidor", "caucionante"] },
-      "confusesWith": ["owner", "signatory"],
-      "contextClues": { "en": ["guarantees the obligations", "as guarantor", "joint and several guarantee"], "pt": ["garante as obrigações", "na qualidade de fiador"] }
+      "anchors": {
+        "en": [
+          "guarantor",
+          "surety",
+          "co-signer",
+          "guarantee",
+          "bail"
+        ],
+        "pt": [
+          "fiador",
+          "avalista",
+          "garantidor",
+          "caucionante"
+        ]
+      },
+      "confusesWith": [
+        "owner",
+        "signatory"
+      ],
+      "contextClues": {
+        "en": [
+          "guarantees the obligations",
+          "as guarantor",
+          "joint and several guarantee"
+        ],
+        "pt": [
+          "garante as obrigações",
+          "na qualidade de fiador"
+        ]
+      }
     },
     {
       "id": "party_a",
-      "anchors": { "en": ["party a", "first party", "contracting party", "party of the first part"], "pt": ["parte a", "primeiro contratante", "primeira parte", "outorgante"] },
-      "confusesWith": ["party_b"],
-      "contextClues": { "en": ["hereinafter referred to as party a", "the first party"], "pt": ["doravante denominado parte a", "o primeiro contratante"] }
+      "anchors": {
+        "en": [
+          "party a",
+          "first party",
+          "contracting party",
+          "party of the first part"
+        ],
+        "pt": [
+          "parte a",
+          "primeiro contratante",
+          "primeira parte",
+          "outorgante"
+        ]
+      },
+      "confusesWith": [
+        "party_b"
+      ],
+      "contextClues": {
+        "en": [
+          "hereinafter referred to as party a",
+          "the first party"
+        ],
+        "pt": [
+          "doravante denominado parte a",
+          "o primeiro contratante"
+        ]
+      }
     },
     {
       "id": "party_b",
-      "anchors": { "en": ["party b", "second party", "contracted party", "party of the second part"], "pt": ["parte b", "segundo contratante", "segunda parte", "outorgado"] },
-      "confusesWith": ["party_a"],
-      "contextClues": { "en": ["hereinafter referred to as party b", "the second party"], "pt": ["doravante denominado parte b", "o segundo contratante"] }
+      "anchors": {
+        "en": [
+          "party b",
+          "second party",
+          "contracted party",
+          "party of the second part"
+        ],
+        "pt": [
+          "parte b",
+          "segundo contratante",
+          "segunda parte",
+          "outorgado"
+        ]
+      },
+      "confusesWith": [
+        "party_a"
+      ],
+      "contextClues": {
+        "en": [
+          "hereinafter referred to as party b",
+          "the second party"
+        ],
+        "pt": [
+          "doravante denominado parte b",
+          "o segundo contratante"
+        ]
+      }
     },
     {
       "id": "beneficiary",
-      "anchors": { "en": ["beneficiary", "payee", "recipient", "insured"], "pt": ["beneficiário", "favorecido", "destinatário", "segurado"] },
-      "confusesWith": ["signatory"],
-      "contextClues": { "en": ["the beneficiary shall receive", "beneficiary of the policy"], "pt": ["o beneficiário receberá", "beneficiário da apólice"] }
+      "anchors": {
+        "en": [
+          "beneficiary",
+          "payee",
+          "recipient",
+          "insured"
+        ],
+        "pt": [
+          "beneficiário",
+          "favorecido",
+          "destinatário",
+          "segurado"
+        ]
+      },
+      "confusesWith": [
+        "signatory"
+      ],
+      "contextClues": {
+        "en": [
+          "the beneficiary shall receive",
+          "beneficiary of the policy"
+        ],
+        "pt": [
+          "o beneficiário receberá",
+          "beneficiário da apólice"
+        ]
+      }
     },
     {
       "id": "tenant",
-      "anchors": { "en": ["tenant", "lessee", "renter", "occupant"], "pt": ["inquilino", "locatário", "arrendatário"] },
-      "confusesWith": ["owner"],
-      "contextClues": { "en": ["the tenant agrees to", "lessee shall pay"], "pt": ["o inquilino concorda em", "o locatário pagará"] }
+      "anchors": {
+        "en": [
+          "tenant",
+          "lessee",
+          "renter",
+          "occupant"
+        ],
+        "pt": [
+          "inquilino",
+          "locatário",
+          "arrendatário"
+        ]
+      },
+      "confusesWith": [
+        "owner"
+      ],
+      "contextClues": {
+        "en": [
+          "the tenant agrees to",
+          "lessee shall pay"
+        ],
+        "pt": [
+          "o inquilino concorda em",
+          "o locatário pagará"
+        ]
+      }
     }
   ],
   "confusionGraph": {
-    "owner-signatory": { "bidirectional": true, "severity": "high", "penalty": 0.40 },
-    "owner-guarantor": { "bidirectional": true, "severity": "high", "penalty": 0.35 },
-    "owner-tenant": { "bidirectional": true, "severity": "high", "penalty": 0.45 },
-    "signatory-witness": { "bidirectional": true, "severity": "high", "penalty": 0.35 },
-    "party_a-party_b": { "bidirectional": true, "severity": "critical", "penalty": 0.50 },
-    "guarantor-witness": { "bidirectional": true, "severity": "medium", "penalty": 0.30 },
-    "beneficiary-signatory": { "bidirectional": true, "severity": "medium", "penalty": 0.30 }
+    "owner-signatory": {
+      "bidirectional": true,
+      "severity": "high",
+      "penalty": 0.4
+    },
+    "owner-guarantor": {
+      "bidirectional": true,
+      "severity": "high",
+      "penalty": 0.35
+    },
+    "owner-tenant": {
+      "bidirectional": true,
+      "severity": "high",
+      "penalty": 0.45
+    },
+    "signatory-witness": {
+      "bidirectional": true,
+      "severity": "high",
+      "penalty": 0.35
+    },
+    "party_a-party_b": {
+      "bidirectional": true,
+      "severity": "critical",
+      "penalty": 0.5
+    },
+    "guarantor-witness": {
+      "bidirectional": true,
+      "severity": "medium",
+      "penalty": 0.3
+    },
+    "beneficiary-signatory": {
+      "bidirectional": true,
+      "severity": "medium",
+      "penalty": 0.3
+    }
   }
 }

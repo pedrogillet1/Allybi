@@ -11,17 +11,11 @@
       "RuntimeWiringIntegrityService",
       "runtime-bank-coverage"
     ],
-    "tests": {
-      "positive": [
-        "chat runtime preloads all registered banks before first answer",
-        "mode-switch banks are available for chat/editor mode routing"
-      ],
-      "negative": [
-        "missing registered bank fails chat runtime bootstrap",
-        "empty contract set is rejected"
-      ]
-    },
-    "lastUpdated": "2026-03-03"
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ],
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance"
   },
   "config": {
     "enabled": true,

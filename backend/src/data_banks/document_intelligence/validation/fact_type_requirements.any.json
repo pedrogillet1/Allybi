@@ -3,38 +3,89 @@
     "id": "fact_type_requirements",
     "version": "1.0.0",
     "description": "Core fact validation requirements for extraction, citation grounding, and field typing.",
-    "languages": ["any", "en", "pt"],
-    "lastUpdated": "2026-03-03"
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
     "strictTypedFacts": true,
-    "requireEvidenceForFacts": true
+    "requireEvidenceForFacts": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "factTypes": [
     {
       "id": "fact_type_numeric_amount",
       "category": "numeric",
-      "requiredEvidenceFields": ["value", "unit", "currency", "period", "sourceCell", "sourceTable"],
-      "checks": ["parseable", "unitPresent", "periodScopeMatch"]
+      "requiredEvidenceFields": [
+        "value",
+        "unit",
+        "currency",
+        "period",
+        "sourceCell",
+        "sourceTable"
+      ],
+      "checks": [
+        "parseable",
+        "unitPresent",
+        "periodScopeMatch"
+      ]
     },
     {
       "id": "fact_type_ratio",
       "category": "numeric",
-      "requiredEvidenceFields": ["numerator", "denominator", "value", "basis", "period"],
-      "checks": ["divisionByZeroGuard", "sourceHeadersMatch"]
+      "requiredEvidenceFields": [
+        "numerator",
+        "denominator",
+        "value",
+        "basis",
+        "period"
+      ],
+      "checks": [
+        "divisionByZeroGuard",
+        "sourceHeadersMatch"
+      ]
     },
     {
       "id": "fact_type_datetime",
       "category": "temporal",
-      "requiredEvidenceFields": ["dateText", "normalization", "sourceSection", "sourceCell"],
-      "checks": ["formatCanonicalizable", "timezoneAware"]
+      "requiredEvidenceFields": [
+        "dateText",
+        "normalization",
+        "sourceSection",
+        "sourceCell"
+      ],
+      "checks": [
+        "formatCanonicalizable",
+        "timezoneAware"
+      ]
     },
     {
       "id": "fact_type_party",
       "category": "entity",
-      "requiredEvidenceFields": ["name", "role", "sourceSection", "sourceSpan"],
-      "checks": ["exactSpanAlignment", "noSpuriousMerge", "entityTypeMatch"]
+      "requiredEvidenceFields": [
+        "name",
+        "role",
+        "sourceSection",
+        "sourceSpan"
+      ],
+      "checks": [
+        "exactSpanAlignment",
+        "noSpuriousMerge",
+        "entityTypeMatch"
+      ]
     }
   ],
   "rules": [

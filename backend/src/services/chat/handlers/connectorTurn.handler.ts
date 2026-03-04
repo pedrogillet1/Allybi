@@ -15,8 +15,13 @@ import { GmailOAuthService } from "../../connectors/gmail/gmailOAuth.service";
 import { OutlookOAuthService } from "../../connectors/outlook/outlookOAuth.service";
 import { SlackOAuthService } from "../../connectors/slack/slackOAuth.service";
 import { GmailClientService } from "../../connectors/gmail/gmailClient.service";
-import GraphClientService from "../../connectors/outlook/graphClient.service";
-import { SlackClientService } from "../../connectors/slack/slackClient.service";
+import GraphClientService, {
+  type GraphMessageItem,
+} from "../../connectors/outlook/graphClient.service";
+import {
+  SlackClientService,
+  type SlackMessage,
+} from "../../connectors/slack/slackClient.service";
 import { verifyEmailSendConfirmationToken } from "../../connectors/emailSendConfirmation.service";
 import prisma from "../../../config/database";
 
@@ -532,7 +537,8 @@ export class ConnectorTurnHandler {
       assistantTelemetry: undefined,
       sources: [],
       followups: [],
-      answerMode: asString(patch.answerMode) || "action_receipt",
+      answerMode: (asString(patch.answerMode) ||
+        "general_answer") as ChatResult["answerMode"],
       answerClass: "GENERAL",
       navType: null,
       status: patch.status || "success",
@@ -759,6 +765,7 @@ export class ConnectorTurnHandler {
     const msg = listValue.length > 0 ? listValue[0] : null;
     if (!msg) return null;
     const messageRecord = asRecord(msg);
+    const graphMessage = msg as GraphMessageItem;
     const fromRecord = asRecord(messageRecord.from);
     const fromAddressRecord = asRecord(fromRecord.emailAddress);
 
@@ -784,9 +791,9 @@ export class ConnectorTurnHandler {
       to: firstAddress(messageRecord.toRecipients),
       cc: firstAddress(messageRecord.ccRecipients),
       receivedAt: asString(messageRecord.receivedDateTime),
-      preview: normalizePreview(this.deps.graphClient.getMessageText(messageRecord), 320),
+      preview: normalizePreview(this.deps.graphClient.getMessageText(graphMessage), 320),
       bodyText: normalizePreview(
-        this.deps.graphClient.getMessageText(messageRecord),
+        this.deps.graphClient.getMessageText(graphMessage),
         1200,
       ),
     };
@@ -853,7 +860,9 @@ export class ConnectorTurnHandler {
           : null;
         if (!latest) continue;
         const preview = normalizePreview(
-          this.deps.slackClient.extractMessageText(asRecord(latest)),
+          this.deps.slackClient.extractMessageText(
+            latest as unknown as SlackMessage,
+          ),
           320,
         );
         if (!preview) continue;

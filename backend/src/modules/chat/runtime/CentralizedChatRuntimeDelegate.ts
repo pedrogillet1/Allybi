@@ -96,6 +96,7 @@ import { RefusalPolicyService } from "../../../services/core/policy/refusalPolic
 import { ClarificationPolicyService } from "../../../services/core/policy/clarificationPolicy.service";
 import { CompliancePolicyService } from "../../../services/core/policy/compliancePolicy.service";
 import { FallbackDecisionPolicyService } from "../../../services/core/policy/fallbackDecisionPolicy.service";
+import { stableLocationKey } from "../../../services/core/retrieval/retrievalEngine.utils";
 
 type _CertificationTraceMarkerSpanWriter = {
   startSpan: (_traceId: string, _step: string) => string;
@@ -402,6 +403,70 @@ function sanitizeSnippet(value: string, maxChars: number): string {
   return text.length > maxChars ? `${text.slice(0, maxChars - 1)}…` : text;
 }
 
+const CELL_REFERENCE_REGEX =
+  /^[A-Za-z]{1,4}[0-9]{1,7}(?::[A-Za-z]{1,4}[0-9]{1,7})?$/;
+
+type NormalizedEvidenceLocation = {
+  page: number | null;
+  slide: number | null;
+  sheet: string | null;
+  cell: string | null;
+  section: string | null;
+  locationLabel: string | null;
+  locationKey: string | null;
+};
+
+function toPositiveIntegerOrNull(value: unknown): number | null {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return null;
+  const normalized = Math.trunc(parsed);
+  return normalized > 0 ? normalized : null;
+}
+
+function normalizeEvidenceLocation(
+  item: EvidenceItem,
+  fallbackChunkIndex: number,
+): NormalizedEvidenceLocation {
+  const page = toPositiveIntegerOrNull(item.location.page);
+  const slide = toPositiveIntegerOrNull(item.location.slide);
+  const sheet = String(item.location.sheet || "").trim() || null;
+  const sectionKey = String(item.location.sectionKey || "").trim();
+  const isCellReference = CELL_REFERENCE_REGEX.test(sectionKey);
+  const cell = isCellReference ? sectionKey.toUpperCase() : null;
+  const section = !isCellReference ? sectionKey || null : null;
+  const locationLabel = page
+    ? `Page ${page}`
+    : slide
+      ? `Slide ${slide}`
+      : sheet && cell
+        ? `${sheet}!${cell}`
+        : sheet
+          ? sheet
+          : section || null;
+  const rawLocationKey = String(item.locationKey || "").trim();
+  const locationKey =
+    rawLocationKey ||
+    stableLocationKey(
+      item.docId,
+      {
+        page,
+        sheet,
+        slide,
+        sectionKey: cell || section || null,
+      },
+      String(Math.max(1, fallbackChunkIndex)),
+    );
+  return {
+    page,
+    slide,
+    sheet,
+    cell,
+    section,
+    locationLabel,
+    locationKey: String(locationKey || "").trim() || null,
+  };
+}
+
 type ChatSourceEntry = NonNullable<ChatResult["sources"]>[number];
 
 type SourceGroundingOptions = {
@@ -482,27 +547,18 @@ function buildSourcesFromEvidence(evidence: EvidenceItem[]): ChatSourceEntry[] {
 
   for (const item of evidence) {
     if (!item.docId) continue;
+    const normalizedLocation = normalizeEvidenceLocation(item, out.length + 1);
     const dedupeKey = [
       item.docId,
-      String(item.locationKey || "").trim().toLowerCase(),
-      String(item.location.page ?? ""),
-      String(item.location.slide ?? ""),
-      String(item.location.sheet || "").trim().toLowerCase(),
-      String(item.location.sectionKey || "").trim().toLowerCase(),
+      String(normalizedLocation.locationKey || "").trim().toLowerCase(),
+      String(normalizedLocation.page ?? ""),
+      String(normalizedLocation.slide ?? ""),
+      String(normalizedLocation.sheet || "").trim().toLowerCase(),
+      String(normalizedLocation.cell || "").trim().toLowerCase(),
+      String(normalizedLocation.section || "").trim().toLowerCase(),
     ].join("|");
     if (seen.has(dedupeKey)) continue;
     seen.add(dedupeKey);
-    const sectionKey = String(item.location.sectionKey || "").trim();
-    const isCellRef = /^[A-Za-z]{1,4}[0-9]{1,7}(?::[A-Za-z]{1,4}[0-9]{1,7})?$/.test(sectionKey);
-    const locationLabel = item.location.page
-      ? `Page ${item.location.page}`
-      : item.location.slide
-        ? `Slide ${item.location.slide}`
-        : item.location.sheet && isCellRef
-          ? `${String(item.location.sheet)}!${sectionKey.toUpperCase()}`
-          : item.location.sheet
-            ? String(item.location.sheet)
-            : sectionKey || null;
     out.push({
       documentId: item.docId,
       docId: item.docId,
@@ -510,13 +566,13 @@ function buildSourcesFromEvidence(evidence: EvidenceItem[]): ChatSourceEntry[] {
         item.filename || item.title || fallbackSourceLabel(item.docId),
       ),
       mimeType: null,
-      page: item.location.page ?? null,
-      slide: item.location.slide ?? null,
-      sheet: item.location.sheet ?? null,
-      cell: isCellRef ? sectionKey : null,
-      section: !isCellRef ? sectionKey || null : null,
-      locationKey: item.locationKey || null,
-      locationLabel,
+      page: normalizedLocation.page,
+      slide: normalizedLocation.slide,
+      sheet: normalizedLocation.sheet,
+      cell: normalizedLocation.cell,
+      section: normalizedLocation.section,
+      locationKey: normalizedLocation.locationKey,
+      locationLabel: normalizedLocation.locationLabel,
       snippet: item.snippet || null,
     });
     if (out.length >= 6) break;
@@ -2269,9 +2325,13 @@ export class CentralizedChatRuntimeDelegate {
         retrievalPack?.evidence ?? [],
         { enforceScopedSources },
       );
+      const fallbackAttachment = this.buildSourceButtonsFromSources(
+        filteredSources,
+        req.preferredLanguage,
+      );
       const attachmentsPayload = mergeAttachments(
         generated.attachmentsPayload,
-        filteredAttachment,
+        filteredAttachment || fallbackAttachment,
       );
       const sourceInvariantFailureCode = resolveSourceInvariantFailureCode({
         answerMode,
@@ -2947,9 +3007,13 @@ export class CentralizedChatRuntimeDelegate {
         retrievalPack?.evidence ?? [],
         { enforceScopedSources },
       );
+      const fallbackAttachment = this.buildSourceButtonsFromSources(
+        filteredSources,
+        req.preferredLanguage,
+      );
       const attachmentsPayload = mergeAttachments(
         streamed.attachmentsPayload,
-        filteredAttachment,
+        filteredAttachment || fallbackAttachment,
       );
       const sourceInvariantFailureCode = resolveSourceInvariantFailureCode({
         answerMode,
@@ -4241,7 +4305,7 @@ export class CentralizedChatRuntimeDelegate {
         text = buildEmptyAssistantText({
           language: params.req.preferredLanguage,
           reasonCode: revalidated.failureCode,
-          seed: `${params.req.userId}:provenance:${revalidated.failureCode}:${params.req.messageId || Date.now()}`,
+          seed: `${params.req.userId}:provenance:${revalidated.failureCode}:${params.req.conversationId || Date.now()}`,
         });
       }
     }
@@ -5578,12 +5642,22 @@ export class CentralizedChatRuntimeDelegate {
     const sourceCount = retrievalPack?.evidence.length ?? 0;
     const resolvedFallbackSignal =
       fallbackSignal ?? this.resolveFallbackSignal(req, retrievalPack);
+    const inheritedIntentFamily =
+      typeof (req.meta as any)?.intentFamily === "string"
+        ? String((req.meta as any).intentFamily).trim()
+        : "";
+    const inheritedOperator =
+      typeof (req.meta as any)?.operator === "string"
+        ? String((req.meta as any).operator).trim()
+        : "";
     return {
       ...(req.meta || {}),
       preferredLanguage: req.preferredLanguage || "en",
       answerMode,
-      intentFamily: sourceCount > 0 ? "documents" : "general",
-      operator: sourceCount > 0 ? "answer_with_sources" : "answer",
+      intentFamily:
+        inheritedIntentFamily || (sourceCount > 0 ? "documents" : "general"),
+      operator:
+        inheritedOperator || (sourceCount > 0 ? "answer_with_sources" : "answer"),
       fallbackReasonCode: resolvedFallbackSignal.reasonCode,
       fallbackTelemetry: resolvedFallbackSignal.telemetryReasonCode
         ? {
@@ -6149,39 +6223,65 @@ export class CentralizedChatRuntimeDelegate {
   ): unknown | null {
     if (!retrievalPack || retrievalPack.evidence.length === 0) return null;
     const sourceButtonsService = getSourceButtonsService();
-    const toCellReference = (raw: unknown): string | undefined => {
-      const text = String(raw || "").trim();
-      if (!text) return undefined;
-      return /^[A-Za-z]{1,4}[0-9]{1,7}(?::[A-Za-z]{1,4}[0-9]{1,7})?$/.test(text)
-        ? text.toUpperCase()
-        : undefined;
-    };
-    const toLocationLabel = (item: EvidenceItem): string | undefined => {
-      if (item.location.page) return `Page ${item.location.page}`;
-      if (item.location.slide) return `Slide ${item.location.slide}`;
-      const sectionKey = String(item.location.sectionKey || "").trim();
-      const isCellRef = /^[A-Za-z]{1,4}[0-9]{1,7}(?::[A-Za-z]{1,4}[0-9]{1,7})?$/.test(sectionKey);
-      if (item.location.sheet && sectionKey && isCellRef) {
-        return `${String(item.location.sheet)}!${sectionKey.toUpperCase()}`;
-      }
-      if (item.location.sheet) return String(item.location.sheet);
-      return sectionKey || undefined;
-    };
-    const rawSources = retrievalPack.evidence.map((item) => ({
-      documentId: item.docId,
-      filename: String(
-        item.filename || item.title || fallbackSourceLabel(item.docId),
-      ),
-      locationKey: item.locationKey,
-      pageNumber: item.location.page ?? undefined,
-      sheetName: item.location.sheet ?? undefined,
-      cellReference: toCellReference(item.location.sectionKey),
-      slideNumber: item.location.slide ?? undefined,
-      sectionTitle: String(item.location.sectionKey || "").trim() || undefined,
-      locationLabel: toLocationLabel(item),
-      snippet: String(item.snippet || "").trim() || undefined,
-      score: item.score.finalScore,
-    }));
+    const rawSources = retrievalPack.evidence.map((item, idx) => {
+      const normalizedLocation = normalizeEvidenceLocation(item, idx + 1);
+      return {
+        documentId: item.docId,
+        filename: String(
+          item.filename || item.title || fallbackSourceLabel(item.docId),
+        ),
+        locationKey: normalizedLocation.locationKey || undefined,
+        pageNumber: normalizedLocation.page ?? undefined,
+        sheetName: normalizedLocation.sheet ?? undefined,
+        cellReference: normalizedLocation.cell ?? undefined,
+        slideNumber: normalizedLocation.slide ?? undefined,
+        sectionTitle: normalizedLocation.section ?? undefined,
+        locationLabel: normalizedLocation.locationLabel || undefined,
+        snippet: String(item.snippet || "").trim() || undefined,
+        score: item.score.finalScore,
+      };
+    });
+    return sourceButtonsService.buildSourceButtons(rawSources, {
+      context: "qa",
+      language: normalizeChatLanguage(preferredLanguage),
+    });
+  }
+
+  private buildSourceButtonsFromSources(
+    sources: ChatSourceEntry[],
+    preferredLanguage?: string,
+  ): unknown | null {
+    if (!Array.isArray(sources) || sources.length === 0) return null;
+    const sourceButtonsService = getSourceButtonsService();
+    const rawSources = sources
+      .map((source, idx) => {
+        const documentId = String(
+          source.documentId || source.docId || "",
+        ).trim();
+        if (!documentId) return null;
+        const filename = String(source.filename || "").trim();
+        const cellReference = String(source.cell || "")
+          .trim()
+          .toUpperCase();
+        return {
+          documentId,
+          filename: filename || fallbackSourceLabel(documentId || `source-${idx + 1}`),
+          mimeType: source.mimeType || undefined,
+          locationKey: String(source.locationKey || "").trim() || undefined,
+          pageNumber: Number.isFinite(Number(source.page))
+            ? Number(source.page)
+            : undefined,
+          sheetName: String(source.sheet || "").trim() || undefined,
+          cellReference: cellReference || undefined,
+          slideNumber: Number.isFinite(Number(source.slide))
+            ? Number(source.slide)
+            : undefined,
+          sectionTitle: String(source.section || "").trim() || undefined,
+          locationLabel: String(source.locationLabel || "").trim() || undefined,
+          snippet: String(source.snippet || "").trim() || undefined,
+        };
+      })
+      .filter((item): item is NonNullable<typeof item> => Boolean(item));
     return sourceButtonsService.buildSourceButtons(rawSources, {
       context: "qa",
       language: normalizeChatLanguage(preferredLanguage),

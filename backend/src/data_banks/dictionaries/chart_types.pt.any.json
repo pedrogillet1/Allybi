@@ -4,920 +4,2231 @@
     "version": "1.0.0",
     "description": "Comprehensive Portuguese chart type dictionary with synonyms, data shape requirements, and best-use guidance.",
     "lastUpdated": "2026-02-27",
-    "languages": ["pt"]
+    "languages": [
+      "pt"
+    ],
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
-  "config": { "enabled": true },
+  "config": {
+    "enabled": true
+  },
   "chartTypes": [
     {
       "id": "bar",
       "canonicalName": "Gráfico de Barras",
-      "aliases": ["barras", "gráfico de barras", "barras horizontais", "gráfico de barras horizontais"],
+      "aliases": [
+        "barras",
+        "gráfico de barras",
+        "barras horizontais",
+        "gráfico de barras horizontais"
+      ],
       "category": "comparison",
-      "dataShape": { "x": "categorical", "y": "numeric", "series": "optional" },
-      "bestFor": ["Comparar categorias", "Classificar itens por valor"],
-      "avoidWhen": ["Dados de séries temporais", "Muitas categorias (>15)"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "numeric",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Comparar categorias",
+        "Classificar itens por valor"
+      ],
+      "avoidWhen": [
+        "Dados de séries temporais",
+        "Muitas categorias (>15)"
+      ],
       "excelChartType": "bar",
       "matplotlibType": "barh"
     },
     {
       "id": "column",
       "canonicalName": "Gráfico de Colunas",
-      "aliases": ["colunas", "gráfico de colunas", "barras verticais", "gráfico de barras verticais"],
+      "aliases": [
+        "colunas",
+        "gráfico de colunas",
+        "barras verticais",
+        "gráfico de barras verticais"
+      ],
       "category": "comparison",
-      "dataShape": { "x": "categorical", "y": "numeric", "series": "optional" },
-      "bestFor": ["Comparar categorias", "Mostrar variações em poucos períodos"],
-      "avoidWhen": ["Muitas categorias (>12)", "Séries temporais contínuas"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "numeric",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Comparar categorias",
+        "Mostrar variações em poucos períodos"
+      ],
+      "avoidWhen": [
+        "Muitas categorias (>12)",
+        "Séries temporais contínuas"
+      ],
       "excelChartType": "column",
       "matplotlibType": "bar"
     },
     {
       "id": "line",
       "canonicalName": "Gráfico de Linhas",
-      "aliases": ["linhas", "gráfico de linhas", "gráfico de linha", "linha de tendência", "curva"],
+      "aliases": [
+        "linhas",
+        "gráfico de linhas",
+        "gráfico de linha",
+        "linha de tendência",
+        "curva"
+      ],
       "category": "time_series",
-      "dataShape": { "x": "sequential", "y": "numeric", "series": "optional" },
-      "bestFor": ["Mostrar tendências ao longo do tempo", "Comparar múltiplas séries"],
-      "avoidWhen": ["Dados categóricos sem ordem", "Muitas séries sobrepostas (>7)"],
+      "dataShape": {
+        "x": "sequential",
+        "y": "numeric",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Mostrar tendências ao longo do tempo",
+        "Comparar múltiplas séries"
+      ],
+      "avoidWhen": [
+        "Dados categóricos sem ordem",
+        "Muitas séries sobrepostas (>7)"
+      ],
       "excelChartType": "line",
       "matplotlibType": "plot"
     },
     {
       "id": "area",
       "canonicalName": "Gráfico de Área",
-      "aliases": ["área", "gráfico de área", "gráfico de área preenchida", "área preenchida"],
+      "aliases": [
+        "área",
+        "gráfico de área",
+        "gráfico de área preenchida",
+        "área preenchida"
+      ],
       "category": "time_series",
-      "dataShape": { "x": "sequential", "y": "numeric", "series": "optional" },
-      "bestFor": ["Mostrar volume ao longo do tempo", "Enfatizar a magnitude da mudança"],
-      "avoidWhen": ["Múltiplas séries sobrepostas que se ocultam", "Valores negativos"],
+      "dataShape": {
+        "x": "sequential",
+        "y": "numeric",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Mostrar volume ao longo do tempo",
+        "Enfatizar a magnitude da mudança"
+      ],
+      "avoidWhen": [
+        "Múltiplas séries sobrepostas que se ocultam",
+        "Valores negativos"
+      ],
       "excelChartType": "area",
       "matplotlibType": "fill_between"
     },
     {
       "id": "pie",
       "canonicalName": "Gráfico de Pizza",
-      "aliases": ["pizza", "gráfico de pizza", "gráfico de setores", "gráfico circular", "torta"],
+      "aliases": [
+        "pizza",
+        "gráfico de pizza",
+        "gráfico de setores",
+        "gráfico circular",
+        "torta"
+      ],
       "category": "part_to_whole",
-      "dataShape": { "x": "categorical", "y": "numeric", "series": "none" },
-      "bestFor": ["Mostrar proporções de um todo", "Composição simples com poucas fatias"],
-      "avoidWhen": ["Mais de 6 categorias", "Comparar valores entre grupos", "Valores não somam um total significativo"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "numeric",
+        "series": "none"
+      },
+      "bestFor": [
+        "Mostrar proporções de um todo",
+        "Composição simples com poucas fatias"
+      ],
+      "avoidWhen": [
+        "Mais de 6 categorias",
+        "Comparar valores entre grupos",
+        "Valores não somam um total significativo"
+      ],
       "excelChartType": "pie",
       "matplotlibType": "pie"
     },
     {
       "id": "doughnut",
       "canonicalName": "Gráfico de Rosca",
-      "aliases": ["rosca", "gráfico de rosca", "donut", "gráfico de anel", "anel"],
+      "aliases": [
+        "rosca",
+        "gráfico de rosca",
+        "donut",
+        "gráfico de anel",
+        "anel"
+      ],
       "category": "part_to_whole",
-      "dataShape": { "x": "categorical", "y": "numeric", "series": "optional" },
-      "bestFor": ["Composição com rótulo central", "Comparar dois níveis de composição"],
-      "avoidWhen": ["Mais de 6 fatias por anel", "Comparação precisa de valores necessária"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "numeric",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Composição com rótulo central",
+        "Comparar dois níveis de composição"
+      ],
+      "avoidWhen": [
+        "Mais de 6 fatias por anel",
+        "Comparação precisa de valores necessária"
+      ],
       "excelChartType": "doughnut",
       "matplotlibType": "pie"
     },
     {
       "id": "scatter",
       "canonicalName": "Gráfico de Dispersão",
-      "aliases": ["dispersão", "gráfico de dispersão", "gráfico XY", "nuvem de pontos", "scatter"],
+      "aliases": [
+        "dispersão",
+        "gráfico de dispersão",
+        "gráfico XY",
+        "nuvem de pontos",
+        "scatter"
+      ],
       "category": "relationship",
-      "dataShape": { "x": "numeric", "y": "numeric", "series": "optional" },
-      "bestFor": ["Identificar correlações", "Detectar outliers", "Mostrar distribuição de duas variáveis"],
-      "avoidWhen": ["Muitos pontos sobrepostos sem transparência", "Eixos categóricos"],
+      "dataShape": {
+        "x": "numeric",
+        "y": "numeric",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Identificar correlações",
+        "Detectar outliers",
+        "Mostrar distribuição de duas variáveis"
+      ],
+      "avoidWhen": [
+        "Muitos pontos sobrepostos sem transparência",
+        "Eixos categóricos"
+      ],
       "excelChartType": "scatter",
       "matplotlibType": "scatter"
     },
     {
       "id": "bubble",
       "canonicalName": "Gráfico de Bolhas",
-      "aliases": ["bolhas", "gráfico de bolhas", "gráfico de bolha", "dispersão com tamanho"],
+      "aliases": [
+        "bolhas",
+        "gráfico de bolhas",
+        "gráfico de bolha",
+        "dispersão com tamanho"
+      ],
       "category": "relationship",
-      "dataShape": { "x": "numeric", "y": "numeric", "size": "numeric", "series": "optional" },
-      "bestFor": ["Comparação de três variáveis", "Destacar magnitude pelo tamanho da bolha"],
-      "avoidWhen": ["Muitas bolhas sobrepostas", "Comparação precisa de tamanho necessária"],
+      "dataShape": {
+        "x": "numeric",
+        "y": "numeric",
+        "size": "numeric",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Comparação de três variáveis",
+        "Destacar magnitude pelo tamanho da bolha"
+      ],
+      "avoidWhen": [
+        "Muitas bolhas sobrepostas",
+        "Comparação precisa de tamanho necessária"
+      ],
       "excelChartType": "bubble",
       "matplotlibType": "scatter"
     },
     {
       "id": "histogram",
       "canonicalName": "Histograma",
-      "aliases": ["histograma", "gráfico de frequência", "distribuição de frequência", "gráfico de distribuição"],
+      "aliases": [
+        "histograma",
+        "gráfico de frequência",
+        "distribuição de frequência",
+        "gráfico de distribuição"
+      ],
       "category": "distribution",
-      "dataShape": { "x": "numeric", "y": "frequency", "series": "none" },
-      "bestFor": ["Mostrar distribuição de dados", "Identificar assimetria e modalidade"],
-      "avoidWhen": ["Dados categóricos", "Amostras muito pequenas (<20)"],
+      "dataShape": {
+        "x": "numeric",
+        "y": "frequency",
+        "series": "none"
+      },
+      "bestFor": [
+        "Mostrar distribuição de dados",
+        "Identificar assimetria e modalidade"
+      ],
+      "avoidWhen": [
+        "Dados categóricos",
+        "Amostras muito pequenas (<20)"
+      ],
       "excelChartType": "histogram",
       "matplotlibType": "hist"
     },
     {
       "id": "box_plot",
       "canonicalName": "Diagrama de Caixa",
-      "aliases": ["box plot", "diagrama de caixa", "boxplot", "caixa e bigode", "gráfico de caixa"],
+      "aliases": [
+        "box plot",
+        "diagrama de caixa",
+        "boxplot",
+        "caixa e bigode",
+        "gráfico de caixa"
+      ],
       "category": "distribution",
-      "dataShape": { "x": "categorical", "y": "numeric", "series": "optional" },
-      "bestFor": ["Comparar distribuições entre grupos", "Identificar outliers e dispersão"],
-      "avoidWhen": ["Público não familiarizado com estatística", "Amostras muito pequenas"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "numeric",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Comparar distribuições entre grupos",
+        "Identificar outliers e dispersão"
+      ],
+      "avoidWhen": [
+        "Público não familiarizado com estatística",
+        "Amostras muito pequenas"
+      ],
       "excelChartType": "boxWhisker",
       "matplotlibType": "boxplot"
     },
     {
       "id": "stacked_bar",
       "canonicalName": "Gráfico de Barras Empilhadas",
-      "aliases": ["barras empilhadas", "gráfico de barras empilhadas", "barras horizontais empilhadas", "barras segmentadas"],
+      "aliases": [
+        "barras empilhadas",
+        "gráfico de barras empilhadas",
+        "barras horizontais empilhadas",
+        "barras segmentadas"
+      ],
       "category": "comparison",
-      "dataShape": { "x": "categorical", "y": "numeric", "series": "required" },
-      "bestFor": ["Mostrar totais e seus subcomponentes", "Composição dentro de categorias"],
-      "avoidWhen": ["Comparar segmentos individuais entre categorias", "Muitas séries (>5)"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "numeric",
+        "series": "required"
+      },
+      "bestFor": [
+        "Mostrar totais e seus subcomponentes",
+        "Composição dentro de categorias"
+      ],
+      "avoidWhen": [
+        "Comparar segmentos individuais entre categorias",
+        "Muitas séries (>5)"
+      ],
       "excelChartType": "barStacked",
       "matplotlibType": "barh"
     },
     {
       "id": "stacked_column",
       "canonicalName": "Gráfico de Colunas Empilhadas",
-      "aliases": ["colunas empilhadas", "gráfico de colunas empilhadas", "barras verticais empilhadas"],
+      "aliases": [
+        "colunas empilhadas",
+        "gráfico de colunas empilhadas",
+        "barras verticais empilhadas"
+      ],
       "category": "comparison",
-      "dataShape": { "x": "categorical", "y": "numeric", "series": "required" },
-      "bestFor": ["Comparar totais mostrando composição", "Composição categórica ao longo de períodos"],
-      "avoidWhen": ["Comparar subsegmentos individuais", "Mais de 5 séries empilhadas"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "numeric",
+        "series": "required"
+      },
+      "bestFor": [
+        "Comparar totais mostrando composição",
+        "Composição categórica ao longo de períodos"
+      ],
+      "avoidWhen": [
+        "Comparar subsegmentos individuais",
+        "Mais de 5 séries empilhadas"
+      ],
       "excelChartType": "columnStacked",
       "matplotlibType": "bar"
     },
     {
       "id": "stacked_area",
       "canonicalName": "Gráfico de Área Empilhada",
-      "aliases": ["área empilhada", "gráfico de área empilhada", "área cumulativa", "área acumulada"],
+      "aliases": [
+        "área empilhada",
+        "gráfico de área empilhada",
+        "área cumulativa",
+        "área acumulada"
+      ],
       "category": "time_series",
-      "dataShape": { "x": "sequential", "y": "numeric", "series": "required" },
-      "bestFor": ["Mostrar totais cumulativos ao longo do tempo", "Visualizar tendências de composição"],
-      "avoidWhen": ["Muitas séries difíceis de distinguir", "Valores negativos"],
+      "dataShape": {
+        "x": "sequential",
+        "y": "numeric",
+        "series": "required"
+      },
+      "bestFor": [
+        "Mostrar totais cumulativos ao longo do tempo",
+        "Visualizar tendências de composição"
+      ],
+      "avoidWhen": [
+        "Muitas séries difíceis de distinguir",
+        "Valores negativos"
+      ],
       "excelChartType": "areaStacked",
       "matplotlibType": "stackplot"
     },
     {
       "id": "percent_stacked_bar",
       "canonicalName": "Gráfico de Barras Empilhadas 100%",
-      "aliases": ["barras empilhadas 100%", "barras proporcionais", "barras normalizadas", "barras empilhadas percentuais"],
+      "aliases": [
+        "barras empilhadas 100%",
+        "barras proporcionais",
+        "barras normalizadas",
+        "barras empilhadas percentuais"
+      ],
       "category": "part_to_whole",
-      "dataShape": { "x": "categorical", "y": "numeric", "series": "required" },
-      "bestFor": ["Comparar proporções entre categorias", "Mostrar composição relativa"],
-      "avoidWhen": ["Valores absolutos importam", "Menos de 3 categorias"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "numeric",
+        "series": "required"
+      },
+      "bestFor": [
+        "Comparar proporções entre categorias",
+        "Mostrar composição relativa"
+      ],
+      "avoidWhen": [
+        "Valores absolutos importam",
+        "Menos de 3 categorias"
+      ],
       "excelChartType": "barStacked100",
       "matplotlibType": "barh"
     },
     {
       "id": "percent_stacked_column",
       "canonicalName": "Gráfico de Colunas Empilhadas 100%",
-      "aliases": ["colunas empilhadas 100%", "colunas proporcionais", "colunas normalizadas", "colunas empilhadas percentuais"],
+      "aliases": [
+        "colunas empilhadas 100%",
+        "colunas proporcionais",
+        "colunas normalizadas",
+        "colunas empilhadas percentuais"
+      ],
       "category": "part_to_whole",
-      "dataShape": { "x": "categorical", "y": "numeric", "series": "required" },
-      "bestFor": ["Comparar proporções ao longo do tempo ou entre grupos", "Normalizar totais desiguais"],
-      "avoidWhen": ["Magnitudes absolutas são importantes", "Muitas séries"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "numeric",
+        "series": "required"
+      },
+      "bestFor": [
+        "Comparar proporções ao longo do tempo ou entre grupos",
+        "Normalizar totais desiguais"
+      ],
+      "avoidWhen": [
+        "Magnitudes absolutas são importantes",
+        "Muitas séries"
+      ],
       "excelChartType": "columnStacked100",
       "matplotlibType": "bar"
     },
     {
       "id": "percent_stacked_area",
       "canonicalName": "Gráfico de Área Empilhada 100%",
-      "aliases": ["área empilhada 100%", "área proporcional", "área normalizada", "área empilhada percentual"],
+      "aliases": [
+        "área empilhada 100%",
+        "área proporcional",
+        "área normalizada",
+        "área empilhada percentual"
+      ],
       "category": "part_to_whole",
-      "dataShape": { "x": "sequential", "y": "numeric", "series": "required" },
-      "bestFor": ["Mostrar mudanças de composição ao longo do tempo em percentuais", "Comparar tendências de participação"],
-      "avoidWhen": ["Volumes absolutos importam", "Menos de 3 séries"],
+      "dataShape": {
+        "x": "sequential",
+        "y": "numeric",
+        "series": "required"
+      },
+      "bestFor": [
+        "Mostrar mudanças de composição ao longo do tempo em percentuais",
+        "Comparar tendências de participação"
+      ],
+      "avoidWhen": [
+        "Volumes absolutos importam",
+        "Menos de 3 séries"
+      ],
       "excelChartType": "areaStacked100",
       "matplotlibType": "stackplot"
     },
     {
       "id": "time_series_line",
       "canonicalName": "Gráfico de Linha Temporal",
-      "aliases": ["série temporal", "linha temporal", "gráfico de série temporal", "gráfico de evolução", "cronograma"],
+      "aliases": [
+        "série temporal",
+        "linha temporal",
+        "gráfico de série temporal",
+        "gráfico de evolução",
+        "cronograma"
+      ],
       "category": "time_series",
-      "dataShape": { "x": "datetime", "y": "numeric", "series": "optional" },
-      "bestFor": ["Acompanhar métricas ao longo do tempo", "Identificar tendências de longo prazo"],
-      "avoidWhen": ["Intervalos irregulares sem interpolação", "Comparações categóricas"],
+      "dataShape": {
+        "x": "datetime",
+        "y": "numeric",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Acompanhar métricas ao longo do tempo",
+        "Identificar tendências de longo prazo"
+      ],
+      "avoidWhen": [
+        "Intervalos irregulares sem interpolação",
+        "Comparações categóricas"
+      ],
       "excelChartType": "line",
       "matplotlibType": "plot"
     },
     {
       "id": "sparkline",
       "canonicalName": "Sparkline",
-      "aliases": ["sparkline", "minigráfico", "gráfico em linha compacto", "microgáfico"],
+      "aliases": [
+        "sparkline",
+        "minigráfico",
+        "gráfico em linha compacto",
+        "microgáfico"
+      ],
       "category": "time_series",
-      "dataShape": { "x": "sequential", "y": "numeric", "series": "none" },
-      "bestFor": ["Exibição compacta de tendência em tabelas", "Indicadores de KPI em dashboards"],
-      "avoidWhen": ["Análise detalhada necessária", "Rótulos de eixo são importantes"],
+      "dataShape": {
+        "x": "sequential",
+        "y": "numeric",
+        "series": "none"
+      },
+      "bestFor": [
+        "Exibição compacta de tendência em tabelas",
+        "Indicadores de KPI em dashboards"
+      ],
+      "avoidWhen": [
+        "Análise detalhada necessária",
+        "Rótulos de eixo são importantes"
+      ],
       "excelChartType": "sparkline",
       "matplotlibType": "plot"
     },
     {
       "id": "step_line",
       "canonicalName": "Gráfico de Linha em Degrau",
-      "aliases": ["linha em degrau", "gráfico de escada", "gráfico de etapas", "linha escalonada"],
+      "aliases": [
+        "linha em degrau",
+        "gráfico de escada",
+        "gráfico de etapas",
+        "linha escalonada"
+      ],
       "category": "time_series",
-      "dataShape": { "x": "sequential", "y": "numeric", "series": "optional" },
-      "bestFor": ["Mostrar mudanças discretas", "Faixas de preço", "Mudanças de status ao longo do tempo"],
-      "avoidWhen": ["Dados contínuos suaves", "Muitos degraus criando ruído visual"],
+      "dataShape": {
+        "x": "sequential",
+        "y": "numeric",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Mostrar mudanças discretas",
+        "Faixas de preço",
+        "Mudanças de status ao longo do tempo"
+      ],
+      "avoidWhen": [
+        "Dados contínuos suaves",
+        "Muitos degraus criando ruído visual"
+      ],
       "excelChartType": "line",
       "matplotlibType": "step"
     },
     {
       "id": "area_with_trend",
       "canonicalName": "Gráfico de Área com Linha de Tendência",
-      "aliases": ["área com tendência", "área com regressão", "área com linha de tendência"],
+      "aliases": [
+        "área com tendência",
+        "área com regressão",
+        "área com linha de tendência"
+      ],
       "category": "time_series",
-      "dataShape": { "x": "sequential", "y": "numeric", "series": "optional" },
-      "bestFor": ["Destacar direção geral em dados ruidosos", "Auxílio visual de previsão"],
-      "avoidWhen": ["Tendências não lineares sem ajuste adequado", "Múltiplas linhas de tendência conflitantes"],
+      "dataShape": {
+        "x": "sequential",
+        "y": "numeric",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Destacar direção geral em dados ruidosos",
+        "Auxílio visual de previsão"
+      ],
+      "avoidWhen": [
+        "Tendências não lineares sem ajuste adequado",
+        "Múltiplas linhas de tendência conflitantes"
+      ],
       "excelChartType": "area",
       "matplotlibType": "fill_between"
     },
     {
       "id": "moving_average",
       "canonicalName": "Gráfico de Média Móvel",
-      "aliases": ["média móvel", "média deslizante", "gráfico SMA", "linha suavizada", "média corrida"],
+      "aliases": [
+        "média móvel",
+        "média deslizante",
+        "gráfico SMA",
+        "linha suavizada",
+        "média corrida"
+      ],
       "category": "time_series",
-      "dataShape": { "x": "datetime", "y": "numeric", "window": "integer", "series": "optional" },
-      "bestFor": ["Suavizar séries temporais ruidosas", "Identificar tendências subjacentes"],
-      "avoidWhen": ["Séries de dados curtas", "Dados em tempo real onde o atraso importa"],
+      "dataShape": {
+        "x": "datetime",
+        "y": "numeric",
+        "window": "integer",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Suavizar séries temporais ruidosas",
+        "Identificar tendências subjacentes"
+      ],
+      "avoidWhen": [
+        "Séries de dados curtas",
+        "Dados em tempo real onde o atraso importa"
+      ],
       "excelChartType": "line",
       "matplotlibType": "plot"
     },
     {
       "id": "seasonal_decomposition",
       "canonicalName": "Gráfico de Decomposição Sazonal",
-      "aliases": ["decomposição sazonal", "gráfico STL", "decomposição temporal", "análise sazonal"],
+      "aliases": [
+        "decomposição sazonal",
+        "gráfico STL",
+        "decomposição temporal",
+        "análise sazonal"
+      ],
       "category": "time_series",
-      "dataShape": { "x": "datetime", "y": "numeric", "series": "none" },
-      "bestFor": ["Separar componentes de tendência, sazonalidade e resíduo", "Entender padrões cíclicos"],
-      "avoidWhen": ["Dados não sazonais", "Dados insuficientes para múltiplos ciclos"],
+      "dataShape": {
+        "x": "datetime",
+        "y": "numeric",
+        "series": "none"
+      },
+      "bestFor": [
+        "Separar componentes de tendência, sazonalidade e resíduo",
+        "Entender padrões cíclicos"
+      ],
+      "avoidWhen": [
+        "Dados não sazonais",
+        "Dados insuficientes para múltiplos ciclos"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "subplot"
     },
     {
       "id": "candlestick",
       "canonicalName": "Gráfico de Velas",
-      "aliases": ["velas", "gráfico de velas", "candlestick", "gráfico de candles", "velas japonesas"],
+      "aliases": [
+        "velas",
+        "gráfico de velas",
+        "candlestick",
+        "gráfico de candles",
+        "velas japonesas"
+      ],
       "category": "time_series",
-      "dataShape": { "x": "datetime", "open": "numeric", "high": "numeric", "low": "numeric", "close": "numeric" },
-      "bestFor": ["Dados de preços financeiros", "Mostrar abertura-máxima-mínima-fechamento em um glifo"],
-      "avoidWhen": ["Dados não financeiros", "Público não familiarizado com gráficos financeiros"],
+      "dataShape": {
+        "x": "datetime",
+        "open": "numeric",
+        "high": "numeric",
+        "low": "numeric",
+        "close": "numeric"
+      },
+      "bestFor": [
+        "Dados de preços financeiros",
+        "Mostrar abertura-máxima-mínima-fechamento em um glifo"
+      ],
+      "avoidWhen": [
+        "Dados não financeiros",
+        "Público não familiarizado com gráficos financeiros"
+      ],
       "excelChartType": "stockOHLC",
       "matplotlibType": "candlestick_ohlc"
     },
     {
       "id": "ohlc",
       "canonicalName": "Gráfico OHLC",
-      "aliases": ["ohlc", "gráfico OHLC", "abertura-máxima-mínima-fechamento", "gráfico de barras financeiro"],
+      "aliases": [
+        "ohlc",
+        "gráfico OHLC",
+        "abertura-máxima-mínima-fechamento",
+        "gráfico de barras financeiro"
+      ],
       "category": "time_series",
-      "dataShape": { "x": "datetime", "open": "numeric", "high": "numeric", "low": "numeric", "close": "numeric" },
-      "bestFor": ["Movimento de preços financeiros", "Visão mais densa que velas para períodos longos"],
-      "avoidWhen": ["Dados não financeiros", "Telas pequenas onde marcações são difíceis de ler"],
+      "dataShape": {
+        "x": "datetime",
+        "open": "numeric",
+        "high": "numeric",
+        "low": "numeric",
+        "close": "numeric"
+      },
+      "bestFor": [
+        "Movimento de preços financeiros",
+        "Visão mais densa que velas para períodos longos"
+      ],
+      "avoidWhen": [
+        "Dados não financeiros",
+        "Telas pequenas onde marcações são difíceis de ler"
+      ],
       "excelChartType": "stockOHLC",
       "matplotlibType": "ohlc"
     },
     {
       "id": "density_plot",
       "canonicalName": "Gráfico de Densidade",
-      "aliases": ["densidade", "gráfico de densidade", "KDE", "densidade de probabilidade", "curva de densidade"],
+      "aliases": [
+        "densidade",
+        "gráfico de densidade",
+        "KDE",
+        "densidade de probabilidade",
+        "curva de densidade"
+      ],
       "category": "distribution",
-      "dataShape": { "x": "numeric", "y": "density", "series": "optional" },
-      "bestFor": ["Visualização suave de distribuição", "Comparar distribuições sobrepostas"],
-      "avoidWhen": ["Amostras pequenas", "Dados discretos ou categóricos"],
+      "dataShape": {
+        "x": "numeric",
+        "y": "density",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Visualização suave de distribuição",
+        "Comparar distribuições sobrepostas"
+      ],
+      "avoidWhen": [
+        "Amostras pequenas",
+        "Dados discretos ou categóricos"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "kdeplot"
     },
     {
       "id": "violin",
       "canonicalName": "Gráfico de Violino",
-      "aliases": ["violino", "gráfico de violino", "violin plot", "diagrama de violino"],
+      "aliases": [
+        "violino",
+        "gráfico de violino",
+        "violin plot",
+        "diagrama de violino"
+      ],
       "category": "distribution",
-      "dataShape": { "x": "categorical", "y": "numeric", "series": "optional" },
-      "bestFor": ["Mostrar forma da distribuição entre grupos", "Combinar informação de box plot e densidade"],
-      "avoidWhen": ["Público não familiarizado com o formato", "Amostras muito pequenas"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "numeric",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Mostrar forma da distribuição entre grupos",
+        "Combinar informação de box plot e densidade"
+      ],
+      "avoidWhen": [
+        "Público não familiarizado com o formato",
+        "Amostras muito pequenas"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "violinplot"
     },
     {
       "id": "bee_swarm",
       "canonicalName": "Gráfico de Enxame",
-      "aliases": ["enxame", "gráfico de enxame", "beeswarm", "gráfico de jitter", "nuvem de pontos agrupados"],
+      "aliases": [
+        "enxame",
+        "gráfico de enxame",
+        "beeswarm",
+        "gráfico de jitter",
+        "nuvem de pontos agrupados"
+      ],
       "category": "distribution",
-      "dataShape": { "x": "categorical", "y": "numeric", "series": "optional" },
-      "bestFor": ["Mostrar cada ponto de dados sem sobreposição", "Conjuntos de dados pequenos a médios"],
-      "avoidWhen": ["Grandes conjuntos de dados (>500 pontos por grupo)", "Apenas estatísticas resumidas necessárias"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "numeric",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Mostrar cada ponto de dados sem sobreposição",
+        "Conjuntos de dados pequenos a médios"
+      ],
+      "avoidWhen": [
+        "Grandes conjuntos de dados (>500 pontos por grupo)",
+        "Apenas estatísticas resumidas necessárias"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "swarmplot"
     },
     {
       "id": "strip_plot",
       "canonicalName": "Gráfico de Faixa",
-      "aliases": ["faixa", "gráfico de faixa", "strip plot", "dispersão unidimensional", "pontos com jitter"],
+      "aliases": [
+        "faixa",
+        "gráfico de faixa",
+        "strip plot",
+        "dispersão unidimensional",
+        "pontos com jitter"
+      ],
       "category": "distribution",
-      "dataShape": { "x": "categorical", "y": "numeric", "series": "optional" },
-      "bestFor": ["Mostrar observações individuais entre categorias", "Visão rápida de distribuição"],
-      "avoidWhen": ["Grandes conjuntos de dados com sobreposição excessiva", "Estimativa precisa de densidade necessária"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "numeric",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Mostrar observações individuais entre categorias",
+        "Visão rápida de distribuição"
+      ],
+      "avoidWhen": [
+        "Grandes conjuntos de dados com sobreposição excessiva",
+        "Estimativa precisa de densidade necessária"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "stripplot"
     },
     {
       "id": "ecdf",
       "canonicalName": "Gráfico ECDF",
-      "aliases": ["ecdf", "gráfico ECDF", "CDF empírica", "distribuição cumulativa", "função de distribuição acumulada"],
+      "aliases": [
+        "ecdf",
+        "gráfico ECDF",
+        "CDF empírica",
+        "distribuição cumulativa",
+        "função de distribuição acumulada"
+      ],
       "category": "distribution",
-      "dataShape": { "x": "numeric", "y": "cumulative_proportion", "series": "optional" },
-      "bestFor": ["Comparar distribuições sem agrupamento", "Ler percentis diretamente"],
-      "avoidWhen": ["Público não familiarizado com distribuições cumulativas", "Apelo visual é prioridade"],
+      "dataShape": {
+        "x": "numeric",
+        "y": "cumulative_proportion",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Comparar distribuições sem agrupamento",
+        "Ler percentis diretamente"
+      ],
+      "avoidWhen": [
+        "Público não familiarizado com distribuições cumulativas",
+        "Apelo visual é prioridade"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "ecdf"
     },
     {
       "id": "qq_plot",
       "canonicalName": "Gráfico Q-Q",
-      "aliases": ["gráfico Q-Q", "qq plot", "gráfico quantil-quantil", "gráfico de probabilidade normal"],
+      "aliases": [
+        "gráfico Q-Q",
+        "qq plot",
+        "gráfico quantil-quantil",
+        "gráfico de probabilidade normal"
+      ],
       "category": "distribution",
-      "dataShape": { "x": "theoretical_quantiles", "y": "sample_quantiles", "series": "none" },
-      "bestFor": ["Verificar normalidade", "Comparar distribuição da amostra com uma teórica"],
-      "avoidWhen": ["Público não estatístico", "Amostras pequenas onde desvios são esperados"],
+      "dataShape": {
+        "x": "theoretical_quantiles",
+        "y": "sample_quantiles",
+        "series": "none"
+      },
+      "bestFor": [
+        "Verificar normalidade",
+        "Comparar distribuição da amostra com uma teórica"
+      ],
+      "avoidWhen": [
+        "Público não estatístico",
+        "Amostras pequenas onde desvios são esperados"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "scatter"
     },
     {
       "id": "probability_plot",
       "canonicalName": "Gráfico de Probabilidade",
-      "aliases": ["gráfico de probabilidade", "gráfico P-P", "plot de probabilidade", "gráfico de ajuste distribucional"],
+      "aliases": [
+        "gráfico de probabilidade",
+        "gráfico P-P",
+        "plot de probabilidade",
+        "gráfico de ajuste distribucional"
+      ],
       "category": "distribution",
-      "dataShape": { "x": "theoretical_probability", "y": "observed_probability", "series": "none" },
-      "bestFor": ["Avaliar ajuste distribucional", "Identificar desvios da distribuição esperada"],
-      "avoidWhen": ["Público geral", "Análise exploratória onde histogramas bastam"],
+      "dataShape": {
+        "x": "theoretical_probability",
+        "y": "observed_probability",
+        "series": "none"
+      },
+      "bestFor": [
+        "Avaliar ajuste distribucional",
+        "Identificar desvios da distribuição esperada"
+      ],
+      "avoidWhen": [
+        "Público geral",
+        "Análise exploratória onde histogramas bastam"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "probplot"
     },
     {
       "id": "grouped_bar",
       "canonicalName": "Gráfico de Barras Agrupadas",
-      "aliases": ["barras agrupadas", "gráfico de barras agrupadas", "barras lado a lado", "barras clusterizadas"],
+      "aliases": [
+        "barras agrupadas",
+        "gráfico de barras agrupadas",
+        "barras lado a lado",
+        "barras clusterizadas"
+      ],
       "category": "comparison",
-      "dataShape": { "x": "categorical", "y": "numeric", "series": "required" },
-      "bestFor": ["Comparar subcategorias lado a lado", "Comparações entre grupos"],
-      "avoidWhen": ["Muitos grupos ou séries", "Relações parte-todo"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "numeric",
+        "series": "required"
+      },
+      "bestFor": [
+        "Comparar subcategorias lado a lado",
+        "Comparações entre grupos"
+      ],
+      "avoidWhen": [
+        "Muitos grupos ou séries",
+        "Relações parte-todo"
+      ],
       "excelChartType": "barClustered",
       "matplotlibType": "bar"
     },
     {
       "id": "lollipop",
       "canonicalName": "Gráfico de Pirulito",
-      "aliases": ["pirulito", "gráfico de pirulito", "lollipop", "gráfico de haste"],
+      "aliases": [
+        "pirulito",
+        "gráfico de pirulito",
+        "lollipop",
+        "gráfico de haste"
+      ],
       "category": "comparison",
-      "dataShape": { "x": "categorical", "y": "numeric", "series": "none" },
-      "bestFor": ["Alternativa mais limpa ao gráfico de barras", "Classificação com menos poluição visual"],
-      "avoidWhen": ["Múltiplas séries", "Público esperando gráficos de barras tradicionais"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "numeric",
+        "series": "none"
+      },
+      "bestFor": [
+        "Alternativa mais limpa ao gráfico de barras",
+        "Classificação com menos poluição visual"
+      ],
+      "avoidWhen": [
+        "Múltiplas séries",
+        "Público esperando gráficos de barras tradicionais"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "stem"
     },
     {
       "id": "dot_plot",
       "canonicalName": "Gráfico de Pontos",
-      "aliases": ["gráfico de pontos", "dot plot", "gráfico Cleveland", "gráfico de marcadores"],
+      "aliases": [
+        "gráfico de pontos",
+        "dot plot",
+        "gráfico Cleveland",
+        "gráfico de marcadores"
+      ],
       "category": "comparison",
-      "dataShape": { "x": "numeric", "y": "categorical", "series": "optional" },
-      "bestFor": ["Comparação precisa de valores entre categorias", "Alternativa limpa ao gráfico de barras"],
-      "avoidWhen": ["Múltiplas séries sobrepostas", "Necessidade de enfatizar magnitude visualmente"],
+      "dataShape": {
+        "x": "numeric",
+        "y": "categorical",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Comparação precisa de valores entre categorias",
+        "Alternativa limpa ao gráfico de barras"
+      ],
+      "avoidWhen": [
+        "Múltiplas séries sobrepostas",
+        "Necessidade de enfatizar magnitude visualmente"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "scatter"
     },
     {
       "id": "dumbbell",
       "canonicalName": "Gráfico de Haltere",
-      "aliases": ["haltere", "gráfico de haltere", "dumbbell", "gráfico de intervalo", "pontos conectados"],
+      "aliases": [
+        "haltere",
+        "gráfico de haltere",
+        "dumbbell",
+        "gráfico de intervalo",
+        "pontos conectados"
+      ],
       "category": "comparison",
-      "dataShape": { "x_start": "numeric", "x_end": "numeric", "y": "categorical", "series": "none" },
-      "bestFor": ["Mostrar mudança entre dois pontos", "Comparações antes-depois"],
-      "avoidWhen": ["Mais de dois pontos de comparação", "Valores absolutos mais importantes que diferenças"],
+      "dataShape": {
+        "x_start": "numeric",
+        "x_end": "numeric",
+        "y": "categorical",
+        "series": "none"
+      },
+      "bestFor": [
+        "Mostrar mudança entre dois pontos",
+        "Comparações antes-depois"
+      ],
+      "avoidWhen": [
+        "Mais de dois pontos de comparação",
+        "Valores absolutos mais importantes que diferenças"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "hlines"
     },
     {
       "id": "bullet",
       "canonicalName": "Gráfico de Bala",
-      "aliases": ["bala", "gráfico de bala", "bullet chart", "gráfico bullet"],
+      "aliases": [
+        "bala",
+        "gráfico de bala",
+        "bullet chart",
+        "gráfico bullet"
+      ],
       "category": "comparison",
-      "dataShape": { "x": "numeric", "target": "numeric", "ranges": "numeric_array" },
-      "bestFor": ["Comparar real vs meta", "Indicadores de KPI em dashboards sem medidores circulares"],
-      "avoidWhen": ["Múltiplas dimensões", "Público não familiarizado com o formato"],
+      "dataShape": {
+        "x": "numeric",
+        "target": "numeric",
+        "ranges": "numeric_array"
+      },
+      "bestFor": [
+        "Comparar real vs meta",
+        "Indicadores de KPI em dashboards sem medidores circulares"
+      ],
+      "avoidWhen": [
+        "Múltiplas dimensões",
+        "Público não familiarizado com o formato"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "barh"
     },
     {
       "id": "cleveland_dot",
       "canonicalName": "Gráfico de Pontos Cleveland",
-      "aliases": ["pontos Cleveland", "gráfico Cleveland", "dot plot ordenado", "gráfico de pontos ordenado"],
+      "aliases": [
+        "pontos Cleveland",
+        "gráfico Cleveland",
+        "dot plot ordenado",
+        "gráfico de pontos ordenado"
+      ],
       "category": "comparison",
-      "dataShape": { "x": "numeric", "y": "categorical", "series": "optional" },
-      "bestFor": ["Classificar itens com alta precisão", "Muitas categorias em espaço compacto"],
-      "avoidWhen": ["Necessidade de mostrar distribuição", "Poucas categorias onde barras são mais simples"],
+      "dataShape": {
+        "x": "numeric",
+        "y": "categorical",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Classificar itens com alta precisão",
+        "Muitas categorias em espaço compacto"
+      ],
+      "avoidWhen": [
+        "Necessidade de mostrar distribuição",
+        "Poucas categorias onde barras são mais simples"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "scatter"
     },
     {
       "id": "back_to_back_bar",
       "canonicalName": "Gráfico de Barras Espelhadas",
-      "aliases": ["barras espelhadas", "pirâmide populacional", "barras opostas", "gráfico borboleta", "barras costas a costas"],
+      "aliases": [
+        "barras espelhadas",
+        "pirâmide populacional",
+        "barras opostas",
+        "gráfico borboleta",
+        "barras costas a costas"
+      ],
       "category": "comparison",
-      "dataShape": { "x_left": "numeric", "x_right": "numeric", "y": "categorical" },
-      "bestFor": ["Comparar dois grupos simetricamente", "Pirâmides populacionais", "Pesquisas concordo/discordo"],
-      "avoidWhen": ["Mais de dois grupos de comparação", "Valores com escalas muito diferentes"],
+      "dataShape": {
+        "x_left": "numeric",
+        "x_right": "numeric",
+        "y": "categorical"
+      },
+      "bestFor": [
+        "Comparar dois grupos simetricamente",
+        "Pirâmides populacionais",
+        "Pesquisas concordo/discordo"
+      ],
+      "avoidWhen": [
+        "Mais de dois grupos de comparação",
+        "Valores com escalas muito diferentes"
+      ],
       "excelChartType": "barClustered",
       "matplotlibType": "barh"
     },
     {
       "id": "diverging_bar",
       "canonicalName": "Gráfico de Barras Divergentes",
-      "aliases": ["barras divergentes", "gráfico divergente", "barras bipolares", "barras de sentimento"],
+      "aliases": [
+        "barras divergentes",
+        "gráfico divergente",
+        "barras bipolares",
+        "barras de sentimento"
+      ],
       "category": "comparison",
-      "dataShape": { "x": "categorical", "y": "numeric_signed", "series": "none" },
-      "bestFor": ["Mostrar desvios positivos e negativos de uma base", "Dados de sentimento ou pesquisa"],
-      "avoidWhen": ["Todos os valores são do mesmo sinal", "Base não centralizada"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "numeric_signed",
+        "series": "none"
+      },
+      "bestFor": [
+        "Mostrar desvios positivos e negativos de uma base",
+        "Dados de sentimento ou pesquisa"
+      ],
+      "avoidWhen": [
+        "Todos os valores são do mesmo sinal",
+        "Base não centralizada"
+      ],
       "excelChartType": "barClustered",
       "matplotlibType": "barh"
     },
     {
       "id": "treemap",
       "canonicalName": "Mapa de Árvore",
-      "aliases": ["mapa de árvore", "treemap", "mapa retangular", "retângulos aninhados"],
+      "aliases": [
+        "mapa de árvore",
+        "treemap",
+        "mapa retangular",
+        "retângulos aninhados"
+      ],
       "category": "part_to_whole",
-      "dataShape": { "x": "hierarchical", "y": "numeric", "series": "none" },
-      "bestFor": ["Parte-todo hierárquico", "Mostrar tamanhos relativos de categorias aninhadas"],
-      "avoidWhen": ["Muitas fatias pequenas", "Comparação precisa necessária"],
+      "dataShape": {
+        "x": "hierarchical",
+        "y": "numeric",
+        "series": "none"
+      },
+      "bestFor": [
+        "Parte-todo hierárquico",
+        "Mostrar tamanhos relativos de categorias aninhadas"
+      ],
+      "avoidWhen": [
+        "Muitas fatias pequenas",
+        "Comparação precisa necessária"
+      ],
       "excelChartType": "treemap",
       "matplotlibType": "treemap"
     },
     {
       "id": "sunburst",
       "canonicalName": "Gráfico Sunburst",
-      "aliases": ["sunburst", "gráfico sunburst", "pizza multinível", "gráfico radial hierárquico", "explosão solar"],
+      "aliases": [
+        "sunburst",
+        "gráfico sunburst",
+        "pizza multinível",
+        "gráfico radial hierárquico",
+        "explosão solar"
+      ],
       "category": "part_to_whole",
-      "dataShape": { "x": "hierarchical", "y": "numeric", "series": "none" },
-      "bestFor": ["Parte-todo em múltiplos níveis", "Hierarquias com drill-down"],
-      "avoidWhen": ["Mais de 3 níveis de hierarquia", "Muitas fatias pequenas nos anéis externos"],
+      "dataShape": {
+        "x": "hierarchical",
+        "y": "numeric",
+        "series": "none"
+      },
+      "bestFor": [
+        "Parte-todo em múltiplos níveis",
+        "Hierarquias com drill-down"
+      ],
+      "avoidWhen": [
+        "Mais de 3 níveis de hierarquia",
+        "Muitas fatias pequenas nos anéis externos"
+      ],
       "excelChartType": "sunburst",
       "matplotlibType": "sunburst"
     },
     {
       "id": "waffle",
       "canonicalName": "Gráfico Waffle",
-      "aliases": ["waffle", "gráfico waffle", "gráfico de unidades", "pizza quadrada", "gráfico de grade"],
+      "aliases": [
+        "waffle",
+        "gráfico waffle",
+        "gráfico de unidades",
+        "pizza quadrada",
+        "gráfico de grade"
+      ],
       "category": "part_to_whole",
-      "dataShape": { "x": "categorical", "y": "numeric_proportion", "series": "none" },
-      "bestFor": ["Mostrar percentuais como unidades preenchidas", "Mais intuitivo que pizza para proporções exatas"],
-      "avoidWhen": ["Muitas categorias", "Dados dinâmicos ou em tempo real"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "numeric_proportion",
+        "series": "none"
+      },
+      "bestFor": [
+        "Mostrar percentuais como unidades preenchidas",
+        "Mais intuitivo que pizza para proporções exatas"
+      ],
+      "avoidWhen": [
+        "Muitas categorias",
+        "Dados dinâmicos ou em tempo real"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "waffle"
     },
     {
       "id": "mosaic",
       "canonicalName": "Gráfico de Mosaico",
-      "aliases": ["mosaico", "gráfico de mosaico", "marimekko", "gráfico mekko", "barras de largura variável"],
+      "aliases": [
+        "mosaico",
+        "gráfico de mosaico",
+        "marimekko",
+        "gráfico mekko",
+        "barras de largura variável"
+      ],
       "category": "part_to_whole",
-      "dataShape": { "x": "categorical", "y": "categorical", "size": "numeric" },
-      "bestFor": ["Dados categóricos bidimensionais", "Mostrar distribuição conjunta de duas variáveis"],
-      "avoidWhen": ["Mais de duas dimensões categóricas", "Leitura precisa de valores necessária"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "categorical",
+        "size": "numeric"
+      },
+      "bestFor": [
+        "Dados categóricos bidimensionais",
+        "Mostrar distribuição conjunta de duas variáveis"
+      ],
+      "avoidWhen": [
+        "Mais de duas dimensões categóricas",
+        "Leitura precisa de valores necessária"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "mosaic"
     },
     {
       "id": "icicle",
       "canonicalName": "Gráfico de Estalactite",
-      "aliases": ["estalactite", "gráfico de estalactite", "icicle", "gráfico de partição", "flame chart invertido"],
+      "aliases": [
+        "estalactite",
+        "gráfico de estalactite",
+        "icicle",
+        "gráfico de partição",
+        "flame chart invertido"
+      ],
       "category": "part_to_whole",
-      "dataShape": { "x": "hierarchical", "y": "numeric", "series": "none" },
-      "bestFor": ["Decomposição hierárquica com rótulos legíveis", "Alternativa ao sunburst sem distorção angular"],
-      "avoidWhen": ["Dados não hierárquicos", "Hierarquias muito profundas (>5 níveis)"],
+      "dataShape": {
+        "x": "hierarchical",
+        "y": "numeric",
+        "series": "none"
+      },
+      "bestFor": [
+        "Decomposição hierárquica com rótulos legíveis",
+        "Alternativa ao sunburst sem distorção angular"
+      ],
+      "avoidWhen": [
+        "Dados não hierárquicos",
+        "Hierarquias muito profundas (>5 níveis)"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "icicle"
     },
     {
       "id": "partition",
       "canonicalName": "Gráfico de Partição",
-      "aliases": ["partição", "gráfico de partição", "layout de partição", "partição hierárquica"],
+      "aliases": [
+        "partição",
+        "gráfico de partição",
+        "layout de partição",
+        "partição hierárquica"
+      ],
       "category": "part_to_whole",
-      "dataShape": { "x": "hierarchical", "y": "numeric", "series": "none" },
-      "bestFor": ["Mostrar relações hierárquicas de tamanho", "Visualizações navegáveis com drill-down"],
-      "avoidWhen": ["Dados planos não hierárquicos", "Comparações precisas entre nós não irmãos"],
+      "dataShape": {
+        "x": "hierarchical",
+        "y": "numeric",
+        "series": "none"
+      },
+      "bestFor": [
+        "Mostrar relações hierárquicas de tamanho",
+        "Visualizações navegáveis com drill-down"
+      ],
+      "avoidWhen": [
+        "Dados planos não hierárquicos",
+        "Comparações precisas entre nós não irmãos"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "bar"
     },
     {
       "id": "nested_doughnut",
       "canonicalName": "Gráfico de Rosca Aninhada",
-      "aliases": ["rosca aninhada", "donut aninhado", "rosca multinível", "rosca concêntrica"],
+      "aliases": [
+        "rosca aninhada",
+        "donut aninhado",
+        "rosca multinível",
+        "rosca concêntrica"
+      ],
       "category": "part_to_whole",
-      "dataShape": { "x": "categorical", "y": "numeric", "series": "required" },
-      "bestFor": ["Comparar dois níveis de composição", "Parte-todo compacto com múltiplos anéis"],
-      "avoidWhen": ["Mais de 3 anéis", "Muitas fatias por anel"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "numeric",
+        "series": "required"
+      },
+      "bestFor": [
+        "Comparar dois níveis de composição",
+        "Parte-todo compacto com múltiplos anéis"
+      ],
+      "avoidWhen": [
+        "Mais de 3 anéis",
+        "Muitas fatias por anel"
+      ],
       "excelChartType": "doughnut",
       "matplotlibType": "pie"
     },
     {
       "id": "connected_scatter",
       "canonicalName": "Gráfico de Dispersão Conectado",
-      "aliases": ["dispersão conectada", "scatter conectado", "gráfico de trajetória", "dispersão com linha"],
+      "aliases": [
+        "dispersão conectada",
+        "scatter conectado",
+        "gráfico de trajetória",
+        "dispersão com linha"
+      ],
       "category": "relationship",
-      "dataShape": { "x": "numeric", "y": "numeric", "order": "sequential", "series": "optional" },
-      "bestFor": ["Mostrar trajetória de duas variáveis ao longo do tempo", "Revelar relações cíclicas"],
-      "avoidWhen": ["Sem sequência significativa", "Muitas linhas cruzadas"],
+      "dataShape": {
+        "x": "numeric",
+        "y": "numeric",
+        "order": "sequential",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Mostrar trajetória de duas variáveis ao longo do tempo",
+        "Revelar relações cíclicas"
+      ],
+      "avoidWhen": [
+        "Sem sequência significativa",
+        "Muitas linhas cruzadas"
+      ],
       "excelChartType": "scatterLine",
       "matplotlibType": "plot"
     },
     {
       "id": "pair_plot",
       "canonicalName": "Gráfico de Pares",
-      "aliases": ["gráfico de pares", "pairplot", "matriz de dispersão", "SPLOM", "matriz de gráficos de dispersão"],
+      "aliases": [
+        "gráfico de pares",
+        "pairplot",
+        "matriz de dispersão",
+        "SPLOM",
+        "matriz de gráficos de dispersão"
+      ],
       "category": "relationship",
-      "dataShape": { "x": "numeric_multi", "y": "numeric_multi", "series": "optional" },
-      "bestFor": ["Explorar relações par a par em dados multivariados", "Exploração inicial de dados"],
-      "avoidWhen": ["Mais de 8 variáveis", "Dados não numéricos"],
+      "dataShape": {
+        "x": "numeric_multi",
+        "y": "numeric_multi",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Explorar relações par a par em dados multivariados",
+        "Exploração inicial de dados"
+      ],
+      "avoidWhen": [
+        "Mais de 8 variáveis",
+        "Dados não numéricos"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "pairplot"
     },
     {
       "id": "correlogram",
       "canonicalName": "Correlograma",
-      "aliases": ["correlograma", "mapa de calor de correlação", "gráfico de correlação", "matriz de correlação visual"],
+      "aliases": [
+        "correlograma",
+        "mapa de calor de correlação",
+        "gráfico de correlação",
+        "matriz de correlação visual"
+      ],
       "category": "relationship",
-      "dataShape": { "x": "numeric_multi", "y": "numeric_multi", "series": "none" },
-      "bestFor": ["Visualizar matrizes de correlação", "Identificar variáveis fortemente relacionadas"],
-      "avoidWhen": ["Dados não numéricos", "Menos de 4 variáveis"],
+      "dataShape": {
+        "x": "numeric_multi",
+        "y": "numeric_multi",
+        "series": "none"
+      },
+      "bestFor": [
+        "Visualizar matrizes de correlação",
+        "Identificar variáveis fortemente relacionadas"
+      ],
+      "avoidWhen": [
+        "Dados não numéricos",
+        "Menos de 4 variáveis"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "heatmap"
     },
     {
       "id": "slope_chart",
       "canonicalName": "Gráfico de Inclinação",
-      "aliases": ["gráfico de inclinação", "slope chart", "gráfico antes-depois", "linha de comparação"],
+      "aliases": [
+        "gráfico de inclinação",
+        "slope chart",
+        "gráfico antes-depois",
+        "linha de comparação"
+      ],
       "category": "relationship",
-      "dataShape": { "x_before": "numeric", "x_after": "numeric", "y": "categorical" },
-      "bestFor": ["Mostrar mudança entre dois pontos no tempo", "Destacar mudanças de ranking"],
-      "avoidWhen": ["Mais de dois pontos no tempo", "Muitas linhas sobrepostas (>15)"],
+      "dataShape": {
+        "x_before": "numeric",
+        "x_after": "numeric",
+        "y": "categorical"
+      },
+      "bestFor": [
+        "Mostrar mudança entre dois pontos no tempo",
+        "Destacar mudanças de ranking"
+      ],
+      "avoidWhen": [
+        "Mais de dois pontos no tempo",
+        "Muitas linhas sobrepostas (>15)"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "plot"
     },
     {
       "id": "regression_line",
       "canonicalName": "Gráfico de Regressão",
-      "aliases": ["regressão", "gráfico de regressão", "ajuste linear", "linha de tendência com dispersão", "reta ajustada"],
+      "aliases": [
+        "regressão",
+        "gráfico de regressão",
+        "ajuste linear",
+        "linha de tendência com dispersão",
+        "reta ajustada"
+      ],
       "category": "relationship",
-      "dataShape": { "x": "numeric", "y": "numeric", "series": "optional" },
-      "bestFor": ["Mostrar relação linear", "Visuais de previsão e projeção"],
-      "avoidWhen": ["Relações não lineares sem modelo apropriado", "Dados heteroscedásticos"],
+      "dataShape": {
+        "x": "numeric",
+        "y": "numeric",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Mostrar relação linear",
+        "Visuais de previsão e projeção"
+      ],
+      "avoidWhen": [
+        "Relações não lineares sem modelo apropriado",
+        "Dados heteroscedásticos"
+      ],
       "excelChartType": "scatter",
       "matplotlibType": "regplot"
     },
     {
       "id": "bubble_with_labels",
       "canonicalName": "Gráfico de Bolhas com Rótulos",
-      "aliases": ["bolhas com rótulos", "bolhas rotuladas", "bolhas anotadas", "gráfico de bolhas nomeadas"],
+      "aliases": [
+        "bolhas com rótulos",
+        "bolhas rotuladas",
+        "bolhas anotadas",
+        "gráfico de bolhas nomeadas"
+      ],
       "category": "relationship",
-      "dataShape": { "x": "numeric", "y": "numeric", "size": "numeric", "label": "text", "series": "optional" },
-      "bestFor": ["Comparação de três variáveis com identificação de entidade", "Apresentações executivas"],
-      "avoidWhen": ["Muitas bolhas causando sobreposição de rótulos", "Áreas de exibição pequenas"],
+      "dataShape": {
+        "x": "numeric",
+        "y": "numeric",
+        "size": "numeric",
+        "label": "text",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Comparação de três variáveis com identificação de entidade",
+        "Apresentações executivas"
+      ],
+      "avoidWhen": [
+        "Muitas bolhas causando sobreposição de rótulos",
+        "Áreas de exibição pequenas"
+      ],
       "excelChartType": "bubble",
       "matplotlibType": "scatter"
     },
     {
       "id": "waterfall",
       "canonicalName": "Gráfico de Cascata",
-      "aliases": ["cascata", "gráfico de cascata", "gráfico ponte", "gráfico waterfall", "gráfico em cascata"],
+      "aliases": [
+        "cascata",
+        "gráfico de cascata",
+        "gráfico ponte",
+        "gráfico waterfall",
+        "gráfico em cascata"
+      ],
       "category": "flow",
-      "dataShape": { "x": "categorical", "y": "numeric_delta", "series": "none" },
-      "bestFor": ["Mostrar efeito cumulativo de valores sequenciais", "Reconciliação financeira"],
-      "avoidWhen": ["Dados não sequenciais", "Muitos passos (>20)"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "numeric_delta",
+        "series": "none"
+      },
+      "bestFor": [
+        "Mostrar efeito cumulativo de valores sequenciais",
+        "Reconciliação financeira"
+      ],
+      "avoidWhen": [
+        "Dados não sequenciais",
+        "Muitos passos (>20)"
+      ],
       "excelChartType": "waterfall",
       "matplotlibType": "bar"
     },
     {
       "id": "funnel",
       "canonicalName": "Gráfico de Funil",
-      "aliases": ["funil", "gráfico de funil", "funil de vendas", "funil de conversão", "gráfico de pipeline"],
+      "aliases": [
+        "funil",
+        "gráfico de funil",
+        "funil de vendas",
+        "funil de conversão",
+        "gráfico de pipeline"
+      ],
       "category": "flow",
-      "dataShape": { "x": "categorical_ordered", "y": "numeric", "series": "none" },
-      "bestFor": ["Mostrar redução progressiva por etapas", "Pipelines de vendas e conversão"],
-      "avoidWhen": ["Etapas não sequenciais", "Valores que aumentam ao longo das etapas"],
+      "dataShape": {
+        "x": "categorical_ordered",
+        "y": "numeric",
+        "series": "none"
+      },
+      "bestFor": [
+        "Mostrar redução progressiva por etapas",
+        "Pipelines de vendas e conversão"
+      ],
+      "avoidWhen": [
+        "Etapas não sequenciais",
+        "Valores que aumentam ao longo das etapas"
+      ],
       "excelChartType": "funnel",
       "matplotlibType": "barh"
     },
     {
       "id": "sankey",
       "canonicalName": "Diagrama de Sankey",
-      "aliases": ["sankey", "diagrama de Sankey", "diagrama de fluxo", "diagrama aluvial", "fluxo de energia"],
+      "aliases": [
+        "sankey",
+        "diagrama de Sankey",
+        "diagrama de fluxo",
+        "diagrama aluvial",
+        "fluxo de energia"
+      ],
       "category": "flow",
-      "dataShape": { "source": "categorical", "target": "categorical", "value": "numeric" },
-      "bestFor": ["Mostrar quantidades de fluxo entre nós", "Fluxo de energia, orçamento ou tráfego"],
-      "avoidWhen": ["Muitos nós ou conexões", "Fluxos simples de duas etapas onde barras bastam"],
+      "dataShape": {
+        "source": "categorical",
+        "target": "categorical",
+        "value": "numeric"
+      },
+      "bestFor": [
+        "Mostrar quantidades de fluxo entre nós",
+        "Fluxo de energia, orçamento ou tráfego"
+      ],
+      "avoidWhen": [
+        "Muitos nós ou conexões",
+        "Fluxos simples de duas etapas onde barras bastam"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "sankey"
     },
     {
       "id": "bridge",
       "canonicalName": "Gráfico Ponte",
-      "aliases": ["ponte", "gráfico ponte", "ponte de variância", "gráfico de caminhada"],
+      "aliases": [
+        "ponte",
+        "gráfico ponte",
+        "ponte de variância",
+        "gráfico de caminhada"
+      ],
       "category": "flow",
-      "dataShape": { "x": "categorical", "y": "numeric_delta", "series": "none" },
-      "bestFor": ["Explicar variância do início ao fim", "Análise de variância orçamentária"],
-      "avoidWhen": ["Componentes não aditivos", "Muitos passos intermediários"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "numeric_delta",
+        "series": "none"
+      },
+      "bestFor": [
+        "Explicar variância do início ao fim",
+        "Análise de variância orçamentária"
+      ],
+      "avoidWhen": [
+        "Componentes não aditivos",
+        "Muitos passos intermediários"
+      ],
       "excelChartType": "waterfall",
       "matplotlibType": "bar"
     },
     {
       "id": "alluvial",
       "canonicalName": "Diagrama Aluvial",
-      "aliases": ["aluvial", "diagrama aluvial", "gráfico aluvial", "conjuntos paralelos", "fluxo entre categorias"],
+      "aliases": [
+        "aluvial",
+        "diagrama aluvial",
+        "gráfico aluvial",
+        "conjuntos paralelos",
+        "fluxo entre categorias"
+      ],
       "category": "flow",
-      "dataShape": { "x": "categorical_multi", "y": "numeric", "series": "none" },
-      "bestFor": ["Mostrar como associações categóricas mudam entre etapas", "Migração de eleitores, fluxos de coorte"],
-      "avoidWhen": ["Muitas categorias por etapa", "Dados estáticos de uma única etapa"],
+      "dataShape": {
+        "x": "categorical_multi",
+        "y": "numeric",
+        "series": "none"
+      },
+      "bestFor": [
+        "Mostrar como associações categóricas mudam entre etapas",
+        "Migração de eleitores, fluxos de coorte"
+      ],
+      "avoidWhen": [
+        "Muitas categorias por etapa",
+        "Dados estáticos de uma única etapa"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "alluvial"
     },
     {
       "id": "dendrogram",
       "canonicalName": "Dendrograma",
-      "aliases": ["dendrograma", "diagrama de árvore", "árvore hierárquica", "árvore de agrupamento"],
+      "aliases": [
+        "dendrograma",
+        "diagrama de árvore",
+        "árvore hierárquica",
+        "árvore de agrupamento"
+      ],
       "category": "hierarchical",
-      "dataShape": { "x": "hierarchical", "y": "distance", "series": "none" },
-      "bestFor": ["Mostrar resultados de agrupamento hierárquico", "Visualização de taxonomia"],
-      "avoidWhen": ["Conjuntos de dados muito grandes (>100 folhas)", "Relações não hierárquicas"],
+      "dataShape": {
+        "x": "hierarchical",
+        "y": "distance",
+        "series": "none"
+      },
+      "bestFor": [
+        "Mostrar resultados de agrupamento hierárquico",
+        "Visualização de taxonomia"
+      ],
+      "avoidWhen": [
+        "Conjuntos de dados muito grandes (>100 folhas)",
+        "Relações não hierárquicas"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "dendrogram"
     },
     {
       "id": "radial_tree",
       "canonicalName": "Árvore Radial",
-      "aliases": ["árvore radial", "dendrograma radial", "árvore circular", "árvore polar"],
+      "aliases": [
+        "árvore radial",
+        "dendrograma radial",
+        "árvore circular",
+        "árvore polar"
+      ],
       "category": "hierarchical",
-      "dataShape": { "x": "hierarchical", "y": "optional", "series": "none" },
-      "bestFor": ["Exibição hierárquica compacta", "Organogramas com muitas ramificações"],
-      "avoidWhen": ["Hierarquias profundas com poucas ramificações", "Leitura precisa de distância necessária"],
+      "dataShape": {
+        "x": "hierarchical",
+        "y": "optional",
+        "series": "none"
+      },
+      "bestFor": [
+        "Exibição hierárquica compacta",
+        "Organogramas com muitas ramificações"
+      ],
+      "avoidWhen": [
+        "Hierarquias profundas com poucas ramificações",
+        "Leitura precisa de distância necessária"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "polar"
     },
     {
       "id": "cluster_map",
       "canonicalName": "Mapa de Clusters",
-      "aliases": ["mapa de clusters", "clustermap", "mapa de calor com dendrogramas", "mapa de calor clusterizado"],
+      "aliases": [
+        "mapa de clusters",
+        "clustermap",
+        "mapa de calor com dendrogramas",
+        "mapa de calor clusterizado"
+      ],
       "category": "hierarchical",
-      "dataShape": { "x": "categorical", "y": "categorical", "value": "numeric" },
-      "bestFor": ["Revelar padrões via agrupamento de linhas/colunas", "Expressão genética, padrões de pesquisa"],
-      "avoidWhen": ["Dados não numéricos", "Matrizes pequenas onde uma tabela simples basta"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "categorical",
+        "value": "numeric"
+      },
+      "bestFor": [
+        "Revelar padrões via agrupamento de linhas/colunas",
+        "Expressão genética, padrões de pesquisa"
+      ],
+      "avoidWhen": [
+        "Dados não numéricos",
+        "Matrizes pequenas onde uma tabela simples basta"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "clustermap"
     },
     {
       "id": "heatmap",
       "canonicalName": "Mapa de Calor",
-      "aliases": ["mapa de calor", "heatmap", "matriz de cores", "mapa de intensidade", "mapa térmico"],
+      "aliases": [
+        "mapa de calor",
+        "heatmap",
+        "matriz de cores",
+        "mapa de intensidade",
+        "mapa térmico"
+      ],
       "category": "matrix",
-      "dataShape": { "x": "categorical", "y": "categorical", "value": "numeric" },
-      "bestFor": ["Identificar padrões em dados matriciais", "Padrões de hora do dia ou dia da semana"],
-      "avoidWhen": ["Muitas células para renderizar com legibilidade", "Leitura precisa de valores necessária"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "categorical",
+        "value": "numeric"
+      },
+      "bestFor": [
+        "Identificar padrões em dados matriciais",
+        "Padrões de hora do dia ou dia da semana"
+      ],
+      "avoidWhen": [
+        "Muitas células para renderizar com legibilidade",
+        "Leitura precisa de valores necessária"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "heatmap"
     },
     {
       "id": "correlation_matrix",
       "canonicalName": "Matriz de Correlação",
-      "aliases": ["matriz de correlação", "matriz de corr", "tabela de correlação", "matriz de valores r"],
+      "aliases": [
+        "matriz de correlação",
+        "matriz de corr",
+        "tabela de correlação",
+        "matriz de valores r"
+      ],
       "category": "matrix",
-      "dataShape": { "x": "numeric_multi", "y": "numeric_multi", "value": "correlation" },
-      "bestFor": ["Resumir correlações par a par", "Seleção de features em modelagem"],
-      "avoidWhen": ["Variáveis não numéricas", "Menos de 4 variáveis"],
+      "dataShape": {
+        "x": "numeric_multi",
+        "y": "numeric_multi",
+        "value": "correlation"
+      },
+      "bestFor": [
+        "Resumir correlações par a par",
+        "Seleção de features em modelagem"
+      ],
+      "avoidWhen": [
+        "Variáveis não numéricas",
+        "Menos de 4 variáveis"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "heatmap"
     },
     {
       "id": "confusion_matrix",
       "canonicalName": "Matriz de Confusão",
-      "aliases": ["matriz de confusão", "matriz de erro", "matriz de classificação", "matriz de predição"],
+      "aliases": [
+        "matriz de confusão",
+        "matriz de erro",
+        "matriz de classificação",
+        "matriz de predição"
+      ],
       "category": "matrix",
-      "dataShape": { "x": "categorical_predicted", "y": "categorical_actual", "value": "count" },
-      "bestFor": ["Avaliar desempenho de modelo de classificação", "Identificar padrões de classificação incorreta"],
-      "avoidWhen": ["Modelos de regressão", "Tarefas não relacionadas a classificação"],
+      "dataShape": {
+        "x": "categorical_predicted",
+        "y": "categorical_actual",
+        "value": "count"
+      },
+      "bestFor": [
+        "Avaliar desempenho de modelo de classificação",
+        "Identificar padrões de classificação incorreta"
+      ],
+      "avoidWhen": [
+        "Modelos de regressão",
+        "Tarefas não relacionadas a classificação"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "heatmap"
     },
     {
       "id": "tile_map",
       "canonicalName": "Mapa de Blocos",
-      "aliases": ["mapa de blocos", "cartograma", "mapa em grade", "mapa de tiles", "mapa hexagonal"],
+      "aliases": [
+        "mapa de blocos",
+        "cartograma",
+        "mapa em grade",
+        "mapa de tiles",
+        "mapa hexagonal"
+      ],
       "category": "geographic",
-      "dataShape": { "x": "geographic", "y": "geographic", "value": "numeric" },
-      "bestFor": ["Comparação geográfica de áreas iguais", "Evitar distorção pelo tamanho da região"],
-      "avoidWhen": ["Fronteiras geográficas precisas importam", "Público esperando mapas tradicionais"],
+      "dataShape": {
+        "x": "geographic",
+        "y": "geographic",
+        "value": "numeric"
+      },
+      "bestFor": [
+        "Comparação geográfica de áreas iguais",
+        "Evitar distorção pelo tamanho da região"
+      ],
+      "avoidWhen": [
+        "Fronteiras geográficas precisas importam",
+        "Público esperando mapas tradicionais"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "imshow"
     },
     {
       "id": "choropleth",
       "canonicalName": "Mapa Coroplético",
-      "aliases": ["mapa coroplético", "choropleth", "mapa preenchido", "mapa de calor geográfico", "mapa sombreado"],
+      "aliases": [
+        "mapa coroplético",
+        "choropleth",
+        "mapa preenchido",
+        "mapa de calor geográfico",
+        "mapa sombreado"
+      ],
       "category": "geographic",
-      "dataShape": { "x": "geographic_region", "value": "numeric", "series": "none" },
-      "bestFor": ["Mostrar variação de dados regionais em um mapa", "Distribuição geográfica de uma métrica"],
-      "avoidWhen": ["Regiões grandes dominando visual apesar de valores baixos", "Comparações não geográficas"],
+      "dataShape": {
+        "x": "geographic_region",
+        "value": "numeric",
+        "series": "none"
+      },
+      "bestFor": [
+        "Mostrar variação de dados regionais em um mapa",
+        "Distribuição geográfica de uma métrica"
+      ],
+      "avoidWhen": [
+        "Regiões grandes dominando visual apesar de valores baixos",
+        "Comparações não geográficas"
+      ],
       "excelChartType": "filledMap",
       "matplotlibType": "choropleth"
     },
     {
       "id": "error_bar",
       "canonicalName": "Gráfico com Barras de Erro",
-      "aliases": ["barras de erro", "gráfico com barras de erro", "gráfico de intervalo de confiança", "gráfico de incerteza"],
+      "aliases": [
+        "barras de erro",
+        "gráfico com barras de erro",
+        "gráfico de intervalo de confiança",
+        "gráfico de incerteza"
+      ],
       "category": "statistical",
-      "dataShape": { "x": "categorical", "y": "numeric", "error": "numeric", "series": "optional" },
-      "bestFor": ["Mostrar incerteza de medição", "Comparar médias de grupos com intervalos de confiança"],
-      "avoidWhen": ["Público não familiarizado com barras de erro", "Distribuições assimétricas mostradas como barras simétricas"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "numeric",
+        "error": "numeric",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Mostrar incerteza de medição",
+        "Comparar médias de grupos com intervalos de confiança"
+      ],
+      "avoidWhen": [
+        "Público não familiarizado com barras de erro",
+        "Distribuições assimétricas mostradas como barras simétricas"
+      ],
       "excelChartType": "barClustered",
       "matplotlibType": "errorbar"
     },
     {
       "id": "forest_plot",
       "canonicalName": "Gráfico de Floresta",
-      "aliases": ["gráfico de floresta", "forest plot", "blobbograma", "gráfico de meta-análise", "gráfico de tamanho de efeito"],
+      "aliases": [
+        "gráfico de floresta",
+        "forest plot",
+        "blobbograma",
+        "gráfico de meta-análise",
+        "gráfico de tamanho de efeito"
+      ],
       "category": "statistical",
-      "dataShape": { "x": "numeric_estimate", "y": "categorical_study", "ci_lower": "numeric", "ci_upper": "numeric" },
-      "bestFor": ["Resumos de meta-análise", "Comparar tamanhos de efeito com intervalos de confiança entre estudos"],
-      "avoidWhen": ["Público não estatístico", "Resultados de estudo único"],
+      "dataShape": {
+        "x": "numeric_estimate",
+        "y": "categorical_study",
+        "ci_lower": "numeric",
+        "ci_upper": "numeric"
+      },
+      "bestFor": [
+        "Resumos de meta-análise",
+        "Comparar tamanhos de efeito com intervalos de confiança entre estudos"
+      ],
+      "avoidWhen": [
+        "Público não estatístico",
+        "Resultados de estudo único"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "errorbar"
     },
     {
       "id": "funnel_plot",
       "canonicalName": "Gráfico de Funil Estatístico",
-      "aliases": ["funil estatístico", "gráfico de viés de publicação", "gráfico de precisão", "funil de meta-análise"],
+      "aliases": [
+        "funil estatístico",
+        "gráfico de viés de publicação",
+        "gráfico de precisão",
+        "funil de meta-análise"
+      ],
       "category": "statistical",
-      "dataShape": { "x": "numeric_effect", "y": "numeric_precision", "series": "none" },
-      "bestFor": ["Detectar viés de publicação em meta-análises", "Avaliar heterogeneidade de estudos"],
-      "avoidWhen": ["Contextos não relacionados a meta-análise", "Público geral"],
+      "dataShape": {
+        "x": "numeric_effect",
+        "y": "numeric_precision",
+        "series": "none"
+      },
+      "bestFor": [
+        "Detectar viés de publicação em meta-análises",
+        "Avaliar heterogeneidade de estudos"
+      ],
+      "avoidWhen": [
+        "Contextos não relacionados a meta-análise",
+        "Público geral"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "scatter"
     },
     {
       "id": "bland_altman",
       "canonicalName": "Gráfico de Bland-Altman",
-      "aliases": ["Bland-Altman", "gráfico de Bland-Altman", "gráfico de diferença", "gráfico média-diferença"],
+      "aliases": [
+        "Bland-Altman",
+        "gráfico de Bland-Altman",
+        "gráfico de diferença",
+        "gráfico média-diferença"
+      ],
       "category": "statistical",
-      "dataShape": { "x": "numeric_mean", "y": "numeric_difference", "series": "none" },
-      "bestFor": ["Avaliar concordância entre dois métodos de medição", "Comparação clínica de métodos"],
-      "avoidWhen": ["Comparar mais de dois métodos", "Dados não pareados"],
+      "dataShape": {
+        "x": "numeric_mean",
+        "y": "numeric_difference",
+        "series": "none"
+      },
+      "bestFor": [
+        "Avaliar concordância entre dois métodos de medição",
+        "Comparação clínica de métodos"
+      ],
+      "avoidWhen": [
+        "Comparar mais de dois métodos",
+        "Dados não pareados"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "scatter"
     },
     {
       "id": "control_chart",
       "canonicalName": "Gráfico de Controle",
-      "aliases": ["gráfico de controle", "carta de controle", "gráfico de Shewhart", "carta SPC", "gráfico de controle estatístico"],
+      "aliases": [
+        "gráfico de controle",
+        "carta de controle",
+        "gráfico de Shewhart",
+        "carta SPC",
+        "gráfico de controle estatístico"
+      ],
       "category": "statistical",
-      "dataShape": { "x": "sequential", "y": "numeric", "ucl": "numeric", "lcl": "numeric", "center": "numeric" },
-      "bestFor": ["Monitorar estabilidade de processo", "Detectar condições fora de controle"],
-      "avoidWhen": ["Dados não relacionados a processos", "Público não familiarizado com CEP"],
+      "dataShape": {
+        "x": "sequential",
+        "y": "numeric",
+        "ucl": "numeric",
+        "lcl": "numeric",
+        "center": "numeric"
+      },
+      "bestFor": [
+        "Monitorar estabilidade de processo",
+        "Detectar condições fora de controle"
+      ],
+      "avoidWhen": [
+        "Dados não relacionados a processos",
+        "Público não familiarizado com CEP"
+      ],
       "excelChartType": "line",
       "matplotlibType": "plot"
     },
     {
       "id": "residual_plot",
       "canonicalName": "Gráfico de Resíduos",
-      "aliases": ["gráfico de resíduos", "resíduos", "dispersão de resíduos", "resíduos vs ajustados"],
+      "aliases": [
+        "gráfico de resíduos",
+        "resíduos",
+        "dispersão de resíduos",
+        "resíduos vs ajustados"
+      ],
       "category": "statistical",
-      "dataShape": { "x": "numeric_fitted", "y": "numeric_residual", "series": "none" },
-      "bestFor": ["Diagnosticar pressupostos de modelo de regressão", "Detectar heterocedasticidade ou não linearidade"],
-      "avoidWhen": ["Contextos não relacionados a regressão", "Público de negócios geral"],
+      "dataShape": {
+        "x": "numeric_fitted",
+        "y": "numeric_residual",
+        "series": "none"
+      },
+      "bestFor": [
+        "Diagnosticar pressupostos de modelo de regressão",
+        "Detectar heterocedasticidade ou não linearidade"
+      ],
+      "avoidWhen": [
+        "Contextos não relacionados a regressão",
+        "Público de negócios geral"
+      ],
       "excelChartType": "scatter",
       "matplotlibType": "scatter"
     },
     {
       "id": "bump_chart",
       "canonicalName": "Gráfico de Bump",
-      "aliases": ["bump chart", "gráfico de bump", "gráfico de classificação", "gráfico de mudança de ranking"],
+      "aliases": [
+        "bump chart",
+        "gráfico de bump",
+        "gráfico de classificação",
+        "gráfico de mudança de ranking"
+      ],
       "category": "ranking",
-      "dataShape": { "x": "sequential", "y": "rank", "series": "required" },
-      "bestFor": ["Mostrar mudanças de ranking ao longo do tempo", "Comparar posições competitivas"],
-      "avoidWhen": ["Muitas entidades (>15)", "Valores absolutos mais importantes que rankings"],
+      "dataShape": {
+        "x": "sequential",
+        "y": "rank",
+        "series": "required"
+      },
+      "bestFor": [
+        "Mostrar mudanças de ranking ao longo do tempo",
+        "Comparar posições competitivas"
+      ],
+      "avoidWhen": [
+        "Muitas entidades (>15)",
+        "Valores absolutos mais importantes que rankings"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "plot"
     },
     {
       "id": "parallel_coordinates",
       "canonicalName": "Gráfico de Coordenadas Paralelas",
-      "aliases": ["coordenadas paralelas", "eixos paralelos", "gráfico de coordenadas paralelas", "gráfico multieixo"],
+      "aliases": [
+        "coordenadas paralelas",
+        "eixos paralelos",
+        "gráfico de coordenadas paralelas",
+        "gráfico multieixo"
+      ],
       "category": "ranking",
-      "dataShape": { "x": "numeric_multi", "y": "axes", "series": "optional" },
-      "bestFor": ["Explorar dados multivariados", "Identificar clusters e outliers em múltiplas dimensões"],
-      "avoidWhen": ["Muitas linhas causando sobreposição", "Menos de 4 dimensões"],
+      "dataShape": {
+        "x": "numeric_multi",
+        "y": "axes",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Explorar dados multivariados",
+        "Identificar clusters e outliers em múltiplas dimensões"
+      ],
+      "avoidWhen": [
+        "Muitas linhas causando sobreposição",
+        "Menos de 4 dimensões"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "parallel_coordinates"
     },
     {
       "id": "slope_graph",
       "canonicalName": "Gráfico de Declive",
-      "aliases": ["gráfico de declive", "slopegraph", "linha de dois pontos", "declive comparativo"],
+      "aliases": [
+        "gráfico de declive",
+        "slopegraph",
+        "linha de dois pontos",
+        "declive comparativo"
+      ],
       "category": "ranking",
-      "dataShape": { "x_start": "numeric", "x_end": "numeric", "y": "categorical" },
-      "bestFor": ["Comparar dois pontos no tempo ou condições", "Destacar mudança relativa"],
-      "avoidWhen": ["Mais de dois pontos de comparação", "Muitas linhas causando poluição visual"],
+      "dataShape": {
+        "x_start": "numeric",
+        "x_end": "numeric",
+        "y": "categorical"
+      },
+      "bestFor": [
+        "Comparar dois pontos no tempo ou condições",
+        "Destacar mudança relativa"
+      ],
+      "avoidWhen": [
+        "Mais de dois pontos de comparação",
+        "Muitas linhas causando poluição visual"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "plot"
     },
     {
       "id": "rank_plot",
       "canonicalName": "Gráfico de Ranking",
-      "aliases": ["gráfico de ranking", "gráfico de classificação por pontos", "gráfico de posição ordinal", "tabela de classificação visual"],
+      "aliases": [
+        "gráfico de ranking",
+        "gráfico de classificação por pontos",
+        "gráfico de posição ordinal",
+        "tabela de classificação visual"
+      ],
       "category": "ranking",
-      "dataShape": { "x": "numeric", "y": "categorical_ranked", "series": "optional" },
-      "bestFor": ["Exibir rankings ordinais com valores subjacentes", "Classificações esportivas ou de competição"],
-      "avoidWhen": ["Sem ranking significativo", "Categorias nominais"],
+      "dataShape": {
+        "x": "numeric",
+        "y": "categorical_ranked",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Exibir rankings ordinais com valores subjacentes",
+        "Classificações esportivas ou de competição"
+      ],
+      "avoidWhen": [
+        "Sem ranking significativo",
+        "Categorias nominais"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "scatter"
     },
     {
       "id": "bar_line_combo",
       "canonicalName": "Gráfico Combinado Barras e Linha",
-      "aliases": ["combo barras e linha", "gráfico combinado", "barras com linha", "gráfico misto"],
+      "aliases": [
+        "combo barras e linha",
+        "gráfico combinado",
+        "barras com linha",
+        "gráfico misto"
+      ],
       "category": "combo",
-      "dataShape": { "x": "categorical", "y1": "numeric", "y2": "numeric", "series": "required" },
-      "bestFor": ["Mostrar volume (barras) com taxa (linha)", "Receita e taxa de crescimento juntos"],
-      "avoidWhen": ["Ambas as séries têm mesma unidade e escala", "Público confuso com codificações duplas"],
+      "dataShape": {
+        "x": "categorical",
+        "y1": "numeric",
+        "y2": "numeric",
+        "series": "required"
+      },
+      "bestFor": [
+        "Mostrar volume (barras) com taxa (linha)",
+        "Receita e taxa de crescimento juntos"
+      ],
+      "avoidWhen": [
+        "Ambas as séries têm mesma unidade e escala",
+        "Público confuso com codificações duplas"
+      ],
       "excelChartType": "combo",
       "matplotlibType": "bar"
     },
     {
       "id": "dual_axis",
       "canonicalName": "Gráfico de Eixo Duplo",
-      "aliases": ["eixo duplo", "eixo Y duplo", "gráfico de dois eixos", "eixo secundário", "duplo eixo"],
+      "aliases": [
+        "eixo duplo",
+        "eixo Y duplo",
+        "gráfico de dois eixos",
+        "eixo secundário",
+        "duplo eixo"
+      ],
       "category": "combo",
-      "dataShape": { "x": "categorical", "y_left": "numeric", "y_right": "numeric", "series": "required" },
-      "bestFor": ["Comparar duas séries com escalas diferentes", "Mostrar métricas relacionadas com escalas distintas"],
-      "avoidWhen": ["Escalas podem enganar o leitor", "Mais de duas séries"],
+      "dataShape": {
+        "x": "categorical",
+        "y_left": "numeric",
+        "y_right": "numeric",
+        "series": "required"
+      },
+      "bestFor": [
+        "Comparar duas séries com escalas diferentes",
+        "Mostrar métricas relacionadas com escalas distintas"
+      ],
+      "avoidWhen": [
+        "Escalas podem enganar o leitor",
+        "Mais de duas séries"
+      ],
       "excelChartType": "combo",
       "matplotlibType": "twinx"
     },
     {
       "id": "stacked_bar_line",
       "canonicalName": "Gráfico de Barras Empilhadas com Linha",
-      "aliases": ["barras empilhadas com linha", "combo empilhado", "barras empilhadas mais linha"],
+      "aliases": [
+        "barras empilhadas com linha",
+        "combo empilhado",
+        "barras empilhadas mais linha"
+      ],
       "category": "combo",
-      "dataShape": { "x": "categorical", "y_stack": "numeric_multi", "y_line": "numeric", "series": "required" },
-      "bestFor": ["Mostrar composição (empilhamento) junto com total ou taxa (linha)", "Detalhamento de vendas com sobreposição de tendência"],
-      "avoidWhen": ["Muitas séries empilhadas obscurecendo a linha", "Dados simples que não exigem codificação dupla"],
+      "dataShape": {
+        "x": "categorical",
+        "y_stack": "numeric_multi",
+        "y_line": "numeric",
+        "series": "required"
+      },
+      "bestFor": [
+        "Mostrar composição (empilhamento) junto com total ou taxa (linha)",
+        "Detalhamento de vendas com sobreposição de tendência"
+      ],
+      "avoidWhen": [
+        "Muitas séries empilhadas obscurecendo a linha",
+        "Dados simples que não exigem codificação dupla"
+      ],
       "excelChartType": "combo",
       "matplotlibType": "bar"
     },
     {
       "id": "area_line_combo",
       "canonicalName": "Gráfico Combinado Área e Linha",
-      "aliases": ["combo área e linha", "área com linha", "área preenchida mais linha", "combo de área"],
+      "aliases": [
+        "combo área e linha",
+        "área com linha",
+        "área preenchida mais linha",
+        "combo de área"
+      ],
       "category": "combo",
-      "dataShape": { "x": "sequential", "y_area": "numeric", "y_line": "numeric", "series": "required" },
-      "bestFor": ["Enfatizar volume (área) com uma linha de referência", "Real vs meta ao longo do tempo"],
-      "avoidWhen": ["Linha completamente escondida pelo preenchimento da área", "Muitos elementos sobrepostos"],
+      "dataShape": {
+        "x": "sequential",
+        "y_area": "numeric",
+        "y_line": "numeric",
+        "series": "required"
+      },
+      "bestFor": [
+        "Enfatizar volume (área) com uma linha de referência",
+        "Real vs meta ao longo do tempo"
+      ],
+      "avoidWhen": [
+        "Linha completamente escondida pelo preenchimento da área",
+        "Muitos elementos sobrepostos"
+      ],
       "excelChartType": "combo",
       "matplotlibType": "fill_between"
     },
     {
       "id": "faceted_line",
       "canonicalName": "Gráfico de Linhas Facetado",
-      "aliases": ["linhas facetadas", "small multiples de linha", "trellis de linhas", "painel de linhas"],
+      "aliases": [
+        "linhas facetadas",
+        "small multiples de linha",
+        "trellis de linhas",
+        "painel de linhas"
+      ],
       "category": "small_multiples",
-      "dataShape": { "x": "sequential", "y": "numeric", "facet": "categorical", "series": "optional" },
-      "bestFor": ["Comparar tendências entre muitos grupos sem sobreposição", "Mais limpo que muitas linhas em um eixo"],
-      "avoidWhen": ["Menos de 3 facetas", "Público não familiarizado com small multiples"],
+      "dataShape": {
+        "x": "sequential",
+        "y": "numeric",
+        "facet": "categorical",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Comparar tendências entre muitos grupos sem sobreposição",
+        "Mais limpo que muitas linhas em um eixo"
+      ],
+      "avoidWhen": [
+        "Menos de 3 facetas",
+        "Público não familiarizado com small multiples"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "subplot"
     },
     {
       "id": "faceted_bar",
       "canonicalName": "Gráfico de Barras Facetado",
-      "aliases": ["barras facetadas", "small multiples de barras", "trellis de barras", "painel de barras"],
+      "aliases": [
+        "barras facetadas",
+        "small multiples de barras",
+        "trellis de barras",
+        "painel de barras"
+      ],
       "category": "small_multiples",
-      "dataShape": { "x": "categorical", "y": "numeric", "facet": "categorical", "series": "optional" },
-      "bestFor": ["Comparar distribuições entre grupos em painéis separados", "Resultados de pesquisa por grupo demográfico"],
-      "avoidWhen": ["Menos de 3 facetas", "Comparação simples melhor servida por barras agrupadas"],
+      "dataShape": {
+        "x": "categorical",
+        "y": "numeric",
+        "facet": "categorical",
+        "series": "optional"
+      },
+      "bestFor": [
+        "Comparar distribuições entre grupos em painéis separados",
+        "Resultados de pesquisa por grupo demográfico"
+      ],
+      "avoidWhen": [
+        "Menos de 3 facetas",
+        "Comparação simples melhor servida por barras agrupadas"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "subplot"
     },
     {
       "id": "gauge",
       "canonicalName": "Gráfico de Medidor",
-      "aliases": ["medidor", "gráfico de medidor", "gráfico de dial", "gráfico de ponteiro", "gauge"],
+      "aliases": [
+        "medidor",
+        "gráfico de medidor",
+        "gráfico de dial",
+        "gráfico de ponteiro",
+        "gauge"
+      ],
       "category": "gauge",
-      "dataShape": { "value": "numeric", "min": "numeric", "max": "numeric", "thresholds": "numeric_array" },
-      "bestFor": ["Exibição de progresso de KPI único", "Medidores de desempenho em dashboards"],
-      "avoidWhen": ["Comparar múltiplas métricas", "Leitura precisa de valor necessária"],
+      "dataShape": {
+        "value": "numeric",
+        "min": "numeric",
+        "max": "numeric",
+        "thresholds": "numeric_array"
+      },
+      "bestFor": [
+        "Exibição de progresso de KPI único",
+        "Medidores de desempenho em dashboards"
+      ],
+      "avoidWhen": [
+        "Comparar múltiplas métricas",
+        "Leitura precisa de valor necessária"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "pie"
     },
     {
       "id": "speedometer",
       "canonicalName": "Gráfico de Velocímetro",
-      "aliases": ["velocímetro", "gráfico de velocímetro", "tacômetro", "gauge semicircular", "medidor semicircular"],
+      "aliases": [
+        "velocímetro",
+        "gráfico de velocímetro",
+        "tacômetro",
+        "gauge semicircular",
+        "medidor semicircular"
+      ],
       "category": "gauge",
-      "dataShape": { "value": "numeric", "min": "numeric", "max": "numeric", "zones": "numeric_array" },
-      "bestFor": ["Indicador de desempenho em tempo real", "Exibição de zonas verde-amarelo-vermelho"],
-      "avoidWhen": ["Múltiplas métricas simultâneas", "Tendência histórica é mais importante que estado atual"],
+      "dataShape": {
+        "value": "numeric",
+        "min": "numeric",
+        "max": "numeric",
+        "zones": "numeric_array"
+      },
+      "bestFor": [
+        "Indicador de desempenho em tempo real",
+        "Exibição de zonas verde-amarelo-vermelho"
+      ],
+      "avoidWhen": [
+        "Múltiplas métricas simultâneas",
+        "Tendência histórica é mais importante que estado atual"
+      ],
       "excelChartType": "custom",
       "matplotlibType": "pie"
     }

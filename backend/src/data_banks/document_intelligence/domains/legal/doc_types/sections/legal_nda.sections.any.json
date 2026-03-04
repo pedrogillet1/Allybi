@@ -1,12 +1,19 @@
 {
   "_meta": {
-    "id": "legal_nda_sections",
+    "id": "legal_nda_sections_v215acb2d",
     "version": "1.0.0",
     "description": "Section map for Non-Disclosure Agreement.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-02-28",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,

@@ -19,18 +19,9 @@
       "tests.patternDeterminism",
       "bulk_file_operator"
     ],
-    "tests": {
-      "positive": [
-        "move all PDFs to archive",
-        "rename all draft docs with date",
-        "bulk move old versions"
-      ],
-      "negative": [
-        "summarize all files",
-        "open all files and explain",
-        "edit all files"
-      ]
-    },
+    "tests": [
+      "tests/patternDeterminism.test.ts"
+    ],
     "lastUpdated": "2026-03-03",
     "id": "patterns_files_bulk_actions",
     "description": "Bulk file operation patterns: move/copy/rename/archive many documents with filters."

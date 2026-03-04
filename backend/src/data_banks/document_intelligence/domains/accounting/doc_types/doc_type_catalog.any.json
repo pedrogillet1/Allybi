@@ -3,8 +3,17 @@
     "id": "di_accounting_doc_type_catalog_v2",
     "version": "2.0.0",
     "description": "Accounting document type catalog with detection fingerprints and bilingual labels.",
-    "languages": ["any"],
-    "lastUpdated": "2026-03-03"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -12,47 +21,604 @@
   },
   "domain": "accounting",
   "docTypes": [
-    { "id": "acct_chart_of_accounts", "name": {"en": "Chart of Accounts", "pt": "Plano de Contas"}, "description": "Account list and account hierarchy.", "detectionPatterns": ["\\bchart\\s+of\\s+accounts\\b", "\\bCOA\\b", "\\bplano\\s+de\\s+contas\\b", "\\bcodigo\\s+de\\s+conta\\b"], "priority": 100 },
-    { "id": "acct_general_ledger", "name": {"en": "General Ledger", "pt": "Razao Geral"}, "description": "Detailed ledger by transaction date and account.", "detectionPatterns": ["\\bgeneral\\s+ledger\\b", "\\bGL\\b", "\\brazao\\s+geral\\b", "\\blivro\\s+razao\\b"], "priority": 99 },
-    { "id": "acct_gl_export", "name": {"en": "General Ledger Export", "pt": "Exportacao do Razao Geral"}, "description": "General ledger export tables and reconcilable debit/credit movement rows.", "detectionPatterns": ["\\bgeneral\\s+ledger\\s+export\\b", "\\bGL\\s+export\\b", "\\bledger\\s+export\\b", "\\brazao\\s+geral\\s+export\\b"], "priority": 98 },
-    { "id": "acct_trial_balance", "name": {"en": "Trial Balance", "pt": "Balancete de Verificacao"}, "description": "Trial balance with debit/credit totals.", "detectionPatterns": ["\\btrial\\s+balance\\b", "\\bbalancete\\b", "\\bbalancete\\s+de\\s+verificacao\\b"], "priority": 98 },
-    { "id": "acct_journal_entry_support", "name": {"en": "Journal Entry Support", "pt": "Suporte de Lancamento Contabil"}, "description": "Journal entries with debit and credit mapping.", "detectionPatterns": ["\\bjournal\\s+entry\\s+support\\b", "\\bJE\\s+support\\b", "\\blancamento\\s+contabil\\b", "\\bentry\\s+id\\b"], "priority": 97 },
-    { "id": "acct_je_support", "name": {"en": "Journal Entry Support", "pt": "Suporte de Lancamento Contabil"}, "description": "JE support export pack with debit and credit mapped entries.", "detectionPatterns": ["\\bjournal\\s+entry\\s+support\\b", "\\bJE\\s+support\\b", "\\bjournal\\s+entry\\s+supporting\\s+schedule\\b", "\\bacct\\s+je\\s+support\\b"], "priority": 96 },
-    { "id": "acct_journal_entry_adjusting", "name": {"en": "Adjusting Entries", "pt": "Lancamentos de Ajuste"}, "description": "Adjusting and reversing journals.", "detectionPatterns": ["\\badjusting\\s+entries?\\b", "\\breversing\\s+entry", "\\blancamento\\s+de\\s+ajuste\\b", "\\bestorno\\b"], "priority": 97 },
-    { "id": "acct_ar_aging", "name": {"en": "AR Aging", "pt": "Envelhecimento de Contas a Receber"}, "description": "Accounts receivable aging buckets.", "detectionPatterns": ["\\bAR\\s+aging\\b", "\\baccounts\\s+receivable\\s+aging\\b", "\\bcontas\\s+a\\s+receber\\b"], "priority": 96 },
-    { "id": "acct_ap_aging", "name": {"en": "AP Aging", "pt": "Envelhecimento de Contas a Pagar"}, "description": "Accounts payable aging buckets.", "detectionPatterns": ["\\bAP\\s+aging\\b", "\\baccounts\\s+payable\\s+aging\\b", "\\bcontas\\s+a\\s+pagar\\b"], "priority": 96 },
-    { "id": "acct_bank_reconciliation", "name": {"en": "Bank Reconciliation", "pt": "Conciliacao Bancaria"}, "description": "Reconciliation of books and bank statement.", "detectionPatterns": ["\\bbank\\s+reconciliation\\b", "\\breconciliation\\s+statement\\b", "\\bconcilia[cç][aã]o\\s+banc[aá]ria\\b"], "priority": 95 },
-    { "id": "acct_cashbook", "name": {"en": "Cashbook", "pt": "Livro Caixa"}, "description": "Cashbook register and bank activity summary.", "detectionPatterns": ["\\bcashbook\\b", "\\blivro\\s+caixa\\b", "\\bcaixa\\s+geral\\b"], "priority": 95 },
-    { "id": "acct_invoice_register", "name": {"en": "Invoice Register", "pt": "Registro de Faturas"}, "description": "Invoice listing and reconciliation status.", "detectionPatterns": ["\\binvoice\\s+register\\b", "\\bregistro\\s+de\\s+faturas\\b", "\\bconta\\s+fatura\\b"], "priority": 94 },
-    { "id": "acct_payment_run", "name": {"en": "Payment Run", "pt": "Lote de Pagamentos"}, "description": "Batch payment summary and file references.", "detectionPatterns": ["\\bpayment\\s+run\\b", "\\blote\\s+de\\s+pagamentos\\b", "\\bbatch\\s+payment\\b"], "priority": 93 },
-    { "id": "acct_fixed_asset_register", "name": {"en": "Fixed Asset Register", "pt": "Registro de Ativo Imobilizado"}, "description": "Fixed asset movements and accumulated depreciation.", "detectionPatterns": ["\\bfixed\\s+asset\\s+register\\b", "\\bativo\\s+imobilizado\\b", "\\bFA\\s+register\\b", "\\bimobilizado\\b"], "priority": 92 },
-    { "id": "acct_depreciation_schedule", "name": {"en": "Depreciation Schedule", "pt": "Cronograma de Depreciacao"}, "description": "Depreciation and life-cycle rollforward.", "detectionPatterns": ["\\bdepreciation\\s+schedule\\b", "\\bdepreciation\\s+rollforward\\b", "\\bdepreciacao\\s+schedule\\b"], "priority": 91 },
-    { "id": "acct_amortization_schedule", "name": {"en": "Amortization Schedule", "pt": "Cronograma de Amortizacao"}, "description": "Amortization movement and method details.", "detectionPatterns": ["\\bamortization\\s+schedule\\b", "\\bright\\s+of\\s+use\\b", "\\bdespesa\\s+antecipada\\b"], "priority": 90 },
-    { "id": "acct_revenue_recognition", "name": {"en": "Revenue Recognition", "pt": "Reconhecimento de Receita"}, "description": "Deferred and recognized revenue schedule.", "detectionPatterns": ["\\brevenue\\s+recognition\\b", "\\breconhecimento\\s+de\\s+receita\\b", "\\bdeferred\\s+revenue\\b"], "priority": 90 },
-    { "id": "acct_pbc_list", "name": {"en": "PBC Request List", "pt": "Lista PBC"}, "description": "Management prepared-by-client requests and responses.", "detectionPatterns": ["\\bPBC\\s+list\\b", "\\bprepared\\s+by\\s+client\\b", "\\blista\\s+pbc\\b"], "priority": 89 },
-    { "id": "acct_controls_narrative", "name": {"en": "Controls Narrative", "pt": "Narrativa de Controles"}, "description": "Internal control process and owner mappings.", "detectionPatterns": ["\\binternal\\s+controls?\\b", "\\bcontrols?\\s+narrative\\b", "\\bcontroles\\s+internos\\b"], "priority": 88 },
-    { "id": "acct_subledger_customer", "name": {"en": "Customer Subledger", "pt": "Razao de Clientes"}, "description": "Customer-level accounting detail.", "detectionPatterns": ["\\bcustomer\\s+subledger\\b", "\\braz[aã]o\\s+de\\s+clientes\\b", "\\bcustomer\\s+ledger\\b"], "priority": 88 },
-    { "id": "acct_subledger_vendor", "name": {"en": "Vendor Subledger", "pt": "Razao de Fornecedores"}, "description": "Vendor transactions and invoice-level aging.", "detectionPatterns": ["\\bvendor\\s+subledger\\b", "\\bfornecedores\\b", "\\bsupplier\\s+ledger\\b"], "priority": 88 },
-    { "id": "acct_inventory_valuation", "name": {"en": "Inventory Valuation", "pt": "Avaliacao de Estoque"}, "description": "Inventory valuation and stock valuation method.", "detectionPatterns": ["\\binventory\\s+valuation\\b", "\\bestoque\\b", "\\bcusto\\s+do\\s+estoque\\b"], "priority": 87 },
-    { "id": "acct_prepaid_rollforward", "name": {"en": "Prepaid Rollforward", "pt": "Cronograma de Despesas Antecipadas"}, "description": "Prepaid expense roll-forward and amortization.", "detectionPatterns": ["\\bprepaid\\s+rollforward\\b", "\\bdespesa\\s+antecipada\\b", "\\bprepaid\\s+expense\\b"], "priority": 87 },
-    { "id": "acct_accrual_rollforward", "name": {"en": "Accrual Rollforward", "pt": "Cronograma de Provisoes"}, "description": "Accrual and liability roll-forward.", "detectionPatterns": ["\\baccrual\\s+rollforward\\b", "\\bprovis[aã]o\\b", "\\brollforward\\s+de\\s+provisao\\b"], "priority": 86 },
-    { "id": "acct_tax_reconciliation", "name": {"en": "Tax Reconciliation", "pt": "Reconciliacao Fiscal"}, "description": "Tax ledger reconciliation and tax payable tie-outs.", "detectionPatterns": ["\\btax\\s+reconciliation\\b", "\\breconciliacao\\s+fiscal\\b", "\\bimposto\\b"], "priority": 86 },
-    { "id": "acct_budget_pack", "name": {"en": "Budget Pack", "pt": "Pacote de Orcamento"}, "description": "Budget vs actual monitoring.", "detectionPatterns": ["\\bbudget\\b", "\\borcamento\\b", "\\bbudget\\s+variance\\b"], "priority": 85 },
-    { "id": "acct_forecast_pack", "name": {"en": "Forecast Pack", "pt": "Pacote de Projecao"}, "description": "Forecasts and scenario assumptions.", "detectionPatterns": ["\\bforecast\\b", "\\bprevis[aã]o\\b", "\\bprojection\\b"], "priority": 84 },
-    { "id": "acct_variance_pack", "name": {"en": "Variance Analysis", "pt": "Analise de Variacao"}, "description": "Variance explanation pack.", "detectionPatterns": ["\\bvariance\\b", "\\bvariance\\s+analysis\\b", "\\banalise\\s+de\\s+variacao\\b"], "priority": 83 },
-    { "id": "acct_capex_register", "name": {"en": "CAPEX Register", "pt": "Registro de Investimentos"}, "description": "Capital expenditure control.", "detectionPatterns": ["\\bCAPEX\\b", "\\bcapital\\s+expenditure\\b", "\\bregistro\\s+de\\s+investimentos?\\b"], "priority": 83 },
-    { "id": "acct_leasing_schedule", "name": {"en": "Lease Accounting", "pt": "Contabilidade de Arrendamento"}, "description": "Lease liabilities and ROU schedules.", "detectionPatterns": ["\\blease\\s+accounting\\b", "\\barrendamento\\b", "\\bright\\s+of\\s+use\\b"], "priority": 82 },
-    { "id": "acct_cash_flow", "name": {"en": "Cash Flow Pack", "pt": "Demonstracao de Fluxo de Caixa"}, "description": "Statement of cash flows and reconciliations.", "detectionPatterns": ["\\bcash\\s+flow\\b", "\\bstatement\\s+of\\s+cash\\s+flows\\b", "\\bfluxo\\s+de\\s+caixa\\b"], "priority": 82 },
-    { "id": "acct_management_representation", "name": {"en": "Management Representation", "pt": "Carta de Representacao da Administracao"}, "description": "Management representation and signatures.", "detectionPatterns": ["\\bmanagement\\s+representation\\b", "\\bcarta\\s+de\\s+representacao\\b", "\\brepresentacao\\s+da\\s+administracao\\b"], "priority": 80 },
-    { "id": "acct_workpaper", "name": {"en": "Audit Workpaper", "pt": "Papel de Trabalho de Auditoria"}, "description": "Audit planning, procedures, and tie-outs.", "detectionPatterns": ["\\baudit\\s+workpaper\\b", "\\bworking\\s+paper\\b", "\\bpapel\\s+de\\s+trabalho\\b", "\\bworkpaper\\b"], "priority": 79 },
-    { "id": "acct_audit_workpaper", "name": {"en": "Audit Workpaper", "pt": "Papel de Trabalho de Auditoria"}, "description": "Audit workpaper documents and tie-out narratives.", "detectionPatterns": ["\\baudit\\s+workpaper\\b", "\\baudit\\s+work\\s+paper\\b", "\\baudit\\s+work\\s+papers?\\b", "\\bpapel\\s+de\\s+trabalho\\b", "\\btrabalho\\s+de\\s+auditoria\\b"], "priority": 78 },
-    { "id": "acct_financial_statement", "name": {"en": "Financial Statements", "pt": "Demonstracoes Financeiras"}, "description": "Income statement, balance sheet, and note references.", "detectionPatterns": ["\\bfinancial\\s+statement\\b", "\\bdemonstracao\\s+financeira\\b", "\\bstatement\\s+of\\s+financial\\s+position\\b"], "priority": 78 },
-    { "id": "acct_intercompany_reconciliation", "name": {"en": "Intercompany Reconciliation", "pt": "Conciliacao Intercompany"}, "description": "Intercompany due-to and due-from tie-outs.", "detectionPatterns": ["\\bintercompany\\s+reconciliation\\b", "\\binterco\\b", "\\bconciliacao\\s+intercompany\\b"], "priority": 77 },
-    { "id": "acct_foreign_currency", "name": {"en": "Foreign Currency Reconciliation", "pt": "Conciliaao de Moeda Estrangeira"}, "description": "FX transactions and translation differences.", "detectionPatterns": ["\\bforeign\\s+currency\\b", "\\bFX\\b", "\\bmoeda\\s+estrangeira\\b", "\\btraducao\\s+cambial\\b"], "priority": 76 },
-    { "id": "acct_audit_confirmation", "name": {"en": "Audit Confirmation", "pt": "Confirmacao de Auditoria"}, "description": "Confirmation requests and responses.", "detectionPatterns": ["\\baudit\\s+confirmation\\b", "\\bconfirmation\\s+request\\b", "\\bconfirmacao\\s+de\\s+saldo\\b"], "priority": 75 },
-    { "id": "acct_trial_balance_reclass", "name": {"en": "Trial Balance Reclass", "pt": "Reclassificacao do Balancete"}, "description": "Reclassification and restatement trial balance.", "detectionPatterns": ["\\btrial\\s+balance\\s+reclass\\b", "\\breclassificacao\\b", "\\bTB\\s+reclass\\b"], "priority": 74 },
-    { "id": "acct_account_reconciliation", "name": {"en": "Account Reconciliation", "pt": "Conciliacao de Conta"}, "description": "Single-account tie-out review.", "detectionPatterns": ["\\baccount\\s+reconciliation\\b", "\\bconciliacao\\s+de\\s+conta\\b", "\\breconcile\\s+account\\b"], "priority": 74 },
-    { "id": "acct_month_end_close", "name": {"en": "Month End Close", "pt": "Fechamento Mensal"}, "description": "Month-end close package and close-journal.", "detectionPatterns": ["\\bmonth\\s+end\\s+close\\b", "\\bfechamento\\s+mensal\\b", "\\bclosing\\s+journal\\b"], "priority": 73 },
-    { "id": "acct_year_end_close", "name": {"en": "Year End Close", "pt": "Fechamento Anual"}, "description": "Year-end close package and post-close adjustments.", "detectionPatterns": ["\\byear\\s+end\\s+close\\b", "\\bfechamento\\s+anual\\b", "\\bencerramento\\s+do\\s+ano\\b"], "priority": 73 }
+    {
+      "id": "acct_chart_of_accounts",
+      "name": {
+        "en": "Chart of Accounts",
+        "pt": "Plano de Contas"
+      },
+      "description": "Account list and account hierarchy.",
+      "detectionPatterns": [
+        "\\bchart\\s+of\\s+accounts\\b",
+        "\\bCOA\\b",
+        "\\bplano\\s+de\\s+contas\\b",
+        "\\bcodigo\\s+de\\s+conta\\b"
+      ],
+      "priority": 100
+    },
+    {
+      "id": "acct_general_ledger",
+      "name": {
+        "en": "General Ledger",
+        "pt": "Razao Geral"
+      },
+      "description": "Detailed ledger by transaction date and account.",
+      "detectionPatterns": [
+        "\\bgeneral\\s+ledger\\b",
+        "\\bGL\\b",
+        "\\brazao\\s+geral\\b",
+        "\\blivro\\s+razao\\b"
+      ],
+      "priority": 99
+    },
+    {
+      "id": "acct_gl_export",
+      "name": {
+        "en": "General Ledger Export",
+        "pt": "Exportacao do Razao Geral"
+      },
+      "description": "General ledger export tables and reconcilable debit/credit movement rows.",
+      "detectionPatterns": [
+        "\\bgeneral\\s+ledger\\s+export\\b",
+        "\\bGL\\s+export\\b",
+        "\\bledger\\s+export\\b",
+        "\\brazao\\s+geral\\s+export\\b"
+      ],
+      "priority": 98
+    },
+    {
+      "id": "acct_trial_balance",
+      "name": {
+        "en": "Trial Balance",
+        "pt": "Balancete de Verificacao"
+      },
+      "description": "Trial balance with debit/credit totals.",
+      "detectionPatterns": [
+        "\\btrial\\s+balance\\b",
+        "\\bbalancete\\b",
+        "\\bbalancete\\s+de\\s+verificacao\\b"
+      ],
+      "priority": 98
+    },
+    {
+      "id": "acct_journal_entry_support",
+      "name": {
+        "en": "Journal Entry Support",
+        "pt": "Suporte de Lancamento Contabil"
+      },
+      "description": "Journal entries with debit and credit mapping.",
+      "detectionPatterns": [
+        "\\bjournal\\s+entry\\s+support\\b",
+        "\\bJE\\s+support\\b",
+        "\\blancamento\\s+contabil\\b",
+        "\\bentry\\s+id\\b"
+      ],
+      "priority": 97
+    },
+    {
+      "id": "acct_je_support",
+      "name": {
+        "en": "Journal Entry Support",
+        "pt": "Suporte de Lancamento Contabil"
+      },
+      "description": "JE support export pack with debit and credit mapped entries.",
+      "detectionPatterns": [
+        "\\bjournal\\s+entry\\s+support\\b",
+        "\\bJE\\s+support\\b",
+        "\\bjournal\\s+entry\\s+supporting\\s+schedule\\b",
+        "\\bacct\\s+je\\s+support\\b"
+      ],
+      "priority": 96
+    },
+    {
+      "id": "acct_journal_entry_adjusting",
+      "name": {
+        "en": "Adjusting Entries",
+        "pt": "Lancamentos de Ajuste"
+      },
+      "description": "Adjusting and reversing journals.",
+      "detectionPatterns": [
+        "\\badjusting\\s+entries?\\b",
+        "\\breversing\\s+entry",
+        "\\blancamento\\s+de\\s+ajuste\\b",
+        "\\bestorno\\b"
+      ],
+      "priority": 97
+    },
+    {
+      "id": "acct_ar_aging",
+      "name": {
+        "en": "AR Aging",
+        "pt": "Envelhecimento de Contas a Receber"
+      },
+      "description": "Accounts receivable aging buckets.",
+      "detectionPatterns": [
+        "\\bAR\\s+aging\\b",
+        "\\baccounts\\s+receivable\\s+aging\\b",
+        "\\bcontas\\s+a\\s+receber\\b"
+      ],
+      "priority": 96
+    },
+    {
+      "id": "acct_ap_aging",
+      "name": {
+        "en": "AP Aging",
+        "pt": "Envelhecimento de Contas a Pagar"
+      },
+      "description": "Accounts payable aging buckets.",
+      "detectionPatterns": [
+        "\\bAP\\s+aging\\b",
+        "\\baccounts\\s+payable\\s+aging\\b",
+        "\\bcontas\\s+a\\s+pagar\\b"
+      ],
+      "priority": 96
+    },
+    {
+      "id": "acct_bank_reconciliation",
+      "name": {
+        "en": "Bank Reconciliation",
+        "pt": "Conciliacao Bancaria"
+      },
+      "description": "Reconciliation of books and bank statement.",
+      "detectionPatterns": [
+        "\\bbank\\s+reconciliation\\b",
+        "\\breconciliation\\s+statement\\b",
+        "\\bconcilia[cç][aã]o\\s+banc[aá]ria\\b"
+      ],
+      "priority": 95
+    },
+    {
+      "id": "acct_cashbook",
+      "name": {
+        "en": "Cashbook",
+        "pt": "Livro Caixa"
+      },
+      "description": "Cashbook register and bank activity summary.",
+      "detectionPatterns": [
+        "\\bcashbook\\b",
+        "\\blivro\\s+caixa\\b",
+        "\\bcaixa\\s+geral\\b"
+      ],
+      "priority": 95
+    },
+    {
+      "id": "acct_invoice_register",
+      "name": {
+        "en": "Invoice Register",
+        "pt": "Registro de Faturas"
+      },
+      "description": "Invoice listing and reconciliation status.",
+      "detectionPatterns": [
+        "\\binvoice\\s+register\\b",
+        "\\bregistro\\s+de\\s+faturas\\b",
+        "\\bconta\\s+fatura\\b"
+      ],
+      "priority": 94
+    },
+    {
+      "id": "acct_payment_run",
+      "name": {
+        "en": "Payment Run",
+        "pt": "Lote de Pagamentos"
+      },
+      "description": "Batch payment summary and file references.",
+      "detectionPatterns": [
+        "\\bpayment\\s+run\\b",
+        "\\blote\\s+de\\s+pagamentos\\b",
+        "\\bbatch\\s+payment\\b"
+      ],
+      "priority": 93
+    },
+    {
+      "id": "acct_fixed_asset_register",
+      "name": {
+        "en": "Fixed Asset Register",
+        "pt": "Registro de Ativo Imobilizado"
+      },
+      "description": "Fixed asset movements and accumulated depreciation.",
+      "detectionPatterns": [
+        "\\bfixed\\s+asset\\s+register\\b",
+        "\\bativo\\s+imobilizado\\b",
+        "\\bFA\\s+register\\b",
+        "\\bimobilizado\\b"
+      ],
+      "priority": 92
+    },
+    {
+      "id": "acct_depreciation_schedule",
+      "name": {
+        "en": "Depreciation Schedule",
+        "pt": "Cronograma de Depreciacao"
+      },
+      "description": "Depreciation and life-cycle rollforward.",
+      "detectionPatterns": [
+        "\\bdepreciation\\s+schedule\\b",
+        "\\bdepreciation\\s+rollforward\\b",
+        "\\bdepreciacao\\s+schedule\\b"
+      ],
+      "priority": 91
+    },
+    {
+      "id": "acct_amortization_schedule",
+      "name": {
+        "en": "Amortization Schedule",
+        "pt": "Cronograma de Amortizacao"
+      },
+      "description": "Amortization movement and method details.",
+      "detectionPatterns": [
+        "\\bamortization\\s+schedule\\b",
+        "\\bright\\s+of\\s+use\\b",
+        "\\bdespesa\\s+antecipada\\b"
+      ],
+      "priority": 90
+    },
+    {
+      "id": "acct_revenue_recognition",
+      "name": {
+        "en": "Revenue Recognition",
+        "pt": "Reconhecimento de Receita"
+      },
+      "description": "Deferred and recognized revenue schedule.",
+      "detectionPatterns": [
+        "\\brevenue\\s+recognition\\b",
+        "\\breconhecimento\\s+de\\s+receita\\b",
+        "\\bdeferred\\s+revenue\\b"
+      ],
+      "priority": 90
+    },
+    {
+      "id": "acct_pbc_list",
+      "name": {
+        "en": "PBC Request List",
+        "pt": "Lista PBC"
+      },
+      "description": "Management prepared-by-client requests and responses.",
+      "detectionPatterns": [
+        "\\bPBC\\s+list\\b",
+        "\\bprepared\\s+by\\s+client\\b",
+        "\\blista\\s+pbc\\b"
+      ],
+      "priority": 89
+    },
+    {
+      "id": "acct_controls_narrative",
+      "name": {
+        "en": "Controls Narrative",
+        "pt": "Narrativa de Controles"
+      },
+      "description": "Internal control process and owner mappings.",
+      "detectionPatterns": [
+        "\\binternal\\s+controls?\\b",
+        "\\bcontrols?\\s+narrative\\b",
+        "\\bcontroles\\s+internos\\b"
+      ],
+      "priority": 88
+    },
+    {
+      "id": "acct_subledger_customer",
+      "name": {
+        "en": "Customer Subledger",
+        "pt": "Razao de Clientes"
+      },
+      "description": "Customer-level accounting detail.",
+      "detectionPatterns": [
+        "\\bcustomer\\s+subledger\\b",
+        "\\braz[aã]o\\s+de\\s+clientes\\b",
+        "\\bcustomer\\s+ledger\\b"
+      ],
+      "priority": 88
+    },
+    {
+      "id": "acct_subledger_vendor",
+      "name": {
+        "en": "Vendor Subledger",
+        "pt": "Razao de Fornecedores"
+      },
+      "description": "Vendor transactions and invoice-level aging.",
+      "detectionPatterns": [
+        "\\bvendor\\s+subledger\\b",
+        "\\bfornecedores\\b",
+        "\\bsupplier\\s+ledger\\b"
+      ],
+      "priority": 88
+    },
+    {
+      "id": "acct_inventory_valuation",
+      "name": {
+        "en": "Inventory Valuation",
+        "pt": "Avaliacao de Estoque"
+      },
+      "description": "Inventory valuation and stock valuation method.",
+      "detectionPatterns": [
+        "\\binventory\\s+valuation\\b",
+        "\\bestoque\\b",
+        "\\bcusto\\s+do\\s+estoque\\b"
+      ],
+      "priority": 87
+    },
+    {
+      "id": "acct_prepaid_rollforward",
+      "name": {
+        "en": "Prepaid Rollforward",
+        "pt": "Cronograma de Despesas Antecipadas"
+      },
+      "description": "Prepaid expense roll-forward and amortization.",
+      "detectionPatterns": [
+        "\\bprepaid\\s+rollforward\\b",
+        "\\bdespesa\\s+antecipada\\b",
+        "\\bprepaid\\s+expense\\b"
+      ],
+      "priority": 87
+    },
+    {
+      "id": "acct_accrual_rollforward",
+      "name": {
+        "en": "Accrual Rollforward",
+        "pt": "Cronograma de Provisoes"
+      },
+      "description": "Accrual and liability roll-forward.",
+      "detectionPatterns": [
+        "\\baccrual\\s+rollforward\\b",
+        "\\bprovis[aã]o\\b",
+        "\\brollforward\\s+de\\s+provisao\\b"
+      ],
+      "priority": 86
+    },
+    {
+      "id": "acct_tax_reconciliation",
+      "name": {
+        "en": "Tax Reconciliation",
+        "pt": "Reconciliacao Fiscal"
+      },
+      "description": "Tax ledger reconciliation and tax payable tie-outs.",
+      "detectionPatterns": [
+        "\\btax\\s+reconciliation\\b",
+        "\\breconciliacao\\s+fiscal\\b",
+        "\\bimposto\\b"
+      ],
+      "priority": 86
+    },
+    {
+      "id": "acct_budget_pack",
+      "name": {
+        "en": "Budget Pack",
+        "pt": "Pacote de Orcamento"
+      },
+      "description": "Budget vs actual monitoring.",
+      "detectionPatterns": [
+        "\\bbudget\\b",
+        "\\borcamento\\b",
+        "\\bbudget\\s+variance\\b"
+      ],
+      "priority": 85
+    },
+    {
+      "id": "acct_forecast_pack",
+      "name": {
+        "en": "Forecast Pack",
+        "pt": "Pacote de Projecao"
+      },
+      "description": "Forecasts and scenario assumptions.",
+      "detectionPatterns": [
+        "\\bforecast\\b",
+        "\\bprevis[aã]o\\b",
+        "\\bprojection\\b"
+      ],
+      "priority": 84
+    },
+    {
+      "id": "acct_variance_pack",
+      "name": {
+        "en": "Variance Analysis",
+        "pt": "Analise de Variacao"
+      },
+      "description": "Variance explanation pack.",
+      "detectionPatterns": [
+        "\\bvariance\\b",
+        "\\bvariance\\s+analysis\\b",
+        "\\banalise\\s+de\\s+variacao\\b"
+      ],
+      "priority": 83
+    },
+    {
+      "id": "acct_capex_register",
+      "name": {
+        "en": "CAPEX Register",
+        "pt": "Registro de Investimentos"
+      },
+      "description": "Capital expenditure control.",
+      "detectionPatterns": [
+        "\\bCAPEX\\b",
+        "\\bcapital\\s+expenditure\\b",
+        "\\bregistro\\s+de\\s+investimentos?\\b"
+      ],
+      "priority": 83
+    },
+    {
+      "id": "acct_leasing_schedule",
+      "name": {
+        "en": "Lease Accounting",
+        "pt": "Contabilidade de Arrendamento"
+      },
+      "description": "Lease liabilities and ROU schedules.",
+      "detectionPatterns": [
+        "\\blease\\s+accounting\\b",
+        "\\barrendamento\\b",
+        "\\bright\\s+of\\s+use\\b"
+      ],
+      "priority": 82
+    },
+    {
+      "id": "acct_cash_flow",
+      "name": {
+        "en": "Cash Flow Pack",
+        "pt": "Demonstracao de Fluxo de Caixa"
+      },
+      "description": "Statement of cash flows and reconciliations.",
+      "detectionPatterns": [
+        "\\bcash\\s+flow\\b",
+        "\\bstatement\\s+of\\s+cash\\s+flows\\b",
+        "\\bfluxo\\s+de\\s+caixa\\b"
+      ],
+      "priority": 82
+    },
+    {
+      "id": "acct_management_representation",
+      "name": {
+        "en": "Management Representation",
+        "pt": "Carta de Representacao da Administracao"
+      },
+      "description": "Management representation and signatures.",
+      "detectionPatterns": [
+        "\\bmanagement\\s+representation\\b",
+        "\\bcarta\\s+de\\s+representacao\\b",
+        "\\brepresentacao\\s+da\\s+administracao\\b"
+      ],
+      "priority": 80
+    },
+    {
+      "id": "acct_workpaper",
+      "name": {
+        "en": "Audit Workpaper",
+        "pt": "Papel de Trabalho de Auditoria"
+      },
+      "description": "Audit planning, procedures, and tie-outs.",
+      "detectionPatterns": [
+        "\\baudit\\s+workpaper\\b",
+        "\\bworking\\s+paper\\b",
+        "\\bpapel\\s+de\\s+trabalho\\b",
+        "\\bworkpaper\\b"
+      ],
+      "priority": 79
+    },
+    {
+      "id": "acct_audit_workpaper",
+      "name": {
+        "en": "Audit Workpaper",
+        "pt": "Papel de Trabalho de Auditoria"
+      },
+      "description": "Audit workpaper documents and tie-out narratives.",
+      "detectionPatterns": [
+        "\\baudit\\s+workpaper\\b",
+        "\\baudit\\s+work\\s+paper\\b",
+        "\\baudit\\s+work\\s+papers?\\b",
+        "\\bpapel\\s+de\\s+trabalho\\b",
+        "\\btrabalho\\s+de\\s+auditoria\\b"
+      ],
+      "priority": 78
+    },
+    {
+      "id": "acct_financial_statement",
+      "name": {
+        "en": "Financial Statements",
+        "pt": "Demonstracoes Financeiras"
+      },
+      "description": "Income statement, balance sheet, and note references.",
+      "detectionPatterns": [
+        "\\bfinancial\\s+statement\\b",
+        "\\bdemonstracao\\s+financeira\\b",
+        "\\bstatement\\s+of\\s+financial\\s+position\\b"
+      ],
+      "priority": 78
+    },
+    {
+      "id": "acct_intercompany_reconciliation",
+      "name": {
+        "en": "Intercompany Reconciliation",
+        "pt": "Conciliacao Intercompany"
+      },
+      "description": "Intercompany due-to and due-from tie-outs.",
+      "detectionPatterns": [
+        "\\bintercompany\\s+reconciliation\\b",
+        "\\binterco\\b",
+        "\\bconciliacao\\s+intercompany\\b"
+      ],
+      "priority": 77
+    },
+    {
+      "id": "acct_foreign_currency",
+      "name": {
+        "en": "Foreign Currency Reconciliation",
+        "pt": "Conciliaao de Moeda Estrangeira"
+      },
+      "description": "FX transactions and translation differences.",
+      "detectionPatterns": [
+        "\\bforeign\\s+currency\\b",
+        "\\bFX\\b",
+        "\\bmoeda\\s+estrangeira\\b",
+        "\\btraducao\\s+cambial\\b"
+      ],
+      "priority": 76
+    },
+    {
+      "id": "acct_audit_confirmation",
+      "name": {
+        "en": "Audit Confirmation",
+        "pt": "Confirmacao de Auditoria"
+      },
+      "description": "Confirmation requests and responses.",
+      "detectionPatterns": [
+        "\\baudit\\s+confirmation\\b",
+        "\\bconfirmation\\s+request\\b",
+        "\\bconfirmacao\\s+de\\s+saldo\\b"
+      ],
+      "priority": 75
+    },
+    {
+      "id": "acct_trial_balance_reclass",
+      "name": {
+        "en": "Trial Balance Reclass",
+        "pt": "Reclassificacao do Balancete"
+      },
+      "description": "Reclassification and restatement trial balance.",
+      "detectionPatterns": [
+        "\\btrial\\s+balance\\s+reclass\\b",
+        "\\breclassificacao\\b",
+        "\\bTB\\s+reclass\\b"
+      ],
+      "priority": 74
+    },
+    {
+      "id": "acct_account_reconciliation",
+      "name": {
+        "en": "Account Reconciliation",
+        "pt": "Conciliacao de Conta"
+      },
+      "description": "Single-account tie-out review.",
+      "detectionPatterns": [
+        "\\baccount\\s+reconciliation\\b",
+        "\\bconciliacao\\s+de\\s+conta\\b",
+        "\\breconcile\\s+account\\b"
+      ],
+      "priority": 74
+    },
+    {
+      "id": "acct_month_end_close",
+      "name": {
+        "en": "Month End Close",
+        "pt": "Fechamento Mensal"
+      },
+      "description": "Month-end close package and close-journal.",
+      "detectionPatterns": [
+        "\\bmonth\\s+end\\s+close\\b",
+        "\\bfechamento\\s+mensal\\b",
+        "\\bclosing\\s+journal\\b"
+      ],
+      "priority": 73
+    },
+    {
+      "id": "acct_year_end_close",
+      "name": {
+        "en": "Year End Close",
+        "pt": "Fechamento Anual"
+      },
+      "description": "Year-end close package and post-close adjustments.",
+      "detectionPatterns": [
+        "\\byear\\s+end\\s+close\\b",
+        "\\bfechamento\\s+anual\\b",
+        "\\bencerramento\\s+do\\s+ano\\b"
+      ],
+      "priority": 73
+    }
   ]
 }

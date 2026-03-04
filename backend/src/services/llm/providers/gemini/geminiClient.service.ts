@@ -149,11 +149,11 @@ export class GeminiClientService implements LLMClient {
     const t = Date.now();
     try {
       const base = this.cfg.baseUrl.replace(/\/$/, "");
-      const url = `${base}/models?key=${this.cfg.apiKey}`;
+      const url = `${base}/models`;
       const ac = new AbortController();
       const timeout = setTimeout(() => ac.abort(), this.cfg.pingTimeoutMs ?? 5000);
       try {
-        const res = await fetch(url, { signal: ac.signal });
+        const res = await fetch(url, { signal: ac.signal, headers: this.headers() });
         return { ok: res.ok, provider: "google", t };
       } finally {
         clearTimeout(timeout);
@@ -632,7 +632,7 @@ export class GeminiClientService implements LLMClient {
 
     for (const p of content.parts) {
       // Skip thinking/thought parts — only include actual response text
-      if ((p as Record<string, unknown>).thought === true) continue;
+      if ((p as unknown as Record<string, unknown>).thought === true) continue;
       if ("text" in p && typeof p.text === "string") {
         text += p.text;
       } else if ("functionCall" in p && p.functionCall?.name) {
@@ -714,10 +714,6 @@ function chunkText(text: string, maxChars: number): string[] {
     i += maxChars;
   }
   return out;
-}
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function makeDeterministicCallId(name: string, args: unknown): string {

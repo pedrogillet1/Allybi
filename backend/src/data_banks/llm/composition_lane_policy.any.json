@@ -1,0 +1,80 @@
+{
+  "_meta": {
+    "id": "composition_lane_policy",
+    "version": "1.0.0",
+    "description": "Deterministic lane policy for answer composition model routing.",
+    "lastUpdated": "2026-03-04",
+    "owner": "llm-routing",
+    "usedBy": [
+      "services/llm/core/llmRouter.service.ts"
+    ],
+    "tests": [
+      "tests/certification/composition-routing.cert.test.ts"
+    ],
+    "languages": [
+      "any"
+    ]
+  },
+  "config": {
+    "enabled": true
+  },
+  "lanes": [
+    {
+      "id": "final_quote_authority",
+      "when": {
+        "stage": "final",
+        "answerModes": [
+          "doc_grounded_quote"
+        ]
+      },
+      "route": {
+        "provider": "openai",
+        "model": "gpt-5.2",
+        "modelFamily": "gpt-5.2"
+      },
+      "qualityReason": "quote_strict"
+    },
+    {
+      "id": "final_numeric_authority",
+      "when": {
+        "stage": "final",
+        "reasons": [
+          "numeric_strict",
+          "quote_strict",
+          "hallucination_guard",
+          "policy_retry"
+        ]
+      },
+      "route": {
+        "provider": "openai",
+        "model": "gpt-5.2",
+        "modelFamily": "gpt-5.2"
+      },
+      "qualityReason": "quality_guard"
+    },
+    {
+      "id": "final_authority_default",
+      "when": {
+        "stage": "final"
+      },
+      "route": {
+        "provider": "openai",
+        "model": "gpt-5.2",
+        "modelFamily": "gpt-5.2"
+      },
+      "qualityReason": "quality_finish"
+    },
+    {
+      "id": "draft_fast_default",
+      "when": {
+        "stage": "draft"
+      },
+      "route": {
+        "provider": "gemini",
+        "model": "gemini-2.5-flash",
+        "modelFamily": "gemini-2.5-flash"
+      },
+      "qualityReason": "fast_path"
+    }
+  ]
+}

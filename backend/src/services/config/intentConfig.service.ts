@@ -85,6 +85,8 @@ export interface IntentDecisionOutput {
   domainId: string;
   confidence: number;
   decisionNotes: string[];
+  requiresClarification?: boolean;
+  clarifyReason?: string;
   // if the orchestrator wants to persist:
   persistable: {
     intentId: string;
@@ -422,8 +424,22 @@ export class IntentConfigService {
     const ambiguous =
       second && (margin < cfg.thresholds.ambiguousMarginLt || topBelowClarify);
 
-    if (ambiguous) notes.push("decision:ambiguous");
-    else if (autopick) notes.push("decision:autopick");
+    if (ambiguous) {
+      notes.push("decision:clarify_required");
+      const clarifyDecision = this.makeOutputFromCandidate(
+        top,
+        cfg,
+        state,
+        notes,
+        "picked_top_candidate",
+      );
+      clarifyDecision.requiresClarification = true;
+      clarifyDecision.clarifyReason = topBelowClarify
+        ? "low_confidence"
+        : "ambiguous_margin";
+      return clarifyDecision;
+    }
+    if (autopick) notes.push("decision:autopick");
     else notes.push("decision:default_pick_top");
 
     // 8) Build output from the top candidate (or fallback to family defaults)

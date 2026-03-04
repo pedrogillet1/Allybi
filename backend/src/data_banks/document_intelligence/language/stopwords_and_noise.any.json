@@ -9,7 +9,13 @@
       "pt"
     ],
     "lastUpdated": "2026-03-03",
-    "description": "Retrieval-safe stopword, boilerplate, and noise-filtering rules for document extraction."
+    "description": "Retrieval-safe stopword, boilerplate, and noise-filtering rules for document extraction.",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,

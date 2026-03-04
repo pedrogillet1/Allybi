@@ -6,7 +6,14 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-03-01"
+    "lastUpdated": "2026-03-01",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -50,6 +57,12 @@
       "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
       "addedAt": "2026-02-27",
       "expiresInDays": null
+    },
+    {
+      "alias": "address_patterns",
+      "canonicalId": "address_patterns",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
     },
     {
       "alias": "allybi_capabilities",
@@ -136,6 +149,12 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "ambiguity_playbooks",
+      "canonicalId": "ambiguity_playbooks",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "ambiguity_questions",
       "canonicalId": "ambiguity_questions",
       "source": "runtime_self_alias",
@@ -167,6 +186,12 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "anti_robotic_style_rules",
+      "canonicalId": "anti_robotic_style_rules",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "assumption_policy",
       "canonicalId": "assumption_policy",
       "source": "runtime_self_alias",
@@ -194,6 +219,12 @@
     {
       "alias": "bank_dependencies",
       "canonicalId": "bank_dependencies",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "bank_generation_report",
+      "canonicalId": "bank_generation_report",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -353,6 +384,12 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "chat_runtime_bank_contract",
+      "canonicalId": "chat_runtime_bank_contract",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "citation_policy",
       "canonicalId": "citation_policy",
       "source": "runtime_self_alias",
@@ -396,6 +433,12 @@
       "expiresInDays": 180
     },
     {
+      "alias": "closers",
+      "canonicalId": "closers",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "colors_en",
       "canonicalId": "colors_en",
       "source": "runtime_self_alias",
@@ -426,14 +469,68 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "compiled_alias_trie",
+      "canonicalId": "compiled_alias_trie",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "compiled_compiled_manifest",
+      "canonicalId": "compiled_compiled_manifest",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "compiled_doctype_signature_index",
+      "canonicalId": "compiled_doctype_signature_index",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "compiled_section_heading_index",
+      "canonicalId": "compiled_section_heading_index",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "compiled_table_header_hash_index",
+      "canonicalId": "compiled_table_header_hash_index",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "compliance_policy",
       "canonicalId": "compliance_policy",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "composition_lane_policy",
+      "canonicalId": "composition_lane_policy",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "connect_intents_en",
+      "canonicalId": "connect_intents_en",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "connect_intents_pt",
+      "canonicalId": "connect_intents_pt",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "connector_operators",
       "canonicalId": "connector_operators",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "connector_operators_v46dbe3f4",
+      "canonicalId": "connector_operators_v46dbe3f4",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -445,6 +542,24 @@
     {
       "alias": "connectors_routing",
       "canonicalId": "connectors_routing",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "consistency_checks",
+      "canonicalId": "consistency_checks",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "contact_patterns",
+      "canonicalId": "contact_patterns",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "contradiction_policy",
+      "canonicalId": "contradiction_policy",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -463,6 +578,12 @@
     {
       "alias": "date_patterns",
       "canonicalId": "date_patterns",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "date_patterns_vf6e34b10",
+      "canonicalId": "date_patterns_vf6e34b10",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -605,8 +726,26 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_accounting_extraction_acct_account_reconciliation",
+      "canonicalId": "di_accounting_extraction_acct_account_reconciliation",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_extraction_acct_accrual_rollforward",
+      "canonicalId": "di_accounting_extraction_acct_accrual_rollforward",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_accounting_extraction_acct_accruals_schedule",
       "canonicalId": "di_accounting_extraction_acct_accruals_schedule",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_extraction_acct_amortization_schedule",
+      "canonicalId": "di_accounting_extraction_acct_amortization_schedule",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -619,6 +758,12 @@
     {
       "alias": "di_accounting_extraction_acct_ar_aging",
       "canonicalId": "di_accounting_extraction_acct_ar_aging",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_extraction_acct_audit_confirmation",
+      "canonicalId": "di_accounting_extraction_acct_audit_confirmation",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -637,6 +782,30 @@
     {
       "alias": "di_accounting_extraction_acct_bank_reconciliation",
       "canonicalId": "di_accounting_extraction_acct_bank_reconciliation",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_extraction_acct_budget_pack",
+      "canonicalId": "di_accounting_extraction_acct_budget_pack",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_extraction_acct_capex_register",
+      "canonicalId": "di_accounting_extraction_acct_capex_register",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_extraction_acct_cash_flow",
+      "canonicalId": "di_accounting_extraction_acct_cash_flow",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_extraction_acct_cashbook",
+      "canonicalId": "di_accounting_extraction_acct_cashbook",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -665,8 +834,32 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_accounting_extraction_acct_financial_statement",
+      "canonicalId": "di_accounting_extraction_acct_financial_statement",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_accounting_extraction_acct_fixed_asset_register",
       "canonicalId": "di_accounting_extraction_acct_fixed_asset_register",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_extraction_acct_forecast_pack",
+      "canonicalId": "di_accounting_extraction_acct_forecast_pack",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_extraction_acct_foreign_currency",
+      "canonicalId": "di_accounting_extraction_acct_foreign_currency",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_extraction_acct_general_ledger",
+      "canonicalId": "di_accounting_extraction_acct_general_ledger",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -679,6 +872,12 @@
     {
       "alias": "di_accounting_extraction_acct_intercompany_reconciliation",
       "canonicalId": "di_accounting_extraction_acct_intercompany_reconciliation",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_extraction_acct_inventory_valuation",
+      "canonicalId": "di_accounting_extraction_acct_inventory_valuation",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -701,6 +900,12 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_accounting_extraction_acct_journal_entry_adjusting",
+      "canonicalId": "di_accounting_extraction_acct_journal_entry_adjusting",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_accounting_extraction_acct_journal_entry_support",
       "canonicalId": "di_accounting_extraction_acct_journal_entry_support",
       "source": "runtime_self_alias",
@@ -713,8 +918,32 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_accounting_extraction_acct_leasing_schedule",
+      "canonicalId": "di_accounting_extraction_acct_leasing_schedule",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_accounting_extraction_acct_management_rep_letter",
       "canonicalId": "di_accounting_extraction_acct_management_rep_letter",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_extraction_acct_management_representation",
+      "canonicalId": "di_accounting_extraction_acct_management_representation",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_extraction_acct_month_end_close",
+      "canonicalId": "di_accounting_extraction_acct_month_end_close",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_extraction_acct_payment_run",
+      "canonicalId": "di_accounting_extraction_acct_payment_run",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -731,8 +960,20 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_accounting_extraction_acct_prepaid_rollforward",
+      "canonicalId": "di_accounting_extraction_acct_prepaid_rollforward",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_accounting_extraction_acct_prepaids_amortization_schedule",
       "canonicalId": "di_accounting_extraction_acct_prepaids_amortization_schedule",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_extraction_acct_revenue_recognition",
+      "canonicalId": "di_accounting_extraction_acct_revenue_recognition",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -743,8 +984,50 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_accounting_extraction_acct_subledger_customer",
+      "canonicalId": "di_accounting_extraction_acct_subledger_customer",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_extraction_acct_subledger_vendor",
+      "canonicalId": "di_accounting_extraction_acct_subledger_vendor",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_extraction_acct_tax_reconciliation",
+      "canonicalId": "di_accounting_extraction_acct_tax_reconciliation",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_accounting_extraction_acct_trial_balance",
       "canonicalId": "di_accounting_extraction_acct_trial_balance",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_extraction_acct_trial_balance_reclass",
+      "canonicalId": "di_accounting_extraction_acct_trial_balance_reclass",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_extraction_acct_variance_pack",
+      "canonicalId": "di_accounting_extraction_acct_variance_pack",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_extraction_acct_workpaper",
+      "canonicalId": "di_accounting_extraction_acct_workpaper",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_extraction_acct_year_end_close",
+      "canonicalId": "di_accounting_extraction_acct_year_end_close",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -779,8 +1062,26 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_accounting_sections_acct_account_reconciliation",
+      "canonicalId": "di_accounting_sections_acct_account_reconciliation",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_sections_acct_accrual_rollforward",
+      "canonicalId": "di_accounting_sections_acct_accrual_rollforward",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_accounting_sections_acct_accruals_schedule",
       "canonicalId": "di_accounting_sections_acct_accruals_schedule",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_sections_acct_amortization_schedule",
+      "canonicalId": "di_accounting_sections_acct_amortization_schedule",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -793,6 +1094,12 @@
     {
       "alias": "di_accounting_sections_acct_ar_aging",
       "canonicalId": "di_accounting_sections_acct_ar_aging",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_sections_acct_audit_confirmation",
+      "canonicalId": "di_accounting_sections_acct_audit_confirmation",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -811,6 +1118,30 @@
     {
       "alias": "di_accounting_sections_acct_bank_reconciliation",
       "canonicalId": "di_accounting_sections_acct_bank_reconciliation",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_sections_acct_budget_pack",
+      "canonicalId": "di_accounting_sections_acct_budget_pack",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_sections_acct_capex_register",
+      "canonicalId": "di_accounting_sections_acct_capex_register",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_sections_acct_cash_flow",
+      "canonicalId": "di_accounting_sections_acct_cash_flow",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_sections_acct_cashbook",
+      "canonicalId": "di_accounting_sections_acct_cashbook",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -839,8 +1170,32 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_accounting_sections_acct_financial_statement",
+      "canonicalId": "di_accounting_sections_acct_financial_statement",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_accounting_sections_acct_fixed_asset_register",
       "canonicalId": "di_accounting_sections_acct_fixed_asset_register",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_sections_acct_forecast_pack",
+      "canonicalId": "di_accounting_sections_acct_forecast_pack",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_sections_acct_foreign_currency",
+      "canonicalId": "di_accounting_sections_acct_foreign_currency",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_sections_acct_general_ledger",
+      "canonicalId": "di_accounting_sections_acct_general_ledger",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -853,6 +1208,12 @@
     {
       "alias": "di_accounting_sections_acct_intercompany_reconciliation",
       "canonicalId": "di_accounting_sections_acct_intercompany_reconciliation",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_sections_acct_inventory_valuation",
+      "canonicalId": "di_accounting_sections_acct_inventory_valuation",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -875,6 +1236,12 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_accounting_sections_acct_journal_entry_adjusting",
+      "canonicalId": "di_accounting_sections_acct_journal_entry_adjusting",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_accounting_sections_acct_journal_entry_support",
       "canonicalId": "di_accounting_sections_acct_journal_entry_support",
       "source": "runtime_self_alias",
@@ -887,8 +1254,32 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_accounting_sections_acct_leasing_schedule",
+      "canonicalId": "di_accounting_sections_acct_leasing_schedule",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_accounting_sections_acct_management_rep_letter",
       "canonicalId": "di_accounting_sections_acct_management_rep_letter",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_sections_acct_management_representation",
+      "canonicalId": "di_accounting_sections_acct_management_representation",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_sections_acct_month_end_close",
+      "canonicalId": "di_accounting_sections_acct_month_end_close",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_sections_acct_payment_run",
+      "canonicalId": "di_accounting_sections_acct_payment_run",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -905,8 +1296,20 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_accounting_sections_acct_prepaid_rollforward",
+      "canonicalId": "di_accounting_sections_acct_prepaid_rollforward",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_accounting_sections_acct_prepaids_amortization_schedule",
       "canonicalId": "di_accounting_sections_acct_prepaids_amortization_schedule",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_sections_acct_revenue_recognition",
+      "canonicalId": "di_accounting_sections_acct_revenue_recognition",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -917,14 +1320,74 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_accounting_sections_acct_subledger_customer",
+      "canonicalId": "di_accounting_sections_acct_subledger_customer",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_sections_acct_subledger_vendor",
+      "canonicalId": "di_accounting_sections_acct_subledger_vendor",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_sections_acct_tax_reconciliation",
+      "canonicalId": "di_accounting_sections_acct_tax_reconciliation",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_accounting_sections_acct_trial_balance",
       "canonicalId": "di_accounting_sections_acct_trial_balance",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_accounting_sections_acct_trial_balance_reclass",
+      "canonicalId": "di_accounting_sections_acct_trial_balance_reclass",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_sections_acct_variance_pack",
+      "canonicalId": "di_accounting_sections_acct_variance_pack",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_sections_acct_workpaper",
+      "canonicalId": "di_accounting_sections_acct_workpaper",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_sections_acct_year_end_close",
+      "canonicalId": "di_accounting_sections_acct_year_end_close",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_tables_acct_account_reconciliation",
+      "canonicalId": "di_accounting_tables_acct_account_reconciliation",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_tables_acct_accrual_rollforward",
+      "canonicalId": "di_accounting_tables_acct_accrual_rollforward",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_accounting_tables_acct_accruals_schedule",
       "canonicalId": "di_accounting_tables_acct_accruals_schedule",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_tables_acct_amortization_schedule",
+      "canonicalId": "di_accounting_tables_acct_amortization_schedule",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -937,6 +1400,12 @@
     {
       "alias": "di_accounting_tables_acct_ar_aging",
       "canonicalId": "di_accounting_tables_acct_ar_aging",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_tables_acct_audit_confirmation",
+      "canonicalId": "di_accounting_tables_acct_audit_confirmation",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -955,6 +1424,30 @@
     {
       "alias": "di_accounting_tables_acct_bank_reconciliation",
       "canonicalId": "di_accounting_tables_acct_bank_reconciliation",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_tables_acct_budget_pack",
+      "canonicalId": "di_accounting_tables_acct_budget_pack",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_tables_acct_capex_register",
+      "canonicalId": "di_accounting_tables_acct_capex_register",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_tables_acct_cash_flow",
+      "canonicalId": "di_accounting_tables_acct_cash_flow",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_tables_acct_cashbook",
+      "canonicalId": "di_accounting_tables_acct_cashbook",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -983,8 +1476,32 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_accounting_tables_acct_financial_statement",
+      "canonicalId": "di_accounting_tables_acct_financial_statement",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_accounting_tables_acct_fixed_asset_register",
       "canonicalId": "di_accounting_tables_acct_fixed_asset_register",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_tables_acct_forecast_pack",
+      "canonicalId": "di_accounting_tables_acct_forecast_pack",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_tables_acct_foreign_currency",
+      "canonicalId": "di_accounting_tables_acct_foreign_currency",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_tables_acct_general_ledger",
+      "canonicalId": "di_accounting_tables_acct_general_ledger",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -997,6 +1514,12 @@
     {
       "alias": "di_accounting_tables_acct_intercompany_reconciliation",
       "canonicalId": "di_accounting_tables_acct_intercompany_reconciliation",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_tables_acct_inventory_valuation",
+      "canonicalId": "di_accounting_tables_acct_inventory_valuation",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -1019,6 +1542,12 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_accounting_tables_acct_journal_entry_adjusting",
+      "canonicalId": "di_accounting_tables_acct_journal_entry_adjusting",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_accounting_tables_acct_journal_entry_support",
       "canonicalId": "di_accounting_tables_acct_journal_entry_support",
       "source": "runtime_self_alias",
@@ -1031,8 +1560,32 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_accounting_tables_acct_leasing_schedule",
+      "canonicalId": "di_accounting_tables_acct_leasing_schedule",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_accounting_tables_acct_management_rep_letter",
       "canonicalId": "di_accounting_tables_acct_management_rep_letter",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_tables_acct_management_representation",
+      "canonicalId": "di_accounting_tables_acct_management_representation",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_tables_acct_month_end_close",
+      "canonicalId": "di_accounting_tables_acct_month_end_close",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_tables_acct_payment_run",
+      "canonicalId": "di_accounting_tables_acct_payment_run",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -1049,8 +1602,20 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_accounting_tables_acct_prepaid_rollforward",
+      "canonicalId": "di_accounting_tables_acct_prepaid_rollforward",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_accounting_tables_acct_prepaids_amortization_schedule",
       "canonicalId": "di_accounting_tables_acct_prepaids_amortization_schedule",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_tables_acct_revenue_recognition",
+      "canonicalId": "di_accounting_tables_acct_revenue_recognition",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -1061,8 +1626,50 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_accounting_tables_acct_subledger_customer",
+      "canonicalId": "di_accounting_tables_acct_subledger_customer",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_tables_acct_subledger_vendor",
+      "canonicalId": "di_accounting_tables_acct_subledger_vendor",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_tables_acct_tax_reconciliation",
+      "canonicalId": "di_accounting_tables_acct_tax_reconciliation",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_accounting_tables_acct_trial_balance",
       "canonicalId": "di_accounting_tables_acct_trial_balance",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_tables_acct_trial_balance_reclass",
+      "canonicalId": "di_accounting_tables_acct_trial_balance_reclass",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_tables_acct_variance_pack",
+      "canonicalId": "di_accounting_tables_acct_variance_pack",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_tables_acct_workpaper",
+      "canonicalId": "di_accounting_tables_acct_workpaper",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_accounting_tables_acct_year_end_close",
+      "canonicalId": "di_accounting_tables_acct_year_end_close",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -1417,6 +2024,12 @@
     {
       "alias": "di_billing_validation_policies",
       "canonicalId": "di_billing_validation_policies",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_diacritic_equivalence",
+      "canonicalId": "di_diacritic_equivalence",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -1991,8 +2604,32 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_finance_extraction_fin_annual_financials",
+      "canonicalId": "di_finance_extraction_fin_annual_financials",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_extraction_fin_annual_report",
+      "canonicalId": "di_finance_extraction_fin_annual_report",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_finance_extraction_fin_arr_mrr_report",
       "canonicalId": "di_finance_extraction_fin_arr_mrr_report",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_extraction_fin_audit_compliance_pack",
+      "canonicalId": "di_finance_extraction_fin_audit_compliance_pack",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_extraction_fin_balance_sheet",
+      "canonicalId": "di_finance_extraction_fin_balance_sheet",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -2003,8 +2640,20 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_finance_extraction_fin_benchmarking_report",
+      "canonicalId": "di_finance_extraction_fin_benchmarking_report",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_finance_extraction_fin_board_deck_finance",
       "canonicalId": "di_finance_extraction_fin_board_deck_finance",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_extraction_fin_board_minutes_finance",
+      "canonicalId": "di_finance_extraction_fin_board_minutes_finance",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -2015,14 +2664,32 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_finance_extraction_fin_budget_vs_actual",
+      "canonicalId": "di_finance_extraction_fin_budget_vs_actual",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_finance_extraction_fin_cap_table",
       "canonicalId": "di_finance_extraction_fin_cap_table",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_finance_extraction_fin_cash_flow",
+      "canonicalId": "di_finance_extraction_fin_cash_flow",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_finance_extraction_fin_cash_forecast",
       "canonicalId": "di_finance_extraction_fin_cash_forecast",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_extraction_fin_cash_management",
+      "canonicalId": "di_finance_extraction_fin_cash_management",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -2051,8 +2718,20 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_finance_extraction_fin_credit_facility",
+      "canonicalId": "di_finance_extraction_fin_credit_facility",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_finance_extraction_fin_debt_schedule",
       "canonicalId": "di_finance_extraction_fin_debt_schedule",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_extraction_fin_dividend_policy",
+      "canonicalId": "di_finance_extraction_fin_dividend_policy",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -2063,8 +2742,32 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_finance_extraction_fin_efs",
+      "canonicalId": "di_finance_extraction_fin_efs",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_extraction_fin_esg_finance_linkage",
+      "canonicalId": "di_finance_extraction_fin_esg_finance_linkage",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_finance_extraction_fin_esg_report",
       "canonicalId": "di_finance_extraction_fin_esg_report",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_extraction_fin_financing_term_sheet",
+      "canonicalId": "di_finance_extraction_fin_financing_term_sheet",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_extraction_fin_fixed_income_portfolio",
+      "canonicalId": "di_finance_extraction_fin_fixed_income_portfolio",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -2075,8 +2778,38 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_finance_extraction_fin_fx_exposure_report",
+      "canonicalId": "di_finance_extraction_fin_fx_exposure_report",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_extraction_fin_incentive_plan",
+      "canonicalId": "di_finance_extraction_fin_incentive_plan",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_extraction_fin_income_statement",
+      "canonicalId": "di_finance_extraction_fin_income_statement",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_extraction_fin_investment_portfolio",
+      "canonicalId": "di_finance_extraction_fin_investment_portfolio",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_finance_extraction_fin_investor_presentation",
       "canonicalId": "di_finance_extraction_fin_investor_presentation",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_extraction_fin_investor_termsheet",
+      "canonicalId": "di_finance_extraction_fin_investor_termsheet",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -2099,6 +2832,18 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_finance_extraction_fin_quarterly_close_pack",
+      "canonicalId": "di_finance_extraction_fin_quarterly_close_pack",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_extraction_fin_revenue_operational_review",
+      "canonicalId": "di_finance_extraction_fin_revenue_operational_review",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_finance_extraction_fin_rolling_forecast",
       "canonicalId": "di_finance_extraction_fin_rolling_forecast",
       "source": "runtime_self_alias",
@@ -2107,6 +2852,24 @@
     {
       "alias": "di_finance_extraction_fin_statements_pack",
       "canonicalId": "di_finance_extraction_fin_statements_pack",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_extraction_fin_tax_deed_summary",
+      "canonicalId": "di_finance_extraction_fin_tax_deed_summary",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_extraction_fin_tax_return_summary",
+      "canonicalId": "di_finance_extraction_fin_tax_return_summary",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_extraction_fin_treasury_memo",
+      "canonicalId": "di_finance_extraction_fin_treasury_memo",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -2177,8 +2940,32 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_finance_sections_fin_annual_financials",
+      "canonicalId": "di_finance_sections_fin_annual_financials",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_sections_fin_annual_report",
+      "canonicalId": "di_finance_sections_fin_annual_report",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_finance_sections_fin_arr_mrr_report",
       "canonicalId": "di_finance_sections_fin_arr_mrr_report",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_sections_fin_audit_compliance_pack",
+      "canonicalId": "di_finance_sections_fin_audit_compliance_pack",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_sections_fin_balance_sheet",
+      "canonicalId": "di_finance_sections_fin_balance_sheet",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -2189,8 +2976,20 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_finance_sections_fin_benchmarking_report",
+      "canonicalId": "di_finance_sections_fin_benchmarking_report",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_finance_sections_fin_board_deck_finance",
       "canonicalId": "di_finance_sections_fin_board_deck_finance",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_sections_fin_board_minutes_finance",
+      "canonicalId": "di_finance_sections_fin_board_minutes_finance",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -2201,14 +3000,32 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_finance_sections_fin_budget_vs_actual",
+      "canonicalId": "di_finance_sections_fin_budget_vs_actual",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_finance_sections_fin_cap_table",
       "canonicalId": "di_finance_sections_fin_cap_table",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_finance_sections_fin_cash_flow",
+      "canonicalId": "di_finance_sections_fin_cash_flow",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_finance_sections_fin_cash_forecast",
       "canonicalId": "di_finance_sections_fin_cash_forecast",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_sections_fin_cash_management",
+      "canonicalId": "di_finance_sections_fin_cash_management",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -2237,8 +3054,20 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_finance_sections_fin_credit_facility",
+      "canonicalId": "di_finance_sections_fin_credit_facility",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_finance_sections_fin_debt_schedule",
       "canonicalId": "di_finance_sections_fin_debt_schedule",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_sections_fin_dividend_policy",
+      "canonicalId": "di_finance_sections_fin_dividend_policy",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -2249,8 +3078,32 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_finance_sections_fin_efs",
+      "canonicalId": "di_finance_sections_fin_efs",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_sections_fin_esg_finance_linkage",
+      "canonicalId": "di_finance_sections_fin_esg_finance_linkage",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_finance_sections_fin_esg_report",
       "canonicalId": "di_finance_sections_fin_esg_report",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_sections_fin_financing_term_sheet",
+      "canonicalId": "di_finance_sections_fin_financing_term_sheet",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_sections_fin_fixed_income_portfolio",
+      "canonicalId": "di_finance_sections_fin_fixed_income_portfolio",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -2261,8 +3114,38 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_finance_sections_fin_fx_exposure_report",
+      "canonicalId": "di_finance_sections_fin_fx_exposure_report",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_sections_fin_incentive_plan",
+      "canonicalId": "di_finance_sections_fin_incentive_plan",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_sections_fin_income_statement",
+      "canonicalId": "di_finance_sections_fin_income_statement",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_sections_fin_investment_portfolio",
+      "canonicalId": "di_finance_sections_fin_investment_portfolio",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_finance_sections_fin_investor_presentation",
       "canonicalId": "di_finance_sections_fin_investor_presentation",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_sections_fin_investor_termsheet",
+      "canonicalId": "di_finance_sections_fin_investor_termsheet",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -2285,6 +3168,18 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_finance_sections_fin_quarterly_close_pack",
+      "canonicalId": "di_finance_sections_fin_quarterly_close_pack",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_sections_fin_revenue_operational_review",
+      "canonicalId": "di_finance_sections_fin_revenue_operational_review",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_finance_sections_fin_rolling_forecast",
       "canonicalId": "di_finance_sections_fin_rolling_forecast",
       "source": "runtime_self_alias",
@@ -2293,6 +3188,24 @@
     {
       "alias": "di_finance_sections_fin_statements_pack",
       "canonicalId": "di_finance_sections_fin_statements_pack",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_sections_fin_tax_deed_summary",
+      "canonicalId": "di_finance_sections_fin_tax_deed_summary",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_sections_fin_tax_return_summary",
+      "canonicalId": "di_finance_sections_fin_tax_return_summary",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_sections_fin_treasury_memo",
+      "canonicalId": "di_finance_sections_fin_treasury_memo",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -2333,8 +3246,32 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_finance_tables_fin_annual_financials",
+      "canonicalId": "di_finance_tables_fin_annual_financials",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_tables_fin_annual_report",
+      "canonicalId": "di_finance_tables_fin_annual_report",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_finance_tables_fin_arr_mrr_report",
       "canonicalId": "di_finance_tables_fin_arr_mrr_report",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_tables_fin_audit_compliance_pack",
+      "canonicalId": "di_finance_tables_fin_audit_compliance_pack",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_tables_fin_balance_sheet",
+      "canonicalId": "di_finance_tables_fin_balance_sheet",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -2345,8 +3282,20 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_finance_tables_fin_benchmarking_report",
+      "canonicalId": "di_finance_tables_fin_benchmarking_report",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_finance_tables_fin_board_deck_finance",
       "canonicalId": "di_finance_tables_fin_board_deck_finance",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_tables_fin_board_minutes_finance",
+      "canonicalId": "di_finance_tables_fin_board_minutes_finance",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -2357,14 +3306,32 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_finance_tables_fin_budget_vs_actual",
+      "canonicalId": "di_finance_tables_fin_budget_vs_actual",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_finance_tables_fin_cap_table",
       "canonicalId": "di_finance_tables_fin_cap_table",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_finance_tables_fin_cash_flow",
+      "canonicalId": "di_finance_tables_fin_cash_flow",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_finance_tables_fin_cash_forecast",
       "canonicalId": "di_finance_tables_fin_cash_forecast",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_tables_fin_cash_management",
+      "canonicalId": "di_finance_tables_fin_cash_management",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -2393,8 +3360,20 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_finance_tables_fin_credit_facility",
+      "canonicalId": "di_finance_tables_fin_credit_facility",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_finance_tables_fin_debt_schedule",
       "canonicalId": "di_finance_tables_fin_debt_schedule",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_tables_fin_dividend_policy",
+      "canonicalId": "di_finance_tables_fin_dividend_policy",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -2405,8 +3384,32 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_finance_tables_fin_efs",
+      "canonicalId": "di_finance_tables_fin_efs",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_tables_fin_esg_finance_linkage",
+      "canonicalId": "di_finance_tables_fin_esg_finance_linkage",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_finance_tables_fin_esg_report",
       "canonicalId": "di_finance_tables_fin_esg_report",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_tables_fin_financing_term_sheet",
+      "canonicalId": "di_finance_tables_fin_financing_term_sheet",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_tables_fin_fixed_income_portfolio",
+      "canonicalId": "di_finance_tables_fin_fixed_income_portfolio",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -2417,8 +3420,38 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_finance_tables_fin_fx_exposure_report",
+      "canonicalId": "di_finance_tables_fin_fx_exposure_report",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_tables_fin_incentive_plan",
+      "canonicalId": "di_finance_tables_fin_incentive_plan",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_tables_fin_income_statement",
+      "canonicalId": "di_finance_tables_fin_income_statement",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_tables_fin_investment_portfolio",
+      "canonicalId": "di_finance_tables_fin_investment_portfolio",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_finance_tables_fin_investor_presentation",
       "canonicalId": "di_finance_tables_fin_investor_presentation",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_tables_fin_investor_termsheet",
+      "canonicalId": "di_finance_tables_fin_investor_termsheet",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -2441,6 +3474,18 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_finance_tables_fin_quarterly_close_pack",
+      "canonicalId": "di_finance_tables_fin_quarterly_close_pack",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_tables_fin_revenue_operational_review",
+      "canonicalId": "di_finance_tables_fin_revenue_operational_review",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_finance_tables_fin_rolling_forecast",
       "canonicalId": "di_finance_tables_fin_rolling_forecast",
       "source": "runtime_self_alias",
@@ -2449,6 +3494,24 @@
     {
       "alias": "di_finance_tables_fin_statements_pack",
       "canonicalId": "di_finance_tables_fin_statements_pack",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_tables_fin_tax_deed_summary",
+      "canonicalId": "di_finance_tables_fin_tax_deed_summary",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_tables_fin_tax_return_summary",
+      "canonicalId": "di_finance_tables_fin_tax_return_summary",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_finance_tables_fin_treasury_memo",
+      "canonicalId": "di_finance_tables_fin_treasury_memo",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -3167,6 +4230,18 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "di_normalization_rules_vf6f60bcf",
+      "canonicalId": "di_normalization_rules_vf6f60bcf",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_normalization_rules_vfc81701f",
+      "canonicalId": "di_normalization_rules_vfc81701f",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "di_ops_abbreviations_en",
       "canonicalId": "di_ops_abbreviations_en",
       "source": "runtime_self_alias",
@@ -3361,6 +4436,18 @@
     {
       "alias": "di_section_ontology",
       "canonicalId": "di_section_ontology",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_stopwords_and_noise",
+      "canonicalId": "di_stopwords_and_noise",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "di_table_ontology",
+      "canonicalId": "di_table_ontology",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -4285,6 +5372,12 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "doc_taxonomy_vd13afef0",
+      "canonicalId": "doc_taxonomy_vd13afef0",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "doc_title_boost_rules",
       "canonicalId": "doc_title_boost_rules",
       "source": "runtime_self_alias",
@@ -4401,6 +5494,12 @@
     {
       "alias": "document_intelligence_dependency_graph",
       "canonicalId": "document_intelligence_dependency_graph",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "document_intelligence_implementation_report",
+      "canonicalId": "document_intelligence_implementation_report",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -4587,6 +5686,12 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "empathy_and_support_language",
+      "canonicalId": "empathy_and_support_language",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "entity_role_ontology",
       "canonicalId": "entity_role_ontology",
       "source": "runtime_self_alias",
@@ -4599,8 +5704,20 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "error_explanations",
+      "canonicalId": "error_explanations",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "every_doc_type_catalog",
       "canonicalId": "every_doc_type_catalog",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "everyday_doc_type_aliases",
+      "canonicalId": "everyday_doc_type_aliases",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -4779,8 +5896,20 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "fact_type_requirements",
+      "canonicalId": "fact_type_requirements",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "fallback_extraction_recovery",
       "canonicalId": "fallback_extraction_recovery",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "fallback_messages",
+      "canonicalId": "fallback_messages",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -4891,8 +6020,20 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "followup_suggestions_v1c6269cc",
+      "canonicalId": "followup_suggestions_v1c6269cc",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "fonts",
       "canonicalId": "fonts",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "format_guardrails",
+      "canonicalId": "format_guardrails",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -4909,6 +6050,12 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "headings_map_v1ca83df8",
+      "canonicalId": "headings_map_v1ca83df8",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "headings.map",
       "canonicalId": "headings_map",
       "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
@@ -4916,8 +6063,26 @@
       "expiresInDays": null
     },
     {
+      "alias": "hedging_and_uncertainty_language",
+      "canonicalId": "hedging_and_uncertainty_language",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "help_microcopy",
+      "canonicalId": "help_microcopy",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "identifier_patterns",
       "canonicalId": "identifier_patterns",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "identifier_patterns_v6735c929",
+      "canonicalId": "identifier_patterns_v6735c929",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -4967,6 +6132,12 @@
     {
       "alias": "intent_patterns_excel_pt",
       "canonicalId": "intent_patterns_excel_pt",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "jargon_control",
+      "canonicalId": "jargon_control",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -5059,11 +6230,197 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "layout_cues_v61e6793a",
+      "canonicalId": "layout_cues_v61e6793a",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "layout.cues",
       "canonicalId": "layout_cues",
       "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
       "addedAt": "2026-02-27",
       "expiresInDays": null
+    },
+    {
+      "alias": "legacy_doc_taxonomy",
+      "canonicalId": "legacy_doc_taxonomy",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_abbreviations_en",
+      "canonicalId": "legacy_legal_abbreviations_en",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_abbreviations_pt",
+      "canonicalId": "legacy_legal_abbreviations_pt",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_board_resolution_extraction_hints",
+      "canonicalId": "legacy_legal_board_resolution_extraction_hints",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_board_resolution_sections",
+      "canonicalId": "legacy_legal_board_resolution_sections",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_board_resolution_tables",
+      "canonicalId": "legacy_legal_board_resolution_tables",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_dpa_extraction_hints",
+      "canonicalId": "legacy_legal_dpa_extraction_hints",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_dpa_sections",
+      "canonicalId": "legacy_legal_dpa_sections",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_dpa_tables",
+      "canonicalId": "legacy_legal_dpa_tables",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_employment_agreement_extraction_hints",
+      "canonicalId": "legacy_legal_employment_agreement_extraction_hints",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_employment_agreement_sections",
+      "canonicalId": "legacy_legal_employment_agreement_sections",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_employment_agreement_tables",
+      "canonicalId": "legacy_legal_employment_agreement_tables",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_lexicon_en",
+      "canonicalId": "legacy_legal_lexicon_en",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_lexicon_pt",
+      "canonicalId": "legacy_legal_lexicon_pt",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_msa_extraction_hints",
+      "canonicalId": "legacy_legal_msa_extraction_hints",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_msa_sections",
+      "canonicalId": "legacy_legal_msa_sections",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_msa_tables",
+      "canonicalId": "legacy_legal_msa_tables",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_nda_extraction_hints",
+      "canonicalId": "legacy_legal_nda_extraction_hints",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_nda_sections",
+      "canonicalId": "legacy_legal_nda_sections",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_nda_tables",
+      "canonicalId": "legacy_legal_nda_tables",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_privacy_policy_extraction_hints",
+      "canonicalId": "legacy_legal_privacy_policy_extraction_hints",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_privacy_policy_sections",
+      "canonicalId": "legacy_legal_privacy_policy_sections",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_privacy_policy_tables",
+      "canonicalId": "legacy_legal_privacy_policy_tables",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_sow_extraction_hints",
+      "canonicalId": "legacy_legal_sow_extraction_hints",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_sow_sections",
+      "canonicalId": "legacy_legal_sow_sections",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_sow_tables",
+      "canonicalId": "legacy_legal_sow_tables",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_medical_abbreviations_en",
+      "canonicalId": "legacy_medical_abbreviations_en",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_medical_abbreviations_pt",
+      "canonicalId": "legacy_medical_abbreviations_pt",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_medical_lexicon_en",
+      "canonicalId": "legacy_medical_lexicon_en",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_medical_lexicon_pt",
+      "canonicalId": "legacy_medical_lexicon_pt",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
     },
     {
       "alias": "legal_abbreviations_en",
@@ -5072,8 +6429,20 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "legal_abbreviations_en_v9b6629e1",
+      "canonicalId": "legal_abbreviations_en_v9b6629e1",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "legal_abbreviations_pt",
       "canonicalId": "legal_abbreviations_pt",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legal_abbreviations_pt_v1331926f",
+      "canonicalId": "legal_abbreviations_pt_v1331926f",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -5144,14 +6513,32 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "legal_board_resolution_extraction_hints_v50c4150f",
+      "canonicalId": "legal_board_resolution_extraction_hints_v50c4150f",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "legal_board_resolution_sections",
       "canonicalId": "legal_board_resolution_sections",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "legal_board_resolution_sections_v0d54900e",
+      "canonicalId": "legal_board_resolution_sections_v0d54900e",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "legal_board_resolution_tables",
       "canonicalId": "legal_board_resolution_tables",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legal_board_resolution_tables_v07fdadde",
+      "canonicalId": "legal_board_resolution_tables_v07fdadde",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -5312,6 +6699,12 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "legal_doc_type_aliases",
+      "canonicalId": "legal_doc_type_aliases",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "legal_doc_type_catalog",
       "canonicalId": "legal_doc_type_catalog",
       "source": "runtime_self_alias",
@@ -5336,8 +6729,20 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "legal_dpa_extraction_hints_vc1cbb882",
+      "canonicalId": "legal_dpa_extraction_hints_vc1cbb882",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "legal_dpa_sections",
       "canonicalId": "legal_dpa_sections",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legal_dpa_sections_v59ba1526",
+      "canonicalId": "legal_dpa_sections_v59ba1526",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -5348,8 +6753,20 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "legal_dpa_tables_v679bed8b",
+      "canonicalId": "legal_dpa_tables_v679bed8b",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "legal_employment_agreement_extraction_hints",
       "canonicalId": "legal_employment_agreement_extraction_hints",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legal_employment_agreement_extraction_hints_v1ed74ca8",
+      "canonicalId": "legal_employment_agreement_extraction_hints_v1ed74ca8",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -5360,8 +6777,20 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "legal_employment_agreement_sections_v9f1eb8d7",
+      "canonicalId": "legal_employment_agreement_sections_v9f1eb8d7",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "legal_employment_agreement_tables",
       "canonicalId": "legal_employment_agreement_tables",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legal_employment_agreement_tables_v1a28d070",
+      "canonicalId": "legal_employment_agreement_tables_v1a28d070",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -5468,8 +6897,20 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "legal_lexicon_en_v28fa8616",
+      "canonicalId": "legal_lexicon_en_v28fa8616",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "legal_lexicon_pt",
       "canonicalId": "legal_lexicon_pt",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legal_lexicon_pt_v02671738",
+      "canonicalId": "legal_lexicon_pt_v02671738",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -5534,8 +6975,20 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "legal_msa_extraction_hints_v41111395",
+      "canonicalId": "legal_msa_extraction_hints_v41111395",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "legal_msa_sections",
       "canonicalId": "legal_msa_sections",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legal_msa_sections_v24b4aa70",
+      "canonicalId": "legal_msa_sections_v24b4aa70",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -5546,8 +6999,20 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "legal_msa_tables_vdb79e19e",
+      "canonicalId": "legal_msa_tables_vdb79e19e",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "legal_nda_extraction_hints",
       "canonicalId": "legal_nda_extraction_hints",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legal_nda_extraction_hints_v94b17eb1",
+      "canonicalId": "legal_nda_extraction_hints_v94b17eb1",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -5558,8 +7023,20 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "legal_nda_sections_v215acb2d",
+      "canonicalId": "legal_nda_sections_v215acb2d",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "legal_nda_tables",
       "canonicalId": "legal_nda_tables",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legal_nda_tables_v3a19a550",
+      "canonicalId": "legal_nda_tables_v3a19a550",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -5606,14 +7083,32 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "legal_privacy_policy_extraction_hints_v3525de6b",
+      "canonicalId": "legal_privacy_policy_extraction_hints_v3525de6b",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "legal_privacy_policy_sections",
       "canonicalId": "legal_privacy_policy_sections",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "legal_privacy_policy_sections_v5a2b8d13",
+      "canonicalId": "legal_privacy_policy_sections_v5a2b8d13",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "legal_privacy_policy_tables",
       "canonicalId": "legal_privacy_policy_tables",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legal_privacy_policy_tables_v113ccc0c",
+      "canonicalId": "legal_privacy_policy_tables_v113ccc0c",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -5726,14 +7221,32 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "legal_sow_extraction_hints_vfb984862",
+      "canonicalId": "legal_sow_extraction_hints_vfb984862",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "legal_sow_sections",
       "canonicalId": "legal_sow_sections",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "legal_sow_sections_v24240fd6",
+      "canonicalId": "legal_sow_sections_v24240fd6",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "legal_sow_tables",
       "canonicalId": "legal_sow_tables",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legal_sow_tables_v23424409",
+      "canonicalId": "legal_sow_tables_v23424409",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -6139,6 +7652,30 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "llm_cost_table",
+      "canonicalId": "llm_cost_table",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "llm_global_guards",
+      "canonicalId": "llm_global_guards",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "llm_minimal_safe_prompt",
+      "canonicalId": "llm_minimal_safe_prompt",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "llm_nav_pills_contract",
+      "canonicalId": "llm_nav_pills_contract",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "locale_numeric_date_rules",
       "canonicalId": "locale_numeric_date_rules",
       "source": "runtime_self_alias",
@@ -6151,8 +7688,62 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "marketing_difficulty_mapping",
+      "canonicalId": "marketing_difficulty_mapping",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "marketing_event_mapping",
+      "canonicalId": "marketing_event_mapping",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "marketing_pain_point_signals",
+      "canonicalId": "marketing_pain_point_signals",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "marketing_probe_schema",
       "canonicalId": "marketing_probe_schema",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "marketing_query_templates",
+      "canonicalId": "marketing_query_templates",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "marketing_risk_tier_mapping",
+      "canonicalId": "marketing_risk_tier_mapping",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "marketing_topic_clusters_finance",
+      "canonicalId": "marketing_topic_clusters_finance",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "marketing_topic_clusters_legal",
+      "canonicalId": "marketing_topic_clusters_legal",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "marketing_topic_clusters_medical",
+      "canonicalId": "marketing_topic_clusters_medical",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "marketing_topic_clusters_ops",
+      "canonicalId": "marketing_topic_clusters_ops",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -6163,8 +7754,20 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "medical_abbreviations_en_ve94da59c",
+      "canonicalId": "medical_abbreviations_en_ve94da59c",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "medical_abbreviations_pt",
       "canonicalId": "medical_abbreviations_pt",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "medical_abbreviations_pt_v5a704629",
+      "canonicalId": "medical_abbreviations_pt_v5a704629",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -6271,8 +7874,20 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "medical_lexicon_en_v5cc95d35",
+      "canonicalId": "medical_lexicon_en_v5cc95d35",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "medical_lexicon_pt",
       "canonicalId": "medical_lexicon_pt",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "medical_lexicon_pt_v2852e464",
+      "canonicalId": "medical_lexicon_pt_v2852e464",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -7128,11 +8743,41 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "money_patterns_v743656d7",
+      "canonicalId": "money_patterns_v743656d7",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "money.patterns",
       "canonicalId": "money_patterns",
       "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
       "addedAt": "2026-02-27",
       "expiresInDays": null
+    },
+    {
+      "alias": "nav_failure_recovery",
+      "canonicalId": "nav_failure_recovery",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "nav_intents_en",
+      "canonicalId": "nav_intents_en",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "nav_intents_pt",
+      "canonicalId": "nav_intents_pt",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "negative_retrieval_patterns",
+      "canonicalId": "negative_retrieval_patterns",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
     },
     {
       "alias": "no_docs_messages",
@@ -7153,6 +8798,12 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "numeric_reconciliation_rules",
+      "canonicalId": "numeric_reconciliation_rules",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "numeric.integrity",
       "canonicalId": "numeric_integrity",
       "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
@@ -7162,6 +8813,18 @@
     {
       "alias": "ontology_schema",
       "canonicalId": "ontology_schema",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "open_disambiguation",
+      "canonicalId": "open_disambiguation",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "openers",
+      "canonicalId": "openers",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -7192,6 +8855,72 @@
     {
       "alias": "operator_output_shapes",
       "canonicalId": "operator_output_shapes",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "operator_patterns_advise",
+      "canonicalId": "operator_patterns_advise",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "operator_patterns_calculate",
+      "canonicalId": "operator_patterns_calculate",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "operator_patterns_compare",
+      "canonicalId": "operator_patterns_compare",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "operator_patterns_evaluate",
+      "canonicalId": "operator_patterns_evaluate",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "operator_patterns_extract",
+      "canonicalId": "operator_patterns_extract",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "operator_patterns_locate",
+      "canonicalId": "operator_patterns_locate",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "operator_patterns_monitor",
+      "canonicalId": "operator_patterns_monitor",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "operator_patterns_navigate",
+      "canonicalId": "operator_patterns_navigate",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "operator_patterns_open",
+      "canonicalId": "operator_patterns_open",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "operator_patterns_summarize",
+      "canonicalId": "operator_patterns_summarize",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "operator_patterns_validate",
+      "canonicalId": "operator_patterns_validate",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -7870,11 +9599,23 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "party_patterns_vf0714139",
+      "canonicalId": "party_patterns_vf0714139",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "party.patterns",
       "canonicalId": "party_patterns",
       "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
       "addedAt": "2026-02-27",
       "expiresInDays": null
+    },
+    {
+      "alias": "path_string_guardrails",
+      "canonicalId": "path_string_guardrails",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
     },
     {
       "alias": "pattern_library",
@@ -7888,6 +9629,324 @@
       "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
       "addedAt": "2026-02-27",
       "expiresInDays": null
+    },
+    {
+      "alias": "patterns_core_aggregation_patterns",
+      "canonicalId": "patterns_core_aggregation_patterns",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_core_entity_mentions",
+      "canonicalId": "patterns_core_entity_mentions",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_core_intent_families",
+      "canonicalId": "patterns_core_intent_families",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_core_multi_intent_connectors_en",
+      "canonicalId": "patterns_core_multi_intent_connectors_en",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_core_multi_intent_connectors_pt",
+      "canonicalId": "patterns_core_multi_intent_connectors_pt",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_core_question_shapes",
+      "canonicalId": "patterns_core_question_shapes",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_core_time_scope_patterns",
+      "canonicalId": "patterns_core_time_scope_patterns",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_doc_refs_doc_ref_phrases_accounting",
+      "canonicalId": "patterns_doc_refs_doc_ref_phrases_accounting",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_doc_refs_doc_ref_phrases_everyday",
+      "canonicalId": "patterns_doc_refs_doc_ref_phrases_everyday",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_doc_refs_doc_ref_phrases_finance",
+      "canonicalId": "patterns_doc_refs_doc_ref_phrases_finance",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_doc_refs_doc_ref_phrases_legal",
+      "canonicalId": "patterns_doc_refs_doc_ref_phrases_legal",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_doc_refs_doc_ref_phrases_medical",
+      "canonicalId": "patterns_doc_refs_doc_ref_phrases_medical",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_doc_refs_doc_set_compare_patterns",
+      "canonicalId": "patterns_doc_refs_doc_set_compare_patterns",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_doc_refs_folder_scope_patterns",
+      "canonicalId": "patterns_doc_refs_folder_scope_patterns",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_doc_refs_versioning_patterns",
+      "canonicalId": "patterns_doc_refs_versioning_patterns",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_domains_accounting_aging_report_patterns",
+      "canonicalId": "patterns_domains_accounting_aging_report_patterns",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_domains_accounting_gl_export_patterns",
+      "canonicalId": "patterns_domains_accounting_gl_export_patterns",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_domains_accounting_journal_entry_patterns",
+      "canonicalId": "patterns_domains_accounting_journal_entry_patterns",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_domains_accounting_reconciliation_patterns",
+      "canonicalId": "patterns_domains_accounting_reconciliation_patterns",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_domains_accounting_trial_balance_patterns",
+      "canonicalId": "patterns_domains_accounting_trial_balance_patterns",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_domains_finance_anomaly_patterns",
+      "canonicalId": "patterns_domains_finance_anomaly_patterns",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_domains_finance_footnote_priority_patterns",
+      "canonicalId": "patterns_domains_finance_footnote_priority_patterns",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_domains_finance_kpi_patterns",
+      "canonicalId": "patterns_domains_finance_kpi_patterns",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_domains_finance_period_and_unit_patterns",
+      "canonicalId": "patterns_domains_finance_period_and_unit_patterns",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_domains_finance_statement_structures",
+      "canonicalId": "patterns_domains_finance_statement_structures",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_domains_legal_amendment_and_version_patterns",
+      "canonicalId": "patterns_domains_legal_amendment_and_version_patterns",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_domains_legal_clause_patterns",
+      "canonicalId": "patterns_domains_legal_clause_patterns",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_domains_legal_cross_reference_patterns",
+      "canonicalId": "patterns_domains_legal_cross_reference_patterns",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_domains_legal_quote_requirements",
+      "canonicalId": "patterns_domains_legal_quote_requirements",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_domains_legal_risk_flag_patterns",
+      "canonicalId": "patterns_domains_legal_risk_flag_patterns",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_editor_anchor_resolution_patterns",
+      "canonicalId": "patterns_editor_anchor_resolution_patterns",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_editor_apply_undo_intents_en",
+      "canonicalId": "patterns_editor_apply_undo_intents_en",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_editor_apply_undo_intents_pt",
+      "canonicalId": "patterns_editor_apply_undo_intents_pt",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_editor_highlight_intents_en",
+      "canonicalId": "patterns_editor_highlight_intents_en",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_editor_highlight_intents_pt",
+      "canonicalId": "patterns_editor_highlight_intents_pt",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_editor_locate_target_phrases",
+      "canonicalId": "patterns_editor_locate_target_phrases",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_editor_multi_selection_rules",
+      "canonicalId": "patterns_editor_multi_selection_rules",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_editor_scope_precedence_rules",
+      "canonicalId": "patterns_editor_scope_precedence_rules",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_editor_selection_intents_en",
+      "canonicalId": "patterns_editor_selection_intents_en",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_editor_selection_intents_pt",
+      "canonicalId": "patterns_editor_selection_intents_pt",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_files_bulk_actions",
+      "canonicalId": "patterns_files_bulk_actions",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_files_folder_tree_en",
+      "canonicalId": "patterns_files_folder_tree_en",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_files_folder_tree_pt",
+      "canonicalId": "patterns_files_folder_tree_pt",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_files_move_copy_rename_en",
+      "canonicalId": "patterns_files_move_copy_rename_en",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_files_move_copy_rename_pt",
+      "canonicalId": "patterns_files_move_copy_rename_pt",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_medical_encounter_timeline_patterns",
+      "canonicalId": "patterns_medical_encounter_timeline_patterns",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_medical_lab_panel_patterns",
+      "canonicalId": "patterns_medical_lab_panel_patterns",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_medical_red_flag_patterns",
+      "canonicalId": "patterns_medical_red_flag_patterns",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_medical_safety_boundary_triggers",
+      "canonicalId": "patterns_medical_safety_boundary_triggers",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_medical_unit_reference_patterns",
+      "canonicalId": "patterns_medical_unit_reference_patterns",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_modes_mode_switch_en",
+      "canonicalId": "patterns_modes_mode_switch_en",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_modes_mode_switch_pt",
+      "canonicalId": "patterns_modes_mode_switch_pt",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "patterns_modes_preview_vs_apply",
+      "canonicalId": "patterns_modes_preview_vs_apply",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
     },
     {
       "alias": "pii_field_labels",
@@ -7932,6 +9991,18 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "provider_capabilities",
+      "canonicalId": "provider_capabilities",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "provider_fallbacks",
+      "canonicalId": "provider_fallbacks",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "python_chart_recipes",
       "canonicalId": "python_chart_recipes",
       "source": "runtime_self_alias",
@@ -7950,6 +10021,12 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "quality_ambiguity_triggers",
+      "canonicalId": "quality_ambiguity_triggers",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "quality_document_intelligence_schema",
       "canonicalId": "quality_document_intelligence_schema",
       "source": "runtime_self_alias",
@@ -7962,6 +10039,42 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "quality_language_lock_triggers",
+      "canonicalId": "quality_language_lock_triggers",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "quality_numeric_integrity_triggers",
+      "canonicalId": "quality_numeric_integrity_triggers",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "quality_unsafe_operation_triggers",
+      "canonicalId": "quality_unsafe_operation_triggers",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "quality_weak_evidence_triggers",
+      "canonicalId": "quality_weak_evidence_triggers",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "quality_wrong_doc_risk_triggers",
+      "canonicalId": "quality_wrong_doc_risk_triggers",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "quarantine_2026_02_memory_audit_bank_generation_report",
+      "canonicalId": "quarantine_2026_02_memory_audit_bank_generation_report",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "query_family_catalog",
       "canonicalId": "query_family_catalog",
       "source": "runtime_self_alias",
@@ -7970,6 +10083,12 @@
     {
       "alias": "query_intent_patterns",
       "canonicalId": "query_intent_patterns",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "query_rewrite_policies",
+      "canonicalId": "query_rewrite_policies",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -8051,6 +10170,12 @@
       "expiresInDays": null
     },
     {
+      "alias": "quote_integrity_rules",
+      "canonicalId": "quote_integrity_rules",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "quote_styles",
       "canonicalId": "quote_styles",
       "source": "runtime_self_alias",
@@ -8117,6 +10242,12 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "reports_bank_audit_report",
+      "canonicalId": "reports_bank_audit_report",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "response_templates",
       "canonicalId": "response_templates",
       "source": "runtime_self_alias",
@@ -8159,6 +10290,12 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "safety_tone_overrides",
+      "canonicalId": "safety_tone_overrides",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "scope_hints",
       "canonicalId": "scope_hints",
       "source": "runtime_self_alias",
@@ -8179,6 +10316,18 @@
     {
       "alias": "scoped_not_found_messages",
       "canonicalId": "scoped_not_found_messages",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "search_intents_en",
+      "canonicalId": "search_intents_en",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "search_intents_pt",
+      "canonicalId": "search_intents_pt",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -8266,8 +10415,32 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "semantic_vs_lexical_router",
+      "canonicalId": "semantic_vs_lexical_router",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "send_intents_en",
+      "canonicalId": "send_intents_en",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "send_intents_pt",
+      "canonicalId": "send_intents_pt",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "sheetname_patterns",
       "canonicalId": "sheetname_patterns",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "sheetname_patterns_vd1212689",
+      "canonicalId": "sheetname_patterns_vd1212689",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -8341,6 +10514,18 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "sync_intents_en",
+      "canonicalId": "sync_intents_en",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "sync_intents_pt",
+      "canonicalId": "sync_intents_pt",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "synonym_expansion",
       "canonicalId": "synonym_expansion",
       "source": "runtime_self_alias",
@@ -8366,8 +10551,20 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "table_cell_evidence_rules",
+      "canonicalId": "table_cell_evidence_rules",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "table_header_ontology_accounting",
       "canonicalId": "table_header_ontology_accounting",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "table_header_ontology_accounting_v440f0106",
+      "canonicalId": "table_header_ontology_accounting_v440f0106",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -8390,8 +10587,20 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "table_header_ontology_everyday_v37e0344c",
+      "canonicalId": "table_header_ontology_everyday_v37e0344c",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "table_header_ontology_finance",
       "canonicalId": "table_header_ontology_finance",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "table_header_ontology_finance_v5baba7af",
+      "canonicalId": "table_header_ontology_finance_v5baba7af",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -8408,8 +10617,20 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "table_header_ontology_legal_v439d4f7c",
+      "canonicalId": "table_header_ontology_legal_v439d4f7c",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "table_header_ontology_medical",
       "canonicalId": "table_header_ontology_medical",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "table_header_ontology_medical_ved51f076",
+      "canonicalId": "table_header_ontology_medical_ved51f076",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -8491,6 +10712,12 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "token_rate_limits",
+      "canonicalId": "token_rate_limits",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "tone_profiles",
       "canonicalId": "tone_profiles",
       "source": "runtime_self_alias",
@@ -8499,6 +10726,12 @@
     {
       "alias": "tool_prompts",
       "canonicalId": "tool_prompts",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "transition_phrases",
+      "canonicalId": "transition_phrases",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -8515,8 +10748,38 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "ui_highlight_styles",
+      "canonicalId": "ui_highlight_styles",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "ui_receipt_shapes",
+      "canonicalId": "ui_receipt_shapes",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "unsafe_inference_rules",
+      "canonicalId": "unsafe_inference_rules",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "unused_bank_lifecycle",
       "canonicalId": "unused_bank_lifecycle",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "verb_phrase_bank",
+      "canonicalId": "verb_phrase_bank",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "verbosity_ladder",
+      "canonicalId": "verbosity_ladder",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -8547,6 +10810,12 @@
     {
       "alias": "viewer_source_navigation_microcopy",
       "canonicalId": "viewer_source_navigation_microcopy",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "voice_personality_profiles",
+      "canonicalId": "voice_personality_profiles",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },

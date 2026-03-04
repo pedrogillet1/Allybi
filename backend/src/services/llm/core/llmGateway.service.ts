@@ -23,6 +23,17 @@ import {
 import { getProductHelpService } from "../../chat/productHelp.service";
 import { getAnswerModeRouterService } from "../../config/answerModeRouter.service";
 import { BankRuntimeCache } from "../../core/cache/bankRuntimeCache.service";
+import {
+  checkBudget,
+  recordUsage,
+  TokenBudgetExceededError,
+} from "./tokenBudgetLimiter.service";
+import {
+  computeCostUsd,
+  toCostFamilyModel,
+  type CostTable,
+} from "./llmCostCalculator";
+import { canonicalizeToLlmProvider } from "./providerNormalization";
 
 export type GatewayChatRole = "system" | "user" | "assistant";
 
@@ -97,16 +108,7 @@ type MemoryPolicyRuntimeTuning = {
 };
 
 function mapProviderForRequest(provider: LLMProvider): LLMProvider {
-  const normalized = String(provider || "")
-    .trim()
-    .toLowerCase();
-  if (!normalized || normalized === "unknown" || normalized === "gemini")
-    return "google";
-  if (normalized === "google") return "google";
-  if (normalized === "openai") return "openai";
-  if (normalized === "local") return "local";
-  if (normalized === "ollama") return "local";
-  return "unknown";
+  return canonicalizeToLlmProvider(provider);
 }
 
 function mapPurpose(promptType: string): LLMRequest["purpose"] {
@@ -262,6 +264,16 @@ function hashString(value: string): string {
   return createHash("sha256").update(value, "utf8").digest("hex");
 }
 
+function asRecord(value: unknown): Record<string, unknown> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  return value as Record<string, unknown>;
+}
+
+function asStringOrNull(value: unknown): string | null {
+  const text = String(value ?? "").trim();
+  return text ? text : null;
+}
+
 function hashEvidencePack(evidencePack: EvidencePackLike | null | undefined): string {
   if (!evidencePack || !Array.isArray(evidencePack.evidence)) return "none";
   const normalizedEvidence = evidencePack.evidence.map((item) => ({
@@ -314,6 +326,20 @@ export class LlmGatewayService {
     );
   }
 
+  private static resolveFallbackRank(
+    attempts: GatewayExecutionAttempt[],
+    executed: { provider: LLMProvider; model: string },
+  ): number | null {
+    if (!Array.isArray(attempts) || attempts.length < 1) return null;
+    const idx = attempts.findIndex(
+      (attempt) =>
+        attempt.status === "ok" &&
+        attempt.provider === executed.provider &&
+        attempt.model === executed.model,
+    );
+    return idx >= 0 ? idx : null;
+  }
+
   async generate(params: LlmGatewayRequest): Promise<{
     text: string;
     telemetry?: Record<string, unknown>;
@@ -332,17 +358,25 @@ export class LlmGatewayService {
     if (composeCacheKey) {
       const cached = getSharedComposedFragmentCache().get(composeCacheKey);
       if (cached) {
+        const modelFamily = toCostFamilyModel(String(routedModel)) || String(routedModel);
         return {
           text: cached.text,
           telemetry: {
             ...(cached.telemetry || {}),
             provider: routedProvider,
             model: routedModel,
+            modelFamily,
+            pinnedModel: routedModel,
             routedProvider,
             routedModel,
             executedProvider: routedProvider,
             executedModel: routedModel,
             fallbackUsed: false,
+            fallbackRank: 0,
+            fallbackPolicyRuleId: null,
+            routeLane: prepared.route.lane ?? null,
+            qualityReason: prepared.route.qualityReason ?? null,
+            policyRuleId: prepared.route.policyRuleId ?? null,
             attemptCount: 0,
             attempts: [],
             finishReason: "cache_hit",
@@ -356,24 +390,64 @@ export class LlmGatewayService {
         };
       }
     }
+    // Token budget check (fail-open if bank not loaded)
+    const userId = (params.meta?.userId as string) || params.userId || "system";
+    const estimatedInputTokens = Math.ceil(
+      prepared.request.messages.reduce((sum, m) => sum + (m.content?.length ?? 0), 0) / 4,
+    );
+    const budgetCheck = checkBudget(userId, estimatedInputTokens);
+    if (!budgetCheck.allowed) {
+      throw new TokenBudgetExceededError(userId, budgetCheck.window);
+    }
+
     const execution = await this.completeWithFallback(
       prepared.route,
       prepared.request,
     );
     const response = execution.response;
+    const modelFamily =
+      toCostFamilyModel(String(execution.executed.model)) ||
+      String(execution.executed.model);
+    const fallbackRank = LlmGatewayService.resolveFallbackRank(
+      execution.attempts,
+      execution.executed,
+    );
+
+    // Record actual usage after success
+    const actualCost = computeCostUsd(
+      String(execution.executed.provider),
+      String(execution.executed.model),
+      response.usage?.promptTokens,
+      response.usage?.completionTokens,
+      getOptionalBank<CostTable>("llm_cost_table"),
+    );
+    recordUsage(
+      userId,
+      response.usage?.promptTokens ?? 0,
+      response.usage?.completionTokens ?? 0,
+      actualCost,
+    );
 
     const telemetry = {
       provider: execution.executed.provider,
       model: execution.executed.model,
+      modelFamily,
+      pinnedModel: execution.executed.model,
       routedProvider: execution.routed.provider,
       routedModel: execution.routed.model,
       executedProvider: execution.executed.provider,
       executedModel: execution.executed.model,
       fallbackUsed: execution.fallbackUsed,
+      fallbackRank,
+      fallbackPolicyRuleId: execution.fallbackUsed ? "provider_fallbacks" : null,
+      routeLane: prepared.route.lane ?? null,
+      qualityReason: prepared.route.qualityReason ?? null,
+      policyRuleId: prepared.route.policyRuleId ?? null,
       attemptCount: execution.attempts.length,
       attempts: execution.attempts,
       finishReason: response.finishReason || "unknown",
       usage: response.usage,
+      costUsd: actualCost || null,
       promptType: prepared.promptType,
       requestedMaxOutputTokens:
         prepared.request.sampling?.maxOutputTokens ?? null,
@@ -414,17 +488,31 @@ export class LlmGatewayService {
       prepared.request,
     );
     const response = execution.response;
+    const modelFamily =
+      toCostFamilyModel(String(execution.executed.model)) ||
+      String(execution.executed.model);
+    const fallbackRank = LlmGatewayService.resolveFallbackRank(
+      execution.attempts,
+      execution.executed,
+    );
 
     return {
       text: response.content,
       telemetry: {
         provider: execution.executed.provider,
         model: execution.executed.model,
+        modelFamily,
+        pinnedModel: execution.executed.model,
         routedProvider: execution.routed.provider,
         routedModel: execution.routed.model,
         executedProvider: execution.executed.provider,
         executedModel: execution.executed.model,
         fallbackUsed: execution.fallbackUsed,
+        fallbackRank,
+        fallbackPolicyRuleId: execution.fallbackUsed ? "provider_fallbacks" : null,
+        routeLane: prepared.route.lane ?? null,
+        qualityReason: prepared.route.qualityReason ?? null,
+        policyRuleId: prepared.route.policyRuleId ?? null,
         attemptCount: execution.attempts.length,
         attempts: execution.attempts,
         finishReason: response.finishReason || "unknown",
@@ -456,17 +544,31 @@ export class LlmGatewayService {
       params.streamingConfig,
     );
     const result = execution.response;
+    const modelFamily =
+      toCostFamilyModel(String(execution.executed.model)) ||
+      String(execution.executed.model);
+    const fallbackRank = LlmGatewayService.resolveFallbackRank(
+      execution.attempts,
+      execution.executed,
+    );
 
     return {
       finalText: result.finalText,
       telemetry: {
         provider: execution.executed.provider,
         model: execution.executed.model,
+        modelFamily,
+        pinnedModel: execution.executed.model,
         routedProvider: execution.routed.provider,
         routedModel: execution.routed.model,
         executedProvider: execution.executed.provider,
         executedModel: execution.executed.model,
         fallbackUsed: execution.fallbackUsed,
+        fallbackRank,
+        fallbackPolicyRuleId: execution.fallbackUsed ? "provider_fallbacks" : null,
+        routeLane: prepared.route.lane ?? null,
+        qualityReason: prepared.route.qualityReason ?? null,
+        policyRuleId: prepared.route.policyRuleId ?? null,
         attemptCount: execution.attempts.length,
         attempts: execution.attempts,
         finishReason: result.finishReason || "unknown",
@@ -570,7 +672,8 @@ export class LlmGatewayService {
     const order = this.buildAttemptOrder(route);
     let lastError: unknown = null;
 
-    for (const candidate of order) {
+    for (let idx = 0; idx < order.length; idx++) {
+      const candidate = order[idx] as { provider: LLMProvider; model: string };
       const client = this.resolveClient(candidate.provider);
       if (!client) {
         attempts.push({
@@ -583,11 +686,32 @@ export class LlmGatewayService {
         continue;
       }
 
+      const baseMeta = asRecord(request.meta);
+      const routeMeta = asRecord(baseMeta.route);
+      const attemptModelFamily =
+        toCostFamilyModel(String(candidate.model)) || String(candidate.model);
+
       const attemptRequest: LLMRequest = {
         ...request,
         model: {
           provider: candidate.provider,
           model: candidate.model,
+        },
+        meta: {
+          ...baseMeta,
+          routeLane:
+            asStringOrNull(baseMeta.routeLane) ??
+            asStringOrNull(routeMeta.lane),
+          qualityReason:
+            asStringOrNull(baseMeta.qualityReason) ??
+            asStringOrNull(routeMeta.qualityReason),
+          policyRuleId:
+            asStringOrNull(baseMeta.policyRuleId) ??
+            asStringOrNull(routeMeta.policyRuleId),
+          modelFamily: attemptModelFamily,
+          pinnedModel: String(candidate.model),
+          fallbackRank: idx,
+          fallbackPolicyRuleId: idx > 0 ? "provider_fallbacks" : null,
         },
       };
 
@@ -646,7 +770,8 @@ export class LlmGatewayService {
     const order = this.buildAttemptOrder(route);
     let lastError: unknown = null;
 
-    for (const candidate of order) {
+    for (let idx = 0; idx < order.length; idx++) {
+      const candidate = order[idx] as { provider: LLMProvider; model: string };
       const client = this.resolveClient(candidate.provider);
       if (!client) {
         attempts.push({
@@ -659,11 +784,32 @@ export class LlmGatewayService {
         continue;
       }
 
+      const baseMeta = asRecord(request.meta);
+      const routeMeta = asRecord(baseMeta.route);
+      const attemptModelFamily =
+        toCostFamilyModel(String(candidate.model)) || String(candidate.model);
+
       const attemptRequest: LLMRequest = {
         ...request,
         model: {
           provider: candidate.provider,
           model: candidate.model,
+        },
+        meta: {
+          ...baseMeta,
+          routeLane:
+            asStringOrNull(baseMeta.routeLane) ??
+            asStringOrNull(routeMeta.lane),
+          qualityReason:
+            asStringOrNull(baseMeta.qualityReason) ??
+            asStringOrNull(routeMeta.qualityReason),
+          policyRuleId:
+            asStringOrNull(baseMeta.policyRuleId) ??
+            asStringOrNull(routeMeta.policyRuleId),
+          modelFamily: attemptModelFamily,
+          pinnedModel: String(candidate.model),
+          fallbackRank: idx,
+          fallbackPolicyRuleId: idx > 0 ? "provider_fallbacks" : null,
         },
       };
 

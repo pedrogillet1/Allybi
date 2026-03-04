@@ -3,7 +3,12 @@
     "id": "disambiguation_policies",
     "version": "1.0.0",
     "description": "Deterministic disambiguation policies for Koda. Defines when to autopick vs ask a single clarification, option limits (2–4), confidence/margin thresholds, and scope-aware behavior. Ensures ChatGPT-like minimal clarification: only when truly blocked, ask one question, otherwise proceed safely.",
-    "languages": ["any", "en", "pt", "es"],
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
     "lastUpdated": "2026-01-26",
     "owner": "koda-ambiguity",
     "compat": ">=1.0.0",
@@ -11,6 +16,12 @@
       "Added strict 1-question and 2–4 option policy with deterministic thresholds",
       "Added scope-aware overrides (explicit locks, discovery mode, follow-up continuity)",
       "Added tests for autopick margin, collisions, multilingual, and regressions"
+    ],
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
     ]
   },
   "config": {
@@ -51,9 +62,21 @@
       "allowCorrection": true,
       "onlyWhen": {
         "all": [
-          { "path": "metrics.topScore", "op": "gte", "value": 0.85 },
-          { "path": "metrics.scoreGap", "op": "gte", "value": 0.25 },
-          { "path": "metrics.topScopeCompliance", "op": "gte", "value": 0.8 }
+          {
+            "path": "metrics.topScore",
+            "op": "gte",
+            "value": 0.85
+          },
+          {
+            "path": "metrics.scoreGap",
+            "op": "gte",
+            "value": 0.25
+          },
+          {
+            "path": "metrics.topScopeCompliance",
+            "op": "gte",
+            "value": 0.8
+          }
         ]
       }
     },
@@ -93,24 +116,47 @@
         "disambiguationOptions",
         "clarificationQuestionAllowed"
       ]
-    }
+    },
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "rules": [
     {
       "id": "autopick_when_high_confidence_and_margin",
       "scope": "global",
       "description": "Autopick when top score and margin are high and scope compliance is strong.",
-      "appliesTo": ["disambiguation_decision"],
+      "appliesTo": [
+        "disambiguation_decision"
+      ],
       "triggerPatterns": {
-        "en": [".+"],
-        "pt": [".+"],
-        "es": [".+"]
+        "en": [
+          ".+"
+        ],
+        "pt": [
+          ".+"
+        ],
+        "es": [
+          ".+"
+        ]
       },
       "when": {
         "all": [
-          { "path": "metrics.topScore", "op": "gte", "value": 0.85 },
-          { "path": "metrics.scoreGap", "op": "gte", "value": 0.25 },
-          { "path": "metrics.topScopeCompliance", "op": "gte", "value": 0.8 }
+          {
+            "path": "metrics.topScore",
+            "op": "gte",
+            "value": 0.85
+          },
+          {
+            "path": "metrics.scoreGap",
+            "op": "gte",
+            "value": 0.25
+          },
+          {
+            "path": "metrics.topScopeCompliance",
+            "op": "gte",
+            "value": 0.8
+          }
         ]
       },
       "action": {
@@ -125,16 +171,32 @@
       "id": "disambiguate_when_scores_close",
       "scope": "global",
       "description": "Disambiguate when top scores are close or below confidence thresholds.",
-      "appliesTo": ["disambiguation_decision"],
+      "appliesTo": [
+        "disambiguation_decision"
+      ],
       "triggerPatterns": {
-        "en": [".+"],
-        "pt": [".+"],
-        "es": [".+"]
+        "en": [
+          ".+"
+        ],
+        "pt": [
+          ".+"
+        ],
+        "es": [
+          ".+"
+        ]
       },
       "when": {
         "any": [
-          { "path": "metrics.topScore", "op": "lt", "value": 0.7 },
-          { "path": "metrics.scoreGap", "op": "lt", "value": 0.15 }
+          {
+            "path": "metrics.topScore",
+            "op": "lt",
+            "value": 0.7
+          },
+          {
+            "path": "metrics.scoreGap",
+            "op": "lt",
+            "value": 0.15
+          }
         ]
       },
       "action": {
@@ -149,15 +211,27 @@
       "id": "no_disambiguation_if_explicit_doc_lock",
       "scope": "cross_family",
       "description": "If explicit doc lock exists, do not disambiguate across documents; keep within locked scope.",
-      "appliesTo": ["disambiguation_decision"],
+      "appliesTo": [
+        "disambiguation_decision"
+      ],
       "triggerPatterns": {
-        "en": [".+"],
-        "pt": [".+"],
-        "es": [".+"]
+        "en": [
+          ".+"
+        ],
+        "pt": [
+          ".+"
+        ],
+        "es": [
+          ".+"
+        ]
       },
       "when": {
         "all": [
-          { "path": "signals.explicitDocLock", "op": "eq", "value": true }
+          {
+            "path": "signals.explicitDocLock",
+            "op": "eq",
+            "value": true
+          }
         ]
       },
       "action": {
@@ -171,15 +245,27 @@
       "id": "discovery_prefers_doc_list",
       "scope": "cross_family",
       "description": "In discovery intent, prefer showing candidate docs (nav pills/doc list) instead of clarifying question.",
-      "appliesTo": ["disambiguation_decision"],
+      "appliesTo": [
+        "disambiguation_decision"
+      ],
       "triggerPatterns": {
-        "en": [".+"],
-        "pt": [".+"],
-        "es": [".+"]
+        "en": [
+          ".+"
+        ],
+        "pt": [
+          ".+"
+        ],
+        "es": [
+          ".+"
+        ]
       },
       "when": {
         "all": [
-          { "path": "signals.intentFamily", "op": "eq", "value": "doc_discovery" }
+          {
+            "path": "signals.intentFamily",
+            "op": "eq",
+            "value": "doc_discovery"
+          }
         ]
       },
       "action": {
@@ -194,11 +280,19 @@
       "id": "enforce_option_limits",
       "scope": "global",
       "description": "Always enforce 2–4 option limits with diversity trimming.",
-      "appliesTo": ["disambiguation_options"],
+      "appliesTo": [
+        "disambiguation_options"
+      ],
       "triggerPatterns": {
-        "en": [".+"],
-        "pt": [".+"],
-        "es": [".+"]
+        "en": [
+          ".+"
+        ],
+        "pt": [
+          ".+"
+        ],
+        "es": [
+          ".+"
+        ]
       },
       "action": {
         "type": "limit_options",
@@ -213,11 +307,19 @@
       "id": "single_question_enforced",
       "scope": "global",
       "description": "Always enforce exactly one question if a question is asked.",
-      "appliesTo": ["disambiguation_rendering"],
+      "appliesTo": [
+        "disambiguation_rendering"
+      ],
       "triggerPatterns": {
-        "en": [".+"],
-        "pt": [".+"],
-        "es": [".+"]
+        "en": [
+          ".+"
+        ],
+        "pt": [
+          ".+"
+        ],
+        "es": [
+          ".+"
+        ]
       },
       "action": {
         "type": "limit_questions",
@@ -231,44 +333,106 @@
     "cases": [
       {
         "id": "DP_0001_autopick_high_confidence",
-        "context": { "metrics": { "topScore": 0.9, "scoreGap": 0.3, "topScopeCompliance": 0.9 } },
-        "expect": { "autopicked": true, "reasonCode": "auto_pick_high_confidence" }
+        "context": {
+          "metrics": {
+            "topScore": 0.9,
+            "scoreGap": 0.3,
+            "topScopeCompliance": 0.9
+          }
+        },
+        "expect": {
+          "autopicked": true,
+          "reasonCode": "auto_pick_high_confidence"
+        }
       },
       {
         "id": "DP_0002_disambiguate_low_gap",
-        "context": { "metrics": { "topScore": 0.82, "scoreGap": 0.1 } },
-        "expect": { "requiresDisambiguation": true, "reasonCode": "doc_ambiguous" }
+        "context": {
+          "metrics": {
+            "topScore": 0.82,
+            "scoreGap": 0.1
+          }
+        },
+        "expect": {
+          "requiresDisambiguation": true,
+          "reasonCode": "doc_ambiguous"
+        }
       },
       {
         "id": "DP_0003_option_limits_enforced",
-        "context": { "metrics": { "candidateCount": 10 } },
-        "expect": { "optionsMax": 4, "optionsMin": 2 }
+        "context": {
+          "metrics": {
+            "candidateCount": 10
+          }
+        },
+        "expect": {
+          "optionsMax": 4,
+          "optionsMin": 2
+        }
       },
       {
         "id": "DP_0004_single_question_only",
-        "context": { "metrics": { "clarificationQuestionCount": 2 } },
-        "expect": { "blockedOrReducedToOne": true }
+        "context": {
+          "metrics": {
+            "clarificationQuestionCount": 2
+          }
+        },
+        "expect": {
+          "blockedOrReducedToOne": true
+        }
       },
       {
         "id": "DP_0005_explicit_doc_lock_restricts",
-        "context": { "signals": { "explicitDocLock": true }, "metrics": { "candidateDocsOutsideLock": 2 } },
-        "expect": { "restrictedWithinActiveDoc": true }
+        "context": {
+          "signals": {
+            "explicitDocLock": true
+          },
+          "metrics": {
+            "candidateDocsOutsideLock": 2
+          }
+        },
+        "expect": {
+          "restrictedWithinActiveDoc": true
+        }
       },
       {
         "id": "DP_0006_discovery_prefers_doc_list",
-        "context": { "signals": { "intentFamily": "doc_discovery" }, "metrics": { "candidateCount": 3 } },
-        "expect": { "renderMode": "nav_pills_or_doc_list", "askSingleQuestion": false }
+        "context": {
+          "signals": {
+            "intentFamily": "doc_discovery"
+          },
+          "metrics": {
+            "candidateCount": 3
+          }
+        },
+        "expect": {
+          "renderMode": "nav_pills_or_doc_list",
+          "askSingleQuestion": false
+        }
       },
       {
         "id": "DP_0007_multilingual_pt_disambiguate",
         "input": "abrir o arquivo",
-        "context": { "metrics": { "topScore": 0.6, "scoreGap": 0.05 } },
-        "expect": { "requiresDisambiguation": true }
+        "context": {
+          "metrics": {
+            "topScore": 0.6,
+            "scoreGap": 0.05
+          }
+        },
+        "expect": {
+          "requiresDisambiguation": true
+        }
       },
       {
         "id": "DP_0008_regression_no_multi_question",
-        "context": { "metrics": { "clarificationQuestionCount": 3 } },
-        "expect": { "questionCountMax": 1 }
+        "context": {
+          "metrics": {
+            "clarificationQuestionCount": 3
+          }
+        },
+        "expect": {
+          "questionCountMax": 1
+        }
       }
     ]
   }

@@ -6,7 +6,14 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-03-03"
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -23,7 +30,12 @@
       "order": 1,
       "required": true,
       "mustHave": true,
-      "headingAnchors": ["return", "tax return", "declaration", "document title"]
+      "headingAnchors": [
+        "return",
+        "tax return",
+        "declaration",
+        "document title"
+      ]
     },
     {
       "id": "taxpayer_profile",
@@ -34,7 +46,13 @@
       "order": 2,
       "required": true,
       "mustHave": true,
-      "headingAnchors": ["taxpayer", "nome", "contribuinte", "cnpj", "cpf"]
+      "headingAnchors": [
+        "taxpayer",
+        "nome",
+        "contribuinte",
+        "cnpj",
+        "cpf"
+      ]
     },
     {
       "id": "filing_section",
@@ -45,7 +63,12 @@
       "order": 3,
       "required": true,
       "mustHave": true,
-      "headingAnchors": ["fiscal year", "tax year", "period", "due date"]
+      "headingAnchors": [
+        "fiscal year",
+        "tax year",
+        "period",
+        "due date"
+      ]
     },
     {
       "id": "income_section",
@@ -56,7 +79,12 @@
       "order": 4,
       "required": true,
       "mustHave": true,
-      "headingAnchors": ["income", "wages", "salary", "rendimento"]
+      "headingAnchors": [
+        "income",
+        "wages",
+        "salary",
+        "rendimento"
+      ]
     },
     {
       "id": "deductions",
@@ -67,7 +95,12 @@
       "order": 5,
       "required": true,
       "mustHave": true,
-      "headingAnchors": ["deduction", "dependents", "expenses", "dedução"]
+      "headingAnchors": [
+        "deduction",
+        "dependents",
+        "expenses",
+        "dedução"
+      ]
     },
     {
       "id": "credits",
@@ -78,7 +111,12 @@
       "order": 6,
       "required": false,
       "mustHave": false,
-      "headingAnchors": ["credits", "withholding", "reimbursements", "impugnation"]
+      "headingAnchors": [
+        "credits",
+        "withholding",
+        "reimbursements",
+        "impugnation"
+      ]
     },
     {
       "id": "tax_summary",
@@ -89,7 +127,12 @@
       "order": 7,
       "required": true,
       "mustHave": true,
-      "headingAnchors": ["tax summary", "total due", "total tax", "valor devido"]
+      "headingAnchors": [
+        "tax summary",
+        "total due",
+        "total tax",
+        "valor devido"
+      ]
     },
     {
       "id": "payment_or_refund",
@@ -100,7 +143,12 @@
       "order": 8,
       "required": false,
       "mustHave": false,
-      "headingAnchors": ["refund", "payment", "tax payable", "credito"]
+      "headingAnchors": [
+        "refund",
+        "payment",
+        "tax payable",
+        "credito"
+      ]
     },
     {
       "id": "signatures",
@@ -111,7 +159,11 @@
       "order": 9,
       "required": false,
       "mustHave": false,
-      "headingAnchors": ["signature", "authorized", "assinatura"]
+      "headingAnchors": [
+        "signature",
+        "authorized",
+        "assinatura"
+      ]
     },
     {
       "id": "footnotes_or_annexes",
@@ -122,7 +174,12 @@
       "order": 10,
       "required": false,
       "mustHave": false,
-      "headingAnchors": ["footnote", "annex", "attachment", "anexo"]
+      "headingAnchors": [
+        "footnote",
+        "annex",
+        "attachment",
+        "anexo"
+      ]
     }
   ]
 }

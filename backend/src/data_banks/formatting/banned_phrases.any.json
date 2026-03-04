@@ -3,10 +3,21 @@
     "id": "banned_phrases",
     "version": "2.0.0",
     "description": "Banned phrases and patterns for Koda responses. Prevents system self-reference, capability disclaimers, debug leakage, and other undesirable output patterns. Includes regex matching and optional replacements.",
-    "languages": ["any", "en", "pt", "es"],
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
     "lastUpdated": "2026-01-26",
     "owner": "koda-formatting",
-    "compat": ">=1.0.0"
+    "compat": ">=1.0.0",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -17,7 +28,10 @@
         "multipleMatches": "apply_all",
         "hardBlockIsTerminal": true
       }
-    }
+    },
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "categories": {
     "system_self_reference": {
@@ -52,28 +66,36 @@
       "category": "system_self_reference",
       "regex": "(?i)\\bas an? (?:ai|artificial intelligence|language model|llm|assistant)\\b",
       "action": "strip",
-      "languages": ["en"]
+      "languages": [
+        "en"
+      ]
     },
     {
       "id": "BAN_002_como_uma_ia",
       "category": "system_self_reference",
       "regex": "(?i)\\bcomo uma? (?:ia|inteligência artificial|modelo de linguagem|assistente)\\b",
       "action": "strip",
-      "languages": ["pt"]
+      "languages": [
+        "pt"
+      ]
     },
     {
       "id": "BAN_003_como_una_ia",
       "category": "system_self_reference",
       "regex": "(?i)\\bcomo una? (?:ia|inteligencia artificial|modelo de lenguaje|asistente)\\b",
       "action": "strip",
-      "languages": ["es"]
+      "languages": [
+        "es"
+      ]
     },
     {
       "id": "BAN_004_my_training",
       "category": "system_self_reference",
       "regex": "(?i)\\bmy (?:training(?: data)?|knowledge (?:cutoff|base))\\b",
       "action": "strip",
-      "languages": ["en"]
+      "languages": [
+        "en"
+      ]
     },
     {
       "id": "BAN_005_i_cannot_access",
@@ -81,7 +103,9 @@
       "regex": "(?i)\\bI (?:cannot|can't|don't have(?: the ability to)?|am unable to) (?:access|browse|search|retrieve|connect to)\\b",
       "action": "replace",
       "replacement": "I couldn't find",
-      "languages": ["en"]
+      "languages": [
+        "en"
+      ]
     },
     {
       "id": "BAN_006_nao_consigo",
@@ -89,7 +113,9 @@
       "regex": "(?i)\\bnão (?:consigo|posso|tenho acesso)\\b",
       "action": "replace",
       "replacement": "não encontrei",
-      "languages": ["pt"]
+      "languages": [
+        "pt"
+      ]
     },
     {
       "id": "BAN_007_no_puedo",
@@ -97,98 +123,126 @@
       "regex": "(?i)\\bno (?:puedo|tengo acceso)\\b",
       "action": "replace",
       "replacement": "no encontré",
-      "languages": ["es"]
+      "languages": [
+        "es"
+      ]
     },
     {
       "id": "BAN_008_i_apologize",
       "category": "excessive_hedging",
       "regex": "(?i)\\bI (?:apologize|am sorry|must apologize)(?:,? but)?\\b",
       "action": "strip",
-      "languages": ["en"]
+      "languages": [
+        "en"
+      ]
     },
     {
       "id": "BAN_009_desculpe",
       "category": "excessive_hedging",
       "regex": "(?i)\\b(?:desculpe|peço desculpas|me desculpe)(?:,? mas)?\\b",
       "action": "strip",
-      "languages": ["pt"]
+      "languages": [
+        "pt"
+      ]
     },
     {
       "id": "BAN_010_disculpa",
       "category": "excessive_hedging",
       "regex": "(?i)\\b(?:disculpa|lo siento|perdón)(?:,? pero)?\\b",
       "action": "strip",
-      "languages": ["es"]
+      "languages": [
+        "es"
+      ]
     },
     {
       "id": "BAN_011_debug_markers",
       "category": "debug_leakage",
       "regex": "(?i)\\[(?:DEBUG|TRACE|LOG|INTERNAL|SYSTEM)\\]",
       "action": "strip",
-      "languages": ["any"]
+      "languages": [
+        "any"
+      ]
     },
     {
       "id": "BAN_012_mode_markers",
       "category": "debug_leakage",
       "regex": "(?i)\\[(?:answerMode|operator|intent|profile)[:=][^\\]]+\\]",
       "action": "strip",
-      "languages": ["any"]
+      "languages": [
+        "any"
+      ]
     },
     {
       "id": "BAN_013_confidence_scores",
       "category": "debug_leakage",
       "regex": "(?i)\\b(?:confidence|score|probability)[:=]\\s*[0-9.]+",
       "action": "strip",
-      "languages": ["any"]
+      "languages": [
+        "any"
+      ]
     },
     {
       "id": "BAN_014_system_prompt_leak",
       "category": "debug_leakage",
       "regex": "(?i)\\b(?:system prompt|instructions say|I was told to|my instructions)\\b",
       "action": "strip",
-      "languages": ["en"]
+      "languages": [
+        "en"
+      ]
     },
     {
       "id": "BAN_015_based_on_context",
       "category": "filler_phrases",
       "regex": "(?i)\\bbased on (?:the )?(?:context|information) (?:provided|given|available)\\b",
       "action": "strip",
-      "languages": ["en"]
+      "languages": [
+        "en"
+      ]
     },
     {
       "id": "BAN_016_com_base_no",
       "category": "filler_phrases",
       "regex": "(?i)\\bcom base n[oa]s? (?:informações|informacoes|contexto|dados) (?:fornecid[oa]s?|dispon[ií]veis?|limitad[oa]s?(?:\\s+dispon[ií]veis?)?)\\b",
       "action": "strip",
-      "languages": ["pt"]
+      "languages": [
+        "pt"
+      ]
     },
     {
       "id": "BAN_017_it_appears_that",
       "category": "excessive_hedging",
       "regex": "(?i)\\bit (?:appears|seems|looks like) that\\b",
       "action": "strip",
-      "languages": ["en"]
+      "languages": [
+        "en"
+      ]
     },
     {
       "id": "BAN_018_please_note_that",
       "category": "filler_phrases",
       "regex": "(?i)\\bplease (?:note|be aware) that\\b",
       "action": "strip",
-      "languages": ["en"]
+      "languages": [
+        "en"
+      ]
     },
     {
       "id": "BAN_019_vale_ressaltar",
       "category": "filler_phrases",
       "regex": "(?i)\\b(?:vale|é importante) (?:ressaltar|destacar|notar) que\\b",
       "action": "strip",
-      "languages": ["pt"]
+      "languages": [
+        "pt"
+      ]
     },
     {
       "id": "BAN_020_certainly_absolutely",
       "category": "filler_phrases",
       "regex": "(?i)^(?:certainly|absolutely|of course|sure)[!,.]?\\s*",
       "action": "strip",
-      "languages": ["en"]
+      "languages": [
+        "en"
+      ]
     }
   ],
   "postProcessing": {
@@ -202,7 +256,9 @@
       "id": "apply_all_bans",
       "scope": "global",
       "description": "Apply all banned phrase patterns to every response.",
-      "appliesTo": ["all_answers"],
+      "appliesTo": [
+        "all_answers"
+      ],
       "action": {
         "type": "apply_banned_patterns",
         "source": "patterns"
@@ -214,7 +270,9 @@
       "id": "language_specific_bans",
       "scope": "global",
       "description": "Apply language-specific banned patterns based on detected language.",
-      "appliesTo": ["all_answers"],
+      "appliesTo": [
+        "all_answers"
+      ],
       "action": {
         "type": "filter_by_language",
         "languageSource": "detectedLanguage"
@@ -228,28 +286,40 @@
       {
         "id": "BAN_001_strip_as_an_ai",
         "input": "As an AI, I can help you with that.",
-        "expect": { "output": "I can help you with that." }
+        "expect": {
+          "output": "I can help you with that."
+        }
       },
       {
         "id": "BAN_002_strip_debug_marker",
         "input": "[DEBUG] Here is the answer.",
-        "expect": { "output": "Here is the answer." }
+        "expect": {
+          "output": "Here is the answer."
+        }
       },
       {
         "id": "BAN_003_replace_i_cannot",
         "input": "I cannot access external websites.",
-        "expect": { "output": "I couldn't find external websites." }
+        "expect": {
+          "output": "I couldn't find external websites."
+        }
       },
       {
         "id": "BAN_004_strip_portuguese",
-        "context": { "language": "pt" },
+        "context": {
+          "language": "pt"
+        },
         "input": "Como uma IA, posso ajudar.",
-        "expect": { "output": "Posso ajudar." }
+        "expect": {
+          "output": "Posso ajudar."
+        }
       },
       {
         "id": "BAN_005_strip_filler",
         "input": "Certainly! Based on the context provided, the revenue is $5M.",
-        "expect": { "output": "The revenue is $5M." }
+        "expect": {
+          "output": "The revenue is $5M."
+        }
       }
     ]
   }

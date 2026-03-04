@@ -3,8 +3,20 @@
     "id": "retrieval_prompt",
     "version": "1.0.0",
     "description": "LLM prompt used ONLY to generate retrieval plans (query variants, required terms, exclusions, and location targets). Output is machine-consumed strict JSON and must be deterministic and scope-aware. Never produces user-facing text.",
-    "languages": ["any", "en", "pt", "es"],
-    "lastUpdated": "2026-01-26"
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-01-26",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -19,8 +31,20 @@
     "maxTimeHints": 3,
     "maxDocTypePrefs": 4,
     "placeholders": {
-      "required": ["{{language}}", "{{userQuery}}", "{{operator}}", "{{answerMode}}", "{{domainId}}", "{{scope}}", "{{docContext}}"],
-      "optional": ["{{state}}", "{{runtimeSignals}}", "{{knownDocTitles}}"]
+      "required": [
+        "{{language}}",
+        "{{userQuery}}",
+        "{{operator}}",
+        "{{answerMode}}",
+        "{{domainId}}",
+        "{{scope}}",
+        "{{docContext}}"
+      ],
+      "optional": [
+        "{{state}}",
+        "{{runtimeSignals}}",
+        "{{knownDocTitles}}"
+      ]
     }
   },
   "templates": {
@@ -152,18 +176,46 @@
     "cases": [
       {
         "id": "RP_0001_scope_hard_not_broadened",
-        "input": { "scope": { "hard": { "docIdAllowlist": ["doc:locked"] } }, "userQuery": "Find revenue" },
-        "expect": { "mustNotAddCorpusWide": true }
+        "input": {
+          "scope": {
+            "hard": {
+              "docIdAllowlist": [
+                "doc:locked"
+              ]
+            }
+          },
+          "userQuery": "Find revenue"
+        },
+        "expect": {
+          "mustNotAddCorpusWide": true
+        }
       },
       {
         "id": "RP_0002_numeric_adds_metric_and_location",
-        "input": { "userQuery": "Value in Sheet2 cell B12", "signals": { "numericIntent": true } },
-        "expect": { "locationTargetsIncludeAny": ["sheet|Sheet2", "cell|B12"] }
+        "input": {
+          "userQuery": "Value in Sheet2 cell B12",
+          "signals": {
+            "numericIntent": true
+          }
+        },
+        "expect": {
+          "locationTargetsIncludeAny": [
+            "sheet|Sheet2",
+            "cell|B12"
+          ]
+        }
       },
       {
         "id": "RP_0003_discovery_allows_corpus_when_signal",
-        "input": { "operator": "locate_docs", "signals": { "discoveryQuery": true } },
-        "expect": { "maySearchAllDocs": true }
+        "input": {
+          "operator": "locate_docs",
+          "signals": {
+            "discoveryQuery": true
+          }
+        },
+        "expect": {
+          "maySearchAllDocs": true
+        }
       }
     ]
   }

@@ -3,9 +3,24 @@
     "id": "llm_minimal_safe_prompt",
     "version": "1.0.0",
     "description": "Fallback identity prompt used when no other prompt template resolves. Replaces hardcoded minimalSafePrompt().",
-    "lastUpdated": "2026-03-03"
+    "lastUpdated": "2026-03-03",
+    "languages": [
+      "any"
+    ],
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
-  "config": { "enabled": true },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
+  },
   "rules": [
     "Assistant identity: Allybi.",
     "Refer to yourself in first person (I/me/my). Do not speak about yourself in third person.",

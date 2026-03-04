@@ -7,9 +7,33 @@ const STRICT_RUNTIME =
   process.argv.includes("--strict");
 
 const CWD = process.cwd();
-const BACKEND_ROOT = fs.existsSync(path.resolve(CWD, "backend/src"))
-  ? path.resolve(CWD, "backend")
-  : CWD;
+const SEED_RELATIVE_PATHS = ["server.ts", path.join("main", "server.ts"), "app.ts"];
+
+function hasSeedAtRoot(rootDir) {
+  return SEED_RELATIVE_PATHS.some((seedPath) =>
+    fs.existsSync(path.join(rootDir, "src", seedPath)),
+  );
+}
+
+function resolveBackendRoot() {
+  const cwdRoot = CWD;
+  const nestedRoot = path.resolve(CWD, "backend");
+  const cwdHasSrc = fs.existsSync(path.join(cwdRoot, "src"));
+  const nestedHasSrc = fs.existsSync(path.join(nestedRoot, "src"));
+
+  if (cwdHasSrc && !nestedHasSrc) return cwdRoot;
+  if (!cwdHasSrc && nestedHasSrc) return nestedRoot;
+  if (cwdHasSrc && nestedHasSrc) {
+    const cwdHasSeed = hasSeedAtRoot(cwdRoot);
+    const nestedHasSeed = hasSeedAtRoot(nestedRoot);
+    if (cwdHasSeed && !nestedHasSeed) return cwdRoot;
+    if (!cwdHasSeed && nestedHasSeed) return nestedRoot;
+    return cwdRoot;
+  }
+  return cwdRoot;
+}
+
+const BACKEND_ROOT = resolveBackendRoot();
 const SRC_ROOT = path.join(BACKEND_ROOT, "src");
 const OUTPUT_DIR = path.join(BACKEND_ROOT, "docs", "runtime");
 

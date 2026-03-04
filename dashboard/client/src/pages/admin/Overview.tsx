@@ -55,7 +55,7 @@ const mockIngestionFailures = [
 
 const mockLLMErrors = [
   { id: "1", provider: "OpenAI", model: "gpt-5.2", error: "Rate limit exceeded", timestamp: "1 min ago" },
-  { id: "2", provider: "Gemini", model: "3.0-flash", error: "Context length exceeded", timestamp: "12 min ago" },
+  { id: "2", provider: "Gemini", model: "gemini-2.5-flash", error: "Context length exceeded", timestamp: "12 min ago" },
   { id: "3", provider: "OpenAI", model: "gpt-5.2", error: "Timeout", timestamp: "28 min ago" },
 ];
 

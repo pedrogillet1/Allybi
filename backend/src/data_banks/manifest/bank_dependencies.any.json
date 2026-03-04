@@ -6,7 +6,14 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-03-01"
+    "lastUpdated": "2026-03-01",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -134,7 +141,8 @@
       "routing",
       "semantics"
     ],
-    "tests": []
+    "tests": [],
+    "llm": []
   },
   "banks": [
     {
@@ -146,6 +154,11 @@
       "dependsOn": [
         "doc_archetypes_finance"
       ]
+    },
+    {
+      "id": "address_patterns",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "allybi_capabilities",
@@ -218,6 +231,11 @@
       "optional": true
     },
     {
+      "id": "ambiguity_playbooks",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "ambiguity_questions",
       "dependsOn": [
         "quality_gates"
@@ -240,6 +258,11 @@
       ]
     },
     {
+      "id": "anti_robotic_style_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "assumption_policy",
       "dependsOn": [
         "clarification_policy"
@@ -258,6 +281,11 @@
     {
       "id": "bank_dependencies",
       "dependsOn": []
+    },
+    {
+      "id": "bank_generation_report",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "bank_manifest",
@@ -387,6 +415,11 @@
       "optional": true
     },
     {
+      "id": "chat_runtime_bank_contract",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "citation_policy",
       "dependsOn": [],
       "optional": true
@@ -419,6 +452,11 @@
       "optional": true
     },
     {
+      "id": "closers",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "colors_en",
       "dependsOn": [],
       "optional": true
@@ -444,8 +482,47 @@
       "optional": true
     },
     {
+      "id": "compiled_alias_trie",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "compiled_compiled_manifest",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "compiled_doctype_signature_index",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "compiled_section_heading_index",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "compiled_table_header_hash_index",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "compliance_policy",
       "dependsOn": []
+    },
+    {
+      "id": "composition_lane_policy",
+      "dependsOn": []
+    },
+    {
+      "id": "connect_intents_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "connect_intents_pt",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "connector_operators",
@@ -456,11 +533,31 @@
       ]
     },
     {
+      "id": "connector_operators_v46dbe3f4",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "connectors_routing",
       "dependsOn": [
         "intent_patterns",
         "operator_families"
       ]
+    },
+    {
+      "id": "consistency_checks",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "contact_patterns",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "contradiction_policy",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "crossdoc_alignment_rules",
@@ -476,6 +573,11 @@
       "dependsOn": [
         "doc_taxonomy"
       ]
+    },
+    {
+      "id": "date_patterns_vf6e34b10",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "decision_support_accounting",
@@ -583,10 +685,25 @@
       "optional": true
     },
     {
+      "id": "di_accounting_extraction_acct_account_reconciliation",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_extraction_acct_accrual_rollforward",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_accounting_extraction_acct_accruals_schedule",
       "dependsOn": [
         "di_accounting_doc_type_catalog_v2"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_extraction_acct_amortization_schedule",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -601,6 +718,11 @@
       "dependsOn": [
         "di_accounting_doc_type_catalog_v2"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_extraction_acct_audit_confirmation",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -622,6 +744,26 @@
       "dependsOn": [
         "di_accounting_doc_type_catalog_v2"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_extraction_acct_budget_pack",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_extraction_acct_capex_register",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_extraction_acct_cash_flow",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_extraction_acct_cashbook",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -653,10 +795,30 @@
       "optional": true
     },
     {
+      "id": "di_accounting_extraction_acct_financial_statement",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_accounting_extraction_acct_fixed_asset_register",
       "dependsOn": [
         "di_accounting_doc_type_catalog_v2"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_extraction_acct_forecast_pack",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_extraction_acct_foreign_currency",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_extraction_acct_general_ledger",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -671,6 +833,11 @@
       "dependsOn": [
         "di_accounting_doc_type_catalog_v2"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_extraction_acct_inventory_valuation",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -695,6 +862,11 @@
       "optional": true
     },
     {
+      "id": "di_accounting_extraction_acct_journal_entry_adjusting",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_accounting_extraction_acct_journal_entry_support",
       "dependsOn": [
         "di_accounting_doc_type_catalog_v2"
@@ -709,10 +881,30 @@
       "optional": true
     },
     {
+      "id": "di_accounting_extraction_acct_leasing_schedule",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_accounting_extraction_acct_management_rep_letter",
       "dependsOn": [
         "di_accounting_doc_type_catalog_v2"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_extraction_acct_management_representation",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_extraction_acct_month_end_close",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_extraction_acct_payment_run",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -730,10 +922,20 @@
       "optional": true
     },
     {
+      "id": "di_accounting_extraction_acct_prepaid_rollforward",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_accounting_extraction_acct_prepaids_amortization_schedule",
       "dependsOn": [
         "di_accounting_doc_type_catalog_v2"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_extraction_acct_revenue_recognition",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -744,10 +946,45 @@
       "optional": true
     },
     {
+      "id": "di_accounting_extraction_acct_subledger_customer",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_extraction_acct_subledger_vendor",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_extraction_acct_tax_reconciliation",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_accounting_extraction_acct_trial_balance",
       "dependsOn": [
         "di_accounting_doc_type_catalog_v2"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_extraction_acct_trial_balance_reclass",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_extraction_acct_variance_pack",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_extraction_acct_workpaper",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_extraction_acct_year_end_close",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -786,10 +1023,25 @@
       "optional": true
     },
     {
+      "id": "di_accounting_sections_acct_account_reconciliation",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_sections_acct_accrual_rollforward",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_accounting_sections_acct_accruals_schedule",
       "dependsOn": [
         "di_accounting_doc_type_catalog_v2"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_sections_acct_amortization_schedule",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -804,6 +1056,11 @@
       "dependsOn": [
         "di_accounting_doc_type_catalog_v2"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_sections_acct_audit_confirmation",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -825,6 +1082,26 @@
       "dependsOn": [
         "di_accounting_doc_type_catalog_v2"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_sections_acct_budget_pack",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_sections_acct_capex_register",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_sections_acct_cash_flow",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_sections_acct_cashbook",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -856,10 +1133,30 @@
       "optional": true
     },
     {
+      "id": "di_accounting_sections_acct_financial_statement",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_accounting_sections_acct_fixed_asset_register",
       "dependsOn": [
         "di_accounting_doc_type_catalog_v2"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_sections_acct_forecast_pack",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_sections_acct_foreign_currency",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_sections_acct_general_ledger",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -874,6 +1171,11 @@
       "dependsOn": [
         "di_accounting_doc_type_catalog_v2"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_sections_acct_inventory_valuation",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -898,6 +1200,11 @@
       "optional": true
     },
     {
+      "id": "di_accounting_sections_acct_journal_entry_adjusting",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_accounting_sections_acct_journal_entry_support",
       "dependsOn": [
         "di_accounting_doc_type_catalog_v2"
@@ -912,10 +1219,30 @@
       "optional": true
     },
     {
+      "id": "di_accounting_sections_acct_leasing_schedule",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_accounting_sections_acct_management_rep_letter",
       "dependsOn": [
         "di_accounting_doc_type_catalog_v2"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_sections_acct_management_representation",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_sections_acct_month_end_close",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_sections_acct_payment_run",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -933,10 +1260,20 @@
       "optional": true
     },
     {
+      "id": "di_accounting_sections_acct_prepaid_rollforward",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_accounting_sections_acct_prepaids_amortization_schedule",
       "dependsOn": [
         "di_accounting_doc_type_catalog_v2"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_sections_acct_revenue_recognition",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -947,6 +1284,21 @@
       "optional": true
     },
     {
+      "id": "di_accounting_sections_acct_subledger_customer",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_sections_acct_subledger_vendor",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_sections_acct_tax_reconciliation",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_accounting_sections_acct_trial_balance",
       "dependsOn": [
         "di_accounting_doc_type_catalog_v2"
@@ -954,10 +1306,45 @@
       "optional": true
     },
     {
+      "id": "di_accounting_sections_acct_trial_balance_reclass",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_sections_acct_variance_pack",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_sections_acct_workpaper",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_sections_acct_year_end_close",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_tables_acct_account_reconciliation",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_tables_acct_accrual_rollforward",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_accounting_tables_acct_accruals_schedule",
       "dependsOn": [
         "di_accounting_doc_type_catalog_v2"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_tables_acct_amortization_schedule",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -972,6 +1359,11 @@
       "dependsOn": [
         "di_accounting_doc_type_catalog_v2"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_tables_acct_audit_confirmation",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -993,6 +1385,26 @@
       "dependsOn": [
         "di_accounting_doc_type_catalog_v2"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_tables_acct_budget_pack",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_tables_acct_capex_register",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_tables_acct_cash_flow",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_tables_acct_cashbook",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -1024,10 +1436,30 @@
       "optional": true
     },
     {
+      "id": "di_accounting_tables_acct_financial_statement",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_accounting_tables_acct_fixed_asset_register",
       "dependsOn": [
         "di_accounting_doc_type_catalog_v2"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_tables_acct_forecast_pack",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_tables_acct_foreign_currency",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_tables_acct_general_ledger",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -1042,6 +1474,11 @@
       "dependsOn": [
         "di_accounting_doc_type_catalog_v2"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_tables_acct_inventory_valuation",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -1066,6 +1503,11 @@
       "optional": true
     },
     {
+      "id": "di_accounting_tables_acct_journal_entry_adjusting",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_accounting_tables_acct_journal_entry_support",
       "dependsOn": [
         "di_accounting_doc_type_catalog_v2"
@@ -1080,10 +1522,30 @@
       "optional": true
     },
     {
+      "id": "di_accounting_tables_acct_leasing_schedule",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_accounting_tables_acct_management_rep_letter",
       "dependsOn": [
         "di_accounting_doc_type_catalog_v2"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_tables_acct_management_representation",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_tables_acct_month_end_close",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_tables_acct_payment_run",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -1101,10 +1563,20 @@
       "optional": true
     },
     {
+      "id": "di_accounting_tables_acct_prepaid_rollforward",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_accounting_tables_acct_prepaids_amortization_schedule",
       "dependsOn": [
         "di_accounting_doc_type_catalog_v2"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_tables_acct_revenue_recognition",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -1115,10 +1587,45 @@
       "optional": true
     },
     {
+      "id": "di_accounting_tables_acct_subledger_customer",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_tables_acct_subledger_vendor",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_tables_acct_tax_reconciliation",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_accounting_tables_acct_trial_balance",
       "dependsOn": [
         "di_accounting_doc_type_catalog_v2"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_tables_acct_trial_balance_reclass",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_tables_acct_variance_pack",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_tables_acct_workpaper",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_accounting_tables_acct_year_end_close",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -1475,6 +1982,11 @@
     },
     {
       "id": "di_billing_validation_policies",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_diacritic_equivalence",
       "dependsOn": [],
       "optional": true
     },
@@ -2082,10 +2594,30 @@
       "optional": true
     },
     {
+      "id": "di_finance_extraction_fin_annual_financials",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_finance_extraction_fin_annual_report",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_finance_extraction_fin_arr_mrr_report",
       "dependsOn": [
         "di_finance_doc_type_catalog"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_extraction_fin_audit_compliance_pack",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_finance_extraction_fin_balance_sheet",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -2096,10 +2628,20 @@
       "optional": true
     },
     {
+      "id": "di_finance_extraction_fin_benchmarking_report",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_finance_extraction_fin_board_deck_finance",
       "dependsOn": [
         "di_finance_doc_type_catalog"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_extraction_fin_board_minutes_finance",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -2110,6 +2652,11 @@
       "optional": true
     },
     {
+      "id": "di_finance_extraction_fin_budget_vs_actual",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_finance_extraction_fin_cap_table",
       "dependsOn": [
         "di_finance_doc_type_catalog"
@@ -2117,10 +2664,20 @@
       "optional": true
     },
     {
+      "id": "di_finance_extraction_fin_cash_flow",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_finance_extraction_fin_cash_forecast",
       "dependsOn": [
         "di_finance_doc_type_catalog"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_extraction_fin_cash_management",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -2152,10 +2709,20 @@
       "optional": true
     },
     {
+      "id": "di_finance_extraction_fin_credit_facility",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_finance_extraction_fin_debt_schedule",
       "dependsOn": [
         "di_finance_doc_type_catalog"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_extraction_fin_dividend_policy",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -2166,10 +2733,30 @@
       "optional": true
     },
     {
+      "id": "di_finance_extraction_fin_efs",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_finance_extraction_fin_esg_finance_linkage",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_finance_extraction_fin_esg_report",
       "dependsOn": [
         "di_finance_doc_type_catalog"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_extraction_fin_financing_term_sheet",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_finance_extraction_fin_fixed_income_portfolio",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -2180,10 +2767,35 @@
       "optional": true
     },
     {
+      "id": "di_finance_extraction_fin_fx_exposure_report",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_finance_extraction_fin_incentive_plan",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_finance_extraction_fin_income_statement",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_finance_extraction_fin_investment_portfolio",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_finance_extraction_fin_investor_presentation",
       "dependsOn": [
         "di_finance_doc_type_catalog"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_extraction_fin_investor_termsheet",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -2208,6 +2820,16 @@
       "optional": true
     },
     {
+      "id": "di_finance_extraction_fin_quarterly_close_pack",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_finance_extraction_fin_revenue_operational_review",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_finance_extraction_fin_rolling_forecast",
       "dependsOn": [
         "di_finance_doc_type_catalog"
@@ -2219,6 +2841,21 @@
       "dependsOn": [
         "di_finance_doc_type_catalog"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_extraction_fin_tax_deed_summary",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_finance_extraction_fin_tax_return_summary",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_finance_extraction_fin_treasury_memo",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -2299,10 +2936,30 @@
       "optional": true
     },
     {
+      "id": "di_finance_sections_fin_annual_financials",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_finance_sections_fin_annual_report",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_finance_sections_fin_arr_mrr_report",
       "dependsOn": [
         "di_finance_doc_type_catalog"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_sections_fin_audit_compliance_pack",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_finance_sections_fin_balance_sheet",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -2313,10 +2970,20 @@
       "optional": true
     },
     {
+      "id": "di_finance_sections_fin_benchmarking_report",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_finance_sections_fin_board_deck_finance",
       "dependsOn": [
         "di_finance_doc_type_catalog"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_sections_fin_board_minutes_finance",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -2327,6 +2994,11 @@
       "optional": true
     },
     {
+      "id": "di_finance_sections_fin_budget_vs_actual",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_finance_sections_fin_cap_table",
       "dependsOn": [
         "di_finance_doc_type_catalog"
@@ -2334,10 +3006,20 @@
       "optional": true
     },
     {
+      "id": "di_finance_sections_fin_cash_flow",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_finance_sections_fin_cash_forecast",
       "dependsOn": [
         "di_finance_doc_type_catalog"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_sections_fin_cash_management",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -2369,10 +3051,20 @@
       "optional": true
     },
     {
+      "id": "di_finance_sections_fin_credit_facility",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_finance_sections_fin_debt_schedule",
       "dependsOn": [
         "di_finance_doc_type_catalog"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_sections_fin_dividend_policy",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -2383,10 +3075,30 @@
       "optional": true
     },
     {
+      "id": "di_finance_sections_fin_efs",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_finance_sections_fin_esg_finance_linkage",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_finance_sections_fin_esg_report",
       "dependsOn": [
         "di_finance_doc_type_catalog"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_sections_fin_financing_term_sheet",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_finance_sections_fin_fixed_income_portfolio",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -2397,10 +3109,35 @@
       "optional": true
     },
     {
+      "id": "di_finance_sections_fin_fx_exposure_report",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_finance_sections_fin_incentive_plan",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_finance_sections_fin_income_statement",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_finance_sections_fin_investment_portfolio",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_finance_sections_fin_investor_presentation",
       "dependsOn": [
         "di_finance_doc_type_catalog"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_sections_fin_investor_termsheet",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -2425,6 +3162,16 @@
       "optional": true
     },
     {
+      "id": "di_finance_sections_fin_quarterly_close_pack",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_finance_sections_fin_revenue_operational_review",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_finance_sections_fin_rolling_forecast",
       "dependsOn": [
         "di_finance_doc_type_catalog"
@@ -2436,6 +3183,21 @@
       "dependsOn": [
         "di_finance_doc_type_catalog"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_sections_fin_tax_deed_summary",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_finance_sections_fin_tax_return_summary",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_finance_sections_fin_treasury_memo",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -2481,10 +3243,30 @@
       "optional": true
     },
     {
+      "id": "di_finance_tables_fin_annual_financials",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_finance_tables_fin_annual_report",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_finance_tables_fin_arr_mrr_report",
       "dependsOn": [
         "di_finance_doc_type_catalog"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_tables_fin_audit_compliance_pack",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_finance_tables_fin_balance_sheet",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -2495,10 +3277,20 @@
       "optional": true
     },
     {
+      "id": "di_finance_tables_fin_benchmarking_report",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_finance_tables_fin_board_deck_finance",
       "dependsOn": [
         "di_finance_doc_type_catalog"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_tables_fin_board_minutes_finance",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -2509,6 +3301,11 @@
       "optional": true
     },
     {
+      "id": "di_finance_tables_fin_budget_vs_actual",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_finance_tables_fin_cap_table",
       "dependsOn": [
         "di_finance_doc_type_catalog"
@@ -2516,10 +3313,20 @@
       "optional": true
     },
     {
+      "id": "di_finance_tables_fin_cash_flow",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_finance_tables_fin_cash_forecast",
       "dependsOn": [
         "di_finance_doc_type_catalog"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_tables_fin_cash_management",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -2551,10 +3358,20 @@
       "optional": true
     },
     {
+      "id": "di_finance_tables_fin_credit_facility",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_finance_tables_fin_debt_schedule",
       "dependsOn": [
         "di_finance_doc_type_catalog"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_tables_fin_dividend_policy",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -2565,10 +3382,30 @@
       "optional": true
     },
     {
+      "id": "di_finance_tables_fin_efs",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_finance_tables_fin_esg_finance_linkage",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_finance_tables_fin_esg_report",
       "dependsOn": [
         "di_finance_doc_type_catalog"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_tables_fin_financing_term_sheet",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_finance_tables_fin_fixed_income_portfolio",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -2579,10 +3416,35 @@
       "optional": true
     },
     {
+      "id": "di_finance_tables_fin_fx_exposure_report",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_finance_tables_fin_incentive_plan",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_finance_tables_fin_income_statement",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_finance_tables_fin_investment_portfolio",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_finance_tables_fin_investor_presentation",
       "dependsOn": [
         "di_finance_doc_type_catalog"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_tables_fin_investor_termsheet",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -2607,6 +3469,16 @@
       "optional": true
     },
     {
+      "id": "di_finance_tables_fin_quarterly_close_pack",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_finance_tables_fin_revenue_operational_review",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_finance_tables_fin_rolling_forecast",
       "dependsOn": [
         "di_finance_doc_type_catalog"
@@ -2618,6 +3490,21 @@
       "dependsOn": [
         "di_finance_doc_type_catalog"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_finance_tables_fin_tax_deed_summary",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_finance_tables_fin_tax_return_summary",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_finance_tables_fin_treasury_memo",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -3338,6 +4225,16 @@
       "optional": true
     },
     {
+      "id": "di_normalization_rules_vf6f60bcf",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_normalization_rules_vfc81701f",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_ops_abbreviations_en",
       "dependsOn": [],
       "optional": true
@@ -3535,6 +4432,16 @@
     },
     {
       "id": "di_section_ontology",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_stopwords_and_noise",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_table_ontology",
       "dependsOn": [],
       "optional": true
     },
@@ -4048,6 +4955,11 @@
       "dependsOn": []
     },
     {
+      "id": "doc_taxonomy_vd13afef0",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "doc_title_boost_rules",
       "dependsOn": []
     },
@@ -4077,6 +4989,11 @@
       "dependsOn": [
         "document_intelligence_schema_registry"
       ]
+    },
+    {
+      "id": "document_intelligence_implementation_report",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "document_intelligence_manifest_schema",
@@ -4190,6 +5107,11 @@
       ]
     },
     {
+      "id": "empathy_and_support_language",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "entity_role_ontology",
       "dependsOn": [],
       "optional": true
@@ -4201,7 +5123,17 @@
       ]
     },
     {
+      "id": "error_explanations",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "every_doc_type_catalog",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "everyday_doc_type_aliases",
       "dependsOn": [],
       "optional": true
     },
@@ -4325,7 +5257,17 @@
       "optional": true
     },
     {
+      "id": "fact_type_requirements",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "fallback_extraction_recovery",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "fallback_messages",
       "dependsOn": [],
       "optional": true
     },
@@ -4397,7 +5339,17 @@
       "dependsOn": []
     },
     {
+      "id": "followup_suggestions_v1c6269cc",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "fonts",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "format_guardrails",
       "dependsOn": [],
       "optional": true
     },
@@ -4413,10 +5365,30 @@
       ]
     },
     {
+      "id": "headings_map_v1ca83df8",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "hedging_and_uncertainty_language",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "help_microcopy",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "identifier_patterns",
       "dependsOn": [
         "doc_taxonomy"
       ]
+    },
+    {
+      "id": "identifier_patterns_v6735c929",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "incident_response_policy",
@@ -4451,6 +5423,11 @@
     },
     {
       "id": "intent_patterns_excel_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "jargon_control",
       "dependsOn": [],
       "optional": true
     },
@@ -4517,6 +5494,161 @@
       ]
     },
     {
+      "id": "layout_cues_v61e6793a",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_doc_taxonomy",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_abbreviations_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_abbreviations_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_board_resolution_extraction_hints",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_board_resolution_sections",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_board_resolution_tables",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_dpa_extraction_hints",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_dpa_sections",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_dpa_tables",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_employment_agreement_extraction_hints",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_employment_agreement_sections",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_employment_agreement_tables",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_lexicon_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_lexicon_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_msa_extraction_hints",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_msa_sections",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_msa_tables",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_nda_extraction_hints",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_nda_sections",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_nda_tables",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_privacy_policy_extraction_hints",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_privacy_policy_sections",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_privacy_policy_tables",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_sow_extraction_hints",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_sow_sections",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_sow_tables",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_medical_abbreviations_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_medical_abbreviations_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_medical_lexicon_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_medical_lexicon_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "legal_abbreviations_en",
       "dependsOn": [
         "legal_domain_profile"
@@ -4524,10 +5656,20 @@
       "optional": true
     },
     {
+      "id": "legal_abbreviations_en_v9b6629e1",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "legal_abbreviations_pt",
       "dependsOn": [
         "legal_domain_profile"
       ],
+      "optional": true
+    },
+    {
+      "id": "legal_abbreviations_pt_v1331926f",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -4608,6 +5750,11 @@
       "optional": true
     },
     {
+      "id": "legal_board_resolution_extraction_hints_v50c4150f",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "legal_board_resolution_sections",
       "dependsOn": [
         "legal_doc_type_catalog"
@@ -4615,10 +5762,20 @@
       "optional": true
     },
     {
+      "id": "legal_board_resolution_sections_v0d54900e",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "legal_board_resolution_tables",
       "dependsOn": [
         "legal_doc_type_catalog"
       ],
+      "optional": true
+    },
+    {
+      "id": "legal_board_resolution_tables_v07fdadde",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -4803,6 +5960,11 @@
       "optional": true
     },
     {
+      "id": "legal_doc_type_aliases",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "legal_doc_type_catalog",
       "dependsOn": [
         "legal_domain_profile"
@@ -4829,10 +5991,20 @@
       "optional": true
     },
     {
+      "id": "legal_dpa_extraction_hints_vc1cbb882",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "legal_dpa_sections",
       "dependsOn": [
         "legal_doc_type_catalog"
       ],
+      "optional": true
+    },
+    {
+      "id": "legal_dpa_sections_v59ba1526",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -4843,10 +6015,20 @@
       "optional": true
     },
     {
+      "id": "legal_dpa_tables_v679bed8b",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "legal_employment_agreement_extraction_hints",
       "dependsOn": [
         "legal_doc_type_catalog"
       ],
+      "optional": true
+    },
+    {
+      "id": "legal_employment_agreement_extraction_hints_v1ed74ca8",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -4857,10 +6039,20 @@
       "optional": true
     },
     {
+      "id": "legal_employment_agreement_sections_v9f1eb8d7",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "legal_employment_agreement_tables",
       "dependsOn": [
         "legal_doc_type_catalog"
       ],
+      "optional": true
+    },
+    {
+      "id": "legal_employment_agreement_tables_v1a28d070",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -4983,10 +6175,20 @@
       "optional": true
     },
     {
+      "id": "legal_lexicon_en_v28fa8616",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "legal_lexicon_pt",
       "dependsOn": [
         "legal_domain_profile"
       ],
+      "optional": true
+    },
+    {
+      "id": "legal_lexicon_pt_v02671738",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -5060,10 +6262,20 @@
       "optional": true
     },
     {
+      "id": "legal_msa_extraction_hints_v41111395",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "legal_msa_sections",
       "dependsOn": [
         "legal_doc_type_catalog"
       ],
+      "optional": true
+    },
+    {
+      "id": "legal_msa_sections_v24b4aa70",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -5074,10 +6286,20 @@
       "optional": true
     },
     {
+      "id": "legal_msa_tables_vdb79e19e",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "legal_nda_extraction_hints",
       "dependsOn": [
         "legal_doc_type_catalog"
       ],
+      "optional": true
+    },
+    {
+      "id": "legal_nda_extraction_hints_v94b17eb1",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -5088,10 +6310,20 @@
       "optional": true
     },
     {
+      "id": "legal_nda_sections_v215acb2d",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "legal_nda_tables",
       "dependsOn": [
         "legal_doc_type_catalog"
       ],
+      "optional": true
+    },
+    {
+      "id": "legal_nda_tables_v3a19a550",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -5144,6 +6376,11 @@
       "optional": true
     },
     {
+      "id": "legal_privacy_policy_extraction_hints_v3525de6b",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "legal_privacy_policy_sections",
       "dependsOn": [
         "legal_doc_type_catalog"
@@ -5151,10 +6388,20 @@
       "optional": true
     },
     {
+      "id": "legal_privacy_policy_sections_v5a2b8d13",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "legal_privacy_policy_tables",
       "dependsOn": [
         "legal_doc_type_catalog"
       ],
+      "optional": true
+    },
+    {
+      "id": "legal_privacy_policy_tables_v113ccc0c",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -5282,6 +6529,11 @@
       "optional": true
     },
     {
+      "id": "legal_sow_extraction_hints_vfb984862",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "legal_sow_sections",
       "dependsOn": [
         "legal_doc_type_catalog"
@@ -5289,10 +6541,20 @@
       "optional": true
     },
     {
+      "id": "legal_sow_sections_v24240fd6",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "legal_sow_tables",
       "dependsOn": [
         "legal_doc_type_catalog"
       ],
+      "optional": true
+    },
+    {
+      "id": "legal_sow_tables_v23424409",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -5375,6 +6637,25 @@
       "dependsOn": []
     },
     {
+      "id": "llm_cost_table",
+      "dependsOn": []
+    },
+    {
+      "id": "llm_global_guards",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "llm_minimal_safe_prompt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "llm_nav_pills_contract",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "locale_numeric_date_rules",
       "dependsOn": [],
       "optional": true
@@ -5384,10 +6665,55 @@
       "dependsOn": []
     },
     {
+      "id": "marketing_difficulty_mapping",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "marketing_event_mapping",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "marketing_pain_point_signals",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "marketing_probe_schema",
       "dependsOn": [
         "bank_registry"
       ]
+    },
+    {
+      "id": "marketing_query_templates",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "marketing_risk_tier_mapping",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "marketing_topic_clusters_finance",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "marketing_topic_clusters_legal",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "marketing_topic_clusters_medical",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "marketing_topic_clusters_ops",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "medical_abbreviations_en",
@@ -5397,10 +6723,20 @@
       "optional": true
     },
     {
+      "id": "medical_abbreviations_en_ve94da59c",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "medical_abbreviations_pt",
       "dependsOn": [
         "medical_domain_profile"
       ],
+      "optional": true
+    },
+    {
+      "id": "medical_abbreviations_pt_v5a704629",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -5520,10 +6856,20 @@
       "optional": true
     },
     {
+      "id": "medical_lexicon_en_v5cc95d35",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "medical_lexicon_pt",
       "dependsOn": [
         "medical_domain_profile"
       ],
+      "optional": true
+    },
+    {
+      "id": "medical_lexicon_pt_v2852e464",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -6168,6 +7514,31 @@
       ]
     },
     {
+      "id": "money_patterns_v743656d7",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "nav_failure_recovery",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "nav_intents_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "nav_intents_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "negative_retrieval_patterns",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "no_docs_messages",
       "dependsOn": []
     },
@@ -6183,10 +7554,25 @@
       "optional": true
     },
     {
+      "id": "numeric_reconciliation_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "ontology_schema",
       "dependsOn": [
         "bank_schema"
       ]
+    },
+    {
+      "id": "open_disambiguation",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "openers",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "operator_catalog",
@@ -6215,6 +7601,61 @@
       "dependsOn": [
         "operator_contracts"
       ]
+    },
+    {
+      "id": "operator_patterns_advise",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "operator_patterns_calculate",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "operator_patterns_compare",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "operator_patterns_evaluate",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "operator_patterns_extract",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "operator_patterns_locate",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "operator_patterns_monitor",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "operator_patterns_navigate",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "operator_patterns_open",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "operator_patterns_summarize",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "operator_patterns_validate",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "operator_playbook_advise_finance",
@@ -6631,10 +8072,285 @@
       ]
     },
     {
+      "id": "party_patterns_vf0714139",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "path_string_guardrails",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "pattern_library",
       "dependsOn": [
         "document_intelligence_bank_map"
       ],
+      "optional": true
+    },
+    {
+      "id": "patterns_core_aggregation_patterns",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_core_entity_mentions",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_core_intent_families",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_core_multi_intent_connectors_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_core_multi_intent_connectors_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_core_question_shapes",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_core_time_scope_patterns",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_doc_refs_doc_ref_phrases_accounting",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_doc_refs_doc_ref_phrases_everyday",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_doc_refs_doc_ref_phrases_finance",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_doc_refs_doc_ref_phrases_legal",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_doc_refs_doc_ref_phrases_medical",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_doc_refs_doc_set_compare_patterns",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_doc_refs_folder_scope_patterns",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_doc_refs_versioning_patterns",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_domains_accounting_aging_report_patterns",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_domains_accounting_gl_export_patterns",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_domains_accounting_journal_entry_patterns",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_domains_accounting_reconciliation_patterns",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_domains_accounting_trial_balance_patterns",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_domains_finance_anomaly_patterns",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_domains_finance_footnote_priority_patterns",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_domains_finance_kpi_patterns",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_domains_finance_period_and_unit_patterns",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_domains_finance_statement_structures",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_domains_legal_amendment_and_version_patterns",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_domains_legal_clause_patterns",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_domains_legal_cross_reference_patterns",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_domains_legal_quote_requirements",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_domains_legal_risk_flag_patterns",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_editor_anchor_resolution_patterns",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_editor_apply_undo_intents_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_editor_apply_undo_intents_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_editor_highlight_intents_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_editor_highlight_intents_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_editor_locate_target_phrases",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_editor_multi_selection_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_editor_scope_precedence_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_editor_selection_intents_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_editor_selection_intents_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_files_bulk_actions",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_files_folder_tree_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_files_folder_tree_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_files_move_copy_rename_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_files_move_copy_rename_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_medical_encounter_timeline_patterns",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_medical_lab_panel_patterns",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_medical_red_flag_patterns",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_medical_safety_boundary_triggers",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_medical_unit_reference_patterns",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_modes_mode_switch_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_modes_mode_switch_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "patterns_modes_preview_vs_apply",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -6671,6 +8387,14 @@
       "optional": true
     },
     {
+      "id": "provider_capabilities",
+      "dependsOn": []
+    },
+    {
+      "id": "provider_fallbacks",
+      "dependsOn": []
+    },
+    {
       "id": "python_chart_recipes",
       "dependsOn": [],
       "optional": true
@@ -6694,6 +8418,11 @@
       "optional": true
     },
     {
+      "id": "quality_ambiguity_triggers",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "quality_document_intelligence_schema",
       "dependsOn": [
         "bank_registry"
@@ -6704,12 +8433,47 @@
       "dependsOn": []
     },
     {
+      "id": "quality_language_lock_triggers",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "quality_numeric_integrity_triggers",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "quality_unsafe_operation_triggers",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "quality_weak_evidence_triggers",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "quality_wrong_doc_risk_triggers",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "quarantine_2026_02_memory_audit_bank_generation_report",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "query_family_catalog",
       "dependsOn": [],
       "optional": true
     },
     {
       "id": "query_intent_patterns",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "query_rewrite_policies",
       "dependsOn": [],
       "optional": true
     },
@@ -6749,6 +8513,11 @@
     },
     {
       "id": "query_slot_contracts",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "quote_integrity_rules",
       "dependsOn": [],
       "optional": true
     },
@@ -6805,6 +8574,11 @@
       "optional": true
     },
     {
+      "id": "reports_bank_audit_report",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "response_templates",
       "dependsOn": [],
       "optional": true
@@ -6839,6 +8613,11 @@
       "optional": true
     },
     {
+      "id": "safety_tone_overrides",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "scope_hints",
       "dependsOn": [],
       "optional": true
@@ -6856,6 +8635,16 @@
     {
       "id": "scoped_not_found_messages",
       "dependsOn": []
+    },
+    {
+      "id": "search_intents_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "search_intents_pt",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "secrets_rotation_policy",
@@ -6899,10 +8688,30 @@
       "dependsOn": []
     },
     {
+      "id": "semantic_vs_lexical_router",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "send_intents_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "send_intents_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "sheetname_patterns",
       "dependsOn": [
         "doc_taxonomy"
       ]
+    },
+    {
+      "id": "sheetname_patterns_vd1212689",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "slot_extraction_cases",
@@ -6944,6 +8753,16 @@
       "dependsOn": []
     },
     {
+      "id": "sync_intents_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "sync_intents_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "synonym_expansion",
       "dependsOn": []
     },
@@ -6958,10 +8777,20 @@
       "optional": true
     },
     {
+      "id": "table_cell_evidence_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "table_header_ontology_accounting",
       "dependsOn": [
         "doc_taxonomy"
       ],
+      "optional": true
+    },
+    {
+      "id": "table_header_ontology_accounting_v440f0106",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -6980,10 +8809,20 @@
       "optional": true
     },
     {
+      "id": "table_header_ontology_everyday_v37e0344c",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "table_header_ontology_finance",
       "dependsOn": [
         "doc_archetypes_finance"
       ]
+    },
+    {
+      "id": "table_header_ontology_finance_v5baba7af",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "table_header_ontology_insurance",
@@ -6997,10 +8836,20 @@
       ]
     },
     {
+      "id": "table_header_ontology_legal_v439d4f7c",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "table_header_ontology_medical",
       "dependsOn": [
         "doc_archetypes_medical"
       ]
+    },
+    {
+      "id": "table_header_ontology_medical_ved51f076",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "table_header_ontology_ops",
@@ -7039,12 +8888,22 @@
       "optional": true
     },
     {
+      "id": "token_rate_limits",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "tone_profiles",
       "dependsOn": [],
       "optional": true
     },
     {
       "id": "tool_prompts",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "transition_phrases",
       "dependsOn": [],
       "optional": true
     },
@@ -7059,7 +8918,32 @@
       "optional": true
     },
     {
+      "id": "ui_highlight_styles",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "ui_receipt_shapes",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "unsafe_inference_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "unused_bank_lifecycle",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "verb_phrase_bank",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "verbosity_ladder",
       "dependsOn": [],
       "optional": true
     },
@@ -7093,6 +8977,11 @@
     },
     {
       "id": "viewer_source_navigation_microcopy",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "voice_personality_profiles",
       "dependsOn": [],
       "optional": true
     },

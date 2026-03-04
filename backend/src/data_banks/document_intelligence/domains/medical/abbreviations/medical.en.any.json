@@ -1,12 +1,19 @@
 {
   "_meta": {
-    "id": "medical_abbreviations_en",
+    "id": "medical_abbreviations_en_ve94da59c",
     "version": "1.0.0",
     "description": "English abbreviations for medical domain.",
     "languages": [
       "en"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-02-28",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,

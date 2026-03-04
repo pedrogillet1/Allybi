@@ -217,6 +217,7 @@ describe("RuntimeWiringIntegrityService – structural contract", () => {
     const expectedFields: Array<keyof typeof result> = [
       "ok",
       "missingBanks",
+      "missingLlmRoutingPolicyBanks",
       "missingRuntimePolicyConsumers",
       "runtimePolicyEnvGaps",
       "missingOperatorContracts",
@@ -353,6 +354,25 @@ describe("RuntimeWiringIntegrityService – missing banks", () => {
     wireCleanBanks();
     const result = buildService().validate();
     expect(result.missingBanks).toHaveLength(0);
+  });
+
+  test("missingLlmRoutingPolicyBanks reports missing llm policy banks explicitly", () => {
+    const banks = makeCleanBanks();
+    delete banks.provider_capabilities;
+    delete banks.provider_fallbacks;
+    delete banks.composition_lane_policy;
+    mockedGetOptionalBank.mockImplementation(
+      (id: string) => (banks[id] ?? null) as ReturnType<typeof getOptionalBank>,
+    );
+
+    const result = buildService().validate();
+    expect(result.missingLlmRoutingPolicyBanks).toEqual(
+      expect.arrayContaining([
+        "provider_capabilities",
+        "provider_fallbacks",
+        "composition_lane_policy",
+      ]),
+    );
   });
 });
 

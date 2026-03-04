@@ -1,12 +1,19 @@
 {
   "_meta": {
-    "id": "legal_lexicon_en",
+    "id": "legal_lexicon_en_v28fa8616",
     "version": "2.1.0",
     "description": "English legal lexicon for clause-aware extraction, retrieval, and policy checks.",
     "languages": [
       "en"
     ],
-    "lastUpdated": "2026-03-03"
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -15,65 +22,597 @@
   },
   "domain": "legal",
   "terms": [
-    { "id": "legal_term_001", "canonical": "agreement", "synonyms": ["agreement", "contract", "document"], "display": "Agreement" },
-    { "id": "legal_term_002", "canonical": "non-disclosure agreement", "synonyms": ["NDA", "confidentiality agreement"], "display": "Non-Disclosure Agreement" },
-    { "id": "legal_term_003", "canonical": "master services agreement", "synonyms": ["MSA", "master service agreement", "services agreement"], "display": "Master Services Agreement" },
-    { "id": "legal_term_004", "canonical": "statement of work", "synonyms": ["SOW", "work order", "statement of work"], "display": "Statement of Work" },
-    { "id": "legal_term_005", "canonical": "data processing agreement", "synonyms": ["DPA", "processor agreement"], "display": "Data Processing Agreement" },
-    { "id": "legal_term_006", "canonical": "parties", "synonyms": ["party", "counterparty", "party names"], "display": "Parties" },
-    { "id": "legal_term_007", "canonical": "governing law", "synonyms": ["governing law", "applicable law", "choice of law"], "display": "Governing Law" },
-    { "id": "legal_term_008", "canonical": "jurisdiction", "synonyms": ["forum", "venue", "competent court"], "display": "Jurisdiction" },
-    { "id": "legal_term_009", "canonical": "confidential information", "synonyms": ["confidential information", "proprietary information", "non-public information"], "display": "Confidential Information" },
-    { "id": "legal_term_010", "canonical": "confidentiality", "synonyms": ["confidentiality clause", "non-disclosure", "confidential treatment"], "display": "Confidentiality" },
-    { "id": "legal_term_011", "canonical": "term", "synonyms": ["effective date", "term", "initial term"], "display": "Term" },
-    { "id": "legal_term_012", "canonical": "termination", "synonyms": ["termination", "termination for convenience", "termination for cause", "termination clause"], "display": "Termination" },
-    { "id": "legal_term_013", "canonical": "cure period", "synonyms": ["cure period", "cure window", "remedy period"], "display": "Cure Period" },
-    { "id": "legal_term_014", "canonical": "renewal", "synonyms": ["automatic renewal", "renewal term", "extensions"], "display": "Renewal" },
-    { "id": "legal_term_015", "canonical": "termination fee", "synonyms": ["termination fee", "liquidated damages"], "display": "Termination Fee" },
-    { "id": "legal_term_016", "canonical": "liability", "synonyms": ["liability", "damages liability", "contractual liability"], "display": "Liability" },
-    { "id": "legal_term_017", "canonical": "indemnity", "synonyms": ["indemnify", "indemnification", "indemnity obligation"], "display": "Indemnity" },
-    { "id": "legal_term_018", "canonical": "limitation of liability", "synonyms": ["liability cap", "cap amount", "exclusion of damages"], "display": "Limitation of Liability" },
-    { "id": "legal_term_019", "canonical": "exclusion of liability", "synonyms": ["no liability", "liability exclusion", "consequential damages"], "display": "Exclusion of Liability" },
-    { "id": "legal_term_020", "canonical": "warranty", "synonyms": ["representations and warranties", "warranty", "representation"], "display": "Warranty" },
-    { "id": "legal_term_021", "canonical": "representation", "synonyms": ["representation", "rep", "rep and warranty"], "display": "Representation" },
-    { "id": "legal_term_022", "canonical": "breach", "synonyms": ["breach", "material breach", "contract breach"], "display": "Breach" },
-    { "id": "legal_term_023", "canonical": "remedy", "synonyms": ["remedy", "recourse", "remedies"], "display": "Remedy" },
-    { "id": "legal_term_024", "canonical": "default", "synonyms": ["default", "event of default", "default event"], "display": "Default" },
-    { "id": "legal_term_025", "canonical": "dispute resolution", "synonyms": ["dispute resolution", "arbitration", "mediation", "litigation"], "display": "Dispute Resolution" },
-    { "id": "legal_term_026", "canonical": "notice", "synonyms": ["notice", "written notice", "service of notice"], "display": "Notice" },
-    { "id": "legal_term_027", "canonical": "notice period", "synonyms": ["notice period", "advance notice", "notification period"], "display": "Notice Period" },
-    { "id": "legal_term_028", "canonical": "definition", "synonyms": ["definition", "defined term", "for avoidance of doubt"], "display": "Definition" },
-    { "id": "legal_term_029", "canonical": "exceptions", "synonyms": ["except as set forth", "exceptions", "carve-out"], "display": "Exceptions" },
-    { "id": "legal_term_030", "canonical": "controller", "synonyms": ["data controller", "controller"], "display": "Controller" },
-    { "id": "legal_term_031", "canonical": "processor", "synonyms": ["data processor", "processor"], "display": "Processor" },
-    { "id": "legal_term_032", "canonical": "personal data", "synonyms": ["personal data", "personal information", "sensitive personal data"], "display": "Personal Data" },
-    { "id": "legal_term_033", "canonical": "data security", "synonyms": ["security", "data security", "information security"], "display": "Data Security" },
-    { "id": "legal_term_034", "canonical": "data breach", "synonyms": ["security incident", "breach notification"], "display": "Data Breach" },
-    { "id": "legal_term_035", "canonical": "subprocessor", "synonyms": ["subprocessor", "agent", "sub-contractor"], "display": "Subprocessor" },
-    { "id": "legal_term_036", "canonical": "conflict of law", "synonyms": ["conflict of laws", "applicable law"], "display": "Conflict of Law" },
-    { "id": "legal_term_037", "canonical": "force majeure", "synonyms": ["force majeure", "act of God"], "display": "Force Majeure" },
-    { "id": "legal_term_038", "canonical": "audit", "synonyms": ["audit", "audit right", "audit rights"], "display": "Audit Rights" },
-    { "id": "legal_term_039", "canonical": "compliance", "synonyms": ["compliance", "regulatory compliance", "legal compliance"], "display": "Compliance" },
-    { "id": "legal_term_040", "canonical": "governance", "synonyms": ["governance", "governance framework"], "display": "Governance" },
-    { "id": "legal_term_041", "canonical": "assignment", "synonyms": ["assignment", "assign", "assignment of rights"], "display": "Assignment" },
-    { "id": "legal_term_042", "canonical": "amendment", "synonyms": ["amendment", "modification", "change order"], "display": "Amendment" },
-    { "id": "legal_term_043", "canonical": "addendum", "synonyms": ["addendum", "supplement", "schedule"], "display": "Addendum" },
-    { "id": "legal_term_044", "canonical": "surrender", "synonyms": ["surrender", "forfeit"], "display": "Surrender" },
-    { "id": "legal_term_045", "canonical": "intellectual property", "synonyms": ["IP", "intellectual property", "copyrights"], "display": "Intellectual Property" },
-    { "id": "legal_term_046", "canonical": "license", "synonyms": ["license", "licensing", "granted license"], "display": "License" },
-    { "id": "legal_term_047", "canonical": "grant of rights", "synonyms": ["right to use", "license grant", "granted rights"], "display": "Grant of Rights" },
-    { "id": "legal_term_048", "canonical": "scope of services", "synonyms": ["scope of services", "services", "work scope"], "display": "Scope of Services" },
-    { "id": "legal_term_049", "canonical": "fees", "synonyms": ["fees", "service fees", "cost", "compensation"], "display": "Fees" },
-    { "id": "legal_term_050", "canonical": "payment terms", "synonyms": ["payment terms", "invoice terms", "net days"], "display": "Payment Terms" },
-    { "id": "legal_term_051", "canonical": "intellectual property indemnity", "synonyms": ["IP indemnity", "IP infringement liability", "IP claim"], "display": "Intellectual Property Indemnity" },
-    { "id": "legal_term_052", "canonical": "non-solicitation", "synonyms": ["non-solicit", "non-solicitation clause", "non-solicit"], "display": "Non-Solicitation" },
-    { "id": "legal_term_053", "canonical": "non-compete", "synonyms": ["non-compete", "non-competition", "competition restraint"], "display": "Non-Compete" },
-    { "id": "legal_term_054", "canonical": "survival", "synonyms": ["survive", "survival clause", "post-termination obligations"], "display": "Survival" },
-    { "id": "legal_term_055", "canonical": "forceful language", "synonyms": ["notwithstanding", "for purposes of", "sole remedy"], "display": "Legal Priority Language" },
-    { "id": "legal_term_056", "canonical": "entire agreement", "synonyms": ["entire agreement", "full and complete agreement"], "display": "Entire Agreement" },
-    { "id": "legal_term_057", "canonical": "severability", "synonyms": ["severability", "severable provisions", "invalidity"], "display": "Severability" },
-    { "id": "legal_term_058", "canonical": "waiver", "synonyms": ["waiver", "waive", "failure to enforce"], "display": "Waiver" },
-    { "id": "legal_term_059", "canonical": "counterparts", "synonyms": ["counterparts", "counterpart execution", "counterpart page"], "display": "Counterparts" },
-    { "id": "legal_term_060", "canonical": "assignment and transfer", "synonyms": ["assignment", "delegation", "transfer"], "display": "Assignment and Transfer" }
+    {
+      "id": "legal_term_001",
+      "canonical": "agreement",
+      "synonyms": [
+        "agreement",
+        "contract",
+        "document"
+      ],
+      "display": "Agreement"
+    },
+    {
+      "id": "legal_term_002",
+      "canonical": "non-disclosure agreement",
+      "synonyms": [
+        "NDA",
+        "confidentiality agreement"
+      ],
+      "display": "Non-Disclosure Agreement"
+    },
+    {
+      "id": "legal_term_003",
+      "canonical": "master services agreement",
+      "synonyms": [
+        "MSA",
+        "master service agreement",
+        "services agreement"
+      ],
+      "display": "Master Services Agreement"
+    },
+    {
+      "id": "legal_term_004",
+      "canonical": "statement of work",
+      "synonyms": [
+        "SOW",
+        "work order",
+        "statement of work"
+      ],
+      "display": "Statement of Work"
+    },
+    {
+      "id": "legal_term_005",
+      "canonical": "data processing agreement",
+      "synonyms": [
+        "DPA",
+        "processor agreement"
+      ],
+      "display": "Data Processing Agreement"
+    },
+    {
+      "id": "legal_term_006",
+      "canonical": "parties",
+      "synonyms": [
+        "party",
+        "counterparty",
+        "party names"
+      ],
+      "display": "Parties"
+    },
+    {
+      "id": "legal_term_007",
+      "canonical": "governing law",
+      "synonyms": [
+        "governing law",
+        "applicable law",
+        "choice of law"
+      ],
+      "display": "Governing Law"
+    },
+    {
+      "id": "legal_term_008",
+      "canonical": "jurisdiction",
+      "synonyms": [
+        "forum",
+        "venue",
+        "competent court"
+      ],
+      "display": "Jurisdiction"
+    },
+    {
+      "id": "legal_term_009",
+      "canonical": "confidential information",
+      "synonyms": [
+        "confidential information",
+        "proprietary information",
+        "non-public information"
+      ],
+      "display": "Confidential Information"
+    },
+    {
+      "id": "legal_term_010",
+      "canonical": "confidentiality",
+      "synonyms": [
+        "confidentiality clause",
+        "non-disclosure",
+        "confidential treatment"
+      ],
+      "display": "Confidentiality"
+    },
+    {
+      "id": "legal_term_011",
+      "canonical": "term",
+      "synonyms": [
+        "effective date",
+        "term",
+        "initial term"
+      ],
+      "display": "Term"
+    },
+    {
+      "id": "legal_term_012",
+      "canonical": "termination",
+      "synonyms": [
+        "termination",
+        "termination for convenience",
+        "termination for cause",
+        "termination clause"
+      ],
+      "display": "Termination"
+    },
+    {
+      "id": "legal_term_013",
+      "canonical": "cure period",
+      "synonyms": [
+        "cure period",
+        "cure window",
+        "remedy period"
+      ],
+      "display": "Cure Period"
+    },
+    {
+      "id": "legal_term_014",
+      "canonical": "renewal",
+      "synonyms": [
+        "automatic renewal",
+        "renewal term",
+        "extensions"
+      ],
+      "display": "Renewal"
+    },
+    {
+      "id": "legal_term_015",
+      "canonical": "termination fee",
+      "synonyms": [
+        "termination fee",
+        "liquidated damages"
+      ],
+      "display": "Termination Fee"
+    },
+    {
+      "id": "legal_term_016",
+      "canonical": "liability",
+      "synonyms": [
+        "liability",
+        "damages liability",
+        "contractual liability"
+      ],
+      "display": "Liability"
+    },
+    {
+      "id": "legal_term_017",
+      "canonical": "indemnity",
+      "synonyms": [
+        "indemnify",
+        "indemnification",
+        "indemnity obligation"
+      ],
+      "display": "Indemnity"
+    },
+    {
+      "id": "legal_term_018",
+      "canonical": "limitation of liability",
+      "synonyms": [
+        "liability cap",
+        "cap amount",
+        "exclusion of damages"
+      ],
+      "display": "Limitation of Liability"
+    },
+    {
+      "id": "legal_term_019",
+      "canonical": "exclusion of liability",
+      "synonyms": [
+        "no liability",
+        "liability exclusion",
+        "consequential damages"
+      ],
+      "display": "Exclusion of Liability"
+    },
+    {
+      "id": "legal_term_020",
+      "canonical": "warranty",
+      "synonyms": [
+        "representations and warranties",
+        "warranty",
+        "representation"
+      ],
+      "display": "Warranty"
+    },
+    {
+      "id": "legal_term_021",
+      "canonical": "representation",
+      "synonyms": [
+        "representation",
+        "rep",
+        "rep and warranty"
+      ],
+      "display": "Representation"
+    },
+    {
+      "id": "legal_term_022",
+      "canonical": "breach",
+      "synonyms": [
+        "breach",
+        "material breach",
+        "contract breach"
+      ],
+      "display": "Breach"
+    },
+    {
+      "id": "legal_term_023",
+      "canonical": "remedy",
+      "synonyms": [
+        "remedy",
+        "recourse",
+        "remedies"
+      ],
+      "display": "Remedy"
+    },
+    {
+      "id": "legal_term_024",
+      "canonical": "default",
+      "synonyms": [
+        "default",
+        "event of default",
+        "default event"
+      ],
+      "display": "Default"
+    },
+    {
+      "id": "legal_term_025",
+      "canonical": "dispute resolution",
+      "synonyms": [
+        "dispute resolution",
+        "arbitration",
+        "mediation",
+        "litigation"
+      ],
+      "display": "Dispute Resolution"
+    },
+    {
+      "id": "legal_term_026",
+      "canonical": "notice",
+      "synonyms": [
+        "notice",
+        "written notice",
+        "service of notice"
+      ],
+      "display": "Notice"
+    },
+    {
+      "id": "legal_term_027",
+      "canonical": "notice period",
+      "synonyms": [
+        "notice period",
+        "advance notice",
+        "notification period"
+      ],
+      "display": "Notice Period"
+    },
+    {
+      "id": "legal_term_028",
+      "canonical": "definition",
+      "synonyms": [
+        "definition",
+        "defined term",
+        "for avoidance of doubt"
+      ],
+      "display": "Definition"
+    },
+    {
+      "id": "legal_term_029",
+      "canonical": "exceptions",
+      "synonyms": [
+        "except as set forth",
+        "exceptions",
+        "carve-out"
+      ],
+      "display": "Exceptions"
+    },
+    {
+      "id": "legal_term_030",
+      "canonical": "controller",
+      "synonyms": [
+        "data controller",
+        "controller"
+      ],
+      "display": "Controller"
+    },
+    {
+      "id": "legal_term_031",
+      "canonical": "processor",
+      "synonyms": [
+        "data processor",
+        "processor"
+      ],
+      "display": "Processor"
+    },
+    {
+      "id": "legal_term_032",
+      "canonical": "personal data",
+      "synonyms": [
+        "personal data",
+        "personal information",
+        "sensitive personal data"
+      ],
+      "display": "Personal Data"
+    },
+    {
+      "id": "legal_term_033",
+      "canonical": "data security",
+      "synonyms": [
+        "security",
+        "data security",
+        "information security"
+      ],
+      "display": "Data Security"
+    },
+    {
+      "id": "legal_term_034",
+      "canonical": "data breach",
+      "synonyms": [
+        "security incident",
+        "breach notification"
+      ],
+      "display": "Data Breach"
+    },
+    {
+      "id": "legal_term_035",
+      "canonical": "subprocessor",
+      "synonyms": [
+        "subprocessor",
+        "agent",
+        "sub-contractor"
+      ],
+      "display": "Subprocessor"
+    },
+    {
+      "id": "legal_term_036",
+      "canonical": "conflict of law",
+      "synonyms": [
+        "conflict of laws",
+        "applicable law"
+      ],
+      "display": "Conflict of Law"
+    },
+    {
+      "id": "legal_term_037",
+      "canonical": "force majeure",
+      "synonyms": [
+        "force majeure",
+        "act of God"
+      ],
+      "display": "Force Majeure"
+    },
+    {
+      "id": "legal_term_038",
+      "canonical": "audit",
+      "synonyms": [
+        "audit",
+        "audit right",
+        "audit rights"
+      ],
+      "display": "Audit Rights"
+    },
+    {
+      "id": "legal_term_039",
+      "canonical": "compliance",
+      "synonyms": [
+        "compliance",
+        "regulatory compliance",
+        "legal compliance"
+      ],
+      "display": "Compliance"
+    },
+    {
+      "id": "legal_term_040",
+      "canonical": "governance",
+      "synonyms": [
+        "governance",
+        "governance framework"
+      ],
+      "display": "Governance"
+    },
+    {
+      "id": "legal_term_041",
+      "canonical": "assignment",
+      "synonyms": [
+        "assignment",
+        "assign",
+        "assignment of rights"
+      ],
+      "display": "Assignment"
+    },
+    {
+      "id": "legal_term_042",
+      "canonical": "amendment",
+      "synonyms": [
+        "amendment",
+        "modification",
+        "change order"
+      ],
+      "display": "Amendment"
+    },
+    {
+      "id": "legal_term_043",
+      "canonical": "addendum",
+      "synonyms": [
+        "addendum",
+        "supplement",
+        "schedule"
+      ],
+      "display": "Addendum"
+    },
+    {
+      "id": "legal_term_044",
+      "canonical": "surrender",
+      "synonyms": [
+        "surrender",
+        "forfeit"
+      ],
+      "display": "Surrender"
+    },
+    {
+      "id": "legal_term_045",
+      "canonical": "intellectual property",
+      "synonyms": [
+        "IP",
+        "intellectual property",
+        "copyrights"
+      ],
+      "display": "Intellectual Property"
+    },
+    {
+      "id": "legal_term_046",
+      "canonical": "license",
+      "synonyms": [
+        "license",
+        "licensing",
+        "granted license"
+      ],
+      "display": "License"
+    },
+    {
+      "id": "legal_term_047",
+      "canonical": "grant of rights",
+      "synonyms": [
+        "right to use",
+        "license grant",
+        "granted rights"
+      ],
+      "display": "Grant of Rights"
+    },
+    {
+      "id": "legal_term_048",
+      "canonical": "scope of services",
+      "synonyms": [
+        "scope of services",
+        "services",
+        "work scope"
+      ],
+      "display": "Scope of Services"
+    },
+    {
+      "id": "legal_term_049",
+      "canonical": "fees",
+      "synonyms": [
+        "fees",
+        "service fees",
+        "cost",
+        "compensation"
+      ],
+      "display": "Fees"
+    },
+    {
+      "id": "legal_term_050",
+      "canonical": "payment terms",
+      "synonyms": [
+        "payment terms",
+        "invoice terms",
+        "net days"
+      ],
+      "display": "Payment Terms"
+    },
+    {
+      "id": "legal_term_051",
+      "canonical": "intellectual property indemnity",
+      "synonyms": [
+        "IP indemnity",
+        "IP infringement liability",
+        "IP claim"
+      ],
+      "display": "Intellectual Property Indemnity"
+    },
+    {
+      "id": "legal_term_052",
+      "canonical": "non-solicitation",
+      "synonyms": [
+        "non-solicit",
+        "non-solicitation clause",
+        "non-solicit"
+      ],
+      "display": "Non-Solicitation"
+    },
+    {
+      "id": "legal_term_053",
+      "canonical": "non-compete",
+      "synonyms": [
+        "non-compete",
+        "non-competition",
+        "competition restraint"
+      ],
+      "display": "Non-Compete"
+    },
+    {
+      "id": "legal_term_054",
+      "canonical": "survival",
+      "synonyms": [
+        "survive",
+        "survival clause",
+        "post-termination obligations"
+      ],
+      "display": "Survival"
+    },
+    {
+      "id": "legal_term_055",
+      "canonical": "forceful language",
+      "synonyms": [
+        "notwithstanding",
+        "for purposes of",
+        "sole remedy"
+      ],
+      "display": "Legal Priority Language"
+    },
+    {
+      "id": "legal_term_056",
+      "canonical": "entire agreement",
+      "synonyms": [
+        "entire agreement",
+        "full and complete agreement"
+      ],
+      "display": "Entire Agreement"
+    },
+    {
+      "id": "legal_term_057",
+      "canonical": "severability",
+      "synonyms": [
+        "severability",
+        "severable provisions",
+        "invalidity"
+      ],
+      "display": "Severability"
+    },
+    {
+      "id": "legal_term_058",
+      "canonical": "waiver",
+      "synonyms": [
+        "waiver",
+        "waive",
+        "failure to enforce"
+      ],
+      "display": "Waiver"
+    },
+    {
+      "id": "legal_term_059",
+      "canonical": "counterparts",
+      "synonyms": [
+        "counterparts",
+        "counterpart execution",
+        "counterpart page"
+      ],
+      "display": "Counterparts"
+    },
+    {
+      "id": "legal_term_060",
+      "canonical": "assignment and transfer",
+      "synonyms": [
+        "assignment",
+        "delegation",
+        "transfer"
+      ],
+      "display": "Assignment and Transfer"
+    }
   ]
 }

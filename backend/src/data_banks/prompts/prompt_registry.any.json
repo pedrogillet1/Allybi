@@ -3,8 +3,20 @@
     "id": "prompt_registry",
     "version": "2.2.0",
     "description": "Canonical runtime prompt registry. Defines layered prompt composition and deterministic task selection.",
-    "languages": ["any", "en", "pt", "es"],
-    "lastUpdated": "2026-03-02"
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-03-02",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -25,93 +37,200 @@
       "path": "prompts/system_base.any.json",
       "required": true,
       "purpose": "Global, always-on system constraints.",
-      "appliesTo": { "allOperators": true, "allDomains": true }
+      "appliesTo": {
+        "allOperators": true,
+        "allDomains": true
+      }
     },
     {
       "id": "mode_chat",
       "path": "prompts/mode_chat.any.json",
       "required": true,
       "purpose": "Chat mode behavior.",
-      "appliesTo": { "allOperators": true, "allDomains": true }
+      "appliesTo": {
+        "allOperators": true,
+        "allDomains": true
+      }
     },
     {
       "id": "mode_editing",
       "path": "prompts/mode_editing.any.json",
       "required": true,
       "purpose": "Editing mode behavior.",
-      "appliesTo": { "operators": ["rewrite", "translate", "format", "plan_edit"] }
+      "appliesTo": {
+        "operators": [
+          "rewrite",
+          "translate",
+          "format",
+          "plan_edit"
+        ]
+      }
     },
     {
       "id": "rag_policy",
       "path": "prompts/rag_policy.any.json",
       "required": true,
       "purpose": "RAG grounding and injection resistance.",
-      "appliesTo": { "allOperators": true, "allDomains": true }
+      "appliesTo": {
+        "allOperators": true,
+        "allDomains": true
+      }
     },
     {
       "id": "policy_citations",
       "path": "prompts/policy_citations.any.json",
       "required": true,
       "purpose": "Attachment-based citation contract (no inline Sources block).",
-      "appliesTo": { "allOperators": true, "allDomains": true }
+      "appliesTo": {
+        "allOperators": true,
+        "allDomains": true
+      }
     },
     {
       "id": "task_answer_with_sources",
       "path": "prompts/task_answer_with_sources.any.json",
       "required": true,
       "purpose": "Final user-answer composition contract.",
-      "appliesTo": { "allOperators": true, "allDomains": true }
+      "appliesTo": {
+        "allOperators": true,
+        "allDomains": true
+      }
     },
     {
       "id": "task_plan_generation",
       "path": "prompts/task_plan_generation.any.json",
       "required": true,
       "purpose": "Schema-bound planner generation contract.",
-      "appliesTo": { "operators": ["plan_edit", "plan_multi_intent", "plan_docx", "plan_xlsx"] }
+      "appliesTo": {
+        "operators": [
+          "plan_edit",
+          "plan_multi_intent",
+          "plan_docx",
+          "plan_xlsx"
+        ]
+      }
     },
     {
       "id": "editing_task_prompts",
       "path": "prompts/editing_task_prompts.any.json",
       "required": true,
       "purpose": "Task-specific editing prompts migrated from legacy runtime strings.",
-      "appliesTo": { "operators": ["docx_bullet_enhance", "docx_line_rewrite", "docx_list_to_paragraph", "docx_section_to_paragraph", "docx_translate_batch", "docx_translate_retry", "docx_translate_single", "paragraph_to_bullets", "rewrite_paragraph", "rewrite_span", "insert_paragraph_below_list", "email_qa", "email_explain", "provisional_indexing_answer", "nav_reasoning_summary", "conversation_title"] }
+      "appliesTo": {
+        "operators": [
+          "docx_bullet_enhance",
+          "docx_line_rewrite",
+          "docx_list_to_paragraph",
+          "docx_section_to_paragraph",
+          "docx_translate_batch",
+          "docx_translate_retry",
+          "docx_translate_single",
+          "paragraph_to_bullets",
+          "rewrite_paragraph",
+          "rewrite_span",
+          "insert_paragraph_below_list",
+          "email_qa",
+          "email_explain",
+          "provisional_indexing_answer",
+          "nav_reasoning_summary",
+          "conversation_title"
+        ]
+      }
     },
     {
       "id": "retrieval_prompt",
       "path": "prompts/retrieval_prompt.any.json",
       "required": true,
       "purpose": "Retrieval planning contract.",
-      "appliesTo": { "operators": ["locate_docs", "locate_content", "extract", "summarize", "compare", "compute", "quote"] }
+      "appliesTo": {
+        "operators": [
+          "locate_docs",
+          "locate_content",
+          "extract",
+          "summarize",
+          "compare",
+          "compute",
+          "quote"
+        ]
+      }
     },
     {
       "id": "disambiguation_prompt",
       "path": "prompts/disambiguation_prompt.any.json",
       "required": true,
       "purpose": "Single-question disambiguation prompt.",
-      "appliesTo": { "operators": ["locate_docs", "open", "locate_file", "extract", "summarize", "compare", "compute", "quote"] }
+      "appliesTo": {
+        "operators": [
+          "locate_docs",
+          "open",
+          "locate_file",
+          "extract",
+          "summarize",
+          "compare",
+          "compute",
+          "quote"
+        ]
+      }
     },
     {
       "id": "fallback_prompt",
       "path": "prompts/fallback_prompt.any.json",
       "required": true,
       "purpose": "Adaptive fallback message template.",
-      "appliesTo": { "allOperators": true, "allDomains": true }
+      "appliesTo": {
+        "allOperators": true,
+        "allDomains": true
+      }
     },
     {
       "id": "tool_prompts",
       "path": "prompts/tool_prompts.any.json",
       "required": false,
       "purpose": "Tool-specific helper prompts.",
-      "appliesTo": { "operators": ["extract", "compute", "locate_content"] }
+      "appliesTo": {
+        "operators": [
+          "extract",
+          "compute",
+          "locate_content"
+        ]
+      }
     }
   ],
   "layersByKind": {
-    "system": ["system_base"],
-    "compose_answer": ["system_base", "mode_chat", "rag_policy", "task_answer_with_sources", "policy_citations"],
-    "retrieval": ["system_base", "mode_chat", "rag_policy", "retrieval_prompt"],
-    "disambiguation": ["system_base", "mode_chat", "disambiguation_prompt"],
-    "fallback": ["system_base", "mode_chat", "fallback_prompt", "policy_citations"],
-    "tool": ["system_base", "mode_editing", "editing_task_prompts", "task_plan_generation", "policy_citations", "tool_prompts"]
+    "system": [
+      "system_base"
+    ],
+    "compose_answer": [
+      "system_base",
+      "mode_chat",
+      "rag_policy",
+      "task_answer_with_sources",
+      "policy_citations"
+    ],
+    "retrieval": [
+      "system_base",
+      "mode_chat",
+      "rag_policy",
+      "retrieval_prompt"
+    ],
+    "disambiguation": [
+      "system_base",
+      "mode_chat",
+      "disambiguation_prompt"
+    ],
+    "fallback": [
+      "system_base",
+      "mode_chat",
+      "fallback_prompt",
+      "policy_citations"
+    ],
+    "tool": [
+      "system_base",
+      "mode_editing",
+      "editing_task_prompts",
+      "task_plan_generation",
+      "policy_citations",
+      "tool_prompts"
+    ]
   },
   "tests": {
     "cases": [
@@ -121,13 +240,36 @@
       },
       {
         "id": "PR_1002_layered_compose_order",
-        "input": { "operator": "extract", "answerMode": "doc_grounded_single" },
-        "expect": { "layerOrder": ["system_base", "mode_chat", "rag_policy", "task_answer_with_sources", "policy_citations"] }
+        "input": {
+          "operator": "extract",
+          "answerMode": "doc_grounded_single"
+        },
+        "expect": {
+          "layerOrder": [
+            "system_base",
+            "mode_chat",
+            "rag_policy",
+            "task_answer_with_sources",
+            "policy_citations"
+          ]
+        }
       },
       {
         "id": "PR_1003_layered_retrieval_order",
-        "input": { "operator": "locate_docs", "signals": { "discoveryQuery": true } },
-        "expect": { "layerOrder": ["system_base", "mode_chat", "rag_policy", "retrieval_prompt"] }
+        "input": {
+          "operator": "locate_docs",
+          "signals": {
+            "discoveryQuery": true
+          }
+        },
+        "expect": {
+          "layerOrder": [
+            "system_base",
+            "mode_chat",
+            "rag_policy",
+            "retrieval_prompt"
+          ]
+        }
       }
     ]
   }

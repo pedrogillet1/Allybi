@@ -17,18 +17,9 @@
       "tests.patternDeterminism",
       "editor_mode_file_ops"
     ],
-    "tests": {
-      "positive": [
-        "mover este relatório para a pasta de marketing",
-        "renomear estes arquivos para incluir a data",
-        "duplicar esta versão como v2"
-      ],
-      "negative": [
-        "resumir esta pasta",
-        "explicar o conteúdo do documento",
-        "editar o texto deste relatório"
-      ]
-    },
+    "tests": [
+      "tests/patternDeterminism.test.ts"
+    ],
     "lastUpdated": "2026-03-03",
     "id": "patterns_files_move_copy_rename_pt",
     "description": "Patrões de organização de arquivos em PT para mover/copiar/renomear/arquivar."

@@ -3,9 +3,18 @@
     "id": "di_accounting_abbreviations_pt_v2",
     "version": "2.0.0",
     "description": "Portuguese abbreviations for accounting domain.",
-    "languages": ["pt"],
+    "languages": [
+      "pt"
+    ],
     "domain": "accounting",
-    "lastUpdated": "2026-03-03"
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -14,71 +23,269 @@
   },
   "domain": "accounting",
   "abbreviations": [
-    { "abbr": "AC", "expansion": "Ativo Circulante" },
-    { "abbr": "ACP", "expansion": "Aprovacao de Conciliação de Pagamentos" },
-    { "abbr": "AFDA", "expansion": "Provisao para Devedores Duvidosos" },
-    { "abbr": "AP", "expansion": "Contas a Pagar" },
-    { "abbr": "AR", "expansion": "Contas a Receber" },
-    { "abbr": "B", "expansion": "Bens" },
-    { "abbr": "BV", "expansion": "Balancete de Verificacao" },
-    { "abbr": "CC", "expansion": "Conta Corrente" },
-    { "abbr": "CCA", "expansion": "Contas Correntes Analiticas" },
-    { "abbr": "CFO", "expansion": "Chief Financial Officer" },
-    { "abbr": "CG", "expansion": "Centro Gerencial" },
-    { "abbr": "CMV", "expansion": "Custo das Mercadorias Vendidas" },
-    { "abbr": "CP", "expansion": "Contas a Pagar" },
-    { "abbr": "CR", "expansion": "Contas a Receber" },
-    { "abbr": "CST", "expansion": "Classificacao de Situação Tributaria" },
-    { "abbr": "DFC", "expansion": "Demonstracao do Fluxo de Caixa" },
-    { "abbr": "DFC", "expansion": "Demonstracao do Fluxo de Caixa" },
-    { "abbr": "DIE", "expansion": "Demonstração de Investimento em Equipamentos" },
-    { "abbr": "DRE", "expansion": "Demonstracao do Resultado do Exercicio" },
-    { "abbr": "DR", "expansion": "Debito" },
-    { "abbr": "DU", "expansion": "Demonstracao Unificada" },
-    { "abbr": "EFC", "expansion": "Escrituração Fiscal Contabil" },
-    { "abbr": "ECD", "expansion": "Escrituracao Contabil Digital" },
-    { "abbr": "ECF", "expansion": "Escrituracao Contabil Fiscal" },
-    { "abbr": "FIFO", "expansion": "Primeiro que Entra, Primeiro que Sai" },
-    { "abbr": "FCO", "expansion": "Fluxo de Caixa Operacional" },
-    { "abbr": "GF", "expansion": "Gerencial Financeira" },
-    { "abbr": "IA", "expansion": "Intangivel" },
-    { "abbr": "IFRS", "expansion": "Normas Internacionais de Relatorio Financeiro" },
-    { "abbr": "IRPJ", "expansion": "Imposto de Renda Pessoa Juridica" },
-    { "abbr": "IV", "expansion": "Imposto Sobre Valor" },
-    { "abbr": "JEC", "expansion": "Lancamento Contabil" },
-    { "abbr": "LA", "expansion": "Lancamento de Ajuste" },
-    { "abbr": "LC", "expansion": "Lancamento Contabil" },
-    { "abbr": "LE", "expansion": "Lancamento de Estorno" },
-    { "abbr": "LIFO", "expansion": "Ultimo que Entra, Primeiro que Sai" },
-    { "abbr": "LL", "expansion": "Livro Razao" },
-    { "abbr": "LCT", "expansion": "Lancamentos Completados por Tipo" },
-    { "abbr": "NCM", "expansion": "Nomenclatura Comum de Mercadorias" },
-    { "abbr": "NIR", "expansion": "Nota de Intencao de Reconciliacao" },
-    { "abbr": "NF-e", "expansion": "Nota Fiscal Eletronica" },
-    { "abbr": "NFS", "expansion": "Nota Fiscal de Servico" },
-    { "abbr": "NFS-e", "expansion": "Nota Fiscal de Servico Eletronica" },
-    { "abbr": "PC", "expansion": "Plano de Contas" },
-    { "abbr": "PDV", "expansion": "Ponto de Venda" },
-    { "abbr": "PL", "expansion": "Patrimonio Liquido" },
-    { "abbr": "PDB", "expansion": "Plano de Demontracao de Balanco" },
-    { "abbr": "PBC", "expansion": "Prepared by Client" },
-    { "abbr": "PDD", "expansion": "Provisao para Devedores Duvidosos" },
-    { "abbr": "PPE", "expansion": "Imobilizado" },
-    { "abbr": "RCO", "expansion": "Reconciliação de Caixa Operacional" },
-    { "abbr": "RA", "expansion": "Razao Auxiliar" },
-    { "abbr": "RAZ", "expansion": "Razao" },
-    { "abbr": "RLP", "expansion": "Relacao de Pagamentos" },
-    { "abbr": "SC", "expansion": "Saldo de Conciliação" },
-    { "abbr": "SFC", "expansion": "Servico Fiscal e Contabil" },
-    { "abbr": "SLA", "expansion": "Service Level Agreement" },
-    { "abbr": "SPED", "expansion": "Sistema Publico de Escrituracao Digital" },
-    { "abbr": "SOD", "expansion": "Segregacao de Funcoes" },
-    { "abbr": "TB", "expansion": "Balancete" },
-    { "abbr": "TTM", "expansion": "Ultimos 12 Meses" },
-    { "abbr": "WIP", "expansion": "Trabalho em Progresso" },
-    { "abbr": "WP", "expansion": "Papel de Trabalho" },
-    { "abbr": "YTD", "expansion": "Acumulado do Ano" },
-    { "abbr": "ZTL", "expansion": "Saldo Zeronada por Lei" },
-    { "abbr": "NIF", "expansion": "Nota de Informacao Financeira" }
+    {
+      "abbr": "AC",
+      "expansion": "Ativo Circulante"
+    },
+    {
+      "abbr": "ACP",
+      "expansion": "Aprovacao de Conciliação de Pagamentos"
+    },
+    {
+      "abbr": "AFDA",
+      "expansion": "Provisao para Devedores Duvidosos"
+    },
+    {
+      "abbr": "AP",
+      "expansion": "Contas a Pagar"
+    },
+    {
+      "abbr": "AR",
+      "expansion": "Contas a Receber"
+    },
+    {
+      "abbr": "B",
+      "expansion": "Bens"
+    },
+    {
+      "abbr": "BV",
+      "expansion": "Balancete de Verificacao"
+    },
+    {
+      "abbr": "CC",
+      "expansion": "Conta Corrente"
+    },
+    {
+      "abbr": "CCA",
+      "expansion": "Contas Correntes Analiticas"
+    },
+    {
+      "abbr": "CFO",
+      "expansion": "Chief Financial Officer"
+    },
+    {
+      "abbr": "CG",
+      "expansion": "Centro Gerencial"
+    },
+    {
+      "abbr": "CMV",
+      "expansion": "Custo das Mercadorias Vendidas"
+    },
+    {
+      "abbr": "CP",
+      "expansion": "Contas a Pagar"
+    },
+    {
+      "abbr": "CR",
+      "expansion": "Contas a Receber"
+    },
+    {
+      "abbr": "CST",
+      "expansion": "Classificacao de Situação Tributaria"
+    },
+    {
+      "abbr": "DFC",
+      "expansion": "Demonstracao do Fluxo de Caixa"
+    },
+    {
+      "abbr": "DFC",
+      "expansion": "Demonstracao do Fluxo de Caixa"
+    },
+    {
+      "abbr": "DIE",
+      "expansion": "Demonstração de Investimento em Equipamentos"
+    },
+    {
+      "abbr": "DRE",
+      "expansion": "Demonstracao do Resultado do Exercicio"
+    },
+    {
+      "abbr": "DR",
+      "expansion": "Debito"
+    },
+    {
+      "abbr": "DU",
+      "expansion": "Demonstracao Unificada"
+    },
+    {
+      "abbr": "EFC",
+      "expansion": "Escrituração Fiscal Contabil"
+    },
+    {
+      "abbr": "ECD",
+      "expansion": "Escrituracao Contabil Digital"
+    },
+    {
+      "abbr": "ECF",
+      "expansion": "Escrituracao Contabil Fiscal"
+    },
+    {
+      "abbr": "FIFO",
+      "expansion": "Primeiro que Entra, Primeiro que Sai"
+    },
+    {
+      "abbr": "FCO",
+      "expansion": "Fluxo de Caixa Operacional"
+    },
+    {
+      "abbr": "GF",
+      "expansion": "Gerencial Financeira"
+    },
+    {
+      "abbr": "IA",
+      "expansion": "Intangivel"
+    },
+    {
+      "abbr": "IFRS",
+      "expansion": "Normas Internacionais de Relatorio Financeiro"
+    },
+    {
+      "abbr": "IRPJ",
+      "expansion": "Imposto de Renda Pessoa Juridica"
+    },
+    {
+      "abbr": "IV",
+      "expansion": "Imposto Sobre Valor"
+    },
+    {
+      "abbr": "JEC",
+      "expansion": "Lancamento Contabil"
+    },
+    {
+      "abbr": "LA",
+      "expansion": "Lancamento de Ajuste"
+    },
+    {
+      "abbr": "LC",
+      "expansion": "Lancamento Contabil"
+    },
+    {
+      "abbr": "LE",
+      "expansion": "Lancamento de Estorno"
+    },
+    {
+      "abbr": "LIFO",
+      "expansion": "Ultimo que Entra, Primeiro que Sai"
+    },
+    {
+      "abbr": "LL",
+      "expansion": "Livro Razao"
+    },
+    {
+      "abbr": "LCT",
+      "expansion": "Lancamentos Completados por Tipo"
+    },
+    {
+      "abbr": "NCM",
+      "expansion": "Nomenclatura Comum de Mercadorias"
+    },
+    {
+      "abbr": "NIR",
+      "expansion": "Nota de Intencao de Reconciliacao"
+    },
+    {
+      "abbr": "NF-e",
+      "expansion": "Nota Fiscal Eletronica"
+    },
+    {
+      "abbr": "NFS",
+      "expansion": "Nota Fiscal de Servico"
+    },
+    {
+      "abbr": "NFS-e",
+      "expansion": "Nota Fiscal de Servico Eletronica"
+    },
+    {
+      "abbr": "PC",
+      "expansion": "Plano de Contas"
+    },
+    {
+      "abbr": "PDV",
+      "expansion": "Ponto de Venda"
+    },
+    {
+      "abbr": "PL",
+      "expansion": "Patrimonio Liquido"
+    },
+    {
+      "abbr": "PDB",
+      "expansion": "Plano de Demontracao de Balanco"
+    },
+    {
+      "abbr": "PBC",
+      "expansion": "Prepared by Client"
+    },
+    {
+      "abbr": "PDD",
+      "expansion": "Provisao para Devedores Duvidosos"
+    },
+    {
+      "abbr": "PPE",
+      "expansion": "Imobilizado"
+    },
+    {
+      "abbr": "RCO",
+      "expansion": "Reconciliação de Caixa Operacional"
+    },
+    {
+      "abbr": "RA",
+      "expansion": "Razao Auxiliar"
+    },
+    {
+      "abbr": "RAZ",
+      "expansion": "Razao"
+    },
+    {
+      "abbr": "RLP",
+      "expansion": "Relacao de Pagamentos"
+    },
+    {
+      "abbr": "SC",
+      "expansion": "Saldo de Conciliação"
+    },
+    {
+      "abbr": "SFC",
+      "expansion": "Servico Fiscal e Contabil"
+    },
+    {
+      "abbr": "SLA",
+      "expansion": "Service Level Agreement"
+    },
+    {
+      "abbr": "SPED",
+      "expansion": "Sistema Publico de Escrituracao Digital"
+    },
+    {
+      "abbr": "SOD",
+      "expansion": "Segregacao de Funcoes"
+    },
+    {
+      "abbr": "TB",
+      "expansion": "Balancete"
+    },
+    {
+      "abbr": "TTM",
+      "expansion": "Ultimos 12 Meses"
+    },
+    {
+      "abbr": "WIP",
+      "expansion": "Trabalho em Progresso"
+    },
+    {
+      "abbr": "WP",
+      "expansion": "Papel de Trabalho"
+    },
+    {
+      "abbr": "YTD",
+      "expansion": "Acumulado do Ano"
+    },
+    {
+      "abbr": "ZTL",
+      "expansion": "Saldo Zeronada por Lei"
+    },
+    {
+      "abbr": "NIF",
+      "expansion": "Nota de Informacao Financeira"
+    }
   ]
 }

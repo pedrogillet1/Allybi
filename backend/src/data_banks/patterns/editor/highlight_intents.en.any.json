@@ -14,20 +14,9 @@
       "editor_mode",
       "retrieval_router"
     ],
-    "tests": {
-      "positive": [
-        "where exactly does it say that the payment terms are net 30",
-        "highlight the heading Payment Terms and mark it",
-        "jump to table Sales and highlight the variance row",
-        "take me to slide 3 and highlight the chart"
-      ],
-      "negative": [
-        "summarize this document",
-        "extract all amounts in one list",
-        "apply this update to all rows",
-        "undo last step"
-      ]
-    },
+    "tests": [
+      "tests/patternDeterminism.test.ts"
+    ],
     "lastUpdated": "2026-03-03",
     "id": "patterns_editor_highlight_intents_en",
     "description": "English editor interaction patterns for highlight and locate behavior across DOCX, XLSX, and Slides"

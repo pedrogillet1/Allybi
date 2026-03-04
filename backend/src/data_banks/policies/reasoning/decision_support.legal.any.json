@@ -12,11 +12,20 @@
     "criticality": "medium",
     "changeLog": [
       "Metadata governance baseline upgrade (2026-03-03)"
+    ],
+    "usedBy": [
+      "services/llm/core/llmRequestBuilder.service.ts"
+    ],
+    "tests": [
+      "tests/certification/prompt-mode-coverage.cert.test.ts"
     ]
   },
   "config": {
     "enabled": true,
-    "domain": "legal"
+    "domain": "legal",
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "domain": "legal",
   "framework": {

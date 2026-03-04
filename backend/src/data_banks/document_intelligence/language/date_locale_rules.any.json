@@ -9,7 +9,13 @@
       "pt"
     ],
     "lastUpdated": "2026-03-03",
-    "description": "PT-BR and EN-US date locale disambiguation rules with explicit conflict handling for numeric date tokens."
+    "description": "PT-BR and EN-US date locale disambiguation rules with explicit conflict handling for numeric date tokens.",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,

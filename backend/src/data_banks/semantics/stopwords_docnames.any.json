@@ -3,7 +3,12 @@
     "id": "stopwords_docnames",
     "version": "2.0.0",
     "description": "Adaptive stopword normalization rules for document-name matching in Koda. Removes generic document naming noise while preserving identifying tokens (numbers, dates, acronyms, file extensions, and distinctive qualifiers). Prevents over-stripping that causes over-matching or wrong-doc drift.",
-    "languages": ["any", "en", "pt", "es"],
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
     "lastUpdated": "2026-01-26",
     "owner": "koda-semantics",
     "compat": ">=1.0.0",
@@ -11,6 +16,12 @@
       "Added deterministic actionsContract and over-strip recovery",
       "Added protected token handling (extensions, numbers, acronyms, year/quarter)",
       "Expanded tests for multilingual and regression coverage"
+    ],
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
     ]
   },
   "config": {
@@ -53,14 +64,19 @@
         "\\b\\w+[\\w\\-_.]*\\.(pdf|docx?|xlsx?|pptx?|csv|txt)\\b",
         "\\b[A-Z]{2,8}\\b"
       ]
-    }
+    },
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "rules": [
     {
       "id": "generic_doc_type_terms",
       "scope": "global",
       "description": "Remove generic document-type words that rarely identify a specific file.",
-      "appliesTo": ["doc_name_matching"],
+      "appliesTo": [
+        "doc_name_matching"
+      ],
       "triggerPatterns": {
         "en": [
           "\\b(file|document|doc|report|presentation|deck|spreadsheet|workbook|sheet|table)\\b"
@@ -83,7 +99,9 @@
       "id": "status_and_recency_adjectives",
       "scope": "global",
       "description": "Remove status adjectives that are not reliable identifiers across document sets.",
-      "appliesTo": ["doc_name_matching"],
+      "appliesTo": [
+        "doc_name_matching"
+      ],
       "triggerPatterns": {
         "en": [
           "\\b(final|latest|updated|new|old|draft|version)\\b"
@@ -106,7 +124,9 @@
       "id": "organizational_fillers",
       "scope": "global",
       "description": "Remove organizational fillers that do not typically identify a unique document.",
-      "appliesTo": ["doc_name_matching"],
+      "appliesTo": [
+        "doc_name_matching"
+      ],
       "triggerPatterns": {
         "en": [
           "\\b(company|internal|confidential|private|public)\\b"
@@ -129,7 +149,9 @@
       "id": "prepositions_and_articles_light",
       "scope": "global",
       "description": "Lightly remove common articles/prepositions in docname matching when they are isolated and not part of an identifier.",
-      "appliesTo": ["doc_name_matching"],
+      "appliesTo": [
+        "doc_name_matching"
+      ],
       "triggerPatterns": {
         "en": [
           "\\b(the|a|an|of|for|to)\\b"
@@ -143,7 +165,11 @@
       },
       "when": {
         "all": [
-          { "path": "signals.tokenIsProtected", "op": "neq", "value": true }
+          {
+            "path": "signals.tokenIsProtected",
+            "op": "neq",
+            "value": true
+          }
         ]
       },
       "action": {
@@ -157,11 +183,21 @@
       "id": "overstrip_recovery_docnames",
       "scope": "global",
       "description": "Recover if stripping would leave zero identifying tokens, to prevent over-matching everything.",
-      "appliesTo": ["doc_name_matching"],
+      "appliesTo": [
+        "doc_name_matching"
+      ],
       "when": {
         "all": [
-          { "path": "metrics.stripRatio", "op": "gt", "value": 0.7 },
-          { "path": "metrics.remainingTokens", "op": "lt", "value": 1 }
+          {
+            "path": "metrics.stripRatio",
+            "op": "gt",
+            "value": 0.7
+          },
+          {
+            "path": "metrics.remainingTokens",
+            "op": "lt",
+            "value": 1
+          }
         ]
       },
       "action": {
@@ -176,33 +212,62 @@
       {
         "id": "SDN_001_strip_generic_type",
         "input": "the final report",
-        "expect": { "normalizedTokensNotContainAny": ["final", "report"] }
+        "expect": {
+          "normalizedTokensNotContainAny": [
+            "final",
+            "report"
+          ]
+        }
       },
       {
         "id": "SDN_002_preserve_year_quarter",
         "input": "report Q4 2023",
-        "expect": { "containsAny": ["Q4", "2023"] }
+        "expect": {
+          "containsAny": [
+            "Q4",
+            "2023"
+          ]
+        }
       },
       {
         "id": "SDN_003_preserve_extension",
         "input": "mezanino_analysis_v2.pdf",
-        "expect": { "contains": "mezanino_analysis_v2.pdf" }
+        "expect": {
+          "contains": "mezanino_analysis_v2.pdf"
+        }
       },
       {
         "id": "SDN_004_pt_preserve_quarter",
         "input": "relatório T2 2024",
-        "expect": { "containsAny": ["T2", "2024"] }
+        "expect": {
+          "containsAny": [
+            "T2",
+            "2024"
+          ]
+        }
       },
       {
         "id": "SDN_005_es_strip_function_words",
         "input": "el informe de costos",
-        "expect": { "normalizedTokensContain": ["informe", "costos"] }
+        "expect": {
+          "normalizedTokensContain": [
+            "informe",
+            "costos"
+          ]
+        }
       },
       {
         "id": "SDN_006_overstrip_recovery",
-        "context": { "metrics": { "stripRatio": 0.9, "remainingTokens": 0 } },
+        "context": {
+          "metrics": {
+            "stripRatio": 0.9,
+            "remainingTokens": 0
+          }
+        },
         "input": "document",
-        "expect": { "overStrippedRecovered": true }
+        "expect": {
+          "overStrippedRecovered": true
+        }
       }
     ]
   }

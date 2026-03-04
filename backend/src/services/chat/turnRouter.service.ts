@@ -68,6 +68,13 @@ function isStrictIntentConfigEnv(): boolean {
   return env === "production" || env === "staging";
 }
 
+function allowIntentDecisionFailOpen(): boolean {
+  const raw = String(process.env.TURN_ROUTER_FAIL_OPEN || "")
+    .trim()
+    .toLowerCase();
+  return raw === "1" || raw === "true" || raw === "yes";
+}
+
 function low(value: string): string {
   return String(value || "").toLowerCase();
 }
@@ -95,10 +102,12 @@ function normalizeForMatching(
 
 function hasDocRefSignal(message: string): boolean {
   const input = low(message);
-  return (
-    /\b(document|doc|pdf|file|spreadsheet|sheet|slide|presentation|arquivo|documento|planilha|apresentacao|apresentação)\b/.test(
-      input,
-    ) || /[a-z0-9_ -]+\.(pdf|docx|xlsx|pptx|txt|csv)\b/.test(input)
+  if (/[a-z0-9_ -]+\.(pdf|docx|xlsx|pptx|txt|csv)\b/.test(input)) {
+    return true;
+  }
+
+  return /\b(?:document|doc|file|spreadsheet|sheet|slide|presentation|arquivo|documento|planilha|apresentacao|apresentação)\s+(?:named|called|titled|nomeado|chamado|intitulado|denominado)\s+["'`][^"'`]{1,160}["'`]/.test(
+    input,
   );
 }
 
@@ -927,7 +936,8 @@ export class TurnRouterService {
       if (isStrictIntentConfigEnv()) {
         throw error;
       }
-      return null;
+      if (allowIntentDecisionFailOpen()) return null;
+      throw error;
     }
   }
 
@@ -1012,7 +1022,9 @@ export class TurnRouterService {
     const decision = this.resolveIntentDecision(ctx, docsAvailable);
     if (decision) {
       return {
-        route: mapIntentFamilyToRoute(decision.intentFamily, docsAvailable),
+        route: decision.requiresClarification
+          ? "CLARIFY"
+          : mapIntentFamilyToRoute(decision.intentFamily, docsAvailable),
         intentDecision: decision,
       };
     }

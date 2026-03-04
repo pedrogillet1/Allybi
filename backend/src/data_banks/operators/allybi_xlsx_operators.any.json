@@ -9,7 +9,13 @@
       "pt"
     ],
     "lastUpdated": "2026-02-27",
-    "owner": "allybi-editing"
+    "owner": "allybi-editing",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -266,7 +272,10 @@
           },
           "type": {
             "type": "string",
-            "enum": ["linear", "date"],
+            "enum": [
+              "linear",
+              "date"
+            ],
             "description": "Series type: linear for numeric sequences, date for date sequences"
           }
         }
@@ -411,7 +420,9 @@
         "properties": {
           "columns": {
             "type": "array",
-            "items": { "type": "number" },
+            "items": {
+              "type": "number"
+            },
             "description": "1-based column numbers to auto-fit"
           },
           "rangeA1": {
@@ -756,12 +767,16 @@
         "properties": {
           "rows": {
             "type": "array",
-            "items": { "type": "number" },
+            "items": {
+              "type": "number"
+            },
             "description": "1-based row numbers to hide"
           },
           "columns": {
             "type": "array",
-            "items": { "type": "number" },
+            "items": {
+              "type": "number"
+            },
             "description": "1-based column numbers to hide"
           }
         }
@@ -785,12 +800,16 @@
         "properties": {
           "rows": {
             "type": "array",
-            "items": { "type": "number" },
+            "items": {
+              "type": "number"
+            },
             "description": "1-based row numbers to unhide"
           },
           "columns": {
             "type": "array",
-            "items": { "type": "number" },
+            "items": {
+              "type": "number"
+            },
             "description": "1-based column numbers to unhide"
           }
         }
@@ -1020,7 +1039,9 @@
       "undo_strategy": "snapshot",
       "schema": {
         "type": "object",
-        "required": ["rangeA1"],
+        "required": [
+          "rangeA1"
+        ],
         "properties": {
           "rangeA1": {
             "type": "string",
@@ -1028,7 +1049,9 @@
           },
           "keyColumns": {
             "type": "array",
-            "items": { "type": "number" },
+            "items": {
+              "type": "number"
+            },
             "description": "1-based column indices to use as dedup key (omit for all columns)"
           },
           "hasHeader": {
@@ -1053,7 +1076,9 @@
       "undo_strategy": "snapshot",
       "schema": {
         "type": "object",
-        "required": ["rangeA1"],
+        "required": [
+          "rangeA1"
+        ],
         "properties": {
           "rangeA1": {
             "type": "string",
@@ -1077,7 +1102,10 @@
       "undo_strategy": "snapshot",
       "schema": {
         "type": "object",
-        "required": ["rangeA1", "normalization"],
+        "required": [
+          "rangeA1",
+          "normalization"
+        ],
         "properties": {
           "rangeA1": {
             "type": "string",
@@ -1085,12 +1113,20 @@
           },
           "normalization": {
             "type": "string",
-            "enum": ["dates", "numbers", "text_case"],
+            "enum": [
+              "dates",
+              "numbers",
+              "text_case"
+            ],
             "description": "Type of normalization to apply"
           },
           "textCase": {
             "type": "string",
-            "enum": ["upper", "lower", "title"],
+            "enum": [
+              "upper",
+              "lower",
+              "title"
+            ],
             "description": "Target text case (only for text_case normalization)"
           },
           "dateFormat": {
@@ -1117,7 +1153,9 @@
       "undo_strategy": "snapshot",
       "schema": {
         "type": "object",
-        "required": ["sheetName"],
+        "required": [
+          "sheetName"
+        ],
         "properties": {
           "sheetName": {
             "type": "string",
@@ -1145,7 +1183,10 @@
       "undo_strategy": "snapshot",
       "schema": {
         "type": "object",
-        "required": ["rangeA1", "locked"],
+        "required": [
+          "rangeA1",
+          "locked"
+        ],
         "properties": {
           "rangeA1": {
             "type": "string",

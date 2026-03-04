@@ -15,19 +15,9 @@
       "preview_apply_policy",
       "tests.patternDeterminism"
     ],
-    "tests": {
-      "positive": [
-        "show me a draft first before replacing values",
-        "delete worksheet now",
-        "confirm delete worksheet",
-        "bold selected header"
-      ],
-      "negative": [
-        "calculate total only",
-        "summarize this section only",
-        "export file do not send email"
-      ]
-    },
+    "tests": [
+      "tests/patternDeterminism.test.ts"
+    ],
     "dependsOn": [
       "patterns_modes_mode_switch_en",
       "patterns_modes_mode_switch_pt"

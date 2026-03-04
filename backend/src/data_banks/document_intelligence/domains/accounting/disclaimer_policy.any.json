@@ -3,8 +3,17 @@
     "id": "di_accounting_disclaimer_policy",
     "version": "1.0.0",
     "description": "Disclaimer templates for accounting domain — required professional and legal disclaimers.",
-    "languages": ["any"],
-    "lastUpdated": "2026-02-27"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,

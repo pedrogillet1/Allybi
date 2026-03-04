@@ -3,8 +3,17 @@
     "id": "di_everyday_tables_every_insurance_policy",
     "version": "1.0.0",
     "description": "Tables expected in every_insurance_policy.",
-    "languages": ["any"],
-    "lastUpdated": "2026-03-03"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -12,11 +21,35 @@
     "docType": "every_insurance_policy"
   },
   "tableHeaderSynonyms": {
-    "policy_number": ["policy", "policy number", "apolice", "numero"],
-    "premium": ["premium", "premio", "pago"],
-    "amount": ["amount", "valor", "total", "quantia"],
-    "date": ["date", "data", "inicio", "fim", "vigencia"],
-    "coverage": ["coverage", "cobertura", "coverage detail"]
+    "policy_number": [
+      "policy",
+      "policy number",
+      "apolice",
+      "numero"
+    ],
+    "premium": [
+      "premium",
+      "premio",
+      "pago"
+    ],
+    "amount": [
+      "amount",
+      "valor",
+      "total",
+      "quantia"
+    ],
+    "date": [
+      "date",
+      "data",
+      "inicio",
+      "fim",
+      "vigencia"
+    ],
+    "coverage": [
+      "coverage",
+      "cobertura",
+      "coverage detail"
+    ]
   },
   "tables": [
     {
@@ -26,14 +59,45 @@
         "pt": "Periodo de Cobertura"
       },
       "section": "coverage_details",
-      "signaturePatterns": ["\\bcoverage\\b", "\\bperiod\\b", "\\bvalidity\\b", "\\bvigencia\\b"],
-      "requiredHeaders": ["policy_number", "coverage_start_date", "coverage_end_date", "currency"],
-           "headerAliases": [["policy_number", "apolice"], ["coverage_start_date", "inicio"], ["coverage_end_date", "fim"], ["currency", "moeda"]],
+      "signaturePatterns": [
+        "\\bcoverage\\b",
+        "\\bperiod\\b",
+        "\\bvalidity\\b",
+        "\\bvigencia\\b"
+      ],
+      "requiredHeaders": [
+        "policy_number",
+        "coverage_start_date",
+        "coverage_end_date",
+        "currency"
+      ],
+      "headerAliases": [
+        [
+          "policy_number",
+          "apolice"
+        ],
+        [
+          "coverage_start_date",
+          "inicio"
+        ],
+        [
+          "coverage_end_date",
+          "fim"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
       "unitsAndScaling": {
-        "preferredScales": ["units"],
+        "preferredScales": [
+          "units"
+        ],
         "requiresScaleEvidence": false
       },
-      "footnotes": ["insurance_policy_fn_01"]
+      "footnotes": [
+        "insurance_policy_fn_01"
+      ]
     },
     {
       "id": "insurance_policy_premium_table",
@@ -42,16 +106,53 @@
         "pt": "Cronograma de Premio"
       },
       "section": "premium_schedule",
-      "signaturePatterns": ["\\bpremium\\b", "\\binstallment\\b", "\\bpremio\\b", "\\bpayment"],
-      "requiredHeaders": ["due_date", "premium_amount", "frequency", "status", "currency"],
-      "headerAliases": [["due_date", "vencimento"], ["premium_amount", "valor"], ["frequency", "periodicidade"], ["status", "status"], ["currency", "moeda"]],
+      "signaturePatterns": [
+        "\\bpremium\\b",
+        "\\binstallment\\b",
+        "\\bpremio\\b",
+        "\\bpayment"
+      ],
+      "requiredHeaders": [
+        "due_date",
+        "premium_amount",
+        "frequency",
+        "status",
+        "currency"
+      ],
+      "headerAliases": [
+        [
+          "due_date",
+          "vencimento"
+        ],
+        [
+          "premium_amount",
+          "valor"
+        ],
+        [
+          "frequency",
+          "periodicidade"
+        ],
+        [
+          "status",
+          "status"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
       "unitsAndScaling": {
-        "preferredScales": ["units", "thousands"],
+        "preferredScales": [
+          "units",
+          "thousands"
+        ],
         "currencyField": "currency",
         "requiresScaleEvidence": true,
         "mixedScaleHandling": "normalize_to_currency_base"
       },
-      "footnotes": ["insurance_policy_fn_02"]
+      "footnotes": [
+        "insurance_policy_fn_02"
+      ]
     },
     {
       "id": "insurance_policy_benefit_table",
@@ -60,16 +161,53 @@
         "pt": "Beneficios e Adicionais"
       },
       "section": "benefits_or_addons",
-      "signaturePatterns": ["\\bbenefits\\b", "\\badd-on\\b", "\\bcoverage\\b", "\\bextra\\b"],
-      "requiredHeaders": ["benefit", "limit", "deductible", "notes", "currency"],
-      "headerAliases": [["benefit", "beneficio"], ["limit", "limite"], ["deductible", "franquia"], ["notes", "obs"], ["currency", "moeda"]],
+      "signaturePatterns": [
+        "\\bbenefits\\b",
+        "\\badd-on\\b",
+        "\\bcoverage\\b",
+        "\\bextra\\b"
+      ],
+      "requiredHeaders": [
+        "benefit",
+        "limit",
+        "deductible",
+        "notes",
+        "currency"
+      ],
+      "headerAliases": [
+        [
+          "benefit",
+          "beneficio"
+        ],
+        [
+          "limit",
+          "limite"
+        ],
+        [
+          "deductible",
+          "franquia"
+        ],
+        [
+          "notes",
+          "obs"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
       "unitsAndScaling": {
-        "preferredScales": ["units", "thousands"],
+        "preferredScales": [
+          "units",
+          "thousands"
+        ],
         "currencyField": "currency",
         "requiresScaleEvidence": true,
         "mixedScaleHandling": "normalize_to_currency_base"
       },
-      "footnotes": ["insurance_policy_fn_03"]
+      "footnotes": [
+        "insurance_policy_fn_03"
+      ]
     },
     {
       "id": "insurance_policy_exclusion_table",
@@ -78,14 +216,44 @@
         "pt": "Exclusoes"
       },
       "section": "exclusions",
-      "signaturePatterns": ["\\bexclusions\\b", "\\bnot covered\\b", "\\nnao coberto\\b"],
-      "requiredHeaders": ["description", "scope", "status", "note"],
-      "headerAliases": [["description", "descricao"], ["scope", "escopo"], ["status", "status"], ["note", "nota"]],
+      "signaturePatterns": [
+        "\\bexclusions\\b",
+        "\\bnot covered\\b",
+        "\\nnao coberto\\b"
+      ],
+      "requiredHeaders": [
+        "description",
+        "scope",
+        "status",
+        "note"
+      ],
+      "headerAliases": [
+        [
+          "description",
+          "descricao"
+        ],
+        [
+          "scope",
+          "escopo"
+        ],
+        [
+          "status",
+          "status"
+        ],
+        [
+          "note",
+          "nota"
+        ]
+      ],
       "unitsAndScaling": {
-        "preferredScales": ["units"],
+        "preferredScales": [
+          "units"
+        ],
         "requiresScaleEvidence": false
       },
-      "footnotes": ["insurance_policy_fn_04"]
+      "footnotes": [
+        "insurance_policy_fn_04"
+      ]
     },
     {
       "id": "insurance_policy_renewal_table",
@@ -94,14 +262,44 @@
         "pt": "Termos de Renovacao"
       },
       "section": "renewal_terms",
-      "signaturePatterns": ["\\brenewal\\b", "\\brenew\\b", "\\brenovacao\\b"],
-      "requiredHeaders": ["status", "next_renewal_date", "grace_period", "notes"],
-      "headerAliases": [["status", "situacao"], ["next_renewal_date", "proxima renovacao"], ["grace_period", "carencia"], ["notes", "notas"]],
+      "signaturePatterns": [
+        "\\brenewal\\b",
+        "\\brenew\\b",
+        "\\brenovacao\\b"
+      ],
+      "requiredHeaders": [
+        "status",
+        "next_renewal_date",
+        "grace_period",
+        "notes"
+      ],
+      "headerAliases": [
+        [
+          "status",
+          "situacao"
+        ],
+        [
+          "next_renewal_date",
+          "proxima renovacao"
+        ],
+        [
+          "grace_period",
+          "carencia"
+        ],
+        [
+          "notes",
+          "notas"
+        ]
+      ],
       "unitsAndScaling": {
-        "preferredScales": ["units"],
+        "preferredScales": [
+          "units"
+        ],
         "requiresScaleEvidence": false
       },
-      "footnotes": ["insurance_policy_fn_05"]
+      "footnotes": [
+        "insurance_policy_fn_05"
+      ]
     }
   ]
 }

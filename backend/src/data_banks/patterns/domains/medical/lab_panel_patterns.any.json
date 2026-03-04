@@ -19,7 +19,10 @@
     ],
     "lastUpdated": "2026-03-03",
     "id": "patterns_medical_lab_panel_patterns",
-    "description": "Patterns for identifying medical lab panel requests without diagnosis output."
+    "description": "Patterns for identifying medical lab panel requests without diagnosis output.",
+    "tests": [
+      "tests/patternDeterminism.test.ts"
+    ]
   },
   "config": {
     "deterministic": true,
@@ -27,7 +30,8 @@
     "requiresNavigationMode": true,
     "minPatterns": 300,
     "maxPatterns": 800,
-    "enabled": true
+    "enabled": true,
+    "sortBy": "id"
   },
   "patterns": [
     {

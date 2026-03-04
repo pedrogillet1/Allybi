@@ -16,6 +16,12 @@
       "Added explicit scoring model with normalization and tie-break policies",
       "Integrated boosts/negatives/diversification hooks with deterministic precedence",
       "Added collision and regression tests for wrong-doc drift and low-relevance promotion"
+    ],
+    "usedBy": [
+      "services/core/retrieval/retrievalEngine.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
     ]
   },
   "config": {
@@ -40,8 +46,8 @@
       },
       "thresholds": {
         "minFinalScore": 0.28,
-        "minSemanticScore": 0.20,
-        "minLexicalScore": 0.10,
+        "minSemanticScore": 0.2,
+        "minLexicalScore": 0.1,
         "maxPerDocChunksSoft": 6,
         "maxPerDocChunksHard": 10,
         "maxTotalChunksSoft": 18,
@@ -56,7 +62,7 @@
     },
     "weights": {
       "semantic": 0.46,
-      "lexical": 0.20,
+      "lexical": 0.2,
       "structural": 0.12,
       "titleBoost": 0.06,
       "documentIntelligenceBoost": 0.08,
@@ -186,7 +192,10 @@
         "staleScope": 0.12,
         "crossDocWhenLocked": 0.4
       }
-    }
+    },
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "rules": [
     {

@@ -2,7 +2,18 @@
   "_meta": {
     "id": "excel_function_catalog",
     "version": "1.0.0",
-    "description": "Production-grade Excel function catalog for safe formula insertion by AI agents"
+    "description": "Production-grade Excel function catalog for safe formula insertion by AI agents",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true

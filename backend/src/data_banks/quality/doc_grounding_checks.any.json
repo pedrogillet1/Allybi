@@ -3,8 +3,17 @@
     "id": "doc_grounding_checks",
     "version": "1.0.0",
     "description": "Doc-grounding minimum checks used by quality gates to block ungrounded document answers.",
-    "languages": ["any"],
-    "lastUpdated": "2026-03-01"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,

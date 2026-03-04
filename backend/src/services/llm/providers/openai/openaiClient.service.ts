@@ -160,13 +160,15 @@ function toOpenAITools(tools: Array<Record<string, unknown>> | undefined): Array
   // If tools are already in OpenAI shape, pass through.
   // Otherwise, attempt to map minimal fields.
   return tools.map((t) => {
-    if (t?.type === "function" && t.function) return t;
+    const toolRecord = t as Record<string, any>;
+    const fn = (toolRecord.function as Record<string, any> | undefined) ?? {};
+    if (toolRecord.type === "function" && toolRecord.function) return toolRecord;
 
-    const name = t?.name || t?.function?.name;
-    const description = t?.description || t?.function?.description || "";
-    const parameters = t?.parameters ||
-      t?.function?.parameters ||
-      t?.schema || { type: "object", properties: {} };
+    const name = toolRecord.name || fn.name;
+    const description = toolRecord.description || fn.description || "";
+    const parameters = toolRecord.parameters ||
+      fn.parameters ||
+      toolRecord.schema || { type: "object", properties: {} };
 
     return {
       type: "function",
@@ -318,12 +320,12 @@ export class OpenAIClientService implements LlmClient {
     const headers = buildRequestHeaders(request);
 
     const raw = await this.client.chat.completions.create(
-      payload as Parameters<typeof this.client.chat.completions.create>[0],
+      payload as unknown as Parameters<typeof this.client.chat.completions.create>[0],
       { signal, headers } as Parameters<typeof this.client.chat.completions.create>[1],
     );
 
     // Parse text and finishReason from response
-    const rawObj = raw as Record<string, unknown>;
+    const rawObj = raw as unknown as Record<string, unknown>;
     const choices = rawObj.choices as Array<Record<string, unknown>> | undefined;
     const firstChoice = choices?.[0];
     const msg = firstChoice?.message as Record<string, unknown> | undefined;
@@ -355,7 +357,7 @@ export class OpenAIClientService implements LlmClient {
 
     // OpenAI SDK returns an AsyncIterable for streaming chat completions.
     const rawStream = await this.client.chat.completions.create(
-      payload as Parameters<typeof this.client.chat.completions.create>[0],
+      payload as unknown as Parameters<typeof this.client.chat.completions.create>[0],
       { signal, headers } as Parameters<typeof this.client.chat.completions.create>[1],
     );
 
@@ -366,7 +368,10 @@ export class OpenAIClientService implements LlmClient {
     );
 
     return {
-      stream: normalized,
+      stream:
+        normalized as unknown as AsyncIterable<
+          import("../../types/llm.types").LlmStreamEvent
+        >,
     };
   }
 

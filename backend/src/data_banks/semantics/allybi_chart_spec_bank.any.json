@@ -3,9 +3,19 @@
     "id": "allybi_chart_spec_bank",
     "version": "1.0.0",
     "description": "Chart correctness bank: deterministic range-to-series mapping and placement rules.",
-    "languages": ["any", "en", "pt"],
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
     "lastUpdated": "2026-02-17",
-    "owner": "allybi-editing"
+    "owner": "allybi-editing",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -22,8 +32,7 @@
     "combo",
     "bubble",
     "histogram",
-    "stacked_column"
-    ,
+    "stacked_column",
     "stacked_bar"
   ],
   "inference": {

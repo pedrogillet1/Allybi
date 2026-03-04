@@ -3,8 +3,20 @@
     "id": "policy_citations",
     "version": "1.2.0",
     "description": "Single citation policy contract for runtime outputs.",
-    "languages": ["any", "en", "pt", "es"],
-    "lastUpdated": "2026-03-02"
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-03-02",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,

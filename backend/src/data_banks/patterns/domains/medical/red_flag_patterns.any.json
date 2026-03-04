@@ -19,7 +19,10 @@
     ],
     "lastUpdated": "2026-03-03",
     "id": "patterns_medical_red_flag_patterns",
-    "description": "Patterns for critical/high/low/abnormal lab and vital signals with non-diagnostic phrasing."
+    "description": "Patterns for critical/high/low/abnormal lab and vital signals with non-diagnostic phrasing.",
+    "tests": [
+      "tests/patternDeterminism.test.ts"
+    ]
   },
   "config": {
     "deterministic": true,
@@ -27,7 +30,8 @@
     "requiresNavigationMode": true,
     "minPatterns": 200,
     "maxPatterns": 600,
-    "enabled": true
+    "enabled": true,
+    "sortBy": "id"
   },
   "patterns": [
     {

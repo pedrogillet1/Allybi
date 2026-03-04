@@ -1,12 +1,19 @@
 {
   "_meta": {
-    "id": "legal_abbreviations_pt",
+    "id": "legal_abbreviations_pt_v1331926f",
     "version": "2.1.0",
     "description": "Portuguese abbreviations for legal domain.",
     "languages": [
       "pt"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-02-28",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -15,73 +22,277 @@
   },
   "domain": "legal",
   "abbreviations": [
-    { "abbr": "AGM", "expansion": "Assembleia Geral Anual" },
-    { "abbr": "AUA", "expansion": "Avaliacao de Usabilidade e Acesso" },
-    { "abbr": "AUP", "expansion": "Politica de Uso Aceitavel" },
-    { "abbr": "AML", "expansion": "Antilavagem de Dinheiro" },
-    { "abbr": "APA", "expansion": "Acordo de Compra de Ativos" },
-    { "abbr": "BAA", "expansion": "Acordo de Associado Comercial" },
-    { "abbr": "BCR", "expansion": "Binding Corporate Rules" },
-    { "abbr": "BOD", "expansion": "Conselho de Administracao" },
-    { "abbr": "CCPA", "expansion": "Lei de Protecao ao Consumidor da California" },
-    { "abbr": "CCPA_", "expansion": "California Consumer Privacy Act" },
-    { "abbr": "CL", "expansion": "Conselho Diretor" },
-    { "abbr": "COI", "expansion": "Conflito de Interesses" },
-    { "abbr": "CR", "expansion": "Clausula de Reversao" },
-    { "abbr": "CSA", "expansion": "Acordo de Seguranca da Cadeia de Fornecimento" },
-    { "abbr": "CVE", "expansion": "Vulnerabilidade Comuns" },
-    { "abbr": "DLP", "expansion": "Prevencao de Perda de Dados" },
-    { "abbr": "DPA", "expansion": "Acordo de Tratamento de Dados" },
-    { "abbr": "DPIA", "expansion": "Avaliacao de Impacto de Protecao de Dados" },
-    { "abbr": "DPO", "expansion": "Encarregado de Protecao de Dados" },
-    { "abbr": "DSAR", "expansion": "Requisicao de Acesso pelo Titular" },
-    { "abbr": "EFFECT", "expansion": "Efectividade" },
-    { "abbr": "EUA", "expansion": "Entidade Unica de Atos" },
-    { "abbr": "EULA", "expansion": "Licenca de Usuario Final" },
-    { "abbr": "FCPA", "expansion": "Lei Anticorrupcao em transacoes no exterior" },
-    { "abbr": "GDPR", "expansion": "Regulamento Geral de Protecao de Dados" },
-    { "abbr": "HNS", "expansion": "Honorarios" },
-    { "abbr": "IP", "expansion": "Propriedade Intelectual" },
-    { "abbr": "JDA", "expansion": "Acordo de Desenvolvimento Conjunto" },
-    { "abbr": "JVA", "expansion": "Joint Venture Agreement" },
-    { "abbr": "KYC", "expansion": "Conheca Seu Cliente" },
-    { "abbr": "LGPD", "expansion": "Lei Geral de Protecao de Dados" },
-    { "abbr": "LPA", "expansion": "Procuracao Limitada" },
-    { "abbr": "LOA", "expansion": "Carta de Autorizacao" },
-    { "abbr": "LOI", "expansion": "Carta de Intencao" },
-    { "abbr": "MFA", "expansion": "Acordo Quadro" },
-    { "abbr": "MFN", "expansion": "Nacao Mais Favorecida" },
-    { "abbr": "MOU", "expansion": "Memorando de Entendimento" },
-    { "abbr": "MSA", "expansion": "Acordo Mestre de Servicos" },
-    { "abbr": "MTA", "expansion": "Acordo de Transferencia de Materiais" },
-    { "abbr": "NCA", "expansion": "Nao Concorrencia" },
-    { "abbr": "NDA", "expansion": "Acordo de Confidencialidade" },
-    { "abbr": "NFR", "expansion": "Requisito Nao Funcional" },
-    { "abbr": "NIS2", "expansion": "Diretiva de Seguranca Cibernetica 2" },
-    { "abbr": "NPA", "expansion": "Avaliacao de Nao Desempenho" },
-    { "abbr": "NSA", "expansion": "Nao Solicitacao de Aliciacao" },
-    { "abbr": "NTP", "expansion": "Notificacao para Proceder" },
-    { "abbr": "PII", "expansion": "Informacao Pessoal Identificavel" },
-    { "abbr": "PIPL", "expansion": "Lei de Protecao de Informacoes Pessoais" },
-    { "abbr": "POA", "expansion": "Procuracao" },
-    { "abbr": "POPIA", "expansion": "Lei Geral de Protecao de Dados Pessoais" },
-    { "abbr": "Q&A", "expansion": "Perguntas e Respostas" },
-    { "abbr": "R&R", "expansion": "Responsabilidades e Relacoes" },
-    { "abbr": "RFI", "expansion": "Request for Information" },
-    { "abbr": "RFP", "expansion": "Request for Proposal" },
-    { "abbr": "ROI", "expansion": "Retorno sobre Investimento" },
-    { "abbr": "SAR", "expansion": "Solicitacao de Acesso do Titular" },
-    { "abbr": "SCC", "expansion": "Clausulas Contratuais Standard" },
-    { "abbr": "SLA", "expansion": "Acordo de Nivel de Servico" },
-    { "abbr": "SOP", "expansion": "Procedimento Operacional Padrao" },
-    { "abbr": "SOW", "expansion": "Declaracao de Trabalho" },
-    { "abbr": "SPA", "expansion": "Acordo de Compra de Acoes" },
-    { "abbr": "SO", "expansion": "Socio Omisso" },
-    { "abbr": "TBD", "expansion": "A Determinar" },
-    { "abbr": "TIA", "expansion": "Analise de Impacto de Transferencia" },
-    { "abbr": "TLA", "expansion": "Acrônimo de Tres Letras" },
-    { "abbr": "TOS", "expansion": "Termos de Servico" },
-    { "abbr": "WIP", "expansion": "Work in Progress" },
-    { "abbr": "WP", "expansion": "Work Product" }
+    {
+      "abbr": "AGM",
+      "expansion": "Assembleia Geral Anual"
+    },
+    {
+      "abbr": "AUA",
+      "expansion": "Avaliacao de Usabilidade e Acesso"
+    },
+    {
+      "abbr": "AUP",
+      "expansion": "Politica de Uso Aceitavel"
+    },
+    {
+      "abbr": "AML",
+      "expansion": "Antilavagem de Dinheiro"
+    },
+    {
+      "abbr": "APA",
+      "expansion": "Acordo de Compra de Ativos"
+    },
+    {
+      "abbr": "BAA",
+      "expansion": "Acordo de Associado Comercial"
+    },
+    {
+      "abbr": "BCR",
+      "expansion": "Binding Corporate Rules"
+    },
+    {
+      "abbr": "BOD",
+      "expansion": "Conselho de Administracao"
+    },
+    {
+      "abbr": "CCPA",
+      "expansion": "Lei de Protecao ao Consumidor da California"
+    },
+    {
+      "abbr": "CCPA_",
+      "expansion": "California Consumer Privacy Act"
+    },
+    {
+      "abbr": "CL",
+      "expansion": "Conselho Diretor"
+    },
+    {
+      "abbr": "COI",
+      "expansion": "Conflito de Interesses"
+    },
+    {
+      "abbr": "CR",
+      "expansion": "Clausula de Reversao"
+    },
+    {
+      "abbr": "CSA",
+      "expansion": "Acordo de Seguranca da Cadeia de Fornecimento"
+    },
+    {
+      "abbr": "CVE",
+      "expansion": "Vulnerabilidade Comuns"
+    },
+    {
+      "abbr": "DLP",
+      "expansion": "Prevencao de Perda de Dados"
+    },
+    {
+      "abbr": "DPA",
+      "expansion": "Acordo de Tratamento de Dados"
+    },
+    {
+      "abbr": "DPIA",
+      "expansion": "Avaliacao de Impacto de Protecao de Dados"
+    },
+    {
+      "abbr": "DPO",
+      "expansion": "Encarregado de Protecao de Dados"
+    },
+    {
+      "abbr": "DSAR",
+      "expansion": "Requisicao de Acesso pelo Titular"
+    },
+    {
+      "abbr": "EFFECT",
+      "expansion": "Efectividade"
+    },
+    {
+      "abbr": "EUA",
+      "expansion": "Entidade Unica de Atos"
+    },
+    {
+      "abbr": "EULA",
+      "expansion": "Licenca de Usuario Final"
+    },
+    {
+      "abbr": "FCPA",
+      "expansion": "Lei Anticorrupcao em transacoes no exterior"
+    },
+    {
+      "abbr": "GDPR",
+      "expansion": "Regulamento Geral de Protecao de Dados"
+    },
+    {
+      "abbr": "HNS",
+      "expansion": "Honorarios"
+    },
+    {
+      "abbr": "IP",
+      "expansion": "Propriedade Intelectual"
+    },
+    {
+      "abbr": "JDA",
+      "expansion": "Acordo de Desenvolvimento Conjunto"
+    },
+    {
+      "abbr": "JVA",
+      "expansion": "Joint Venture Agreement"
+    },
+    {
+      "abbr": "KYC",
+      "expansion": "Conheca Seu Cliente"
+    },
+    {
+      "abbr": "LGPD",
+      "expansion": "Lei Geral de Protecao de Dados"
+    },
+    {
+      "abbr": "LPA",
+      "expansion": "Procuracao Limitada"
+    },
+    {
+      "abbr": "LOA",
+      "expansion": "Carta de Autorizacao"
+    },
+    {
+      "abbr": "LOI",
+      "expansion": "Carta de Intencao"
+    },
+    {
+      "abbr": "MFA",
+      "expansion": "Acordo Quadro"
+    },
+    {
+      "abbr": "MFN",
+      "expansion": "Nacao Mais Favorecida"
+    },
+    {
+      "abbr": "MOU",
+      "expansion": "Memorando de Entendimento"
+    },
+    {
+      "abbr": "MSA",
+      "expansion": "Acordo Mestre de Servicos"
+    },
+    {
+      "abbr": "MTA",
+      "expansion": "Acordo de Transferencia de Materiais"
+    },
+    {
+      "abbr": "NCA",
+      "expansion": "Nao Concorrencia"
+    },
+    {
+      "abbr": "NDA",
+      "expansion": "Acordo de Confidencialidade"
+    },
+    {
+      "abbr": "NFR",
+      "expansion": "Requisito Nao Funcional"
+    },
+    {
+      "abbr": "NIS2",
+      "expansion": "Diretiva de Seguranca Cibernetica 2"
+    },
+    {
+      "abbr": "NPA",
+      "expansion": "Avaliacao de Nao Desempenho"
+    },
+    {
+      "abbr": "NSA",
+      "expansion": "Nao Solicitacao de Aliciacao"
+    },
+    {
+      "abbr": "NTP",
+      "expansion": "Notificacao para Proceder"
+    },
+    {
+      "abbr": "PII",
+      "expansion": "Informacao Pessoal Identificavel"
+    },
+    {
+      "abbr": "PIPL",
+      "expansion": "Lei de Protecao de Informacoes Pessoais"
+    },
+    {
+      "abbr": "POA",
+      "expansion": "Procuracao"
+    },
+    {
+      "abbr": "POPIA",
+      "expansion": "Lei Geral de Protecao de Dados Pessoais"
+    },
+    {
+      "abbr": "Q&A",
+      "expansion": "Perguntas e Respostas"
+    },
+    {
+      "abbr": "R&R",
+      "expansion": "Responsabilidades e Relacoes"
+    },
+    {
+      "abbr": "RFI",
+      "expansion": "Request for Information"
+    },
+    {
+      "abbr": "RFP",
+      "expansion": "Request for Proposal"
+    },
+    {
+      "abbr": "ROI",
+      "expansion": "Retorno sobre Investimento"
+    },
+    {
+      "abbr": "SAR",
+      "expansion": "Solicitacao de Acesso do Titular"
+    },
+    {
+      "abbr": "SCC",
+      "expansion": "Clausulas Contratuais Standard"
+    },
+    {
+      "abbr": "SLA",
+      "expansion": "Acordo de Nivel de Servico"
+    },
+    {
+      "abbr": "SOP",
+      "expansion": "Procedimento Operacional Padrao"
+    },
+    {
+      "abbr": "SOW",
+      "expansion": "Declaracao de Trabalho"
+    },
+    {
+      "abbr": "SPA",
+      "expansion": "Acordo de Compra de Acoes"
+    },
+    {
+      "abbr": "SO",
+      "expansion": "Socio Omisso"
+    },
+    {
+      "abbr": "TBD",
+      "expansion": "A Determinar"
+    },
+    {
+      "abbr": "TIA",
+      "expansion": "Analise de Impacto de Transferencia"
+    },
+    {
+      "abbr": "TLA",
+      "expansion": "Acrônimo de Tres Letras"
+    },
+    {
+      "abbr": "TOS",
+      "expansion": "Termos de Servico"
+    },
+    {
+      "abbr": "WIP",
+      "expansion": "Work in Progress"
+    },
+    {
+      "abbr": "WP",
+      "expansion": "Work Product"
+    }
   ]
 }

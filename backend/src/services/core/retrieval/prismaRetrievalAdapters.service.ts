@@ -27,6 +27,26 @@ const READY_DOCUMENT_STATUSES = [
 
 type SearchMode = "semantic" | "lexical" | "structural";
 
+type TablePayload = {
+  header?: string[];
+  rows?: Array<Array<string | number | null>>;
+  structureScore?: number;
+  numericIntegrityScore?: number;
+  warnings?: string[];
+};
+
+type RetrievalHit = {
+  docId: string;
+  location: ChunkLocation;
+  snippet: string;
+  score: number;
+  locationKey?: string;
+  chunkId?: string;
+  title?: string | null;
+  filename?: string | null;
+  table?: TablePayload;
+};
+
 type ChunkWithDocument = {
   id: string;
   documentId: string;
@@ -34,8 +54,22 @@ type ChunkWithDocument = {
   text: string | null;
   textEncrypted?: string | null;
   page: number | null;
+  sectionName?: string | null;
+  sheetName?: string | null;
+  tableChunkForm?: string | null;
+  tableId?: string | null;
+  rowIndex?: number | null;
+  columnIndex?: number | null;
+  rowLabel?: string | null;
+  colHeader?: string | null;
+  valueRaw?: string | null;
+  unitRaw?: string | null;
+  unitNormalized?: string | null;
+  numericValue?: number | null;
+  metadata?: Record<string, unknown> | null;
   document: {
     id: string;
+    parentVersionId?: string | null;
     filename: string | null;
     displayTitle: string | null;
     encryptedFilename?: string | null;
@@ -51,8 +85,12 @@ type EmbeddingWithDocument = {
   chunkIndex: number;
   content: string;
   pageNumber: number | null;
+  sectionName?: string | null;
+  sheetName?: string | null;
+  metadata?: string | null;
   document: {
     id: string;
+    parentVersionId?: string | null;
     filename: string | null;
     displayTitle: string | null;
     encryptedFilename?: string | null;
@@ -69,6 +107,26 @@ type ChunkRow = {
   text: string | null;
   textEncrypted?: string | null;
   page: number | null;
+  sectionName?: string | null;
+  sheetName?: string | null;
+  tableChunkForm?: string | null;
+  tableId?: string | null;
+  rowIndex?: number | null;
+  columnIndex?: number | null;
+  rowLabel?: string | null;
+  colHeader?: string | null;
+  valueRaw?: string | null;
+  unitRaw?: string | null;
+  unitNormalized?: string | null;
+  numericValue?: number | null;
+  metadata?: Record<string, unknown> | null;
+};
+
+type DocumentVersionRow = {
+  id: string;
+  parentVersionId: string | null;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 let embeddingsServiceSingleton: EmbeddingsService | null | undefined;
@@ -113,6 +171,37 @@ function uniq(values: string[]): string[] {
     out.push(normalized);
   }
   return out;
+}
+
+function rootDocumentIdFor(doc: {
+  id: string;
+  parentVersionId?: string | null;
+}): string {
+  return String(doc.parentVersionId || doc.id);
+}
+
+function compareDocRecency(
+  left: { id: string; updatedAt: Date; createdAt: Date },
+  right: { id: string; updatedAt: Date; createdAt: Date },
+): number {
+  const createdDelta = right.createdAt.getTime() - left.createdAt.getTime();
+  if (createdDelta !== 0) return createdDelta;
+  return right.id.localeCompare(left.id);
+}
+
+function parseEmbeddingMetadata(
+  raw: string | null | undefined,
+): Record<string, unknown> {
+  const value = String(raw || "").trim();
+  if (!value) return {};
+  try {
+    const parsed = JSON.parse(value) as unknown;
+    return parsed && typeof parsed === "object"
+      ? (parsed as Record<string, unknown>)
+      : {};
+  } catch {
+    return {};
+  }
 }
 
 function getEmbeddingsServiceSafe(): EmbeddingsService | null {
@@ -217,12 +306,52 @@ function scoreChunkText(
   );
 }
 
+function sanitizeLocationToken(value: unknown): string | null {
+  const text = String(value || "")
+    .replace(/[|]/g, "/")
+    .replace(/\s+/g, " ")
+    .trim();
+  return text || null;
+}
+
 function toLocationKey(
   documentId: string,
-  page: number | null,
-  chunkIndex: number,
+  params: {
+    page?: number | null;
+    sheet?: string | null;
+    slide?: number | null;
+    sectionKey?: string | null;
+    chunkIndex: number;
+  },
 ): string {
-  return `d:${documentId}|p:${page ?? -1}|c:${chunkIndex}`;
+  const page =
+    typeof params.page === "number" && Number.isFinite(params.page) && params.page > 0
+      ? Math.trunc(params.page)
+      : null;
+  const slide =
+    typeof params.slide === "number" &&
+    Number.isFinite(params.slide) &&
+    params.slide > 0
+      ? Math.trunc(params.slide)
+      : null;
+  const sheet = sanitizeLocationToken(params.sheet);
+  const sectionKey = sanitizeLocationToken(params.sectionKey);
+  const chunkIndex =
+    Number.isFinite(params.chunkIndex) && params.chunkIndex >= 0
+      ? Math.trunc(params.chunkIndex)
+      : 0;
+
+  const parts: string[] = [`d:${documentId}`];
+  if (page != null) {
+    parts.push(`p:${page}`);
+  } else if (slide == null && !sheet && !sectionKey) {
+    parts.push("p:-1");
+  }
+  if (sheet) parts.push(`s:${sheet}`);
+  if (slide != null) parts.push(`sl:${slide}`);
+  if (sectionKey) parts.push(`sec:${sectionKey}`);
+  parts.push(`c:${chunkIndex}`);
+  return parts.join("|");
 }
 
 function sectionKeyFromLocation(
@@ -281,14 +410,155 @@ class PrismaRetrievalUserAdapter
 {
   constructor(private readonly userId: string) {}
 
+  private isLatestVersionOnlyEnabled(): boolean {
+    return isRuntimeFlagEnabled("RETRIEVAL_LATEST_VERSION_ONLY", true);
+  }
+
+  private async resolveLatestReadyDocByRootIds(
+    rootIds: string[],
+  ): Promise<Map<string, DocumentVersionRow>> {
+    const uniqueRoots = uniq(rootIds);
+    if (!uniqueRoots.length) return new Map();
+
+    const familyDocsRaw = await prisma.document.findMany({
+      where: {
+        userId: this.userId,
+        status: { in: [...READY_DOCUMENT_STATUSES] },
+        OR: [
+          { id: { in: uniqueRoots } },
+          { parentVersionId: { in: uniqueRoots } },
+        ],
+      },
+      select: {
+        id: true,
+        parentVersionId: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+    const familyDocs = (Array.isArray(familyDocsRaw)
+      ? familyDocsRaw
+      : []) as unknown as DocumentVersionRow[];
+
+    const latestByRoot = new Map<string, DocumentVersionRow>();
+    for (const doc of familyDocs) {
+      const rootId = rootDocumentIdFor(doc);
+      const existing = latestByRoot.get(rootId);
+      if (!existing || compareDocRecency(doc, existing) < 0) {
+        latestByRoot.set(rootId, doc);
+      }
+    }
+    return latestByRoot;
+  }
+
+  private async resolveScopedDocIds(
+    docIds?: string[],
+  ): Promise<string[] | undefined> {
+    const requested = uniq(Array.isArray(docIds) ? docIds : []);
+    if (!requested.length) return undefined;
+    if (!this.isLatestVersionOnlyEnabled()) return requested;
+
+    const requestedDocsRaw = await prisma.document.findMany({
+      where: {
+        userId: this.userId,
+        id: { in: requested },
+      },
+      select: {
+        id: true,
+        parentVersionId: true,
+      },
+    });
+    const requestedDocs = (Array.isArray(requestedDocsRaw)
+      ? requestedDocsRaw
+      : []) as Array<{ id: string; parentVersionId: string | null }>;
+
+    if (!requestedDocs.length) return requested;
+
+    const pinnedRevisionIds: string[] = [];
+    const requestedRootIds: string[] = [];
+    for (const doc of requestedDocs) {
+      if (doc.parentVersionId) {
+        // Explicit revision ID is treated as a pin.
+        pinnedRevisionIds.push(doc.id);
+        continue;
+      }
+      requestedRootIds.push(doc.id);
+    }
+
+    const latestByRoot = await this.resolveLatestReadyDocByRootIds(
+      requestedRootIds,
+    );
+    const resolvedRootIds = requestedRootIds.map(
+      (rootId) => latestByRoot.get(rootId)?.id || rootId,
+    );
+    return uniq([...resolvedRootIds, ...pinnedRevisionIds]);
+  }
+
+  private async keepLatestVersionHits<T extends { docId: string }>(
+    hits: T[],
+    scopedDocIds?: string[],
+  ): Promise<T[]> {
+    if (!hits.length) return hits;
+    if (!this.isLatestVersionOnlyEnabled()) return hits;
+    if (Array.isArray(scopedDocIds) && scopedDocIds.length > 0) return hits;
+
+    const candidateDocIds = uniq(hits.map((hit) => hit.docId));
+    if (!candidateDocIds.length) return hits;
+
+    const docsRaw = await prisma.document.findMany({
+      where: {
+        userId: this.userId,
+        id: { in: candidateDocIds },
+      },
+      select: {
+        id: true,
+        parentVersionId: true,
+      },
+    });
+    const docs = (Array.isArray(docsRaw) ? docsRaw : []) as Array<{
+      id: string;
+      parentVersionId: string | null;
+    }>;
+    if (!docs.length) return hits;
+
+    const byId = new Map(docs.map((doc) => [doc.id, doc]));
+    const rootIds = uniq(docs.map((doc) => rootDocumentIdFor(doc)));
+    const latestByRoot = await this.resolveLatestReadyDocByRootIds(rootIds);
+    if (!latestByRoot.size) return hits;
+
+    const hitsByRoot = new Map<string, T[]>();
+    for (const hit of hits) {
+      const doc = byId.get(hit.docId);
+      const rootId = doc ? rootDocumentIdFor(doc) : hit.docId;
+      const group = hitsByRoot.get(rootId) || [];
+      group.push(hit);
+      hitsByRoot.set(rootId, group);
+    }
+
+    const kept: T[] = [];
+    for (const [rootId, rootHits] of hitsByRoot) {
+      const latestDocId = latestByRoot.get(rootId)?.id;
+      if (!latestDocId) {
+        kept.push(...rootHits);
+        continue;
+      }
+      const latestHits = rootHits.filter((hit) => hit.docId === latestDocId);
+      // Keep stale hits only when we have no replacement evidence from latest revision.
+      kept.push(...(latestHits.length > 0 ? latestHits : rootHits));
+    }
+
+    return kept;
+  }
+
   async listDocs(): Promise<DocMeta[]> {
-    const docs = await prisma.document.findMany({
+    const docsRaw = await prisma.document.findMany({
       where: {
         userId: this.userId,
         status: { in: [...READY_DOCUMENT_STATUSES] },
       },
       select: {
         id: true,
+        parentVersionId: true,
         filename: true,
         displayTitle: true,
         encryptedFilename: true,
@@ -297,10 +567,30 @@ class PrismaRetrievalUserAdapter
         updatedAt: true,
       },
       take: 5000,
-      orderBy: { id: "asc" },
+      orderBy: [
+        { createdAt: "desc" },
+        { id: "desc" },
+      ],
     });
+    const docs = Array.isArray(docsRaw) ? docsRaw : [];
 
-    return docs.map((doc) => {
+    const effectiveDocs = this.isLatestVersionOnlyEnabled()
+      ? (() => {
+          const latestByRoot = new Map<
+            string,
+            (typeof docs)[number]
+          >();
+          for (const doc of docs) {
+            const rootId = rootDocumentIdFor(doc);
+            if (!latestByRoot.has(rootId)) {
+              latestByRoot.set(rootId, doc);
+            }
+          }
+          return [...latestByRoot.values()];
+        })()
+      : docs;
+
+    return effectiveDocs.map((doc) => {
       const label = resolveDocLabel(doc);
       return {
         docId: doc.id,
@@ -314,13 +604,14 @@ class PrismaRetrievalUserAdapter
   }
 
   async getDocMeta(docId: string): Promise<DocMeta | null> {
-    const doc = await prisma.document.findFirst({
+    const requested = await prisma.document.findFirst({
       where: {
         id: docId,
         userId: this.userId,
       },
       select: {
         id: true,
+        parentVersionId: true,
         filename: true,
         displayTitle: true,
         encryptedFilename: true,
@@ -330,7 +621,38 @@ class PrismaRetrievalUserAdapter
       },
     });
 
-    if (!doc) return null;
+    if (!requested) return null;
+
+    let doc = requested;
+    if (
+      this.isLatestVersionOnlyEnabled() &&
+      !requested.parentVersionId
+    ) {
+      const latestByRoot = await this.resolveLatestReadyDocByRootIds([
+        requested.id,
+      ]);
+      const latestDocId = latestByRoot.get(requested.id)?.id;
+      if (latestDocId && latestDocId !== requested.id) {
+        const latest = await prisma.document.findFirst({
+          where: {
+            id: latestDocId,
+            userId: this.userId,
+          },
+          select: {
+            id: true,
+            parentVersionId: true,
+            filename: true,
+            displayTitle: true,
+            encryptedFilename: true,
+            mimeType: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        });
+        if (latest) doc = latest;
+      }
+    }
+
     const label = resolveDocLabel(doc);
     return {
       docId: doc.id,
@@ -343,14 +665,7 @@ class PrismaRetrievalUserAdapter
   }
 
   async search(opts: { query: string; docIds?: string[]; k: number }): Promise<
-    Array<{
-      docId: string;
-      location: ChunkLocation;
-      snippet: string;
-      score: number;
-      locationKey?: string;
-      chunkId?: string;
-    }>
+    RetrievalHit[]
   > {
     const pineconePrimary = isRuntimeFlagEnabled(
       "RETRIEVAL_SEMANTIC_PINECONE_PRIMARY",
@@ -383,16 +698,7 @@ class PrismaRetrievalUserAdapter
     query: string;
     docIds?: string[];
     k: number;
-  }): Promise<
-    Array<{
-      docId: string;
-      location: ChunkLocation;
-      snippet: string;
-      score: number;
-      locationKey?: string;
-      chunkId?: string;
-    }>
-  > {
+  }): Promise<RetrievalHit[]> {
     return this.runChunkSearch({
       mode: "lexical",
       query: opts.query,
@@ -406,16 +712,7 @@ class PrismaRetrievalUserAdapter
     docIds?: string[];
     k: number;
     anchors: string[];
-  }): Promise<
-    Array<{
-      docId: string;
-      location: ChunkLocation;
-      snippet: string;
-      score: number;
-      locationKey?: string;
-      chunkId?: string;
-    }>
-  > {
+  }): Promise<RetrievalHit[]> {
     const anchorQuery = opts.anchors.length
       ? `${opts.query} ${opts.anchors.join(" ")}`
       : opts.query;
@@ -432,28 +729,24 @@ class PrismaRetrievalUserAdapter
     query: string;
     docIds?: string[];
     k: number;
-  }): Promise<
-    Array<{
-      docId: string;
-      location: ChunkLocation;
-      snippet: string;
-      score: number;
-      locationKey?: string;
-      chunkId?: string;
-      title?: string | null;
-      filename?: string | null;
-    }>
-  > {
+  }): Promise<RetrievalHit[]> {
     const query = String(input.query || "").trim();
     if (!query) return [];
 
+    const scopedDocIds = await this.resolveScopedDocIds(input.docIds);
     const tokens = tokenizeQuery(query);
     if (!tokens.length) return [];
-    const embeddingBackedLexical = isRuntimeFlagEnabled(
+    const embeddingBackedLexicalFlag = isRuntimeFlagEnabled(
       "RETRIEVAL_LEXICAL_FROM_EMBEDDINGS",
       false,
     );
-    if (embeddingBackedLexical) {
+    const encryptedOnlyChunks = isRuntimeFlagEnabled(
+      "INDEXING_ENCRYPTED_CHUNKS_ONLY",
+      true,
+    );
+    const useEmbeddingBackedLexical =
+      embeddingBackedLexicalFlag || encryptedOnlyChunks;
+    if (useEmbeddingBackedLexical) {
       return this.runEmbeddingBackedChunkSearch(input, query, tokens);
     }
 
@@ -465,8 +758,8 @@ class PrismaRetrievalUserAdapter
       },
     };
 
-    if (input.docIds && input.docIds.length > 0) {
-      where.documentId = { in: input.docIds };
+    if (scopedDocIds && scopedDocIds.length > 0) {
+      where.documentId = { in: scopedDocIds };
     }
 
     where.OR = tokens.map((token) => ({
@@ -481,6 +774,7 @@ class PrismaRetrievalUserAdapter
         document: {
           select: {
             id: true,
+            parentVersionId: true,
             filename: true,
             displayTitle: true,
             encryptedFilename: true,
@@ -500,6 +794,7 @@ class PrismaRetrievalUserAdapter
       location: ChunkLocation;
       locationKey: string;
       snippet: string;
+      table?: TablePayload;
       score: number;
       chunkId: string;
     }> = [];
@@ -512,19 +807,30 @@ class PrismaRetrievalUserAdapter
       if (score <= 0) continue;
 
       const label = resolveDocLabel(row.document);
+      const tablePayload = this.buildTablePayloadFromChunkRow(row, snippet);
+      const sheet = sanitizeLocationToken(row.sheetName ?? null);
+      const sectionKey = sanitizeLocationToken(
+        row.sectionName ?? row.tableId ?? row.rowLabel ?? null,
+      );
       scored.push({
         docId: row.documentId,
         title: label.title,
         filename: label.filename,
         location: {
           page: row.page ?? null,
+          sheet,
+          sectionKey,
+          versionId: row.documentId,
+          rootDocumentId: rootDocumentIdFor(row.document),
         } as ChunkLocation,
-        locationKey: toLocationKey(
-          row.documentId,
-          row.page ?? null,
-          row.chunkIndex,
-        ),
+        locationKey: toLocationKey(row.documentId, {
+          page: row.page ?? null,
+          sheet,
+          sectionKey,
+          chunkIndex: row.chunkIndex,
+        }),
         snippet,
+        table: tablePayload,
         score,
         chunkId: row.id,
       });
@@ -536,16 +842,16 @@ class PrismaRetrievalUserAdapter
     // contain query tokens — the other attached docs get zero representation.
     // For multi-doc overview questions ("visão geral dos docs que anexei")
     // the LLM needs context from ALL documents to give a useful answer.
-    if (input.docIds && input.docIds.length > 0) {
+    if (scopedDocIds && scopedDocIds.length > 0) {
       const representedDocs = new Set(scored.map((s) => s.docId));
-      const missingDocs = input.docIds.filter((id) => !representedDocs.has(id));
+      const missingDocs = scopedDocIds.filter((id) => !representedDocs.has(id));
       // Also backfill docs with very few chunks (< 3) for better coverage
       const thinDocs: string[] = [];
       const docCounts = new Map<string, number>();
       for (const s of scored) {
         docCounts.set(s.docId, (docCounts.get(s.docId) ?? 0) + 1);
       }
-      for (const id of input.docIds) {
+      for (const id of scopedDocIds) {
         if ((docCounts.get(id) ?? 0) < 3 && !missingDocs.includes(id)) {
           thinDocs.push(id);
         }
@@ -554,7 +860,7 @@ class PrismaRetrievalUserAdapter
 
       if (docsToBackfill.length > 0) {
         const perDocLimit = Math.max(
-          Math.ceil(input.k / input.docIds.length),
+          Math.ceil(input.k / scopedDocIds.length),
           4,
         );
         const fallbackWhere: Prisma.DocumentChunkWhereInput = {
@@ -573,6 +879,7 @@ class PrismaRetrievalUserAdapter
             document: {
               select: {
                 id: true,
+                parentVersionId: true,
                 filename: true,
                 displayTitle: true,
                 encryptedFilename: true,
@@ -598,17 +905,30 @@ class PrismaRetrievalUserAdapter
           if (!snippet) continue;
           backfillPerDoc.set(row.documentId, count + 1);
           const label = resolveDocLabel(row.document);
+          const tablePayload = this.buildTablePayloadFromChunkRow(row, snippet);
+          const sheet = sanitizeLocationToken(row.sheetName ?? null);
+          const sectionKey = sanitizeLocationToken(
+            row.sectionName ?? row.tableId ?? row.rowLabel ?? null,
+          );
           scored.push({
             docId: row.documentId,
             title: label.title,
             filename: label.filename,
-            location: { page: row.page ?? null } as ChunkLocation,
-            locationKey: toLocationKey(
-              row.documentId,
-              row.page ?? null,
-              row.chunkIndex,
-            ),
+            location: {
+              page: row.page ?? null,
+              sheet,
+              sectionKey,
+              versionId: row.documentId,
+              rootDocumentId: rootDocumentIdFor(row.document),
+            } as ChunkLocation,
+            locationKey: toLocationKey(row.documentId, {
+              page: row.page ?? null,
+              sheet,
+              sectionKey,
+              chunkIndex: row.chunkIndex,
+            }),
             snippet,
+            table: tablePayload,
             score: 0.55,
             chunkId: row.id,
           });
@@ -616,7 +936,12 @@ class PrismaRetrievalUserAdapter
       }
     }
 
-    scored.sort((a, b) => {
+    const filteredScored = await this.keepLatestVersionHits(
+      scored,
+      scopedDocIds,
+    );
+
+    filteredScored.sort((a, b) => {
       if (b.score !== a.score) return b.score - a.score;
       if (a.docId !== b.docId) return a.docId.localeCompare(b.docId);
       if (a.locationKey !== b.locationKey)
@@ -624,25 +949,15 @@ class PrismaRetrievalUserAdapter
       return a.chunkId.localeCompare(b.chunkId);
     });
 
-    return scored.slice(0, Math.max(1, input.k));
+    return filteredScored.slice(0, Math.max(1, input.k));
   }
 
   private async runEmbeddingBackedChunkSearch(
     input: { mode: SearchMode; query: string; docIds?: string[]; k: number },
     query: string,
     tokens: string[],
-  ): Promise<
-    Array<{
-      docId: string;
-      location: ChunkLocation;
-      snippet: string;
-      score: number;
-      locationKey?: string;
-      chunkId?: string;
-      title?: string | null;
-      filename?: string | null;
-    }>
-  > {
+  ): Promise<RetrievalHit[]> {
+    const scopedDocIds = await this.resolveScopedDocIds(input.docIds);
     const where: Prisma.DocumentEmbeddingWhereInput = {
       content: { not: "" },
       document: {
@@ -653,8 +968,8 @@ class PrismaRetrievalUserAdapter
         content: { contains: token, mode: "insensitive" },
       })),
     };
-    if (input.docIds && input.docIds.length > 0) {
-      where.documentId = { in: input.docIds };
+    if (scopedDocIds && scopedDocIds.length > 0) {
+      where.documentId = { in: scopedDocIds };
     }
 
     const rows = (await prisma.documentEmbedding.findMany({
@@ -665,6 +980,7 @@ class PrismaRetrievalUserAdapter
         document: {
           select: {
             id: true,
+            parentVersionId: true,
             filename: true,
             displayTitle: true,
             encryptedFilename: true,
@@ -683,6 +999,7 @@ class PrismaRetrievalUserAdapter
       location: ChunkLocation;
       locationKey: string;
       snippet: string;
+      table?: TablePayload;
       score: number;
       chunkId: string;
     }> = [];
@@ -691,24 +1008,59 @@ class PrismaRetrievalUserAdapter
       if (!snippet) continue;
       const score = scoreChunkText(snippet, query, tokens, input.mode);
       if (score <= 0) continue;
+      const metadata = parseEmbeddingMetadata(row.metadata);
       const label = resolveDocLabel(row.document);
+      const tablePayload = this.buildTablePayloadFromMetadata(metadata, snippet);
+      const sheet = sanitizeLocationToken(
+        row.sheetName ??
+          (typeof metadata.sheetName === "string"
+            ? metadata.sheetName
+            : typeof metadata.sheet === "string"
+              ? metadata.sheet
+              : null),
+      );
+      const sectionKey = sanitizeLocationToken(
+        row.sectionName ??
+          (typeof metadata.sectionName === "string"
+            ? metadata.sectionName
+            : typeof metadata.sectionKey === "string"
+              ? metadata.sectionKey
+              : typeof metadata.tableId === "string"
+                ? metadata.tableId
+                : typeof metadata.rowLabel === "string"
+                  ? metadata.rowLabel
+                  : null),
+      );
       scored.push({
         docId: row.documentId,
         title: label.title,
         filename: label.filename,
-        location: { page: row.pageNumber ?? null } as ChunkLocation,
-        locationKey: toLocationKey(
-          row.documentId,
-          row.pageNumber ?? null,
-          row.chunkIndex,
-        ),
+        location: {
+          page: row.pageNumber ?? null,
+          sheet,
+          sectionKey,
+          versionId: row.documentId,
+          rootDocumentId: rootDocumentIdFor(row.document),
+        } as ChunkLocation,
+        locationKey: toLocationKey(row.documentId, {
+          page: row.pageNumber ?? null,
+          sheet,
+          sectionKey,
+          chunkIndex: row.chunkIndex,
+        }),
         snippet,
+        table: tablePayload,
         score,
         chunkId: `${row.documentId}:${row.chunkIndex}`,
       });
     }
 
-    scored.sort((a, b) => {
+    const filteredScored = await this.keepLatestVersionHits(
+      scored,
+      scopedDocIds,
+    );
+
+    filteredScored.sort((a, b) => {
       if (b.score !== a.score) return b.score - a.score;
       if (a.docId !== b.docId) return a.docId.localeCompare(b.docId);
       if (a.locationKey !== b.locationKey)
@@ -716,25 +1068,14 @@ class PrismaRetrievalUserAdapter
       return a.chunkId.localeCompare(b.chunkId);
     });
 
-    return scored.slice(0, Math.max(1, input.k));
+    return filteredScored.slice(0, Math.max(1, input.k));
   }
 
   private async runPineconeSemanticSearch(opts: {
     query: string;
     docIds?: string[];
     k: number;
-  }): Promise<
-    Array<{
-      docId: string;
-      location: ChunkLocation;
-      snippet: string;
-      score: number;
-      locationKey?: string;
-      chunkId?: string;
-      title?: string | null;
-      filename?: string | null;
-    }>
-  > {
+  }): Promise<RetrievalHit[]> {
     const query = String(opts.query || "").trim();
     if (!query) return [];
     if (!pineconeService.isAvailable()) return [];
@@ -749,6 +1090,8 @@ class PrismaRetrievalUserAdapter
       0.2,
     );
     const requestedDocIds = uniq(Array.isArray(opts.docIds) ? opts.docIds : []);
+    const scopedDocIds = await this.resolveScopedDocIds(requestedDocIds);
+    const targetDocIds = scopedDocIds ?? [];
 
     const queryEmbedding = (
       await embeddingsService.generateQueryEmbedding(query)
@@ -772,21 +1115,21 @@ class PrismaRetrievalUserAdapter
       };
     }> = [];
 
-    if (requestedDocIds.length === 1) {
+    if (targetDocIds.length === 1) {
       hits = await pineconeService.searchSimilarChunks(
         queryEmbedding,
         this.userId,
         effectiveTopK,
         minSimilarity,
-        requestedDocIds[0],
+        targetDocIds[0],
       );
-    } else if (requestedDocIds.length > 1) {
+    } else if (targetDocIds.length > 1) {
       const perDocTopK = Math.max(
-        Math.ceil(effectiveTopK / requestedDocIds.length),
+        Math.ceil(effectiveTopK / targetDocIds.length),
         6,
       );
       const grouped = await Promise.all(
-        requestedDocIds.map((docId) =>
+        targetDocIds.map((docId) =>
           pineconeService.searchSimilarChunks(
             queryEmbedding,
             this.userId,
@@ -807,8 +1150,8 @@ class PrismaRetrievalUserAdapter
     }
 
     const filteredHits =
-      requestedDocIds.length > 0
-        ? hits.filter((hit) => requestedDocIds.includes(hit.documentId))
+      targetDocIds.length > 0
+        ? hits.filter((hit) => targetDocIds.includes(hit.documentId))
         : hits;
 
     const deduped = new Map<string, (typeof filteredHits)[number]>();
@@ -830,15 +1173,53 @@ class PrismaRetrievalUserAdapter
         const semanticKey = `${hit.documentId}:${chunkIndex}`;
         const hydrated = semanticHydrated.get(semanticKey);
         const fallbackPage = hydrated?.page ?? null;
+        const sheet = sanitizeLocationToken(
+          typeof md.sheet === "string"
+            ? md.sheet
+            : typeof md.sheetName === "string"
+              ? md.sheetName
+              : null,
+        );
+        const inferredSectionKey = sanitizeLocationToken(
+          typeof md.sectionKey === "string"
+            ? md.sectionKey
+            : typeof md.sectionName === "string"
+              ? md.sectionName
+              : typeof md.tableId === "string"
+                ? md.tableId
+                : typeof md.rowLabel === "string"
+                  ? md.rowLabel
+                  : null,
+        );
         const locationKey =
           String(md.locationKey || "").trim() ||
-          toLocationKey(hit.documentId, page ?? fallbackPage, chunkIndex);
+          toLocationKey(hit.documentId, {
+            page: page ?? fallbackPage,
+            sheet,
+            slide,
+            sectionKey: inferredSectionKey,
+            chunkIndex,
+          });
+        const sectionKey =
+          inferredSectionKey || sectionKeyFromLocation(locationKey, chunkIndex);
         const title = String(md.title || "").trim() || null;
         const filename =
           String(hit.document?.filename || md.filename || "").trim() || null;
         const snippet = toSnippet(
           hit.content || String(md.content || "") || hydrated?.text || "",
         );
+        const versionId =
+          typeof md.versionId === "string" && String(md.versionId).trim()
+            ? String(md.versionId).trim()
+            : hit.documentId;
+        const rootDocumentId =
+          typeof md.rootDocumentId === "string" && String(md.rootDocumentId).trim()
+            ? String(md.rootDocumentId).trim()
+            : typeof md.parentVersionId === "string" &&
+                String(md.parentVersionId).trim()
+              ? String(md.parentVersionId).trim()
+              : versionId;
+        const tablePayload = this.buildTablePayloadFromMetadata(md, snippet);
 
         return {
           docId: hit.documentId,
@@ -847,18 +1228,13 @@ class PrismaRetrievalUserAdapter
           location: {
             page: page ?? fallbackPage,
             slide,
-            sheet:
-              typeof md.sheet === "string"
-                ? String(md.sheet)
-                : typeof md.sheetName === "string"
-                  ? String(md.sheetName)
-                  : null,
-            sectionKey:
-              typeof md.sectionKey === "string"
-                ? String(md.sectionKey)
-                : sectionKeyFromLocation(locationKey, chunkIndex),
+            sheet,
+            sectionKey,
+            versionId,
+            rootDocumentId,
           } as ChunkLocation,
           snippet,
+          table: tablePayload,
           score: clamp01(Number(hit.similarity || 0)),
           locationKey,
           chunkId: hydrated?.chunkId || `${hit.documentId}:${chunkIndex}`,
@@ -866,7 +1242,12 @@ class PrismaRetrievalUserAdapter
       })
       .filter((item) => item.snippet.length > 0);
 
-    normalized.sort((a, b) => {
+    const filteredNormalized = await this.keepLatestVersionHits(
+      normalized,
+      scopedDocIds,
+    );
+
+    filteredNormalized.sort((a, b) => {
       if (b.score !== a.score) return b.score - a.score;
       if (a.docId !== b.docId) return a.docId.localeCompare(b.docId);
       const ak = String(a.locationKey || "");
@@ -875,7 +1256,81 @@ class PrismaRetrievalUserAdapter
       return String(a.chunkId || "").localeCompare(String(b.chunkId || ""));
     });
 
-    return normalized.slice(0, requestedK);
+    return filteredNormalized.slice(0, requestedK);
+  }
+
+  private buildTablePayloadFromMetadata(
+    metadata: Record<string, unknown>,
+    snippet: string,
+  ): TablePayload | undefined {
+    const chunkForm = String(metadata.tableChunkForm || "")
+      .trim()
+      .toLowerCase();
+    if (!chunkForm) return undefined;
+
+    const rowLabel = String(metadata.rowLabel || "").trim();
+    const colHeader = String(metadata.colHeader || "").trim();
+    const valueRaw = String(metadata.valueRaw || "").trim();
+    const unitRaw = String(metadata.unitRaw || "").trim();
+    const unitNormalized = String(metadata.unitNormalized || "").trim();
+
+    if (chunkForm === "cell_centric") {
+      const header = [rowLabel, colHeader].filter(Boolean);
+      const cellText = valueRaw || snippet;
+      return {
+        header: header.length ? header : undefined,
+        rows: [[cellText || null]],
+        structureScore: 0.95,
+        numericIntegrityScore: unitNormalized ? 0.92 : 0.78,
+        warnings:
+          unitRaw || unitNormalized
+            ? undefined
+            : ["unit_missing_for_cell_fact"],
+      };
+    }
+
+    if (chunkForm === "row_aggregate") {
+      return {
+        header: rowLabel ? [rowLabel] : undefined,
+        rows: [[snippet || null]],
+        structureScore: 0.85,
+        numericIntegrityScore: 0.8,
+      };
+    }
+
+    if (chunkForm === "table_summary") {
+      const sheetName = String(metadata.sheetName || "").trim();
+      const tableId = String(metadata.tableId || "").trim();
+      const header = [sheetName, tableId].filter(Boolean);
+      return {
+        header: header.length ? header : undefined,
+        rows: [[snippet || null]],
+        structureScore: 0.7,
+        numericIntegrityScore: 0.7,
+      };
+    }
+
+    return undefined;
+  }
+
+  private buildTablePayloadFromChunkRow(
+    row: ChunkRow,
+    snippet: string,
+  ): TablePayload | undefined {
+    const merged: Record<string, unknown> = {
+      ...(row.metadata && typeof row.metadata === "object"
+        ? row.metadata
+        : {}),
+      tableChunkForm: row.tableChunkForm ?? undefined,
+      tableId: row.tableId ?? undefined,
+      rowLabel: row.rowLabel ?? undefined,
+      colHeader: row.colHeader ?? undefined,
+      valueRaw: row.valueRaw ?? undefined,
+      unitRaw: row.unitRaw ?? undefined,
+      unitNormalized: row.unitNormalized ?? undefined,
+      sheetName: row.sheetName ?? undefined,
+    };
+    return this.buildTablePayloadFromMetadata(merged, snippet);
   }
 
   private async resolveChunkTexts(

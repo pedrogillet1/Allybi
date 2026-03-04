@@ -3,9 +3,18 @@
     "id": "allybi_response_style",
     "version": "1.0.0",
     "description": "Bilingual response templates for deterministic editing UX microcopy.",
-    "languages": ["en", "pt"],
+    "languages": [
+      "en",
+      "pt"
+    ],
     "lastUpdated": "2026-02-12",
-    "owner": "allybi-editing"
+    "owner": "allybi-editing",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,

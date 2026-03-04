@@ -3,8 +3,17 @@
     "id": "di_accounting_reasoning_scaffolds_v2",
     "version": "2.0.0",
     "description": "Reasoning templates for accounting analysis including tie-out, control evaluation, and period-specific checks.",
-    "languages": ["any"],
-    "lastUpdated": "2026-03-03"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -15,7 +24,11 @@
     {
       "id": "acct_scaffold_001_trial_balance_tieout",
       "name": "Trial Balance to Ledger Tie-Out",
-      "operators": ["validate", "compare", "extract"],
+      "operators": [
+        "validate",
+        "compare",
+        "extract"
+      ],
       "steps": [
         "Extract total debit and credit from the trial balance table section.",
         "Check whether the same period ledger pages present control account totals.",
@@ -29,7 +42,10 @@
     {
       "id": "acct_scaffold_002_bank_reconciliation",
       "name": "Bank Reconciliation Tie-Out",
-      "operators": ["validate", "compare"],
+      "operators": [
+        "validate",
+        "compare"
+      ],
       "steps": [
         "Capture bank statement ending balance and reporting date.",
         "Capture GL/cash account book balance and reporting date from heading/table context.",
@@ -43,7 +59,10 @@
     {
       "id": "acct_scaffold_003_journal_integrity",
       "name": "Journal Entry Integrity Check",
-      "operators": ["validate", "evaluate"],
+      "operators": [
+        "validate",
+        "evaluate"
+      ],
       "steps": [
         "Validate that each JE has both debit and credit side in supported conventions.",
         "Check JE date is within period and cutoff (no future/post-period entries).",
@@ -57,7 +76,10 @@
     {
       "id": "acct_scaffold_004_subledger_tieout",
       "name": "Subledger Tie-Out",
-      "operators": ["compare", "validate"],
+      "operators": [
+        "compare",
+        "validate"
+      ],
       "steps": [
         "Summarize AR or AP subledger totals by control account.",
         "Identify key control account in GL for same period.",
@@ -70,7 +92,11 @@
     {
       "id": "acct_scaffold_005_accrual_cash_compare",
       "name": "Competência x Caixa",
-      "operators": ["compare", "evaluate", "monitor"],
+      "operators": [
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
       "steps": [
         "Identify accrual-based and cash-based totals with clear heading/footnote cues.",
         "Map revenue/expense recognition basis by source section.",
@@ -83,7 +109,10 @@
     {
       "id": "acct_scaffold_006_control_risk",
       "name": "Control Design Evaluation",
-      "operators": ["evaluate", "validate"],
+      "operators": [
+        "evaluate",
+        "validate"
+      ],
       "steps": [
         "Extract control objective and walkthrough from narrative/workpaper table.",
         "Assess control owner, frequency, and key controls evidence.",
@@ -96,7 +125,11 @@
     {
       "id": "acct_scaffold_007_fixed_asset_recon",
       "name": "Fixed Asset Rollforward Validation",
-      "operators": ["calculate", "validate", "compare"],
+      "operators": [
+        "calculate",
+        "validate",
+        "compare"
+      ],
       "steps": [
         "Extract opening carrying amounts and movement columns.",
         "Apply additions, disposals, transfers, depreciation for period.",
@@ -108,7 +141,11 @@
     {
       "id": "acct_scaffold_008_aging_workflow",
       "name": "Aging and Provision Workflow",
-      "operators": ["extract", "monitor", "evaluate"],
+      "operators": [
+        "extract",
+        "monitor",
+        "evaluate"
+      ],
       "steps": [
         "Collect aging buckets and total for same report date.",
         "Identify top balances in each delinquency bucket.",
@@ -121,7 +158,11 @@
     {
       "id": "acct_scaffold_009_pbc_completeness",
       "name": "PBC and Request Completion Check",
-      "operators": ["evaluate", "validate", "summarize"],
+      "operators": [
+        "evaluate",
+        "validate",
+        "summarize"
+      ],
       "steps": [
         "Classify PBC items by document type and required evidence field.",
         "Check if each request has status, owner, receipt date and location.",
@@ -132,7 +173,11 @@
     {
       "id": "acct_scaffold_010_debit_credit_sign",
       "name": "Debit/Credit Sign Convention",
-      "operators": ["validate", "extract", "compare"],
+      "operators": [
+        "validate",
+        "extract",
+        "compare"
+      ],
       "steps": [
         "Determine convention from column headings or explicit sign legend.",
         "Verify DR/CR usage consistency across tables.",

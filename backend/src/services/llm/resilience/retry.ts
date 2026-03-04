@@ -58,3 +58,56 @@ export async function withRetry<T>(
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
+
+/**
+ * Determines whether an error is retryable.
+ * Retryable: HTTP 429 (rate limited), HTTP 5xx, network errors.
+ * Non-retryable: CircuitOpenError, HTTP 4xx (except 429), AbortError.
+ */
+export function isRetryableError(err: unknown): boolean {
+  if (!err || typeof err !== "object") return false;
+
+  const e = err as Record<string, unknown>;
+
+  // Never retry circuit-open or aborts
+  if (e.name === "CircuitOpenError" || e.name === "AbortError") return false;
+  if (err instanceof Error && /abort/i.test(err.message)) return false;
+
+  // Check for HTTP status codes embedded in error
+  const status =
+    typeof e.status === "number"
+      ? e.status
+      : typeof e.statusCode === "number"
+        ? e.statusCode
+        : extractStatusFromMessage(e);
+
+  if (status !== null) {
+    if (status === 429) return true; // rate limited
+    if (status >= 500) return true; // server error
+    if (status >= 400) return false; // client error (not 429)
+  }
+
+  // Network errors
+  if (err instanceof TypeError) return true; // fetch network failure
+  if (
+    typeof e.code === "string" &&
+    (e.code === "ECONNRESET" || e.code === "ETIMEDOUT" || e.code === "ECONNREFUSED")
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
+function extractStatusFromMessage(e: Record<string, unknown>): number | null {
+  if (typeof e.message !== "string") return null;
+  try {
+    const parsed = JSON.parse(e.message);
+    if (typeof parsed?.status === "number") return parsed.status;
+  } catch {
+    // Not JSON — try regex
+    const match = e.message.match(/"status"\s*:\s*(\d{3})/);
+    if (match) return Number(match[1]);
+  }
+  return null;
+}

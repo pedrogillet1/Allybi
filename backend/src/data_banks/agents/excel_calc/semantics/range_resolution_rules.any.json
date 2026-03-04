@@ -3,16 +3,29 @@
     "id": "range_resolution_rules",
     "version": "1.0.0",
     "description": "Range resolution rules for header detection, table boundary inference, temporal row selection, named range expansion, and safety constraints in spreadsheet calculation agents.",
-    "languages": ["any", "en", "pt"],
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
     "lastUpdated": "2026-02-28",
-    "owner": "excel-calc-agent"
+    "owner": "excel-calc-agent",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
     "maxScanRows": 1000,
     "maxScanCols": 100,
     "headerScanDepth": 5,
-    "emptyRowThreshold": 3
+    "emptyRowThreshold": 3,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
   },
   "rules": [
     {
@@ -37,8 +50,16 @@
       },
       "safetyNotes": "Groups with a single row yield trivial aggregation. Verify the grouping column is categorical, not continuous.",
       "examples": {
-        "en": ["total per department", "average by category", "sum grouped by region"],
-        "pt": ["total por departamento", "média por categoria", "soma agrupada por região"]
+        "en": [
+          "total per department",
+          "average by category",
+          "sum grouped by region"
+        ],
+        "pt": [
+          "total por departamento",
+          "média por categoria",
+          "soma agrupada por região"
+        ]
       }
     },
     {
@@ -58,12 +79,24 @@
       "action": {
         "type": "aggregate_column",
         "scope": "full_column",
-        "excludeRows": ["header", "total", "subtotal"]
+        "excludeRows": [
+          "header",
+          "total",
+          "subtotal"
+        ]
       },
       "safetyNotes": "Ensure total/subtotal rows are excluded to avoid double-counting. Check column type before numeric aggregation.",
       "examples": {
-        "en": ["sum the entire column", "total of column D", "average of all values in Revenue"],
-        "pt": ["soma da coluna inteira", "total da coluna D", "média de todos os valores em Receita"]
+        "en": [
+          "sum the entire column",
+          "total of column D",
+          "average of all values in Revenue"
+        ],
+        "pt": [
+          "soma da coluna inteira",
+          "total da coluna D",
+          "média de todos os valores em Receita"
+        ]
       }
     },
     {
@@ -87,8 +120,14 @@
       },
       "safetyNotes": "Column position may differ across sheets even if header matches. Always match by header text, not column index.",
       "examples": {
-        "en": ["sum Revenue across all sheets", "total sales from every month tab"],
-        "pt": ["soma de Receita em todas as planilhas", "total de vendas de cada aba mensal"]
+        "en": [
+          "sum Revenue across all sheets",
+          "total sales from every month tab"
+        ],
+        "pt": [
+          "soma de Receita em todas as planilhas",
+          "total de vendas de cada aba mensal"
+        ]
       }
     },
     {
@@ -113,8 +152,16 @@
       },
       "safetyNotes": "Cumulative calculations require a well-defined row order. If rows are unordered, results may be meaningless.",
       "examples": {
-        "en": ["running total", "cumulative sum", "accumulated revenue"],
-        "pt": ["total acumulado", "soma cumulativa", "receita acumulada"]
+        "en": [
+          "running total",
+          "cumulative sum",
+          "accumulated revenue"
+        ],
+        "pt": [
+          "total acumulado",
+          "soma cumulativa",
+          "receita acumulada"
+        ]
       }
     },
     {
@@ -141,8 +188,16 @@
       },
       "safetyNotes": "Outlier exclusion can silently remove valid extreme values. Always report how many rows were excluded.",
       "examples": {
-        "en": ["average excluding outliers", "sum without extreme values", "mean ignoring anomalies"],
-        "pt": ["média excluindo outliers", "soma sem valores extremos", "média ignorando anomalias"]
+        "en": [
+          "average excluding outliers",
+          "sum without extreme values",
+          "mean ignoring anomalies"
+        ],
+        "pt": [
+          "média excluindo outliers",
+          "soma sem valores extremos",
+          "média ignorando anomalias"
+        ]
       }
     },
     {
@@ -165,8 +220,16 @@
       },
       "safetyNotes": "Hidden rows from manual hide (not autofilter) may be unintentionally excluded. Clarify filter source.",
       "examples": {
-        "en": ["sum of filtered rows", "total of visible data", "average of shown values"],
-        "pt": ["soma das linhas filtradas", "total dos dados visíveis", "média dos valores exibidos"]
+        "en": [
+          "sum of filtered rows",
+          "total of visible data",
+          "average of shown values"
+        ],
+        "pt": [
+          "soma das linhas filtradas",
+          "total dos dados visíveis",
+          "média dos valores exibidos"
+        ]
       }
     },
     {
@@ -192,8 +255,16 @@
       },
       "safetyNotes": "First N-1 rows will have partial windows. Decide whether to show partial results or null for incomplete windows.",
       "examples": {
-        "en": ["3-month moving average", "rolling average of 7 days", "moving mean over 4 quarters"],
-        "pt": ["média móvel de 3 meses", "média rolante de 7 dias", "média móvel de 4 trimestres"]
+        "en": [
+          "3-month moving average",
+          "rolling average of 7 days",
+          "moving mean over 4 quarters"
+        ],
+        "pt": [
+          "média móvel de 3 meses",
+          "média rolante de 7 dias",
+          "média móvel de 4 trimestres"
+        ]
       }
     },
     {
@@ -208,7 +279,12 @@
         "type": "percentile_spec",
         "check": "column_is_numeric",
         "percentileType": "user_specified",
-        "supportedTypes": ["top_percent", "bottom_percent", "quartile", "decile"]
+        "supportedTypes": [
+          "top_percent",
+          "bottom_percent",
+          "quartile",
+          "decile"
+        ]
       },
       "action": {
         "type": "filter_by_percentile",
@@ -218,8 +294,16 @@
       },
       "safetyNotes": "Percentile boundaries may split tied values. Decide on inclusive vs exclusive boundary treatment.",
       "examples": {
-        "en": ["top 10% of sales", "bottom quartile", "top 25% performers"],
-        "pt": ["top 10% de vendas", "quartil inferior", "top 25% de desempenho"]
+        "en": [
+          "top 10% of sales",
+          "bottom quartile",
+          "top 25% performers"
+        ],
+        "pt": [
+          "top 10% de vendas",
+          "quartil inferior",
+          "top 25% de desempenho"
+        ]
       }
     },
     {
@@ -243,8 +327,16 @@
       },
       "safetyNotes": "User-specified ranges may accidentally include header or total rows. Warn if first or last row looks non-data.",
       "examples": {
-        "en": ["sum of B2:B50", "average of D10:D100", "total of the selected cells"],
-        "pt": ["soma de B2:B50", "média de D10:D100", "total das células selecionadas"]
+        "en": [
+          "sum of B2:B50",
+          "average of D10:D100",
+          "total of the selected cells"
+        ],
+        "pt": [
+          "soma de B2:B50",
+          "média de D10:D100",
+          "total das células selecionadas"
+        ]
       }
     },
     {
@@ -258,7 +350,13 @@
       "condition": {
         "type": "weight_detect",
         "check": "weight_column_specified_or_detected",
-        "weightColumnHints": ["weight", "peso", "qty", "quantity", "quantidade"],
+        "weightColumnHints": [
+          "weight",
+          "peso",
+          "qty",
+          "quantity",
+          "quantidade"
+        ],
         "requireNumeric": true
       },
       "action": {
@@ -269,8 +367,14 @@
       },
       "safetyNotes": "Zero or negative weights may distort results. Validate weight column contains only positive numbers.",
       "examples": {
-        "en": ["weighted average price by quantity", "weighted score by credit hours"],
-        "pt": ["preço médio ponderado por quantidade", "nota ponderada por horas de crédito"]
+        "en": [
+          "weighted average price by quantity",
+          "weighted score by credit hours"
+        ],
+        "pt": [
+          "preço médio ponderado por quantidade",
+          "nota ponderada por horas de crédito"
+        ]
       }
     },
     {
@@ -296,8 +400,16 @@
       },
       "safetyNotes": "Fuzzy matching may select wrong column if multiple headers are similar. Prefer exact match when possible.",
       "examples": {
-        "en": ["column Revenue", "the Sales column", "select Total Amount"],
-        "pt": ["coluna Receita", "a coluna Vendas", "selecionar Valor Total"]
+        "en": [
+          "column Revenue",
+          "the Sales column",
+          "select Total Amount"
+        ],
+        "pt": [
+          "coluna Receita",
+          "a coluna Vendas",
+          "selecionar Valor Total"
+        ]
       }
     },
     {
@@ -311,7 +423,11 @@
       "condition": {
         "type": "index_match",
         "check": "column_reference_is_index_or_letter",
-        "acceptFormats": ["letter", "number", "R1C1"],
+        "acceptFormats": [
+          "letter",
+          "number",
+          "R1C1"
+        ],
         "validateBounds": true
       },
       "action": {
@@ -321,8 +437,16 @@
       },
       "safetyNotes": "Column index may be off-by-one if user counts from 1 vs 0. Always confirm which convention is intended.",
       "examples": {
-        "en": ["column C", "the third column", "column number 5"],
-        "pt": ["coluna C", "a terceira coluna", "coluna número 5"]
+        "en": [
+          "column C",
+          "the third column",
+          "column number 5"
+        ],
+        "pt": [
+          "coluna C",
+          "a terceira coluna",
+          "coluna número 5"
+        ]
       }
     },
     {
@@ -346,8 +470,16 @@
       },
       "safetyNotes": "Semantic matching relies on inferred field types. Low-confidence matches should prompt user confirmation.",
       "examples": {
-        "en": ["the revenue column", "find the date field", "select the amount field"],
-        "pt": ["a coluna de receita", "encontrar o campo de data", "selecionar o campo de valor"]
+        "en": [
+          "the revenue column",
+          "find the date field",
+          "select the amount field"
+        ],
+        "pt": [
+          "a coluna de receita",
+          "encontrar o campo de data",
+          "selecionar o campo de valor"
+        ]
       }
     },
     {
@@ -362,7 +494,14 @@
         "type": "type_scan",
         "check": "column_dominant_type",
         "dominanceThreshold": 0.9,
-        "supportedTypes": ["numeric", "text", "date", "boolean", "currency", "percentage"]
+        "supportedTypes": [
+          "numeric",
+          "text",
+          "date",
+          "boolean",
+          "currency",
+          "percentage"
+        ]
       },
       "action": {
         "type": "select_columns_by_type",
@@ -371,8 +510,16 @@
       },
       "safetyNotes": "Mixed-type columns may be excluded if dominance threshold is strict. Lower threshold for messy data.",
       "examples": {
-        "en": ["all numeric columns", "select date columns", "find text fields"],
-        "pt": ["todas as colunas numéricas", "selecionar colunas de data", "encontrar campos de texto"]
+        "en": [
+          "all numeric columns",
+          "select date columns",
+          "find text fields"
+        ],
+        "pt": [
+          "todas as colunas numéricas",
+          "selecionar colunas de data",
+          "encontrar campos de texto"
+        ]
       }
     },
     {
@@ -396,8 +543,16 @@
       },
       "safetyNotes": "Excluding all columns is an error. Validate at least one column remains after exclusion.",
       "examples": {
-        "en": ["all columns except ID", "exclude Notes column", "everything but the first column"],
-        "pt": ["todas as colunas exceto ID", "excluir coluna Notas", "tudo menos a primeira coluna"]
+        "en": [
+          "all columns except ID",
+          "exclude Notes column",
+          "everything but the first column"
+        ],
+        "pt": [
+          "todas as colunas exceto ID",
+          "excluir coluna Notas",
+          "tudo menos a primeira coluna"
+        ]
       }
     },
     {
@@ -422,8 +577,16 @@
       },
       "safetyNotes": "ID columns are often numeric but not intended for aggregation. Consider skipping first numeric column if it looks like an identifier.",
       "examples": {
-        "en": ["the first number column", "first numeric field", "find a numeric column"],
-        "pt": ["a primeira coluna numérica", "primeiro campo numérico", "encontrar uma coluna numérica"]
+        "en": [
+          "the first number column",
+          "first numeric field",
+          "find a numeric column"
+        ],
+        "pt": [
+          "a primeira coluna numérica",
+          "primeiro campo numérico",
+          "encontrar uma coluna numérica"
+        ]
       }
     },
     {
@@ -449,8 +612,16 @@
       },
       "safetyNotes": "If some headers are not found, warn but proceed with found columns. User may have misspelled a column name.",
       "examples": {
-        "en": ["columns Name, Date, and Amount", "select Revenue and Cost", "pick Sales and Quantity columns"],
-        "pt": ["colunas Nome, Data e Valor", "selecionar Receita e Custo", "escolher colunas Vendas e Quantidade"]
+        "en": [
+          "columns Name, Date, and Amount",
+          "select Revenue and Cost",
+          "pick Sales and Quantity columns"
+        ],
+        "pt": [
+          "colunas Nome, Data e Valor",
+          "selecionar Receita e Custo",
+          "escolher colunas Vendas e Quantidade"
+        ]
       }
     },
     {
@@ -464,7 +635,11 @@
       "condition": {
         "type": "range_spec",
         "check": "start_and_end_column_specified",
-        "acceptFormats": ["letter_range", "header_range", "index_range"],
+        "acceptFormats": [
+          "letter_range",
+          "header_range",
+          "index_range"
+        ],
         "validateBounds": true
       },
       "action": {
@@ -475,8 +650,16 @@
       },
       "safetyNotes": "Reversed ranges (F:C) should be normalized to (C:F). Warn if range spans more than 20 columns.",
       "examples": {
-        "en": ["columns C through F", "from Revenue to Profit", "columns 3 to 7"],
-        "pt": ["colunas C até F", "de Receita até Lucro", "colunas 3 a 7"]
+        "en": [
+          "columns C through F",
+          "from Revenue to Profit",
+          "columns 3 to 7"
+        ],
+        "pt": [
+          "colunas C até F",
+          "de Receita até Lucro",
+          "colunas 3 a 7"
+        ]
       }
     },
     {
@@ -503,8 +686,16 @@
       },
       "safetyNotes": "Auto-expansion could include unintended data. Cap expansion at config maxScanRows to prevent runaway ranges.",
       "examples": {
-        "en": ["include new rows automatically", "expand range for new data", "auto-extend the table"],
-        "pt": ["incluir novas linhas automaticamente", "expandir intervalo para novos dados", "auto-estender a tabela"]
+        "en": [
+          "include new rows automatically",
+          "expand range for new data",
+          "auto-extend the table"
+        ],
+        "pt": [
+          "incluir novas linhas automaticamente",
+          "expandir intervalo para novos dados",
+          "auto-estender a tabela"
+        ]
       }
     },
     {
@@ -519,7 +710,10 @@
         "type": "contiguity_scan",
         "check": "cells_non_empty",
         "startCell": "specified_or_A1",
-        "directions": ["down", "right"],
+        "directions": [
+          "down",
+          "right"
+        ],
         "stopOnBlank": true
       },
       "action": {
@@ -530,8 +724,16 @@
       },
       "safetyNotes": "A single stray value far from the table can cause unexpected range expansion. Use emptyRowThreshold to limit scan.",
       "examples": {
-        "en": ["select the whole data region", "expand to all connected cells", "current region"],
-        "pt": ["selecionar toda a região de dados", "expandir para todas as células conectadas", "região atual"]
+        "en": [
+          "select the whole data region",
+          "expand to all connected cells",
+          "current region"
+        ],
+        "pt": [
+          "selecionar toda a região de dados",
+          "expandir para todas as células conectadas",
+          "região atual"
+        ]
       }
     },
     {
@@ -545,7 +747,14 @@
       "condition": {
         "type": "spill_detect",
         "check": "cell_has_spill_range",
-        "formulaTypes": ["SEQUENCE", "FILTER", "SORT", "UNIQUE", "SORTBY", "RANDARRAY"],
+        "formulaTypes": [
+          "SEQUENCE",
+          "FILTER",
+          "SORT",
+          "UNIQUE",
+          "SORTBY",
+          "RANDARRAY"
+        ],
         "detectSpillError": true
       },
       "action": {
@@ -556,8 +765,16 @@
       },
       "safetyNotes": "Spill ranges can change size unpredictably. Always resolve to current actual size, not cached size.",
       "examples": {
-        "en": ["use the spill range", "include all spilled values", "dynamic array result range"],
-        "pt": ["usar o intervalo de spill", "incluir todos os valores derramados", "intervalo de resultado de array dinâmico"]
+        "en": [
+          "use the spill range",
+          "include all spilled values",
+          "dynamic array result range"
+        ],
+        "pt": [
+          "usar o intervalo de spill",
+          "incluir todos os valores derramados",
+          "intervalo de resultado de array dinâmico"
+        ]
       }
     },
     {
@@ -583,8 +800,16 @@
       },
       "safetyNotes": "Title rows above the table may also be bold. Prefer rows with multiple cells over single-cell bold rows.",
       "examples": {
-        "en": ["bold header row", "headers are in bold", "formatted header"],
-        "pt": ["linha de cabeçalho em negrito", "cabeçalhos estão em negrito", "cabeçalho formatado"]
+        "en": [
+          "bold header row",
+          "headers are in bold",
+          "formatted header"
+        ],
+        "pt": [
+          "linha de cabeçalho em negrito",
+          "cabeçalhos estão em negrito",
+          "cabeçalho formatado"
+        ]
       }
     },
     {
@@ -600,7 +825,12 @@
         "check": "row_has_bottom_border",
         "scanFrom": "top",
         "maxDepth": 5,
-        "borderStyles": ["thin", "medium", "thick", "double"]
+        "borderStyles": [
+          "thin",
+          "medium",
+          "thick",
+          "double"
+        ]
       },
       "action": {
         "type": "mark_header",
@@ -610,8 +840,16 @@
       },
       "safetyNotes": "Summary rows mid-table may also have borders. Only consider borders within headerScanDepth from top.",
       "examples": {
-        "en": ["header with underline", "bordered header row", "line under headers"],
-        "pt": ["cabeçalho com sublinhado", "linha de cabeçalho com borda", "linha sob os cabeçalhos"]
+        "en": [
+          "header with underline",
+          "bordered header row",
+          "line under headers"
+        ],
+        "pt": [
+          "cabeçalho com sublinhado",
+          "linha de cabeçalho com borda",
+          "linha sob os cabeçalhos"
+        ]
       }
     },
     {
@@ -638,8 +876,16 @@
       },
       "safetyNotes": "Alternating row colors (banded rows) can trigger false positives. Verify the colored row is unique, not part of a repeating pattern.",
       "examples": {
-        "en": ["colored header row", "header with background color", "shaded header"],
-        "pt": ["linha de cabeçalho colorida", "cabeçalho com cor de fundo", "cabeçalho sombreado"]
+        "en": [
+          "colored header row",
+          "header with background color",
+          "shaded header"
+        ],
+        "pt": [
+          "linha de cabeçalho colorida",
+          "cabeçalho com cor de fundo",
+          "cabeçalho sombreado"
+        ]
       }
     },
     {
@@ -663,8 +909,14 @@
       },
       "safetyNotes": "May misfire on rows of text-formatted numbers. Cross-check with row below for numeric content.",
       "examples": {
-        "en": ["first row is header", "top row has column names"],
-        "pt": ["primeira linha é cabeçalho", "linha superior tem nomes de colunas"]
+        "en": [
+          "first row is header",
+          "top row has column names"
+        ],
+        "pt": [
+          "primeira linha é cabeçalho",
+          "linha superior tem nomes de colunas"
+        ]
       }
     },
     {
@@ -689,8 +941,16 @@
       },
       "safetyNotes": "Some sheets freeze multiple rows for titles and headers. The last frozen row is most likely the header, not the first.",
       "examples": {
-        "en": ["frozen header row", "pinned top rows are headers", "header is frozen"],
-        "pt": ["linha de cabeçalho congelada", "linhas fixas no topo são cabeçalhos", "cabeçalho está congelado"]
+        "en": [
+          "frozen header row",
+          "pinned top rows are headers",
+          "header is frozen"
+        ],
+        "pt": [
+          "linha de cabeçalho congelada",
+          "linhas fixas no topo são cabeçalhos",
+          "cabeçalho está congelado"
+        ]
       }
     },
     {
@@ -716,8 +976,16 @@
       },
       "safetyNotes": "Merged cells make column indexing ambiguous. Expand merged regions to individual column mappings before processing.",
       "examples": {
-        "en": ["merged header cells", "grouped column headers", "hierarchical header"],
-        "pt": ["células de cabeçalho mescladas", "cabeçalhos de colunas agrupadas", "cabeçalho hierárquico"]
+        "en": [
+          "merged header cells",
+          "grouped column headers",
+          "hierarchical header"
+        ],
+        "pt": [
+          "células de cabeçalho mescladas",
+          "cabeçalhos de colunas agrupadas",
+          "cabeçalho hierárquico"
+        ]
       }
     },
     {
@@ -743,8 +1011,14 @@
       },
       "safetyNotes": "Descriptive text rows above the header (titles, notes) may be caught. Ensure the text row has the same column count as data rows.",
       "examples": {
-        "en": ["type boundary header detection", "text to number transition"],
-        "pt": ["detecção de cabeçalho por limite de tipo", "transição de texto para número"]
+        "en": [
+          "type boundary header detection",
+          "text to number transition"
+        ],
+        "pt": [
+          "detecção de cabeçalho por limite de tipo",
+          "transição de texto para número"
+        ]
       }
     },
     {
@@ -772,8 +1046,16 @@
       },
       "safetyNotes": "Concatenated multi-row headers may produce long or awkward column names. Truncate if necessary.",
       "examples": {
-        "en": ["two-row header", "multi-level column names", "hierarchical headers"],
-        "pt": ["cabeçalho de duas linhas", "nomes de colunas multi-nível", "cabeçalhos hierárquicos"]
+        "en": [
+          "two-row header",
+          "multi-level column names",
+          "hierarchical headers"
+        ],
+        "pt": [
+          "cabeçalho de duas linhas",
+          "nomes de colunas multi-nível",
+          "cabeçalhos hierárquicos"
+        ]
       }
     },
     {
@@ -797,8 +1079,16 @@
       },
       "safetyNotes": "Table objects are the most reliable header source. Always prefer this over heuristic detection when available.",
       "examples": {
-        "en": ["Excel table with headers", "structured table header", "ListObject header row"],
-        "pt": ["tabela Excel com cabeçalhos", "cabeçalho de tabela estruturada", "linha de cabeçalho ListObject"]
+        "en": [
+          "Excel table with headers",
+          "structured table header",
+          "ListObject header row"
+        ],
+        "pt": [
+          "tabela Excel com cabeçalhos",
+          "cabeçalho de tabela estruturada",
+          "linha de cabeçalho ListObject"
+        ]
       }
     },
     {
@@ -825,8 +1115,16 @@
       },
       "safetyNotes": "Sheets may have minor header variations (typos, extra columns). Use fuzzy match for cross-sheet comparison.",
       "examples": {
-        "en": ["same header across sheets", "repeated header pattern", "consistent headers in all tabs"],
-        "pt": ["mesmo cabeçalho em várias planilhas", "padrão de cabeçalho repetido", "cabeçalhos consistentes em todas as abas"]
+        "en": [
+          "same header across sheets",
+          "repeated header pattern",
+          "consistent headers in all tabs"
+        ],
+        "pt": [
+          "mesmo cabeçalho em várias planilhas",
+          "padrão de cabeçalho repetido",
+          "cabeçalhos consistentes em todas as abas"
+        ]
       }
     },
     {
@@ -851,8 +1149,16 @@
       },
       "safetyNotes": "Some sheets intentionally start with blank rows for layout. Limit skip to 10 rows to avoid skipping too far.",
       "examples": {
-        "en": ["skip empty rows at top", "ignore blank leading rows", "find first non-empty row"],
-        "pt": ["pular linhas vazias no topo", "ignorar linhas em branco iniciais", "encontrar primeira linha não vazia"]
+        "en": [
+          "skip empty rows at top",
+          "ignore blank leading rows",
+          "find first non-empty row"
+        ],
+        "pt": [
+          "pular linhas vazias no topo",
+          "ignorar linhas em branco iniciais",
+          "encontrar primeira linha não vazia"
+        ]
       }
     },
     {
@@ -879,8 +1185,16 @@
       },
       "safetyNotes": "A data row with all unique values can be mistaken for a header. Combine with type-checking for higher confidence.",
       "examples": {
-        "en": ["unique header values", "no duplicate column names", "distinct header cells"],
-        "pt": ["valores de cabeçalho únicos", "sem nomes de colunas duplicados", "células de cabeçalho distintas"]
+        "en": [
+          "unique header values",
+          "no duplicate column names",
+          "distinct header cells"
+        ],
+        "pt": [
+          "valores de cabeçalho únicos",
+          "sem nomes de colunas duplicados",
+          "células de cabeçalho distintas"
+        ]
       }
     },
     {
@@ -907,8 +1221,16 @@
       },
       "safetyNotes": "Column order may vary across sheets. Align by header name, not position. Missing columns should be filled with null.",
       "examples": {
-        "en": ["combine all sheets", "consolidate monthly tabs", "merge sheets into one table"],
-        "pt": ["combinar todas as planilhas", "consolidar abas mensais", "mesclar planilhas em uma tabela"]
+        "en": [
+          "combine all sheets",
+          "consolidate monthly tabs",
+          "merge sheets into one table"
+        ],
+        "pt": [
+          "combinar todas as planilhas",
+          "consolidar abas mensais",
+          "mesclar planilhas em uma tabela"
+        ]
       }
     },
     {
@@ -934,8 +1256,16 @@
       },
       "safetyNotes": "Same value may exist in multiple sheets. Return all matches and let the user disambiguate if needed.",
       "examples": {
-        "en": ["find value across sheets", "lookup in all tabs", "search all sheets for this ID"],
-        "pt": ["encontrar valor em todas as planilhas", "procurar em todas as abas", "pesquisar todas as planilhas por este ID"]
+        "en": [
+          "find value across sheets",
+          "lookup in all tabs",
+          "search all sheets for this ID"
+        ],
+        "pt": [
+          "encontrar valor em todas as planilhas",
+          "procurar em todas as abas",
+          "pesquisar todas as planilhas por este ID"
+        ]
       }
     },
     {
@@ -949,7 +1279,11 @@
       "condition": {
         "type": "sheet_name_match",
         "check": "name_matches_pattern",
-        "patternTypes": ["glob", "regex", "contains"],
+        "patternTypes": [
+          "glob",
+          "regex",
+          "contains"
+        ],
         "caseInsensitive": true
       },
       "action": {
@@ -960,8 +1294,16 @@
       },
       "safetyNotes": "Broad patterns like '*' will match all sheets. Warn the user if more than 10 sheets are matched.",
       "examples": {
-        "en": ["sheets named Jan through Dec", "all 2025 tabs", "sheets matching Q1 to Q4"],
-        "pt": ["planilhas de Jan a Dez", "todas as abas de 2025", "planilhas correspondendo Q1 a Q4"]
+        "en": [
+          "sheets named Jan through Dec",
+          "all 2025 tabs",
+          "sheets matching Q1 to Q4"
+        ],
+        "pt": [
+          "planilhas de Jan a Dez",
+          "todas as abas de 2025",
+          "planilhas correspondendo Q1 a Q4"
+        ]
       }
     },
     {
@@ -976,7 +1318,11 @@
         "type": "tab_color_match",
         "check": "tab_has_color",
         "colorMatch": "user_specified_or_auto",
-        "supportedFormats": ["name", "hex", "theme_color"]
+        "supportedFormats": [
+          "name",
+          "hex",
+          "theme_color"
+        ]
       },
       "action": {
         "type": "select_sheets",
@@ -985,8 +1331,16 @@
       },
       "safetyNotes": "Tab colors are unreliable metadata. Not all sheets have colors, and color meaning is user-defined. Use as secondary filter.",
       "examples": {
-        "en": ["blue tabs only", "sheets with green tab color", "colored tabs"],
-        "pt": ["apenas abas azuis", "planilhas com cor de aba verde", "abas coloridas"]
+        "en": [
+          "blue tabs only",
+          "sheets with green tab color",
+          "colored tabs"
+        ],
+        "pt": [
+          "apenas abas azuis",
+          "planilhas com cor de aba verde",
+          "abas coloridas"
+        ]
       }
     },
     {
@@ -1013,8 +1367,16 @@
       },
       "safetyNotes": "Minor header differences (casing, abbreviations) are tolerated. Major structural differences should block consolidation.",
       "examples": {
-        "en": ["verify sheets match", "check structure across tabs", "confirm same columns in all sheets"],
-        "pt": ["verificar se planilhas correspondem", "checar estrutura nas abas", "confirmar mesmas colunas em todas as planilhas"]
+        "en": [
+          "verify sheets match",
+          "check structure across tabs",
+          "confirm same columns in all sheets"
+        ],
+        "pt": [
+          "verificar se planilhas correspondem",
+          "checar estrutura nas abas",
+          "confirmar mesmas colunas em todas as planilhas"
+        ]
       }
     },
     {
@@ -1039,8 +1401,16 @@
       },
       "safetyNotes": "Named ranges can reference other workbooks. Block external references for security.",
       "examples": {
-        "en": ["use the SalesData range", "expand named range Revenue", "resolve DataTable range"],
-        "pt": ["usar o intervalo DadosVendas", "expandir intervalo nomeado Receita", "resolver intervalo TabelaDados"]
+        "en": [
+          "use the SalesData range",
+          "expand named range Revenue",
+          "resolve DataTable range"
+        ],
+        "pt": [
+          "usar o intervalo DadosVendas",
+          "expandir intervalo nomeado Receita",
+          "resolver intervalo TabelaDados"
+        ]
       }
     },
     {
@@ -1067,8 +1437,16 @@
       },
       "safetyNotes": "Fuzzy matches below 0.9 similarity should require user confirmation. Never auto-select ambiguous matches.",
       "examples": {
-        "en": ["did you mean SalesData?", "similar range: Revenue2024", "closest match: Q1_Totals"],
-        "pt": ["você quis dizer DadosVendas?", "intervalo similar: Receita2024", "correspondência mais próxima: Totais_Q1"]
+        "en": [
+          "did you mean SalesData?",
+          "similar range: Revenue2024",
+          "closest match: Q1_Totals"
+        ],
+        "pt": [
+          "você quis dizer DadosVendas?",
+          "intervalo similar: Receita2024",
+          "correspondência mais próxima: Totais_Q1"
+        ]
       }
     },
     {
@@ -1093,8 +1471,16 @@
       },
       "safetyNotes": "Table references auto-adjust on insert/delete; named ranges may not. Tables are safer for dynamic data.",
       "examples": {
-        "en": ["use table reference instead", "prefer structured reference", "Table1 over named range"],
-        "pt": ["usar referência de tabela em vez disso", "preferir referência estruturada", "Tabela1 sobre intervalo nomeado"]
+        "en": [
+          "use table reference instead",
+          "prefer structured reference",
+          "Table1 over named range"
+        ],
+        "pt": [
+          "usar referência de tabela em vez disso",
+          "preferir referência estruturada",
+          "Tabela1 sobre intervalo nomeado"
+        ]
       }
     },
     {
@@ -1108,7 +1494,11 @@
       "condition": {
         "type": "formula_check",
         "check": "named_range_uses_dynamic_formula",
-        "dynamicFunctions": ["OFFSET", "INDEX", "INDIRECT"],
+        "dynamicFunctions": [
+          "OFFSET",
+          "INDEX",
+          "INDIRECT"
+        ],
         "requireEvaluation": true
       },
       "action": {
@@ -1119,8 +1509,16 @@
       },
       "safetyNotes": "Dynamic named ranges depend on volatile functions that recalculate. Always evaluate at query time, never cache.",
       "examples": {
-        "en": ["resolve dynamic range", "evaluate OFFSET range", "expand INDEX-based range"],
-        "pt": ["resolver intervalo dinâmico", "avaliar intervalo OFFSET", "expandir intervalo baseado em INDEX"]
+        "en": [
+          "resolve dynamic range",
+          "evaluate OFFSET range",
+          "expand INDEX-based range"
+        ],
+        "pt": [
+          "resolver intervalo dinâmico",
+          "avaliar intervalo OFFSET",
+          "expandir intervalo baseado em INDEX"
+        ]
       }
     },
     {
@@ -1134,7 +1532,10 @@
       "condition": {
         "type": "scope_check",
         "check": "duplicate_name_exists",
-        "scopes": ["sheet", "workbook"],
+        "scopes": [
+          "sheet",
+          "workbook"
+        ],
         "preferScope": "sheet"
       },
       "action": {
@@ -1145,8 +1546,16 @@
       },
       "safetyNotes": "Sheet-scoped names take precedence over workbook-scoped names in Excel. Follow the same convention.",
       "examples": {
-        "en": ["use this sheet's range", "local range definition", "sheet-scoped named range"],
-        "pt": ["usar intervalo desta planilha", "definição de intervalo local", "intervalo nomeado com escopo de planilha"]
+        "en": [
+          "use this sheet's range",
+          "local range definition",
+          "sheet-scoped named range"
+        ],
+        "pt": [
+          "usar intervalo desta planilha",
+          "definição de intervalo local",
+          "intervalo nomeado com escopo de planilha"
+        ]
       }
     },
     {
@@ -1160,7 +1569,11 @@
       "condition": {
         "type": "validity_check",
         "check": "range_reference_valid",
-        "detectErrors": ["#REF!", "deleted_sheet", "out_of_bounds"],
+        "detectErrors": [
+          "#REF!",
+          "deleted_sheet",
+          "out_of_bounds"
+        ],
         "checkDataPresence": true
       },
       "action": {
@@ -1171,8 +1584,16 @@
       },
       "safetyNotes": "Stale named ranges pointing to #REF! errors are common after structural edits. Always validate before use.",
       "examples": {
-        "en": ["validate range reference", "check if range is valid", "verify named range exists"],
-        "pt": ["validar referência de intervalo", "verificar se o intervalo é válido", "verificar se o intervalo nomeado existe"]
+        "en": [
+          "validate range reference",
+          "check if range is valid",
+          "verify named range exists"
+        ],
+        "pt": [
+          "validar referência de intervalo",
+          "verificar se o intervalo é válido",
+          "verificar se o intervalo nomeado existe"
+        ]
       }
     },
     {
@@ -1193,12 +1614,24 @@
         "type": "select_rows",
         "from": "data_start_row",
         "to": "last_data_row",
-        "exclude": ["header", "total", "subtotal"]
+        "exclude": [
+          "header",
+          "total",
+          "subtotal"
+        ]
       },
       "safetyNotes": "Ensure table boundary detection has run first. Without boundaries, this may select non-data rows.",
       "examples": {
-        "en": ["all data rows", "all rows", "every row in the table"],
-        "pt": ["todas as linhas de dados", "todas as linhas", "cada linha na tabela"]
+        "en": [
+          "all data rows",
+          "all rows",
+          "every row in the table"
+        ],
+        "pt": [
+          "todas as linhas de dados",
+          "todas as linhas",
+          "cada linha na tabela"
+        ]
       }
     },
     {
@@ -1223,8 +1656,16 @@
       },
       "safetyNotes": "If N exceeds total data rows, return all data rows with a warning. Do not include summary rows in the count.",
       "examples": {
-        "en": ["last 5 rows", "bottom 10 rows", "final 3 entries"],
-        "pt": ["últimas 5 linhas", "10 linhas do final", "últimas 3 entradas"]
+        "en": [
+          "last 5 rows",
+          "bottom 10 rows",
+          "final 3 entries"
+        ],
+        "pt": [
+          "últimas 5 linhas",
+          "10 linhas do final",
+          "últimas 3 entradas"
+        ]
       }
     },
     {
@@ -1252,8 +1693,16 @@
       },
       "safetyNotes": "Date formats vary widely. Parse dates carefully and handle ambiguous formats (01/02/2025 = Jan 2 or Feb 1?).",
       "examples": {
-        "en": ["rows from Jan to Mar 2025", "entries between 2024-01-01 and 2024-12-31", "data for March"],
-        "pt": ["linhas de Jan a Mar 2025", "entradas entre 01/01/2024 e 31/12/2024", "dados de março"]
+        "en": [
+          "rows from Jan to Mar 2025",
+          "entries between 2024-01-01 and 2024-12-31",
+          "data for March"
+        ],
+        "pt": [
+          "linhas de Jan a Mar 2025",
+          "entradas entre 01/01/2024 e 31/12/2024",
+          "dados de março"
+        ]
       }
     },
     {
@@ -1267,7 +1716,12 @@
       "condition": {
         "type": "value_filter",
         "check": "column_value_match",
-        "matchTypes": ["equals", "contains", "starts_with", "ends_with"],
+        "matchTypes": [
+          "equals",
+          "contains",
+          "starts_with",
+          "ends_with"
+        ],
         "caseInsensitive": true
       },
       "action": {
@@ -1279,8 +1733,16 @@
       },
       "safetyNotes": "Contains matching may return more rows than expected. Prefer exact match when the user is specific.",
       "examples": {
-        "en": ["rows where Status is Active", "filter by Region = North", "entries containing 'error'"],
-        "pt": ["linhas onde Status é Ativo", "filtrar por Região = Norte", "entradas contendo 'erro'"]
+        "en": [
+          "rows where Status is Active",
+          "filter by Region = North",
+          "entries containing 'error'"
+        ],
+        "pt": [
+          "linhas onde Status é Ativo",
+          "filtrar por Região = Norte",
+          "entradas contendo 'erro'"
+        ]
       }
     },
     {
@@ -1308,8 +1770,16 @@
       },
       "safetyNotes": "Ensure min <= max. If reversed, swap values silently. Warn if no rows match the range.",
       "examples": {
-        "en": ["sales between 100 and 500", "rows where amount is 1000 to 5000", "values from 0 to 100"],
-        "pt": ["vendas entre 100 e 500", "linhas onde valor é de 1000 a 5000", "valores de 0 a 100"]
+        "en": [
+          "sales between 100 and 500",
+          "rows where amount is 1000 to 5000",
+          "values from 0 to 100"
+        ],
+        "pt": [
+          "vendas entre 100 e 500",
+          "linhas onde valor é de 1000 a 5000",
+          "valores de 0 a 100"
+        ]
       }
     },
     {
@@ -1334,8 +1804,16 @@
       },
       "safetyNotes": "Deduplication on all columns is strict; partial column dedup may remove rows with different values in non-key columns.",
       "examples": {
-        "en": ["unique rows only", "distinct entries", "remove duplicate rows"],
-        "pt": ["apenas linhas únicas", "entradas distintas", "remover linhas duplicadas"]
+        "en": [
+          "unique rows only",
+          "distinct entries",
+          "remove duplicate rows"
+        ],
+        "pt": [
+          "apenas linhas únicas",
+          "entradas distintas",
+          "remover linhas duplicadas"
+        ]
       }
     },
     {
@@ -1360,8 +1838,16 @@
       },
       "safetyNotes": "Cells containing only spaces or zero-width characters may appear empty but are not. Trim before checking.",
       "examples": {
-        "en": ["skip empty rows", "exclude blanks", "only rows with data in Amount"],
-        "pt": ["pular linhas vazias", "excluir brancos", "apenas linhas com dados em Valor"]
+        "en": [
+          "skip empty rows",
+          "exclude blanks",
+          "only rows with data in Amount"
+        ],
+        "pt": [
+          "pular linhas vazias",
+          "excluir brancos",
+          "apenas linhas com dados em Valor"
+        ]
       }
     },
     {
@@ -1375,7 +1861,15 @@
       "condition": {
         "type": "subtotal_detect",
         "check": "row_is_subtotal",
-        "indicators": ["Total", "Subtotal", "Sum", "Average", "Soma", "Subtotal", "Média"],
+        "indicators": [
+          "Total",
+          "Subtotal",
+          "Sum",
+          "Average",
+          "Soma",
+          "Subtotal",
+          "Média"
+        ],
         "formulaCheck": "SUBTOTAL_function",
         "boldCheck": true
       },
@@ -1387,8 +1881,16 @@
       },
       "safetyNotes": "Subtotal rows may not have explicit labels. Check for SUBTOTAL formulas and bold formatting as additional signals.",
       "examples": {
-        "en": ["exclude totals", "skip summary rows", "data rows only, no subtotals"],
-        "pt": ["excluir totais", "pular linhas de resumo", "apenas linhas de dados, sem subtotais"]
+        "en": [
+          "exclude totals",
+          "skip summary rows",
+          "data rows only, no subtotals"
+        ],
+        "pt": [
+          "excluir totais",
+          "pular linhas de resumo",
+          "apenas linhas de dados, sem subtotais"
+        ]
       }
     },
     {
@@ -1413,8 +1915,16 @@
       },
       "safetyNotes": "If N exceeds available rows, return all rows with a warning. Always exclude header from the count.",
       "examples": {
-        "en": ["first 10 rows", "top 5 entries", "head 20 rows"],
-        "pt": ["primeiras 10 linhas", "5 primeiras entradas", "20 primeiras linhas"]
+        "en": [
+          "first 10 rows",
+          "top 5 entries",
+          "head 20 rows"
+        ],
+        "pt": [
+          "primeiras 10 linhas",
+          "5 primeiras entradas",
+          "20 primeiras linhas"
+        ]
       }
     },
     {
@@ -1439,8 +1949,16 @@
       },
       "safetyNotes": "Zero may be a valid data point in some contexts (e.g., temperature). Only exclude zeros when explicitly requested.",
       "examples": {
-        "en": ["exclude zero values", "non-zero rows only", "skip rows with zero sales"],
-        "pt": ["excluir valores zero", "apenas linhas não-zero", "pular linhas com vendas zero"]
+        "en": [
+          "exclude zero values",
+          "non-zero rows only",
+          "skip rows with zero sales"
+        ],
+        "pt": [
+          "excluir valores zero",
+          "apenas linhas não-zero",
+          "pular linhas com vendas zero"
+        ]
       }
     },
     {
@@ -1466,8 +1984,16 @@
       },
       "safetyNotes": "Systematic sampling can introduce bias if data has periodic patterns. Consider random sampling for statistical use.",
       "examples": {
-        "en": ["every 5th row", "sample every 10 rows", "pick every other row"],
-        "pt": ["cada 5ª linha", "amostrar a cada 10 linhas", "selecionar linhas alternadas"]
+        "en": [
+          "every 5th row",
+          "sample every 10 rows",
+          "pick every other row"
+        ],
+        "pt": [
+          "cada 5ª linha",
+          "amostrar a cada 10 linhas",
+          "selecionar linhas alternadas"
+        ]
       }
     },
     {
@@ -1494,8 +2020,16 @@
       },
       "safetyNotes": "Ties at the Nth position may return more than N rows. Clarify tie-breaking strategy with the user.",
       "examples": {
-        "en": ["top 10 by revenue", "highest 5 scores", "top 3 performers"],
-        "pt": ["top 10 por receita", "5 maiores notas", "3 melhores desempenhos"]
+        "en": [
+          "top 10 by revenue",
+          "highest 5 scores",
+          "top 3 performers"
+        ],
+        "pt": [
+          "top 10 por receita",
+          "5 maiores notas",
+          "3 melhores desempenhos"
+        ]
       }
     },
     {
@@ -1521,8 +2055,16 @@
       },
       "safetyNotes": "Circular references are always blocked. Some users intentionally use iterative calculation, but the agent should not enable it automatically.",
       "examples": {
-        "en": ["A1 references B1 which references A1", "circular formula detected", "self-referencing cell"],
-        "pt": ["A1 referencia B1 que referencia A1", "fórmula circular detectada", "célula auto-referenciável"]
+        "en": [
+          "A1 references B1 which references A1",
+          "circular formula detected",
+          "self-referencing cell"
+        ],
+        "pt": [
+          "A1 referencia B1 que referencia A1",
+          "fórmula circular detectada",
+          "célula auto-referenciável"
+        ]
       }
     },
     {
@@ -1537,7 +2079,10 @@
         "type": "type_check",
         "check": "column_has_mixed_types",
         "mixThreshold": 0.1,
-        "criticalMix": ["numeric_and_text", "date_and_text"]
+        "criticalMix": [
+          "numeric_and_text",
+          "date_and_text"
+        ]
       },
       "action": {
         "type": "warn_and_block",
@@ -1548,8 +2093,16 @@
       },
       "safetyNotes": "A small fraction of text in a numeric column (e.g., 'N/A', '-') is common. Offer to filter or coerce before blocking.",
       "examples": {
-        "en": ["column has text and numbers", "mixed types in Amount column", "cannot sum text values"],
-        "pt": ["coluna tem texto e números", "tipos mistos na coluna Valor", "não é possível somar valores de texto"]
+        "en": [
+          "column has text and numbers",
+          "mixed types in Amount column",
+          "cannot sum text values"
+        ],
+        "pt": [
+          "coluna tem texto e números",
+          "tipos mistos na coluna Valor",
+          "não é possível somar valores de texto"
+        ]
       }
     },
     {
@@ -1575,8 +2128,16 @@
       },
       "safetyNotes": "An empty result set after filtering likely means the filter criteria are too narrow. Suggest relaxing conditions.",
       "examples": {
-        "en": ["no data found in range", "empty result after filter", "no matching rows"],
-        "pt": ["nenhum dado encontrado no intervalo", "resultado vazio após filtro", "nenhuma linha correspondente"]
+        "en": [
+          "no data found in range",
+          "empty result after filter",
+          "no matching rows"
+        ],
+        "pt": [
+          "nenhum dado encontrado no intervalo",
+          "resultado vazio após filtro",
+          "nenhuma linha correspondente"
+        ]
       }
     },
     {
@@ -1602,8 +2163,16 @@
       },
       "safetyNotes": "Large ranges may cause performance issues or timeouts. Truncate with user consent and report how many rows were excluded.",
       "examples": {
-        "en": ["range has 50000 rows", "too many rows to process", "large dataset warning"],
-        "pt": ["intervalo tem 50000 linhas", "muitas linhas para processar", "aviso de conjunto de dados grande"]
+        "en": [
+          "range has 50000 rows",
+          "too many rows to process",
+          "large dataset warning"
+        ],
+        "pt": [
+          "intervalo tem 50000 linhas",
+          "muitas linhas para processar",
+          "aviso de conjunto de dados grande"
+        ]
       }
     },
     {
@@ -1629,8 +2198,16 @@
       },
       "safetyNotes": "Sheets with hundreds of columns are rare but possible. Truncation should be from the right unless user specifies otherwise.",
       "examples": {
-        "en": ["too many columns selected", "exceeds column limit", "wide table warning"],
-        "pt": ["muitas colunas selecionadas", "excede limite de colunas", "aviso de tabela larga"]
+        "en": [
+          "too many columns selected",
+          "exceeds column limit",
+          "wide table warning"
+        ],
+        "pt": [
+          "muitas colunas selecionadas",
+          "excede limite de colunas",
+          "aviso de tabela larga"
+        ]
       }
     },
     {
@@ -1644,7 +2221,11 @@
       "condition": {
         "type": "merge_check",
         "check": "range_contains_merged_cells",
-        "mergeTypes": ["horizontal", "vertical", "both"],
+        "mergeTypes": [
+          "horizontal",
+          "vertical",
+          "both"
+        ],
         "threshold": 1
       },
       "action": {
@@ -1656,8 +2237,16 @@
       },
       "safetyNotes": "Merged cells store value only in top-left cell. Other cells in the merge appear empty. Expand values before aggregation.",
       "examples": {
-        "en": ["merged cells in range", "range spans merged region", "merged cell detected"],
-        "pt": ["células mescladas no intervalo", "intervalo abrange região mesclada", "célula mesclada detectada"]
+        "en": [
+          "merged cells in range",
+          "range spans merged region",
+          "merged cell detected"
+        ],
+        "pt": [
+          "células mescladas no intervalo",
+          "intervalo abrange região mesclada",
+          "célula mesclada detectada"
+        ]
       }
     },
     {
@@ -1683,8 +2272,16 @@
       },
       "safetyNotes": "Without a header, column references by name are impossible. Fall back to first row but require user confirmation.",
       "examples": {
-        "en": ["no header found", "cannot detect column names", "headerless data"],
-        "pt": ["nenhum cabeçalho encontrado", "não foi possível detectar nomes de colunas", "dados sem cabeçalho"]
+        "en": [
+          "no header found",
+          "cannot detect column names",
+          "headerless data"
+        ],
+        "pt": [
+          "nenhum cabeçalho encontrado",
+          "não foi possível detectar nomes de colunas",
+          "dados sem cabeçalho"
+        ]
       }
     },
     {
@@ -1698,7 +2295,14 @@
       "condition": {
         "type": "formula_scan",
         "check": "contains_volatile_functions",
-        "volatileFunctions": ["NOW", "TODAY", "RAND", "RANDBETWEEN", "OFFSET", "INDIRECT"],
+        "volatileFunctions": [
+          "NOW",
+          "TODAY",
+          "RAND",
+          "RANDBETWEEN",
+          "OFFSET",
+          "INDIRECT"
+        ],
         "scanDepth": "all_cells_in_range"
       },
       "action": {
@@ -1710,8 +2314,16 @@
       },
       "safetyNotes": "Volatile functions cause values to change between reads. Snapshot values at query time if consistent results are needed.",
       "examples": {
-        "en": ["range has NOW() function", "volatile formula in data", "RAND() in range"],
-        "pt": ["intervalo tem função NOW()", "fórmula volátil nos dados", "RAND() no intervalo"]
+        "en": [
+          "range has NOW() function",
+          "volatile formula in data",
+          "RAND() in range"
+        ],
+        "pt": [
+          "intervalo tem função NOW()",
+          "fórmula volátil nos dados",
+          "RAND() no intervalo"
+        ]
       }
     },
     {
@@ -1736,8 +2348,16 @@
       },
       "safetyNotes": "A single blank column between data regions may be a separator, not a table edge. Check if data resumes after the gap.",
       "examples": {
-        "en": ["blank column marks table edge", "empty column boundary", "table ends at blank column"],
-        "pt": ["coluna em branco marca borda da tabela", "limite de coluna vazia", "tabela termina na coluna em branco"]
+        "en": [
+          "blank column marks table edge",
+          "empty column boundary",
+          "table ends at blank column"
+        ],
+        "pt": [
+          "coluna em branco marca borda da tabela",
+          "limite de coluna vazia",
+          "tabela termina na coluna em branco"
+        ]
       }
     },
     {
@@ -1762,8 +2382,16 @@
       },
       "safetyNotes": "A single blank row may appear within valid data (e.g., section separator). Require emptyRowThreshold consecutive blanks.",
       "examples": {
-        "en": ["table ends at blank rows", "empty rows mark table bottom", "gap in data"],
-        "pt": ["tabela termina em linhas em branco", "linhas vazias marcam final da tabela", "lacuna nos dados"]
+        "en": [
+          "table ends at blank rows",
+          "empty rows mark table bottom",
+          "gap in data"
+        ],
+        "pt": [
+          "tabela termina em linhas em branco",
+          "linhas vazias marcam final da tabela",
+          "lacuna nos dados"
+        ]
       }
     },
     {
@@ -1788,8 +2416,16 @@
       },
       "safetyNotes": "Excel table objects are the most reliable boundary source. Always prefer over heuristic detection.",
       "examples": {
-        "en": ["use Excel table range", "ListObject boundary", "structured table extent"],
-        "pt": ["usar intervalo de tabela Excel", "limite ListObject", "extensão de tabela estruturada"]
+        "en": [
+          "use Excel table range",
+          "ListObject boundary",
+          "structured table extent"
+        ],
+        "pt": [
+          "usar intervalo de tabela Excel",
+          "limite ListObject",
+          "extensão de tabela estruturada"
+        ]
       }
     },
     {
@@ -1803,7 +2439,12 @@
       "condition": {
         "type": "format_scan",
         "check": "format_discontinuity",
-        "properties": ["font", "alignment", "numberFormat", "borders"],
+        "properties": [
+          "font",
+          "alignment",
+          "numberFormat",
+          "borders"
+        ],
         "discontinuityThreshold": 0.7,
         "scanDirection": "down_and_right"
       },
@@ -1814,8 +2455,16 @@
       },
       "safetyNotes": "Format changes can occur within a table (e.g., conditional formatting). Use as a secondary signal alongside other boundary rules.",
       "examples": {
-        "en": ["formatting changes at row 50", "different format below data", "style boundary"],
-        "pt": ["formatação muda na linha 50", "formato diferente abaixo dos dados", "limite de estilo"]
+        "en": [
+          "formatting changes at row 50",
+          "different format below data",
+          "style boundary"
+        ],
+        "pt": [
+          "formatação muda na linha 50",
+          "formato diferente abaixo dos dados",
+          "limite de estilo"
+        ]
       }
     },
     {
@@ -1841,8 +2490,16 @@
       },
       "safetyNotes": "Merged cells as group headers are common in formatted reports. Each merged region may define a separate logical table.",
       "examples": {
-        "en": ["merged region defines sub-table", "grouped sections by merge", "merged cell boundaries"],
-        "pt": ["região mesclada define sub-tabela", "seções agrupadas por mesclagem", "limites de células mescladas"]
+        "en": [
+          "merged region defines sub-table",
+          "grouped sections by merge",
+          "merged cell boundaries"
+        ],
+        "pt": [
+          "região mesclada define sub-tabela",
+          "seções agrupadas por mesclagem",
+          "limites de células mescladas"
+        ]
       }
     },
     {
@@ -1866,8 +2523,16 @@
       },
       "safetyNotes": "Named ranges may be stale if the sheet has been edited. Validate that the range still contains data.",
       "examples": {
-        "en": ["use DataRange as boundary", "named range defines table", "range Budget covers the table"],
-        "pt": ["usar IntervalosDados como limite", "intervalo nomeado define tabela", "intervalo Orçamento cobre a tabela"]
+        "en": [
+          "use DataRange as boundary",
+          "named range defines table",
+          "range Budget covers the table"
+        ],
+        "pt": [
+          "usar IntervalosDados como limite",
+          "intervalo nomeado define tabela",
+          "intervalo Orçamento cobre a tabela"
+        ]
       }
     },
     {
@@ -1892,8 +2557,16 @@
       },
       "safetyNotes": "Print area may include titles, footers, and margins beyond the data table. Use only as a supplementary hint.",
       "examples": {
-        "en": ["print area covers the data", "use print range as boundary hint", "data within print area"],
-        "pt": ["área de impressão cobre os dados", "usar intervalo de impressão como dica de limite", "dados dentro da área de impressão"]
+        "en": [
+          "print area covers the data",
+          "use print range as boundary hint",
+          "data within print area"
+        ],
+        "pt": [
+          "área de impressão cobre os dados",
+          "usar intervalo de impressão como dica de limite",
+          "dados dentro da área de impressão"
+        ]
       }
     },
     {
@@ -1907,7 +2580,17 @@
       "condition": {
         "type": "summary_scan",
         "check": "row_contains_aggregate_label",
-        "labels": ["Total", "Subtotal", "Grand Total", "Sum", "Average", "Soma", "Subtotal", "Total Geral", "Média"],
+        "labels": [
+          "Total",
+          "Subtotal",
+          "Grand Total",
+          "Sum",
+          "Average",
+          "Soma",
+          "Subtotal",
+          "Total Geral",
+          "Média"
+        ],
         "formulaCheck": "SUM_or_SUBTOTAL",
         "position": "bottom_of_data"
       },
@@ -1919,8 +2602,16 @@
       },
       "safetyNotes": "Multiple summary rows may exist (subtotals + grand total). Detect all of them, not just the last row.",
       "examples": {
-        "en": ["total row at bottom", "exclude grand total row", "summary row detected"],
-        "pt": ["linha de total no final", "excluir linha de total geral", "linha de resumo detectada"]
+        "en": [
+          "total row at bottom",
+          "exclude grand total row",
+          "summary row detected"
+        ],
+        "pt": [
+          "linha de total no final",
+          "excluir linha de total geral",
+          "linha de resumo detectada"
+        ]
       }
     },
     {
@@ -1945,8 +2636,16 @@
       },
       "safetyNotes": "Columns with mixed types may still be valid data (e.g., text notes column). Combine with other signals.",
       "examples": {
-        "en": ["consistent column types define width", "type-based table width", "data type boundary"],
-        "pt": ["tipos de coluna consistentes definem largura", "largura de tabela baseada em tipo", "limite de tipo de dados"]
+        "en": [
+          "consistent column types define width",
+          "type-based table width",
+          "data type boundary"
+        ],
+        "pt": [
+          "tipos de coluna consistentes definem largura",
+          "largura de tabela baseada em tipo",
+          "limite de tipo de dados"
+        ]
       }
     },
     {
@@ -1972,8 +2671,16 @@
       },
       "safetyNotes": "Multiple tables on one sheet are ambiguous. Always ask the user which table they mean if more than one is detected.",
       "examples": {
-        "en": ["two tables on this sheet", "multiple data regions found", "which table do you mean?"],
-        "pt": ["duas tabelas nesta planilha", "múltiplas regiões de dados encontradas", "qual tabela você quer dizer?"]
+        "en": [
+          "two tables on this sheet",
+          "multiple data regions found",
+          "which table do you mean?"
+        ],
+        "pt": [
+          "duas tabelas nesta planilha",
+          "múltiplas regiões de dados encontradas",
+          "qual tabela você quer dizer?"
+        ]
       }
     },
     {
@@ -2000,8 +2707,16 @@
       },
       "safetyNotes": "Current month changes at midnight on the 1st. Ensure the reference date is calculated at query time.",
       "examples": {
-        "en": ["this month", "current month data", "February data"],
-        "pt": ["este mês", "dados do mês atual", "dados de fevereiro"]
+        "en": [
+          "this month",
+          "current month data",
+          "February data"
+        ],
+        "pt": [
+          "este mês",
+          "dados do mês atual",
+          "dados de fevereiro"
+        ]
       }
     },
     {
@@ -2029,8 +2744,16 @@
       },
       "safetyNotes": "Calendar quarters (Q1=Jan-Mar) may differ from fiscal quarters. Clarify with user if ambiguous.",
       "examples": {
-        "en": ["this quarter", "Q1 data", "current quarter totals"],
-        "pt": ["este trimestre", "dados do Q1", "totais do trimestre atual"]
+        "en": [
+          "this quarter",
+          "Q1 data",
+          "current quarter totals"
+        ],
+        "pt": [
+          "este trimestre",
+          "dados do Q1",
+          "totais do trimestre atual"
+        ]
       }
     },
     {
@@ -2057,8 +2780,16 @@
       },
       "safetyNotes": "If data only goes up to a past month, the result may be partial. Inform the user of the actual date coverage.",
       "examples": {
-        "en": ["this year", "2026 data", "current year sales"],
-        "pt": ["este ano", "dados de 2026", "vendas do ano atual"]
+        "en": [
+          "this year",
+          "2026 data",
+          "current year sales"
+        ],
+        "pt": [
+          "este ano",
+          "dados de 2026",
+          "vendas do ano atual"
+        ]
       }
     },
     {
@@ -2086,8 +2817,16 @@
       },
       "safetyNotes": "Fiscal year start month varies by company and country (Apr, Jul, Oct are common). Always ask or detect from data context.",
       "examples": {
-        "en": ["this fiscal year", "FY2025", "current fiscal year data"],
-        "pt": ["este ano fiscal", "AF2025", "dados do ano fiscal atual"]
+        "en": [
+          "this fiscal year",
+          "FY2025",
+          "current fiscal year data"
+        ],
+        "pt": [
+          "este ano fiscal",
+          "AF2025",
+          "dados do ano fiscal atual"
+        ]
       }
     },
     {
@@ -2115,8 +2854,16 @@
       },
       "safetyNotes": "Rolling 12 months from today may not align with calendar months. Clarify if user means 'last 12 complete months'.",
       "examples": {
-        "en": ["last 12 months", "trailing twelve months", "past year of data"],
-        "pt": ["últimos 12 meses", "doze meses anteriores", "último ano de dados"]
+        "en": [
+          "last 12 months",
+          "trailing twelve months",
+          "past year of data"
+        ],
+        "pt": [
+          "últimos 12 meses",
+          "doze meses anteriores",
+          "último ano de dados"
+        ]
       }
     },
     {
@@ -2143,8 +2890,16 @@
       },
       "safetyNotes": "Last month is always a complete month. On March 1st, last month covers all of February.",
       "examples": {
-        "en": ["last month", "previous month data", "January data"],
-        "pt": ["mês passado", "dados do mês anterior", "dados de janeiro"]
+        "en": [
+          "last month",
+          "previous month data",
+          "January data"
+        ],
+        "pt": [
+          "mês passado",
+          "dados do mês anterior",
+          "dados de janeiro"
+        ]
       }
     },
     {
@@ -2172,8 +2927,16 @@
       },
       "safetyNotes": "Last N days includes today. Clarify if user means 'previous N days' (excluding today) or 'last N days' (including today).",
       "examples": {
-        "en": ["last 30 days", "past 7 days", "last 90 days of data"],
-        "pt": ["últimos 30 dias", "últimos 7 dias", "últimos 90 dias de dados"]
+        "en": [
+          "last 30 days",
+          "past 7 days",
+          "last 90 days of data"
+        ],
+        "pt": [
+          "últimos 30 dias",
+          "últimos 7 dias",
+          "últimos 90 dias de dados"
+        ]
       }
     },
     {
@@ -2202,8 +2965,16 @@
       },
       "safetyNotes": "Ambiguity: 'last 3 months' could mean 3 complete prior months or 3 months including current. Default excludes current month.",
       "examples": {
-        "en": ["last 3 months", "previous 6 months", "past 2 months of sales"],
-        "pt": ["últimos 3 meses", "6 meses anteriores", "últimos 2 meses de vendas"]
+        "en": [
+          "last 3 months",
+          "previous 6 months",
+          "past 2 months of sales"
+        ],
+        "pt": [
+          "últimos 3 meses",
+          "6 meses anteriores",
+          "últimos 2 meses de vendas"
+        ]
       }
     },
     {
@@ -2231,8 +3002,16 @@
       },
       "safetyNotes": "In Q1, last quarter refers to Q4 of the previous year. Handle the year boundary correctly.",
       "examples": {
-        "en": ["last quarter", "previous quarter data", "Q4 results"],
-        "pt": ["trimestre passado", "dados do trimestre anterior", "resultados do Q4"]
+        "en": [
+          "last quarter",
+          "previous quarter data",
+          "Q4 results"
+        ],
+        "pt": [
+          "trimestre passado",
+          "dados do trimestre anterior",
+          "resultados do Q4"
+        ]
       }
     },
     {
@@ -2259,8 +3038,16 @@
       },
       "safetyNotes": "Last year is always a complete calendar year. In 2026, last year covers all of 2025.",
       "examples": {
-        "en": ["last year", "2025 data", "previous year totals"],
-        "pt": ["ano passado", "dados de 2025", "totais do ano anterior"]
+        "en": [
+          "last year",
+          "2025 data",
+          "previous year totals"
+        ],
+        "pt": [
+          "ano passado",
+          "dados de 2025",
+          "totais do ano anterior"
+        ]
       }
     },
     {
@@ -2287,8 +3074,16 @@
       },
       "safetyNotes": "MTD on the 1st of the month returns only one day of data. Warn if the result seems unusually small.",
       "examples": {
-        "en": ["month to date", "MTD sales", "this month so far"],
-        "pt": ["acumulado do mês", "vendas MTD", "este mês até agora"]
+        "en": [
+          "month to date",
+          "MTD sales",
+          "this month so far"
+        ],
+        "pt": [
+          "acumulado do mês",
+          "vendas MTD",
+          "este mês até agora"
+        ]
       }
     },
     {
@@ -2316,8 +3111,16 @@
       },
       "safetyNotes": "QTD early in a quarter may return very few rows. Combine with prior quarter comparison for context.",
       "examples": {
-        "en": ["quarter to date", "QTD revenue", "this quarter so far"],
-        "pt": ["acumulado do trimestre", "receita QTD", "este trimestre até agora"]
+        "en": [
+          "quarter to date",
+          "QTD revenue",
+          "this quarter so far"
+        ],
+        "pt": [
+          "acumulado do trimestre",
+          "receita QTD",
+          "este trimestre até agora"
+        ]
       }
     },
     {
@@ -2345,8 +3148,16 @@
       },
       "safetyNotes": "Week start day varies by locale (Monday vs Sunday). Default to Monday but allow configuration.",
       "examples": {
-        "en": ["week to date", "WTD totals", "this week so far"],
-        "pt": ["acumulado da semana", "totais WTD", "esta semana até agora"]
+        "en": [
+          "week to date",
+          "WTD totals",
+          "this week so far"
+        ],
+        "pt": [
+          "acumulado da semana",
+          "totais WTD",
+          "esta semana até agora"
+        ]
       }
     },
     {
@@ -2373,8 +3184,18 @@
       },
       "safetyNotes": "YTD in January returns only partial data. Compare with prior-year YTD for meaningful analysis.",
       "examples": {
-        "en": ["year to date", "YTD revenue", "this year so far", "accumulated this year"],
-        "pt": ["acumulado do ano", "receita YTD", "este ano até agora", "acumulado deste ano"]
+        "en": [
+          "year to date",
+          "YTD revenue",
+          "this year so far",
+          "accumulated this year"
+        ],
+        "pt": [
+          "acumulado do ano",
+          "receita YTD",
+          "este ano até agora",
+          "acumulado deste ano"
+        ]
       }
     }
   ]

@@ -3,8 +3,17 @@
     "id": "doc_type_catalog_schema",
     "version": "1.0.0",
     "description": "Schema for document intelligence doc type catalog banks. Requires domain and docTypes array.",
-    "languages": ["any"],
-    "lastUpdated": "2026-02-27"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-27",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true
@@ -14,21 +23,40 @@
     "$id": "koda://schemas/doc_type_catalog_schema.any.json",
     "title": "Doc Type Catalog Bank Schema",
     "type": "object",
-    "required": ["_meta", "config", "domain", "docTypes"],
+    "required": [
+      "_meta",
+      "config",
+      "domain",
+      "docTypes"
+    ],
     "additionalProperties": true,
     "properties": {
       "_meta": {
         "type": "object",
-        "required": ["id", "version", "description", "languages", "lastUpdated"],
+        "required": [
+          "id",
+          "version",
+          "description",
+          "languages",
+          "lastUpdated"
+        ],
         "additionalProperties": true
       },
       "config": {
         "type": "object",
-        "required": ["enabled"],
+        "required": [
+          "enabled"
+        ],
         "additionalProperties": true
       },
-      "domain": { "type": "string", "minLength": 2 },
-      "docTypes": { "type": "array", "minItems": 1 }
+      "domain": {
+        "type": "string",
+        "minLength": 2
+      },
+      "docTypes": {
+        "type": "array",
+        "minItems": 1
+      }
     }
   }
 }

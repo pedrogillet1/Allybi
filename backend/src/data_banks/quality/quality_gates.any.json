@@ -3,21 +3,50 @@
     "id": "quality_gates",
     "version": "3.1.0",
     "description": "ChatGPT-like answer quality gates for Koda. Post-generation checks + adaptive fallbacks. Guarantees: (1) never answer from the wrong doc when explicit docRef exists, (2) nav_pills responses render as intro-only + pills (no Sources label, no message actions), (3) replace bad fallbacks with adaptive guidance, (4) block malformed/truncated numbers, (5) enforce markdown + paragraph/bullet hygiene, (6) enforce brevity constraints, (7) reduce repetition and banned phrases, (8) minimal privacy-safe output. Designed to be deterministic and explainable.",
-    "languages": ["any"],
-    "lastUpdated": "2026-03-01"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
     "pipelinePlacement": {
-      "runAfter": ["render_policy", "placeholders_and_sanitization", "answer_style_policy", "doc_grounding_checks"],
-      "runBefore": ["final_output", "state_update_rules"]
+      "runAfter": [
+        "render_policy",
+        "placeholders_and_sanitization",
+        "answer_style_policy",
+        "doc_grounding_checks"
+      ],
+      "runBefore": [
+        "final_output",
+        "state_update_rules"
+      ]
     },
     "modes": {
       "byEnv": {
-        "production": { "strictness": "high", "failClosed": true },
-        "staging": { "strictness": "high", "failClosed": true },
-        "dev": { "strictness": "medium", "failClosed": false },
-        "local": { "strictness": "medium", "failClosed": false }
+        "production": {
+          "strictness": "high",
+          "failClosed": true
+        },
+        "staging": {
+          "strictness": "high",
+          "failClosed": true
+        },
+        "dev": {
+          "strictness": "medium",
+          "failClosed": false
+        },
+        "local": {
+          "strictness": "medium",
+          "failClosed": false
+        }
       }
     },
     "limits": {
@@ -29,7 +58,10 @@
       "maxSourcesButtonsHard": 8
     },
     "normalization": {
-      "navAnswerModes": ["nav_pills", "nav_pill"],
+      "navAnswerModes": [
+        "nav_pills",
+        "nav_pill"
+      ],
       "stripDiacritics": true,
       "caseInsensitiveMatch": true,
       "collapseWhitespace": true
@@ -162,7 +194,11 @@
           "severity": "error",
           "description": "nav_pills must not show Sources label/dividers inside the answer body (UI handles pills).",
           "condition": "answerMode.in(['nav_pills','nav_pill']) == true",
-          "patterns": ["\\bSources\\s*:\\b", "\\bFontes\\s*:\\b", "\\bFuentes\\s*:\\b"],
+          "patterns": [
+            "\\bSources\\s*:\\b",
+            "\\bFontes\\s*:\\b",
+            "\\bFuentes\\s*:\\b"
+          ],
           "actionOnFail": "strip_inline_sources"
         },
         {
@@ -219,7 +255,11 @@
           "id": "QG_NUM_002_no_partial_numbers",
           "severity": "error",
           "description": "Block partial numbers ending with '.' or ',' or '**' artifacts.",
-          "patterns": ["\\d+\\.$", "\\d+,$", "\\d+\\*+$"],
+          "patterns": [
+            "\\d+\\.$",
+            "\\d+,$",
+            "\\d+\\*+$"
+          ],
           "actionOnFail": "retry_retrieval_then_regen",
           "reasonCode": "numeric_malformed"
         },
@@ -241,7 +281,11 @@
           "id": "QG_FMT_001_no_json_output",
           "severity": "error",
           "description": "Koda never prints JSON. Convert to a table/bullets or regenerate.",
-          "patterns": ["^\\s*```json", "^\\s*\\{\\s*\"", "^\\s*\\[\\s*\\{"],
+          "patterns": [
+            "^\\s*```json",
+            "^\\s*\\{\\s*\"",
+            "^\\s*\\[\\s*\\{"
+          ],
           "actionOnFail": "convert_json_to_table_or_bullets",
           "reasonCode": "json_disallowed"
         },
@@ -383,28 +427,117 @@
   },
   "actions": {
     "definitions": [
-      { "id": "fail_hard_wrong_doc", "type": "route", "notes": "Block answer and ask user to confirm/choose the intended doc (single question max)." },
-      { "id": "strip_wrong_sources_and_regen", "type": "transform_then_regen", "notes": "Remove sources not matching explicit docRef then regenerate." },
-      { "id": "emit_nav_pills_not_found", "type": "route", "notes": "nav_pills-specific fallback: show a short not-found message (no Sources label) and optionally offer doc choice." },
-      { "id": "strip_inline_sources", "type": "transform", "notes": "Remove inline Sources/Fontes/Fuentes section from body." },
-      { "id": "strip_inline_file_list", "type": "transform", "notes": "Remove inline filename lists; files must be represented via source_buttons." },
-      { "id": "strip_body_keep_intro", "type": "transform", "notes": "Keep only the first sentence of the body (nav_pills intro only)." },
-      { "id": "emit_adaptive_failure_message", "type": "route", "notes": "Select best fallback based on reason codes: no_docs/indexing/extraction_failed/scope_empty/scoped_not_found/weak_evidence." },
-      { "id": "retry_retrieval_then_regen", "type": "route", "priority": "high", "notes": "Re-run retrieval with exact-match boosting for numbers then regenerate; include regenHint." },
-      { "id": "convert_json_to_table_or_bullets", "type": "transform", "notes": "Convert JSON-like output into table/bullets." },
-      { "id": "split_long_paragraphs", "type": "transform", "notes": "Split long paragraphs into short paragraphs (1–2 sentences each)." },
-      { "id": "fix_bullet_hygiene", "type": "transform", "notes": "Split multi-sentence bullets into multiple bullets or trim to <=3 sentences each." },
-      { "id": "repair_table_or_convert", "type": "transform", "notes": "Repair table separator/columns; if impossible convert to key/value bullets." },
-      { "id": "auto_fix_close_fence", "type": "transform", "notes": "Close unclosed code fences to keep markdown valid." },
-      { "id": "unicode_normalize_display_safe", "type": "transform", "notes": "Normalize unicode for display-safe output." },
-      { "id": "auto_shorten_to_constraint", "type": "transform", "notes": "Auto-shorten to meet max sentence/char constraint without losing core answer." },
-      { "id": "truncate_with_offer_narrow", "type": "transform", "notes": "Truncate and add one short line suggesting a narrower ask." },
-      { "id": "ask_one_clarification", "type": "route", "notes": "Ask one crisp clarification using clarification_phrases bank." },
-      { "id": "add_hedge_and_limit_scope", "type": "transform", "notes": "Reduce certainty; only claim what’s evidenced; suggest next best step." },
-      { "id": "remove_banned_phrases", "type": "transform", "notes": "Strip banned/robotic phrases; keep meaning." },
-      { "id": "light_rephrase_keep_facts", "type": "transform", "notes": "Rephrase without changing facts to reduce exact repetition." },
-      { "id": "strip_debug_sections", "type": "transform", "notes": "Remove debug sections from user-visible output." },
-      { "id": "hide_internal_ids", "type": "transform", "notes": "Hide internal ids unless user requested them." }
+      {
+        "id": "fail_hard_wrong_doc",
+        "type": "route",
+        "notes": "Block answer and ask user to confirm/choose the intended doc (single question max)."
+      },
+      {
+        "id": "strip_wrong_sources_and_regen",
+        "type": "transform_then_regen",
+        "notes": "Remove sources not matching explicit docRef then regenerate."
+      },
+      {
+        "id": "emit_nav_pills_not_found",
+        "type": "route",
+        "notes": "nav_pills-specific fallback: show a short not-found message (no Sources label) and optionally offer doc choice."
+      },
+      {
+        "id": "strip_inline_sources",
+        "type": "transform",
+        "notes": "Remove inline Sources/Fontes/Fuentes section from body."
+      },
+      {
+        "id": "strip_inline_file_list",
+        "type": "transform",
+        "notes": "Remove inline filename lists; files must be represented via source_buttons."
+      },
+      {
+        "id": "strip_body_keep_intro",
+        "type": "transform",
+        "notes": "Keep only the first sentence of the body (nav_pills intro only)."
+      },
+      {
+        "id": "emit_adaptive_failure_message",
+        "type": "route",
+        "notes": "Select best fallback based on reason codes: no_docs/indexing/extraction_failed/scope_empty/scoped_not_found/weak_evidence."
+      },
+      {
+        "id": "retry_retrieval_then_regen",
+        "type": "route",
+        "priority": "high",
+        "notes": "Re-run retrieval with exact-match boosting for numbers then regenerate; include regenHint."
+      },
+      {
+        "id": "convert_json_to_table_or_bullets",
+        "type": "transform",
+        "notes": "Convert JSON-like output into table/bullets."
+      },
+      {
+        "id": "split_long_paragraphs",
+        "type": "transform",
+        "notes": "Split long paragraphs into short paragraphs (1–2 sentences each)."
+      },
+      {
+        "id": "fix_bullet_hygiene",
+        "type": "transform",
+        "notes": "Split multi-sentence bullets into multiple bullets or trim to <=3 sentences each."
+      },
+      {
+        "id": "repair_table_or_convert",
+        "type": "transform",
+        "notes": "Repair table separator/columns; if impossible convert to key/value bullets."
+      },
+      {
+        "id": "auto_fix_close_fence",
+        "type": "transform",
+        "notes": "Close unclosed code fences to keep markdown valid."
+      },
+      {
+        "id": "unicode_normalize_display_safe",
+        "type": "transform",
+        "notes": "Normalize unicode for display-safe output."
+      },
+      {
+        "id": "auto_shorten_to_constraint",
+        "type": "transform",
+        "notes": "Auto-shorten to meet max sentence/char constraint without losing core answer."
+      },
+      {
+        "id": "truncate_with_offer_narrow",
+        "type": "transform",
+        "notes": "Truncate and add one short line suggesting a narrower ask."
+      },
+      {
+        "id": "ask_one_clarification",
+        "type": "route",
+        "notes": "Ask one crisp clarification using clarification_phrases bank."
+      },
+      {
+        "id": "add_hedge_and_limit_scope",
+        "type": "transform",
+        "notes": "Reduce certainty; only claim what’s evidenced; suggest next best step."
+      },
+      {
+        "id": "remove_banned_phrases",
+        "type": "transform",
+        "notes": "Strip banned/robotic phrases; keep meaning."
+      },
+      {
+        "id": "light_rephrase_keep_facts",
+        "type": "transform",
+        "notes": "Rephrase without changing facts to reduce exact repetition."
+      },
+      {
+        "id": "strip_debug_sections",
+        "type": "transform",
+        "notes": "Remove debug sections from user-visible output."
+      },
+      {
+        "id": "hide_internal_ids",
+        "type": "transform",
+        "notes": "Hide internal ids unless user requested them."
+      }
     ],
     "adaptiveFallbackRouting": {
       "resolutionOrder": [
@@ -418,14 +551,30 @@
         "generic"
       ],
       "map": {
-        "no_docs": { "bankId": "no_docs_messages" },
-        "indexing": { "bankId": "fallback_processing" },
-        "extraction_failed": { "bankId": "fallback_extraction_recovery" },
-        "scope_empty": { "bankId": "fallback_scope_empty" },
-        "scoped_not_found": { "bankId": "fallback_not_found_scope" },
-        "weak_evidence": { "bankId": "scoped_not_found_messages" },
-        "hallucination_risk": { "bankId": "scoped_not_found_messages" },
-        "generic": { "bankId": "fallback_processing" }
+        "no_docs": {
+          "bankId": "no_docs_messages"
+        },
+        "indexing": {
+          "bankId": "fallback_processing"
+        },
+        "extraction_failed": {
+          "bankId": "fallback_extraction_recovery"
+        },
+        "scope_empty": {
+          "bankId": "fallback_scope_empty"
+        },
+        "scoped_not_found": {
+          "bankId": "fallback_not_found_scope"
+        },
+        "weak_evidence": {
+          "bankId": "scoped_not_found_messages"
+        },
+        "hallucination_risk": {
+          "bankId": "scoped_not_found_messages"
+        },
+        "generic": {
+          "bankId": "fallback_processing"
+        }
       }
     }
   },
@@ -433,23 +582,61 @@
     "cases": [
       {
         "id": "QGT_001_nav_pills_strips_sources_label",
-        "input": { "answerMode": "nav_pills", "answerText": "Here it is:\n\nSources: X", "attachments": { "source_buttons": { "count": 1 } } },
-        "expect": { "actionsAny": ["strip_inline_sources"] }
+        "input": {
+          "answerMode": "nav_pills",
+          "answerText": "Here it is:\n\nSources: X",
+          "attachments": {
+            "source_buttons": {
+              "count": 1
+            }
+          }
+        },
+        "expect": {
+          "actionsAny": [
+            "strip_inline_sources"
+          ]
+        }
       },
       {
         "id": "QGT_002_replace_bad_no_relevant",
-        "input": { "answerText": "No relevant information found in your documents." },
-        "expect": { "actionsAny": ["emit_adaptive_failure_message"] }
+        "input": {
+          "answerText": "No relevant information found in your documents."
+        },
+        "expect": {
+          "actionsAny": [
+            "emit_adaptive_failure_message"
+          ]
+        }
       },
       {
         "id": "QGT_003_truncated_currency_blocks",
-        "input": { "answerText": "Total investment is R$ 900" },
-        "expect": { "actionsAny": ["retry_retrieval_then_regen"] }
+        "input": {
+          "answerText": "Total investment is R$ 900"
+        },
+        "expect": {
+          "actionsAny": [
+            "retry_retrieval_then_regen"
+          ]
+        }
       },
       {
         "id": "QGT_004_explicit_doc_blocks_wrong_doc",
-        "input": { "context": { "explicitDocRef": { "present": true }, "chosenDocs": { "count": 1, "allMatchExplicit": false } } },
-        "expect": { "actionsAny": ["fail_hard_wrong_doc"] }
+        "input": {
+          "context": {
+            "explicitDocRef": {
+              "present": true
+            },
+            "chosenDocs": {
+              "count": 1,
+              "allMatchExplicit": false
+            }
+          }
+        },
+        "expect": {
+          "actionsAny": [
+            "fail_hard_wrong_doc"
+          ]
+        }
       }
     ]
   }

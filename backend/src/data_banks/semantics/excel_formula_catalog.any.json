@@ -3,9 +3,19 @@
     "id": "excel_formula_catalog",
     "version": "1.0.0",
     "description": "Excel formula intent catalog with EN/PT aliases and validation hints.",
-    "languages": ["any", "en", "pt"],
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
     "lastUpdated": "2026-02-13",
-    "owner": "allybi-editing"
+    "owner": "allybi-editing",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -14,43 +24,79 @@
   "functions": [
     {
       "name": "SUM",
-      "aliases_en": ["sum", "total"],
-      "aliases_pt": ["soma", "total"],
+      "aliases_en": [
+        "sum",
+        "total"
+      ],
+      "aliases_pt": [
+        "soma",
+        "total"
+      ],
       "example_en": "=SUM(D5:D20)",
       "example_pt": "=SUM(D5:D20)"
     },
     {
       "name": "SUMIFS",
-      "aliases_en": ["sumifs", "sum with conditions"],
-      "aliases_pt": ["somases", "somar com condi\u00e7\u00f5es"],
+      "aliases_en": [
+        "sumifs",
+        "sum with conditions"
+      ],
+      "aliases_pt": [
+        "somases",
+        "somar com condições"
+      ],
       "example_en": "=SUMIFS(F:F,C:C,\"CABINS\")",
       "example_pt": "=SUMIFS(F:F,C:C,\"CABINS\")"
     },
     {
       "name": "COUNT",
-      "aliases_en": ["count", "count values"],
-      "aliases_pt": ["contar", "contagem"],
+      "aliases_en": [
+        "count",
+        "count values"
+      ],
+      "aliases_pt": [
+        "contar",
+        "contagem"
+      ],
       "example_en": "=COUNT(A:A)",
       "example_pt": "=COUNT(A:A)"
     },
     {
       "name": "IFERROR",
-      "aliases_en": ["iferror", "if error"],
-      "aliases_pt": ["seerro", "se erro"],
+      "aliases_en": [
+        "iferror",
+        "if error"
+      ],
+      "aliases_pt": [
+        "seerro",
+        "se erro"
+      ],
       "example_en": "=IFERROR(A1/B1,0)",
       "example_pt": "=IFERROR(A1/B1,0)"
     },
     {
       "name": "XLOOKUP",
-      "aliases_en": ["xlookup", "lookup by key"],
-      "aliases_pt": ["xlookup", "procurar por chave"],
+      "aliases_en": [
+        "xlookup",
+        "lookup by key"
+      ],
+      "aliases_pt": [
+        "xlookup",
+        "procurar por chave"
+      ],
       "example_en": "=XLOOKUP(A2,Table1[Key],Table1[Value])",
       "example_pt": "=XLOOKUP(A2,Table1[Key],Table1[Value])"
     },
     {
       "name": "LET",
-      "aliases_en": ["let", "named expression"],
-      "aliases_pt": ["let", "express\u00e3o nomeada"],
+      "aliases_en": [
+        "let",
+        "named expression"
+      ],
+      "aliases_pt": [
+        "let",
+        "expressão nomeada"
+      ],
       "example_en": "=LET(x,D5:D20,SUM(x))",
       "example_pt": "=LET(x,D5:D20,SUM(x))"
     }
@@ -62,8 +108,8 @@
         "UNKNOWN_FUNCTION": "Unknown formula function. Try one of: SUM, SUMIFS, COUNT, IFERROR, XLOOKUP, LET."
       },
       "pt": {
-        "MISSING_PREFIX": "A f\u00f3rmula deve come\u00e7ar com '='.",
-        "UNKNOWN_FUNCTION": "Fun\u00e7\u00e3o de f\u00f3rmula desconhecida. Tente: SUM, SUMIFS, COUNT, IFERROR, XLOOKUP, LET."
+        "MISSING_PREFIX": "A fórmula deve começar com '='.",
+        "UNKNOWN_FUNCTION": "Função de fórmula desconhecida. Tente: SUM, SUMIFS, COUNT, IFERROR, XLOOKUP, LET."
       }
     }
   }
