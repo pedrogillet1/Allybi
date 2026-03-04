@@ -1,8 +1,8 @@
 {
   "_meta": {
     "id": "operator_canonical_registry",
-    "version": "1.0.0",
-    "description": "Single source of truth for operator identity. Maps all alias conventions (intent_config, allybi_intents, editing_routing, collision_matrix) to canonical IDs.",
+    "version": "2.0.0",
+    "description": "Single source of truth for operator identity. Maps detection-level names (collision_matrix, file_action_operators) and Allybi-level names (DOCX_*, XLSX_*) to routing-level canonical IDs (intent_config.operatorsAllowed). Allybi mappings must agree with editOperatorAliases.service.ts:runtimeFromAllybiCanonical().",
     "languages": ["any"],
     "lastUpdated": "2026-03-04",
     "owner": "data-bank-governance",
@@ -14,22 +14,35 @@
     {
       "canonicalId": "EDIT_PARAGRAPH",
       "family": "editing",
-      "aliases": ["DOCX_REWRITE_PARAGRAPH", "DOCX_REWRITE_SECTION", "replace_text", "insert_paragraph"]
+      "aliases": ["DOCX_REWRITE_PARAGRAPH"]
     },
     {
       "canonicalId": "EDIT_SPAN",
       "family": "editing",
-      "aliases": ["DOCX_REPLACE_SPAN", "DOCX_SET_RUN_STYLE"]
+      "aliases": ["DOCX_REPLACE_SPAN"]
     },
     {
       "canonicalId": "ADD_PARAGRAPH",
       "family": "editing",
-      "aliases": ["DOCX_INSERT_AFTER", "DOCX_INSERT_BEFORE", "DOCX_DELETE_PARAGRAPH"]
+      "aliases": ["DOCX_INSERT_AFTER", "DOCX_INSERT_BEFORE"]
     },
     {
       "canonicalId": "EDIT_DOCX_BUNDLE",
       "family": "editing",
-      "aliases": []
+      "aliases": [
+        "DOCX_REWRITE_SECTION", "DOCX_DELETE_PARAGRAPH", "DOCX_SET_RUN_STYLE",
+        "DOCX_CLEAR_RUN_STYLE", "DOCX_MERGE_PARAGRAPHS", "DOCX_SPLIT_PARAGRAPH",
+        "DOCX_SET_PARAGRAPH_STYLE", "DOCX_SET_ALIGNMENT", "DOCX_SET_INDENTATION",
+        "DOCX_SET_LINE_SPACING", "DOCX_SET_PARAGRAPH_SPACING",
+        "DOCX_LIST_APPLY_BULLETS", "DOCX_LIST_APPLY_NUMBERING", "DOCX_LIST_REMOVE",
+        "DOCX_LIST_PROMOTE_DEMOTE", "DOCX_LIST_RESTART_NUMBERING", "DOCX_NUMBERING_REPAIR",
+        "DOCX_TRANSLATE_SCOPE", "DOCX_FIND_REPLACE", "DOCX_UPDATE_TOC",
+        "DOCX_CREATE_TABLE", "DOCX_ADD_TABLE_ROW", "DOCX_DELETE_TABLE_ROW",
+        "DOCX_SET_TABLE_CELL", "DOCX_PAGE_BREAK", "DOCX_SECTION_BREAK",
+        "DOCX_ENRICH_FROM_SOURCES", "DOCX_SET_HEADING_LEVEL", "DOCX_SET_TEXT_CASE",
+        "DOCX_GET_TARGETS", "DOCX_LOCK_TARGETS", "DOCX_CLEAR_LOCK",
+        "replace_text", "insert_paragraph", "delete_paragraph"
+      ]
     },
     {
       "canonicalId": "EDIT_CELL",
@@ -39,17 +52,22 @@
     {
       "canonicalId": "EDIT_RANGE",
       "family": "editing",
-      "aliases": ["XLSX_SET_RANGE_VALUES", "XLSX_SET_CELL_FORMULA", "XLSX_FORMAT_RANGE"]
+      "aliases": [
+        "XLSX_SET_RANGE_VALUES", "XLSX_FILL_DOWN", "XLSX_FILL_RIGHT", "XLSX_FILL_SERIES",
+        "XLSX_WRAP_TEXT", "XLSX_AUTO_FIT", "XLSX_COND_FORMAT_DATA_BARS",
+        "XLSX_COND_FORMAT_COLOR_SCALE", "XLSX_COND_FORMAT_TOP_N",
+        "XLSX_HIDE_ROWS_COLS", "XLSX_SHOW_ROWS_COLS"
+      ]
     },
     {
       "canonicalId": "ADD_SHEET",
       "family": "editing",
-      "aliases": []
+      "aliases": ["XLSX_ADD_SHEET"]
     },
     {
       "canonicalId": "RENAME_SHEET",
       "family": "editing",
-      "aliases": []
+      "aliases": ["XLSX_RENAME_SHEET"]
     },
     {
       "canonicalId": "DELETE_SHEET",
@@ -59,15 +77,34 @@
     {
       "canonicalId": "CREATE_CHART",
       "family": "editing",
-      "aliases": ["XLSX_CHART_CREATE", "insert_chart", "create_chart"]
+      "aliases": [
+        "XLSX_CHART_CREATE", "XLSX_CHART_SET_SERIES", "XLSX_CHART_SET_TITLES",
+        "XLSX_CHART_SET_AXES", "XLSX_CHART_MOVE_RESIZE", "XLSX_CHART_DELETE",
+        "insert_chart", "create_chart", "chart_update"
+      ]
     },
     {
       "canonicalId": "COMPUTE",
       "family": "editing",
-      "aliases": ["python_calc", "excel_formula", "PY_COMPUTE"]
+      "aliases": [
+        "XLSX_REMOVE_DUPLICATES", "XLSX_TRIM_WHITESPACE",
+        "XLSX_NORMALIZE_VALUES", "XLSX_SET_PROTECTION", "XLSX_LOCK_CELLS"
+      ]
     },
     {
       "canonicalId": "COMPUTE_BUNDLE",
+      "family": "editing",
+      "aliases": [
+        "XLSX_SET_CELL_FORMULA", "XLSX_SET_RANGE_FORMULAS", "XLSX_FORMAT_RANGE",
+        "XLSX_SET_NUMBER_FORMAT", "XLSX_SORT_RANGE", "XLSX_FILTER_APPLY",
+        "XLSX_FILTER_CLEAR", "XLSX_TABLE_CREATE", "XLSX_DATA_VALIDATION_SET",
+        "XLSX_FREEZE_PANES", "XLSX_MERGE_CELLS",
+        "python_calc", "excel_formula",
+        "insert_row", "delete_row", "add_column", "delete_column", "merge_cells"
+      ]
+    },
+    {
+      "canonicalId": "PY_COMPUTE",
       "family": "editing",
       "aliases": []
     },
@@ -89,52 +126,12 @@
     {
       "canonicalId": "REWRITE_SLIDE_TEXT",
       "family": "editing",
-      "aliases": []
+      "aliases": ["slide_delete", "slide_duplicate"]
     },
     {
       "canonicalId": "REPLACE_SLIDE_IMAGE",
       "family": "editing",
       "aliases": []
-    },
-    {
-      "canonicalId": "insert_row",
-      "family": "editing",
-      "aliases": []
-    },
-    {
-      "canonicalId": "delete_row",
-      "family": "editing",
-      "aliases": []
-    },
-    {
-      "canonicalId": "add_column",
-      "family": "editing",
-      "aliases": []
-    },
-    {
-      "canonicalId": "delete_column",
-      "family": "editing",
-      "aliases": []
-    },
-    {
-      "canonicalId": "merge_cells",
-      "family": "editing",
-      "aliases": ["XLSX_MERGE_CELLS"]
-    },
-    {
-      "canonicalId": "slide_delete",
-      "family": "editing",
-      "aliases": []
-    },
-    {
-      "canonicalId": "slide_duplicate",
-      "family": "editing",
-      "aliases": []
-    },
-    {
-      "canonicalId": "chart_update",
-      "family": "editing",
-      "aliases": ["XLSX_CHART_SET_SERIES", "XLSX_CHART_SET_TITLES"]
     },
     {
       "canonicalId": "open",
@@ -208,6 +205,11 @@
     },
     {
       "canonicalId": "folder_rename",
+      "family": "file_actions",
+      "aliases": []
+    },
+    {
+      "canonicalId": "undo",
       "family": "file_actions",
       "aliases": []
     },
@@ -355,11 +357,6 @@
       "canonicalId": "error",
       "family": "error",
       "aliases": []
-    },
-    {
-      "canonicalId": "delete_paragraph",
-      "family": "editing",
-      "aliases": ["DOCX_DELETE_PARAGRAPH"]
     }
   ]
 }
