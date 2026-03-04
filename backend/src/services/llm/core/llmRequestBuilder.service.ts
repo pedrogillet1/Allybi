@@ -90,6 +90,11 @@ export interface EvidencePackLike {
     };
     locationKey?: string;
     snippet?: string;
+    table?: {
+      header?: string[];
+      rows?: Array<Array<string | number | null>>;
+      warnings?: string[];
+    } | null;
     score?: { finalScore?: number };
     evidenceType?: "text" | "table" | "image";
   }>;
@@ -1045,11 +1050,33 @@ export class LlmRequestBuilderService {
       ).trim();
       const evidenceId = `${e.docId}:${locationKey}`;
 
-      const snippet = (e.snippet || "").trim().replace(/\s+/g, " ");
-      const clipped =
-        snippet.length > maxSnippetChars
-          ? snippet.slice(0, maxSnippetChars - 1) + "…"
-          : snippet;
+      let clipped: string;
+      if (
+        e.evidenceType === "table" &&
+        e.table &&
+        Array.isArray(e.table.header) &&
+        e.table.header.length > 0
+      ) {
+        const hdr = e.table.header.map((h) => String(h ?? "")).join(" | ");
+        const rows = (e.table.rows || [])
+          .slice(0, 8)
+          .map((r) => (r || []).map((c) => String(c ?? "")).join(" | "));
+        const sep = e.table.header.map(() => "---").join(" | ");
+        const tableText = [hdr, sep, ...rows].join("\n");
+        clipped =
+          tableText.length > maxSnippetChars
+            ? tableText.slice(0, maxSnippetChars - 1) + "…"
+            : tableText;
+        if (e.table.warnings?.length) {
+          clipped += ` [warnings: ${e.table.warnings.join(", ")}]`;
+        }
+      } else {
+        const snippet = (e.snippet || "").trim().replace(/\s+/g, " ");
+        clipped =
+          snippet.length > maxSnippetChars
+            ? snippet.slice(0, maxSnippetChars - 1) + "…"
+            : snippet;
+      }
 
       const line = `- evidenceId=${evidenceId} | documentId=${e.docId} | locationKey=${locationKey} | title=${title}${loc ? ` | location=${loc}` : ""} | snippet=${clipped}`;
       if (sectionChars + line.length + 1 > maxSectionChars) {

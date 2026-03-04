@@ -412,4 +412,44 @@ describe("LlmRequestBuilderService", () => {
     );
     expect(maxTokens).toBe(8192);
   });
+
+  test("renders table evidence with headers and rows into prompt", () => {
+    const builder = new LlmRequestBuilderService(prompts);
+    const req = builder.build(
+      createInput({
+        signals: {
+          ...createInput().signals,
+          answerMode: "doc_grounded_table",
+        },
+        evidencePack: {
+          evidence: [
+            {
+              docId: "doc-1",
+              title: "Q1 Report",
+              locationKey: "sheet:Revenue",
+              snippet: undefined,
+              evidenceType: "table",
+              table: {
+                header: ["Region", "Revenue (R$)", "Growth (%)"],
+                rows: [
+                  ["North", 1500000, 12.5],
+                  ["South", 2300000, -3.2],
+                ],
+              },
+              score: { finalScore: 0.78 },
+              location: { sheet: "Revenue" },
+            },
+          ],
+        },
+      }),
+    );
+
+    const userContent = req.messages.find((m) => m.role === "user")?.content ?? "";
+    expect(userContent).toContain("Region");
+    expect(userContent).toContain("Revenue (R$)");
+    expect(userContent).toContain("Growth (%)");
+    expect(userContent).toContain("1500000");
+    expect(userContent).toContain("-3.2");
+    expect(userContent).not.toContain("snippet=\n");
+  });
 });
