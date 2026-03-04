@@ -60,6 +60,13 @@ const OAuthCallback = ({ variant = 'page' }) => {
           // Cache non-sensitive profile locally for quick boot.
           localStorage.setItem('user', JSON.stringify(userData.user));
 
+          // Set flag BEFORE setAuthState — setAuthState triggers isAuthenticated
+          // which fires the safety-net useEffect in AuthModalContext; the flag
+          // must already be present so the safety-net redirects to first-upload.
+          if (!localStorage.getItem(STORAGE_KEYS.FIRST_UPLOAD_DONE)) {
+            localStorage.setItem(STORAGE_KEYS.PENDING_FIRST_UPLOAD, 'true');
+          }
+
           // Update AuthContext state
           setAuthState(userData.user);
 
@@ -67,10 +74,6 @@ const OAuthCallback = ({ variant = 'page' }) => {
           // This prevents race condition where ProtectedRoute checks auth before storage is ready
           await new Promise(resolve => setTimeout(resolve, 50));
 
-          // Set flag so new OAuth users go to first-upload onboarding
-          if (!localStorage.getItem(STORAGE_KEYS.FIRST_UPLOAD_DONE)) {
-            localStorage.setItem(STORAGE_KEYS.PENDING_FIRST_UPLOAD, 'true');
-          }
           // Navigate after successful OAuth login
           completeAuth({ fallback: DEFAULT_AUTH_REDIRECT });
         } else {

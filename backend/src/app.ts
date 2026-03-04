@@ -95,6 +95,8 @@ const corsOptions: cors.CorsOptions = {
     "x-admin-key",
     "X-CSRF-Token",
     "x-csrf-token",
+    "X-Delete-Source",
+    "x-delete-source",
     "Cache-Control",
     "cache-control",
     "Pragma",

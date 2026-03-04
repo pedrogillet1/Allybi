@@ -97,6 +97,16 @@ const Icons = {
       <circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/>
     </svg>
   ),
+  mail: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+    </svg>
+  ),
+  phone: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
+    </svg>
+  ),
 };
 
 const SECTION_ICONS = {
@@ -157,6 +167,9 @@ const Settings = () => {
   const [showCurrentPw, setShowCurrentPw] = useState(false);
   const [showNewPw, setShowNewPw] = useState(false);
   const [showConfirmPw, setShowConfirmPw] = useState(false);
+
+  // ─── Verification state ───
+  const [sendingVerification, setSendingVerification] = useState(false);
 
   // ─── Storage state ───
   const [totalStorage, setTotalStorage] = useState(() => {
@@ -259,6 +272,36 @@ const Settings = () => {
       setShowPasswordModal(false);
     } catch (err) {
       showError(err.response?.data?.error || t('settings.errors.failedToChangePassword'));
+    }
+  };
+
+  const handleSendEmailVerification = async () => {
+    if (sendingVerification) return;
+    setSendingVerification(true);
+    try {
+      await api.post('/api/auth/verify/send-email');
+      showSuccess(t('settings.recovery.emailSent') || 'Verification link sent to your email');
+    } catch (err) {
+      showError(err.response?.data?.error || t('settings.errors.failedToSendVerification') || 'Failed to send verification');
+    } finally {
+      setSendingVerification(false);
+    }
+  };
+
+  const handleSendPhoneVerification = async () => {
+    if (sendingVerification) return;
+    if (!user?.phoneNumber) {
+      setShowProfileModal(true);
+      return;
+    }
+    setSendingVerification(true);
+    try {
+      await api.post('/api/auth/verify/send-phone', { phoneNumber: user.phoneNumber });
+      showSuccess(t('settings.recovery.phoneSent') || 'Verification code sent to your phone');
+    } catch (err) {
+      showError(err.response?.data?.error || t('settings.errors.failedToSendVerification') || 'Failed to send verification');
+    } finally {
+      setSendingVerification(false);
     }
   };
 
@@ -374,6 +417,58 @@ const Settings = () => {
             desc={t('settings.introToAllybiDesc')}
             onClick={() => openOnboarding(0, 'settings')}
           />
+        )}
+        {user?.isEmailVerified && !user?.isPhoneVerified && (
+          <Row
+            icon={Icons.phone}
+            title={t('settings.recovery.verifyPhone')}
+            desc={user?.phoneNumber
+              ? (t('settings.recovery.phoneVerifyDescription'))
+              : (t('settings.recovery.phoneDescription'))}
+            right={
+              <Btn onClick={handleSendPhoneVerification}>
+                {sendingVerification ? '...' : (user?.phoneNumber ? t('settings.recovery.verifyButton') : t('settings.recovery.addPhoneButton'))}
+              </Btn>
+            }
+          />
+        )}
+        {user?.isPhoneVerified && !user?.isEmailVerified && (
+          <Row
+            icon={Icons.mail}
+            title={t('settings.recovery.verifyEmail')}
+            desc={t('settings.recovery.emailDescription')}
+            right={
+              <Btn onClick={handleSendEmailVerification}>
+                {sendingVerification ? '...' : t('settings.recovery.verifyButton')}
+              </Btn>
+            }
+          />
+        )}
+        {!user?.isEmailVerified && !user?.isPhoneVerified && (
+          <>
+            <Row
+              icon={Icons.mail}
+              title={t('settings.recovery.verifyEmail')}
+              desc={t('settings.recovery.emailDescription')}
+              right={
+                <Btn onClick={handleSendEmailVerification}>
+                  {sendingVerification ? '...' : t('settings.recovery.verifyButton')}
+                </Btn>
+              }
+            />
+            <Row
+              icon={Icons.phone}
+              title={t('settings.recovery.verifyPhone')}
+              desc={user?.phoneNumber
+                ? (t('settings.recovery.phoneVerifyDescription'))
+                : (t('settings.recovery.phoneDescription'))}
+              right={
+                <Btn onClick={handleSendPhoneVerification}>
+                  {sendingVerification ? '...' : (user?.phoneNumber ? t('settings.recovery.verifyButton') : t('settings.recovery.addPhoneButton'))}
+                </Btn>
+              }
+            />
+          </>
         )}
         <Row
           icon={Icons.logOut}
