@@ -370,6 +370,12 @@ function buildSectionTree(paragraphs: ParsedParagraph[]): {
 
   let currentPath: string[] = [];
 
+  // Accumulate text that appears before the first heading (preamble)
+  let preambleText = "";
+  let preambleStart: number | undefined;
+  let preambleEnd: number | undefined;
+  let firstHeadingSeen = false;
+
   for (let i = 0; i < paragraphs.length; i++) {
     const para = paragraphs[i];
     const text = para.text.trim();
@@ -377,6 +383,20 @@ function buildSectionTree(paragraphs: ParsedParagraph[]): {
     if (!text) continue;
 
     if (para.headingLevel !== null) {
+      // Before processing the first heading, flush any accumulated preamble
+      if (!firstHeadingSeen && preambleText) {
+        sections.push({
+          heading: undefined,
+          level: 0,
+          path: [],
+          content: preambleText,
+          children: [],
+          paragraphStart: preambleStart,
+          paragraphEnd: preambleEnd,
+        });
+      }
+      firstHeadingSeen = true;
+
       const level = para.headingLevel;
 
       // Pop stack until we find a parent level
@@ -425,7 +445,30 @@ function buildSectionTree(paragraphs: ParsedParagraph[]): {
         currentSection.content = text;
       }
       currentSection.paragraphEnd = para.index;
+    } else {
+      // No heading seen yet — accumulate preamble text
+      if (preambleText) {
+        preambleText += "\n\n" + text;
+      } else {
+        preambleText = text;
+        preambleStart = para.index;
+      }
+      preambleEnd = para.index;
     }
+  }
+
+  // If the document has no headings at all but has preamble text, create a
+  // synthetic section so the content is not lost.
+  if (!firstHeadingSeen && preambleText) {
+    sections.push({
+      heading: undefined,
+      level: 0,
+      path: [],
+      content: preambleText,
+      children: [],
+      paragraphStart: preambleStart,
+      paragraphEnd: preambleEnd,
+    });
   }
 
   return { sections, headings };
@@ -508,8 +551,11 @@ export async function extractDocxWithAnchors(
     // Build full text (preserving structure)
     let fullText = "";
     const appendSection = (section: DocxSection, depth: number = 0): void => {
-      const prefix = "#".repeat(section.level ?? 1) + " ";
-      fullText += prefix + (section.heading ?? "") + "\n\n";
+      // Preamble sections have no heading — skip the markdown heading line
+      if (section.heading) {
+        const prefix = "#".repeat(section.level ?? 1) + " ";
+        fullText += prefix + section.heading + "\n\n";
+      }
       if (section.content) {
         fullText += section.content + "\n\n";
       }

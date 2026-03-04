@@ -33225,7 +33225,7 @@
     },
     {
       "id": "effective_date_resolution",
-      "category": "patterns",
+      "category": "semantics",
       "path": "patterns/doc_refs/effective_date_resolution.any.json",
       "filename": "effective_date_resolution.any.json",
       "version": "1.0.0",
@@ -37306,6 +37306,30 @@
         "local": false
       },
       "dependsOn": ["patterns_doc_refs_versioning_patterns"]
+    },
+    {
+      "id": "wrong_section_lock",
+      "category": "quality",
+      "path": "quality/document_intelligence/wrong_section_lock.any.json",
+      "filename": "wrong_section_lock.any.json",
+      "version": "1.0.0",
+      "contentType": "quality",
+      "schemaId": "quality_document_intelligence_schema",
+      "lastUpdated": "2026-03-04",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": ["wrong_doc_lock"],
+      "checksumSha256": "37a02e1161c9e8a50cf171dc8538895ae18fb583214f5940558832c563111e8b"
     }
   ],
   "tests": [
