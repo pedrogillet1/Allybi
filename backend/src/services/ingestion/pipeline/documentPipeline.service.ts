@@ -16,6 +16,7 @@ import type { DispatchedExtractionResult } from "../extraction/extractionResult.
 import { buildInputChunks, deduplicateChunks } from "./chunkAssembly.service";
 import { clamp01, deriveTextQuality } from "./textQuality.service";
 import { runEncryptionStep } from "./encryptionStep.service";
+import fileValidator from "../fileValidator.service";
 import type { PipelineTimings, InputChunk } from "./pipelineTypes";
 
 // Storage download concurrency limiter
@@ -37,6 +38,24 @@ async function waitForMemory(): Promise<void> {
   while (process.memoryUsage().rss > MAX_RSS_BYTES && Date.now() < deadline) {
     await new Promise((r) => setTimeout(r, 500));
   }
+}
+
+// Per-extraction timeout constants (configurable via env)
+const EXTRACTION_TIMEOUT_MS = parseInt(process.env.EXTRACTION_TIMEOUT_MS || "300000", 10); // 5 min
+const EMBEDDING_TIMEOUT_MS = parseInt(process.env.EMBEDDING_TIMEOUT_MS || "600000", 10);   // 10 min
+
+/**
+ * Wrap a promise with a timeout. Rejects with a descriptive error if the
+ * promise does not settle within `ms` milliseconds.
+ */
+export function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms);
+    promise.then(
+      (val) => { clearTimeout(timer); resolve(val); },
+      (err) => { clearTimeout(timer); reject(err); },
+    );
+  });
 }
 
 /**
@@ -79,6 +98,38 @@ export async function processDocumentAsync(
     data: { fileHash },
   });
 
+  // 1c) Validate file integrity before extraction
+  const headerCheck = fileValidator.validateFileHeader(fileBuffer, mimeType, documentId);
+  if (!headerCheck.isValid) {
+    logger.warn("[Pipeline] File failed header validation", {
+      documentId,
+      filename,
+      errorCode: headerCheck.errorCode,
+      error: headerCheck.error,
+    });
+    return {
+      storageDownloadMs: Date.now() - tDownload,
+      extractionMs: 0,
+      extractionMethod: "text",
+      ocrUsed: false,
+      ocrSuccess: false,
+      ocrConfidence: null,
+      ocrPageCount: null,
+      ocrMode: null,
+      textQuality: "none",
+      textQualityScore: 0,
+      extractionWarnings: [headerCheck.error || "File header validation failed"],
+      textLength: 0,
+      rawChunkCount: 0,
+      chunkCount: 0,
+      embeddingMs: 0,
+      pageCount: null,
+      fileHash,
+      skipped: true,
+      skipReason: `${headerCheck.errorCode}: ${headerCheck.error}`,
+    };
+  }
+
   // 2) Extract text
   const tExtract = Date.now();
   logger.info("[Pipeline] Extracting text", {
@@ -86,7 +137,11 @@ export async function processDocumentAsync(
     mimeType,
     size: fileBuffer.length,
   });
-  const extraction: DispatchedExtractionResult = await extractText(fileBuffer, mimeType, filename);
+  const extraction: DispatchedExtractionResult = await withTimeout(
+    extractText(fileBuffer, mimeType, filename),
+    EXTRACTION_TIMEOUT_MS,
+    "Text extraction",
+  );
   logger.info("[Pipeline] Text extraction", {
     durationMs: Date.now() - tExtract,
     filename,
@@ -184,9 +239,13 @@ export async function processDocumentAsync(
       documentId,
       chunkCount: inputChunks.length,
     });
-    await vectorEmbeddingService.storeDocumentEmbeddings(
-      documentId,
-      inputChunks,
+    await withTimeout(
+      vectorEmbeddingService.storeDocumentEmbeddings(
+        documentId,
+        inputChunks,
+      ),
+      EMBEDDING_TIMEOUT_MS,
+      "Embedding storage",
     );
     logger.info("[Pipeline] Embed+store complete", {
       durationMs: Date.now() - tEmbed,
