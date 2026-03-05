@@ -71,6 +71,7 @@ export default function FileInsightsCard() {
       flex: isMobile ? 'none' : 1,
       display: 'flex',
       flexDirection: 'column',
+      justifyContent: 'space-between',
       overflow: 'hidden',
       minWidth: 0,
       maxWidth: '100%',
@@ -99,7 +100,6 @@ export default function FileInsightsCard() {
       <div style={{
         position: 'relative',
         marginBottom: isMobile ? 16 : 24,
-        flex: 1,
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
@@ -123,7 +123,6 @@ export default function FileInsightsCard() {
             }}
           />
         )}
-        {/* Left fade removed — first icon must always be fully visible */}
 
         <div
           ref={scrollRef}

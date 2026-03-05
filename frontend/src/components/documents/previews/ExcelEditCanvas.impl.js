@@ -195,6 +195,22 @@ function VirtualizedGrid({
   setDragAnchor,
   setDragEnd,
   t,
+  // Inline editing props
+  isInlineEditing,
+  setIsInlineEditing,
+  isApplying,
+  effectiveDraftValue,
+  controlledDraftValue,
+  onDraftValueChange,
+  setDraftValue,
+  inlineEditorRef,
+  revert,
+  commitDraftIfDirty,
+  moveSelectionBy,
+  // Selection props
+  selectedRef,
+  applySelectionRect,
+  gridBounds,
 }) {
   const scrollRef = React.useRef(null);
 
@@ -209,7 +225,10 @@ function VirtualizedGrid({
   }
 
   const totalRows = Math.max(current.rows.length - 1, 100);
-  const totalCols = Math.max(current.colCount || current.rows[0]?.length || 1, 26) - 1; // exclude row-header col
+  const dataCols = (current.colCount || current.rows[0]?.length || 1) - 1;
+  // Extend columns to fill the viewport (like rows extend vertically)
+  const viewportCols = typeof window !== 'undefined' ? Math.ceil((window.innerWidth - 52) / COL_WIDTH) : 26;
+  const totalCols = Math.max(dataCols, viewportCols);
 
   return (
     <VirtualizedGridInner
@@ -241,6 +260,20 @@ function VirtualizedGrid({
       isDraggingRef={isDraggingRef}
       setDragAnchor={setDragAnchor}
       setDragEnd={setDragEnd}
+      isInlineEditing={isInlineEditing}
+      setIsInlineEditing={setIsInlineEditing}
+      isApplying={isApplying}
+      effectiveDraftValue={effectiveDraftValue}
+      controlledDraftValue={controlledDraftValue}
+      onDraftValueChange={onDraftValueChange}
+      setDraftValue={setDraftValue}
+      inlineEditorRef={inlineEditorRef}
+      revert={revert}
+      commitDraftIfDirty={commitDraftIfDirty}
+      moveSelectionBy={moveSelectionBy}
+      selectedRef={selectedRef}
+      applySelectionRect={applySelectionRect}
+      gridBounds={gridBounds}
     />
   );
 }
@@ -274,6 +307,22 @@ function VirtualizedGridInner({
   isDraggingRef,
   setDragAnchor,
   setDragEnd,
+  // Inline editing
+  isInlineEditing,
+  setIsInlineEditing,
+  isApplying,
+  effectiveDraftValue,
+  controlledDraftValue,
+  onDraftValueChange,
+  setDraftValue,
+  inlineEditorRef,
+  revert,
+  commitDraftIfDirty,
+  moveSelectionBy,
+  // Selection
+  selectedRef,
+  applySelectionRect,
+  gridBounds,
 }) {
   const rowVirtualizer = useVirtualizer({
     count: totalRows,
@@ -282,8 +331,7 @@ function VirtualizedGridInner({
     overscan: 10,
   });
 
-  // No column virtualization — render all columns (typically 14-30, trivial).
-  // This avoids measurement issues with the scroll element.
+  // No column virtualization — render all columns.
   const allCols = React.useMemo(() => {
     const cols = [];
     for (let i = 0; i < totalCols; i++) {
@@ -330,9 +378,9 @@ function VirtualizedGridInner({
             zIndex: 30,
             width: ROW_HEADER_WIDTH,
             height: HEADER_HEIGHT,
-            background: '#E0E0E0',
-            borderBottom: '1px solid #A0A0A0',
-            borderRight: '1px solid #A0A0A0',
+            background: '#FAFAFA',
+            borderBottom: '1px solid #E6E6EC',
+            borderRight: '1px solid #E6E6EC',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -352,15 +400,26 @@ function VirtualizedGridInner({
             <div
               key={`ch-${col.index}`}
               role="columnheader"
+              title="Select column"
+              onMouseDown={(e) => {
+                if (e.button !== 0) return;
+                e.preventDefault();
+                isDraggingRef.current = false;
+                applySelectionRect?.(
+                  { rowIdx: 1, colIdx },
+                  { rowIdx: gridBounds?.maxRowIdx || totalRows, colIdx },
+                  { inlineEdit: false },
+                );
+              }}
               style={{
                 position: 'absolute',
                 top: 0,
                 left: col.start + ROW_HEADER_WIDTH,
                 width: col.size,
                 height: HEADER_HEIGHT,
-                background: '#F8F9FA',
-                borderBottom: '1px solid #A0A0A0',
-                borderRight: '1px solid #C0C0C0',
+                background: '#FAFAFA',
+                borderBottom: '1px solid #E6E6EC',
+                borderRight: '1px solid #E6E6EC',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -370,6 +429,7 @@ function VirtualizedGridInner({
                 zIndex: 20,
                 boxSizing: 'border-box',
                 userSelect: 'none',
+                cursor: 'pointer',
               }}
             >
               {label}
@@ -389,15 +449,27 @@ function VirtualizedGridInner({
               {/* Row header */}
               <div
                 role="rowheader"
+                title="Select row"
+                onMouseDown={(e) => {
+                  if (e.button !== 0) return;
+                  e.preventDefault();
+                  isDraggingRef.current = false;
+                  applySelectionRect?.(
+                    { rowIdx, colIdx: 1 },
+                    { rowIdx, colIdx: gridBounds?.maxColIdx || totalCols },
+                    { inlineEdit: false },
+                  );
+                }}
                 style={{
                   position: 'absolute',
                   top: vr.start + HEADER_HEIGHT,
                   left: 0,
                   width: ROW_HEADER_WIDTH,
                   height: vr.size,
-                  background: '#F8F9FA',
-                  borderRight: '1px solid #A0A0A0',
-                  borderBottom: '1px solid #C8C8C8',
+                  background: '#FAFAFA',
+                  borderRight: '1px solid #E6E6EC',
+                  cursor: 'pointer',
+                  borderBottom: '1px solid #E6E6EC',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -528,13 +600,28 @@ function VirtualizedGridInner({
                     onMouseDown={(e) => {
                       if (e.button !== 0) return;
                       e.preventDefault();
+                      if (e.shiftKey && selectedRef?.current) {
+                        isDraggingRef.current = false;
+                        applySelectionRect?.(
+                          selectedRef.current,
+                          { rowIdx, colIdx },
+                          { inlineEdit: false },
+                        );
+                        return;
+                      }
+                      setIsInlineEditing?.(false);
                       setUserHasSelected(true);
-                      setLockedCells(new Set());
+                      setLockedCells(new Set([`${rowIdx}:${colIdx}`]));
                       setSelected({ rowIdx, colIdx });
                       setSelectedRange(null);
                       isDraggingRef.current = true;
                       setDragAnchor({ rowIdx, colIdx });
                       setDragEnd({ rowIdx, colIdx });
+                    }}
+                    onDoubleClick={(e) => {
+                      if (e.button !== 0) return;
+                      e.preventDefault();
+                      setIsInlineEditing?.(true);
                     }}
                     onMouseEnter={() => {
                       if (isDraggingRef.current) {
@@ -549,8 +636,8 @@ function VirtualizedGridInner({
                       height: vr.size,
                       boxSizing: 'border-box',
                       padding: '4px 8px',
-                      borderRight: '1px solid #C8C8C8',
-                      borderBottom: '1px solid #C8C8C8',
+                      borderRight: '1px solid #E6E6EC',
+                      borderBottom: '1px solid #E6E6EC',
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
@@ -568,11 +655,48 @@ function VirtualizedGridInner({
                         ? String(fmtOvr.fontFamily).trim()
                         : undefined,
                     }}
-                    title={isLocked ? 'Locked' : undefined}
+                    title={isLocked ? 'Locked' : 'Click to edit. Drag to select.'}
                   >
                     {(() => {
                       const pending = keyHere ? pendingState?.overrides?.[keyHere] : null;
                       const ovr = keyHere ? draftCellOverrides?.[keyHere] : null;
+                      // Inline editor: render input when this cell is selected and in inline editing mode
+                      if (isSelected && isInlineEditing && !isApplying) {
+                        return (
+                          <input
+                            ref={inlineEditorRef}
+                            className="excel-inline-editor"
+                            value={effectiveDraftValue}
+                            onMouseDown={(evt) => evt.stopPropagation()}
+                            onChange={(evt) => {
+                              const nextValue = evt.target.value;
+                              if (controlledDraftValue != null) onDraftValueChange?.(nextValue);
+                              else setDraftValue?.(nextValue);
+                            }}
+                            onBlur={() => setIsInlineEditing?.(false)}
+                            onKeyDown={(evt) => {
+                              if (evt.key === 'Escape') {
+                                evt.preventDefault();
+                                setIsInlineEditing?.(false);
+                                revert?.();
+                                return;
+                              }
+                              if (evt.key !== 'Enter' && evt.key !== 'Tab') return;
+                              evt.preventDefault();
+                              if (isApplying) return;
+                              const deltaRow = evt.key === 'Enter' ? (evt.shiftKey ? -1 : 1) : 0;
+                              const deltaCol = evt.key === 'Tab' ? (evt.shiftKey ? -1 : 1) : 0;
+                              setIsInlineEditing?.(false);
+                              void (async () => {
+                                const ok = await commitDraftIfDirty?.();
+                                if (!ok) return;
+                                moveSelectionBy?.(deltaRow, deltaCol, { extendRange: false });
+                              })();
+                            }}
+                            aria-label={`Edit cell ${a1Here || ''}`}
+                          />
+                        );
+                      }
                       if (pending) return formatNumericLike(String(pending.value ?? ''), colIdx);
                       if (!ovr) return formatNumericLike(cell.value, colIdx);
                       const isFormula = String(ovr.kind || '') === 'formula';
@@ -3406,6 +3530,20 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
         setDragAnchor={setDragAnchor}
         setDragEnd={setDragEnd}
         t={t}
+        isInlineEditing={isInlineEditing}
+        setIsInlineEditing={setIsInlineEditing}
+        isApplying={isApplying}
+        effectiveDraftValue={effectiveDraftValue}
+        controlledDraftValue={controlledDraftValue}
+        onDraftValueChange={onDraftValueChange}
+        setDraftValue={setDraftValue}
+        inlineEditorRef={inlineEditorRef}
+        revert={revert}
+        commitDraftIfDirty={commitDraftIfDirty}
+        moveSelectionBy={moveSelectionBy}
+        selectedRef={selectedRef}
+        applySelectionRect={applySelectionRect}
+        gridBounds={gridBounds}
       />
 
       {/* Sheet Tabs */}

@@ -136,12 +136,12 @@ export default function ContinueCard({ onUpload }) {
     .filter(doc => viewHistory[doc.id])
     .slice()
     .sort((a, b) => (viewHistory[b.id] || 0) - (viewHistory[a.id] || 0))
-    .slice(0, 4);
+    .slice(0, 3);
 
   const recentChats = (conversationsData?.conversations || [])
     .slice()
     .sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt))
-    .slice(0, 3);
+    .slice(0, 1);
 
   const hasContent = recentDocs.length > 0 || recentChats.length > 0;
 

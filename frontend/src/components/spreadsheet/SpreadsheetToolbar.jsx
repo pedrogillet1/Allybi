@@ -120,6 +120,97 @@ function DropdownMenu({ trigger, items, value, onChange, width = 100 }) {
   );
 }
 
+const COLOR_PRESETS = [
+  '#111827', '#374151', '#6B7280', '#0F172A',
+  '#1D4ED8', '#2563EB', '#16A34A', '#DC2626',
+  '#F59E0B', '#A855F7',
+];
+
+function ColorPicker({ colorHex = '#000000', onColorChange }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    };
+    window.document.addEventListener('mousedown', handler);
+    return () => window.document.removeEventListener('mousedown', handler);
+  }, [open]);
+
+  return (
+    <div ref={ref} style={{ position: 'relative' }}>
+      <button
+        type="button"
+        aria-label="Font color"
+        title="Font color"
+        onClick={() => setOpen((o) => !o)}
+        onMouseEnter={(e) => { e.currentTarget.style.background = '#F5F5F5'; }}
+        onMouseLeave={(e) => { e.currentTarget.style.background = 'none'; }}
+        style={{ ...iconBtn, position: 'relative' }}
+      >
+        <span style={{ fontSize: 16, fontWeight: 800, color: colorHex || '#000000', lineHeight: 1 }}>A</span>
+        <span style={{
+          position: 'absolute',
+          bottom: 3,
+          left: 6,
+          right: 6,
+          height: 3,
+          background: colorHex || '#000000',
+          borderRadius: 1,
+        }} />
+      </button>
+      {open ? (
+        <div style={{
+          position: 'absolute',
+          top: 30,
+          left: 0,
+          background: '#FFFFFF',
+          border: '1px solid #E6E6EC',
+          borderRadius: 8,
+          boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+          zIndex: 50,
+          padding: 10,
+          minWidth: 160,
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+            <input
+              type="color"
+              value={colorHex || '#000000'}
+              onChange={(e) => onColorChange?.(e.target.value)}
+              aria-label="Text color"
+              style={{ width: 28, height: 28, border: 'none', padding: 0, cursor: 'pointer' }}
+            />
+            <span style={{ fontWeight: 900, fontSize: 12, color: '#111827', fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
+              {String(colorHex || '#000000').toUpperCase()}
+            </span>
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+            {COLOR_PRESETS.map((c) => (
+              <button
+                key={c}
+                type="button"
+                onClick={() => { onColorChange?.(c); setOpen(false); }}
+                title={c}
+                style={{
+                  width: 24,
+                  height: 24,
+                  borderRadius: 4,
+                  border: c === colorHex ? '2px solid #111827' : '1px solid #E6E6EC',
+                  background: c,
+                  cursor: 'pointer',
+                  padding: 0,
+                }}
+              />
+            ))}
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 function SpreadsheetToolbar({
   onUndo,
   onRedo,
@@ -228,24 +319,11 @@ function SpreadsheetToolbar({
         <Underline size={16} color="#32302C" />
       </button>
 
-      {/* Font color swatch */}
-      <button
-        type="button"
-        aria-label="Font color"
-        title="Font color"
-        style={{ ...iconBtn, position: 'relative' }}
-      >
-        <span style={{ fontSize: 16, fontWeight: 800, color: colorHex || '#000000', lineHeight: 1 }}>A</span>
-        <span style={{
-          position: 'absolute',
-          bottom: 3,
-          left: 6,
-          right: 6,
-          height: 3,
-          background: colorHex || '#000000',
-          borderRadius: 1,
-        }} />
-      </button>
+      {/* Font color picker */}
+      <ColorPicker
+        colorHex={colorHex}
+        onColorChange={(c) => onFormatChange?.({ color: c })}
+      />
 
       <div style={sep} />
 

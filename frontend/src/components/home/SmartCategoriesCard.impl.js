@@ -346,36 +346,6 @@ export default function SmartCategoriesCard({
             );
           })}
 
-          {/* "View all categories" tile */}
-          {hasMore && (
-            <button
-              role="listitem"
-              onClick={() => navigate(ROUTES.DOCUMENTS)}
-              style={{
-                width: 156,
-                minWidth: 156,
-                background: '#F5F5F5',
-                borderRadius: 16,
-                border: '1px solid #E6E6EC',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 6,
-                cursor: 'pointer',
-                fontFamily: 'Plus Jakarta Sans, sans-serif',
-                fontWeight: 600,
-                fontSize: 13,
-                color: '#55534E',
-                boxSizing: 'border-box',
-                flexShrink: 0,
-                padding: 0,
-              }}
-            >
-              {t('home.categories.viewAll')}
-              <ArrowIcon style={{ width: 14, height: 14, filter: 'brightness(0) invert(0.3)' }} aria-hidden="true" />
-            </button>
-          )}
         </div>
         </>
       ) : (
@@ -578,36 +548,6 @@ export default function SmartCategoriesCard({
             );
           })}
 
-          {/* "View all categories" tile */}
-          {hasMore && (
-            <button
-              role="listitem"
-              onClick={() => navigate(ROUTES.DOCUMENTS)}
-              style={{
-                height: 88,
-                padding: 16,
-                background: '#F5F5F5',
-                borderRadius: 16,
-                border: '1px solid #E6E6EC',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 8,
-                cursor: 'pointer',
-                fontFamily: 'Plus Jakarta Sans, sans-serif',
-                fontWeight: 600,
-                fontSize: 14,
-                color: '#55534E',
-                transition: 'background 120ms ease, color 120ms ease',
-                boxSizing: 'border-box',
-              }}
-              onMouseEnter={e => { e.currentTarget.style.background = '#ECECEC'; e.currentTarget.style.color = '#181818'; }}
-              onMouseLeave={e => { e.currentTarget.style.background = '#F5F5F5'; e.currentTarget.style.color = '#55534E'; }}
-            >
-              {t('home.categories.viewAll')}
-              <ArrowIcon style={{ width: 16, height: 16, filter: 'brightness(0) invert(0.3)' }} aria-hidden="true" />
-            </button>
-          )}
         </div>
       )}
 
