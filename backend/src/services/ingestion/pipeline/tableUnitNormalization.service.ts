@@ -11,12 +11,12 @@ export interface NormalizedCellUnit {
   numericValue: number | null;
 }
 
-type UnitPattern = {
+export type UnitPattern = {
   normalized: string;
   patterns: RegExp[];
 };
 
-const UNIT_PATTERNS: UnitPattern[] = [
+export const UNIT_PATTERNS: UnitPattern[] = [
   {
     normalized: "currency_brl",
     patterns: [/\br\$/i, /\bbrl\b/i, /\breais?\b/i],

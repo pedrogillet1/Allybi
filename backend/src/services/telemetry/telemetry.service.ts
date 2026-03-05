@@ -50,6 +50,7 @@ export class TelemetryService {
   private readonly cfg: Required<TelemetryServiceConfig>;
   private buffer: BufferedItem[] = [];
   private flushTimer?: NodeJS.Timeout;
+  private droppedCount = 0;
 
   constructor(
     private readonly prisma: PrismaClient,
@@ -70,8 +71,13 @@ export class TelemetryService {
     }
   }
 
-  shutdown(): void {
+  async shutdown(): Promise<void> {
     if (this.flushTimer) clearInterval(this.flushTimer);
+
+    // Drain the entire buffer (flush() processes 250 at a time)
+    while (this.buffer.length > 0) {
+      await this.flush();
+    }
   }
 
   /* ----------------------------- Public API ----------------------------- */
@@ -94,6 +100,16 @@ export class TelemetryService {
     event: IngestionEventCreate,
   ): Promise<TelemetryWriteResult> {
     return this.write({ kind: "ingestion", data: event });
+  }
+
+  /** Total number of events dropped due to buffer overflow. */
+  get totalDropped(): number {
+    return this.droppedCount;
+  }
+
+  /** Current number of events waiting in the buffer. */
+  get bufferSize(): number {
+    return this.buffer.length;
   }
 
   /**
@@ -161,6 +177,12 @@ export class TelemetryService {
     if (this.buffer.length > this.cfg.maxBufferSize) {
       const overflow = this.buffer.length - this.cfg.maxBufferSize;
       this.buffer.splice(0, overflow);
+      this.droppedCount += overflow;
+      if (this.droppedCount % 100 < overflow) {
+        console.warn(
+          `[telemetry] buffer overflow: dropped ${overflow} events (total dropped: ${this.droppedCount})`,
+        );
+      }
     }
   }
 

@@ -1,0 +1,152 @@
+{
+  "_meta": {
+    "id": "table_header_ontology_housing",
+    "version": "1.3.0",
+    "description": "Table header ontology for housing.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-04",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "housing",
+    "tiebreakContract": {
+      "version": "2.0.0",
+      "deterministic": true,
+      "requiredFields": [
+        "priority",
+        "scope",
+        "disambiguationRuleId"
+      ],
+      "defaultDisambiguationRuleId": "structure_tiebreak_default",
+      "strategy": "semantic_priority_weighting",
+      "requireCurationReason": true,
+      "requireDisambiguationRulePerRow": true
+    }
+  },
+  "domain": "housing",
+  "headers": [
+    {
+      "canonical": "mortgage_amortization",
+      "synonyms": [
+        "mortgage amortization",
+        "Mortgage Amortization field",
+        "campo mortgage_amortization",
+        "mortgage_amortization value",
+        "Mortgage Amortization valor"
+      ],
+      "related": [
+        "hoa_fees",
+        "property_tax_breakdown"
+      ],
+      "normalizationNotes": "Map mortgage_amortization to normalized canonical mortgage_amortization.",
+      "priority": 500,
+      "scope": "table_header:housing",
+      "disambiguationRuleId": "headers_disambiguation_housing_mortgage_amortization",
+      "curationReason": "weighted:mortgage_amortization:domain_housing"
+    },
+    {
+      "canonical": "hoa_fees",
+      "synonyms": [
+        "hoa fees",
+        "HOA Fees field",
+        "campo hoa_fees",
+        "hoa_fees value",
+        "HOA Fees valor"
+      ],
+      "related": [
+        "property_tax_breakdown",
+        "inspection_findings"
+      ],
+      "normalizationNotes": "Map hoa_fees to normalized canonical hoa_fees.",
+      "priority": 501,
+      "scope": "table_header:housing",
+      "disambiguationRuleId": "headers_disambiguation_housing_hoa_fees",
+      "curationReason": "weighted:hoa_fees:domain_housing"
+    },
+    {
+      "canonical": "property_tax_breakdown",
+      "synonyms": [
+        "property tax breakdown",
+        "Property Tax Breakdown field",
+        "campo property_tax_breakdown",
+        "property_tax_breakdown value",
+        "Property Tax Breakdown valor"
+      ],
+      "related": [
+        "inspection_findings",
+        "rent_charges"
+      ],
+      "normalizationNotes": "Map property_tax_breakdown to normalized canonical property_tax_breakdown.",
+      "priority": 502,
+      "scope": "table_header:housing",
+      "disambiguationRuleId": "headers_disambiguation_housing_property_tax_breakdown",
+      "curationReason": "weighted:property_tax_breakdown:domain_housing"
+    },
+    {
+      "canonical": "inspection_findings",
+      "synonyms": [
+        "inspection findings",
+        "Inspection Findings field",
+        "campo inspection_findings",
+        "inspection_findings value",
+        "Inspection Findings valor"
+      ],
+      "related": [
+        "rent_charges",
+        "utility_costs"
+      ],
+      "normalizationNotes": "Map inspection_findings to normalized canonical inspection_findings.",
+      "priority": 503,
+      "scope": "table_header:housing",
+      "disambiguationRuleId": "headers_disambiguation_housing_inspection_findings",
+      "curationReason": "weighted:inspection_findings:domain_housing"
+    },
+    {
+      "canonical": "rent_charges",
+      "synonyms": [
+        "rent charges",
+        "Rent Charges field",
+        "campo rent_charges",
+        "rent_charges value",
+        "Rent Charges valor"
+      ],
+      "related": [
+        "utility_costs",
+        "mortgage_amortization"
+      ],
+      "normalizationNotes": "Map rent_charges to normalized canonical rent_charges.",
+      "priority": 504,
+      "scope": "table_header:housing",
+      "disambiguationRuleId": "headers_disambiguation_housing_rent_charges",
+      "curationReason": "weighted:rent_charges:domain_housing"
+    },
+    {
+      "canonical": "utility_costs",
+      "synonyms": [
+        "utility costs",
+        "Utility Costs field",
+        "campo utility_costs",
+        "utility_costs value",
+        "Utility Costs valor"
+      ],
+      "related": [
+        "mortgage_amortization",
+        "hoa_fees"
+      ],
+      "normalizationNotes": "Map utility_costs to normalized canonical utility_costs.",
+      "priority": 505,
+      "scope": "table_header:housing",
+      "disambiguationRuleId": "headers_disambiguation_housing_utility_costs",
+      "curationReason": "weighted:utility_costs:domain_housing"
+    }
+  ]
+}

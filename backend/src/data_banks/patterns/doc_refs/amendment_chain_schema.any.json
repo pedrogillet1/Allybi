@@ -1,0 +1,88 @@
+{
+  "_meta": {
+    "id": "amendment_chain_schema",
+    "version": "1.0.0",
+    "description": "Schema for representing amendment chains, version relationships, and effective-date precedence between documents. Used by revision.service.ts to resolve 'which version governs?'",
+    "languages": ["en", "pt"],
+    "lastUpdated": "2026-03-04",
+    "owner": "data-bank-governance",
+    "usedBy": ["services/documents/revision.service.ts", "services/core/scope/scopeGate.service.ts"],
+    "tests": ["tests/document-intelligence/version-chain.test.ts"]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "resolutionStrategy": "latest_effective_date_wins"
+  },
+  "relationshipTypes": [
+    {
+      "type": "amends",
+      "label": { "en": "amends", "pt": "altera" },
+      "description": "This document modifies specific clauses of a parent document. Parent remains in force except where amended.",
+      "precedence": "child_clauses_override_parent"
+    },
+    {
+      "type": "supersedes",
+      "label": { "en": "supersedes", "pt": "substitui" },
+      "description": "This document entirely replaces a prior version. Prior version becomes status=superseded.",
+      "precedence": "child_replaces_parent"
+    },
+    {
+      "type": "restates",
+      "label": { "en": "restates", "pt": "consolida" },
+      "description": "This document incorporates all prior amendments into a single clean version.",
+      "precedence": "child_replaces_parent_and_amendments"
+    },
+    {
+      "type": "extends",
+      "label": { "en": "extends", "pt": "prorroga" },
+      "description": "This document extends the term of a parent document without changing its substance.",
+      "precedence": "parent_terms_persist_with_new_dates"
+    },
+    {
+      "type": "terminates",
+      "label": { "en": "terminates", "pt": "rescinde" },
+      "description": "This document terminates a parent document.",
+      "precedence": "parent_no_longer_in_force"
+    }
+  ],
+  "versionStatuses": [
+    { "status": "draft", "label": { "en": "Draft", "pt": "Rascunho" }, "inForce": false },
+    { "status": "executed", "label": { "en": "Executed/Signed", "pt": "Assinado" }, "inForce": true },
+    { "status": "effective", "label": { "en": "Effective", "pt": "Vigente" }, "inForce": true },
+    { "status": "superseded", "label": { "en": "Superseded", "pt": "Substituído" }, "inForce": false },
+    { "status": "terminated", "label": { "en": "Terminated", "pt": "Rescindido" }, "inForce": false },
+    { "status": "expired", "label": { "en": "Expired", "pt": "Expirado" }, "inForce": false },
+    { "status": "amended", "label": { "en": "Amended (read with amendments)", "pt": "Alterado" }, "inForce": true }
+  ],
+  "detectionPatterns": {
+    "amends": ["\\bamend(?:s|ed|ment|ing)\\b", "\\baltera(?:ção|r|do)\\b", "\\baditivo\\b"],
+    "supersedes": ["\\bsupersed(?:es|ed|ing)\\b", "\\breplac(?:es|ed|ing)\\b", "\\bsubstitui(?:r|do|ção)\\b"],
+    "restates": ["\\brestat(?:es|ed|ement)\\b", "\\bamended and restated\\b", "\\bconsolidad[oa]\\b"],
+    "extends": ["\\bextend(?:s|ed|ing)\\b", "\\brenewal\\b", "\\bprorrog(?:ar|ação|ado)\\b"],
+    "terminates": ["\\bterminat(?:es|ed|ion)\\b", "\\brescis(?:ão|dir)\\b"]
+  },
+  "conflictDetection": {
+    "enabled": true,
+    "rules": [
+      {
+        "id": "VCR_001",
+        "trigger": "Two documents claim to amend the same parent clause",
+        "action": "flag_conflict",
+        "severity": "warning"
+      },
+      {
+        "id": "VCR_002",
+        "trigger": "A document is marked as both 'effective' and 'superseded'",
+        "action": "require_resolution",
+        "severity": "error"
+      },
+      {
+        "id": "VCR_003",
+        "trigger": "Amendment references a parent document not in the corpus",
+        "action": "flag_missing_parent",
+        "severity": "info"
+      }
+    ]
+  }
+}

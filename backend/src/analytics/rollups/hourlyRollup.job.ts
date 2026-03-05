@@ -3,6 +3,7 @@
 
 import { PrismaClient } from "@prisma/client";
 import { percentile } from "../calculators/latency.calculator";
+import { USAGE_EVENT_TYPES } from "../../services/telemetry/telemetry.constants";
 
 // ─────────────────────────────────────────────────────────────
 // TYPES
@@ -108,6 +109,23 @@ async function releaseLock(prisma: PrismaClient): Promise<void> {
 // METRICS COMPUTATION
 // ─────────────────────────────────────────────────────────────
 
+// ─────────────────────────────────────────────────────────────
+// COMPILE-TIME TYPE GUARD
+// If USAGE_EVENT_TYPES changes, this block will fail to compile.
+// ─────────────────────────────────────────────────────────────
+type UsageEventType = (typeof USAGE_EVENT_TYPES)[number];
+type AssertContains<T extends string, _U extends T> = true;
+// Each event type referenced in the SQL below must be in USAGE_EVENT_TYPES:
+type _ActiveUserGuard = AssertContains<
+  UsageEventType,
+  | "CHAT_MESSAGE_SENT"
+  | "SEARCH_PERFORMED"
+  | "DOCUMENT_UPLOADED"
+  | "SESSION_START"
+>;
+type _MessageGuard = AssertContains<UsageEventType, "CHAT_MESSAGE_SENT">;
+type _DocUploadGuard = AssertContains<UsageEventType, "DOCUMENT_UPLOADED">;
+
 async function computeHourlyMetrics(
   prisma: PrismaClient,
   bucketStart: Date,
@@ -141,7 +159,7 @@ async function computeHourlyMetrics(
     FROM usage_events
     WHERE "at" >= ${bucketStart} AND "at" < ${bucketEnd}
       AND "userId" IS NOT NULL
-      AND "eventType" IN ('chat.message_sent', 'rag.query', 'document.upload', 'auth.login')
+      AND "eventType" IN ('CHAT_MESSAGE_SENT', 'SEARCH_PERFORMED', 'DOCUMENT_UPLOADED', 'SESSION_START')
   `;
   metrics.activeUsers = Number(activeUsersResult[0]?.count || 0);
 
@@ -150,7 +168,7 @@ async function computeHourlyMetrics(
     SELECT COUNT(*) as count
     FROM usage_events
     WHERE "at" >= ${bucketStart} AND "at" < ${bucketEnd}
-      AND "eventType" = 'chat.message_sent'
+      AND "eventType" = 'CHAT_MESSAGE_SENT'
   `;
   metrics.messages = Number(messagesResult[0]?.count || 0);
 
@@ -174,7 +192,7 @@ async function computeHourlyMetrics(
     SELECT COUNT(*) as count
     FROM usage_events
     WHERE "at" >= ${bucketStart} AND "at" < ${bucketEnd}
-      AND "eventType" = 'document.upload'
+      AND "eventType" = 'DOCUMENT_UPLOADED'
   `;
   metrics.documentsUploaded = Number(docsResult[0]?.count || 0);
 
@@ -234,6 +252,22 @@ async function computeHourlyMetrics(
   metrics.llmCostUsd = Number(llmResult[0]?.cost || 0);
   metrics.llmTokensIn = Number(llmResult[0]?.tokensIn || 0);
   metrics.llmTokensOut = Number(llmResult[0]?.tokensOut || 0);
+
+  // ─── TTFT (from model_calls) ───
+  const ttftResult = await prisma.$queryRawUnsafe<[{ avg_ttft: number | null }]>(
+    `SELECT AVG("firstTokenMs") as avg_ttft
+     FROM "model_calls"
+     WHERE "at" >= $1 AND "at" < $2
+       AND "firstTokenMs" IS NOT NULL
+       AND "firstTokenMs" > 0
+       AND "status" = 'ok'`,
+    bucketStart,
+    bucketEnd,
+  );
+  const ttftAvgMs = ttftResult[0]?.avg_ttft
+    ? Math.round(ttftResult[0].avg_ttft * 100) / 100
+    : null;
+  metrics.ttftAvgMs = ttftAvgMs;
 
   return metrics;
 }

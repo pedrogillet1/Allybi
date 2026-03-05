@@ -1,0 +1,152 @@
+{
+  "_meta": {
+    "id": "table_header_ontology_travel",
+    "version": "1.3.0",
+    "description": "Table header ontology for travel.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-04",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "travel",
+    "tiebreakContract": {
+      "version": "2.0.0",
+      "deterministic": true,
+      "requiredFields": [
+        "priority",
+        "scope",
+        "disambiguationRuleId"
+      ],
+      "defaultDisambiguationRuleId": "structure_tiebreak_default",
+      "strategy": "semantic_priority_weighting",
+      "requireCurationReason": true,
+      "requireDisambiguationRulePerRow": true
+    }
+  },
+  "domain": "travel",
+  "headers": [
+    {
+      "canonical": "flight_segments",
+      "synonyms": [
+        "flight segments",
+        "Flight Segments field",
+        "campo flight_segments",
+        "flight_segments value",
+        "Flight Segments valor"
+      ],
+      "related": [
+        "hotel_charges",
+        "car_rental_charges"
+      ],
+      "normalizationNotes": "Map flight_segments to normalized canonical flight_segments.",
+      "priority": 500,
+      "scope": "table_header:travel",
+      "disambiguationRuleId": "headers_disambiguation_travel_flight_segments",
+      "curationReason": "weighted:flight_segments:domain_travel"
+    },
+    {
+      "canonical": "hotel_charges",
+      "synonyms": [
+        "hotel charges",
+        "Hotel Charges field",
+        "campo hotel_charges",
+        "hotel_charges value",
+        "Hotel Charges valor"
+      ],
+      "related": [
+        "car_rental_charges",
+        "itinerary_legs"
+      ],
+      "normalizationNotes": "Map hotel_charges to normalized canonical hotel_charges.",
+      "priority": 501,
+      "scope": "table_header:travel",
+      "disambiguationRuleId": "headers_disambiguation_travel_hotel_charges",
+      "curationReason": "weighted:hotel_charges:domain_travel"
+    },
+    {
+      "canonical": "car_rental_charges",
+      "synonyms": [
+        "car rental charges",
+        "Car Rental Charges field",
+        "campo car_rental_charges",
+        "car_rental_charges value",
+        "Car Rental Charges valor"
+      ],
+      "related": [
+        "itinerary_legs",
+        "insurance_coverage"
+      ],
+      "normalizationNotes": "Map car_rental_charges to normalized canonical car_rental_charges.",
+      "priority": 502,
+      "scope": "table_header:travel",
+      "disambiguationRuleId": "headers_disambiguation_travel_car_rental_charges",
+      "curationReason": "weighted:car_rental_charges:domain_travel"
+    },
+    {
+      "canonical": "itinerary_legs",
+      "synonyms": [
+        "itinerary legs",
+        "Itinerary Legs field",
+        "campo itinerary_legs",
+        "itinerary_legs value",
+        "Itinerary Legs valor"
+      ],
+      "related": [
+        "insurance_coverage",
+        "visa_requirements"
+      ],
+      "normalizationNotes": "Map itinerary_legs to normalized canonical itinerary_legs.",
+      "priority": 503,
+      "scope": "table_header:travel",
+      "disambiguationRuleId": "headers_disambiguation_travel_itinerary_legs",
+      "curationReason": "weighted:itinerary_legs:domain_travel"
+    },
+    {
+      "canonical": "insurance_coverage",
+      "synonyms": [
+        "insurance coverage",
+        "Insurance Coverage field",
+        "campo insurance_coverage",
+        "insurance_coverage value",
+        "Insurance Coverage valor"
+      ],
+      "related": [
+        "visa_requirements",
+        "flight_segments"
+      ],
+      "normalizationNotes": "Map insurance_coverage to normalized canonical insurance_coverage.",
+      "priority": 504,
+      "scope": "table_header:travel",
+      "disambiguationRuleId": "headers_disambiguation_travel_insurance_coverage",
+      "curationReason": "weighted:insurance_coverage:domain_travel"
+    },
+    {
+      "canonical": "visa_requirements",
+      "synonyms": [
+        "visa requirements",
+        "Visa Requirements field",
+        "campo visa_requirements",
+        "visa_requirements value",
+        "Visa Requirements valor"
+      ],
+      "related": [
+        "flight_segments",
+        "hotel_charges"
+      ],
+      "normalizationNotes": "Map visa_requirements to normalized canonical visa_requirements.",
+      "priority": 505,
+      "scope": "table_header:travel",
+      "disambiguationRuleId": "headers_disambiguation_travel_visa_requirements",
+      "curationReason": "weighted:visa_requirements:domain_travel"
+    }
+  ]
+}

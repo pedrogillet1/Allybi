@@ -92,6 +92,112 @@ const ACCOUNTING_INTENT_MARKERS = [
 ];
 const OPS_INTENT_MARKERS = ["ops", "operation", "sla", "runbook", "incident"];
 
+// -- cross_domain_tiebreak_policy bank reference (used for deterministic tiebreak resolution) --
+
+interface TiebreakRule {
+  id: string;
+  domainA: string;
+  domainB: string;
+  winner: string;
+  confidenceBoost: number;
+  reason: string;
+}
+
+interface TiebreakPolicyBank {
+  _meta: { id: string; version: string };
+  config: { enabled: boolean };
+  rules: TiebreakRule[];
+}
+
+interface DomainScore {
+  domain: DocumentIntelligenceDomain;
+  score: number;
+}
+
+const TIEBREAK_SCORE_GAP_THRESHOLD = 0.15;
+
+/**
+ * Score a query against all known domain marker sets.
+ * Returns a list of { domain, score } sorted descending by score.
+ * Each domain receives a score of (matched_markers / total_markers_in_set).
+ */
+function scoreDomainCandidates(query: string): DomainScore[] {
+  const q = lower(query);
+  if (!q) return [];
+
+  const sets: Array<{ domain: DocumentIntelligenceDomain; markers: string[] }> = [
+    { domain: "legal", markers: LEGAL_INTENT_MARKERS },
+    { domain: "finance", markers: FINANCE_INTENT_MARKERS },
+    { domain: "medical", markers: MEDICAL_INTENT_MARKERS },
+    { domain: "accounting", markers: ACCOUNTING_INTENT_MARKERS },
+    { domain: "ops", markers: OPS_INTENT_MARKERS },
+  ];
+
+  const results: DomainScore[] = [];
+  for (const { domain, markers } of sets) {
+    const matchCount = markers.filter((m) => q.includes(m)).length;
+    if (matchCount > 0) {
+      results.push({ domain, score: matchCount / markers.length });
+    }
+  }
+
+  results.sort((a, b) => b.score - a.score);
+  return results;
+}
+
+/**
+ * Given scored domain candidates, apply cross_domain_tiebreak_policy rules
+ * when two or more domains have a score gap < TIEBREAK_SCORE_GAP_THRESHOLD.
+ * Returns the winning domain and any applied rules info.
+ */
+function applyTiebreakPolicy(
+  candidates: DomainScore[],
+  reasons: string[],
+): DomainScore[] {
+  if (candidates.length < 2) return candidates;
+
+  const tiebreakBank = getOptionalBank<TiebreakPolicyBank>(
+    "cross_domain_tiebreak_policy",
+  );
+  if (!tiebreakBank || !tiebreakBank.config?.enabled) return candidates;
+
+  const rules = tiebreakBank.rules || [];
+  const updated = [...candidates];
+
+  // Check consecutive pairs from the top for tiebreak eligibility
+  for (let i = 0; i < updated.length - 1; i++) {
+    const top = updated[i];
+    const runner = updated[i + 1];
+    const gap = top.score - runner.score;
+
+    if (gap < TIEBREAK_SCORE_GAP_THRESHOLD) {
+      // Look up the tiebreak rule for this pair
+      const rule = rules.find(
+        (r) =>
+          (r.domainA === top.domain && r.domainB === runner.domain) ||
+          (r.domainA === runner.domain && r.domainB === top.domain),
+      );
+
+      if (rule) {
+        // Apply confidenceBoost to the winner
+        const winnerIdx = updated.findIndex((c) => c.domain === rule.winner);
+        if (winnerIdx >= 0) {
+          updated[winnerIdx] = {
+            ...updated[winnerIdx],
+            score: updated[winnerIdx].score + rule.confidenceBoost,
+          };
+          reasons.push("cross_domain_tiebreak_applied");
+          reasons.push(`tiebreak_rule:${rule.id}:${rule.winner}`);
+        }
+      }
+    }
+  }
+
+  // Re-sort after boosts
+  updated.sort((a, b) => b.score - a.score);
+  return updated;
+}
+
 function clean(value: unknown): string {
   return String(value || "").trim();
 }
@@ -211,7 +317,21 @@ export class BankSelectionPlannerService {
     const reasons: string[] = [];
 
     const explicitDomain = normalizeDocumentIntelligenceDomain(input.domainId);
-    const inferredDomain = inferDomainFromText(input.query);
+    let inferredDomain: DocumentIntelligenceDomain | null = null;
+
+    if (!explicitDomain) {
+      // Score all domain candidates and apply tiebreak resolution when close
+      const candidates = scoreDomainCandidates(input.query);
+      if (candidates.length >= 2) {
+        const resolved = applyTiebreakPolicy(candidates, reasons);
+        inferredDomain = resolved.length > 0 ? resolved[0].domain : null;
+      } else if (candidates.length === 1) {
+        inferredDomain = candidates[0].domain;
+      } else {
+        inferredDomain = inferDomainFromText(input.query);
+      }
+    }
+
     const domainId = explicitDomain || inferredDomain;
     if (explicitDomain) reasons.push("domain:explicit");
     else if (inferredDomain) reasons.push("domain:inferred_query");

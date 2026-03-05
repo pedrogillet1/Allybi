@@ -710,11 +710,13 @@ function toEngineEvidencePack(pack: EvidencePack | null) {
       },
       locationKey: item.locationKey,
       snippet: item.snippet,
+      table: item.table ?? null,
       score: {
         finalScore: item.score.finalScore,
       },
       evidenceType: item.evidenceType,
     })),
+    conflicts: pack.conflicts,
   };
 }
 
@@ -1440,7 +1442,8 @@ export class CentralizedChatRuntimeDelegate {
 
   private resolveTraceId(req: ChatRequest): string {
     const meta = asObject(req.meta);
-    return sanitizeTraceId(meta.requestId) || mkTraceId();
+    // Prefer body meta.requestId, fall back to HTTP middleware requestId
+    return sanitizeTraceId(meta.requestId) || sanitizeTraceId(meta.httpRequestId) || mkTraceId();
   }
 
   private toTraceFinalStatus(
@@ -5273,6 +5276,7 @@ export class CentralizedChatRuntimeDelegate {
     const traceId =
       sanitizeTraceId(params.runtimeCtx?.traceId) ||
       sanitizeTraceId((params.req.meta as any)?.requestId) ||
+      sanitizeTraceId((params.req.meta as any)?.httpRequestId) ||
       mkTraceId();
     const conversationId = String(
       params.runtimeCtx?.conversationId || params.req.conversationId || "",

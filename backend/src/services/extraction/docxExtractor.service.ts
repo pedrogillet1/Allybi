@@ -132,6 +132,95 @@ function extractParagraphText(pNode: any): string {
 }
 
 /**
+ * Extract text from a w:tbl (table) node and format as a markdown table.
+ *
+ * Walks w:tr -> w:tc -> w:p, reusing extractParagraphText for cell content.
+ * The first row is treated as the header row with a --- separator line.
+ */
+function extractTableText(tblNode: any): string {
+  const rows: string[][] = [];
+
+  const trNodes = tblNode["w:tr"];
+  if (!trNodes) return "";
+
+  const trArray = Array.isArray(trNodes) ? trNodes : [trNodes];
+
+  for (const tr of trArray) {
+    if (!tr) continue;
+    const cells: string[] = [];
+
+    const tcNodes = tr["w:tc"];
+    if (!tcNodes) {
+      rows.push([]);
+      continue;
+    }
+
+    const tcArray = Array.isArray(tcNodes) ? tcNodes : [tcNodes];
+
+    for (const tc of tcArray) {
+      if (!tc) {
+        cells.push("");
+        continue;
+      }
+
+      // Each cell can contain multiple w:p paragraphs
+      const pNodes = tc["w:p"];
+      if (!pNodes) {
+        cells.push("");
+        continue;
+      }
+
+      const pArray = Array.isArray(pNodes) ? pNodes : [pNodes];
+      const cellTextParts: string[] = [];
+
+      for (const p of pArray) {
+        if (!p) continue;
+        const pText = extractParagraphText(p);
+        if (pText) {
+          cellTextParts.push(pText);
+        }
+      }
+
+      // Join multi-paragraph cell content with a space (markdown table cells are single-line)
+      cells.push(cellTextParts.join(" ").trim());
+    }
+
+    rows.push(cells);
+  }
+
+  if (rows.length === 0) return "";
+
+  // Determine the max number of columns across all rows
+  const maxCols = Math.max(...rows.map((r) => r.length));
+  if (maxCols === 0) return "";
+
+  // Normalize each row to have the same number of columns
+  const normalized = rows.map((row) => {
+    while (row.length < maxCols) {
+      row.push("");
+    }
+    return row;
+  });
+
+  // Build markdown table
+  const lines: string[] = [];
+
+  // Header row
+  const header = normalized[0];
+  lines.push("| " + header.map((c) => c || " ").join(" | ") + " |");
+
+  // Separator
+  lines.push("| " + header.map(() => "---").join(" | ") + " |");
+
+  // Data rows
+  for (let i = 1; i < normalized.length; i++) {
+    lines.push("| " + normalized[i].map((c) => c || " ").join(" | ") + " |");
+  }
+
+  return lines.join("\n");
+}
+
+/**
  * Get paragraph style name from w:p node
  */
 function getParagraphStyle(pNode: any): string | undefined {
@@ -152,13 +241,65 @@ function getParagraphStyle(pNode: any): string | undefined {
 }
 
 /**
- * Parse all paragraphs from document.xml
+ * Process a single w:p node and push the result onto the paragraphs array.
+ */
+function processParagraphNode(
+  pNode: any,
+  index: number,
+  paragraphs: ParsedParagraph[],
+): void {
+  if (!pNode) return;
+  const text = extractParagraphText(pNode);
+  const styleName = getParagraphStyle(pNode);
+  const headingLevel = detectHeadingLevel(styleName);
+
+  paragraphs.push({
+    text,
+    styleName,
+    headingLevel,
+    index,
+  });
+}
+
+/**
+ * Process a single w:tbl node: extract its markdown text and push as a
+ * pseudo-paragraph onto the array.
+ */
+function processTableNode(
+  tblNode: any,
+  index: number,
+  paragraphs: ParsedParagraph[],
+): void {
+  if (!tblNode) return;
+  const tableText = extractTableText(tblNode);
+  if (tableText) {
+    paragraphs.push({
+      text: tableText,
+      styleName: undefined,
+      headingLevel: null,
+      index,
+    });
+  }
+}
+
+/**
+ * Parse all paragraphs and tables from document.xml in document order.
+ *
+ * Uses xml2js with { explicitChildren, preserveChildrenOrder } to obtain
+ * the `$$` ordered children array so interleaved w:p and w:tbl elements
+ * are emitted in the correct sequence.
+ *
+ * Falls back to separate w:p + w:tbl extraction when `$$` is unavailable.
  */
 async function parseParagraphs(
   documentXml: string,
 ): Promise<ParsedParagraph[]> {
   const xml2js = require("xml2js");
-  const parser = new xml2js.Parser();
+  const parser = new xml2js.Parser({
+    explicitChildren: true,
+    preserveChildrenOrder: true,
+    charsAsChildren: false,
+  });
 
   const result = await parser.parseStringPromise(documentXml);
   const paragraphs: ParsedParagraph[] = [];
@@ -173,24 +314,40 @@ async function parseParagraphs(
   const bodyContent = Array.isArray(body) ? body[0] : body;
   if (!bodyContent) return paragraphs;
 
-  // Extract paragraphs (w:p)
-  const pNodes = bodyContent["w:p"] || [];
-  const pArray = Array.isArray(pNodes) ? pNodes : [pNodes];
+  // Try ordered children first (available with explicitChildren + preserveChildrenOrder)
+  const orderedChildren: any[] | undefined = bodyContent["$$"];
 
-  for (let i = 0; i < pArray.length; i++) {
-    const pNode = pArray[i];
-    if (!pNode) continue;
+  if (orderedChildren && orderedChildren.length > 0) {
+    let idx = 0;
+    for (const child of orderedChildren) {
+      const tagName: string | undefined = child["#name"];
+      if (tagName === "w:p") {
+        processParagraphNode(child, idx, paragraphs);
+        idx++;
+      } else if (tagName === "w:tbl") {
+        processTableNode(child, idx, paragraphs);
+        idx++;
+      }
+      // Other element types (w:sectPr, etc.) are silently skipped
+    }
+  } else {
+    // Fallback: grab w:p and w:tbl separately (order between them is lost,
+    // but at least we don't drop tables entirely).
+    let idx = 0;
 
-    const text = extractParagraphText(pNode);
-    const styleName = getParagraphStyle(pNode);
-    const headingLevel = detectHeadingLevel(styleName);
+    const pNodes = bodyContent["w:p"] || [];
+    const pArray = Array.isArray(pNodes) ? pNodes : [pNodes];
+    for (const pNode of pArray) {
+      processParagraphNode(pNode, idx, paragraphs);
+      idx++;
+    }
 
-    paragraphs.push({
-      text,
-      styleName,
-      headingLevel,
-      index: i,
-    });
+    const tblNodes = bodyContent["w:tbl"] || [];
+    const tblArray = Array.isArray(tblNodes) ? tblNodes : [tblNodes];
+    for (const tblNode of tblArray) {
+      processTableNode(tblNode, idx, paragraphs);
+      idx++;
+    }
   }
 
   return paragraphs;
@@ -213,6 +370,12 @@ function buildSectionTree(paragraphs: ParsedParagraph[]): {
 
   let currentPath: string[] = [];
 
+  // Accumulate text that appears before the first heading (preamble)
+  let preambleText = "";
+  let preambleStart: number | undefined;
+  let preambleEnd: number | undefined;
+  let firstHeadingSeen = false;
+
   for (let i = 0; i < paragraphs.length; i++) {
     const para = paragraphs[i];
     const text = para.text.trim();
@@ -220,6 +383,20 @@ function buildSectionTree(paragraphs: ParsedParagraph[]): {
     if (!text) continue;
 
     if (para.headingLevel !== null) {
+      // Before processing the first heading, flush any accumulated preamble
+      if (!firstHeadingSeen && preambleText) {
+        sections.push({
+          heading: undefined,
+          level: 0,
+          path: [],
+          content: preambleText,
+          children: [],
+          paragraphStart: preambleStart,
+          paragraphEnd: preambleEnd,
+        });
+      }
+      firstHeadingSeen = true;
+
       const level = para.headingLevel;
 
       // Pop stack until we find a parent level
@@ -268,7 +445,30 @@ function buildSectionTree(paragraphs: ParsedParagraph[]): {
         currentSection.content = text;
       }
       currentSection.paragraphEnd = para.index;
+    } else {
+      // No heading seen yet — accumulate preamble text
+      if (preambleText) {
+        preambleText += "\n\n" + text;
+      } else {
+        preambleText = text;
+        preambleStart = para.index;
+      }
+      preambleEnd = para.index;
     }
+  }
+
+  // If the document has no headings at all but has preamble text, create a
+  // synthetic section so the content is not lost.
+  if (!firstHeadingSeen && preambleText) {
+    sections.push({
+      heading: undefined,
+      level: 0,
+      path: [],
+      content: preambleText,
+      children: [],
+      paragraphStart: preambleStart,
+      paragraphEnd: preambleEnd,
+    });
   }
 
   return { sections, headings };
@@ -351,8 +551,11 @@ export async function extractDocxWithAnchors(
     // Build full text (preserving structure)
     let fullText = "";
     const appendSection = (section: DocxSection, depth: number = 0): void => {
-      const prefix = "#".repeat(section.level ?? 1) + " ";
-      fullText += prefix + (section.heading ?? "") + "\n\n";
+      // Preamble sections have no heading — skip the markdown heading line
+      if (section.heading) {
+        const prefix = "#".repeat(section.level ?? 1) + " ";
+        fullText += prefix + section.heading + "\n\n";
+      }
       if (section.content) {
         fullText += section.content + "\n\n";
       }

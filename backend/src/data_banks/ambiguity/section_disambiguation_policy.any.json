@@ -1,0 +1,87 @@
+{
+  "_meta": {
+    "id": "section_disambiguation_policy",
+    "version": "1.0.0",
+    "description": "Section-level disambiguation rules. Fires when a user references a section (clause, heading, table) that exists in multiple documents or is ambiguous within a single document.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-03-04",
+    "owner": "koda-ambiguity",
+    "usedBy": ["services/core/scope/scopeGate.service.ts", "services/core/policy/clarificationPolicy.service.ts"],
+    "tests": ["tests/document-intelligence/section-disambiguation.test.ts"]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "maxQuestions": 1,
+    "sectionMatchThresholds": {
+      "autopickMinConfidence": 0.9,
+      "autopickMinGap": 0.3,
+      "disambiguateIfBelow": 0.75
+    }
+  },
+  "rules": [
+    {
+      "id": "SDP_001_multi_doc_same_section",
+      "trigger": "User references a section label (e.g., 'termination clause') that exists in 2+ documents in scope.",
+      "action": "ASK_WHICH_DOCUMENT",
+      "maxOptions": 4,
+      "maxQuestions": 1,
+      "candidateType": "document",
+      "example": "User asks 'What does the termination clause say?' with 3 contracts uploaded.",
+      "fallbackQuestion": {
+        "en": "Which contract's termination clause?",
+        "pt": "A cláusula de rescisão de qual contrato?",
+        "es": "¿La cláusula de terminación de cuál contrato?"
+      }
+    },
+    {
+      "id": "SDP_002_section_alias_ambiguity",
+      "trigger": "User references a section by alias that maps to multiple canonical section IDs within the same document.",
+      "action": "ASK_WHICH_SECTION",
+      "maxOptions": 4,
+      "maxQuestions": 1,
+      "candidateType": "section",
+      "example": "User asks 'Show me the liability section' in a document with both 'liability_and_indemnity' and 'limitation_of_liability'.",
+      "fallbackQuestion": {
+        "en": "Which section — liability and indemnity, or limitation of liability?",
+        "pt": "Qual seção — responsabilidade e indenização, ou limitação de responsabilidade?",
+        "es": "¿Cuál sección — responsabilidad e indemnización, o limitación de responsabilidad?"
+      }
+    },
+    {
+      "id": "SDP_003_clause_number_required",
+      "trigger": "User references a clause by number but document has multiple numbered clause systems (e.g., appendix vs main body).",
+      "action": "ASK_WHICH_SECTION",
+      "maxOptions": 3,
+      "maxQuestions": 1,
+      "candidateType": "section",
+      "example": "'What does clause 5 say?' but clause 5 exists in both main agreement and appendix A.",
+      "fallbackQuestion": {
+        "en": "Clause 5 of the main agreement or of the appendix?",
+        "pt": "Cláusula 5 do contrato principal ou do apêndice?",
+        "es": "¿Cláusula 5 del contrato principal o del apéndice?"
+      }
+    },
+    {
+      "id": "SDP_004_section_autopick_single_match",
+      "trigger": "User references a section label that matches exactly one section in exactly one document.",
+      "action": "AUTOPICK",
+      "example": "'Show me the NDA confidentiality clause' with only one NDA uploaded.",
+      "suppressDisambiguation": true
+    },
+    {
+      "id": "SDP_005_table_ambiguity",
+      "trigger": "User references a table type that exists in multiple sections or documents.",
+      "action": "ASK_WHICH_TABLE",
+      "maxOptions": 4,
+      "maxQuestions": 1,
+      "candidateType": "table",
+      "example": "'Show me the depreciation table' with both a fixed asset register and a depreciation schedule uploaded.",
+      "fallbackQuestion": {
+        "en": "The depreciation table from which document?",
+        "pt": "A tabela de depreciação de qual documento?",
+        "es": "¿La tabla de depreciación de cuál documento?"
+      }
+    }
+  ]
+}
