@@ -148,7 +148,8 @@
   "banks": [
     {
       "id": "access_control_policy",
-      "dependsOn": []
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "accounting_rules",
@@ -5639,8 +5640,7 @@
     },
     {
       "id": "followup_suggestions_v1c6269cc",
-      "dependsOn": [],
-      "optional": true
+      "dependsOn": []
     },
     {
       "id": "fonts",
@@ -7339,6 +7339,11 @@
     },
     {
       "id": "nav_intents_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "nav_intents_es",
       "dependsOn": [],
       "optional": true
     },

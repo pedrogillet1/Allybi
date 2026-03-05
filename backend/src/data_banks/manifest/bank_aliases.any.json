@@ -6321,9 +6321,9 @@
     },
     {
       "alias": "followup_suggestions",
-      "canonicalId": "followup_suggestions_v1c6269cc",
+      "canonicalId": "followup_suggestions",
       "source": "runtime_self_alias",
-      "notes": "Legacy alias pinned to canonical versioned compose bank."
+      "notes": "Generated self-alias for governance integrity."
     },
     {
       "alias": "followup_suggestions_v1c6269cc",
@@ -8251,6 +8251,12 @@
     {
       "alias": "nav_intents_en",
       "canonicalId": "nav_intents_en",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "nav_intents_es",
+      "canonicalId": "nav_intents_es",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
