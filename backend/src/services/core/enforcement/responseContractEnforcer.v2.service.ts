@@ -54,6 +54,10 @@ import {
   type UiContractDecision,
 } from "./uiContractInterpreter.service";
 import { UiReceiptContractValidatorService } from "./uiReceiptContractValidator.service";
+import {
+  ComposeMicrocopyService,
+  type AnalyticalCopy,
+} from "./composeMicrocopy.service";
 
 // -----------------------------------------------------------------------------
 // Types
@@ -2162,6 +2166,192 @@ function buildSourceLabel(button: Record<string, unknown>): string {
   return locationLabel ? `${title} | ${locationLabel}` : title;
 }
 
+function splitSentences(input: string): string[] {
+  const normalized = String(input || "")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!normalized) return [];
+  const matches = normalized.match(/[^.!?]+[.!?]?/g);
+  if (!matches) return [normalized];
+  return matches.map((entry) => String(entry || "").trim()).filter(Boolean);
+}
+
+function tokenSet(input: string): Set<string> {
+  const normalized = String(input || "").toLowerCase();
+  const raw = normalized.match(/[a-z0-9]{3,}/g) || [];
+  const stop = new Set([
+    "the",
+    "and",
+    "for",
+    "that",
+    "with",
+    "from",
+    "this",
+    "was",
+    "were",
+    "are",
+    "is",
+    "into",
+    "over",
+    "under",
+    "sobre",
+    "com",
+    "para",
+    "que",
+    "uma",
+    "por",
+    "los",
+    "las",
+    "con",
+    "para",
+    "una",
+  ]);
+  const out = new Set<string>();
+  for (const token of raw) {
+    if (stop.has(token)) continue;
+    out.add(token);
+  }
+  return out;
+}
+
+function sourceSnippetPool(
+  sourceButtons: Array<Record<string, unknown>>,
+): string[] {
+  const snippets: string[] = [];
+  for (const button of sourceButtons) {
+    const keys = ["snippet", "excerpt", "quote", "text", "summary"];
+    for (const key of keys) {
+      const value = String((button as Record<string, unknown>)[key] || "").trim();
+      if (value) snippets.push(value);
+    }
+  }
+  return snippets;
+}
+
+function isClaimLikeSentence(sentence: string): boolean {
+  const text = String(sentence || "").trim();
+  if (!text) return false;
+  if (/\d|%|\$|€|£/.test(text)) return true;
+  return /\b(increased|decreased|grew|fell|reported|shows?|indicates?|remains?|total(?:ed)?|equals?)\b/i.test(
+    text,
+  );
+}
+
+function hasSnippetSupport(sentence: string, snippets: string[]): boolean {
+  if (snippets.length === 0) return true;
+  const claimTokens = tokenSet(sentence);
+  if (claimTokens.size === 0) return true;
+  for (const snippet of snippets) {
+    const snippetTokens = tokenSet(snippet);
+    if (snippetTokens.size === 0) continue;
+    let overlap = 0;
+    for (const token of claimTokens) {
+      if (snippetTokens.has(token)) overlap += 1;
+    }
+    const minOverlap =
+      claimTokens.size <= 4 ? 1 : claimTokens.size <= 8 ? 2 : 3;
+    if (overlap >= minOverlap) return true;
+  }
+  return false;
+}
+
+function applyAnalyticalClaimCitationGuard(
+  directAnswer: string,
+  sourceButtons: Array<Record<string, unknown>>,
+  fallbackLine?: string,
+): {
+  directAnswer: string;
+  droppedClaims: number;
+  claimGuardApplied: boolean;
+} {
+  const safeFallback =
+    String(fallbackLine || "").trim() ||
+    "Not enough evidence in the provided documents.";
+  const snippets = sourceSnippetPool(sourceButtons);
+  const sentences = splitSentences(directAnswer);
+  if (sentences.length === 0) {
+    return {
+      directAnswer,
+      droppedClaims: 0,
+      claimGuardApplied: false,
+    };
+  }
+  if (snippets.length === 0) {
+    // When snippet text is unavailable, enforce a conservative fallback:
+    // - with no sources: do not keep factual claims
+    // - with source metadata only: keep at most one factual sentence
+    const sourceMetadataOnly = sourceButtons.length > 0;
+    const kept: string[] = [];
+    let keptClaim = 0;
+    let droppedClaims = 0;
+    for (const sentence of sentences) {
+      if (!isClaimLikeSentence(sentence)) {
+        kept.push(sentence);
+        continue;
+      }
+      if (sourceMetadataOnly && keptClaim === 0) {
+        kept.push(sentence);
+        keptClaim += 1;
+      } else {
+        droppedClaims += 1;
+      }
+    }
+    if (droppedClaims <= 0) {
+      return {
+        directAnswer,
+        droppedClaims: 0,
+        claimGuardApplied: false,
+      };
+    }
+    const nextDirectAnswer = kept.join(" ").trim();
+    return {
+      directAnswer: nextDirectAnswer || safeFallback,
+      droppedClaims,
+      claimGuardApplied: true,
+    };
+  }
+  const kept: string[] = [];
+  let droppedClaims = 0;
+  for (const sentence of sentences) {
+    if (!isClaimLikeSentence(sentence)) {
+      kept.push(sentence);
+      continue;
+    }
+    if (hasSnippetSupport(sentence, snippets)) {
+      kept.push(sentence);
+      continue;
+    }
+    droppedClaims += 1;
+  }
+  if (droppedClaims <= 0) {
+    return {
+      directAnswer,
+      droppedClaims: 0,
+      claimGuardApplied: false,
+    };
+  }
+  const nextDirectAnswer = kept.join(" ").trim();
+  return {
+    directAnswer: nextDirectAnswer || safeFallback,
+    droppedClaims,
+    claimGuardApplied: true,
+  };
+}
+
+function claimGuardEvidenceLine(
+  language: "en" | "pt" | "es",
+  droppedClaims: number,
+): string {
+  const dropped = Math.max(1, Math.floor(Number(droppedClaims) || 1));
+  if (language === "pt") {
+    return `Removi ${dropped} afirmacao(oes) sem suporte direto de citacao.`;
+  }
+  if (language === "es") {
+    return `Elimine ${dropped} afirmacion(es) sin soporte directo de citacion.`;
+  }
+  return `Removed ${dropped} claim(s) without direct citation support.`;
+}
+
 function analyticalSynthesisLine(language: "en" | "pt" | "es"): string {
   if (language === "pt") {
     return "Em resumo, esta resposta está limitada às evidências citadas nos documentos.";
@@ -2186,17 +2376,23 @@ function enforceAnalyticalStructuredTemplate(
   text: string,
   attachments: Attachment[],
   language: "en" | "pt" | "es",
-): string {
+  copy?: AnalyticalCopy,
+): {
+  text: string;
+  claimGuardApplied: boolean;
+} {
   const normalizedText = String(text || "").trim();
   const directMatch = normalizedText.match(
     /direct answer:\s*([\s\S]*?)(?:key evidence:|sources used:|$)/i,
   );
   let directAnswer = directMatch ? String(directMatch[1] || "").trim() : "";
   if (!directAnswer) {
-    const firstSentence = normalizedText.match(/(.+?[.!?])(?:\s|$)/);
-    directAnswer = firstSentence
-      ? String(firstSentence[1] || "").trim()
-      : normalizedText || "Not enough evidence in the provided documents.";
+    const seedSentences = splitSentences(normalizedText).slice(0, 2);
+    directAnswer =
+      seedSentences.join(" ").trim() ||
+      normalizedText ||
+      copy?.insufficientEvidenceLine ||
+      "Not enough evidence in the provided documents.";
   }
 
   const evidenceLines: string[] = [];
@@ -2204,21 +2400,29 @@ function enforceAnalyticalStructuredTemplate(
   const seenEvidence = new Set<string>();
   const seenSources = new Set<string>();
   const sourceButtons = listSourceButtons(attachments);
+  const maxSourceLines = Math.max(1, Math.min(copy?.maxSourceLines || 2, 5));
+  const claimGuard = applyAnalyticalClaimCitationGuard(
+    directAnswer,
+    sourceButtons,
+    copy?.insufficientEvidenceLine,
+  );
+  directAnswer = claimGuard.directAnswer;
 
   for (const button of sourceButtons) {
     const label = buildSourceLabel(button);
     const evidenceLine = label
-      ? `Evidence referenced from ${label}.`
+      ? `${copy?.evidenceLinePrefix || "Evidence referenced from"} ${label}.`
       : null;
     if (evidenceLine && !seenEvidence.has(evidenceLine)) {
       seenEvidence.add(evidenceLine);
       evidenceLines.push(evidenceLine);
-      if (evidenceLines.length >= 2) break;
+      if (evidenceLines.length >= maxSourceLines) break;
     }
   }
   if (evidenceLines.length === 0) {
     evidenceLines.push(
-      "Evidence references were available only as source metadata.",
+      copy?.evidenceFallbackLine ||
+        "Evidence references were available only as source metadata.",
     );
   }
 
@@ -2227,21 +2431,28 @@ function enforceAnalyticalStructuredTemplate(
     if (!label || seenSources.has(label)) continue;
     seenSources.add(label);
     sourceLines.push(label);
-    if (sourceLines.length >= 2) break;
+    if (sourceLines.length >= maxSourceLines) break;
   }
   if (sourceLines.length === 0) {
-    sourceLines.push("No source metadata provided");
+    sourceLines.push(copy?.sourceFallbackLine || "No source metadata provided");
+  }
+  if (claimGuard.claimGuardApplied) {
+    evidenceLines.unshift(claimGuardEvidenceLine(language, claimGuard.droppedClaims));
   }
 
-  return [
-    `Direct answer: ${directAnswer}`,
-    "Key evidence:",
+  const structuredText = [
+    copy?.openerLine || null,
+    `${copy?.directAnswerLabel || "Direct answer"}: ${directAnswer}`,
+    `${copy?.keyEvidenceLabel || "Key evidence"}:`,
     ...evidenceLines.map((line) => `- ${line}`),
-    "Sources used:",
+    `${copy?.sourcesUsedLabel || "Sources used"}:`,
     ...sourceLines.map((line) => `- ${line}`),
-    analyticalSynthesisLine(language),
-    analyticalFollowupLine(language),
-  ].join("\n");
+    copy?.synthesisLine || analyticalSynthesisLine(language),
+    copy?.followupLine || analyticalFollowupLine(language),
+  ]
+    .filter((entry): entry is string => Boolean(entry))
+    .join("\n");
+  return { text: structuredText, claimGuardApplied: claimGuard.claimGuardApplied };
 }
 
 // -----------------------------------------------------------------------------
@@ -2267,6 +2478,7 @@ export class ResponseContractEnforcerService {
   private uiContractsLoadWarnings: string[] = [];
   private readonly uiContractInterpreter = new UiContractInterpreterService();
   private readonly uiReceiptValidator = new UiReceiptContractValidatorService();
+  private readonly composeMicrocopy = new ComposeMicrocopyService();
 
   constructor() {
     this.reloadBanks();
@@ -2339,6 +2551,7 @@ export class ResponseContractEnforcerService {
   }
 
   reloadBanks(): void {
+    this.composeMicrocopy.reloadBanks();
     this.renderPolicy = getBank<RenderPolicyBank>("render_policy");
     this.uiContractsLoadWarnings = [];
     const strictUiContracts = this.shouldFailClosedUiContracts();
@@ -3130,12 +3343,12 @@ export class ResponseContractEnforcerService {
       }
     }
 
+    const shouldApplyShortConstraints =
+      ctx.constraints?.userRequestedShort ||
+      (ctx.constraints?.maxSentences && ctx.constraints.maxSentences <= 3);
 
     // 6) Enforce short constraints (if user requested short)
-    if (
-      ctx.constraints?.userRequestedShort ||
-      (ctx.constraints?.maxSentences && ctx.constraints.maxSentences <= 3)
-    ) {
+    if (shouldApplyShortConstraints) {
       const requestedShortTokenLimit = toPositiveInt(
         ctx.constraints?.maxOutputTokens,
       );
@@ -3302,15 +3515,67 @@ export class ResponseContractEnforcerService {
     // 10) Enforce analytical response template when requested by query profile/signals.
     {
       if (shouldEnforceAnalyticalStructure(ctx)) {
+        const copy = this.composeMicrocopy.resolveAnalyticalCopy({
+          language: ctx.language,
+          seed: [
+            String(ctx.answerMode || ""),
+            String(ctx.intentFamily || ""),
+            String(ctx.operator || ""),
+            content,
+          ].join("|"),
+          intent: String(ctx.intentFamily || "extract"),
+        });
         const structured = enforceAnalyticalStructuredTemplate(
           content,
           attachments,
           ctx.language,
+          copy,
         );
-        if (structured !== content) {
+        if (structured.text !== content) {
           repairs.push("ANALYTICAL_STRUCTURE_ENFORCED");
-          content = structured;
+          content = structured.text;
         }
+        if (structured.claimGuardApplied) {
+          repairs.push("ANALYTICAL_CLAIM_CITATION_GUARD_APPLIED");
+        }
+      }
+    }
+
+    // 10b) Re-apply short constraints after analytical structure.
+    // Analytical formatting can expand content after step 6.
+    if (shouldApplyShortConstraints && shouldEnforceAnalyticalStructure(ctx)) {
+      const requestedShortTokenLimit = toPositiveInt(
+        ctx.constraints?.maxOutputTokens,
+      );
+      const shortTokenLimit = Math.max(
+        24,
+        requestedShortTokenLimit ??
+          Math.min(this.resolveSoftTokenLimitInternal(ctx), 180),
+      );
+      const maxChars = resolveShortMaxChars(ctx, shortTokenLimit);
+      const shortTokenLimited = trimTextToTokenBudget(
+        content,
+        shortTokenLimit,
+        {
+          preserveSentenceBoundary: true,
+        },
+      );
+      if (shortTokenLimited.truncated) {
+        repairs.push("ANALYTICAL_SHORT_CONSTRAINT_TRIMMED_TOKENS");
+      }
+      content = shortTokenLimited.text;
+
+      const limited = limitChars(content, maxChars);
+      if (limited.changed) {
+        repairs.push("ANALYTICAL_SHORT_CONSTRAINT_TRIMMED_CHARS");
+      }
+      content = limited.text;
+
+      const sent = countSentences(content);
+      if (sent > 3) {
+        const parts = content.split(/(?<=[.!?])\s+/);
+        content = parts.slice(0, 3).join(" ").trim();
+        repairs.push("ANALYTICAL_SHORT_CONSTRAINT_TRIMMED_SENTENCES");
       }
     }
 
@@ -3349,9 +3614,7 @@ export class ResponseContractEnforcerService {
   }
 
   private navNotFoundLine(lang: "en" | "pt" | "es"): string {
-    if (lang === "pt") return "Não encontrei esse arquivo.";
-    if (lang === "es") return "No encontré ese archivo.";
-    return "I couldn't find that file.";
+    return this.composeMicrocopy.resolveNotFoundLine(lang);
   }
 }
 
@@ -3361,3 +3624,4 @@ export function getResponseContractEnforcer(): ResponseContractEnforcerService {
   if (!instance) instance = new ResponseContractEnforcerService();
   return instance;
 }
+

@@ -5634,7 +5634,8 @@
     },
     {
       "id": "followup_suggestions",
-      "dependsOn": []
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "followup_suggestions_v1c6269cc",
@@ -8829,8 +8830,7 @@
       "dependsOn": [
         "editing_routing",
         "feature_flags"
-      ],
-      "optional": true
+      ]
     },
     {
       "id": "viewer_locked_chat_policy",

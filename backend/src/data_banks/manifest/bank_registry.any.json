@@ -103,10 +103,10 @@
         "local": true
       },
       "requiredByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
       },
       "checksumSha256": "a22df03b5eeec47485afead82e2bb098dbd5c40ca7b48c36a6cb6c9d856a36fc",
       "lastUpdated": "2026-03-03"
@@ -752,7 +752,7 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "9c78e9025000bdbef7cefe9ba832d485a953d1b6a5ce21d5d5690a0ee83cd2ed",
+      "checksumSha256": "2b53628b062b4786382c57035fc7aae0f51bd7828aa36ec1b4b1ec794f93e568",
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -21588,7 +21588,7 @@
         "dev": false,
         "local": false
       },
-      "checksumSha256": "0adb30b59dc528955a0fc65bc19b342b525ff605609377c48ac3c25d3ad3e24b",
+      "checksumSha256": "8db97cc2cd1fea16ee977dd08298ecfe96baa2167caad60099dbbd7fc858a6e5",
       "lastUpdated": "2026-02-27",
       "dependsOn": []
     },
@@ -21615,7 +21615,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "ef8ce079834ee36372f8ab685754def08cec7c7259a0125bae7409eb6ab116c0",
+      "checksumSha256": "7920326b5809608a1a066c07d863d983547bacf6dca2a09ad6672f821375746c",
       "lastUpdated": "2026-03-01"
     },
     {
@@ -21745,7 +21745,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "feb7f647f6c9e6e186a49148bb33b0108ade54fa6282d1c59989c420d1c38da6",
+      "checksumSha256": "2aa7eb3f5e495168e9e85ec7102f09eadcf50adde7da39a71bc2a899674ed169",
       "lastUpdated": "2026-02-28"
     },
     {
@@ -21799,7 +21799,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "39ce9fbc7f4927186c960f452cc73693e345e5e083c5436df412240aa491b869",
+      "checksumSha256": "afe1952bbbeb8959a73d68524d5341d7363580590f1dce3475ca3bb64d02f160",
       "lastUpdated": "2026-02-28"
     },
     {
@@ -23278,10 +23278,10 @@
         "local": true
       },
       "requiredByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
       },
       "checksumSha256": "470f40ebd108116b1c37e182e6d9d818d99343ac61ed5b3ccda16848c1ec8c3d",
       "lastUpdated": "2026-02-19"
@@ -23302,10 +23302,10 @@
         "local": true
       },
       "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
       },
       "checksumSha256": "972444bed2a7ba544ccba9eb8e5ceb4abb8bc2a00601c027acb89b509e857c29",
       "lastUpdated": "2026-03-03"
@@ -36697,10 +36697,10 @@
         "local": true
       },
       "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
       },
       "checksumSha256": "eed956085f6f2f2e1790326d86edcdf8d24bc73e4bde103a7943c67c3ed1f56a",
       "lastUpdated": "2026-03-02"

@@ -6321,9 +6321,9 @@
     },
     {
       "alias": "followup_suggestions",
-      "canonicalId": "followup_suggestions",
+      "canonicalId": "followup_suggestions_v1c6269cc",
       "source": "runtime_self_alias",
-      "notes": "Generated self-alias for governance integrity."
+      "notes": "Legacy alias pinned to canonical versioned compose bank."
     },
     {
       "alias": "followup_suggestions_v1c6269cc",

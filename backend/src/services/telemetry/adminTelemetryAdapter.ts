@@ -62,6 +62,12 @@ function toFiniteNumber(input: unknown): number | null {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
+export const QUALITY_SLO_THRESHOLDS = {
+  reaskRateMaxPct: 35,
+  truncationRateMaxPct: 15,
+  regenerationRateMaxPct: 25,
+} as const;
+
 // ---------------------------------------------------------------------------
 // Factory
 // ---------------------------------------------------------------------------
@@ -1310,10 +1316,79 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
           reaskRate: total > 0 ? (reaskCount / total) * 100 : 0,
           reaskCount,
           totalConversations: total,
+          thresholdMaxPct: QUALITY_SLO_THRESHOLDS.reaskRateMaxPct,
         };
       } catch (err) {
         console.error("[adminTelemetryAdapter] reaskRate error:", err);
-        return { reaskRate: 0, reaskCount: 0, totalConversations: 0 };
+        return {
+          reaskRate: 0,
+          reaskCount: 0,
+          totalConversations: 0,
+          thresholdMaxPct: QUALITY_SLO_THRESHOLDS.reaskRateMaxPct,
+        };
+      }
+    },
+
+    async truncationRate({ range }: { range: string }) {
+      const since = rangeToDate(range);
+      try {
+        const queries = await prisma.queryTelemetry.findMany({
+          where: { timestamp: { gte: since } },
+          select: { wasTruncated: true, wasProviderTruncated: true },
+        });
+        const total = queries.length;
+        const truncatedCount = queries.filter(
+          (q) => q.wasTruncated || q.wasProviderTruncated,
+        ).length;
+        return {
+          truncationRate: total > 0 ? (truncatedCount / total) * 100 : 0,
+          truncatedCount,
+          totalQueries: total,
+          thresholdMaxPct: QUALITY_SLO_THRESHOLDS.truncationRateMaxPct,
+        };
+      } catch (err) {
+        console.error("[adminTelemetryAdapter] truncationRate error:", err);
+        return {
+          truncationRate: 0,
+          truncatedCount: 0,
+          totalQueries: 0,
+          thresholdMaxPct: QUALITY_SLO_THRESHOLDS.truncationRateMaxPct,
+        };
+      }
+    },
+
+    async regenerationRate({ range }: { range: string }) {
+      const since = rangeToDate(range);
+      try {
+        const [regenerateCount, messageCount] = await Promise.all([
+          prisma.usageEvent.count({
+            where: {
+              at: { gte: since },
+              eventType: "REGENERATE_USED",
+            },
+          }),
+          prisma.usageEvent.count({
+            where: {
+              at: { gte: since },
+              eventType: "CHAT_MESSAGE_SENT",
+            },
+          }),
+        ]);
+        return {
+          regenerationRate:
+            messageCount > 0 ? (regenerateCount / messageCount) * 100 : 0,
+          regenerateCount,
+          totalMessages: messageCount,
+          thresholdMaxPct: QUALITY_SLO_THRESHOLDS.regenerationRateMaxPct,
+        };
+      } catch (err) {
+        console.error("[adminTelemetryAdapter] regenerationRate error:", err);
+        return {
+          regenerationRate: 0,
+          regenerateCount: 0,
+          totalMessages: 0,
+          thresholdMaxPct: QUALITY_SLO_THRESHOLDS.regenerationRateMaxPct,
+        };
       }
     },
 

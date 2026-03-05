@@ -660,6 +660,116 @@ describe("ResponseContractEnforcerService nav_pills contract", () => {
     expect(out.content).toContain("If you'd like,");
   });
 
+  test("filters unsupported analytical claims when snippets do not support them", async () => {
+    const { ResponseContractEnforcerService } =
+      await import("./responseContractEnforcer.service");
+    const enforcer = new ResponseContractEnforcerService();
+
+    const out = enforcer.enforce(
+      {
+        content:
+          "Revenue increased 12% year over year. EBITDA margin reached 80%.",
+        attachments: [
+          {
+            type: "source_buttons",
+            buttons: [
+              {
+                documentId: "doc-1",
+                title: "results.pdf",
+                location: { type: "page", value: 2, label: "Page 2" },
+                locationKey: "d:doc-1|p:2|c:1",
+                snippet:
+                  "Revenue increased 12% year over year compared to Q1.",
+              },
+            ],
+          } as any,
+        ],
+      },
+      {
+        answerMode: "general_answer",
+        language: "en",
+        signals: { queryProfile: "analytical" },
+      },
+    );
+
+    expect(out.enforcement.blocked).toBe(false);
+    expect(out.enforcement.repairs).toContain("ANALYTICAL_STRUCTURE_ENFORCED");
+    expect(out.enforcement.repairs).toContain(
+      "ANALYTICAL_CLAIM_CITATION_GUARD_APPLIED",
+    );
+    expect(out.content).toContain("Revenue increased 12% year over year.");
+    expect(out.content).not.toContain("EBITDA margin reached 80%.");
+    expect(out.content).toContain(
+      "Removed 1 claim(s) without direct citation support.",
+    );
+  });
+
+  test("applies conservative analytical claim guard when snippets are absent", async () => {
+    const { ResponseContractEnforcerService } =
+      await import("./responseContractEnforcer.service");
+    const enforcer = new ResponseContractEnforcerService();
+
+    const out = enforcer.enforce(
+      {
+        content:
+          "Revenue increased 12% year over year. EBITDA margin reached 80%. Cash conversion remained stable.",
+        attachments: [
+          {
+            type: "source_buttons",
+            buttons: [
+              {
+                documentId: "doc-1",
+                title: "results.pdf",
+                location: { type: "page", value: 2, label: "Page 2" },
+                locationKey: "d:doc-1|p:2|c:1",
+              },
+            ],
+          } as any,
+        ],
+      },
+      {
+        answerMode: "general_answer",
+        language: "en",
+        signals: { queryProfile: "analytical" },
+      },
+    );
+
+    expect(out.enforcement.blocked).toBe(false);
+    expect(out.enforcement.repairs).toContain(
+      "ANALYTICAL_CLAIM_CITATION_GUARD_APPLIED",
+    );
+    expect(out.content).toContain("Revenue increased 12% year over year.");
+    expect(out.content).not.toContain("EBITDA margin reached 80%.");
+    expect(out.content).not.toContain("Cash conversion remained stable.");
+  });
+
+  test("uses localized analytical fallback when all unsupported claims are removed", async () => {
+    const { ResponseContractEnforcerService } =
+      await import("./responseContractEnforcer.service");
+    const enforcer = new ResponseContractEnforcerService();
+
+    const out = enforcer.enforce(
+      {
+        content: "A receita aumentou 12%. A margem EBITDA atingiu 80%.",
+        attachments: [],
+      },
+      {
+        answerMode: "general_answer",
+        language: "pt",
+        signals: { queryProfile: "analytical" },
+      },
+    );
+
+    expect(out.enforcement.blocked).toBe(false);
+    expect(out.enforcement.repairs).toContain(
+      "ANALYTICAL_CLAIM_CITATION_GUARD_APPLIED",
+    );
+    expect(out.content).toContain("Nao encontrei esse arquivo.");
+    expect(out.content).not.toContain(
+      "Not enough evidence in the provided documents.",
+    );
+  });
+
   test("applies banned phrase stripping from patterns schema", async () => {
     mockGetBank.mockImplementation((bankId: string) => {
       const base = bankById(bankId) as any;

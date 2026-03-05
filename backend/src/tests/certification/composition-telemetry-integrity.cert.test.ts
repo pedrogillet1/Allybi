@@ -1,9 +1,12 @@
 import { describe, expect, jest, test } from "@jest/globals";
+import fs from "fs";
+import path from "path";
 import type { LLMClient } from "../../services/llm/core/llmClient.interface";
 import {
   LlmGatewayService,
   clearGatewayCaches,
 } from "../../services/llm/core/llmGateway.service";
+import { QUALITY_SLO_THRESHOLDS } from "../../services/telemetry/adminTelemetryAdapter";
 import { writeCertificationGateReport } from "./reporting";
 
 jest.mock("../../services/core/banks/bankLoader.service", () => ({
@@ -117,6 +120,36 @@ describe("Certification: composition telemetry integrity", () => {
     if (out.telemetry?.qualityReason !== "quality_finish") {
       failures.push(`MISSING_QUALITY_REASON:${String(out.telemetry?.qualityReason)}`);
     }
+    const routesPath = path.resolve(
+      __dirname,
+      "../../entrypoints/http/routes/admin-telemetry.routes.ts",
+    );
+    const controllerPath = path.resolve(
+      __dirname,
+      "../../controllers/adminTelemetry.controller.ts",
+    );
+    const routesSource = fs.readFileSync(routesPath, "utf8");
+    const controllerSource = fs.readFileSync(controllerPath, "utf8");
+    const hasTruncationEndpoint =
+      routesSource.includes('/quality/truncation-rate') &&
+      controllerSource.includes("adminTelemetryTruncationRate");
+    const hasRegenerationEndpoint =
+      routesSource.includes('/quality/regeneration-rate') &&
+      controllerSource.includes("adminTelemetryRegenerationRate");
+    if (!hasTruncationEndpoint) failures.push("MISSING_TRUNCATION_RATE_ENDPOINT");
+    if (!hasRegenerationEndpoint)
+      failures.push("MISSING_REGENERATION_RATE_ENDPOINT");
+    const hasQualityThresholds =
+      Number.isFinite(QUALITY_SLO_THRESHOLDS.reaskRateMaxPct) &&
+      Number.isFinite(QUALITY_SLO_THRESHOLDS.truncationRateMaxPct) &&
+      Number.isFinite(QUALITY_SLO_THRESHOLDS.regenerationRateMaxPct) &&
+      QUALITY_SLO_THRESHOLDS.reaskRateMaxPct > 0 &&
+      QUALITY_SLO_THRESHOLDS.reaskRateMaxPct <= 100 &&
+      QUALITY_SLO_THRESHOLDS.truncationRateMaxPct > 0 &&
+      QUALITY_SLO_THRESHOLDS.truncationRateMaxPct <= 100 &&
+      QUALITY_SLO_THRESHOLDS.regenerationRateMaxPct > 0 &&
+      QUALITY_SLO_THRESHOLDS.regenerationRateMaxPct <= 100;
+    if (!hasQualityThresholds) failures.push("MISSING_QUALITY_SLO_THRESHOLDS");
 
     writeCertificationGateReport("composition-telemetry-integrity", {
       passed: failures.length === 0,
@@ -124,11 +157,17 @@ describe("Certification: composition telemetry integrity", () => {
         hasRouteLane: out.telemetry?.routeLane ? 1 : 0,
         hasModelFamily: out.telemetry?.modelFamily ? 1 : 0,
         hasFallbackRank: out.telemetry?.fallbackRank != null ? 1 : 0,
+        hasTruncationRateEndpoint: hasTruncationEndpoint ? 1 : 0,
+        hasRegenerationRateEndpoint: hasRegenerationEndpoint ? 1 : 0,
+        hasQualitySloThresholds: hasQualityThresholds ? 1 : 0,
       },
       thresholds: {
         hasRouteLane: 1,
         hasModelFamily: 1,
         hasFallbackRank: 1,
+        hasTruncationRateEndpoint: 1,
+        hasRegenerationRateEndpoint: 1,
+        hasQualitySloThresholds: 1,
       },
       failures,
     });
