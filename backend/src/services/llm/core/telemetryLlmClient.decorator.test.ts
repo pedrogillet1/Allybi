@@ -12,7 +12,7 @@ function makeRequest(): LLMRequest {
   return {
     traceId: "trace-1",
     turnId: "turn-1",
-    model: { provider: "openai", model: "gpt-5-mini" },
+    model: { provider: "openai", model: "gpt-5.2" },
     purpose: "answer_compose",
     messages: [{ role: "user", content: "hello" }],
     meta: {
@@ -37,7 +37,7 @@ describe("TelemetryLLMClient routing metadata mapping", () => {
     const completeResult: LLMCompletionResponse = {
       traceId: "trace-1",
       turnId: "turn-1",
-      model: { provider: "openai", model: "gpt-5-mini" },
+      model: { provider: "openai", model: "gpt-5.2" },
       content: "ok",
       usage: {
         promptTokens: 10,
@@ -52,7 +52,7 @@ describe("TelemetryLLMClient routing metadata mapping", () => {
         const streamResult: LLMStreamResponse = {
           traceId: "trace-1",
           turnId: "turn-1",
-          model: { provider: "openai", model: "gpt-5-mini" },
+          model: { provider: "openai", model: "gpt-5.2" },
           finalText: "ok",
         };
         return streamResult;
