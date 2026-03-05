@@ -207,6 +207,9 @@ function ensureNonEmptyDocxHtml(value, fallbackText = '') {
   return '<span>\u200B</span>';
 }
 
+// Module-level promise: lets load() await any in-flight save from a previous unmount.
+let _inflightDocxFlush = null;
+
 const DocxEditCanvas = forwardRef(function DocxEditCanvas(
   {
     document,
@@ -243,6 +246,7 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
   const isManualSaveRef = useRef(false);
   const scheduleAutoSaveRef = useRef(null);
   const flushDirtyParagraphsRef = useRef(null);
+  const mountedRef = useRef(true);
 
   // Centralized editing state (blocks, baselines, drafts, undo/redo, etc.)
   const { state: editState, actions } = useDocxEditState();
@@ -269,11 +273,19 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
     [blocks, effectiveSelectedId]
   );
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (opts = {}) => {
     if (!docId) return;
-    setLoading(true);
-    setError('');
-    setStatusMsg('');
+    // Wait for any in-flight flush from a previous unmount before fetching fresh data.
+    // Skip when called from within flush/save to avoid circular await (deadlock).
+    if (_inflightDocxFlush && !isFlushingRef.current && !isManualSaveRef.current) {
+      try { await _inflightDocxFlush; } catch {}
+      _inflightDocxFlush = null;
+    }
+    if (!opts.silent) {
+      setLoading(true);
+      setError('');
+      setStatusMsg('');
+    }
     try {
       const normalizeBlocks = (rawBlocks) =>
         (Array.isArray(rawBlocks) ? rawBlocks : []).map((b) => ({
@@ -347,9 +359,9 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
         onSelectedIdChangeRef.current?.(firstId);
       }
     } catch (e) {
-      setError(e?.response?.data?.error || e?.message || 'Failed to load DOCX editor.');
+      if (!opts.silent) setError(e?.response?.data?.error || e?.message || 'Failed to load DOCX editor.');
     } finally {
-      setLoading(false);
+      if (!opts.silent) setLoading(false);
       onDirtyChangeRef.current?.(false);
     }
   }, [docId]);
@@ -357,6 +369,11 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
   useEffect(() => {
     load();
   }, [load]);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => { mountedRef.current = false; };
+  }, []);
 
   useEffect(() => {
     const onSel = () => {
@@ -1654,24 +1671,38 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
     [submitSingleEdit],
   );
 
-  // Debounced auto-save: flush all dirty paragraphs after 1.2s of inactivity.
+  // Auto-save: flush all dirty paragraphs.
   // Guarded by isFlushingRef to prevent concurrent save interleaving.
-  const flushDirtyParagraphs = useCallback(async () => {
-    if (isFlushingRef.current) return [];
+  // Exposes its promise via _inflightDocxFlush so load() can await it after remount.
+  const flushDirtyParagraphs = useCallback(() => {
+    if (isFlushingRef.current) return Promise.resolve([]);
+    if (isManualSaveRef.current) return Promise.resolve([]);
+    const dirty = actions.getDirtyPids();
+    if (dirty.length === 0) return Promise.resolve([]);
     isFlushingRef.current = true;
-    try {
-      const dirty = actions.getDirtyPids();
-      const results = [];
-      for (const pid of dirty) {
-        const res = await submitSingleEdit({ paragraphId: pid, operator: 'EDIT_PARAGRAPH', silent: false, userConfirmed: true });
-        results.push(res);
+    const promise = (async () => {
+      try {
+        const results = [];
+        for (const pid of dirty) {
+          const res = await submitSingleEdit({ paragraphId: pid, operator: 'EDIT_PARAGRAPH', silent: true, userConfirmed: true });
+          results.push(res);
+        }
+        // After successful saves, reload to refresh paragraph IDs (they are hash-based
+        // and change when the DOCX file is modified). Skip reload during unmount.
+        const savedCount = results.filter(r => r?.ok && r?.revisionId).length;
+        if (savedCount > 0 && mountedRef.current) {
+          try { await load({ silent: true }); } catch {}
+        }
+        onDirtyChangeRef.current?.(actions.getDirtyPids().length > 0);
+        return results;
+      } finally {
+        isFlushingRef.current = false;
+        if (_inflightDocxFlush === promise) _inflightDocxFlush = null;
       }
-      onDirtyChangeRef.current?.(false);
-      return results;
-    } finally {
-      isFlushingRef.current = false;
-    }
-  }, [actions, submitSingleEdit]);
+    })();
+    _inflightDocxFlush = promise;
+    return promise;
+  }, [actions, submitSingleEdit, load]);
   flushDirtyParagraphsRef.current = flushDirtyParagraphs;
 
   // Dedicated save function for explicit Save button.
@@ -1716,13 +1747,22 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
   const saveAllManualEdits = useCallback(async () => {
     if (isManualSaveRef.current) return [];
     isManualSaveRef.current = true;
+    // Cancel any pending autosave — we're saving explicitly now.
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+      autoSaveTimerRef.current = null;
+    }
+    // Wait for any in-flight autosave to finish first so we don't race.
+    if (_inflightDocxFlush) {
+      try { await _inflightDocxFlush; } catch {}
+      _inflightDocxFlush = null;
+    }
     const results = [];
 
     const { dirtySet, candidatePids, staleDirtyPids } = collectPendingEditCandidates();
     const candidatePidSet = new Set(candidatePids);
     for (const pid of Array.from(dirtySet)) {
       if (!candidatePidSet.has(pid)) {
-        // Drop stale dirty flags so Save button status matches reality.
         actions.clearDirty(pid);
       }
     }
@@ -1772,37 +1812,58 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
     if (lastRevisionId) {
       onApplied?.({ revisionId: lastRevisionId });
     }
+
+    // After successful saves, reload blocks to refresh paragraph IDs.
+    // DOCX paragraph IDs are hash-based and change after the file is modified.
+    // Without reloading, subsequent saves would use stale IDs and fail.
+    const savedCount = results.filter(r => r.ok && r.revisionId).length;
+    if (savedCount > 0) {
+      try { await load({ silent: true }); } catch {}
+    }
+
     const pendingAfter = collectPendingEditCandidates().candidatePids.length > 0;
     onDirtyChangeRef.current?.(pendingAfter);
     return results;
-  }, [actions, collectPendingEditCandidates, submitSingleEdit, onApplied]);
+  }, [actions, blocks, collectPendingEditCandidates, submitSingleEdit, onApplied, load]);
 
   const scheduleAutoSave = useCallback(() => {
     if (readOnly) return;
-    // When the parent provides onDirtyChange, explicit Save/Discard buttons
-    // control the save lifecycle — skip the debounced auto-save.
-    if (onDirtyChangeRef.current) return;
     if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
     autoSaveTimerRef.current = setTimeout(() => {
       autoSaveTimerRef.current = null;
       flushDirtyParagraphs();
-    }, 1200);
+    }, 800);
   }, [readOnly, flushDirtyParagraphs]);
   scheduleAutoSaveRef.current = scheduleAutoSave;
 
-  // Cleanup timer on unmount — flush any pending dirty paragraphs immediately
+  // Cleanup: flush any pending dirty paragraphs on unmount so edits survive navigation.
   useEffect(() => {
     return () => {
       if (autoSaveTimerRef.current) {
         clearTimeout(autoSaveTimerRef.current);
         autoSaveTimerRef.current = null;
       }
-      // Explicit Save/Discard mode owns persistence; do not auto-flush on unmount.
-      if (onDirtyChangeRef.current) return;
       // Fire-and-forget flush so edits aren't lost when navigating away.
       try { flushDirtyParagraphsRef.current?.(); } catch {}
     };
   }, []);
+
+  // Warn before tab close if there are unsaved edits.
+  useEffect(() => {
+    const onBeforeUnload = (e) => {
+      const dirty = actions.getDirtyPids();
+      if (dirty.length === 0) return;
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+        autoSaveTimerRef.current = null;
+      }
+      flushDirtyParagraphs();
+      e.preventDefault();
+      e.returnValue = '';
+    };
+    window.addEventListener('beforeunload', onBeforeUnload);
+    return () => window.removeEventListener('beforeunload', onBeforeUnload);
+  }, [flushDirtyParagraphs, actions]);
 
   const commitParagraph = useCallback(
     ({ paragraphId, instruction, operator = 'EDIT_PARAGRAPH' } = {}) =>
@@ -2108,18 +2169,9 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
             onSelectedIdChange?.(pid);
           }}
           onBlur={() => {
-            if (readOnly) return;
-            if (!autoSaveOnBlur) return;
-            // When parent provides onDirtyChange, explicit buttons handle save.
-            if (onDirtyChangeRef.current) return;
-            // Save any paragraphs touched since last focus. (Keeps "edit like Word" feel.)
-            (async () => {
-              const dirty = actions.getDirtyPids();
-              for (const pid of dirty) {
-                // eslint-disable-next-line no-await-in-loop
-                await applyParagraph(pid, { silent: false });
-              }
-            })();
+            // Autosave handles persistence via scheduleAutoSave; no explicit flush on blur.
+            // Flushing on blur races with the Save button and autosave timer,
+            // causing duplicate requests that hit stale paragraph IDs.
           }}
           style={{
             width: paperMode ? '100%' : 'min(860px, 100%)',

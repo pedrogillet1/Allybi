@@ -163,6 +163,10 @@ function worksheetColToPreviewColIdx(columnIndexZeroBased) {
   return Math.max(1, Math.trunc(n) + 1);
 }
 
+// Module-level promise: lets load() await any in-flight save from a previous unmount.
+// Without this, navigating away → back loads stale preview before the save completes.
+let _inflightFlush = null;
+
 const COL_WIDTH = 100;
 const ROW_HEIGHT = 24;
 const ROW_HEADER_WIDTH = 48;
@@ -206,6 +210,7 @@ function VirtualizedGrid({
   inlineEditorRef,
   revert,
   commitDraftIfDirty,
+  commitCellEdit,
   moveSelectionBy,
   // Selection props
   selectedRef,
@@ -224,11 +229,8 @@ function VirtualizedGrid({
     );
   }
 
-  const totalRows = Math.max(current.rows.length - 1, 100);
-  const dataCols = (current.colCount || current.rows[0]?.length || 1) - 1;
-  // Extend columns to fill the viewport (like rows extend vertically)
-  const viewportCols = typeof window !== 'undefined' ? Math.ceil((window.innerWidth - 52) / COL_WIDTH) : 26;
-  const totalCols = Math.max(dataCols, viewportCols);
+  const dataRows = Math.max(current.rows.length - 1, 1);
+  const dataCols = Math.max((current.colCount || current.rows[0]?.length || 1) - 1, 1);
 
   return (
     <VirtualizedGridInner
@@ -236,8 +238,8 @@ function VirtualizedGrid({
       tableContainerRef={tableContainerRef}
       current={current}
       scale={scale}
-      totalRows={totalRows}
-      totalCols={totalCols}
+      dataRows={dataRows}
+      dataCols={dataCols}
       selected={selected}
       selectedRange={selectedRange}
       lockedCells={lockedCells}
@@ -270,6 +272,7 @@ function VirtualizedGrid({
       inlineEditorRef={inlineEditorRef}
       revert={revert}
       commitDraftIfDirty={commitDraftIfDirty}
+      commitCellEdit={commitCellEdit}
       moveSelectionBy={moveSelectionBy}
       selectedRef={selectedRef}
       applySelectionRect={applySelectionRect}
@@ -283,8 +286,8 @@ function VirtualizedGridInner({
   tableContainerRef,
   current,
   scale,
-  totalRows,
-  totalCols,
+  dataRows,
+  dataCols,
   selected,
   selectedRange,
   lockedCells,
@@ -318,12 +321,80 @@ function VirtualizedGridInner({
   inlineEditorRef,
   revert,
   commitDraftIfDirty,
+  commitCellEdit,
   moveSelectionBy,
   // Selection
   selectedRef,
   applySelectionRect,
   gridBounds,
 }) {
+  // -- Viewport measurement for infinite-feeling grid --
+  const [vpSize, setVpSize] = useState({ w: 0, h: 0 });
+  const [extCols, setExtCols] = useState(0);
+  const [extRows, setExtRows] = useState(0);
+  const extendingRef = useRef(false);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setVpSize({ w: entry.contentRect.width, h: entry.contentRect.height });
+      }
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [scrollRef]);
+
+  // Reset extensions when data changes (e.g. sheet switch)
+  useEffect(() => {
+    setExtCols(0);
+    setExtRows(0);
+  }, [dataCols, dataRows]);
+
+  // Compute final col/row counts to fill viewport + dynamic extensions
+  const cellW = COL_WIDTH * scale;
+  const cellH = ROW_HEIGHT * scale;
+  const minCols = vpSize.w > 0 ? Math.ceil(vpSize.w / cellW) + 10 : 26;
+  const minRows = vpSize.h > 0 ? Math.ceil(vpSize.h / cellH) + 20 : 100;
+  const totalCols = Math.max(dataCols, minCols) + extCols;
+  const totalRows = Math.max(dataRows, minRows) + extRows;
+
+  // Dynamic extension on scroll near edges + Shift+wheel → horizontal scroll
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const onScroll = () => {
+      if (extendingRef.current) return;
+      const threshold = 300;
+      let extend = false;
+      if (el.scrollLeft + el.clientWidth >= el.scrollWidth - threshold) {
+        setExtCols((c) => c + 50);
+        extend = true;
+      }
+      if (el.scrollTop + el.clientHeight >= el.scrollHeight - threshold) {
+        setExtRows((r) => r + 200);
+        extend = true;
+      }
+      if (extend) {
+        extendingRef.current = true;
+        requestAnimationFrame(() => { extendingRef.current = false; });
+      }
+    };
+    const onWheel = (e) => {
+      if (e.shiftKey) {
+        e.preventDefault();
+        el.scrollLeft += e.deltaY;
+      }
+    };
+    el.addEventListener('scroll', onScroll, { passive: true });
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => {
+      el.removeEventListener('scroll', onScroll);
+      el.removeEventListener('wheel', onWheel);
+    };
+  }, [scrollRef]);
+
   const rowVirtualizer = useVirtualizer({
     count: totalRows,
     getScrollElement: () => scrollRef.current,
@@ -609,6 +680,7 @@ function VirtualizedGridInner({
                         );
                         return;
                       }
+                      commitCellEdit?.();
                       setIsInlineEditing?.(false);
                       setUserHasSelected(true);
                       setLockedCells(new Set([`${rowIdx}:${colIdx}`]));
@@ -673,7 +745,7 @@ function VirtualizedGridInner({
                               if (controlledDraftValue != null) onDraftValueChange?.(nextValue);
                               else setDraftValue?.(nextValue);
                             }}
-                            onBlur={() => setIsInlineEditing?.(false)}
+                            onBlur={() => { commitCellEdit?.(); setIsInlineEditing?.(false); }}
                             onKeyDown={(evt) => {
                               if (evt.key === 'Escape') {
                                 evt.preventDefault();
@@ -686,12 +758,9 @@ function VirtualizedGridInner({
                               if (isApplying) return;
                               const deltaRow = evt.key === 'Enter' ? (evt.shiftKey ? -1 : 1) : 0;
                               const deltaCol = evt.key === 'Tab' ? (evt.shiftKey ? -1 : 1) : 0;
+                              commitCellEdit?.();
                               setIsInlineEditing?.(false);
-                              void (async () => {
-                                const ok = await commitDraftIfDirty?.();
-                                if (!ok) return;
-                                moveSelectionBy?.(deltaRow, deltaCol, { extendRange: false });
-                              })();
+                              moveSelectionBy?.(deltaRow, deltaCol, { extendRange: false });
                             }}
                             aria-label={`Edit cell ${a1Here || ''}`}
                           />
@@ -744,6 +813,7 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
     onStatusMsg,
     onSheetMetaChange,
     onHistoryStateChange,
+    onSaveStatusChange,
     onAskAllybi,
     selectionHint = null,
     clearSelectionNonce = 0,
@@ -783,6 +853,16 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
   const [editHistoryVersion, setEditHistoryVersion] = useState(0);
   const selectionHistoryRef = useRef({ items: [], index: -1 });
   const [selectionHistoryVersion, setSelectionHistoryVersion] = useState(0);
+  const [saveStatus, setSaveStatus] = useState('idle'); // 'idle' | 'saving' | 'saved' | 'error'
+  const patchQueueRef = useRef([]);    // queued patches: [{ targetId, a1, beforeText, proposedText }]
+  const saveTimerRef = useRef(null);   // debounce timer ID
+  const savingRef = useRef(false);     // currently flushing patches?
+  const dirtyRef = useRef(false);      // any unsaved changes?
+  const commitGuardRef = useRef(false); // prevents double-commit from blur+mouseDown in same cycle
+  const selectedInfoRef = useRef(null); // latest selectedInfo for cleanup
+  const effectiveDraftValueRef = useRef(''); // latest draft for cleanup
+  const mountedRef = useRef(true);     // prevents setState on unmounted component
+
   const selectedRef = useRef(selected);
   const selectedRangeRef = useRef(selectedRange);
   const lockedCellsRef = useRef(lockedCells);
@@ -825,8 +905,15 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
   const canUndoEdit = useCallback(() => (editUndoStackRef.current?.length || 0) > 0, []);
   const canRedoEdit = useCallback(() => (editRedoStackRef.current?.length || 0) > 0, []);
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (opts = {}) => {
     if (!docId) return;
+    // Don't overwrite dirty local edits unless explicitly forced (undo/redo/initial)
+    if (dirtyRef.current && !opts.force) return;
+    // Wait for any in-flight save from a previous unmount to complete first
+    if (_inflightFlush) {
+      try { await _inflightFlush; } catch {}
+      _inflightFlush = null;
+    }
     setLoading(true);
     setError('');
     setStatusMsg('');
@@ -850,7 +937,7 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
   }, [docId]);
 
   useEffect(() => {
-    load();
+    load({ force: true });
   }, [load]);
 
   useEffect(() => {
@@ -1019,6 +1106,10 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
     editHistoryVersion,
     selectionHistoryVersion,
   ]);
+
+  useEffect(() => {
+    onSaveStatusChange?.(saveStatus);
+  }, [onSaveStatusChange, saveStatus]);
 
   const undoSelection = useCallback(() => {
     const timeline = selectionHistoryRef.current;
@@ -1311,6 +1402,7 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
       format,
     };
   }, [current, selected, currentSheetName, draftFormatOverrides]);
+  selectedInfoRef.current = selectedInfo;
 
   const cellA1At = useCallback((rowIdx, colIdx) => {
     if (!current) return null;
@@ -2191,6 +2283,7 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
   }, [userHasSelected]);
 
   const effectiveDraftValue = controlledDraftValue != null ? controlledDraftValue : draftValue;
+  effectiveDraftValueRef.current = effectiveDraftValue;
 
   useEffect(() => {
     if (!isInlineEditing) return;
@@ -2506,7 +2599,8 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
 
       setStatusMsg('Applied. Refreshing…');
       onStatusMsg?.('Applied. Refreshing…');
-      await load();
+      dirtyRef.current = false;
+      await load({ force: true });
       if (nextFlashRect) {
         setFlashRect(nextFlashRect);
         setHighlightsForSheet(currentSheetName, mergeHighlightRects(highlightsBySheetRef.current.get(currentSheetName) || [], [nextFlashRect]));
@@ -2586,7 +2680,8 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
 
       setStatusMsg('Applied. Refreshing…');
       onStatusMsg?.('Applied. Refreshing…');
-      await load();
+      dirtyRef.current = false;
+      await load({ force: true });
       if (nextFlashRect) {
         setFlashRect(nextFlashRect);
         window.setTimeout(() => setFlashRect(null), 950);
@@ -2685,6 +2780,194 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
     const result = await apply();
     return Boolean(result?.ok);
   }, [apply, hasPendingEdits]);
+
+  // --- Autosave: patch queue + debounced persistence ---
+
+  // Track mounted state to avoid setState on unmounted component
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => { mountedRef.current = false; };
+  }, []);
+
+  const updateCellLocally = useCallback((rowIdx, colIdx, newValue) => {
+    setSheetData((prev) => {
+      const sheetKey = activeSheet;
+      const sheet = prev[sheetKey];
+      if (!sheet?.rows?.[rowIdx]) return prev;
+      const newRows = sheet.rows.map((row, ri) => {
+        if (ri !== rowIdx) return row;
+        return row.map((cell, ci) => {
+          if (ci !== colIdx) return cell;
+          return { ...cell, value: String(newValue ?? '') };
+        });
+      });
+      return { ...prev, [sheetKey]: { ...sheet, rows: newRows } };
+    });
+  }, [activeSheet]);
+
+  const flushPatches = useCallback(() => {
+    if (savingRef.current) return;
+    const patches = [...patchQueueRef.current];
+    if (patches.length === 0) return;
+    patchQueueRef.current = [];
+    savingRef.current = true;
+    if (mountedRef.current) setSaveStatus('saving');
+
+    // Build the async work as a promise and expose it at module level
+    // so that load() on remount can await it before fetching stale data.
+    const promise = (async () => {
+      try {
+        for (const patch of patches) {
+          const payload = {
+            instruction: `Manual edit in viewer: ${cleanDocumentName(document?.filename)}`,
+            operator: 'EDIT_CELL',
+            domain: 'sheets',
+            documentId: docId,
+            targetHint: patch.targetId,
+            target: {
+              id: patch.targetId,
+              label: `Cell ${patch.a1}`,
+              confidence: 1,
+              candidates: [],
+              decisionMargin: 1,
+              isAmbiguous: false,
+              resolutionReason: 'viewer_selection',
+            },
+            beforeText: patch.beforeText || '(empty)',
+            proposedText: patch.proposedText,
+            userConfirmed: true,
+          };
+          const res = await applyEdit(payload);
+          if (!isNoopResult(res)) {
+            const revisionId = extractRevisionId(res);
+            if (revisionId) {
+              pushEditHistory({ kind: 'applyEdit', revisionId, payload });
+            }
+          }
+        }
+        dirtyRef.current = patchQueueRef.current.length > 0;
+        onApplied?.();
+        if (mountedRef.current) {
+          setSaveStatus('saved');
+          setTimeout(() => {
+            if (mountedRef.current) setSaveStatus((s) => s === 'saved' ? 'idle' : s);
+          }, 2000);
+        }
+      } catch (e) {
+        // Put failed patches back for retry
+        patchQueueRef.current = [...patches, ...patchQueueRef.current];
+        dirtyRef.current = true;
+        if (mountedRef.current) {
+          setSaveStatus('error');
+          const msg = e?.response?.data?.error?.message || e?.message || 'Autosave failed.';
+          setStatusMsg(msg);
+          onStatusMsg?.(msg);
+        }
+      } finally {
+        savingRef.current = false;
+        if (_inflightFlush === promise) _inflightFlush = null;
+      }
+    })();
+
+    _inflightFlush = promise;
+  }, [docId, document?.filename, extractRevisionId, onApplied, onStatusMsg, pushEditHistory]);
+
+  const enqueuePatch = useCallback((patch) => {
+    // Deduplicate: if same cell already queued, replace with latest edit
+    const idx = patchQueueRef.current.findIndex((p) => p.targetId === patch.targetId);
+    if (idx >= 0) {
+      patchQueueRef.current[idx] = patch;
+    } else {
+      patchQueueRef.current.push(patch);
+    }
+    dirtyRef.current = true;
+    // Debounced save (800ms)
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = setTimeout(() => {
+      saveTimerRef.current = null;
+      flushPatches();
+    }, 800);
+    if (mountedRef.current) setSaveStatus('pending');
+  }, [flushPatches]);
+
+  const commitCellEdit = useCallback(() => {
+    if (commitGuardRef.current) return;
+    // Read latest values from refs (safe even during unmount / stale closures)
+    const info = selectedInfoRef.current;
+    const draft = String(effectiveDraftValueRef.current ?? '').trim();
+    if (!info?.a1 || !info?.targetId) return;
+    const before = String(info.beforeText ?? '').trim();
+    if (draft === before) return;
+    const isGrid = draft.includes('\n') || draft.includes('\t');
+    if (isGrid) return; // grid/range pastes use existing apply() flow
+
+    commitGuardRef.current = true;
+    // 1. Optimistic local update
+    const sel = selectedRef.current;
+    if (sel) updateCellLocally(sel.rowIdx, sel.colIdx, draft);
+    // 2. Enqueue patch for debounced background save
+    enqueuePatch({
+      targetId: info.targetId,
+      a1: info.a1,
+      beforeText: info.beforeText,
+      proposedText: draft,
+    });
+    // 3. Sync draft value to match new local value
+    if (controlledDraftValue != null) onDraftValueChange?.(draft);
+    else setDraftValue(draft);
+    // Release guard after microtask to prevent blur+mouseDown double-fire
+    Promise.resolve().then(() => { commitGuardRef.current = false; });
+  }, [controlledDraftValue, onDraftValueChange, updateCellLocally, enqueuePatch]);
+
+  // On unmount: commit any uncommitted cell + flush all patches immediately.
+  // onBlur does NOT fire when React removes the element from DOM.
+  useEffect(() => {
+    return () => {
+      // Cancel debounce timer
+      if (saveTimerRef.current) {
+        clearTimeout(saveTimerRef.current);
+        saveTimerRef.current = null;
+      }
+      // Commit uncommitted inline edit (blur didn't fire on DOM removal)
+      const info = selectedInfoRef.current;
+      const draft = String(effectiveDraftValueRef.current ?? '').trim();
+      if (info?.a1 && info?.targetId) {
+        const before = String(info.beforeText ?? '').trim();
+        const isGrid = draft.includes('\n') || draft.includes('\t');
+        if (!isGrid && draft !== before) {
+          patchQueueRef.current.push({
+            targetId: info.targetId,
+            a1: info.a1,
+            beforeText: info.beforeText,
+            proposedText: draft,
+          });
+          dirtyRef.current = true;
+        }
+      }
+      // Flush all patches (fire-and-forget — fetch continues after unmount)
+      if (patchQueueRef.current.length > 0) {
+        flushPatches();
+      }
+    };
+  }, [flushPatches]);
+
+  // beforeunload: warn user + attempt save on tab close
+  useEffect(() => {
+    const onBeforeUnload = (e) => {
+      if (!dirtyRef.current && patchQueueRef.current.length === 0) return;
+      // Flush patches best-effort
+      if (saveTimerRef.current) {
+        clearTimeout(saveTimerRef.current);
+        saveTimerRef.current = null;
+      }
+      flushPatches();
+      // Show browser confirmation dialog
+      e.preventDefault();
+      e.returnValue = '';
+    };
+    window.addEventListener('beforeunload', onBeforeUnload);
+    return () => window.removeEventListener('beforeunload', onBeforeUnload);
+  }, [flushPatches]);
 
   const applyBlankToCurrentRect = useCallback(async () => {
     const rect = getClipboardRect();
@@ -2854,7 +3137,8 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
       await undoEdit({ documentId: docId, revisionId: entry?.revisionId || undefined });
       editRedoStackRef.current = [...(editRedoStackRef.current || []), entry].slice(-40);
       setEditHistoryVersion((v) => v + 1);
-      await load();
+      dirtyRef.current = false;
+      await load({ force: true });
       const msg = 'Undid last change.';
       setStatusMsg(msg);
       onStatusMsg?.(msg);
@@ -2911,7 +3195,8 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
       const nextEntry = { ...entry, revisionId: nextRevisionId };
       editUndoStackRef.current = [...(editUndoStackRef.current || []), nextEntry].slice(-40);
       setEditHistoryVersion((v) => v + 1);
-      await load();
+      dirtyRef.current = false;
+      await load({ force: true });
       const msg = 'Redid last change.';
       setStatusMsg(msg);
       onStatusMsg?.(msg);
@@ -3022,14 +3307,11 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
       if (key === 'Tab' || key === 'Enter') {
         e.preventDefault();
         if (isApplying) return;
+        commitCellEdit();
         setIsInlineEditing(false);
         const deltaRow = key === 'Enter' ? (e.shiftKey ? -1 : 1) : 0;
         const deltaCol = key === 'Tab' ? (e.shiftKey ? -1 : 1) : 0;
-        void (async () => {
-          const ok = await commitDraftIfDirty();
-          if (!ok) return;
-          moveSelectionBy(deltaRow, deltaCol, { extendRange: false });
-        })();
+        moveSelectionBy(deltaRow, deltaCol, { extendRange: false });
         return;
       }
 
@@ -3080,6 +3362,7 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
   }, [
     applyBlankToCurrentRect,
     applySelectionRect,
+    commitCellEdit,
     commitDraftIfDirty,
     gridBounds.maxColIdx,
     gridBounds.maxRowIdx,
@@ -3104,7 +3387,9 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
     hasPendingEdits,
     compute,
     applyFormat,
-    reload: () => load(),
+    commitCellEdit,
+    getSaveStatus: () => saveStatus,
+    reload: () => load({ force: true }),
     applyDraftOps: ({ draftId, ops }) => {
       const id = String(draftId || '').trim();
       if (!id) return false;
@@ -3193,7 +3478,7 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
       return null;
     },
     clearSelection,
-  }), [apply, revert, saveAllManualEdits, discardAllManualEdits, hasPendingEdits, compute, selectedInfo, effectiveDraftValue, controlledDraftValue, onDraftValueChange, isApplying, load, sheetMeta, lockedCells, current, cellA1At, currentSheetName, activeAskBubble, selectedRange, selected, viewerSelectionForRange, clearSelection, undoSelection, redoSelection, undoAction, redoAction, canUndoEdit, canRedoEdit, canUndoSelection, canRedoSelection, editHistoryVersion, selectionHistoryVersion]);
+  }), [apply, revert, saveAllManualEdits, discardAllManualEdits, hasPendingEdits, compute, commitCellEdit, saveStatus, selectedInfo, effectiveDraftValue, controlledDraftValue, onDraftValueChange, isApplying, load, sheetMeta, lockedCells, current, cellA1At, currentSheetName, activeAskBubble, selectedRange, selected, viewerSelectionForRange, clearSelection, undoSelection, redoSelection, undoAction, redoAction, canUndoEdit, canRedoEdit, canUndoSelection, canRedoSelection, editHistoryVersion, selectionHistoryVersion]);
 
   if (loading) {
     return (
@@ -3540,6 +3825,7 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
         inlineEditorRef={inlineEditorRef}
         revert={revert}
         commitDraftIfDirty={commitDraftIfDirty}
+        commitCellEdit={commitCellEdit}
         moveSelectionBy={moveSelectionBy}
         selectedRef={selectedRef}
         applySelectionRect={applySelectionRect}

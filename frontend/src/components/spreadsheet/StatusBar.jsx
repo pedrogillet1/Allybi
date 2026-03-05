@@ -1,11 +1,23 @@
 import React, { useCallback } from 'react';
 import { Minus, Plus } from 'lucide-react';
 
-function StatusBar({ selectionStats, zoom = 100, onZoomChange }) {
+function StatusBar({ selectionStats, zoom = 100, onZoomChange, saveStatus = 'idle' }) {
   const stats = selectionStats || {};
   const hasStats = Number.isFinite(stats.sum) && stats.count > 0;
 
   const clampZoom = useCallback((v) => Math.max(50, Math.min(200, Math.round(v))), []);
+
+  const saveLabel = saveStatus === 'saving' ? 'Saving…'
+    : saveStatus === 'saved' ? 'Saved'
+    : saveStatus === 'error' ? 'Not saved'
+    : saveStatus === 'pending' ? 'Unsaved changes'
+    : null;
+
+  const saveColor = saveStatus === 'saving' ? '#6C6B6E'
+    : saveStatus === 'saved' ? '#16A34A'
+    : saveStatus === 'error' ? '#DC2626'
+    : saveStatus === 'pending' ? '#D97706'
+    : '#6C6B6E';
 
   return (
     <div
@@ -24,8 +36,11 @@ function StatusBar({ selectionStats, zoom = 100, onZoomChange }) {
         userSelect: 'none',
       }}
     >
-      {/* Left: selection stats */}
+      {/* Left: selection stats + save status */}
       <div style={{ display: 'flex', gap: 12, alignItems: 'center', minWidth: 0 }}>
+        {saveLabel && (
+          <span style={{ color: saveColor, fontWeight: 500 }}>{saveLabel}</span>
+        )}
         {hasStats ? (
           <>
             <span>Sum: <strong style={{ color: '#32302C' }}>{stats.sum.toLocaleString()}</strong></span>

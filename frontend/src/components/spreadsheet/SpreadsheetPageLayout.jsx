@@ -65,6 +65,7 @@ function SpreadsheetPageLayout({
   // Save
   hasPendingEdits = false,
   lastSavedAt,
+  saveStatus = 'idle',
 
   // Grid children (ExcelEditCanvas)
   children,
@@ -110,6 +111,8 @@ function SpreadsheetPageLayout({
         display: 'flex',
         flexDirection: 'column',
         flex: 1,
+        width: '100%',
+        alignSelf: 'stretch',
         minHeight: 0,
         minWidth: 0,
         overflow: 'hidden',
@@ -173,6 +176,7 @@ function SpreadsheetPageLayout({
         selectionStats={selectionStats}
         zoom={zoom}
         onZoomChange={onZoomChange}
+        saveStatus={saveStatus}
       />
     </div>
   );

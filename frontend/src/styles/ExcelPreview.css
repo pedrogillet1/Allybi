@@ -118,9 +118,7 @@
   flex: 1;
   min-height: 0;
   min-width: 0;
-  overflow-x: scroll;
-  overflow-y: auto;
-  scrollbar-gutter: stable both-edges;
+  overflow: auto;
   background: white;
   padding: 0;
 }

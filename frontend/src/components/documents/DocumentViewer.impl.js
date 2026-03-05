@@ -720,6 +720,7 @@ const DocumentViewer = () => {
     canUndo: false,
     canRedo: false,
   });
+  const [excelSaveStatus, setExcelSaveStatus] = useState('idle');
   const excelCanApply = useMemo(() => {
     if (!excelSelectedInfo?.a1) return false;
     const draft = String(excelDraftValue ?? '');
@@ -4823,6 +4824,7 @@ const DocumentViewer = () => {
 	                          onStatusMsg={setEditorStatusMsg}
 	                          onSheetMetaChange={setExcelSheetMeta}
                               onHistoryStateChange={handleExcelHistoryStateChange}
+                              onSaveStatusChange={setExcelSaveStatus}
 	                          onApplied={handleExcelApplied}
 	                          onCountUpdate={setChildPreviewCount}
 	                        />
@@ -5665,6 +5667,7 @@ const DocumentViewer = () => {
               zoom={zoom}
               onZoomChange={setZoom}
               hasPendingEdits={Boolean(excelCanvasRef.current?.hasPendingEdits?.())}
+              saveStatus={excelSaveStatus}
             >
               {previewCanvas}
             </SpreadsheetPageLayout>
