@@ -791,6 +791,7 @@ class PrismaRetrievalUserAdapter
         status: { in: [...READY_DOCUMENT_STATUSES] },
       },
     };
+    (where as any).isActive = true;
 
     if (scopedDocIds && scopedDocIds.length > 0) {
       where.documentId = { in: scopedDocIds };
@@ -905,6 +906,7 @@ class PrismaRetrievalUserAdapter
             status: { in: [...READY_DOCUMENT_STATUSES] },
           },
         };
+        (fallbackWhere as any).isActive = true;
         const fallbackRows = (await prisma.documentChunk.findMany({
           where: fallbackWhere,
           take: perDocLimit * docsToBackfill.length,
@@ -1007,6 +1009,7 @@ class PrismaRetrievalUserAdapter
         { valueRaw: { contains: token, mode: "insensitive" } },
       ]),
     };
+    (where as any).isActive = true;
     if (scopedDocIds && scopedDocIds.length > 0) {
       where.documentId = { in: scopedDocIds };
     }
@@ -1038,6 +1041,7 @@ class PrismaRetrievalUserAdapter
           status: { in: [...READY_DOCUMENT_STATUSES] },
         },
       };
+      (broadWhere as any).isActive = true;
       if (scopedDocIds && scopedDocIds.length > 0) {
         broadWhere.documentId = { in: scopedDocIds };
       }
@@ -1476,11 +1480,12 @@ class PrismaRetrievalUserAdapter
     const rows = (await prisma.documentChunk.findMany({
       where: {
         OR: ors,
+        isActive: true,
         document: {
           userId: this.userId,
           status: { in: [...READY_DOCUMENT_STATUSES] },
         },
-      },
+      } as any,
       select: {
         id: true,
         documentId: true,

@@ -299,6 +299,8 @@ model DocumentMetadata {
 model DocumentChunk {
   id            String   @id @default(uuid())
   documentId    String
+  indexingOperationId String? @map("indexing_operation_id")
+  isActive      Boolean  @default(true) @map("is_active")
   chunkIndex    Int
   text          String?
   textEncrypted String?
@@ -332,6 +334,9 @@ model DocumentChunk {
   document      Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
 
   @@index([documentId])
+  @@index([documentId, isActive])
+  @@index([documentId, indexingOperationId])
+  @@index([documentId, isActive, chunkIndex])
   @@index([documentId, chunkIndex])
   @@index([documentId, page])
   @@index([documentId, sectionId])
@@ -341,7 +346,7 @@ model DocumentChunk {
   @@index([documentId, rowLabel, colHeader])
   @@index([documentId, chunkType])
   @@index([documentId, sourceType])
-  @@unique([documentId, chunkIndex])
+  @@unique([documentId, indexingOperationId, chunkIndex])
   @@map("document_chunks")
 }
 

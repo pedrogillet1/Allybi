@@ -10,6 +10,7 @@ const mockDocumentUpdate = jest.fn();
 const mockChunkCreateMany = jest.fn();
 const mockChunkCount = jest.fn();
 const mockChunkDeleteMany = jest.fn();
+const mockChunkUpdateMany = jest.fn();
 const mockTransaction = jest.fn();
 
 const mockUpsertDocumentEmbeddings = jest.fn();
@@ -39,6 +40,7 @@ jest.mock("../../config/database", () => ({
       createMany: (...args: any[]) => mockChunkCreateMany(...args),
       count: (...args: any[]) => mockChunkCount(...args),
       deleteMany: (...args: any[]) => mockChunkDeleteMany(...args),
+      updateMany: (...args: any[]) => mockChunkUpdateMany(...args),
     },
     $transaction: (...args: any[]) => mockTransaction(...args),
   },
@@ -193,6 +195,7 @@ describe("vectorEmbedding.service", () => {
     mockDeleteEmbeddingsByOperationId.mockResolvedValue(undefined);
     mockChunkCreateMany.mockResolvedValue({ count: 2 });
     mockChunkDeleteMany.mockResolvedValue({ count: 0 });
+    mockChunkUpdateMany.mockResolvedValue({ count: 0 });
     mockChunkCount.mockResolvedValue(2);
     mockGenerateBatchEmbeddings.mockResolvedValue(makeBatchResult(2));
 
@@ -201,7 +204,7 @@ describe("vectorEmbedding.service", () => {
       if (typeof fnOrArgs === "function") {
         return fnOrArgs({
           documentChunk: {
-            deleteMany: mockChunkDeleteMany,
+            updateMany: mockChunkUpdateMany,
             createMany: mockChunkCreateMany,
           },
         });
@@ -391,8 +394,8 @@ describe("vectorEmbedding.service", () => {
     });
 
     expect(mockTransaction).toHaveBeenCalledTimes(1);
-    // Within the transaction, old rows are deleted and new chunks are created.
-    expect(mockChunkDeleteMany).toHaveBeenCalled();
+    // Within the transaction, previous active rows are deactivated and new chunks are created.
+    expect(mockChunkUpdateMany).toHaveBeenCalled();
     expect(mockChunkCreateMany).toHaveBeenCalled();
   });
 
@@ -495,7 +498,7 @@ describe("vectorEmbedding.service", () => {
     const txCallback = mockTransaction.mock.calls[0][0] as Function;
     const mockTx = {
       documentChunk: {
-        deleteMany: jest.fn().mockResolvedValue({ count: 0 }),
+        updateMany: jest.fn().mockResolvedValue({ count: 0 }),
         createMany: jest.fn().mockResolvedValue({ count: 1 }),
       },
     };
@@ -523,7 +526,7 @@ describe("vectorEmbedding.service", () => {
       }
       return fn({
         documentChunk: {
-          deleteMany: mockChunkDeleteMany,
+          updateMany: mockChunkUpdateMany,
           createMany: mockChunkCreateMany,
         },
       });
@@ -664,7 +667,11 @@ describe("vectorEmbedding.service", () => {
     });
 
     expect(mockChunkCount).toHaveBeenCalledWith({
-      where: { documentId: DOC_ID },
+      where: {
+        documentId: DOC_ID,
+        isActive: true,
+        indexingOperationId: expect.any(String),
+      },
     });
   });
 

@@ -569,6 +569,8 @@ export async function storeDocumentEmbeddings(
         return {
           id,
           documentId,
+          indexingOperationId: operationId,
+          isActive: true,
           chunkIndex: c.chunkIndex,
           text: encryptionMode === "encrypted_only" ? null : plaintext,
           textEncrypted,
@@ -638,18 +640,27 @@ export async function storeDocumentEmbeddings(
       }
 
       // Postgres tx SECOND — if this fails, compensating rollback deletes Pinecone vectors.
+      // Keep chunk history append-only by deactivating previous active rows.
       const txTimeout = parseInt(
         process.env.PRISMA_TRANSACTION_TIMEOUT || "120000",
         10,
       );
       await prisma.$transaction(
         async (tx) => {
-          await tx.documentChunk.deleteMany({ where: { documentId } });
+          await tx.documentChunk.updateMany({
+            where: {
+              documentId,
+              isActive: true,
+              NOT: { indexingOperationId: operationId },
+            } as any,
+            data: { isActive: false } as any,
+          });
           const chunkInserts = [];
           for (let i = 0; i < chunkRecords.length; i += batchSize) {
             chunkInserts.push(
               tx.documentChunk.createMany({
-                data: chunkRecords.slice(i, i + batchSize),
+                data: chunkRecords.slice(i, i + batchSize) as any,
+                skipDuplicates: true,
               }),
             );
           }
@@ -681,7 +692,11 @@ export async function storeDocumentEmbeddings(
 
       if (verifyAfterStore || strictVerify) {
         const dbChunkCount = await prisma.documentChunk.count({
-          where: { documentId },
+          where: {
+            documentId,
+            isActive: true,
+            indexingOperationId: operationId,
+          } as any,
         });
         if (dbChunkCount !== usableChunks.length) {
           throw new Error(

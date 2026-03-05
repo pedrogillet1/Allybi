@@ -109,7 +109,7 @@ describe("vectorEmbedding rollback", () => {
     mockTransaction.mockImplementation(async (fn: any) => {
       await fn({
         documentChunk: {
-          deleteMany: async () => ({ count: 1 }),
+          updateMany: async () => ({ count: 1 }),
           createMany: async () => ({ count: 1 }),
         },
       });
@@ -148,7 +148,7 @@ describe("vectorEmbedding rollback", () => {
     mockTransaction.mockImplementation(async (fn: any) => {
       await fn({
         documentChunk: {
-          deleteMany: async () => ({ count: 1 }),
+          updateMany: async () => ({ count: 1 }),
           createMany: async (args: any) => {
             createdChunkRows.push(...(args?.data || []));
             return { count: (args?.data || []).length };

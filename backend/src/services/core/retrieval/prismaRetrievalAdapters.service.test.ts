@@ -110,6 +110,20 @@ describe("PrismaRetrievalAdapterFactory encrypted chunk hydration", () => {
     ]);
   });
 
+  test("lexical search constrains DB reads to active chunk rows", async () => {
+    mockChunkFindMany.mockResolvedValue([]);
+
+    const deps = new PrismaRetrievalAdapterFactory().createForUser("user-1");
+    await deps.lexicalIndex.search({
+      query: "invoice due",
+      k: 3,
+    });
+
+    expect(mockChunkFindMany).toHaveBeenCalledTimes(1);
+    const firstCall = mockChunkFindMany.mock.calls[0]?.[0] || {};
+    expect(firstCall.where?.isActive).toBe(true);
+  });
+
   test("semantic search hydrates missing pinecone content from encrypted chunks", async () => {
     mockPineconeAvailable.mockReturnValue(true);
     mockGenerateQueryEmbedding.mockResolvedValue({

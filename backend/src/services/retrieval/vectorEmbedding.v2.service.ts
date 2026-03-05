@@ -12,9 +12,17 @@ import {
 async function verifyIndexedVectorCount(params: {
   documentId: string;
   userId: string;
+  operationId?: string;
 }): Promise<void> {
+  const where: Record<string, unknown> = {
+    documentId: params.documentId,
+    isActive: true,
+  };
+  if (params.operationId) {
+    where.indexingOperationId = params.operationId;
+  }
   const expectedCount = await prisma.documentChunk.count({
-    where: { documentId: params.documentId },
+    where: where as any,
   });
   if (expectedCount <= 0) {
     throw new Error(
@@ -86,7 +94,11 @@ export async function storeDocumentEmbeddings(
 
   if (shouldVerify) {
     try {
-      await verifyIndexedVectorCount({ documentId, userId });
+      await verifyIndexedVectorCount({
+        documentId,
+        userId,
+        operationId: currentOperationId || undefined,
+      });
       verificationPassed = true;
     } catch (error: any) {
       const message = String(error?.message || error || "unknown_error");
