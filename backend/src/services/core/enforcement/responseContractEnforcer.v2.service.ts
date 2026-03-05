@@ -2247,6 +2247,48 @@ function tokenSet(input: string): Set<string> {
   return out;
 }
 
+const NEGATION_TOKENS = new Set([
+  "not",
+  "no",
+  "never",
+  "without",
+  "none",
+  "nao",
+  "não",
+  "nem",
+  "nunca",
+  "sin",
+  "nunca",
+  "jamas",
+  "jamás",
+]);
+
+function hasNegationToken(input: string): boolean {
+  const tokens = tokenSet(input);
+  for (const token of tokens) {
+    if (NEGATION_TOKENS.has(token)) return true;
+  }
+  return false;
+}
+
+function numericTokenSet(input: string): Set<string> {
+  const out = new Set<string>();
+  const raw = String(input || "").match(/\d+(?:[.,]\d+)?%?/g) || [];
+  for (const token of raw) out.add(token.replace(",", "."));
+  return out;
+}
+
+function numericTokensCompatible(claim: string, snippet: string): boolean {
+  const claimNums = numericTokenSet(claim);
+  if (claimNums.size === 0) return true;
+  const snippetNums = numericTokenSet(snippet);
+  if (snippetNums.size === 0) return false;
+  for (const token of claimNums) {
+    if (snippetNums.has(token)) return true;
+  }
+  return false;
+}
+
 function sourceSnippetPool(
   sourceButtons: Array<Record<string, unknown>>,
 ): string[] {
@@ -2274,9 +2316,12 @@ function hasSnippetSupport(sentence: string, snippets: string[]): boolean {
   if (snippets.length === 0) return true;
   const claimTokens = tokenSet(sentence);
   if (claimTokens.size === 0) return true;
+  const claimHasNegation = hasNegationToken(sentence);
   for (const snippet of snippets) {
     const snippetTokens = tokenSet(snippet);
     if (snippetTokens.size === 0) continue;
+    if (hasNegationToken(snippet) !== claimHasNegation) continue;
+    if (!numericTokensCompatible(sentence, snippet)) continue;
     let overlap = 0;
     for (const token of claimTokens) {
       if (snippetTokens.has(token)) overlap += 1;
