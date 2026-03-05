@@ -1,6 +1,12 @@
 import { test, expect, Page } from "@playwright/test";
 import * as fs from "fs";
 import * as path from "path";
+import { TARGET_DOC_IDS } from "./support/target-documents";
+import {
+  createQueryIndexByText,
+  resolveScopedDocsForRequest,
+} from "./support/attachment-scope";
+import { captureAssistantMessage } from "./support/response-capture";
 
 /* ─────────────────────────────────────────────────────────────────────────────
  * 100-Query Sequential Chat Test (v2 — with deterministic doc attachment,
@@ -221,6 +227,7 @@ const RUN_QUERIES = QUERIES.slice(
   QUERY_START_INDEX,
   Math.min(QUERIES.length, QUERY_START_INDEX + QUERY_LIMIT),
 );
+const QUERY_INDEX_BY_TEXT = createQueryIndexByText(RUN_QUERIES, QUERY_START_INDEX);
 
 // ── Transport metadata interceptor ──
 // We intercept every chat/stream request to capture HTTP status, request ID,
@@ -563,6 +570,7 @@ async function ensureChatComposerVisible(page: Page) {
 
 // ── Inject attachedDocuments into every outgoing chat/stream request ──
 async function setupDocumentAttachmentInjector(page: Page) {
+  const scopedState = { fallbackTurn: 0 };
   await page.route("**/api/chat/stream", async (route) => {
     const request = route.request();
     if (request.method() !== "POST") {
@@ -579,10 +587,21 @@ async function setupDocumentAttachmentInjector(page: Page) {
       }
       const postData = JSON.parse(raw);
       const hadDocs = postData.attachedDocuments?.length > 0;
+      const scope = resolveScopedDocsForRequest({
+        postData,
+        queryIndexByText: QUERY_INDEX_BY_TEXT,
+        queryStartIndex: QUERY_START_INDEX,
+        state: scopedState,
+      });
       if (!hadDocs) {
-        postData.attachedDocuments = TARGET_DOCUMENTS;
+        postData.attachedDocuments = scope.scopedDocs;
       }
-      console.log(`[INJECT] Injected ${TARGET_DOCUMENTS.length} docs (had=${hadDocs}) into ${request.url()}`);
+      const finalCount = Array.isArray(postData.attachedDocuments)
+        ? postData.attachedDocuments.length
+        : 0;
+      console.log(
+        `[INJECT] queryIdx=${scope.resolvedIndex} reason=${scope.reason} docs=${finalCount} had=${hadDocs} url=${request.url()}`,
+      );
       await route.continue({ postData: JSON.stringify(postData) });
     } catch (err: any) {
       console.log(`[INJECT] ERROR: ${err.message}`);
@@ -602,9 +621,15 @@ async function verifyAttachmentInjection(page: Page): Promise<boolean> {
       ) {
         try {
           const body = request.postDataJSON();
+          const attachedDocuments = Array.isArray(body?.attachedDocuments)
+            ? body.attachedDocuments
+            : [];
           const hasAttachments =
-            Array.isArray(body?.attachedDocuments) &&
-            body.attachedDocuments.length === TARGET_DOCUMENTS.length;
+            attachedDocuments.length > 0 &&
+            attachedDocuments.every((doc: any) => {
+              const id = String(doc?.id || "").trim();
+              return id && TARGET_DOC_IDS.has(id);
+            });
           page.off("request", handler);
           resolve(hasAttachments);
         } catch {
@@ -680,47 +705,9 @@ async function sendQueryAndCapture(
       failureCode = meta.finalFailureCode;
     }
 
-    // DOM fallback: remove source/followup/action UI nodes before collecting text.
-    const markdownEl = lastMsg.locator('.markdown-preview-container');
-    if (!responseText && await markdownEl.isVisible({ timeout: 3000 }).catch(() => false)) {
-      responseText = await markdownEl.evaluate((el) => el.innerText);
-    }
-    if (!responseText) {
-      responseText = await lastMsg.evaluate((rootNode) => {
-        const root = rootNode as HTMLElement;
-        const copy = root.cloneNode(true) as HTMLElement;
-        const stripSelectors = [
-          ".koda-source-pill",
-          ".koda-source-pill__text",
-          ".source-pill",
-          ".suggested-questions",
-          ".chat-message-actions",
-          "button",
-        ];
-        for (const sel of stripSelectors) {
-          copy.querySelectorAll(sel).forEach((el) => el.remove());
-        }
-        return (copy.innerText || "").trim();
-      });
-    }
-
-    // Capture source pills only when stream final frame did not provide sources.
-    if (sources.length === 0) {
-      const sourcePills = lastMsg.locator(".koda-source-pill__text");
-      const pillCount = await sourcePills.count();
-      for (let i = 0; i < pillCount; i++) {
-        const txt = await sourcePills.nth(i).textContent();
-        if (txt) sources.push(txt.trim());
-      }
-      const altPills = lastMsg.locator(
-        ".koda-source-pill, .source-pill, [class*='source']",
-      );
-      const altCount = await altPills.count();
-      for (let i = 0; i < altCount; i++) {
-        const txt = await altPills.nth(i).evaluate((el) => el.innerText);
-        if (txt && txt.trim()) sources.push(txt.trim());
-      }
-    }
+    const captured = await captureAssistantMessage(lastMsg, responseText, sources);
+    responseText = captured.responseText;
+    sources = captured.sources;
 
     // Capture truncation warning only when not in final payload.
     if (!truncation) {
