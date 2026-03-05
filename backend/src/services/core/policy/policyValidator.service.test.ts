@@ -7,6 +7,21 @@ import { describe, expect, test } from "@jest/globals";
 import { PolicyValidatorService } from "./policyValidator.service";
 
 describe("PolicyValidatorService", () => {
+  test("includes policy-like ui contract banks in certification scope", () => {
+    const service = new PolicyValidatorService();
+    const files = service.listPolicyFiles();
+    const hasUiContracts = files.some((filePath) =>
+      filePath.replace(/\\/g, "/").endsWith("/data_banks/overlays/ui_contracts.any.json"),
+    );
+    const hasUiReceiptShapes = files.some((filePath) =>
+      filePath
+        .replace(/\\/g, "/")
+        .endsWith("/data_banks/patterns/ui/receipt_shapes.any.json"),
+    );
+    expect(hasUiContracts).toBe(true);
+    expect(hasUiReceiptShapes).toBe(true);
+  });
+
   test("flags missing strict meta contract fields", () => {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), "policy-validator-"));
     const filePath = path.join(dir, "sample.any.json");

@@ -11,6 +11,8 @@
     ],
     "lastUpdated": "2026-01-26",
     "owner": "koda-overlays",
+    "reviewCadenceDays": 30,
+    "criticality": "high",
     "compat": ">=1.0.0",
     "changeLog": [
       "Added strict nav_pills contract (single intro sentence, no sources label, no actions)",

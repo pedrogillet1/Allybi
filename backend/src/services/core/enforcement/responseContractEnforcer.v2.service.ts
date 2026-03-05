@@ -45,6 +45,11 @@ import {
   detectJsonLike,
   normalizeNewlines,
 } from "./responseContractEnforcer.text";
+import {
+  UiContractInterpreterService,
+  type UiContractDecision,
+} from "./uiContractInterpreter.service";
+import { UiReceiptContractValidatorService } from "./uiReceiptContractValidator.service";
 
 // -----------------------------------------------------------------------------
 // Types
@@ -118,6 +123,8 @@ export interface ResponseContractContext {
 export interface DraftResponse {
   content: string;
   attachments?: Attachment[];
+  receipts?: unknown[];
+  renderPlan?: Record<string, unknown> | null;
 }
 
 export interface EnforcedResponse {
@@ -128,6 +135,15 @@ export interface EnforcedResponse {
     warnings: string[];
     blocked: boolean;
     reasonCode?: string;
+    uiContracts?: {
+      version?: string | null;
+      appliedRuleIds?: string[];
+      appliedContracts?: string[];
+    };
+    uiReceiptContracts?: {
+      version?: string | null;
+      mappingId?: string | null;
+    };
     provenance?: {
       action: "allow" | "hedge" | "block";
       reasonCode: string | null;
@@ -165,17 +181,57 @@ type RenderPolicyBank = {
 };
 
 type UIContractsBank = {
-  _meta: unknown;
-  config?: { enabled?: boolean };
-  // optional, depends on your design
-  sources?: {
-    nav_pills?: {
-      hideLabel?: boolean;
-      hideDivider?: boolean;
-      pillsOnly?: boolean;
+  _meta?: { id?: string; version?: string };
+  config?: {
+    enabled?: boolean;
+    actionsContract?: {
+      thresholds?: {
+        maxIntroSentencesNavPills?: number;
+        maxClarificationQuestions?: number;
+      };
     };
-    default?: { showLabel?: boolean; showDivider?: boolean };
   };
+  contracts?: {
+    nav_pills?: {
+      maxIntroSentences?: number;
+      maxIntroChars?: number;
+      noSourcesHeader?: boolean;
+      noInlineCitations?: boolean;
+      disallowedTextPatterns?: string[];
+    };
+  };
+  rules?: Array<{
+    id?: string;
+    reasonCode?: string;
+    when?: Record<string, unknown>;
+    triggerPatterns?: Record<string, string[]>;
+    action?: {
+      type?: string;
+      contract?: string;
+      stripDisallowedTextPatterns?: boolean;
+      suppressActions?: boolean;
+    };
+  }>;
+};
+
+type UiReceiptShapesBank = {
+  _meta?: {
+    id?: string;
+    version?: string;
+  };
+  config?: {
+    enabled?: boolean;
+    strictEnvelopeEnforcement?: boolean;
+  };
+  mappings?: Array<{
+    id?: string;
+    operator?: string;
+    intent?: string;
+    mode?: string;
+    contract?: {
+      requiredEnvelopeFields?: string[];
+    };
+  }>;
 };
 
 type BannedPhrasesBank = {
@@ -736,6 +792,71 @@ function keepFirstSentence(text: string, maxChars: number = 90): string {
   return first.length > maxChars
     ? first.slice(0, maxChars).trim()
     : first.trim();
+}
+
+function keepFirstNSentences(
+  text: string,
+  maxSentences: number,
+  maxChars: number,
+): string {
+  const t = String(text || "").trim();
+  if (!t) return "";
+  const sentences = t.split(/(?<=[.!?])\s+/).filter(Boolean);
+  const limited = sentences.slice(0, Math.max(1, maxSentences));
+  const joined = limited.join(" ").trim();
+  if (!joined) return "";
+  return joined.length > maxChars ? joined.slice(0, maxChars).trim() : joined;
+}
+
+function applyDisallowedPatterns(
+  text: string,
+  patterns: string[],
+): { text: string; changed: boolean } {
+  let out = String(text || "");
+  const before = out.trim();
+  for (const pattern of patterns) {
+    const raw = String(pattern || "").trim();
+    if (!raw) continue;
+    try {
+      const rx = new RegExp(raw, "gi");
+      out = out.replace(rx, "");
+    } catch {
+      continue;
+    }
+  }
+  out = out.replace(/\s{2,}/g, " ").trim();
+  return { text: out, changed: out !== before };
+}
+
+function suppressActionLanguage(
+  text: string,
+  patterns: string[],
+): { text: string; changed: boolean } {
+  const source = String(text || "").trim();
+  if (!source) return { text: source, changed: false };
+  const regexes = patterns
+    .map((pattern) => {
+      try {
+        return new RegExp(String(pattern || "").trim(), "i");
+      } catch {
+        return null;
+      }
+    })
+    .filter((rx): rx is RegExp => Boolean(rx));
+  if (regexes.length === 0) return { text: source, changed: false };
+
+  const sentences = source
+    .split(/(?<=[.!?])\s+/)
+    .map((value) => value.trim())
+    .filter(Boolean);
+  if (sentences.length === 0) return { text: source, changed: false };
+
+  const kept = sentences.filter((sentence) =>
+    regexes.every((regex) => !regex.test(sentence)),
+  );
+  const out = kept.join(" ").trim();
+  if (!out) return { text: "", changed: true };
+  return { text: out, changed: out !== source };
 }
 
 function normalizeOperatorId(value: unknown): string {
@@ -2018,6 +2139,7 @@ function enforceAnalyticalStructuredTemplate(
 export class ResponseContractEnforcerService {
   private renderPolicy?: RenderPolicyBank;
   private uiContracts?: UIContractsBank;
+  private uiReceiptShapes?: UiReceiptShapesBank;
   private bannedPhrases?: BannedPhrasesBank;
   private truncation?: TruncationLimitsBank;
   private bulletRules?: BulletRulesBank;
@@ -2030,6 +2152,8 @@ export class ResponseContractEnforcerService {
   private boldingRules?: BoldingRulesBank;
   private operatorContracts?: OperatorContractsBank;
   private operatorOutputShapes?: OperatorOutputShapesBank;
+  private readonly uiContractInterpreter = new UiContractInterpreterService();
+  private readonly uiReceiptValidator = new UiReceiptContractValidatorService();
 
   constructor() {
     this.reloadBanks();
@@ -2038,6 +2162,8 @@ export class ResponseContractEnforcerService {
   reloadBanks(): void {
     this.renderPolicy = getBank<RenderPolicyBank>("render_policy");
     this.uiContracts = getBank<UIContractsBank>("ui_contracts");
+    this.uiReceiptShapes =
+      getOptionalBank<UiReceiptShapesBank>("ui_receipt_shapes") || undefined;
     this.bannedPhrases = getBank<BannedPhrasesBank>("banned_phrases");
     this.truncation = getBank<TruncationLimitsBank>("truncation_and_limits");
     this.bulletRules = getBank<BulletRulesBank>("bullet_rules");
@@ -2214,6 +2340,22 @@ export class ResponseContractEnforcerService {
       .toLowerCase();
     let styleMaxQuestions: number | null = null;
     let styleProfileMaxChars: number | null = null;
+    let uiDecision: UiContractDecision | null = null;
+    let uiReceiptTrace:
+      | EnforcedResponse["enforcement"]["uiReceiptContracts"]
+      | undefined;
+    const buildUiTrace = () => ({
+      ...(uiDecision
+        ? {
+            uiContracts: {
+              version: uiDecision.version,
+              appliedRuleIds: uiDecision.appliedRuleIds,
+              appliedContracts: uiDecision.appliedContracts,
+            },
+          }
+        : {}),
+      ...(uiReceiptTrace ? { uiReceiptContracts: uiReceiptTrace } : {}),
+    });
 
     if (
       operatorContract.preferredAnswerMode &&
@@ -2236,19 +2378,108 @@ export class ResponseContractEnforcerService {
       this.renderPolicy?.config?.markdown?.maxConsecutiveNewlines ?? 2;
     content = normalizeNewlines(content, maxNL);
 
+    uiDecision = this.uiContractInterpreter.resolve({
+      bank: this.uiContracts,
+      answerMode: String(ctx.answerMode || ""),
+      language: ctx.language,
+      signals: ctx.signals,
+      metrics: {},
+      content,
+    });
+    const resolvedUiDecision = uiDecision;
+    const uiReceiptValidation = this.uiReceiptValidator.validate({
+      bank: this.uiReceiptShapes,
+      operator: ctx.operator,
+      intentFamily: ctx.intentFamily,
+      answerMode: String(ctx.answerMode || ""),
+      requireHard: parseBoolish(
+        (ctx.signals as Record<string, unknown> | null)?.enforceReceiptContracts,
+      ),
+      draft: {
+        receipts: draft.receipts,
+        renderPlan: draft.renderPlan || undefined,
+      },
+    });
+    if (uiReceiptValidation.matchedMappingId) {
+      uiReceiptTrace = {
+        version: uiReceiptValidation.version,
+        mappingId: uiReceiptValidation.matchedMappingId,
+      };
+    }
+    if (uiReceiptValidation.warnings.length > 0) {
+      warnings.push(...uiReceiptValidation.warnings);
+    }
+    if (uiReceiptValidation.blocked) {
+      return {
+        content: "",
+        attachments,
+        enforcement: {
+          repairs,
+          warnings,
+          blocked: true,
+          reasonCode:
+            uiReceiptValidation.reasonCode || "ui_receipt_contract_missing_fields",
+          ...buildUiTrace(),
+          ...(provenanceEnforcement
+            ? { provenance: provenanceEnforcement }
+            : {}),
+        },
+      };
+    }
+    if (resolvedUiDecision.shouldHardBlock) {
+      return {
+        content: "",
+        attachments,
+        enforcement: {
+          repairs,
+          warnings,
+          blocked: true,
+          reasonCode:
+            resolvedUiDecision.hardBlockReasonCode || "ui_contract_hard_block",
+          ...buildUiTrace(),
+          ...(provenanceEnforcement
+            ? { provenance: provenanceEnforcement }
+            : {}),
+        },
+      };
+    }
+    if (resolvedUiDecision.suppressActionLanguage) {
+      const suppressed = suppressActionLanguage(
+        content,
+        resolvedUiDecision.suppressRegexes,
+      );
+      if (suppressed.changed) {
+        repairs.push("UI_ACTION_LANGUAGE_SUPPRESSED");
+        content = suppressed.text;
+      }
+    }
+
     // 1) nav_pills contract
     if (ctx.answerMode === "nav_pills") {
       // No inline sources headers or lists
-      const s1 = stripInlineSourcesSections(content);
-      if (s1.changed) repairs.push("STRIPPED_INLINE_SOURCES_HEADER");
-      content = s1.text;
+      if (resolvedUiDecision.navPills.noSourcesHeader) {
+        const s1 = stripInlineSourcesSections(content);
+        if (s1.changed) repairs.push("STRIPPED_INLINE_SOURCES_HEADER");
+        content = s1.text;
+      }
 
       const s2 = stripInlineFileLists(content);
       if (s2.changed) repairs.push("STRIPPED_INLINE_FILE_LIST");
       content = s2.text;
+      const strippedPatterns = applyDisallowedPatterns(
+        content,
+        resolvedUiDecision.navPills.disallowedTextPatterns,
+      );
+      if (strippedPatterns.changed) {
+        repairs.push("NAV_PILLS_DISALLOWED_PATTERNS_STRIPPED");
+        content = strippedPatterns.text;
+      }
 
-      // Max 1 sentence, max 90 chars
-      const intro = keepFirstSentence(content, 90);
+      const intro = keepFirstNSentences(
+        content,
+        resolvedUiDecision.navPills.maxIntroSentences,
+        resolvedUiDecision.navPills.maxIntroChars,
+      );
       if (intro !== content) repairs.push("NAV_PILLS_BODY_TRIMMED");
       content = intro;
 
@@ -2262,6 +2493,7 @@ export class ResponseContractEnforcerService {
             warnings: [...warnings, "NAV_PILLS_MISSING_SOURCE_BUTTONS"],
             blocked: true,
             reasonCode: "nav_pills_missing_buttons",
+            ...buildUiTrace(),
             ...(provenanceEnforcement
               ? { provenance: provenanceEnforcement }
               : {}),
@@ -2276,6 +2508,7 @@ export class ResponseContractEnforcerService {
           repairs,
           warnings,
           blocked: false,
+          ...buildUiTrace(),
           ...(provenanceEnforcement
             ? { provenance: provenanceEnforcement }
             : {}),
@@ -2357,6 +2590,7 @@ export class ResponseContractEnforcerService {
             warnings: [...warnings, ...provenanceCheck.warnings],
             blocked: true,
             reasonCode,
+            ...buildUiTrace(),
             ...(provenanceDecision
               ? { provenance: provenanceDecision }
               : {}),
@@ -2385,6 +2619,7 @@ export class ResponseContractEnforcerService {
               warnings: [...warnings, ...mapCheck.warnings],
               blocked: true,
               reasonCode: mapReasonCode,
+              ...buildUiTrace(),
               ...(provenanceDecision
                 ? { provenance: provenanceDecision }
                 : {}),
@@ -2441,6 +2676,7 @@ export class ResponseContractEnforcerService {
             warnings,
             blocked: true,
             reasonCode: "json_not_allowed",
+            ...buildUiTrace(),
             ...(provenanceEnforcement
               ? { provenance: provenanceEnforcement }
               : {}),
@@ -2537,13 +2773,21 @@ export class ResponseContractEnforcerService {
           : null;
       const renderPolicyMaxQuestions =
         toPositiveInt(((maxQuestionsRule as Record<string, unknown> | null)?.then as Record<string, unknown> | undefined)?.maxQuestions) || 1;
+      const uiContractMaxQuestions =
+        uiDecision && Number.isFinite(Number(uiDecision.maxClarificationQuestions))
+          ? Math.max(0, Math.floor(Number(uiDecision.maxClarificationQuestions)))
+          : null;
       const effectiveMaxQuestions =
         typeof styleMaxQuestions === "number"
           ? Math.max(0, Math.min(renderPolicyMaxQuestions, styleMaxQuestions))
           : renderPolicyMaxQuestions;
+      const finalMaxQuestions =
+        typeof uiContractMaxQuestions === "number"
+          ? Math.max(0, Math.min(effectiveMaxQuestions, uiContractMaxQuestions))
+          : effectiveMaxQuestions;
       const limitedQuestions = enforceMaxQuestions(
         content,
-        effectiveMaxQuestions,
+        finalMaxQuestions,
       );
       if (limitedQuestions.changed) {
         repairs.push("MAX_QUESTIONS_ENFORCED");
@@ -2675,6 +2919,7 @@ export class ResponseContractEnforcerService {
             warnings: [...warnings, "BANNED_PHRASE_CRITICAL_RESIDUAL"],
             blocked: true,
             reasonCode: "banned_phrase_critical",
+            ...buildUiTrace(),
             ...(provenanceEnforcement
               ? { provenance: provenanceEnforcement }
               : {}),
@@ -2747,6 +2992,7 @@ export class ResponseContractEnforcerService {
           warnings: [...warnings, "EMPTY_AFTER_ENFORCEMENT"],
           blocked: true,
           reasonCode: "empty_after_contract_enforcement",
+          ...buildUiTrace(),
           ...(provenanceEnforcement
             ? { provenance: provenanceEnforcement }
             : {}),
@@ -2761,6 +3007,7 @@ export class ResponseContractEnforcerService {
         repairs,
         warnings,
         blocked: false,
+        ...buildUiTrace(),
         ...(provenanceEnforcement ? { provenance: provenanceEnforcement } : {}),
       },
     };

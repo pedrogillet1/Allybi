@@ -10,6 +10,7 @@ interface PatternBank {
   };
   config?: Record<string, unknown>;
   patterns?: PatternRow[];
+  mappings?: PatternRow[];
   connectors?: PatternRow[];
   rules?: PatternRow[];
   guardrails?: PatternRow[];
@@ -24,6 +25,7 @@ const FAMILY_PATHS: Record<string, string> = {
   operators: "patterns/operators",
   domains: "patterns/domains",
   quality: "patterns/quality",
+  ui: "patterns/ui",
 };
 
 const ALLOWLIST_MISSING_META_FILES = new Set<string>([
@@ -68,6 +70,7 @@ function readJson(filePath: string): PatternBank {
 
 function getPatternRows(bank: PatternBank): PatternRow[] {
   if (Array.isArray(bank.patterns)) return bank.patterns;
+  if (Array.isArray(bank.mappings)) return bank.mappings;
   if (Array.isArray(bank.connectors)) return bank.connectors;
   if (Array.isArray(bank.rules)) return bank.rules;
   if (Array.isArray(bank.guardrails)) return bank.guardrails;

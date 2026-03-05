@@ -22,7 +22,26 @@ function bankById(bankId: string): unknown {
         },
       };
     case "ui_contracts":
-      return { config: { enabled: true } };
+      return {
+        _meta: { id: "ui_contracts", version: "1.0.0" },
+        config: {
+          enabled: true,
+          actionsContract: {
+            thresholds: {
+              maxIntroSentencesNavPills: 1,
+              maxClarificationQuestions: 1,
+            },
+          },
+        },
+        contracts: {
+          nav_pills: {
+            maxIntroSentences: 1,
+            maxIntroChars: 40,
+            noSourcesHeader: true,
+            disallowedTextPatterns: ["\\bSources?:\\b"],
+          },
+        },
+      };
     case "banned_phrases":
       return {
         config: { enabled: true, actionOnMatch: "strip_or_replace" },
@@ -53,6 +72,8 @@ function bankById(bankId: string): unknown {
         },
         profiles: {},
       };
+    case "ui_receipt_shapes":
+      return { config: { enabled: true }, mappings: [] };
     default:
       return { config: { enabled: true } };
   }
@@ -85,6 +106,33 @@ describe("ResponseContractEnforcerService v2", () => {
 
     expect(out.enforcement.blocked).toBe(true);
     expect(out.enforcement.reasonCode).toBe("nav_pills_missing_buttons");
+  });
+
+  test("uses ui_contracts nav maxIntroChars instead of hardcoded limit", async () => {
+    const { ResponseContractEnforcerService } = await import(
+      "./responseContractEnforcer.v2.service"
+    );
+    const enforcer = new ResponseContractEnforcerService();
+
+    const out = enforcer.enforce(
+      {
+        content:
+          "Open the quarterly board deck and jump to revenue bridge details please.",
+        attachments: [
+          {
+            type: "source_buttons",
+            buttons: [{ id: "doc-1", label: "Deck.pdf" }],
+          } as any,
+        ],
+      },
+      {
+        answerMode: "nav_pills",
+        language: "en",
+      },
+    );
+
+    expect(out.enforcement.blocked).toBe(false);
+    expect(out.content.length).toBeLessThanOrEqual(40);
   });
 
   test("blocks json-like outputs when no-json policy is enabled", async () => {

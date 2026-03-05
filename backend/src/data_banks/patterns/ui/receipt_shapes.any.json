@@ -7,6 +7,8 @@
       "any"
     ],
     "owner": "ui-contracts",
+    "reviewCadenceDays": 45,
+    "criticality": "low",
     "usedBy": [
       "ui_renderer",
       "editor_router",

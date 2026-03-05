@@ -127,7 +127,49 @@ export const BankRegistrySchema = z.object({
 
 // ui_contracts — used by frontend contract enforcement
 export const UIContractsSchema = z.object({
-  _meta: z.object({ id: z.string() }).passthrough(),
+  _meta: z.object({
+    id: z.string(),
+    version: z.string().optional(),
+    owner: z.string().optional(),
+    lastUpdated: z.string().optional(),
+    reviewCadenceDays: z.number().optional(),
+    criticality: z.string().optional(),
+  }).passthrough(),
+  config: z.object({
+    enabled: z.boolean().optional(),
+    applyStage: z.string().optional(),
+    actionsContract: z.object({
+      thresholds: z.object({
+        maxIntroSentencesNavPills: z.number().optional(),
+        maxClarificationQuestions: z.number().optional(),
+      }).passthrough().optional(),
+    }).passthrough().optional(),
+  }).passthrough().optional(),
+  contracts: z.object({
+    nav_pills: z.object({
+      maxIntroSentences: z.number().optional(),
+      maxIntroChars: z.number().optional(),
+      noSourcesHeader: z.boolean().optional(),
+      noInlineCitations: z.boolean().optional(),
+      disallowedTextPatterns: z.array(z.string()).optional(),
+    }).passthrough().optional(),
+    doc_grounded: z.object({}).passthrough().optional(),
+    conversation: z.object({}).passthrough().optional(),
+  }).passthrough().optional(),
+  rules: z.array(
+    z.object({
+      id: z.string().optional(),
+      reasonCode: z.string().optional(),
+      when: z.object({}).passthrough().optional(),
+      triggerPatterns: z.record(z.string(), z.array(z.string())).optional(),
+      action: z.object({
+        type: z.string().optional(),
+        contract: z.string().optional(),
+        stripDisallowedTextPatterns: z.boolean().optional(),
+        suppressActions: z.boolean().optional(),
+      }).passthrough().optional(),
+    }).passthrough(),
+  ).optional(),
 }).passthrough();
 
 // fallback_policy — used by adaptive fallback router

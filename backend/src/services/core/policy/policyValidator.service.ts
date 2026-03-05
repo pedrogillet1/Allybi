@@ -13,6 +13,12 @@ import {
 } from "./policyContracts";
 
 const POLICY_SUBPATH = path.join("src", "data_banks", "policies");
+const POLICY_AUX_FILES = [
+  path.join("src", "data_banks", "overlays", "ui_contracts.any.json"),
+  path.join("src", "data_banks", "patterns", "ui", "receipt_shapes.any.json"),
+  path.join("backend", "src", "data_banks", "overlays", "ui_contracts.any.json"),
+  path.join("backend", "src", "data_banks", "patterns", "ui", "receipt_shapes.any.json"),
+];
 
 function asObject(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== "object" || Array.isArray(value)) return {};
@@ -216,6 +222,11 @@ export class PolicyValidatorService {
     const out = new Set<string>();
     for (const root of roots) {
       for (const filePath of listJsonFilesRecursive(root)) out.add(filePath);
+    }
+    const cwd = process.cwd();
+    for (const relativePath of POLICY_AUX_FILES) {
+      const candidate = path.join(cwd, relativePath);
+      if (fs.existsSync(candidate)) out.add(candidate);
     }
     return [...out].sort((a, b) => a.localeCompare(b));
   }

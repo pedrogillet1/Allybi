@@ -34,6 +34,7 @@ export interface RuntimeWiringIntegrityResult {
   composeAnswerModeTemplateGaps: string[];
   answerModeContractDrift: string[];
   productHelpRuntimeUsageMissing: string[];
+  followupOverlayCoverageGaps: string[];
 }
 
 export const RUNTIME_REQUIRED_BANKS = [
@@ -43,6 +44,8 @@ export const RUNTIME_REQUIRED_BANKS = [
   "operator_contracts",
   "operator_output_shapes",
   "operator_collision_matrix",
+  "ui_contracts",
+  "ui_receipt_shapes",
   "render_policy",
   "answer_style_policy",
   "truncation_and_limits",
@@ -636,17 +639,20 @@ function collectMemoryRawPersistencePatterns(): string[] {
 }
 
 function collectMemoryPolicyHookEngineMissing(): string[] {
-  const candidatePaths = [
-    path.join(
-      process.cwd(),
-      "backend/src/services/memory/memoryPolicyEngine.service.ts",
+  const candidatePaths = Array.from(
+    new Set(
+      [
+        path.join(
+          process.cwd(),
+          "backend/src/services/memory/memoryPolicyEngine.service.ts",
+        ),
+        path.join(
+          process.cwd(),
+          "src/services/memory/memoryPolicyEngine.service.ts",
+        ),
+      ].map((p) => path.resolve(p)),
     ),
-    path.join(
-      process.cwd(),
-      "src/services/memory/memoryPolicyEngine.service.ts",
-    ),
-  ];
-  const failures: string[] = [];
+  );
   const existingCandidates: string[] = [];
   for (const filePath of candidatePaths) {
     if (!fs.existsSync(filePath)) {
@@ -655,18 +661,20 @@ function collectMemoryPolicyHookEngineMissing(): string[] {
     existingCandidates.push(filePath);
     try {
       const src = fs.readFileSync(filePath, "utf8");
-      if (
-        !/integrationHooks/.test(src) ||
-        !/memory_policy integration hook banks missing/.test(src)
-      ) {
-        continue;
+      const hasIntegrationHooks = /integrationHooks/.test(src);
+      const hasMemoryPolicyHookBankRef =
+        /memory_policy integration hook banks missing/i.test(src) ||
+        /memory_policy/i.test(src);
+      if (hasIntegrationHooks && hasMemoryPolicyHookBankRef) {
+        return [];
       }
-      return [];
     } catch {
       continue;
     }
   }
-  return existingCandidates.length > 0 ? existingCandidates : candidatePaths;
+  return existingCandidates.length > 0
+    ? Array.from(new Set(existingCandidates))
+    : candidatePaths;
 }
 
 function collectDormantIntentConfigUsage(): string[] {
@@ -786,6 +794,49 @@ function collectProductHelpRuntimeUsageMissing(): string[] {
   }
 
   return failures;
+}
+
+const ROUTING_LOCALES = ["en", "pt", "es"] as const;
+
+function collectFollowupOverlayCoverageGaps(
+  intentPatterns: Record<string, unknown> | null,
+  followupIndicators: Record<string, unknown> | null,
+): string[] {
+  const gaps: string[] = [];
+  const overlays = asRecord(intentPatterns?.overlays);
+  const followupPatternsByLocale = asRecord(overlays.followupIndicators);
+  for (const locale of ROUTING_LOCALES) {
+    const patterns = Array.isArray(followupPatternsByLocale[locale])
+      ? (followupPatternsByLocale[locale] as unknown[])
+      : [];
+    if (patterns.length < 1) {
+      gaps.push(`intent_patterns.overlays.followupIndicators.${locale}:missing`);
+    }
+  }
+
+  const indicatorsEnabled = followupIndicators?.config
+    ? asRecord(followupIndicators.config).enabled !== false
+    : false;
+  if (!indicatorsEnabled) return gaps;
+
+  const rules = Array.isArray(followupIndicators?.rules)
+    ? (followupIndicators.rules as Array<Record<string, unknown>>)
+    : [];
+  for (const rule of rules) {
+    const ruleId = asTrimmedString(rule?.id) || "rule";
+    const triggerPatterns = asRecord(rule?.triggerPatterns);
+    for (const locale of ROUTING_LOCALES) {
+      const patterns = Array.isArray(triggerPatterns[locale])
+        ? (triggerPatterns[locale] as unknown[])
+        : [];
+      if (patterns.length < 1) {
+        gaps.push(
+          `followup_indicators.rules.${ruleId}.triggerPatterns.${locale}:missing`,
+        );
+      }
+    }
+  }
+  return gaps;
 }
 
 function listRuntimeSourceFiles(): string[] {
@@ -940,6 +991,9 @@ export class RuntimeWiringIntegrityService {
     const taskPlanGeneration = getOptionalBank<Record<string, unknown>>("task_plan_generation");
     const editingTaskPrompts = getOptionalBank<Record<string, unknown>>("editing_task_prompts");
     const llmBuilderPolicy = getOptionalBank<Record<string, unknown>>("llm_builder_policy");
+    const followupIndicators = getOptionalBank<Record<string, unknown>>(
+      "followup_indicators",
+    );
 
     const routingOps = new Set<string>([
       ...collectOperatorIdsFromIntentConfig(intentConfig),
@@ -1024,6 +1078,10 @@ export class RuntimeWiringIntegrityService {
     const answerModeContractDrift = collectAnswerModeContractDrift();
     const productHelpRuntimeUsageMissing =
       collectProductHelpRuntimeUsageMissing();
+    const followupOverlayCoverageGaps = collectFollowupOverlayCoverageGaps(
+      intentPatterns,
+      followupIndicators,
+    );
 
     return {
       ok:
@@ -1050,7 +1108,8 @@ export class RuntimeWiringIntegrityService {
         dormantIntentConfigUsage.length === 0 &&
         composeAnswerModeTemplateGaps.length === 0 &&
         answerModeContractDrift.length === 0 &&
-        productHelpRuntimeUsageMissing.length === 0,
+        productHelpRuntimeUsageMissing.length === 0 &&
+        followupOverlayCoverageGaps.length === 0,
       missingBanks,
       missingLlmRoutingPolicyBanks,
       missingRuntimePolicyConsumers,
@@ -1075,6 +1134,7 @@ export class RuntimeWiringIntegrityService {
       composeAnswerModeTemplateGaps,
       answerModeContractDrift,
       productHelpRuntimeUsageMissing,
+      followupOverlayCoverageGaps,
     };
   }
 }

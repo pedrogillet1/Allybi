@@ -19,7 +19,26 @@ function bankById(bankId: string): unknown {
         },
       };
     case "ui_contracts":
-      return { config: { enabled: true } };
+      return {
+        _meta: { id: "ui_contracts", version: "1.0.0" },
+        config: {
+          enabled: true,
+          actionsContract: {
+            thresholds: {
+              maxIntroSentencesNavPills: 1,
+              maxClarificationQuestions: 1,
+            },
+          },
+        },
+        contracts: {
+          nav_pills: {
+            maxIntroSentences: 1,
+            maxIntroChars: 40,
+            noSourcesHeader: true,
+            disallowedTextPatterns: ["\\bSources?:\\b"],
+          },
+        },
+      };
     case "banned_phrases":
       return {
         config: { enabled: true, actionOnMatch: "strip_or_replace" },
@@ -135,6 +154,8 @@ function bankById(bankId: string): unknown {
           },
         },
       };
+    case "ui_receipt_shapes":
+      return { config: { enabled: true }, mappings: [] };
     default:
       return {};
   }
@@ -197,8 +218,137 @@ describe("ResponseContractEnforcerService nav_pills contract", () => {
     );
 
     expect(out.enforcement.blocked).toBe(false);
-    expect(out.content.length).toBeLessThanOrEqual(90);
+    expect(out.content.length).toBeLessThanOrEqual(40);
     expect(out.enforcement.repairs).toContain("NAV_PILLS_BODY_TRIMMED");
+  });
+
+  test("hard blocks when ui_contract rule with hard_block action matches", async () => {
+    mockGetBank.mockImplementation((bankId: string) => {
+      if (bankId !== "ui_contracts") return bankById(bankId);
+      return {
+        ...bankById("ui_contracts"),
+        rules: [
+          {
+            id: "no_sources_header_anywhere_in_nav_pills",
+            reasonCode: "nav_pills_sources_label",
+            when: {
+              all: [{ path: "answerMode", op: "eq", value: "nav_pills" }],
+            },
+            triggerPatterns: { en: ["\\bSources?:"] },
+            action: { type: "hard_block" },
+          },
+        ],
+      };
+    });
+
+    const { ResponseContractEnforcerService } =
+      await import("./responseContractEnforcer.service");
+    const enforcer = new ResponseContractEnforcerService();
+
+    const out = enforcer.enforce(
+      {
+        content: "Sources: Budget.xlsx",
+        attachments: [],
+      },
+      {
+        answerMode: "nav_pills",
+        language: "en",
+      },
+    );
+
+    expect(out.enforcement.blocked).toBe(true);
+    expect(out.enforcement.reasonCode).toBe("nav_pills_sources_label");
+  });
+
+  test("suppresses action confirmation language when ui_contract rule matches", async () => {
+    mockGetBank.mockImplementation((bankId: string) => {
+      if (bankId !== "ui_contracts") return bankById(bankId);
+      return {
+        ...bankById("ui_contracts"),
+        rules: [
+          {
+            id: "no_action_hallucination_without_execution",
+            reasonCode: "no_fake_action_confirmation",
+            when: {
+              all: [{ path: "signals.toolExecuted", op: "neq", value: true }],
+            },
+            triggerPatterns: { en: ["\\b(i (opened|deleted|moved|renamed)|done|completed)\\b"] },
+            action: { type: "suppress_action_language" },
+          },
+        ],
+      };
+    });
+
+    const { ResponseContractEnforcerService } =
+      await import("./responseContractEnforcer.service");
+    const enforcer = new ResponseContractEnforcerService();
+
+    const out = enforcer.enforce(
+      {
+        content: "Done. I opened the file. Next, choose the section.",
+        attachments: [],
+      },
+      {
+        answerMode: "general_answer",
+        language: "en",
+        signals: { toolExecuted: false },
+      },
+    );
+
+    expect(out.enforcement.blocked).toBe(false);
+    expect(out.enforcement.repairs).toContain("UI_ACTION_LANGUAGE_SUPPRESSED");
+    expect(out.content.toLowerCase()).not.toContain("i opened");
+    expect(out.enforcement.uiContracts?.appliedRuleIds).toContain(
+      "no_action_hallucination_without_execution",
+    );
+  });
+
+  test("enforces ui_receipt_shapes when hard enforcement signal is enabled", async () => {
+    mockGetOptionalBank.mockImplementation((bankId: string) => {
+      if (bankId !== "ui_receipt_shapes") return bankById(bankId);
+      return {
+        _meta: { id: "ui_receipt_shapes", version: "1.0.0" },
+        config: { enabled: true },
+        mappings: [
+          {
+            id: "RS_OPEN_NAV",
+            operator: "open",
+            intent: "file_actions",
+            mode: "navigation",
+            contract: { requiredEnvelopeFields: ["receipts", "renderPlan"] },
+          },
+        ],
+      };
+    });
+    const { ResponseContractEnforcerService } =
+      await import("./responseContractEnforcer.service");
+    const enforcer = new ResponseContractEnforcerService();
+
+    const out = enforcer.enforce(
+      {
+        content: "Open this file.",
+        attachments: [
+          {
+            type: "source_buttons",
+            buttons: [{ id: "doc-1", label: "A.pdf" }],
+          } as any,
+        ],
+      },
+      {
+        answerMode: "nav_pills",
+        language: "en",
+        operator: "open",
+        intentFamily: "file_actions",
+        signals: { enforceReceiptContracts: true },
+      },
+    );
+
+    expect(out.enforcement.blocked).toBe(true);
+    expect(out.enforcement.reasonCode).toBe("ui_receipt_contract_missing_fields");
+    expect(out.enforcement.warnings.some((value) =>
+      value.includes("UI_RECEIPT_MISSING_FIELDS"),
+    )).toBe(true);
+    expect(out.enforcement.uiReceiptContracts?.mappingId).toBe("RS_OPEN_NAV");
   });
 
   test("enforces quote output shape from operator contracts in non-nav mode", async () => {
