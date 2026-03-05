@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 
 import { extractPolicyRules, PolicyRuntimeEngine } from "./policyRuntimeEngine.service";
+import { UiContractInterpreterService } from "../enforcement/uiContractInterpreter.service";
 import {
   POLICY_CRITICALITIES,
   type PolicyBankContract,
@@ -142,6 +143,20 @@ function expectedActionFromCase(row: PolicyTestCase): string | null {
   return action || null;
 }
 
+function normalizeUiLanguage(value: unknown): "en" | "pt" | "es" {
+  const normalized = asTrimmed(value).toLowerCase();
+  if (normalized === "pt") return "pt";
+  if (normalized === "es") return "es";
+  return "en";
+}
+
+function asCaseInputText(value: unknown): string {
+  if (typeof value === "string") return value;
+  const record = asObject(value);
+  const content = asTrimmed(record.content);
+  return content || "";
+}
+
 function behavioralIssuesForCases(input: {
   bank: PolicyBankContract;
   filePath: string;
@@ -189,6 +204,106 @@ function behavioralIssuesForCases(input: {
     }
   }
 
+  return issues;
+}
+
+function uiContractBehaviorIssuesForCases(input: {
+  bank: PolicyBankContract;
+  filePath: string;
+  bankId: string;
+}): PolicyValidationIssue[] {
+  if (input.bankId !== "ui_contracts") return [];
+  const rows = collectCaseRows(input.bank);
+  if (rows.length < 1) return [];
+  const interpreter = new UiContractInterpreterService();
+  const issues: PolicyValidationIssue[] = [];
+
+  for (const row of rows) {
+    const rowObj = asObject(row);
+    const caseId = asTrimmed(rowObj.id) || "unknown_case";
+    const expectObj = asObject(rowObj.expect);
+    const context = asObject(rowObj.context);
+    const runtime = runtimeFromCase(row) || {};
+    const merged = { ...runtime, ...context };
+    const answerMode = asTrimmed((merged as Record<string, unknown>).answerMode);
+    const decision = interpreter.resolve({
+      bank: input.bank as any,
+      answerMode: answerMode || "general_answer",
+      language: normalizeUiLanguage(
+        (merged as Record<string, unknown>).language || rowObj.language,
+      ),
+      signals: asObject((merged as Record<string, unknown>).signals),
+      metrics: asObject((merged as Record<string, unknown>).metrics),
+      content: asCaseInputText(rowObj.input),
+    });
+
+    if (typeof expectObj.blocked === "boolean") {
+      const expectedBlocked = expectObj.blocked === true;
+      if (decision.shouldHardBlock !== expectedBlocked) {
+        issues.push(
+          makeIssue({
+            code: "behavior_case_block_mismatch",
+            severity: "error",
+            message: `behavior case ${caseId} expected blocked=${expectedBlocked} got=${decision.shouldHardBlock}`,
+            filePath: input.filePath,
+            bankId: input.bankId,
+          }),
+        );
+      }
+    }
+    if (typeof expectObj.actionLanguageSuppressed === "boolean") {
+      const expectedSuppressed = expectObj.actionLanguageSuppressed === true;
+      if (decision.suppressActionLanguage !== expectedSuppressed) {
+        issues.push(
+          makeIssue({
+            code: "behavior_case_action_language_mismatch",
+            severity: "error",
+            message: `behavior case ${caseId} expected actionLanguageSuppressed=${expectedSuppressed} got=${decision.suppressActionLanguage}`,
+            filePath: input.filePath,
+            bankId: input.bankId,
+          }),
+        );
+      }
+    }
+    const expectedIntroMax = toInt(expectObj.maxIntroSentences);
+    if (expectedIntroMax != null) {
+      if (decision.navPills.maxIntroSentences !== expectedIntroMax) {
+        issues.push(
+          makeIssue({
+            code: "behavior_case_nav_intro_sentences_mismatch",
+            severity: "error",
+            message: `behavior case ${caseId} expected maxIntroSentences=${expectedIntroMax} got=${decision.navPills.maxIntroSentences}`,
+            filePath: input.filePath,
+            bankId: input.bankId,
+          }),
+        );
+      }
+    }
+    if (Array.isArray(expectObj.allowedOutputShapes)) {
+      const expectedShapes = expectObj.allowedOutputShapes
+        .map((value) => asTrimmed(value).toLowerCase())
+        .filter(Boolean);
+      if (expectedShapes.length > 0) {
+        const actual = new Set(
+          decision.navPills.allowedOutputShapes.map((value) =>
+            asTrimmed(value).toLowerCase(),
+          ),
+        );
+        const missing = expectedShapes.filter((value) => !actual.has(value));
+        if (missing.length > 0) {
+          issues.push(
+            makeIssue({
+              code: "behavior_case_allowed_output_shapes_mismatch",
+              severity: "error",
+              message: `behavior case ${caseId} missing allowedOutputShapes=${missing.join(",")}`,
+              filePath: input.filePath,
+              bankId: input.bankId,
+            }),
+          );
+        }
+      }
+    }
+  }
   return issues;
 }
 
@@ -352,6 +467,13 @@ export class PolicyValidatorService {
 
     issues.push(
       ...behavioralIssuesForCases({
+        bank,
+        filePath,
+        bankId,
+      }),
+    );
+    issues.push(
+      ...uiContractBehaviorIssuesForCases({
         bank,
         filePath,
         bankId,

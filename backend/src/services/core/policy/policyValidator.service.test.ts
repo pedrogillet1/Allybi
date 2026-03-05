@@ -179,4 +179,62 @@ describe("PolicyValidatorService", () => {
       result.issues.some((issue) => issue.code === "behavior_case_action_mismatch"),
     ).toBe(true);
   });
+
+  test("validates ui_contract behavior expectations beyond expect.action", () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "policy-validator-"));
+    const filePath = path.join(dir, "ui_contracts.any.json");
+    fs.writeFileSync(
+      filePath,
+      JSON.stringify(
+        {
+          _meta: {
+            id: "ui_contracts",
+            version: "1.0.0",
+            description: "ui contracts",
+            lastUpdated: "2026-03-03",
+            owner: "runtime-certification",
+            reviewCadenceDays: 30,
+            criticality: "high",
+          },
+          config: {
+            enabled: true,
+            contracts: {
+              nav_pills: {
+                maxIntroSentences: 1,
+                allowedOutputShapes: ["button_only"],
+              },
+            },
+          },
+          rules: [
+            {
+              id: "NAV_BLOCK_SOURCES",
+              when: {
+                all: [{ path: "answerMode", op: "eq", value: "nav_pills" }],
+              },
+              triggerPatterns: { en: ["\\bSources?:\\b"] },
+              action: { type: "hard_block" },
+            },
+          ],
+          tests: {
+            cases: [
+              {
+                id: "UI_CASE_1",
+                context: { answerMode: "nav_pills", language: "en" },
+                input: "Open the file.",
+                expect: { blocked: true },
+              },
+            ],
+          },
+        },
+        null,
+        2,
+      ),
+    );
+
+    const service = new PolicyValidatorService();
+    const result = service.validateFile(filePath);
+    expect(
+      result.issues.some((issue) => issue.code === "behavior_case_block_mismatch"),
+    ).toBe(true);
+  });
 });

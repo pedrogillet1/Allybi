@@ -80,10 +80,26 @@ function asNumber(value: unknown): number | null {
   return num;
 }
 
+function asStringArray(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((item) => asString(item))
+    .filter((item): item is string => item != null);
+}
+
 function buildModelCallMeta(rawMeta: unknown): Record<string, unknown> | null {
   const meta = asRecord(rawMeta);
   const route = asRecord(meta.route);
   const routingDecision = asRecord(meta.routingDecision);
+  const followupReasons = asStringArray(routingDecision.followupReasonCodes);
+  const followupReasonCodes = followupReasons.length > 0
+    ? followupReasons.join(",")
+    : null;
+  const followupDegraded = followupReasons.some((reason) =>
+    reason.startsWith("followup_overlay_patterns_missing"),
+  )
+    ? true
+    : null;
   const eventMeta: Record<string, unknown> = {
     promptType: asString(meta.promptType),
     routeLane: asString(meta.routeLane) ?? asString(route.lane),
@@ -102,6 +118,8 @@ function buildModelCallMeta(rawMeta: unknown): Record<string, unknown> | null {
     routingRoute: asString(routingDecision.route),
     routingLocale: asString(routingDecision.locale),
     routingFollowupSource: asString(routingDecision.followupSource),
+    routingFollowupReasonCodes: followupReasonCodes,
+    routingFollowupDegraded: followupDegraded,
   };
 
   const normalized = Object.fromEntries(

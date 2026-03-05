@@ -76,15 +76,104 @@ function hasPattern(filePath, pattern) {
 }
 
 function loadLegacyAllowlist() {
-  if (!fs.existsSync(legacyAllowlistPath)) return new Set();
+  if (!fs.existsSync(legacyAllowlistPath)) {
+    return {
+      files: new Set(),
+      malformedEntries: [],
+      expiredEntries: [],
+    };
+  }
+  const files = new Set();
+  const malformedEntries = [];
+  const expiredEntries = [];
+
   try {
-    const entries = read(legacyAllowlistPath)
+    const lines = read(legacyAllowlistPath)
       .split(/\r?\n/)
-      .map((line) => line.trim())
-      .filter((line) => line.length > 0 && !line.startsWith("#"));
-    return new Set(entries);
+      .map((line, index) => ({ line: line.trim(), lineNumber: index + 1 }))
+      .filter((entry) => entry.line.length > 0 && !entry.line.startsWith("#"));
+    const today = new Date();
+    const todayUtc = Date.UTC(
+      today.getUTCFullYear(),
+      today.getUTCMonth(),
+      today.getUTCDate(),
+    );
+    for (const entry of lines) {
+      const parts = entry.line.split("|").map((part) => part.trim());
+      const file = String(parts[0] || "").trim();
+      if (!file) {
+        malformedEntries.push({
+          lineNumber: entry.lineNumber,
+          line: entry.line,
+          reason: "missing_file_path",
+        });
+        continue;
+      }
+      files.add(file);
+
+      const fields = {};
+      for (const segment of parts.slice(1)) {
+        const eq = segment.indexOf("=");
+        if (eq <= 0 || eq === segment.length - 1) continue;
+        const key = segment.slice(0, eq).trim().toLowerCase();
+        const value = segment.slice(eq + 1).trim();
+        if (key) fields[key] = value;
+      }
+      const owner = String(fields.owner || "").trim();
+      const reason = String(fields.reason || "").trim();
+      const expires = String(fields.expires || "").trim();
+      const ticket = String(fields.ticket || "").trim();
+
+      if (!owner || !reason || !expires || !ticket) {
+        malformedEntries.push({
+          lineNumber: entry.lineNumber,
+          line: entry.line,
+          reason: "missing_required_metadata",
+        });
+        continue;
+      }
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(expires)) {
+        malformedEntries.push({
+          lineNumber: entry.lineNumber,
+          line: entry.line,
+          reason: "invalid_expires_format",
+        });
+        continue;
+      }
+      const expiresUtc = Date.parse(`${expires}T00:00:00.000Z`);
+      if (!Number.isFinite(expiresUtc)) {
+        malformedEntries.push({
+          lineNumber: entry.lineNumber,
+          line: entry.line,
+          reason: "invalid_expires_date",
+        });
+        continue;
+      }
+      if (expiresUtc < todayUtc) {
+        expiredEntries.push({
+          lineNumber: entry.lineNumber,
+          line: entry.line,
+          reason: "expired_waiver",
+        });
+      }
+    }
+    return {
+      files,
+      malformedEntries,
+      expiredEntries,
+    };
   } catch {
-    return new Set();
+    return {
+      files,
+      malformedEntries: [
+        {
+          lineNumber: 0,
+          line: "",
+          reason: "allowlist_read_error",
+        },
+      ],
+      expiredEntries,
+    };
   }
 }
 
@@ -227,6 +316,55 @@ if (hasPattern(connectorsIngestionFile, /vectorEmbedding\.service/)) {
 if (hasPattern(prismaDocumentFile, /vectorEmbedding\.service/)) {
   runtimeSelectorBypassFiles.push(rel(prismaDocumentFile));
 }
+const selectorObservabilityMissingFiles = [];
+const retrievalEngineRuntimeSelectorFile = path.join(
+  SRC,
+  "services/core/retrieval/retrievalEngine.runtime.service.ts",
+);
+const prismaRetrievalRuntimeSelectorFile = path.join(
+  SRC,
+  "services/core/retrieval/prismaRetrievalAdapters.runtime.service.ts",
+);
+const vectorEmbeddingRuntimeSelectorFile = path.join(
+  SRC,
+  "services/retrieval/vectorEmbedding.runtime.service.ts",
+);
+if (
+  !hasPattern(
+    retrievalEngineRuntimeSelectorFile,
+    /export const retrievalEngineRuntimeMetadata/,
+  ) ||
+  !hasPattern(
+    retrievalEngineRuntimeSelectorFile,
+    /export function getRetrievalEngineRuntimeMetadata/,
+  )
+) {
+  selectorObservabilityMissingFiles.push(rel(retrievalEngineRuntimeSelectorFile));
+}
+if (
+  !hasPattern(
+    prismaRetrievalRuntimeSelectorFile,
+    /export const prismaRetrievalRuntimeMetadata/,
+  ) ||
+  !hasPattern(
+    prismaRetrievalRuntimeSelectorFile,
+    /export function getPrismaRetrievalRuntimeMetadata/,
+  )
+) {
+  selectorObservabilityMissingFiles.push(rel(prismaRetrievalRuntimeSelectorFile));
+}
+if (
+  !hasPattern(
+    vectorEmbeddingRuntimeSelectorFile,
+    /export const vectorEmbeddingRuntimeMetadata/,
+  ) ||
+  !hasPattern(
+    vectorEmbeddingRuntimeSelectorFile,
+    /export function getVectorEmbeddingRuntimeMetadata/,
+  )
+) {
+  selectorObservabilityMissingFiles.push(rel(vectorEmbeddingRuntimeSelectorFile));
+}
 const certificationSelectorBypassTargets = [
   "src/tests/certification/wrong-doc.cert.test.ts",
   "src/tests/certification/retrieval-behavioral.cert.test.ts",
@@ -278,10 +416,10 @@ for (const entry of legacyRetrievalFiles) {
 }
 const legacyAllowlist = loadLegacyAllowlist();
 const allowlistedLegacyRetrievalUnused = legacyRetrievalUnused.filter((file) =>
-  legacyAllowlist.has(file),
+  legacyAllowlist.files.has(file),
 );
 const unresolvedLegacyRetrievalUnused = legacyRetrievalUnused.filter(
-  (file) => !legacyAllowlist.has(file),
+  (file) => !legacyAllowlist.files.has(file),
 );
 
 const centralizationOk =
@@ -407,6 +545,11 @@ if (runtimeSelectorBypassFiles.length > 0) {
     `[retrieval-audit] FAIL runtime selector bypass imports: ${runtimeSelectorBypassFiles.join(", ")}`,
   );
 }
+if (selectorObservabilityMissingFiles.length > 0) {
+  lines.push(
+    `[retrieval-audit] FAIL runtime selector observability contract missing: ${selectorObservabilityMissingFiles.join(", ")}`,
+  );
+}
 if (certificationSelectorBypassFiles.length > 0) {
   lines.push(
     `[retrieval-audit] FAIL certification selector bypass imports: ${certificationSelectorBypassFiles.join(", ")}`,
@@ -432,6 +575,20 @@ if (allowlistedLegacyRetrievalUnused.length > 0) {
     `[retrieval-audit] WARN allowlisted unused legacy retrieval services: ${allowlistedLegacyRetrievalUnused.join(", ")}`,
   );
 }
+if (legacyAllowlist.malformedEntries.length > 0) {
+  lines.push(
+    `[retrieval-audit] FAIL malformed legacy allowlist entries: ${legacyAllowlist.malformedEntries
+      .map((entry) => `${entry.lineNumber}:${entry.reason}`)
+      .join(", ")}`,
+  );
+}
+if (legacyAllowlist.expiredEntries.length > 0) {
+  lines.push(
+    `[retrieval-audit] FAIL expired legacy allowlist waivers: ${legacyAllowlist.expiredEntries
+      .map((entry) => `${entry.lineNumber}:${entry.reason}`)
+      .join(", ")}`,
+  );
+}
 if (unresolvedLegacyRetrievalUnused.length > 0) {
   lines.push(
     `[retrieval-audit] FAIL unresolved unused legacy retrieval services: ${unresolvedLegacyRetrievalUnused.join(", ")}`,
@@ -448,12 +605,15 @@ const strictFail =
   legacyRuntimeImportLeakFiles.length > 0 ||
   !runtimeEntryWiringOk ||
   runtimeSelectorBypassFiles.length > 0 ||
+  selectorObservabilityMissingFiles.length > 0 ||
   certificationSelectorBypassFiles.length > 0 ||
   !configIntegrityOk ||
   !deployReadinessOk ||
   !evidenceGateEnforced ||
   !failClosedRequiredBanks ||
   !retrievalPhaseCountersAccurate ||
+  legacyAllowlist.malformedEntries.length > 0 ||
+  legacyAllowlist.expiredEntries.length > 0 ||
   unresolvedLegacyRetrievalUnused.length > 0;
 
 if (STRICT && strictFail) {

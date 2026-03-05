@@ -163,4 +163,39 @@ describe("patternDeterminism", () => {
       expect(rowCount).toBeGreaterThan(0);
     });
   }
+
+  test("ui receipt mappings keep stable required field signature per operator+intent+mode", () => {
+    const filePath = path.join(
+      DATA_BANKS_ROOT,
+      "patterns",
+      "ui",
+      "receipt_shapes.any.json",
+    );
+    expect(fs.existsSync(filePath)).toBe(true);
+    const bank = readJson(filePath);
+    const rows = Array.isArray(bank.mappings) ? bank.mappings : [];
+    const byKey = new Map<string, Set<string>>();
+
+    for (const row of rows) {
+      const operator = String(row.operator || "").trim().toLowerCase();
+      const intent = String(row.intent || "").trim().toLowerCase();
+      const mode = String(row.mode || "").trim().toLowerCase();
+      const key = `${operator}|${intent}|${mode}`;
+      const required = Array.isArray((row.contract as Record<string, unknown> | undefined)?.requiredEnvelopeFields)
+        ? ((row.contract as Record<string, unknown>).requiredEnvelopeFields as unknown[])
+            .map((value) => String(value || "").trim().toLowerCase())
+            .filter(Boolean)
+            .sort((a, b) => a.localeCompare(b))
+        : [];
+      const signature = required.join(",");
+      if (!byKey.has(key)) byKey.set(key, new Set<string>());
+      byKey.get(key)?.add(signature);
+    }
+
+    const conflicts = Array.from(byKey.entries())
+      .filter(([, signatures]) => signatures.size > 1)
+      .map(([key]) => key)
+      .sort((a, b) => a.localeCompare(b));
+    expect(conflicts).toEqual([]);
+  });
 });

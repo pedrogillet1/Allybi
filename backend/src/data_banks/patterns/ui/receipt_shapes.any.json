@@ -22,6 +22,7 @@
   },
   "config": {
     "enabled": true,
+    "strictEnvelopeEnforcement": true,
     "deterministic": true,
     "dedupe": true,
     "sortBy": "id",

@@ -138,13 +138,37 @@ export const UIContractsSchema = z.object({
   config: z.object({
     enabled: z.boolean().optional(),
     applyStage: z.string().optional(),
+    contracts: z.object({
+      nav_pills: z.object({
+        maxIntroSentences: z.number().optional(),
+        maxIntroChars: z.number().optional(),
+        noSourcesHeader: z.boolean().optional(),
+        noInlineCitations: z.boolean().optional(),
+        disallowedTextPatterns: z.array(z.string()).optional(),
+        allowedOutputShapes: z.array(z.string()).optional(),
+        allowedAttachments: z.array(z.string()).optional(),
+        disallowedAttachments: z.array(z.string()).optional(),
+        suppressActions: z.boolean().optional(),
+      }).passthrough().optional(),
+      doc_grounded: z.object({}).passthrough().optional(),
+      conversation: z.object({}).passthrough().optional(),
+    }).passthrough().optional(),
     actionsContract: z.object({
+      combination: z.object({
+        multipleMatches: z.string().optional(),
+        hardBlockIsTerminal: z.boolean().optional(),
+      }).passthrough().optional(),
+      conflictResolution: z.object({
+        ifActionsAndNoToolExecution: z.string().optional(),
+        ifMultipleViolations: z.string().optional(),
+      }).passthrough().optional(),
       thresholds: z.object({
         maxIntroSentencesNavPills: z.number().optional(),
         maxClarificationQuestions: z.number().optional(),
       }).passthrough().optional(),
     }).passthrough().optional(),
   }).passthrough().optional(),
+  // Legacy shape support. Runtime should prefer config.contracts.
   contracts: z.object({
     nav_pills: z.object({
       maxIntroSentences: z.number().optional(),
@@ -152,6 +176,10 @@ export const UIContractsSchema = z.object({
       noSourcesHeader: z.boolean().optional(),
       noInlineCitations: z.boolean().optional(),
       disallowedTextPatterns: z.array(z.string()).optional(),
+      allowedOutputShapes: z.array(z.string()).optional(),
+      allowedAttachments: z.array(z.string()).optional(),
+      disallowedAttachments: z.array(z.string()).optional(),
+      suppressActions: z.boolean().optional(),
     }).passthrough().optional(),
     doc_grounded: z.object({}).passthrough().optional(),
     conversation: z.object({}).passthrough().optional(),
@@ -167,6 +195,40 @@ export const UIContractsSchema = z.object({
         contract: z.string().optional(),
         stripDisallowedTextPatterns: z.boolean().optional(),
         suppressActions: z.boolean().optional(),
+      }).passthrough().optional(),
+    }).passthrough(),
+  ).optional(),
+}).passthrough();
+
+// ui_receipt_shapes — used by receipt envelope contract validation
+export const UIReceiptShapesSchema = z.object({
+  _meta: z.object({
+    id: z.string(),
+    version: z.string().optional(),
+    owner: z.string().optional(),
+    lastUpdated: z.string().optional(),
+    reviewCadenceDays: z.number().optional(),
+    criticality: z.string().optional(),
+  }).passthrough(),
+  config: z.object({
+    enabled: z.boolean().optional(),
+    strictEnvelopeEnforcement: z.boolean().optional(),
+    deterministic: z.boolean().optional(),
+    dedupe: z.boolean().optional(),
+    sortBy: z.string().optional(),
+    minMappings: z.number().optional(),
+    maxMappings: z.number().optional(),
+  }).passthrough().optional(),
+  mappings: z.array(
+    z.object({
+      id: z.string().optional(),
+      domain: z.string().optional(),
+      operator: z.string().optional(),
+      intent: z.string().optional(),
+      mode: z.string().optional(),
+      priority: z.number().optional(),
+      contract: z.object({
+        requiredEnvelopeFields: z.array(z.string()).optional(),
       }).passthrough().optional(),
     }).passthrough(),
   ).optional(),
@@ -190,5 +252,6 @@ export const BANK_SCHEMAS: Record<string, z.ZodType> = {
   intent_patterns: IntentPatternsSchema,
   bank_registry: BankRegistrySchema,
   ui_contracts: UIContractsSchema,
+  ui_receipt_shapes: UIReceiptShapesSchema,
   fallback_policy: FallbackPolicySchema,
 };

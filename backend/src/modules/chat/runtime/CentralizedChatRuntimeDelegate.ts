@@ -4126,6 +4126,13 @@ export class CentralizedChatRuntimeDelegate {
       const reqSignals = asObject(
         (params.req.context as Record<string, unknown> | null)?.signals ?? null,
       );
+      const retrievalSummary = asObject(
+        asObject(asObject(params.retrievalPack).telemetry).summary,
+      );
+      const classifiedDomain =
+        String(retrievalSummary.classifiedDomain || "")
+          .trim()
+          .toLowerCase() || null;
       const styleSignals = this.buildFormattingStyleSignals(
         params.req,
         params.answerMode,
@@ -4142,7 +4149,25 @@ export class CentralizedChatRuntimeDelegate {
         ...reqSignals,
         ...(styleSignals || {}),
         ...(operatorFamily ? { operatorFamily } : {}),
+        ...(classifiedDomain ? { classifiedDomain } : {}),
       };
+      const reqMeta = asObject(params.req.meta);
+      const reqContext = asObject(params.req.context);
+      const metaEnvelope = asObject(reqMeta.uiEnvelope);
+      const contextEnvelope = asObject(reqContext.uiEnvelope);
+      const signalEnvelope = asObject(reqSignals.uiEnvelope);
+      const uiEnvelope =
+        Object.keys(metaEnvelope).length > 0
+          ? metaEnvelope
+          : Object.keys(contextEnvelope).length > 0
+            ? contextEnvelope
+            : signalEnvelope;
+      const receipts = Array.isArray(uiEnvelope.receipts)
+        ? uiEnvelope.receipts
+        : undefined;
+      const renderPlan = asObject(uiEnvelope.renderPlan);
+      const editPlan = asObject(uiEnvelope.editPlan);
+      const undoToken = String(uiEnvelope.undoToken || "").trim() || undefined;
       const enforcerCtx: ResponseContractContext = {
         answerMode: params.answerMode,
         language: normalizeChatLanguage(params.req.preferredLanguage),
@@ -4170,7 +4195,14 @@ export class CentralizedChatRuntimeDelegate {
         },
       };
       const enforced = enforcer.enforce(
-        { content: text, attachments: [] },
+        {
+          content: text,
+          attachments: [],
+          ...(receipts ? { receipts } : {}),
+          ...(Object.keys(renderPlan).length > 0 ? { renderPlan } : {}),
+          ...(Object.keys(editPlan).length > 0 ? { editPlan } : {}),
+          ...(undoToken ? { undoToken } : {}),
+        },
         enforcerCtx,
       );
       if (enforced.enforcement.provenance) {

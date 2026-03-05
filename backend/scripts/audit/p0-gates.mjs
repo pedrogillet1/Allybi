@@ -4,14 +4,27 @@ import fs from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { resolveCommitHash } from "../certification/git-commit.mjs";
+import {
+  requireLiveRuntimeGraphEvidence,
+  resolveCertificationProfileFromArgs,
+} from "../certification/certification-policy.mjs";
 
 const strict =
   process.argv.includes("--strict") ||
   process.argv.includes("--mode=strict") ||
   (process.argv.includes("--mode") && process.argv.includes("strict"));
-const autoRefresh =
-  !process.argv.includes("--no-auto-refresh") &&
-  !process.argv.includes("--no-refresh-missing");
+const repairMode =
+  process.argv.includes("--repair") ||
+  process.argv.includes("--mode=repair");
+const verifyOnly =
+  process.argv.includes("--verify-only") ||
+  process.argv.includes("--mode=verify");
+const autoRefresh = repairMode
+  ? true
+  : !strict &&
+    !verifyOnly &&
+    !process.argv.includes("--no-auto-refresh") &&
+    !process.argv.includes("--no-refresh-missing");
 
 const ROOT = process.cwd();
 const gatesDir = path.resolve(ROOT, "reports/cert/gates");
@@ -22,22 +35,6 @@ const maxAgeHours = Number(
 const maxAgeMs = Number.isFinite(maxAgeHours) && maxAgeHours > 0
   ? maxAgeHours * 60 * 60 * 1000
   : 24 * 60 * 60 * 1000;
-
-function requireLiveRuntimeGraphEvidence() {
-  const override = String(process.env.CERT_REQUIRE_RUNTIME_GRAPH_LIVE || "")
-    .trim()
-    .toLowerCase();
-  if (override === "1" || override === "true") return true;
-  if (override === "0" || override === "false") return false;
-  const ciFlags = [
-    process.env.CI,
-    process.env.GITHUB_ACTIONS,
-    process.env.BUILD_BUILDID,
-  ]
-    .map((value) => String(value || "").trim().toLowerCase())
-    .filter(Boolean);
-  return ciFlags.some((value) => value === "1" || value === "true");
-}
 
 const GATE_GENERATORS = {
   "wrong-doc": "test:cert:wrong-doc",
@@ -199,6 +196,7 @@ function main() {
   const failures = [];
   const checks = [];
   const regenerated = [];
+  const profile = resolveCertificationProfileFromArgs({ args: process.argv });
   const commitMetadata = currentCommitHash();
   const commitHash = commitMetadata.commitHash;
   verifyRuntimeWiringContract(failures);
@@ -377,7 +375,7 @@ function main() {
       failures.push("P0-9_RUNTIME_WIRING_COMMAND_STATUS_NON_ZERO");
     }
     if (strict) {
-      const needsLive = requireLiveRuntimeGraphEvidence();
+      const needsLive = requireLiveRuntimeGraphEvidence({ profile, strict });
       const valid =
         commandMode === "live" ||
         (!needsLive && commandMode === "cached");
@@ -413,9 +411,23 @@ function main() {
     failures.push("P0-11_MODEL_GOVERNANCE_STRICT_FAILED");
   }
 
+  const modelsConsistencyPassed = runScript("audit:models:consistency", commitHash);
+  checks.push({
+    gateId: "models-consistency",
+    passed: modelsConsistencyPassed,
+    metrics: {},
+    freshness: { stale: false, reasons: [] },
+  });
+  if (!modelsConsistencyPassed) {
+    failures.push("P0-12_MODEL_GOVERNANCE_CONSISTENCY_FAILED");
+  }
+
   const summary = {
     generatedAt: new Date().toISOString(),
     strict,
+    profile,
+    mode: repairMode ? "repair" : "verify",
+    verifyOnly: verifyOnly || !repairMode,
     autoRefresh,
     commitHash,
     commitHashSource: commitMetadata.source,

@@ -32,7 +32,11 @@
 //   (let fallback engine decide the microcopy).
 
 import type { Attachment } from "../../../types/handlerResult.types";
-import { getBank, getOptionalBank } from "../banks/bankLoader.service";
+import { getBank, getOptionalBank, getTypedBank } from "../banks/bankLoader.service";
+import {
+  UIContractsSchema,
+  UIReceiptShapesSchema,
+} from "../banks/bankSchemas";
 import type { ChatProvenanceDTO } from "../../../modules/chat/domain/chat.contracts";
 import { validateChatProvenance } from "../../../modules/chat/runtime/provenance/ProvenanceValidator";
 import {
@@ -125,6 +129,8 @@ export interface DraftResponse {
   attachments?: Attachment[];
   receipts?: unknown[];
   renderPlan?: Record<string, unknown> | null;
+  editPlan?: Record<string, unknown> | null;
+  undoToken?: string | null;
 }
 
 export interface EnforcedResponse {
@@ -184,22 +190,36 @@ type UIContractsBank = {
   _meta?: { id?: string; version?: string };
   config?: {
     enabled?: boolean;
+    contracts?: Record<
+      string,
+      {
+        maxIntroSentences?: number;
+        maxIntroChars?: number;
+        noSourcesHeader?: boolean;
+        noInlineCitations?: boolean;
+        disallowedTextPatterns?: string[];
+        allowedOutputShapes?: string[];
+        allowedAttachments?: string[];
+        disallowedAttachments?: string[];
+        suppressActions?: boolean;
+      }
+    >;
     actionsContract?: {
+      combination?: {
+        multipleMatches?: "apply_most_restrictive" | "apply_first_match";
+        hardBlockIsTerminal?: boolean;
+      };
+      conflictResolution?: {
+        ifActionsAndNoToolExecution?: string;
+        ifMultipleViolations?: string;
+      };
       thresholds?: {
         maxIntroSentencesNavPills?: number;
         maxClarificationQuestions?: number;
       };
     };
   };
-  contracts?: {
-    nav_pills?: {
-      maxIntroSentences?: number;
-      maxIntroChars?: number;
-      noSourcesHeader?: boolean;
-      noInlineCitations?: boolean;
-      disallowedTextPatterns?: string[];
-    };
-  };
+  contracts?: Record<string, Record<string, unknown>>;
   rules?: Array<{
     id?: string;
     reasonCode?: string;
@@ -225,9 +245,11 @@ type UiReceiptShapesBank = {
   };
   mappings?: Array<{
     id?: string;
+    domain?: string;
     operator?: string;
     intent?: string;
     mode?: string;
+    priority?: number;
     contract?: {
       requiredEnvelopeFields?: string[];
     };
@@ -1950,6 +1972,56 @@ function getSourceButtonsCount(attachments: Attachment[] = []): number {
   ).length;
 }
 
+function normalizeAttachmentType(value: unknown): string {
+  return String(value || "")
+    .trim()
+    .toLowerCase();
+}
+
+function filterAttachmentsByUiPolicy(
+  attachments: Attachment[],
+  policy: {
+    allowedTypes?: string[];
+    disallowedTypes?: string[];
+    suppressActions?: boolean;
+  },
+): {
+  attachments: Attachment[];
+  removed: number;
+} {
+  const allowed = new Set(
+    (Array.isArray(policy.allowedTypes) ? policy.allowedTypes : [])
+      .map((entry) => normalizeAttachmentType(entry))
+      .filter(Boolean),
+  );
+  const disallowed = new Set(
+    (Array.isArray(policy.disallowedTypes) ? policy.disallowedTypes : [])
+      .map((entry) => normalizeAttachmentType(entry))
+      .filter(Boolean),
+  );
+  if (policy.suppressActions) {
+    disallowed.add("action");
+    disallowed.add("actions");
+  }
+  if (allowed.size < 1 && disallowed.size < 1) {
+    return { attachments, removed: 0 };
+  }
+
+  const filtered = attachments.filter((attachment) => {
+    const payload = asObjectRecord(attachment);
+    if (!payload) return false;
+    const type = normalizeAttachmentType(payload.type);
+    if (!type) return false;
+    if (disallowed.has(type)) return false;
+    if (allowed.size > 0 && !allowed.has(type)) return false;
+    return true;
+  });
+  return {
+    attachments: filtered,
+    removed: Math.max(0, attachments.length - filtered.length),
+  };
+}
+
 function asObjectRecord(value: unknown): Record<string, unknown> | null {
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
   return value as Record<string, unknown>;
@@ -2161,9 +2233,11 @@ export class ResponseContractEnforcerService {
 
   reloadBanks(): void {
     this.renderPolicy = getBank<RenderPolicyBank>("render_policy");
-    this.uiContracts = getBank<UIContractsBank>("ui_contracts");
-    this.uiReceiptShapes =
-      getOptionalBank<UiReceiptShapesBank>("ui_receipt_shapes") || undefined;
+    this.uiContracts = getTypedBank("ui_contracts", UIContractsSchema) as UIContractsBank;
+    const uiReceiptRaw = getOptionalBank<unknown>("ui_receipt_shapes");
+    this.uiReceiptShapes = uiReceiptRaw
+      ? (UIReceiptShapesSchema.parse(uiReceiptRaw) as UiReceiptShapesBank)
+      : undefined;
     this.bannedPhrases = getBank<BannedPhrasesBank>("banned_phrases");
     this.truncation = getBank<TruncationLimitsBank>("truncation_and_limits");
     this.bulletRules = getBank<BulletRulesBank>("bullet_rules");
@@ -2317,7 +2391,7 @@ export class ResponseContractEnforcerService {
   ): EnforcedResponse {
     const repairs: string[] = [];
     const warnings: string[] = [];
-    const attachments: Attachment[] = Array.isArray(draft.attachments)
+    let attachments: Attachment[] = Array.isArray(draft.attachments)
       ? draft.attachments
       : [];
     let content = draft.content || "";
@@ -2387,8 +2461,19 @@ export class ResponseContractEnforcerService {
       content,
     });
     const resolvedUiDecision = uiDecision;
+    if (resolvedUiDecision.warnings.length > 0) {
+      warnings.push(...resolvedUiDecision.warnings);
+    }
     const uiReceiptValidation = this.uiReceiptValidator.validate({
       bank: this.uiReceiptShapes,
+      domain:
+        String(
+          (ctx.signals as Record<string, unknown> | null)?.classifiedDomain ||
+            (ctx.signals as Record<string, unknown> | null)?.domain ||
+            "",
+        )
+          .trim()
+          .toLowerCase() || undefined,
       operator: ctx.operator,
       intentFamily: ctx.intentFamily,
       answerMode: String(ctx.answerMode || ""),
@@ -2398,6 +2483,8 @@ export class ResponseContractEnforcerService {
       draft: {
         receipts: draft.receipts,
         renderPlan: draft.renderPlan || undefined,
+        editPlan: draft.editPlan || undefined,
+        undoToken: draft.undoToken || undefined,
       },
     });
     if (uiReceiptValidation.matchedMappingId) {
@@ -2452,6 +2539,18 @@ export class ResponseContractEnforcerService {
         repairs.push("UI_ACTION_LANGUAGE_SUPPRESSED");
         content = suppressed.text;
       }
+    }
+    const attachmentPolicyApplied = filterAttachmentsByUiPolicy(attachments, {
+      allowedTypes: resolvedUiDecision.attachmentPolicy.allowedTypes,
+      disallowedTypes: resolvedUiDecision.attachmentPolicy.disallowedTypes,
+      suppressActions: resolvedUiDecision.attachmentPolicy.suppressActions,
+    });
+    if (attachmentPolicyApplied.removed > 0) {
+      repairs.push("UI_CONTRACT_ATTACHMENTS_FILTERED");
+      warnings.push(
+        `UI_CONTRACT_ATTACHMENTS_REMOVED:${attachmentPolicyApplied.removed}`,
+      );
+      attachments = attachmentPolicyApplied.attachments;
     }
 
     // 1) nav_pills contract

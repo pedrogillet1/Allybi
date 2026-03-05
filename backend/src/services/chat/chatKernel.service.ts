@@ -43,6 +43,18 @@ export class ChatKernelService {
     return null;
   }
 
+  private parseRoutingFollowupReasonCodes(notes: string[] | undefined): string[] {
+    if (!Array.isArray(notes)) return [];
+    const codes = new Set<string>();
+    for (const note of notes) {
+      const value = String(note || "").trim();
+      if (!value.startsWith("routing:followup_reason:")) continue;
+      const code = value.slice("routing:followup_reason:".length).trim();
+      if (code) codes.add(code);
+    }
+    return Array.from(codes).slice(0, 6);
+  }
+
   private sanitizeRoutingNotes(notes: string[] | undefined): string[] {
     if (!Array.isArray(notes)) return [];
     return notes
@@ -77,6 +89,9 @@ export class ChatKernelService {
       domainId: intentDecision.domainId,
       confidence: Math.max(0, Math.min(1, Number(intentDecision.confidence || 0))),
       followupSource: this.parseRoutingFollowupSource(intentDecision.decisionNotes),
+      followupReasonCodes: this.parseRoutingFollowupReasonCodes(
+        intentDecision.decisionNotes,
+      ),
       notes: this.sanitizeRoutingNotes(intentDecision.decisionNotes),
     };
 

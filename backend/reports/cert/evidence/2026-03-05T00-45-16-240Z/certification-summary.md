@@ -1,17 +1,17 @@
 # Certification Summary
 
-- Generated: 2026-03-05T00:50:01.712Z
+- Generated: 2026-03-05T00:42:06.382Z
 - Strict mode: yes
 - Certification profile: local
 - Auto refresh: yes
 - Commit hash: bbfb60c03cc6dcc8a0b80a9bfaf903e87bd7d140
 - Commit hash source: git-files
-- Lineage run id: cert_2026-03-05T00-50-01-712Z
+- Lineage run id: cert_2026-03-05T00-42-06-382Z
 - Lineage dataset id: none
 - Lineage profile: local
 - Passed: yes
 - Passed gates: 23/23
-- Local cert run: fail (recent, ageHours=2.67)
+- Local cert run: fail (recent, ageHours=2.59)
 - Optional gate skipped: query-latency (missing_per_query_report)
 
 | Gate | Criticality | Passed | Fresh | Failures |

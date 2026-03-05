@@ -1,18 +1,17 @@
 # Certification Summary
 
-- Generated: 2026-03-05T00:50:01.712Z
+- Generated: 2026-03-05T00:33:52.650Z
 - Strict mode: yes
 - Certification profile: local
 - Auto refresh: yes
-- Commit hash: bbfb60c03cc6dcc8a0b80a9bfaf903e87bd7d140
+- Commit hash: 403079f11ef5a5d660b72fd6808834a05f027aaf
 - Commit hash source: git-files
-- Lineage run id: cert_2026-03-05T00-50-01-712Z
+- Lineage run id: cert_2026-03-05T00-33-52-650Z
 - Lineage dataset id: none
 - Lineage profile: local
-- Passed: yes
-- Passed gates: 23/23
-- Local cert run: fail (recent, ageHours=2.67)
-- Optional gate skipped: query-latency (missing_per_query_report)
+- Passed: no
+- Passed gates: 23/24
+- Local cert run: fail (recent, ageHours=2.46)
 
 | Gate | Criticality | Passed | Fresh | Failures |
 |---|---|---:|---:|---:|
@@ -39,6 +38,7 @@
 | security-auth | required | yes | yes | 0 |
 | observability-integrity | required | yes | yes | 0 |
 | retrieval-behavioral | required | yes | yes | 0 |
+| query-latency | required | no | yes | 1 |
 
 ## wrong-doc
 - Passed: yes
@@ -177,4 +177,10 @@
 - Freshness: fresh
 - Failures: none
 - Metrics: `{"totalCases":120,"wrongDocCount":0,"wrongDocRate":0,"missCount":0,"missRate":0,"passCount":120,"passRate":1}`
+
+## query-latency
+- Passed: no
+- Freshness: fresh
+- Failures: MISSING_PER_QUERY_REPORT
+- Metrics: `{}`
 

@@ -473,6 +473,7 @@ export class TurnRouterService {
       locale,
     );
     if (overlayPatterns.length === 0) {
+      const reasonCode = `followup_overlay_patterns_missing_${locale}`;
       if (!TurnRouterService._followupMisconfigWarned) {
         TurnRouterService._followupMisconfigWarned = true;
         console.warn("[turn-router] followup detection disabled: overlayPatterns is empty for locale", locale);
@@ -481,7 +482,7 @@ export class TurnRouterService {
         isFollowup: false,
         confidence: null,
         source: "none",
-        reasonCodes: [],
+        reasonCodes: ["followup_overlay_patterns_missing", reasonCode],
       };
     }
     const matched = this.regexMatchesAny(normalized, overlayPatterns);
@@ -630,7 +631,17 @@ export class TurnRouterService {
             item.source,
           ),
       )
-      .sort((a, b) => followupSourceRank(a.source) - followupSourceRank(b.source));
+      .sort((a, b) => {
+        const rankDelta = followupSourceRank(a.source) - followupSourceRank(b.source);
+        if (rankDelta !== 0) return rankDelta;
+        const reasonDelta = b.reasonCodes.length - a.reasonCodes.length;
+        if (reasonDelta !== 0) return reasonDelta;
+        const confidenceA =
+          typeof a.confidence === "number" ? a.confidence : Number.NEGATIVE_INFINITY;
+        const confidenceB =
+          typeof b.confidence === "number" ? b.confidence : Number.NEGATIVE_INFINITY;
+        return confidenceB - confidenceA;
+      });
     if (ranked.length > 0) return ranked[0];
     return {
       isFollowup: false,

@@ -15,6 +15,9 @@
 ## SLO Targets
 - `routing-behavioral.passed` must be `true`.
 - `followup-source-coverage.metrics.coveredSourceCount` must be `4`.
+- `followup-source-coverage.metrics.followupPrecision` must meet `thresholds.minFollowupPrecision`.
+- `followup-source-coverage.metrics.followupRecall` must meet `thresholds.minFollowupRecall`.
+- `followup-source-coverage.metrics.followupFalsePositiveRate` must be <= `thresholds.maxFollowupFalsePositiveRate`.
 - `routing-precedence-parity.passed` must be `true`.
 - `runtime-wiring.metrics.commandMode`:
   - CI/release: must be `live`.
@@ -28,12 +31,14 @@ npm run audit:routing:slo:strict
 
 ## Triage Steps
 1. Open `reports/cert/routing-quality-slo.json` and identify failing checks.
-2. For follow-up source failures:
+2. Ensure canonical gate file exists:
+   - `reports/cert/gates/routing-behavioral.json`
+3. For follow-up source failures:
    - Validate `overlays/followup_indicators.any.json` locale coverage.
    - Validate `routing/intent_patterns.any.json` `overlays.followupIndicators`.
-3. For precedence failures:
+4. For precedence failures:
    - Compare runtime behavior with `src/services/chat/routingPrecedence.contract.ts`.
-4. For runtime graph evidence failures:
+5. For runtime graph evidence failures:
    - Regenerate with `npm run audit:runtime-graph`.
    - Confirm `runtime-wiring` gate reports `commandMode: live` in CI.
 

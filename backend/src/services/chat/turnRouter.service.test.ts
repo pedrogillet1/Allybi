@@ -636,6 +636,49 @@ describe("TurnRouterService.decide()", () => {
     expect(out.intentDecision?.decisionNotes).toContain("routing:locale:en");
   });
 
+  test("emits structured followup degradation reason when overlay patterns are missing", () => {
+    const routePolicy = {
+      isConnectorTurn: jest.fn<() => boolean>().mockReturnValue(false),
+    };
+    const intentConfig = {
+      decide: jest.fn(() => makeDecisionOutput("documents")),
+    };
+    const router = new TurnRouterService(
+      routePolicy,
+      intentConfig as any,
+      (() => null) as any,
+      ((bankId: string) => {
+        if (bankId === "followup_indicators") {
+          return { config: { enabled: false }, rules: [] };
+        }
+        if (bankId === "intent_patterns") {
+          return {
+            config: { enabled: true, matching: {} },
+            overlays: { followupIndicators: { en: [] } },
+            operators: {},
+          };
+        }
+        return null;
+      }) as any,
+    );
+
+    const out = router.decideWithIntent(
+      makeCtx({
+        messageText: "and also this one",
+      }),
+    );
+
+    expect(out.intentDecision?.decisionNotes).toContain(
+      "routing:followup_source:none",
+    );
+    expect(out.intentDecision?.decisionNotes).toContain(
+      "routing:followup_reason:followup_overlay_patterns_missing",
+    );
+    expect(out.intentDecision?.decisionNotes).toContain(
+      "routing:followup_reason:followup_overlay_patterns_missing_en",
+    );
+  });
+
   test("does not mark generic 'file' wording as explicit document reference", () => {
     const routePolicy = {
       isConnectorTurn: jest.fn<() => boolean>().mockReturnValue(false),

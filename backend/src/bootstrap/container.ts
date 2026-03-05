@@ -141,6 +141,7 @@ class KodaV3Container {
               wiring.legacyChatRuntimeImports,
               wiring.dormantCoreRoutingImports,
               wiring.turnRoutePolicyDynamicFallback,
+              wiring.followupOverlayCoverageGaps,
             ];
             const hasCriticalIssue = criticalFields.some(
               (arr) => arr && arr.length > 0,
@@ -162,6 +163,7 @@ class KodaV3Container {
               dormantCoreRoutingImports: wiring.dormantCoreRoutingImports,
               turnRoutePolicyDynamicFallback:
                 wiring.turnRoutePolicyDynamicFallback,
+              followupOverlayCoverageGaps: wiring.followupOverlayCoverageGaps,
             };
             if (strict && hasCriticalIssue) {
               throw new Error(

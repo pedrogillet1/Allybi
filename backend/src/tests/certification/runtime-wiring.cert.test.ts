@@ -69,12 +69,22 @@ function isCiRuntime(): boolean {
   return flags.some((value) => value === "1" || value === "true");
 }
 
+function resolveCertificationProfile(): "local" | "ci" | "release" {
+  const raw = String(process.env.CERT_PROFILE || "")
+    .trim()
+    .toLowerCase();
+  if (raw === "ci" || raw === "release" || raw === "local") return raw;
+  return "local";
+}
+
 function requireLiveRuntimeGraphEvidence(): boolean {
   const override = String(process.env.CERT_REQUIRE_RUNTIME_GRAPH_LIVE || "")
     .trim()
     .toLowerCase();
   if (override === "1" || override === "true") return true;
   if (override === "0" || override === "false") return false;
+  const profile = resolveCertificationProfile();
+  if (profile === "ci" || profile === "release") return true;
   return isCiRuntime();
 }
 

@@ -199,4 +199,49 @@ describe("ChatKernelService intent metadata propagation", () => {
       }),
     );
   });
+
+  test("extracts structured followup source and reason codes into routingDecision metadata", async () => {
+    const executor = {
+      chat: jest.fn(async () => makeResult()),
+      streamChat: jest.fn(async () => makeResult()),
+    };
+    const kernel = new ChatKernelService(executor);
+    (kernel as any).router = {
+      decideWithIntent: () => ({
+        route: "KNOWLEDGE",
+        intentDecision: {
+          intentId: "documents",
+          intentFamily: "documents",
+          operatorId: "extract",
+          domainId: "finance",
+          confidence: 0.9,
+          decisionNotes: [
+            "routing:followup_source:none",
+            "routing:followup_reason:followup_overlay_patterns_missing",
+            "routing:followup_reason:followup_overlay_patterns_missing_en",
+          ],
+          persistable: {
+            intentId: "documents",
+            operatorId: "extract",
+            intentFamily: "documents",
+            domainId: "finance",
+            confidence: 0.9,
+          },
+        },
+      }),
+    };
+
+    await kernel.handleTurn(makeRequest());
+
+    const forwardedReq = executor.chat.mock.calls[0][0] as ChatRequest;
+    expect((forwardedReq.meta as any)?.routingDecision).toEqual(
+      expect.objectContaining({
+        followupSource: "none",
+        followupReasonCodes: [
+          "followup_overlay_patterns_missing",
+          "followup_overlay_patterns_missing_en",
+        ],
+      }),
+    );
+  });
 });

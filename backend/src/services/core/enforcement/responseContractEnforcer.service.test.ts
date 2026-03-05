@@ -2,11 +2,13 @@ import { beforeEach, describe, expect, jest, test } from "@jest/globals";
 
 const mockGetBank = jest.fn();
 const mockGetOptionalBank = jest.fn();
+const mockGetTypedBank = jest.fn();
 
 jest.mock("../banks/bankLoader.service", () => ({
   __esModule: true,
   getBank: (...args: unknown[]) => mockGetBank(...args),
   getOptionalBank: (...args: unknown[]) => mockGetOptionalBank(...args),
+  getTypedBank: (...args: unknown[]) => mockGetTypedBank(...args),
 }));
 
 function bankById(bankId: string): unknown {
@@ -23,19 +25,22 @@ function bankById(bankId: string): unknown {
         _meta: { id: "ui_contracts", version: "1.0.0" },
         config: {
           enabled: true,
+          contracts: {
+            nav_pills: {
+              maxIntroSentences: 1,
+              maxIntroChars: 40,
+              noSourcesHeader: true,
+              disallowedTextPatterns: ["\\bSources?:\\b"],
+              allowedAttachments: ["source_buttons"],
+              disallowedAttachments: ["actions"],
+              suppressActions: true,
+            },
+          },
           actionsContract: {
             thresholds: {
               maxIntroSentencesNavPills: 1,
               maxClarificationQuestions: 1,
             },
-          },
-        },
-        contracts: {
-          nav_pills: {
-            maxIntroSentences: 1,
-            maxIntroChars: 40,
-            noSourcesHeader: true,
-            disallowedTextPatterns: ["\\bSources?:\\b"],
           },
         },
       };
@@ -165,10 +170,12 @@ describe("ResponseContractEnforcerService nav_pills contract", () => {
   beforeEach(() => {
     mockGetBank.mockReset();
     mockGetOptionalBank.mockReset();
+    mockGetTypedBank.mockReset();
     mockGetBank.mockImplementation((bankId: string) => bankById(bankId));
     mockGetOptionalBank.mockImplementation((bankId: string) =>
       bankById(bankId),
     );
+    mockGetTypedBank.mockImplementation((bankId: string) => bankById(bankId));
   });
 
   test("blocks nav_pills response when source_buttons attachment is missing", async () => {
@@ -223,7 +230,7 @@ describe("ResponseContractEnforcerService nav_pills contract", () => {
   });
 
   test("hard blocks when ui_contract rule with hard_block action matches", async () => {
-    mockGetBank.mockImplementation((bankId: string) => {
+    mockGetTypedBank.mockImplementation((bankId: string) => {
       if (bankId !== "ui_contracts") return bankById(bankId);
       return {
         ...bankById("ui_contracts"),
@@ -261,7 +268,7 @@ describe("ResponseContractEnforcerService nav_pills contract", () => {
   });
 
   test("suppresses action confirmation language when ui_contract rule matches", async () => {
-    mockGetBank.mockImplementation((bankId: string) => {
+    mockGetTypedBank.mockImplementation((bankId: string) => {
       if (bankId !== "ui_contracts") return bankById(bankId);
       return {
         ...bankById("ui_contracts"),
@@ -349,6 +356,109 @@ describe("ResponseContractEnforcerService nav_pills contract", () => {
       value.includes("UI_RECEIPT_MISSING_FIELDS"),
     )).toBe(true);
     expect(out.enforcement.uiReceiptContracts?.mappingId).toBe("RS_OPEN_NAV");
+  });
+
+  test("enforces extended ui_receipt required fields from contract", async () => {
+    mockGetOptionalBank.mockImplementation((bankId: string) => {
+      if (bankId !== "ui_receipt_shapes") return bankById(bankId);
+      return {
+        _meta: { id: "ui_receipt_shapes", version: "1.0.0" },
+        config: { enabled: true },
+        mappings: [
+          {
+            id: "RS_APPLY_EDITOR",
+            operator: "apply",
+            intent: "file_actions",
+            mode: "analysis",
+            contract: {
+              requiredEnvelopeFields: [
+                "receipts",
+                "renderPlan",
+                "editPlan",
+                "undoToken",
+              ],
+            },
+          },
+        ],
+      };
+    });
+    const { ResponseContractEnforcerService } =
+      await import("./responseContractEnforcer.service");
+    const enforcer = new ResponseContractEnforcerService();
+
+    const out = enforcer.enforce(
+      {
+        content: "Applying the change.",
+        attachments: [],
+        receipts: [{ id: "r1" }] as any[],
+        renderPlan: { mode: "editor" },
+      },
+      {
+        answerMode: "doc_grounded_single",
+        language: "en",
+        operator: "apply",
+        intentFamily: "file_actions",
+        signals: { enforceReceiptContracts: true },
+      },
+    );
+
+    expect(out.enforcement.blocked).toBe(true);
+    expect(out.enforcement.reasonCode).toBe("ui_receipt_contract_missing_fields");
+    expect(out.enforcement.warnings.some((value) =>
+      value.includes("editplan") && value.includes("undotoken"),
+    )).toBe(true);
+  });
+
+  test("filters disallowed action attachments from ui contract policy", async () => {
+    mockGetTypedBank.mockImplementation((bankId: string) => {
+      if (bankId !== "ui_contracts") return bankById(bankId);
+      return {
+        ...bankById("ui_contracts"),
+        rules: [
+          {
+            id: "nav_pills_terminal_contract",
+            when: {
+              all: [{ path: "answerMode", op: "eq", value: "nav_pills" }],
+            },
+            triggerPatterns: { en: [".+"] },
+            action: {
+              type: "enforce_ui_contract",
+              contract: "nav_pills",
+              suppressActions: true,
+            },
+          },
+        ],
+      };
+    });
+    const { ResponseContractEnforcerService } =
+      await import("./responseContractEnforcer.service");
+    const enforcer = new ResponseContractEnforcerService();
+
+    const out = enforcer.enforce(
+      {
+        content: "Open the file.",
+        attachments: [
+          {
+            type: "source_buttons",
+            buttons: [{ id: "doc-1", label: "A.pdf" }],
+          } as any,
+          {
+            type: "actions",
+            actions: [{ id: "apply", label: "Apply" }],
+          } as any,
+        ],
+      },
+      {
+        answerMode: "nav_pills",
+        language: "en",
+      },
+    );
+
+    expect(out.enforcement.blocked).toBe(false);
+    expect(out.enforcement.repairs).toContain("UI_CONTRACT_ATTACHMENTS_FILTERED");
+    expect(out.attachments.some((entry) => (entry as any).type === "actions")).toBe(
+      false,
+    );
   });
 
   test("enforces quote output shape from operator contracts in non-nav mode", async () => {

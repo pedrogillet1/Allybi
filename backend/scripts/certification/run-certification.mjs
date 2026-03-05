@@ -5,11 +5,25 @@ import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { resolveCommitHash } from "./git-commit.mjs";
 import { packageCertificationEvidence } from "./package-evidence-bundle.mjs";
+import {
+  requireLiveRuntimeGraphEvidence,
+  resolveCertificationProfileFromArgs,
+  resolveLocalCertRunPolicy,
+  resolveQueryLatencyPolicy,
+} from "./certification-policy.mjs";
 
 const strict = !process.argv.includes("--no-strict");
-const autoRefresh =
-  !process.argv.includes("--no-auto-refresh") &&
-  !process.argv.includes("--no-refresh-missing");
+const repairMode =
+  process.argv.includes("--repair") ||
+  process.argv.includes("--mode=repair");
+const verifyOnly =
+  process.argv.includes("--verify-only") ||
+  process.argv.includes("--mode=verify");
+const autoRefresh = repairMode
+  ? true
+  : !verifyOnly &&
+    !process.argv.includes("--no-auto-refresh") &&
+    !process.argv.includes("--no-refresh-missing");
 
 const ROOT = process.cwd();
 const certRoot = path.resolve(ROOT, "reports/cert");
@@ -21,28 +35,6 @@ const maxAgeHours = Number(process.env.CERT_GATE_MAX_AGE_HOURS || 24);
 const maxAgeMs = Number.isFinite(maxAgeHours) && maxAgeHours > 0
   ? maxAgeHours * 60 * 60 * 1000
   : 24 * 60 * 60 * 1000;
-
-function resolveCertificationProfile() {
-  const raw = String(process.env.CERT_PROFILE || "").trim().toLowerCase();
-  if (raw === "ci" || raw === "release" || raw === "local") return raw;
-  return "local";
-}
-
-function requireLiveRuntimeGraphEvidence() {
-  const override = String(process.env.CERT_REQUIRE_RUNTIME_GRAPH_LIVE || "")
-    .trim()
-    .toLowerCase();
-  if (override === "1" || override === "true") return true;
-  if (override === "0" || override === "false") return false;
-  const ciFlags = [
-    process.env.CI,
-    process.env.GITHUB_ACTIONS,
-    process.env.BUILD_BUILDID,
-  ]
-    .map((value) => String(value || "").trim().toLowerCase())
-    .filter(Boolean);
-  return ciFlags.some((value) => value === "1" || value === "true");
-}
 
 const baseRequiredGates = [
   "wrong-doc",
@@ -203,18 +195,16 @@ function resolvePerQueryReportPath() {
   return null;
 }
 
-function resolveGateSet() {
+function resolveGateSet(profile, hasLatencyInput) {
   const requiredGates = [...baseRequiredGates];
   const optionalGates = ["query-latency"];
   const skippedOptionalGates = [];
-  const forceQueryLatency =
-    String(process.env.CERT_REQUIRE_QUERY_LATENCY || "").trim() === "1" ||
-    String(process.env.CERT_REQUIRE_QUERY_LATENCY || "")
-      .trim()
-      .toLowerCase() === "true";
-  const requiresStrictQueryLatency = strict;
-
-  if (forceQueryLatency || requiresStrictQueryLatency || hasQueryLatencyInput()) {
+  const queryLatencyPolicy = resolveQueryLatencyPolicy({
+    strict,
+    profile,
+    hasLatencyInput,
+  });
+  if (queryLatencyPolicy.required) {
     requiredGates.push("query-latency");
   } else {
     skippedOptionalGates.push({
@@ -224,7 +214,12 @@ function resolveGateSet() {
     });
   }
 
-  return { requiredGates, optionalGates, skippedOptionalGates };
+  return {
+    requiredGates,
+    optionalGates,
+    skippedOptionalGates,
+    queryLatencyPolicy,
+  };
 }
 
 function currentCommitMetadata() {
@@ -329,6 +324,8 @@ function toMarkdown(summary) {
   lines.push(`- Generated: ${summary.generatedAt}`);
   lines.push(`- Strict mode: ${summary.strict ? "yes" : "no"}`);
   lines.push(`- Certification profile: ${summary.profile}`);
+  lines.push(`- Mode: ${summary.mode || "verify"}`);
+  lines.push(`- Verify only: ${summary.verifyOnly ? "yes" : "no"}`);
   lines.push(`- Auto refresh: ${summary.autoRefresh ? "yes" : "no"}`);
   lines.push(`- Commit hash: ${summary.commitHash || "unknown"}`);
   lines.push(`- Commit hash source: ${summary.commitHashSource || "unknown"}`);
@@ -379,8 +376,10 @@ function main() {
   fs.mkdirSync(certRoot, { recursive: true });
   const commitMetadata = currentCommitMetadata();
   const commitHash = commitMetadata.commitHash;
-  const profile = resolveCertificationProfile();
-  const { requiredGates, optionalGates, skippedOptionalGates } = resolveGateSet();
+  const profile = resolveCertificationProfileFromArgs({ args: process.argv });
+  const hasLatencyInput = hasQueryLatencyInput();
+  const { requiredGates, optionalGates, skippedOptionalGates, queryLatencyPolicy } =
+    resolveGateSet(profile, hasLatencyInput);
   const generatedAt = new Date().toISOString();
   const reportPath = resolvePerQueryReportPath();
   const lineage = {
@@ -399,14 +398,7 @@ function main() {
   const failures = [];
   const regenerated = [];
 
-  const hasLatencyInput = hasQueryLatencyInput();
-  const forceQueryLatency =
-    String(process.env.CERT_REQUIRE_QUERY_LATENCY || "").trim() === "1" ||
-    String(process.env.CERT_REQUIRE_QUERY_LATENCY || "")
-      .trim()
-      .toLowerCase() === "true";
-  const strictLatencyRequired =
-    strict && (forceQueryLatency || profile === "ci" || profile === "release");
+  const strictLatencyRequired = strict && queryLatencyPolicy.required;
   if (strictLatencyRequired && !hasLatencyInput) {
     failures.push("MISSING_QUERY_LATENCY_INPUT");
   }
@@ -433,11 +425,13 @@ function main() {
     }
     if (strict && gateId === "runtime-wiring") {
       const commandMode = String(report?.metrics?.commandMode || "").trim();
+      const liveEvidenceRequired = requireLiveRuntimeGraphEvidence({
+        profile,
+        strict,
+      });
       if (
-        (requireLiveRuntimeGraphEvidence() && commandMode !== "live") ||
-        (!requireLiveRuntimeGraphEvidence() &&
-          commandMode !== "live" &&
-          commandMode !== "cached")
+        (liveEvidenceRequired && commandMode !== "live") ||
+        (!liveEvidenceRequired && commandMode !== "live" && commandMode !== "cached")
       ) {
         failures.push(
           `DEGRADED_GATE_EVIDENCE:${gateId}:commandMode_${commandMode || "missing"}`,
@@ -449,14 +443,8 @@ function main() {
   const allowFailedLocalRun =
     String(process.env.CERT_ALLOW_FAILED_LOCAL_RUN || "").trim().toLowerCase() ===
       "true" || process.env.CERT_ALLOW_FAILED_LOCAL_RUN === "1";
-  const localRunHealthOverride = String(
-    process.env.CERT_ENFORCE_LOCAL_CERT_RUN || "",
-  )
-    .trim()
-    .toLowerCase();
-  const enforceLocalRunHealth =
-    localRunHealthOverride === "1" ||
-    localRunHealthOverride === "true";
+  const localRunPolicy = resolveLocalCertRunPolicy({ strict, profile });
+  const enforceLocalRunHealth = localRunPolicy.enforce;
   const localCertRun = analyzeLocalCertRun();
   if (
     strict &&
@@ -474,12 +462,21 @@ function main() {
     generatedAt,
     strict,
     profile,
+    mode: repairMode ? "repair" : "verify",
+    verifyOnly: verifyOnly || !repairMode,
     autoRefresh,
     commitHash,
     commitHashSource: commitMetadata.source,
     lineage,
     maxAgeHours,
     regenerated,
+    policy: {
+      queryLatency: queryLatencyPolicy,
+      localCertRun: localRunPolicy,
+      runtimeGraph: {
+        requireLiveMode: requireLiveRuntimeGraphEvidence({ profile, strict }),
+      },
+    },
     optionalGates,
     skippedOptionalGates,
     localCertRun,
@@ -497,13 +494,19 @@ function main() {
   fs.writeFileSync(tmpMdPath, `${toMarkdown(summary)}\n`, "utf8");
   fs.renameSync(tmpJsonPath, summaryJsonPath);
   fs.renameSync(tmpMdPath, summaryMdPath);
-  const evidenceMetadata = packageCertificationEvidence(ROOT);
+  const evidenceMetadata = verifyOnly
+    ? null
+    : packageCertificationEvidence(ROOT);
 
   console.log(`[certification] summary written: ${summaryJsonPath}`);
   console.log(`[certification] markdown written: ${summaryMdPath}`);
-  console.log(
-    `[certification] evidence bundle: ${evidenceMetadata.bundleDir}`,
-  );
+  if (evidenceMetadata?.bundleDir) {
+    console.log(
+      `[certification] evidence bundle: ${evidenceMetadata.bundleDir}`,
+    );
+  } else {
+    console.log("[certification] evidence bundle: skipped (verify-only mode)");
+  }
   console.log(
     `[certification] passed=${summary.passed} gates=${summary.passedGates}/${summary.totalGates}`,
   );

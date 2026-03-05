@@ -25,6 +25,13 @@ describe("prisma retrieval adapters runtime selector", () => {
 
     const mod = await import("./prismaRetrievalAdapters.runtime.service");
     expect(mod.PrismaRetrievalAdapterFactory).toBe(FactoryV1);
+    expect(mod.prismaRetrievalRuntimeMetadata).toEqual({
+      flag: "RETRIEVAL_V2_PRISMA_ADAPTERS",
+      mode: "v1",
+    });
+    expect(mod.getPrismaRetrievalRuntimeMetadata()).toEqual(
+      mod.prismaRetrievalRuntimeMetadata,
+    );
   });
 
   test("uses v2 adapter factory when flag is enabled", async () => {
@@ -42,5 +49,9 @@ describe("prisma retrieval adapters runtime selector", () => {
 
     const mod = await import("./prismaRetrievalAdapters.runtime.service");
     expect(mod.PrismaRetrievalAdapterFactory).toBe(FactoryV2);
+    expect(mod.prismaRetrievalRuntimeMetadata).toEqual({
+      flag: "RETRIEVAL_V2_PRISMA_ADAPTERS",
+      mode: "v2",
+    });
   });
 });

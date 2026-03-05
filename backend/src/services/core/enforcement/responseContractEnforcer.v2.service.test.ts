@@ -2,11 +2,13 @@ import { beforeEach, describe, expect, jest, test } from "@jest/globals";
 
 const mockGetBank = jest.fn();
 const mockGetOptionalBank = jest.fn();
+const mockGetTypedBank = jest.fn();
 
 jest.mock("../banks/bankLoader.service", () => ({
   __esModule: true,
   getBank: (...args: unknown[]) => mockGetBank(...args),
   getOptionalBank: (...args: unknown[]) => mockGetOptionalBank(...args),
+  getTypedBank: (...args: unknown[]) => mockGetTypedBank(...args),
 }));
 
 function bankById(bankId: string): unknown {
@@ -26,19 +28,22 @@ function bankById(bankId: string): unknown {
         _meta: { id: "ui_contracts", version: "1.0.0" },
         config: {
           enabled: true,
+          contracts: {
+            nav_pills: {
+              maxIntroSentences: 1,
+              maxIntroChars: 40,
+              noSourcesHeader: true,
+              disallowedTextPatterns: ["\\bSources?:\\b"],
+              allowedAttachments: ["source_buttons"],
+              disallowedAttachments: ["actions"],
+              suppressActions: true,
+            },
+          },
           actionsContract: {
             thresholds: {
               maxIntroSentencesNavPills: 1,
               maxClarificationQuestions: 1,
             },
-          },
-        },
-        contracts: {
-          nav_pills: {
-            maxIntroSentences: 1,
-            maxIntroChars: 40,
-            noSourcesHeader: true,
-            disallowedTextPatterns: ["\\bSources?:\\b"],
           },
         },
       };
@@ -83,8 +88,10 @@ describe("ResponseContractEnforcerService v2", () => {
   beforeEach(() => {
     mockGetBank.mockReset();
     mockGetOptionalBank.mockReset();
+    mockGetTypedBank.mockReset();
     mockGetBank.mockImplementation((bankId: string) => bankById(bankId));
     mockGetOptionalBank.mockImplementation((bankId: string) => bankById(bankId));
+    mockGetTypedBank.mockImplementation((bankId: string) => bankById(bankId));
   });
 
   test("blocks nav_pills response when source_buttons attachment is missing", async () => {

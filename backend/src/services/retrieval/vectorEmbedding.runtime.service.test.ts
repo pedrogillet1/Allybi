@@ -24,6 +24,13 @@ describe("vectorEmbedding runtime selector", () => {
 
     const mod = await import("./vectorEmbedding.runtime.service");
     expect((mod.default as any).runtime).toBe("v1");
+    expect(mod.vectorEmbeddingRuntimeMetadata).toEqual({
+      flag: "RETRIEVAL_V2_VECTOR_EMBEDDING",
+      mode: "v1",
+    });
+    expect(mod.getVectorEmbeddingRuntimeMetadata()).toEqual(
+      mod.vectorEmbeddingRuntimeMetadata,
+    );
   });
 
   test("uses v2 implementation when flag is enabled", async () => {
@@ -40,5 +47,9 @@ describe("vectorEmbedding runtime selector", () => {
 
     const mod = await import("./vectorEmbedding.runtime.service");
     expect((mod.default as any).runtime).toBe("v2");
+    expect(mod.vectorEmbeddingRuntimeMetadata).toEqual({
+      flag: "RETRIEVAL_V2_VECTOR_EMBEDDING",
+      mode: "v2",
+    });
   });
 });

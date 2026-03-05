@@ -168,6 +168,10 @@ interface TransportMeta {
   sseTerminalType: string | null;
   requestId: string | null;
   errorBody: string | null;
+  finalText: string | null;
+  finalSources: string[];
+  finalFailureCode: string | null;
+  finalTruncation: string | null;
 }
 
 interface QueryResult {
@@ -226,6 +230,99 @@ interface StreamInterceptState {
   lastRequestId: string | null;
   lastErrorBody: string | null;
   lastSseTerminalType: string | null;
+  lastFinalText: string | null;
+  lastFinalSources: string[];
+  lastFinalFailureCode: string | null;
+  lastFinalTruncation: string | null;
+  lastParsePromise: Promise<void> | null;
+  token: number;
+}
+
+function safeParseJson(raw: string): Record<string, any> | null {
+  try {
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === "object") return parsed;
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+function parseSseBody(rawBody: string): {
+  terminalType: string | null;
+  finalText: string | null;
+  finalSources: string[];
+  finalFailureCode: string | null;
+  finalTruncation: string | null;
+} {
+  const events: Array<Record<string, any>> = [];
+  const lines = String(rawBody || "").split(/\r?\n/);
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+    if (!line || line.startsWith(":")) continue;
+    if (!line.startsWith("data:")) continue;
+    const payload = line.slice(5).trim();
+    if (!payload || payload === "[DONE]") continue;
+    const evt = safeParseJson(payload);
+    if (evt) events.push(evt);
+  }
+
+  let terminalType: string | null = null;
+  let finalText: string | null = null;
+  let finalSources: string[] = [];
+  let finalFailureCode: string | null = null;
+  let finalTruncation: string | null = null;
+
+  for (const evt of events) {
+    const type = String(evt.type || evt.event || "").trim().toLowerCase();
+    if (!type) continue;
+    if (type === "done") terminalType = "done";
+    if (type === "error") {
+      terminalType = "error";
+      continue;
+    }
+    if (type !== "final") continue;
+
+    terminalType = "final";
+    const msg = (evt.message && typeof evt.message === "object")
+      ? evt.message
+      : evt.payload && typeof evt.payload === "object"
+        ? evt.payload
+        : evt;
+    const text = String(
+      msg.text ?? msg.content ?? evt.text ?? evt.content ?? "",
+    ).trim();
+    finalText = text || null;
+    const parsedSources = Array.isArray(msg.sources)
+      ? msg.sources
+      : Array.isArray(evt.sources)
+        ? evt.sources
+        : [];
+    finalSources = parsedSources
+      .map((s: any) => {
+        if (typeof s === "string") return s.trim();
+        if (s && typeof s === "object") {
+          return String(s.label || s.title || s.name || s.documentName || "").trim();
+        }
+        return "";
+      })
+      .filter(Boolean);
+    const failureCode = String(msg.failureCode ?? evt.failureCode ?? "").trim();
+    finalFailureCode = failureCode || null;
+    const truncation = msg.truncation ?? evt.truncation ?? null;
+    finalTruncation =
+      truncation && typeof truncation === "object"
+        ? String(truncation.reason || truncation.code || "truncated").trim()
+        : String(truncation || "").trim() || null;
+  }
+
+  return {
+    terminalType,
+    finalText,
+    finalSources,
+    finalFailureCode,
+    finalTruncation,
+  };
 }
 
 function setupStreamInterceptor(page: Page): StreamInterceptState {
@@ -234,6 +331,12 @@ function setupStreamInterceptor(page: Page): StreamInterceptState {
     lastRequestId: null,
     lastErrorBody: null,
     lastSseTerminalType: null,
+    lastFinalText: null,
+    lastFinalSources: [],
+    lastFinalFailureCode: null,
+    lastFinalTruncation: null,
+    lastParsePromise: null,
+    token: 0,
   };
 
   page.on("response", async (response) => {
@@ -249,33 +352,87 @@ function setupStreamInterceptor(page: Page): StreamInterceptState {
     state.lastHttpStatus = response.status();
     state.lastRequestId = response.request().headers()["x-request-id"] || null;
 
-    if (!response.ok()) {
+    const responseToken = state.token;
+    const parsePromise = (async () => {
       try {
-        state.lastErrorBody = await response.text();
+        const bodyText = await response.text();
+        if (responseToken !== state.token) return;
+
+        if (!response.ok()) {
+          state.lastErrorBody = bodyText || `HTTP ${response.status()} (empty body)`;
+          state.lastSseTerminalType = "http_error";
+          return;
+        }
+
+        state.lastErrorBody = null;
+        const parsed = parseSseBody(bodyText);
+        state.lastSseTerminalType = parsed.terminalType;
+        state.lastFinalText = parsed.finalText;
+        state.lastFinalSources = parsed.finalSources;
+        state.lastFinalFailureCode = parsed.finalFailureCode;
+        state.lastFinalTruncation = parsed.finalTruncation;
       } catch {
-        state.lastErrorBody = `HTTP ${response.status()} (body unreadable)`;
+        if (responseToken === state.token) {
+          state.lastSseTerminalType = "parse_error";
+          if (!state.lastErrorBody) {
+            state.lastErrorBody = `HTTP ${response.status()} (body unreadable)`;
+          }
+        }
       }
-    } else {
-      state.lastErrorBody = null;
+    })();
+
+    state.lastParsePromise = parsePromise;
+    await parsePromise;
+    if (state.lastParsePromise === parsePromise) {
+      state.lastParsePromise = null;
     }
   });
 
   return state;
 }
 
-function resetTransport(state: StreamInterceptState) {
+function resetTransport(state: StreamInterceptState): number {
+  state.token += 1;
   state.lastHttpStatus = null;
   state.lastRequestId = null;
   state.lastErrorBody = null;
   state.lastSseTerminalType = null;
+  state.lastFinalText = null;
+  state.lastFinalSources = [];
+  state.lastFinalFailureCode = null;
+  state.lastFinalTruncation = null;
+  state.lastParsePromise = null;
+  return state.token;
 }
 
-function snapshotTransport(state: StreamInterceptState): TransportMeta {
+async function snapshotTransport(
+  state: StreamInterceptState,
+  token: number,
+): Promise<TransportMeta> {
+  if (state.lastParsePromise) {
+    await state.lastParsePromise.catch(() => {});
+  }
+  if (token !== state.token) {
+    return {
+      httpStatus: null,
+      sseTerminalType: "stale_token",
+      requestId: null,
+      errorBody: "transport token mismatch",
+      finalText: null,
+      finalSources: [],
+      finalFailureCode: null,
+      finalTruncation: null,
+    };
+  }
   return {
     httpStatus: state.lastHttpStatus,
     sseTerminalType: state.lastSseTerminalType,
     requestId: state.lastRequestId,
     errorBody: state.lastErrorBody,
+    finalText: state.lastFinalText,
+    finalSources: state.lastFinalSources,
+    finalFailureCode: state.lastFinalFailureCode,
+    finalTruncation: state.lastFinalTruncation,
   };
 }
 
@@ -474,7 +631,7 @@ async function sendQueryAndCapture(
   transport: StreamInterceptState,
 ): Promise<QueryResult> {
   const start = Date.now();
-  resetTransport(transport);
+  const transportToken = resetTransport(transport);
 
   try {
     // Count existing assistant messages BEFORE sending
@@ -503,29 +660,58 @@ async function sendQueryAndCapture(
     // Extra wait for final DOM updates
     await page.waitForTimeout(1500);
 
-    // Capture response text — target markdown container to avoid UI artifacts
-    const markdownEl = lastMsg.locator('.markdown-preview-container');
-    const contentEl = lastMsg.locator(
-      '[data-testid="assistant-message-content"]',
-    );
+    // Capture response text from authoritative final SSE payload first.
     let responseText = "";
-    if (await markdownEl.isVisible({ timeout: 3000 }).catch(() => false)) {
-      responseText = await markdownEl.evaluate((el) => el.innerText);
-    } else if (await contentEl.isVisible({ timeout: 3000 }).catch(() => false)) {
-      responseText = await contentEl.evaluate((el) => el.innerText);
-    } else {
-      responseText = await lastMsg.evaluate((el) => el.innerText);
+    let sources: string[] = [];
+    let truncation: string | null = null;
+    let failureCode: string | null = null;
+
+    const meta = await snapshotTransport(transport, transportToken);
+    if (meta.finalText) {
+      responseText = meta.finalText.trim();
+    }
+    if (meta.finalSources.length > 0) {
+      sources = meta.finalSources;
+    }
+    if (meta.finalTruncation) {
+      truncation = meta.finalTruncation;
+    }
+    if (meta.finalFailureCode) {
+      failureCode = meta.finalFailureCode;
     }
 
-    // Capture source pills
-    const sourcePills = lastMsg.locator(".koda-source-pill__text");
-    const pillCount = await sourcePills.count();
-    const sources: string[] = [];
-    for (let i = 0; i < pillCount; i++) {
-      const txt = await sourcePills.nth(i).textContent();
-      if (txt) sources.push(txt.trim());
+    // DOM fallback: remove source/followup/action UI nodes before collecting text.
+    const markdownEl = lastMsg.locator('.markdown-preview-container');
+    if (!responseText && await markdownEl.isVisible({ timeout: 3000 }).catch(() => false)) {
+      responseText = await markdownEl.evaluate((el) => el.innerText);
     }
-    if (pillCount === 0) {
+    if (!responseText) {
+      responseText = await lastMsg.evaluate((rootNode) => {
+        const root = rootNode as HTMLElement;
+        const copy = root.cloneNode(true) as HTMLElement;
+        const stripSelectors = [
+          ".koda-source-pill",
+          ".koda-source-pill__text",
+          ".source-pill",
+          ".suggested-questions",
+          ".chat-message-actions",
+          "button",
+        ];
+        for (const sel of stripSelectors) {
+          copy.querySelectorAll(sel).forEach((el) => el.remove());
+        }
+        return (copy.innerText || "").trim();
+      });
+    }
+
+    // Capture source pills only when stream final frame did not provide sources.
+    if (sources.length === 0) {
+      const sourcePills = lastMsg.locator(".koda-source-pill__text");
+      const pillCount = await sourcePills.count();
+      for (let i = 0; i < pillCount; i++) {
+        const txt = await sourcePills.nth(i).textContent();
+        if (txt) sources.push(txt.trim());
+      }
       const altPills = lastMsg.locator(
         ".koda-source-pill, .source-pill, [class*='source']",
       );
@@ -536,22 +722,23 @@ async function sendQueryAndCapture(
       }
     }
 
-    // Capture truncation warning
-    let truncation: string | null = null;
-    const truncEl = lastMsg.locator('span:has-text("truncated")');
-    if (await truncEl.isVisible({ timeout: 500 }).catch(() => false)) {
-      truncation = (await truncEl.textContent()) || "truncated";
+    // Capture truncation warning only when not in final payload.
+    if (!truncation) {
+      const truncEl = lastMsg.locator('span:has-text("truncated")');
+      if (await truncEl.isVisible({ timeout: 500 }).catch(() => false)) {
+        truncation = (await truncEl.textContent()) || "truncated";
+      }
     }
 
-    // Capture failure code
-    let failureCode: string | null = null;
-    const failEl = lastMsg.locator('span:has-text("Warning:")');
-    if (await failEl.isVisible({ timeout: 500 }).catch(() => false)) {
-      failureCode = (await failEl.textContent()) || "unknown";
+    // Capture failure code only when not in final payload.
+    if (!failureCode) {
+      const failEl = lastMsg.locator('span:has-text("Warning:")');
+      if (await failEl.isVisible({ timeout: 500 }).catch(() => false)) {
+        failureCode = (await failEl.textContent()) || "unknown";
+      }
     }
 
     const durationMs = Date.now() - start;
-    const meta = snapshotTransport(transport);
 
     // ── STATUS CLASSIFICATION (Phase 1.3) ──
     // Never mark as "ok" if there are transport or content error signals
@@ -561,9 +748,10 @@ async function sendQueryAndCapture(
     const isHttpError = meta.httpStatus !== null && meta.httpStatus >= 400;
     const isContentError = failureCode !== null;
     const isEmptyResponse = responseText.trim().length === 0;
+    const isSseError = meta.sseTerminalType === "error" || meta.sseTerminalType === "http_error";
 
     let status: "ok" | "error" | "timeout" = "ok";
-    if (isGenericError || isHttpError || isContentError || isEmptyResponse) {
+    if (isGenericError || isHttpError || isContentError || isEmptyResponse || isSseError) {
       status = "error";
     }
 
@@ -591,7 +779,7 @@ async function sendQueryAndCapture(
     };
   } catch (err: any) {
     const durationMs = Date.now() - start;
-    const meta = snapshotTransport(transport);
+    const meta = await snapshotTransport(transport, transportToken);
     return {
       index: queryIndex + 1,
       query,

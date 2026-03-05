@@ -2,6 +2,10 @@
 /* eslint-disable no-console */
 import fs from "node:fs";
 import path from "node:path";
+import {
+  requireLiveRuntimeGraphEvidence,
+  resolveCertificationProfile,
+} from "../certification/certification-policy.mjs";
 
 const strict = process.argv.includes("--strict");
 const ROOT = process.cwd();
@@ -37,42 +41,21 @@ function getGate(gateId) {
   }
 }
 
-function requireLiveRuntimeGraphEvidence() {
-  const override = String(process.env.CERT_REQUIRE_RUNTIME_GRAPH_LIVE || "")
-    .trim()
-    .toLowerCase();
-  if (override === "1" || override === "true") return true;
-  if (override === "0" || override === "false") return false;
-  const ciFlags = [
-    process.env.CI,
-    process.env.GITHUB_ACTIONS,
-    process.env.BUILD_BUILDID,
-  ]
-    .map((value) => String(value || "").trim().toLowerCase())
-    .filter(Boolean);
-  return ciFlags.some((value) => value === "1" || value === "true");
-}
-
 const failures = [];
 const checks = [];
+const profile = resolveCertificationProfile();
 
-let routingBehavioral = getGate("routing-behavioral");
-if (!routingBehavioral.ok || !routingBehavioral.report) {
-  const fallbackGate = getGate("routing-determinism");
-  if (fallbackGate.ok && fallbackGate.report) {
-    routingBehavioral = fallbackGate;
-  }
-}
+const routingBehavioral = getGate("routing-behavioral");
 if (!routingBehavioral.ok || !routingBehavioral.report) {
   failures.push("routing-behavioral:missing_gate_report");
 } else {
   const passed = routingBehavioral.report.passed === true;
   checks.push({
-    gateId: routingBehavioral.gateId,
+    gateId: "routing-behavioral",
     passed,
     metrics: routingBehavioral.report.metrics || {},
   });
-  if (!passed) failures.push(`${routingBehavioral.gateId}:gate_failed`);
+  if (!passed) failures.push("routing-behavioral:gate_failed");
 }
 
 const followupCoverage = getGate("followup-source-coverage");
@@ -92,6 +75,13 @@ if (!followupCoverage.ok || !followupCoverage.report) {
       coveredSources: String(
         followupCoverage.report.metrics?.coveredSources || "",
       ),
+      followupPrecision: Number(
+        followupCoverage.report.metrics?.followupPrecision || 0,
+      ),
+      followupRecall: Number(followupCoverage.report.metrics?.followupRecall || 0),
+      followupFalsePositiveRate: Number(
+        followupCoverage.report.metrics?.followupFalsePositiveRate || 1,
+      ),
     },
   });
   if (coveredSourceCount < 4) {
@@ -99,6 +89,29 @@ if (!followupCoverage.ok || !followupCoverage.report) {
   }
   if (followupCoverage.report.passed !== true) {
     failures.push("followup-source-coverage:gate_failed");
+  }
+  const minPrecision = Number(
+    followupCoverage.report.thresholds?.minFollowupPrecision || 0.9,
+  );
+  const minRecall = Number(
+    followupCoverage.report.thresholds?.minFollowupRecall || 0.9,
+  );
+  const maxFalsePositiveRate = Number(
+    followupCoverage.report.thresholds?.maxFollowupFalsePositiveRate || 0.15,
+  );
+  const precision = Number(followupCoverage.report.metrics?.followupPrecision || 0);
+  const recall = Number(followupCoverage.report.metrics?.followupRecall || 0);
+  const falsePositiveRate = Number(
+    followupCoverage.report.metrics?.followupFalsePositiveRate || 1,
+  );
+  if (!(precision >= minPrecision)) {
+    failures.push("followup-source-coverage:precision_below_threshold");
+  }
+  if (!(recall >= minRecall)) {
+    failures.push("followup-source-coverage:recall_below_threshold");
+  }
+  if (!(falsePositiveRate <= maxFalsePositiveRate)) {
+    failures.push("followup-source-coverage:false_positive_rate_above_threshold");
   }
 }
 
@@ -120,7 +133,10 @@ if (!runtimeWiring.ok || !runtimeWiring.report) {
   failures.push("runtime-wiring:missing_gate_report");
 } else {
   const commandMode = String(runtimeWiring.report.metrics?.commandMode || "").trim();
-  const needsLive = requireLiveRuntimeGraphEvidence();
+  const needsLive = requireLiveRuntimeGraphEvidence({
+    profile,
+    strict,
+  });
   const validMode =
     commandMode === "live" || (!needsLive && commandMode === "cached");
   checks.push({

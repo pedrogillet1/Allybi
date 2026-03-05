@@ -28,6 +28,13 @@ describe("retrieval engine runtime selector", () => {
     const mod = await import("./retrievalEngine.runtime.service");
     expect(mod.RetrievalEngineService).toBe(EngineV1);
     expect(mod.RetrievalScopeViolationError).toBe(ScopeViolationError);
+    expect(mod.retrievalEngineRuntimeMetadata).toEqual({
+      flag: "RETRIEVAL_V2_ENGINE",
+      mode: "v1",
+    });
+    expect(mod.getRetrievalEngineRuntimeMetadata()).toEqual(
+      mod.retrievalEngineRuntimeMetadata,
+    );
   });
 
   test("uses v2 engine when flag is enabled", async () => {
@@ -48,5 +55,9 @@ describe("retrieval engine runtime selector", () => {
     const mod = await import("./retrievalEngine.runtime.service");
     expect(mod.RetrievalEngineService).toBe(EngineV2);
     expect(mod.RetrievalScopeViolationError).toBe(ScopeViolationError);
+    expect(mod.retrievalEngineRuntimeMetadata).toEqual({
+      flag: "RETRIEVAL_V2_ENGINE",
+      mode: "v2",
+    });
   });
 });

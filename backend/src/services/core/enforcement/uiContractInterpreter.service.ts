@@ -34,6 +34,18 @@ type UiRule = {
   };
 };
 
+type UiContractConfig = {
+  maxIntroSentences?: number;
+  maxIntroChars?: number;
+  noSourcesHeader?: boolean;
+  noInlineCitations?: boolean;
+  disallowedTextPatterns?: string[];
+  allowedOutputShapes?: string[];
+  allowedAttachments?: string[];
+  disallowedAttachments?: string[];
+  suppressActions?: boolean;
+};
+
 type UiContractsBank = {
   _meta?: {
     id?: string;
@@ -41,28 +53,30 @@ type UiContractsBank = {
   };
   config?: {
     enabled?: boolean;
+    contracts?: Record<string, UiContractConfig>;
     actionsContract?: {
+      combination?: {
+        multipleMatches?: "apply_most_restrictive" | "apply_first_match";
+        hardBlockIsTerminal?: boolean;
+      };
+      conflictResolution?: {
+        ifActionsAndNoToolExecution?: string;
+        ifMultipleViolations?: string;
+      };
       thresholds?: {
         maxIntroSentencesNavPills?: number;
         maxClarificationQuestions?: number;
       };
     };
   };
-  contracts?: {
-    nav_pills?: {
-      maxIntroSentences?: number;
-      maxIntroChars?: number;
-      noSourcesHeader?: boolean;
-      noInlineCitations?: boolean;
-      disallowedTextPatterns?: string[];
-    };
-  };
+  contracts?: Record<string, UiContractConfig>;
   rules?: UiRule[];
 };
 
 export type UiContractDecision = {
   enabled: boolean;
   version: string | null;
+  warnings: string[];
   appliedRuleIds: string[];
   appliedContracts: string[];
   suppressActionLanguage: boolean;
@@ -70,12 +84,18 @@ export type UiContractDecision = {
   shouldHardBlock: boolean;
   hardBlockReasonCode: string | null;
   maxClarificationQuestions: number;
+  attachmentPolicy: {
+    allowedTypes: string[];
+    disallowedTypes: string[];
+    suppressActions: boolean;
+  };
   navPills: {
     maxIntroSentences: number;
     maxIntroChars: number;
     noSourcesHeader: boolean;
     noInlineCitations: boolean;
     disallowedTextPatterns: string[];
+    allowedOutputShapes: string[];
   };
 };
 
@@ -97,6 +117,15 @@ function toPositiveInt(value: unknown, fallback: number): number {
   const parsed = Number(value);
   if (!Number.isFinite(parsed) || parsed <= 0) return fallback;
   return Math.floor(parsed);
+}
+
+function parseBoolish(value: unknown): boolean {
+  if (value === true) return true;
+  if (typeof value === "number") return Number.isFinite(value) && value > 0;
+  const normalized = String(value || "")
+    .trim()
+    .toLowerCase();
+  return normalized === "1" || normalized === "true" || normalized === "yes";
 }
 
 function getPath(input: Record<string, unknown>, path: string): unknown {
@@ -204,15 +233,38 @@ function countQuestions(text: string): number {
   return Array.isArray(matches) ? matches.length : 0;
 }
 
+function normalizedTypeList(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((entry) =>
+      String(entry || "")
+        .trim()
+        .toLowerCase(),
+    )
+    .filter(Boolean);
+}
+
 export class UiContractInterpreterService {
   resolve(input: ResolveInput): UiContractDecision {
     const bank = input.bank || null;
-    const contracts = asObject((bank as UiContractsBank | null)?.contracts);
+    const config = asObject((bank as UiContractsBank | null)?.config);
+    const contractsFromConfig = asObject(config.contracts);
+    const contractsFromLegacy = asObject((bank as UiContractsBank | null)?.contracts);
+    const hasConfigContracts = Object.keys(contractsFromConfig).length > 0;
+    const hasLegacyContracts = Object.keys(contractsFromLegacy).length > 0;
+    const contracts = hasConfigContracts ? contractsFromConfig : contractsFromLegacy;
     const navBank = asObject(contracts.nav_pills);
     const thresholds = asObject(
-      asObject(asObject((bank as UiContractsBank | null)?.config).actionsContract)
-        .thresholds,
+      asObject(asObject(config.actionsContract).thresholds),
     );
+    const actionsContract = asObject(config.actionsContract);
+    const combination = asObject(actionsContract.combination);
+    const conflictResolution = asObject(actionsContract.conflictResolution);
+    const applyFirstMatch =
+      String(combination.multipleMatches || "")
+        .trim()
+        .toLowerCase() === "apply_first_match";
+    const hardBlockIsTerminal = combination.hardBlockIsTerminal !== false;
     const runtime = {
       answerMode: String(input.answerMode || "").trim(),
       signals: asObject(input.signals),
@@ -223,10 +275,11 @@ export class UiContractInterpreterService {
     } as Record<string, unknown>;
 
     const decision: UiContractDecision = {
-      enabled: asObject((bank as UiContractsBank | null)?.config).enabled !== false,
+      enabled: config.enabled !== false,
       version:
         String(asObject((bank as UiContractsBank | null)?._meta).version || "").trim() ||
         null,
+      warnings: [],
       appliedRuleIds: [],
       appliedContracts: [],
       suppressActionLanguage: false,
@@ -237,6 +290,11 @@ export class UiContractInterpreterService {
         thresholds.maxClarificationQuestions,
         1,
       ),
+      attachmentPolicy: {
+        allowedTypes: [],
+        disallowedTypes: [],
+        suppressActions: false,
+      },
       navPills: {
         maxIntroSentences: toPositiveInt(
           navBank.maxIntroSentences ?? thresholds.maxIntroSentencesNavPills,
@@ -250,8 +308,21 @@ export class UiContractInterpreterService {
               .map((entry) => String(entry || "").trim())
               .filter(Boolean)
           : [],
+        allowedOutputShapes: Array.isArray(navBank.allowedOutputShapes)
+          ? navBank.allowedOutputShapes
+              .map((entry) => String(entry || "").trim().toLowerCase())
+              .filter(Boolean)
+          : [],
       },
     };
+
+    if (hasConfigContracts && hasLegacyContracts) {
+      decision.warnings.push(
+        "UI_CONTRACT_DUPLICATE_CONTRACT_PATHS_CONFIG_WINS",
+      );
+    } else if (!hasConfigContracts && hasLegacyContracts) {
+      decision.warnings.push("UI_CONTRACT_LEGACY_CONTRACT_PATH");
+    }
 
     if (!bank || !decision.enabled) return decision;
 
@@ -268,6 +339,10 @@ export class UiContractInterpreterService {
       if (actionType === "enforce_ui_contract") {
         const contractId = String(rule?.action?.contract || "").trim();
         if (contractId) decision.appliedContracts.push(contractId);
+        if (parseBoolish(rule?.action?.suppressActions)) {
+          decision.attachmentPolicy.suppressActions = true;
+        }
+        if (applyFirstMatch) break;
         continue;
       }
       if (actionType === "hard_block") {
@@ -275,18 +350,81 @@ export class UiContractInterpreterService {
         decision.hardBlockReasonCode =
           String(rule?.reasonCode || "").trim() ||
           String(ruleId || "ui_contract_hard_block");
+        if (hardBlockIsTerminal) break;
+        if (applyFirstMatch) break;
         continue;
       }
       if (actionType === "suppress_action_language") {
         decision.suppressActionLanguage = true;
         decision.suppressRegexes.push(...trigger);
+        if (parseBoolish(rule?.action?.suppressActions)) {
+          decision.attachmentPolicy.suppressActions = true;
+        }
+        if (applyFirstMatch) break;
       }
     }
 
     decision.appliedRuleIds = Array.from(new Set(decision.appliedRuleIds));
     decision.appliedContracts = Array.from(new Set(decision.appliedContracts));
     decision.suppressRegexes = Array.from(new Set(decision.suppressRegexes));
+
+    let allowedAccumulator: Set<string> | null = null;
+    const disallowed = new Set<string>();
+    for (const contractId of decision.appliedContracts) {
+      const contract = asObject(contracts[contractId]);
+      const allowedTypes = normalizedTypeList(contract.allowedAttachments);
+      if (allowedTypes.length > 0) {
+        const allowedSet = new Set(allowedTypes);
+        if (!allowedAccumulator) {
+          allowedAccumulator = allowedSet;
+        } else {
+          allowedAccumulator = new Set(
+            [...allowedAccumulator].filter((value) => allowedSet.has(value)),
+          );
+        }
+      }
+      for (const type of normalizedTypeList(contract.disallowedAttachments)) {
+        disallowed.add(type);
+      }
+      if (parseBoolish(contract.suppressActions)) {
+        decision.attachmentPolicy.suppressActions = true;
+      }
+    }
+
+    const suppressActionsByConflictRule =
+      String(conflictResolution.ifActionsAndNoToolExecution || "")
+        .trim()
+        .toLowerCase() === "suppress_actions" &&
+      runtime.signals &&
+      (runtime.signals as Record<string, unknown>).toolExecuted !== true;
+    if (suppressActionsByConflictRule) {
+      decision.suppressActionLanguage = true;
+      decision.attachmentPolicy.suppressActions = true;
+      decision.warnings.push("UI_CONTRACT_SUPPRESS_ACTIONS_NO_TOOL_EXECUTION");
+    }
+    if (decision.attachmentPolicy.suppressActions) {
+      disallowed.add("actions");
+      disallowed.add("action");
+    }
+    if (
+      String(conflictResolution.ifMultipleViolations || "")
+        .trim()
+        .toLowerCase() === "hard_block" &&
+      decision.appliedRuleIds.length > 1
+    ) {
+      decision.shouldHardBlock = true;
+      if (!decision.hardBlockReasonCode) {
+        decision.hardBlockReasonCode = "ui_contract_multiple_violations";
+      }
+    }
+
+    decision.attachmentPolicy.allowedTypes = allowedAccumulator
+      ? Array.from(allowedAccumulator).sort((a, b) => a.localeCompare(b))
+      : [];
+    decision.attachmentPolicy.disallowedTypes = Array.from(disallowed).sort(
+      (a, b) => a.localeCompare(b),
+    );
+    decision.warnings = Array.from(new Set(decision.warnings));
     return decision;
   }
 }
-

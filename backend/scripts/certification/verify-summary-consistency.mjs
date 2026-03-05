@@ -2,6 +2,11 @@
 /* eslint-disable no-console */
 import fs from "node:fs";
 import path from "node:path";
+import {
+  requireLiveRuntimeGraphEvidence,
+  resolveCertificationProfile,
+  resolveLocalCertRunPolicy,
+} from "./certification-policy.mjs";
 
 const root = process.cwd();
 const jsonPath = path.resolve(root, "reports/cert/certification-summary.json");
@@ -38,6 +43,14 @@ const expectedPassedGates = `${summary.passedGates}/${summary.totalGates}`;
 const expectedRunId = String(summary?.lineage?.runId || "").trim();
 const expectedDatasetId = String(summary?.lineage?.datasetId || "").trim();
 const expectedProfile = String(summary?.lineage?.profile || "").trim();
+const profile = resolveCertificationProfile({
+  ...process.env,
+  CERT_PROFILE:
+    String(summary?.profile || "").trim() ||
+    String(summary?.lineage?.profile || "").trim() ||
+    process.env.CERT_PROFILE,
+});
+const strict = summary?.strict === true;
 
 const failures = [];
 if (!mdGenerated) failures.push("MD_MISSING_GENERATED");
@@ -78,30 +91,31 @@ const runtimeWiringGate = Array.isArray(summary.gates)
 if (!runtimeWiringGate) {
   failures.push("RUNTIME_WIRING_GATE_MISSING_IN_SUMMARY");
 } else {
+  const requireLiveMode = requireLiveRuntimeGraphEvidence({ profile });
   const commandMode = String(runtimeWiringGate?.metrics?.commandMode || "").trim();
-  if (commandMode !== "live" && commandMode !== "cached") {
+  if (
+    (requireLiveMode && commandMode !== "live") ||
+    (!requireLiveMode && commandMode !== "live" && commandMode !== "cached")
+  ) {
     failures.push(
       `RUNTIME_WIRING_DEGRADED_EVIDENCE_MODE:${commandMode || "missing"}`,
     );
+  }
+  const gateRequireLive = runtimeWiringGate?.metrics?.requireLiveMode;
+  if (strict && typeof gateRequireLive === "boolean" && gateRequireLive !== requireLiveMode) {
+    failures.push("RUNTIME_WIRING_REQUIRE_LIVE_MODE_MISMATCH");
   }
 }
 
 const allowFailedLocalRun =
   String(process.env.CERT_ALLOW_FAILED_LOCAL_RUN || "").trim().toLowerCase() ===
     "true" || process.env.CERT_ALLOW_FAILED_LOCAL_RUN === "1";
-const localRunHealthOverride = String(
-  process.env.CERT_ENFORCE_LOCAL_CERT_RUN || "",
-)
-  .trim()
-  .toLowerCase();
-const enforceLocalRunHealth =
-  localRunHealthOverride === "1" ||
-  localRunHealthOverride === "true" ||
-  (localRunHealthOverride !== "0" && localRunHealthOverride !== "false");
+const localRunPolicy = resolveLocalCertRunPolicy({ strict, profile });
+const enforceLocalRunHealth = localRunPolicy.enforce;
 if (fs.existsSync(localCertRunPath)) {
   try {
     const localRun = JSON.parse(fs.readFileSync(localCertRunPath, "utf8"));
-    const endTimeMs = Number(localRun?.endTime || 0);
+    const endTimeMs = Number(localRun?.testResults?.endTime || localRun?.endTime || 0);
     const startTimeMs = Number(localRun?.startTime || 0);
     const bestTimestamp = Number.isFinite(endTimeMs) && endTimeMs > 0
       ? endTimeMs
