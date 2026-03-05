@@ -5,6 +5,7 @@ describe("resolveOpenAIModel", () => {
   const cfg = {
     allowedModels: ["gpt-5.2"],
     defaultModelFinal: "gpt-5.2",
+    strictModelAllowlist: true,
   };
 
   test("keeps pinned model version when family is allowlisted", () => {
@@ -20,5 +21,13 @@ describe("resolveOpenAIModel", () => {
   test("falls back to default for disallowed model", () => {
     const out = resolveOpenAIModel("unsupported-openai-model", cfg);
     expect(out).toBe("gpt-5.2");
+  });
+
+  test("allows requested model when strict allowlist is disabled", () => {
+    const out = resolveOpenAIModel("gpt-5.2-experimental", {
+      ...cfg,
+      strictModelAllowlist: false,
+    });
+    expect(out).toBe("gpt-5.2-experimental");
   });
 });

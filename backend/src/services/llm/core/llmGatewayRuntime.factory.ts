@@ -97,6 +97,7 @@ export function buildLLMFactoryFromEnv(
               defaultModelDraft: openaiCfg.defaultModelDraft,
               defaultModelFinal: openaiCfg.defaultModelFinal,
               allowedModels: openaiCfg.allowedModels,
+              strictModelAllowlist: openaiCfg.strictModelAllowlist,
               includeUsageInStream: openaiCfg.includeUsageInStream,
               maxDeltaCharsSoft: openaiCfg.maxDeltaCharsSoft,
               allowTools: openaiCfg.allowTools,

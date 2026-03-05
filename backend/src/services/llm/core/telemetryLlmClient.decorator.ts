@@ -147,12 +147,17 @@ export class TelemetryLLMClient implements LLMClient {
       throw err;
     } finally {
       const durationMs = Date.now() - startMs;
+      const requestedProvider = req.model.provider;
+      const requestedModel = req.model.model;
+      const executedProvider = response?.executedModel?.provider || requestedProvider;
+      const executedModel = response?.executedModel?.model || requestedModel;
+      const baseMeta = buildModelCallMeta(req.meta) || {};
       this.telemetry.logModelCall({
         userId: (req.meta?.userId as string) || "system",
         traceId: req.traceId,
         turnId: req.turnId || null,
-        provider: mapProvider(req.model.provider),
-        model: req.model.model,
+        provider: mapProvider(executedProvider),
+        model: executedModel,
         stage: mapStage(req.purpose),
         status: errorCode ? "fail" : "ok",
         errorCode: errorCode || null,
@@ -163,14 +168,20 @@ export class TelemetryLLMClient implements LLMClient {
         durationMs,
         retries: (response as Record<string, unknown> | undefined)?.__retryAttempts as number ?? null,
         costUsd: computeCostUsd(
-          mapProvider(req.model.provider),
-          req.model.model,
+          mapProvider(executedProvider),
+          executedModel,
           response?.usage?.promptTokens,
           response?.usage?.completionTokens,
           getCostTable(),
         ) || null,
         at: new Date(),
-        meta: buildModelCallMeta(req.meta),
+        meta: {
+          ...baseMeta,
+          requestedProvider,
+          requestedModel,
+          executedProvider,
+          executedModel,
+        },
       });
     }
   }
@@ -221,12 +232,18 @@ export class TelemetryLLMClient implements LLMClient {
       throw err;
     } finally {
       const durationMs = Date.now() - startMs;
+      const requestedProvider = params.req.model.provider;
+      const requestedModel = params.req.model.model;
+      const executedProvider =
+        response?.executedModel?.provider || requestedProvider;
+      const executedModel = response?.executedModel?.model || requestedModel;
+      const baseMeta = buildModelCallMeta(params.req.meta) || {};
       this.telemetry.logModelCall({
         userId: (params.req.meta?.userId as string) || "system",
         traceId: params.req.traceId,
         turnId: params.req.turnId || null,
-        provider: mapProvider(params.req.model.provider),
-        model: params.req.model.model,
+        provider: mapProvider(executedProvider),
+        model: executedModel,
         stage: mapStage(params.req.purpose),
         status: errorCode ? "fail" : "ok",
         errorCode: errorCode || null,
@@ -237,14 +254,20 @@ export class TelemetryLLMClient implements LLMClient {
         durationMs,
         retries: (response as Record<string, unknown> | undefined)?.__retryAttempts as number ?? null,
         costUsd: computeCostUsd(
-          mapProvider(params.req.model.provider),
-          params.req.model.model,
+          mapProvider(executedProvider),
+          executedModel,
           response?.usage?.promptTokens,
           response?.usage?.completionTokens,
           getCostTable(),
         ) || null,
         at: new Date(),
-        meta: buildModelCallMeta(params.req.meta),
+        meta: {
+          ...baseMeta,
+          requestedProvider,
+          requestedModel,
+          executedProvider,
+          executedModel,
+        },
       });
     }
   }

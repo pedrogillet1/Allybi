@@ -3,6 +3,7 @@ import type {
   LLMClient,
   LLMCompletionResponse,
   LLMStreamResponse,
+  LLMModelSpec,
   LLMMessage,
   LLMRequest,
 } from "./llmClient.interface";
@@ -362,6 +363,20 @@ export class LlmGatewayService {
         attempt.model === executed.model,
     );
     return idx >= 0 ? idx : null;
+  }
+
+  private static resolveExecutedTarget(
+    fallback: { provider: LLMProvider; model: string },
+    response:
+      | Pick<LLMCompletionResponse, "executedModel" | "model">
+      | Pick<LLMStreamResponse, "executedModel" | "model">,
+  ): { provider: LLMProvider; model: string } {
+    const modelSpec: LLMModelSpec | undefined = response.executedModel || response.model;
+    const provider = mapProviderForRequest(
+      (modelSpec?.provider as LLMProvider) || fallback.provider,
+    );
+    const model = String(modelSpec?.model || fallback.model).trim() || fallback.model;
+    return { provider, model };
   }
 
   async generate(params: LlmGatewayRequest): Promise<{
@@ -761,9 +776,13 @@ export class LlmGatewayService {
       const startedAtMs = Date.now();
       try {
         const response = await client.complete(attemptRequest);
+        const executed = LlmGatewayService.resolveExecutedTarget(
+          candidate,
+          response,
+        );
         attempts.push({
-          provider: candidate.provider,
-          model: candidate.model,
+          provider: executed.provider,
+          model: executed.model,
           status: "ok",
           durationMs: Date.now() - startedAtMs,
           errorCode: null,
@@ -772,10 +791,10 @@ export class LlmGatewayService {
           response,
           attempts,
           routed,
-          executed: candidate,
+          executed,
           fallbackUsed:
-            candidate.provider !== routed.provider ||
-            candidate.model !== routed.model,
+            executed.provider !== routed.provider ||
+            executed.model !== routed.model,
         };
       } catch (err) {
         lastError = err;
@@ -890,9 +909,13 @@ export class LlmGatewayService {
           sink: retryableSink,
           config: streamingConfig,
         });
+        const executed = LlmGatewayService.resolveExecutedTarget(
+          candidate,
+          response,
+        );
         attempts.push({
-          provider: candidate.provider,
-          model: candidate.model,
+          provider: executed.provider,
+          model: executed.model,
           status: "ok",
           durationMs: Date.now() - startedAtMs,
           errorCode: null,
@@ -902,10 +925,10 @@ export class LlmGatewayService {
           response,
           attempts,
           routed,
-          executed: candidate,
+          executed,
           fallbackUsed:
-            candidate.provider !== routed.provider ||
-            candidate.model !== routed.model,
+            executed.provider !== routed.provider ||
+            executed.model !== routed.model,
         };
       } catch (err) {
         lastError = err;

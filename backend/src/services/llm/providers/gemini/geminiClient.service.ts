@@ -207,10 +207,11 @@ export class GeminiClientService implements LLMClient {
     const ac = new AbortController();
     if (signal) signal.addEventListener("abort", () => ac.abort(), { once: true });
     const timeout = setTimeout(() => ac.abort(), this.cfg.timeoutMs);
+    const requestedModel = req.model;
+    const executedModelId = resolveGeminiModel(req.model.model, this.cfg);
 
     try {
-      const model = resolveGeminiModel(req.model.model, this.cfg);
-      const url = this.buildGenerateUrl(model);
+      const url = this.buildGenerateUrl(executedModelId);
       const body = this.buildGeminiRequest(req);
 
       const res = await fetch(url, {
@@ -240,6 +241,11 @@ export class GeminiClientService implements LLMClient {
         traceId: req.traceId,
         turnId: req.turnId,
         model: req.model,
+        requestedModel,
+        executedModel: {
+          provider: "google",
+          model: executedModelId,
+        },
         content: parsed.text,
         finishReason: normalizeFinishReason(parsed.finishReason),
         toolCallRequest: parsed.toolCalls?.length
@@ -267,6 +273,8 @@ export class GeminiClientService implements LLMClient {
     signal?: AbortSignal;
   }): Promise<LLMStreamResponse> {
     const { req, sink, config, hooks, initialState, signal } = params;
+    const requestedModel = req.model;
+    const executedModelId = resolveGeminiModel(req.model.model, this.cfg);
 
     const state: StreamState = {
       phase: "init",
@@ -292,8 +300,7 @@ export class GeminiClientService implements LLMClient {
     const timeout = setTimeout(() => ac.abort(), this.cfg.timeoutMs);
 
     try {
-      const model = resolveGeminiModel(req.model.model, this.cfg);
-      const url = this.buildStreamUrl(model);
+      const url = this.buildStreamUrl(executedModelId);
       const body = this.buildGeminiRequest(req);
 
       // Gemini streaming endpoint returns a stream of JSON objects (often NDJSON-ish).
@@ -409,7 +416,7 @@ export class GeminiClientService implements LLMClient {
           kind: state.kind,
           llm: {
             provider: "google",
-            model: req.model.model,
+            model: executedModelId,
           },
           markers: state.markers,
           traceId: state.traceId,
@@ -430,6 +437,11 @@ export class GeminiClientService implements LLMClient {
         traceId: req.traceId,
         turnId: req.turnId,
         model: req.model,
+        requestedModel,
+        executedModel: {
+          provider: "google",
+          model: executedModelId,
+        },
         finalText: state.accumulatedText,
         usage: usageMetadata
           ? {
@@ -449,6 +461,11 @@ export class GeminiClientService implements LLMClient {
           traceId: req.traceId,
           turnId: req.turnId,
           model: req.model,
+          requestedModel,
+          executedModel: {
+            provider: "google",
+            model: executedModelId,
+          },
           finalText: state.accumulatedText,
         };
       }
@@ -487,6 +504,11 @@ export class GeminiClientService implements LLMClient {
         traceId: req.traceId,
         turnId: req.turnId,
         model: req.model,
+        requestedModel,
+        executedModel: {
+          provider: "google",
+          model: executedModelId,
+        },
         finalText: state.accumulatedText,
       };
     } finally {

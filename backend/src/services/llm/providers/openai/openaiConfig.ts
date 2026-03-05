@@ -19,6 +19,7 @@
  */
 
 import type { EnvName } from "../../types/llm.types";
+import { toCostFamilyModel } from "../../core/llmCostCalculator";
 import {
   OPENAI_PRIMARY_MODEL,
   listOpenAIModels,
@@ -53,10 +54,15 @@ export interface OpenAIProviderConfig {
   strictNoImages: boolean;
 }
 
+function isAllowedOpenAIFamilyModel(model: string): boolean {
+  const family = toCostFamilyModel(String(model || ""));
+  return family === "gpt-5.2";
+}
+
 export function loadOpenAIConfig(env: EnvName): OpenAIProviderConfig {
   const apiKey = process.env.OPENAI_API_KEY || "";
 
-  return {
+  const resolved: OpenAIProviderConfig = {
     env,
 
     apiKey,
@@ -87,4 +93,39 @@ export function loadOpenAIConfig(env: EnvName): OpenAIProviderConfig {
       process.env.OPENAI_SUPPORTS_DEVELOPER_ROLE !== "false",
     strictNoImages: process.env.OPENAI_STRICT_NO_IMAGES !== "false",
   };
+
+  if (
+    (env === "production" || env === "staging") &&
+    resolved.strictModelAllowlist === false
+  ) {
+    throw new Error(
+      "OPENAI_STRICT_ALLOWLIST must remain enabled in production/staging",
+    );
+  }
+
+  if (
+    env === "production" ||
+    env === "staging"
+  ) {
+    if (!isAllowedOpenAIFamilyModel(resolved.defaultModelDraft)) {
+      throw new Error(
+        `OPENAI_DRAFT_MODEL is outside governance allowlist: ${resolved.defaultModelDraft}`,
+      );
+    }
+    if (!isAllowedOpenAIFamilyModel(resolved.defaultModelFinal)) {
+      throw new Error(
+        `OPENAI_FINAL_MODEL is outside governance allowlist: ${resolved.defaultModelFinal}`,
+      );
+    }
+    const invalidAllowed = resolved.allowedModels.find(
+      (model) => !isAllowedOpenAIFamilyModel(model),
+    );
+    if (invalidAllowed) {
+      throw new Error(
+        `OPENAI_ALLOWED_MODELS contains model outside governance allowlist: ${invalidAllowed}`,
+      );
+    }
+  }
+
+  return resolved;
 }

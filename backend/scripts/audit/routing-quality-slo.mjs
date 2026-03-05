@@ -56,17 +56,23 @@ function requireLiveRuntimeGraphEvidence() {
 const failures = [];
 const checks = [];
 
-const routingBehavioral = getGate("routing-behavioral");
+let routingBehavioral = getGate("routing-behavioral");
+if (!routingBehavioral.ok || !routingBehavioral.report) {
+  const fallbackGate = getGate("routing-determinism");
+  if (fallbackGate.ok && fallbackGate.report) {
+    routingBehavioral = fallbackGate;
+  }
+}
 if (!routingBehavioral.ok || !routingBehavioral.report) {
   failures.push("routing-behavioral:missing_gate_report");
 } else {
   const passed = routingBehavioral.report.passed === true;
   checks.push({
-    gateId: "routing-behavioral",
+    gateId: routingBehavioral.gateId,
     passed,
     metrics: routingBehavioral.report.metrics || {},
   });
-  if (!passed) failures.push("routing-behavioral:gate_failed");
+  if (!passed) failures.push(`${routingBehavioral.gateId}:gate_failed`);
 }
 
 const followupCoverage = getGate("followup-source-coverage");

@@ -218,8 +218,9 @@ function buildChatCompletionPayload(
   request: LlmRequest,
   cfg: OpenAIConfig,
   streaming: boolean,
+  resolvedModel?: string,
 ): Record<string, unknown> {
-  const model = resolveOpenAIModel(request.route?.model, cfg);
+  const model = resolvedModel || resolveOpenAIModel(request.route?.model, cfg);
 
   const messages = toOpenAIChatMessages(request.messages);
 
@@ -332,7 +333,13 @@ export class OpenAIClientService implements LlmClient {
     request: LlmRequest,
     signal?: AbortSignal,
   ): Promise<LlmCallResult> {
-    const payload = buildChatCompletionPayload(request, this.cfg, false);
+    const resolvedModel = this.resolveRequestedModel(request.route?.model);
+    const payload = buildChatCompletionPayload(
+      request,
+      this.cfg,
+      false,
+      resolvedModel,
+    );
     const headers = buildRequestHeaders(request);
 
     const raw = await this.client.chat.completions.create(
@@ -368,7 +375,13 @@ export class OpenAIClientService implements LlmClient {
     request: LlmRequest,
     signal?: AbortSignal,
   ): Promise<LlmStreamResult> {
-    const payload = buildChatCompletionPayload(request, this.cfg, true);
+    const resolvedModel = this.resolveRequestedModel(request.route?.model);
+    const payload = buildChatCompletionPayload(
+      request,
+      this.cfg,
+      true,
+      resolvedModel,
+    );
     const headers = buildRequestHeaders(request);
 
     // OpenAI SDK returns an AsyncIterable for streaming chat completions.
@@ -410,6 +423,10 @@ export class OpenAIClientService implements LlmClient {
   getDefaultFinalModel(): string {
     return this.cfg.defaultModelFinal;
   }
+
+  resolveRequestedModel(routeModel: string | undefined): string {
+    return resolveOpenAIModel(routeModel, this.cfg);
+  }
 }
 
 export default OpenAIClientService;
@@ -443,6 +460,7 @@ export class OpenAILLMClientAdapter implements LLMClient {
   }
 
   async complete(req: LLMRequestCore, signal?: AbortSignal): Promise<LLMCompletionResponse> {
+    const requestedModel = req.model.model;
     const llmReq: LlmRequest = {
       messages: req.messages.map((m) => ({
         role: m.role,
@@ -464,11 +482,18 @@ export class OpenAILLMClientAdapter implements LLMClient {
     const result = await this.inner.call(llmReq, signal);
     const raw = result.response.raw as Record<string, unknown> | undefined;
     const usage = raw?.usage as Record<string, number> | undefined;
+    const rawModel = typeof raw?.model === "string" ? raw.model : null;
+    const executedModel = rawModel || this.inner.resolveRequestedModel(requestedModel);
 
     return {
       traceId: req.traceId,
       turnId: req.turnId,
       model: req.model,
+      requestedModel: req.model,
+      executedModel: {
+        provider: "openai",
+        model: executedModel,
+      },
       content: result.response.text || "",
       finishReason: result.response.finishReason || "unknown",
       usage: usage
@@ -490,6 +515,8 @@ export class OpenAILLMClientAdapter implements LLMClient {
     signal?: AbortSignal;
   }): Promise<LLMStreamResponse> {
     const { req, sink, config, hooks, initialState, signal } = params;
+    const requestedModel = req.model.model;
+    const executedModel = this.inner.resolveRequestedModel(requestedModel);
 
     const state: StreamState = {
       phase: "init",
@@ -567,7 +594,7 @@ export class OpenAILLMClientAdapter implements LLMClient {
           data: {
             text: state.accumulatedText,
             kind: state.kind,
-            llm: { provider: "openai" as LLMProvider, model: req.model.model },
+            llm: { provider: "openai" as LLMProvider, model: executedModel },
             markers: state.markers,
             traceId: state.traceId,
             timings: {
@@ -587,6 +614,11 @@ export class OpenAILLMClientAdapter implements LLMClient {
         traceId: req.traceId,
         turnId: req.turnId,
         model: req.model,
+        requestedModel: req.model,
+        executedModel: {
+          provider: "openai",
+          model: executedModel,
+        },
         finalText: state.accumulatedText,
         finishReason: "stop",
       };
@@ -616,6 +648,11 @@ export class OpenAILLMClientAdapter implements LLMClient {
         traceId: req.traceId,
         turnId: req.turnId,
         model: req.model,
+        requestedModel: req.model,
+        executedModel: {
+          provider: "openai",
+          model: executedModel,
+        },
         finalText: state.accumulatedText,
       };
     }

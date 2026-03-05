@@ -66,4 +66,14 @@ describe("llmGatewayRuntime.factory", () => {
     const factory = buildLLMFactoryFromEnv("local");
     expect(factory.listConfigured()).toEqual(["openai"]);
   });
+
+  test("buildLLMFactoryFromEnv enforces OPENAI strict allowlist in production/staging", () => {
+    resetKeys();
+    process.env.OPENAI_API_KEY = "openai-test-key";
+    process.env.OPENAI_STRICT_ALLOWLIST = "false";
+
+    expect(() => buildLLMFactoryFromEnv("production")).toThrow(
+      "OPENAI_STRICT_ALLOWLIST must remain enabled in production/staging",
+    );
+  });
 });

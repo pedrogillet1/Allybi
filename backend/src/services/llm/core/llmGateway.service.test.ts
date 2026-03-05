@@ -467,6 +467,88 @@ describe("LlmGatewayService retrieval-plan producer", () => {
     expect(out.telemetry?.model).toBe("gemini-2.5-flash");
   });
 
+  test("uses provider-reported executed model in telemetry when it differs from requested", async () => {
+    const openaiClient: LLMClient = {
+      provider: "openai",
+      complete: jest.fn(async () => ({
+        traceId: "trace-5b",
+        turnId: "turn-5b",
+        model: { provider: "openai", model: "gpt-5.2-2026-01-15" },
+        requestedModel: { provider: "openai", model: "gpt-5.2-2026-01-15" },
+        executedModel: { provider: "openai", model: "gpt-5.2" },
+        content: "openai",
+      })),
+      stream: jest.fn(async () => ({
+        traceId: "trace-5b",
+        turnId: "turn-5b",
+        model: { provider: "openai", model: "gpt-5.2-2026-01-15" },
+        requestedModel: { provider: "openai", model: "gpt-5.2-2026-01-15" },
+        executedModel: { provider: "openai", model: "gpt-5.2" },
+        finalText: "",
+      })),
+    };
+    const router: any = {
+      route: jest.fn(() => ({
+        provider: "openai",
+        model: "gpt-5.2-2026-01-15",
+        reason: "quality_finish",
+        stage: "final",
+        constraints: {},
+      })),
+      listFallbackTargets: jest.fn(() => []),
+    };
+    const builder: any = {
+      build: jest.fn((input: any) => ({
+        route: input.route,
+        messages: [{ role: "system", content: "compose" }],
+        options: { stream: false, maxOutputTokens: 256 },
+        kodaMeta: {
+          promptType: "compose_answer",
+          promptTrace: {
+            orderedPrompts: [
+              {
+                bankId: "compose_prompt",
+                version: "1.0.0",
+                templateId: "compose_prompt:templates.en",
+                hash: "h",
+              },
+            ],
+          },
+        },
+      })),
+    };
+
+    const gateway = new LlmGatewayService(
+      openaiClient,
+      router,
+      builder,
+      {
+        env: "local",
+        provider: "openai",
+        modelId: "gpt-5.2",
+      },
+      {
+        resolve() {
+          return null;
+        },
+      },
+    );
+
+    const out = await gateway.generate({
+      traceId: "trace-5b",
+      userId: "u1",
+      conversationId: "c1",
+      messages: [{ role: "user", content: "hello" }],
+    });
+
+    expect((openaiClient.complete as jest.Mock).mock.calls).toHaveLength(1);
+    expect(out.telemetry?.routedModel).toBe("gpt-5.2-2026-01-15");
+    expect(out.telemetry?.executedModel).toBe("gpt-5.2");
+    expect(out.telemetry?.model).toBe("gpt-5.2");
+    expect(out.telemetry?.modelFamily).toBe("gpt-5.2");
+    expect(out.telemetry?.fallbackUsed).toBe(false);
+  });
+
   test("falls back to next routed candidate when primary provider fails", async () => {
     const openaiClient: LLMClient = {
       provider: "openai",
