@@ -400,7 +400,13 @@ function main() {
   const regenerated = [];
 
   const hasLatencyInput = hasQueryLatencyInput();
-  const strictLatencyRequired = strict;
+  const forceQueryLatency =
+    String(process.env.CERT_REQUIRE_QUERY_LATENCY || "").trim() === "1" ||
+    String(process.env.CERT_REQUIRE_QUERY_LATENCY || "")
+      .trim()
+      .toLowerCase() === "true";
+  const strictLatencyRequired =
+    strict && (forceQueryLatency || profile === "ci" || profile === "release");
   if (strictLatencyRequired && !hasLatencyInput) {
     failures.push("MISSING_QUERY_LATENCY_INPUT");
   }
