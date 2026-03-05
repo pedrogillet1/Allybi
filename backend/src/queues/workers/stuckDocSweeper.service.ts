@@ -81,9 +81,19 @@ export async function startStuckDocSweeper() {
       // -----------------------------------------------------------------------
       const permanentlyFailed: string[] = [];
       const resetDocs: typeof stuckEnriching = [];
+      const transitionFailures: string[] = [];
 
       for (const doc of stuckEnriching) {
         const result = await documentStateManager.resetToUploadedOrFail(doc.id);
+        if (!result.success) {
+          transitionFailures.push(doc.id);
+          logger.warn("[StuckDocSweeper] Failed to reset stuck document", {
+            documentId: doc.id,
+            reason: result.reason,
+          });
+          continue;
+        }
+
         if (result.toStatus === "failed") {
           permanentlyFailed.push(doc.id);
           // Log DLQ event
@@ -104,8 +114,14 @@ export async function startStuckDocSweeper() {
                 error: e.message,
               }),
             );
-        } else {
+        } else if (result.toStatus === "uploaded") {
           resetDocs.push(doc);
+        } else {
+          transitionFailures.push(doc.id);
+          logger.warn("[StuckDocSweeper] Unexpected reset target status", {
+            documentId: doc.id,
+            toStatus: result.toStatus,
+          });
         }
       }
 
@@ -186,13 +202,16 @@ export async function startStuckDocSweeper() {
         stuckUploaded: stuckUploaded.length,
         stuckEnriching: stuckEnriching.length,
         permanentlyFailed: permanentlyFailed.length,
+        transitionFailures: transitionFailures.length,
         requeued,
       });
 
       return {
-        found: allStuck.length + permanentlyFailed.length,
+        found:
+          allStuck.length + permanentlyFailed.length + transitionFailures.length,
         requeued,
         permanentlyFailed: permanentlyFailed.length,
+        transitionFailures: transitionFailures.length,
       };
     },
     {

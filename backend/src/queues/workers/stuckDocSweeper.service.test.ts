@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, jest, test } from "@jest/globals";
+import { afterEach, beforeEach, describe, expect, jest, test } from "@jest/globals";
 
 // ---------------------------------------------------------------------------
 // Mock declarations (before imports)
@@ -80,7 +80,7 @@ jest.mock("../../utils/logger", () => ({
   },
 }));
 
-import { startStuckDocSweeper } from "./stuckDocSweeper.service";
+import { startStuckDocSweeper, stopStuckDocSweeper } from "./stuckDocSweeper.service";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -103,6 +103,7 @@ function makeStuckDoc(id: string, overrides: Record<string, unknown> = {}) {
 
 describe("stuckDocSweeper", () => {
   beforeEach(async () => {
+    stopStuckDocSweeper();
     capturedProcessor = null;
     mockDocFindMany.mockReset();
     mockResetToUploadedOrFail.mockReset();
@@ -112,6 +113,10 @@ describe("stuckDocSweeper", () => {
     // Start sweeper to capture the processor
     await startStuckDocSweeper();
     expect(capturedProcessor).not.toBeNull();
+  });
+
+  afterEach(() => {
+    stopStuckDocSweeper();
   });
 
   // -----------------------------------------------------------------------
@@ -231,5 +236,28 @@ describe("stuckDocSweeper", () => {
     );
     expect(result.requeued).toBe(1);
     expect(result.permanentlyFailed).toBe(1);
+  });
+
+  // -----------------------------------------------------------------------
+  // 5. Does not re-enqueue docs when reset transition itself fails
+  // -----------------------------------------------------------------------
+  test("does not re-enqueue docs when reset transition returns success:false", async () => {
+    mockDocFindMany
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([makeStuckDoc("doc-transition-fail")]);
+
+    mockResetToUploadedOrFail.mockResolvedValue({
+      success: false,
+      documentId: "doc-transition-fail",
+      fromStatus: "enriching",
+      toStatus: "uploaded",
+      reason: "CAS failed",
+    });
+
+    const result = await capturedProcessor!({ id: "job-5" });
+
+    expect(mockAddDocumentJob).not.toHaveBeenCalled();
+    expect(result.requeued).toBe(0);
+    expect(result.transitionFailures).toBe(1);
   });
 });

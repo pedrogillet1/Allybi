@@ -42,9 +42,12 @@ const visionSrc = exists(visionPath) ? read(visionPath) : "";
 const gracefulImageProviderUnavailable =
   has(
     extractionDispatchSrc,
-    /\[OCR\]\s*Provider unavailable,\s*saving as visual-only/,
+    /\[OCR\]\s*(Provider unavailable,\s*saving as visual-only|Google Vision unavailable,\s*trying Tesseract fallback)/,
   ) &&
-  has(extractionDispatchSrc, /skipReason:\s*`Image saved as visual-only/) &&
+  has(
+    extractionDispatchSrc,
+    /skipReason:\s*(`Image saved as visual-only|\"Image saved as visual-only \(Google Vision unavailable, Tesseract returned no text\)\")/,
+  ) &&
   has(extractionDispatchSrc, /visionService\.isAvailable\(\)/);
 
 const gracefulImageOcrRuntimeFailure =
@@ -63,7 +66,7 @@ const imageSkipMarkedReady =
     /const keepVisibleWithoutText\s*=\s*[\s\S]*isImageMime\(effectiveMimeType\)/,
   ) &&
   has(pipelineSrc, /markReadyWithoutContent\(documentId\)/) &&
-  has(pipelineSrc, /markSkipped\(documentId,\s*reason\)/);
+  has(pipelineSrc, /markSkipped\(\s*documentId,\s*reason\s*,?\s*\)/);
 
 const visionRetryPresent =
   has(visionSrc, /async extractTextWithRetry\(/) &&

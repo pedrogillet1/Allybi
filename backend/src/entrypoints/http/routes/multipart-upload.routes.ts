@@ -253,7 +253,50 @@ router.post(
           });
         }
       } catch (queueErr: any) {
-        logger.error("[MultipartUpload] failed to queue", { documentId });
+        const queueMessage = queueErr?.message || "Queue unavailable";
+        logger.error("[MultipartUpload] failed to queue", {
+          documentId,
+          error: queueMessage,
+        });
+        try {
+          await prisma.document.update({
+            where: { id: documentId },
+            data: {
+              status: "uploaded",
+              indexingState: "failed",
+              indexingError: `Queue scheduling failed: ${String(queueMessage).slice(0, 300)}`,
+              indexingUpdatedAt: new Date(),
+            },
+          });
+          await prisma.ingestionEvent.create({
+            data: {
+              userId,
+              documentId,
+              filename: doc.filename || "unknown",
+              mimeType: doc.mimeType || "application/octet-stream",
+              status: "queue_fail",
+              errorCode: String(queueMessage).slice(0, 50),
+              extractionMethod: "queue_schedule",
+              at: new Date(),
+              meta: {
+                route: "multipart.complete",
+                storageKey,
+              },
+            },
+          });
+        } catch (stateErr: any) {
+          logger.warn("[MultipartUpload] failed to persist queue failure state", {
+            documentId,
+            error: stateErr?.message || String(stateErr),
+          });
+        }
+        res.status(503).json({
+          error:
+            "Upload completed but processing could not be scheduled. Please retry shortly.",
+          code: "QUEUE_UNAVAILABLE",
+          documentId,
+        });
+        return;
       }
 
       res.json({ ok: true, documentId });

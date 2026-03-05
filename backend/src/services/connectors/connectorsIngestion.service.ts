@@ -3,9 +3,34 @@ import { createHash } from "crypto";
 import prisma from "../../config/database";
 import { uploadFile } from "../../config/storage";
 import { splitTextIntoChunks } from "../ingestion/chunking.service";
-import vectorEmbeddingService from "../retrieval/vectorEmbedding.service";
+import vectorEmbeddingRuntimeService from "../retrieval/vectorEmbedding.runtime.service";
 import type { ConnectorProvider } from "./connectorsRegistry";
 import { documentContentVault } from "../documents/documentContentVault.service";
+import {
+  documentStateManager,
+  type TransitionResult,
+} from "../documents/documentStateManager.service";
+import { logger } from "../../utils/logger";
+
+const CONNECTOR_MIME_MAP: Record<string, string> = {
+  gmail: "message/rfc822",
+  outlook: "message/rfc822",
+  slack: "application/x-slack-message",
+};
+
+const CONNECTOR_DOC_TYPE_MAP: Record<string, string> = {
+  gmail: "email_message",
+  outlook: "email_message",
+  slack: "slack_message",
+};
+
+function resolveConnectorMimeType(sourceType: string): string {
+  return CONNECTOR_MIME_MAP[sourceType] || "text/plain";
+}
+
+function resolveConnectorDocType(sourceType: string): string {
+  return CONNECTOR_DOC_TYPE_MAP[sourceType] || sourceType;
+}
 
 export interface ConnectorDocument {
   sourceType: ConnectorProvider;
@@ -27,14 +52,26 @@ export interface ConnectorIngestionContext {
 
 export interface ConnectorIngestionResultItem {
   sourceId: string;
-  documentId: string;
-  status: "created" | "existing";
+  documentId?: string;
+  status: "created" | "existing" | "failed";
+  error?: string;
 }
 
 /**
  * Ingest connector payloads as first-class Documents and push to existing chunk/embed pipeline.
  */
 export class ConnectorsIngestionService {
+  private ensureTransitionSucceeded(
+    result: TransitionResult,
+    context: string,
+  ): void {
+    if (result.success) return;
+    const reason = result.reason || "unknown transition failure";
+    throw new Error(
+      `[ConnectorsIngestion] State transition failed during ${context}: ${reason}`,
+    );
+  }
+
   isIngestionEnabled(): boolean {
     return (
       String(process.env.CONNECTORS_INGEST_AS_DOCUMENTS || "").toLowerCase() ===
@@ -87,10 +124,13 @@ export class ConnectorsIngestionService {
         const encryptDocumentText =
           documentContentVault.isEnabled() || documentContentVault.isStrict();
 
+        const resolvedMime = resolveConnectorMimeType(normalized.sourceType);
+        const resolvedDocType = resolveConnectorDocType(normalized.sourceType);
+
         await uploadFile(
           storageKey,
           Buffer.from(textContent, "utf8"),
-          "text/plain",
+          resolvedMime,
         );
 
         await prisma.$transaction(async (tx) => {
@@ -101,7 +141,7 @@ export class ConnectorsIngestionService {
               filename,
               encryptedFilename: storageKey,
               fileSize: Buffer.byteLength(textContent, "utf8"),
-              mimeType: "text/plain",
+              mimeType: resolvedMime,
               fileHash,
               status: "uploaded",
               indexingState: "pending",
@@ -129,7 +169,7 @@ export class ConnectorsIngestionService {
                 actors: normalized.actors,
                 labelsOrChannel: normalized.labelsOrChannel,
               }),
-              classification: normalized.sourceType,
+              classification: resolvedDocType,
               topics: JSON.stringify(normalized.labelsOrChannel),
             },
           });
@@ -152,8 +192,9 @@ export class ConnectorsIngestionService {
             documentId,
             userId: ctx.userId,
             filename,
-            mimeType: "text/plain",
+            mimeType: resolvedMime,
             encryptedFilename: storageKey,
+            connectorDocType: resolvedDocType,
           },
           textContent,
         );
@@ -165,10 +206,15 @@ export class ConnectorsIngestionService {
         });
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
-        console.error(
+        logger.error(
           `[ConnectorsIngestion] Failed to ingest item ${item.sourceType}:${item.sourceId}: ${msg}`,
         );
         // Continue processing remaining items instead of aborting the entire sync.
+        results.push({
+          sourceId: item.sourceId,
+          status: "failed",
+          error: msg,
+        });
       }
     }
 
@@ -232,6 +278,7 @@ export class ConnectorsIngestionService {
       filename: string;
       mimeType: string;
       encryptedFilename: string;
+      connectorDocType?: string;
     },
     textContent: string,
   ): Promise<void> {
@@ -251,19 +298,49 @@ export class ConnectorsIngestionService {
       metadata: { source: "connector_ingestion" },
     }));
 
-    await vectorEmbeddingService.storeDocumentEmbeddings(
+    const claimResult = await documentStateManager.claimForEnrichment(
       queuePayload.documentId,
-      chunks,
     );
+    this.ensureTransitionSucceeded(claimResult, "claimForEnrichment");
 
-    await prisma.document.update({
-      where: { id: queuePayload.documentId },
-      data: {
-        status: "indexed",
-        embeddingsGenerated: true,
-        chunksCount: chunks.length,
-      },
-    });
+    try {
+      await vectorEmbeddingRuntimeService.storeDocumentEmbeddings(
+        queuePayload.documentId,
+        chunks,
+      );
+
+      await prisma.document.update({
+        where: { id: queuePayload.documentId },
+        data: {
+          embeddingsGenerated: true,
+        },
+      });
+
+      const markIndexedResult = await documentStateManager.markIndexed(
+        queuePayload.documentId,
+        chunks.length,
+      );
+      this.ensureTransitionSucceeded(markIndexedResult, "markIndexed");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      try {
+        const markFailedResult = await documentStateManager.markFailed(
+          queuePayload.documentId,
+          "enriching",
+          `Connector inline indexing failed: ${message}`.slice(0, 500),
+        );
+        this.ensureTransitionSucceeded(markFailedResult, "markFailed");
+      } catch (markFailedError) {
+        const markFailedMessage =
+          markFailedError instanceof Error
+            ? markFailedError.message
+            : String(markFailedError);
+        throw new Error(
+          `[ConnectorsIngestion] Inline indexing failed and markFailed transition failed: inline="${message}" markFailed="${markFailedMessage}"`,
+        );
+      }
+      throw error;
+    }
   }
 }
 

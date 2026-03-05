@@ -26,6 +26,7 @@ export interface SlackSyncResult {
   userId: string;
   fetchedCount: number;
   ingestedCount: number;
+  failedCount: number;
   createdCount: number;
   existingCount: number;
   channelsScanned: number;
@@ -138,6 +139,8 @@ export class SlackSyncService {
       },
       docs,
     );
+    const successfulItems = ingested.filter((item) => item.status !== "failed");
+    const failedCount = ingested.length - successfulItems.length;
 
     const createdCount = ingested.filter(
       (item) => item.status === "created",
@@ -145,11 +148,17 @@ export class SlackSyncService {
     const existingCount = ingested.filter(
       (item) => item.status === "existing",
     ).length;
+    const successfulSourceIds = new Set(
+      successfulItems.map((item) => item.sourceId),
+    );
+    const latestSuccessful = sorted.find((entry) =>
+      successfulSourceIds.has(`${entry.channel.id}:${entry.message.ts}`),
+    );
 
     const nextCursor: SlackSyncCursor = {
       userId: input.userId,
       lastSyncAt: new Date().toISOString(),
-      lastMessageTs: sorted[0]?.message.ts || cursor?.lastMessageTs,
+      lastMessageTs: latestSuccessful?.message.ts || cursor?.lastMessageTs,
       updatedAt: new Date().toISOString(),
     };
 
@@ -159,7 +168,8 @@ export class SlackSyncService {
       provider: "slack",
       userId: input.userId,
       fetchedCount: sorted.length,
-      ingestedCount: ingested.length,
+      ingestedCount: successfulItems.length,
+      failedCount,
       createdCount,
       existingCount,
       channelsScanned: channels.length,

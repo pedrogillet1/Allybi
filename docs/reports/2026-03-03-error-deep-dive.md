@@ -1,5 +1,7 @@
 # Error Deep Dive Report (2026-03-03)
 
+> Historical snapshot: superseded by `docs/reports/2026-03-05-ingestion-audit-refresh.md` for current ingestion status.
+
 ## Scope
 This report audits runtime/test/static errors with emphasis on ingestion and normalization behavior, plus global compile blockers currently present in backend.
 

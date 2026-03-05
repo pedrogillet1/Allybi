@@ -39,6 +39,7 @@ export interface OutlookSyncResult {
   syncedCount: number;
   fetchedCount: number;
   ingestedCount: number;
+  failedCount: number;
   createdCount: number;
   existingCount: number;
   skippedCount: number;
@@ -105,6 +106,7 @@ export class OutlookSyncService {
     };
     let totalFetched = 0;
     let totalIngested = 0;
+    let totalFailed = 0;
     let totalCreated = 0;
     let totalExisting = 0;
 
@@ -156,7 +158,11 @@ export class OutlookSyncService {
         );
       }
 
-      totalIngested += ingested.length;
+      const successfulItems = ingested.filter((item) => item.status !== "failed");
+      const failedCount = ingested.length - successfulItems.length;
+
+      totalIngested += successfulItems.length;
+      totalFailed += failedCount;
       totalCreated += ingested.filter(
         (item) => item.status === "created",
       ).length;
@@ -165,7 +171,11 @@ export class OutlookSyncService {
       ).length;
 
       // Track per-folder high-water mark.
+      const successfulSourceIds = new Set(
+        successfulItems.map((item) => item.sourceId),
+      );
       const latestReceived = messages
+        .filter((m) => successfulSourceIds.has(m.id))
         .map((m) => m.receivedDateTime)
         .filter((d): d is string => Boolean(d))
         .sort()
@@ -192,9 +202,10 @@ export class OutlookSyncService {
       syncedCount: totalIngested,
       fetchedCount: totalFetched,
       ingestedCount: totalIngested,
+      failedCount: totalFailed,
       createdCount: totalCreated,
       existingCount: totalExisting,
-      skippedCount: Math.max(0, totalFetched - totalIngested),
+      skippedCount: Math.max(0, totalFetched - totalIngested - totalFailed),
       mode,
       lastSyncAt,
       foldersScanned: folders.length,

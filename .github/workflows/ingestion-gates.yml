@@ -1,0 +1,81 @@
+name: Ingestion Gates
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'backend/src/entrypoints/http/routes/multipart-upload.routes.ts'
+      - 'backend/src/queues/workers/documentIngestionPipeline.service.ts'
+      - 'backend/src/queues/workers/stuckDocSweeper.service.ts'
+      - 'backend/src/services/connectors/**'
+      - 'backend/src/services/documents/documentStateManager.service.ts'
+      - 'backend/src/services/ingestion/**'
+      - 'backend/src/services/retrieval/vectorEmbedding.runtime.service.ts'
+      - 'backend/scripts/lint/ocr-degrade-audit.mjs'
+      - '.github/workflows/ingestion-gates.yml'
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'backend/src/entrypoints/http/routes/multipart-upload.routes.ts'
+      - 'backend/src/queues/workers/documentIngestionPipeline.service.ts'
+      - 'backend/src/queues/workers/stuckDocSweeper.service.ts'
+      - 'backend/src/services/connectors/**'
+      - 'backend/src/services/documents/documentStateManager.service.ts'
+      - 'backend/src/services/ingestion/**'
+      - 'backend/src/services/retrieval/vectorEmbedding.runtime.service.ts'
+      - 'backend/scripts/lint/ocr-degrade-audit.mjs'
+      - '.github/workflows/ingestion-gates.yml'
+
+jobs:
+  ingestion-gates:
+    name: Ingestion typecheck + OCR + targeted tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Typecheck
+        run: npm run typecheck --silent
+
+      - name: OCR strict audit
+        run: npm run audit:ocr:strict --silent
+
+      - name: Run ingestion-focused tests
+        run: |
+          npm test -- --runInBand --runTestsByPath \
+            src/entrypoints/http/routes/multipart-upload.routes.test.ts \
+            src/queues/workers/stuckDocSweeper.service.test.ts \
+            src/queues/workers/documentIngestionPipeline.service.test.ts \
+            src/services/retrieval/vectorEmbedding.runtime.service.test.ts \
+            src/services/ingestion/fileValidator.service.test.ts \
+            src/services/ingestion/pipeline/__tests__/documentPipeline.validation.test.ts \
+            src/services/connectors/gmail/gmailSync.service.test.ts \
+            src/services/connectors/outlook/outlookSync.service.test.ts \
+            src/services/connectors/slack/slackSync.service.test.ts \
+            src/services/connectors/connectorsIngestion.service.test.ts
+
+      - name: Enforce no raw console logs in connector ingestion runtime
+        run: |
+          if rg -n "console\\." \
+            src/services/connectors/connectorsIngestion.service.ts \
+            src/services/connectors/gmail/gmailSync.service.ts; then
+            echo "Raw console usage detected in connector ingestion runtime"
+            exit 1
+          fi

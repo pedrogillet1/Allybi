@@ -8,6 +8,7 @@ import {
   ConnectorsIngestionService,
   type ConnectorDocument,
 } from "../connectorsIngestion.service";
+import { logger } from "../../../utils/logger";
 
 interface GmailSyncCursor {
   historyId?: string;
@@ -37,6 +38,7 @@ export interface GmailSyncResult {
   syncedCount: number;
   fetchedCount: number;
   ingestedCount: number;
+  failedCount: number;
   createdCount: number;
   existingCount: number;
   skippedCount: number;
@@ -225,6 +227,10 @@ export class GmailSyncService {
       },
       docs,
     );
+    const failedCount = ingested.filter(
+      (item) => item.status === "failed",
+    ).length;
+    const successfulItems = ingested.filter((item) => item.status !== "failed");
     const createdCount = ingested.filter(
       (item) => item.status === "created",
     ).length;
@@ -232,11 +238,23 @@ export class GmailSyncService {
       (item) => item.status === "existing",
     ).length;
     const fetchedCount = docs.length;
-    const ingestedCount = ingested.length;
-    const skippedCount = Math.max(0, fetchedCount - ingestedCount);
+    const ingestedCount = successfulItems.length;
+    const skippedCount = Math.max(
+      0,
+      fetchedCount - ingestedCount - failedCount,
+    );
+    const shouldAdvanceHistoryCursor = failedCount === 0;
+
+    if (!shouldAdvanceHistoryCursor && failedCount > 0) {
+      logger.warn(
+        `[GmailSync] Keeping prior history cursor due to ${failedCount} ingestion failures`,
+      );
+    }
 
     cursorFile.providers.gmail = {
-      historyId: (profile.historyId as string | undefined) || prior.historyId,
+      historyId: shouldAdvanceHistoryCursor
+        ? (profile.historyId as string | undefined) || prior.historyId
+        : prior.historyId,
       lastSyncAt: new Date().toISOString(),
     };
 
@@ -247,6 +265,7 @@ export class GmailSyncService {
       syncedCount: ingestedCount,
       fetchedCount,
       ingestedCount,
+      failedCount,
       createdCount,
       existingCount,
       skippedCount,

@@ -47,11 +47,9 @@ jobs:
 
       - name: 🗄️ Generate Prisma Client
         run: npx prisma generate
-        continue-on-error: true
 
       - name: 🔍 Check TypeScript (Full)
         run: npx tsc --noEmit
-        continue-on-error: true
         id: full-check
 
       - name: 🔍 Check Chat Files
@@ -158,7 +156,6 @@ jobs:
             echo "Running TypeScript compiler..."
             npx tsc --noEmit
           fi
-        continue-on-error: true
 
       - name: 📊 Frontend Check Summary
         if: always()
@@ -193,11 +190,9 @@ jobs:
 
       - name: 🧹 Run ESLint
         run: npm run lint
-        continue-on-error: true
 
       - name: 🎨 Check Prettier
         run: npm run format:check
-        continue-on-error: true
 
   build-test:
     name: Build Test
@@ -229,7 +224,6 @@ jobs:
       - name: 🗄️ Generate Prisma Client (Backend only)
         if: matrix.component == 'backend'
         run: npx prisma generate
-        continue-on-error: true
 
       - name: 🏗️ Build
         run: npm run build

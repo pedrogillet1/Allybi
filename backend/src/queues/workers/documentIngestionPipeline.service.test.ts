@@ -368,4 +368,30 @@ describe("documentIngestionPipeline", () => {
       }),
     );
   });
+
+  // -----------------------------------------------------------------------
+  // 9. Throws when state transition to indexed fails (CAS mismatch, etc.)
+  // -----------------------------------------------------------------------
+  test("throws when markIndexed transition returns success:false", async () => {
+    mockDocFindUnique.mockResolvedValue(makeDocument());
+    mockClaimForEnrichment.mockResolvedValue({ success: true });
+    mockProcessDocumentAsync.mockResolvedValue(makeTimings({ chunkCount: 3 }));
+    mockIsPipelineSkipped.mockReturnValue(false);
+    mockDocFindFirst.mockResolvedValue(null);
+    mockMarkIndexed.mockResolvedValue({
+      success: false,
+      reason: "CAS failed",
+    });
+    mockMarkFailed.mockResolvedValue({ success: true });
+
+    await expect(
+      runDocumentIngestionPipeline(makeJobData()),
+    ).rejects.toThrow("State transition failed during markIndexed");
+
+    expect(mockMarkFailed).toHaveBeenCalledWith(
+      "doc-1",
+      "enriching",
+      expect.stringContaining("State transition failed during markIndexed"),
+    );
+  });
 });

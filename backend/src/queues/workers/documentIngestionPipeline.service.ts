@@ -27,7 +27,10 @@ import {
   generatePreviewPdf,
   needsPreviewPdfGeneration,
 } from "../../services/preview/previewPdfGenerator.service";
-import { documentStateManager } from "../../services/documents/documentStateManager.service";
+import {
+  documentStateManager,
+  type TransitionResult,
+} from "../../services/documents/documentStateManager.service";
 import type { ProcessDocumentJobData } from "../queueConfig";
 import type { ProgressEmitter } from "../../services/ingestion/pipeline/pipelineTypes";
 
@@ -58,6 +61,47 @@ async function persistWithRetry(
       }
     }
   }
+}
+
+async function awaitWithTimeout(
+  label: string,
+  task: Promise<void>,
+  timeoutMs: number,
+): Promise<void> {
+  if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
+    await task;
+    return;
+  }
+
+  let timer: NodeJS.Timeout | null = null;
+  try {
+    await Promise.race([
+      task,
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => {
+          reject(new Error(`${label} timed out after ${timeoutMs}ms`));
+        }, timeoutMs);
+      }),
+    ]);
+  } catch (err: any) {
+    logger.warn(`[IngestionPipeline] ${label} not fully persisted`, {
+      error: err?.message || String(err),
+      timeoutMs,
+    });
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
+
+function ensureTransitionSucceeded(
+  result: TransitionResult,
+  context: string,
+): void {
+  if (result.success) return;
+  const reason = result.reason || "unknown transition failure";
+  throw new Error(
+    `[IngestionPipeline] State transition failed during ${context}: ${reason}`,
+  );
 }
 
 export interface IngestionPipelineOptions {
@@ -93,6 +137,10 @@ export async function runDocumentIngestionPipeline(
     thumbnailUrl,
   } = data;
   const startTime = Date.now();
+  const failureTelemetryTimeoutMs = parseInt(
+    process.env.INGESTION_FAILURE_TELEMETRY_TIMEOUT_MS || "3000",
+    10,
+  );
 
   const dbHost = config.DATABASE_URL?.match(/@([^:/]+)/)?.[1] || "unknown";
   logger.info("[IngestionPipeline] Enriching document", {
@@ -239,7 +287,9 @@ export async function runDocumentIngestionPipeline(
         isImageMime(effectiveMimeType);
 
       if (keepVisibleWithoutText) {
-        await documentStateManager.markReadyWithoutContent(documentId);
+        const transitionResult =
+          await documentStateManager.markReadyWithoutContent(documentId);
+        ensureTransitionSucceeded(transitionResult, "markReadyWithoutContent");
         emitToUser(userId, "document-ready", {
           documentId,
           filename,
@@ -247,7 +297,11 @@ export async function runDocumentIngestionPipeline(
           hasContent: false,
         });
       } else {
-        await documentStateManager.markSkipped(documentId, reason);
+        const transitionResult = await documentStateManager.markSkipped(
+          documentId,
+          reason,
+        );
+        ensureTransitionSucceeded(transitionResult, "markSkipped");
         emitToUser(userId, "document-skipped", {
           documentId,
           filename,
@@ -262,8 +316,8 @@ export async function runDocumentIngestionPipeline(
         durationMs: totalTime,
       });
 
-      // Persist skipped ingestion telemetry (fire-and-forget with retry)
-      persistWithRetry("Persist skipped telemetry", () =>
+      // Persist skipped ingestion telemetry (with retry)
+      await persistWithRetry("Persist skipped telemetry", () =>
         prisma.ingestionEvent.create({
           data: {
             userId,
@@ -300,7 +354,11 @@ export async function runDocumentIngestionPipeline(
     // -----------------------------------------------------------------------
     // 7. Mark indexed via DocumentStateManager
     // -----------------------------------------------------------------------
-    await documentStateManager.markIndexed(documentId, timings.chunkCount);
+    const markIndexedResult = await documentStateManager.markIndexed(
+      documentId,
+      timings.chunkCount,
+    );
+    ensureTransitionSucceeded(markIndexedResult, "markIndexed");
 
     // Save pageCount metadata (best-effort)
     if (timings.pageCount && timings.pageCount > 0) {
@@ -324,7 +382,7 @@ export async function runDocumentIngestionPipeline(
     });
 
     // -----------------------------------------------------------------------
-    // 8. Persist processing metrics (best-effort, fire-and-forget)
+    // 8. Persist processing metrics (with retry)
     // -----------------------------------------------------------------------
     const metricsData = {
       uploadStartedAt: document.createdAt,
@@ -342,7 +400,7 @@ export async function runDocumentIngestionPipeline(
       embeddingsCreated: timings.chunkCount,
       chunksCreated: timings.chunkCount,
     };
-    persistWithRetry("Persist processing metrics", () =>
+    await persistWithRetry("Persist processing metrics", () =>
       prisma.documentProcessingMetrics.upsert({
         where: { documentId },
         create: { documentId, ...metricsData },
@@ -351,9 +409,9 @@ export async function runDocumentIngestionPipeline(
     );
 
     // -----------------------------------------------------------------------
-    // 9. Persist ingestion telemetry (fire-and-forget with retry)
+    // 9. Persist ingestion telemetry (with retry)
     // -----------------------------------------------------------------------
-    persistWithRetry("Persist ingestion telemetry", () =>
+    await persistWithRetry("Persist ingestion telemetry", () =>
       prisma.ingestionEvent.create({
         data: {
           userId,
@@ -397,7 +455,10 @@ export async function runDocumentIngestionPipeline(
         logger.info("[IngestionPipeline] Generating preview PDF", { filename });
         try {
           const result = await generatePreviewPdf(documentId, userId);
-          await documentStateManager.markReady(documentId);
+          const transitionResult = await documentStateManager.markReady(
+            documentId,
+          );
+          ensureTransitionSucceeded(transitionResult, "markReady(with preview)");
           emitToUser(userId, "document-ready", {
             documentId,
             filename,
@@ -408,7 +469,13 @@ export async function runDocumentIngestionPipeline(
             filename,
             error: err.message,
           });
-          await documentStateManager.markReady(documentId);
+          const transitionResult = await documentStateManager.markReady(
+            documentId,
+          );
+          ensureTransitionSucceeded(
+            transitionResult,
+            "markReady(preview fallback)",
+          );
           emitToUser(userId, "document-ready", {
             documentId,
             filename,
@@ -416,7 +483,8 @@ export async function runDocumentIngestionPipeline(
           });
         }
       } else {
-        await documentStateManager.markReady(documentId);
+        const transitionResult = await documentStateManager.markReady(documentId);
+        ensureTransitionSucceeded(transitionResult, "markReady");
         emitToUser(userId, "document-ready", { documentId, filename });
       }
     }
@@ -437,11 +505,17 @@ export async function runDocumentIngestionPipeline(
 
     // Mark as failed via DocumentStateManager
     try {
-      await documentStateManager.markFailed(
+      const markFailedResult = await documentStateManager.markFailed(
         documentId,
         "enriching",
         error.message || "Enrichment failed",
       );
+      if (!markFailedResult.success) {
+        logger.warn("[IngestionPipeline] markFailed transition was not applied", {
+          documentId,
+          reason: markFailedResult.reason,
+        });
+      }
     } catch (updateErr: any) {
       logger.warn(
         "[IngestionPipeline] Could not mark document as failed (may be deleted)",
@@ -449,7 +523,7 @@ export async function runDocumentIngestionPipeline(
       );
     }
 
-    // Persist failure metrics (fire-and-forget)
+    // Persist failure metrics with bounded timeout budget.
     const failData = {
       uploadStartedAt: new Date(startTime),
       processingStartedAt: new Date(startTime),
@@ -458,29 +532,37 @@ export async function runDocumentIngestionPipeline(
       processingFailed: true,
       processingError: (error.message || "Unknown error").slice(0, 500),
     };
-    persistWithRetry("Persist failure metrics", () =>
-      prisma.documentProcessingMetrics.upsert({
-        where: { documentId },
-        create: { documentId, ...failData },
-        update: failData,
-      }),
+    await awaitWithTimeout(
+      "Persist failure metrics",
+      persistWithRetry("Persist failure metrics", () =>
+        prisma.documentProcessingMetrics.upsert({
+          where: { documentId },
+          create: { documentId, ...failData },
+          update: failData,
+        }),
+      ),
+      failureTelemetryTimeoutMs,
     );
 
-    // Persist failure ingestion event (fire-and-forget with retry)
-    persistWithRetry("Persist failure telemetry", () =>
-      prisma.ingestionEvent.create({
-        data: {
-          userId,
-          documentId,
-          filename: filename || "unknown",
-          mimeType: mimeType || "unknown",
-          status: "fail",
-          errorCode: String(error.code || error.name || "UNKNOWN").slice(0, 50),
-          extractionMethod: "unknown",
-          durationMs: totalTime,
-          at: new Date(),
-        },
-      }),
+    // Persist failure ingestion event with bounded timeout budget.
+    await awaitWithTimeout(
+      "Persist failure telemetry",
+      persistWithRetry("Persist failure telemetry", () =>
+        prisma.ingestionEvent.create({
+          data: {
+            userId,
+            documentId,
+            filename: filename || "unknown",
+            mimeType: mimeType || "unknown",
+            status: "fail",
+            errorCode: String(error.code || error.name || "UNKNOWN").slice(0, 50),
+            extractionMethod: "unknown",
+            durationMs: totalTime,
+            at: new Date(),
+          },
+        }),
+      ),
+      failureTelemetryTimeoutMs,
     );
 
     emitProcessingUpdate({

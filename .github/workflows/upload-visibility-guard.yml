@@ -19,10 +19,9 @@ on:
       - 'frontend/src/services/unifiedUploadService.js'
       - 'frontend/src/services/resumableUploadService.js'
       # Backend upload endpoints
-      - 'backend/src/controllers/presigned-url.controller.ts'
-      - 'backend/src/controllers/batch.controller.ts'
-      - 'backend/src/routes/presigned-url.routes.ts'
-      - 'backend/src/routes/batch.routes.ts'
+      - 'backend/src/entrypoints/http/routes/presigned-urls.routes.ts'
+      - 'backend/src/entrypoints/http/routes/batch.routes.ts'
+      - 'backend/src/entrypoints/http/routes/multipart-upload.routes.ts'
       # E2E proof script itself
       - 'scripts/e2e-upload-proof.sh'
 
@@ -32,8 +31,9 @@ on:
     paths:
       - 'frontend/src/components/*Upload*.jsx'
       - 'frontend/src/context/DocumentsContext.jsx'
-      - 'backend/src/controllers/presigned-url.controller.ts'
-      - 'backend/src/controllers/batch.controller.ts'
+      - 'backend/src/entrypoints/http/routes/presigned-urls.routes.ts'
+      - 'backend/src/entrypoints/http/routes/batch.routes.ts'
+      - 'backend/src/entrypoints/http/routes/multipart-upload.routes.ts'
       - 'scripts/e2e-upload-proof.sh'
 
 jobs:
@@ -132,13 +132,18 @@ jobs:
             const hashedPassword = await bcrypt.hash('test123', 10);
             await prisma.user.upsert({
               where: { email: 'test@example.com' },
-              update: {},
+              update: {
+                passwordHash: hashedPassword,
+                isEmailVerified: true,
+                role: 'user',
+              },
               create: {
                 email: 'test@example.com',
-                password: hashedPassword,
-                name: 'Test User',
-                isActive: true,
-                emailVerified: true,
+                passwordHash: hashedPassword,
+                firstName: 'Test',
+                lastName: 'User',
+                isEmailVerified: true,
+                role: 'user',
               }
             });
             console.log('Test user created');
@@ -148,6 +153,9 @@ jobs:
           "
         env:
           DATABASE_URL: postgresql://koda:koda_password@localhost:5432/koda_db
+
+      - name: Assert upload visibility proof harness exists
+        run: test -f scripts/e2e-upload-proof.sh
 
       - name: Start backend server
         working-directory: backend
@@ -183,6 +191,8 @@ jobs:
           ./scripts/e2e-upload-proof.sh
         env:
           BACKEND_URL: http://localhost:5001
+          TEST_USER_EMAIL: test@example.com
+          TEST_USER_PASSWORD: test123
 
       - name: Upload visibility check summary
         if: always()
