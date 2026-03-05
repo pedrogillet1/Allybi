@@ -169,7 +169,7 @@ describe("Certification: telemetry completeness", () => {
         fallbackReasonCodeTelemetry: undefined,
         assistantText: "Here is your summary.",
         telemetry: {
-          model: "gpt-4o-mini",
+          model: "gpt-5.2-mini",
           firstTokenMs: 120,
           costUsd: 0.018,
           requestedMaxOutputTokens: 900,

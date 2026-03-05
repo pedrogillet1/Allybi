@@ -69,4 +69,42 @@ export class ChunkCryptoService {
     }
     return result;
   }
+
+  async decryptChunkMetadataBatch(
+    userId: string,
+    documentId: string,
+    chunkIds: string[],
+  ): Promise<Map<string, Record<string, unknown>>> {
+    const dk = await this.docKeys.getDocumentKey(userId, documentId);
+    const chunks = await this.prisma.documentChunk.findMany({
+      where: { id: { in: chunkIds }, documentId },
+      select: { id: true, metadata: true, metadataEncrypted: true },
+    });
+
+    const result = new Map<string, Record<string, unknown>>();
+    for (const chunk of chunks) {
+      if (chunk.metadataEncrypted) {
+        try {
+          const decrypted = this.docCrypto.decryptChunkText(
+            userId,
+            documentId,
+            `${chunk.id}:meta`,
+            chunk.metadataEncrypted,
+            dk,
+          );
+          const parsed = JSON.parse(String(decrypted || "{}"));
+          if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+            result.set(chunk.id, parsed as Record<string, unknown>);
+            continue;
+          }
+        } catch {
+          // best effort decrypt; fallback to plaintext JSON below
+        }
+      }
+      if (chunk.metadata && typeof chunk.metadata === "object" && !Array.isArray(chunk.metadata)) {
+        result.set(chunk.id, chunk.metadata as Record<string, unknown>);
+      }
+    }
+    return result;
+  }
 }

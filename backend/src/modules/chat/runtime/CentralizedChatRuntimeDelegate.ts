@@ -78,7 +78,9 @@ import {
   getResponseContractEnforcer,
   type ResponseContractContext,
 } from "../../../services/core/enforcement/responseContractEnforcer.service";
-import { resolveGovernanceFailClosed } from "../../../services/core/enforcement/governanceFailClosedPolicy";
+import {
+  resolveGovernanceQualityGateEnforcement,
+} from "../../../services/core/enforcement/governanceFailClosedPolicy";
 import { trimTextToTokenBudget } from "../../../services/core/enforcement/tokenBudget.service";
 import {
   SEMANTIC_TRUNCATION_DETECTOR_VERSION,
@@ -1284,6 +1286,7 @@ const HARD_FAIL_CLOSED_REASON_CODES = new Set<string>([
   "missing_provenance",
   "insufficient_provenance_coverage",
   "nav_pills_missing_buttons",
+  "bank_loader_unhealthy",
 ]);
 
 function normalizeReasonCode(value: unknown): string {
@@ -1313,13 +1316,17 @@ function resolveRuntimeFailureMode(
   return failSoftEnabled ? "fail_soft" : "fail_closed";
 }
 
-function shouldForceStrictGovernanceFailClosed(): boolean {
-  return resolveGovernanceFailClosed({
+function resolveRuntimeGovernanceQualityGatePolicy(): {
+  enforceQualityGates: boolean;
+  failClosed: boolean;
+} {
+  return resolveGovernanceQualityGateEnforcement({
     nodeEnv: process.env.NODE_ENV,
     runtimeEnv: process.env.RUNTIME_ENV || process.env.APP_ENV,
     certProfile: process.env.CERT_PROFILE,
     strictGovernanceFlag: process.env.CHAT_RUNTIME_STRICT_GOVERNANCE,
-  }).failClosed;
+    qualityGatesEnforcingFlag: process.env.QUALITY_GATES_ENFORCING,
+  });
 }
 
 function detectDominantLanguageTag(text: string): "en" | "pt" | "es" | "unknown" {
@@ -1364,6 +1371,13 @@ function buildWarningMessageForReason(params: {
     if (lang === "es")
       return "No pude aplicar todas las validaciones finales. Revisa los detalles criticos.";
     return "I could not apply all final validations. Please review critical details.";
+  }
+  if (reason === "bank_loader_unhealthy") {
+    if (lang === "pt")
+      return "As validacoes de governanca nao estao disponiveis no momento. Tente novamente em instantes.";
+    if (lang === "es")
+      return "Las validaciones de gobernanza no estan disponibles en este momento. Intentalo de nuevo en breve.";
+    return "Governance validations are currently unavailable. Please retry shortly.";
   }
   if (reason === "language_contract_mismatch") {
     if (lang === "pt")
@@ -2253,6 +2267,16 @@ export class CentralizedChatRuntimeDelegate {
               : null,
           fallbackReasonCodeUser: fallbackReasonForUser,
           provenanceTelemetry: params.provenanceTelemetry || null,
+          boostRuleDeltas: ruleEvents
+            .filter((e) => String(e?.event || "") === "retrieval.boost_rule_applied")
+            .map((e) => {
+              const p = asObject(e?.payload);
+              return {
+                ruleId: typeof p.ruleId === "string" ? p.ruleId : null,
+                ...(asObject(p.scoreDeltaSummary) as Record<string, unknown>),
+              };
+            })
+            .filter((d) => d.ruleId) || null,
         },
       }),
       ...retrievalRuleEventWrites,
@@ -4295,15 +4319,67 @@ export class CentralizedChatRuntimeDelegate {
     // 2. Run quality gates (format checks, brevity, markdown sanity)
     let qualityGateIssues: string[] = [];
     let qualityGates: ChatQualityGateState = { allPassed: true, failed: [] };
-    const isTestEnv =
-      String(process.env.NODE_ENV || "")
-        .trim()
-        .toLowerCase() === "test";
-    const enforceQualityGates = shouldForceStrictGovernanceFailClosed()
-      ? true
-      : isTestEnv
-        ? isRuntimeFlagEnabled("QUALITY_GATES_ENFORCING", true)
-        : true;
+    const governanceQualityPolicy = resolveRuntimeGovernanceQualityGatePolicy();
+    const enforceQualityGates = governanceQualityPolicy.enforceQualityGates;
+    const strictGovernanceFailClosed = governanceQualityPolicy.failClosed;
+    const bankLoaderHealth = getBankLoaderInstance().health();
+    if (!bankLoaderHealth.ok) {
+      const reasonCode = "bank_loader_unhealthy";
+      if (strictGovernanceFailClosed) {
+        this.emitGovernanceMetric({
+          traceId,
+          req: params.req,
+          answerMode: params.answerMode,
+          metricName: "governance_gate_fail_total",
+          reasonCode,
+          gateName: "bank_loader_health",
+          failureMode: "fail_closed",
+          enforced: true,
+          blocked: true,
+        });
+        failureCode = reasonCode;
+        text = buildEmptyAssistantText({
+          language: params.req.preferredLanguage,
+          reasonCode,
+          seed: `${params.req.userId}:governance:${reasonCode}`,
+        });
+        qualityGateIssues = [reasonCode];
+        qualityGates = {
+          allPassed: false,
+          failed: [
+            {
+              gateName: "bank_loader_health",
+              severity: "block",
+              reason:
+                bankLoaderHealth.lastError?.message ||
+                "Bank loader health check failed for governed runtime.",
+            },
+          ],
+        };
+        addWarning({
+          code: reasonCode,
+          source: "quality_gate",
+          severity: "error",
+        });
+      } else {
+        this.emitGovernanceMetric({
+          traceId,
+          req: params.req,
+          answerMode: params.answerMode,
+          metricName: "governance_fail_soft_mode_total",
+          reasonCode,
+          gateName: "bank_loader_health",
+          failureMode: "fail_soft",
+          enforced: false,
+          blocked: false,
+        });
+        addWarning({
+          code: reasonCode,
+          source: "quality_gate",
+          severity: "warning",
+        });
+      }
+    }
     if (!enforceQualityGates) {
       this.emitGovernanceMetric({
         traceId,
@@ -4318,7 +4394,8 @@ export class CentralizedChatRuntimeDelegate {
       });
     }
     const qualityGateSeverityByName = resolveQualityGateSeverityMap();
-    try {
+    if (failureCode !== "bank_loader_unhealthy") {
+      try {
       const qualityRunner = new QualityGateRunnerService();
       const contextSignals = asObject(
         (params.req.context as Record<string, unknown> | null)?.signals ?? null,
@@ -4484,52 +4561,53 @@ export class CentralizedChatRuntimeDelegate {
           }
         }
       }
-    } catch (error) {
-      appLogger.warn("[finalizeChatTurn] Quality gate runner error", {
-        error: error instanceof Error ? error.message : String(error),
-      });
-      if (enforceQualityGates && !failureCode) {
-        const reasonCode = "quality_gate_runner_error";
-        const failureMode = resolveRuntimeFailureMode(
-          reasonCode,
-          failSoftWarningsEnabled,
-        );
-        this.emitGovernanceMetric({
-          traceId,
-          req: params.req,
-          answerMode: params.answerMode,
-          metricName: "governance_gate_fail_total",
-          reasonCode,
-          gateName: reasonCode,
-          failureMode,
-          enforced: failureMode === "fail_closed",
-          blocked: failureMode === "fail_closed",
+      } catch (error) {
+        appLogger.warn("[finalizeChatTurn] Quality gate runner error", {
+          error: error instanceof Error ? error.message : String(error),
         });
-        if (failureMode === "fail_closed") {
-          failureCode = reasonCode;
-          text = buildEmptyAssistantText({
-            language: params.req.preferredLanguage,
+        if (enforceQualityGates && !failureCode) {
+          const reasonCode = "quality_gate_runner_error";
+          const failureMode = resolveRuntimeFailureMode(
             reasonCode,
-            seed: `${params.req.userId}:quality_gate:${reasonCode}`,
+            failSoftWarningsEnabled,
+          );
+          this.emitGovernanceMetric({
+            traceId,
+            req: params.req,
+            answerMode: params.answerMode,
+            metricName: "governance_gate_fail_total",
+            reasonCode,
+            gateName: reasonCode,
+            failureMode,
+            enforced: failureMode === "fail_closed",
+            blocked: failureMode === "fail_closed",
           });
-        } else {
-          addWarning({
-            code: reasonCode,
-            source: "quality_gate",
-            severity: "warning",
-          });
+          if (failureMode === "fail_closed") {
+            failureCode = reasonCode;
+            text = buildEmptyAssistantText({
+              language: params.req.preferredLanguage,
+              reasonCode,
+              seed: `${params.req.userId}:quality_gate:${reasonCode}`,
+            });
+          } else {
+            addWarning({
+              code: reasonCode,
+              source: "quality_gate",
+              severity: "warning",
+            });
+          }
+          qualityGates = {
+            allPassed: false,
+            failed: [
+              {
+                gateName: reasonCode,
+                severity: "block",
+                reason: error instanceof Error ? error.message : String(error),
+              },
+            ],
+          };
+          qualityGateIssues = [reasonCode];
         }
-        qualityGates = {
-          allPassed: false,
-          failed: [
-            {
-              gateName: reasonCode,
-              severity: "block",
-              reason: error instanceof Error ? error.message : String(error),
-            },
-          ],
-        };
-        qualityGateIssues = [reasonCode];
       }
     }
 

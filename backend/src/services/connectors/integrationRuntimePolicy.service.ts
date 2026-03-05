@@ -1,4 +1,4 @@
-import { createHash, createHmac } from "crypto";
+import { createHash, createHmac, timingSafeEqual } from "crypto";
 
 export interface OAuthCompletionPayload {
   type: "koda_oauth_done";
@@ -6,6 +6,14 @@ export interface OAuthCompletionPayload {
   ok: boolean;
   t: number;
   sig: string | null;
+}
+
+interface OAuthCompletionPayloadLike {
+  type?: unknown;
+  provider?: unknown;
+  ok?: unknown;
+  t?: unknown;
+  sig?: unknown;
 }
 
 function envList(name: string): string[] {
@@ -75,6 +83,50 @@ export function buildOAuthCompletionPayload(
   const data = `${safeProvider}:${payload.ok ? "1" : "0"}:${nowMs}`;
   payload.sig = createHmac("sha256", secret).update(data).digest("base64url");
   return payload;
+}
+
+function safeSignatureEqual(expected: string, provided: string): boolean {
+  try {
+    const expectedBuf = Buffer.from(expected, "utf8");
+    const providedBuf = Buffer.from(provided, "utf8");
+    if (expectedBuf.length !== providedBuf.length) return false;
+    return timingSafeEqual(expectedBuf, providedBuf);
+  } catch {
+    return false;
+  }
+}
+
+export function verifyOAuthCompletionPayload(
+  payload: unknown,
+  nowMs = Date.now(),
+): boolean {
+  const record = payload as OAuthCompletionPayloadLike;
+  if (!record || typeof record !== "object") return false;
+  if (record.type !== "koda_oauth_done") return false;
+
+  const provider = String(record.provider || "").trim().toLowerCase();
+  const ok = record.ok;
+  const ts = Number(record.t);
+  const sig = String(record.sig || "").trim();
+  if (!provider || !Number.isFinite(ts) || !sig) return false;
+  if (ok !== true && ok !== false) return false;
+
+  const secret = resolveOAuthSigningSecret();
+  // Fail closed: if signing secret is absent, callback payload authenticity cannot be verified.
+  if (!secret) return false;
+
+  const maxAgeMsRaw = Number(process.env.CONNECTOR_OAUTH_CALLBACK_MAX_AGE_MS);
+  const maxAgeMs =
+    Number.isFinite(maxAgeMsRaw) && maxAgeMsRaw > 0
+      ? Math.min(Math.floor(maxAgeMsRaw), 15 * 60 * 1000)
+      : 5 * 60 * 1000;
+  // Allow small positive clock skew while rejecting stale/implausible timestamps.
+  if (ts > nowMs + 60_000) return false;
+  if (nowMs - ts > maxAgeMs) return false;
+
+  const data = `${provider}:${ok ? "1" : "0"}:${ts}`;
+  const expected = createHmac("sha256", secret).update(data).digest("base64url");
+  return safeSignatureEqual(expected, sig);
 }
 
 export function normalizeIntegrationErrorMessage(error: unknown): string {

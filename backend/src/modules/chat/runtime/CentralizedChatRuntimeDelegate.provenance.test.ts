@@ -27,7 +27,10 @@ jest.mock("../../../services/core/retrieval/evidenceGate.service", () => ({
 import { CentralizedChatRuntimeDelegate } from "./CentralizedChatRuntimeDelegate";
 import { CentralizedChatRuntimeDelegate as CentralizedChatRuntimeDelegateV2 } from "./CentralizedChatRuntimeDelegate.v2";
 import type { ChatEngine } from "../domain/chat.contracts";
-import { initializeBanks } from "../../../services/core/banks/bankLoader.service";
+import {
+  getBankLoaderInstance,
+  initializeBanks,
+} from "../../../services/core/banks/bankLoader.service";
 import * as enforcerModule from "../../../services/core/enforcement/responseContractEnforcer.service";
 import { QualityGateRunnerService } from "../../../services/core/enforcement/qualityGateRunner.service";
 
@@ -40,9 +43,11 @@ describe("CentralizedChatRuntimeDelegate provenance enforcement", () => {
   let restoreQualityRunner:
     | jest.SpiedFunction<QualityGateRunnerService["runGates"]>
     | null = null;
+  let restoreBankHealth: jest.SpiedFunction<any> | null = null;
   let priorFailSoftFlag: string | undefined;
   let priorQualityGatesEnforcingFlag: string | undefined;
   let priorNodeEnv: string | undefined;
+  let priorStrictGovernanceFlag: string | undefined;
   let priorProvenanceFailOpenFlag: string | undefined;
 
   beforeAll(async () => {
@@ -59,6 +64,7 @@ describe("CentralizedChatRuntimeDelegate provenance enforcement", () => {
     priorFailSoftFlag = process.env.CHAT_RUNTIME_FAIL_SOFT_WARNINGS;
     priorQualityGatesEnforcingFlag = process.env.QUALITY_GATES_ENFORCING;
     priorNodeEnv = process.env.NODE_ENV;
+    priorStrictGovernanceFlag = process.env.CHAT_RUNTIME_STRICT_GOVERNANCE;
     priorProvenanceFailOpenFlag =
       process.env.PROVENANCE_USER_FAILOPEN_WITH_EVIDENCE;
     restoreEnforcer = jest
@@ -95,6 +101,14 @@ describe("CentralizedChatRuntimeDelegate provenance enforcement", () => {
         finalScore: 1,
         results: [],
       });
+    restoreBankHealth = jest
+      .spyOn(getBankLoaderInstance(), "health")
+      .mockReturnValue({
+        ok: true,
+        env: "dev",
+        loadedCount: 100,
+        loadedIdsSample: ["quality_gates"],
+      } as any);
   });
 
   afterEach(() => {
@@ -106,6 +120,8 @@ describe("CentralizedChatRuntimeDelegate provenance enforcement", () => {
     restoreGenerateFollowupsV2 = null;
     restoreQualityRunner?.mockRestore();
     restoreQualityRunner = null;
+    restoreBankHealth?.mockRestore();
+    restoreBankHealth = null;
     if (priorFailSoftFlag === undefined) {
       delete process.env.CHAT_RUNTIME_FAIL_SOFT_WARNINGS;
     } else {
@@ -120,6 +136,11 @@ describe("CentralizedChatRuntimeDelegate provenance enforcement", () => {
       delete process.env.NODE_ENV;
     } else {
       process.env.NODE_ENV = priorNodeEnv;
+    }
+    if (priorStrictGovernanceFlag === undefined) {
+      delete process.env.CHAT_RUNTIME_STRICT_GOVERNANCE;
+    } else {
+      process.env.CHAT_RUNTIME_STRICT_GOVERNANCE = priorStrictGovernanceFlag;
     }
     if (priorProvenanceFailOpenFlag === undefined) {
       delete process.env.PROVENANCE_USER_FAILOPEN_WITH_EVIDENCE;
@@ -419,6 +440,171 @@ describe("CentralizedChatRuntimeDelegate provenance enforcement", () => {
     expect(finalized.failureCode).toBe("quality_gate_blocked");
     expect(finalized.assistantText).not.toBe(
       "This text should be replaced by fallback.",
+    );
+  });
+
+  test("keeps governance blocking outcome consistent across provider model families", async () => {
+    restoreQualityRunner?.mockResolvedValue({
+      allPassed: false,
+      finalScore: 0,
+      results: [
+        {
+          passed: false,
+          gateName: "privacy_minimal",
+          issues: ["blocked for parity test"],
+        },
+      ],
+    });
+
+    const engine: ChatEngine = {
+      async generate() {
+        return { text: "unused" };
+      },
+      async stream() {
+        return { text: "unused", chunks: [] };
+      },
+    } as ChatEngine;
+
+    const delegate = new CentralizedChatRuntimeDelegate(engine, {
+      conversationMemory: {} as any,
+    });
+
+    const models = ["openai:gpt-5.2", "gemini:gemini-2.5-flash"];
+    const outcomes: Array<{ model: string; failureCode: string | null }> = [];
+    for (const model of models) {
+      const finalized = await (delegate as any).finalizeChatTurn({
+        assistantText: "This text should be replaced by fallback.",
+        req: {
+          userId: `user-quality-${model}`,
+          message: "summarize this",
+          preferredLanguage: "en",
+        },
+        answerMode: "general_answer",
+        answerClass: "GENERAL",
+        retrievalPack: null,
+        sources: [],
+        telemetry: { model },
+      });
+      outcomes.push({ model, failureCode: finalized.failureCode || null });
+    }
+
+    expect(outcomes).toEqual([
+      { model: "openai:gpt-5.2", failureCode: "quality_gate_blocked" },
+      { model: "gemini:gemini-2.5-flash", failureCode: "quality_gate_blocked" },
+    ]);
+  });
+
+  test("fails closed when bank loader health is degraded in strict governance mode", async () => {
+    process.env.NODE_ENV = "production";
+    restoreBankHealth?.mockReturnValue({
+      ok: false,
+      env: "production",
+      loadedCount: 0,
+      loadedIdsSample: [],
+      missingCritical: ["clarification_policy"],
+      lastError: {
+        name: "DataBankError",
+        message: "Dependency graph missing nodes for registered banks",
+      },
+    } as any);
+    restoreQualityRunner?.mockResolvedValue({
+      allPassed: true,
+      finalScore: 1,
+      results: [],
+    });
+
+    const engine: ChatEngine = {
+      async generate() {
+        return { text: "unused" };
+      },
+      async stream() {
+        return { text: "unused", chunks: [] };
+      },
+    } as ChatEngine;
+
+    const delegate = new CentralizedChatRuntimeDelegate(engine, {
+      conversationMemory: {} as any,
+    });
+
+    const finalized = await (delegate as any).finalizeChatTurn({
+      assistantText: "This text should be replaced by fallback.",
+      req: {
+        userId: "user-bank-health",
+        message: "summarize this",
+        preferredLanguage: "en",
+      },
+      answerMode: "general_answer",
+      answerClass: "GENERAL",
+      retrievalPack: null,
+      sources: [],
+      telemetry: { model: "unit-test-model" },
+    });
+
+    expect(finalized.failureCode).toBe("bank_loader_unhealthy");
+    expect(finalized.assistantText).not.toBe(
+      "This text should be replaced by fallback.",
+    );
+    expect(finalized.qualityGateIssues).toContain("bank_loader_unhealthy");
+    expect(finalized.qualityGates.failed).toContainEqual(
+      expect.objectContaining({
+        gateName: "bank_loader_health",
+        severity: "block",
+      }),
+    );
+  });
+
+  test("stays fail-soft on bank loader health issues in non-protected env", async () => {
+    process.env.NODE_ENV = "development";
+    process.env.CHAT_RUNTIME_STRICT_GOVERNANCE = "false";
+    restoreBankHealth?.mockReturnValue({
+      ok: false,
+      env: "dev",
+      loadedCount: 0,
+      loadedIdsSample: [],
+      missingCritical: ["clarification_policy"],
+      lastError: {
+        name: "DataBankError",
+        message: "Dependency graph missing nodes for registered banks",
+      },
+    } as any);
+    restoreQualityRunner?.mockResolvedValue({
+      allPassed: true,
+      finalScore: 1,
+      results: [],
+    });
+
+    const engine: ChatEngine = {
+      async generate() {
+        return { text: "unused" };
+      },
+      async stream() {
+        return { text: "unused", chunks: [] };
+      },
+    } as ChatEngine;
+
+    const delegate = new CentralizedChatRuntimeDelegate(engine, {
+      conversationMemory: {} as any,
+    });
+
+    const finalized = await (delegate as any).finalizeChatTurn({
+      assistantText: "This text should stay eligible for normal flow.",
+      req: {
+        userId: "user-bank-health-soft",
+        message: "summarize this",
+        preferredLanguage: "en",
+      },
+      answerMode: "general_answer",
+      answerClass: "GENERAL",
+      retrievalPack: null,
+      sources: [],
+      telemetry: { model: "unit-test-model" },
+    });
+
+    expect(finalized.failureCode).toBeNull();
+    expect(finalized.warnings || []).toContainEqual(
+      expect.objectContaining({
+        code: "bank_loader_unhealthy",
+      }),
     );
   });
 
@@ -745,6 +931,65 @@ describe("CentralizedChatRuntimeDelegate provenance enforcement", () => {
     expect(finalized.failureCode).toBe("quality_gate_blocked");
     expect(finalized.assistantText).not.toBe(
       "This text should be replaced by fallback.",
+    );
+  });
+
+  test("v2 fails closed when bank loader health is degraded in strict governance mode", async () => {
+    process.env.NODE_ENV = "production";
+    restoreBankHealth?.mockReturnValue({
+      ok: false,
+      env: "production",
+      loadedCount: 0,
+      loadedIdsSample: [],
+      missingCritical: ["clarification_policy"],
+      lastError: {
+        name: "DataBankError",
+        message: "Dependency graph missing nodes for registered banks",
+      },
+    } as any);
+    restoreQualityRunner?.mockResolvedValue({
+      allPassed: true,
+      finalScore: 1,
+      results: [],
+    });
+
+    const engine: ChatEngine = {
+      async generate() {
+        return { text: "unused" };
+      },
+      async stream() {
+        return { text: "unused", chunks: [] };
+      },
+    } as ChatEngine;
+
+    const delegate = new CentralizedChatRuntimeDelegateV2(engine, {
+      conversationMemory: {} as any,
+    });
+
+    const finalized = await (delegate as any).finalizeChatTurn({
+      assistantText: "This text should be replaced by fallback.",
+      req: {
+        userId: "user-bank-health-v2",
+        message: "summarize this",
+        preferredLanguage: "en",
+      },
+      answerMode: "general_answer",
+      answerClass: "GENERAL",
+      retrievalPack: null,
+      sources: [],
+      telemetry: { model: "unit-test-model" },
+    });
+
+    expect(finalized.failureCode).toBe("bank_loader_unhealthy");
+    expect(finalized.assistantText).not.toBe(
+      "This text should be replaced by fallback.",
+    );
+    expect(finalized.qualityGateIssues).toContain("bank_loader_unhealthy");
+    expect(finalized.qualityGates.failed).toContainEqual(
+      expect.objectContaining({
+        gateName: "bank_loader_health",
+        severity: "block",
+      }),
     );
   });
 

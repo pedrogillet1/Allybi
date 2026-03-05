@@ -109,6 +109,7 @@ async function main() {
   let summary = null;
   let collectedWindow = null;
   let fallbackUsed = false;
+  let collectionFailed = false;
 
   try {
     const collected = await collectEvents(windowHours);
@@ -130,6 +131,7 @@ async function main() {
       "utf8",
     );
   } catch (error) {
+    collectionFailed = true;
     collectionError = error instanceof Error ? error.message : String(error);
     if (fs.existsSync(reportPath)) {
       try {
@@ -168,6 +170,13 @@ async function main() {
       warnings.push("INSUFFICIENT_SAMPLE_NON_BLOCKING");
     } else {
       failures.push(...evaluation.failures);
+    }
+  }
+
+  if (required && collectionFailed) {
+    failures.push("INGESTION_SLO_COLLECTION_FAILED");
+    if (fallbackUsed) {
+      failures.push("FALLBACK_REPORT_NOT_ALLOWED_IN_REQUIRED_MODE");
     }
   }
 

@@ -73,6 +73,7 @@ type ChunkWithDocument = {
   numericValue?: number | null;
   scaleRaw?: string | null;
   scaleMultiplier?: number | null;
+  metadataEncrypted?: string | null;
   metadata?: Record<string, unknown> | null;
   document: {
     id: string;
@@ -108,6 +109,7 @@ type ChunkRow = {
   numericValue?: number | null;
   scaleRaw?: string | null;
   scaleMultiplier?: number | null;
+  metadataEncrypted?: string | null;
   metadata?: Record<string, unknown> | null;
 };
 
@@ -148,6 +150,17 @@ function toSafeInt(value: unknown, fallback: number): number {
 function parseNullableNumber(value: unknown): number | null {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : null;
+}
+
+function parseNullableInt(value: unknown): number | null {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return null;
+  return Math.trunc(parsed);
+}
+
+function parseNullableString(value: unknown): string | null {
+  const normalized = String(value || "").trim();
+  return normalized || null;
 }
 
 function uniq(values: string[]): string[] {
@@ -869,6 +882,7 @@ class PrismaRetrievalUserAdapter
       },
     })) as unknown as ChunkWithDocument[];
     const plaintextByChunkId = await this.resolveChunkTexts(rows);
+    const metadataByChunkId = await this.resolveChunkMetadata(rows);
 
     const scored: Array<{
       docId: string;
@@ -882,7 +896,11 @@ class PrismaRetrievalUserAdapter
       chunkId: string;
     }> = [];
 
-    for (const row of rows) {
+    for (const sourceRow of rows) {
+      const row = this.withHydratedMetadata(
+        sourceRow,
+        metadataByChunkId.get(sourceRow.id),
+      ) as ChunkWithDocument;
       const snippet = toSnippet(plaintextByChunkId.get(row.id) ?? row.text);
       if (!snippet) continue;
 
@@ -976,10 +994,16 @@ class PrismaRetrievalUserAdapter
         })) as unknown as ChunkWithDocument[];
         const fallbackPlaintextByChunkId =
           await this.resolveChunkTexts(fallbackRows);
+        const fallbackMetadataByChunkId =
+          await this.resolveChunkMetadata(fallbackRows);
 
         const existingKeys = new Set(scored.map((s) => s.chunkId));
         const backfillPerDoc = new Map<string, number>();
-        for (const row of fallbackRows) {
+        for (const sourceRow of fallbackRows) {
+          const row = this.withHydratedMetadata(
+            sourceRow,
+            fallbackMetadataByChunkId.get(sourceRow.id),
+          ) as ChunkWithDocument;
           if (existingKeys.has(row.id)) continue;
           const count = backfillPerDoc.get(row.documentId) ?? 0;
           if (count >= perDocLimit) continue;
@@ -1115,6 +1139,7 @@ class PrismaRetrievalUserAdapter
     }
 
     const plaintextByChunkId = await this.resolveChunkTexts(rows);
+    const metadataByChunkId = await this.resolveChunkMetadata(rows);
 
     const scored: Array<{
       docId: string;
@@ -1127,7 +1152,11 @@ class PrismaRetrievalUserAdapter
       score: number;
       chunkId: string;
     }> = [];
-    for (const row of rows) {
+    for (const sourceRow of rows) {
+      const row = this.withHydratedMetadata(
+        sourceRow,
+        metadataByChunkId.get(sourceRow.id),
+      ) as ChunkWithDocument;
       const snippet = toSnippet(plaintextByChunkId.get(row.id) ?? row.text);
       if (!snippet) continue;
       const score = scoreChunkText(snippet, query, tokens, input.mode);
@@ -1452,6 +1481,83 @@ class PrismaRetrievalUserAdapter
     return undefined;
   }
 
+  private withHydratedMetadata(
+    row: ChunkRow,
+    metadata: Record<string, unknown> | undefined,
+  ): ChunkRow {
+    if (!metadata || Object.keys(metadata).length === 0) return row;
+    const mergedMetadata = {
+      ...(row.metadata && typeof row.metadata === "object" ? row.metadata : {}),
+      ...metadata,
+    };
+    return {
+      ...row,
+      metadata: mergedMetadata,
+      page:
+        row.page ??
+        parseNullableInt((mergedMetadata as Record<string, unknown>).pageNumber),
+      sectionId:
+        row.sectionId ??
+        parseNullableString(
+          (mergedMetadata as Record<string, unknown>).sectionId,
+        ),
+      sectionName:
+        row.sectionName ??
+        parseNullableString(
+          (mergedMetadata as Record<string, unknown>).sectionName,
+        ),
+      sheetName:
+        row.sheetName ??
+        parseNullableString(
+          (mergedMetadata as Record<string, unknown>).sheetName,
+        ),
+      tableChunkForm:
+        row.tableChunkForm ??
+        parseNullableString(
+          (mergedMetadata as Record<string, unknown>).tableChunkForm,
+        ),
+      tableId:
+        row.tableId ??
+        parseNullableString((mergedMetadata as Record<string, unknown>).tableId),
+      rowLabel:
+        row.rowLabel ??
+        parseNullableString(
+          (mergedMetadata as Record<string, unknown>).rowLabel,
+        ),
+      colHeader:
+        row.colHeader ??
+        parseNullableString(
+          (mergedMetadata as Record<string, unknown>).colHeader,
+        ),
+      valueRaw:
+        row.valueRaw ??
+        parseNullableString(
+          (mergedMetadata as Record<string, unknown>).valueRaw,
+        ),
+      unitRaw:
+        row.unitRaw ??
+        parseNullableString((mergedMetadata as Record<string, unknown>).unitRaw),
+      unitNormalized:
+        row.unitNormalized ??
+        parseNullableString(
+          (mergedMetadata as Record<string, unknown>).unitNormalized,
+        ),
+      numericValue:
+        row.numericValue ??
+        parseNullableNumber(
+          (mergedMetadata as Record<string, unknown>).numericValue,
+        ),
+      scaleRaw:
+        row.scaleRaw ??
+        parseNullableString((mergedMetadata as Record<string, unknown>).scaleRaw),
+      scaleMultiplier:
+        row.scaleMultiplier ??
+        parseNullableNumber(
+          (mergedMetadata as Record<string, unknown>).scaleMultiplier,
+        ),
+    };
+  }
+
   private buildTablePayloadFromChunkRow(
     row: ChunkRow,
     snippet: string,
@@ -1515,6 +1621,58 @@ class PrismaRetrievalUserAdapter
         }
       } catch {
         // Decryption is best-effort; callers skip empty snippets.
+      }
+    }
+
+    return out;
+  }
+
+  private async resolveChunkMetadata(
+    rows: ChunkRow[],
+  ): Promise<Map<string, Record<string, unknown>>> {
+    const out = new Map<string, Record<string, unknown>>();
+    if (!rows.length) return out;
+
+    const toDecryptByDoc = new Map<string, string[]>();
+    for (const row of rows) {
+      if (row.metadata && typeof row.metadata === "object" && !Array.isArray(row.metadata)) {
+        out.set(row.id, row.metadata);
+      }
+      const encrypted = String(row.metadataEncrypted || "").trim();
+      if (!encrypted) continue;
+      const list = toDecryptByDoc.get(row.documentId) || [];
+      list.push(row.id);
+      toDecryptByDoc.set(row.documentId, list);
+    }
+    if (toDecryptByDoc.size === 0) return out;
+
+    const chunkCrypto = getChunkCryptoServiceSafe();
+    const canDecryptMetadata = Boolean(
+      chunkCrypto &&
+      typeof (chunkCrypto as any).decryptChunkMetadataBatch === "function",
+    );
+    if (!canDecryptMetadata) return out;
+
+    const docs = [...toDecryptByDoc.keys()].sort((a, b) => a.localeCompare(b));
+    for (const docId of docs) {
+      const chunkIds = uniq((toDecryptByDoc.get(docId) || []).sort());
+      if (!chunkIds.length) continue;
+      try {
+        const decrypted = await (chunkCrypto as any).decryptChunkMetadataBatch(
+          this.userId,
+          docId,
+          chunkIds,
+        );
+        for (const chunkId of chunkIds) {
+          const metadata = decrypted?.get?.(chunkId);
+          if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) {
+            continue;
+          }
+          const previous = out.get(chunkId) || {};
+          out.set(chunkId, { ...previous, ...metadata });
+        }
+      } catch {
+        // Decryption is best-effort; callers fall back to row columns.
       }
     }
 

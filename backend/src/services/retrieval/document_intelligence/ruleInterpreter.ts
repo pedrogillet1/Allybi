@@ -1066,10 +1066,25 @@ function isCompareIntent(ctx: RuleMatchContext): boolean {
   const operator = normalizeToken(ctx.operator);
   if (intent.includes("compare")) return true;
   if (operator.includes("compare")) return true;
+  if (isExplicitNonCompareOperator(operator)) return false;
   const query = normalizeToken(ctx.normalizedQuery || ctx.query);
   return /\b(compare|comparison|vs|versus|difference|diff|between|comparar|diferenca|diferença|entre)\b/i.test(
     query,
   );
+}
+
+function isExplicitNonCompareOperator(operator: string): boolean {
+  if (!operator) return false;
+  return new Set([
+    "extract",
+    "summarize",
+    "locate_docs",
+    "locate",
+    "search",
+    "lookup",
+    "find",
+    "quote",
+  ]).has(String(operator || "").trim().toLowerCase());
 }
 
 function resolveCrossDocRule(
@@ -1322,3 +1337,6 @@ export function enforceCrossDocPolicy(
     actualExplicitDocs: ctx.explicitDocsCount,
   };
 }
+
+
+

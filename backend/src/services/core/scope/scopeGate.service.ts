@@ -393,6 +393,7 @@ export class ScopeGateService {
     } catch {
       diSectionOntologyBank = null;
     }
+    const headingsMapBank = this.safeGetBank<Record<string, unknown>>("headings_map");
     const stopwordsDocnames = this.safeGetBank<Record<string, unknown>>("stopwords_docnames");
     const ambiguityPolicies = this.safeGetBank<Record<string, unknown>>("disambiguation_policies");
     const rankFeatures = this.safeGetBank<Record<string, unknown>>("ambiguity_rank_features");
@@ -785,6 +786,7 @@ export class ScopeGateService {
         docs,
         docTaxonomyBank,
         diSectionOntologyBank,
+        headingsMapBank,
       );
       if (sectionResult) {
         activeSectionHint = sectionResult.candidates[0]?.label ?? null;
@@ -1238,6 +1240,7 @@ export class ScopeGateService {
     docs: DocMeta[],
     docTaxonomyBank: Record<string, unknown> | null,
     diSectionOntologyBank: Record<string, unknown> | null,
+    headingsMapBank: Record<string, unknown> | null,
   ): { candidates: Array<{ sectionId: string; label: string; score: number }> } | null {
     const queryFolded = foldDiacritics(normalizedQuery);
     const sectionKeywords =
@@ -1300,13 +1303,6 @@ export class ScopeGateService {
     if (!descriptor) return null;
 
     const sectionStopwords = new Set([
-      "clause",
-      "section",
-      "part",
-      "article",
-      "clausula",
-      "secao",
-      "artigo",
       "where",
       "what",
       "which",
@@ -1320,13 +1316,19 @@ export class ScopeGateService {
       );
     if (!descriptorTokens.length) return null;
 
-    const phraseMap = new Map<string, string>();
-    const appendPhrase = (value: unknown) => {
+    const phraseMap = new Map<string, { label: string; weight: number }>();
+    const appendPhrase = (
+      value: unknown,
+      weight = 1,
+    ) => {
       const raw = String(value || "").trim();
       if (!raw) return;
       const normalized = foldDiacritics(raw).replace(/\s+/g, " ").trim();
       if (!normalized || normalized.length < 3) return;
-      if (!phraseMap.has(normalized)) phraseMap.set(normalized, raw);
+      const existing = phraseMap.get(normalized);
+      if (!existing || weight > existing.weight) {
+        phraseMap.set(normalized, { label: raw, weight });
+      }
     };
 
     const typeDefinitions = Array.isArray(docTaxonomyBank?.typeDefinitions)
@@ -1337,29 +1339,46 @@ export class ScopeGateService {
         ? definition.requiredSections
         : [];
       const aliases = Array.isArray(definition?.aliases) ? definition.aliases : [];
-      requiredSections.forEach(appendPhrase);
-      aliases.forEach(appendPhrase);
+      requiredSections.forEach((phrase) => appendPhrase(phrase, 1.1));
+      aliases.forEach((phrase) => appendPhrase(phrase, 1));
     }
 
     const ontologySections = Array.isArray(diSectionOntologyBank?.sections)
       ? (diSectionOntologyBank.sections as Array<Record<string, unknown>>)
       : [];
     for (const section of ontologySections) {
-      appendPhrase(section?.label);
-      appendPhrase(section?.labelPt);
-      appendPhrase(section?.category);
+      appendPhrase(section?.label, 0.95);
+      appendPhrase(section?.labelPt, 0.95);
+      appendPhrase(section?.category, 0.85);
       const variants = asObject(section?.headerVariants);
       Object.values(variants).forEach((entries) => {
         if (!Array.isArray(entries)) return;
-        entries.forEach(appendPhrase);
+        entries.forEach((phrase) => appendPhrase(phrase, 0.9));
       });
+    }
+    const headings = Array.isArray(headingsMapBank?.headings)
+      ? (headingsMapBank.headings as Array<Record<string, unknown>>)
+      : [];
+    for (const heading of headings) {
+      const canonical = String(heading?.canonical || "")
+        .trim()
+        .replace(/_/g, " ");
+      appendPhrase(canonical, 1.2);
+      const synonyms = asObject(heading?.synonyms);
+      const en = Array.isArray(synonyms.en) ? synonyms.en : [];
+      const pt = Array.isArray(synonyms.pt) ? synonyms.pt : [];
+      en.forEach((phrase) => appendPhrase(phrase, 1.2));
+      pt.forEach((phrase) => appendPhrase(phrase, 1.2));
     }
 
     const descriptorText = descriptorTokens.join(" ");
     const descriptorSet = new Set(descriptorTokens);
+    const descriptorMentionsClauseFamily = /\b(clause|section|article|clausula|cláusula|secao|seção|artigo)\b/i.test(
+      foldDiacritics(descriptor),
+    );
     const semanticCandidates: Array<{ sectionId: string; label: string; score: number }> = [];
 
-    for (const [phraseNormalized, phraseLabel] of phraseMap.entries()) {
+    for (const [phraseNormalized, phrase] of phraseMap.entries()) {
       const phraseTokens = phraseNormalized
         .split(/[^a-z0-9]+/)
         .map((token) => token.trim())
@@ -1381,11 +1400,20 @@ export class ScopeGateService {
       } else if (descriptorSet.size === 1 && overlap >= 1) {
         score = 0.78;
       }
+      const phraseMentionsClauseFamily = /\b(clause|section|article|clausula|clausula|secao|seção|artigo)\b/i.test(
+        phraseNormalized,
+      );
+      if (descriptorMentionsClauseFamily && phraseMentionsClauseFamily) {
+        score += 0.05;
+      } else if (descriptorMentionsClauseFamily && !phraseMentionsClauseFamily) {
+        score -= 0.07;
+      }
+      score *= phrase.weight;
       if (score < 0.75) continue;
 
       semanticCandidates.push({
         sectionId: `${activeDocId}#${phraseNormalized.replace(/\s+/g, "_").slice(0, 96)}`,
-        label: phraseLabel,
+        label: phrase.label,
         score: clamp01(score),
       });
     }

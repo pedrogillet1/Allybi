@@ -41,24 +41,33 @@ async function persistWithRetry(
   label: string,
   fn: () => Promise<unknown>,
   retries = 1,
+  failClosed = false,
 ): Promise<void> {
+  let finalError: Error | null = null;
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
       await fn();
       return;
     } catch (err: any) {
+      finalError =
+        err instanceof Error ? err : new Error(err?.message || String(err));
       if (attempt < retries) {
         logger.warn(`[IngestionPipeline] ${label} failed, retrying`, {
           attempt: attempt + 1,
-          error: err.message,
+          error: finalError.message,
         });
         await new Promise((r) => setTimeout(r, 500));
       } else {
         logger.warn(`[IngestionPipeline] ${label} failed after retries`, {
-          error: err.message,
+          error: finalError.message,
         });
       }
     }
+  }
+  if (failClosed) {
+    throw new Error(
+      `[IngestionPipeline] ${label} failed after retries: ${finalError?.message || "unknown error"}`,
+    );
   }
 }
 
@@ -115,6 +124,27 @@ function toSizeBucket(sizeBytes: number | null | undefined): string | null {
   return "gte_200mb";
 }
 
+export function resolveIngestionTelemetryFailClosed(
+  rawValue: string | undefined = process.env.INGESTION_TELEMETRY_FAIL_CLOSED,
+  nodeEnv: string | undefined = process.env.NODE_ENV,
+): boolean {
+  const protectedEnv = nodeEnv === "production" || nodeEnv === "staging";
+  const normalized = String(rawValue ?? (protectedEnv ? "true" : "false"))
+    .trim()
+    .toLowerCase();
+  const enabled = normalized === "true" || normalized === "1";
+
+  if (protectedEnv && !enabled) {
+    logger.error(
+      "[IngestionPipeline] INGESTION_TELEMETRY_FAIL_CLOSED=false is not allowed in production/staging; forcing fail-closed",
+      { nodeEnv },
+    );
+    return true;
+  }
+
+  return enabled;
+}
+
 export interface IngestionPipelineOptions {
   /** Emit progress updates (e.g., BullMQ job.updateProgress) */
   emitProgress?: ProgressEmitter;
@@ -152,6 +182,7 @@ export async function runDocumentIngestionPipeline(
     process.env.INGESTION_FAILURE_TELEMETRY_TIMEOUT_MS || "3000",
     10,
   );
+  const failClosedTelemetry = resolveIngestionTelemetryFailClosed();
 
   const dbHost = config.DATABASE_URL?.match(/@([^:/]+)/)?.[1] || "unknown";
   logger.info("[IngestionPipeline] Enriching document", {
@@ -344,12 +375,18 @@ export async function runDocumentIngestionPipeline(
               ocrMode: timings.ocrMode,
               ocrPageCount: timings.ocrPageCount,
               textQuality: timings.textQuality,
+              extractionWarnings: timings.extractionWarnings.slice(0, 20),
+              extractionWarningCodes: Array.isArray(timings.extractionWarningCodes)
+                ? timings.extractionWarningCodes.slice(0, 20)
+                : [],
               peakRssMb: timings.peakRssMb ?? null,
               sizeBucket,
             },
           },
         }),
-      );
+      1,
+      failClosedTelemetry,
+    );
 
       return {
         success: true,
@@ -359,38 +396,14 @@ export async function runDocumentIngestionPipeline(
       };
     }
 
-    // -----------------------------------------------------------------------
-    // 7. Mark indexed via DocumentStateManager
-    // -----------------------------------------------------------------------
-    const markIndexedResult = await documentStateManager.markIndexed(
-      documentId,
-      timings.chunkCount,
-    );
-    ensureTransitionSucceeded(markIndexedResult, "markIndexed");
-
-    // Save pageCount metadata (best-effort)
-    if (timings.pageCount && timings.pageCount > 0) {
-      try {
-        await prisma.documentMetadata.upsert({
-          where: { documentId },
-          create: { documentId, pageCount: timings.pageCount },
-          update: { pageCount: timings.pageCount },
-        });
-      } catch (err: any) {
-        logger.warn("[IngestionPipeline] Failed to save pageCount", {
-          err: err.message,
-        });
-      }
-    }
-
     const totalTime = Date.now() - startTime;
-    logger.info("[IngestionPipeline] Indexing complete", {
+    logger.info("[IngestionPipeline] Ingestion payload prepared", {
       filename,
       durationMs: totalTime,
     });
 
     // -----------------------------------------------------------------------
-    // 8. Persist processing metrics (with retry)
+    // 7. Persist processing metrics (with retry)
     // -----------------------------------------------------------------------
     const metricsData = {
       uploadStartedAt: document.createdAt,
@@ -414,10 +427,12 @@ export async function runDocumentIngestionPipeline(
         create: { documentId, ...metricsData },
         update: metricsData,
       }),
+      1,
+      failClosedTelemetry,
     );
 
     // -----------------------------------------------------------------------
-    // 9. Persist ingestion telemetry (with retry)
+    // 8. Persist ingestion telemetry (with retry)
     // -----------------------------------------------------------------------
     await persistWithRetry("Persist ingestion telemetry", () =>
       prisma.ingestionEvent.create({
@@ -447,6 +462,9 @@ export async function runDocumentIngestionPipeline(
             textQuality: timings.textQuality,
             textQualityScore: timings.textQualityScore,
             extractionWarnings: timings.extractionWarnings.slice(0, 20),
+            extractionWarningCodes: Array.isArray(timings.extractionWarningCodes)
+              ? timings.extractionWarningCodes.slice(0, 20)
+              : [],
             tablesDetected: (timings as any).tablesDetected ?? null,
             extractorDurationMs: (timings as any).extractorDurationMs ?? null,
             fileHash: timings.fileHash ?? null,
@@ -455,7 +473,38 @@ export async function runDocumentIngestionPipeline(
           },
         },
       }),
+      1,
+      failClosedTelemetry,
     );
+
+    // -----------------------------------------------------------------------
+    // 9. Mark indexed via DocumentStateManager
+    // -----------------------------------------------------------------------
+    const markIndexedResult = await documentStateManager.markIndexed(
+      documentId,
+      timings.chunkCount,
+    );
+    ensureTransitionSucceeded(markIndexedResult, "markIndexed");
+
+    // Save pageCount metadata (best-effort)
+    if (timings.pageCount && timings.pageCount > 0) {
+      try {
+        await prisma.documentMetadata.upsert({
+          where: { documentId },
+          create: { documentId, pageCount: timings.pageCount },
+          update: { pageCount: timings.pageCount },
+        });
+      } catch (err: any) {
+        logger.warn("[IngestionPipeline] Failed to save pageCount", {
+          err: err.message,
+        });
+      }
+    }
+
+    logger.info("[IngestionPipeline] Indexing complete", {
+      filename,
+      durationMs: totalTime,
+    });
 
     emitToUser(userId, "document-indexed", { documentId, filename });
 
@@ -552,6 +601,8 @@ export async function runDocumentIngestionPipeline(
           create: { documentId, ...failData },
           update: failData,
         }),
+        1,
+        failClosedTelemetry,
       ),
       failureTelemetryTimeoutMs,
     );
@@ -573,6 +624,8 @@ export async function runDocumentIngestionPipeline(
             at: new Date(),
           },
         }),
+        1,
+        failClosedTelemetry,
       ),
       failureTelemetryTimeoutMs,
     );

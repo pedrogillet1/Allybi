@@ -129,4 +129,35 @@ describe("indexingPolicy.service", () => {
     } as NodeJS.ProcessEnv);
     expect(policy.encryptedChunksOnly).toBe(true);
   });
+
+  test("fails closed in protected environments when invariant enforcement flags are disabled", () => {
+    expect(() =>
+      resolveIndexingPolicySnapshot({
+        NODE_ENV: "production",
+        INDEXING_ENCRYPTED_CHUNKS_ONLY: "true",
+        INDEXING_ENFORCE_CHUNK_METADATA: "false",
+      } as NodeJS.ProcessEnv),
+    ).toThrow(/Protected runtime requires strict indexing invariants/i);
+  });
+
+  test("fails closed in protected environments when verify-required is disabled", () => {
+    expect(() =>
+      resolveIndexingPolicySnapshot({
+        NODE_ENV: "staging",
+        INDEXING_ENCRYPTED_CHUNKS_ONLY: "true",
+        INDEXING_VERIFY_REQUIRED: "false",
+      } as NodeJS.ProcessEnv),
+    ).toThrow(/Protected runtime requires strict indexing invariants/i);
+  });
+
+  test("allows relaxed invariant flags in non-protected environments", () => {
+    const policy = resolveIndexingPolicySnapshot({
+      NODE_ENV: "development",
+      INDEXING_ENCRYPTED_CHUNKS_ONLY: "true",
+      INDEXING_ENFORCE_CHUNK_METADATA: "false",
+      INDEXING_VERIFY_REQUIRED: "false",
+    } as NodeJS.ProcessEnv);
+    expect(policy.enforceChunkMetadataInvariant).toBe(false);
+    expect(policy.verifyRequired).toBe(false);
+  });
 });

@@ -8,6 +8,11 @@ export interface GovernanceFailClosedResolutionInput {
   configuredFailClosed?: boolean | null | undefined;
 }
 
+export interface GovernanceQualityGateEnforcementInput
+  extends GovernanceFailClosedResolutionInput {
+  qualityGatesEnforcingFlag?: unknown;
+}
+
 function normalizeString(value: unknown): string {
   return String(value || "")
     .trim()
@@ -94,5 +99,40 @@ export function resolveGovernanceFailClosed(
     runtimeEnv,
     protectedEnv,
     strictCertProfile,
+  };
+}
+
+export function resolveGovernanceQualityGateEnforcement(
+  input: GovernanceQualityGateEnforcementInput,
+): {
+  enforceQualityGates: boolean;
+  failClosed: boolean;
+  runtimeEnv: GovernanceRuntimeEnv;
+  protectedEnv: boolean;
+  strictCertProfile: boolean;
+  reasonCode?: string;
+} {
+  const failClosed = resolveGovernanceFailClosed(input);
+  if (failClosed.failClosed) {
+    return {
+      enforceQualityGates: true,
+      failClosed: true,
+      runtimeEnv: failClosed.runtimeEnv,
+      protectedEnv: failClosed.protectedEnv,
+      strictCertProfile: failClosed.strictCertProfile,
+      reasonCode: "strict_fail_closed",
+    };
+  }
+  const explicit = parseBooleanString(input.qualityGatesEnforcingFlag);
+  const enforceQualityGates = explicit !== false;
+  return {
+    enforceQualityGates,
+    failClosed: false,
+    runtimeEnv: failClosed.runtimeEnv,
+    protectedEnv: failClosed.protectedEnv,
+    strictCertProfile: failClosed.strictCertProfile,
+    reasonCode: enforceQualityGates
+      ? "quality_gates_enforcing_enabled"
+      : "quality_gates_enforcing_disabled",
   };
 }

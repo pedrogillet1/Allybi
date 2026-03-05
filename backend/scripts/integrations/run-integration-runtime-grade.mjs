@@ -168,6 +168,13 @@ async function main() {
     "v2",
     "ChatInterfaceV2.impl.js",
   );
+  const securityAuthCertPath = path.join(
+    backendRoot,
+    "src",
+    "tests",
+    "certification",
+    "security-auth.cert.test.ts",
+  );
 
   const controllerText = readFileSafe(controllerPath);
   const routesText = readFileSafe(routesPath);
@@ -180,6 +187,7 @@ async function main() {
   const frontendOAuthCallbackText = readFileSafe(frontendOAuthCallbackPath);
   const frontendIntegrationsHookText = readFileSafe(frontendIntegrationsHookPath);
   const frontendChatText = readFileSafe(frontendChatPath);
+  const securityAuthCertText = readFileSafe(securityAuthCertPath);
 
   checks.push({
     id: "no_wildcard_postmessage",
@@ -243,6 +251,42 @@ async function main() {
   });
 
   checks.push({
+    id: "oauth_completion_signature_verification_wired",
+    severity: "high",
+    weight: 25,
+    pass:
+      /\/oauth\/verify/.test(routesText) &&
+      /verifyOAuthCompletionPayload/.test(controllerText) &&
+      /verifyOAuthCompletion/.test(frontendIntegrationsHookText) &&
+      /verifyOAuthCompletion/.test(frontendChatText),
+    detail:
+      "OAuth completion payload authenticity must be server-verified before frontend applies connection state.",
+  });
+
+  checks.push({
+    id: "chat_oauth_popup_source_validation",
+    severity: "high",
+    weight: 20,
+    pass:
+      /event\.source\s*!==\s*popup/.test(frontendIntegrationsHookText) &&
+      /expectedPopup/.test(frontendChatText) &&
+      /e\?\.source/.test(frontendChatText),
+    detail:
+      "OAuth completion handlers must bind postMessage events to the initiating popup window source.",
+  });
+
+  checks.push({
+    id: "security_cert_scans_dashboard_client",
+    severity: "high",
+    weight: 20,
+    pass:
+      /dashboard/.test(securityAuthCertText) &&
+      /DASHBOARD_SRC_NOT_FOUND_FOR_SECURITY_SCAN/.test(securityAuthCertText),
+    detail:
+      "Security certification must include dashboard client source scanning (not only frontend).",
+  });
+
+  checks.push({
     id: "editor_mode_blocks_connector_routing",
     severity: "high",
     weight: 20,
@@ -290,6 +334,13 @@ async function main() {
       "integrationRuntimePolicy.service.test.ts",
     ),
     path.join(backendRoot, "src", "services", "chat", "turnRouter.service.test.ts"),
+    path.join(
+      backendRoot,
+      "src",
+      "tests",
+      "certification",
+      "security-auth.cert.test.ts",
+    ),
     path.join(
       backendRoot,
       "src",

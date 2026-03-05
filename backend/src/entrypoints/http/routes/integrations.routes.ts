@@ -790,6 +790,14 @@ router.post(
   },
 );
 
+router.post(
+  "/oauth/verify",
+  authMiddleware,
+  authorizeIntegrations,
+  rateLimitMiddleware,
+  (req, res) => controller.oauthVerify(req, res),
+);
+
 router.get(
   "/:provider/start",
   authMiddleware,

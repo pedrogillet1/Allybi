@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { getAdminApiKey } from "../auth/adminKeyStore";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
 
@@ -38,10 +37,7 @@ function classifyProxyFailure(
 }
 
 function getAuthHeaders(): Record<string, string> {
-  const adminKey = getAdminApiKey();
-  return {
-    ...(adminKey && { "X-Admin-Key": adminKey }),
-  };
+  return {};
 }
 
 async function fetchWithValidation<T>(

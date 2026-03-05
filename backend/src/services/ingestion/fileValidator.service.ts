@@ -23,6 +23,7 @@ import {
   XLSX_MIMES,
   PPTX_MIMES,
 } from "./extraction/ingestionMimeRegistry.service";
+import { OCR_MIN_DOCUMENT_TEXT_CONFIDENCE } from "../extraction/ocrPolicy.service";
 
 export interface ValidationResult {
   isValid: boolean;
@@ -392,7 +393,7 @@ class FileValidatorService {
       }
 
       // Check OCR confidence for scanned documents
-      if (confidence < 0.7) {
+      if (confidence < OCR_MIN_DOCUMENT_TEXT_CONFIDENCE) {
         return {
           isValid: false,
           error: "Scan quality too low for reliable text extraction",

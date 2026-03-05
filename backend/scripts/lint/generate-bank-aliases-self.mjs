@@ -40,9 +40,14 @@ if (!fs.existsSync(registryPath) || !fs.existsSync(aliasesPath)) {
 
 const registry = readJson(registryPath);
 const aliasesBank = readJson(aliasesPath);
-const registryIds = new Set(
+const registryById = new Map(
   (Array.isArray(registry?.banks) ? registry.banks : [])
-    .map((entry) => String(entry?.id || "").trim())
+    .map((entry) => [String(entry?.id || "").trim(), entry])
+    .filter(([id]) => id),
+);
+const registryIds = new Set(
+  [...registryById.keys()]
+    .map((id) => String(id || "").trim())
     .filter(Boolean),
 );
 
@@ -90,6 +95,7 @@ for (const entry of rawAliases) {
     seenByNormalized.set(normalized, {
       alias: entry.alias,
       canonicalId: entry.canonicalId,
+      source: entry.source,
     });
     deduped.push(entry);
   }
@@ -100,6 +106,14 @@ for (const canonicalId of Array.from(registryIds).sort((a, b) => a.localeCompare
   const existing = seenByNormalized.get(normalized);
   if (existing && existing.canonicalId === canonicalId) continue;
   if (existing && existing.canonicalId !== canonicalId) {
+    const registryEntry = registryById.get(canonicalId) || {};
+    const required = registryEntry?.requiredByEnv || {};
+    const legacyOptionalInProdStaging =
+      required.production !== true && required.staging !== true;
+    const migrationPinnedAlias = String(existing?.source || "") === "migration_alias";
+    if (legacyOptionalInProdStaging && migrationPinnedAlias) {
+      continue;
+    }
     collisions.push({
       alias: canonicalId,
       canonicalId,

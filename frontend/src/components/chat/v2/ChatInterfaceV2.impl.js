@@ -2286,6 +2286,7 @@ export default function ChatInterface({
   const abortRef = useRef(null);
   const oauthPollRef = useRef(null);
   const oauthTimeoutRef = useRef(null);
+  const oauthPopupByProviderRef = useRef({});
   // Best-effort debounce so we don't spam the backend if the user toggles connectors repeatedly.
   const lastConnectorSyncAtRef = useRef({});
 
@@ -2868,21 +2869,29 @@ export default function ChatInterface({
       if (data.type !== "koda_oauth_done") return;
       const provider = String(data.provider || "").toLowerCase();
       if (!CONNECTOR_PROVIDER_SET.has(provider)) return;
-      setActivatingConnector(null);
-      // Optimistically mark provider as connected so the pill appears instantly
-      if (data.ok) {
-        setConnectorStatus((prev) => ({
-          ...prev,
-          [provider]: { ...prev[provider], connected: true, expired: false },
-        }));
-        // Auto-activate the connector that was just connected.
-        setActiveConnectors((prev) => (Array.isArray(prev) && prev.includes(provider) ? prev : [...(prev || []), provider]));
-        connectorReplayProviderRef.current = provider;
-        // Auto-sync immediately after connect so the user never has to type "sync gmail/outlook".
-        // (Debounced by cooldown.)
-        maybeAutoSyncConnector(provider);
-      }
-      refreshConnectorStatus();
+      const expectedPopup = oauthPopupByProviderRef.current?.[provider];
+      if (expectedPopup && e?.source && e.source !== expectedPopup) return;
+
+      Promise.resolve(integrationsService.verifyOAuthCompletion(data))
+        .then((valid) => {
+          if (!valid) return;
+          setActivatingConnector(null);
+          // Optimistically mark provider as connected so the pill appears instantly.
+          if (data.ok) {
+            setConnectorStatus((prev) => ({
+              ...prev,
+              [provider]: { ...prev[provider], connected: true, expired: false },
+            }));
+            // Auto-activate the connector that was just connected.
+            setActiveConnectors((prev) => (Array.isArray(prev) && prev.includes(provider) ? prev : [...(prev || []), provider]));
+            connectorReplayProviderRef.current = provider;
+            // Auto-sync immediately after connect so the user never has to type "sync gmail/outlook".
+            // (Debounced by cooldown.)
+            maybeAutoSyncConnector(provider);
+          }
+          refreshConnectorStatus();
+        })
+        .catch(() => {});
     };
 
     window.addEventListener("message", onMessage);
@@ -2975,6 +2984,16 @@ export default function ChatInterface({
         window.location.href = authorizationUrl;
         return;
       }
+      oauthPopupByProviderRef.current = {
+        ...(oauthPopupByProviderRef.current || {}),
+        [normalized]: popup,
+      };
+
+      const clearPopupRef = () => {
+        const next = { ...(oauthPopupByProviderRef.current || {}) };
+        delete next[normalized];
+        oauthPopupByProviderRef.current = next;
+      };
 
       // Poll status until the popup closes, then refresh.
       if (oauthPollRef.current) clearInterval(oauthPollRef.current);
@@ -2993,6 +3012,7 @@ export default function ChatInterface({
         if (!isClosed) return;
         clearInterval(oauthPollRef.current);
         oauthPollRef.current = null;
+        clearPopupRef();
         setActivatingConnector(null);
         await refreshConnectorStatus();
       }, 750);
@@ -3004,10 +3024,14 @@ export default function ChatInterface({
           clearInterval(oauthPollRef.current);
           oauthPollRef.current = null;
         }
+        clearPopupRef();
         setActivatingConnector(null);
         await refreshConnectorStatus();
       }, 2 * 60 * 1000);
     } catch (e) {
+      const next = { ...(oauthPopupByProviderRef.current || {}) };
+      delete next[normalized];
+      oauthPopupByProviderRef.current = next;
       const msg = e?.response?.data?.error?.message || e?.message || 'Connector activation failed.';
       setConnectorError(String(msg));
       setActivatingConnector(null);

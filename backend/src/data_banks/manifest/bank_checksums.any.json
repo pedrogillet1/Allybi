@@ -210,12 +210,12 @@
       "category": "semantics"
     },
     "document_intelligence/compose/anti_robotic_style_rules.any.json": {
-      "sha256": "cd80695bd5659560ed6a7f983de0ee158d8bb2b1a62fbc597a54775afb13df42",
+      "sha256": "01be5a610af0dc870fa736c2e1b2ff376983f20ceaa72f081ea5d0b6c56bfb2d",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/compose/citation_policy.any.json": {
-      "sha256": "eb000eb16d164f0982dd4981aa5fdb9074a13da99cf6d42fb4602345c1fb43f9",
+      "sha256": "a1d7e9bc2fdad338823098ae933e0d16fe5e6abe06afac9aba41b6a5d88138bc",
       "required": false,
       "category": "semantics"
     },
@@ -225,7 +225,7 @@
       "category": "semantics"
     },
     "document_intelligence/compose/closers.any.json": {
-      "sha256": "5c323e2ee2fae0ed9af1768a1f14d62513a1781e34309651a4897218eb3e665e",
+      "sha256": "23bad93fdd4e40ae774bfde752a487c50ec28b1a580d4228e8e920f82e75c86e",
       "required": false,
       "category": "semantics"
     },
@@ -240,17 +240,17 @@
       "category": "semantics"
     },
     "document_intelligence/compose/fallback_messages.any.json": {
-      "sha256": "8d8c6296dda3780e53c420a2ee044075243f293656ca77340c3cf40ded33a3bb",
+      "sha256": "47e6679db2a4662a6a1b30d8fa206f435a4e16891093d5ab7b8f0f8de99e76a1",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/compose/followup_suggestions.any.json": {
-      "sha256": "972444bed2a7ba544ccba9eb8e5ceb4abb8bc2a00601c027acb89b509e857c29",
+      "sha256": "1ca098be37afdb74821052c3768ee31c808b51485d8c807e27e79cefef33f670",
       "required": true,
       "category": "semantics"
     },
     "document_intelligence/compose/format_guardrails.any.json": {
-      "sha256": "a6737583d9bbb6bbd1500a6d02b14027966130d492d12af04731d62e18c3f074",
+      "sha256": "7e2af20abfc0ea597035b8541e89a06e177aa9edf194dc27ac2c4667fe596022",
       "required": false,
       "category": "semantics"
     },
@@ -260,7 +260,7 @@
       "category": "semantics"
     },
     "document_intelligence/compose/help_microcopy.any.json": {
-      "sha256": "6b785051b8298dfbabb1032b018f406fdec7c56f5d483798d449973bcdd85bc0",
+      "sha256": "8c7b49cc8b70063756bbbea58d59b7971a0f147fabfe027f8c3945ff83b332dc",
       "required": false,
       "category": "semantics"
     },
@@ -270,12 +270,12 @@
       "category": "semantics"
     },
     "document_intelligence/compose/openers.any.json": {
-      "sha256": "0c96cde1bf205aacac40b8cbce4bede2f052d3abf390ddd4f2bae5fbbe001e7e",
+      "sha256": "21b91810004de27cd3daa17284ce4bce89b53857aa44238ad7d2e566023f58df",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/compose/response_templates.any.json": {
-      "sha256": "ceb3946ffaaf425b9489aa6f98e376e4adcf821eaa0103885fa146218992366f",
+      "sha256": "a6b7e2c2f7be7a9a34f5c324937ba10877a6e70451ec719dd9d59372b474ce24",
       "required": false,
       "category": "semantics"
     },
@@ -285,12 +285,12 @@
       "category": "semantics"
     },
     "document_intelligence/compose/table_render_policy.any.json": {
-      "sha256": "fa3360c9b4480bc033f6b11995eac20df889853f3c3e826fea7fc46a7f593219",
+      "sha256": "325ec10185d447459579a131074b8dbff1ea1c037a28ae5a28e73a060755c8c0",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/compose/tone_profiles.any.json": {
-      "sha256": "17bc32871efcb0041a653d7d8eeb17ef61476cab5834af2b86a609b816c5031b",
+      "sha256": "d1446d0c5fc890b3858f9860acb84b729e51e8097605abf64d2599a98e2ba434",
       "required": false,
       "category": "semantics"
     },
@@ -305,12 +305,12 @@
       "category": "semantics"
     },
     "document_intelligence/compose/verbosity_ladder.any.json": {
-      "sha256": "85f659e75a7b5c4de0cedd2118d1821174db0a614032d1158e759abb323d5f47",
+      "sha256": "7e3c457eb0be3342f3927a83c2f5c3913f9829eb97f5e988b2aa56c1a4d94a7c",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/compose/voice_personality_profiles.any.json": {
-      "sha256": "9d55ebda65ec545c59cec24f0db28ac130099751d3034ee421dbc3dbd30014db",
+      "sha256": "b0b49de89171625c5ffe77a839147413af4da533c847727c1ad093f4c8bdef9b",
       "required": false,
       "category": "semantics"
     },
@@ -335,7 +335,7 @@
       "category": "policies"
     },
     "document_intelligence/domains/accounting/doc_types/doc_type_catalog.any.json": {
-      "sha256": "467b94cea13f0c7666442a35e1e8002308fe7269cb9ada7321fa14578dc011c8",
+      "sha256": "6b43ccad8d5e6c3fc4f5b173f50a9cab831ca42ec36231a8638c8494c7780604",
       "required": false,
       "category": "semantics"
     },
@@ -1170,7 +1170,7 @@
       "category": "policies"
     },
     "document_intelligence/domains/banking/doc_types/doc_type_catalog.any.json": {
-      "sha256": "badc84bd47070a97b7e1ef0fe1e7e446f2498d2cc7eef45c2ae9a0c9682cbbdf",
+      "sha256": "78210ebba5418deaf447d7a80adade73066437140e03c95c3017b1fff6ac165f",
       "required": false,
       "category": "semantics"
     },
@@ -1360,7 +1360,7 @@
       "category": "policies"
     },
     "document_intelligence/domains/billing/doc_types/doc_type_catalog.any.json": {
-      "sha256": "06e26bb9d103287118796152f86f7e8810f9d4809d0cd8e06267201fdcb93406",
+      "sha256": "bf19066a82f6b24120c675a12f8e71094b16377edcdca9cc1f4a065fad82eb9a",
       "required": false,
       "category": "semantics"
     },
@@ -1520,7 +1520,7 @@
       "category": "policies"
     },
     "document_intelligence/domains/education/doc_types/doc_type_catalog.any.json": {
-      "sha256": "5f5a9f92674de291d9d330f2cf32e2b51997a05d45fa58e174361338f510e496",
+      "sha256": "3e2e7213c0f0d11bd2d3bcef0dc3b9f614fcc69c53f1ae401dd98bb8966a4617",
       "required": false,
       "category": "semantics"
     },
@@ -1685,7 +1685,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/everyday/doc_types/doc_type_catalog.any.json": {
-      "sha256": "8d7452e7edfec907b3eead68317746382cce7023a13e27d62486c30ea235e8f3",
+      "sha256": "21b6f7cc5cf64c235bfcc4c88a347fb9d63261186dad532778a17c0d3f99bd0b",
       "required": false,
       "category": "semantics"
     },
@@ -1935,7 +1935,7 @@
       "category": "policies"
     },
     "document_intelligence/domains/finance/doc_types/doc_type_catalog.any.json": {
-      "sha256": "0c7ccf6704a3d3f473758f636c0c30dd716351ce114762a840bd9f5a3d4435ea",
+      "sha256": "4c1efc4c2b146fd89c1caf0ce75711979f7e6c4a57c23e3d44fbd4c50adafce1",
       "required": false,
       "category": "semantics"
     },
@@ -2770,7 +2770,7 @@
       "category": "policies"
     },
     "document_intelligence/domains/housing/doc_types/doc_type_catalog.any.json": {
-      "sha256": "02dbdf5d57982bb3cb940a1b874aef7af11e60b9da7565cc8c431fb77987d26f",
+      "sha256": "4e4aa9ca1e8b0c5c813c73367256b33ef014b0a70d99b1a7c7afb6f3072c0162",
       "required": false,
       "category": "semantics"
     },
@@ -2930,7 +2930,7 @@
       "category": "policies"
     },
     "document_intelligence/domains/hr_payroll/doc_types/doc_type_catalog.any.json": {
-      "sha256": "e0a96ec3bd5b0b47e7152977d1f023c0feebf7334f253396ef5ce6e9fd80d6b6",
+      "sha256": "e995858edcad9f3d9899fb806c8e8af99a3afb3057bd85fd8b5ca0aa8d41fd19",
       "required": false,
       "category": "semantics"
     },
@@ -3075,7 +3075,7 @@
       "category": "policies"
     },
     "document_intelligence/domains/identity/doc_types/doc_type_catalog.any.json": {
-      "sha256": "1b1c240dc0b73701c7746cf8c11fa7150f90552eeee1e378aff65f2dc3ab43dc",
+      "sha256": "1ab16307e4f7df117dbcae0888a415963a79f303bacc66c85014da87e22a638f",
       "required": false,
       "category": "semantics"
     },
@@ -3280,7 +3280,7 @@
       "category": "policies"
     },
     "document_intelligence/domains/insurance/doc_types/doc_type_catalog.any.json": {
-      "sha256": "fab017ad21efecb7e35c41b3af1b0ca97c82378828fb81eff9c9e5b71549be58",
+      "sha256": "757f9cb7218a2f8c6ea2b0dad5b9f182b4ba22be437cf1d7038d6591f8c66624",
       "required": false,
       "category": "semantics"
     },
@@ -3485,7 +3485,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/legal/doc_types/doc_type_catalog.any.json": {
-      "sha256": "1fd4c2adc43920f3b6ab552fd3d57aab3cfebf73dfc1b27581e51ad239396cb6",
+      "sha256": "22fc41e0219b58488023c7bcf01e773badc1672007cf1f78e7695924f1406c0d",
       "required": false,
       "category": "semantics"
     },
@@ -4055,7 +4055,7 @@
       "category": "policies"
     },
     "document_intelligence/domains/medical/doc_types/doc_type_catalog.any.json": {
-      "sha256": "04901d4d1ada24c1ab56759127552bea8488b76ee7a52f750775d89334617819",
+      "sha256": "8687c7b45e3049508e01af63b7f5029fda56ee14400d50cf1657de06a65595c0",
       "required": false,
       "category": "semantics"
     },
@@ -4495,7 +4495,7 @@
       "category": "policies"
     },
     "document_intelligence/domains/ops/doc_types/doc_type_catalog.any.json": {
-      "sha256": "cc772cc4f9fe715b5886db62e563db395f5d6b3399bb749aaa96a4143ae0ca49",
+      "sha256": "598f5942d9d963c508baf2a656aa5c3447394ec1b2dd7113f0011ee226856996",
       "required": false,
       "category": "semantics"
     },
@@ -4655,7 +4655,7 @@
       "category": "policies"
     },
     "document_intelligence/domains/tax/doc_types/doc_type_catalog.any.json": {
-      "sha256": "e28d2faf313b3fd7d7d3172abac1a7b406ec81976cff124e45b8a66fde465457",
+      "sha256": "1d578dc1bc37c9d2b4725bff3b796e4ce938788a4d4b7e524ea6e025bcdbd28a",
       "required": false,
       "category": "semantics"
     },
@@ -4785,7 +4785,7 @@
       "category": "policies"
     },
     "document_intelligence/domains/travel/doc_types/doc_type_catalog.any.json": {
-      "sha256": "9d48bde3a0bafb43e3ccbc7c275dbe7dfcfe09d56a4913df5e4acf43002b9008",
+      "sha256": "c4dd8f2765cf0000bd53d2b0c9cb9b2dd3194134e84fec538423c6eb75736e09",
       "required": false,
       "category": "semantics"
     },
@@ -4925,7 +4925,7 @@
       "category": "quality"
     },
     "document_intelligence/eval/suites/suite_registry.any.json": {
-      "sha256": "e5dcb5b7054c262df64852f2f547fcf7ebc60a564ad9c1b62a38c4e22c81c648",
+      "sha256": "f7ef0debbd97953863c75961f63e96ae41f1c17bce91de4b28b62dafb89a1a61",
       "required": false,
       "category": "semantics"
     },
@@ -4985,7 +4985,7 @@
       "category": "manifest"
     },
     "document_intelligence/retrieval/crossdoc_alignment_rules.any.json": {
-      "sha256": "bd6f7f66c66f255dcf9e7f291c258a9d621e60178181a682e7219a4cb44778b3",
+      "sha256": "3883cd25f9320a829a805a988f0a97cd0ac1ac132977e07ba2dbf0bbb529177b",
       "required": false,
       "category": "semantics"
     },
@@ -5025,7 +5025,7 @@
       "category": "retrieval"
     },
     "document_intelligence/retrieval/snippet_compression_policy.any.json": {
-      "sha256": "4079e287005b57b713503144e52554017ad1c9952cf061f60b0a018b410f393d",
+      "sha256": "b1129767770a4c6f0ba32a7b2af085c74aa6d6c96e449cfa557f546b48f1e48f",
       "required": false,
       "category": "semantics"
     },
@@ -5080,7 +5080,7 @@
       "category": "semantics"
     },
     "document_intelligence/semantics/domain_ontology.any.json": {
-      "sha256": "2915c67ed597c6eb0e178ccb506ebd5110b794982ce600b30e322ec816604291",
+      "sha256": "e67c02aba13e20040d4a90aae24e1e70e8e5f7a68fbdf9211cb7140e68ff71f7",
       "required": false,
       "category": "semantics"
     },
@@ -5345,7 +5345,7 @@
       "category": "llm"
     },
     "manifest/bank_aliases.any.json": {
-      "sha256": "8ef986d6a3da536dc6396cffafc2fc70d1634335cf0549fc415b74592f105d6f",
+      "sha256": "c8d0e146efc7f3a21e984f78e1c6eb88dc29fdba5c7baf8ef315f28f8dd34bfa",
       "required": true,
       "category": "manifest"
     },
@@ -5355,7 +5355,7 @@
       "category": "manifest"
     },
     "manifest/bank_dependencies.any.json": {
-      "sha256": "f5ad503f7609ba1b34d1d29e8d202366329bbf9148719021eb4490663b3d2f7d",
+      "sha256": "37905d60cc3cbe34afbf2bc0499c86fa4e166e4fd248fc3e3b22b62bd956ceab",
       "required": true,
       "category": "manifest"
     },
@@ -6356,7 +6356,7 @@
     },
     "policies/access_control_policy.any.json": {
       "sha256": "a22df03b5eeec47485afead82e2bb098dbd5c40ca7b48c36a6cb6c9d856a36fc",
-      "required": false,
+      "required": true,
       "category": "semantics"
     },
     "policies/allybi_connector_permissions.any.json": {
@@ -6400,7 +6400,7 @@
       "category": "semantics"
     },
     "policies/llm_builder_policy.any.json": {
-      "sha256": "3a5e94a99f05b24522dd23e3d4a74ede702167e13cb360bb93c8ae751025e3be",
+      "sha256": "24b492fded9f6d9ffd54256caa9fc5be3abbc112405c35728b6e2d7b29071a42",
       "required": true,
       "category": "policies"
     },
@@ -6720,7 +6720,7 @@
       "category": "semantics"
     },
     "quality/quality_gates.any.json": {
-      "sha256": "c38e1e6622d4c7665081b85687e3377cbf0fca53b46bab28a2d3f5ca922efcde",
+      "sha256": "136abd8aa751e04f923c6ff47823babc6494605f913dd8a59b42fb5e741a9af7",
       "required": true,
       "category": "quality"
     },
@@ -6765,7 +6765,7 @@
       "category": "retrieval"
     },
     "retrieval/evidence_packaging.any.json": {
-      "sha256": "7ea9ab0a1291e6a69c682bed78b452ed484abe5024f74724afaacd08e6a23878",
+      "sha256": "ef73fbe14ed61ac137303dc4c4725fec554e4a3d5a12226b47c5923e2f3bf695",
       "required": true,
       "category": "retrieval"
     },
@@ -6805,12 +6805,12 @@
       "category": "retrieval"
     },
     "retrieval/retrieval_negatives.any.json": {
-      "sha256": "c0f5c59f989c87acfeec1e4ed14f3530bca01a805ddb12a990b7b1dc29537c01",
+      "sha256": "6c1392b2ef2433742650ba3e8fb4f0c5f8c84ce59fd2dd359fa5ab312da3cab3",
       "required": true,
       "category": "retrieval"
     },
     "retrieval/retrieval_ranker_config.any.json": {
-      "sha256": "b56b5c72219d11a703563477b32fa378d75606088c63af019cd8873aee6709e5",
+      "sha256": "93829f808378d276f195077d2bebffa13c0ebcf0dd7a8fab1b5cfb5f0977494f",
       "required": true,
       "category": "retrieval"
     },
@@ -6930,17 +6930,17 @@
       "category": "routing"
     },
     "routing/intent_patterns.any.json": {
-      "sha256": "a4855c5afce32bafe2b61376ed8612ebf878237dd014cedb2396786ca6f85fde",
+      "sha256": "06c150b967b2a8c5398fc13cb8bdbb5317035493cf79137c13add10614fa5914",
       "required": true,
       "category": "routing"
     },
     "routing/operator_families.any.json": {
-      "sha256": "40dde7d63fea9d34df46ed7bedf4de21c5aaf79800c55abd81a3552eaf5e6aa0",
+      "sha256": "66ab8d145fc480b92c5d6d2bf1c2900f0eb1c18520697ecef08d06c9d2e7ee11",
       "required": true,
       "category": "routing"
     },
     "routing/routing_priority.any.json": {
-      "sha256": "0d6679b0dcdc534524c18a6b396731ea40f398c051279f6ea100e8bd601fac95",
+      "sha256": "8180c85b1712fa19d6055a05ca85b3f5f6274df0c5ab2398f6a0ed7266a3f8ca",
       "required": false,
       "category": "routing"
     },
@@ -6956,6 +6956,11 @@
     },
     "schemas/bank_schema.any.json": {
       "sha256": "371500afec5af943b8ec6de0884ec67245c1bf237fd50d69b5eb9e010068cf2a",
+      "required": true,
+      "category": "schemas"
+    },
+    "schemas/compose_microcopy_schema.any.json": {
+      "sha256": "7ce600d63db83e89753032269bbdfead54581ee0ce2ebf6d27f4e19c510ad73f",
       "required": true,
       "category": "schemas"
     },
@@ -7029,6 +7034,16 @@
       "required": true,
       "category": "schemas"
     },
+    "schemas/retrieval_ranker_schema.any.json": {
+      "sha256": "fc143be634da3b5494cc605eea531591f0c0522b031a106e2f8a8ff397429fa7",
+      "required": true,
+      "category": "schemas"
+    },
+    "schemas/routing_rule_schema.any.json": {
+      "sha256": "03c6101f97578808a856f86f7cc8cf2259d408ce4d12f1555b892e30e29cd659",
+      "required": true,
+      "category": "schemas"
+    },
     "scope/allybi_docx_resolvers.any.json": {
       "sha256": "aeda2ac7677b53c36a9182f35cddf79efd4f84bcfc9d6fd202e94603490ce345",
       "required": false,
@@ -7070,7 +7085,7 @@
       "category": "semantics"
     },
     "semantics/document_intelligence_bank_map.any.json": {
-      "sha256": "899eecec4809eae0a05f73ff1481f08934149cc93aa70931f40892a11dc01486",
+      "sha256": "36e8ee8113de8232ab7402dafe4d13735566c3bdb98d32af8dacce3105f27f28",
       "required": true,
       "category": "semantics"
     },
@@ -7135,22 +7150,22 @@
       "category": "semantics"
     },
     "semantics/entities/date_patterns.any.json": {
-      "sha256": "45edbf8b4ef4ca4bd546cf591d705a67763525ddd9616e84e607281afdc8b20c",
+      "sha256": "73f15b1291c9e790d1f86cd0ce0c2693c889e8af7a977621e2e7ef47e085c82f",
       "required": true,
       "category": "semantics"
     },
     "semantics/entities/identifier_patterns.any.json": {
-      "sha256": "e65e6808d42d6fe87a8289026e126de2a3541e8f386977ecdc4ee4de3606e09b",
+      "sha256": "922068e7c93da156122970a8dc0f20a6344d5797873b0ee46124150f5937fa7d",
       "required": true,
       "category": "semantics"
     },
     "semantics/entities/money_patterns.any.json": {
-      "sha256": "cdee0fda957e9bf13adf6205b78d6db45a01e04986573b054b21e7058552b821",
+      "sha256": "7cc447b9db8acc69779cd8e4b0510300b5d1dfacaab72c5ce238e11fac833b0e",
       "required": true,
       "category": "semantics"
     },
     "semantics/entities/party_patterns.any.json": {
-      "sha256": "b82c0e10fa52a2bf8cae743a4c53eda6c193d3dcb6e3a6fd76bd2749af6cbf9f",
+      "sha256": "501549d9b791fc76d80727c5d1664bf9ecdc24f527586651a25bd0dcd06eb8ce",
       "required": true,
       "category": "semantics"
     },
@@ -7175,7 +7190,7 @@
       "category": "semantics"
     },
     "semantics/spreadsheet_semantics.any.json": {
-      "sha256": "63e7c2b0324d1de7bfdd2df1d49d2a60427f64194329de09c46fe853cc4cdc64",
+      "sha256": "377efb97648e504aa65f97cff84b0f7ad6e6177f9babde62859322128f9974bf",
       "required": false,
       "category": "semantics"
     },
@@ -7230,7 +7245,7 @@
       "category": "semantics"
     },
     "semantics/structure/table_header_ontology.education.any.json": {
-      "sha256": "865e2dce191ca83909f7aefcf3cf1362f00cd758c54f87ad8c1919ab7d5e3f38",
+      "sha256": "a3f1000848b26e01e8ed9951d1897df2567f72006f57809f7c9fbebeb44ae13b",
       "required": false,
       "category": "semantics"
     },
@@ -7240,22 +7255,22 @@
       "category": "semantics"
     },
     "semantics/structure/table_header_ontology.finance.any.json": {
-      "sha256": "5802d0ec5847bde49fc7db45876791ccc58e2bc188897f002e7aab7318060dbb",
+      "sha256": "70f1b554469c41ccc9f18310758375abce9e0335c5129563b409a5fb5a9e38eb",
       "required": true,
       "category": "semantics"
     },
     "semantics/structure/table_header_ontology.housing.any.json": {
-      "sha256": "17ab48500324166878d6565726c50f8f03f0317bc1932e2b71fdfeb4fc8b7838",
+      "sha256": "5a644f3724c3534800516ffdbb851fdc5129fdc45ec3e42c62a9899a037ab54b",
       "required": false,
       "category": "semantics"
     },
     "semantics/structure/table_header_ontology.hr_payroll.any.json": {
-      "sha256": "f03f5ebced115fc2a07609bce47ef7a8461a8bc4949208bc874a4f53aa320548",
+      "sha256": "49055a99e357e98f4f8b61d2ea38e2147af6e098c3700acea37382ff97cf4798",
       "required": false,
       "category": "semantics"
     },
     "semantics/structure/table_header_ontology.identity.any.json": {
-      "sha256": "cc8ac7c82c8d3821bc615dcf2360ef987ecf11529776906d78e5c374281afc10",
+      "sha256": "41350d0b8295a9665486a30c6f823af6c92100999ea744aebfdb740fcea5527f",
       "required": false,
       "category": "semantics"
     },
@@ -7265,7 +7280,7 @@
       "category": "semantics"
     },
     "semantics/structure/table_header_ontology.legal.any.json": {
-      "sha256": "b7210159ad2a210a78f5613ebb88f5a84473af1e789852f1c2c7e45ddc440886",
+      "sha256": "8ba5179fb8fe9808e9a8734a12ff9d5ccfe0bc875d74b664b9b4c6f44ce2f608",
       "required": true,
       "category": "semantics"
     },
@@ -7285,82 +7300,82 @@
       "category": "semantics"
     },
     "semantics/structure/table_header_ontology.travel.any.json": {
-      "sha256": "9a5a0b6c15fbaef2ace5c3a347e9a581b079fdd5e88bf27dae715ab23b184a19",
+      "sha256": "882a86613878ae6fec92ae5bccda95c1f3aa5a39d43f4d410e1c7a18096e599e",
       "required": false,
       "category": "semantics"
     },
     "semantics/taxonomy/doc_archetypes/accounting.any.json": {
-      "sha256": "e1672830854a48ae9044b7d87b4ee4e6c22531f6acfee792ac99664be1995018",
+      "sha256": "882d09747f35823186c8e549b6dac6e370c44d85bd4ab206e4758a739b1d68d7",
       "required": true,
       "category": "semantics"
     },
     "semantics/taxonomy/doc_archetypes/banking.any.json": {
-      "sha256": "eac47f3377bf7b04d4a4da4d8bfb05cee6e6773d1f8fecfe903893f64c23393d",
+      "sha256": "4ea63ee2e37a3ad94e209a8bb3d9dde7185daab5ebae03b2e624fd201fe93b04",
       "required": true,
       "category": "semantics"
     },
     "semantics/taxonomy/doc_archetypes/billing.any.json": {
-      "sha256": "e53bf635406b5040860410893ef70fec29ee691ac31d3395500be9d8b85bd2f5",
+      "sha256": "7c04aceb06636156994f34bb56a66092a01ac4a4eb6084645e9ea1aaafab022f",
       "required": true,
       "category": "semantics"
     },
     "semantics/taxonomy/doc_archetypes/education.any.json": {
-      "sha256": "4e0afc7d453043b36611463526122002578331745e41808c2079c9fe2869cf79",
+      "sha256": "6cf00c36869998979e4ff951d1daba6a9ca6ef0f28734c88f70ae10ac26b7c1c",
       "required": true,
       "category": "semantics"
     },
     "semantics/taxonomy/doc_archetypes/everyday.any.json": {
-      "sha256": "958347eae913e0ce38b71221ddb514b20562100148ff132318ef7598ab07f9ea",
+      "sha256": "4b7d1636e752e36346a6ccf1a86e7b59039b0f3d5478b60e3c30980d69412a79",
       "required": true,
       "category": "semantics"
     },
     "semantics/taxonomy/doc_archetypes/finance.any.json": {
-      "sha256": "c433741e0e5597fad93dad387b799058627d28df1daf1bffff6115cbd6dab260",
+      "sha256": "7cd43427c58f659140ed4dfa64fb7d5d856b9f5be96322479235bbbfba2a527d",
       "required": true,
       "category": "semantics"
     },
     "semantics/taxonomy/doc_archetypes/housing.any.json": {
-      "sha256": "f8e08ec08c3cb4022c6011676b27f434e68119328812f90139bb6a51bceb8501",
+      "sha256": "2f158c10e3cb80ebbdb3389ae712f49387ae7cd9639039b7f0fd7ff0332b9ea0",
       "required": true,
       "category": "semantics"
     },
     "semantics/taxonomy/doc_archetypes/hr_payroll.any.json": {
-      "sha256": "7b1431daf2c8f0f34a96b33642b187c87cc2193097c66966740174ffdaf48ce0",
+      "sha256": "e407de1d0caff803ee300452ee4c494bdfd65bcd368ab788624d2fc943234167",
       "required": true,
       "category": "semantics"
     },
     "semantics/taxonomy/doc_archetypes/identity.any.json": {
-      "sha256": "78786055d0c6074f0312dc0f781ee1982c122845046eb2d90c46feab6baa3c6b",
+      "sha256": "aac8cf8168095423f4205c0c1555e2919188cfb78a2ae90f55f403bbed4ab210",
       "required": true,
       "category": "semantics"
     },
     "semantics/taxonomy/doc_archetypes/insurance.any.json": {
-      "sha256": "d2cf947cd66fdb6721b790d1f168f027038669f53935b6ce44df2f67b3c93ecc",
+      "sha256": "043bbb4b33501d755dc9ba6a2820c2957f90a520672480270cfaa0b019740bdc",
       "required": true,
       "category": "semantics"
     },
     "semantics/taxonomy/doc_archetypes/legal.any.json": {
-      "sha256": "8a73e8e37ef57d40535a2626adf242c5ed33536ade8f97ce92364ea252de8f57",
+      "sha256": "6249c5f2acb53ed8ef65ebcca7c2d1193984710b483e31cb268d394f82e19c9d",
       "required": true,
       "category": "semantics"
     },
     "semantics/taxonomy/doc_archetypes/medical.any.json": {
-      "sha256": "b1c2c9e1a16315ace9b4fca8cbafb35bde61069dd1a722667dfd61bc46e1395b",
+      "sha256": "e7c505bdcbd9ad71f816bb39742582ebe9b1f41b4c9e09273226f81c0bbaa454",
       "required": true,
       "category": "semantics"
     },
     "semantics/taxonomy/doc_archetypes/ops.any.json": {
-      "sha256": "198b470e12d0e22b97d3de7bad3d901cdaefb2699634a1718ecaa6103d2868fc",
+      "sha256": "a68608c9cae380beb8d3f197406327ed95f9c83bcf3641b2d7a015bb2c6d0452",
       "required": true,
       "category": "semantics"
     },
     "semantics/taxonomy/doc_archetypes/tax.any.json": {
-      "sha256": "80aa5440fca9364ca7ac364f3d1953f6b3a3543c4fe42515005d39e316a53f2c",
+      "sha256": "8f37b16d7997207c8467405221569f3557e6428eacf07efa4a932f0bd855fc45",
       "required": true,
       "category": "semantics"
     },
     "semantics/taxonomy/doc_archetypes/travel.any.json": {
-      "sha256": "ee701f29f53ec6c45a67912b55fb8a113a358ec0f5342029d2ff21c239b023e3",
+      "sha256": "22a9e5ddd33a20704ec56053689f63f8654a53dc79c9f7ebf1a830d3014eb6e1",
       "required": true,
       "category": "semantics"
     },

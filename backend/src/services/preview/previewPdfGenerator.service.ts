@@ -14,6 +14,7 @@
  */
 
 import prisma from "../../config/database";
+import { performanceConsole as previewLog } from "../../utils/logger";
 import { downloadFile, uploadFile, fileExists } from "../../config/storage";
 import * as cloudConvert from "../conversion/cloudConvertPptx.service";
 import * as googleSlides from "./googleSlidesPreview.service";
@@ -67,7 +68,7 @@ export async function generatePreviewPdf(
   const startTime = Date.now();
 
   try {
-    console.log(
+    previewLog.log(
       `[PreviewPDF] Starting preview generation for document ${documentId.substring(0, 8)}...`,
     );
 
@@ -83,7 +84,7 @@ export async function generatePreviewPdf(
 
     // 2. Check if this document type needs PDF conversion
     if (!needsPreviewPdfGeneration(document.mimeType)) {
-      console.log(
+      previewLog.log(
         `[PreviewPDF] Document ${documentId.substring(0, 8)} does not need PDF preview (${document.mimeType})`,
       );
       await updatePreviewStatus(documentId, "skipped", null, null);
@@ -94,7 +95,7 @@ export async function generatePreviewPdf(
     const currentAttempts = document.metadata?.previewPdfAttempts || 0;
     if (!options?.skipRetryCheck && currentAttempts >= MAX_RETRY_ATTEMPTS) {
       const error = `Max retry attempts (${MAX_RETRY_ATTEMPTS}) exceeded`;
-      console.warn(
+      previewLog.warn(
         `[PreviewPDF] ${error} for document ${documentId.substring(0, 8)}`,
       );
       await updatePreviewStatus(documentId, "failed", null, error);
@@ -111,7 +112,7 @@ export async function generatePreviewPdf(
     const pdfAlreadyExists = await fileExists(pdfKey);
 
     if (pdfAlreadyExists) {
-      console.log(
+      previewLog.log(
         `[PreviewPDF] PDF already exists at ${pdfKey}, skipping conversion`,
       );
       await updatePreviewStatus(documentId, "ready", pdfKey, null, {
@@ -125,18 +126,18 @@ export async function generatePreviewPdf(
       incrementAttempts: true,
     });
     const newAttempts = currentAttempts + 1;
-    console.log(
+    previewLog.log(
       `[PreviewPDF] Processing attempt ${newAttempts}/${MAX_RETRY_ATTEMPTS} for ${documentId.substring(0, 8)}`,
     );
 
     // 6. Download the original file
     if (!document.encryptedFilename) {
       const error = "Document has no storage key (encryptedFilename is null)";
-      console.error(`[PreviewPDF] ${error}`);
+      previewLog.error(`[PreviewPDF] ${error}`);
       await updatePreviewStatus(documentId, "failed", null, error);
       return { success: false, status: "failed", error };
     }
-    console.log(
+    previewLog.log(
       `[PreviewPDF] Downloading original file: ${document.encryptedFilename}`,
     );
     let fileBuffer = await downloadFile(document.encryptedFilename);
@@ -147,7 +148,7 @@ export async function generatePreviewPdf(
       document.encryptionIV &&
       document.encryptionAuthTag
     ) {
-      console.log(`[PreviewPDF] Decrypting file...`);
+      previewLog.log(`[PreviewPDF] Decrypting file...`);
       try {
         const crypto = await import("crypto");
         const key = crypto.scryptSync(`document-${userId}`, "salt", 32);
@@ -160,7 +161,7 @@ export async function generatePreviewPdf(
           decipher.final(),
         ]);
       } catch (decryptErr: any) {
-        console.error(`[PreviewPDF] Decryption failed:`, decryptErr.message);
+        previewLog.error(`[PreviewPDF] Decryption failed:`, decryptErr.message);
         // Continue with original buffer — document may not actually be encrypted
       }
     }
@@ -180,7 +181,7 @@ export async function generatePreviewPdf(
     const provider = choosePreviewProvider(document.mimeType, fname);
 
     if (provider === PreviewProvider.NONE) {
-      console.log(
+      previewLog.log(
         `[PreviewPDF] No conversion needed for ${fname} (${document.mimeType})`,
       );
       await updatePreviewStatus(documentId, "skipped", null, null);
@@ -190,7 +191,7 @@ export async function generatePreviewPdf(
     let conversion: { success: boolean; pdfBuffer?: Buffer; error?: string };
 
     if (provider === PreviewProvider.GOOGLE_SLIDES) {
-      console.log(
+      previewLog.log(
         `[PreviewPDF] Converting ${fname} to PDF using Google Slides API...`,
       );
       conversion = await googleSlides.convertPptxViaSlidesApi(
@@ -199,7 +200,7 @@ export async function generatePreviewPdf(
       );
       // Fallback to CloudConvert if Google Slides fails
       if (!conversion.success && cloudConvert.isCloudConvertAvailable()) {
-        console.warn(
+        previewLog.warn(
           `[PreviewPDF] Google Slides failed, falling back to CloudConvert: ${conversion.error}`,
         );
         conversion = await cloudConvert.convertToPdf(
@@ -213,11 +214,11 @@ export async function generatePreviewPdf(
       if (!cloudConvert.isCloudConvertAvailable()) {
         const error =
           "CLOUDCONVERT_API_KEY is not configured — required for preview generation";
-        console.error(`[PreviewPDF] ${error}`);
+        previewLog.error(`[PreviewPDF] ${error}`);
         await updatePreviewStatus(documentId, "failed", null, error);
         return { success: false, status: "failed", error };
       }
-      console.log(
+      previewLog.log(
         `[PreviewPDF] Converting ${fname} to PDF using CloudConvert...`,
       );
       conversion = await cloudConvert.convertToPdf(
@@ -229,7 +230,7 @@ export async function generatePreviewPdf(
 
     if (!conversion.success || !conversion.pdfBuffer) {
       const error = conversion.error || "PDF conversion failed";
-      console.error(
+      previewLog.error(
         `[PreviewPDF] Conversion failed (attempt ${newAttempts}/${MAX_RETRY_ATTEMPTS}): ${error}`,
       );
 
@@ -246,14 +247,14 @@ export async function generatePreviewPdf(
     }
 
     // 10. Upload PDF to S3
-    console.log(`[PreviewPDF] Uploading PDF to storage: ${pdfKey}`);
+    previewLog.log(`[PreviewPDF] Uploading PDF to storage: ${pdfKey}`);
     await uploadFile(pdfKey, conversion.pdfBuffer, "application/pdf");
 
     // 11. Update status to ready
     await updatePreviewStatus(documentId, "ready", pdfKey, null);
 
     const duration = Date.now() - startTime;
-    console.log(
+    previewLog.log(
       `[PreviewPDF] Preview generated successfully in ${duration}ms (attempt ${newAttempts}): ${pdfKey}`,
     );
 
@@ -261,7 +262,7 @@ export async function generatePreviewPdf(
     const isPptx = isPptxMime(document.mimeType);
 
     if (isPptx && conversion.pdfBuffer) {
-      console.log(`[PreviewPDF] Triggering slide image generation for PPTX...`);
+      previewLog.log(`[PreviewPDF] Triggering slide image generation for PPTX...`);
       pptxSlideImageGenerator
         .generateSlideImages(conversion.pdfBuffer, documentId)
         .then(async (slideResult) => {
@@ -279,11 +280,11 @@ export async function generatePreviewPdf(
                 slideGenerationStatus: "completed",
               },
             });
-            console.log(
+            previewLog.log(
               `[PreviewPDF] Slide images generated: ${slideResult.totalSlides} slides`,
             );
           } else {
-            console.warn(
+            previewLog.warn(
               `[PreviewPDF] Slide image generation failed: ${slideResult.error}`,
             );
             await prisma.documentMetadata.upsert({
@@ -301,7 +302,7 @@ export async function generatePreviewPdf(
           }
         })
         .catch((err) => {
-          console.error(
+          previewLog.error(
             `[PreviewPDF] Slide image generation error:`,
             err.message,
           );
@@ -318,7 +319,7 @@ export async function generatePreviewPdf(
   } catch (error: any) {
     const errorMessage =
       error.message || "Unknown error during preview generation";
-    console.error(
+    previewLog.error(
       `[PreviewPDF] Error generating preview for ${documentId}:`,
       errorMessage,
     );
@@ -523,10 +524,10 @@ export async function reconcilePreviewJobs(): Promise<{
   failed: number;
   skipped: number;
 }> {
-  console.log("[PreviewPDF] Starting preview reconciliation...");
+  previewLog.log("[PreviewPDF] Starting preview reconciliation...");
 
   const documentsNeedingRetry = await findDocumentsNeedingPreviewRetry();
-  console.log(
+  previewLog.log(
     `[PreviewPDF] Found ${documentsNeedingRetry.length} documents needing preview retry`,
   );
 
@@ -537,7 +538,7 @@ export async function reconcilePreviewJobs(): Promise<{
 
   for (const doc of documentsNeedingRetry) {
     processed++;
-    console.log(
+    previewLog.log(
       `[PreviewPDF] Retrying ${doc.filename} (${doc.documentId.substring(0, 8)}...) - attempt ${doc.attempts + 1}/${MAX_RETRY_ATTEMPTS}`,
     );
 
@@ -548,32 +549,32 @@ export async function reconcilePreviewJobs(): Promise<{
 
       if (result.success) {
         succeeded++;
-        console.log(
+        previewLog.log(
           `[PreviewPDF] Retry succeeded for ${doc.documentId.substring(0, 8)}`,
         );
       } else if (result.status === "skipped") {
         skipped++;
       } else if (result.status === "max_retries_exceeded") {
         failed++;
-        console.log(
+        previewLog.log(
           `[PreviewPDF] Max retries exceeded for ${doc.documentId.substring(0, 8)}`,
         );
       } else {
         failed++;
-        console.log(
+        previewLog.log(
           `[PreviewPDF] Retry failed for ${doc.documentId.substring(0, 8)}: ${result.error}`,
         );
       }
     } catch (error: any) {
       failed++;
-      console.error(
+      previewLog.error(
         `[PreviewPDF] Exception during retry for ${doc.documentId.substring(0, 8)}:`,
         error.message,
       );
     }
   }
 
-  console.log(
+  previewLog.log(
     `[PreviewPDF] Reconciliation complete: ${processed} processed, ${succeeded} succeeded, ${failed} failed, ${skipped} skipped`,
   );
 
@@ -609,3 +610,4 @@ export default {
   MAX_RETRY_ATTEMPTS,
   STALE_PROCESSING_TIMEOUT_MS,
 };
+

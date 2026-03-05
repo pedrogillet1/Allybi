@@ -109,7 +109,10 @@ jest.mock("../../utils/logger", () => ({
   },
 }));
 
-import { runDocumentIngestionPipeline } from "./documentIngestionPipeline.service";
+import {
+  runDocumentIngestionPipeline,
+  resolveIngestionTelemetryFailClosed,
+} from "./documentIngestionPipeline.service";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -160,6 +163,7 @@ function makeTimings(overrides: Record<string, unknown> = {}) {
     textQuality: "good",
     textQualityScore: 0.9,
     extractionWarnings: [],
+    extractionWarningCodes: [],
     peakRssMb: 512.3,
     fileHash: null,
     ...overrides,
@@ -172,6 +176,7 @@ function makeTimings(overrides: Record<string, unknown> = {}) {
 
 describe("documentIngestionPipeline", () => {
   beforeEach(() => {
+    delete process.env.INGESTION_TELEMETRY_FAIL_CLOSED;
     mockDocFindUnique.mockReset();
     mockDocFindFirst.mockReset();
     mockDocMetaUpsert.mockReset();
@@ -262,6 +267,16 @@ describe("documentIngestionPipeline", () => {
     );
   });
 
+  test("forces fail-closed telemetry in production/staging when env disables it", () => {
+    expect(resolveIngestionTelemetryFailClosed("false", "production")).toBe(
+      true,
+    );
+    expect(resolveIngestionTelemetryFailClosed("false", "staging")).toBe(true);
+    expect(resolveIngestionTelemetryFailClosed("false", "development")).toBe(
+      false,
+    );
+  });
+
   // -----------------------------------------------------------------------
   // 5. Marks skipped for XLSX with zero chunks (strict no-content policy)
   // -----------------------------------------------------------------------
@@ -295,6 +310,7 @@ describe("documentIngestionPipeline", () => {
           meta: expect.objectContaining({
             ocrAttempted: false,
             ocrOutcome: "not_attempted",
+            extractionWarningCodes: [],
             peakRssMb: 512.3,
             sizeBucket: "lt_1mb",
           }),
@@ -327,6 +343,7 @@ describe("documentIngestionPipeline", () => {
           meta: expect.objectContaining({
             ocrAttempted: false,
             ocrOutcome: "not_attempted",
+            extractionWarningCodes: [],
           }),
         }),
       }),
@@ -413,5 +430,48 @@ describe("documentIngestionPipeline", () => {
       "enriching",
       expect.stringContaining("State transition failed during markIndexed"),
     );
+  });
+
+  test("fails closed when ingestion telemetry persistence fails and fail-closed mode is enabled", async () => {
+    process.env.INGESTION_TELEMETRY_FAIL_CLOSED = "true";
+    mockDocFindUnique.mockResolvedValue(makeDocument());
+    mockClaimForEnrichment.mockResolvedValue({ success: true });
+    mockProcessDocumentAsync.mockResolvedValue(makeTimings({ chunkCount: 3 }));
+    mockIsPipelineSkipped.mockReturnValue(false);
+    mockDocFindFirst.mockResolvedValue(null);
+    mockMetricsUpsert.mockResolvedValue({});
+    mockIngestionEventCreate.mockImplementation(() => {
+      throw new Error("telemetry store unavailable");
+    });
+    mockMarkFailed.mockResolvedValue({ success: true });
+
+    await expect(
+      runDocumentIngestionPipeline(makeJobData()),
+    ).rejects.toThrow("Persist ingestion telemetry failed after retries");
+
+    expect(mockMarkIndexed).not.toHaveBeenCalled();
+    expect(mockMarkFailed).toHaveBeenCalledWith(
+      "doc-1",
+      "enriching",
+      expect.stringContaining("Persist ingestion telemetry failed after retries"),
+    );
+  });
+
+  test("keeps fail-open behavior in development when telemetry persistence fails", async () => {
+    process.env.INGESTION_TELEMETRY_FAIL_CLOSED = "false";
+    mockDocFindUnique.mockResolvedValue(makeDocument());
+    mockClaimForEnrichment.mockResolvedValue({ success: true });
+    mockProcessDocumentAsync.mockResolvedValue(makeTimings({ chunkCount: 3 }));
+    mockIsPipelineSkipped.mockReturnValue(false);
+    mockDocFindFirst.mockResolvedValue(null);
+    mockMetricsUpsert.mockResolvedValue({});
+    mockIngestionEventCreate.mockImplementation(() => {
+      throw new Error("telemetry store unavailable");
+    });
+    mockMarkIndexed.mockResolvedValue({ success: true });
+
+    const result = await runDocumentIngestionPipeline(makeJobData());
+    expect(result.success).toBe(true);
+    expect(mockMarkIndexed).toHaveBeenCalledWith("doc-1", 3);
   });
 });

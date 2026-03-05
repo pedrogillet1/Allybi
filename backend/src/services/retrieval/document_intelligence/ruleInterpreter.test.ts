@@ -160,6 +160,37 @@ describe("ruleInterpreter", () => {
     expect(decision.actualExplicitDocs).toBe(1);
   });
 
+  test("extract operator with lexical compare cues does not trigger compare gating", () => {
+    const decision = enforceCrossDocPolicy(
+      baseCtx({
+        query: "extract budget versus actual variance by business unit",
+        normalizedQuery:
+          "extract budget versus actual variance by business unit",
+        operator: "extract",
+        explicitDocsCount: 1,
+        explicitDocIds: ["doc-a"],
+        candidateDocIds: ["doc-a", "doc-b"],
+      }),
+      {
+        config: { enabled: true },
+        retrievalPolicy: {
+          maxSourceDocuments: 5,
+        },
+      },
+      {
+        config: {
+          enabled: true,
+          requireExplicitComparisonScope: true,
+          minDocsForCompare: 2,
+        },
+      },
+    );
+
+    expect(decision.allow).toBe(true);
+    expect(decision.reasonCode).toBeNull();
+    expect(decision.askDisambiguation).toBe(false);
+  });
+
   test("single-document compare stays allowed when scope resolves to one doc", () => {
     const decision = enforceCrossDocPolicy(
       baseCtx({

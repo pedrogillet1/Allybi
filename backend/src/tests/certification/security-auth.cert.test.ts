@@ -265,50 +265,95 @@ describe("Certification: security auth hardening", () => {
       /URLSearchParams\s*\(\s*\{[\s\S]*accessToken[\s\S]*refreshToken[\s\S]*\}\s*\)/.test(
         authRoutesSource,
       ) || /accessToken=.*refreshToken=/.test(authRoutesSource);
+    const hasGoogleStateIssue = /issueGoogleOAuthState\s*\(/.test(
+      authRoutesSource,
+    );
+    const hasGoogleStateVerify = /verifyGoogleOAuthState\s*\(/.test(
+      authRoutesSource,
+    );
+    const hasGoogleStateCookie = /koda_google_oauth_state/.test(authRoutesSource);
+    const hasGoogleStateValidatorMiddleware = /validateGoogleOAuthState/.test(
+      authRoutesSource,
+    );
+    const hasGooglePassportStateOption = /state:\s*stateToken/.test(
+      authRoutesSource,
+    );
     if (hasUrlTokenCompatFlag) failures.push("AUTH_URL_TOKEN_COMPAT_PRESENT");
     if (hasTokenQueryRedirect) failures.push("AUTH_TOKEN_QUERY_REDIRECT_PRESENT");
+    if (!hasGoogleStateIssue) failures.push("GOOGLE_OAUTH_STATE_ISSUE_MISSING");
+    if (!hasGoogleStateVerify) failures.push("GOOGLE_OAUTH_STATE_VERIFY_MISSING");
+    if (!hasGoogleStateCookie) failures.push("GOOGLE_OAUTH_STATE_COOKIE_MISSING");
+    if (!hasGoogleStateValidatorMiddleware)
+      failures.push("GOOGLE_OAUTH_STATE_VALIDATOR_NOT_WIRED");
+    if (!hasGooglePassportStateOption)
+      failures.push("GOOGLE_OAUTH_PASSPORT_STATE_OPTION_MISSING");
 
-    // -- Static analysis: frontend must not read auth tokens from localStorage --
+    // -- Static analysis: browser clients must not read auth tokens from localStorage
+    // and dashboard code must not keep API keys in JS runtime state. --
     const frontendRootCandidates = [
       path.resolve(process.cwd(), "..", "frontend", "src"),
       path.resolve(process.cwd(), "frontend", "src"),
     ];
+    const dashboardRootCandidates = [
+      path.resolve(process.cwd(), "..", "dashboard", "client", "src"),
+      path.resolve(process.cwd(), "dashboard", "client", "src"),
+    ];
     const frontendRoot = frontendRootCandidates.find((candidate) =>
+      fs.existsSync(candidate),
+    );
+    const dashboardRoot = dashboardRootCandidates.find((candidate) =>
       fs.existsSync(candidate),
     );
     let frontendTokenReadPatterns = 0;
     let frontendCompatFlagPatterns = 0;
-    if (frontendRoot) {
-      const walk = (dir: string): void => {
-        for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-          if (entry.name.toLowerCase() === "nul") continue;
-          const fullPath = path.join(dir, entry.name);
-          if (entry.isDirectory()) {
-            walk(fullPath);
-            continue;
-          }
-          if (!/\.(js|jsx|ts|tsx)$/.test(entry.name)) continue;
-          const src = fs.readFileSync(fullPath, "utf8");
-          if (/AUTH_LOCALSTORAGE_COMPAT/.test(src)) {
-            frontendCompatFlagPatterns++;
-          }
-          if (
-            /localStorage\.getItem\(["']token["']\)/.test(src) ||
-            /localStorage\.getItem\(["']accessToken["']\)/.test(src)
-          ) {
-            frontendTokenReadPatterns++;
-          }
+    let dashboardApiKeyPatterns = 0;
+    const walk = (dir: string, appId: "frontend" | "dashboard"): void => {
+      for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+        if (entry.name.toLowerCase() === "nul") continue;
+        const fullPath = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+          walk(fullPath, appId);
+          continue;
         }
-      };
-      walk(frontendRoot);
+        if (!/\.(js|jsx|ts|tsx)$/.test(entry.name)) continue;
+        const src = fs.readFileSync(fullPath, "utf8");
+        if (/AUTH_LOCALSTORAGE_COMPAT/.test(src)) {
+          frontendCompatFlagPatterns++;
+        }
+        if (
+          /localStorage\.getItem\(["']token["']\)/.test(src) ||
+          /localStorage\.getItem\(["']accessToken["']\)/.test(src)
+        ) {
+          frontendTokenReadPatterns++;
+        }
+        if (
+          appId === "dashboard" &&
+          (/X-Admin-Key/.test(src) ||
+            /loginWithApiKey/.test(src) ||
+            /adminApiKey/i.test(src))
+        ) {
+          dashboardApiKeyPatterns++;
+        }
+      }
+    };
+    if (frontendRoot) {
+      walk(frontendRoot, "frontend");
     } else {
       failures.push("FRONTEND_SRC_NOT_FOUND_FOR_SECURITY_SCAN");
+    }
+    if (dashboardRoot) {
+      walk(dashboardRoot, "dashboard");
+    } else {
+      failures.push("DASHBOARD_SRC_NOT_FOUND_FOR_SECURITY_SCAN");
     }
     if (frontendCompatFlagPatterns > 0) {
       failures.push("FRONTEND_AUTH_LOCALSTORAGE_COMPAT_PRESENT");
     }
     if (frontendTokenReadPatterns > 0) {
       failures.push("FRONTEND_TOKEN_LOCALSTORAGE_READ_PRESENT");
+    }
+    if (dashboardApiKeyPatterns > 0) {
+      failures.push("DASHBOARD_JS_APIKEY_AUTH_PRESENT");
     }
 
     // ── Static analysis: no plaintext extractedText writes ───────────────
@@ -382,8 +427,14 @@ describe("Certification: security auth hardening", () => {
         unmaskedPhoneLogging,
         hasUrlTokenCompatFlag,
         hasTokenQueryRedirect,
+        hasGoogleStateIssue,
+        hasGoogleStateVerify,
+        hasGoogleStateCookie,
+        hasGoogleStateValidatorMiddleware,
+        hasGooglePassportStateOption,
         frontendCompatFlagPatterns,
         frontendTokenReadPatterns,
+        dashboardApiKeyPatterns,
         plaintextWritePathCount,
       },
       thresholds: {
@@ -400,8 +451,14 @@ describe("Certification: security auth hardening", () => {
         unmaskedPhoneLogging: false,
         hasUrlTokenCompatFlag: false,
         hasTokenQueryRedirect: false,
+        hasGoogleStateIssue: true,
+        hasGoogleStateVerify: true,
+        hasGoogleStateCookie: true,
+        hasGoogleStateValidatorMiddleware: true,
+        hasGooglePassportStateOption: true,
         maxFrontendCompatFlagPatterns: 0,
         maxFrontendTokenReadPatterns: 0,
+        maxDashboardApiKeyPatterns: 0,
         maxPlaintextWritePathCount: 0,
       },
       failures,

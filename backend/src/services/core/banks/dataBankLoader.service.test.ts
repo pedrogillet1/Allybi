@@ -747,7 +747,7 @@ describe("DataBankLoaderService hardening", () => {
       _meta: makeMeta("bank_registry"),
       config: { enabled: true },
       loadOrder: ["schemas", "retrieval"],
-      schemaMap: { retrieval: "retrieval_ranker_schema", schemas: "bank_schema" },
+      schemaMap: { retrieval: "retrieval_ranker_schema" },
       banks: [
         {
           id: "retrieval_ranker_schema",
@@ -828,7 +828,7 @@ describe("DataBankLoaderService hardening", () => {
       _meta: makeMeta("bank_registry"),
       config: { enabled: true },
       loadOrder: ["schemas", "routing"],
-      schemaMap: { routing: "routing_rule_schema", schemas: "bank_schema" },
+      schemaMap: { routing: "routing_rule_schema" },
       banks: [
         {
           id: "routing_rule_schema",
@@ -921,7 +921,6 @@ describe("DataBankLoaderService hardening", () => {
       _meta: makeMeta("bank_registry"),
       config: { enabled: true },
       loadOrder: ["schemas", "semantics"],
-      schemaMap: { schemas: "bank_schema" },
       banks: [
         {
           id: "compose_microcopy_schema",
@@ -1063,12 +1062,12 @@ describe("DataBankLoaderService hardening", () => {
       allowEmptyChecksumsInNonProd: true,
     });
 
-    // Simulate AJV being unavailable
+    // Simulate AJV being unavailable after construction
     (loader as any).ajv = null;
 
     await expect(loader.loadAll()).rejects.toThrow(DataBankError);
     await expect(loader.loadAll()).rejects.toThrow(
-      /AJV is required.*strict mode/i,
+      /AJV is unavailable.*strict mode requires schema validation/i,
     );
   });
 });

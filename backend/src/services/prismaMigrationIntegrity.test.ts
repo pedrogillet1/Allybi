@@ -307,18 +307,19 @@ describe("Prisma migration integrity guards", () => {
     const pkg = readFileSync(join(root, "package.json"), "utf8");
     expect(pkg).toContain('"prisma:deps:check"');
     expect(pkg).toContain('"prisma:rls:verify"');
+    expect(pkg).toContain('"prisma:rls:seed-service-role"');
     expect(pkg).toContain('"prisma:telemetry:repair:audit"');
   });
 
-  test("rls verification script supports service_role profile enforcement", () => {
-    const script = readFileSync(
-      join(root, "scripts", "prisma", "verify-rls.mjs"),
+  test("rls verification core supports profile + override enforcement", () => {
+    const core = readFileSync(
+      join(root, "scripts", "prisma", "verify-rls-core.cjs"),
       "utf8",
     );
-    expect(script).toContain("PRISMA_RLS_PROFILE");
-    expect(script).toContain("PRISMA_RLS_REQUIRE_SERVICE_ROLE");
-    expect(script).toContain("service_role_all");
-    expect(script).toContain("relforcerowsecurity");
+    expect(core).toContain("PRISMA_RLS_PROFILE");
+    expect(core).toContain("PRISMA_RLS_REQUIRE_SERVICE_ROLE");
+    expect(core).toContain('"prod", true');
+    expect(core).toContain('"ci", false');
   });
 
   test("telemetry repair audit script exists for ambiguous-clamp visibility", () => {
@@ -331,12 +332,23 @@ describe("Prisma migration integrity guards", () => {
     expect(script).toContain("exactOneRowsMayContainClampedValues");
   });
 
-  test("migration replay workflow pins CI RLS profile", () => {
+  test("migration replay workflow enforces soft+strict RLS profiles and telemetry ambiguity gate", () => {
     const workflow = readFileSync(
       join(root, "..", ".github", "workflows", "prisma-migration-replay.yml"),
       "utf8",
     );
     expect(workflow).toContain('PRISMA_RLS_PROFILE: "ci"');
+    expect(workflow).toContain('PRISMA_RLS_PROFILE: "prod"');
+    expect(workflow).toContain("prisma:rls:seed-service-role");
+    expect(workflow).toContain("PRISMA_TELEMETRY_AUDIT_FAIL_ON_AMBIGUOUS: \"1\"");
+    expect(workflow).toContain("PRISMA_TELEMETRY_AUDIT_OUT:");
+    expect(workflow).toContain("actions/upload-artifact@v4");
+
+    const replayIndex = workflow.indexOf("npm run prisma:replay:check");
+    const seedIndex = workflow.indexOf("npm run prisma:rls:seed-service-role");
+    expect(replayIndex).toBeGreaterThan(-1);
+    expect(seedIndex).toBeGreaterThan(-1);
+    expect(seedIndex).toBeLessThan(replayIndex);
   });
 
   test("post-baseline migrations do not include sqlite-only tokens", () => {
@@ -482,6 +494,6 @@ describe("Prisma migration integrity guards", () => {
       "utf8",
     );
     const matches = adminAnalytics.match(/prisma\.\$queryRaw/g) ?? [];
-    expect(matches.length).toBeLessThanOrEqual(27);
+    expect(matches.length).toBeLessThanOrEqual(24);
   });
 });

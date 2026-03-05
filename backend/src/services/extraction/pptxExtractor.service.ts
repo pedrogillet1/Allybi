@@ -21,42 +21,14 @@ import { formatAsMarkdownTable } from "../../utils/pdfTableExtractor";
 import { logger } from "../../utils/logger";
 import type { ExtractedTable } from "../ingestion/extraction/extractionResult.types";
 import { extractWithTesseract } from "./tesseractFallback.service";
-
-const PPTX_IMAGE_OCR_LIMIT = 10;
-const MIN_PPTX_IMAGE_OCR_TEXT_LEN = 10;
-const DEFAULT_PPTX_IMAGE_OCR_MIN_CONFIDENCE = 0.6;
-const DEFAULT_PPTX_SLIDE_PARSE_FAILURE_POLICY = "warn";
-const DEFAULT_PPTX_SLIDE_PARSE_FAILURE_MAX_RATIO = 0.25;
-
-type PptxParseFailurePolicy = "warn" | "fail";
-
-function clamp01(value: number): number {
-  if (!Number.isFinite(value)) return 0;
-  if (value < 0) return 0;
-  if (value > 1) return 1;
-  return value;
-}
-
-function resolvePptxImageOcrMinConfidence(): number {
-  const parsed = Number(process.env.PPTX_IMAGE_OCR_MIN_CONFIDENCE);
-  if (!Number.isFinite(parsed)) return DEFAULT_PPTX_IMAGE_OCR_MIN_CONFIDENCE;
-  return clamp01(parsed);
-}
-
-function resolvePptxParseFailurePolicy(): PptxParseFailurePolicy {
-  const raw = String(
-    process.env.PPTX_SLIDE_PARSE_FAILURE_POLICY || DEFAULT_PPTX_SLIDE_PARSE_FAILURE_POLICY,
-  )
-    .trim()
-    .toLowerCase();
-  return raw === "fail" ? "fail" : "warn";
-}
-
-function resolvePptxParseFailureMaxRatio(): number {
-  const parsed = Number(process.env.PPTX_SLIDE_PARSE_FAILURE_MAX_RATIO);
-  if (!Number.isFinite(parsed)) return DEFAULT_PPTX_SLIDE_PARSE_FAILURE_MAX_RATIO;
-  return clamp01(parsed);
-}
+import {
+  clamp01,
+  MIN_PPTX_IMAGE_OCR_TEXT_LEN,
+  PPTX_IMAGE_OCR_LIMIT,
+  resolvePptxImageOcrMinConfidence,
+  resolvePptxParseFailureMaxRatio,
+  resolvePptxParseFailurePolicy,
+} from "./ocrPolicy.service";
 
 // ============================================================================
 // Post-processing

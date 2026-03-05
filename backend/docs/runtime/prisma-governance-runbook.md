@@ -16,8 +16,13 @@ the expected write boundaries for HTTP routes.
 4. `npm run prisma:rls:verify` validates RLS posture for the active environment
    profile (`PRISMA_RLS_PROFILE`; CI uses `ci`, prod/staging should use `prod`).
 5. `npm run prisma:telemetry:repair:audit` reports remaining ambiguous telemetry
-   cohorts after compensation.
-6. `.github/workflows/prisma-migration-replay.yml` is the canonical replay gate.
+   cohorts after compensation and can fail with
+   `PRISMA_TELEMETRY_AUDIT_FAIL_ON_AMBIGUOUS=1`.
+6. `npm run prisma:rls:seed-service-role` should run before replay in CI/local
+   environments where RLS migrations depend on role presence.
+7. `.github/workflows/prisma-migration-replay.yml` is the canonical replay gate
+   and runs both soft (`ci`) and strict (`prod`) RLS verification profiles.
+8. CI exports telemetry audit evidence as `prisma-telemetry-audit` artifact.
 
 ## Route Write Boundary
 

@@ -3,9 +3,10 @@
 import fs from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 
 const strict = process.argv.includes("--strict");
-const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), "../..");
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const OUT_DIR = path.join(ROOT, "reports", "operators");
 const OUT_JSON = path.join(OUT_DIR, "operator-systems-grade.json");
 const OUT_MD = path.join(OUT_DIR, "operator-systems-grade.md");

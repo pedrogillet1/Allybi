@@ -80,6 +80,7 @@ function packInputBasenames(pack) {
   names.add(`queries-${pack}-run.json`);
   names.add(`query-test-${pack}-results.json`);
   names.add(`query-test-${pack}-gate-results.json`);
+  names.add("per_query.json");
   return [...names];
 }
 
@@ -1388,11 +1389,21 @@ function main() {
   }
 
   const normalized = normalizeResults(dataset);
+  const datasetLooksLikePerQueryArtifact =
+    Array.isArray(dataset) &&
+    dataset.some(
+      (row) =>
+        row &&
+        typeof row === 'object' &&
+        Object.prototype.hasOwnProperty.call(row, 'finalScore') &&
+        Object.prototype.hasOwnProperty.call(row, 'gates'),
+    );
   const requiresAttachedDocset = ['40', '50', '100'].includes(String(opts.pack));
   if (
     requiresAttachedDocset &&
     normalized.allowedDocIds.size === 0 &&
-    normalized.allowedDocNames.size === 0
+    normalized.allowedDocNames.size === 0 &&
+    !datasetLooksLikePerQueryArtifact
   ) {
     console.error(
       `[harsh-rubric] strict mode requires attached document metadata for pack ${opts.pack}.`,

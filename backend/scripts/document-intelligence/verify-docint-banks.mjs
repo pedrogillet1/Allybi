@@ -25,6 +25,7 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import safeRegex from "safe-regex";
 
 // ── paths ────────────────────────────────────────────────────────────────────
 const __filename = fileURLToPath(import.meta.url);
@@ -433,9 +434,13 @@ try {
       (allow.allowlistedBankIds || []).map(String),
     );
     allowlistedPrefixes = (allow.allowlistedIdPrefixes || []).map(String);
-    allowlistedPatterns = (allow.allowlistedIdPatterns || []).map(
-      (p) => new RegExp(p),
-    );
+    allowlistedPatterns = (allow.allowlistedIdPatterns || []).map((p) => {
+      const re = new RegExp(p);
+      if (!safeRegex(re)) {
+        failures.push(`orphan_allowlist.allowlistedIdPatterns contains potentially unsafe regex (ReDoS risk): ${p}`);
+      }
+      return re;
+    });
   }
 } catch {
   // If we cannot load, proceed without allowlist.
@@ -468,7 +473,11 @@ const consumedPrefixes = ((usageManifest && usageManifest.consumedIdPrefixes) ||
 const consumedPatterns = ((usageManifest && usageManifest.consumedIdPatterns) || [])
   .map((pattern) => {
     try {
-      return new RegExp(String(pattern || "").trim());
+      const re = new RegExp(String(pattern || "").trim());
+      if (!safeRegex(re)) {
+        failures.push(`usage_manifest.consumedIdPatterns contains potentially unsafe regex (ReDoS risk): ${pattern}`);
+      }
+      return re;
     } catch {
       return null;
     }

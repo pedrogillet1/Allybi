@@ -40,6 +40,11 @@ const failures = [];
 const warnings = [];
 
 const banks = Array.isArray(registry?.banks) ? registry.banks : [];
+const registryById = new Map(
+  banks
+    .map((entry) => [String(entry?.id || "").trim(), entry])
+    .filter(([id]) => id),
+);
 const registryIds = new Set(banks.map((b) => String(b?.id || "").trim()).filter(Boolean));
 const registryPaths = new Set(banks.map((b) => String(b?.path || "").trim()).filter(Boolean));
 const registryCategories = new Set(
@@ -152,16 +157,27 @@ for (const aliasEntry of aliasEntries) {
   const normalized = normalizeAlias(alias, aliasConfig);
   if (!normalized) continue;
   const existing = normalizedAliasMap.get(normalized);
-  if (existing && existing !== canonicalId) {
-    failures.push(`bank_aliases normalized collision: ${alias} -> ${canonicalId} conflicts with ${existing}`);
+  if (existing && existing.canonicalId !== canonicalId) {
+    failures.push(
+      `bank_aliases normalized collision: ${alias} -> ${canonicalId} conflicts with ${existing.canonicalId}`,
+    );
   } else {
-    normalizedAliasMap.set(normalized, canonicalId);
+    normalizedAliasMap.set(normalized, {
+      canonicalId,
+      source: String(aliasEntry?.source || "").trim(),
+    });
   }
 }
 for (const id of registryIds) {
   const normalized = normalizeAlias(id, aliasConfig);
-  const canonical = normalizedAliasMap.get(normalized);
-  if (canonical !== id) {
+  const alias = normalizedAliasMap.get(normalized);
+  const canonical = alias?.canonicalId;
+  const registryEntry = registryById.get(id) || {};
+  const required = registryEntry?.requiredByEnv || {};
+  const legacyOptionalInProdStaging =
+    required.production !== true && required.staging !== true;
+  const migrationPinnedAlias = String(alias?.source || "") === "migration_alias";
+  if (canonical !== id && !(legacyOptionalInProdStaging && migrationPinnedAlias)) {
     failures.push(`bank_aliases missing self-alias for ${id}`);
   }
 }

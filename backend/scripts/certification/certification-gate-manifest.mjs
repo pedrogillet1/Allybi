@@ -47,11 +47,13 @@ const RETRIEVAL_SIGNOFF_REQUIRED_GATE_IDS = [
   "retrieval-openworld-eval",
   "frontend-retrieval-evidence",
   "indexing-live-integration",
+  "indexing-storage-invariants",
 ];
 
 const CI_RELEASE_REQUIRED_GATE_IDS = [
   "frontend-retrieval-evidence",
   "indexing-live-integration",
+  "indexing-storage-invariants",
 ];
 
 function normalizeBoolean(value) {
@@ -99,6 +101,7 @@ export function resolveCertificationGateSet({
     "query-latency",
     "frontend-retrieval-evidence",
     "indexing-live-integration",
+    "indexing-storage-invariants",
   ];
   const skippedOptionalGates = [];
 
@@ -143,9 +146,15 @@ export function resolveCertificationGateSet({
     liveIndexingOverride === true;
   if (requireLiveIndexing) {
     requiredGateIds.push("indexing-live-integration");
+    requiredGateIds.push("indexing-storage-invariants");
   } else {
     skippedOptionalGates.push({
       gateId: "indexing-live-integration",
+      criticality: "optional",
+      reason: "profile_or_env_not_live_indexing",
+    });
+    skippedOptionalGates.push({
+      gateId: "indexing-storage-invariants",
       criticality: "optional",
       reason: "profile_or_env_not_live_indexing",
     });

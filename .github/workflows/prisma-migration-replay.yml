@@ -59,6 +59,9 @@ jobs:
       - name: Generate Prisma client
         run: npm run prisma:generate
 
+      - name: Seed service_role before migration replay
+        run: npm run prisma:rls:seed-service-role
+
       - name: Validate + replay migrations
         run: npm run prisma:replay:check
 
@@ -66,6 +69,25 @@ jobs:
         run: npm run prisma:rls:verify
         env:
           PRISMA_RLS_PROFILE: "ci"
+
+      - name: Audit telemetry ambiguity (fail on ambiguous rows)
+        run: npm run prisma:telemetry:repair:audit
+        env:
+          PRISMA_TELEMETRY_AUDIT_FAIL_ON_AMBIGUOUS: "1"
+          PRISMA_TELEMETRY_AUDIT_OUT: "reports/prisma/telemetry-audit-ci.json"
+
+      - name: Upload telemetry audit artifact
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: prisma-telemetry-audit
+          path: backend/reports/prisma/telemetry-audit-ci.json
+          if-no-files-found: warn
+
+      - name: Verify RLS profile (strict prod profile)
+        run: npm run prisma:rls:verify
+        env:
+          PRISMA_RLS_PROFILE: "prod"
 
       - name: Run Prisma invariant tests
         run: npm run test:prisma:invariants

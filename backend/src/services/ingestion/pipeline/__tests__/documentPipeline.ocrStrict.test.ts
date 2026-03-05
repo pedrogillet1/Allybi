@@ -92,6 +92,12 @@ describe("processDocumentAsync strict OCR policy", () => {
     expect(out.skipped).toBe(true);
     expect(out.skipCode).toBe("OCR_REQUIRED_UNAVAILABLE");
     expect(out.ocrOutcome).toBe("provider_unavailable");
+    expect(out.extractionWarningCodes).toEqual(
+      expect.arrayContaining([
+        "low_chars_per_page",
+        "ocr_required_unavailable",
+      ]),
+    );
     expect(mockStoreEmbeddings).not.toHaveBeenCalled();
     expect(mockRunEncryptionStep).not.toHaveBeenCalled();
   }, 15000);

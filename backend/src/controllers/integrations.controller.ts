@@ -21,6 +21,7 @@ import {
   clientSafeIntegrationMessage,
   normalizeIntegrationErrorMessage,
   resolveOAuthPostMessageOrigin,
+  verifyOAuthCompletionPayload,
 } from "../services/connectors/integrationRuntimePolicy.service";
 import { consumeEmailSendConfirmationTokenOnce } from "../services/connectors/emailSendReplayGuard.service";
 
@@ -894,6 +895,13 @@ export class IntegrationsController {
       receipt:
         (result.data?.receipt as Record<string, unknown> | null | undefined) ??
         null,
+    });
+  };
+
+  oauthVerify = async (req: Request, res: Response): Promise<Response> => {
+    const payload = (req.body || {}) as Record<string, unknown>;
+    return sendOk(res, {
+      valid: verifyOAuthCompletionPayload(payload),
     });
   };
 

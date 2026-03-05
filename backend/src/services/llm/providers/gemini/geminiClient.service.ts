@@ -148,6 +148,35 @@ export interface GeminiClientConfig {
   defaultModelFinal?: string;
 }
 
+export function normalizeGeminiBaseUrl(raw: string): string {
+  const value = String(raw || "").trim();
+  if (!value) {
+    throw new Error("Gemini baseUrl is required.");
+  }
+
+  let parsed: URL;
+  try {
+    parsed = new URL(value);
+  } catch {
+    throw new Error("Gemini baseUrl is invalid.");
+  }
+
+  if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
+    throw new Error("Gemini baseUrl must use http or https.");
+  }
+
+  if (parsed.username || parsed.password) {
+    throw new Error("Gemini baseUrl must not contain credentials.");
+  }
+
+  if (parsed.search) {
+    throw new Error("Gemini baseUrl must not include query parameters.");
+  }
+
+  const path = parsed.pathname.replace(/\/+$/, "");
+  return path && path !== "/" ? `${parsed.origin}${path}` : parsed.origin;
+}
+
 export function resolveGeminiModel(
   routeModel: string | undefined,
   cfg: Pick<
@@ -182,14 +211,19 @@ export function resolveGeminiModel(
 
 export class GeminiClientService implements LLMClient {
   public readonly provider: LLMProvider = "google";
+  private readonly normalizedBaseUrl: string;
 
-  constructor(private readonly cfg: GeminiClientConfig) {}
+  constructor(private readonly cfg: GeminiClientConfig) {
+    if (!String(cfg.apiKey || "").trim()) {
+      throw new Error("Gemini API key is required.");
+    }
+    this.normalizedBaseUrl = normalizeGeminiBaseUrl(cfg.baseUrl);
+  }
 
   async ping(): Promise<{ ok: boolean; provider: LLMProvider; t: number }> {
     const t = Date.now();
     try {
-      const base = this.cfg.baseUrl.replace(/\/$/, "");
-      const url = `${base}/models`;
+      const url = `${this.normalizedBaseUrl}/models`;
       const ac = new AbortController();
       const timeout = setTimeout(() => ac.abort(), this.cfg.pingTimeoutMs ?? 5000);
       try {
@@ -534,15 +568,13 @@ export class GeminiClientService implements LLMClient {
 
   private buildGenerateUrl(model: string): string {
     // v1beta/models/{model}:generateContent
-    const base = this.cfg.baseUrl.replace(/\/$/, "");
-    return `${base}/models/${encodeURIComponent(model)}:generateContent`;
+    return `${this.normalizedBaseUrl}/models/${encodeURIComponent(model)}:generateContent`;
   }
 
   private buildStreamUrl(model: string): string {
     // v1beta/models/{model}:streamGenerateContent?alt=sse
     // alt=sse enables Server-Sent Events for true incremental streaming
-    const base = this.cfg.baseUrl.replace(/\/$/, "");
-    return `${base}/models/${encodeURIComponent(model)}:streamGenerateContent?alt=sse`;
+    return `${this.normalizedBaseUrl}/models/${encodeURIComponent(model)}:streamGenerateContent?alt=sse`;
   }
 
   private inferKind(req: LLMRequest): "answer" | "nav_pills" | "system" {

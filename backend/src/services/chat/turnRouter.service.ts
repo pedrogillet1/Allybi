@@ -399,7 +399,7 @@ export class TurnRouterService {
                 .toLowerCase(),
             )
           : [];
-        if (negatives.some((token) => token && normalized.includes(token))) {
+        if (negatives.some((token: string) => token && normalized.includes(token))) {
           continue;
         }
         return true;
@@ -463,7 +463,7 @@ export class TurnRouterService {
         : [];
       if (
         negatives.some(
-          (token) => token && normalized.includes(token),
+          (token: string) => token && normalized.includes(token),
         )
       ) {
         continue;

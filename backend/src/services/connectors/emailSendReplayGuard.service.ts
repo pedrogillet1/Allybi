@@ -44,7 +44,7 @@ function replayKey(
 
 function shouldSkipDurableCheck(): boolean {
   const mode = asString(process.env.CONNECTOR_EMAIL_SEND_REPLAY_MODE).toLowerCase();
-  if (mode === "memory") return true;
+  if (mode === "memory") return process.env.NODE_ENV === "test";
   return process.env.NODE_ENV === "test";
 }
 

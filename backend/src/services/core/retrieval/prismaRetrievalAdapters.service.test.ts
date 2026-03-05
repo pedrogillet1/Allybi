@@ -11,6 +11,7 @@ const mockDocumentFindFirst = jest.fn();
 const mockDocumentLinkFindMany = jest.fn();
 const mockChunkFindMany = jest.fn();
 const mockDecryptChunksBatch = jest.fn();
+const mockDecryptChunkMetadataBatch = jest.fn();
 const mockSearchSimilarChunks = jest.fn();
 const mockPineconeAvailable = jest.fn();
 const mockGenerateQueryEmbedding = jest.fn();
@@ -34,6 +35,8 @@ jest.mock("../../../config/database", () => ({
 jest.mock("../../retrieval/chunkCrypto.service", () => ({
   ChunkCryptoService: jest.fn().mockImplementation(() => ({
     decryptChunksBatch: (...args: any[]) => mockDecryptChunksBatch(...args),
+    decryptChunkMetadataBatch: (...args: any[]) =>
+      mockDecryptChunkMetadataBatch(...args),
   })),
 }));
 
@@ -62,6 +65,7 @@ describe("PrismaRetrievalAdapterFactory encrypted chunk hydration", () => {
     mockDocumentLinkFindMany.mockReset();
     mockChunkFindMany.mockReset();
     mockDecryptChunksBatch.mockReset();
+    mockDecryptChunkMetadataBatch.mockReset();
     mockSearchSimilarChunks.mockReset();
     mockPineconeAvailable.mockReset();
     mockGenerateQueryEmbedding.mockReset();
@@ -69,6 +73,7 @@ describe("PrismaRetrievalAdapterFactory encrypted chunk hydration", () => {
     delete process.env.RETRIEVAL_INCLUDE_RELATED_DOCS_STRICT;
     mockDocumentFindMany.mockResolvedValue([]);
     mockDocumentLinkFindMany.mockResolvedValue([]);
+    mockDecryptChunkMetadataBatch.mockResolvedValue(new Map());
   });
 
   test("lexical search decrypts encrypted chunk text when plaintext is not stored", async () => {
@@ -274,6 +279,80 @@ describe("PrismaRetrievalAdapterFactory encrypted chunk hydration", () => {
     expect(hits[0].locationKey).toContain("|sec:tbl_kpi|");
     expect(hits[0].locationKey).not.toContain("|p:-1|");
     process.env.RETRIEVAL_LEXICAL_FROM_EMBEDDINGS = "false";
+  });
+
+  test("embedding-backed lexical search hydrates encrypted table metadata for cell payload", async () => {
+    process.env.RETRIEVAL_LEXICAL_FROM_EMBEDDINGS = "true";
+    process.env.INDEXING_ENCRYPTED_CHUNKS_ONLY = "true";
+    mockChunkFindMany.mockResolvedValue([
+      {
+        id: "chunk-enc-table-1",
+        documentId: "doc-enc-1",
+        chunkIndex: 9,
+        text: "Revenue / Q1 = $900",
+        textEncrypted: null,
+        metadataEncrypted: '{"v":1}',
+        page: null,
+        tableChunkForm: null,
+        tableId: null,
+        rowLabel: null,
+        colHeader: null,
+        valueRaw: null,
+        unitRaw: null,
+        unitNormalized: null,
+        metadata: {
+          sourceType: "xlsx",
+          chunkType: "cell_fact",
+        },
+        document: {
+          id: "doc-enc-1",
+          parentVersionId: null,
+          filename: "secure-kpi.xlsx",
+          displayTitle: "Secure KPI",
+          encryptedFilename: "users/u-1/secure-kpi.xlsx",
+          mimeType:
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          createdAt: new Date("2026-01-01T00:00:00.000Z"),
+          updatedAt: new Date("2026-01-01T00:00:00.000Z"),
+        },
+      },
+    ]);
+    mockDecryptChunkMetadataBatch.mockResolvedValue(
+      new Map([
+        [
+          "chunk-enc-table-1",
+          {
+            tableChunkForm: "cell_centric",
+            tableId: "sheet:Summary",
+            sheetName: "Summary",
+            rowLabel: "Revenue",
+            colHeader: "Q1",
+            valueRaw: "$900",
+            unitRaw: "$",
+            unitNormalized: "currency_usd",
+          },
+        ],
+      ]),
+    );
+
+    const deps = new PrismaRetrievalAdapterFactory().createForUser("user-1");
+    const hits = await deps.lexicalIndex.search({
+      query: "revenue q1",
+      k: 2,
+    });
+
+    expect(hits).toHaveLength(1);
+    expect(hits[0].table?.header).toEqual(["Revenue", "Q1"]);
+    expect(hits[0].table?.rows?.[0]?.[0]).toBe("$900");
+    expect(hits[0].location.sheet).toBe("Summary");
+    expect(hits[0].location.sectionKey).toBe("sheet:Summary");
+    expect(mockDecryptChunkMetadataBatch).toHaveBeenCalledWith(
+      "user-1",
+      "doc-enc-1",
+      ["chunk-enc-table-1"],
+    );
+    process.env.RETRIEVAL_LEXICAL_FROM_EMBEDDINGS = "false";
+    process.env.INDEXING_ENCRYPTED_CHUNKS_ONLY = "false";
   });
 
   test("semantic search uses sheet metadata for non-placeholder location keys", async () => {

@@ -1246,7 +1246,22 @@ export class LlmRequestBuilderService {
 
     if (parts.length === 0) return "";
     const serialized = parts.join(" | ");
-    return this.clipSnippetPreservingSemantics(serialized, maxChars);
+    if (serialized.length <= maxChars) return serialized;
+
+    // Preserve core table semantics by dropping lowest-priority segments first,
+    // instead of truncating arbitrarily in the middle of key fields.
+    const prunedParts = [...parts];
+    for (const prefix of ["footnotes=[", "rows=["]) {
+      if (prunedParts.join(" | ").length <= maxChars) break;
+      const idx = prunedParts.findIndex((part) => part.startsWith(prefix));
+      if (idx >= 0) {
+        prunedParts.splice(idx, 1);
+      }
+    }
+
+    const pruned = prunedParts.join(" | ");
+    if (pruned.length <= maxChars) return pruned;
+    return this.clipSnippetPreservingSemantics(pruned, maxChars);
   }
 
   private hashSnippet(input: string): string {

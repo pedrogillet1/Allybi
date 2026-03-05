@@ -2,8 +2,9 @@
 /* eslint-disable no-console */
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
 
-const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), "../..");
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 
 function read(relPath) {
   return fs.readFileSync(path.join(ROOT, relPath), "utf8");

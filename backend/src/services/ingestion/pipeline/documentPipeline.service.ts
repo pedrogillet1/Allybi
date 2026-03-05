@@ -22,6 +22,7 @@ import type { PipelineTimings, InputChunk } from "./pipelineTypes";
 import { recordIngestionTiming, recordExtractionAttempt } from "./pipelineMetrics.service";
 import { deriveOcrSignals } from "../../extraction/ocrSignals.service";
 import { toSkipCode } from "./skipCodes";
+import { deriveExtractionWarningCodes } from "../extraction/warningCodes.service";
 
 // Storage download concurrency limiter
 const pLimit = require("p-limit");
@@ -146,6 +147,9 @@ export async function processDocumentAsync(
   // 1d) Validate file integrity before extraction
   const headerCheck = fileValidator.validateFileHeader(fileBuffer, mimeType, documentId);
   if (!headerCheck.isValid) {
+    const headerWarnings = [
+      headerCheck.error || "File header validation failed",
+    ];
     logger.warn("[Pipeline] File failed header validation", {
       documentId,
       filename,
@@ -165,7 +169,8 @@ export async function processDocumentAsync(
       ocrMode: null,
       textQuality: "none",
       textQualityScore: 0,
-      extractionWarnings: [headerCheck.error || "File header validation failed"],
+      extractionWarnings: headerWarnings,
+      extractionWarningCodes: deriveExtractionWarningCodes(headerWarnings),
       textLength: 0,
       rawChunkCount: 0,
       chunkCount: 0,
@@ -220,6 +225,16 @@ export async function processDocumentAsync(
       ? extraction.extractionWarnings
       : []),
   ];
+  const extractionWarningCodes = Array.from(
+    new Set([
+      ...(Array.isArray(extraction.extractionWarningCodes)
+        ? extraction.extractionWarningCodes
+            .map((code) => String(code || "").trim())
+            .filter((code) => code.length > 0)
+        : []),
+      ...deriveExtractionWarningCodes(extractionWarnings),
+    ]),
+  );
 
   // Detect scanned PDF with no OCR applied — log structured warning for monitoring
   if (
@@ -247,6 +262,10 @@ export async function processDocumentAsync(
     recordExtractionAttempt(false);
     const skipReason =
       "Weak PDF text quality and OCR was unavailable; extraction skipped to avoid unreliable indexing";
+    const strictWarnings = [
+      ...extractionWarnings,
+      "ocr_required_unavailable: OCR required for weak PDF but unavailable",
+    ];
     logger.warn("[Pipeline] Strict PDF OCR requirement triggered", {
       documentId,
       filename,
@@ -266,10 +285,8 @@ export async function processDocumentAsync(
       ocrMode,
       textQuality: textQuality.label,
       textQualityScore: textQuality.score,
-      extractionWarnings: [
-        ...extractionWarnings,
-        "OCR required for weak PDF but unavailable",
-      ],
+      extractionWarnings: strictWarnings,
+      extractionWarningCodes: deriveExtractionWarningCodes(strictWarnings),
       textLength: fullText.length,
       rawChunkCount: 0,
       chunkCount: 0,
@@ -310,6 +327,7 @@ export async function processDocumentAsync(
       textQuality: "none",
       textQualityScore: 0,
       extractionWarnings,
+      extractionWarningCodes,
       textLength: 0,
       rawChunkCount: 0,
       chunkCount: 0,
@@ -409,6 +427,7 @@ export async function processDocumentAsync(
     textQuality: textQuality.label,
     textQualityScore: textQuality.score,
     extractionWarnings,
+    extractionWarningCodes,
     textLength: fullText.length,
     rawChunkCount: rawChunks.length,
     chunkCount: inputChunks.length,

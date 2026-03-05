@@ -15,7 +15,6 @@ import {
   SystemHealthSchema,
   SearchResponseSchema,
 } from "@/types/admin";
-import { getAdminApiKey } from "../auth/adminKeyStore";
 import type {
   TimeRange,
   Environment,
@@ -61,10 +60,7 @@ class ApiError extends Error {
 }
 
 function getAuthHeaders(): Record<string, string> {
-  const adminKey = getAdminApiKey();
-  return {
-    ...(adminKey && { "X-Admin-Key": adminKey }),
-  };
+  return {};
 }
 
 /**

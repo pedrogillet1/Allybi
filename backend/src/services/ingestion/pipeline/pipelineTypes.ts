@@ -21,6 +21,7 @@ interface BasePipelineTimings {
   textQuality: "high" | "medium" | "low" | "none";
   textQualityScore: number | null;
   extractionWarnings: string[];
+  extractionWarningCodes?: string[];
   textLength: number;
   rawChunkCount: number;
   chunkCount: number;

@@ -262,6 +262,7 @@ if (isRetrievalSignoff) {
     "retrieval-openworld-eval",
     "frontend-retrieval-evidence",
     "indexing-live-integration",
+    "indexing-storage-invariants",
   ]);
   const presentGateIds = new Set(
     Array.isArray(summary?.gates)
@@ -283,6 +284,7 @@ if (requiresCiEvidenceGates) {
     "query-latency",
     "frontend-retrieval-evidence",
     "indexing-live-integration",
+    "indexing-storage-invariants",
   ]);
   const presentGateIds = new Set(
     Array.isArray(summary?.gates)

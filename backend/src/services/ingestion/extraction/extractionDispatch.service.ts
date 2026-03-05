@@ -12,6 +12,14 @@ import { extractXlsxWithAnchors } from "../../extraction/xlsxExtractor.service";
 import { extractPptxWithAnchors } from "../../extraction/pptxExtractor.service";
 import { getGoogleVisionOcrService } from "../../extraction/google-vision-ocr.service";
 import { extractWithTesseract } from "../../extraction/tesseractFallback.service";
+import {
+  OCR_MIN_IMAGE_SIZE_BYTES,
+  OCR_MIN_IMAGE_EDGE,
+  OCR_MIN_IMAGE_PIXELS,
+  OCR_LOW_VARIANCE_STDEV_THRESHOLD,
+  OCR_LOW_ENTROPY_THRESHOLD,
+  resolveImageOcrConfidence,
+} from "../../extraction/ocrPolicy.service";
 import sharp from "sharp";
 import type { DispatchedExtractionResult } from "./extractionResult.types";
 import { recordExtractorTiming, recordOcrUsage } from "../pipeline/pipelineMetrics.service";
@@ -66,12 +74,6 @@ const SKIP_OCR_FILENAME_PATTERNS = [
   /\.(svg|gif|webp)$/i,
 ];
 
-const MIN_IMAGE_SIZE_FOR_OCR = 10 * 1024; // 10KB
-const MIN_IMAGE_EDGE_FOR_OCR = 48;
-const MIN_IMAGE_PIXELS_FOR_OCR = 48 * 48;
-const LOW_VARIANCE_STDEV_THRESHOLD = 4.5;
-const LOW_ENTROPY_THRESHOLD = 1.15;
-
 async function analyzeImageVisualSignals(
   buffer: Buffer,
 ): Promise<{ skip: boolean; reason?: string }> {
@@ -86,7 +88,10 @@ async function analyzeImageVisualSignals(
     }
 
     const pixels = width * height;
-    if (Math.min(width, height) < MIN_IMAGE_EDGE_FOR_OCR || pixels < MIN_IMAGE_PIXELS_FOR_OCR) {
+    if (
+      Math.min(width, height) < OCR_MIN_IMAGE_EDGE ||
+      pixels < OCR_MIN_IMAGE_PIXELS
+    ) {
       return {
         skip: true,
         reason: `image dimensions too small (${width}x${height})`,
@@ -102,8 +107,9 @@ async function analyzeImageVisualSignals(
     const avgChannelStdev =
       channels.reduce((sum, ch) => sum + (ch.stdev ?? 0), 0) / channels.length;
     const entropy = typeof stats.entropy === "number" ? stats.entropy : null;
-    const veryLowVariance = avgChannelStdev <= LOW_VARIANCE_STDEV_THRESHOLD;
-    const lowEntropy = entropy !== null && entropy <= LOW_ENTROPY_THRESHOLD;
+    const veryLowVariance =
+      avgChannelStdev <= OCR_LOW_VARIANCE_STDEV_THRESHOLD;
+    const lowEntropy = entropy !== null && entropy <= OCR_LOW_ENTROPY_THRESHOLD;
 
     if (veryLowVariance && lowEntropy) {
       return {
@@ -135,7 +141,7 @@ export async function shouldSkipImageOcr(
     }
   }
 
-  if (buffer.length < MIN_IMAGE_SIZE_FOR_OCR) {
+  if (buffer.length < OCR_MIN_IMAGE_SIZE_BYTES) {
     return {
       skip: true,
       reason: `image too small (${(buffer.length / 1024).toFixed(1)}KB < 10KB)`,
@@ -318,12 +324,15 @@ export async function extractText(
         };
       }
       recordOcrUsage("google_vision", true);
+      const normalizedConfidence = resolveImageOcrConfidence(
+        ocrResult.confidence,
+      );
       return {
         sourceType: "image",
         text: ocrResult.text,
         wordCount: ocrResult.text.split(/\s+/).length,
-        confidence: ocrResult.confidence ?? 0.5,
-        ...(ocrResult.confidence === undefined || ocrResult.confidence === null
+        confidence: normalizedConfidence.confidence,
+        ...(normalizedConfidence.estimated
           ? { extractionWarnings: ["ocr_confidence_estimated: provider returned no confidence score, using default 0.5"] }
           : {}),
       };

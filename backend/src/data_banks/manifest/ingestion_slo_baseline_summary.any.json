@@ -15,12 +15,14 @@
   "to": "2026-03-05T00:00:00.000Z",
   "docsProcessed": 240,
   "p95LatencyMs": 84250,
+  "p95PeakRssMb": 812.4,
   "byMimeSize": [
     {
       "mimeType": "application/pdf",
       "sizeBucket": "medium",
       "count": 120,
       "p95LatencyMs": 90210,
+      "p95PeakRssMb": 940.2,
       "failureRate": 1.67
     },
     {
@@ -28,6 +30,7 @@
       "sizeBucket": "small",
       "count": 70,
       "p95LatencyMs": 56140,
+      "p95PeakRssMb": 604.7,
       "failureRate": 1.43
     },
     {
@@ -35,6 +38,7 @@
       "sizeBucket": "small",
       "count": 50,
       "p95LatencyMs": 33880,
+      "p95PeakRssMb": 452.1,
       "failureRate": 0
     }
   ]

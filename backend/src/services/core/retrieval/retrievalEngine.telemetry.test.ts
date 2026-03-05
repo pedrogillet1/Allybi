@@ -371,6 +371,26 @@ describe("RetrievalEngineService telemetry", () => {
     ).toBeGreaterThan(0);
   });
 
+  test("persists boost rule scoring deltas with candidateHits and delta metrics", async () => {
+    const engine = makeEngine();
+    const pack = await engine.retrieve(buildRequest());
+
+    const boostAppliedEvents = (pack.telemetry?.ruleEvents || []).filter(
+      (event) => event.event === "retrieval.boost_rule_applied",
+    );
+    expect(boostAppliedEvents.length).toBeGreaterThan(0);
+
+    for (const event of boostAppliedEvents) {
+      expect(event.payload.ruleId).toBeDefined();
+      expect(event.payload.scoreDeltaSummary).toBeDefined();
+      const summary = event.payload.scoreDeltaSummary;
+      expect(typeof summary.candidateHits).toBe("number");
+      expect(typeof summary.totalDelta).toBe("number");
+      expect(typeof summary.averageDelta).toBe("number");
+      expect(typeof summary.maxDelta).toBe("number");
+    }
+  });
+
   test("emits crossdoc gated telemetry when compare has fewer than required explicit docs", async () => {
     const engine = makeEngine();
     const request = buildRequest({
@@ -397,6 +417,39 @@ describe("RetrievalEngineService telemetry", () => {
     );
     expect(gatedEvent?.payload.requiredExplicitDocs).toBe(2);
     expect(gatedEvent?.payload.actualExplicitDocs).toBe(1);
+    expect(
+      (pack.telemetry?.summary.candidateDecisionDigest || []).length,
+    ).toBeGreaterThan(0);
+    expect(
+      pack.telemetry?.summary.candidateDecisionDigest?.[0]?.filterReason,
+    ).toBe("cross_doc_compare_needs_explicit_docs");
+  });
+
+  test("does not infer compare intent from lexical cues when operator is extract", async () => {
+    const engine = makeEngine();
+    const request = buildRequest({
+      query: "extract budget versus actual variance by business unit",
+      signals: {
+        intentFamily: "documents",
+        operator: "extract",
+        domainHint: "finance",
+        explicitDocIds: ["fin-actual"],
+        explicitDocTypes: ["variance_report"],
+        explicitDocDomains: ["finance"],
+        singleDocIntent: true,
+        allowExpansion: false,
+      },
+    });
+    const pack = await engine.retrieve(request);
+
+    expect(pack.evidence.length).toBeGreaterThan(0);
+    expect(
+      (pack.telemetry?.ruleEvents || []).some(
+        (event) =>
+          event.event === "retrieval.crossdoc_gated" &&
+          event.payload.reason === "cross_doc_compare_needs_explicit_docs",
+      ),
+    ).toBe(false);
   });
 
   test("post-packaging policy blocks compare when table evidence mixes currency units", () => {
@@ -524,6 +577,47 @@ describe("RetrievalEngineService telemetry", () => {
         locationKey: "loc-4",
         location: { sectionKey: "variance_analysis" },
         snippet: "Actual variance by unit",
+        score: { finalScore: 0.86 },
+      },
+    ] as unknown as EvidenceItem[];
+
+    const reason = (engine as any).resolvePostPackagingPolicyReason({
+      evidence,
+      compareIntent: true,
+      signals: { intentFamily: "documents", operator: "compare" },
+    });
+    expect(reason).toBe("cross_doc_evidence_minimum_not_met");
+  });
+
+  test("post-packaging compare minimum fails when total evidence cannot satisfy configured per-doc minimum", () => {
+    const engine = makeEngine();
+    const originalSafeGetBank = (engine as any).safeGetBank.bind(engine);
+    (engine as any).safeGetBank = (bankId: string) => {
+      if (bankId === "crossdoc_alignment_rules") {
+        return {
+          config: {
+            minEvidencePerDocForCompare: 2,
+          },
+        };
+      }
+      return originalSafeGetBank(bankId);
+    };
+
+    const evidence = [
+      {
+        evidenceType: "text",
+        docId: "fin-budget",
+        locationKey: "loc-1",
+        location: { sectionKey: "variance_analysis" },
+        snippet: "Budget variance summary",
+        score: { finalScore: 0.9 },
+      },
+      {
+        evidenceType: "text",
+        docId: "fin-actual",
+        locationKey: "loc-2",
+        location: { sectionKey: "variance_analysis" },
+        snippet: "Actual variance summary",
         score: { finalScore: 0.86 },
       },
     ] as unknown as EvidenceItem[];

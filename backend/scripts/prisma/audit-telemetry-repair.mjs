@@ -3,6 +3,7 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { Client } from "pg";
+import telemetryAuditCore from "./telemetry-audit-core.cjs";
 
 const REQUIRED_HISTORY = [
   "20260205_fix_evidence_strength",
@@ -17,15 +18,8 @@ const SCORE_TABLES = [
   { table: "QueryTelemetry", scoreColumn: "topRelevanceScore" },
 ];
 
-function parseBool(raw, fallback = false) {
-  const normalized = String(raw || "")
-    .trim()
-    .toLowerCase();
-  if (!normalized) return fallback;
-  if (["1", "true", "yes", "on"].includes(normalized)) return true;
-  if (["0", "false", "no", "off"].includes(normalized)) return false;
-  return fallback;
-}
+const { parseBool, calculateAmbiguousRows, allRepairMigrationsApplied } =
+  telemetryAuditCore;
 
 function resolveOutputPath() {
   const raw = String(process.env.PRISMA_TELEMETRY_AUDIT_OUT || "").trim();
@@ -132,10 +126,7 @@ async function main() {
       tableAudits.push({ ...audit, status: "ok" });
     }
 
-    const ambiguousRows = tableAudits.reduce((sum, audit) => {
-      if (typeof audit?.exactOneRows !== "number") return sum;
-      return sum + audit.exactOneRows;
-    }, 0);
+    const ambiguousRows = calculateAmbiguousRows(tableAudits);
 
     const report = {
       generatedAt: new Date().toISOString(),
@@ -143,8 +134,9 @@ async function main() {
       summary: {
         ambiguousRows,
         failOnAmbiguous,
-        allRepairMigrationsApplied: REQUIRED_HISTORY.every(
-          (name) => history[name]?.applied === true,
+        allRepairMigrationsApplied: allRepairMigrationsApplied(
+          REQUIRED_HISTORY,
+          history,
         ),
       },
       tableAudits,

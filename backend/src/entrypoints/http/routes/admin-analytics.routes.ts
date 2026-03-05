@@ -147,12 +147,14 @@ router.get(
         LIMIT 24
       `,
         // Documents by type
-        prisma.$queryRaw<{ type: string; count: bigint }[]>`
-        SELECT d."mimeType" as type, COUNT(*)::bigint as count
-        FROM documents d
-        GROUP BY d."mimeType"
-        ORDER BY count DESC
-      `,
+        prisma.document
+          .groupBy({
+            by: ["mimeType"],
+            _count: { _all: true },
+          })
+          .then((rows) =>
+            rows.sort((a, b) => (b._count._all || 0) - (a._count._all || 0)),
+          ),
         // Recent uploads (include encryption fields for decryption)
         prisma.document.findMany({
           take: 5,
@@ -251,8 +253,8 @@ router.get(
           documentsUploadedToday: docsToday,
           totalStorageGB: Math.round(totalStorageGB * 100) / 100,
           documentsByType: docsByType.map((r) => ({
-            type: r.type,
-            count: Number(r.count),
+            type: r.mimeType || "unknown",
+            count: Number(r._count._all || 0),
           })),
           recentUploads: recentUploads.map((d) => ({
             filename: encryptedDisplayName(d),
@@ -625,18 +627,22 @@ router.get(
         GROUP BY DATE(d."createdAt")
         ORDER BY date ASC
       `,
-        prisma.$queryRaw<{ type: string; count: bigint }[]>`
-        SELECT d."mimeType" as type, COUNT(*)::bigint as count
-        FROM documents d
-        GROUP BY d."mimeType"
-        ORDER BY count DESC
-      `,
-        prisma.$queryRaw<{ status: string; count: bigint }[]>`
-        SELECT d.status, COUNT(*)::bigint as count
-        FROM documents d
-        GROUP BY d.status
-        ORDER BY count DESC
-      `,
+        prisma.document
+          .groupBy({
+            by: ["mimeType"],
+            _count: { _all: true },
+          })
+          .then((rows) =>
+            rows.sort((a, b) => (b._count._all || 0) - (a._count._all || 0)),
+          ),
+        prisma.document
+          .groupBy({
+            by: ["status"],
+            _count: { _all: true },
+          })
+          .then((rows) =>
+            rows.sort((a, b) => (b._count._all || 0) - (a._count._all || 0)),
+          ),
         prisma.$queryRaw<
           {
             id: string;
@@ -689,12 +695,12 @@ router.get(
           count: Number(r.count),
         })),
         documentsByType: docsByType.map((r) => ({
-          type: r.type,
-          count: Number(r.count),
+          type: r.mimeType || "unknown",
+          count: Number(r._count._all || 0),
         })),
         documentsByStatus: docsByStatus.map((r) => ({
-          status: r.status,
-          count: Number(r.count),
+          status: String(r.status),
+          count: Number(r._count._all || 0),
         })),
         largestDocuments: largestDocs.map((d) => ({
           filename: encryptedDisplayName(d),

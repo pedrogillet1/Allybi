@@ -505,6 +505,12 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "compose_microcopy_schema",
+      "canonicalId": "compose_microcopy_schema",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "composition_lane_policy",
       "canonicalId": "composition_lane_policy",
       "source": "runtime_self_alias",
@@ -6322,10 +6328,10 @@
     {
       "alias": "followup_suggestions",
       "canonicalId": "followup_suggestions_v1c6269cc",
-      "source": "migration_alias",
       "reason": "Legacy follow-up bank id pinned to versioned compose canonical id.",
       "addedAt": "2026-03-05",
-      "expiresInDays": null
+      "expiresInDays": null,
+      "source": "migration_alias"
     },
     {
       "alias": "followup_suggestions_v1c6269cc",
@@ -9779,8 +9785,20 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "retrieval_ranker_schema",
+      "canonicalId": "retrieval_ranker_schema",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "routing_priority",
       "canonicalId": "routing_priority",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "routing_rule_schema",
+      "canonicalId": "routing_rule_schema",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },

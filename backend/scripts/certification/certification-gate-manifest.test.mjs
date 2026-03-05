@@ -80,9 +80,11 @@ test("cert scope for ci requires latency and retrieval evidence gates", () => {
   assert.equal(out.requiredGateIds.includes("query-latency"), true);
   assert.equal(out.requiredGateIds.includes("frontend-retrieval-evidence"), true);
   assert.equal(out.requiredGateIds.includes("indexing-live-integration"), true);
+  assert.equal(out.requiredGateIds.includes("indexing-storage-invariants"), true);
   assert.equal(out.optionalGateIds.includes("query-latency"), false);
   assert.equal(out.optionalGateIds.includes("frontend-retrieval-evidence"), false);
   assert.equal(out.optionalGateIds.includes("indexing-live-integration"), false);
+  assert.equal(out.optionalGateIds.includes("indexing-storage-invariants"), false);
 });
 
 test("cert scope for local keeps retrieval evidence gates optional", () => {
@@ -96,10 +98,12 @@ test("cert scope for local keeps retrieval evidence gates optional", () => {
   assert.equal(out.requiredGateIds.includes("query-latency"), false);
   assert.equal(out.requiredGateIds.includes("frontend-retrieval-evidence"), false);
   assert.equal(out.requiredGateIds.includes("indexing-live-integration"), false);
+  assert.equal(out.requiredGateIds.includes("indexing-storage-invariants"), false);
   assert.equal(out.requiredGateIds.includes("doc-identity-behavioral"), true);
   assert.equal(out.optionalGateIds.includes("query-latency"), true);
   assert.equal(out.optionalGateIds.includes("frontend-retrieval-evidence"), true);
   assert.equal(out.optionalGateIds.includes("indexing-live-integration"), true);
+  assert.equal(out.optionalGateIds.includes("indexing-storage-invariants"), true);
 });
 
 test("retrieval_signoff requires query-latency and retrieval evidence gates", () => {
@@ -116,9 +120,11 @@ test("retrieval_signoff requires query-latency and retrieval evidence gates", ()
   assert.equal(out.requiredGateIds.includes("retrieval-openworld-eval"), true);
   assert.equal(out.requiredGateIds.includes("frontend-retrieval-evidence"), true);
   assert.equal(out.requiredGateIds.includes("indexing-live-integration"), true);
+  assert.equal(out.requiredGateIds.includes("indexing-storage-invariants"), true);
   assert.equal(out.optionalGateIds.includes("query-latency"), false);
   assert.equal(out.optionalGateIds.includes("frontend-retrieval-evidence"), false);
   assert.equal(out.optionalGateIds.includes("indexing-live-integration"), false);
+  assert.equal(out.optionalGateIds.includes("indexing-storage-invariants"), false);
 });
 
 test("required and optional gates are always disjoint", () => {

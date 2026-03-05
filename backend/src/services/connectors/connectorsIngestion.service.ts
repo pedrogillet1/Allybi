@@ -4,7 +4,6 @@ import prisma from "../../config/database";
 import { uploadFile } from "../../config/storage";
 import { splitTextIntoChunksWithOffsets } from "../ingestion/chunking.service";
 import vectorEmbeddingRuntimeService from "../retrieval/vectorEmbedding.runtime.service";
-import type { InputChunk } from "../retrieval/vectorEmbedding.service";
 import type { ConnectorProvider } from "./connectorsRegistry";
 import { documentContentVault } from "../documents/documentContentVault.service";
 import {
@@ -12,6 +11,10 @@ import {
   type TransitionResult,
 } from "../documents/documentStateManager.service";
 import { logger } from "../../utils/logger";
+
+type InputChunk = Parameters<
+  typeof vectorEmbeddingRuntimeService.storeDocumentEmbeddings
+>[1][number];
 
 const CONNECTOR_MIME_MAP: Record<string, string> = {
   gmail: "message/rfc822",

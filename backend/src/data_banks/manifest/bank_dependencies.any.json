@@ -148,8 +148,7 @@
   "banks": [
     {
       "id": "access_control_policy",
-      "dependsOn": [],
-      "optional": true
+      "dependsOn": []
     },
     {
       "id": "accounting_rules",
@@ -513,6 +512,12 @@
     {
       "id": "compliance_policy",
       "dependsOn": []
+    },
+    {
+      "id": "compose_microcopy_schema",
+      "dependsOn": [
+        "bank_registry"
+      ]
     },
     {
       "id": "composition_lane_policy",
@@ -8427,9 +8432,21 @@
       "dependsOn": []
     },
     {
+      "id": "retrieval_ranker_schema",
+      "dependsOn": [
+        "bank_registry"
+      ]
+    },
+    {
       "id": "routing_priority",
       "dependsOn": [],
       "optional": true
+    },
+    {
+      "id": "routing_rule_schema",
+      "dependsOn": [
+        "bank_registry"
+      ]
     },
     {
       "id": "safety_tone_overrides",

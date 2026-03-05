@@ -1,5 +1,11 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { getStatus, startConnect, disconnect, sync } from '../services/integrationsService';
+import {
+  getStatus,
+  startConnect,
+  disconnect,
+  sync,
+  verifyOAuthCompletion,
+} from '../services/integrationsService';
 import { getApiBaseUrl } from '../services/runtimeConfig';
 import { INTEGRATION_PROVIDERS } from '../constants/integrationProviders';
 
@@ -213,15 +219,17 @@ export function useIntegrationStatus() {
           eventType === 'OAUTH_COMPLETE';
         if (!doneType) return;
         if (eventProvider && eventProvider !== String(provider).toLowerCase()) return;
-        if (data.ok === false) {
-          handleOAuthFail('Connection failed. Please try again.');
-          return;
-        }
-
-        Promise.resolve(confirmProviderConnected())
-          .then((connected) => {
-            if (!connected) return;
-            handleOAuthDone();
+        Promise.resolve(verifyOAuthCompletion(data))
+          .then((valid) => {
+            if (!valid) return;
+            if (data.ok === false) {
+              handleOAuthFail('Connection failed. Please try again.');
+              return;
+            }
+            return confirmProviderConnected().then((connected) => {
+              if (!connected) return;
+              handleOAuthDone();
+            });
           })
           .catch(() => {});
       };

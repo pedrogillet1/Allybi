@@ -4,6 +4,7 @@ import fs from "fs";
 import path from "path";
 import crypto from "crypto";
 import { fileURLToPath } from "url";
+import safeRegex from "safe-regex";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -75,7 +76,11 @@ function compileRegexList(values, failures, label) {
   const out = [];
   for (const raw of values) {
     try {
-      out.push(new RegExp(raw));
+      const re = new RegExp(raw);
+      if (!safeRegex(re)) {
+        failures.push(`${label} contains potentially unsafe regex (ReDoS risk): ${raw}`);
+      }
+      out.push(re);
     } catch {
       failures.push(`${label} contains invalid regex: ${raw}`);
     }

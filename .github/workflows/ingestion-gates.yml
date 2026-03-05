@@ -12,6 +12,8 @@ on:
       - 'backend/src/services/ingestion/**'
       - 'backend/src/services/retrieval/vectorEmbedding.runtime.service.ts'
       - 'backend/scripts/lint/ocr-degrade-audit.mjs'
+      - 'backend/scripts/audit/ingestion-slo-cert-gate.mjs'
+      - 'backend/src/data_banks/manifest/ingestion_slo_baseline_summary.any.json'
       - '.github/workflows/ingestion-gates.yml'
   push:
     branches: [ main, develop ]
@@ -24,6 +26,8 @@ on:
       - 'backend/src/services/ingestion/**'
       - 'backend/src/services/retrieval/vectorEmbedding.runtime.service.ts'
       - 'backend/scripts/lint/ocr-degrade-audit.mjs'
+      - 'backend/scripts/audit/ingestion-slo-cert-gate.mjs'
+      - 'backend/src/data_banks/manifest/ingestion_slo_baseline_summary.any.json'
       - '.github/workflows/ingestion-gates.yml'
 
 jobs:
@@ -57,6 +61,12 @@ jobs:
       - name: OCR strict audit
         run: npm run audit:ocr:strict --silent
 
+      - name: Ingestion SLO strict cert gate
+        env:
+          CERT_PROFILE: ci
+          CERT_REQUIRE_INGESTION_SLO: "1"
+        run: node scripts/audit/ingestion-slo-cert-gate.mjs --strict
+
       - name: Run ingestion-focused tests
         run: |
           npm test -- --runInBand --runTestsByPath \
@@ -66,6 +76,12 @@ jobs:
             src/services/retrieval/vectorEmbedding.runtime.service.test.ts \
             src/services/ingestion/fileValidator.service.test.ts \
             src/services/ingestion/pipeline/__tests__/documentPipeline.validation.test.ts \
+            src/tests/ingestion/ingestion-determinism.replay.test.ts \
+            src/services/extraction/__tests__/pdfExtractor.ocrTables.test.ts \
+            src/services/extraction/__tests__/docxExtractor.tables.test.ts \
+            src/services/extraction/__tests__/xlsxExtractor.service.test.ts \
+            src/services/extraction/__tests__/pptxExtractor.tables.test.ts \
+            src/services/extraction/__tests__/pptxExtractor.ocr-and-failures.test.ts \
             src/services/connectors/gmail/gmailSync.service.test.ts \
             src/services/connectors/outlook/outlookSync.service.test.ts \
             src/services/connectors/slack/slackSync.service.test.ts \
@@ -81,8 +97,19 @@ jobs:
             src/services/connectors/gmail/gmailSync.service.ts \
             src/services/connectors/outlook/outlookSync.service.ts \
             src/services/connectors/slack/slackSync.service.ts \
+            src/services/preview/previewPdfGenerator.service.ts \
             src/queues/workers/documentIngestionPipeline.service.ts \
             src/queues/workers/stuckDocSweeper.service.ts; then
             echo "Raw console usage detected in ingestion runtime"
             exit 1
           fi
+
+      - name: Upload ingestion certification artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ingestion-cert-artifacts
+          path: |
+            backend/reports/cert/ingestion-slo-summary.json
+            backend/reports/cert/ingestion-slo-gate.json
+          if-no-files-found: warn

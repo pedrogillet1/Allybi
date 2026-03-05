@@ -64,6 +64,33 @@ function isProtectedRuntimeEnv(nodeEnv: unknown): boolean {
   return normalized === "production" || normalized === "staging";
 }
 
+function assertProtectedRuntimeInvariants(params: {
+  nodeEnv: unknown;
+  enforceEncryptedOnlyInvariant: boolean;
+  enforceChunkMetadataInvariant: boolean;
+  enforceVersionMetadataInvariant: boolean;
+  verifyRequired: boolean;
+}): void {
+  if (!isProtectedRuntimeEnv(params.nodeEnv)) return;
+  const disabled: string[] = [];
+  if (!params.enforceEncryptedOnlyInvariant) {
+    disabled.push("INDEXING_ENFORCE_ENCRYPTED_ONLY");
+  }
+  if (!params.enforceChunkMetadataInvariant) {
+    disabled.push("INDEXING_ENFORCE_CHUNK_METADATA");
+  }
+  if (!params.enforceVersionMetadataInvariant) {
+    disabled.push("INDEXING_ENFORCE_VERSION_METADATA");
+  }
+  if (!params.verifyRequired) {
+    disabled.push("INDEXING_VERIFY_REQUIRED");
+  }
+  if (disabled.length === 0) return;
+  throw new Error(
+    `[indexing] Protected runtime requires strict indexing invariants. Disabled flags: ${disabled.join(", ")}.`,
+  );
+}
+
 export function resolveIndexingPolicySnapshot(
   env: NodeJS.ProcessEnv = process.env,
 ): IndexingPolicySnapshot {
@@ -82,6 +109,19 @@ export function resolveIndexingPolicySnapshot(
   const plaintextOverrideReason = String(
     env.INDEXING_PLAINTEXT_OVERRIDE_REASON || "",
   ).trim();
+  const enforceEncryptedOnlyInvariant = parseBooleanFlag(
+    env.INDEXING_ENFORCE_ENCRYPTED_ONLY,
+    true,
+  );
+  const enforceChunkMetadataInvariant = parseBooleanFlag(
+    env.INDEXING_ENFORCE_CHUNK_METADATA,
+    true,
+  );
+  const enforceVersionMetadataInvariant = parseBooleanFlag(
+    env.INDEXING_ENFORCE_VERSION_METADATA,
+    true,
+  );
+  const verifyRequired = parseBooleanFlag(env.INDEXING_VERIFY_REQUIRED, true);
 
   if (!encryptedChunksOnly && isProtectedRuntimeEnv(env.NODE_ENV)) {
     throw new Error(
@@ -102,6 +142,13 @@ export function resolveIndexingPolicySnapshot(
       "[indexing] INDEXING_ALLOW_PLAINTEXT_CHUNKS=true requires INDEXING_PLAINTEXT_OVERRIDE_REASON to be set.",
     );
   }
+  assertProtectedRuntimeInvariants({
+    nodeEnv: env.NODE_ENV,
+    enforceEncryptedOnlyInvariant,
+    enforceChunkMetadataInvariant,
+    enforceVersionMetadataInvariant,
+    verifyRequired,
+  });
 
   return {
     runtimeSelectorFlag: VECTOR_EMBEDDING_SELECTOR_FLAG,
@@ -113,19 +160,10 @@ export function resolveIndexingPolicySnapshot(
     encryptedChunksOnly,
     allowPlaintextChunksOverride,
     plaintextOverrideReason: plaintextOverrideReason || null,
-    enforceEncryptedOnlyInvariant: parseBooleanFlag(
-      env.INDEXING_ENFORCE_ENCRYPTED_ONLY,
-      true,
-    ),
-    enforceChunkMetadataInvariant: parseBooleanFlag(
-      env.INDEXING_ENFORCE_CHUNK_METADATA,
-      true,
-    ),
-    enforceVersionMetadataInvariant: parseBooleanFlag(
-      env.INDEXING_ENFORCE_VERSION_METADATA,
-      true,
-    ),
-    verifyRequired: parseBooleanFlag(env.INDEXING_VERIFY_REQUIRED, true),
+    enforceEncryptedOnlyInvariant,
+    enforceChunkMetadataInvariant,
+    enforceVersionMetadataInvariant,
+    verifyRequired,
     allowUnverifiedPreviousOperationDelete: parseBooleanFlag(
       env.INDEXING_ALLOW_UNVERIFIED_PREVOP_DELETE,
       false,

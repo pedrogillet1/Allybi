@@ -35,6 +35,12 @@ import prisma from "../../../platform/db/prismaClient";
 import { config } from "../../../config/env";
 import { generateAccessToken, generateRefreshToken } from "../../../utils/jwt";
 import { setAuthCookies } from "../../../utils/authCookies";
+import { logger } from "../../../utils/logger";
+import {
+  issueGoogleOAuthState,
+  verifyGoogleOAuthState,
+  timingSafeEqualString,
+} from "../../../services/authOAuthState.service";
 
 import * as authService from "../../../services/auth.service";
 import * as twoFactorController from "../../../controllers/twoFactor.controller";
@@ -47,12 +53,118 @@ const router = Router();
 
 const REFRESH_TOKEN_PEPPER =
   process.env.KODA_REFRESH_PEPPER || process.env.JWT_REFRESH_SECRET || "";
+const GOOGLE_OAUTH_STATE_COOKIE = "koda_google_oauth_state";
+const GOOGLE_OAUTH_STATE_TTL_MS = 10 * 60 * 1000;
+const isProduction = process.env.NODE_ENV === "production";
 
 function hmacSha256(input: string): string {
   return crypto
     .createHmac("sha256", REFRESH_TOKEN_PEPPER)
     .update(input)
     .digest("hex");
+}
+
+function oauthRedirect(res: Response, code: string): void {
+  res.redirect(`${config.FRONTEND_URL}/a/x7k2m9/c3b?error=${code}`);
+}
+
+function resolveGoogleOAuthStateSecret(): string {
+  return String(
+    process.env.KODA_OAUTH_STATE_SECRET ||
+      process.env.KODA_REFRESH_PEPPER ||
+      config.JWT_ACCESS_SECRET ||
+      config.JWT_REFRESH_SECRET ||
+      "",
+  ).trim();
+}
+
+function setGoogleOAuthStateCookie(res: Response, stateToken: string): void {
+  res.cookie(GOOGLE_OAUTH_STATE_COOKIE, stateToken, {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: "lax",
+    path: "/",
+    maxAge: GOOGLE_OAUTH_STATE_TTL_MS,
+  });
+}
+
+function clearGoogleOAuthStateCookie(res: Response): void {
+  res.clearCookie(GOOGLE_OAUTH_STATE_COOKIE, { path: "/" });
+}
+
+function getGoogleOAuthStateFromQuery(req: Request): string {
+  const raw = req.query?.state;
+  if (typeof raw === "string") return raw.trim();
+  if (Array.isArray(raw) && typeof raw[0] === "string") return raw[0].trim();
+  return "";
+}
+
+export function startGoogleOAuth(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): void {
+  try {
+    const secret = resolveGoogleOAuthStateSecret();
+    if (!secret) {
+      logger.error("[OAuth] Google state secret is missing.");
+      clearGoogleOAuthStateCookie(res);
+      oauthRedirect(res, "oauth_failed");
+      return;
+    }
+
+    const stateToken = issueGoogleOAuthState({ secret });
+    setGoogleOAuthStateCookie(res, stateToken);
+
+    passport.authenticate("google", {
+      scope: ["profile", "email"],
+      session: false,
+      state: stateToken,
+    })(req, res, next);
+  } catch (error) {
+    logger.error("[OAuth] Failed to start Google OAuth.", {
+      error: error instanceof Error ? error.message : String(error),
+    });
+    clearGoogleOAuthStateCookie(res);
+    oauthRedirect(res, "oauth_failed");
+  }
+}
+
+export function validateGoogleOAuthState(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): void {
+  const stateFromQuery = getGoogleOAuthStateFromQuery(req);
+  const stateFromCookie = String(req.cookies?.[GOOGLE_OAUTH_STATE_COOKIE] || "").trim();
+  clearGoogleOAuthStateCookie(res);
+
+  if (
+    !stateFromQuery ||
+    !stateFromCookie ||
+    !timingSafeEqualString(stateFromQuery, stateFromCookie)
+  ) {
+    logger.warn("[OAuth] Google callback state mismatch.");
+    oauthRedirect(res, "invalid_state");
+    return;
+  }
+
+  const secret = resolveGoogleOAuthStateSecret();
+  const verification = verifyGoogleOAuthState({
+    state: stateFromQuery,
+    secret,
+    ttlMs: GOOGLE_OAUTH_STATE_TTL_MS,
+  });
+
+  if (!verification.ok) {
+    logger.warn("[OAuth] Google callback state verification failed.", {
+      reason: verification.reason,
+    });
+    oauthRedirect(res, "invalid_state");
+    return;
+  }
+
+  next();
 }
 
 /**
@@ -136,7 +248,9 @@ async function handleOAuthUser(
     setAuthCookies(res, accessToken, refreshToken);
     return res.redirect(`${config.FRONTEND_URL}/a/x7k2m9/c3b?auth=ok`);
   } catch (e: any) {
-    console.error("[OAuth] Error handling user:", e?.message || e);
+    logger.error("[OAuth] Error handling user.", {
+      error: e?.message || String(e),
+    });
     return res.redirect(
       `${config.FRONTEND_URL}/a/x7k2m9/c3b?error=oauth_error`,
     );
@@ -492,14 +606,12 @@ router.get("/session/bootstrap", authenticateToken, (req, res) =>
 router.get(
   "/google",
   authLimiter,
-  passport.authenticate("google", {
-    scope: ["profile", "email"],
-    session: false,
-  }),
+  startGoogleOAuth,
 );
 
 router.get(
   "/google/callback",
+  validateGoogleOAuthState,
   passport.authenticate("google", {
     session: false,
     failureRedirect: `${config.FRONTEND_URL}/a/x7k2m9/c3b?error=oauth_failed`,
@@ -596,7 +708,9 @@ router.post(
 
       return handleOAuthUser(res, { appleId, email, displayName });
     } catch (e: any) {
-      console.error("[Apple OAuth] Error:", e?.message || e);
+      logger.error("[Apple OAuth] Error.", {
+        error: e?.message || String(e),
+      });
       return res.redirect(
         `${config.FRONTEND_URL}/a/x7k2m9/c3b?error=oauth_error`,
       );

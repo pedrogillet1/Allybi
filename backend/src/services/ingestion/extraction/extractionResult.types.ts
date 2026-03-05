@@ -25,6 +25,7 @@ export interface BaseExtractionResult {
   textQualityScore?: number;
   weakTextReasons?: string[];
   extractionWarnings?: string[];
+  extractionWarningCodes?: string[];
 }
 
 // ---------------------------------------------------------------------------

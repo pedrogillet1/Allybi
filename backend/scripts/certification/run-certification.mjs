@@ -74,6 +74,8 @@ const gateGenerators = {
   "frontend-retrieval-evidence": "test:cert:frontend-retrieval-evidence",
   "indexing-live-integration":
     "jest:path:src/tests/certification/indexing-live-integration.cert.test.ts",
+  "indexing-storage-invariants":
+    "jest:path:src/tests/certification/indexing-storage-invariants.cert.test.ts",
 };
 
 function readJson(filePath) {

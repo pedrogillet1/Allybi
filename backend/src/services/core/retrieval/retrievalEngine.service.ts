@@ -768,7 +768,9 @@ export class RetrievalEngineService {
           selectedSectionRuleId,
           crossDocGatedReason,
           classification,
-          candidateDecisions: [],
+          candidateDecisions: [
+            this.buildPolicyGateDecision(crossDocGatedReason),
+          ],
         }),
       );
     }
@@ -1203,7 +1205,10 @@ export class RetrievalEngineService {
           selectedSectionRuleId,
           crossDocGatedReason: postPackagingPolicyReason,
           classification,
-          candidateDecisions: [],
+          candidateDecisions:
+            pack.debug?.candidateDecisions && pack.debug.candidateDecisions.length > 0
+              ? pack.debug.candidateDecisions
+              : [this.buildPolicyGateDecision(postPackagingPolicyReason)],
         }),
       );
     }
@@ -1630,12 +1635,30 @@ export class RetrievalEngineService {
     normalizedQuery: string,
   ): boolean {
     const intent = String(signals.intentFamily || "").toLowerCase();
-    const operator = String(signals.operator || "").toLowerCase();
+    const operator = String(signals.operator || "")
+      .trim()
+      .toLowerCase();
     if (intent.includes("compare")) return true;
     if (operator.includes("compare")) return true;
+    if (this.isExplicitNonCompareOperator(operator)) return false;
     return /\b(compare|comparison|vs\.?|versus|difference|differ|between|contrast|comparar|diferenca|diferença|entre)\b/i.test(
       normalizedQuery,
     );
+  }
+
+  private isExplicitNonCompareOperator(operator: string): boolean {
+    if (!operator) return false;
+    const nonCompareOperators = new Set([
+      "extract",
+      "summarize",
+      "locate_docs",
+      "locate",
+      "search",
+      "lookup",
+      "find",
+      "quote",
+    ]);
+    return nonCompareOperators.has(String(operator || "").trim().toLowerCase());
   }
 
   private detectCompareCurrencySetSize(normalizedQuery: string): number {
@@ -4031,10 +4054,7 @@ export class RetrievalEngineService {
         }
       }
 
-      if (
-        minEvidencePerDocForCompare > 1 &&
-        evidence.length >= minEvidencePerDocForCompare * 2
-      ) {
+      if (minEvidencePerDocForCompare > 1) {
         const evidenceCountByDoc = new Map<string, number>();
         for (const item of evidence) {
           const docId = String(item.docId || "").trim();
@@ -4043,6 +4063,11 @@ export class RetrievalEngineService {
           evidenceCountByDoc.set(docId, count + 1);
         }
         if (evidenceCountByDoc.size >= 2) {
+          const minTotalEvidence =
+            evidenceCountByDoc.size * minEvidencePerDocForCompare;
+          if (evidence.length < minTotalEvidence) {
+            return "cross_doc_evidence_minimum_not_met";
+          }
           for (const [, count] of evidenceCountByDoc) {
             if (count < minEvidencePerDocForCompare) {
               return "cross_doc_evidence_minimum_not_met";
@@ -4977,6 +5002,26 @@ export class RetrievalEngineService {
       });
     }
     return out;
+  }
+
+  private buildPolicyGateDecision(reasonCode: string | null): {
+    chunkId: string;
+    docId: string;
+    scores: Record<string, number>;
+    boosts: Record<string, number>;
+    penalties: Record<string, number>;
+    filtered: boolean;
+    filterReason?: string;
+  } {
+    return {
+      chunkId: "__policy_gate__",
+      docId: "__none__",
+      scores: { final: 0, semantic: 0, lexical: 0, structural: 0 },
+      boosts: {},
+      penalties: { total: 1 },
+      filtered: true,
+      filterReason: String(reasonCode || "policy_gate_blocked"),
+    };
   }
 
   private buildRetrievalCacheKey(params: {

@@ -1,8 +1,4 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
-import {
-  clearAdminApiKey,
-  setAdminApiKey,
-} from "../auth/adminKeyStore";
 
 interface Admin {
   id: string;
@@ -17,7 +13,6 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (username: string, password: string) => Promise<void>;
-  loginWithApiKey: (apiKey: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -38,13 +33,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Initialize from cookie session or API-key mode.
+  // Initialize from cookie-backed admin session.
   useEffect(() => {
     const initAuth = async () => {
-      // Legacy cleanup: admin_key localStorage is no longer used.
-      localStorage.removeItem("admin_key");
-
-      // Try auto-detect: nginx may be injecting admin key
       try {
         const response = await fetch(`${API_BASE_URL}/admin/overview?range=7d`, {
           method: "GET",
@@ -53,9 +44,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         });
 
         if (response.ok) {
-          // Nginx is injecting the admin key - auto-authenticate
           const adminData: Admin = {
-            id: "nginx-admin",
+            id: "session-admin",
             username: "admin",
             name: "Admin",
             role: "admin",
@@ -64,7 +54,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setToken("cookie-session");
         }
       } catch {
-        // API not accessible - require manual login
+      // API not accessible - require manual login
       }
 
       setIsLoading(false);
@@ -86,44 +76,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw new Error(data.error?.message || "Login failed");
     }
 
-    const { admin: adminData, tokens } = data.data;
-
-    setToken(tokens?.accessToken || "cookie-session");
+    const { admin: adminData } = data.data;
+    setToken("cookie-session");
     setAdmin(adminData);
-  }, []);
-
-  const loginWithApiKey = useCallback(async (apiKey: string) => {
-    // Validate the API key by making a test request to the admin API
-    const response = await fetch(`${API_BASE_URL}/admin/overview?range=7d`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Admin-Key": apiKey,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error("Invalid API key");
-    }
-
-    // API key is valid - store it and set authenticated state
-    setAdminApiKey(apiKey);
-    // Set a placeholder admin for API key auth
-    const adminData: Admin = {
-      id: "api-key-admin",
-      username: "admin",
-      name: "API Key Admin",
-      role: "admin",
-    };
-    setAdmin(adminData);
-    setToken("api-key-auth"); // Placeholder token to indicate authenticated
   }, []);
 
   const logout = useCallback(() => {
     setToken(null);
     setAdmin(null);
-    clearAdminApiKey();
-    localStorage.removeItem("admin_key");
   }, []);
 
   return (
@@ -134,7 +94,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isAuthenticated: !!token,
         isLoading,
         login,
-        loginWithApiKey,
         logout,
       }}
     >

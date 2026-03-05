@@ -6,6 +6,7 @@ import {
   clientSafeIntegrationMessage,
   resolveAllowedFrontendOrigins,
   resolveOAuthPostMessageOrigin,
+  verifyOAuthCompletionPayload,
 } from "./integrationRuntimePolicy.service";
 
 const ENV_KEYS = [
@@ -54,6 +55,30 @@ describe("integrationRuntimePolicy.service", () => {
     expect(payload.t).toBe(12345);
     expect(typeof payload.sig).toBe("string");
     expect(payload.sig).not.toBeNull();
+  });
+
+  test("verifies signed oauth payload with bounded timestamp freshness", () => {
+    process.env.CONNECTOR_OAUTH_CALLBACK_SECRET = "test-secret";
+    const now = 200_000;
+    const payload = buildOAuthCompletionPayload("gmail", true, now);
+    expect(verifyOAuthCompletionPayload(payload, now + 30_000)).toBe(true);
+    expect(verifyOAuthCompletionPayload(payload, now + 6 * 60_000)).toBe(false);
+  });
+
+  test("fails closed when signature is missing, malformed, or secret absent", () => {
+    process.env.CONNECTOR_OAUTH_CALLBACK_SECRET = "test-secret";
+    const payload = buildOAuthCompletionPayload("outlook", false, 55_000);
+    expect(verifyOAuthCompletionPayload({ ...payload, sig: null }, 55_500)).toBe(
+      false,
+    );
+    expect(
+      verifyOAuthCompletionPayload({ ...payload, sig: "invalid-signature" }, 55_500),
+    ).toBe(false);
+
+    delete process.env.CONNECTOR_OAUTH_CALLBACK_SECRET;
+    delete process.env.CONNECTOR_OAUTH_STATE_SECRET;
+    delete process.env.ENCRYPTION_KEY;
+    expect(verifyOAuthCompletionPayload(payload, 55_500)).toBe(false);
   });
 
   test("returns fallback for server errors and keeps detail for client errors", () => {

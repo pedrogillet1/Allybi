@@ -106,4 +106,17 @@ async function sync(provider, opts = {}) {
   return response?.data ?? null;
 }
 
-export { getStatus, startConnect, disconnect, sync, normalizeProviderStatus, PROVIDERS };
+async function verifyOAuthCompletion(payload) {
+  const response = await api.post("/api/integrations/oauth/verify", payload || {});
+  return Boolean(response?.valid);
+}
+
+export {
+  getStatus,
+  startConnect,
+  disconnect,
+  sync,
+  verifyOAuthCompletion,
+  normalizeProviderStatus,
+  PROVIDERS,
+};

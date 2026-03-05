@@ -48,6 +48,7 @@
     "prisma:ci:policy:check": "node scripts/prisma/assert-no-ci-db-push.mjs",
     "prisma:replay:check": "npm run prisma:deps:check && npm run prisma:ci:policy:check && node scripts/prisma/replay-check.mjs",
     "prisma:rls:verify": "node scripts/prisma/verify-rls.mjs",
+    "prisma:rls:seed-service-role": "node scripts/prisma/seed-service-role.mjs",
     "prisma:telemetry:repair:audit": "node scripts/prisma/audit-telemetry-repair.mjs",
     "prisma:studio": "prisma studio",
     "test": "jest --config jest.config.cjs",
@@ -378,6 +379,7 @@
     "pg": "^8.16.3",
     "prettier": "^3.6.2",
     "prisma": "^6.19.0",
+    "safe-regex": "^2.1.1",
     "sqlite3": "^5.1.7",
     "supertest": "^7.1.4",
     "ts-jest": "^29.4.5",
@@ -387,4 +389,3 @@
     "typescript": "^5.9.3"
   }
 }
-

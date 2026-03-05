@@ -96,6 +96,47 @@ describe("IntegrationsController", () => {
     expect(html).toContain("\"sig\":");
   });
 
+  test("oauth verify endpoint validates signed completion payload", async () => {
+    process.env.CONNECTOR_OAUTH_CALLBACK_SECRET = "oauth-callback-test-secret";
+    const controller = createIntegrationsController({
+      execute: jest.fn(),
+    } as any);
+    const { res, state } = makeJsonRes();
+    const validPayload = {
+      type: "koda_oauth_done",
+      provider: "gmail",
+      ok: true,
+      t: 1000,
+      sig: "stub",
+    };
+    // Generate a real payload via callback HTML so signature generation stays aligned.
+    registerConnector("gmail", {
+      capabilities: { oauth: true, sync: true, search: true },
+      oauthService: {
+        handleCallback: async () => ({ connected: true }),
+      },
+    });
+    const { res: htmlRes, state: htmlState } = makeJsonRes();
+    await controller.oauthCallback(
+      {
+        params: { provider: "gmail" },
+        query: { code: "code-1", state: "state-1" },
+        headers: { accept: "text/html" },
+        body: {},
+      } as any,
+      htmlRes as any,
+    );
+    const html = String(htmlState.body || "");
+    const match = html.match(/var completion = (\{[\s\S]*?\});/);
+    expect(match).toBeTruthy();
+    const completion = JSON.parse(String(match?.[1] || JSON.stringify(validPayload)));
+
+    await controller.oauthVerify({ body: completion } as any, res as any);
+    expect(state.status).toBe(200);
+    expect(state.body?.ok).toBe(true);
+    expect(state.body?.data?.valid).toBe(true);
+  });
+
   test("send returns normalized receipt payload", async () => {
     process.env.CONNECTOR_ACTION_SECRET = "test-action-secret";
     const now = Date.now();
