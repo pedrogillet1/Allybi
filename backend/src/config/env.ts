@@ -110,7 +110,7 @@ interface EnvConfig {
   // Search
   GOOGLE_SEARCH_API_KEY: string;
   GOOGLE_SEARCH_ENGINE_ID: string;
-  // Vector DB
+  // Vector DB (optional at process boot; enforced by integration env checks)
   PINECONE_API_KEY: string;
   PINECONE_INDEX_NAME: string;
   // Financial APIs
@@ -236,8 +236,8 @@ export const config: EnvConfig = {
   GOOGLE_SEARCH_API_KEY: getEnvVar("GOOGLE_SEARCH_API_KEY", false),
   GOOGLE_SEARCH_ENGINE_ID: getEnvVar("GOOGLE_SEARCH_ENGINE_ID", false),
   // Vector DB
-  PINECONE_API_KEY: getEnvVar("PINECONE_API_KEY"),
-  PINECONE_INDEX_NAME: getEnvVar("PINECONE_INDEX_NAME"),
+  PINECONE_API_KEY: getEnvVar("PINECONE_API_KEY", false),
+  PINECONE_INDEX_NAME: getEnvVar("PINECONE_INDEX_NAME", false),
   // Financial APIs
   ALPHA_VANTAGE_API_KEY: getEnvVar("ALPHA_VANTAGE_API_KEY", false),
   FRED_API_KEY: getEnvVar("FRED_API_KEY", false),

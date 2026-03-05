@@ -18,9 +18,24 @@ const API_BASE = String(
   'http://localhost:5000',
 ).trim().replace(/\/+$/, '');
 
+function quoteCmdArg(value) {
+  const raw = String(value ?? '');
+  if (!/[\s"]/g.test(raw)) return raw;
+  return `"${raw.replace(/"/g, '\\"')}"`;
+}
+
+function spawnPortable(cmd, cmdArgs, options) {
+  if (process.platform === 'win32' && (cmd === 'npm' || cmd === 'npx')) {
+    const shellCmd = cmd === 'npm' ? 'npm.cmd' : 'npx.cmd';
+    const command = [shellCmd, ...cmdArgs].map((arg) => quoteCmdArg(arg)).join(' ');
+    return spawnSync('cmd.exe', ['/d', '/s', '/c', command], options);
+  }
+  return spawnSync(cmd, cmdArgs, options);
+}
+
 function run(cmd, cmdArgs, cwd, extraEnv = {}) {
   console.log(`\n$ ${cmd} ${cmdArgs.join(' ')}`);
-  const result = spawnSync(cmd, cmdArgs, {
+  const result = spawnPortable(cmd, cmdArgs, {
     cwd,
     stdio: 'inherit',
     env: {
@@ -31,6 +46,9 @@ function run(cmd, cmdArgs, cwd, extraEnv = {}) {
     },
     shell: false,
   });
+  if (result.error) {
+    throw new Error(`Command failed to launch: ${cmd} ${cmdArgs.join(' ')} (${result.error.message})`);
+  }
   if (result.status !== 0) {
     throw new Error(`Command failed: ${cmd} ${cmdArgs.join(' ')} (exit ${result.status})`);
   }
@@ -97,10 +115,7 @@ async function main() {
     }
     summary.steps.push({ step: 'api_probe', status: 'PASS', url: apiProbe.url, httpStatus: apiProbe.status });
 
-    // 1) Backend hard gates
-    run('npm', ['run', 'audit:cert:strict'], BACKEND_DIR);
-    summary.steps.push({ step: 'backend_audit_cert_strict', status: 'PASS' });
-
+    // 1) Backend P0 gates (independent of frontend grading artifacts)
     run('npm', ['run', 'audit:p0:strict'], BACKEND_DIR);
     summary.steps.push({ step: 'backend_audit_p0_strict', status: 'PASS' });
 
@@ -119,18 +134,24 @@ async function main() {
     run('node', ['e2e/grading/run-harsh-rubric.mjs', '--pack', '40', '--input', 'e2e/reports/queries-40-run.json'], FRONTEND_DIR);
     const score40 = loadLatestScorecard();
     assertGo(score40, 40);
+    run('node', ['e2e/grading/validate-report-lineage.mjs'], FRONTEND_DIR);
     summary.steps.push({ step: 'pack40_grade', status: 'PASS', score: score40.summary.finalScore });
 
-    // 5) Pack 50
+    // 5) Backend strict certification (requires per_query lineage generated above)
+    run('npm', ['run', 'audit:cert:strict'], BACKEND_DIR);
+    summary.steps.push({ step: 'backend_audit_cert_strict', status: 'PASS' });
+
+    // 6) Pack 50
     run('npx', ['playwright', 'test', 'e2e/query-test-50-gate.spec.ts', '--project=chromium'], FRONTEND_DIR);
     summary.steps.push({ step: 'pack50_run', status: 'PASS' });
 
     run('node', ['e2e/grading/run-harsh-rubric.mjs', '--pack', '50', '--input', 'e2e/reports/query-test-50-gate-results.json'], FRONTEND_DIR);
     const score50 = loadLatestScorecard();
     assertGo(score50, 50);
+    run('node', ['e2e/grading/validate-report-lineage.mjs'], FRONTEND_DIR);
     summary.steps.push({ step: 'pack50_grade', status: 'PASS', score: score50.summary.finalScore });
 
-    // 6) Optional pack 100
+    // 7) Optional pack 100
     if (include100) {
       run('npx', ['playwright', 'test', 'e2e/query-test-100.spec.ts', '--project=chromium'], FRONTEND_DIR);
       summary.steps.push({ step: 'pack100_run', status: 'PASS' });
@@ -140,10 +161,11 @@ async function main() {
       if (String(score100?.summary?.verdict || 'NO_GO') !== 'GO' || Number(score100?.summary?.finalScore || 0) < 95) {
         throw new Error(`Pack 100 did not pass full readiness gate (verdict=${score100.summary.verdict}, score=${score100.summary.finalScore})`);
       }
+      run('node', ['e2e/grading/validate-report-lineage.mjs'], FRONTEND_DIR);
       summary.steps.push({ step: 'pack100_grade', status: 'PASS', score: score100.summary.finalScore });
     }
 
-    // 7) Report hygiene check (must be canonical)
+    // 8) Report hygiene check (must be canonical)
     run('node', ['e2e/grading/report-hygiene.mjs', '--check'], FRONTEND_DIR);
     summary.steps.push({ step: 'report_hygiene_check', status: 'PASS' });
 

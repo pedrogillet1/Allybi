@@ -963,7 +963,7 @@ export class RetrievalEngineService {
     });
 
     // 6) Merge into CandidateChunks with provenance + stable ids
-    let candidates = this.mergePhaseCandidates(phaseResults, scope, req);
+    let candidates = this.mergePhaseCandidates(phaseResults, scope, req, packaging);
     const exploratoryMode = this.isExploratoryRetrievalRequest({
       compareIntent,
       queryNormalized,
@@ -2298,9 +2298,26 @@ export class RetrievalEngineService {
       rangeA1?: string | null;
     },
     req: RetrievalRequest,
+    packagingBank: Record<string, any> | null,
   ): CandidateChunk[] {
     const out: CandidateChunk[] = [];
     const seen = new Map<string, CandidateChunk>();
+    const minProvenanceFields = Math.max(
+      1,
+      Math.floor(
+        safeNumber(
+          packagingBank?.config?.actionsContract?.thresholds?.minProvenanceFields,
+          3,
+        ),
+      ),
+    );
+    const requireProvenance =
+      packagingBank?.config?.requireProvenance !== false;
+    const locationFields = Array.isArray(
+      packagingBank?.config?.schemaContract?.locationFields,
+    )
+      ? packagingBank.config.schemaContract.locationFields
+      : [];
 
     for (const phase of phaseResults) {
       for (let i = 0; i < phase.hits.length; i++) {
@@ -2354,8 +2371,15 @@ export class RetrievalEngineService {
           String(hit.snippet ?? "").trim(),
           tablePayload,
         );
-        // Minimal provenance requirement: docId + (location OR stable locationKey) + snippet
-        const provenanceOk = Boolean(docId && locationKey && snippet);
+        const provenanceOk = this.isCandidateProvenanceValid({
+          docId,
+          snippet,
+          location: loc,
+          locationKey,
+          requireProvenance,
+          minProvenanceFields,
+          locationFields,
+        });
 
         const candidate: CandidateChunk = {
           candidateId,
@@ -2403,6 +2427,106 @@ export class RetrievalEngineService {
     }
 
     return out;
+  }
+
+  private isCandidateProvenanceValid(input: {
+    docId: string;
+    snippet: string;
+    location: ChunkLocation;
+    locationKey: string;
+    requireProvenance: boolean;
+    minProvenanceFields: number;
+    locationFields: unknown[];
+  }): boolean {
+    const hasDocId = Boolean(String(input.docId || "").trim());
+    const hasSnippet = Boolean(String(input.snippet || "").trim());
+    if (!input.requireProvenance) {
+      return hasDocId && hasSnippet;
+    }
+
+    const hasLocation = this.hasRequiredLocationField(
+      input.location,
+      input.locationKey,
+      input.locationFields,
+    );
+    const provenanceFieldsPresent = [hasDocId, hasSnippet, hasLocation].filter(
+      Boolean,
+    ).length;
+    return provenanceFieldsPresent >= input.minProvenanceFields;
+  }
+
+  private hasRequiredLocationField(
+    location: ChunkLocation | null | undefined,
+    locationKey: string | null | undefined,
+    locationFields: unknown[],
+  ): boolean {
+    const expectedFields = Array.isArray(locationFields)
+      ? locationFields
+          .map((field) => String(field || "").trim().toLowerCase())
+          .filter(Boolean)
+      : [];
+    const expectedSet = new Set(
+      expectedFields.length > 0
+        ? expectedFields
+        : ["page", "sheet", "slide", "sectionkey", "bbox"],
+    );
+
+    const loc = (location ?? {}) as ChunkLocation & {
+      section?: string | null;
+      locationLabel?: string | null;
+      rangeA1?: string | null;
+      cell?: string | null;
+      cellReference?: string | null;
+    };
+    const key = String(locationKey || "").toLowerCase();
+
+    const hasPage =
+      Number.isFinite(Number(loc.page)) && Number(loc.page) > 0;
+    const hasSheet = Boolean(String(loc.sheet || "").trim());
+    const hasSlide =
+      Number.isFinite(Number(loc.slide)) && Number(loc.slide) > 0;
+    const hasSection = Boolean(
+      String(loc.sectionKey || loc.section || "").trim(),
+    );
+    const hasBBox = Boolean(
+      loc.bbox &&
+        Number.isFinite(Number(loc.bbox.x)) &&
+        Number.isFinite(Number(loc.bbox.y)) &&
+        Number.isFinite(Number(loc.bbox.w)) &&
+        Number.isFinite(Number(loc.bbox.h)),
+    );
+    const hasRange = Boolean(
+      String(loc.rangeA1 || loc.cell || loc.cellReference || "").trim(),
+    );
+    const hasLabel = Boolean(String(loc.locationLabel || "").trim());
+    const hasLocationKey = Boolean(
+      key.includes("|p:") ||
+        key.includes("|s:") ||
+        key.includes("|sl:") ||
+        key.includes("|sec:"),
+    );
+
+    if (expectedSet.has("page") && hasPage) return true;
+    if (expectedSet.has("sheet") && hasSheet) return true;
+    if (expectedSet.has("slide") && hasSlide) return true;
+    if (
+      (expectedSet.has("sectionkey") || expectedSet.has("section")) &&
+      hasSection
+    ) {
+      return true;
+    }
+    if (expectedSet.has("bbox") && hasBBox) return true;
+    if (expectedSet.has("rangea1") && hasRange) return true;
+    if (
+      (expectedSet.has("cell") || expectedSet.has("cellreference")) &&
+      hasRange
+    ) {
+      return true;
+    }
+    if (expectedSet.has("locationlabel") && hasLabel) return true;
+    if (expectedSet.has("locationkey") && hasLocationKey) return true;
+
+    return hasLocationKey;
   }
 
   private resolveCandidateSnippet(
@@ -2563,9 +2687,18 @@ export class RetrievalEngineService {
     if (!negativesBank?.config?.enabled) return candidates;
 
     const cfg = negativesBank.config;
-    const minRelevance = safeNumber(
-      cfg?.actionsContract?.thresholds?.minRelevanceScore,
-      0.55,
+    const minRelevance = clamp01(
+      safeNumber(
+        cfg?.actionsContract?.thresholds?.minRelevanceScore ??
+          cfg?.actionsContract?.thresholds?.minChunkRelevance,
+        0.55,
+      ),
+    );
+    const scopedMinRelevance = clamp01(
+      safeNumber(
+        cfg?.actionsContract?.thresholds?.scopedMinChunkRelevance,
+        Math.min(minRelevance, 0.2),
+      ),
     );
 
     const scopeEnforced = this.shouldEnforceScopedDocSet(scope, signals);
@@ -2626,7 +2759,7 @@ export class RetrievalEngineService {
       // than filtering aggressively on keyword-overlap relevance scores.
       const isInScope = allowedDocSet && allowedDocSet.has(c.docId);
       const effectiveMinRelevance = isInScope
-        ? Math.min(minRelevance, 0.05)
+        ? Math.min(minRelevance, scopedMinRelevance)
         : minRelevance;
       const topScore = Math.max(
         c.scores.semantic ?? 0,
@@ -3890,7 +4023,14 @@ export class RetrievalEngineService {
     // these docs — a strict keyword-overlap threshold blocks valid evidence,
     // especially for Portuguese meta-questions whose tokens don't appear in
     // document text. Any evidence from attached docs is better than none.
-    const scopedMinScore = ctx.scope.hardScopeActive ? 0 : minFinalScore;
+    const scopedMinScore = ctx.scope.hardScopeActive
+      ? clamp01(
+          safeNumber(
+            cfg.actionsContract?.thresholds?.scopedMinFinalScore,
+            Math.min(minFinalScore, 0.18),
+          ),
+        )
+      : minFinalScore;
 
     const evidence: EvidenceItem[] = [];
     const perDoc = new Map<string, number>();
@@ -4093,7 +4233,7 @@ export class RetrievalEngineService {
         : null;
 
     const pack: EvidencePack = {
-      runtimeStatus: "ok",
+      runtimeStatus: evidence.length > 0 ? "ok" : "degraded",
       query: {
         original: ctx.queryOriginal,
         normalized: ctx.queryNormalized,
@@ -4401,7 +4541,7 @@ export class RetrievalEngineService {
     telemetry?: EvidencePack["telemetry"],
   ): EvidencePack {
     return {
-      runtimeStatus: "ok",
+      runtimeStatus: "degraded",
       query: { original: req.query, normalized: (req.query ?? "").trim() },
       scope: {
         activeDocId: req.signals.activeDocId ?? null,

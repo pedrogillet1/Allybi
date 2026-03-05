@@ -45,7 +45,6 @@ export function resolveFactoryKey(provider: LLMProvider): LLMClientKey | null {
   if (!normalized || normalized === "unknown") return null;
   if (normalized === "openai") return "openai";
   if (normalized === "google" || normalized === "gemini") return "google";
-  if (normalized === "local" || normalized === "ollama") return "local";
   return null;
 }
 
@@ -80,6 +79,9 @@ export function buildLLMFactoryFromEnv(
                 gemini3Flash: geminiCfg!.models.defaultDraft,
               },
               timeoutMs: geminiCfg!.timeoutMs,
+              allowedModels: geminiCfg!.models.allowed,
+              strictModelAllowlist: geminiCfg!.models.strictAllowlist,
+              defaultModelFinal: geminiCfg!.models.defaultFinal,
             },
           }
         : undefined,
@@ -140,9 +142,7 @@ export function buildGatewayRuntime(
   const defaultModelId =
     defaultClient.provider === "openai"
       ? openaiCfg.defaultModelDraft
-      : defaultClient.provider === "google"
-        ? geminiCfg.models.defaultDraft
-        : "local-default";
+      : geminiCfg.models.defaultDraft;
 
   const bankLoader = getBankLoaderInstance();
   const promptRegistry = new PromptRegistryService(bankLoader);

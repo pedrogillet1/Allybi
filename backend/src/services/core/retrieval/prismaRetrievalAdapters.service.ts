@@ -79,27 +79,6 @@ type ChunkWithDocument = {
   };
 };
 
-type EmbeddingWithDocument = {
-  id: string;
-  documentId: string;
-  chunkIndex: number;
-  content: string;
-  pageNumber: number | null;
-  sectionName?: string | null;
-  sheetName?: string | null;
-  metadata?: string | null;
-  document: {
-    id: string;
-    parentVersionId?: string | null;
-    filename: string | null;
-    displayTitle: string | null;
-    encryptedFilename?: string | null;
-    mimeType: string;
-    createdAt: Date;
-    updatedAt: Date;
-  };
-};
-
 type ChunkRow = {
   id: string;
   documentId: string;
@@ -187,21 +166,6 @@ function compareDocRecency(
   const createdDelta = right.createdAt.getTime() - left.createdAt.getTime();
   if (createdDelta !== 0) return createdDelta;
   return right.id.localeCompare(left.id);
-}
-
-function parseEmbeddingMetadata(
-  raw: string | null | undefined,
-): Record<string, unknown> {
-  const value = String(raw || "").trim();
-  if (!value) return {};
-  try {
-    const parsed = JSON.parse(value) as unknown;
-    return parsed && typeof parsed === "object"
-      ? (parsed as Record<string, unknown>)
-      : {};
-  } catch {
-    return {};
-  }
 }
 
 function getEmbeddingsServiceSafe(): EmbeddingsService | null {
@@ -681,13 +645,13 @@ class PrismaRetrievalUserAdapter
         const semanticResults = await this.runPineconeSemanticSearch(opts);
         if (semanticResults.length > 0) return semanticResults;
       } catch {
-        // Fail closed to DB lexical-semantic fallback for availability.
+        // Fail closed to DB lexical fallback for availability.
       }
       if (!allowDbFallback) return [];
     }
 
     return this.runChunkSearch({
-      mode: "semantic",
+      mode: "lexical",
       query: opts.query,
       docIds: opts.docIds,
       k: opts.k,
@@ -958,21 +922,26 @@ class PrismaRetrievalUserAdapter
     tokens: string[],
   ): Promise<RetrievalHit[]> {
     const scopedDocIds = await this.resolveScopedDocIds(input.docIds);
-    const where: Prisma.DocumentEmbeddingWhereInput = {
-      content: { not: "" },
+    const where: Prisma.DocumentChunkWhereInput = {
       document: {
         userId: this.userId,
         status: { in: [...READY_DOCUMENT_STATUSES] },
       },
-      OR: tokens.map((token) => ({
-        content: { contains: token, mode: "insensitive" },
-      })),
+      OR: tokens.flatMap((token) => [
+        { text: { contains: token, mode: "insensitive" } },
+        { sectionName: { contains: token, mode: "insensitive" } },
+        { sheetName: { contains: token, mode: "insensitive" } },
+        { tableId: { contains: token, mode: "insensitive" } },
+        { rowLabel: { contains: token, mode: "insensitive" } },
+        { colHeader: { contains: token, mode: "insensitive" } },
+        { valueRaw: { contains: token, mode: "insensitive" } },
+      ]),
     };
     if (scopedDocIds && scopedDocIds.length > 0) {
       where.documentId = { in: scopedDocIds };
     }
 
-    const rows = (await prisma.documentEmbedding.findMany({
+    let rows = (await prisma.documentChunk.findMany({
       where,
       take: Math.max(input.k * 8, 80),
       orderBy: [{ documentId: "asc" }, { chunkIndex: "asc" }, { id: "asc" }],
@@ -990,7 +959,40 @@ class PrismaRetrievalUserAdapter
           },
         },
       },
-    })) as unknown as EmbeddingWithDocument[];
+    })) as unknown as ChunkWithDocument[];
+
+    if (!rows.length) {
+      const broadWhere: Prisma.DocumentChunkWhereInput = {
+        document: {
+          userId: this.userId,
+          status: { in: [...READY_DOCUMENT_STATUSES] },
+        },
+      };
+      if (scopedDocIds && scopedDocIds.length > 0) {
+        broadWhere.documentId = { in: scopedDocIds };
+      }
+      rows = (await prisma.documentChunk.findMany({
+        where: broadWhere,
+        take: Math.max(input.k * 12, 120),
+        orderBy: [{ documentId: "asc" }, { chunkIndex: "asc" }, { id: "asc" }],
+        include: {
+          document: {
+            select: {
+              id: true,
+              parentVersionId: true,
+              filename: true,
+              displayTitle: true,
+              encryptedFilename: true,
+              mimeType: true,
+              createdAt: true,
+              updatedAt: true,
+            },
+          },
+        },
+      })) as unknown as ChunkWithDocument[];
+    }
+
+    const plaintextByChunkId = await this.resolveChunkTexts(rows);
 
     const scored: Array<{
       docId: string;
@@ -1004,46 +1006,29 @@ class PrismaRetrievalUserAdapter
       chunkId: string;
     }> = [];
     for (const row of rows) {
-      const snippet = toSnippet(row.content);
+      const snippet = toSnippet(plaintextByChunkId.get(row.id) ?? row.text);
       if (!snippet) continue;
       const score = scoreChunkText(snippet, query, tokens, input.mode);
       if (score <= 0) continue;
-      const metadata = parseEmbeddingMetadata(row.metadata);
       const label = resolveDocLabel(row.document);
-      const tablePayload = this.buildTablePayloadFromMetadata(metadata, snippet);
-      const sheet = sanitizeLocationToken(
-        row.sheetName ??
-          (typeof metadata.sheetName === "string"
-            ? metadata.sheetName
-            : typeof metadata.sheet === "string"
-              ? metadata.sheet
-              : null),
-      );
+      const tablePayload = this.buildTablePayloadFromChunkRow(row, snippet);
+      const sheet = sanitizeLocationToken(row.sheetName ?? null);
       const sectionKey = sanitizeLocationToken(
-        row.sectionName ??
-          (typeof metadata.sectionName === "string"
-            ? metadata.sectionName
-            : typeof metadata.sectionKey === "string"
-              ? metadata.sectionKey
-              : typeof metadata.tableId === "string"
-                ? metadata.tableId
-                : typeof metadata.rowLabel === "string"
-                  ? metadata.rowLabel
-                  : null),
+        row.sectionName ?? row.tableId ?? row.rowLabel ?? null,
       );
       scored.push({
         docId: row.documentId,
         title: label.title,
         filename: label.filename,
         location: {
-          page: row.pageNumber ?? null,
+          page: row.page ?? null,
           sheet,
           sectionKey,
           versionId: row.documentId,
           rootDocumentId: rootDocumentIdFor(row.document),
         } as ChunkLocation,
         locationKey: toLocationKey(row.documentId, {
-          page: row.pageNumber ?? null,
+          page: row.page ?? null,
           sheet,
           sectionKey,
           chunkIndex: row.chunkIndex,
@@ -1051,7 +1036,7 @@ class PrismaRetrievalUserAdapter
         snippet,
         table: tablePayload,
         score,
-        chunkId: `${row.documentId}:${row.chunkIndex}`,
+        chunkId: row.id,
       });
     }
 

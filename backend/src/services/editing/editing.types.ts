@@ -326,6 +326,7 @@ export interface EditApplyResult {
 export interface UndoRequest {
   documentId: string;
   revisionId?: string;
+  expectedFileHash?: string;
 }
 
 export interface UndoResult {
@@ -399,6 +400,7 @@ export interface EditRevisionStore {
     documentId: string;
     userId: string;
     revisionId?: string;
+    expectedFileHash?: string;
   }): Promise<{
     restoredRevisionId: string;
     beforeHash?: string;

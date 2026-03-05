@@ -35,7 +35,7 @@
       "id": "policyholder_information",
       "name": {
         "en": "Policyholder Information",
-        "pt": "Informacoes do Segurado"
+        "pt": "Informações do Segurado"
       },
       "required": true,
       "order": 2,
@@ -93,3 +93,4 @@
     }
   ]
 }
+

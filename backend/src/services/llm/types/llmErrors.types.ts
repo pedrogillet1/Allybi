@@ -11,8 +11,6 @@
 export type LLMProvider =
   | "openai"
   | "google"
-  | "ollama"
-  | "local"
   | "unknown";
 
 export type LLMErrorLayer =

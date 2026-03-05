@@ -1,0 +1,185 @@
+{
+  "_meta": {
+    "id": "doc_archetypes_travel",
+    "version": "1.0.0",
+    "description": "Travel document archetypes for document identity classification.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-04",
+    "schemaId": "doc_identity_schema",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/document-intelligence/doc-archetypes-coverage.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "travel"
+  },
+  "domain": "travel",
+  "archetypes": [
+    {
+      "id": "travel_itinerary",
+      "label": "Itinerary",
+      "expectedSections": [
+        "Header",
+        "Cabeçalho",
+        "Issuer Profile",
+        "Perfil do Emissor",
+        "Recipient Profile",
+        "Perfil do Destinatario",
+        "Account or Reference",
+        "Conta ou Referencia",
+        "Period or Schedule",
+        "Período ou Agenda",
+        "Line Items or Events",
+        "Itens ou Eventos"
+      ],
+      "headings": [
+        "statement",
+        "document",
+        "header",
+        "issuer",
+        "provider",
+        "organization",
+        "emitente",
+        "recipient",
+        "holder",
+        "student",
+        "employee",
+        "destinatario",
+        "account",
+        "reference",
+        "numero",
+        "id"
+      ],
+      "expectedTableFamilies": [
+        "Itinerary line-item table",
+        "Itinerary summary matrix"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals"
+      ],
+      "missingQuestions": [
+        "Which itinerary variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?"
+      ]
+    },
+    {
+      "id": "travel_boarding_pass",
+      "label": "Boarding Pass",
+      "expectedSections": [
+        "Header",
+        "Cabeçalho",
+        "Issuer Profile",
+        "Perfil do Emissor",
+        "Recipient Profile",
+        "Perfil do Destinatario",
+        "Account or Reference",
+        "Conta ou Referencia",
+        "Period or Schedule",
+        "Período ou Agenda",
+        "Line Items or Events",
+        "Itens ou Eventos"
+      ],
+      "headings": [
+        "statement",
+        "document",
+        "header",
+        "issuer",
+        "provider",
+        "organization",
+        "emitente",
+        "recipient",
+        "holder",
+        "student",
+        "employee",
+        "destinatario",
+        "account",
+        "reference",
+        "numero",
+        "id"
+      ],
+      "expectedTableFamilies": [
+        "Boarding Pass line-item table",
+        "Boarding Pass summary matrix"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals"
+      ],
+      "missingQuestions": [
+        "Which boarding pass variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?"
+      ]
+    },
+    {
+      "id": "travel_hotel_booking_confirmation",
+      "label": "Hotel Booking Confirmation",
+      "expectedSections": [
+        "Header",
+        "Cabeçalho",
+        "Issuer Profile",
+        "Perfil do Emissor",
+        "Recipient Profile",
+        "Perfil do Destinatario",
+        "Account or Reference",
+        "Conta ou Referencia",
+        "Period or Schedule",
+        "Período ou Agenda",
+        "Line Items or Events",
+        "Itens ou Eventos"
+      ],
+      "headings": [
+        "statement",
+        "document",
+        "header",
+        "issuer",
+        "provider",
+        "organization",
+        "emitente",
+        "recipient",
+        "holder",
+        "student",
+        "employee",
+        "destinatario",
+        "account",
+        "reference",
+        "numero",
+        "id"
+      ],
+      "expectedTableFamilies": [
+        "Hotel Booking Confirmation line-item table",
+        "Hotel Booking Confirmation summary matrix"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals"
+      ],
+      "missingQuestions": [
+        "Which hotel booking confirmation variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?"
+      ]
+    }
+  ]
+}

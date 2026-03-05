@@ -141,6 +141,7 @@ export interface ProcessDocumentJobData {
   thumbnailUrl?: string | null;
   priority?: "high" | "normal" | "low";
   plaintextForEmbeddings?: string;
+  connectorDocType?: string;
 }
 
 export interface PreviewGenerationJobData {

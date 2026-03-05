@@ -1140,9 +1140,7 @@ export class LlmRequestBuilderService {
       const providerKey =
         input.route.provider === "openai"
           ? "openai"
-          : input.route.provider === "local"
-            ? "local"
-            : "gemini";
+          : "gemini";
       const models = providers[providerKey]?.models as Record<string, Record<string, unknown>> | undefined;
       if (!models) return 0;
       const routeModel = String(input.route.model || "").trim();

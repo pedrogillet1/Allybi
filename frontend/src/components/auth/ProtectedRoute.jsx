@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
-import { useLocation } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { AUTH_MODES, STORAGE_KEYS } from '../../constants/routes';
+import { AUTH_MODES, ROUTES, STORAGE_KEYS } from '../../constants/routes';
 import { useAuthModal } from '../../context/AuthModalContext';
 
 export const useAuthGate = () => {
@@ -46,7 +46,8 @@ const getAuthRedirectMode = () => {
  * Includes mobile bottom navigation for authenticated users.
  */
 const ProtectedRoute = ({ children }) => {
-    const { loading } = useAuth();
+    const location = useLocation();
+    const { isAuthenticated, loading } = useAuth();
 
     if (loading) {
         return (
@@ -67,6 +68,17 @@ const ProtectedRoute = ({ children }) => {
                     Loading...
                 </div>
             </div>
+        );
+    }
+
+    if (!isAuthenticated) {
+        const returnTo = `${location.pathname}${location.search || ''}`;
+        return (
+            <Navigate
+                to={`${ROUTES.AUTH}?returnTo=${encodeURIComponent(returnTo)}`}
+                replace
+                state={{ from: location }}
+            />
         );
     }
 

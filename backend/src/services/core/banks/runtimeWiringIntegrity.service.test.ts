@@ -49,6 +49,26 @@ function makeCleanBanks(): Record<string, unknown> {
     },
     intent_patterns: {
       patterns: [{ operator: "op_a" }],
+      overlays: {
+        followupIndicators: {
+          en: ["\\band\\b"],
+          pt: ["\\be\\b"],
+          es: ["\\by\\b"],
+        },
+      },
+    },
+    followup_indicators: {
+      config: { enabled: true },
+      rules: [
+        {
+          id: "continuation_markers",
+          triggerPatterns: {
+            en: ["\\b(and|also|continue)\\b"],
+            pt: ["\\b(e|tambem|continuar)\\b"],
+            es: ["\\b(y|tambien|continuar)\\b"],
+          },
+        },
+      ],
     },
     operator_families: {
       families: [{ operators: ["op_a"] }],
@@ -167,6 +187,13 @@ const MEMORY_POLICY_PATHS_SUFFIX = [
   "src/services/memory/memoryPolicyEngine.service.ts",
 ];
 
+function hasMemoryPolicySuffix(value: unknown): boolean {
+  const normalized = String(value || "").replace(/\\/g, "/");
+  return MEMORY_POLICY_PATHS_SUFFIX.some((suffix) =>
+    normalized.endsWith(suffix),
+  );
+}
+
 const CLEAN_MEMORY_POLICY_CONTENT = [
   "// integrationHooks: wired from policy bank",
   "// 'memory_policy integration hook banks missing' guard active",
@@ -179,13 +206,11 @@ beforeEach(() => {
   // Exception: memoryPolicyEngine.service.ts paths must exist with clean content
   // because that check reports missing-file as a failure (inverted logic).
   mockedExistsSync.mockImplementation((p) =>
-    MEMORY_POLICY_PATHS_SUFFIX.some((suffix) => String(p).endsWith(suffix)),
+    hasMemoryPolicySuffix(p),
   );
 
   mockedReadFileSync.mockImplementation((p) => {
-    if (
-      MEMORY_POLICY_PATHS_SUFFIX.some((suffix) => String(p).endsWith(suffix))
-    ) {
+    if (hasMemoryPolicySuffix(p)) {
       return CLEAN_MEMORY_POLICY_CONTENT as unknown as Buffer;
     }
     return "" as unknown as Buffer;
@@ -240,6 +265,7 @@ describe("RuntimeWiringIntegrityService – structural contract", () => {
       "composeAnswerModeTemplateGaps",
       "answerModeContractDrift",
       "productHelpRuntimeUsageMissing",
+      "followupOverlayCoverageGaps",
     ];
 
     for (const field of expectedFields) {
@@ -1163,7 +1189,7 @@ describe("RuntimeWiringIntegrityService – answer mode parity and product help 
         return "const x = 1; // no product help wiring" as unknown as Buffer;
       }
       if (
-        MEMORY_POLICY_PATHS_SUFFIX.some((suffix) => String(p).endsWith(suffix))
+        hasMemoryPolicySuffix(p)
       ) {
         return CLEAN_MEMORY_POLICY_CONTENT as unknown as Buffer;
       }
@@ -1177,7 +1203,56 @@ describe("RuntimeWiringIntegrityService – answer mode parity and product help 
 });
 
 // ==============================================================================
-// 18. ok flag is the conjunction of all issue arrays
+// 18. Follow-up overlay coverage
+// ==============================================================================
+
+describe("RuntimeWiringIntegrityService â€“ followupOverlayCoverageGaps", () => {
+  test("followupOverlayCoverageGaps is empty when intent_patterns and followup_indicators cover all locales", () => {
+    wireCleanBanks();
+    const result = buildService().validate();
+    expect(result.followupOverlayCoverageGaps).toHaveLength(0);
+  });
+
+  test("followupOverlayCoverageGaps flags missing intent_patterns followup locale overlays", () => {
+    const banks = makeCleanBanks();
+    (banks["intent_patterns"] as any).overlays.followupIndicators.es = [];
+    mockedGetOptionalBank.mockImplementation(
+      (id: string) => (banks[id] ?? null) as ReturnType<typeof getOptionalBank>,
+    );
+
+    const result = buildService().validate();
+    expect(result.followupOverlayCoverageGaps).toContain(
+      "intent_patterns.overlays.followupIndicators.es:missing",
+    );
+    expect(result.ok).toBe(false);
+  });
+
+  test("followupOverlayCoverageGaps flags missing followup_indicators rule locale patterns when enabled", () => {
+    const banks = makeCleanBanks();
+    (banks["followup_indicators"] as any).rules = [
+      {
+        id: "continuation_markers",
+        triggerPatterns: {
+          en: ["\\b(and|also)\\b"],
+          pt: ["\\b(e|tambem)\\b"],
+          es: [],
+        },
+      },
+    ];
+    mockedGetOptionalBank.mockImplementation(
+      (id: string) => (banks[id] ?? null) as ReturnType<typeof getOptionalBank>,
+    );
+
+    const result = buildService().validate();
+    expect(result.followupOverlayCoverageGaps).toContain(
+      "followup_indicators.rules.continuation_markers.triggerPatterns.es:missing",
+    );
+    expect(result.ok).toBe(false);
+  });
+});
+
+// ==============================================================================
+// 19. ok flag is the conjunction of all issue arrays
 // ==============================================================================
 
 describe("RuntimeWiringIntegrityService – ok flag invariant", () => {

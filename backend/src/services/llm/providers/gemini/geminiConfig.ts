@@ -213,10 +213,20 @@ const DEFAULTS: Omit<GeminiProviderConfig, "env" | "apiKey"> = {
 
 export function loadGeminiConfig(env: EnvName): GeminiProviderConfig {
   const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || "";
-
-  return {
+  const resolved = {
     env,
     apiKey,
     ...DEFAULTS,
   };
+
+  if (
+    (env === "production" || env === "staging") &&
+    resolved.models.strictAllowlist === false
+  ) {
+    throw new Error(
+      "GEMINI_STRICT_ALLOWLIST must remain enabled in production/staging",
+    );
+  }
+
+  return resolved;
 }

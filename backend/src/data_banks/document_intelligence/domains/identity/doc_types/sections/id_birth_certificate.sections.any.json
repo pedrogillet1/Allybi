@@ -35,7 +35,7 @@
       "id": "child_information",
       "name": {
         "en": "Child Information",
-        "pt": "Informacoes da Crianca"
+        "pt": "Informações da Crianca"
       },
       "required": true,
       "order": 2,
@@ -45,7 +45,7 @@
       "id": "parents_information",
       "name": {
         "en": "Parents Information",
-        "pt": "Informacoes dos Pais"
+        "pt": "Informações dos Pais"
       },
       "required": true,
       "order": 3,
@@ -65,7 +65,7 @@
       "id": "registrar_information",
       "name": {
         "en": "Registrar Information",
-        "pt": "Informacoes do Cartorio"
+        "pt": "Informações do Cartorio"
       },
       "required": true,
       "order": 5,
@@ -73,3 +73,4 @@
     }
   ]
 }
+

@@ -7,9 +7,6 @@ import { beforeEach, describe, expect, jest, test } from "@jest/globals";
 const mockDocumentFindUnique = jest.fn();
 const mockDocumentFindMany = jest.fn();
 const mockDocumentUpdate = jest.fn();
-const mockEmbeddingCreateMany = jest.fn();
-const mockEmbeddingCount = jest.fn();
-const mockEmbeddingDeleteMany = jest.fn();
 const mockChunkCreateMany = jest.fn();
 const mockChunkCount = jest.fn();
 const mockChunkDeleteMany = jest.fn();
@@ -37,11 +34,6 @@ jest.mock("../../config/database", () => ({
       findUnique: (...args: any[]) => mockDocumentFindUnique(...args),
       findMany: (...args: any[]) => mockDocumentFindMany(...args),
       update: (...args: any[]) => mockDocumentUpdate(...args),
-    },
-    documentEmbedding: {
-      createMany: (...args: any[]) => mockEmbeddingCreateMany(...args),
-      count: (...args: any[]) => mockEmbeddingCount(...args),
-      deleteMany: (...args: any[]) => mockEmbeddingDeleteMany(...args),
     },
     documentChunk: {
       createMany: (...args: any[]) => mockChunkCreateMany(...args),
@@ -194,11 +186,8 @@ describe("vectorEmbedding.service", () => {
     mockUpsertDocumentEmbeddings.mockResolvedValue(undefined);
     mockPineconeDeleteDocumentEmbeddings.mockResolvedValue(undefined);
     mockDeleteEmbeddingsByOperationId.mockResolvedValue(undefined);
-    mockEmbeddingCreateMany.mockResolvedValue({ count: 2 });
     mockChunkCreateMany.mockResolvedValue({ count: 2 });
-    mockEmbeddingDeleteMany.mockResolvedValue({ count: 0 });
     mockChunkDeleteMany.mockResolvedValue({ count: 0 });
-    mockEmbeddingCount.mockResolvedValue(2);
     mockChunkCount.mockResolvedValue(2);
     mockGenerateBatchEmbeddings.mockResolvedValue(makeBatchResult(2));
 
@@ -206,10 +195,6 @@ describe("vectorEmbedding.service", () => {
     mockTransaction.mockImplementation(async (fnOrArgs: any, _opts?: any) => {
       if (typeof fnOrArgs === "function") {
         return fnOrArgs({
-          documentEmbedding: {
-            deleteMany: mockEmbeddingDeleteMany,
-            createMany: mockEmbeddingCreateMany,
-          },
           documentChunk: {
             deleteMany: mockChunkDeleteMany,
             createMany: mockChunkCreateMany,
@@ -252,7 +237,6 @@ describe("vectorEmbedding.service", () => {
       { chunkIndex: 1, content: "This is a valid chunk with enough characters" },
     ];
     mockGenerateBatchEmbeddings.mockResolvedValue(makeBatchResult(1));
-    mockEmbeddingCount.mockResolvedValue(1);
     mockChunkCount.mockResolvedValue(1);
 
     await storeDocumentEmbeddings(DOC_ID, chunks, {
@@ -281,7 +265,6 @@ describe("vectorEmbedding.service", () => {
       { chunkIndex: 1, content: "second chunk content is also valid here" },
     ];
     mockGenerateBatchEmbeddings.mockResolvedValue(makeBatchResult(2));
-    mockEmbeddingCount.mockResolvedValue(2);
     mockChunkCount.mockResolvedValue(2);
 
     await storeDocumentEmbeddings(DOC_ID, chunks, {
@@ -302,7 +285,6 @@ describe("vectorEmbedding.service", () => {
   test("calls generateBatchEmbeddings with chunk content", async () => {
     const chunks = makeChunks(3);
     mockGenerateBatchEmbeddings.mockResolvedValue(makeBatchResult(3));
-    mockEmbeddingCount.mockResolvedValue(3);
     mockChunkCount.mockResolvedValue(3);
 
     await storeDocumentEmbeddings(DOC_ID, chunks, {
@@ -318,9 +300,9 @@ describe("vectorEmbedding.service", () => {
   });
 
   /* ================================================================ */
-  /*  6. Sets indexingState to "indexed" on success (but NOT status)   */
+  /*  6. Updates chunk counters without mutating indexing state          */
   /* ================================================================ */
-  test("sets indexingState to indexed on success", async () => {
+  test("updates chunksCount/embeddingsGenerated without setting indexingState", async () => {
     const chunks = makeChunks(2);
     mockGenerateBatchEmbeddings.mockResolvedValue(makeBatchResult(2));
 
@@ -330,11 +312,12 @@ describe("vectorEmbedding.service", () => {
       encryptionMode: "plaintext",
     });
 
-    // Last document.update call should set indexingState to "indexed"
+    // Last document.update call should update counters only.
     const updateCalls = mockDocumentUpdate.mock.calls;
     const lastUpdateData = updateCalls[updateCalls.length - 1][0].data;
-    expect(lastUpdateData.indexingState).toBe("indexed");
-    // Must NOT set status (pipeline handles it via DocumentStateManager)
+    expect(lastUpdateData.chunksCount).toBe(2);
+    expect(lastUpdateData.embeddingsGenerated).toBe(true);
+    expect(lastUpdateData.indexingState).toBeUndefined();
     expect(lastUpdateData.status).toBeUndefined();
   });
 
@@ -368,9 +351,9 @@ describe("vectorEmbedding.service", () => {
   });
 
   /* ================================================================ */
-  /*  8. Stores chunks and embeddings in Postgres                     */
+  /*  8. Stores chunks in Postgres                                    */
   /* ================================================================ */
-  test("stores chunks and embeddings in Postgres via transaction", async () => {
+  test("stores chunks in Postgres via transaction", async () => {
     const chunks = makeChunks(2);
     mockGenerateBatchEmbeddings.mockResolvedValue(makeBatchResult(2));
 
@@ -381,10 +364,8 @@ describe("vectorEmbedding.service", () => {
     });
 
     expect(mockTransaction).toHaveBeenCalledTimes(1);
-    // Within the transaction, old records are deleted and new ones created
-    expect(mockEmbeddingDeleteMany).toHaveBeenCalled();
+    // Within the transaction, old rows are deleted and new chunks are created.
     expect(mockChunkDeleteMany).toHaveBeenCalled();
-    expect(mockEmbeddingCreateMany).toHaveBeenCalled();
     expect(mockChunkCreateMany).toHaveBeenCalled();
   });
 
@@ -455,10 +436,8 @@ describe("vectorEmbedding.service", () => {
     const pineconeChunks = mockUpsertDocumentEmbeddings.mock.calls[0][3];
     expect(pineconeChunks[0].metadata.isLatestVersion).toBe(false);
 
-    const embeddingRecord = mockEmbeddingCreateMany.mock.calls[0][0].data[0];
-    const parsedMetadata = JSON.parse(embeddingRecord.metadata);
-    expect(parsedMetadata.isLatestVersion).toBe(false);
-    expect(parsedMetadata.versionId).toBe(DOC_ID);
+    const pineconeMetadata = pineconeChunks[0].metadata;
+    expect(pineconeMetadata.versionId).toBe(DOC_ID);
   });
 
   /* ================================================================ */
@@ -467,7 +446,6 @@ describe("vectorEmbedding.service", () => {
   test("handles encryption mode by storing encrypted text", async () => {
     const chunks = makeChunks(1);
     mockGenerateBatchEmbeddings.mockResolvedValue(makeBatchResult(1));
-    mockEmbeddingCount.mockResolvedValue(1);
     mockChunkCount.mockResolvedValue(1);
 
     await storeDocumentEmbeddings(DOC_ID, chunks, {
@@ -479,10 +457,6 @@ describe("vectorEmbedding.service", () => {
     // Chunk records should have textEncrypted and text=null
     const txCallback = mockTransaction.mock.calls[0][0] as Function;
     const mockTx = {
-      documentEmbedding: {
-        deleteMany: jest.fn().mockResolvedValue({ count: 0 }),
-        createMany: jest.fn().mockResolvedValue({ count: 1 }),
-      },
       documentChunk: {
         deleteMany: jest.fn().mockResolvedValue({ count: 0 }),
         createMany: jest.fn().mockResolvedValue({ count: 1 }),
@@ -510,10 +484,6 @@ describe("vectorEmbedding.service", () => {
         throw new Error("transient DB error");
       }
       return fn({
-        documentEmbedding: {
-          deleteMany: mockEmbeddingDeleteMany,
-          createMany: mockEmbeddingCreateMany,
-        },
         documentChunk: {
           deleteMany: mockChunkDeleteMany,
           createMany: mockChunkCreateMany,
@@ -531,9 +501,9 @@ describe("vectorEmbedding.service", () => {
   });
 
   /* ================================================================ */
-  /*  11. Sets indexingState to "failed" on terminal failure           */
+  /*  11. Does not write indexingState on terminal failure             */
   /* ================================================================ */
-  test("sets indexingState to failed on terminal failure", async () => {
+  test("does not set indexingState on terminal failure", async () => {
     const chunks = makeChunks(2);
     mockGenerateBatchEmbeddings.mockResolvedValue(makeBatchResult(2));
     mockTransaction.mockRejectedValue(new Error("permanent failure"));
@@ -546,12 +516,11 @@ describe("vectorEmbedding.service", () => {
       }),
     ).rejects.toThrow(/Failed to store embeddings/);
 
-    // Should set indexingState to "failed" (last update call)
-    const updateCalls = mockDocumentUpdate.mock.calls;
-    const lastUpdateData = updateCalls[updateCalls.length - 1][0].data;
-    expect(lastUpdateData.indexingState).toBe("failed");
-    // Must NOT set status
-    expect(lastUpdateData.status).toBeUndefined();
+    const updatePayloads = mockDocumentUpdate.mock.calls.map((call) => call[0].data);
+    for (const payload of updatePayloads) {
+      expect(payload.indexingState).toBeUndefined();
+      expect(payload.status).toBeUndefined();
+    }
   });
 
   /* ================================================================ */
@@ -603,9 +572,6 @@ describe("vectorEmbedding.service", () => {
   test("deleteDocumentEmbeddings removes from Pinecone and Postgres", async () => {
     mockTransaction.mockImplementation(async (fn: any) => {
       return fn({
-        documentEmbedding: {
-          deleteMany: mockEmbeddingDeleteMany,
-        },
         documentChunk: {
           deleteMany: mockChunkDeleteMany,
         },
@@ -648,7 +614,6 @@ describe("vectorEmbedding.service", () => {
 
     const chunks = makeChunks(2);
     mockGenerateBatchEmbeddings.mockResolvedValue(makeBatchResult(2));
-    mockEmbeddingCount.mockResolvedValue(2);
     mockChunkCount.mockResolvedValue(2);
 
     await storeDocumentEmbeddings(DOC_ID, chunks, {
@@ -658,9 +623,6 @@ describe("vectorEmbedding.service", () => {
       encryptionMode: "plaintext",
     });
 
-    expect(mockEmbeddingCount).toHaveBeenCalledWith({
-      where: { documentId: DOC_ID },
-    });
     expect(mockChunkCount).toHaveBeenCalledWith({
       where: { documentId: DOC_ID },
     });
@@ -674,7 +636,6 @@ describe("vectorEmbedding.service", () => {
 
     const chunks = makeChunks(2);
     mockGenerateBatchEmbeddings.mockResolvedValue(makeBatchResult(2));
-    mockEmbeddingCount.mockResolvedValue(2);
     mockChunkCount.mockResolvedValue(2);
 
     await storeDocumentEmbeddings(DOC_ID, chunks, {

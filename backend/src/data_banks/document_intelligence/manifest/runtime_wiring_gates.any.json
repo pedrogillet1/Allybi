@@ -142,11 +142,11 @@
         {
           "id": "doc_type_sections",
           "bankIdPatterns": [
-            "^(legal|medical)_.*_sections$"
+            "^(legal|medical)_.*_sections(?:_v[0-9a-f]+)?$"
           ],
           "sampleBankIds": [
-            "legal_nda_sections",
-            "medical_soap_note_sections"
+            "legal_nda_sections_v215acb2d",
+            "medical_med_soap_note_sections"
           ],
           "proofTests": [
             "src/tests/document-intelligence/docint-wiring-proof.test.ts"
@@ -155,11 +155,11 @@
         {
           "id": "doc_type_tables_extraction",
           "bankIdPatterns": [
-            "^(legal|medical)_.*_(tables|extraction_hints)$"
+            "^(legal|medical)_.*_(tables|extraction_hints)(?:_v[0-9a-f]+)?$"
           ],
           "sampleBankIds": [
-            "legal_nda_tables",
-            "medical_soap_note_extraction_hints"
+            "legal_nda_tables_v3a19a550",
+            "medical_med_soap_note_extraction_hints"
           ],
           "proofTests": [
             "src/tests/document-intelligence/docint-wiring-proof.test.ts"
@@ -292,13 +292,13 @@
         "document_intelligence_usage_manifest",
         "legal_doc_type_catalog",
         "legal_domain_profile",
-        "legal_nda_sections",
+        "legal_nda_sections_v215acb2d",
         "legal_retrieval_strategies",
         "legal_validation_policies",
         "medical_doc_type_catalog",
         "medical_domain_profile",
         "medical_retrieval_strategies",
-        "medical_soap_note_sections",
+        "medical_med_soap_note_sections",
         "medical_validation_policies",
         "numeric_integrity",
         "query_rewrites_accounting",

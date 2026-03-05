@@ -10,6 +10,7 @@ import {
   ConnectorsIngestionService,
   type ConnectorDocument,
 } from "../connectorsIngestion.service";
+import { logger } from "../../../utils/logger";
 
 interface OutlookCursorData {
   lastSyncAt?: string;
@@ -135,7 +136,7 @@ export class OutlookSyncService {
       } catch (err) {
         // Skip folders that fail (permission denied, token errors, timeouts, etc.).
         const msg = err instanceof Error ? err.message : String(err);
-        console.warn(
+        logger.warn(
           `[OutlookSync] Skipping folder "${folder.displayName}" (${folder.id}): ${msg}`,
         );
         continue;

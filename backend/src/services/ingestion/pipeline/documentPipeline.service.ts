@@ -9,10 +9,10 @@ import { createHash } from "crypto";
 import { logger } from "../../../utils/logger";
 import prisma from "../../../config/database";
 import { downloadFile } from "../../../config/storage";
-import vectorEmbeddingService from "../../retrieval/vectorEmbedding.service";
+import vectorEmbeddingRuntimeService from "../../retrieval/vectorEmbedding.runtime.service";
 import { extractText, PDF_MIMES, DOCX_MIMES, XLSX_MIMES, PPTX_MIMES } from "../extraction/extractionDispatch.service";
-import { isSkipped } from "../extraction/extractionResult.types";
-import type { DispatchedExtractionResult } from "../extraction/extractionResult.types";
+import { isSkipped, hasPagesArray, hasSlidesArray } from "../extraction/extractionResult.types";
+import type { DispatchedExtractionResult, ImageSkippedResult } from "../extraction/extractionResult.types";
 import { buildInputChunks, deduplicateChunks } from "./chunkAssembly.service";
 import { clamp01, deriveTextQuality } from "./textQuality.service";
 import { runEncryptionStep } from "./encryptionStep.service";
@@ -213,7 +213,7 @@ export async function processDocumentAsync(
     recordExtractionAttempt(false);
 
     const skipReason = wasSkipped
-      ? (extraction as any).skipReason
+      ? (extraction as ImageSkippedResult).skipReason
       : "No extractable text content";
 
     logger.info("[Pipeline] File skipped, no usable content", {
@@ -275,7 +275,7 @@ export async function processDocumentAsync(
       chunkCount: inputChunks.length,
     });
     await withTimeout(
-      vectorEmbeddingService.storeDocumentEmbeddings(
+      vectorEmbeddingRuntimeService.storeDocumentEmbeddings(
         documentId,
         inputChunks,
       ),
@@ -333,7 +333,8 @@ export async function processDocumentAsync(
     chunkCount: inputChunks.length,
     embeddingMs,
     pageCount:
-      (extraction as any).pageCount ?? (extraction as any).slideCount ?? null,
+      hasPagesArray(extraction) ? extraction.pageCount :
+      hasSlidesArray(extraction) ? extraction.slideCount : null,
     fileHash,
   };
 }

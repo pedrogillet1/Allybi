@@ -35,7 +35,7 @@
       "id": "spouse_information",
       "name": {
         "en": "Spouse Information",
-        "pt": "Informacoes dos Conjuges"
+        "pt": "Informações dos Conjuges"
       },
       "required": true,
       "order": 2,
@@ -65,7 +65,7 @@
       "id": "registrar_information",
       "name": {
         "en": "Registrar Information",
-        "pt": "Informacoes do Cartorio"
+        "pt": "Informações do Cartorio"
       },
       "required": true,
       "order": 5,
@@ -73,3 +73,4 @@
     }
   ]
 }
+

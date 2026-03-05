@@ -3,8 +3,8 @@ import { beforeEach, describe, expect, jest, test } from "@jest/globals";
 process.env.KODA_MASTER_KEY_BASE64 = Buffer.alloc(32, 9).toString("base64");
 
 const mockFindDocument = jest.fn();
+const mockFindDocumentMany = jest.fn();
 const mockUpdateDocument = jest.fn();
-const mockEmbeddingCount = jest.fn();
 const mockChunkCount = jest.fn();
 const mockTransaction = jest.fn();
 const mockIsAvailable = jest.fn();
@@ -19,10 +19,8 @@ jest.mock("../../config/database", () => ({
   default: {
     document: {
       findUnique: (...args: any[]) => mockFindDocument(...args),
+      findMany: (...args: any[]) => mockFindDocumentMany(...args),
       update: (...args: any[]) => mockUpdateDocument(...args),
-    },
-    documentEmbedding: {
-      count: (...args: any[]) => mockEmbeddingCount(...args),
     },
     documentChunk: { count: (...args: any[]) => mockChunkCount(...args) },
     $transaction: (...args: any[]) => mockTransaction(...args),
@@ -66,8 +64,8 @@ import { storeDocumentEmbeddings } from "../../services/retrieval/vectorEmbeddin
 describe("vectorEmbedding rollback", () => {
   beforeEach(() => {
     mockFindDocument.mockReset();
+    mockFindDocumentMany.mockReset();
     mockUpdateDocument.mockReset();
-    mockEmbeddingCount.mockReset();
     mockChunkCount.mockReset();
     mockTransaction.mockReset();
     mockIsAvailable.mockReset();
@@ -88,7 +86,9 @@ describe("vectorEmbedding rollback", () => {
       folder: null,
     });
     mockUpdateDocument.mockResolvedValue({});
-    mockEmbeddingCount.mockResolvedValue(1);
+    mockFindDocumentMany.mockResolvedValue([
+      { id: "doc-1", createdAt: new Date("2026-01-01T00:00:00.000Z") },
+    ]);
     mockChunkCount.mockResolvedValue(1);
     mockIsAvailable.mockReturnValue(true);
     mockUpsert.mockResolvedValue({ upserted: 1, skipped: 0 });
@@ -105,10 +105,6 @@ describe("vectorEmbedding rollback", () => {
   test("uses operation-scoped pinecone rollback when post-upsert verification fails", async () => {
     mockTransaction.mockImplementation(async (fn: any) => {
       await fn({
-        documentEmbedding: {
-          deleteMany: async () => ({ count: 1 }),
-          createMany: async () => ({ count: 1 }),
-        },
         documentChunk: {
           deleteMany: async () => ({ count: 1 }),
           createMany: async () => ({ count: 1 }),
@@ -116,7 +112,6 @@ describe("vectorEmbedding rollback", () => {
       });
       return;
     });
-    mockEmbeddingCount.mockResolvedValue(0);
     mockChunkCount.mockResolvedValue(0);
 
     await expect(
@@ -144,10 +139,6 @@ describe("vectorEmbedding rollback", () => {
 
     mockTransaction.mockImplementation(async (fn: any) => {
       await fn({
-        documentEmbedding: {
-          deleteMany: async () => ({ count: 1 }),
-          createMany: async () => ({ count: 1 }),
-        },
         documentChunk: {
           deleteMany: async () => ({ count: 1 }),
           createMany: async (args: any) => {

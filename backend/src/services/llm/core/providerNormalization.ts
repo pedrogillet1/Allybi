@@ -1,6 +1,6 @@
 import type { LLMProvider } from "./llmErrors.types";
 
-export type CanonicalProvider = "openai" | "google" | "local";
+export type CanonicalProvider = "openai" | "google";
 
 function normalizeRaw(value: unknown): string {
   return String(value || "")
@@ -27,10 +27,6 @@ export function canonicalizeProvider(value: unknown): CanonicalProvider | null {
 
   if (raw === "openai" || raw.includes("openai") || raw.startsWith("gpt")) {
     return "openai";
-  }
-
-  if (raw === "local" || raw === "ollama" || raw.includes("ollama")) {
-    return "local";
   }
 
   return null;

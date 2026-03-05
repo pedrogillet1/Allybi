@@ -1,5 +1,6 @@
 import { getOptionalBank } from "./bankLoader.service";
 import {
+  getDocumentIntelligenceBanksInstance,
   normalizeDocumentIntelligenceDomain,
   type DocumentIntelligenceDomain,
 } from "./documentIntelligenceBanks.service";
@@ -91,6 +92,84 @@ const ACCOUNTING_INTENT_MARKERS = [
   "accrual",
 ];
 const OPS_INTENT_MARKERS = ["ops", "operation", "sla", "runbook", "incident"];
+const BANKING_INTENT_MARKERS = [
+  "banking",
+  "bank statement",
+  "checking",
+  "savings",
+  "wire transfer",
+  "deposit",
+];
+const BILLING_INTENT_MARKERS = [
+  "billing",
+  "invoice",
+  "bill",
+  "utility",
+  "payment due",
+];
+const EDUCATION_INTENT_MARKERS = [
+  "education",
+  "transcript",
+  "diploma",
+  "enrollment",
+  "syllabus",
+  "student",
+];
+const EVERYDAY_INTENT_MARKERS = [
+  "everyday",
+  "personal",
+  "household",
+  "proof of address",
+  "every_",
+];
+const HOUSING_INTENT_MARKERS = [
+  "housing",
+  "mortgage",
+  "rent",
+  "lease",
+  "property",
+  "hoa",
+];
+const HR_INTENT_MARKERS = [
+  "hr",
+  "payroll",
+  "pay stub",
+  "benefits",
+  "employment",
+  "timesheet",
+];
+const IDENTITY_INTENT_MARKERS = [
+  "identity",
+  "passport",
+  "driver license",
+  "birth certificate",
+  "visa",
+  "id card",
+];
+const INSURANCE_INTENT_MARKERS = [
+  "insurance",
+  "policy",
+  "claim",
+  "premium",
+  "coverage",
+  "deductible",
+];
+const TAX_INTENT_MARKERS = [
+  "tax",
+  "tax return",
+  "assessment",
+  "property tax",
+  "irs",
+  "w-2",
+];
+const TRAVEL_INTENT_MARKERS = [
+  "travel",
+  "boarding pass",
+  "itinerary",
+  "hotel",
+  "car rental",
+  "flight",
+];
 
 // -- cross_domain_tiebreak_policy bank reference (used for deterministic tiebreak resolution) --
 
@@ -115,6 +194,124 @@ interface DomainScore {
 }
 
 const TIEBREAK_SCORE_GAP_THRESHOLD = 0.15;
+const DOC_TYPE_CONFUSION_BOOST_DEFAULT = 0.25;
+
+interface DocTypeConfusionRule {
+  id: string;
+  docTypeA: string;
+  docTypeB: string;
+  winner: string;
+  confidenceBoost?: number;
+  structureCue?: string;
+  reason?: string;
+}
+
+interface DocTypeConfusionMatrixBank {
+  _meta?: { id?: string; version?: string };
+  config?: { enabled?: boolean; strategy?: string };
+  rules?: DocTypeConfusionRule[];
+}
+
+function resolveDomainFromDocTypeId(
+  docTypeId: string,
+): DocumentIntelligenceDomain | null {
+  const normalized = lower(docTypeId);
+  const token = normalized.split("_")[0] || "";
+
+  const byPrefix: Record<string, DocumentIntelligenceDomain> = {
+    acct: "accounting",
+    fin: "finance",
+    med: "medical",
+    legal: "legal",
+    ops: "ops",
+    banking: "banking",
+    billing: "billing",
+    education: "education",
+    every: "everyday",
+    housing: "housing",
+    hr: "hr_payroll",
+    id: "identity",
+    ins: "insurance",
+    tax: "tax",
+    travel: "travel",
+  };
+
+  if (Object.prototype.hasOwnProperty.call(byPrefix, token)) {
+    return byPrefix[token];
+  }
+
+  const normalizedDomain = normalizeDocumentIntelligenceDomain(token);
+  return normalizedDomain ?? null;
+}
+
+/**
+ * Apply doc_type_confusion_matrix rules for ambiguous doc-type IDs.
+ * This stage runs before cross-domain tiebreak, because doc-type rules are
+ * more specific than broad query intent markers.
+ */
+function applyDocTypeConfusionMatrix(
+  candidates: DomainScore[],
+  docTypeId: string,
+  reasons: string[],
+): DomainScore[] {
+  if (candidates.length < 2) return candidates;
+  const normalizedDocType = lower(docTypeId);
+  if (!normalizedDocType) return candidates;
+
+  const confusionBank = getOptionalBank<DocTypeConfusionMatrixBank>(
+    "doc_type_confusion_matrix",
+  );
+  if (!confusionBank || confusionBank.config?.enabled === false) return candidates;
+
+  const rules = Array.isArray(confusionBank.rules) ? confusionBank.rules : [];
+  if (rules.length === 0) return candidates;
+
+  const updated = [...candidates];
+  let applied = false;
+
+  for (const rule of rules) {
+    const docTypeA = lower(rule.docTypeA);
+    const docTypeB = lower(rule.docTypeB);
+    const winnerDocType = lower(rule.winner);
+    if (
+      normalizedDocType !== docTypeA &&
+      normalizedDocType !== docTypeB &&
+      normalizedDocType !== winnerDocType
+    ) {
+      continue;
+    }
+
+    const winnerDomain = resolveDomainFromDocTypeId(winnerDocType);
+    if (!winnerDomain) continue;
+
+    const winnerIdx = updated.findIndex((candidate) => candidate.domain === winnerDomain);
+    if (winnerIdx < 0) continue;
+
+    const loserDocType = winnerDocType === docTypeA ? docTypeB : docTypeA;
+    const loserDomain = resolveDomainFromDocTypeId(loserDocType);
+    if (loserDomain) {
+      const loserIdx = updated.findIndex((candidate) => candidate.domain === loserDomain);
+      if (loserIdx < 0) continue;
+    }
+
+    const boost = Number.isFinite(rule.confidenceBoost)
+      ? Number(rule.confidenceBoost)
+      : DOC_TYPE_CONFUSION_BOOST_DEFAULT;
+    if (boost <= 0) continue;
+
+    updated[winnerIdx] = {
+      ...updated[winnerIdx],
+      score: updated[winnerIdx].score + boost,
+    };
+    reasons.push("doc_type_confusion_matrix_applied");
+    reasons.push(`doc_type_confusion_rule:${rule.id}:${winnerDomain}`);
+    applied = true;
+  }
+
+  if (!applied) return candidates;
+  updated.sort((a, b) => b.score - a.score);
+  return updated;
+}
 
 /**
  * Score a query against all known domain marker sets.
@@ -131,6 +328,16 @@ function scoreDomainCandidates(query: string): DomainScore[] {
     { domain: "medical", markers: MEDICAL_INTENT_MARKERS },
     { domain: "accounting", markers: ACCOUNTING_INTENT_MARKERS },
     { domain: "ops", markers: OPS_INTENT_MARKERS },
+    { domain: "banking", markers: BANKING_INTENT_MARKERS },
+    { domain: "billing", markers: BILLING_INTENT_MARKERS },
+    { domain: "education", markers: EDUCATION_INTENT_MARKERS },
+    { domain: "everyday", markers: EVERYDAY_INTENT_MARKERS },
+    { domain: "housing", markers: HOUSING_INTENT_MARKERS },
+    { domain: "hr_payroll", markers: HR_INTENT_MARKERS },
+    { domain: "identity", markers: IDENTITY_INTENT_MARKERS },
+    { domain: "insurance", markers: INSURANCE_INTENT_MARKERS },
+    { domain: "tax", markers: TAX_INTENT_MARKERS },
+    { domain: "travel", markers: TRAVEL_INTENT_MARKERS },
   ];
 
   const results: DomainScore[] = [];
@@ -263,6 +470,16 @@ function inferDomainFromText(query: string): DocumentIntelligenceDomain | null {
   if (containsAny(q, ACCOUNTING_INTENT_MARKERS)) return "accounting";
   if (containsAny(q, OPS_INTENT_MARKERS)) return "ops";
   if (containsAny(q, FINANCE_INTENT_MARKERS)) return "finance";
+  if (containsAny(q, BANKING_INTENT_MARKERS)) return "banking";
+  if (containsAny(q, BILLING_INTENT_MARKERS)) return "billing";
+  if (containsAny(q, EDUCATION_INTENT_MARKERS)) return "education";
+  if (containsAny(q, EVERYDAY_INTENT_MARKERS)) return "everyday";
+  if (containsAny(q, HOUSING_INTENT_MARKERS)) return "housing";
+  if (containsAny(q, HR_INTENT_MARKERS)) return "hr_payroll";
+  if (containsAny(q, IDENTITY_INTENT_MARKERS)) return "identity";
+  if (containsAny(q, INSURANCE_INTENT_MARKERS)) return "insurance";
+  if (containsAny(q, TAX_INTENT_MARKERS)) return "tax";
+  if (containsAny(q, TRAVEL_INTENT_MARKERS)) return "travel";
   return null;
 }
 
@@ -318,21 +535,41 @@ export class BankSelectionPlannerService {
 
     const explicitDomain = normalizeDocumentIntelligenceDomain(input.domainId);
     let inferredDomain: DocumentIntelligenceDomain | null = null;
+    const normalizedDocType = lower(input.docTypeId || "");
+    if (normalizedDocType) reasons.push(`docType:${normalizedDocType}`);
 
     if (!explicitDomain) {
       // Score all domain candidates and apply tiebreak resolution when close
       const candidates = scoreDomainCandidates(input.query);
-      if (candidates.length >= 2) {
-        const resolved = applyTiebreakPolicy(candidates, reasons);
+      const confusionResolved = applyDocTypeConfusionMatrix(
+        candidates,
+        normalizedDocType,
+        reasons,
+      );
+      if (confusionResolved.length >= 2) {
+        const resolved = applyTiebreakPolicy(confusionResolved, reasons);
         inferredDomain = resolved.length > 0 ? resolved[0].domain : null;
-      } else if (candidates.length === 1) {
-        inferredDomain = candidates[0].domain;
+      } else if (confusionResolved.length === 1) {
+        inferredDomain = confusionResolved[0].domain;
       } else {
         inferredDomain = inferDomainFromText(input.query);
       }
     }
 
-    const domainId = explicitDomain || inferredDomain;
+    let domainId = explicitDomain || inferredDomain;
+    const diDomainOntology = getDocumentIntelligenceBanksInstance().getDiOntology("domain");
+    const canonicalDiDomains = Array.isArray(diDomainOntology?.config?.canonicalDomainIds)
+      ? diDomainOntology.config.canonicalDomainIds
+          .map((value: unknown) => normalizeDocumentIntelligenceDomain(value))
+          .filter(
+            (value: unknown): value is DocumentIntelligenceDomain =>
+              Boolean(value),
+          )
+      : [];
+    if (domainId && canonicalDiDomains.length > 0 && !canonicalDiDomains.includes(domainId)) {
+      reasons.push(`domain:rejected_by_di_ontology:${domainId}`);
+      domainId = null;
+    }
     if (explicitDomain) reasons.push("domain:explicit");
     else if (inferredDomain) reasons.push("domain:inferred_query");
     else reasons.push("domain:none");

@@ -4,7 +4,7 @@ import providerCapabilitiesBank from "../../../data_banks/llm/provider_capabilit
 import providerFallbacksBank from "../../../data_banks/llm/provider_fallbacks.any.json";
 import compositionLanePolicyBank from "../../../data_banks/llm/composition_lane_policy.any.json";
 
-function makePolicyAwareLoader(): BankLoader {
+function makePolicyAwareLoader(enableMultiProvider: boolean = true): BankLoader {
   return {
     getBank(bankId: string) {
       if (bankId === "provider_capabilities" || bankId === "providerCapabilities") {
@@ -18,6 +18,22 @@ function makePolicyAwareLoader(): BankLoader {
         bankId === "compositionLanePolicy"
       ) {
         return compositionLanePolicyBank;
+      }
+      if (bankId === "feature_flags") {
+        return {
+          config: { enabled: true },
+          flags: [
+            {
+              id: "ff.enable_multi_provider",
+              defaultByEnv: {
+                production: enableMultiProvider,
+                staging: enableMultiProvider,
+                dev: enableMultiProvider,
+                local: enableMultiProvider,
+              },
+            },
+          ],
+        };
       }
       throw new Error(`bank_missing:${bankId}`);
     },
@@ -85,6 +101,20 @@ describe("LlmRouterService", () => {
     });
 
     expect(out[0]).toEqual({ provider: "gemini", model: "gemini-2.5-flash" });
+  });
+
+  test("multi-provider fallback disabled flag returns no fallback targets", () => {
+    const router = new LlmRouterService(makePolicyAwareLoader(false));
+    const out = router.listFallbackTargets({
+      primary: {
+        provider: "openai",
+        model: "gpt-5.2",
+        stage: "final",
+      },
+      requireStreaming: true,
+      allowTools: false,
+    });
+    expect(out).toEqual([]);
   });
 
   test("logs warning when no provider health data is available", () => {
@@ -168,5 +198,20 @@ describe("LlmRouterService", () => {
       providerHealth: [{ provider: "openai", ok: false, models: {} }],
     });
     expect(plan.provider).toBe("gemini");
+  });
+
+  test("ignores forced override when model is outside approved families", () => {
+    const router = new LlmRouterService(makePolicyAwareLoader());
+    const plan = router.route({
+      env: "production",
+      stage: "final",
+      force: {
+        provider: "openai",
+        model: "unsupported-model",
+      },
+    });
+    expect(plan.provider).toBe("openai");
+    expect(plan.model).toBe("gpt-5.2-2026-01-15");
+    expect(plan.lane).toBe("final_authority_default");
   });
 });

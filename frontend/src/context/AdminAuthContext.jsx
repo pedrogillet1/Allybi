@@ -15,15 +15,15 @@ export const AdminAuthProvider = ({ children }) => {
     if (stored && authed) {
       setAdmin(stored);
       setIsAuthenticated(true);
-      setAccessToken(adminAuthService.getAccessToken());
+      setAccessToken("cookie-session");
     }
     setLoading(false);
   }, []);
 
   const login = async (username, password) => {
-    const { admin: adminData, tokens } = await adminAuthService.login(username, password);
+    const { admin: adminData } = await adminAuthService.login(username, password);
     setAdmin(adminData);
-    setAccessToken(tokens.accessToken);
+    setAccessToken("cookie-session");
     setIsAuthenticated(true);
     return adminData;
   };

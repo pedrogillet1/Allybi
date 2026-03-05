@@ -595,42 +595,42 @@
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_account_reconciliation.sections.any.json": {
-      "sha256": "e0238749f04760d10d27c1db95202d11eda4c6bca495674010dbe4871611d056",
+      "sha256": "8ce53fc69f1efbb13aea3fd39e40bdc0bf8b22cef3d1073fdc07061c8aeaf096",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_accrual_rollforward.sections.any.json": {
-      "sha256": "89162187c2f63af72d490d0efdfd733ba763c5764ff3a24da6e8ba3a7e94f4b2",
+      "sha256": "dd2c678c2c9033a239db1f416e03dd716bbf39b9b9460204ea166c7545923c72",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_accruals_schedule.sections.any.json": {
-      "sha256": "be10377a0f9528db24560e33ee9deaf7c5b20300114378345455bd4dde38ea86",
+      "sha256": "67c71419395a8d88dbb4fb6793275606b84fdde2cdb5132123833a2249393e3f",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_amortization_schedule.sections.any.json": {
-      "sha256": "aaa6ff36562a35bceacb4566644a2f47d4b0869a66e785dd0c714ba5f0789cf6",
+      "sha256": "8bde386da5290241ac4504f41000d1b9555ffdd264f703f6ea06ac1b98df4d6c",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_ap_aging.sections.any.json": {
-      "sha256": "8041d501973d5604f75155bc5c8b8643e9a749528c97019f724f8bdd66a5f639",
+      "sha256": "728b85e24c8916a079eadd4726dbf6706779878f1fd023587b97d180064b99de",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_ar_aging.sections.any.json": {
-      "sha256": "c6cc42dbb80aa157992e7ec158c7856ca3fbe177e7b0186f9bd67cebfb1f909c",
+      "sha256": "b26685e55f94ece2acbdfce08f804814c50f2df4131cb1fbcfce9059d60bd6e8",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_audit_confirmation.sections.any.json": {
-      "sha256": "b7b2a93eaedfad636db1783a2b3fb5d6062413e7d0b08047997d206e03ddb889",
+      "sha256": "3e6c53cd80dcb4072d46e0e4cccdf4565332b9e1bc9fdb1b3e70422b22015cd3",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_audit_workpaper.sections.any.json": {
-      "sha256": "2827822b10c6a32069d0d77253683644a7423c75c67a68c55b5a1cd0be680fc8",
+      "sha256": "528f8784053605dc3674c42381893e27b2cd4e198d93ee0e66a2074b1e94f44a",
       "required": false,
       "category": "semantics"
     },
@@ -640,212 +640,212 @@
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_bank_reconciliation.sections.any.json": {
-      "sha256": "8f008de048b9100f8725f019744e662cf4f15e364c7909c1fe06d05815c89d66",
+      "sha256": "1bab1d621a29be2d8b1a7cacf7a979822eed7f24c2e0e2515372a951881379a6",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_budget_pack.sections.any.json": {
-      "sha256": "1e8ad48b182b6e17b52dabef61a369f2f2d1b48df95ce10d53806869cd8f4dad",
+      "sha256": "bd1e475076ff42b40e75d3e0f9c39ef8862388eb7316775cc9c9303c67c18b5d",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_capex_register.sections.any.json": {
-      "sha256": "c1e38b818dd4c6b757e49d15c6cd487cf8947a0b85e4bb440cf0392ba3d4170d",
+      "sha256": "b3a28fa1a5eb004e0df9c28b9a20eac3f1cf36f286034a919905f2c4d5222415",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_cash_flow.sections.any.json": {
-      "sha256": "cf20d77be63010f6d7cf16b6ea3fc33fe92ee15f85f3e5f14f2f368c8cd308b9",
+      "sha256": "2a5a6221cd9505d4af1f609b7a86b5f3df5a137287f8581627aca403a5085375",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_cashbook.sections.any.json": {
-      "sha256": "1ff72c06b7f3a5942dd7c684a15b85438a312a72f35bd49bda884d22940b17cd",
+      "sha256": "a6f68e93da022045b70b21b66851d9e9a49dfaba85b77c5b7ade416d229e2fb6",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_chart_of_accounts.sections.any.json": {
-      "sha256": "7b1a6e1a8bafe0ddec7428407933ab7cd4b75248d3761698e131e3f5187b4b0e",
+      "sha256": "fa94a5fbde7bbb3bd944bbf131a05d7e7cd1e22375a37b9fd81a899131de60e7",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_controls_narrative.sections.any.json": {
-      "sha256": "8382fae775126324f563da44ec007ed172621b419d1954bc9afcb53190615cc6",
+      "sha256": "a1e9a336192924ef8967125762f575ab47072051eda4d733b9288486a2d0ab1a",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_credit_card_reconciliation.sections.any.json": {
-      "sha256": "c2bc1cd6848219283c1cbad12da552cc533d3ea719f4db085a33ddd7f1e6ed0d",
+      "sha256": "e28e871d5de16b9ee2dd405973efb72e1a642099f5eb2779d16094941ff3cb96",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_depreciation_schedule.sections.any.json": {
-      "sha256": "124d21e0aad3adf4f11d8b7c2719dba3c3bafeee60fc00e705ffa4f8fdea09b1",
+      "sha256": "f1dd7644879d3f4194d0fe35a186370b44ddcfcbe863ecf7dd08c01c412bc35c",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_financial_statement.sections.any.json": {
-      "sha256": "f2c2e3051c96c98c9aab11ca35325116d07ed54733f8e9ffe95649757d62540f",
+      "sha256": "26700b76bdb965b728e6ff32cc717a787df62621bac3c90867352cc12ee4dc41",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_fixed_asset_register.sections.any.json": {
-      "sha256": "20a2680dcd5f756785bcb5992aa77524775673741d5d21f0707c29ae555daa9b",
+      "sha256": "380bd330c3c7ec54a30feac0de26e4e885dfb5c1ece8150304e077a38d12251e",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_forecast_pack.sections.any.json": {
-      "sha256": "21872124c7c8aa099e5b77fb6e70fd52c7ea070ff3e554dfac9045aaa53f3489",
+      "sha256": "43969d47c7c13d7ef4215bbcbe0716151479b1fb714ba1e94120f65e4473d126",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_foreign_currency.sections.any.json": {
-      "sha256": "9a04e08473e318ad04720f9a43ca835df71b91a99be6e2298a0dc7f9180bb627",
+      "sha256": "dfe30998bfb5a7a2078fbe34a44364209a1efb76e68a980183f22c7d9b1e9151",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_general_ledger.sections.any.json": {
-      "sha256": "1fc46d3b1196c07177fb4fcff176585ee9b81972959a3b18fad873731d5ccb83",
+      "sha256": "3a16d3355a413473348879d47564cbc03fdafc02a056fefb33f87ec366a93a87",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_gl_export.sections.any.json": {
-      "sha256": "745e2082ff8f319d93f1ef3235f3d40378c77e5b02e0b0a27a595371a3fec243",
+      "sha256": "2192c3c5ec1136dfcc656ccd40208b1173f3dcc32484efbd3ce9c5f610e1ee15",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_intercompany_reconciliation.sections.any.json": {
-      "sha256": "8abb1749e1b5dcf178bcef03feeef415aebd8f2dd0855e493c29235095492625",
+      "sha256": "5d55605e35e697bcc4ed524350549ef4f6310deff13c460312611a28a5514fc3",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_inventory_valuation_report.sections.any.json": {
-      "sha256": "a6a309a907688e80bda8fa26c6dd12ac7a085132f162f87bd1657b9b483fc83c",
+      "sha256": "3f98d9249ce5ab80902dfc804f8cdaf80150a810f6c07033f8cc8cbd12b7a1e0",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_inventory_valuation.sections.any.json": {
-      "sha256": "5dd74c2e07379aab90265d9fedd9878a21ed7931e7625d911a876c3641304b98",
+      "sha256": "5505620db2d3c1dc1fe91344137cdcaff3ad1e1f23be27551233db2fb9dbb573",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_invoice_register.sections.any.json": {
-      "sha256": "b467990dd5efeb37fc8db9156abe857a477ad3ef5ec08fbe499e357d7c856887",
+      "sha256": "0acf1dcd57f9364037e54a2e32fc571a30f0e9d34ddb4f5567574529f7f38a66",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_je_support.sections.any.json": {
-      "sha256": "8f81419499769169aa6f4d96510e5c5b598a4e2f786761d567417c214d13e43e",
+      "sha256": "4fdd4ced84587d4d73f7d67e42aa377dd7bcb5ad265810a516527a047d07546f",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_journal_entry_adjusting.sections.any.json": {
-      "sha256": "b6ef2f9670740d64333c7ea722c2112392df461404a1dcadc14ffadfc370a96c",
+      "sha256": "b05d1b1fe98a8030a9cf44915dca120c1ddb9883998c89916e6980bcb90e9af7",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_journal_entry_support.sections.any.json": {
-      "sha256": "e8f4e9a7743af1a456d953586e166e3a92ab9204b1be18a54aca9c9a1961e5cf",
+      "sha256": "5e4cdc92ec4ee640441ed489c5dbe9c5cfbfb9f35b3e7fed65af6efa9f0e0be2",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_lease_accounting_schedule.sections.any.json": {
-      "sha256": "f66e83c7d136e52e0382bee636df6b88cb04aa3fa7e68c15af5772cff07e8e7f",
+      "sha256": "19913a5ef3996b2facf8195dd7cafe58dcf231a4f2fa6209fe10efc8275f2d39",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_leasing_schedule.sections.any.json": {
-      "sha256": "c2dc15a99876a87218fa4e317fb6b5caebb136fff764f24a0b9e6c2ea7489be2",
+      "sha256": "98e0fe9754822b6091628da023462cd4a892a30da05724a318f58f73e246b23c",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_management_rep_letter.sections.any.json": {
-      "sha256": "686a12223ec9798d5a87132ca5bdc3ef82e65df0aad30f67caec83378e3c80cf",
+      "sha256": "c0385645b74c70333daea33f0d5cdfa42f3ccc42b74466df1e765ad6b80dd3b2",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_management_representation.sections.any.json": {
-      "sha256": "942bd5c4f5d420c58c754efb7c8b1ad11e84d4c2f02b8d49ac107d78e534a552",
+      "sha256": "3834717ae50d4e356872164d033a53946ab1d3580db6638c0ff1b9ee9361610e",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_month_end_close.sections.any.json": {
-      "sha256": "a0963444124068119c13ba4f12daa38216a1472457960b9a41bef451bceefa81",
+      "sha256": "450e3674ab06a04d59f78fc5867b061b039657bc3385d0543dfc28d30f680604",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_payment_run_report.sections.any.json": {
-      "sha256": "ac754bd9e599931a472b7e693a56aff9cc40e845e9f211f402a7732210a6ff09",
+      "sha256": "82bf9f57f7f7af34d630e3bec3e16ffc8b18d757d7d61e449fa85c1935092cd8",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_payment_run.sections.any.json": {
-      "sha256": "efd352b6755722d8a09d4b57d22bfc26cf6de6271c5d9d783367d43b8a6c33ff",
+      "sha256": "8b71030f8471a044205399268445733f95903a4c26dd394d33ecc97e122ea8cf",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_pbc_list.sections.any.json": {
-      "sha256": "8bc9e3c3fd3786ab6009bc59fbadf6642cd37aa8dfaeccb74c01ac3cca76d41b",
+      "sha256": "4bcca7afcb56d8f0f9650e804439fb09f90aa616aa1bc54047a7a8dc4552aeeb",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_prepaid_rollforward.sections.any.json": {
-      "sha256": "e3cd5845deca4ce9e5928d41c0ea2196b500deb536d865178ce160b88249e4d9",
+      "sha256": "ddbe01f41b94fa3df57af982ece723adabc0c57108a9b03a66a092da2a28d94b",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_prepaids_amortization_schedule.sections.any.json": {
-      "sha256": "a527bdf1f568ce498e7fda91bcb8c82bee9614f08fc1fab7ecb9bab0b7f19430",
+      "sha256": "b3365501fc16c33db5692685d394e743eea779895bf1ed75f5eae308d2482095",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_revenue_recognition_schedule.sections.any.json": {
-      "sha256": "31a7f11fd11fd17652ebe45803686f540d7d256b216a9252ced05ea6c46e6ad4",
+      "sha256": "05a83c81fd9e80d0026ae2e068f8b2e6c748f0ea26cba0ec8243d61a581861dc",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_revenue_recognition.sections.any.json": {
-      "sha256": "e0750bf18daad7e02586e08e15afb5cf12e8e0c17a9e4741c601ef2911216266",
+      "sha256": "86bc809de1f105bdd856ec07e1c116b576645dbf5c22406b9cdc4da4deb7f36c",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_subledger_customer.sections.any.json": {
-      "sha256": "0c9f3bd588b4b9c577d89538c46888ea4ca6c5a44253b97ab1e8e5d9d2bd1572",
+      "sha256": "5adbdb27e3d878167226447f69f3e3041cbc205e4a7923ba5a7661c62bf2ecd2",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_subledger_vendor.sections.any.json": {
-      "sha256": "6faa39bed8537e7107bbc172a3931ea6ca614e4da9f86337df171fd2987950b7",
+      "sha256": "6dd1ffc0c80ea485e1036ef8455f7fde683f2bb89192acb936574a8d177b0b9a",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_tax_reconciliation.sections.any.json": {
-      "sha256": "dc316e645d839bcf583d2303fcfe31571de02ce1add28cb1fa33b47499f835e2",
+      "sha256": "f80da6b2ba76e4528a2997a6a643d29fbe982da27c3953c59d5af7e35df4eaf7",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_trial_balance_reclass.sections.any.json": {
-      "sha256": "5cd2c9766da0ab4520d9bbaf2a563c77511d58894f92e213086131f5cf25d443",
+      "sha256": "00cf8e3a1709218dfe43b62036c9df7033c599002b52250d1cdf1f0b535717c6",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_trial_balance.sections.any.json": {
-      "sha256": "4ba49e88984e93ac7d87e9ef6ddb1dbc4eda9973a8d6f539f484e029c09db50d",
+      "sha256": "cb8fa9c0febd26e10bc5179a4a8d76d771a8e960ebcb7efb4740b1cfc5fcd6e0",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_variance_pack.sections.any.json": {
-      "sha256": "1152a78e9572c339613041586a1614da0b83bffb5471f96f83e00ba6f8a67e65",
+      "sha256": "eb64a922b1bfb2f29f474ee36f51addba1f48bd6ce8efa5c43b887ddb2aa2b1c",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_workpaper.sections.any.json": {
-      "sha256": "f1efa8afeb5bc45b361508a9e686112fe1e748a72521e534e791376ab4a9f7d1",
+      "sha256": "81c2b88356d9770d6b4b9e04ccdeb8d132bed0106b6310e56e4ea4d6062ba18f",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_year_end_close.sections.any.json": {
-      "sha256": "6fc5a5405059395e44e67b87e6674fa659a90bb853b39e4e80d1573df18f2037",
+      "sha256": "dbcbb5f8a0a2c8cb753d103af339787e9374443f0b99bf2285eb1c20f4cb3008",
       "required": false,
       "category": "semantics"
     },
@@ -860,7 +860,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/tables/acct_accruals_schedule.tables.any.json": {
-      "sha256": "994900bdf379a310ab485e0dabd1f3dfebaaf50537682368119899611a499672",
+      "sha256": "97a634524b03e3241585c52e67175cc35e5e1c34b3dc2c849b8e3ec3e2db1c9e",
       "required": false,
       "category": "semantics"
     },
@@ -890,7 +890,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/tables/acct_bank_rec.tables.any.json": {
-      "sha256": "ea4b9c7eb79e06c68d57fc43c39e60018acf30e7c50318f7f4e5d581aca8b24d",
+      "sha256": "a7ff18f0ddbe5aad29d63813b6f56a2736a6f7960e0007d14f3ba86281251501",
       "required": false,
       "category": "semantics"
     },
@@ -920,7 +920,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/tables/acct_chart_of_accounts.tables.any.json": {
-      "sha256": "602b8e7366f0621c64e3c73ab6e197fe0f9f73d110211e1d07f0acb8571b8821",
+      "sha256": "5fb6816a285caa3b2f7fd48b5e95beb95733af42660bde474f288f3a52d248d3",
       "required": false,
       "category": "semantics"
     },
@@ -930,12 +930,12 @@
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/tables/acct_credit_card_reconciliation.tables.any.json": {
-      "sha256": "cacc3ce1580bd321a2c78906668549787057a0acbc43be9bf64a91459df67180",
+      "sha256": "9aa26670e85b6b53d991e6d7a985d1e2db5ab6aeff5274e940ecd6ece66de160",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/tables/acct_depreciation_schedule.tables.any.json": {
-      "sha256": "fcb83037887524c5667b5d2dbb6c068807df2606ddb66a3f91748195c16fb170",
+      "sha256": "bb56f3d5588d08812f27eaf3abc1192c2240019757c69395bf3bdde8cb43aab6",
       "required": false,
       "category": "semantics"
     },
@@ -945,7 +945,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/tables/acct_fixed_asset_register.tables.any.json": {
-      "sha256": "db836e6e1856fa85f126498b9fcffa8356b2f4938e233c45d16b2f1d7b9b46bd",
+      "sha256": "c8cf5286f1da591a033532bc449630b15cbbe81667f97ec3cad53254560fb1b7",
       "required": false,
       "category": "semantics"
     },
@@ -970,12 +970,12 @@
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/tables/acct_intercompany_reconciliation.tables.any.json": {
-      "sha256": "645655e8cd0c20a0ea313db7d6bb0f5782cc6ba32c8a0d6c2fa040c9ffb36cd5",
+      "sha256": "4f68e8d843f27e74500dd9e4100581ba535d91a005853609d1bf5f480da301ea",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/tables/acct_inventory_valuation_report.tables.any.json": {
-      "sha256": "722b6a4e4196e9036db5bd03eaefb3fe42ca560e021353dac16181a153ff66d5",
+      "sha256": "e3fbd794471f32639ba564e2df819c2c7a2f537fdb3ab787b026b4960eb3d5a2",
       "required": false,
       "category": "semantics"
     },
@@ -985,7 +985,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/tables/acct_invoice_register.tables.any.json": {
-      "sha256": "318d662f6d94bdb5aba3d3d53c0d0507ad603a0fadd1d9f0922f4ce92ba101fa",
+      "sha256": "31ef414d2a1f5d58df8b3c6fbb6c875ac4d211ef55e885c6ab70241f2d5aedce",
       "required": false,
       "category": "semantics"
     },
@@ -1000,12 +1000,12 @@
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/tables/acct_journal_entry_support.tables.any.json": {
-      "sha256": "a4d21d8e40952dfdcf61c1e819031ea4bd1b260729a528ea59358e5ec60b7a82",
+      "sha256": "a825549e406dc70f2fe9dc26a7486a5d7498a77951cf1501a8d24d19039d0990",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/tables/acct_lease_accounting_schedule.tables.any.json": {
-      "sha256": "bebc63861d89240c03034992859876f635f33bc7823423aef9f5a521d67e9d2c",
+      "sha256": "dd86ffe5f475079d95d451f2b70f841e47921cb2adc844b7adb27fb1fd4685de",
       "required": false,
       "category": "semantics"
     },
@@ -1015,7 +1015,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/tables/acct_management_rep_letter.tables.any.json": {
-      "sha256": "dfeb64295b4707fe5171933878bc7e329a136a8fbc6a4f887a880f4469cd3cba",
+      "sha256": "333f24918140ae25cb720a074f2a7ed324bee7983db07404c9094b307eec7650",
       "required": false,
       "category": "semantics"
     },
@@ -1030,7 +1030,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/tables/acct_payment_run_report.tables.any.json": {
-      "sha256": "6a5e5f51be1bb47a072c868b8df1b5f682f660c738ea08ea038cb0cc011f59bd",
+      "sha256": "5e33829d3fe3057427f96012a4cfb95d707de9cfbed37d68e28d32f582fb023a",
       "required": false,
       "category": "semantics"
     },
@@ -1040,7 +1040,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/tables/acct_pbc_list.tables.any.json": {
-      "sha256": "341397bb7eb3e0663d6ba998a7959cfec842dd4e0e42f863bb8543995ecd236b",
+      "sha256": "39493078e3ab77bd56923e1ae6fed674d0d49c38ba256de0f844d7729c479f0f",
       "required": false,
       "category": "semantics"
     },
@@ -1050,12 +1050,12 @@
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/tables/acct_prepaids_amortization_schedule.tables.any.json": {
-      "sha256": "ce49ba1c52cd62290bc63d93be2d965e3153feb6f015c27d4428e1247529350d",
+      "sha256": "27581b19bd30f0f10f5c10d14172dd96721ec73e2e7fd18633a496159afa5133",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/tables/acct_revenue_recognition_schedule.tables.any.json": {
-      "sha256": "19afabdc6244db60310e578926f3ae86ef9348678bacc763b87c2c661387a86d",
+      "sha256": "915a139d2d083c42038f75880adf7fdb667ad72c19565b1bd04bc7312a5baf7e",
       "required": false,
       "category": "semantics"
     },
@@ -1179,8 +1179,23 @@
       "required": false,
       "category": "semantics"
     },
+    "document_intelligence/domains/banking/doc_types/extraction/banking_brokerage_statement.extraction_hints.any.json": {
+      "sha256": "9b548af267b3f12ca3e73935e7b349c88cf0d35ba2a53d9cbd3f7cfb2b4824a1",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/banking/doc_types/extraction/banking_cd_statement.extraction_hints.any.json": {
+      "sha256": "424451b00107a2b134590fe98b02cc20016d3ad2d8ab285cd19df0f21cee4b5a",
+      "required": false,
+      "category": "semantics"
+    },
     "document_intelligence/domains/banking/doc_types/extraction/banking_credit_card_statement.extraction_hints.any.json": {
       "sha256": "00df238758a12f968d0d59f07ec9de5bc14861ab91a20f371a1513b0fb97e72f",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/banking/doc_types/extraction/banking_investment_account_statement.extraction_hints.any.json": {
+      "sha256": "b03940d5e2fa961416ae7fd8015a90f40aa1513f0c941282abeb3c657c93eede",
       "required": false,
       "category": "semantics"
     },
@@ -1194,23 +1209,48 @@
       "required": false,
       "category": "semantics"
     },
+    "document_intelligence/domains/banking/doc_types/extraction/banking_wire_transfer_confirmation.extraction_hints.any.json": {
+      "sha256": "99218f01c6512457328118f93c0ebbfc6df6ad6fb61eb0aa9d51d7529a97f76c",
+      "required": false,
+      "category": "semantics"
+    },
     "document_intelligence/domains/banking/doc_types/sections/banking_bank_statement.sections.any.json": {
-      "sha256": "e23ea4272a1701d1e3f43172b662dbcff204e61c4a27a086e4372b2f28a0363c",
+      "sha256": "ba5bfa39924c0c2c6a130f460d5fbad0a605a43bf64d5ed70be7e63d494cc4ae",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/banking/doc_types/sections/banking_brokerage_statement.sections.any.json": {
+      "sha256": "04dabe3f836b7a8bd380a32a703901a0094c106400cd4c0aae767426f874a045",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/banking/doc_types/sections/banking_cd_statement.sections.any.json": {
+      "sha256": "fa011574d4e3c2b92f1e513e264a3b1e579f8c311995305f350dbb364c34ad9a",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/banking/doc_types/sections/banking_credit_card_statement.sections.any.json": {
-      "sha256": "8b5eec88cc0ffc9c7c5032e7024334a35a55e88d61cab6b355835f7960a35745",
+      "sha256": "d72a06ec37a6baf3818e90dcac205203dbb209b0f6f7b8898541ebf4914d7530",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/banking/doc_types/sections/banking_investment_account_statement.sections.any.json": {
+      "sha256": "961c7e12809424777b0006e9e158c65eb0909345e7505c9ebde522777aed7cb9",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/banking/doc_types/sections/banking_loan_statement.sections.any.json": {
-      "sha256": "4769da00440008922899b3edd8ad6c11f5518151468e9207f5a7c5a193dcefe7",
+      "sha256": "ab3436330dd23bd3d06f27f608ec590f04926cb3d3e38d5238cb01f7eb0779a5",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/banking/doc_types/sections/banking_payment_receipt.sections.any.json": {
-      "sha256": "2282b9ce096b2693fa5230c951421d6d9e6ae29932bad11530855fc206b54eed",
+      "sha256": "f008311194acbb7e06a5f7b9658746f445d111e9720adbc41d1e931767ad0c92",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/banking/doc_types/sections/banking_wire_transfer_confirmation.sections.any.json": {
+      "sha256": "60ccabcf14aed132dd8c0cae682983fc962fec348ccdc963574b1b393fb39b45",
       "required": false,
       "category": "semantics"
     },
@@ -1219,8 +1259,23 @@
       "required": false,
       "category": "semantics"
     },
+    "document_intelligence/domains/banking/doc_types/tables/banking_brokerage_statement.tables.any.json": {
+      "sha256": "4b82e95ac942ca278271a9e1fd355939f3802a827e9dcafc2a46fe7fe2319508",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/banking/doc_types/tables/banking_cd_statement.tables.any.json": {
+      "sha256": "ff10ac9ab76577728682a86ac9dfc62d9a2e2db5d8650e85a8941fcf82f0f563",
+      "required": false,
+      "category": "semantics"
+    },
     "document_intelligence/domains/banking/doc_types/tables/banking_credit_card_statement.tables.any.json": {
       "sha256": "fdaf71bd1f4b57d8ccfd5d42f6646ec42a42258e9f2e4af4e620a5b01ca7a990",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/banking/doc_types/tables/banking_investment_account_statement.tables.any.json": {
+      "sha256": "a75f2a35f307cb47aab95cdc05b2a683db47da02a586434f77fea93577c06bf9",
       "required": false,
       "category": "semantics"
     },
@@ -1231,6 +1286,11 @@
     },
     "document_intelligence/domains/banking/doc_types/tables/banking_payment_receipt.tables.any.json": {
       "sha256": "5af2223ac3e007d4646fb2edbefea3ae8ccfdeaaf32961d4903e02724c0b1ae4",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/banking/doc_types/tables/banking_wire_transfer_confirmation.tables.any.json": {
+      "sha256": "a141806ef12b83104b2e958d2cfb53c4f553652e6f4a6a469c5c50caee5e200c",
       "required": false,
       "category": "semantics"
     },
@@ -1335,32 +1395,32 @@
       "category": "semantics"
     },
     "document_intelligence/domains/billing/doc_types/sections/billing_electricity_bill.sections.any.json": {
-      "sha256": "6cf7b1cf503b96ee0a352cf09a36b6bb6b6e0cf9a0c329e61fd08c06e791bd93",
+      "sha256": "6d069310573c04d6b5c12e4c5efdba040e19130b782ee24bf99c2c78f5bf87ba",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/billing/doc_types/sections/billing_internet_bill.sections.any.json": {
-      "sha256": "a3f9e49b9581058d57dd62429add466fce1f7cd42f6c9b23b2bd4c69d527af3d",
+      "sha256": "93d8170c989038378cb80fa4f15e06cd9af3493100e62070bae716f4a30d0b29",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/billing/doc_types/sections/billing_invoice_business.sections.any.json": {
-      "sha256": "575c840c46a770f26c5d81d331b74aaf0e93afafeb1f076136b8715246d00473",
+      "sha256": "e8e3d62de8d86698645a2706487bf09aa25ee8bb0a81160ebbae25c6570d0a94",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/billing/doc_types/sections/billing_phone_bill_mobile.sections.any.json": {
-      "sha256": "792936cb369c7b2d9d31b8fb0424608a1f94ddb39b3cd8fe594682b8cccb475a",
+      "sha256": "eb1e413d93e44b4ac1bdcf9de6e1817d00b49a4d47c21d22555369218ab50ce5",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/billing/doc_types/sections/billing_retail_receipt.sections.any.json": {
-      "sha256": "b8c500b00e4154cc66169a3d1fd881b442b8110c6197e7142682e787e1d97a0a",
+      "sha256": "c4e9eb0965456499c075008dffc828dc22da8c7bca68c863605a59006b42fa72",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/billing/doc_types/sections/billing_water_sewer_bill.sections.any.json": {
-      "sha256": "ac27e1d85e4660a7b6039ff683f3b4049e2138e98d39858dc84b21d887b12c93",
+      "sha256": "f63a7b85acee39cfbe4e523c4adf620bb6c3702fbf17c18ec55264dbe44aba24",
       "required": false,
       "category": "semantics"
     },
@@ -1495,32 +1555,32 @@
       "category": "semantics"
     },
     "document_intelligence/domains/education/doc_types/sections/edu_course_syllabus.sections.any.json": {
-      "sha256": "daa9387c950fbb121f5a79e364f067490334fca2ac2599f696bbc43cd362fdc9",
+      "sha256": "464f3809c43729768ca273fb190e4b53d89444a78eaa51c07e25e93c74e240fd",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/education/doc_types/sections/edu_diploma_certificate.sections.any.json": {
-      "sha256": "8781ee09347a4c7aee7038e595197983d2bd6e15a1f66fc0c37387c86a6055bf",
+      "sha256": "89e78aa2c822399ec8de8aa503d10262b6ae087d712ae4f4f1c30a4a64ca4d5d",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/education/doc_types/sections/edu_enrollment_letter.sections.any.json": {
-      "sha256": "2d2b3c43a8f764e66667ef9e750c4e145661808bc8ac3232da52a695696c085e",
+      "sha256": "b921844dc732cc8892d15a1c4ba51d180d98be6eece6c83b022e93b37fe217f3",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/education/doc_types/sections/edu_student_financial_aid_award.sections.any.json": {
-      "sha256": "fb29e0074dc64f2d03890ee24a51ced1b60121fe4798a06b29487df0d1ca20af",
+      "sha256": "fc1e63419fc663fb87c37c087315458b907e7c03f0a63fb86e926679979125ca",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/education/doc_types/sections/edu_student_schedule.sections.any.json": {
-      "sha256": "3e03591b33f462fc2c4c662f55e45a9a523e390da88fead3fb91873abe04c66d",
+      "sha256": "32d95449dd69a0d04659f2eb98844a83601ba266dad37a151436edb478a7470d",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/education/doc_types/sections/edu_transcript.sections.any.json": {
-      "sha256": "3e9572dd3668e4b73854a6d73bda89030b24f40e023a7effe3f54190ad72e902",
+      "sha256": "67a63ee805981256c5bb7c97f76ab882fb6373a4a971a2498f5ba042eabbd185",
       "required": false,
       "category": "semantics"
     },
@@ -1690,62 +1750,62 @@
       "category": "semantics"
     },
     "document_intelligence/domains/everyday/doc_types/sections/every_bank_statement.sections.any.json": {
-      "sha256": "9bd8e34f6e06d20eb88dea09289e4513946a9a393210a5dfd03935b3b49db05c",
+      "sha256": "4a4b93e23d40261dff6745852aa6687cb77a7c6e2b4ec8c6bd862d57f5936099",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/everyday/doc_types/sections/every_electricity_bill.sections.any.json": {
-      "sha256": "c725f4b689baa8b611f96a64eaa06547e4a9e1a658ea052e2486dd600bc01d25",
+      "sha256": "1c12bcfd02ef9fa268f994c3459296247bd533d9aea541f1e594337c7d62fc0c",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/everyday/doc_types/sections/every_identity_document.sections.any.json": {
-      "sha256": "86c8b97e0653fe05edb0c1c0b4c467b8d85a4c5fcb1f86197b9231cedbaabc6e",
+      "sha256": "7710b7b01d208e50db1012592523785a24fb65394fb674552c59438a3ddd460b",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/everyday/doc_types/sections/every_insurance_claim.sections.any.json": {
-      "sha256": "e9df00b8bd322c74d6e8ab06bb8e09a51238db72521e7209e394fb7c4cd9eca9",
+      "sha256": "66ef0f63235b72963c2c7fa069b9faf95e7022e8005ac9e5997731ad44b8561b",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/everyday/doc_types/sections/every_insurance_policy.sections.any.json": {
-      "sha256": "3e84b6b42ef4071a9863514ec5729736595bb15cae91d86a43e87588995b5d93",
+      "sha256": "812e60450dfad06b9ff630c7d631a3da6a9217ffd37173912178dc1c71d90638",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/everyday/doc_types/sections/every_internet_bill.sections.any.json": {
-      "sha256": "b1e63f7d01b84cf366ef03994cf11ef324ab2119a646a617c984b26d9d109107",
+      "sha256": "157fb4ba72cee07e190a3560b20e2e8c6ba8af892eab2347f4ec4f966c1d447e",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/everyday/doc_types/sections/every_invoice.sections.any.json": {
-      "sha256": "22353fdd934c3a2e7dc8c219804228d497694b4069adefbfda2d7817ee92acdc",
+      "sha256": "5d1190d6affe6ef7a78670e5ca02c08169dfe7c904a62c54f5bb4c52db301842",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/everyday/doc_types/sections/every_phone_bill.sections.any.json": {
-      "sha256": "0b7bfe5f4855c089b30b70f09f88f0d4fc5c7394583adc574f0eebbd0901ab02",
+      "sha256": "f8ef366cdc1cbc4184f55bda8fd4fde5ed7d132e9067fc33f101a045abf5c8b3",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/everyday/doc_types/sections/every_rent_receipt.sections.any.json": {
-      "sha256": "93e6bc0c8b2ebb499dd8453c8ae6134bfa21fc495ae32b9b525879afe6aaa1d5",
+      "sha256": "9f4edac2cb42290ea3fbd4ae761caef3ae4aa49c7db4b2ef0b4c6c1fccdf1fb5",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/everyday/doc_types/sections/every_retail_receipt.sections.any.json": {
-      "sha256": "812b33b4c38c0db807234ea2be0c3499e8f45bbc42c773a07c7e74037a309a9d",
+      "sha256": "4c28edb1ee7ff13f81a78be6affe4b70bc747e856da9a26bcd4e1771ca7a256b",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/everyday/doc_types/sections/every_tax_notice.sections.any.json": {
-      "sha256": "a635cd2c09f9be63a991017e6d89e10f6245f55fe6295e2696b9f2ec4d19a690",
+      "sha256": "13a9e0dc495e83b3b8ea3d838e1fe704383c5422430c366b016fa06ef396341b",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/everyday/doc_types/sections/every_tax_return.sections.any.json": {
-      "sha256": "4a1bf5288fc7f8f8547127603ba882d5e1d558659ea9e17c6da07eb0b3b829a5",
+      "sha256": "4fb1e0e77b1afa815aba22a115119240ff2d0280b3cea4ef05bddb4a0809cf15",
       "required": false,
       "category": "semantics"
     },
@@ -2135,257 +2195,257 @@
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_10k.sections.any.json": {
-      "sha256": "9efd6b8e62e25b9ce03f24e24646016f50e7b5c12414ce56126ec0af79beb91e",
+      "sha256": "480c5f665d0f38be93a98bdb755e40b21330da4414940cb150e232fbf3f7b8ca",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_10q.sections.any.json": {
-      "sha256": "3c15d5f60187bbcc110bbeb2f498b02b38ceb70f611f11615e2b8b63629946d6",
+      "sha256": "30413099fb505645ce6f7ecc179e7f69b5ca92368813fa40535bd9b71c9f84a3",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_8k.sections.any.json": {
-      "sha256": "b65c02b789f03d975d09890948d52042f6ee5b964ce41a7948007cfdd07d314d",
+      "sha256": "b83df18f280f68860799cbd8fe33b9aba0a936a1acea061a550a4289774cb4a9",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_annual_financials.sections.any.json": {
-      "sha256": "4d255b357632eb5de1774aeefdf8b2c793e09126f1bc8f081b99bc2dda73e5ed",
+      "sha256": "a4211e1eb5398abbdc0cc6da9801bb3b1ba993cf855aab2236d1645ad0b76f1c",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_annual_report.sections.any.json": {
-      "sha256": "4698caed7218a339c216ca655f0fbeebac100f7747d272e85f7358e523ace124",
+      "sha256": "fb869d08c8d22d0d9ebea0044da3fe1c976a2bca3d6a966c7c39e3be757e184c",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_arr_mrr_report.sections.any.json": {
-      "sha256": "97fd253fcf4f5a27608f0c10dc7260749281319e249e9fd031154605a2bfa927",
+      "sha256": "037107c27d2cc532f413e0d88312f43dd0437d40f721a583db80176f25572488",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_audit_compliance_pack.sections.any.json": {
-      "sha256": "c5ba32b4bf5c17614ce118cab0cc27540ea75a4b4fe66b066507bb3b513d4ab5",
+      "sha256": "7e8e8b8790bdaeb9a7e421df443036666b1a30f61cdc2257ad8738c85cc22da5",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_balance_sheet.sections.any.json": {
-      "sha256": "2998c98baa239c1ddf4152510efa49a4f9f258f74f9afe7b4b4c05c29a289df5",
+      "sha256": "64d82d6e424f47c1b8ddf6e7e8377576addcf1057d0b6d3a6fb333d31990db9f",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_bank_statement.sections.any.json": {
-      "sha256": "7acc8c2dfd23d2c606b93d938317a39e722004aa2d25c720859e8622c16ba889",
+      "sha256": "ed23f3eddbd53993915bd2288070c2508030ec41beb14896f10c3789eb339467",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_benchmarking_report.sections.any.json": {
-      "sha256": "420c280f7e403aceb58a00cc0f1ecd05f2c127b7e09451e6f92748b36df21135",
+      "sha256": "0c0e3fa0d1c64bd21fbeab45802b18de3f9c8525b110a334db817d65c460b265",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_board_deck_finance.sections.any.json": {
-      "sha256": "dd98de0ea9a2b18086241407baca92ca6f22639d07079b3680d9d6b11d2aefb4",
+      "sha256": "ea606949f80b4c40cca2c26fa532f49f1750c7ce2c246b519a0682c7ffa6276d",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_board_minutes_finance.sections.any.json": {
-      "sha256": "bdbe00d5b334afd095dcfb655b5749bf6e8a64705da737b0183f71aaf0e5d22a",
+      "sha256": "c41eaa61d9138b5107d1e5639b6672c44ccd6f44ca8e35819ddabe0e1495e293",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_budget_vs_actual.sections.any.json": {
-      "sha256": "53913d42a1336e5e0030b739a06484c805ce7c8146a973c44cee54dcdf5b403b",
+      "sha256": "9cf479a28f21205bc742abe7bafec81116a02171c34449e04bc0ecf71969eabb",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_budget.sections.any.json": {
-      "sha256": "5d44ce6f173107fb5ee92d708aa4062dbbb3ab7e43a841f1fce9df725322604a",
+      "sha256": "f7c5d4944ef01a4f36fb9db822657cf2b6f1e1b3bc8bf7c433042a5166c40e29",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_cap_table.sections.any.json": {
-      "sha256": "8f972373ebe92b37bc04e8daf544f3a0f0281d52fc47ac61d55cd8cd1ed090a7",
+      "sha256": "69f07eb72e738c38396988e6ba7a5c0d5c4a4df5042193959a9f6263b5b35453",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_cash_flow.sections.any.json": {
-      "sha256": "a74599e75186aaa7cc7349589498f740c0c1367f326a4371cc07fccc24b0bee3",
+      "sha256": "b01f4fde1ed7043b920906fe80052cc17f1dec15e7ba051a700ef1bc270db082",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_cash_forecast.sections.any.json": {
-      "sha256": "f4a840d014276e4dcc2dfcbc99b2326d0bcbf9f22587c4bc0a93ae79983caec5",
+      "sha256": "563ae2a58ef09eeeb9f0ce0653d3a15971ac31dd2de0b3b74d7a78268b3dc002",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_cash_management.sections.any.json": {
-      "sha256": "69501ab194ed0d9af897df547c0d245e4db65fcbf0d2409c7e8168ba88c84bed",
+      "sha256": "282a26cb6a901f2aeaff462cf341f7f2ede4f76dfa822973319e7ee3e0de2fe1",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_cohort_analysis.sections.any.json": {
-      "sha256": "5bced55abbb49f23efdab329d0435c3a5943d5a784a3beb4868d7af330cfab43",
+      "sha256": "84d25d8b513b59705ec7d0a56d1313da1fce1a52add77c45652f4ae8633f0b46",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_covenant_compliance_certificate.sections.any.json": {
-      "sha256": "d1121f0bd60944a871c2bd1ccb2a40c6af34cb95d8b63d07cb8709c94902e389",
+      "sha256": "f0f804ea113ce31d956d11396c329290fd25377e0aff1d825e90dd7d63d4d7bb",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_covenant_report.sections.any.json": {
-      "sha256": "1e0b5ca33b4c1179080ae68343d1da66ae0c072ecf2c311d9cf4cc8dcdfee3d8",
+      "sha256": "8110f4f7ce012f42bc1b1f0ab87d608a0846093ba7cbca5482c8a18dc5bd3b60",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_covenant.sections.any.json": {
-      "sha256": "f301350a20ecfb248ad2474d3fcf88177361889352969f41de3f87ee256d1f59",
+      "sha256": "bbb713375f7b87a92c44ec5741211090b20e09e37b1a8521ee884c7347372522",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_credit_facility.sections.any.json": {
-      "sha256": "4c99df34ec83a7c34f6aad6c384961b82add9f9e1edb3ad55729ab91abed9e09",
+      "sha256": "d9b08ed7d499f73ccdf9ed01fb5ae89e95d457d0b031035d2827819521e18718",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_debt_schedule.sections.any.json": {
-      "sha256": "324ad7c9c15808c4719925ba799bbdb30942e78e55e476a4bcc9b40075479b82",
+      "sha256": "0a6a510b14b7091c73af4675ce1502d9933b64da0f0f53e2b109967c02297a59",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_dividend_policy.sections.any.json": {
-      "sha256": "3f727567fc017271d897899aeb922cc185efd437208fb6ee0c9b2c6c9203339b",
+      "sha256": "4e88bc242f5764a606a786370885d8983cc1d98b92c52b26fbc4e01eca6ac14d",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_earnings_release.sections.any.json": {
-      "sha256": "20e03bbfe5e1fbd08ea9133ea264cdc0eac47eb07cfe886f7c930c25436a7a5f",
+      "sha256": "5bac74dd6d683fde3f3ae0cb5fe078eed4987bc0a169c418cca44930e3f05d0c",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_efs.sections.any.json": {
-      "sha256": "b060b36951d39c161e2e9564fd6094acc1cb4216b92f80a57a2a148270c4b362",
+      "sha256": "271539b0de77b3307f57015380d21b0daa8a32ed3628584c48a7bb7a184d7dd7",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_esg_finance_linkage.sections.any.json": {
-      "sha256": "33f97323bd04b53d605a32d52e13d65cd0f32e2edf595d14f8f18ce91f5e5f68",
+      "sha256": "55aff12b496542465eac880d5b60e7d671367bf9e7f7b45a07697f1ae9db859b",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_esg_report.sections.any.json": {
-      "sha256": "b7bcf997bafdeb900f5a14358708189a929d6d15573a40556cc07e2af90fe172",
+      "sha256": "62e3eeb8253673551a79fdc7cd7cbdd765a72437ad36a8510114309a5486ad4f",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_financing_term_sheet.sections.any.json": {
-      "sha256": "d93cad35b319b7610dc48ba4cc064feb5e8f1ecb1100c6ddd08469edcd1c7d9a",
+      "sha256": "4bd052a8d7ce7216230fbf4d926cd9976b8008fbedfdbbd336c529326384634e",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_fixed_income_portfolio.sections.any.json": {
-      "sha256": "8381a115c532f6b5459abb02c8cc95aaac0664d1f36ed700a0d0cf2c70bd5ee8",
+      "sha256": "03d5e1f4a7365460f33bdef7aa699d981fee91fb85e830fb043ef099e9b36e35",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_forecast.sections.any.json": {
-      "sha256": "124a582b50e2cb05cb60370e5501eca1141438b723476c573f01f9f93dcb8629",
+      "sha256": "8bac1f5ae79f8862391aff33b8c1e487066f2acb06f3f924b1b451364ab2a008",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_fx_exposure_report.sections.any.json": {
-      "sha256": "0d4f6ead34793b732515498aa7cf75c5645ef076c09ed4ba8d7b2df392631871",
+      "sha256": "d7d6a5abe1c3dbee1e9143a2e62174129657f089e659609531df6a3f6b8563aa",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_incentive_plan.sections.any.json": {
-      "sha256": "b4cda6c12a1a621f9d1a9870fc9d902aaf90ae971fc63e05d4ee5d29ba4866e9",
+      "sha256": "b689fd89ceb35d46d4f636da4b427c331bacf4e312878d47551de77cd39fb76c",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_income_statement.sections.any.json": {
-      "sha256": "90d665eb0cd4ef7518badce4b6ff1364f0df010ab1efc7aa21caac548a9736b1",
+      "sha256": "35d585853f9fead43dab7c6389456cbd6befadc1ad4e2c2ded81469c64700646",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_investment_portfolio.sections.any.json": {
-      "sha256": "7f05fdb7fb7439240c3ca900f10d6defbfb52d91832483eac2dcd573b1832122",
+      "sha256": "ca0bb2a2e33de07bd38df12ca56c1fee7010a78b5f1a503eb46c3354f440a914",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_investor_presentation.sections.any.json": {
-      "sha256": "bbd24c9642ed8a63c4565e6e24e244f59e1ba9a7aef94ba7efb0596bb1fc3ef2",
+      "sha256": "50b01099270a8b516ca2a257a9bd78cf13804b0cb590d19465e42c19cb8b9718",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_investor_termsheet.sections.any.json": {
-      "sha256": "91d7e144d1dd8c9f69d5d030823e3474b806a69db6415cfd83d21366bb2a267d",
+      "sha256": "9644d908e8eb50308753f08e6fdf1742234c05bbf5b93b7ed1292a2c0a7f33f2",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_kpi_dashboard.sections.any.json": {
-      "sha256": "b8cca8b435091dc0999d1441bf8a21b33b90d812fb73886b5d159070d7752998",
+      "sha256": "5481e0bc3e031655c65fc4cad21a8496cb3aac14a3b4592149fa42ee47bab6c8",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_monthly_close_pack.sections.any.json": {
-      "sha256": "474f4504e2fa6e8288bff640699e94d37716a107368ee21a5c37cc1021bc7b74",
+      "sha256": "d97eb19025cb5d2892a136dfa86497308399dac94d419c3d91652161d0cc3f6b",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_pipeline_report.sections.any.json": {
-      "sha256": "a7a661004aa47932cdaf2ee2cb6d5561fe02a0a7891cdabb30d5cdb922d95889",
+      "sha256": "778e0946baa22f208df025723af009f65cd9575a9f2b82cc3e148b9c803f9845",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_quarterly_close_pack.sections.any.json": {
-      "sha256": "e0432b2aa5a09662786160121a98f85dba624226aaa94b11b93d923665a6f3c0",
+      "sha256": "ef378ccaefcdc84ac3081926af1c3030371989ac1d7e8ff5943a760b055481c2",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_revenue_operational_review.sections.any.json": {
-      "sha256": "8a303ebdb24538191effb646351fb5d10d2730969c69722da8a894fd833e75fb",
+      "sha256": "46d5874731a900f2672f5e2a9133bbef05d35afef547deefa557bfb023a29d71",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_rolling_forecast.sections.any.json": {
-      "sha256": "e15a54cc5a39a66c0036ca1fca5a5c996559ed29ad9099589a7014510c832bf7",
+      "sha256": "eb2c3ff070997a10f75f2875939b6b6acc33d2e4a5b99e0b277a81c2d52b9faa",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_statements_pack.sections.any.json": {
-      "sha256": "13930b16398cd3de9fd43e1e0b7b857db50501dca95648c653cf27e8940718f3",
+      "sha256": "f95fd766ac3b1fe748752e424ae0c2a5cfc18a7ad496d9a157f2add262e24a07",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_tax_deed_summary.sections.any.json": {
-      "sha256": "a01f9150a28113dc87cf17fdb604c0745241b393c4d19c6dbb80b9a3c7f240a1",
+      "sha256": "c44cedad9ab72f6231d091fafdba02547a8d24db7b408f8a80753fcedd03fbf1",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_tax_return_summary.sections.any.json": {
-      "sha256": "19d73d40001c19168a6a691e477bdb9fd67a8b2d135f69f00a417935674715f3",
+      "sha256": "830c424554fd6fd69a1640357cacc91c905878f9e7e6993df30d7d9691615ed5",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_treasury_memo.sections.any.json": {
-      "sha256": "36bc94b184acf29f5ec2751b1f132159c2d6f8ade6c86a274b0d1265620bbd56",
+      "sha256": "8caa7cacc864986712e20703c368980dbc6f0c096041d6de58f4d02b72a5eeaf",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_unit_economics_model.sections.any.json": {
-      "sha256": "710139e43531793999fb596d64203c6fe5e2d5123e31e93820ca69ccefa12341",
+      "sha256": "6d9f9799af7bfe5916ea41aec2d27fe0a9cfc3920096a0eb96fca70d7b091fee",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_variance_report.sections.any.json": {
-      "sha256": "3f093561b0e428fd0c5e2e7981910503647866a24eadc3bbcda29288add0b9f9",
+      "sha256": "122d39e7d923ea1c7a19ba7ad5d78402863bfc88746795beccb2d29b2a596a10",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_variance.sections.any.json": {
-      "sha256": "b3e186151b8db9f0ffc89d5bf3618e250d1f2faf89eb38ad7ce147ec7cc09bd3",
+      "sha256": "c6028876c12400038c81bdc44eae3d38c892df5fe408e2d91cd71dc91a109676",
       "required": false,
       "category": "semantics"
     },
@@ -2745,32 +2805,32 @@
       "category": "semantics"
     },
     "document_intelligence/domains/housing/doc_types/sections/housing_hoa_statement.sections.any.json": {
-      "sha256": "17b6e709a72daacc92905b5f8db7a362456dc53154cb03fd7137dcbbcd615ea5",
+      "sha256": "7424fe2d3c23f7a9acdaa502be69fbfd3790d833075ee93c37b455246672b7f8",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/housing/doc_types/sections/housing_home_inspection_report.sections.any.json": {
-      "sha256": "060141c3b409829a5296fdf9edfdc18593fbdea7ea1a24d2eb6ae596e0b26220",
+      "sha256": "53eaf6132fe81dd1f7e59b78e8dfe17357321abc889fe983a78038631fac92db",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/housing/doc_types/sections/housing_lease_summary.sections.any.json": {
-      "sha256": "806f7a59a05a27526a3dedb4259366cdfdd97b4d92b112135552e952f16b1e0c",
+      "sha256": "8cc9f8c57d3754f58a85d6b739e70cce866b95c1ea2784e7db5fdc0ba869efe5",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/housing/doc_types/sections/housing_mortgage_statement.sections.any.json": {
-      "sha256": "f9c61a7012edae709fb8d808926d37e340f2dd57ea2e0116e6e9feacb9ac97bd",
+      "sha256": "5bec498a407566974ec38623f4fbfea54b2738cf59d763e2250767d3189c261c",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/housing/doc_types/sections/housing_property_tax_bill.sections.any.json": {
-      "sha256": "2961c9aa698c126d95fd5bdfd4800c3511cceaea5e891bb33ce80ef030eed532",
+      "sha256": "4e3dbe599ac5babb1d66ac8cad8a593f69d2ad9c7c7971fba183ce95d45919dd",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/housing/doc_types/sections/housing_rent_receipt.sections.any.json": {
-      "sha256": "c2c130abddf01ba32c60063ff2eb789bdb929ee11b54d1318240ba573753cda4",
+      "sha256": "b6deed98a1d951a972c8dada64f599c7e4bb6b3ce2c2a26256287b7987fe803e",
       "required": false,
       "category": "semantics"
     },
@@ -2900,27 +2960,27 @@
       "category": "semantics"
     },
     "document_intelligence/domains/hr_payroll/doc_types/sections/hr_benefits_enrollment_summary.sections.any.json": {
-      "sha256": "b0c2cff332143b18c73ac557378c99810d6162746d1b5a1189450b80b8181f65",
+      "sha256": "a9d224fcc297d19c6ac83ae0de6cc869481154372fc17542409cf5c8e9749c22",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/hr_payroll/doc_types/sections/hr_employment_verification_letter.sections.any.json": {
-      "sha256": "654a2d4f3a225cb816cdcdbef20b0cc9fad1b15b7719796987a1be45b8ffeb1a",
+      "sha256": "d4f1f440ecfd45ee21afa04b50f2c21b4d44e31db047d580a298af9ce3adb6b8",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/hr_payroll/doc_types/sections/hr_expense_report.sections.any.json": {
-      "sha256": "74314a5ec3d12d250a24df595f05e49da76d34e20c064be3959de92f4e065f5b",
+      "sha256": "ab046199a1757dcfdc0e0a2473361e3e5ea20922b072182d2fc449ae761f0fbe",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/hr_payroll/doc_types/sections/hr_pay_stub.sections.any.json": {
-      "sha256": "2f97b7df91459307480f6ac3a657b3ddb023cc575e46855a9efd574d0cd21797",
+      "sha256": "86f92e12cb2fa4203fb57b557bcc0883035d78d31836d726122f66eb987d2455",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/hr_payroll/doc_types/sections/hr_timesheet.sections.any.json": {
-      "sha256": "223960a589bfc3731d6066d6cb60a62106b293635482d9ccd932ea707f442958",
+      "sha256": "e6b0fb35d15b8a38651f10669b119b340ad238cb8c1156bc02d312d209b5e35c",
       "required": false,
       "category": "semantics"
     },
@@ -3019,6 +3079,11 @@
       "required": false,
       "category": "semantics"
     },
+    "document_intelligence/domains/identity/doc_types/extraction/id_birth_certificate.extraction_hints.any.json": {
+      "sha256": "ae0f3ca3f884a58389c4fdbbf112a654cdbbadea535ecdd85bd9f715dad8aea9",
+      "required": false,
+      "category": "semantics"
+    },
     "document_intelligence/domains/identity/doc_types/extraction/id_business_registration_certificate.extraction_hints.any.json": {
       "sha256": "7de170e86c513b2e91bdaf1ede61ee27597d2dd4d5806ab3265ef837dd10d474",
       "required": false,
@@ -3026,6 +3091,11 @@
     },
     "document_intelligence/domains/identity/doc_types/extraction/id_driver_license.extraction_hints.any.json": {
       "sha256": "fa2e67dc4fa25ada6cad2f2a0a9cd5c23d9056ef2803582f9e4f93dd0afedb63",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/identity/doc_types/extraction/id_marriage_license.extraction_hints.any.json": {
+      "sha256": "0eb5e2de8fe6b4c637d06deb9e60d1593983f606e451706ab7648a08e7b9f23a",
       "required": false,
       "category": "semantics"
     },
@@ -3039,43 +3109,108 @@
       "required": false,
       "category": "semantics"
     },
+    "document_intelligence/domains/identity/doc_types/extraction/id_social_security_card.extraction_hints.any.json": {
+      "sha256": "17fc74c53356cf650438b0ff5a605ac2d20639d3703fedd704ecd88ece85235f",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/identity/doc_types/extraction/id_visa.extraction_hints.any.json": {
+      "sha256": "c185e61c1fb707852fc38203ef79f4a2ea0a15f920cb8697d9308787d6ac3ef7",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/identity/doc_types/extraction/id_voter_registration.extraction_hints.any.json": {
+      "sha256": "c56677530323811192c4d202790d2f3d524d027458336ef952896355dba6cccd",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/identity/doc_types/sections/id_birth_certificate.sections.any.json": {
+      "sha256": "2ecfcfbb6c1b6a6ddae595ad929668409545be35a3c89a53a2779e609de21244",
+      "required": false,
+      "category": "semantics"
+    },
     "document_intelligence/domains/identity/doc_types/sections/id_business_registration_certificate.sections.any.json": {
-      "sha256": "bf2d642e1c569729bc1ae4e06a749c13b781561f1a891202c6e475ecf2b7faca",
+      "sha256": "79f02555d642f18d91692d6beb4e26694a8463b6394be23743f66bdfa4bd9a97",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/identity/doc_types/sections/id_driver_license.sections.any.json": {
-      "sha256": "cdd775098461d0ea9b821e17a61e1e163226f6feda0a4f85c468866ff85d61ed",
+      "sha256": "e7cf8f068a4e5fe0d8199026bd5877063b3212293faff62afe5f1d214d2884dd",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/identity/doc_types/sections/id_marriage_license.sections.any.json": {
+      "sha256": "7ceaa8c52b527dce934331dc7f60e195204894044ce27b6648b37d729e59ff38",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/identity/doc_types/sections/id_passport.sections.any.json": {
-      "sha256": "50f7fd95ce92e26a62ce920be5fa28b8d29bf628c84be4334d0b2d073f80a946",
+      "sha256": "5fd87e5e6d624dde0c093fc71d95aabaaed7f0b4c6ebb7d91c462a3cca89990f",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/identity/doc_types/sections/id_proof_of_address.sections.any.json": {
-      "sha256": "d25f62dde73c0103ad64997ac53f9384c1b1b9126066e58b03a5252c5cae214c",
+      "sha256": "1e38cfe08d46add416aaba04549454188daaa6f431ab7ca453d8d372d21d21eb",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/identity/doc_types/sections/id_social_security_card.sections.any.json": {
+      "sha256": "f04fd40a4ce11d2c6e601cc4255633dcd8c73b1f8665813454fe1f8a9b0b6bdc",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/identity/doc_types/sections/id_visa.sections.any.json": {
+      "sha256": "d21b5f423347994c20e01b2ef97f6c93f51ecee5880ade971a42d1ec50b98d65",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/identity/doc_types/sections/id_voter_registration.sections.any.json": {
+      "sha256": "914f204f59cf03faa3c85efee869bc865fb8d1b41897e6b394fbb9f472f247cb",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/identity/doc_types/tables/id_birth_certificate.tables.any.json": {
+      "sha256": "75b4f403284ae5731cd46406bc2804ef5807d5900bdfb294cc4d462a9b21d93a",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/identity/doc_types/tables/id_business_registration_certificate.tables.any.json": {
-      "sha256": "ac76ed2d29b5cd9567362007e81b14e22ec9231ff7e9890994219b9904045487",
+      "sha256": "9bd23651ccc3fd25f0cfd6dcd00835415c6c4f2bc2e4d5849cb0d9e8f85f923f",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/identity/doc_types/tables/id_driver_license.tables.any.json": {
-      "sha256": "570e68058f76c23fc2a67f3b404607e655ffb9e5586e56ac633fa6faaa846e86",
+      "sha256": "0a44d9ec324013323a74dc74d8c6a72b6fe280f7834b249544d3e2525f7aba43",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/identity/doc_types/tables/id_marriage_license.tables.any.json": {
+      "sha256": "2a9d62cb9747de9649188ef3e1f1458d17268d9eb5ad9f38fe4eb9874078a845",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/identity/doc_types/tables/id_passport.tables.any.json": {
-      "sha256": "4d25642c21d08efb0410398a68e329a58abbe78f5c222f5f87bc76a4f059ec79",
+      "sha256": "f8529b5d9311b7620a9454cae4803ec0b9d81af2304473561529a9ee55e1acf5",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/identity/doc_types/tables/id_proof_of_address.tables.any.json": {
-      "sha256": "04ff1350c1dcf63ab10e7fe0fe35baa8e4dcca5e6820e3056a78182f4ffdc3b0",
+      "sha256": "a9fe5dd2ca0dbe5fe3bcb637759351a6acc60e639488967e34763b51dca44e00",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/identity/doc_types/tables/id_social_security_card.tables.any.json": {
+      "sha256": "7590c033cb7b43e53c026dc09d773e29976d2878a91b09d6b24cf13c2329fd63",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/identity/doc_types/tables/id_visa.tables.any.json": {
+      "sha256": "f33620a3f689d04a43d96f6e49d465d39abf3bfc172985853c7d478ea4e0613e",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/identity/doc_types/tables/id_voter_registration.tables.any.json": {
+      "sha256": "b1dfa85dffcf1b176264cb3b9d2e0581354a708f6f62ed044f46d14fc1f45b41",
       "required": false,
       "category": "semantics"
     },
@@ -3149,8 +3284,23 @@
       "required": false,
       "category": "semantics"
     },
+    "document_intelligence/domains/insurance/doc_types/extraction/ins_auto_declaration.extraction_hints.any.json": {
+      "sha256": "fefc8a9f052945b830953110b337e7f1db7c6ba139a9960c5ebd75eb8de26d9c",
+      "required": false,
+      "category": "semantics"
+    },
     "document_intelligence/domains/insurance/doc_types/extraction/ins_claim_submission.extraction_hints.any.json": {
       "sha256": "949bfc37775375088ea3f209bda1d0861e26da6096e9aebf743bd3e212e8e401",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/insurance/doc_types/extraction/ins_dental_plan.extraction_hints.any.json": {
+      "sha256": "25f10e0f8baa983a20b2203ff3695cea3c5895812b8ced5e7381bede46561893",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/insurance/doc_types/extraction/ins_disability.extraction_hints.any.json": {
+      "sha256": "50b1d09fac131f1efaac18e56d1b696078fc53f9ca5e8db1560c44a3c1956b76",
       "required": false,
       "category": "semantics"
     },
@@ -3169,28 +3319,68 @@
       "required": false,
       "category": "semantics"
     },
+    "document_intelligence/domains/insurance/doc_types/extraction/ins_umbrella_policy.extraction_hints.any.json": {
+      "sha256": "e29079f97f8b42a85c9899ff6bcb8c511e0d9d75804524204293a47698f63dc6",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/insurance/doc_types/sections/ins_auto_declaration.sections.any.json": {
+      "sha256": "e1c00a1229be0dfedb8ba786498c4314c1bd9760da5ade265d2f45f87f602ccd",
+      "required": false,
+      "category": "semantics"
+    },
     "document_intelligence/domains/insurance/doc_types/sections/ins_claim_submission.sections.any.json": {
-      "sha256": "d82f0cfb08c48fbcd15499e673457e3ef05c732a07df744e86b7149b545aeb6e",
+      "sha256": "58f587824d712db4ab885cf92b801355774e74e076e9d36986b81154346167c9",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/insurance/doc_types/sections/ins_dental_plan.sections.any.json": {
+      "sha256": "006af2eb603309ed32eba834d8b888fa48063d9a8ac92348d412e93d6f412400",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/insurance/doc_types/sections/ins_disability.sections.any.json": {
+      "sha256": "7665d2295a03c4fe400a046d569f101a6926edfb411546b46be2bca88538c92d",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/insurance/doc_types/sections/ins_explanation_of_benefits.sections.any.json": {
-      "sha256": "6eb24cd0ef0f62102278f5a42388a567d35777185ab82273047e01c31a53820e",
+      "sha256": "619c7a5fb496b8b89a5c84597e69a555a5f37ba9cb773eb5976a6593a540860b",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/insurance/doc_types/sections/ins_policy_document.sections.any.json": {
-      "sha256": "a8cc8d3449fc83f0e1cb57d120c5cbadbeea070e6a21326b7b50b978dd3d3485",
+      "sha256": "572bcfd38110ede9c5206b891bce5ca5906328f021e91e60608f82214b7e0f3d",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/insurance/doc_types/sections/ins_premium_invoice.sections.any.json": {
-      "sha256": "875221e180a1e4d4461e4c1b4c0de26bc31acfe8efa703e8c81a374569213592",
+      "sha256": "d41a0f463480efeb89f7f7a5252ae10edefee44268dc6991b3a0826d9e4e15e4",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/insurance/doc_types/sections/ins_umbrella_policy.sections.any.json": {
+      "sha256": "20bc68d7ff34f3a4b0a1d3631a7aed6311aa9a2019c8274cb5607466b93fb662",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/insurance/doc_types/tables/ins_auto_declaration.tables.any.json": {
+      "sha256": "2ce8f9128576afb8a63d3a43e16632b6c0df1bb7d42b97403d8689a39ebaee1e",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/insurance/doc_types/tables/ins_claim_submission.tables.any.json": {
       "sha256": "bd00e71e57945a5410bbbd7ceefb914f9eb5a524b97edd742979b196bdcf67a7",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/insurance/doc_types/tables/ins_dental_plan.tables.any.json": {
+      "sha256": "11540788586f7be5d354ac52f0f185fd2ae8867489621b71400deb625a0c385a",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/insurance/doc_types/tables/ins_disability.tables.any.json": {
+      "sha256": "e18db3a851d8247b81d0a2ec4318411ad019ae4835871a94cd632c9176f84603",
       "required": false,
       "category": "semantics"
     },
@@ -3206,6 +3396,11 @@
     },
     "document_intelligence/domains/insurance/doc_types/tables/ins_premium_invoice.tables.any.json": {
       "sha256": "83073b4867fd121dff198b564bede18710ea4ce9645a8d0a97168225f0c042c9",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/insurance/doc_types/tables/ins_umbrella_policy.tables.any.json": {
+      "sha256": "a9f3c684f97833e3aa03ef734393f044dd482b3279f1ce8eb4de4f5679ce63c2",
       "required": false,
       "category": "semantics"
     },
@@ -3291,26 +3486,6 @@
     },
     "document_intelligence/domains/legal/doc_types/doc_type_catalog.any.json": {
       "sha256": "1fd4c2adc43920f3b6ab552fd3d57aab3cfebf73dfc1b27581e51ad239396cb6",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/legal/doc_types/extraction/board_resolution.extraction_hints.any.json": {
-      "sha256": "a964ccc08c389cccfd224b6eb29cb1f6933f62dfd01c39380ffa3bf0f5cd1afa",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/legal/doc_types/extraction/dpa.extraction_hints.any.json": {
-      "sha256": "95b012faf16cb2a5cf91d24c7a1c14c95b620694f62439c4ae4c8d3b15bacb22",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/legal/doc_types/extraction/employment_agreement.extraction_hints.any.json": {
-      "sha256": "ec454e264bc7c9bb2cc2e85685a02ce0f022ee98d97c3248e7959ca39ed978f3",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/legal/doc_types/extraction/lease.extraction_hints.any.json": {
-      "sha256": "cc014b89f2829343795e20bcb8bef715fb36ac390acf17eb9dad6eca45b36617",
       "required": false,
       "category": "semantics"
     },
@@ -3474,68 +3649,18 @@
       "required": false,
       "category": "semantics"
     },
-    "document_intelligence/domains/legal/doc_types/extraction/litigation_memo.extraction_hints.any.json": {
-      "sha256": "2ddc1ce53603726cd044a033fb45e6ff12f75528cfd16691b426d1c61e54389c",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/legal/doc_types/extraction/msa.extraction_hints.any.json": {
-      "sha256": "3526e8233c05c06e7f7e576fa19de711f9a0c1ce38fb4d14c22e2d9116eb6d74",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/legal/doc_types/extraction/nda.extraction_hints.any.json": {
-      "sha256": "dacf018de614322ca8f7e8c43ece5362c4d0fc964560399cdf14b96fdaefca92",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/legal/doc_types/extraction/privacy_policy.extraction_hints.any.json": {
-      "sha256": "7fdb408eb0bbb55f6931e2d9d68e5f582c4c0fbb9002d409927a2b845e99eafc",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/legal/doc_types/extraction/sow.extraction_hints.any.json": {
-      "sha256": "b371fd67a9088d53b951b42ebff59b74fc33d7901175cf993bc832dd1c285919",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/legal/doc_types/extraction/terms.extraction_hints.any.json": {
-      "sha256": "a8b995d273d734a5b34e827be8b53901fd71b48301a3d15b858e935ee28cb058",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/legal/doc_types/sections/board_resolution.sections.any.json": {
-      "sha256": "9e1821c00820240c20118cd0b49ac2e5d3fbcd2b8b373155cde19e20733cc0b7",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/legal/doc_types/sections/dpa.sections.any.json": {
-      "sha256": "ac9f557008c9b998caa91899ca284e9ff03cc28cf0b22e898407b6e45a5a0021",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/legal/doc_types/sections/employment_agreement.sections.any.json": {
-      "sha256": "80052e5b6b725cfd6bdb8eb0716d2cd8f06cda33c7b072d1c2396e1b08a55df7",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/legal/doc_types/sections/lease.sections.any.json": {
-      "sha256": "4a73c50c0a668388cea5ebf5fcf69f1605c1747f6fa45699f82026986e711d6c",
-      "required": false,
-      "category": "semantics"
-    },
     "document_intelligence/domains/legal/doc_types/sections/legal_acceptable_use_policy.sections.any.json": {
-      "sha256": "9616889a16e1b0ac563c5ebf2af3c4068e8db0b394055ba49c2fa8ecc12a981f",
+      "sha256": "cce488042d3aa4788e9be56d2def0654ec7fe03c16cc0488b32b8fc7641b38f6",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/legal/doc_types/sections/legal_baa.sections.any.json": {
-      "sha256": "3ae1ae8a4fcd89d2ab3179f1b13e03c166790de07391834b2930e963f13cdd44",
+      "sha256": "45f4e05397fcae959e8ed92c574615786d678bc8494fc34b3920bb9c83117f7c",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/legal/doc_types/sections/legal_board_minutes.sections.any.json": {
-      "sha256": "48bc905e3fc05a90a8bbef615a7179bb9b7af3aa054ecfa3e5b4a1a53f8b6e0e",
+      "sha256": "89635597370b107753c2b695d6aaf61a15daf75a51f2314c869f2eb828171c7b",
       "required": false,
       "category": "semantics"
     },
@@ -3545,42 +3670,42 @@
       "category": "semantics"
     },
     "document_intelligence/domains/legal/doc_types/sections/legal_bylaws_charter.sections.any.json": {
-      "sha256": "2b121974740391b2ad43b45dc967b2f0ab8b15cb4088b6dc0cc6b7fdb7551b48",
+      "sha256": "f7ef6fbf1094ba492f447e14d16bd516ec4959f5cccde8242c2dc9a363fc3119",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/legal/doc_types/sections/legal_code_of_conduct.sections.any.json": {
-      "sha256": "002babaff37d08dfa29e7651a08e4d539818d4ba1666e07b0041e5f7fad5059e",
+      "sha256": "eafc1484f05a883160457afd28146b45bbaaed23d9551297d280f8b3ecd1dee1",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/legal/doc_types/sections/legal_complaint.sections.any.json": {
-      "sha256": "ae34ccf9ccbaee3d955952df72638daab31a32fb5169400e84d649c96d28bd38",
+      "sha256": "68fc1e0a7e5d508609219c2fa951a63144631f0e7c9509d0c56e12a74d3ddee2",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/legal/doc_types/sections/legal_consulting_agreement.sections.any.json": {
-      "sha256": "a037cf27e16d7b1ff310d7b7f1d9823615b084f2d8e6adc632df4385b017ce72",
+      "sha256": "164304dc97867c28db025720f4d26465a2112599b78e03867ba8263e3eb28201",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/legal/doc_types/sections/legal_contractor_agreement.sections.any.json": {
-      "sha256": "746d94fee2c52a797020a63c546c0ba3d1b51f4d088080e5ac62c9b4b7d5c52f",
+      "sha256": "ba2d5f301dc8d3a3b2d22e3d653f5252017338fc055d6b51a27f2732f93a39f8",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/legal/doc_types/sections/legal_cookie_policy.sections.any.json": {
-      "sha256": "42857159edc5aec76087ae0899da3d03089827ffc4d4f35988a0976891050a34",
+      "sha256": "b321a2c5c6f9038332daf5a649f4133c85d44a06d950ed0643ec143a9a901022",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/legal/doc_types/sections/legal_court_order.sections.any.json": {
-      "sha256": "0611132b27d4c7632bc170d47c47c33dc78a5aa06cfc9315729923a3212b01cd",
+      "sha256": "e5092d27f197bda9f2c8cab5856a6ec29027ec7d862dcfb9b490655ed40d8b6d",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/legal/doc_types/sections/legal_data_retention_policy.sections.any.json": {
-      "sha256": "b8f40585978381db406b219c49140a4aa20828c77e0834f563bfbffd68d207bf",
+      "sha256": "21d6d84ac914921f2c8c9b6376f309247ac3c9b8de0f99eaed3a0c069ebdd1d5",
       "required": false,
       "category": "semantics"
     },
@@ -3595,12 +3720,12 @@
       "category": "semantics"
     },
     "document_intelligence/domains/legal/doc_types/sections/legal_eula.sections.any.json": {
-      "sha256": "dfda667bf9d4b4ca1f728526c29ecf5fc5442cee9617d9c9c850de24cd52fc97",
+      "sha256": "66104489fc9dd5a0b80bcbdad58c4bf1ba1c208a321d16fdd8932140ca5c6663",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/legal/doc_types/sections/legal_ip_assignment.sections.any.json": {
-      "sha256": "b1dce81889aa883126518cc9152a30ed332f4b7dc09785e3cb2b5204d8f2344e",
+      "sha256": "ecc93fc1a81636aaf6c1967d7c3c0a22f7c2e13178334f55da36cc4e1ada6684",
       "required": false,
       "category": "semantics"
     },
@@ -3610,7 +3735,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/legal/doc_types/sections/legal_license_agreement.sections.any.json": {
-      "sha256": "2804f1973fbad01f67d7e100bc36884c891ec2b8807c4a9a9126f190c3ef4b51",
+      "sha256": "e7fc2e1ecee9cf2413f39759e7d877be2a60224106068c9fa03b189511ce4900",
       "required": false,
       "category": "semantics"
     },
@@ -3620,7 +3745,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/legal/doc_types/sections/legal_motion_brief.sections.any.json": {
-      "sha256": "bf7f7c186ae833c97f8841c3729fecc1445fd70e5e100cdfed8009df28171570",
+      "sha256": "faa166fc3c176eabf1ac9d45d6c15a9c794c76aa4321e65f3e951f3cbba5a916",
       "required": false,
       "category": "semantics"
     },
@@ -3635,12 +3760,12 @@
       "category": "semantics"
     },
     "document_intelligence/domains/legal/doc_types/sections/legal_offer_letter.sections.any.json": {
-      "sha256": "c068685fc2cb1ec505e7634056904cdd44c4af959d8c730e264b0cbce9a763f4",
+      "sha256": "8546cd5643e6bd4974b2b1def0a6f8e023103f96f055236a9827a1e393825ae4",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/legal/doc_types/sections/legal_partnership_jv.sections.any.json": {
-      "sha256": "bcc1f70f4b248fb746d6e1efc7cd9e9e7039752ad0f067875da85a49cb685a06",
+      "sha256": "d9156664e97e7d9b98f983556ed07a00fb23e9f59811a72b8278c2af787f9839",
       "required": false,
       "category": "semantics"
     },
@@ -3650,22 +3775,22 @@
       "category": "semantics"
     },
     "document_intelligence/domains/legal/doc_types/sections/legal_reseller_distribution.sections.any.json": {
-      "sha256": "b67c18f5ec5be5649368be4000883d0e3dfa383b344512f8ab5d4969d5be5b16",
+      "sha256": "0ecb40267aea07e034958155c0eddd323c5aaca1defbab73d25b2e8d17eda446",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/legal/doc_types/sections/legal_security_policy.sections.any.json": {
-      "sha256": "23fa9304f1ab5ac5a23b4651691a6f575259d9aaea37e22557f969960a0b497c",
+      "sha256": "af4aec899934094cbb43d64e8c074d3376a79fd1de6a677f043827d915bc7e0e",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/legal/doc_types/sections/legal_settlement_agreement.sections.any.json": {
-      "sha256": "ced791c504aa2559927f4dee56f412a125d1e4c2c40911d1dab6196a1b08ecce",
+      "sha256": "64670460556f44400e65b985ddf754d8eab0cd49c12c0a1ecd4eea2daf752e38",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/legal/doc_types/sections/legal_sla.sections.any.json": {
-      "sha256": "a6fe645ee7534a2fe4f6d88e48c65c6fcf20b1fe6b57176ff52a80976b5a8986",
+      "sha256": "02512f4b19bb798bb7ee73c34901e56a92a5c1353722e0a984b0fe885a7239f9",
       "required": false,
       "category": "semantics"
     },
@@ -3675,62 +3800,12 @@
       "category": "semantics"
     },
     "document_intelligence/domains/legal/doc_types/sections/legal_terms_of_service.sections.any.json": {
-      "sha256": "de7d9d5154dc1a823ec8b107f09335843cdb54f0888208491ba041e8a11f6a19",
+      "sha256": "04b9579053f835c9987788d9df779647227df546a3bd3059bea80b75ad7da9b3",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/legal/doc_types/sections/legal_written_consent.sections.any.json": {
-      "sha256": "884282358a5559cf26a0f8a91560e0943623056112c5495799aeb9976243defc",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/legal/doc_types/sections/litigation_memo.sections.any.json": {
-      "sha256": "f6b1456ca1370215bd275666f9cfff50e927ce4c0625860e52165821ddc07f94",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/legal/doc_types/sections/msa.sections.any.json": {
-      "sha256": "9523d283e2a22236782dc0a766927ce8d5db78abbb26730b1ffd4f53fabf8787",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/legal/doc_types/sections/nda.sections.any.json": {
-      "sha256": "2eaeec684d8ff1bc671c0eb2b32fe1eb222c244c36ba18b0b56d3f95a173755d",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/legal/doc_types/sections/privacy_policy.sections.any.json": {
-      "sha256": "d0103d5ddd8add50055b9bcc0ce6b3f4470d7be31cf0b10e2dd1983e162addd4",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/legal/doc_types/sections/sow.sections.any.json": {
-      "sha256": "8e8e70241b753b26e0665896fd73f9dcd60589ac5286717bd6f5ae2f9f695012",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/legal/doc_types/sections/terms.sections.any.json": {
-      "sha256": "dab65b5bce9374b6428ef72173bbe182aff25989927bc0508acc0893517038f3",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/legal/doc_types/tables/board_resolution.tables.any.json": {
-      "sha256": "7011a9117255c41861e1438a062a3720bda06cd1179ec38ca0948f31a7680681",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/legal/doc_types/tables/dpa.tables.any.json": {
-      "sha256": "3b643d1703b2b4cf7977ba4dd3824ee2c8fb9e44dd9b29cf7f9f871ff10654be",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/legal/doc_types/tables/employment_agreement.tables.any.json": {
-      "sha256": "d963a14a7882272f29caf0fe1a92dbefcdf0da849f6d269591d4400f63886523",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/legal/doc_types/tables/lease.tables.any.json": {
-      "sha256": "fc389eafa7b3fc919525304d582daad2b0cbdd8eb24dd74af366d18bfd1a8d0f",
+      "sha256": "7633912db93c62159c2b710c6a1d7791e7ccb706f42460048eec1e43155a8ebe",
       "required": false,
       "category": "semantics"
     },
@@ -3894,36 +3969,6 @@
       "required": false,
       "category": "semantics"
     },
-    "document_intelligence/domains/legal/doc_types/tables/litigation_memo.tables.any.json": {
-      "sha256": "4d546f89868a28f99805590dc925647d34d2a27fe2c52c440385cd9349712cdb",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/legal/doc_types/tables/msa.tables.any.json": {
-      "sha256": "d829aa1cb260078f6be5a4563eb5709d95aafb5768c5d905ef5d3cf96c631f99",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/legal/doc_types/tables/nda.tables.any.json": {
-      "sha256": "71a20a892579a63818b6eebc1c308cd3944966e6afaeb034a5fafc0925bf13c2",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/legal/doc_types/tables/privacy_policy.tables.any.json": {
-      "sha256": "26c6a85e3c86a7922f82549a86c3be5e001299de546da1a8cbcb55fc665f5cae",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/legal/doc_types/tables/sow.tables.any.json": {
-      "sha256": "97f0d0701233c171c309b90ac843d46674150f4fccbe39f09ada442c2579015d",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/legal/doc_types/tables/terms.tables.any.json": {
-      "sha256": "e2b6866f83435db8c719b24507721fecf9e878a360b1f5ae6abe8c238f5ebe69",
-      "required": false,
-      "category": "semantics"
-    },
     "document_intelligence/domains/legal/domain_detection_rules.any.json": {
       "sha256": "bb2596f7d1b6aecf2444aa5f30de8837253095ffa83cd419bf13c8088839e4c1",
       "required": false,
@@ -4014,21 +4059,6 @@
       "required": false,
       "category": "semantics"
     },
-    "document_intelligence/domains/medical/doc_types/extraction/care_plan.extraction_hints.any.json": {
-      "sha256": "c3573a4b93c4cf816c991692ea8693341afff1f154a94181db485aa573718b66",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/medical/doc_types/extraction/discharge_summary.extraction_hints.any.json": {
-      "sha256": "32e46ee0eaf69058a8680154d68439ae67d9ab645feb18be440751d8bc7335cb",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/medical/doc_types/extraction/lab_report.extraction_hints.any.json": {
-      "sha256": "e7e47fc79a73efd9a29ae0964ab5a023bf380bbfedb724020f78fd07c16a858c",
-      "required": false,
-      "category": "semantics"
-    },
     "document_intelligence/domains/medical/doc_types/extraction/med_allergy_list.extraction_hints.any.json": {
       "sha256": "6b335e1fddb28fe1042eb6d6e14ea0dd003cc800756a5e5245fcd1ede5ec3f24",
       "required": false,
@@ -4104,6 +4134,11 @@
       "required": false,
       "category": "semantics"
     },
+    "document_intelligence/domains/medical/doc_types/extraction/med_patient_intake_form.extraction_hints.any.json": {
+      "sha256": "d58b4f7bee3efb630938deb25059ca0edbad500c4829cf38ba44efc34ad584ea",
+      "required": false,
+      "category": "semantics"
+    },
     "document_intelligence/domains/medical/doc_types/extraction/med_prescription.extraction_hints.any.json": {
       "sha256": "2b4f1cc097cafab7aa4a187686b7b431e303ec61525589f397aa05ddf289154c",
       "required": false,
@@ -4144,83 +4179,48 @@
       "required": false,
       "category": "semantics"
     },
-    "document_intelligence/domains/medical/doc_types/extraction/progress_note.extraction_hints.any.json": {
-      "sha256": "e92369935deab4fe71ebf02bfe73ee914af7d2fea760eedf5cee91f437441d13",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/medical/doc_types/extraction/radiology_report.extraction_hints.any.json": {
-      "sha256": "dc9dd170b520b4cb5ccb46334c90d1e07d1d70da2722fcf0a5f0acde11cf1b79",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/medical/doc_types/extraction/referral.extraction_hints.any.json": {
-      "sha256": "cae31208e07c06aa7cc5269781bb2af98361e74de9f9f17b2dd7b2875b8e0559",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/medical/doc_types/extraction/soap_note.extraction_hints.any.json": {
-      "sha256": "4872f33cd8e47a86763e06c742eae6701e739f2b3a19d0c7a518753b99976949",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/medical/doc_types/sections/care_plan.sections.any.json": {
-      "sha256": "7fc7688ca251390ea7331237e3328d470c9f3f0b780f42e729d27d580e7994a7",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/medical/doc_types/sections/discharge_summary.sections.any.json": {
-      "sha256": "f09c2e75e98f8ace50f405a1948ac4a43cc025d8b3babc61bb70a7123d360b77",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/medical/doc_types/sections/lab_report.sections.any.json": {
-      "sha256": "0bb61adda5535017ad8f190dab451d1a53d8ee11a9389d6430ced1d0806278ce",
-      "required": false,
-      "category": "semantics"
-    },
     "document_intelligence/domains/medical/doc_types/sections/med_allergy_list.sections.any.json": {
-      "sha256": "1ce62c9fb35cb4664ef6ec5f80d928abfb26b1eae18178f02d68a45a9ec7b320",
+      "sha256": "d374c6d82db90eebe339aeca6d6b46a3a38bb9bb0838dbf8dfca85b965cfaf23",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/medical/doc_types/sections/med_care_plan.sections.any.json": {
-      "sha256": "33dd6bd6c8d6a4f67863ed97803ce1f7cfc737470761fdf95ff36610ab647a61",
+      "sha256": "5d4e543e609b994676f99bc6d675a694d2f441c576d5e0eb4ae30aba42fb45cf",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/medical/doc_types/sections/med_consult_note.sections.any.json": {
-      "sha256": "a888f7c4d2b4f287bd9b11294d56731b7fb5bc57cf675d6471ae68a547a5bf7f",
+      "sha256": "681f99afe5a3213d2b7fb07dd8a2555751f080ec6b2288007fdc73d02faa2c25",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/medical/doc_types/sections/med_discharge_summary.sections.any.json": {
-      "sha256": "f6a9066ee2146e0e79a4c8d6501b11c3944703df253be9beccf526b792428196",
+      "sha256": "60206f89a79567287f26d87932dc56c97e6e4bed7b28a5e634d93430a95d8567",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/medical/doc_types/sections/med_ecg_report.sections.any.json": {
-      "sha256": "1b713da7d6752ee2d30ee0ade2428ae59cd7b3c2e0c5ca73dcec27bd3810c1bb",
+      "sha256": "f3d2b2b4534315cb103379a926b86b6b4bb853aef08c518b0ef4f5aaab6ae23d",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/medical/doc_types/sections/med_emergency_note.sections.any.json": {
-      "sha256": "d0a858afa36819a0c5882fd867e398f92ebb50bcc55b6f55bd25dd3de2731ab7",
+      "sha256": "bbbe4a21641e3883263d94e39f2148d705df790df5932d04d6d9b2cf24c8e833",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/medical/doc_types/sections/med_followup_instructions.sections.any.json": {
-      "sha256": "84ee64751301908fd13bfff311a6821f8536ef9844a2083da7c2127d8fff2e6b",
+      "sha256": "8846040f794779ba0ee09a59e6d6fa362d71aa79c939f20a5b3003dbfd44bb95",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/medical/doc_types/sections/med_history_and_physical.sections.any.json": {
-      "sha256": "a8a1675eb537b901b7badeee82886b84daf2b8d73b879114e59d6ba8df2d6f55",
+      "sha256": "ae40f59ec65c56f752ec81c7cbb3d91757df03a879574f1eb78dcabb11903534",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/medical/doc_types/sections/med_immunization_record.sections.any.json": {
-      "sha256": "c738e80b0dd0aa2769c56c6b1cde6ea409b4959ae801261138484f1d6d93f65a",
+      "sha256": "6f0d58d296513633a8b16a97eefe952415e6724bd17eb53a29dbe7b3d1a53a8c",
       "required": false,
       "category": "semantics"
     },
@@ -4230,7 +4230,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/medical/doc_types/sections/med_lab_results_report.sections.any.json": {
-      "sha256": "63a3cc74405a2ffb84435071dd0e87bb74b42e3e606adb43583d87503e5a13e6",
+      "sha256": "76ba08e8ab33369a84aac6b328852dbf28f4a7516c346c681f6521cbad7c2fb1",
       "required": false,
       "category": "semantics"
     },
@@ -4240,92 +4240,62 @@
       "category": "semantics"
     },
     "document_intelligence/domains/medical/doc_types/sections/med_medication_list.sections.any.json": {
-      "sha256": "c5bdeea36fce09a496be967bcb46de0766a99e064fb4b76e2140e347b901fb81",
+      "sha256": "28e261073d8ac56f1ed355db9b3b176c834bd3d0fe9c6be229ecbcf0f7d45b69",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/medical/doc_types/sections/med_nursing_note.sections.any.json": {
-      "sha256": "9b74d6d9272fdaa1ec0064e2cea7f0492284fe2bd26fce43134f664e1c07732d",
+      "sha256": "d04a409ad96740d95296cdc7435b43217aa2e4ad596658b96445ee532180d33c",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/medical/doc_types/sections/med_pathology_report.sections.any.json": {
-      "sha256": "8008b59b5036df8a322a2e638c76b187c1adc59aacf129433833fa165cbeac03",
+      "sha256": "16208fb3631e61b3456b6f3cec6d48ca708faae90a9a9c9b5a6badd75d6e2b97",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/medical/doc_types/sections/med_patient_intake_form.sections.any.json": {
+      "sha256": "815046d036b840ed21b97b8144e7baca0f01ef9fa6928a1d7f035cb780b2e292",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/medical/doc_types/sections/med_prescription.sections.any.json": {
-      "sha256": "53839000469f0c8e2c0189593f1696140d42b3bfda711f152c010a9669dfb8a7",
+      "sha256": "9fece2d80590bfeed71c94b1471d59b98860e32ea5bc0632b43e0ae8a9fa4ecf",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/medical/doc_types/sections/med_problem_list.sections.any.json": {
-      "sha256": "46e2e3ea651c7b7cb8e74ed26d8d2574b9fc97eb3c684360705a9d425c47846a",
+      "sha256": "fe6d5b4ded61ed47a1dd5906eca4a55e9c816c495eca3b139a439e9b9d287ea2",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/medical/doc_types/sections/med_progress_note.sections.any.json": {
-      "sha256": "5ec327fbd75f78cd08a43da4a13202b4c244c8366944b19cf3cac97095576d9f",
+      "sha256": "4779ffc6f7c67fb06629558deed14426bd578b1b52066a95b0b20c597e2381c4",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/medical/doc_types/sections/med_radiology_report.sections.any.json": {
-      "sha256": "4d69a4dd82c430b8506bc4614222622692d83887488d54bef42dfc7bb3136c99",
+      "sha256": "9f4576118f979f76a79f12cb927aa6356f4b87fc0646ed694dbb32042fc217f4",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/medical/doc_types/sections/med_referral_letter.sections.any.json": {
-      "sha256": "2a63294f024833e605ae071a06fdaa48eef6fe1935a2d767b4533d7e71940d03",
+      "sha256": "f7ef9cae02d50601dd7803b782cd8069f4ff7bef1c421280f5dcdee01a7a4d2e",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/medical/doc_types/sections/med_referral_note.sections.any.json": {
-      "sha256": "5a7b2fe4ffbe47de6d7df0c1d17123e121f71c38e6f908e37846150fb3428044",
+      "sha256": "d19b4b66c2c110ae85c9f232251a33069288f1bdd73c96bfa1f77d22204f668b",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/medical/doc_types/sections/med_soap_note.sections.any.json": {
-      "sha256": "0851caaa6ee5ffd35c8acd0430eb92a4ea6544addb19f900d3bf674d40e7ca30",
+      "sha256": "60c12a9739326ee3a5b904c0b2c95fe1b85074d8fadecd3cf01064fb19d758a0",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/medical/doc_types/sections/med_vitals_chart.sections.any.json": {
-      "sha256": "5e91911c1023beba4a8b00b63cf60185efd86bfbeb4fd1cbd7477af95e6674d8",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/medical/doc_types/sections/progress_note.sections.any.json": {
-      "sha256": "bb8356c3cd72ac3bfedfa6b9d64c5db32324ca0f2b5863d33aa112e4c62ff0d1",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/medical/doc_types/sections/radiology_report.sections.any.json": {
-      "sha256": "c186ea8fc99bfd8d713777ea292d95fd4a9d1e6dd40aa72d080e5e3e81f88e4e",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/medical/doc_types/sections/referral.sections.any.json": {
-      "sha256": "4e6394bb57ab349871fd0b1b489d865d0e40694d3dbb468968f49d631e042167",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/medical/doc_types/sections/soap_note.sections.any.json": {
-      "sha256": "8a59fc0221c03310d94a2d6234142719dc1fcede63d8de06aeca4673f8cdaadc",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/medical/doc_types/tables/care_plan.tables.any.json": {
-      "sha256": "38c7549d62dd46e32c5213de14ccb65b38f7ea1257b86ffc3fb5a06d1aad9206",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/medical/doc_types/tables/discharge_summary.tables.any.json": {
-      "sha256": "94efa77696b96dc5cb4834383b4ac8d8405437f9f0e34f3034f75ad9a7f9776f",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/medical/doc_types/tables/lab_report.tables.any.json": {
-      "sha256": "3e475fc18d4d3219481d76b3a1cfd95d3989a3996b83607cb3dd74cc3c68bf67",
+      "sha256": "3a8ce0458c7c5cef950277e7b5772db8a7be8669ca70ed521d87d150e3e15f96",
       "required": false,
       "category": "semantics"
     },
@@ -4404,6 +4374,11 @@
       "required": false,
       "category": "semantics"
     },
+    "document_intelligence/domains/medical/doc_types/tables/med_patient_intake_form.tables.any.json": {
+      "sha256": "5eeca653a4323fe2d53fbf8a87375262a5fd9deb024320ccd9e1f31717d9d123",
+      "required": false,
+      "category": "semantics"
+    },
     "document_intelligence/domains/medical/doc_types/tables/med_prescription.tables.any.json": {
       "sha256": "de66f4b7570941bb64d3e940c9e9a1bad02dea9a5698edcadd172f0378bac16a",
       "required": false,
@@ -4441,26 +4416,6 @@
     },
     "document_intelligence/domains/medical/doc_types/tables/med_vitals_chart.tables.any.json": {
       "sha256": "35df66967fb3510ac5e8ef79dde36bed3492b64abb7af283f8db8321f5f90be3",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/medical/doc_types/tables/progress_note.tables.any.json": {
-      "sha256": "bed6b1499924f69e2c95f8be63af548c073d0844b809aa4a737aaec29336f1da",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/medical/doc_types/tables/radiology_report.tables.any.json": {
-      "sha256": "2dbab8eda41a5d0b79728cf9315eafb71af869806edbe29ede9959d284071a1f",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/medical/doc_types/tables/referral.tables.any.json": {
-      "sha256": "40418765cf867d1414eff6fd09abbbd85fc98eaf2fd8eba9b445aaff3c00205d",
-      "required": false,
-      "category": "semantics"
-    },
-    "document_intelligence/domains/medical/doc_types/tables/soap_note.tables.any.json": {
-      "sha256": "83517b3bd0ab9efced5f0264c2779c1a5216eca8238f6b12e2e146674f6eefd7",
       "required": false,
       "category": "semantics"
     },
@@ -4575,32 +4530,32 @@
       "category": "semantics"
     },
     "document_intelligence/domains/ops/doc_types/sections/ops_incident_report.sections.any.json": {
-      "sha256": "da6500b5dc684cc8c8cc699961e664e32116fd68a8a054597a928ea886acb047",
+      "sha256": "4ff3416145c0cd214710e5e230e45e96e2d17c09eb68d13308e099dbc06cc305",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/ops/doc_types/sections/ops_maintenance_log.sections.any.json": {
-      "sha256": "39708477c003e4901534ebffd00b304e63f5c53f0d0ce11d50bc11a1655e26e1",
+      "sha256": "b16b6c05acb038412e89b5d8787e58405dfd4c8e4c59e96fa271c34ec61da8ea",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/ops/doc_types/sections/ops_quality_report.sections.any.json": {
-      "sha256": "0a2bf259dfc1a23a8d91da3fc3832f88938444e040001ced12df2d7b1acdb9a9",
+      "sha256": "8a30b606cdb3a866316d74d7f44bb6004f9719ff87b25dae4650a1b4bb997648",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/ops/doc_types/sections/ops_shipping_manifest.sections.any.json": {
-      "sha256": "cd72e4999342208dd5a97c9f1dbcc8cf6ce0e989868ef641eb525f8c599a982c",
+      "sha256": "94f1e018fd80731c735d0a5042709dfa72e3d309cae0741797445007fa1f8366",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/ops/doc_types/sections/ops_sla_report.sections.any.json": {
-      "sha256": "dc557af4fb66075dc600faf621fc21c036cbbd86b3c919613c066d17305d2acb",
+      "sha256": "0fced03663204e2f92cf36ef298f7e5fcdecfd9cc7707d4f3f8ca8a5a6c8065c",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/ops/doc_types/sections/ops_work_order.sections.any.json": {
-      "sha256": "1e14a471c848e1287dc9f02174bfb9b2566b908c1675963e3070165f77e37980",
+      "sha256": "7642d222add5e30cfe2a3009d63efd5c467e9f538135aa249bea1c4dbcda352f",
       "required": false,
       "category": "semantics"
     },
@@ -4725,22 +4680,22 @@
       "category": "semantics"
     },
     "document_intelligence/domains/tax/doc_types/sections/tax_assessment_notice.sections.any.json": {
-      "sha256": "ccd9e3ca7822d68d7abfed7475a68d1cccf8ef476183bd01de03a88e2a2d62fd",
+      "sha256": "df4ce0ae2d0fec1d0b679e5bc6212503a29eb27eb69948549531ea85c8d0995b",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/tax/doc_types/sections/tax_individual_income_return.sections.any.json": {
-      "sha256": "178676b93557afb3069a88a15468bc9d071ba4a6ad0e732c08e0d9175ffc40e1",
+      "sha256": "e5a4f5f17ffdafd607986cf601237dc97db8fe3f1b3b716b19a3293e735fddc7",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/tax/doc_types/sections/tax_payment_slip.sections.any.json": {
-      "sha256": "2dfbd50b548fa711cf2513cda8ae6647984f63f155cd26fce25f2f755c7ee918",
+      "sha256": "db3c435944905899d47c6015bf024d85b632886246efff67365d057bfb748f00",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/tax/doc_types/sections/tax_property_tax_bill.sections.any.json": {
-      "sha256": "12506f5acdad1666f3519c971a11824235ef0a9ca327de6a38929ea3778dc42f",
+      "sha256": "b9687a76b091c997d8ca029624b45f32a067adf4f7262588e1f421536c15067c",
       "required": false,
       "category": "semantics"
     },
@@ -4865,32 +4820,32 @@
       "category": "semantics"
     },
     "document_intelligence/domains/travel/doc_types/sections/travel_boarding_pass.sections.any.json": {
-      "sha256": "995cbdd9be4fb7e8c7b4a866fda2c8968f61dd28ffee17ae29f7957b288b3eea",
+      "sha256": "a0f3c98194aa25524ee4e1aabae6c477094a24ca222ac0b3c366aff2bc473e3f",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/travel/doc_types/sections/travel_car_rental_agreement.sections.any.json": {
-      "sha256": "0ed0f376728714f458139c336a2ccc2f6a4551260fbd451d8ee02501830be0b3",
+      "sha256": "a3015753bc1d553e53ab648c016d356c2d45a6c942de29c4c166af447d163ffa",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/travel/doc_types/sections/travel_hotel_booking_confirmation.sections.any.json": {
-      "sha256": "86a903761cb08abbd4145fa89d712e6e218a57331234ecc6ea01db5a007261ef",
+      "sha256": "12da090d60d9259304dbba16e9bbcc5265fc9d9e86c80cc0efd53169745e9921",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/travel/doc_types/sections/travel_itinerary.sections.any.json": {
-      "sha256": "f2ac92969ac43416f9b459d0189d40dfb48ea5a13d7d61d90fbc8ee319cb8868",
+      "sha256": "ed15a1d080f3885b9bd795ac3694bc2b8b65dd46a5f314bd3ecc6921d122dcea",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/travel/doc_types/sections/travel_travel_insurance_policy.sections.any.json": {
-      "sha256": "29c3798476c3abb1c2ee944b0ff6b7c5235777df27a2fee6c6c626f8a8b62f9d",
+      "sha256": "454bc0266445824bff46d5c04cecbfe359fcd57b81b5b7240c42951fcc7e863b",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/travel/doc_types/sections/travel_visa_application_receipt.sections.any.json": {
-      "sha256": "713f00dad2d744f09a36496d0767f2dfbd35c491fff82a2c335259db95519ab2",
+      "sha256": "15ddaba8cbdf46df50ef8c11342c8462c80fbd366f15527bbf76f82de6d9876c",
       "required": false,
       "category": "semantics"
     },
@@ -5010,7 +4965,7 @@
       "category": "manifest"
     },
     "document_intelligence/manifest/dependency_graph.any.json": {
-      "sha256": "f79a26fa0ad4438a6ec5ec59a846a439aefba8d7661ac4d2383e3a52eb1fd4dc",
+      "sha256": "6826e0cf028237f7b7cfc38950706181fc8c7fea4cb866e80e29577fd7bbaa35",
       "required": true,
       "category": "manifest"
     },
@@ -5020,12 +4975,12 @@
       "category": "manifest"
     },
     "document_intelligence/manifest/runtime_wiring_gates.any.json": {
-      "sha256": "f2ffb49d82061148a0d2167b7f76c97d02a1e585c99c5b36824184c82b28cd12",
+      "sha256": "feb7f647f6c9e6e186a49148bb33b0108ade54fa6282d1c59989c420d1c38da6",
       "required": true,
       "category": "manifest"
     },
     "document_intelligence/manifest/usage_manifest.any.json": {
-      "sha256": "0e42dc661da8b3c71aca67d0107290db9005e07cf8dace18102b89a717a00ec9",
+      "sha256": "39ce9fbc7f4927186c960f452cc73693e345e5e083c5436df412240aa491b869",
       "required": true,
       "category": "manifest"
     },
@@ -5120,12 +5075,12 @@
       "category": "policies"
     },
     "document_intelligence/semantics/doc_type_ontology.any.json": {
-      "sha256": "1cb51e3ebe4d62df00c3b3f9f9f4262b5746c235e113fae40d405020e97f763a",
+      "sha256": "3a9170a399fd44e58e032b83b3c51c1b423af64be8308551c93ed7058dbc4f9d",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/semantics/domain_ontology.any.json": {
-      "sha256": "beffae98002a06b7384894cc0a177664dde10cbcdc19b2952a52ed88e01d14cc",
+      "sha256": "0ebeacdba2e27bbf30d023f20f28eab9c0dafe84c1a1fb41dc66da120fcac8a5",
       "required": false,
       "category": "semantics"
     },
@@ -5250,7 +5205,7 @@
       "category": "fallbacks"
     },
     "fallbacks/fallback_router.any.json": {
-      "sha256": "c14c294a77d7be879a350b7bfd10b00e084bd17bb6f9a2b745af5e456fd45c78",
+      "sha256": "74bde422a2bbbb1d0ba0add2bf830657ee0af92ecbbe840fbaf96989ca44def9",
       "required": false,
       "category": "fallbacks"
     },
@@ -5314,6 +5269,11 @@
       "required": false,
       "category": "formatting"
     },
+    "ingestion/abbreviations.chunking.any.json": {
+      "sha256": "8864024860dbfdbd1d4ada0829c48d292295b920a290e28200835a0b08f36abb",
+      "required": false,
+      "category": "semantics"
+    },
     "intent_patterns/docx.en.any.json": {
       "sha256": "06f1d89b710f73c18faf4131e2e3fb84f092eb4be3402a1bd45567ed4ccd0bde",
       "required": false,
@@ -5370,22 +5330,22 @@
       "category": "llm"
     },
     "llm/llm_cost_table.any.json": {
-      "sha256": "a1674ca95f863af0e6802e321a083f9a18df5976a7f369f4a861342bc4838b44",
+      "sha256": "a0f689fd08b1027a34a03587a2f2ec812e290570de99a2929dee9e43c6a0f4b1",
       "required": true,
       "category": "llm"
     },
     "llm/provider_capabilities.any.json": {
-      "sha256": "e37c6f665b7e7ad604cf87e88334406e2796835bda791dea3344dc463d90c920",
+      "sha256": "a78bbccc1667e977868004f1b396d3f4cf34005a590457d90c5638fbb6923e08",
       "required": true,
       "category": "llm"
     },
     "llm/provider_fallbacks.any.json": {
-      "sha256": "d15dbd206106aea30c03a44b1d2552912ae743c811c09e752c3a20eb5bee18fe",
+      "sha256": "b2e64577b538a1b46d8660d45edc88e932c2f5e3c80d06836069053c8f1464d8",
       "required": true,
       "category": "llm"
     },
     "manifest/bank_aliases.any.json": {
-      "sha256": "41a28ffb8a7eb02b8886d7434307ea2fee7bea55e16d9664fb7d6b382d672c5c",
+      "sha256": "12223a0ec5fef65ffe39b9ba83937ec1c7a0542003cf72b5bec1ce36b04655db",
       "required": true,
       "category": "manifest"
     },
@@ -5395,7 +5355,7 @@
       "category": "manifest"
     },
     "manifest/bank_dependencies.any.json": {
-      "sha256": "792ec33429bfdd4b4b4826baf7efd9e3a6c0aa305b08b1608e91e04331b2e8e6",
+      "sha256": "9c78e9025000bdbef7cefe9ba832d485a953d1b6a5ce21d5d5690a0ee83cd2ed",
       "required": true,
       "category": "manifest"
     },
@@ -5420,7 +5380,7 @@
       "category": "manifest"
     },
     "manifest/feature_flags.any.json": {
-      "sha256": "dc18940a333a0d1bf166c96d3f45152b20568bc6416adfb323647b21686873f3",
+      "sha256": "70bbf107fe9c0b35799bd1c190ee946dba1adc6a192d7427a4a9db1dcef16d8f",
       "required": true,
       "category": "manifest"
     },
@@ -5565,7 +5525,7 @@
       "category": "semantics"
     },
     "normalizers/doc_archetypes.any.json": {
-      "sha256": "d7f0a755e916a323558f6f42d2d867d29634cd66f5a4950a867a5ad7ba60828f",
+      "sha256": "8603bfb8464340639da8ef11d3937b37905ba6fe2c394620212a605a3c0bde49",
       "required": false,
       "category": "semantics"
     },
@@ -5597,6 +5557,11 @@
     "operators/file_action_operators.any.json": {
       "sha256": "8ee163514018451f18e305e261d105a37d66c6ee6778a5324cf37f1edcb1dcf7",
       "required": true,
+      "category": "operators"
+    },
+    "operators/operator_canonical_registry.any.json": {
+      "sha256": "35770f4d4b30fb025bc7cdc4efd025d9160426327f03c2f8c05a8d9cd17788db",
+      "required": false,
       "category": "operators"
     },
     "operators/operator_collision_matrix.any.json": {
@@ -5860,7 +5825,7 @@
       "category": "overlays"
     },
     "overlays/ui_contracts.any.json": {
-      "sha256": "ddb84172868a6573070975dd5f6a59a1a9d68767df421df5f198cd3f9262e907",
+      "sha256": "f3aab7f3f3b4ae3b5baaa4527957b4eca73aa3115eaa88308dfd763910052431",
       "required": false,
       "category": "overlays"
     },
@@ -6065,27 +6030,27 @@
       "category": "semantics"
     },
     "patterns/domains/medical/encounter_timeline_patterns.any.json": {
-      "sha256": "f2f43a38459d5490c6911d14222cdef38dd5edd0b7f822df5214878bf488c2a6",
+      "sha256": "95040f127679de2aba82a70f1012ad01d70e5d175524802db920aae7d7bb841b",
       "required": false,
       "category": "semantics"
     },
     "patterns/domains/medical/lab_panel_patterns.any.json": {
-      "sha256": "1e3693ee36d8d513c953adaf3786191c6bdbebfa48607fda90c5f2a1495b4c0b",
+      "sha256": "d62ef5cfc195e2418f89982fe50e053bf48353399da1b88d67664dcfbe9675db",
       "required": false,
       "category": "semantics"
     },
     "patterns/domains/medical/red_flag_patterns.any.json": {
-      "sha256": "ca9d91c17ef40ebcf9a2085385397a11f53fa6888f39b11008f8c02c8bede4a9",
+      "sha256": "c7bd9ca1f631fbd88a468ab9b472457abc55d0fae48135ed657d146998fa3123",
       "required": false,
       "category": "semantics"
     },
     "patterns/domains/medical/safety_boundary_triggers.any.json": {
-      "sha256": "0a89750274bce952213d42cfad9505cd760b768e2795c383bd4b01293019995d",
+      "sha256": "4d7c8aab458c0a1c9a3d912357d57c8a24e45688bf192a3c1dff10840813af13",
       "required": false,
       "category": "semantics"
     },
     "patterns/domains/medical/unit_and_reference_range_patterns.any.json": {
-      "sha256": "fb47f48c954a0e4375e3976aa9120618e57ef8eadc7f902897f5a118f3908d2b",
+      "sha256": "c63f7a4c08f2d5fe9512bcc1164df2b29b797db1b659703bb98137620027c0c2",
       "required": false,
       "category": "semantics"
     },
@@ -6250,112 +6215,112 @@
       "category": "semantics"
     },
     "patterns/navigation/nav_failure_recovery.any.json": {
-      "sha256": "1872d0c230baeddfc2616c0eb8e866e6cd0f61803e692977e69ee299eeb23de7",
+      "sha256": "eb03883a9ca988111fae020ca5141f4e204749a506abced71aede6befd273c70",
       "required": false,
       "category": "semantics"
     },
     "patterns/navigation/nav_intents.en.any.json": {
-      "sha256": "e7ccc709ff34893d52f2ebc8e9d708db49e43439c6a577f463be13b560401593",
+      "sha256": "d2e33247e2ea6a03e97a65eed9cfce453f8fad06db2495cb92c5c9ca0102516b",
       "required": false,
       "category": "semantics"
     },
     "patterns/navigation/nav_intents.pt.any.json": {
-      "sha256": "2ade9f0682256e454f304f70b8b060a8bdf3324ed914a26c014abe8d2d567810",
+      "sha256": "61103b4a1050db212a9d3c9cf6fcc32ff1c3a666aa2ed8a389acb9e1630e1a7c",
       "required": false,
       "category": "semantics"
     },
     "patterns/navigation/open_disambiguation.any.json": {
-      "sha256": "c4c57b397347af25d3335096ba31114decf06fec9a370cd5299287074ba51156",
+      "sha256": "38583ce99eef2d6e9bbcb789a193998cc0bd38501ceb2d16fcbdf7d704cfad76",
       "required": false,
       "category": "semantics"
     },
     "patterns/navigation/path_string_guardrails.any.json": {
-      "sha256": "63beed1e00f4814f816384bcda3910501d45e79110f725d46f0baa96a47a5326",
+      "sha256": "0f7a41ed3ba77b94fae099f2fa92372933d1e7ca9004cc5f96a666fa353d98f9",
       "required": false,
       "category": "semantics"
     },
     "patterns/operators/advise.any.json": {
-      "sha256": "31b4a7c8595c11e62316f87e5435924f82f8456ccbcc71bbcfa06beeb32e7818",
+      "sha256": "76254e12713660e00e1fe8da8951285d81119f2c09a62d32174d6a6c7c634bab",
       "required": false,
       "category": "semantics"
     },
     "patterns/operators/calculate.any.json": {
-      "sha256": "647f622170db4520e52fb610d4ad4207cb4f7b3a602d404f0a55d57cc5c4fd27",
+      "sha256": "399ddfe2d20cd844bbd1479f4938d0da5f90c503bad85e28a0bb5800f0b26a31",
       "required": false,
       "category": "semantics"
     },
     "patterns/operators/compare.any.json": {
-      "sha256": "4ab4bbb68ff9c38324e1875d63dd56ebba344f931da8bb10c12064f552e35e62",
+      "sha256": "5de0f7a97708b4a32e54a33c2d434295824068cce49e2b4458f22956be5638da",
       "required": false,
       "category": "semantics"
     },
     "patterns/operators/evaluate.any.json": {
-      "sha256": "1a203483e305436ec583a2119f27dcc7797fcd94b0076d27b9ec22c203ccdbab",
+      "sha256": "dcbee1b587cdfa6e650cfbeaa9dc4f7557f4a5ddc1302ad9f230a64a9f57b8f2",
       "required": false,
       "category": "semantics"
     },
     "patterns/operators/extract.any.json": {
-      "sha256": "2276b11bb8bc518b1b79f47677c84303a18b30ee349867beae839dc057db5199",
+      "sha256": "da1312c55e0ecd743d003c1743ad16586388dad6787311d4b329bda788636360",
       "required": false,
       "category": "semantics"
     },
     "patterns/operators/locate.any.json": {
-      "sha256": "e8f45cae5bcbbc10aee319f6efaccf6a137f69a12406b3c96724e59882bf8c37",
+      "sha256": "9856bbed3e78b890784917f2f077a01b979ee42e82b9adbb11708185e12aacbe",
       "required": false,
       "category": "semantics"
     },
     "patterns/operators/monitor.any.json": {
-      "sha256": "7225ec8e7a1ad2ad34959be4919a1648017044a0c60147b684509a52638ec2fb",
+      "sha256": "d1fbec1c9e12ceab0c33c5179552fc8a9595cfef663d0dd1b202d1860e22349e",
       "required": false,
       "category": "semantics"
     },
     "patterns/operators/navigate.any.json": {
-      "sha256": "53165e7d67ec0f9f6b26b46dc38fc56ceeac2ace24325370c0e104069ca74023",
+      "sha256": "210600600a7f6e15254ca6ff4ef7e29da8c70c3f49c337c22190af9e58c1d023",
       "required": false,
       "category": "semantics"
     },
     "patterns/operators/open.any.json": {
-      "sha256": "30a7b6c5cd7fa9184f957d53f5cda5d88e0314ea467799aeb338ae338bf0cd27",
+      "sha256": "7cf3df4f6f803bad45503a5f892cde06d46df00461fe9ba10858950db2220a9a",
       "required": false,
       "category": "semantics"
     },
     "patterns/operators/summarize.any.json": {
-      "sha256": "d0d1ee6ad05d8fdcdd8fb178f892a7088c93cf6e7472707d46f521cf19a9df65",
+      "sha256": "49ea0233f646348f967d52874a9f8fd01e750e00bf855f29cc76a8ecd0c2d581",
       "required": false,
       "category": "semantics"
     },
     "patterns/operators/validate.any.json": {
-      "sha256": "00ddd31b942dc4f07c39d924759b2d9215da1268a31ed5bf82a824ccefd3f231",
+      "sha256": "0dc55f3a22d895e5a29812c4463f6708bac53d02c78c18ae00c095168cf5b0c4",
       "required": false,
       "category": "semantics"
     },
     "patterns/quality/ambiguity_triggers.any.json": {
-      "sha256": "10c9e9322c42220fa69d587c910c4e47ce81bd5f8f8022385296db5237158e8c",
+      "sha256": "353e23aa8b8523eeaaeb8a8d0aa75170b007c4d59c491127240f3dcd606229ba",
       "required": false,
       "category": "semantics"
     },
     "patterns/quality/language_lock_triggers.any.json": {
-      "sha256": "22a6fdd6a24ff03dac57a3aaeb629c78df31aba95cccd18ba90f72fb85d893f1",
+      "sha256": "ce4ddbf4698c597e6c3aaafa4c6e955a7c7fe09471de79897f51ad91b56a9a68",
       "required": false,
       "category": "semantics"
     },
     "patterns/quality/numeric_integrity_triggers.any.json": {
-      "sha256": "2c0b165fb16e33522f41bb5febed4aefd89e0b803891956b27c467788e463d12",
+      "sha256": "34ec1802a5c538f0edb792dba03339714c04e3c02659dce32b46b57157e4f8e5",
       "required": false,
       "category": "semantics"
     },
     "patterns/quality/unsafe_operation_triggers.any.json": {
-      "sha256": "668c85bc2c9a031eddfcbc50f63665f1d1c78197b625c764369e8ed8f48b6ebe",
+      "sha256": "68091ce4f9b903bd1a7dee23d7b59f3ac481f0a050009ab9ede62ada046425f7",
       "required": false,
       "category": "semantics"
     },
     "patterns/quality/weak_evidence_triggers.any.json": {
-      "sha256": "8ec0140f5aed264a7f41662acf77dda40ae6aeaf5733019057318a4c03ed61bd",
+      "sha256": "b78f5bce7172e5831870a44c257523a715cb5d4adf98c1e0068faab337000940",
       "required": false,
       "category": "semantics"
     },
     "patterns/quality/wrong_doc_risk.any.json": {
-      "sha256": "53d2158099b6ef611992f82dbdae89c5a0fdd6f85a0e8ac4b0f795751e1103bf",
+      "sha256": "ed9e4e549f83a17f990ac8b5c3d472dd5f6cb17e6b4493325106b76e460defc4",
       "required": false,
       "category": "semantics"
     },
@@ -6380,7 +6345,7 @@
       "category": "semantics"
     },
     "patterns/ui/receipt_shapes.any.json": {
-      "sha256": "563739a800d4caf6f0c6e79307e227a30c9351c9db9645c0a987158220c2231d",
+      "sha256": "a6d17b14de79bc7ac7998e3cfc4135e97168b4fe4df6f48073905c3e81bb19d8",
       "required": false,
       "category": "semantics"
     },
@@ -6705,7 +6670,12 @@
       "category": "quality"
     },
     "quality/document_intelligence/cross_domain_tiebreak_policy.any.json": {
-      "sha256": "c4d51609adfff282f0773e772abc7e97df997c25ff3fd76a946999d8625bfaca",
+      "sha256": "0cf5d5ee8cf70341f7834556a65437e1d2d632c4a8320b0124ee3d46c55799a9",
+      "required": true,
+      "category": "quality"
+    },
+    "quality/document_intelligence/doc_type_confusion_matrix.any.json": {
+      "sha256": "6f7060df8ed54844a8b86ed06b8feadadd31a05f278023af54644a593c066fab",
       "required": true,
       "category": "quality"
     },
@@ -6790,7 +6760,7 @@
       "category": "retrieval"
     },
     "retrieval/evidence_packaging.any.json": {
-      "sha256": "0abb8e7ac5bb06c0f87352952f68439e7133a9eb88817cc6c7aceaffdade7b98",
+      "sha256": "7ea9ab0a1291e6a69c682bed78b452ed484abe5024f74724afaacd08e6a23878",
       "required": true,
       "category": "retrieval"
     },
@@ -6830,7 +6800,7 @@
       "category": "retrieval"
     },
     "retrieval/retrieval_negatives.any.json": {
-      "sha256": "d5222d71a6833d3c2c5a3fb8582e70f0d3195bfc0fe5b69f081dff825cbe2939",
+      "sha256": "c0f5c59f989c87acfeec1e4ed14f3530bca01a805ddb12a990b7b1dc29537c01",
       "required": true,
       "category": "retrieval"
     },
@@ -6844,9 +6814,49 @@
       "required": true,
       "category": "retrieval"
     },
+    "retrieval/section_priority.banking.any.json": {
+      "sha256": "ab9f38b284d1fe80a6d01f0d61a9ec3d46bfba8bceb8723559a8a0d120f8aaf0",
+      "required": false,
+      "category": "retrieval"
+    },
+    "retrieval/section_priority.billing.any.json": {
+      "sha256": "6c5eeae8b2ca22d38d2bcfc7a3bd784a322b1f1f828741df01c63a2fdc32e476",
+      "required": false,
+      "category": "retrieval"
+    },
+    "retrieval/section_priority.education.any.json": {
+      "sha256": "ebe0be7381fb052ae4375ff194ae56cb24167d6f6eb551b6485866431f70441a",
+      "required": false,
+      "category": "retrieval"
+    },
+    "retrieval/section_priority.everyday.any.json": {
+      "sha256": "60655836de2e0806a2fde46fd900119e2df881706b9b9d71feac9abfc76d5704",
+      "required": false,
+      "category": "retrieval"
+    },
     "retrieval/section_priority.finance.any.json": {
       "sha256": "c2db1d2a64a13275a7deb0b3663eacd71abc00075f169bea26c1812443cf9bb9",
       "required": true,
+      "category": "retrieval"
+    },
+    "retrieval/section_priority.housing.any.json": {
+      "sha256": "3d984a1df9a637de41e88b2eec7264670384f04c739870e7b97ce427f109adb6",
+      "required": false,
+      "category": "retrieval"
+    },
+    "retrieval/section_priority.hr_payroll.any.json": {
+      "sha256": "8c5c622898162e30b1e02e8f0dae26a5da7d482245aba9abccbbc703f375ecb4",
+      "required": false,
+      "category": "retrieval"
+    },
+    "retrieval/section_priority.identity.any.json": {
+      "sha256": "7a7f202c667837632f4d358b87084919b34c5bdba9e3ccf485c8dda6faa3c01b",
+      "required": false,
+      "category": "retrieval"
+    },
+    "retrieval/section_priority.insurance.any.json": {
+      "sha256": "49d18109aa2a9559316fb8d471d9d8a9c6551b2adb21dbfa6413f38efdaa03f5",
+      "required": false,
       "category": "retrieval"
     },
     "retrieval/section_priority.legal.any.json": {
@@ -6862,6 +6872,16 @@
     "retrieval/section_priority.ops.any.json": {
       "sha256": "86f093953418d928309bd8db325fbfeca22569f7d80470ab713edce7b9515807",
       "required": true,
+      "category": "retrieval"
+    },
+    "retrieval/section_priority.tax.any.json": {
+      "sha256": "d9564509659befe2c4f8ada29510a3475dc1abf008c159e9ba0859bd1149f2de",
+      "required": false,
+      "category": "retrieval"
+    },
+    "retrieval/section_priority.travel.any.json": {
+      "sha256": "f5071b8fb080d56ac49af10731e51d0d2975c732af14ea47c7debc19d2ae2172",
+      "required": false,
       "category": "retrieval"
     },
     "retrieval/semantic_search_config.any.json": {
@@ -7045,12 +7065,12 @@
       "category": "semantics"
     },
     "semantics/document_intelligence_bank_map.any.json": {
-      "sha256": "8c12fc43075625ccb1883712ee24ce1ce50a3a77c4eff9bad6b856f6dc70804e",
+      "sha256": "2642ed8e750b1c403fb341faf709b0b5809941b73273d718d3c1323462fad086",
       "required": true,
       "category": "semantics"
     },
     "semantics/domain_ontology.any.json": {
-      "sha256": "ddb84641a763a10d161c135602138b36c40bb7e5a630071b85894698923d740a",
+      "sha256": "e534a6f8fd9699a6125494e86c1a7243e978c95d3bedf53b15a4b831d611c41a",
       "required": true,
       "category": "semantics"
     },
@@ -7269,8 +7289,48 @@
       "required": true,
       "category": "semantics"
     },
+    "semantics/taxonomy/doc_archetypes/banking.any.json": {
+      "sha256": "eac47f3377bf7b04d4a4da4d8bfb05cee6e6773d1f8fecfe903893f64c23393d",
+      "required": true,
+      "category": "semantics"
+    },
+    "semantics/taxonomy/doc_archetypes/billing.any.json": {
+      "sha256": "e53bf635406b5040860410893ef70fec29ee691ac31d3395500be9d8b85bd2f5",
+      "required": true,
+      "category": "semantics"
+    },
+    "semantics/taxonomy/doc_archetypes/education.any.json": {
+      "sha256": "4e0afc7d453043b36611463526122002578331745e41808c2079c9fe2869cf79",
+      "required": true,
+      "category": "semantics"
+    },
+    "semantics/taxonomy/doc_archetypes/everyday.any.json": {
+      "sha256": "958347eae913e0ce38b71221ddb514b20562100148ff132318ef7598ab07f9ea",
+      "required": true,
+      "category": "semantics"
+    },
     "semantics/taxonomy/doc_archetypes/finance.any.json": {
       "sha256": "c433741e0e5597fad93dad387b799058627d28df1daf1bffff6115cbd6dab260",
+      "required": true,
+      "category": "semantics"
+    },
+    "semantics/taxonomy/doc_archetypes/housing.any.json": {
+      "sha256": "f8e08ec08c3cb4022c6011676b27f434e68119328812f90139bb6a51bceb8501",
+      "required": true,
+      "category": "semantics"
+    },
+    "semantics/taxonomy/doc_archetypes/hr_payroll.any.json": {
+      "sha256": "7b1431daf2c8f0f34a96b33642b187c87cc2193097c66966740174ffdaf48ce0",
+      "required": true,
+      "category": "semantics"
+    },
+    "semantics/taxonomy/doc_archetypes/identity.any.json": {
+      "sha256": "78786055d0c6074f0312dc0f781ee1982c122845046eb2d90c46feab6baa3c6b",
+      "required": true,
+      "category": "semantics"
+    },
+    "semantics/taxonomy/doc_archetypes/insurance.any.json": {
+      "sha256": "d2cf947cd66fdb6721b790d1f168f027038669f53935b6ce44df2f67b3c93ecc",
       "required": true,
       "category": "semantics"
     },
@@ -7289,8 +7349,18 @@
       "required": true,
       "category": "semantics"
     },
+    "semantics/taxonomy/doc_archetypes/tax.any.json": {
+      "sha256": "80aa5440fca9364ca7ac364f3d1953f6b3a3543c4fe42515005d39e316a53f2c",
+      "required": true,
+      "category": "semantics"
+    },
+    "semantics/taxonomy/doc_archetypes/travel.any.json": {
+      "sha256": "ee701f29f53ec6c45a67912b55fb8a113a358ec0f5342029d2ff21c239b023e3",
+      "required": true,
+      "category": "semantics"
+    },
     "semantics/taxonomy/doc_taxonomy.any.json": {
-      "sha256": "4fdd25d264006c829e88525f3b0124632712d9a7252cba7ddf770801b08613fe",
+      "sha256": "c9891fcf65e7d461d0fc347838f84b5b90aa1b29e658b1ff2da11f34d5772217",
       "required": true,
       "category": "semantics"
     },

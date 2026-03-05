@@ -124,10 +124,10 @@ const mockExternalProviders = [
   },
   {
     id: "ext_003",
-    provider: "Anthropic",
+    provider: "Gemini",
     category: "LLM",
     endpoints: [
-      { endpoint: "messages", calls24h: 5678, avgLatency: 1567, errorRate: 0.52, cost24h: 8.90 },
+      { endpoint: "generateContent", calls24h: 5678, avgLatency: 1567, errorRate: 0.52, cost24h: 8.90 },
     ],
     totalCalls24h: 5678,
     avgLatency: 1567,

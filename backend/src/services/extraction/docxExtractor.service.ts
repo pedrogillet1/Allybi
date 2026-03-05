@@ -384,6 +384,7 @@ async function parseParagraphs(
   } else {
     // Fallback: grab w:p and w:tbl separately (order between them is lost,
     // but at least we don't drop tables entirely).
+    logger.warn("[DOCX] Ordered children ($$) unavailable, falling back to unordered w:p + w:tbl extraction");
     let idx = 0;
 
     const pNodes = bodyContent["w:p"] || [];

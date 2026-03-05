@@ -385,14 +385,14 @@ describe("LlmRequestBuilderService", () => {
     expect(maxTokens).toBe(128000);
   });
 
-  test("resolves max input tokens using wildcard model rules", () => {
+  test("resolves max input tokens using wildcard family rules", () => {
     mockedGetOptionalBank.mockImplementation((bankId: string) => {
       if (bankId === "provider_capabilities") {
         return {
           providers: {
-            local: {
+            gemini: {
               models: {
-                "ollama:*": { maxInputTokens: 8192 },
+                "gemini-2.5-*": { maxInputTokens: 8192 },
               },
             },
           },
@@ -405,8 +405,8 @@ describe("LlmRequestBuilderService", () => {
       createInput({
         route: {
           ...createInput().route,
-          provider: "local",
-          model: "ollama:phi4",
+          provider: "gemini",
+          model: "gemini-2.5-flash-001",
         },
       }),
     );

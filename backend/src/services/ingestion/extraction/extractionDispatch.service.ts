@@ -13,7 +13,7 @@ import { extractPptxWithAnchors } from "../../extraction/pptxExtractor.service";
 import { getGoogleVisionOcrService } from "../../extraction/google-vision-ocr.service";
 import { extractWithTesseract } from "../../extraction/tesseractFallback.service";
 import type { DispatchedExtractionResult } from "./extractionResult.types";
-import { recordExtractorTiming, recordOcrUsage } from "../pipeline/pipelineMetrics.service";
+import { recordExtractorTiming, recordExtractionAttempt, recordOcrUsage } from "../pipeline/pipelineMetrics.service";
 
 // ---------------------------------------------------------------------------
 // MIME constants
@@ -130,7 +130,7 @@ export async function extractText(
     }
     extractor = "docx";
     const result = await extractDocxWithAnchors(buffer);
-    return { sourceType: "docx", sections: [], ...result } as unknown as DispatchedExtractionResult;
+    return { sourceType: "docx", ...result } as unknown as DispatchedExtractionResult;
   }
 
   if (XLSX_MIMES.includes(mimeType)) {
@@ -141,7 +141,7 @@ export async function extractText(
     }
     extractor = "xlsx";
     const result = await extractXlsxWithAnchors(buffer);
-    return { sourceType: "xlsx", sheetCount: 0, sheets: [], ...result } as unknown as DispatchedExtractionResult;
+    return { sourceType: "xlsx", ...result } as unknown as DispatchedExtractionResult;
   }
 
   if (PPTX_MIMES.includes(mimeType)) {
@@ -152,7 +152,7 @@ export async function extractText(
     }
     extractor = "pptx";
     const result = await extractPptxWithAnchors(buffer);
-    return { sourceType: "pptx", slideCount: 0, slides: [], ...result } as unknown as DispatchedExtractionResult;
+    return { sourceType: "pptx", ...result } as unknown as DispatchedExtractionResult;
   }
 
   // Plain text fallback
@@ -274,6 +274,9 @@ export async function extractText(
   }
 
   throw new Error(`Unsupported mimeType for extraction: ${mimeType}`);
+  } catch (err) {
+    recordExtractionAttempt(false);
+    throw err;
   } finally {
     const durationMs = Date.now() - tStart;
     if (extractor !== "unknown") {

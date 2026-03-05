@@ -1,0 +1,7 @@
+# Unused legacy retrieval files temporarily allowlisted until fully deleted.
+src/services/retrieval/embedding.service.test.ts
+src/services/retrieval/gcsStorage.service.test.ts
+src/services/retrieval/pinecone.service.test.ts
+src/services/retrieval/vectorEmbedding.runtime.service.test.ts
+src/services/retrieval/vectorEmbedding.service.test.ts
+src/services/retrieval/vectorEmbedding.v2.service.test.ts

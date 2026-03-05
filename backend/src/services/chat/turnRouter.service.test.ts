@@ -550,10 +550,15 @@ describe("TurnRouterService.decide()", () => {
     const intentConfig = {
       decide: jest.fn(
         (input: {
-          signals?: { isFollowup?: boolean; followupConfidence?: number };
+          signals?: {
+            isFollowup?: boolean;
+            followupConfidence?: number;
+            followupSource?: string;
+          };
         }) => {
           expect(input.signals?.isFollowup).toBe(true);
           expect((input.signals?.followupConfidence || 0) >= 0.65).toBe(true);
+          expect(input.signals?.followupSource).toBe("followup_indicators");
           return makeDecisionOutput("documents");
         },
       ),
@@ -601,6 +606,36 @@ describe("TurnRouterService.decide()", () => {
     expect(intentConfig.decide).toHaveBeenCalled();
   });
 
+  test("emits routing followup notes in intent decision metadata", () => {
+    const routePolicy = {
+      isConnectorTurn: jest.fn<() => boolean>().mockReturnValue(false),
+    };
+    const intentConfig = {
+      decide: jest.fn(() => makeDecisionOutput("documents")),
+    };
+    const router = new TurnRouterService(routePolicy, intentConfig as any);
+    const out = router.decideWithIntent(
+      makeCtx({
+        messageText: "and also this one",
+        request: {
+          userId: "user-1",
+          message: "and also this one",
+          context: {
+            signals: {
+              isFollowup: true,
+              followupConfidence: 0.9,
+            },
+          },
+        },
+      }),
+    );
+
+    expect(out.intentDecision?.decisionNotes).toContain(
+      "routing:followup_source:context",
+    );
+    expect(out.intentDecision?.decisionNotes).toContain("routing:locale:en");
+  });
+
   test("does not mark generic 'file' wording as explicit document reference", () => {
     const routePolicy = {
       isConnectorTurn: jest.fn<() => boolean>().mockReturnValue(false),
@@ -636,6 +671,55 @@ describe("TurnRouterService.decide()", () => {
 
     expect(
       router.decide(makeCtx({ messageText: "summarize quarterly_report.pdf" })),
+    ).toBe("KNOWLEDGE");
+  });
+
+  test("does not classify generic capability question as discovery routing", () => {
+    const routePolicy = {
+      isConnectorTurn: jest.fn<() => boolean>().mockReturnValue(false),
+    };
+    const intentConfig = {
+      decide: jest.fn((input: any) => {
+        expect(input.signals?.discoveryQuery).toBe(false);
+        const hasDocumentsCandidate = (input.candidates || []).some(
+          (candidate: { intentFamily?: string }) =>
+            candidate.intentFamily === "documents",
+        );
+        expect(hasDocumentsCandidate).toBe(false);
+        return makeDecisionOutput("help");
+      }),
+    };
+    const router = new TurnRouterService(routePolicy, intentConfig as any);
+
+    expect(
+      router.decide(makeCtx({ messageText: "which integrations do you support?" })),
+    ).toBe("GENERAL");
+  });
+
+  test("classifies document-locating question as discovery when document context exists", () => {
+    const routePolicy = {
+      isConnectorTurn: jest.fn<() => boolean>().mockReturnValue(false),
+    };
+    const intentConfig = {
+      decide: jest.fn((input: any) => {
+        expect(input.signals?.discoveryQuery).toBe(true);
+        const docCandidate = (input.candidates || []).find(
+          (candidate: { intentFamily?: string; operatorId?: string }) =>
+            candidate.intentFamily === "documents",
+        );
+        expect(docCandidate?.operatorId).toBe("locate_docs");
+        return makeDecisionOutput("documents");
+      }),
+    };
+    const router = new TurnRouterService(routePolicy, intentConfig as any);
+
+    expect(
+      router.decide(
+        makeCtx({
+          messageText: "where in the document is clause 4?",
+          attachedDocuments: [{ id: "doc-4", mime: "application/pdf" }],
+        }),
+      ),
     ).toBe("KNOWLEDGE");
   });
 

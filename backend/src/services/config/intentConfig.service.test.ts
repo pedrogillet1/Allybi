@@ -121,4 +121,42 @@ describe("IntentConfigService", () => {
     expect(decision.operatorId).toBe("open");
     expect(decision.requiresClarification).not.toBe(true);
   });
+
+  test("treats input.env=production as strict even when NODE_ENV is local", () => {
+    const prevNodeEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = "local";
+    try {
+      const service = new IntentConfigService();
+      expect(() =>
+        service.decide({
+          env: "production",
+          language: "en",
+          queryText: "summarize this",
+          candidates: [],
+        }),
+      ).toThrow("intent_config bank is required in strict runtime environments.");
+    } finally {
+      if (typeof prevNodeEnv === "string") process.env.NODE_ENV = prevNodeEnv;
+      else delete process.env.NODE_ENV;
+    }
+  });
+
+  test("treats input.env=local as non-strict even when NODE_ENV is production", () => {
+    const prevNodeEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = "production";
+    try {
+      const service = new IntentConfigService();
+      const decision = service.decide({
+        env: "local",
+        language: "en",
+        queryText: "summarize this",
+        candidates: [],
+      });
+      expect(decision.intentFamily).toBe("documents");
+      expect(decision.decisionNotes).toContain("fallback:no_candidates");
+    } finally {
+      if (typeof prevNodeEnv === "string") process.env.NODE_ENV = prevNodeEnv;
+      else delete process.env.NODE_ENV;
+    }
+  });
 });

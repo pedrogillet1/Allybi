@@ -7,6 +7,7 @@ import {
   markOAuthStateNonceUsedDurable,
 } from "../oauthStateNonceStore.service";
 import { TokenVaultService } from "../tokenVault.service";
+import { ConnectorIdentityMapService } from "../connectorIdentityMap.service";
 
 const PROVIDER: ConnectorProvider = "outlook";
 const AUTH_BASE_COMMON =
@@ -191,6 +192,20 @@ export class OutlookOAuthService {
       scopes,
       expiresAt,
     );
+
+    try {
+      const cim = new ConnectorIdentityMapService();
+      const email = (me as Record<string, unknown> | null)?.mail as string | undefined
+        || (me as Record<string, unknown> | null)?.userPrincipalName as string | undefined;
+      await cim.upsertLink({
+        userId,
+        provider: PROVIDER,
+        externalWorkspaceId: providerAccountId || userId,
+        externalAccountEmail: email || undefined,
+      });
+    } catch {
+      // non-fatal
+    }
 
     return {
       provider: PROVIDER,

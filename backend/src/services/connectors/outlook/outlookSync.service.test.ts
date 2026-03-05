@@ -12,6 +12,15 @@ jest.mock("../connectorsIngestion.service", () => ({
   ConnectorsIngestionService: class MockConnectorsIngestionService {},
 }));
 
+jest.mock("../../../utils/logger", () => ({
+  logger: {
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+    debug: jest.fn(),
+  },
+}));
+
 import { OutlookSyncService } from "./outlookSync.service";
 
 function makeService(ingestResult: any[]) {

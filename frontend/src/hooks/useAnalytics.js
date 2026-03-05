@@ -38,9 +38,9 @@ export const useAnalytics = (endpoint, options = {}) => {
 
       const response = await fetch(`${API_BASE}/admin/analytics/${endpoint}`, {
         headers: {
-          'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json'
-        }
+        },
+        credentials: 'include',
       });
 
       if (!response.ok) {
@@ -124,14 +124,14 @@ export const useFeatureUsage = (options = {}) => {
 };
 
 // Utility functions
-export const refreshAnalyticsCache = async (accessToken, key = null) => {
+export const refreshAnalyticsCache = async (_accessToken, key = null) => {
   try {
     const response = await fetch(`${API_BASE}/admin/analytics/refresh`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${accessToken}`,
         'Content-Type': 'application/json'
       },
+      credentials: 'include',
       body: JSON.stringify({ key })
     });
 
@@ -143,13 +143,11 @@ export const refreshAnalyticsCache = async (accessToken, key = null) => {
   }
 };
 
-export const exportAnalyticsData = async (accessToken, type, format = 'json', options = {}) => {
+export const exportAnalyticsData = async (_accessToken, type, format = 'json', options = {}) => {
   try {
     const params = new URLSearchParams({ type, format, ...options });
     const response = await fetch(`${API_BASE}/admin/analytics/export?${params}`, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`
-      }
+      credentials: 'include',
     });
 
     if (format === 'csv') {

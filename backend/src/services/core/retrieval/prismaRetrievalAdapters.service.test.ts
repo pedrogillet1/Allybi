@@ -9,7 +9,6 @@ process.env.RETRIEVAL_LATEST_VERSION_ONLY = "true";
 const mockDocumentFindMany = jest.fn();
 const mockDocumentFindFirst = jest.fn();
 const mockChunkFindMany = jest.fn();
-const mockEmbeddingFindMany = jest.fn();
 const mockDecryptChunksBatch = jest.fn();
 const mockSearchSimilarChunks = jest.fn();
 const mockPineconeAvailable = jest.fn();
@@ -24,9 +23,6 @@ jest.mock("../../../config/database", () => ({
     },
     documentChunk: {
       findMany: (...args: any[]) => mockChunkFindMany(...args),
-    },
-    documentEmbedding: {
-      findMany: (...args: any[]) => mockEmbeddingFindMany(...args),
     },
   },
 }));
@@ -60,13 +56,11 @@ describe("PrismaRetrievalAdapterFactory encrypted chunk hydration", () => {
     mockDocumentFindMany.mockReset();
     mockDocumentFindFirst.mockReset();
     mockChunkFindMany.mockReset();
-    mockEmbeddingFindMany.mockReset();
     mockDecryptChunksBatch.mockReset();
     mockSearchSimilarChunks.mockReset();
     mockPineconeAvailable.mockReset();
     mockGenerateQueryEmbedding.mockReset();
     mockDocumentFindMany.mockResolvedValue([]);
-    mockEmbeddingFindMany.mockResolvedValue([]);
   });
 
   test("lexical search decrypts encrypted chunk text when plaintext is not stored", async () => {
@@ -202,26 +196,24 @@ describe("PrismaRetrievalAdapterFactory encrypted chunk hydration", () => {
     expect(hits[0].locationKey).not.toContain("|p:-1|");
   });
 
-  test("embedding-backed lexical search emits table payload from embedding metadata", async () => {
+  test("embedding-backed lexical search emits table payload from chunk metadata", async () => {
     process.env.RETRIEVAL_LEXICAL_FROM_EMBEDDINGS = "true";
-    mockEmbeddingFindMany.mockResolvedValue([
+    mockChunkFindMany.mockResolvedValue([
       {
-        id: "emb-1",
+        id: "chunk-emb-1",
         documentId: "doc-11",
         chunkIndex: 2,
-        content: "EBITDA / Q1 = 42%",
-        metadata: JSON.stringify({
-          tableChunkForm: "cell_centric",
-          sheetName: "KPI Dashboard",
-          tableId: "tbl_kpi",
-          rowLabel: "EBITDA",
-          colHeader: "Q1",
-          valueRaw: "42%",
-          unitRaw: "%",
-          unitNormalized: "percent",
-        }),
-        pageNumber: null,
-        sectionName: null,
+        text: "EBITDA / Q1 = 42%",
+        textEncrypted: null,
+        page: null,
+        tableChunkForm: "cell_centric",
+        sheetName: "KPI Dashboard",
+        tableId: "tbl_kpi",
+        rowLabel: "EBITDA",
+        colHeader: "Q1",
+        valueRaw: "42%",
+        unitRaw: "%",
+        unitNormalized: "percent",
         document: {
           id: "doc-11",
           parentVersionId: null,

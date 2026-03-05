@@ -2,7 +2,7 @@
  * geminiClient.service.ts
  *
  * Gemini (Google) LLM client for Allybi, aligned with the README "Gemini fast worker" guidance:
- * - Gemini 3.0 Flash: low-latency intent/routing/scope/discovery/first-pass answers
+ * - Gemini 2.5 Flash: low-latency intent/routing/scope/discovery/first-pass answers
  *
  * This file:
  * - Implements the provider-agnostic LLMClient interface
@@ -27,6 +27,7 @@ import type {
 
 import type { LLMProvider } from "./llmErrors.types";
 import type { ProviderToolCall } from "./llmTools.types";
+import { toCostFamilyModel } from "../../core/llmCostCalculator";
 
 import type {
   LLMStreamingConfig,
@@ -138,6 +139,45 @@ export interface GeminiClientConfig {
    * Timeout for ping() health check (ms).
    */
   pingTimeoutMs?: number;
+
+  /**
+   * Optional strict model allowlist for governance.
+   */
+  allowedModels?: string[];
+  strictModelAllowlist?: boolean;
+  defaultModelFinal?: string;
+}
+
+export function resolveGeminiModel(
+  routeModel: string | undefined,
+  cfg: Pick<
+    GeminiClientConfig,
+    "allowedModels" | "strictModelAllowlist" | "defaultModelFinal" | "defaults"
+  >,
+): string {
+  const fallback =
+    String(
+      cfg.defaultModelFinal ||
+      cfg.defaults?.gemini3Flash ||
+      cfg.defaults?.gemini3 ||
+      "gemini-2.5-flash",
+    ).trim() || "gemini-2.5-flash";
+
+  const requested = String(routeModel || "").trim();
+  if (!requested) return fallback;
+  if (cfg.strictModelAllowlist === false) return requested;
+
+  const allowed =
+    Array.isArray(cfg.allowedModels) && cfg.allowedModels.length > 0
+      ? cfg.allowedModels
+          .map((m) => String(m || "").trim())
+          .filter(Boolean)
+      : [fallback];
+
+  if (allowed.includes(requested)) return requested;
+  const family = toCostFamilyModel(requested);
+  if (family && allowed.includes(family)) return requested;
+  return fallback;
 }
 
 export class GeminiClientService implements LLMClient {
@@ -169,7 +209,8 @@ export class GeminiClientService implements LLMClient {
     const timeout = setTimeout(() => ac.abort(), this.cfg.timeoutMs);
 
     try {
-      const url = this.buildGenerateUrl(req.model.model);
+      const model = resolveGeminiModel(req.model.model, this.cfg);
+      const url = this.buildGenerateUrl(model);
       const body = this.buildGeminiRequest(req);
 
       const res = await fetch(url, {
@@ -251,7 +292,8 @@ export class GeminiClientService implements LLMClient {
     const timeout = setTimeout(() => ac.abort(), this.cfg.timeoutMs);
 
     try {
-      const url = this.buildStreamUrl(req.model.model);
+      const model = resolveGeminiModel(req.model.model, this.cfg);
+      const url = this.buildStreamUrl(model);
       const body = this.buildGeminiRequest(req);
 
       // Gemini streaming endpoint returns a stream of JSON objects (often NDJSON-ish).

@@ -291,8 +291,12 @@ export class PrismaDocumentService implements DocumentService {
     // Cascade: synchronously delete Pinecone vectors after Postgres deletion
     if (deletedCount > 0) {
       try {
-        const vectorEmbeddingService = (await import("../services/retrieval/vectorEmbedding.service")).default;
-        await vectorEmbeddingService.deleteDocumentEmbeddings(input.documentId);
+        const vectorEmbeddingRuntimeService = (
+          await import("../services/retrieval/vectorEmbedding.runtime.service")
+        ).default;
+        await vectorEmbeddingRuntimeService.deleteDocumentEmbeddings(
+          input.documentId,
+        );
       } catch (pineconeErr: any) {
         // Non-fatal: Pinecone cleanup will be caught by orphan sweeper
         console.warn("[DocumentDelete] Pinecone cascade delete failed", {

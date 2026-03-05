@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { authMiddleware } from "../../../middleware/auth.middleware";
+import { logger } from "../../../utils/logger";
 
 const router = Router();
 
@@ -36,10 +37,11 @@ router.get(
         },
       });
     } catch (err: any) {
-      console.error("[Batch] initial-data error:", err.message);
+      logger.error("[Batch] initial-data error:", err.message);
       res.status(500).json({ ok: false, error: err.message });
     }
   },
 );
 
 export default router;
+

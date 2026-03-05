@@ -33,7 +33,7 @@ export type EnvName = "production" | "staging" | "dev" | "local";
  * Providers are intentionally open-ended. Keep known providers as literals,
  * but allow custom strings for new providers.
  */
-export type LlmProviderId = "openai" | "gemini" | "local" | (string & {});
+export type LlmProviderId = "openai" | "gemini" | (string & {});
 
 /**
  * Model id is provider-specific but treated as a string across Allybi.
@@ -401,7 +401,7 @@ export interface LlmStreamResult {
 
 /**
  * Provider client interface (minimal).
- * Implemented by providers/openai/*, providers/gemini/*, providers/local/*.
+ * Implemented by providers/openai/* and providers/gemini/*.
  */
 export interface LlmClient {
   provider: LlmProviderId;

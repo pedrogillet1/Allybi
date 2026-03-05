@@ -86,12 +86,12 @@ const mockInteractions = [
     evidenceStrength: 0.95,
     domain: "general",
     intent: "summarize",
-    providers: ["gemini", "openai", "anthropic"],
+    providers: ["gemini", "openai"],
     stages: [
       { stage: "intent_classification", durationMs: 105, tokens: 38, provider: "gemini", status: "success" },
       { stage: "retrieval", durationMs: 480, tokens: 0, provider: null, status: "success", chunksRetrieved: 8 },
       { stage: "reranking", durationMs: 195, tokens: 240, provider: "openai", status: "success", chunksKept: 8 },
-      { stage: "generation", durationMs: 1320, tokens: 1556, provider: "anthropic", status: "success" },
+      { stage: "generation", durationMs: 1320, tokens: 1556, provider: "openai", status: "success" },
     ],
   },
   { 

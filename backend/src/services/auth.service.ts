@@ -279,7 +279,7 @@ export const addPhoneToPendingUser = async (
     formattedPhone,
   );
 
-  if (process.env.NODE_ENV !== "production") {
+  if (process.env.NODE_ENV === "development") {
     const maskedNum =
       formattedPhone.slice(0, -4).replace(/\d/g, "*") +
       formattedPhone.slice(-4);
@@ -493,7 +493,7 @@ export const verifyPhoneCode = async (userId: string, code: string) => {
     return updatedUser;
   });
 
-  if (process.env.NODE_ENV !== "production") {
+  if (process.env.NODE_ENV === "development") {
     const maskedPh = result.phoneNumber
       ? result.phoneNumber.slice(0, -4).replace(/\d/g, "*") +
         result.phoneNumber.slice(-4)

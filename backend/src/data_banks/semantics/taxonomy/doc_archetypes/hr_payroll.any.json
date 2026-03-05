@@ -1,0 +1,185 @@
+{
+  "_meta": {
+    "id": "doc_archetypes_hr_payroll",
+    "version": "1.0.0",
+    "description": "Hr Payroll document archetypes for document identity classification.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-04",
+    "schemaId": "doc_identity_schema",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/document-intelligence/doc-archetypes-coverage.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "hr_payroll"
+  },
+  "domain": "hr_payroll",
+  "archetypes": [
+    {
+      "id": "hr_pay_stub",
+      "label": "Pay Stub",
+      "expectedSections": [
+        "Header",
+        "Cabeçalho",
+        "Issuer Profile",
+        "Perfil do Emissor",
+        "Recipient Profile",
+        "Perfil do Destinatario",
+        "Account or Reference",
+        "Conta ou Referencia",
+        "Period or Schedule",
+        "Período ou Agenda",
+        "Line Items or Events",
+        "Itens ou Eventos"
+      ],
+      "headings": [
+        "statement",
+        "document",
+        "header",
+        "issuer",
+        "provider",
+        "organization",
+        "emitente",
+        "recipient",
+        "holder",
+        "student",
+        "employee",
+        "destinatario",
+        "account",
+        "reference",
+        "numero",
+        "id"
+      ],
+      "expectedTableFamilies": [
+        "Pay Stub line-item table",
+        "Pay Stub summary matrix"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals"
+      ],
+      "missingQuestions": [
+        "Which pay stub variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?"
+      ]
+    },
+    {
+      "id": "hr_timesheet",
+      "label": "Timesheet",
+      "expectedSections": [
+        "Header",
+        "Cabeçalho",
+        "Issuer Profile",
+        "Perfil do Emissor",
+        "Recipient Profile",
+        "Perfil do Destinatario",
+        "Account or Reference",
+        "Conta ou Referencia",
+        "Period or Schedule",
+        "Período ou Agenda",
+        "Line Items or Events",
+        "Itens ou Eventos"
+      ],
+      "headings": [
+        "statement",
+        "document",
+        "header",
+        "issuer",
+        "provider",
+        "organization",
+        "emitente",
+        "recipient",
+        "holder",
+        "student",
+        "employee",
+        "destinatario",
+        "account",
+        "reference",
+        "numero",
+        "id"
+      ],
+      "expectedTableFamilies": [
+        "Timesheet line-item table",
+        "Timesheet summary matrix"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals"
+      ],
+      "missingQuestions": [
+        "Which timesheet variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?"
+      ]
+    },
+    {
+      "id": "hr_benefits_enrollment_summary",
+      "label": "Benefits Enrollment Summary",
+      "expectedSections": [
+        "Header",
+        "Cabeçalho",
+        "Issuer Profile",
+        "Perfil do Emissor",
+        "Recipient Profile",
+        "Perfil do Destinatario",
+        "Account or Reference",
+        "Conta ou Referencia",
+        "Period or Schedule",
+        "Período ou Agenda",
+        "Line Items or Events",
+        "Itens ou Eventos"
+      ],
+      "headings": [
+        "statement",
+        "document",
+        "header",
+        "issuer",
+        "provider",
+        "organization",
+        "emitente",
+        "recipient",
+        "holder",
+        "student",
+        "employee",
+        "destinatario",
+        "account",
+        "reference",
+        "numero",
+        "id"
+      ],
+      "expectedTableFamilies": [
+        "Benefits Enrollment Summary line-item table",
+        "Benefits Enrollment Summary summary matrix"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals"
+      ],
+      "missingQuestions": [
+        "Which benefits enrollment summary variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?"
+      ]
+    }
+  ]
+}

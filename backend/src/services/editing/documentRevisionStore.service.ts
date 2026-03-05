@@ -1806,7 +1806,6 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
 
       await prisma.$transaction(async (tx) => {
         await tx.documentChunk.deleteMany({ where: { documentId: docId } });
-        await tx.documentEmbedding.deleteMany({ where: { documentId: docId } });
 
         if (isSlidesEdit || isSheetsEdit) {
           const base = (meta as any).pptxMetadata ?? null;
@@ -2073,7 +2072,6 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
 
     await prisma.$transaction(async (tx) => {
       await tx.documentChunk.deleteMany({ where: { documentId: docId } });
-      await tx.documentEmbedding.deleteMany({ where: { documentId: docId } });
 
       if (isSlidesEdit || isSheetsEdit) {
         const existingMeta = await tx.documentMetadata.findUnique({
@@ -2237,7 +2235,6 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
 
       await prisma.$transaction([
         prisma.documentChunk.deleteMany({ where: { documentId: docId } }),
-        prisma.documentEmbedding.deleteMany({ where: { documentId: docId } }),
         prisma.documentMetadata.deleteMany({ where: { documentId: docId } }),
         prisma.documentProcessingMetrics.deleteMany({
           where: { documentId: docId },

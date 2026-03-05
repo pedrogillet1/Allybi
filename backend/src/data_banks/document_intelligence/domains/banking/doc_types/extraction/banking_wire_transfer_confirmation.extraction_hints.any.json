@@ -1,0 +1,95 @@
+{
+  "_meta": {
+    "id": "di_banking_extraction_banking_wire_transfer_confirmation",
+    "version": "1.0.0",
+    "description": "Extraction hints for banking_wire_transfer_confirmation documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-04",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/document-intelligence/extraction-hints-coverage.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "banking",
+    "docType": "banking_wire_transfer_confirmation"
+  },
+  "hints": [
+    {
+      "id": "hint_01_doc_type",
+      "entity": "docType",
+      "anchors": [
+        "banking_wire_transfer_confirmation",
+        "Banking Wire Transfer Confirmation"
+      ],
+      "location": "header",
+      "extractionMethod": "classification_rule"
+    },
+    {
+      "id": "hint_02_primary_subject",
+      "entity": "primarySubject",
+      "anchors": [
+        "wire transfer",
+        "transfer confirmation",
+        "confirmacao de transferencia",
+        "sender"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_03_reference_number",
+      "entity": "referenceNumber",
+      "anchors": [
+        "Reference",
+        "ID",
+        "Number",
+        "Numero"
+      ],
+      "location": "header",
+      "extractionMethod": "regex_capture"
+    },
+    {
+      "id": "hint_04_issue_date",
+      "entity": "issueDate",
+      "anchors": [
+        "Issue Date",
+        "Date",
+        "Data",
+        "Emissao"
+      ],
+      "location": "header",
+      "extractionMethod": "date_parse"
+    },
+    {
+      "id": "hint_05_primary_amount",
+      "entity": "primaryAmount",
+      "anchors": [
+        "Total",
+        "Amount",
+        "Valor",
+        "Balance"
+      ],
+      "location": "summary",
+      "extractionMethod": "amount_parse"
+    },
+    {
+      "id": "hint_06_party_name",
+      "entity": "partyName",
+      "anchors": [
+        "Name",
+        "Holder",
+        "Member",
+        "Customer"
+      ],
+      "location": "parties",
+      "extractionMethod": "heading_proximity"
+    }
+  ]
+}

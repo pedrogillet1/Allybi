@@ -1,4 +1,3 @@
-import { describe, it, expect } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
 import glob from "glob";
@@ -40,6 +39,8 @@ describe("SSOT drift guard", () => {
       }
     }
 
-    expect(duplicates, `SSOT violations found:\n${JSON.stringify(duplicates, null, 2)}`).toEqual([]);
+    expect(duplicates).toEqual([]);
   });
 });
+
+

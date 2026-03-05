@@ -83,6 +83,7 @@ function asNumber(value: unknown): number | null {
 function buildModelCallMeta(rawMeta: unknown): Record<string, unknown> | null {
   const meta = asRecord(rawMeta);
   const route = asRecord(meta.route);
+  const routingDecision = asRecord(meta.routingDecision);
   const eventMeta: Record<string, unknown> = {
     promptType: asString(meta.promptType),
     routeLane: asString(meta.routeLane) ?? asString(route.lane),
@@ -95,6 +96,12 @@ function buildModelCallMeta(rawMeta: unknown): Record<string, unknown> | null {
     fallbackPolicyRuleId: asString(meta.fallbackPolicyRuleId),
     routedProvider: asString(route.provider),
     routedModel: asString(route.model),
+    routingIntentFamily:
+      asString(routingDecision.intentFamily) ?? asString(meta.intentFamily),
+    routingOperator: asString(routingDecision.operator) ?? asString(meta.operator),
+    routingRoute: asString(routingDecision.route),
+    routingLocale: asString(routingDecision.locale),
+    routingFollowupSource: asString(routingDecision.followupSource),
   };
 
   const normalized = Object.fromEntries(

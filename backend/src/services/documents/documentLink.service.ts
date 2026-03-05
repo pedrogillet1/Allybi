@@ -1,3 +1,4 @@
+import type { Prisma } from "@prisma/client";
 import prisma from "../../config/database";
 import { logger } from "../../utils/logger";
 
@@ -126,7 +127,10 @@ export async function createDocumentLink(
       sourceDocumentId: input.sourceDocumentId,
       targetDocumentId: input.targetDocumentId,
       relationshipType: input.relationshipType,
-      metadata: input.metadata ?? undefined,
+      metadata:
+        input.metadata == null
+          ? undefined
+          : (JSON.parse(JSON.stringify(input.metadata)) as Prisma.InputJsonValue),
     },
   });
 

@@ -1,0 +1,51 @@
+name: Certification Evidence Bundle
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "backend/scripts/certification/**"
+      - "backend/scripts/audit/p0-gates.mjs"
+      - "backend/src/tests/certification/**"
+      - "backend/src/tests/document-intelligence/docint-bank-integrity.test.ts"
+      - "frontend/e2e/grading/**"
+      - ".github/workflows/cert-evidence-bundle.yml"
+
+jobs:
+  cert-evidence:
+    name: Build Certification Evidence Bundle
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run retrieval and P0 audits
+        run: |
+          npm run audit:retrieval:strict
+          npm run audit:p0:strict
+
+      - name: Build certification summary
+        run: npm run audit:cert:strict
+
+      - name: Build immutable evidence bundle
+        run: npm run cert:evidence:bundle
+
+      - name: Upload evidence bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: certification-evidence-bundle
+          path: backend/reports/cert/evidence
+          retention-days: 14

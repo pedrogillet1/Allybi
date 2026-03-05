@@ -6,18 +6,7 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-03-02",
-    "owner": "koda-document-intelligence",
-    "dependsOn": [
-      "bank_registry",
-      "document_intelligence_bank_map"
-    ],
-    "usedBy": [
-      "services/core/banks/documentIntelligenceIntegrity.service.ts"
-    ],
-    "tests": [
-      "src/tests/document-intelligence/docint-wiring-proof.test.ts"
-    ]
+    "lastUpdated": "2026-02-28"
   },
   "config": {
     "enabled": true,
@@ -46,9 +35,7 @@
     },
     {
       "id": "boost_rules_accounting",
-      "dependsOn": [
-        "doc_archetypes_accounting"
-      ]
+      "dependsOn": []
     },
     {
       "id": "boost_rules_finance",
@@ -309,22 +296,16 @@
       ]
     },
     {
-      "id": "legal_board_resolution_extraction_hints",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ]
+      "id": "legal_board_resolution_extraction_hints_v50c4150f",
+      "dependsOn": []
     },
     {
-      "id": "legal_board_resolution_sections",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ]
+      "id": "legal_board_resolution_sections_v0d54900e",
+      "dependsOn": []
     },
     {
-      "id": "legal_board_resolution_tables",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ]
+      "id": "legal_board_resolution_tables_v07fdadde",
+      "dependsOn": []
     },
     {
       "id": "legal_clause_ontology",
@@ -355,63 +336,33 @@
       "dependsOn": []
     },
     {
-      "id": "legal_dpa_extraction_hints",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ]
+      "id": "legal_dpa_extraction_hints_vc1cbb882",
+      "dependsOn": []
     },
     {
-      "id": "legal_dpa_sections",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ]
+      "id": "legal_dpa_sections_v59ba1526",
+      "dependsOn": []
     },
     {
-      "id": "legal_dpa_tables",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ]
+      "id": "legal_dpa_tables_v679bed8b",
+      "dependsOn": []
     },
     {
-      "id": "legal_employment_agreement_extraction_hints",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ]
+      "id": "legal_employment_agreement_extraction_hints_v1ed74ca8",
+      "dependsOn": []
     },
     {
-      "id": "legal_employment_agreement_sections",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ]
+      "id": "legal_employment_agreement_sections_v9f1eb8d7",
+      "dependsOn": []
     },
     {
-      "id": "legal_employment_agreement_tables",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ]
+      "id": "legal_employment_agreement_tables_v1a28d070",
+      "dependsOn": []
     },
     {
       "id": "legal_evidence_requirements",
       "dependsOn": [
         "legal_domain_profile"
-      ]
-    },
-    {
-      "id": "legal_lease_extraction_hints",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ]
-    },
-    {
-      "id": "legal_lease_sections",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ]
-    },
-    {
-      "id": "legal_lease_tables",
-      "dependsOn": [
-        "legal_doc_type_catalog"
       ]
     },
     {
@@ -427,76 +378,40 @@
       ]
     },
     {
-      "id": "legal_litigation_memo_extraction_hints",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ]
+      "id": "legal_msa_extraction_hints_v41111395",
+      "dependsOn": []
     },
     {
-      "id": "legal_litigation_memo_sections",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ]
+      "id": "legal_msa_sections_v24b4aa70",
+      "dependsOn": []
     },
     {
-      "id": "legal_litigation_memo_tables",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ]
+      "id": "legal_msa_tables_vdb79e19e",
+      "dependsOn": []
     },
     {
-      "id": "legal_msa_extraction_hints",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ]
+      "id": "legal_nda_extraction_hints_v94b17eb1",
+      "dependsOn": []
     },
     {
-      "id": "legal_msa_sections",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ]
+      "id": "legal_nda_sections_v215acb2d",
+      "dependsOn": []
     },
     {
-      "id": "legal_msa_tables",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ]
+      "id": "legal_nda_tables_v3a19a550",
+      "dependsOn": []
     },
     {
-      "id": "legal_nda_extraction_hints",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ]
+      "id": "legal_privacy_policy_extraction_hints_v3525de6b",
+      "dependsOn": []
     },
     {
-      "id": "legal_nda_sections",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ]
+      "id": "legal_privacy_policy_sections_v5a2b8d13",
+      "dependsOn": []
     },
     {
-      "id": "legal_nda_tables",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ]
-    },
-    {
-      "id": "legal_privacy_policy_extraction_hints",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ]
-    },
-    {
-      "id": "legal_privacy_policy_sections",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ]
-    },
-    {
-      "id": "legal_privacy_policy_tables",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ]
+      "id": "legal_privacy_policy_tables_v113ccc0c",
+      "dependsOn": []
     },
     {
       "id": "legal_reasoning_scaffolds",
@@ -529,40 +444,16 @@
       ]
     },
     {
-      "id": "legal_sow_extraction_hints",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ]
+      "id": "legal_sow_extraction_hints_vfb984862",
+      "dependsOn": []
     },
     {
-      "id": "legal_sow_sections",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ]
+      "id": "legal_sow_sections_v24240fd6",
+      "dependsOn": []
     },
     {
-      "id": "legal_sow_tables",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ]
-    },
-    {
-      "id": "legal_terms_extraction_hints",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ]
-    },
-    {
-      "id": "legal_terms_sections",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ]
-    },
-    {
-      "id": "legal_terms_tables",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ]
+      "id": "legal_sow_tables_v23424409",
+      "dependsOn": []
     },
     {
       "id": "legal_validation_policies",
@@ -586,42 +477,6 @@
       "id": "medical_answer_style_bank",
       "dependsOn": [
         "medical_domain_profile"
-      ]
-    },
-    {
-      "id": "medical_care_plan_extraction_hints",
-      "dependsOn": [
-        "medical_doc_type_catalog"
-      ]
-    },
-    {
-      "id": "medical_care_plan_sections",
-      "dependsOn": [
-        "medical_doc_type_catalog"
-      ]
-    },
-    {
-      "id": "medical_care_plan_tables",
-      "dependsOn": [
-        "medical_doc_type_catalog"
-      ]
-    },
-    {
-      "id": "medical_discharge_summary_extraction_hints",
-      "dependsOn": [
-        "medical_doc_type_catalog"
-      ]
-    },
-    {
-      "id": "medical_discharge_summary_sections",
-      "dependsOn": [
-        "medical_doc_type_catalog"
-      ]
-    },
-    {
-      "id": "medical_discharge_summary_tables",
-      "dependsOn": [
-        "medical_doc_type_catalog"
       ]
     },
     {
@@ -659,24 +514,6 @@
       ]
     },
     {
-      "id": "medical_lab_report_extraction_hints",
-      "dependsOn": [
-        "medical_doc_type_catalog"
-      ]
-    },
-    {
-      "id": "medical_lab_report_sections",
-      "dependsOn": [
-        "medical_doc_type_catalog"
-      ]
-    },
-    {
-      "id": "medical_lab_report_tables",
-      "dependsOn": [
-        "medical_doc_type_catalog"
-      ]
-    },
-    {
       "id": "medical_lexicon_en",
       "dependsOn": [
         "medical_domain_profile"
@@ -707,42 +544,6 @@
       ]
     },
     {
-      "id": "medical_progress_note_extraction_hints",
-      "dependsOn": [
-        "medical_doc_type_catalog"
-      ]
-    },
-    {
-      "id": "medical_progress_note_sections",
-      "dependsOn": [
-        "medical_doc_type_catalog"
-      ]
-    },
-    {
-      "id": "medical_progress_note_tables",
-      "dependsOn": [
-        "medical_doc_type_catalog"
-      ]
-    },
-    {
-      "id": "medical_radiology_report_extraction_hints",
-      "dependsOn": [
-        "medical_doc_type_catalog"
-      ]
-    },
-    {
-      "id": "medical_radiology_report_sections",
-      "dependsOn": [
-        "medical_doc_type_catalog"
-      ]
-    },
-    {
-      "id": "medical_radiology_report_tables",
-      "dependsOn": [
-        "medical_doc_type_catalog"
-      ]
-    },
-    {
       "id": "medical_reasoning_scaffolds",
       "dependsOn": [
         "medical_domain_profile"
@@ -752,24 +553,6 @@
       "id": "medical_redaction_and_safety_rules",
       "dependsOn": [
         "medical_domain_profile"
-      ]
-    },
-    {
-      "id": "medical_referral_extraction_hints",
-      "dependsOn": [
-        "medical_doc_type_catalog"
-      ]
-    },
-    {
-      "id": "medical_referral_sections",
-      "dependsOn": [
-        "medical_doc_type_catalog"
-      ]
-    },
-    {
-      "id": "medical_referral_tables",
-      "dependsOn": [
-        "medical_doc_type_catalog"
       ]
     },
     {
@@ -788,24 +571,6 @@
       "id": "medical_safety_boundaries",
       "dependsOn": [
         "doc_archetypes_medical"
-      ]
-    },
-    {
-      "id": "medical_soap_note_extraction_hints",
-      "dependsOn": [
-        "medical_doc_type_catalog"
-      ]
-    },
-    {
-      "id": "medical_soap_note_sections",
-      "dependsOn": [
-        "medical_doc_type_catalog"
-      ]
-    },
-    {
-      "id": "medical_soap_note_tables",
-      "dependsOn": [
-        "medical_doc_type_catalog"
       ]
     },
     {
@@ -1228,9 +993,7 @@
     },
     {
       "id": "query_rewrites_accounting",
-      "dependsOn": [
-        "doc_archetypes_accounting"
-      ]
+      "dependsOn": []
     },
     {
       "id": "query_rewrites_finance",
@@ -1258,9 +1021,7 @@
     },
     {
       "id": "section_priority_accounting",
-      "dependsOn": [
-        "doc_archetypes_accounting"
-      ]
+      "dependsOn": []
     },
     {
       "id": "section_priority_finance",

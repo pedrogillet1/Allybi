@@ -160,7 +160,6 @@ export async function deleteDocumentEmbeddings(
   );
   await prisma.$transaction(
     async (tx) => {
-      await tx.documentEmbedding.deleteMany({ where: { documentId } });
       await tx.documentChunk.deleteMany({ where: { documentId } });
     },
     { maxWait: 10000, timeout: txTimeout },

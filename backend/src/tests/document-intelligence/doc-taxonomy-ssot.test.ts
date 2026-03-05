@@ -1,6 +1,5 @@
 import * as fs from "fs";
 import * as path from "path";
-import { describe, expect, it, test } from "vitest";
 
 function resolveDataBanksRoot(): string {
   const candidates = [
@@ -137,3 +136,4 @@ describe("table_header_ontology SSOT", () => {
     }
   });
 });
+

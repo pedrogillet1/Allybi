@@ -32,6 +32,10 @@ function resolveBackendRoot() {
 
 const BACKEND_ROOT = resolveBackendRoot();
 const SRC = path.resolve(BACKEND_ROOT, "src");
+const legacyAllowlistPath = path.join(
+  BACKEND_ROOT,
+  "scripts/lint/retrieval-legacy-allowlist.txt",
+);
 
 function rel(filePath) {
   return path.relative(BACKEND_ROOT, filePath).replace(/\\/g, "/");
@@ -69,6 +73,19 @@ function escapeRegex(value) {
 function hasPattern(filePath, pattern) {
   if (!fs.existsSync(filePath)) return false;
   return pattern.test(read(filePath));
+}
+
+function loadLegacyAllowlist() {
+  if (!fs.existsSync(legacyAllowlistPath)) return new Set();
+  try {
+    const entries = read(legacyAllowlistPath)
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0 && !line.startsWith("#"));
+    return new Set(entries);
+  } catch {
+    return new Set();
+  }
 }
 
 function scoreBucket(ok, maxPoints) {
@@ -155,12 +172,88 @@ const containerFile = path.join(SRC, "bootstrap/container.ts");
 const containerHasRetrievalRegistration =
   hasPattern(containerFile, /tryLoad\("retrievalEngine"/) &&
   hasPattern(containerFile, /tryLoad\("answerEngine"/);
+const retrievalModuleBarrelFile = path.join(
+  SRC,
+  "modules/retrieval/application/index.ts",
+);
+const documentPipelineFile = path.join(
+  SRC,
+  "services/ingestion/pipeline/documentPipeline.service.ts",
+);
+const connectorsIngestionFile = path.join(
+  SRC,
+  "services/connectors/connectorsIngestion.service.ts",
+);
+const prismaDocumentFile = path.join(SRC, "services/prismaDocument.service.ts");
+const runtimeEntryWiringOk =
+  hasPattern(
+    retrievalModuleBarrelFile,
+    /retrievalEngine\.runtime\.service/,
+  ) &&
+  hasPattern(
+    retrievalModuleBarrelFile,
+    /prismaRetrievalAdapters\.runtime\.service/,
+  ) &&
+  hasPattern(
+    containerFile,
+    /prismaRetrievalAdapters\.runtime\.service/,
+  ) &&
+  hasPattern(documentPipelineFile, /vectorEmbedding\.runtime\.service/) &&
+  hasPattern(connectorsIngestionFile, /vectorEmbedding\.runtime\.service/) &&
+  hasPattern(prismaDocumentFile, /vectorEmbedding\.runtime\.service/);
+
+const runtimeSelectorBypassFiles = [];
+if (hasPattern(containerFile, /prismaRetrievalAdapters\.service/)) {
+  runtimeSelectorBypassFiles.push(rel(containerFile));
+}
+if (
+  hasPattern(
+    retrievalModuleBarrelFile,
+    /export\s*\{\s*RetrievalEngineService[\s\S]*retrievalEngine\.service/,
+  ) ||
+  hasPattern(
+    retrievalModuleBarrelFile,
+    /export\s*\{\s*PrismaRetrievalAdapterFactory[\s\S]*prismaRetrievalAdapters\.service/,
+  )
+) {
+  runtimeSelectorBypassFiles.push(rel(retrievalModuleBarrelFile));
+}
+if (hasPattern(documentPipelineFile, /vectorEmbedding\.service/)) {
+  runtimeSelectorBypassFiles.push(rel(documentPipelineFile));
+}
+if (hasPattern(connectorsIngestionFile, /vectorEmbedding\.service/)) {
+  runtimeSelectorBypassFiles.push(rel(connectorsIngestionFile));
+}
+if (hasPattern(prismaDocumentFile, /vectorEmbedding\.service/)) {
+  runtimeSelectorBypassFiles.push(rel(prismaDocumentFile));
+}
+const certificationSelectorBypassTargets = [
+  "src/tests/certification/wrong-doc.cert.test.ts",
+  "src/tests/certification/retrieval-behavioral.cert.test.ts",
+  "src/tests/certification/retrieval-golden-eval.cert.test.ts",
+].map((relPath) => path.join(BACKEND_ROOT, relPath));
+const certificationSelectorBypassFiles = certificationSelectorBypassTargets
+  .filter((file) => fs.existsSync(file))
+  .filter((file) => {
+    const src = read(file);
+    return (
+      /services\/core\/retrieval\/retrievalEngine\.service/.test(src) ||
+      /services\/core\/retrieval\/prismaRetrievalAdapters\.service/.test(src) ||
+      /services\/retrieval\/vectorEmbedding\.service/.test(src)
+    );
+  })
+  .map((file) => rel(file));
 
 const legacyRetrievalDir = path.join(SRC, "services/retrieval");
 const legacyRetrievalFiles = fs.existsSync(legacyRetrievalDir)
   ? fs
       .readdirSync(legacyRetrievalDir)
-      .filter((name) => name.endsWith(".ts") && name !== "index.ts")
+      .filter(
+        (name) =>
+          name.endsWith(".ts") &&
+          name !== "index.ts" &&
+          !name.endsWith(".test.ts"),
+      )
       .map((name) => ({
         name,
         file: path.join(legacyRetrievalDir, name),
@@ -183,6 +276,13 @@ for (const entry of legacyRetrievalFiles) {
     legacyRetrievalUnused.push(rel(entry.file));
   }
 }
+const legacyAllowlist = loadLegacyAllowlist();
+const allowlistedLegacyRetrievalUnused = legacyRetrievalUnused.filter((file) =>
+  legacyAllowlist.has(file),
+);
+const unresolvedLegacyRetrievalUnused = legacyRetrievalUnused.filter(
+  (file) => !legacyAllowlist.has(file),
+);
 
 const centralizationOk =
   runtimeLegacyRetrievalImports.length === 0 &&
@@ -243,6 +343,9 @@ let score =
   scoreBreakdown.runtimeIsolation +
   scoreBreakdown.configIntegrity +
   scoreBreakdown.deployReadiness;
+if (unresolvedLegacyRetrievalUnused.length > 0) {
+  score = Math.min(score, 9);
+}
 
 const lines = [];
 lines.push(`[retrieval-audit] score: ${score}/10`);
@@ -294,6 +397,21 @@ if (!containerHasRetrievalRegistration) {
     `[retrieval-audit] FAIL container missing retrieval/answer runtime registration`,
   );
 }
+if (!runtimeEntryWiringOk) {
+  lines.push(
+    `[retrieval-audit] FAIL runtime selectors not wired across retrieval/indexing entrypoints`,
+  );
+}
+if (runtimeSelectorBypassFiles.length > 0) {
+  lines.push(
+    `[retrieval-audit] FAIL runtime selector bypass imports: ${runtimeSelectorBypassFiles.join(", ")}`,
+  );
+}
+if (certificationSelectorBypassFiles.length > 0) {
+  lines.push(
+    `[retrieval-audit] FAIL certification selector bypass imports: ${certificationSelectorBypassFiles.join(", ")}`,
+  );
+}
 if (!evidenceGateEnforced) {
   lines.push(
     `[retrieval-audit] FAIL evidence gate result is not enforced in centralized chat runtime`,
@@ -309,9 +427,14 @@ if (!retrievalPhaseCountersAccurate) {
     `[retrieval-audit] FAIL retrieval stats counters are not phase-accurate`,
   );
 }
-if (legacyRetrievalUnused.length > 0) {
+if (allowlistedLegacyRetrievalUnused.length > 0) {
   lines.push(
-    `[retrieval-audit] WARN unused legacy retrieval services: ${legacyRetrievalUnused.join(", ")}`,
+    `[retrieval-audit] WARN allowlisted unused legacy retrieval services: ${allowlistedLegacyRetrievalUnused.join(", ")}`,
+  );
+}
+if (unresolvedLegacyRetrievalUnused.length > 0) {
+  lines.push(
+    `[retrieval-audit] FAIL unresolved unused legacy retrieval services: ${unresolvedLegacyRetrievalUnused.join(", ")}`,
   );
 }
 
@@ -323,11 +446,15 @@ for (const line of lines) {
 const strictFail =
   runtimeLegacyRetrievalImports.length > 0 ||
   legacyRuntimeImportLeakFiles.length > 0 ||
+  !runtimeEntryWiringOk ||
+  runtimeSelectorBypassFiles.length > 0 ||
+  certificationSelectorBypassFiles.length > 0 ||
   !configIntegrityOk ||
   !deployReadinessOk ||
   !evidenceGateEnforced ||
   !failClosedRequiredBanks ||
-  !retrievalPhaseCountersAccurate;
+  !retrievalPhaseCountersAccurate ||
+  unresolvedLegacyRetrievalUnused.length > 0;
 
 if (STRICT && strictFail) {
   process.exit(1);

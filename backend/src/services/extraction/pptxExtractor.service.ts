@@ -587,7 +587,7 @@ export function mergeImageOcrText(
 
   // Rebuild combined text for legacy compatibility
   const allText = result.slides
-    .map((s) => {
+    .map((s: (typeof result.slides)[number]) => {
       let slideText = "";
       if (s.title) slideText += `${s.title}\n\n`;
       slideText += s.text;

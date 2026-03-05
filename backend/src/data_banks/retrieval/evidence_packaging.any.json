@@ -9,7 +9,7 @@
       "pt",
       "es"
     ],
-    "lastUpdated": "2026-02-19",
+    "lastUpdated": "2026-03-04",
     "owner": "koda-retrieval",
     "compat": ">=1.0.0",
     "usedBy": [
@@ -47,6 +47,7 @@
         "nearDuplicateWindowChars": 280,
         "minChunkRelevance": 0.2,
         "minFinalScore": 0.28,
+        "scopedMinFinalScore": 0.18,
         "minProvenanceFields": 3
       },
       "conflictResolution": {
@@ -92,6 +93,8 @@
         "sheet",
         "slide",
         "sectionKey",
+        "locationKey",
+        "locationLabel",
         "bbox"
       ],
       "scoreFields": [

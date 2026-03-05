@@ -70,7 +70,6 @@ describe("llmCost.routes", () => {
         models: {
           "google:gemini-2.5-flash": { inputPer1M: 0.15, outputPer1M: 0.6 },
           "openai:gpt-5.2": { inputPer1M: 2.5, outputPer1M: 10 },
-          "local:*": { inputPer1M: 0, outputPer1M: 0 },
         },
       };
     });

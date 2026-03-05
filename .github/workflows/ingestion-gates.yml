@@ -71,11 +71,18 @@ jobs:
             src/services/connectors/slack/slackSync.service.test.ts \
             src/services/connectors/connectorsIngestion.service.test.ts
 
-      - name: Enforce no raw console logs in connector ingestion runtime
+      - name: Enforce no raw console logs in ingestion runtime
         run: |
           if rg -n "console\\." \
+            src/entrypoints/http/routes/multipart-upload.routes.ts \
+            src/entrypoints/http/routes/presigned-urls.routes.ts \
+            src/entrypoints/http/routes/batch.routes.ts \
             src/services/connectors/connectorsIngestion.service.ts \
-            src/services/connectors/gmail/gmailSync.service.ts; then
-            echo "Raw console usage detected in connector ingestion runtime"
+            src/services/connectors/gmail/gmailSync.service.ts \
+            src/services/connectors/outlook/outlookSync.service.ts \
+            src/services/connectors/slack/slackSync.service.ts \
+            src/queues/workers/documentIngestionPipeline.service.ts \
+            src/queues/workers/stuckDocSweeper.service.ts; then
+            echo "Raw console usage detected in ingestion runtime"
             exit 1
           fi

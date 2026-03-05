@@ -36,6 +36,12 @@ class RingBuffer {
   count(): number {
     return this.full ? WINDOW_SIZE : this.buffer.length;
   }
+
+  reset(): void {
+    this.buffer = [];
+    this.index = 0;
+    this.full = false;
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -200,15 +206,9 @@ export function getMetricsSummary(): {
 // ---------------------------------------------------------------------------
 
 export function resetMetrics(): void {
-  extractionTimings["buffer"] = [];
-  extractionTimings["index"] = 0;
-  extractionTimings["full"] = false;
-  embeddingTimings["buffer"] = [];
-  embeddingTimings["index"] = 0;
-  embeddingTimings["full"] = false;
-  totalTimings["buffer"] = [];
-  totalTimings["index"] = 0;
-  totalTimings["full"] = false;
+  extractionTimings.reset();
+  embeddingTimings.reset();
+  totalTimings.reset();
   extractorTimings.clear();
   tablesDetectedCount = 0;
   dlqEntryCount = 0;

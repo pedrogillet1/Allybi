@@ -1,13 +1,24 @@
 import { getOptionalBank } from "./bankLoader.service";
+import {
+  resolveFeatureFlagBoolean,
+  resolveFeatureFlagEnvName,
+} from "./featureFlagResolver.service";
 
 interface FeatureFlagEntry {
+  id?: unknown;
   key?: unknown;
-  enabled?: unknown;
   rolloutPercent?: unknown;
   audience?: unknown;
 }
 
 interface FeatureFlagsBank {
+  config?: {
+    enabled?: unknown;
+    runtimeOverrides?: {
+      enabled?: unknown;
+      allowList?: unknown;
+    };
+  };
   flags?: unknown;
 }
 
@@ -19,13 +30,6 @@ export interface BankRolloutContext {
 
 function clean(value: unknown): string {
   return String(value || "").trim();
-}
-
-function asBool(value: unknown, fallback = false): boolean {
-  if (typeof value === "boolean") return value;
-  const raw = clean(value).toLowerCase();
-  if (!raw) return fallback;
-  return raw === "1" || raw === "true" || raw === "yes";
 }
 
 function asNumber(value: unknown, fallback: number): number {
@@ -50,10 +54,19 @@ function toFlagEntries(value: unknown): FeatureFlagEntry[] {
 export class BankRolloutService {
   isEnabled(flagKey: string, ctx: BankRolloutContext): boolean {
     const flagsBank = getOptionalBank<FeatureFlagsBank>("feature_flags");
+    const enabled = resolveFeatureFlagBoolean({
+      bank: flagsBank,
+      flagId: flagKey,
+      env: resolveFeatureFlagEnvName(process.env.NODE_ENV),
+      fallback: false,
+    });
+    if (!enabled) return false;
+
     const flags = toFlagEntries(flagsBank?.flags);
-    const match = flags.find((row) => clean(row?.key) === flagKey);
-    if (!match) return false;
-    if (!asBool(match.enabled, false)) return false;
+    const match =
+      flags.find((row) => clean(row?.key) === flagKey) ||
+      flags.find((row) => clean(row?.id) === flagKey);
+    if (!match) return true;
 
     const rolloutPercent = Math.max(
       0,

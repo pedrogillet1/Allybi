@@ -802,8 +802,9 @@ function round(value: number, digits = 4): number {
   return Math.round(value * factor) / factor;
 }
 
-async function main() {
-  const mode = parseEvalModeArg(process.argv.slice(2));
+export async function runRetrievalEval(
+  mode: EvalMode = DEFAULT_EVAL_MODE,
+): Promise<Record<string, any>> {
   let runtimeLoadedBankIds: string[] = [];
 
   let runtimeBankLoader: ReturnType<typeof getBankLoaderInstance> | undefined;
@@ -1082,10 +1083,18 @@ async function main() {
     queryDiagnostics,
   };
 
+  return report;
+}
+
+async function main() {
+  const mode = parseEvalModeArg(process.argv.slice(2));
+  const report = await runRetrievalEval(mode);
   console.log(JSON.stringify(report, null, 2));
 }
 
-void main().catch((error) => {
-  console.error("[retrieval_eval] failed:", error);
-  process.exitCode = 1;
-});
+if (require.main === module) {
+  void main().catch((error) => {
+    console.error("[retrieval_eval] failed:", error);
+    process.exitCode = 1;
+  });
+}

@@ -1,7 +1,6 @@
 /* eslint-disable no-console */
 
-import { spawnSync } from "child_process";
-import path from "path";
+import { runRetrievalEval } from "./retrieval_eval";
 
 type EvalMode = "mock" | "real_banks";
 
@@ -36,30 +35,8 @@ function parseModeArg(argv: string[]): EvalMode {
   throw new Error(`Invalid --mode value "${mode}"`);
 }
 
-function runEval(mode: EvalMode): Record<string, any> {
-  const root = path.resolve(__dirname, "../..");
-  const exec = spawnSync(
-    "npx",
-    ["ts-node", "--transpile-only", "scripts/eval/retrieval_eval.ts", `--mode=${mode}`],
-    {
-      cwd: root,
-      encoding: "utf8",
-      env: process.env,
-      maxBuffer: 10 * 1024 * 1024,
-    },
-  );
-
-  if (exec.status !== 0) {
-    const stderr = exec.stderr?.trim() || "(no stderr)";
-    const stdout = exec.stdout?.trim() || "(no stdout)";
-    throw new Error(
-      `retrieval_eval failed (status=${String(exec.status)}).\nstdout:\n${stdout}\nstderr:\n${stderr}`,
-    );
-  }
-
-  const output = (exec.stdout || "").trim();
-  if (!output) throw new Error("retrieval_eval returned empty output.");
-  return JSON.parse(output) as Record<string, any>;
+async function runEval(mode: EvalMode): Promise<Record<string, any>> {
+  return runRetrievalEval(mode);
 }
 
 function assertGate(metrics: Record<string, any>, thresholds: GateThresholds): string[] {
@@ -161,7 +138,7 @@ async function main() {
     },
   };
 
-  const report = runEval(mode);
+  const report = await runEval(mode);
   const metrics = (report.metrics || {}) as Record<string, any>;
   const failures = assertGate(metrics, thresholds);
 

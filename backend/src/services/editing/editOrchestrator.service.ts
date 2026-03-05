@@ -893,6 +893,7 @@ export class EditOrchestratorService {
         documentId: request.documentId,
         userId: ctx.userId,
         revisionId: request.revisionId,
+        expectedFileHash: request.expectedFileHash,
       });
 
       return {

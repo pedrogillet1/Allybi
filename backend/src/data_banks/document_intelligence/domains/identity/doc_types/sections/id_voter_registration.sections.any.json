@@ -35,7 +35,7 @@
       "id": "voter_information",
       "name": {
         "en": "Voter Information",
-        "pt": "Informacoes do Eleitor"
+        "pt": "Informações do Eleitor"
       },
       "required": true,
       "order": 2,
@@ -55,7 +55,7 @@
       "id": "precinct_information",
       "name": {
         "en": "Precinct Information",
-        "pt": "Informacoes da Zona Eleitoral"
+        "pt": "Informações da Zona Eleitoral"
       },
       "required": false,
       "order": 4,
@@ -63,3 +63,4 @@
     }
   ]
 }
+

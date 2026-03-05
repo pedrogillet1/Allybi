@@ -35,7 +35,7 @@
       "id": "cardholder_information",
       "name": {
         "en": "Cardholder Information",
-        "pt": "Informacoes do Titular"
+        "pt": "Informações do Titular"
       },
       "required": true,
       "order": 2,
@@ -63,3 +63,4 @@
     }
   ]
 }
+

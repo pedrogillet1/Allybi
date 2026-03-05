@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import fs from 'fs';
 import path from 'path';
+import crypto from 'crypto';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -12,6 +13,12 @@ const DEFAULT_INPUT_BY_PACK = {
   '40': path.join(REPORTS_DIR, 'queries-40-run.json'),
   '50': path.join(REPORTS_DIR, 'query-test-50-gate-results.json'),
   '100': path.join(REPORTS_DIR, 'query-test-100-results.json'),
+};
+const PRODUCER_COMMAND_BY_PACK = {
+  '25': 'npx playwright test e2e/query-test-25-gate.spec.ts --project=chromium',
+  '40': 'node e2e/regression-runner.mjs --base http://localhost:5000',
+  '50': 'npx playwright test e2e/query-test-50-gate.spec.ts --project=chromium',
+  '100': 'npx playwright test e2e/query-test-100.spec.ts --project=chromium',
 };
 
 function parseArgs(argv) {
@@ -57,6 +64,12 @@ function expectedRowsForPack(pack) {
   const n = Number(String(pack || '').trim());
   if (!Number.isFinite(n) || n <= 0) return 1;
   return Math.floor(n);
+}
+
+function deriveDatasetId(inputFile, rowCount) {
+  const normalized = path.basename(String(inputFile || '').trim());
+  const rows = Number.isFinite(rowCount) ? rowCount : 0;
+  return `${normalized || 'unknown'}:${rows}`;
 }
 
 function packInputBasenames(pack) {
@@ -155,6 +168,7 @@ function resolveInputDataset(opts) {
     [
       `[harsh-rubric] no valid input artifact found for pack ${pack}.`,
       `Expected at least ${requiredRows} rows.`,
+      `Producer command: ${PRODUCER_COMMAND_BY_PACK[pack] || 'run the corresponding query pack runner'}`,
       sampledReasons ? `Checked candidates:\n${sampledReasons}` : 'No candidates were discovered.',
     ].join('\n'),
   );
@@ -1061,6 +1075,7 @@ function renderMarkdown(result) {
   md += `- Generated: ${generatedAt}\n`;
   md += `- Input: ${inputFile}\n`;
   md += `- Run ID: ${meta.runId}\n`;
+  md += `- Dataset ID: ${meta.datasetId}\n`;
   md += `- Verdict: **${summary.verdict}**\n`;
   md += `- Final Score: **${summary.finalScore}/100**\n\n`;
   if (meta.scopeKnown !== undefined) {
@@ -1130,6 +1145,195 @@ function renderMarkdown(result) {
   return md;
 }
 
+function validateScorecardLineage(result) {
+  const failures = [];
+  const generatedAt = String(result?.generatedAt || '').trim();
+  const pack = String(result?.pack || '').trim();
+  const inputFile = String(result?.inputFile || '').trim();
+  const runId = String(result?.meta?.runId || '').trim();
+  const datasetId = String(result?.meta?.datasetId || '').trim();
+  const totalQueries = Number(result?.meta?.totalQueries || 0);
+  if (!generatedAt) failures.push('missing_generatedAt');
+  if (!pack) failures.push('missing_pack');
+  if (!inputFile) failures.push('missing_inputFile');
+  if (!runId) failures.push('missing_meta_runId');
+  if (!datasetId) failures.push('missing_meta_datasetId');
+  if (!Number.isFinite(totalQueries) || totalQueries < 1) {
+    failures.push('invalid_meta_totalQueries');
+  }
+  return { ok: failures.length === 0, failures };
+}
+
+function toPosixRelative(fromDir, targetPath) {
+  return path.relative(fromDir, targetPath).replace(/\\/g, '/');
+}
+
+function sha256(value) {
+  return crypto.createHash('sha256').update(value).digest('hex');
+}
+
+function writeAtomic(filePath, content) {
+  const tmpPath = `${filePath}.tmp`;
+  fs.writeFileSync(tmpPath, content, 'utf8');
+  fs.renameSync(tmpPath, filePath);
+}
+
+function writeLatestAndArchiveArtifacts(result, scoredRows) {
+  const runId = String(result?.meta?.runId || '').trim();
+  const datasetId = String(result?.meta?.datasetId || '').trim();
+  if (!runId) {
+    throw new Error('[harsh-rubric] missing runId for artifact writing');
+  }
+  if (!datasetId) {
+    throw new Error('[harsh-rubric] missing datasetId for artifact writing');
+  }
+  const archiveRoot = path.join(REPORTS_DIR, 'archive');
+  const runArchiveDir = path.join(archiveRoot, runId);
+  fs.mkdirSync(LATEST_DIR, { recursive: true });
+  fs.mkdirSync(runArchiveDir, { recursive: true });
+
+  const scorecardJson = `${JSON.stringify(result, null, 2)}\n`;
+  const gradingMd = `${renderMarkdown(result)}\n`;
+  const deepDiveMd = `${renderAPlusGapDeepDive(result)}\n`;
+  const perQueryJson = `${JSON.stringify(scoredRows, null, 2)}\n`;
+
+  const artifacts = [
+    { key: 'scorecard', fileName: 'scorecard.json', content: scorecardJson },
+    { key: 'grading', fileName: 'grading.md', content: gradingMd },
+    { key: 'deepDive', fileName: 'a-plus-gap-deep-dive.md', content: deepDiveMd },
+    { key: 'perQuery', fileName: 'per_query.json', content: perQueryJson },
+  ];
+  const lineageArtifacts = {};
+  for (const artifact of artifacts) {
+    const latestPath = path.join(LATEST_DIR, artifact.fileName);
+    const archivePath = path.join(runArchiveDir, artifact.fileName);
+    writeAtomic(latestPath, artifact.content);
+    writeAtomic(archivePath, artifact.content);
+    const digest = sha256(artifact.content);
+    const bytes = Buffer.byteLength(artifact.content, 'utf8');
+    lineageArtifacts[artifact.key] = {
+      latestPath: path.resolve(latestPath),
+      archivePath: path.resolve(archivePath),
+      latestRelPath: toPosixRelative(REPORTS_DIR, latestPath),
+      archiveRelPath: toPosixRelative(REPORTS_DIR, archivePath),
+      sha256: digest,
+      bytes,
+    };
+  }
+
+  const lineage = {
+    generatedAt: result.generatedAt,
+    runId,
+    datasetId,
+    pack: result.pack,
+    inputFile: String(result.inputFile || ''),
+    totalQueries: Number(result?.meta?.totalQueries || 0),
+    source: 'run-harsh-rubric.v2.mjs',
+    artifacts: lineageArtifacts,
+    // Legacy fields retained for downstream compatibility.
+    latestPerQueryPath: path.resolve(LATEST_DIR, 'per_query.json'),
+    archivePerQueryPath: path.resolve(runArchiveDir, 'per_query.json'),
+    scorecardPath: path.resolve(LATEST_DIR, 'scorecard.json'),
+    archiveScorecardPath: path.resolve(runArchiveDir, 'scorecard.json'),
+  };
+  const lineageJson = `${JSON.stringify(lineage, null, 2)}\n`;
+  writeAtomic(path.join(LATEST_DIR, 'lineage.json'), lineageJson);
+  writeAtomic(path.join(runArchiveDir, 'lineage.json'), lineageJson);
+}
+
+function renderAPlusGapDeepDive(result) {
+  const { generatedAt, rows, summary, meta } = result;
+  const total = rows.length;
+  const strictAPlusRows = rows.filter((row) => {
+    const allPass = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'].every((gate) => row.gates?.[gate] === true);
+    return row.finalScore >= 95 && allPass;
+  });
+  const gateDescription = {
+    A: 'Doc-grounded answers must include sources when docs are attached.',
+    B: 'Sources must stay within attached docset (no wrong-doc/out-of-scope).',
+    C: 'No semantic truncation in final answer.',
+    D: 'No fallback response without sources when docs are attached.',
+    E: 'Answer language must match expected language.',
+    F: 'All cited sources must be relevant to the query intent.',
+    G: 'At least one cited source must include rich location metadata.',
+    H: 'Analytical queries must include required structure headers/blocks.',
+  };
+
+  const universalBlockers = [];
+  for (const gate of ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']) {
+    if (summary.gateFails[gate] === total && total > 0) {
+      universalBlockers.push(gate);
+    }
+  }
+
+  const topIssues = new Map();
+  for (const row of rows) {
+    for (const issue of row.issues || []) {
+      topIssues.set(issue, (topIssues.get(issue) || 0) + 1);
+    }
+  }
+  const topIssueRows = [...topIssues.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 20);
+
+  let md = '';
+  md += '# A+ Gap Deep Dive (Queries)\n\n';
+  md += `Generated: ${generatedAt}\n`;
+  md += 'Source: frontend/e2e/reports/latest/scorecard.json\n\n';
+  md += `Run ID: ${meta.runId}\n`;
+  md += `Dataset ID: ${meta.datasetId}\n`;
+  md += `Pack: ${result.pack}\n\n`;
+  md += '## Scope\n\n';
+  md += `- Total queries analyzed: **${total}**\n`;
+  md += `- Queries currently A+: **${strictAPlusRows.length}**\n`;
+  md += `- Queries below A+ (needs work): **${Math.max(0, total - strictAPlusRows.length)}**\n`;
+  md += '- Target bar for A+: **>=95 with no hard gate failures**\n\n';
+
+  md += '## What Is Missing For All Queries To Reach A+\n\n';
+  md += '| Gate | Missing In | Fail Rate | Requirement |\n';
+  md += '|---|---:|---:|---|\n';
+  for (const gate of ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']) {
+    const failCount = Number(summary.gateFails[gate] || 0);
+    const failRate = total > 0 ? `${Math.round((failCount / total) * 100)}%` : '0%';
+    md += `| ${gate} | ${failCount}/${total} | ${failRate} | ${gateDescription[gate]} |\n`;
+  }
+  md += '\n';
+  if (universalBlockers.length > 0) {
+    md += 'Universal blocker(s):\n';
+    for (const gate of universalBlockers) {
+      md += `- Gate ${gate}: ${gateDescription[gate]}\n`;
+    }
+    md += '\n';
+  }
+
+  md += '## Top Missing Pieces (Issue Frequency)\n\n';
+  md += '| Issue | Count |\n';
+  md += '|---|---:|\n';
+  for (const [issue, count] of topIssueRows) {
+    md += `| ${issue} | ${count} |\n`;
+  }
+  md += '\n';
+
+  md += '## Lowest-Scoring Queries\n\n';
+  md += '| # | Score | Failed Gates | Missing For A+ |\n';
+  md += '|---:|---:|---|---|\n';
+  for (const row of [...rows].sort((a, b) => a.finalScore - b.finalScore).slice(0, 20)) {
+    const failedGates = Object.entries(row.gates || {})
+      .filter(([, passed]) => passed !== true)
+      .map(([gate]) => gate);
+    const missing = failedGates.map((gate) => `${gate}: ${gateDescription[gate]}`).join(' / ');
+    md += `| ${row.index} | ${row.finalScore} | ${failedGates.join(', ') || '-'} | ${missing || 'None'} |\n`;
+  }
+  md += '\n';
+  if (meta?.scopeKnown !== undefined) {
+    md += '## Scope Diagnostics\n\n';
+    md += `- Scope Known: ${meta.scopeKnown ? 'yes' : 'no'}\n`;
+    md += `- Scope Source: ${meta.scopeSource || 'none'}\n`;
+    md += `- Scope Policy Applied: ${meta.scopePolicyApplied || 'none'}\n\n`;
+  }
+  return md;
+}
+
 function main() {
   const opts = parseArgs(process.argv.slice(2));
   let resolved = null;
@@ -1194,6 +1398,7 @@ function main() {
     pack: opts.pack,
     meta: {
       runId: opts.runId || `run_${generatedAt.replace(/[:.]/g, '-')}`,
+      datasetId: deriveDatasetId(inputFile, resolved.rowCount),
       expectedLanguage: opts.expectedLanguage,
       totalQueries: scoredRows.length,
       allowedDocIdsCount: normalized.allowedDocIds.size,
@@ -1208,12 +1413,16 @@ function main() {
     summary,
     rows: scoredRows,
   };
+  const lineage = validateScorecardLineage(result);
+  if (!lineage.ok) {
+    console.error(
+      `[harsh-rubric] result lineage invalid: ${lineage.failures.join(', ')}`,
+    );
+    process.exit(1);
+  }
 
   if (opts.writeLatest) {
-    fs.mkdirSync(LATEST_DIR, { recursive: true });
-    fs.writeFileSync(path.join(LATEST_DIR, 'scorecard.json'), JSON.stringify(result, null, 2));
-    fs.writeFileSync(path.join(LATEST_DIR, 'grading.md'), renderMarkdown(result));
-    fs.writeFileSync(path.join(LATEST_DIR, 'per_query.json'), JSON.stringify(scoredRows, null, 2));
+    writeLatestAndArchiveArtifacts(result, scoredRows);
   }
 
   console.log(`[harsh-rubric] pack=${opts.pack} total=${scoredRows.length} final=${summary.finalScore} verdict=${summary.verdict}`);

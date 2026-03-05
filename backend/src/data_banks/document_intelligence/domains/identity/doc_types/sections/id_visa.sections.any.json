@@ -35,7 +35,7 @@
       "id": "applicant_information",
       "name": {
         "en": "Applicant Information",
-        "pt": "Informacoes do Requerente"
+        "pt": "Informações do Requerente"
       },
       "required": true,
       "order": 2,
@@ -55,7 +55,7 @@
       "id": "validity_period",
       "name": {
         "en": "Validity Period",
-        "pt": "Periodo de Validade"
+        "pt": "Período de Validade"
       },
       "required": true,
       "order": 4,
@@ -65,7 +65,7 @@
       "id": "conditions_and_restrictions",
       "name": {
         "en": "Conditions and Restrictions",
-        "pt": "Condicoes e Restricoes"
+        "pt": "Condições e Restricoes"
       },
       "required": false,
       "order": 5,
@@ -73,3 +73,4 @@
     }
   ]
 }
+

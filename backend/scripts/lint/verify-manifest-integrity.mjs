@@ -45,6 +45,21 @@ const registryPaths = new Set(banks.map((b) => String(b?.path || "").trim()).fil
 const registryCategories = new Set(
   banks.map((b) => String(b?.category || "").trim()).filter(Boolean),
 );
+const registryLoadOrder = Array.isArray(registry?.loadOrder)
+  ? registry.loadOrder.map((c) => String(c || "").trim()).filter(Boolean)
+  : [];
+const registryLoadOrderSet = new Set(registryLoadOrder);
+
+const missingInLoadOrder = setDiff(registryCategories, registryLoadOrderSet);
+const loadOrderUnknownCategories = setDiff(registryLoadOrderSet, registryCategories);
+if (missingInLoadOrder.length > 0) {
+  failures.push(`bank_registry.loadOrder missing categories: ${missingInLoadOrder.join(", ")}`);
+}
+if (loadOrderUnknownCategories.length > 0) {
+  warnings.push(
+    `bank_registry.loadOrder references categories not present in registry banks: ${loadOrderUnknownCategories.join(", ")}`,
+  );
+}
 
 const manifestCategories = new Set(
   Array.isArray(manifest?.allowedCategoryIds)

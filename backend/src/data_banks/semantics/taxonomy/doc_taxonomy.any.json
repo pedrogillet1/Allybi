@@ -14,7 +14,8 @@
     ],
     "tests": [
       "tests/patternWiringProof.test.ts"
-    ]
+    ],
+    "ssotRole": "doc_type_semantic_contract"
   },
   "config": {
     "enabled": true,

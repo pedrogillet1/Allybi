@@ -11,7 +11,6 @@ const mockCostTable: CostTable = {
   models: {
     "google:gemini-2.5-flash": { inputPer1M: 0.15, outputPer1M: 0.60 },
     "openai:gpt-5.2": { inputPer1M: 2.50, outputPer1M: 10.00 },
-    "local:*": { inputPer1M: 0, outputPer1M: 0 },
   },
 };
 
@@ -28,11 +27,6 @@ describe("computeCostUsd", () => {
     // input: 10000/1M * 2.50 = 0.025
     // output: 2000/1M * 10.00 = 0.02
     expect(cost).toBeCloseTo(0.045, 6);
-  });
-
-  it("should fallback to wildcard model", () => {
-    const cost = computeCostUsd("local", "some-model", 1000, 1000, mockCostTable);
-    expect(cost).toBe(0);
   });
 
   it("should return 0 for unknown provider", () => {
@@ -99,9 +93,9 @@ describe("computeCostUsd", () => {
 
 describe("diagnoseCostLookup", () => {
   it("returns warning for unknown provider with non-empty model", () => {
-    const result = diagnoseCostLookup("anthropic", "claude-4", mockCostTable);
+    const result = diagnoseCostLookup("other_provider", "other_model", mockCostTable);
     expect(result.found).toBe(false);
-    expect(result.warning).toContain("anthropic:claude-4");
+    expect(result.warning).toContain("other_provider:other_model");
   });
 
   it("returns no warning for valid provider", () => {

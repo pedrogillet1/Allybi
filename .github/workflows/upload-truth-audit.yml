@@ -32,19 +32,6 @@ jobs:
         working-directory: backend
         run: npm ci
 
-      - name: Generate deterministic test token
-        id: token
-        working-directory: backend
-        run: |
-          TOKEN=$(node -e "const jwt=require('jsonwebtoken'); const token=jwt.sign({userId:'upload-truth-ci-user', email:'upload.truth.ci@example.com'}, process.env.JWT_ACCESS_SECRET, {expiresIn:'30m'}); if(!token){process.exit(1);} process.stdout.write(token);")
-          echo "token=$TOKEN" >> $GITHUB_OUTPUT
-        env:
-          JWT_ACCESS_SECRET: ci-upload-truth-secret
-
-      - name: Assert token was generated
-        run: |
-          test -n "${{ steps.token.outputs.token }}"
-
       - name: Run upload route truth tests
         working-directory: backend
         run: |
@@ -56,4 +43,4 @@ jobs:
       - name: Check for failures
         run: |
           echo "Upload truth audit passed"
-          echo "Token generation and multipart scheduling contract checks succeeded."
+          echo "Multipart, presigned, and batch scheduling contract checks succeeded."

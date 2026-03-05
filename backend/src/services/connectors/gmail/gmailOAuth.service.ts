@@ -5,6 +5,7 @@ import { google, gmail_v1 } from "googleapis";
 import type { ConnectorProvider } from "../connectorsRegistry";
 import { markOAuthStateNonceUsedDurable } from "../oauthStateNonceStore.service";
 import { TokenVaultService } from "../tokenVault.service";
+import { ConnectorIdentityMapService } from "../connectorIdentityMap.service";
 
 export interface GmailOAuthContext {
   correlationId?: string;
@@ -586,6 +587,18 @@ export class GmailOAuthService {
       scopes,
       expiresAt,
     );
+
+    try {
+      const cim = new ConnectorIdentityMapService();
+      await cim.upsertLink({
+        userId,
+        provider: "gmail",
+        externalWorkspaceId: profile?.emailAddress || userId,
+        externalAccountEmail: profile?.emailAddress || undefined,
+      });
+    } catch {
+      // non-fatal: CIM row creation failure shouldn't block OAuth completion
+    }
 
     return {
       provider: "gmail",

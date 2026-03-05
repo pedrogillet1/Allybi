@@ -6,8 +6,29 @@
  * All upload paths (multer, presigned, multipart) MUST use these constants.
  */
 
-// Ensure env vars are loaded before reading config
-import "./env";
+import fs from "fs";
+import path from "path";
+import dotenv from "dotenv";
+
+function loadEnvFileIfExists(filePath: string): void {
+  try {
+    if (!fs.existsSync(filePath)) return;
+    dotenv.config({ path: filePath });
+  } catch {
+    // no-op: upload config should be importable in isolated tests
+  }
+}
+
+const envCandidates = [
+  path.resolve(process.cwd(), ".env.local"),
+  path.resolve(process.cwd(), ".env"),
+  path.resolve(process.cwd(), "backend/.env.local"),
+  path.resolve(process.cwd(), "backend/.env"),
+  path.resolve(__dirname, "../../.env.local"),
+  path.resolve(__dirname, "../../.env"),
+];
+
+for (const envPath of envCandidates) loadEnvFileIfExists(envPath);
 
 export const UPLOAD_CONFIG = {
   // Storage Provider: "gcs" for Google Cloud Storage, "local" for local filesystem (fast dev)

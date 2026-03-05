@@ -11,19 +11,11 @@ const adminApi = axios.create({
   withCredentials: true,
 });
 
-// Attach admin access token and admin key
 adminApi.interceptors.request.use((config) => {
-  const token = adminAuthService.getAccessToken();
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-
-  // Attach X-KODA-ADMIN-KEY for /api/admin/* routes (not /api/auth/admin/*)
   const adminKey = process.env.REACT_APP_ADMIN_KEY;
   if (adminKey && config.url?.includes('/api/admin/') && !config.url?.includes('/api/auth/admin/')) {
     config.headers['X-KODA-ADMIN-KEY'] = adminKey;
   }
-
   return config;
 });
 
@@ -46,8 +38,7 @@ adminApi.interceptors.response.use(
     ) {
       original._retry = true;
       try {
-        const tokens = await adminAuthService.refresh();
-        original.headers.Authorization = `Bearer ${tokens.accessToken}`;
+        await adminAuthService.refresh();
         return adminApi(original);
       } catch {
         adminAuthService.clearStorage();

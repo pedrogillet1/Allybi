@@ -96,6 +96,7 @@ function main() {
 
   const summary = {
     ok,
+    scope: "composition-only",
     score,
     grade,
     requiredGates: REQUIRED_GATES.length,

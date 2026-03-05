@@ -18,7 +18,7 @@ describe("resolveOpenAIModel", () => {
   });
 
   test("falls back to default for disallowed model", () => {
-    const out = resolveOpenAIModel("gpt-4.1", cfg);
+    const out = resolveOpenAIModel("unsupported-openai-model", cfg);
     expect(out).toBe("gpt-5.2");
   });
 });

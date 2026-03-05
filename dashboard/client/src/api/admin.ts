@@ -60,10 +60,8 @@ class ApiError extends Error {
 }
 
 function getAuthHeaders(): Record<string, string> {
-  const token = localStorage.getItem("auth_token");
   const adminKey = localStorage.getItem("admin_key");
   return {
-    ...(token && { Authorization: `Bearer ${token}` }),
     ...(adminKey && { "X-Admin-Key": adminKey }),
   };
 }

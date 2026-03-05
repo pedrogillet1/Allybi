@@ -1,7 +1,7 @@
 import { describe, expect, test } from "@jest/globals";
 
 import seeds from "../../services/core/retrieval/__fixtures__/golden-eval.seeds.json";
-import { RetrievalEngineService } from "../../services/core/retrieval/retrievalEngine.service";
+import { RetrievalEngineService as RetrievalEngineRuntime } from "../../services/core/retrieval/retrievalEngine.runtime.service";
 import { writeCertificationGateReport } from "./reporting";
 
 // ── Seed types ──────────────────────────────────────────────────────────
@@ -90,7 +90,7 @@ function makeRequiredBanks() {
 
 function makeGoldenEngine(
   targetDocIds: string[],
-): RetrievalEngineService {
+): InstanceType<typeof RetrievalEngineRuntime> {
   const bankLoader = {
     getBank<T = unknown>(bankId: string): T {
       const banks = makeRequiredBanks() as Record<string, unknown>;
@@ -182,7 +182,7 @@ function makeGoldenEngine(
     getSectionPriorityRules: () => null,
   };
 
-  return new RetrievalEngineService(
+  return new RetrievalEngineRuntime(
     bankLoader as any,
     docStore as any,
     semanticIndex as any,
@@ -333,7 +333,9 @@ function makeProductionWeightsBanks() {
   };
 }
 
-function makeProductionGoldenEngine(targetDocIds: string[]): RetrievalEngineService {
+function makeProductionGoldenEngine(
+  targetDocIds: string[],
+): InstanceType<typeof RetrievalEngineRuntime> {
   const prodBanks = makeProductionWeightsBanks() as Record<string, unknown>;
   const bankLoader = {
     getBank<T = unknown>(bankId: string): T {
@@ -385,7 +387,7 @@ function makeProductionGoldenEngine(targetDocIds: string[]): RetrievalEngineServ
   const lexicalIndex = { async search() { return []; } };
   const structuralIndex = { async search() { return []; } };
 
-  return new RetrievalEngineService(
+  return new RetrievalEngineRuntime(
     bankLoader as any, docStore as any, semanticIndex as any,
     lexicalIndex as any, structuralIndex as any,
   );

@@ -117,6 +117,77 @@ describe("DataBankLoaderService hardening", () => {
     );
   });
 
+  test("warns (without auto-healing) when loadOrder misses categories in non-strict mode", async () => {
+    const root = fs.mkdtempSync(
+      path.join(os.tmpdir(), "koda-banks-loadorder-warn-"),
+    );
+
+    writeJson(path.join(root, "manifest/bank_manifest.any.json"), {
+      _meta: makeMeta("bank_manifest"),
+      config: {
+        enabled: true,
+        strictCategories: true,
+        failOnUnknownCategory: true,
+      },
+      allowedCategoryIds: ["manifest", "semantics"],
+    });
+
+    writeJson(path.join(root, "manifest/bank_registry.any.json"), {
+      _meta: makeMeta("bank_registry"),
+      config: { enabled: true },
+      loadOrder: ["manifest"],
+      banks: [
+        {
+          id: "semantic_bank",
+          category: "semantics",
+          path: "semantics/semantic_bank.any.json",
+          filename: "semantic_bank.any.json",
+          version: "1.0.0",
+          enabledByEnv: envAll(true),
+          requiredByEnv: envAll(false),
+        },
+      ],
+    });
+
+    writeJson(path.join(root, "semantics/semantic_bank.any.json"), {
+      _meta: makeMeta("semantic_bank"),
+      config: { enabled: true },
+      payload: { ok: true },
+    });
+
+    const warns: Array<{ msg: string; meta?: Record<string, unknown> }> = [];
+    const loader = new DataBankLoaderService({
+      rootDir: root,
+      env: "dev",
+      strict: false,
+      validateSchemas: false,
+      allowEmptyChecksumsInNonProd: true,
+      logger: {
+        info: () => undefined,
+        warn: (msg, meta) => warns.push({ msg, meta }),
+        error: () => undefined,
+      },
+    });
+
+    await expect(loader.loadAll()).resolves.toBeUndefined();
+    const loadOrderWarning = warns.find((w) =>
+      /categories missing from loadOrder/i.test(w.msg),
+    );
+    expect(loadOrderWarning).toBeDefined();
+    expect(loadOrderWarning?.meta).toEqual(
+      expect.objectContaining({
+        missingCategoriesInLoadOrder: ["semantics"],
+        loadOrder: ["manifest"],
+      }),
+    );
+    expect(
+      Object.prototype.hasOwnProperty.call(
+        loadOrderWarning?.meta || {},
+        "patchedLoadOrder",
+      ),
+    ).toBe(false);
+  });
+
   test("rejects dependency overlays missing registry nodes in strict mode", async () => {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), "koda-banks-deps-"));
 

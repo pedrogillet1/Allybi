@@ -25,13 +25,13 @@
       "id": "document_header",
       "name": {
         "en": "Document Header",
-        "pt": "Cabecalho do Documento"
+        "pt": "Cabeçalho do Documento"
       },
       "required": true,
       "order": 1,
       "headingAnchors": [
         "Document Header",
-        "Cabecalho do Documento",
+        "Cabeçalho do Documento",
         "patient intake",
         "new patient form",
         "Patient Intake Form Document Header"
@@ -56,13 +56,13 @@
       "id": "insurance_information",
       "name": {
         "en": "Insurance Information",
-        "pt": "Informacoes do Seguro"
+        "pt": "Informações do Seguro"
       },
       "required": true,
       "order": 3,
       "headingAnchors": [
         "Insurance Information",
-        "Informacoes do Seguro",
+        "Informações do Seguro",
         "insurance",
         "coverage",
         "payer"
@@ -115,3 +115,4 @@
     }
   ]
 }
+

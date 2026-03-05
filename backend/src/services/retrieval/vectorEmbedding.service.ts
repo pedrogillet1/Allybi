@@ -271,7 +271,6 @@ export async function storeDocumentEmbeddings(
   await prisma.document.update({
     where: { id: documentId },
     data: {
-      indexingState: "running",
       indexingOperationId: operationId,
       indexingError: null,
       indexingUpdatedAt: new Date(indexedAtMs),
@@ -366,26 +365,6 @@ export async function storeDocumentEmbeddings(
           userId: document.userId,
         });
       }
-
-      // 3) Prepare Postgres records (compute upfront, before async I/O).
-      const embeddingRecords = usableChunks.map((c) => ({
-        documentId,
-        chunkIndex: c.chunkIndex,
-        content: c.content,
-        embedding: JSON.stringify(c.embedding || []),
-        userId: document.userId,
-        pageNumber: c.pageNumber ?? c.metadata?.pageNumber ?? null,
-        chunkText: c.content.slice(0, 4000),
-        metadata: JSON.stringify({
-          ...(c.metadata || {}),
-          ...sharedIndexingMetadata,
-        }),
-        chunkType: c.metadata?.chunkType || null,
-        sectionName: c.metadata?.sectionName || c.metadata?.tableId || null,
-        embeddingModel:
-          process.env.OPENAI_EMBEDDING_MODEL || "text-embedding-3-small",
-        updatedAt: new Date(indexedAtMs),
-      }));
 
       const chunkEncryptors =
         encryptionMode === "encrypted_only"
@@ -491,21 +470,7 @@ export async function storeDocumentEmbeddings(
       );
       await prisma.$transaction(
         async (tx) => {
-          // Clear old — parallel deletes (different tables, no lock contention).
-          await Promise.all([
-            tx.documentEmbedding.deleteMany({ where: { documentId } }),
-            tx.documentChunk.deleteMany({ where: { documentId } }),
-          ]);
-
-          // Insert new — parallel streams for embeddings and chunks.
-          const embeddingInserts = [];
-          for (let i = 0; i < embeddingRecords.length; i += batchSize) {
-            embeddingInserts.push(
-              tx.documentEmbedding.createMany({
-                data: embeddingRecords.slice(i, i + batchSize),
-              }),
-            );
-          }
+          await tx.documentChunk.deleteMany({ where: { documentId } });
           const chunkInserts = [];
           for (let i = 0; i < chunkRecords.length; i += batchSize) {
             chunkInserts.push(
@@ -514,7 +479,7 @@ export async function storeDocumentEmbeddings(
               }),
             );
           }
-          await Promise.all([...embeddingInserts, ...chunkInserts]);
+          await Promise.all(chunkInserts);
         },
         { maxWait: 10000, timeout: txTimeout },
       );
@@ -541,16 +506,12 @@ export async function storeDocumentEmbeddings(
       }
 
       if (verifyAfterStore || strictVerify) {
-        const [dbEmbeddingCount, dbChunkCount] = await Promise.all([
-          prisma.documentEmbedding.count({ where: { documentId } }),
-          prisma.documentChunk.count({ where: { documentId } }),
-        ]);
-        if (
-          dbEmbeddingCount !== usableChunks.length ||
-          dbChunkCount !== usableChunks.length
-        ) {
+        const dbChunkCount = await prisma.documentChunk.count({
+          where: { documentId },
+        });
+        if (dbChunkCount !== usableChunks.length) {
           throw new Error(
-            `[vectorEmbedding] DB verification mismatch for ${documentId}: embeddings=${dbEmbeddingCount}, chunks=${dbChunkCount}, expected=${usableChunks.length}`,
+            `[vectorEmbedding] DB verification mismatch for ${documentId}: chunks=${dbChunkCount}, expected=${usableChunks.length}`,
           );
         }
       }
@@ -561,7 +522,6 @@ export async function storeDocumentEmbeddings(
           // DO NOT set status — pipeline handles it via DocumentStateManager
           chunksCount: usableChunks.length,
           embeddingsGenerated: true,
-          indexingState: "indexed",
           indexingOperationId: operationId,
           indexingError: null,
           indexingUpdatedAt: new Date(),
@@ -569,7 +529,6 @@ export async function storeDocumentEmbeddings(
       });
 
       logger.info("[vectorEmbedding] Postgres ok", {
-        embeddings: embeddingRecords.length,
         chunks: chunkRecords.length,
         documentId,
       });
@@ -626,22 +585,6 @@ export async function storeDocumentEmbeddings(
   const terminalMessage = String(
     lastErr?.message || lastErr || "Indexing failed",
   );
-  const failureData: Record<string, unknown> = {
-    indexingState: "failed",
-    indexingOperationId: operationId,
-    indexingError: terminalMessage.slice(0, 500),
-    indexingUpdatedAt: new Date(),
-    // DO NOT set status — pipeline handles it via DocumentStateManager
-  };
-  try {
-    await prisma.document.update({
-      where: { id: documentId },
-      data: failureData,
-    });
-  } catch {
-    // best effort: document may have been deleted during retries.
-  }
-
   throw new Error(
     `Failed to store embeddings for document ${documentId} after ${maxRetries} attempts: ${terminalMessage}`,
   );
@@ -676,7 +619,6 @@ export async function deleteDocumentEmbeddings(
   );
   await prisma.$transaction(
     async (tx) => {
-      await tx.documentEmbedding.deleteMany({ where: { documentId } });
       await tx.documentChunk.deleteMany({ where: { documentId } });
     },
     { maxWait: 10000, timeout: txTimeout },
@@ -704,3 +646,4 @@ export const vectorEmbeddingService = {
 };
 
 export default vectorEmbeddingService;
+

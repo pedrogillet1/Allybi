@@ -15,13 +15,62 @@ function percentile(values: number[], p: number): number | null {
   return sorted[lower] * (1 - weight) + sorted[upper] * weight;
 }
 
-function resolvePerQueryReportPath(): string | null {
-  const candidates = [
-    path.resolve(process.cwd(), "../frontend/e2e/reports/latest/per_query.json"),
-    path.resolve(process.cwd(), "frontend/e2e/reports/latest/per_query.json"),
-  ];
-  for (const candidate of candidates) {
+function normalizePath(value: string): string {
+  const trimmed = String(value || "").trim();
+  if (!trimmed) return "";
+  return path.resolve(trimmed);
+}
+
+function findNewestArchivePerQuery(frontendReportsRoot: string): string | null {
+  const archiveRoot = path.join(frontendReportsRoot, "archive");
+  if (!fs.existsSync(archiveRoot)) return null;
+  const dirs = fs
+    .readdirSync(archiveRoot, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort((a, b) => b.localeCompare(a));
+  for (const dirName of dirs) {
+    const candidate = path.join(archiveRoot, dirName, "per_query.json");
     if (fs.existsSync(candidate)) return candidate;
+  }
+  return null;
+}
+
+function resolveFromLineage(frontendReportsRoot: string): string | null {
+  const lineagePath = path.join(frontendReportsRoot, "latest", "lineage.json");
+  if (!fs.existsSync(lineagePath)) return null;
+  try {
+    const lineage = JSON.parse(fs.readFileSync(lineagePath, "utf8")) as Record<
+      string,
+      unknown
+    >;
+    const archivePath = normalizePath(String(lineage?.archivePerQueryPath || ""));
+    if (archivePath && fs.existsSync(archivePath)) return archivePath;
+  } catch {
+    return null;
+  }
+  return null;
+}
+
+function resolvePerQueryReportPath(): string | null {
+  const explicitPath = String(process.env.CERT_QUERY_LATENCY_REPORT || "").trim();
+  const frontendReportsRoots = [
+    path.resolve(process.cwd(), "../frontend/e2e/reports"),
+    path.resolve(process.cwd(), "frontend/e2e/reports"),
+  ];
+  const candidates: string[] = [];
+  if (explicitPath) candidates.push(normalizePath(explicitPath));
+  for (const reportsRoot of frontendReportsRoots) {
+    candidates.push(path.join(reportsRoot, "latest", "per_query.json"));
+    const lineageResolved = resolveFromLineage(reportsRoot);
+    if (lineageResolved) candidates.push(lineageResolved);
+    const newestArchive = findNewestArchivePerQuery(reportsRoot);
+    if (newestArchive) candidates.push(newestArchive);
+  }
+  for (const candidate of candidates) {
+    if (candidate && fs.existsSync(candidate)) {
+      return candidate;
+    }
   }
   return null;
 }

@@ -929,12 +929,12 @@ export class DataBankLoaderService {
         .filter((category) => !loadOrderSet.has(category))
         .sort((a, b) => a.localeCompare(b));
       if (missingCategoriesInLoadOrder.length > 0) {
-        const details = { missingCategoriesInLoadOrder };
+        const details = {
+          missingCategoriesInLoadOrder,
+          loadOrder: [...loadOrder],
+        };
         if (this.opts.strict) {
-          throw new DataBankError(
-            "Registry categories missing from loadOrder",
-            details,
-          );
+          throw new DataBankError("Registry categories missing from loadOrder", details);
         }
         this.logger.warn("Registry categories missing from loadOrder", details);
       }
@@ -1743,12 +1743,15 @@ export class DataBankLoaderService {
       return;
     }
 
-    // Registry is self-referential; validating its own checksum against a mutable
-    // manifest creates an impossible fixed point and can hard-fail startup.
+    const id = String(entry.id || "").trim();
+    const normalizedPath = normalizeRegistryPath(String(entry.path || "").trim());
+    // Self-generated manifest files are exempt: they include their own hash maps,
+    // so strict checksum enforcement creates impossible fixed points.
     if (
-      String(entry.id || "").trim() === "bank_registry" ||
-      normalizeRegistryPath(String(entry.path || "").trim()) ===
-        "manifest/bank_registry.any.json"
+      id === "bank_registry" ||
+      id === "bank_checksums" ||
+      normalizedPath === "manifest/bank_registry.any.json" ||
+      normalizedPath === "manifest/bank_checksums.any.json"
     ) {
       return;
     }

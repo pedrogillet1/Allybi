@@ -15,7 +15,8 @@
     ],
     "tests": [
       "tests/patternWiringProof.test.ts"
-    ]
+    ],
+    "ssotRole": "doc_type_enumeration"
   },
   "config": {
     "enabled": true

@@ -7,46 +7,40 @@ const adminAuthService = {
     const res = await fetch(`${API_URL}/api/auth/admin/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({ username, password }),
     });
     const json = await res.json();
     if (!res.ok || !json.ok) {
       throw new Error(json.error?.message || 'Login failed');
     }
-    const { admin, tokens } = json.data;
-    localStorage.setItem('adminAccessToken', tokens.accessToken);
-    localStorage.setItem('adminRefreshToken', tokens.refreshToken);
+    const { admin } = json.data;
     localStorage.setItem('adminUser', JSON.stringify(admin));
-    return { admin, tokens };
+    return { admin };
   },
 
   async refresh() {
-    const refreshToken = localStorage.getItem('adminRefreshToken');
-    if (!refreshToken) throw new Error('No admin refresh token');
-
     const res = await fetch(`${API_URL}/api/auth/admin/refresh`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refreshToken }),
+      credentials: 'include',
+      body: JSON.stringify({}),
     });
     const json = await res.json();
     if (!res.ok || !json.ok) {
       adminAuthService.clearStorage();
       throw new Error(json.error?.message || 'Refresh failed');
     }
-    const { tokens } = json.data;
-    localStorage.setItem('adminAccessToken', tokens.accessToken);
-    localStorage.setItem('adminRefreshToken', tokens.refreshToken);
-    return tokens;
+    return { refreshed: true };
   },
 
   async logout() {
-    const refreshToken = localStorage.getItem('adminRefreshToken');
     try {
       await fetch(`${API_URL}/api/auth/admin/logout`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refreshToken }),
+        credentials: 'include',
+        body: JSON.stringify({}),
       });
     } catch {
       // ignore network errors on logout
@@ -55,13 +49,11 @@ const adminAuthService = {
   },
 
   clearStorage() {
-    localStorage.removeItem('adminAccessToken');
-    localStorage.removeItem('adminRefreshToken');
     localStorage.removeItem('adminUser');
   },
 
   getAccessToken() {
-    return localStorage.getItem('adminAccessToken');
+    return null;
   },
 
   getCurrentAdmin() {
@@ -74,7 +66,7 @@ const adminAuthService = {
   },
 
   isAuthenticated() {
-    return !!localStorage.getItem('adminAccessToken') && !!localStorage.getItem('adminUser');
+    return !!localStorage.getItem('adminUser');
   },
 };
 

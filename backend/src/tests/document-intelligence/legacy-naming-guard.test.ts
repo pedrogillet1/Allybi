@@ -1,4 +1,3 @@
-import { describe, it, expect } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -7,7 +6,7 @@ const DOMAINS_ROOT = path.resolve(
   "../../data_banks/document_intelligence/domains",
 );
 
-describe("legacy naming guard — no unprefixed doc type files", () => {
+describe("legacy naming guard - no unprefixed doc type files", () => {
   const KNOWN_PREFIXES: Record<string, string> = {
     legal: "legal_",
     medical: "med_",
@@ -47,10 +46,7 @@ describe("legacy naming guard — no unprefixed doc type files", () => {
         }
       }
 
-      expect(
-        unprefixed,
-        `Found unprefixed legacy files in ${domain}: ${unprefixed.join(", ")}`,
-      ).toHaveLength(0);
+      expect(unprefixed).toHaveLength(0);
     });
   }
 });

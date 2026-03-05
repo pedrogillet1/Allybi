@@ -748,7 +748,10 @@ export class ScopeGateService {
 
     // 11b) Quality trigger gate awareness — record which quality banks are loaded.
     const qualityGatesLoaded = Object.entries(qualityTriggers)
-      .filter(([, bank]) => bank?.config?.enabled !== false && bank != null)
+      .filter(([, bank]) => {
+        if (bank == null) return false;
+        return (bank as { config?: { enabled?: boolean } }).config?.enabled !== false;
+      })
       .map(([key]) => key);
     if (qualityGatesLoaded.length > 0) {
       debug.notes.push(`quality_gates_loaded: ${qualityGatesLoaded.join(",")}`);

@@ -15,6 +15,10 @@ import type {
 } from "../config/intentConfig.service";
 import { IntentConfigService } from "../config/intentConfig.service";
 import { getOptionalBank } from "../core/banks/bankLoader.service";
+import {
+  followupSourceRank,
+  ROUTING_PRECEDENCE_CONTRACT,
+} from "./routingPrecedence.contract";
 
 export interface RoutedTurnDecision {
   route: TurnRouteDecision;
@@ -79,6 +83,10 @@ function low(value: string): string {
   return String(value || "").toLowerCase();
 }
 
+function pushUnique(values: string[], value: string): void {
+  if (!values.includes(value)) values.push(value);
+}
+
 function normalizeForMatching(
   value: string,
   opts?: {
@@ -111,9 +119,18 @@ function hasDocRefSignal(message: string): boolean {
   );
 }
 
-function isDiscoveryQuery(message: string): boolean {
-  return /\b(find|locate|search|which|where|encontre|localize|procure|qual|onde)\b/.test(
+function hasDocumentContextTerms(message: string): boolean {
+  return /\b(document|doc|file|folder|pdf|docx|xlsx|pptx|sheet|slide|clause|section|paragraph|arquivo|documento|pasta|planilha|pagina|se[cç][aã]o|cl[aá]usula|par[aá]grafo)\b/.test(
     low(message),
+  );
+}
+
+function isDiscoveryQuery(message: string): boolean {
+  const input = low(message);
+  if (hasDocRefSignal(input)) return true;
+  if (!hasDocumentContextTerms(input)) return false;
+  return /\b(find|locate|search|look up|lookup|which|where|encontre|localize|procure|buscar|busque|qual|onde)\b/.test(
+    input,
   );
 }
 
@@ -245,9 +262,16 @@ export class TurnRouterService {
    * Returns null when bank is unavailable (fail-open).
    */
   private getNavIntentsBank(locale: "en" | "pt" | "es"): any | null {
-    const bankId = locale === "es" ? "nav_intents_en" : `nav_intents_${locale}`;
+    const primaryBankId = `nav_intents_${locale}`;
     try {
-      return this.routingBankProvider(bankId);
+      const primary = this.routingBankProvider(primaryBankId);
+      if (primary) return primary;
+    } catch {
+      // Fall back to EN below.
+    }
+    if (locale === "en") return null;
+    try {
+      return this.routingBankProvider("nav_intents_en");
     } catch {
       return null;
     }
@@ -327,7 +351,7 @@ export class TurnRouterService {
     ) {
       return family;
     }
-    return "documents";
+    return "help";
   }
 
   private detectIntentPatternCandidates(
@@ -400,7 +424,9 @@ export class TurnRouterService {
     }
     // Supplement with per-operator pattern banks (fail-open: missing banks are skipped).
     for (const candidate of out) {
-      const opBank = this.getOperatorPatternBank(candidate.operatorId);
+      const operatorId = String(candidate.operatorId || "").trim();
+      if (!operatorId) continue;
+      const opBank = this.getOperatorPatternBank(operatorId);
       if (!opBank?.config?.enabled) continue;
       // If the per-operator bank has supplementary confidence boosts, apply them.
       const supplementaryBoost = Number(opBank?.config?.confidenceBoost || 0);
@@ -577,25 +603,60 @@ export class TurnRouterService {
     hasExplicitDocRef: boolean,
   ): FollowupDetectionResult {
     const contextSignals = getContextSignals(ctx);
-    if (typeof contextSignals.isFollowup === "boolean") {
-      return {
-        isFollowup: contextSignals.isFollowup,
-        confidence:
-          typeof contextSignals.followupConfidence === "number"
-            ? contextSignals.followupConfidence
-            : null,
-        source: "context",
-        reasonCodes: [],
-      };
-    }
+    const fromContext: FollowupDetectionResult | null =
+      typeof contextSignals.isFollowup === "boolean"
+        ? {
+            isFollowup: contextSignals.isFollowup,
+            confidence:
+              typeof contextSignals.followupConfidence === "number"
+                ? contextSignals.followupConfidence
+                : null,
+            source: "context",
+            reasonCodes: [],
+          }
+        : null;
     const fromBank = this.detectFollowupFromIndicatorsBank(
       ctx,
       query,
       ctx.locale,
       hasExplicitDocRef,
     );
-    if (fromBank.source !== "none") return fromBank;
-    return this.detectFollowupFromPatterns(query, ctx.locale);
+    const fromPatterns = this.detectFollowupFromPatterns(query, ctx.locale);
+    const ranked = [fromContext, fromBank, fromPatterns]
+      .filter(
+        (item): item is FollowupDetectionResult =>
+          item != null &&
+          ROUTING_PRECEDENCE_CONTRACT.followupSourcePriority.includes(
+            item.source,
+          ),
+      )
+      .sort((a, b) => followupSourceRank(a.source) - followupSourceRank(b.source));
+    if (ranked.length > 0) return ranked[0];
+    return {
+      isFollowup: false,
+      confidence: null,
+      source: "none",
+      reasonCodes: [],
+    };
+  }
+
+  private buildFollowupDecisionNotes(
+    signals: IntentSignals,
+    locale: "en" | "pt" | "es",
+  ): string[] {
+    const notes: string[] = [];
+    const followupSource = String(signals.followupSource || "none").trim();
+    pushUnique(notes, `routing:followup_source:${followupSource || "none"}`);
+    pushUnique(notes, `routing:locale:${locale}`);
+    const reasonCodes = Array.isArray(signals.followupReasonCodes)
+      ? signals.followupReasonCodes
+      : [];
+    for (const reasonCode of reasonCodes.slice(0, 3)) {
+      const normalized = String(reasonCode || "").trim();
+      if (!normalized) continue;
+      pushUnique(notes, `routing:followup_reason:${normalized}`);
+    }
+    return notes;
   }
 
   private getTiebreakWeight(stageId: string): number {
@@ -794,6 +855,10 @@ export class TurnRouterService {
   private buildCandidates(
     ctx: TurnContext,
     docsAvailable: boolean,
+    precomputed?: {
+      hasExplicitDocRef?: boolean;
+      followup?: FollowupDetectionResult;
+    },
   ): RouterCandidate[] {
     const query = String(ctx.messageText || "");
     const locale = ctx.locale || "en";
@@ -801,8 +866,12 @@ export class TurnRouterService {
     const discovery = isDiscoveryQuery(query);
     const howTo = isHowToQuery(query);
     const fileAction = this.detectFileAction(query);
-    const docRef = hasDocRefSignal(query);
-    const followup = this.detectFollowupSignal(ctx, query, docRef);
+    const docRef =
+      typeof precomputed?.hasExplicitDocRef === "boolean"
+        ? precomputed.hasExplicitDocRef
+        : hasDocRefSignal(query);
+    const followup =
+      precomputed?.followup || this.detectFollowupSignal(ctx, query, docRef);
     const patternCandidates = this.detectIntentPatternCandidates(
       query,
       locale,
@@ -815,10 +884,14 @@ export class TurnRouterService {
         (candidate) => low(candidate.intentFamily || "") === low(family),
       );
 
-    if (!hasFamily("documents") && (docsAvailable || discovery || docRef)) {
+    const discoveryWithDocContext = discovery && (docsAvailable || docRef);
+    if (
+      !hasFamily("documents") &&
+      (docsAvailable || docRef || discoveryWithDocContext)
+    ) {
       candidates.push({
         intentId: "documents",
-        operatorId: discovery ? "locate_docs" : "extract",
+        operatorId: discoveryWithDocContext ? "locate_docs" : "extract",
         intentFamily: "documents",
         domainId: "general",
         score:
@@ -887,11 +960,19 @@ export class TurnRouterService {
     ctx: TurnContext,
     docsAvailable: boolean,
     candidates: RouterCandidate[],
+    precomputed?: {
+      hasExplicitDocRef?: boolean;
+      followup?: FollowupDetectionResult;
+    },
   ): IntentSignals {
     const contextSignals = getContextSignals(ctx);
     const query = String(ctx.messageText || "");
-    const docRef = hasDocRefSignal(query);
-    const followup = this.detectFollowupSignal(ctx, query, docRef);
+    const docRef =
+      typeof precomputed?.hasExplicitDocRef === "boolean"
+        ? precomputed.hasExplicitDocRef
+        : hasDocRefSignal(query);
+    const followup =
+      precomputed?.followup || this.detectFollowupSignal(ctx, query, docRef);
     const discoveryFromPattern = this.hasOperatorCandidate(candidates, [
       "locate_docs",
     ]);
@@ -917,6 +998,8 @@ export class TurnRouterService {
           : followup.confidence != null
             ? followup.confidence
             : undefined,
+      followupSource: followup.source,
+      followupReasonCodes: followup.reasonCodes,
       hasExplicitDocRef: contextSignals.explicitDocRef === true || docRef,
       discoveryQuery:
         contextSignals.discoveryQuery === true ||
@@ -963,15 +1046,38 @@ export class TurnRouterService {
     docsAvailable: boolean,
   ): IntentDecisionOutput | null {
     try {
-      const candidates = this.buildCandidates(ctx, docsAvailable);
-      return this.intentConfig.decide({
+      const queryText = String(ctx.messageText || "");
+      const hasExplicitDocRef = hasDocRefSignal(queryText);
+      const followup = this.detectFollowupSignal(
+        ctx,
+        queryText,
+        hasExplicitDocRef,
+      );
+      const candidates = this.buildCandidates(ctx, docsAvailable, {
+        hasExplicitDocRef,
+        followup,
+      });
+      const signals = this.buildSignals(ctx, docsAvailable, candidates, {
+        hasExplicitDocRef,
+        followup,
+      });
+      const decision = this.intentConfig.decide({
         env: resolveEnv(),
         language: ctx.locale,
-        queryText: String(ctx.messageText || ""),
+        queryText,
         candidates,
-        signals: this.buildSignals(ctx, docsAvailable, candidates),
+        signals,
         state: getPersistedIntentState(ctx),
       });
+      if (!decision) return decision;
+      const decisionNotes = [...decision.decisionNotes];
+      for (const note of this.buildFollowupDecisionNotes(signals, ctx.locale)) {
+        pushUnique(decisionNotes, note);
+      }
+      return {
+        ...decision,
+        decisionNotes,
+      };
     } catch (error) {
       if (isStrictIntentConfigEnv()) {
         throw error;

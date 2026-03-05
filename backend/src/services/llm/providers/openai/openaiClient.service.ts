@@ -51,6 +51,7 @@ type OpenAIConfig = {
 
   // routing guardrails
   allowedModels: LlmModelId[]; // explicit allowlist for safety + determinism
+  strictModelAllowlist: boolean;
 
   // streaming
   includeUsageInStream: boolean;
@@ -72,6 +73,7 @@ const DEFAULT_CONFIG: OpenAIConfig = {
   defaultModelFinal: "gpt-5.2",
 
   allowedModels: ["gpt-5.2"],
+  strictModelAllowlist: true,
 
   includeUsageInStream: true,
   maxDeltaCharsSoft: 64,
@@ -100,13 +102,22 @@ function capDelta(text: string, maxChars: number): string[] {
 
 export function resolveOpenAIModel(
   routeModel: string | undefined,
-  cfg: Pick<OpenAIConfig, "allowedModels" | "defaultModelFinal">,
+  cfg: Pick<
+    OpenAIConfig,
+    "allowedModels" | "defaultModelFinal" | "strictModelAllowlist"
+  >,
 ): string {
   const m = (routeModel || "").trim();
   if (!m) return cfg.defaultModelFinal;
-  if ((cfg.allowedModels as string[]).includes(m)) return m;
+  if (cfg.strictModelAllowlist === false) return m;
+
+  const allowed =
+    Array.isArray(cfg.allowedModels) && cfg.allowedModels.length > 0
+      ? (cfg.allowedModels as string[])
+      : [cfg.defaultModelFinal];
+  if (allowed.includes(m)) return m;
   const family = toCostFamilyModel(m);
-  if (family && (cfg.allowedModels as string[]).includes(family)) return m;
+  if (family && allowed.includes(family)) return m;
   // Deterministic fallback: default final
   return cfg.defaultModelFinal;
 }

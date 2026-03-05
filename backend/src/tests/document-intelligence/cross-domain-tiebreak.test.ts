@@ -1,4 +1,3 @@
-import { describe, it, expect } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -63,7 +62,7 @@ describe("cross_domain_tiebreak_policy", () => {
           (r.domainA === domainA && r.domainB === domainB) ||
           (r.domainA === domainB && r.domainB === domainA),
       );
-      expect(match, `missing tiebreak for ${domainA} vs ${domainB}`).toBeTruthy();
+      expect(match).toBeTruthy();
     }
   });
 
@@ -82,7 +81,7 @@ describe("cross_domain_tiebreak_policy", () => {
       seen.add(key);
     }
 
-    expect(duplicates, `duplicate pairs found: ${duplicates.join(", ")}`).toHaveLength(0);
+    expect(duplicates).toHaveLength(0);
   });
 
   it("each rule has a winner, reason, and confidenceBoost", () => {
@@ -114,3 +113,5 @@ describe("cross_domain_tiebreak wiring proof", () => {
     expect(src).toContain("cross_domain_tiebreak_policy");
   });
 });
+
+

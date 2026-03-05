@@ -139,6 +139,8 @@ export interface LLMCompletionResponse {
   turnId: string;
 
   model: LLMModelSpec;
+  requestedModel?: LLMModelSpec;
+  executedModel?: LLMModelSpec;
 
   /** Assistant message content */
   content: string;
@@ -168,6 +170,8 @@ export interface LLMStreamResponse {
   turnId: string;
 
   model: LLMModelSpec;
+  requestedModel?: LLMModelSpec;
+  executedModel?: LLMModelSpec;
 
   /** Final accumulated text (what was streamed) */
   finalText: string;

@@ -15,9 +15,9 @@ describe("providerNormalization", () => {
     expect(canonicalizeProvider("gpt")).toBe("openai");
   });
 
-  test("maps local aliases to local", () => {
-    expect(canonicalizeProvider("local")).toBe("local");
-    expect(canonicalizeProvider("ollama")).toBe("local");
+  test("does not map local aliases", () => {
+    expect(canonicalizeProvider("local")).toBeNull();
+    expect(canonicalizeProvider("legacy-local-provider")).toBeNull();
   });
 
   test("unknown values do not map to google", () => {

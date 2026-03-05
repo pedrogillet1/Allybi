@@ -6,7 +6,7 @@
  * 2. Answer titles and section headings
  * 3. Document titles (file listing)
  *
- * Uses Gemini 3.0 Flash for fast, cost-effective title generation.
+ * Uses Gemini 2.5 Flash for fast, cost-effective title generation.
  */
 
 import { randomUUID } from "crypto";

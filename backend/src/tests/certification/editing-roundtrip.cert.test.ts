@@ -87,6 +87,7 @@ class InMemoryRoundtripStore implements EditRevisionStore {
     documentId: string;
     userId: string;
     revisionId?: string;
+    expectedFileHash?: string;
   }): Promise<{
     restoredRevisionId: string;
     beforeHash?: string;

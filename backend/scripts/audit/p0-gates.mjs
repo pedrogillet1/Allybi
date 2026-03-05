@@ -3,6 +3,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
+import { resolveCommitHash } from "../certification/git-commit.mjs";
 
 const strict =
   process.argv.includes("--strict") ||
@@ -22,12 +23,63 @@ const maxAgeMs = Number.isFinite(maxAgeHours) && maxAgeHours > 0
   ? maxAgeHours * 60 * 60 * 1000
   : 24 * 60 * 60 * 1000;
 
+function requireLiveRuntimeGraphEvidence() {
+  const override = String(process.env.CERT_REQUIRE_RUNTIME_GRAPH_LIVE || "")
+    .trim()
+    .toLowerCase();
+  if (override === "1" || override === "true") return true;
+  if (override === "0" || override === "false") return false;
+  const ciFlags = [
+    process.env.CI,
+    process.env.GITHUB_ACTIONS,
+    process.env.BUILD_BUILDID,
+  ]
+    .map((value) => String(value || "").trim().toLowerCase())
+    .filter(Boolean);
+  return ciFlags.some((value) => value === "1" || value === "true");
+}
+
 const GATE_GENERATORS = {
   "wrong-doc": "test:cert:wrong-doc",
+  truncation: "test:cert:truncation",
+  "runtime-wiring": "test:runtime-wiring",
   "enforcer-failclosed": "test:cert:enforcer-failclosed",
   "evidence-fidelity": "test:cert:evidence-fidelity",
   "security-auth": "test:cert:security-auth",
 };
+
+function readPackageScripts() {
+  const pkgPath = path.resolve(ROOT, "package.json");
+  if (!fs.existsSync(pkgPath)) return {};
+  try {
+    const pkg = readJson(pkgPath);
+    return pkg?.scripts && typeof pkg.scripts === "object" ? pkg.scripts : {};
+  } catch {
+    return {};
+  }
+}
+
+function verifyRuntimeWiringContract(failures) {
+  const expectedGenerator = "test:runtime-wiring";
+  const actualGenerator = String(GATE_GENERATORS["runtime-wiring"] || "").trim();
+  if (actualGenerator !== expectedGenerator) {
+    failures.push("P0-9_RUNTIME_WIRING_GENERATOR_DRIFT");
+    return;
+  }
+
+  const scripts = readPackageScripts();
+  const runtimeScript = String(scripts["test:runtime-wiring"] || "");
+  if (!runtimeScript) {
+    failures.push("P0-9_RUNTIME_WIRING_SCRIPT_MISSING");
+    return;
+  }
+  if (!runtimeScript.includes("docint-bank-integrity.test.ts")) {
+    failures.push("P0-9_RUNTIME_WIRING_DOCINT_INTEGRITY_NOT_INCLUDED");
+  }
+  if (!runtimeScript.includes("runtime-wiring.cert.test.ts")) {
+    failures.push("P0-9_RUNTIME_WIRING_GATE_REPORT_NOT_INCLUDED");
+  }
+}
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, "utf8"));
@@ -42,13 +94,7 @@ function getGate(gateId) {
 }
 
 function currentCommitHash() {
-  const result = spawnSync("git", ["rev-parse", "HEAD"], {
-    cwd: ROOT,
-    encoding: "utf8",
-  });
-  if (result.status !== 0) return null;
-  const hash = String(result.stdout || "").trim();
-  return hash || null;
+  return resolveCommitHash(ROOT);
 }
 
 function analyzeFreshness(gate, commitHash) {
@@ -81,12 +127,27 @@ function analyzeFreshness(gate, commitHash) {
   };
 }
 
-function runScript(scriptName) {
-  const result = spawnSync("npm", ["run", "-s", scriptName], {
-    cwd: ROOT,
-    stdio: "inherit",
-    env: process.env,
-  });
+function runScript(scriptName, commitHash = null) {
+  const childEnv = {
+    ...process.env,
+    ...(commitHash ? { GIT_COMMIT_HASH: commitHash } : {}),
+  };
+  const result = process.platform === "win32"
+    ? spawnSync("cmd.exe", ["/d", "/s", "/c", `npm.cmd run -s ${scriptName}`], {
+      cwd: ROOT,
+      stdio: "inherit",
+      env: childEnv,
+    })
+    : spawnSync("npm", ["run", "-s", scriptName], {
+      cwd: ROOT,
+      stdio: "inherit",
+      env: childEnv,
+    });
+  if (result.error) {
+    console.error(
+      `[p0-gates] failed to execute '${scriptName}': ${result.error.message}`,
+    );
+  }
   return result.status === 0;
 }
 
@@ -100,7 +161,7 @@ function ensureGate(gateId, commitHash, regenerated) {
       console.log(
         `[p0-gates] gate '${gateId}' missing; running: npm run ${generator}`,
       );
-      const ok = runScript(generator);
+      const ok = runScript(generator, commitHash);
       if (ok) {
         gate = getGate(gateId);
         refreshed = true;
@@ -114,7 +175,7 @@ function ensureGate(gateId, commitHash, regenerated) {
       console.log(
         `[p0-gates] gate '${gateId}' stale (${freshness.reasons.join(", ")}); running: npm run ${generator}`,
       );
-      const ok = runScript(generator);
+      const ok = runScript(generator, commitHash);
       if (ok) {
         gate = getGate(gateId);
         refreshed = true;
@@ -138,7 +199,9 @@ function main() {
   const failures = [];
   const checks = [];
   const regenerated = [];
-  const commitHash = currentCommitHash();
+  const commitMetadata = currentCommitHash();
+  const commitHash = commitMetadata.commitHash;
+  verifyRuntimeWiringContract(failures);
 
   const wrongDocState = ensureGate("wrong-doc", commitHash, regenerated);
   const wrongDoc = wrongDocState.gate;
@@ -264,11 +327,87 @@ function main() {
     if (!missingTokenRejected) failures.push("P0-1_MISSING_TOKEN_NOT_REJECTED");
   }
 
+  const truncationState = ensureGate("truncation", commitHash, regenerated);
+  const truncation = truncationState.gate;
+  if (truncation.missing) {
+    failures.push("P0-8_GATE_MISSING_TRUNCATION");
+  } else {
+    if (truncationState.freshness.stale) {
+      failures.push(
+        `P0-8_GATE_STALE_TRUNCATION:${truncationState.freshness.reasons.join("|")}`,
+      );
+    }
+    checks.push({
+      gateId: "truncation",
+      passed: truncation?.passed === true,
+      metrics: truncation?.metrics || {},
+      freshness: truncationState.freshness,
+    });
+    if (truncation?.passed !== true) {
+      failures.push("P0-8_TRUNCATION_GATE_FAILED");
+    }
+  }
+
+  const runtimeWiringState = ensureGate(
+    "runtime-wiring",
+    commitHash,
+    regenerated,
+  );
+  const runtimeWiring = runtimeWiringState.gate;
+  if (runtimeWiring.missing) {
+    failures.push("P0-9_GATE_MISSING_RUNTIME_WIRING");
+  } else {
+    if (runtimeWiringState.freshness.stale) {
+      failures.push(
+        `P0-9_GATE_STALE_RUNTIME_WIRING:${runtimeWiringState.freshness.reasons.join("|")}`,
+      );
+    }
+    const commandStatus = Number(runtimeWiring?.metrics?.commandStatus ?? 1);
+    const commandMode = String(runtimeWiring?.metrics?.commandMode || "").trim();
+    checks.push({
+      gateId: "runtime-wiring",
+      passed: runtimeWiring?.passed === true,
+      metrics: { commandStatus, commandMode },
+      freshness: runtimeWiringState.freshness,
+    });
+    if (runtimeWiring?.passed !== true) {
+      failures.push("P0-9_RUNTIME_WIRING_GATE_FAILED");
+    }
+    if (strict && commandStatus !== 0) {
+      failures.push("P0-9_RUNTIME_WIRING_COMMAND_STATUS_NON_ZERO");
+    }
+    if (strict) {
+      const needsLive = requireLiveRuntimeGraphEvidence();
+      const valid =
+        commandMode === "live" ||
+        (!needsLive && commandMode === "cached");
+      if (!valid) {
+        failures.push(
+          needsLive
+            ? "P0-9_RUNTIME_WIRING_EVIDENCE_MODE_NOT_LIVE"
+            : "P0-9_RUNTIME_WIRING_EVIDENCE_MODE_INVALID",
+        );
+      }
+    }
+  }
+
+  const banksIntegrityPassed = runScript("banks:integrity:check", commitHash);
+  checks.push({
+    gateId: "banks-integrity",
+    passed: banksIntegrityPassed,
+    metrics: {},
+    freshness: { stale: false, reasons: [] },
+  });
+  if (!banksIntegrityPassed) {
+    failures.push("P0-10_BANKS_INTEGRITY_FAILED");
+  }
+
   const summary = {
     generatedAt: new Date().toISOString(),
     strict,
     autoRefresh,
     commitHash,
+    commitHashSource: commitMetadata.source,
     maxAgeHours,
     regenerated,
     passed: failures.length === 0,

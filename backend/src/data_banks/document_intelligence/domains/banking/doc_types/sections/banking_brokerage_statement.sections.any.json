@@ -56,7 +56,7 @@
       "id": "transactions",
       "name": {
         "en": "Transactions",
-        "pt": "Transacoes"
+        "pt": "Transações"
       },
       "required": true,
       "order": 3,
@@ -102,3 +102,4 @@
     }
   ]
 }
+

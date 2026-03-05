@@ -40,6 +40,10 @@ import type {
   LlmRouteReason,
 } from "../types/llm.types";
 import { toCostFamilyModel } from "./llmCostCalculator";
+import {
+  resolveFeatureFlagBoolean,
+  resolveFeatureFlagEnvName,
+} from "../../core/banks/featureFlagResolver.service";
 
 export interface BankLoader {
   getBank<T = unknown>(bankId: string): T;
@@ -175,8 +179,8 @@ type CompositionLanePolicyBank = {
 
 type FeatureFlagsBank = {
   _meta?: Record<string, unknown>;
-  config?: { enabled?: boolean };
-  flags?: Record<string, unknown>;
+  config?: Record<string, unknown>;
+  flags?: unknown;
 };
 
 function uniq(arr: string[] = []) {
@@ -185,6 +189,28 @@ function uniq(arr: string[] = []) {
 
 function bool(v: unknown): boolean {
   return v === true;
+}
+
+function normalizeProvider(provider: unknown): LlmProviderId {
+  const raw = String(provider || "").trim().toLowerCase();
+  if (raw === "google") return "gemini";
+  return raw as LlmProviderId;
+}
+
+function isStrictRoutingEnv(env: unknown): boolean {
+  const raw = String(env || "").trim().toLowerCase();
+  return raw === "production" || raw === "staging";
+}
+
+function isAllowedProviderModel(
+  provider: LlmProviderId,
+  model: LlmModelId,
+): boolean {
+  const family = toCostFamilyModel(String(model)) ?? String(model);
+  return (
+    (provider === "gemini" && family === "gemini-2.5-flash") ||
+    (provider === "openai" && family === "gpt-5.2")
+  );
 }
 
 function isNavPills(ctx: RouteContext): boolean {
@@ -260,8 +286,12 @@ export class LlmRouterService {
       "providerFallbacks",
     ]);
     const flags = this.safeGetBank<FeatureFlagsBank>("feature_flags");
-    const feature = flags?.flags ?? {};
-    const enableMultiProvider = feature.enable_multi_provider !== false;
+    const enableMultiProvider = resolveFeatureFlagBoolean({
+      bank: flags,
+      flagId: "ff.enable_multi_provider",
+      env: resolveFeatureFlagEnvName(process.env.NODE_ENV),
+      fallback: true,
+    });
 
     return this.computeFallbackList(
       input.primary,
@@ -278,23 +308,30 @@ export class LlmRouterService {
   route(ctx: RouteContext): LlmRoutePlan {
     // 0) Forced override (admin/dev/testing)
     if (ctx.force?.provider && ctx.force?.model) {
-      const forcedModel = String(ctx.force.model);
-      return {
-        provider: ctx.force.provider,
-        model: ctx.force.model,
-        modelFamily: toCostFamilyModel(forcedModel) ?? forcedModel,
-        reason: "unknown",
-        lane: "forced_override",
-        policyRuleId: "forced_override",
-        qualityReason: "forced_override",
-        stage: ctx.stage,
-        constraints: {
-          requireStreaming: bool(ctx.requireStreaming),
-          disallowTools: ctx.allowTools === false,
-          disallowImages: true,
-          maxLatencyMs: ctx.latencyBudgetMs,
-        },
-      };
+      const forcedProvider = normalizeProvider(ctx.force.provider);
+      const forcedModel = String(ctx.force.model).trim() as LlmModelId;
+      if (isAllowedProviderModel(forcedProvider, forcedModel)) {
+        return {
+          provider: forcedProvider,
+          model: forcedModel,
+          modelFamily: toCostFamilyModel(forcedModel) ?? forcedModel,
+          reason: "unknown",
+          lane: "forced_override",
+          policyRuleId: "forced_override",
+          qualityReason: "forced_override",
+          stage: ctx.stage,
+          constraints: {
+            requireStreaming: bool(ctx.requireStreaming),
+            disallowTools: ctx.allowTools === false,
+            disallowImages: true,
+            maxLatencyMs: ctx.latencyBudgetMs,
+          },
+        };
+      }
+      this.logger?.warn("Ignoring forced override outside allowed model governance", {
+        provider: forcedProvider,
+        model: forcedModel,
+      });
     }
 
     // 1) Load optional banks
@@ -311,10 +348,13 @@ export class LlmRouterService {
       "compositionLanePolicy",
     ]);
     const flags = this.safeGetBank<FeatureFlagsBank>("feature_flags");
-
-    const feature = flags?.flags ?? {};
-    const preferLocalInDev = bool(feature.prefer_local_in_dev);
-    const enableMultiProvider = feature.enable_multi_provider !== false;
+    const strictRouting = isStrictRoutingEnv(ctx.env);
+    const enableMultiProvider = resolveFeatureFlagBoolean({
+      bank: flags,
+      flagId: "ff.enable_multi_provider",
+      env: resolveFeatureFlagEnvName(ctx.env),
+      fallback: true,
+    });
 
     // 2) Determine routing reason and preferred stage
     const reason = this.computeRouteReason(ctx);
@@ -325,9 +365,6 @@ export class LlmRouterService {
       reason,
       caps,
       lanePolicy,
-      {
-        preferLocalInDev,
-      },
     );
 
     // 4) Validate capability constraints and provider health
@@ -349,6 +386,7 @@ export class LlmRouterService {
         needStreaming,
         needTools,
         ctx.estimatedInputTokens,
+        strictRouting,
       ) && pickHealth(ctx.providerHealth, primary.provider, primary.model).ok;
 
     if (okPrimary) {
@@ -380,6 +418,7 @@ export class LlmRouterService {
           needStreaming,
           needTools,
           ctx.estimatedInputTokens,
+          strictRouting,
         ) && pickHealth(ctx.providerHealth, cand.provider, cand.model).ok;
 
       if (supported) {
@@ -461,7 +500,6 @@ export class LlmRouterService {
     reason: LlmRouteReason,
     caps: ProviderCapabilitiesBank | null,
     lanePolicy: CompositionLanePolicyBank | null,
-    opts: { preferLocalInDev: boolean },
   ): PrimaryTarget {
     // Bank defaults if present
     const bankDraft = caps?.defaults?.draft;
@@ -477,12 +515,6 @@ export class LlmRouterService {
     const DEFAULT_FINAL = {
       provider: "openai" as LlmProviderId,
       model: "gpt-5.2" as LlmModelId,
-    };
-
-    // Dev/local cost control: optionally prefer local for draft
-    const localDraft = {
-      provider: "local" as LlmProviderId,
-      model: "local-default" as LlmModelId,
     };
 
     // Decide stage override from reason
@@ -537,18 +569,6 @@ export class LlmRouterService {
       };
     }
 
-    // stage === draft
-    if ((ctx.env === "dev" || ctx.env === "local") && opts.preferLocalInDev) {
-      return {
-        ...localDraft,
-        stage: "draft",
-        lane: "draft_local_dev",
-        modelFamily: toCostFamilyModel(localDraft.model) ?? localDraft.model,
-        policyRuleId: "router_builtin_local_dev",
-        qualityReason: "fast_path",
-      };
-    }
-
     const laneTarget = this.selectLanePolicyTarget(
       ctx,
       reason,
@@ -579,7 +599,10 @@ export class LlmRouterService {
     needStreaming: boolean,
     needTools: boolean,
     estimatedInputTokens?: number,
+    strictRouting: boolean = false,
   ): boolean {
+    if (strictRouting && !isAllowedProviderModel(provider, model)) return false;
+
     // If no capabilities bank, assume supported (system is configured elsewhere)
     if (!caps?.providers) return true;
 
@@ -625,6 +648,8 @@ export class LlmRouterService {
   ): Array<{ provider: LlmProviderId; model: LlmModelId }> {
     const out: Array<{ provider: LlmProviderId; model: LlmModelId }> = [];
 
+    if (!enableMultiProvider) return out;
+
     // 1) Bank-driven fallbacks
     const fallbackRules =
       fallbacks?.config?.enabled !== false &&
@@ -651,7 +676,7 @@ export class LlmRouterService {
 
     // 2) Deterministic default fallbacks (no bank required)
     // Keep this minimal and general:
-    // - If gemini fails, try openai; if openai fails, try local; then swap.
+    // - If gemini fails, try openai; if openai fails, try gemini.
     const primaryKey = `${primary.provider}:${primary.model}`;
     const add = (p: LlmProviderId, m: LlmModelId) => {
       const k = `${p}:${m}`;
@@ -660,20 +685,18 @@ export class LlmRouterService {
       out.push({ provider: p, model: m });
     };
 
-    if (enableMultiProvider) {
-      if (primary.provider === "gemini") {
+    if (primary.provider === "gemini") {
+      add("openai", "gpt-5.2");
+    } else if (primary.provider === "openai") {
+      add("gemini", "gemini-2.5-flash");
+    } else {
+      // Unknown provider path: keep deterministic ordering by stage.
+      if (primary.stage === "final") {
         add("openai", "gpt-5.2");
-      } else if (primary.provider === "openai") {
         add("gemini", "gemini-2.5-flash");
       } else {
-        // local primary
-        if (primary.stage === "final") {
-          add("openai", "gpt-5.2");
-          add("gemini", "gemini-2.5-flash");
-        } else {
-          add("gemini", "gemini-2.5-flash");
-          add("openai", "gpt-5.2");
-        }
+        add("gemini", "gemini-2.5-flash");
+        add("openai", "gpt-5.2");
       }
     }
 

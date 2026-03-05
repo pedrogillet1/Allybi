@@ -6,6 +6,11 @@ import {
   adminLimiter,
 } from "../../../middleware/rateLimit.middleware";
 import prisma from "../../../platform/db/prismaClient";
+import {
+  setAdminAuthCookies,
+  clearAdminAuthCookies,
+  getAdminTokensFromCookies,
+} from "../../../utils/adminAuthCookies";
 
 const router = Router();
 
@@ -72,7 +77,14 @@ router.post(
         ip,
         userAgent,
       });
-      res.json({ ok: true, data: result });
+      if (result.tokens) {
+        setAdminAuthCookies(
+          res,
+          result.tokens.accessToken,
+          result.tokens.refreshToken,
+        );
+      }
+      res.json({ ok: true, data: { admin: result.admin } });
     } catch (err: any) {
       logAdminSecurityEvent("ADMIN_LOGIN_FAILED", {
         username: req.body?.username,
@@ -98,7 +110,8 @@ router.post(
   authLimiter,
   async (req: Request, res: Response): Promise<void> => {
     try {
-      const { refreshToken } = req.body;
+      const refreshToken =
+        req.body.refreshToken || getAdminTokensFromCookies(req).refreshToken;
       if (!refreshToken) {
         res.status(400).json({
           ok: false,
@@ -107,7 +120,14 @@ router.post(
         return;
       }
       const result = await svc(req).refresh({ refreshToken });
-      res.json({ ok: true, data: result });
+      if (result.tokens?.accessToken) {
+        setAdminAuthCookies(
+          res,
+          result.tokens.accessToken,
+          result.tokens.refreshToken || refreshToken,
+        );
+      }
+      res.json({ ok: true, data: { refreshed: true } });
     } catch (err: any) {
       res.status(401).json({
         ok: false,
@@ -122,8 +142,11 @@ router.post(
   authLimiter,
   async (req: Request, res: Response): Promise<void> => {
     try {
-      const { refreshToken, adminId } = req.body;
+      const refreshToken =
+        req.body.refreshToken || getAdminTokensFromCookies(req).refreshToken;
+      const { adminId } = req.body;
       await svc(req).logout({ refreshToken, adminId });
+      clearAdminAuthCookies(res);
       res.json({ ok: true });
     } catch (err: any) {
       res.status(500).json({

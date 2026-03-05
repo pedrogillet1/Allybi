@@ -1,4 +1,3 @@
-import { describe, it, expect } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -25,10 +24,9 @@ describe("domain_ontology SSOT alignment", () => {
     const diDomains: string[] = di.config.canonicalDomainIds || [];
     const taxDomains: string[] =
       taxonomy.config?.canonicalDomains || taxonomy.canonicalDomains || [];
+
     for (const domain of diDomains) {
-      expect(taxDomains, `DI domain '${domain}' not in taxonomy`).toContain(
-        domain,
-      );
+      expect(taxDomains).toContain(domain);
     }
   });
 
@@ -36,12 +34,10 @@ describe("domain_ontology SSOT alignment", () => {
     const di = JSON.parse(fs.readFileSync(diPath, "utf-8"));
     const diDomains: string[] = di.config.canonicalDomainIds || [];
     const domainsDir = path.join(BANKS_ROOT, "document_intelligence/domains");
+
     for (const domain of diDomains) {
       const domainDir = path.join(domainsDir, domain);
-      expect(
-        fs.existsSync(domainDir),
-        `phantom domain '${domain}' — defined in ontology but no folder at ${domainDir}`,
-      ).toBe(true);
+      expect(fs.existsSync(domainDir)).toBe(true);
     }
   });
 });

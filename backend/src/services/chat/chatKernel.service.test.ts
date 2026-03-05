@@ -56,6 +56,18 @@ describe("ChatKernelService intent metadata propagation", () => {
     expect((forwardedReq.meta || {}).operator).toBe("extract");
     expect((forwardedReq.meta || {}).domain).toBe("finance");
     expect((forwardedReq.meta || {}).domainId).toBe("finance");
+    expect((forwardedReq.meta as any)?.routingDecision).toEqual(
+      expect.objectContaining({
+        route: "KNOWLEDGE",
+        locale: "en",
+        intentFamily: "documents",
+        operator: "extract",
+        domainId: "finance",
+      }),
+    );
+    expect(
+      JSON.stringify((forwardedReq.meta as any)?.routingDecision || {}),
+    ).not.toContain("summarize this document");
     expect((forwardedReq.context as any)?.intentState?.activeDomain).toBe(
       "finance",
     );
@@ -126,6 +138,14 @@ describe("ChatKernelService intent metadata propagation", () => {
       .req as ChatRequest;
     expect((forwardedReq.meta || {}).operator).toBe("open");
     expect((forwardedReq.meta || {}).domainId).toBe("legal");
+    expect((forwardedReq.meta as any)?.routingDecision).toEqual(
+      expect.objectContaining({
+        route: "KNOWLEDGE",
+        locale: "en",
+        intentFamily: "file_actions",
+        operator: "open",
+      }),
+    );
     expect((forwardedReq.context as any)?.intentState?.activeDomain).toBe(
       "legal",
     );
@@ -170,5 +190,13 @@ describe("ChatKernelService intent metadata propagation", () => {
     const forwardedReq = executor.chat.mock.calls[0][0] as ChatRequest;
     expect((forwardedReq.meta || {}).requiresClarification).toBe(true);
     expect((forwardedReq.meta || {}).clarifyReason).toBe("ambiguous_margin");
+    expect((forwardedReq.meta as any)?.routingDecision).toEqual(
+      expect.objectContaining({
+        route: "CLARIFY",
+        locale: "en",
+        intentFamily: "documents",
+        operator: "extract",
+      }),
+    );
   });
 });

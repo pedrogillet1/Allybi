@@ -33,7 +33,7 @@ describe("llmGatewayRuntime.factory", () => {
     expect(resolveFactoryKey("openai")).toBe("openai");
     expect(resolveFactoryKey("google")).toBe("google");
     expect(resolveFactoryKey("gemini")).toBe("google");
-    expect(resolveFactoryKey("local")).toBe("local");
+    expect(resolveFactoryKey("local")).toBeNull();
     expect(resolveFactoryKey("unknown")).toBeNull();
   });
 

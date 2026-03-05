@@ -39,17 +39,15 @@ export const useTelemetry = (endpoint, options = {}) => {
       const url = `${API_BASE}/admin/telemetry/${endpoint}${query ? `?${query}` : ''}`;
 
       const headers = {
-        Authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
       };
 
-      // Add admin key for production security
       const adminKey = process.env.REACT_APP_ADMIN_KEY;
       if (adminKey) {
         headers['X-KODA-ADMIN-KEY'] = adminKey;
       }
 
-      const response = await fetch(url, { headers });
+      const response = await fetch(url, { headers, credentials: 'include' });
 
       if (!response.ok) {
         if (response.status === 403) throw new Error('Admin access required');

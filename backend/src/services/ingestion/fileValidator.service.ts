@@ -16,6 +16,7 @@
 import * as XLSX from "xlsx";
 import mammoth from "mammoth";
 import { UPLOAD_CONFIG } from "../../config/upload.config";
+import { logger } from "../../utils/logger";
 
 export interface ValidationResult {
   isValid: boolean;
@@ -122,9 +123,9 @@ class FileValidatorService {
   ): ValidationResult {
     // Check for empty/zero-byte files
     if (!buffer || buffer.length === 0) {
-      console.error(
-        `[FileValidator] Corrupt upload detected: zero-byte file${documentId ? ` (docId=${documentId})` : ""}`,
-      );
+      logger.warn("[FileValidator] Corrupt upload detected: zero-byte file", {
+        documentId,
+      });
       return {
         isValid: false,
         error: "File is empty (0 bytes)",
@@ -136,9 +137,10 @@ class FileValidatorService {
 
     // Check for very small files (likely corrupt)
     if (buffer.length < 10) {
-      console.error(
-        `[FileValidator] Corrupt upload detected: file too small (${buffer.length} bytes)${documentId ? ` (docId=${documentId})` : ""}`,
-      );
+      logger.warn("[FileValidator] Corrupt upload detected: file too small", {
+        documentId,
+        sizeBytes: buffer.length,
+      });
       return {
         isValid: false,
         error: `File is too small (${buffer.length} bytes)`,
@@ -167,9 +169,10 @@ class FileValidatorService {
       });
 
       if (!matchesAny) {
-        console.error(
-          `[FileValidator] Header mismatch: expected ${mimeType} but magic bytes don't match${documentId ? ` (docId=${documentId})` : ""}`,
-        );
+        logger.warn("[FileValidator] Header mismatch: magic bytes don't match", {
+          documentId,
+          mimeType,
+        });
         return {
           isValid: false,
           error: `File header doesn't match expected format (${mimeType})`,
@@ -303,7 +306,7 @@ class FileValidatorService {
 
       return { isValid: true };
     } catch (error: any) {
-      console.error("Server-side validation error:", error);
+      logger.error("[FileValidator] Server-side validation error", { error: error?.message });
       return {
         isValid: false,
         error: "File validation failed",
@@ -382,7 +385,7 @@ class FileValidatorService {
 
       return { isValid: true };
     } catch (error: any) {
-      console.error("Content extraction validation error:", error);
+      logger.error("[FileValidator] Content extraction validation error", { error: error?.message });
       return {
         isValid: false,
         error: "Failed to extract text from document",
@@ -454,6 +457,7 @@ class FileValidatorService {
     } catch (error: any) {
       return {
         isValid: false,
+        error: error?.message || "Password protection check failed",
         errorCode: ValidationErrorCode.FILE_CORRUPTED,
         suggestion:
           "File could not be read. It may be corrupted or password-protected.",

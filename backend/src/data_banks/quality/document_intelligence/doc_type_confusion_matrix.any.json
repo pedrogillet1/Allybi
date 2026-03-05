@@ -1,0 +1,88 @@
+{
+  "_meta": {
+    "id": "doc_type_confusion_matrix",
+    "version": "1.0.0",
+    "description": "Disambiguation rules for doc types that frequently confuse with each other across domains.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-04",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/bankSelectionPlanner.service.ts"
+    ],
+    "tests": [
+      "tests/document-intelligence/doc-type-confusion-matrix.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "strategy": "prefer_specialized_domain"
+  },
+  "rules": [
+    {
+      "id": "CTM_001",
+      "docTypeA": "every_bank_statement",
+      "docTypeB": "banking_bank_statement",
+      "winner": "banking_bank_statement",
+      "structureCue": "Has routing number, bank logo header, or account ledger layout",
+      "reason": "Banking domain has specialized extraction for account and transaction structures."
+    },
+    {
+      "id": "CTM_002",
+      "docTypeA": "every_bank_statement",
+      "docTypeB": "fin_bank_statement",
+      "winner": "fin_bank_statement",
+      "structureCue": "Has portfolio positions, market value columns, or securities listings",
+      "reason": "Finance domain covers investor-style statement structure and metrics."
+    },
+    {
+      "id": "CTM_003",
+      "docTypeA": "every_electricity_bill",
+      "docTypeB": "billing_electricity_bill",
+      "winner": "billing_electricity_bill",
+      "structureCue": "Contains meter readings, kWh usage lines, and tariff blocks",
+      "reason": "Billing utility schemas are more specific for energy billing fields."
+    },
+    {
+      "id": "CTM_004",
+      "docTypeA": "every_internet_bill",
+      "docTypeB": "billing_internet_bill",
+      "winner": "billing_internet_bill",
+      "structureCue": "Contains service plan speed/data usage and telecom fee breakdown",
+      "reason": "Billing telecom extraction handles plan-level and line-item service charges."
+    },
+    {
+      "id": "CTM_005",
+      "docTypeA": "every_phone_bill",
+      "docTypeB": "billing_phone_bill_mobile",
+      "winner": "billing_phone_bill_mobile",
+      "structureCue": "Contains per-line call/text/data usage and roaming fee blocks",
+      "reason": "Billing mobile schemas include phone-line usage and overage parsing."
+    },
+    {
+      "id": "CTM_006",
+      "docTypeA": "every_retail_receipt",
+      "docTypeB": "billing_retail_receipt",
+      "winner": "billing_retail_receipt",
+      "structureCue": "Contains SKU-level itemization with quantity, unit price, and totals",
+      "reason": "Billing receipt structures provide stronger item-level extraction contracts."
+    },
+    {
+      "id": "CTM_007",
+      "docTypeA": "every_insurance_claim",
+      "docTypeB": "ins_claim_submission",
+      "winner": "ins_claim_submission",
+      "structureCue": "Contains claim number, policy linkage, and adjudication workflow fields",
+      "reason": "Insurance domain has claim-specific extraction and safety-centric policy handling."
+    },
+    {
+      "id": "CTM_008",
+      "docTypeA": "every_insurance_policy",
+      "docTypeB": "ins_policy_document",
+      "winner": "ins_policy_document",
+      "structureCue": "Contains coverage limits, exclusions, endorsements, and declarations page",
+      "reason": "Insurance policy documents require specialized clause-level extraction."
+    }
+  ]
+}

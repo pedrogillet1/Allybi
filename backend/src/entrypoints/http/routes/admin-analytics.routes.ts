@@ -602,7 +602,7 @@ router.get(
         docsMonth,
         storageAgg,
         avgSizeAgg,
-        embeddingCount,
+        indexedChunkCount,
         avgChunks,
         uploadTrend,
         docsByType,
@@ -616,7 +616,7 @@ router.get(
         prisma.document.count({ where: { createdAt: { gte: monthAgo } } }),
         prisma.user.aggregate({ _sum: { storageUsedBytes: true } }),
         prisma.document.aggregate({ _avg: { fileSize: true } }),
-        prisma.documentEmbedding.count(),
+        prisma.documentChunk.count(),
         prisma.document.aggregate({ _avg: { chunksCount: true } }),
         prisma.$queryRaw<{ date: Date; count: bigint }[]>`
         SELECT DATE(d."createdAt") as date, COUNT(*)::bigint as count
@@ -680,7 +680,7 @@ router.get(
         totalStorageGB: Math.round(storageGB * 100) / 100,
         avgDocumentSizeBytes: Math.round(avgSizeAgg._avg.fileSize ?? 0),
         embeddingStats: {
-          totalEmbeddings: embeddingCount,
+          totalEmbeddings: indexedChunkCount,
           avgChunksPerDocument:
             Math.round((avgChunks._avg.chunksCount ?? 0) * 10) / 10,
         },

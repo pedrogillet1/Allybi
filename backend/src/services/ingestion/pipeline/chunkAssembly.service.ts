@@ -32,7 +32,7 @@ import { normalizeCellUnit, checkRowUnitConsistency } from "./tableUnitNormaliza
 function emitCellFactChunks(
   tables: ExtractedTable[],
   ctxMeta: InputChunkMetadata,
-  sourceType: string,
+  sourceType: NonNullable<InputChunkMetadata["sourceType"]>,
   startIdx: number,
 ): InputChunk[] {
   const out: InputChunk[] = [];
@@ -208,7 +208,7 @@ export function buildInputChunks(
     // Fall back to plain-text split if sections yielded nothing
     if (out.length === 0) {
       const segments = splitTextIntoChunks(fullText.trim(), policyOverrides);
-      const fallback = segments.map((content, i) => ({
+      const fallback: InputChunk[] = segments.map((content, i) => ({
         chunkIndex: i,
         content,
         metadata: { ...ctxMeta, chunkType: "text" as const, sourceType: "docx" as const },
@@ -286,7 +286,13 @@ export function buildInputChunks(
           colHeader,
           rowLabel,
         });
-        const headerPath = toHeaderPath(rowLabel, colHeader, fact.headerHierarchy);
+        const headerPath = toHeaderPath(
+          rowLabel,
+          colHeader,
+          Array.isArray((fact as any).headerHierarchy)
+            ? ((fact as any).headerHierarchy as string[])
+            : undefined,
+        );
         const summaryLeft = headerPath.length
           ? headerPath.join(" / ")
           : cell || "Cell";

@@ -1,4 +1,3 @@
-import { describe, it, expect } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -17,7 +16,7 @@ describe("table_header_ontology coverage", () => {
   for (const domain of ALL_TABLE_DOMAINS) {
     it(`table_header_ontology.${domain}.any.json exists`, () => {
       const filePath = path.join(STRUCTURE_DIR, `table_header_ontology.${domain}.any.json`);
-      expect(fs.existsSync(filePath), `missing: ${filePath}`).toBe(true);
+      expect(fs.existsSync(filePath)).toBe(true);
     });
 
     it(`table_header_ontology.${domain} has valid structure`, () => {
@@ -41,3 +40,4 @@ describe("table_header_ontology coverage", () => {
     });
   }
 });
+

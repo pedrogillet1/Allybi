@@ -1,0 +1,185 @@
+{
+  "_meta": {
+    "id": "doc_archetypes_everyday",
+    "version": "1.0.0",
+    "description": "Everyday document archetypes for document identity classification.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-04",
+    "schemaId": "doc_identity_schema",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/document-intelligence/doc-archetypes-coverage.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday"
+  },
+  "domain": "everyday",
+  "archetypes": [
+    {
+      "id": "every_bank_statement",
+      "label": "Bank Statement",
+      "expectedSections": [
+        "Header",
+        "Cabeçalho",
+        "Account Profile",
+        "Perfil da Conta",
+        "Statement Period",
+        "Período do Extrato",
+        "Opening and Closing",
+        "Saldo Inicial e Final",
+        "Transactions",
+        "Transações",
+        "Charges and Interest",
+        "Tarifas e Juros"
+      ],
+      "headings": [
+        "bank statement",
+        "extrato",
+        "statement",
+        "account",
+        "bank",
+        "agencia",
+        "conta",
+        "period",
+        "from",
+        "to",
+        "de",
+        "a",
+        "opening balance",
+        "closing balance",
+        "saldo inicial",
+        "saldo final"
+      ],
+      "expectedTableFamilies": [
+        "Bank Statement line-item table",
+        "Bank Statement summary matrix"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals"
+      ],
+      "missingQuestions": [
+        "Which bank statement variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?"
+      ]
+    },
+    {
+      "id": "every_retail_receipt",
+      "label": "Retail Receipt",
+      "expectedSections": [
+        "Receipt Header",
+        "Cabeçalho do Recibo",
+        "Merchant Profile",
+        "Perfil do Estabelecimento",
+        "Transaction Lines",
+        "Itens da Compra",
+        "Discounts and Taxes",
+        "Descontos e Impostos",
+        "Totals",
+        "Totais",
+        "Payment Info",
+        "Informações de Pagamento"
+      ],
+      "headings": [
+        "receipt",
+        "cupom",
+        "fiscal",
+        "merchant",
+        "store",
+        "cnpj",
+        "retailer",
+        "item",
+        "description",
+        "qt",
+        "quantity",
+        "discount",
+        "tax",
+        "subtotal",
+        "total",
+        "valor total"
+      ],
+      "expectedTableFamilies": [
+        "Retail Receipt line-item table",
+        "Retail Receipt summary matrix"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals"
+      ],
+      "missingQuestions": [
+        "Which retail receipt variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?"
+      ]
+    },
+    {
+      "id": "every_tax_notice",
+      "label": "Tax Notice",
+      "expectedSections": [
+        "Document Header",
+        "Cabeçalho do Documento",
+        "Notice Reference",
+        "Referencia da Notificacao",
+        "Assessment Summary",
+        "Resumo da Atribuicao",
+        "Assessed Amounts",
+        "Valores Avaliados",
+        "Penalties and Interest",
+        "Multas e Juros",
+        "Payment Instructions",
+        "Instrucoes de Pagamento"
+      ],
+      "headings": [
+        "tax notice",
+        "notificacao",
+        "notice of assessment",
+        "notice number",
+        "reference",
+        "notice id",
+        "protocolo",
+        "assessment",
+        "summary",
+        "resumo",
+        "total assessed",
+        "assessed",
+        "tax due",
+        "amount due",
+        "base",
+        "penalty"
+      ],
+      "expectedTableFamilies": [
+        "Tax Notice line-item table",
+        "Tax Notice summary matrix"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals"
+      ],
+      "missingQuestions": [
+        "Which tax notice variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?"
+      ]
+    }
+  ]
+}

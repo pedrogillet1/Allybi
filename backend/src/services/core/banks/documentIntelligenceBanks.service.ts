@@ -23,6 +23,7 @@ export type DocumentIntelligenceDomain =
   | "travel"
   | "everyday"
   | "compliance"
+  | "connectors"
   | "education_research"
   | "procurement";
 
@@ -129,6 +130,7 @@ const CORE_DOMAINS: DocumentIntelligenceDomain[] = [
 const EXTENDED_DOMAINS: DocumentIntelligenceDomain[] = [
   "banking",
   "billing",
+  "connectors",
   "education",
   "housing",
   "hr_payroll",

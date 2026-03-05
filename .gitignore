@@ -68,6 +68,11 @@ nul
 # Test files
 koda_test_files/
 frontend/e2e/test-results/
+frontend/e2e/reports/latest/*
+!frontend/e2e/reports/latest/.gitkeep
+frontend/e2e/reports/html/
+frontend/e2e/reports/*.md
+frontend/e2e/reports/*.csv
 
 # Backup files
 *.backup

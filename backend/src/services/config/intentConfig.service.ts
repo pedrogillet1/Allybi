@@ -45,6 +45,8 @@ export interface RouterCandidate {
 export interface IntentSignals {
   isFollowup?: boolean;
   followupConfidence?: number; // 0..1
+  followupSource?: "context" | "followup_indicators" | "intent_patterns" | "none";
+  followupReasonCodes?: string[];
   hasExplicitDocRef?: boolean;
   discoveryQuery?: boolean;
   navQuery?: boolean;
@@ -240,38 +242,67 @@ const FALLBACK_BANK: IntentConfigBank = {
 export class IntentConfigService {
   private cache: IntentConfigBank | null = null;
   private loadedAtMs = 0;
+  private cacheEnv: EnvName | null = null;
 
   // If you want hot reload in dev/local, lower this.
   private readonly CACHE_TTL_MS = 5_000;
 
-  private isStrictEnv(): boolean {
-    const env = String(process.env.NODE_ENV || "").toLowerCase();
+  private normalizeEnvName(raw: string): EnvName {
+    const env = String(raw || "").toLowerCase().trim();
+    if (env === "production") return "production";
+    if (env === "staging") return "staging";
+    if (env === "development" || env === "dev") return "dev";
+    return "local";
+  }
+
+  private resolveEffectiveEnv(inputEnv?: EnvName): EnvName {
+    if (
+      inputEnv === "production" ||
+      inputEnv === "staging" ||
+      inputEnv === "dev" ||
+      inputEnv === "local"
+    ) {
+      return inputEnv;
+    }
+    return this.normalizeEnvName(String(process.env.NODE_ENV || ""));
+  }
+
+  private isStrictEnv(inputEnv?: EnvName): boolean {
+    const env = this.resolveEffectiveEnv(inputEnv);
     return env === "production" || env === "staging";
   }
 
-  getConfig(): IntentConfigBank {
+  getConfig(inputEnv?: EnvName): IntentConfigBank {
+    const env = this.resolveEffectiveEnv(inputEnv);
     const now = Date.now();
-    if (this.cache && now - this.loadedAtMs < this.CACHE_TTL_MS)
+    if (
+      this.cache &&
+      this.cacheEnv === env &&
+      now - this.loadedAtMs < this.CACHE_TTL_MS
+    ) {
       return this.cache;
+    }
 
     const bank = getOptionalBank<IntentConfigBank>("intent_config");
     if (!bank) {
-      if (this.isStrictEnv()) {
+      if (this.isStrictEnv(env)) {
         throw new Error(
           "intent_config bank is required in strict runtime environments.",
         );
       }
       this.cache = FALLBACK_BANK;
+      this.cacheEnv = env;
       this.loadedAtMs = now;
       return this.cache;
     }
     if (!bank?.config?.enabled) {
-      if (this.isStrictEnv()) {
+      if (this.isStrictEnv(env)) {
         throw new Error(
           "intent_config bank must be enabled in strict runtime environments.",
         );
       }
       this.cache = FALLBACK_BANK;
+      this.cacheEnv = env;
       this.loadedAtMs = now;
       return this.cache;
     }
@@ -279,12 +310,13 @@ export class IntentConfigService {
     // Soft-validate minimal shape so we never crash.
     const safe = this.softValidate(bank);
     this.cache = safe;
+    this.cacheEnv = env;
     this.loadedAtMs = now;
     return this.cache;
   }
 
   decide(input: IntentDecisionInput): IntentDecisionOutput {
-    const bank = this.getConfig();
+    const bank = this.getConfig(input.env);
     const cfg = bank.config;
 
     const notes: string[] = [];

@@ -26,6 +26,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs/promises";
 import pLimit from "p-limit";
+import { logger } from "../../../utils/logger";
 
 // Limit concurrent DB operations to prevent connection pool exhaustion
 const dbConcurrencyLimit = pLimit(
@@ -332,7 +333,7 @@ async function createFolderHierarchy(
     },
     select: { id: true, name: true, parentFolderId: true },
   });
-  console.log(
+  logger.info(
     `[createFolderHierarchy] Fetched ${existingFolders.length} existing folders in ${Date.now() - t1}ms`,
   );
 
@@ -424,7 +425,7 @@ async function createFolderHierarchy(
     }
   }
 
-  console.log(
+  logger.info(
     `[createFolderHierarchy] Created ${folderMap.size} folder mappings in ${Date.now() - t2}ms (total: ${Date.now() - t0}ms)`,
   );
   return folderMap;
@@ -478,7 +479,7 @@ router.post(
       // Diagnostic: log first file object to verify field names
       if (files.length > 0) {
         const sample = files[0];
-        console.log(
+        logger.info(
           `[presigned-urls/bulk] START ${files.length} files, batchFolderId=${folderId}`,
         );
       }
@@ -500,7 +501,7 @@ router.post(
       const folderMap = shouldSkipFolderHierarchy
         ? new Map<string, string>()
         : await createFolderHierarchy(files, userId, folderId);
-      console.log(
+      logger.info(
         `[presigned-urls/bulk] FOLDERS: ${Date.now() - tFolders}ms (${shouldSkipFolderHierarchy ? "skipped" : "resolved"})`,
       );
 
@@ -537,7 +538,7 @@ router.post(
           resolvedMimeType,
         );
         if (!validation.valid) {
-          console.log(
+          logger.info(
             `[presigned-urls/bulk] Rejecting unsupported file: ${skipIdentifier} (${validation.reason})`,
           );
           skippedFiles.push(skipIdentifier);
@@ -622,7 +623,7 @@ router.post(
         results.push(...batchResults);
       }
 
-      console.log(
+      logger.info(
         `[presigned-urls/bulk] FILES: ${Date.now() - tFiles}ms for ${validFiles.length} files (bulk DB + presigned URLs)`,
       );
 
@@ -632,7 +633,7 @@ router.post(
         documentIds.push(r.documentId);
       }
 
-      console.log(
+      logger.info(
         `[presigned-urls/bulk] TOTAL: ${Date.now() - t0}ms — ${documentIds.length} docs, ${skippedFiles.length} skipped`,
       );
       res.json({
@@ -642,7 +643,7 @@ router.post(
         storageMode: isLocalStorage ? "local" : "gcs",
       });
     } catch (e: any) {
-      console.error("POST /presigned-urls/bulk error:", e);
+      logger.error("POST /presigned-urls/bulk error:", e);
       res.status(500).json({ error: "Failed to generate presigned URLs" });
     }
   },
@@ -748,7 +749,7 @@ router.post(
 
       const requestIdHeader =
         (req.headers["x-request-id"] as string | undefined) || undefined;
-      console.log(
+      logger.info(
         `[complete-bulk] transitioned=${updateResult.count} confirmed=${confirmedIds.length} pending=${pending.length} failed=${failed.length} queued=${queueCandidates.length} requestId=${requestIdHeader || "none"} uploadSessionId=${uploadSessionId || "none"}`,
       );
 
@@ -798,7 +799,7 @@ router.post(
                       ? uploadSessionId
                       : undefined,
                 });
-                console.log(
+                logger.info(
                   `[complete-bulk] Background: Published ${out.publishedDocs} docs in ${out.publishedBatches} fanout batches (messageIds=${out.messageIds.length})`,
                 );
               } else {
@@ -806,7 +807,7 @@ router.post(
                 const queued = Array.from(results.values()).filter(
                   (v) => v !== "error",
                 ).length;
-                console.log(
+                logger.info(
                   `[complete-bulk] Background: Published ${queued} extract jobs`,
                 );
               }
@@ -820,12 +821,12 @@ router.post(
                 encryptedFilename: doc.encryptedFilename || undefined,
               }));
               const bulkJobs = await addDocumentJobsBulk(bulkItems);
-              console.log(
+              logger.info(
                 `[complete-bulk] Background: Enqueued ${bulkJobs.length} jobs to BullMQ`,
               );
             }
           } catch (err: any) {
-            console.error(
+            logger.error(
               "[complete-bulk] Background enqueue failed:",
               err.message,
             );
@@ -834,7 +835,7 @@ router.post(
         });
       }
     } catch (e: any) {
-      console.error("POST /presigned-urls/complete-bulk error:", e);
+      logger.error("POST /presigned-urls/complete-bulk error:", e);
       res.status(500).json({ error: "Failed to complete bulk uploads" });
     }
   },
@@ -903,7 +904,7 @@ router.post(
         verifiedDocuments,
       });
     } catch (e: any) {
-      console.error("POST /presigned-urls/reconcile error:", e);
+      logger.error("POST /presigned-urls/reconcile error:", e);
       res.status(500).json({ error: "Failed to reconcile uploads" });
     }
   },
@@ -996,11 +997,11 @@ router.post(
             const errors = Array.from(results.values()).filter(
               (v) => v === "error",
             ).length;
-            console.log(
+            logger.info(
               `[complete] Published ${queued} jobs to GCP Pub/Sub (${errors} errors)`,
             );
           } catch (err: any) {
-            console.error(`Failed to publish to Pub/Sub:`, err.message);
+            logger.error(`Failed to publish to Pub/Sub:`, err.message);
             // Don't fail the request - docs are uploaded, they just need manual reprocess
           }
         } else {
@@ -1012,7 +1013,7 @@ router.post(
               mimeType: doc.mimeType || "application/octet-stream",
               encryptedFilename: doc.encryptedFilename || undefined,
             })),
-          ).catch((err) => console.error(`Failed to bulk queue:`, err.message));
+          ).catch((err) => logger.error(`Failed to bulk queue:`, err.message));
         }
       }
 
@@ -1026,7 +1027,7 @@ router.post(
         },
       });
     } catch (e: any) {
-      console.error("POST /presigned-urls/complete error:", e);
+      logger.error("POST /presigned-urls/complete error:", e);
       res.status(500).json({ error: "Failed to complete uploads" });
     }
   },
@@ -1104,7 +1105,7 @@ router.post(
           doc.mimeType || "application/octet-stream",
           doc.filename || undefined,
         );
-        console.log(`[local-upload] Published job to GCP Pub/Sub`);
+        logger.info(`[local-upload] Published job to GCP Pub/Sub`);
       } else {
         await addDocumentJob({
           documentId,
@@ -1115,12 +1116,12 @@ router.post(
         });
       }
 
-      console.log(
+      logger.info(
         `[local-upload] File saved: ${storageKey} (${file.size} bytes)`,
       );
       res.json({ success: true, documentId, storageKey });
     } catch (e: any) {
-      console.error("POST /local-upload error:", e);
+      logger.error("POST /local-upload error:", e);
       res.status(500).json({ error: "Failed to upload file" });
     }
   },
@@ -1138,3 +1139,4 @@ router.get("/storage-mode", (_req: Request, res: Response) => {
 });
 
 export default router;
+

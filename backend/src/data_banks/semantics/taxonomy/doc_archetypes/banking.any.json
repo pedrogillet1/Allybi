@@ -1,0 +1,181 @@
+{
+  "_meta": {
+    "id": "doc_archetypes_banking",
+    "version": "1.0.0",
+    "description": "Banking document archetypes for document identity classification.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-04",
+    "schemaId": "doc_identity_schema",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/document-intelligence/doc-archetypes-coverage.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "banking"
+  },
+  "domain": "banking",
+  "archetypes": [
+    {
+      "id": "banking_bank_statement",
+      "label": "Bank Statement",
+      "expectedSections": [
+        "Header",
+        "Cabeçalho",
+        "Issuer and Customer",
+        "Emissor e Cliente",
+        "Period",
+        "Período",
+        "Summary",
+        "Resumo",
+        "Charges and Fees",
+        "Cobrancas e Taxas",
+        "Usage or Activity",
+        "Uso ou Atividade"
+      ],
+      "headings": [
+        "account",
+        "statement",
+        "invoice",
+        "bill",
+        "bank",
+        "deposit",
+        "withdrawal",
+        "balance",
+        "issuer",
+        "provider",
+        "customer",
+        "subscriber",
+        "name",
+        "id",
+        "billing period",
+        "statement period"
+      ],
+      "expectedTableFamilies": [
+        "Bank Statement line-item table",
+        "Bank Statement summary matrix"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals"
+      ],
+      "missingQuestions": [
+        "Which bank statement variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?"
+      ]
+    },
+    {
+      "id": "banking_brokerage_statement",
+      "label": "Brokerage Statement",
+      "expectedSections": [
+        "Account Summary",
+        "Resumo da Conta",
+        "Holdings",
+        "Posicoes",
+        "Transactions",
+        "Transacoes",
+        "Dividends and Income",
+        "Dividendos e Rendimentos",
+        "Gains and Losses",
+        "Ganhos e Perdas"
+      ],
+      "headings": [
+        "account summary",
+        "portfolio summary",
+        "account overview",
+        "resumo da conta",
+        "holdings",
+        "positions",
+        "portfolio holdings",
+        "securities held",
+        "posicoes",
+        "transactions",
+        "activity",
+        "trade activity",
+        "transacoes",
+        "dividends",
+        "income",
+        "interest earned"
+      ],
+      "expectedTableFamilies": [
+        "Brokerage Statement line-item table",
+        "Brokerage Statement summary matrix"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals"
+      ],
+      "missingQuestions": [
+        "Which brokerage statement variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?"
+      ]
+    },
+    {
+      "id": "banking_wire_transfer_confirmation",
+      "label": "Wire Transfer Confirmation",
+      "expectedSections": [
+        "Transfer Header",
+        "Cabecalho da Transferencia",
+        "Sender Information",
+        "Informacoes do Remetente",
+        "Beneficiary Information",
+        "Informacoes do Beneficiario",
+        "Transfer Details",
+        "Detalhes da Transferencia",
+        "Status and Tracking",
+        "Status e Rastreamento"
+      ],
+      "headings": [
+        "wire transfer",
+        "transfer confirmation",
+        "confirmacao de transferencia",
+        "sender",
+        "originator",
+        "remitting bank",
+        "remetente",
+        "beneficiary",
+        "recipient",
+        "receiving bank",
+        "beneficiario",
+        "transfer amount",
+        "wire details",
+        "reference number",
+        "detalhes da transferencia",
+        "status"
+      ],
+      "expectedTableFamilies": [
+        "Wire Transfer Confirmation line-item table",
+        "Wire Transfer Confirmation summary matrix"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals"
+      ],
+      "missingQuestions": [
+        "Which wire transfer confirmation variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?"
+      ]
+    }
+  ]
+}

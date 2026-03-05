@@ -100,6 +100,7 @@
       "operators",
       "routing"
     ],
+    "llm": [],
     "policies": [
       "formatting",
       "operators",
@@ -142,8 +143,7 @@
       "routing",
       "semantics"
     ],
-    "tests": [],
-    "llm": []
+    "tests": []
   },
   "banks": [
     {
@@ -289,11 +289,6 @@
     {
       "id": "bank_dependencies",
       "dependsOn": []
-    },
-    {
-      "id": "bank_generation_report",
-      "dependsOn": [],
-      "optional": true
     },
     {
       "id": "bank_manifest",
@@ -1697,7 +1692,28 @@
       "optional": true
     },
     {
+      "id": "di_banking_extraction_banking_brokerage_statement",
+      "dependsOn": [
+        "di_banking_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_banking_extraction_banking_cd_statement",
+      "dependsOn": [
+        "di_banking_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
       "id": "di_banking_extraction_banking_credit_card_statement",
+      "dependsOn": [
+        "di_banking_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_banking_extraction_banking_investment_account_statement",
       "dependsOn": [
         "di_banking_doc_type_catalog"
       ],
@@ -1712,6 +1728,13 @@
     },
     {
       "id": "di_banking_extraction_banking_payment_receipt",
+      "dependsOn": [
+        "di_banking_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_banking_extraction_banking_wire_transfer_confirmation",
       "dependsOn": [
         "di_banking_doc_type_catalog"
       ],
@@ -1750,10 +1773,25 @@
       "optional": true
     },
     {
+      "id": "di_banking_sections_banking_brokerage_statement",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_banking_sections_banking_cd_statement",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_banking_sections_banking_credit_card_statement",
       "dependsOn": [
         "di_banking_doc_type_catalog"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_banking_sections_banking_investment_account_statement",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -1771,6 +1809,11 @@
       "optional": true
     },
     {
+      "id": "di_banking_sections_banking_wire_transfer_confirmation",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_banking_tables_banking_bank_statement",
       "dependsOn": [
         "di_banking_doc_type_catalog"
@@ -1778,10 +1821,25 @@
       "optional": true
     },
     {
+      "id": "di_banking_tables_banking_brokerage_statement",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_banking_tables_banking_cd_statement",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_banking_tables_banking_credit_card_statement",
       "dependsOn": [
         "di_banking_doc_type_catalog"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_banking_tables_banking_investment_account_statement",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -1796,6 +1854,11 @@
       "dependsOn": [
         "di_banking_doc_type_catalog"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_banking_tables_banking_wire_transfer_confirmation",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -3961,6 +4024,13 @@
       "optional": true
     },
     {
+      "id": "di_identity_extraction_id_birth_certificate",
+      "dependsOn": [
+        "di_identity_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
       "id": "di_identity_extraction_id_business_registration_certificate",
       "dependsOn": [
         "di_identity_doc_type_catalog"
@@ -3975,6 +4045,13 @@
       "optional": true
     },
     {
+      "id": "di_identity_extraction_id_marriage_license",
+      "dependsOn": [
+        "di_identity_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
       "id": "di_identity_extraction_id_passport",
       "dependsOn": [
         "di_identity_doc_type_catalog"
@@ -3983,6 +4060,27 @@
     },
     {
       "id": "di_identity_extraction_id_proof_of_address",
+      "dependsOn": [
+        "di_identity_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_identity_extraction_id_social_security_card",
+      "dependsOn": [
+        "di_identity_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_identity_extraction_id_visa",
+      "dependsOn": [
+        "di_identity_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_identity_extraction_id_voter_registration",
       "dependsOn": [
         "di_identity_doc_type_catalog"
       ],
@@ -4014,6 +4112,11 @@
       "optional": true
     },
     {
+      "id": "di_identity_sections_id_birth_certificate",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_identity_sections_id_business_registration_certificate",
       "dependsOn": [
         "di_identity_doc_type_catalog"
@@ -4025,6 +4128,11 @@
       "dependsOn": [
         "di_identity_doc_type_catalog"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_identity_sections_id_marriage_license",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -4042,6 +4150,26 @@
       "optional": true
     },
     {
+      "id": "di_identity_sections_id_social_security_card",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_identity_sections_id_visa",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_identity_sections_id_voter_registration",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_identity_tables_id_birth_certificate",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_identity_tables_id_business_registration_certificate",
       "dependsOn": [
         "di_identity_doc_type_catalog"
@@ -4056,6 +4184,11 @@
       "optional": true
     },
     {
+      "id": "di_identity_tables_id_marriage_license",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_identity_tables_id_passport",
       "dependsOn": [
         "di_identity_doc_type_catalog"
@@ -4067,6 +4200,21 @@
       "dependsOn": [
         "di_identity_doc_type_catalog"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_identity_tables_id_social_security_card",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_identity_tables_id_visa",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_identity_tables_id_voter_registration",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -4115,7 +4263,28 @@
       "optional": true
     },
     {
+      "id": "di_insurance_extraction_ins_auto_declaration",
+      "dependsOn": [
+        "di_insurance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
       "id": "di_insurance_extraction_ins_claim_submission",
+      "dependsOn": [
+        "di_insurance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_insurance_extraction_ins_dental_plan",
+      "dependsOn": [
+        "di_insurance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_insurance_extraction_ins_disability",
       "dependsOn": [
         "di_insurance_doc_type_catalog"
       ],
@@ -4137,6 +4306,13 @@
     },
     {
       "id": "di_insurance_extraction_ins_premium_invoice",
+      "dependsOn": [
+        "di_insurance_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "di_insurance_extraction_ins_umbrella_policy",
       "dependsOn": [
         "di_insurance_doc_type_catalog"
       ],
@@ -4168,10 +4344,25 @@
       "optional": true
     },
     {
+      "id": "di_insurance_sections_ins_auto_declaration",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_insurance_sections_ins_claim_submission",
       "dependsOn": [
         "di_insurance_doc_type_catalog"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_insurance_sections_ins_dental_plan",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_insurance_sections_ins_disability",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -4196,10 +4387,30 @@
       "optional": true
     },
     {
+      "id": "di_insurance_sections_ins_umbrella_policy",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_insurance_tables_ins_auto_declaration",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "di_insurance_tables_ins_claim_submission",
       "dependsOn": [
         "di_insurance_doc_type_catalog"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_insurance_tables_ins_dental_plan",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "di_insurance_tables_ins_disability",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -4221,6 +4432,11 @@
       "dependsOn": [
         "di_insurance_doc_type_catalog"
       ],
+      "optional": true
+    },
+    {
+      "id": "di_insurance_tables_ins_umbrella_policy",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -4925,7 +5141,55 @@
       ]
     },
     {
+      "id": "doc_archetypes_banking",
+      "dependsOn": [
+        "doc_taxonomy"
+      ]
+    },
+    {
+      "id": "doc_archetypes_billing",
+      "dependsOn": [
+        "doc_taxonomy"
+      ]
+    },
+    {
+      "id": "doc_archetypes_education",
+      "dependsOn": [
+        "doc_taxonomy"
+      ]
+    },
+    {
+      "id": "doc_archetypes_everyday",
+      "dependsOn": [
+        "doc_taxonomy"
+      ]
+    },
+    {
       "id": "doc_archetypes_finance",
+      "dependsOn": [
+        "doc_taxonomy"
+      ]
+    },
+    {
+      "id": "doc_archetypes_housing",
+      "dependsOn": [
+        "doc_taxonomy"
+      ]
+    },
+    {
+      "id": "doc_archetypes_hr_payroll",
+      "dependsOn": [
+        "doc_taxonomy"
+      ]
+    },
+    {
+      "id": "doc_archetypes_identity",
+      "dependsOn": [
+        "doc_taxonomy"
+      ]
+    },
+    {
+      "id": "doc_archetypes_insurance",
       "dependsOn": [
         "doc_taxonomy"
       ]
@@ -4944,6 +5208,18 @@
     },
     {
       "id": "doc_archetypes_ops",
+      "dependsOn": [
+        "doc_taxonomy"
+      ]
+    },
+    {
+      "id": "doc_archetypes_tax",
+      "dependsOn": [
+        "doc_taxonomy"
+      ]
+    },
+    {
+      "id": "doc_archetypes_travel",
       "dependsOn": [
         "doc_taxonomy"
       ]
@@ -4980,6 +5256,12 @@
       "id": "doc_type_catalog_schema",
       "dependsOn": [
         "bank_schema"
+      ]
+    },
+    {
+      "id": "doc_type_confusion_matrix",
+      "dependsOn": [
+        "doc_taxonomy"
       ]
     },
     {
@@ -5411,6 +5693,11 @@
       "dependsOn": []
     },
     {
+      "id": "ingestion_abbreviations_chunking",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "intent_config",
       "dependsOn": [
         "bank_schema"
@@ -5515,156 +5802,6 @@
       "optional": true
     },
     {
-      "id": "legacy_doc_taxonomy",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_abbreviations_en",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_abbreviations_pt",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_board_resolution_extraction_hints",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_board_resolution_sections",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_board_resolution_tables",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_dpa_extraction_hints",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_dpa_sections",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_dpa_tables",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_employment_agreement_extraction_hints",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_employment_agreement_sections",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_employment_agreement_tables",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_lexicon_en",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_lexicon_pt",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_msa_extraction_hints",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_msa_sections",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_msa_tables",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_nda_extraction_hints",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_nda_sections",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_nda_tables",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_privacy_policy_extraction_hints",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_privacy_policy_sections",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_privacy_policy_tables",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_sow_extraction_hints",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_sow_sections",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_sow_tables",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_medical_abbreviations_en",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_medical_abbreviations_pt",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_medical_lexicon_en",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_medical_lexicon_pt",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
       "id": "legal_abbreviations_en",
       "dependsOn": [
         "legal_domain_profile"
@@ -5759,34 +5896,13 @@
       "optional": true
     },
     {
-      "id": "legal_board_resolution_extraction_hints",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ],
-      "optional": true
-    },
-    {
       "id": "legal_board_resolution_extraction_hints_v50c4150f",
       "dependsOn": [],
       "optional": true
     },
     {
-      "id": "legal_board_resolution_sections",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ],
-      "optional": true
-    },
-    {
       "id": "legal_board_resolution_sections_v0d54900e",
       "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legal_board_resolution_tables",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ],
       "optional": true
     },
     {
@@ -6000,22 +6116,8 @@
       "optional": true
     },
     {
-      "id": "legal_dpa_extraction_hints",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ],
-      "optional": true
-    },
-    {
       "id": "legal_dpa_extraction_hints_vc1cbb882",
       "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legal_dpa_sections",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ],
       "optional": true
     },
     {
@@ -6024,22 +6126,8 @@
       "optional": true
     },
     {
-      "id": "legal_dpa_tables",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ],
-      "optional": true
-    },
-    {
       "id": "legal_dpa_tables_v679bed8b",
       "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legal_employment_agreement_extraction_hints",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ],
       "optional": true
     },
     {
@@ -6048,22 +6136,8 @@
       "optional": true
     },
     {
-      "id": "legal_employment_agreement_sections",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ],
-      "optional": true
-    },
-    {
       "id": "legal_employment_agreement_sections_v9f1eb8d7",
       "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legal_employment_agreement_tables",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ],
       "optional": true
     },
     {
@@ -6115,27 +6189,6 @@
     },
     {
       "id": "legal_ip_assignment_tables",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ],
-      "optional": true
-    },
-    {
-      "id": "legal_lease_extraction_hints",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ],
-      "optional": true
-    },
-    {
-      "id": "legal_lease_sections",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ],
-      "optional": true
-    },
-    {
-      "id": "legal_lease_tables",
       "dependsOn": [
         "legal_doc_type_catalog"
       ],
@@ -6229,27 +6282,6 @@
       "optional": true
     },
     {
-      "id": "legal_litigation_memo_extraction_hints",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ],
-      "optional": true
-    },
-    {
-      "id": "legal_litigation_memo_sections",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ],
-      "optional": true
-    },
-    {
-      "id": "legal_litigation_memo_tables",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ],
-      "optional": true
-    },
-    {
       "id": "legal_motion_brief_extraction_hints",
       "dependsOn": [
         "legal_doc_type_catalog"
@@ -6271,22 +6303,8 @@
       "optional": true
     },
     {
-      "id": "legal_msa_extraction_hints",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ],
-      "optional": true
-    },
-    {
       "id": "legal_msa_extraction_hints_v41111395",
       "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legal_msa_sections",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ],
       "optional": true
     },
     {
@@ -6295,22 +6313,8 @@
       "optional": true
     },
     {
-      "id": "legal_msa_tables",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ],
-      "optional": true
-    },
-    {
       "id": "legal_msa_tables_vdb79e19e",
       "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legal_nda_extraction_hints",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ],
       "optional": true
     },
     {
@@ -6319,22 +6323,8 @@
       "optional": true
     },
     {
-      "id": "legal_nda_sections",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ],
-      "optional": true
-    },
-    {
       "id": "legal_nda_sections_v215acb2d",
       "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legal_nda_tables",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ],
       "optional": true
     },
     {
@@ -6385,34 +6375,13 @@
       "optional": true
     },
     {
-      "id": "legal_privacy_policy_extraction_hints",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ],
-      "optional": true
-    },
-    {
       "id": "legal_privacy_policy_extraction_hints_v3525de6b",
       "dependsOn": [],
       "optional": true
     },
     {
-      "id": "legal_privacy_policy_sections",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ],
-      "optional": true
-    },
-    {
       "id": "legal_privacy_policy_sections_v5a2b8d13",
       "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legal_privacy_policy_tables",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ],
       "optional": true
     },
     {
@@ -6538,22 +6507,8 @@
       "optional": true
     },
     {
-      "id": "legal_sow_extraction_hints",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ],
-      "optional": true
-    },
-    {
       "id": "legal_sow_extraction_hints_vfb984862",
       "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legal_sow_sections",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ],
       "optional": true
     },
     {
@@ -6562,22 +6517,8 @@
       "optional": true
     },
     {
-      "id": "legal_sow_tables",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ],
-      "optional": true
-    },
-    {
       "id": "legal_sow_tables_v23424409",
       "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legal_terms_extraction_hints",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ],
       "optional": true
     },
     {
@@ -6596,20 +6537,6 @@
     },
     {
       "id": "legal_terms_of_service_tables",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ],
-      "optional": true
-    },
-    {
-      "id": "legal_terms_sections",
-      "dependsOn": [
-        "legal_doc_type_catalog"
-      ],
-      "optional": true
-    },
-    {
-      "id": "legal_terms_tables",
       "dependsOn": [
         "legal_doc_type_catalog"
       ],
@@ -6763,48 +6690,6 @@
       "optional": true
     },
     {
-      "id": "medical_care_plan_extraction_hints",
-      "dependsOn": [
-        "medical_doc_type_catalog"
-      ],
-      "optional": true
-    },
-    {
-      "id": "medical_care_plan_sections",
-      "dependsOn": [
-        "medical_doc_type_catalog"
-      ],
-      "optional": true
-    },
-    {
-      "id": "medical_care_plan_tables",
-      "dependsOn": [
-        "medical_doc_type_catalog"
-      ],
-      "optional": true
-    },
-    {
-      "id": "medical_discharge_summary_extraction_hints",
-      "dependsOn": [
-        "medical_doc_type_catalog"
-      ],
-      "optional": true
-    },
-    {
-      "id": "medical_discharge_summary_sections",
-      "dependsOn": [
-        "medical_doc_type_catalog"
-      ],
-      "optional": true
-    },
-    {
-      "id": "medical_discharge_summary_tables",
-      "dependsOn": [
-        "medical_doc_type_catalog"
-      ],
-      "optional": true
-    },
-    {
       "id": "medical_disclaimer_policy",
       "dependsOn": [
         "medical_domain_profile"
@@ -6842,27 +6727,6 @@
       "dependsOn": [
         "doc_archetypes_medical"
       ]
-    },
-    {
-      "id": "medical_lab_report_extraction_hints",
-      "dependsOn": [
-        "medical_doc_type_catalog"
-      ],
-      "optional": true
-    },
-    {
-      "id": "medical_lab_report_sections",
-      "dependsOn": [
-        "medical_doc_type_catalog"
-      ],
-      "optional": true
-    },
-    {
-      "id": "medical_lab_report_tables",
-      "dependsOn": [
-        "medical_doc_type_catalog"
-      ],
-      "optional": true
     },
     {
       "id": "medical_lexicon_en",
@@ -7204,6 +7068,23 @@
       "optional": true
     },
     {
+      "id": "medical_med_patient_intake_form_extraction_hints",
+      "dependsOn": [
+        "medical_doc_type_catalog"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_med_patient_intake_form_sections",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "medical_med_patient_intake_form_tables",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "medical_med_prescription_extraction_hints",
       "dependsOn": [
         "medical_doc_type_catalog"
@@ -7372,48 +7253,6 @@
       "optional": true
     },
     {
-      "id": "medical_progress_note_extraction_hints",
-      "dependsOn": [
-        "medical_doc_type_catalog"
-      ],
-      "optional": true
-    },
-    {
-      "id": "medical_progress_note_sections",
-      "dependsOn": [
-        "medical_doc_type_catalog"
-      ],
-      "optional": true
-    },
-    {
-      "id": "medical_progress_note_tables",
-      "dependsOn": [
-        "medical_doc_type_catalog"
-      ],
-      "optional": true
-    },
-    {
-      "id": "medical_radiology_report_extraction_hints",
-      "dependsOn": [
-        "medical_doc_type_catalog"
-      ],
-      "optional": true
-    },
-    {
-      "id": "medical_radiology_report_sections",
-      "dependsOn": [
-        "medical_doc_type_catalog"
-      ],
-      "optional": true
-    },
-    {
-      "id": "medical_radiology_report_tables",
-      "dependsOn": [
-        "medical_doc_type_catalog"
-      ],
-      "optional": true
-    },
-    {
       "id": "medical_reasoning_scaffolds",
       "dependsOn": [
         "medical_domain_profile"
@@ -7424,27 +7263,6 @@
       "id": "medical_redaction_and_safety_rules",
       "dependsOn": [
         "medical_domain_profile"
-      ],
-      "optional": true
-    },
-    {
-      "id": "medical_referral_extraction_hints",
-      "dependsOn": [
-        "medical_doc_type_catalog"
-      ],
-      "optional": true
-    },
-    {
-      "id": "medical_referral_sections",
-      "dependsOn": [
-        "medical_doc_type_catalog"
-      ],
-      "optional": true
-    },
-    {
-      "id": "medical_referral_tables",
-      "dependsOn": [
-        "medical_doc_type_catalog"
       ],
       "optional": true
     },
@@ -7466,27 +7284,6 @@
       "dependsOn": [
         "doc_archetypes_medical"
       ]
-    },
-    {
-      "id": "medical_soap_note_extraction_hints",
-      "dependsOn": [
-        "medical_doc_type_catalog"
-      ],
-      "optional": true
-    },
-    {
-      "id": "medical_soap_note_sections",
-      "dependsOn": [
-        "medical_doc_type_catalog"
-      ],
-      "optional": true
-    },
-    {
-      "id": "medical_soap_note_tables",
-      "dependsOn": [
-        "medical_doc_type_catalog"
-      ],
-      "optional": true
     },
     {
       "id": "medical_validation_policies",
@@ -7587,6 +7384,11 @@
     },
     {
       "id": "openers",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "operator_canonical_registry",
       "dependsOn": [],
       "optional": true
     },
@@ -8474,11 +8276,6 @@
       "optional": true
     },
     {
-      "id": "quarantine_2026_02_memory_audit_bank_generation_report",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
       "id": "query_family_catalog",
       "dependsOn": [],
       "optional": true
@@ -8684,10 +8481,50 @@
       "dependsOn": []
     },
     {
+      "id": "section_priority_banking",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "section_priority_billing",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "section_priority_education",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "section_priority_everyday",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "section_priority_finance",
       "dependsOn": [
         "doc_archetypes_finance"
       ]
+    },
+    {
+      "id": "section_priority_housing",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "section_priority_hr_payroll",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "section_priority_identity",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "section_priority_insurance",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "section_priority_legal",
@@ -8706,6 +8543,16 @@
       "dependsOn": [
         "doc_archetypes_ops"
       ]
+    },
+    {
+      "id": "section_priority_tax",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "section_priority_travel",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "semantic_search_config",

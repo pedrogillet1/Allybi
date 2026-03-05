@@ -108,10 +108,11 @@ export async function extractWithTesseract(
 ): Promise<TesseractOcrResult> {
   try {
     const worker = await getOrCreateWorker(langs);
-    const { data } = await withTimeout(
+    const recognizeResult = (await withTimeout(
       worker.recognize(buffer),
       TESSERACT_TIMEOUT_MS,
-    );
+    )) as { data?: { text?: string; confidence?: number } };
+    const data = recognizeResult?.data ?? {};
 
     const text = (data.text || "").trim();
     const confidence = (data.confidence || 0) / 100; // Tesseract uses 0-100, normalize to 0-1

@@ -268,7 +268,7 @@ function generateInitialAlerts(): Alert[] {
 
 function generateAlert(): Alert {
   const alerts = [
-    { severity: "critical" as const, title: "LLM API Timeout", description: "Claude API request timed out after 30s", source: "llm-monitor" },
+    { severity: "critical" as const, title: "LLM API Timeout", description: "Gemini API request timed out after 30s", source: "llm-monitor" },
     { severity: "critical" as const, title: "Database Connection Failed", description: "Unable to establish connection to primary database", source: "db-monitor" },
     { severity: "warning" as const, title: "Rate Limit Approaching", description: "API rate limit at 85% of quota", source: "api-monitor" },
     { severity: "warning" as const, title: "Queue Backlog Growing", description: "Document processing queue has 150+ pending items", source: "queue-monitor" },

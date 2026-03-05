@@ -35,7 +35,7 @@
       "id": "insured_information",
       "name": {
         "en": "Insured Information",
-        "pt": "Informacoes do Segurado"
+        "pt": "Informações do Segurado"
       },
       "required": true,
       "order": 2,
@@ -55,7 +55,7 @@
       "id": "elimination_period",
       "name": {
         "en": "Elimination Period",
-        "pt": "Periodo de Carencia"
+        "pt": "Período de Carencia"
       },
       "required": true,
       "order": 4,
@@ -73,3 +73,4 @@
     }
   ]
 }
+

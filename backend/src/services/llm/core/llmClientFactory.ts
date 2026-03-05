@@ -4,7 +4,7 @@
  * LLM Client Factory (core-layer, Map-based)
  * -----------------------------------------
  * Purpose:
- * - Central, deterministic registry of provider clients (OpenAI / Gemini / Local)
+ * - Central, deterministic registry of provider clients (OpenAI / Gemini)
  * - Bank/config-driven selection (no hardcoding in call sites)
  * - Test-friendly (can inject prebuilt clients)
  *
@@ -21,19 +21,16 @@ import {
   type GeminiClientConfig,
 } from "../providers/gemini/geminiClient.service";
 import { OpenAIClientService, OpenAILLMClientAdapter } from "../providers/openai/openaiClient.service";
-import { LocalClientService } from "../providers/local/localClient.service";
 import type { OpenAIProviderConfig } from "../providers/openai/openaiConfig";
-import type { LocalProviderConfig, LocalConfig } from "../providers/local/localConfig";
 import { ResilienceLLMClient } from "../resilience/resilienceLlmClient.decorator";
 import { Semaphore } from "../resilience/semaphore";
 import { CircuitBreaker } from "../resilience/circuitBreaker";
 import { isRetryableError } from "../resilience/retry";
 
-export type LLMClientKey = "openai" | "google" | "local";
+export type LLMClientKey = "openai" | "google";
 
 /** Alias config types for factory consumers */
 export type OpenAIClientConfig = Partial<OpenAIProviderConfig>;
-export type LocalClientConfig = Partial<LocalProviderConfig>;
 
 export interface LLMClientFactoryConfig {
   defaultProvider: LLMClientKey;
@@ -41,7 +38,6 @@ export interface LLMClientFactoryConfig {
   providers: {
     openai?: { enabled: boolean; config: OpenAIClientConfig };
     google?: { enabled: boolean; config: GeminiClientConfig };
-    local?: { enabled: boolean; config: LocalClientConfig };
   };
 
   /**
@@ -106,10 +102,6 @@ export class LLMClientFactory {
       this.clients.set("google", wrapWithResilience(raw, "google", envInt("GEMINI_CONCURRENCY", 6)));
     }
 
-    if (!this.clients.has("local") && p.local?.enabled) {
-      const raw = new LocalClientService(p.local.config as LocalConfig | undefined);
-      this.clients.set("local", wrapWithResilience(raw, "local", envInt("LOCAL_LLM_CONCURRENCY", 2)));
-    }
   }
 
   /**
@@ -142,7 +134,7 @@ export class LLMClientFactory {
    * List configured providers (stable order).
    */
   listConfigured(): LLMClientKey[] {
-    const order: LLMClientKey[] = ["openai", "google", "local"];
+    const order: LLMClientKey[] = ["openai", "google"];
     return order.filter((k) => this.clients.has(k));
   }
 
@@ -152,7 +144,7 @@ export class LLMClientFactory {
   static toKey(provider: LLMProvider): LLMClientKey {
     if (provider === "openai") return "openai";
     if (provider === "google") return "google";
-    return "local";
+    throw new Error(`LLM_PROVIDER_NOT_SUPPORTED:${provider}`);
   }
 
   /**
@@ -160,7 +152,6 @@ export class LLMClientFactory {
    */
   static toProvider(key: LLMClientKey): LLMProvider {
     if (key === "openai") return "openai";
-    if (key === "google") return "google";
-    return "local";
+    return "google";
   }
 }

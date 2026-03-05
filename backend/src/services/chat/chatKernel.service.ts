@@ -32,15 +32,53 @@ export class ChatKernelService {
     return value as Record<string, unknown>;
   }
 
+  private parseRoutingFollowupSource(notes: string[] | undefined): string | null {
+    if (!Array.isArray(notes)) return null;
+    for (const note of notes) {
+      const value = String(note || "").trim();
+      if (!value.startsWith("routing:followup_source:")) continue;
+      const source = value.slice("routing:followup_source:".length).trim();
+      if (source) return source;
+    }
+    return null;
+  }
+
+  private sanitizeRoutingNotes(notes: string[] | undefined): string[] {
+    if (!Array.isArray(notes)) return [];
+    return notes
+      .map((note) => String(note || "").trim())
+      .filter((note) => note.length > 0)
+      .filter(
+        (note) =>
+          note.startsWith("routing:") ||
+          note.startsWith("followup:") ||
+          note.startsWith("override:") ||
+          note.startsWith("decision:"),
+      )
+      .slice(0, 12);
+  }
+
   private withIntentMetadata(
     req: ChatRequest,
     intentDecision: IntentDecisionOutput | null,
+    route: TurnRouteDecision,
+    locale: "en" | "pt" | "es",
   ): ChatRequest {
     if (!intentDecision) return req;
 
     const meta = this.asRecord(req.meta);
     const context = this.asRecord(req.context);
     const intentState = this.asRecord((context as any).intentState);
+    const routingDecision = {
+      route,
+      locale,
+      intentFamily: intentDecision.intentFamily,
+      operator: intentDecision.operatorId,
+      domainId: intentDecision.domainId,
+      confidence: Math.max(0, Math.min(1, Number(intentDecision.confidence || 0))),
+      followupSource: this.parseRoutingFollowupSource(intentDecision.decisionNotes),
+      notes: this.sanitizeRoutingNotes(intentDecision.decisionNotes),
+    };
 
     return {
       ...req,
@@ -55,6 +93,7 @@ export class ChatKernelService {
           typeof intentDecision.clarifyReason === "string"
             ? intentDecision.clarifyReason
             : null,
+        routingDecision,
       },
       context: {
         ...context,
@@ -99,6 +138,8 @@ export class ChatKernelService {
     const nextReq = this.withIntentMetadata(
       ctx.request,
       resolved.intentDecision,
+      resolved.route,
+      ctx.locale,
     );
     const nextCtx =
       nextReq === ctx.request ? ctx : { ...ctx, request: nextReq };
@@ -115,6 +156,8 @@ export class ChatKernelService {
     const nextReq = this.withIntentMetadata(
       ctx.request,
       resolved.intentDecision,
+      resolved.route,
+      ctx.locale,
     );
     const nextCtx =
       nextReq === ctx.request ? ctx : { ...ctx, request: nextReq };

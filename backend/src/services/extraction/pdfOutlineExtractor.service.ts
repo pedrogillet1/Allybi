@@ -141,8 +141,9 @@ function walkOutlineTree(
 
   while (currentRef) {
     // Resolve to a dict
-    const resolved = context.lookup(currentRef);
+    const resolved = context.lookup(currentRef as any) as unknown;
     if (!(resolved instanceof PDFDict)) break;
+    const resolvedDict = resolved as PDFDict;
 
     // Cycle guard
     const refKey =
@@ -153,11 +154,11 @@ function walkOutlineTree(
     visited.add(refKey);
 
     // Extract title
-    const titleRaw = resolved.get(PDFName.of("Title"));
+    const titleRaw = resolvedDict.get(PDFName.of("Title"));
     const title = decodeTitle(titleRaw ? context.lookup(titleRaw) ?? titleRaw : titleRaw).trim();
 
     // Resolve destination page
-    const pageIndex = resolvePageIndex(resolved, context, pageRefs);
+    const pageIndex = resolvePageIndex(resolvedDict, context, pageRefs);
 
     if (title) {
       entries.push({
@@ -168,13 +169,13 @@ function walkOutlineTree(
     }
 
     // Recurse into children (/First)
-    const firstChild = resolved.get(PDFName.of("First"));
+    const firstChild = resolvedDict.get(PDFName.of("First"));
     if (firstChild) {
       walkOutlineTree(context, firstChild, level + 1, entries, pageRefs, visited);
     }
 
     // Move to next sibling (/Next)
-    currentRef = resolved.get(PDFName.of("Next")) ?? null;
+    currentRef = resolvedDict.get(PDFName.of("Next")) ?? null;
   }
 }
 

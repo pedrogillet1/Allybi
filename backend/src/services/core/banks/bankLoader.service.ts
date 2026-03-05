@@ -18,6 +18,7 @@
  */
 
 import * as path from "path";
+import * as fs from "fs";
 import {
   DataBankLoaderService,
   DataBankLoaderOptions,
@@ -36,6 +37,24 @@ function normalizeEnv(value: string): EnvName {
   if (value === "development") return "dev";
   if (value === "test") return "dev";
   return (value as EnvName) || "local";
+}
+
+function resolveDataBanksRootDir(): string {
+  const candidates = [
+    path.join(process.cwd(), "src/data_banks"),
+    path.join(process.cwd(), "backend/src/data_banks"),
+    path.resolve(__dirname, "../../data_banks"),
+    path.resolve(__dirname, "../../../src/data_banks"),
+  ];
+  for (const candidate of candidates) {
+    try {
+      const probe = path.join(candidate, "manifest/bank_registry.any.json");
+      if (fs.existsSync(probe)) return candidate;
+    } catch {
+      // ignore
+    }
+  }
+  return candidates[0];
 }
 
 export interface BankLoaderLogger {
@@ -390,8 +409,7 @@ export async function initializeBanks(
   const strictEnv = resolvedEnv === "production" || resolvedEnv === "staging";
   const fullOpts: BankLoaderInitOptions = {
     env: resolvedEnv,
-    rootDir:
-      opts?.rootDir ?? path.join(process.cwd(), "backend/src/data_banks"),
+    rootDir: opts?.rootDir ?? resolveDataBanksRootDir(),
     strict: opts?.strict,
     validateSchemas: opts?.validateSchemas ?? strictEnv,
     allowEmptyChecksumsInNonProd:

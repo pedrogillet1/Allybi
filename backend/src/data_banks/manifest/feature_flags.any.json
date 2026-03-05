@@ -29,6 +29,7 @@
       "enabled": true,
       "allowList": [
         "ff.nav_pills_sources_ui_contract",
+        "ff.enable_multi_provider",
         "ff.adaptive_failure_fallbacks",
         "ff.regen_variation_seed",
         "ff.bold_keywords_from_query",
@@ -60,6 +61,23 @@
         "frontend_sources_ui"
       ],
       "riskLevel": "low"
+    },
+    {
+      "id": "ff.enable_multi_provider",
+      "description": "Allow cross-provider fallback between Gemini and OpenAI for high availability in routing.",
+      "type": "boolean",
+      "defaultByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "impacts": [
+        "llm_router",
+        "provider_fallbacks",
+        "llm_gateway"
+      ],
+      "riskLevel": "high"
     },
     {
       "id": "ff.adaptive_failure_fallbacks",

@@ -37,6 +37,13 @@ function resolveDataBanksRoot(): string {
 
 const DATA_BANKS_ROOT = resolveDataBanksRoot();
 
+function normalizeBankPath(value: string): string {
+  return String(value || "")
+    .trim()
+    .replace(/\\/g, "/")
+    .replace(/^\.?\//, "");
+}
+
 /**
  * Directories that contain document-intelligence-related banks.
  * These sub-trees are walked recursively for .any.json files.
@@ -111,13 +118,13 @@ function collectDiBankFiles(): string[] {
   const registryPaths = new Set<string>(
     Array.isArray(registry?.banks)
       ? registry.banks
-          .map((entry: any) => String(entry?.path ?? "").trim())
+          .map((entry: any) => normalizeBankPath(String(entry?.path ?? "")))
           .filter(Boolean)
       : [],
   );
 
   return files.filter((filePath) => {
-    const rel = path.relative(DATA_BANKS_ROOT, filePath);
+    const rel = normalizeBankPath(path.relative(DATA_BANKS_ROOT, filePath));
     return (
       registryPaths.has(rel) ||
       rel === "semantics/document_intelligence_bank_map.any.json" ||
@@ -519,7 +526,13 @@ describe("DI schema references", () => {
 // ---------------------------------------------------------------------------
 
 describe("DI cross-domain parity", () => {
-  const DOMAINS = ["accounting", "finance", "legal", "medical", "ops"] as const;
+  const DEFAULT_DOMAINS = [
+    "accounting",
+    "finance",
+    "legal",
+    "medical",
+    "ops",
+  ] as const;
   const FULL_PARITY_DOMAINS = ["finance", "legal", "medical", "ops"] as const;
   const OPERATORS = [
     "navigate",
@@ -536,6 +549,19 @@ describe("DI cross-domain parity", () => {
   ] as const;
 
   const bankMap = loadBankMap();
+  const DOMAINS = Array.isArray(bankMap?.config?.domainNormalization?.coreDomains)
+    ? bankMap.config.domainNormalization.coreDomains
+        .map((domain: unknown) => normalizeDomain(domain))
+        .filter(Boolean)
+    : [...DEFAULT_DOMAINS];
+  const CORE_DOMAIN_SET = new Set(DOMAINS);
+  const EXTENDED_DOMAIN_SET = new Set(
+    Array.isArray(bankMap?.extendedDomains)
+      ? bankMap.extendedDomains
+          .map((domain: unknown) => normalizeDomain(domain))
+          .filter(Boolean)
+      : [],
+  );
   const allBankIds = new Set(
     parsedBanks.map((b) => b.data?._meta?.id).filter(Boolean),
   );
@@ -628,8 +654,21 @@ describe("DI cross-domain parity", () => {
     const merged = Array.from(
       new Set([...clusterDomains, ...typeDefDomains].filter(Boolean)),
     ).sort();
+    const taxonomyCanonical = Array.isArray(taxonomy?.config?.canonicalDomains)
+      ? taxonomy.config.canonicalDomains
+          .map((domain: unknown) => normalizeDomain(domain))
+          .filter(Boolean)
+          .sort()
+      : merged;
 
-    expect(merged).toEqual([...DOMAINS].sort());
+    expect(merged).toEqual(taxonomyCanonical);
+    for (const domain of DOMAINS) {
+      expect(merged).toContain(domain);
+    }
+    for (const domain of merged) {
+      if (CORE_DOMAIN_SET.has(domain)) continue;
+      expect(EXTENDED_DOMAIN_SET.has(domain)).toBe(true);
+    }
   });
 
   test("doc taxonomy keeps operations->ops compatibility alias", () => {

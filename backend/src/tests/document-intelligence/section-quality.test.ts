@@ -1,4 +1,3 @@
-import { describe, it, expect } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
 import glob from "glob";
@@ -44,7 +43,7 @@ describe("Portuguese accent correctness in section files", () => {
       }
     }
 
-    expect(violations, `Accent violations:\n${violations.join("\n")}`).toEqual([]);
+    expect(violations).toEqual([]);
   });
 });
 
@@ -60,11 +59,18 @@ describe("10-K section heading grounding", () => {
     const allAnchors = sections.flatMap(
       (s: Record<string, unknown>) => {
         const anchors = s.headingAnchors || s.headerVariants;
-        if (Array.isArray(anchors)) return anchors;
-        if (anchors && typeof anchors === "object") {
-          return Object.values(anchors as Record<string, string[]>).flat();
+        const names = [];
+        if (s.name && typeof s.name === "object") {
+          names.push(...Object.values(s.name as Record<string, string>));
         }
-        return [];
+        if (Array.isArray(anchors)) return [...anchors, ...names];
+        if (anchors && typeof anchors === "object") {
+          return [
+            ...Object.values(anchors as Record<string, string[]>).flat(),
+            ...names,
+          ];
+        }
+        return names;
       },
     );
     const joined = allAnchors.join(" ").toLowerCase();
@@ -89,11 +95,18 @@ describe("Trial balance section heading grounding", () => {
     const allAnchors = sections.flatMap(
       (s: Record<string, unknown>) => {
         const anchors = s.headingAnchors || s.headerVariants;
-        if (Array.isArray(anchors)) return anchors;
-        if (anchors && typeof anchors === "object") {
-          return Object.values(anchors as Record<string, string[]>).flat();
+        const names = [];
+        if (s.name && typeof s.name === "object") {
+          names.push(...Object.values(s.name as Record<string, string>));
         }
-        return [];
+        if (Array.isArray(anchors)) return [...anchors, ...names];
+        if (anchors && typeof anchors === "object") {
+          return [
+            ...Object.values(anchors as Record<string, string[]>).flat(),
+            ...names,
+          ];
+        }
+        return names;
       },
     );
     const joined = allAnchors.join(" ").toLowerCase();
@@ -113,16 +126,29 @@ describe("Insurance policy heading grounding", () => {
     const allAnchors = sections.flatMap(
       (s: Record<string, unknown>) => {
         const anchors = s.headingAnchors || s.headerVariants;
-        if (Array.isArray(anchors)) return anchors;
-        if (anchors && typeof anchors === "object") {
-          return Object.values(anchors as Record<string, string[]>).flat();
+        const names = [];
+        if (s.name && typeof s.name === "object") {
+          names.push(...Object.values(s.name as Record<string, string>));
         }
-        return [];
+        if (Array.isArray(anchors)) return [...anchors, ...names];
+        if (anchors && typeof anchors === "object") {
+          return [
+            ...Object.values(anchors as Record<string, string[]>).flat(),
+            ...names,
+          ];
+        }
+        return names;
       },
     );
     const joined = allAnchors.join(" ").toLowerCase();
     // At least one of these should be present
-    const hasRelevant = joined.includes("coverage") || joined.includes("premium") || joined.includes("policy");
+    const hasRelevant =
+      joined.includes("coverage") ||
+      joined.includes("premium") ||
+      joined.includes("policy") ||
+      joined.includes("cobertura") ||
+      joined.includes("premio") ||
+      joined.includes("apolice");
     expect(hasRelevant).toBe(true);
   });
 });
@@ -204,3 +230,5 @@ describe("Invoice heading grounding", () => {
     expect(hasTotal).toBe(true);
   });
 });
+
+

@@ -311,7 +311,7 @@ class KodaV3Container {
 
       await this.tryLoad("retrievalEngine", async () => {
         const { PrismaRetrievalAdapterFactory } =
-          await import("../services/core/retrieval/prismaRetrievalAdapters.service");
+          await import("../services/core/retrieval/prismaRetrievalAdapters.runtime.service");
         const db = (await import("../config/database")).default;
         return {
           id: "centralized_retrieval_runtime",

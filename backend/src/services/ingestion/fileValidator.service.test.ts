@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Tests for FileValidatorService.
  *
  * Covers:
@@ -10,6 +10,12 @@
  * - Fixed catch block in checkPasswordProtection (returns isValid: false)
  * - image/jpg vs image/jpeg alias
  */
+
+jest.mock("pdf-parse", () => ({
+  PDFParse: jest.fn().mockImplementation(() => ({
+    getText: jest.fn().mockResolvedValue({ text: "mock pdf text content" }),
+  })),
+}));
 
 import fileValidator from "./fileValidator.service";
 import { ValidationErrorCode } from "./fileValidator.service";
@@ -26,7 +32,7 @@ const OLE_HEADER = Buffer.from([0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1, 
 
 describe("FileValidatorService", () => {
   // -------------------------------------------------------------------------
-  // validateFileHeader — magic bytes
+  // validateFileHeader â€” magic bytes
   // -------------------------------------------------------------------------
   describe("validateFileHeader", () => {
     it("accepts valid PDF magic bytes", () => {
@@ -110,7 +116,7 @@ describe("FileValidatorService", () => {
   });
 
   // -------------------------------------------------------------------------
-  // validateClientSide — legacy format rejection
+  // validateClientSide â€” legacy format rejection
   // -------------------------------------------------------------------------
   describe("validateClientSide", () => {
     it("rejects .doc (application/msword) with specific suggestion", () => {
@@ -168,7 +174,7 @@ describe("FileValidatorService", () => {
     it("rejects oversized files", () => {
       const result = fileValidator.validateClientSide({
         type: "application/pdf",
-        size: 500 * 1024 * 1024, // 500MB — well above any limit
+        size: 501 * 1024 * 1024, // 500MB â€” well above any limit
         name: "huge.pdf",
       });
       expect(result.isValid).toBe(false);
@@ -186,7 +192,7 @@ describe("FileValidatorService", () => {
   });
 
   // -------------------------------------------------------------------------
-  // validateServerSide — legacy rejection + password protection
+  // validateServerSide â€” legacy rejection + password protection
   // -------------------------------------------------------------------------
   describe("validateServerSide", () => {
     it("rejects legacy .doc on server side", async () => {
@@ -231,8 +237,8 @@ describe("FileValidatorService", () => {
         "application/pdf",
         "normal.pdf",
       );
-      // Will hit integrity check (pdf-parse not available) → caught → returns isValid: false
-      // That's OK — we're testing the password flow doesn't fire on non-encrypted PDFs
+      // Will hit integrity check (pdf-parse not available) â†’ caught â†’ returns isValid: false
+      // That's OK â€” we're testing the password flow doesn't fire on non-encrypted PDFs
       // The important thing is errorCode is NOT PASSWORD_PROTECTED
       if (!result.isValid) {
         expect(result.errorCode).not.toBe(ValidationErrorCode.PASSWORD_PROTECTED);
@@ -240,3 +246,4 @@ describe("FileValidatorService", () => {
     });
   });
 });
+
