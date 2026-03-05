@@ -10,8 +10,10 @@ interface BasePipelineTimings {
   storageDownloadMs: number;
   extractionMs: number;
   extractionMethod: string;
+  ocrAttempted: boolean;
   ocrUsed: boolean;
   ocrSuccess: boolean;
+  ocrOutcome: string;
   ocrConfidence: number | null;
   ocrPageCount: number | null;
   ocrMode: string | null;
@@ -55,6 +57,7 @@ export function isPipelineSkipped(
 // ---------------------------------------------------------------------------
 
 export interface InputChunkMetadata {
+  sectionId?: string;
   sectionName?: string;
   sectionLevel?: number;
   sectionPath?: string[];

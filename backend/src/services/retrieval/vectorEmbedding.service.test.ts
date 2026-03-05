@@ -388,6 +388,8 @@ describe("vectorEmbedding.service", () => {
           unitRaw: "$",
           unitNormalized: "currency_usd",
           numericValue: 125,
+          scaleRaw: "thousands",
+          scaleMultiplier: 1000,
         },
       },
     ];
@@ -408,6 +410,8 @@ describe("vectorEmbedding.service", () => {
     expect(chunkCreatePayload.columnIndex).toBe(3);
     expect(chunkCreatePayload.unitNormalized).toBe("currency_usd");
     expect(chunkCreatePayload.numericValue).toBe(125);
+    expect(chunkCreatePayload.scaleRaw).toBe("thousands");
+    expect(chunkCreatePayload.scaleMultiplier).toBe(1000);
   });
 
   test("marks metadata isLatestVersion false when a newer revision exists", async () => {

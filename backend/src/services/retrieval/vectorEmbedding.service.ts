@@ -28,6 +28,7 @@ import embeddingService from "./embedding.service";
 import { resolveIndexingPolicySnapshot } from "./indexingPolicy.service";
 import pineconeService from "./pinecone.service";
 import type { InputChunk as PipelineInputChunk } from "../ingestion/pipeline/pipelineTypes";
+import { recordIndexingQualityMetrics } from "../ingestion/pipeline/pipelineMetrics.service";
 
 type JsonPrimitive = string | number | boolean | null;
 type PineconeMetaValue = JsonPrimitive | string[];
@@ -148,6 +149,39 @@ function dedupeByChunkIndex<T extends { chunkIndex: number }>(items: T[]): T[] {
   return out;
 }
 
+function inferScaleSignal(metadata: Record<string, any>): boolean {
+  if (!metadata || typeof metadata !== "object") return false;
+  if (typeof metadata.scaleRaw === "string" && metadata.scaleRaw.trim()) return true;
+  const probe = [
+    metadata.colHeader,
+    metadata.rowLabel,
+    metadata.valueRaw,
+  ]
+    .map((value) => String(value || ""))
+    .join(" ")
+    .toLowerCase();
+  return /\b(bn|mn|mm|millions?|billions?|thousands?|k)\b|'\s*000/.test(probe);
+}
+
+function hasRequiredChunkMetadata(chunk: {
+  pageNumber?: number;
+  metadata?: Record<string, any>;
+}): boolean {
+  const metadata = chunk.metadata || {};
+  const hasBase =
+    typeof metadata.chunkType === "string" &&
+    metadata.chunkType.trim().length > 0 &&
+    typeof metadata.sourceType === "string" &&
+    metadata.sourceType.trim().length > 0;
+  if (!hasBase) return false;
+  return Boolean(
+    metadata.sectionId ||
+      metadata.tableId ||
+      metadata.sheetName ||
+      Number.isFinite(chunk.pageNumber),
+  );
+}
+
 function pickMostRecentDocId(
   docs: Array<{ id: string; createdAt: Date }>,
   fallbackId: string,
@@ -231,6 +265,39 @@ export async function storeDocumentEmbeddings(
 
   // De-dupe chunkIndex to avoid DB uniqueness conflicts (and Pinecone id collisions)
   const usableChunks = dedupeByChunkIndex(normalized);
+
+  const metadataTotal = usableChunks.length;
+  const metadataComplete = usableChunks.filter((chunk) =>
+    hasRequiredChunkMetadata(chunk),
+  ).length;
+  const scaleDetected = usableChunks.filter((chunk) =>
+    inferScaleSignal(chunk.metadata || {}),
+  ).length;
+  const scaleCaptured = usableChunks.filter((chunk) => {
+    const metadata = chunk.metadata || {};
+    return (
+      inferScaleSignal(metadata) &&
+      typeof metadata.scaleRaw === "string" &&
+      metadata.scaleRaw.trim().length > 0 &&
+      typeof metadata.scaleMultiplier === "number" &&
+      Number.isFinite(metadata.scaleMultiplier)
+    );
+  }).length;
+  const encryptionExpected = indexingPolicy.encryptedChunksOnly;
+  const encryptionTotal = usableChunks.length;
+  const encryptionCompliant = encryptionExpected
+    ? encryptionMode === "encrypted_only"
+      ? encryptionTotal
+      : 0
+    : encryptionTotal;
+  recordIndexingQualityMetrics({
+    metadataComplete,
+    metadataTotal,
+    scaleDetected,
+    scaleCaptured,
+    encryptionCompliant,
+    encryptionTotal,
+  });
 
   // Generate embeddings for chunks that don't have them (true batch for efficiency)
   const needsEmbedding = usableChunks.filter(
@@ -397,6 +464,7 @@ export async function storeDocumentEmbeddings(
           text: encryptionMode === "encrypted_only" ? null : plaintext,
           textEncrypted,
           page: c.pageNumber ?? c.metadata?.pageNumber ?? null,
+          sectionId: metadata.sectionId || null,
           startChar: c.metadata?.startChar ?? null,
           endChar: c.metadata?.endChar ?? null,
           sectionName: metadata.sectionName || null,
@@ -417,6 +485,11 @@ export async function storeDocumentEmbeddings(
           numericValue:
             typeof metadata.numericValue === "number"
               ? metadata.numericValue
+              : null,
+          scaleRaw: metadata.scaleRaw || null,
+          scaleMultiplier:
+            typeof metadata.scaleMultiplier === "number"
+              ? metadata.scaleMultiplier
               : null,
           chunkType: metadata.chunkType || null,
           sectionLevel:

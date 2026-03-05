@@ -50,6 +50,13 @@ function emitCellFactChunks(
           pageNumber: table.pageOrSlide,
           metadata: {
             ...ctxMeta,
+            sectionId: buildSectionId({
+              sourceType,
+              pageNumber: table.pageOrSlide,
+              tableId: table.tableId,
+              rowIndex: row.rowIndex,
+              columnIndex: cell.colIndex,
+            }),
             chunkType: "cell_fact",
             tableChunkForm: "cell_centric",
             tableId: table.tableId,
@@ -120,6 +127,65 @@ function toHeaderPath(
   return [row, String(colHeader || "").trim()].filter(Boolean);
 }
 
+function toSectionToken(value: unknown): string | null {
+  const token = String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "_")
+    .replace(/[^a-z0-9:_/.-]/g, "");
+  return token || null;
+}
+
+function buildSectionId(params: {
+  sourceType: string;
+  sectionPath?: string[];
+  sectionName?: string;
+  pageNumber?: number;
+  slideNumber?: number;
+  sheetName?: string;
+  tableId?: string;
+  rowLabel?: string;
+  rowIndex?: number | null;
+  columnIndex?: number | null;
+}): string | undefined {
+  const parts: string[] = [params.sourceType];
+  const sectionPath = Array.isArray(params.sectionPath)
+    ? params.sectionPath
+        .map((item) => toSectionToken(item))
+        .filter((item): item is string => Boolean(item))
+    : [];
+  if (sectionPath.length > 0) parts.push(`path:${sectionPath.join("/")}`);
+
+  const sectionName = toSectionToken(params.sectionName);
+  if (sectionName) parts.push(`name:${sectionName}`);
+
+  if (Number.isFinite(params.pageNumber)) {
+    parts.push(`p:${Math.trunc(params.pageNumber as number)}`);
+  }
+  if (Number.isFinite(params.slideNumber)) {
+    parts.push(`sl:${Math.trunc(params.slideNumber as number)}`);
+  }
+
+  const sheetName = toSectionToken(params.sheetName);
+  if (sheetName) parts.push(`sheet:${sheetName}`);
+
+  const tableId = toSectionToken(params.tableId);
+  if (tableId) parts.push(`table:${tableId}`);
+
+  const rowLabel = toSectionToken(params.rowLabel);
+  if (rowLabel) parts.push(`row:${rowLabel}`);
+
+  if (Number.isFinite(params.rowIndex)) {
+    parts.push(`r:${Math.trunc(params.rowIndex as number)}`);
+  }
+  if (Number.isFinite(params.columnIndex)) {
+    parts.push(`c:${Math.trunc(params.columnIndex as number)}`);
+  }
+
+  if (parts.length <= 1) return undefined;
+  return `sec:${parts.join("|").slice(0, 220)}`;
+}
+
 /**
  * Build input chunks from a typed extraction result.
  * Uses page/slide/section/sheet boundaries when available; falls back to plain text split.
@@ -155,6 +221,12 @@ export function buildInputChunks(
       const sectionName = section.heading || undefined;
       const sectionLevel = section.level ?? 1;
       const sectionPath = section.path ?? (sectionName ? [...parentPath, sectionName] : parentPath);
+      const sectionId = buildSectionId({
+        sourceType: "docx",
+        sectionPath,
+        sectionName,
+        pageNumber,
+      });
 
       // Heading chunk
       if (sectionName) {
@@ -165,6 +237,7 @@ export function buildInputChunks(
           pageNumber,
           metadata: {
             ...ctxMeta,
+            sectionId,
             sectionName,
             sectionLevel,
             sectionPath,
@@ -187,6 +260,7 @@ export function buildInputChunks(
             pageNumber,
             metadata: {
               ...ctxMeta,
+              sectionId,
               sectionName,
               sectionLevel,
               sectionPath,
@@ -211,7 +285,12 @@ export function buildInputChunks(
       const fallback: InputChunk[] = segments.map((content, i) => ({
         chunkIndex: i,
         content,
-        metadata: { ...ctxMeta, chunkType: "text" as const, sourceType: "docx" as const },
+        metadata: {
+          ...ctxMeta,
+          sectionId: buildSectionId({ sourceType: "docx", sectionName: "fallback" }),
+          chunkType: "text" as const,
+          sourceType: "docx" as const,
+        },
       }));
       // Emit cell_fact chunks from structured tables even in fallback
       if (extraction.extractedTables?.length) {
@@ -245,6 +324,11 @@ export function buildInputChunks(
             content: segment,
             metadata: {
               ...ctxMeta,
+              sectionId: buildSectionId({
+                sourceType: "xlsx",
+                sheetName,
+                tableId,
+              }),
               sheetName,
               chunkType: "table",
               tableChunkForm: "table_summary",
@@ -313,8 +397,18 @@ export function buildInputChunks(
           unitRaw: unit.unitRaw ?? undefined,
           unitNormalized: unit.unitNormalized ?? undefined,
           numericValue: unit.numericValue ?? undefined,
+          scaleRaw: unit.scaleRaw ?? undefined,
+          scaleMultiplier: unit.scaleMultiplier ?? undefined,
           isFinancial: sheetFinancialMap.get(sheetName) ?? extraction.isFinancial ?? false,
           sourceType: "xlsx",
+          sectionId: buildSectionId({
+            sourceType: "xlsx",
+            sheetName,
+            tableId,
+            rowLabel,
+            rowIndex: location.rowIndex,
+            columnIndex: location.columnIndex,
+          }),
         };
 
         out.push({
@@ -367,6 +461,12 @@ export function buildInputChunks(
           content,
           metadata: {
             ...ctxMeta,
+            sectionId: buildSectionId({
+              sourceType: "xlsx",
+              sheetName,
+              tableId,
+              rowLabel,
+            }),
             sheetName,
             chunkType: "cell_fact",
             tableChunkForm: "row_aggregate",
@@ -424,6 +524,11 @@ export function buildInputChunks(
       const outlineEntry = outlinesByPage.get(pageIndex);
       const sectionName = outlineEntry?.title ?? inferPageHeading(pageText);
       const sectionLevel = outlineEntry?.level;
+      const sectionId = buildSectionId({
+        sourceType: "pdf",
+        sectionName,
+        pageNumber: p.page,
+      });
 
       for (const seg of splitTextIntoChunksWithOffsets(pageText, charOffset, policyOverrides)) {
         out.push({
@@ -432,6 +537,7 @@ export function buildInputChunks(
           pageNumber: p.page,
           metadata: {
             ...ctxMeta,
+            sectionId,
             chunkType: "text",
             sectionName,
             ...(sectionLevel !== undefined ? { sectionLevel } : {}),
@@ -458,6 +564,11 @@ export function buildInputChunks(
     let charOffset = 0;
     for (const s of extraction.slides) {
       const slideTitle = s.title || undefined;
+      const sectionId = buildSectionId({
+        sourceType: "pptx",
+        sectionName: slideTitle || "slide",
+        slideNumber: s.slide,
+      });
 
       // Slide title as heading chunk
       if (slideTitle) {
@@ -467,6 +578,7 @@ export function buildInputChunks(
           pageNumber: s.slide,
           metadata: {
             ...ctxMeta,
+            sectionId,
             chunkType: "heading",
             slideTitle,
             startChar: charOffset,
@@ -487,6 +599,7 @@ export function buildInputChunks(
             pageNumber: s.slide,
             metadata: {
               ...ctxMeta,
+              sectionId,
               chunkType: "text",
               slideTitle,
               startChar: seg.startChar,
@@ -510,6 +623,7 @@ export function buildInputChunks(
               pageNumber: s.slide,
               metadata: {
                 ...ctxMeta,
+                sectionId,
                 chunkType: "notes",
                 slideTitle,
                 hasNotes: true,
@@ -535,7 +649,12 @@ export function buildInputChunks(
   return segments.map((content, idx) => ({
     chunkIndex: idx,
     content,
-    metadata: { ...ctxMeta, chunkType: "text" as const, sourceType: "text" as const },
+    metadata: {
+      ...ctxMeta,
+      sectionId: buildSectionId({ sourceType: "text", sectionName: "plain_text" }),
+      chunkType: "text" as const,
+      sourceType: "text" as const,
+    },
   }));
 }
 

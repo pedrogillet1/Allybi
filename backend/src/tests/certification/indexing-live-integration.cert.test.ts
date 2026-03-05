@@ -12,6 +12,9 @@ describe("Certification: indexing live integration", () => {
     if (!runtimeMetadata.modeAllowed) {
       failures.push("RUNTIME_MODE_NOT_ALLOWED");
     }
+    if (runtimeMetadata.mode !== "v2") {
+      failures.push("RUNTIME_MODE_NOT_V2");
+    }
     if (!snapshot.strictFailClosed) {
       failures.push("STRICT_FAIL_CLOSED_DISABLED");
     }
@@ -29,6 +32,7 @@ describe("Certification: indexing live integration", () => {
         verifyRequired: snapshot.verifyRequired,
       },
       thresholds: {
+        runtimeMode: "v2",
         runtimeModeAllowed: true,
         strictFailClosed: true,
         verifyRequired: true,

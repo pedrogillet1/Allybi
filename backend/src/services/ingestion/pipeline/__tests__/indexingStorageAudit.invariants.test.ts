@@ -25,6 +25,7 @@ describe("Audit Invariant 1: every chunk has non-empty documentId + sourceType +
       expect(c.metadata.documentId).toBe("doc-audit-1");
       expect(c.metadata.sourceType).toBeTruthy();
       expect(c.metadata.chunkType).toBeTruthy();
+      expect(c.metadata.sectionId).toBeTruthy();
     }
   });
 });
@@ -96,6 +97,7 @@ describe("Audit Invariant 3: cell_fact chunks always carry tableId + rowIndex + 
         expect(c.metadata.tableId).toBeTruthy();
         expect(c.metadata.rowIndex).toBeGreaterThanOrEqual(0);
         expect(c.metadata.columnIndex).toBeGreaterThanOrEqual(0);
+        expect(c.metadata.sectionId).toBeTruthy();
       }
     }
   });
@@ -145,5 +147,31 @@ describe("Audit Invariant 5: no chunk content is empty string after assembly + d
         expect(c.content.trim().length).toBeGreaterThan(0);
       }
     }
+  });
+});
+
+describe("Audit Invariant 6: xlsx cell_fact chunks preserve scale metadata", () => {
+  test("cell-centric chunks carry scaleRaw and scaleMultiplier when headers encode scale", () => {
+    const extraction: any = {
+      sourceType: "xlsx",
+      text: "Revenue",
+      sheets: [{ sheetName: "P&L", textContent: "Revenue (mn)" }],
+      cellFacts: [
+        {
+          sheet: "P&L",
+          cell: "B4",
+          rowLabel: "Revenue",
+          colHeader: "FY24 (mn)",
+          value: "12.5",
+          displayValue: "12.5",
+        },
+      ],
+    };
+    const chunks = buildInputChunks(extraction, extraction.text);
+    const cell = chunks.find((c) => c.metadata.chunkType === "cell_fact");
+    expect(cell).toBeDefined();
+    expect(cell!.metadata.scaleRaw).toBe("mn");
+    expect(cell!.metadata.scaleMultiplier).toBe(1000000);
+    expect(cell!.metadata.sectionId).toBeTruthy();
   });
 });

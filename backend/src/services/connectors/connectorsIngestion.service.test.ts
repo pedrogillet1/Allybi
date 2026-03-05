@@ -5,7 +5,7 @@ const mockUpdate = jest.fn();
 const mockTransaction = jest.fn();
 
 const mockUploadFile = jest.fn();
-const mockSplitTextIntoChunks = jest.fn();
+const mockSplitTextIntoChunksWithOffsets = jest.fn();
 const mockStoreDocumentEmbeddings = jest.fn();
 
 const mockVaultIsStrict = jest.fn();
@@ -34,7 +34,8 @@ jest.mock("../../config/storage", () => ({
 }));
 
 jest.mock("../ingestion/chunking.service", () => ({
-  splitTextIntoChunks: (...args: any[]) => mockSplitTextIntoChunks(...args),
+  splitTextIntoChunksWithOffsets: (...args: any[]) =>
+    mockSplitTextIntoChunksWithOffsets(...args),
 }));
 
 jest.mock("../retrieval/vectorEmbedding.runtime.service", () => ({
@@ -102,7 +103,10 @@ describe("ConnectorsIngestionService", () => {
     mockFindFirst.mockReset().mockResolvedValue(null);
     mockUpdate.mockReset().mockResolvedValue({});
     mockUploadFile.mockReset().mockResolvedValue(undefined);
-    mockSplitTextIntoChunks.mockReset().mockReturnValue(["chunk-1", "chunk-2"]);
+    mockSplitTextIntoChunksWithOffsets.mockReset().mockReturnValue([
+      { content: "chunk-1", startChar: 0, endChar: 7 },
+      { content: "chunk-2", startChar: 7, endChar: 14 },
+    ]);
     mockStoreDocumentEmbeddings.mockReset().mockResolvedValue(undefined);
     mockVaultIsStrict.mockReset().mockReturnValue(false);
     mockVaultIsEnabled.mockReset().mockReturnValue(false);
@@ -149,6 +153,20 @@ describe("ConnectorsIngestionService", () => {
     expect(out[0]?.status).toBe("created");
     expect(mockClaimForEnrichment).toHaveBeenCalledTimes(1);
     expect(mockStoreDocumentEmbeddings).toHaveBeenCalledTimes(1);
+    const [, indexedChunks] = mockStoreDocumentEmbeddings.mock.calls[0];
+    expect(Array.isArray(indexedChunks)).toBe(true);
+    expect(indexedChunks[0].metadata).toEqual(
+      expect.objectContaining({
+        source: "connector_ingestion",
+        sourceType: "text",
+        chunkType: "text",
+        sectionName: "connector_message",
+        documentId: expect.any(String),
+        versionId: expect.any(String),
+        rootDocumentId: expect.any(String),
+        isLatestVersion: true,
+      }),
+    );
     expect(mockMarkIndexed).toHaveBeenCalledWith(expect.any(String), 2);
     expect(mockUpdate).toHaveBeenCalledWith(
       expect.objectContaining({

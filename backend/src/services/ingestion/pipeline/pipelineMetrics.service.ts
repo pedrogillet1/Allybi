@@ -64,6 +64,13 @@ let totalExtractionAttempts = 0;
 let tableDuplicationCount = 0;
 const ocrFallbackUsage = new Map<string, { success: number; failure: number }>();
 
+let indexingMetadataCompleteCount = 0;
+let indexingMetadataTotalCount = 0;
+let tableScaleDetectedCount = 0;
+let tableScaleCapturedCount = 0;
+let indexEncryptionCompliantCount = 0;
+let indexEncryptionTotalCount = 0;
+
 // ---------------------------------------------------------------------------
 // Recording functions
 // ---------------------------------------------------------------------------
@@ -124,6 +131,25 @@ export function recordOcrUsage(provider: string, success: boolean): void {
   }
 }
 
+export function recordIndexingQualityMetrics(params: {
+  metadataComplete: number;
+  metadataTotal: number;
+  scaleDetected: number;
+  scaleCaptured: number;
+  encryptionCompliant: number;
+  encryptionTotal: number;
+}): void {
+  indexingMetadataCompleteCount += Math.max(0, Math.trunc(params.metadataComplete));
+  indexingMetadataTotalCount += Math.max(0, Math.trunc(params.metadataTotal));
+  tableScaleDetectedCount += Math.max(0, Math.trunc(params.scaleDetected));
+  tableScaleCapturedCount += Math.max(0, Math.trunc(params.scaleCaptured));
+  indexEncryptionCompliantCount += Math.max(
+    0,
+    Math.trunc(params.encryptionCompliant),
+  );
+  indexEncryptionTotalCount += Math.max(0, Math.trunc(params.encryptionTotal));
+}
+
 // ---------------------------------------------------------------------------
 // Query functions
 // ---------------------------------------------------------------------------
@@ -175,6 +201,9 @@ export function getMetricsSummary(): {
   emptyTextRate: { emptyCount: number; totalAttempts: number; rate: number };
   tableDuplicationCount: number;
   ocrFallbackUsage: Record<string, { success: number; failure: number }>;
+  indexingMetadataCompleteness: { complete: number; total: number; rate: number };
+  tableScaleCapture: { detected: number; captured: number; rate: number };
+  indexEncryptionCompliance: { compliant: number; total: number; rate: number };
 } {
   const rate =
     totalExtractionAttempts > 0
@@ -198,6 +227,30 @@ export function getMetricsSummary(): {
     },
     tableDuplicationCount,
     ocrFallbackUsage: ocrUsage,
+    indexingMetadataCompleteness: {
+      complete: indexingMetadataCompleteCount,
+      total: indexingMetadataTotalCount,
+      rate:
+        indexingMetadataTotalCount > 0
+          ? indexingMetadataCompleteCount / indexingMetadataTotalCount
+          : 0,
+    },
+    tableScaleCapture: {
+      detected: tableScaleDetectedCount,
+      captured: tableScaleCapturedCount,
+      rate:
+        tableScaleDetectedCount > 0
+          ? tableScaleCapturedCount / tableScaleDetectedCount
+          : 0,
+    },
+    indexEncryptionCompliance: {
+      compliant: indexEncryptionCompliantCount,
+      total: indexEncryptionTotalCount,
+      rate:
+        indexEncryptionTotalCount > 0
+          ? indexEncryptionCompliantCount / indexEncryptionTotalCount
+          : 0,
+    },
   };
 }
 
@@ -217,4 +270,10 @@ export function resetMetrics(): void {
   totalExtractionAttempts = 0;
   tableDuplicationCount = 0;
   ocrFallbackUsage.clear();
+  indexingMetadataCompleteCount = 0;
+  indexingMetadataTotalCount = 0;
+  tableScaleDetectedCount = 0;
+  tableScaleCapturedCount = 0;
+  indexEncryptionCompliantCount = 0;
+  indexEncryptionTotalCount = 0;
 }

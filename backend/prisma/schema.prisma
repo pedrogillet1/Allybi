@@ -303,6 +303,7 @@ model DocumentChunk {
   text          String?
   textEncrypted String?
   page          Int?
+  sectionId     String?  @map("section_id")
   startChar     Int?
   endChar       Int?
   embedding     Bytes?
@@ -318,6 +319,8 @@ model DocumentChunk {
   unitRaw       String?  @map("unit_raw")
   unitNormalized String? @map("unit_normalized")
   numericValue  Float?   @map("numeric_value")
+  scaleRaw      String?  @map("scale_raw")
+  scaleMultiplier Float? @map("scale_multiplier")
   chunkType     String?  @map("chunk_type")
   sectionLevel  Int?     @map("section_level")
   sourceType    String?  @map("source_type")
@@ -330,6 +333,7 @@ model DocumentChunk {
   @@index([documentId])
   @@index([documentId, chunkIndex])
   @@index([documentId, page])
+  @@index([documentId, sectionId])
   @@index([documentId, sectionName])
   @@index([documentId, sheetName])
   @@index([documentId, tableChunkForm])

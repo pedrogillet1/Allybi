@@ -21,12 +21,12 @@ describe("indexingPolicy.service", () => {
     expect(parseBooleanFlag("unexpected", false)).toBe(false);
   });
 
-  test("uses v1 runtime mode by default and allows both modes", () => {
+  test("uses v2 runtime mode by default and allows both modes", () => {
     const policy = resolveIndexingPolicySnapshot({
       RETRIEVAL_V2_VECTOR_EMBEDDING: "",
     } as NodeJS.ProcessEnv);
 
-    expect(policy.runtimeMode).toBe("v1");
+    expect(policy.runtimeMode).toBe("v2");
     expect(policy.allowedRuntimeModes).toEqual(["v1", "v2"]);
     expect(policy.runtimeModeAllowed).toBe(true);
   });
@@ -39,6 +39,16 @@ describe("indexingPolicy.service", () => {
 
     expect(policy.runtimeMode).toBe("v1");
     expect(policy.allowedRuntimeModes).toEqual(["v2"]);
+    expect(policy.runtimeModeAllowed).toBe(false);
+  });
+
+  test("fails closed for invalid allowed-mode values", () => {
+    const policy = resolveIndexingPolicySnapshot({
+      RETRIEVAL_V2_VECTOR_EMBEDDING: "1",
+      INDEXING_RUNTIME_MODE_ALLOWED: "invalid_mode",
+    } as NodeJS.ProcessEnv);
+
+    expect(policy.allowedRuntimeModes).toEqual([]);
     expect(policy.runtimeModeAllowed).toBe(false);
   });
 

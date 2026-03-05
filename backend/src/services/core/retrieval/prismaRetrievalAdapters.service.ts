@@ -54,6 +54,7 @@ type ChunkWithDocument = {
   text: string | null;
   textEncrypted?: string | null;
   page: number | null;
+  sectionId?: string | null;
   sectionName?: string | null;
   sheetName?: string | null;
   tableChunkForm?: string | null;
@@ -66,6 +67,8 @@ type ChunkWithDocument = {
   unitRaw?: string | null;
   unitNormalized?: string | null;
   numericValue?: number | null;
+  scaleRaw?: string | null;
+  scaleMultiplier?: number | null;
   metadata?: Record<string, unknown> | null;
   document: {
     id: string;
@@ -86,6 +89,7 @@ type ChunkRow = {
   text: string | null;
   textEncrypted?: string | null;
   page: number | null;
+  sectionId?: string | null;
   sectionName?: string | null;
   sheetName?: string | null;
   tableChunkForm?: string | null;
@@ -98,6 +102,8 @@ type ChunkRow = {
   unitRaw?: string | null;
   unitNormalized?: string | null;
   numericValue?: number | null;
+  scaleRaw?: string | null;
+  scaleMultiplier?: number | null;
   metadata?: Record<string, unknown> | null;
 };
 
@@ -341,7 +347,7 @@ function toSnippet(text: string | null): string {
     .replace(/\s+/g, " ")
     .trim();
   if (!clean) return "";
-  return clean.length > 1200 ? `${clean.slice(0, 1199)}…` : clean;
+  return clean.length > 1200 ? `${clean.slice(0, 1199)}...` : clean;
 }
 
 function filenameFromStorageKey(
@@ -376,6 +382,50 @@ class PrismaRetrievalUserAdapter
 
   private isLatestVersionOnlyEnabled(): boolean {
     return isRuntimeFlagEnabled("RETRIEVAL_LATEST_VERSION_ONLY", true);
+  }
+
+  private isRelatedDocExpansionEnabled(): boolean {
+    return isRuntimeFlagEnabled("RETRIEVAL_INCLUDE_RELATED_DOCS", false);
+  }
+
+  private async expandWithRelatedDocIds(docIds: string[]): Promise<string[]> {
+    const seed = uniq(docIds);
+    if (!seed.length || !this.isRelatedDocExpansionEnabled()) return seed;
+    try {
+      const linksRaw = await prisma.documentLink.findMany({
+        where: {
+          status: "active",
+          relationshipType: { in: ["amends", "supersedes", "restates", "extends"] },
+          OR: [
+            { sourceDocumentId: { in: seed } },
+            { targetDocumentId: { in: seed } },
+          ],
+        },
+        select: {
+          sourceDocumentId: true,
+          targetDocumentId: true,
+        },
+      });
+      const links = Array.isArray(linksRaw) ? linksRaw : [];
+      const candidates = new Set<string>(seed);
+      for (const link of links) {
+        candidates.add(String(link.sourceDocumentId || "").trim());
+        candidates.add(String(link.targetDocumentId || "").trim());
+      }
+      const candidateIds = [...candidates].filter(Boolean);
+      if (!candidateIds.length) return seed;
+      const allowedDocsRaw = await prisma.document.findMany({
+        where: {
+          userId: this.userId,
+          id: { in: candidateIds },
+        },
+        select: { id: true },
+      });
+      const allowedDocs = Array.isArray(allowedDocsRaw) ? allowedDocsRaw : [];
+      return uniq(allowedDocs.map((doc) => String(doc.id || "").trim()));
+    } catch {
+      return seed;
+    }
   }
 
   private async resolveLatestReadyDocByRootIds(
@@ -455,7 +505,9 @@ class PrismaRetrievalUserAdapter
     const resolvedRootIds = requestedRootIds.map(
       (rootId) => latestByRoot.get(rootId)?.id || rootId,
     );
-    return uniq([...resolvedRootIds, ...pinnedRevisionIds]);
+    return this.expandWithRelatedDocIds(
+      uniq([...resolvedRootIds, ...pinnedRevisionIds]),
+    );
   }
 
   private async keepLatestVersionHits<T extends { docId: string }>(
@@ -774,7 +826,7 @@ class PrismaRetrievalUserAdapter
       const tablePayload = this.buildTablePayloadFromChunkRow(row, snippet);
       const sheet = sanitizeLocationToken(row.sheetName ?? null);
       const sectionKey = sanitizeLocationToken(
-        row.sectionName ?? row.tableId ?? row.rowLabel ?? null,
+        row.sectionId ?? row.sectionName ?? row.tableId ?? row.rowLabel ?? null,
       );
       scored.push({
         docId: row.documentId,
@@ -803,8 +855,8 @@ class PrismaRetrievalUserAdapter
     // Scoped-document diversity fallback: when we have explicit docIds
     // (attached documents), ensure EVERY document contributes at least a few
     // chunks. Keyword search is biased toward docs whose text happens to
-    // contain query tokens — the other attached docs get zero representation.
-    // For multi-doc overview questions ("visão geral dos docs que anexei")
+    // contain query tokens - the other attached docs get zero representation.
+    // For multi-doc overview questions ("visao geral dos docs que anexei")
     // the LLM needs context from ALL documents to give a useful answer.
     if (scopedDocIds && scopedDocIds.length > 0) {
       const representedDocs = new Set(scored.map((s) => s.docId));
@@ -872,7 +924,7 @@ class PrismaRetrievalUserAdapter
           const tablePayload = this.buildTablePayloadFromChunkRow(row, snippet);
           const sheet = sanitizeLocationToken(row.sheetName ?? null);
           const sectionKey = sanitizeLocationToken(
-            row.sectionName ?? row.tableId ?? row.rowLabel ?? null,
+            row.sectionId ?? row.sectionName ?? row.tableId ?? row.rowLabel ?? null,
           );
           scored.push({
             docId: row.documentId,
@@ -1014,7 +1066,7 @@ class PrismaRetrievalUserAdapter
       const tablePayload = this.buildTablePayloadFromChunkRow(row, snippet);
       const sheet = sanitizeLocationToken(row.sheetName ?? null);
       const sectionKey = sanitizeLocationToken(
-        row.sectionName ?? row.tableId ?? row.rowLabel ?? null,
+        row.sectionId ?? row.sectionName ?? row.tableId ?? row.rowLabel ?? null,
       );
       scored.push({
         docId: row.documentId,
@@ -1168,6 +1220,8 @@ class PrismaRetrievalUserAdapter
         const inferredSectionKey = sanitizeLocationToken(
           typeof md.sectionKey === "string"
             ? md.sectionKey
+            : typeof md.sectionId === "string"
+              ? md.sectionId
             : typeof md.sectionName === "string"
               ? md.sectionName
               : typeof md.tableId === "string"
@@ -1258,6 +1312,9 @@ class PrismaRetrievalUserAdapter
     const valueRaw = String(metadata.valueRaw || "").trim();
     const unitRaw = String(metadata.unitRaw || "").trim();
     const unitNormalized = String(metadata.unitNormalized || "").trim();
+    const scaleRaw = String(metadata.scaleRaw || "").trim();
+    const scaleMultiplier = Number(metadata.scaleMultiplier);
+    const hasScale = scaleRaw.length > 0 || Number.isFinite(scaleMultiplier);
 
     if (chunkForm === "cell_centric") {
       const header = [rowLabel, colHeader].filter(Boolean);
@@ -1266,11 +1323,11 @@ class PrismaRetrievalUserAdapter
         header: header.length ? header : undefined,
         rows: [[cellText || null]],
         structureScore: 0.95,
-        numericIntegrityScore: unitNormalized ? 0.92 : 0.78,
+        numericIntegrityScore: unitNormalized || hasScale ? 0.92 : 0.78,
         warnings:
-          unitRaw || unitNormalized
+          unitRaw || unitNormalized || hasScale
             ? undefined
-            : ["unit_missing_for_cell_fact"],
+            : ["unit_or_scale_missing_for_cell_fact"],
       };
     }
 
@@ -1313,6 +1370,8 @@ class PrismaRetrievalUserAdapter
       valueRaw: row.valueRaw ?? undefined,
       unitRaw: row.unitRaw ?? undefined,
       unitNormalized: row.unitNormalized ?? undefined,
+      scaleRaw: row.scaleRaw ?? undefined,
+      scaleMultiplier: row.scaleMultiplier ?? undefined,
       sheetName: row.sheetName ?? undefined,
     };
     return this.buildTablePayloadFromMetadata(merged, snippet);
@@ -1495,3 +1554,4 @@ export class PrismaRetrievalAdapterFactory {
     };
   }
 }
+

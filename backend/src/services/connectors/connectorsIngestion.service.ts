@@ -2,7 +2,7 @@ import { createHash } from "crypto";
 
 import prisma from "../../config/database";
 import { uploadFile } from "../../config/storage";
-import { splitTextIntoChunks } from "../ingestion/chunking.service";
+import { splitTextIntoChunksWithOffsets } from "../ingestion/chunking.service";
 import vectorEmbeddingRuntimeService from "../retrieval/vectorEmbedding.runtime.service";
 import type { ConnectorProvider } from "./connectorsRegistry";
 import { documentContentVault } from "../documents/documentContentVault.service";
@@ -292,10 +292,23 @@ export class ConnectorsIngestionService {
       // Queue unavailable: fallback to inline indexing.
     }
 
-    const chunks = splitTextIntoChunks(textContent).map((content, idx) => ({
+    const segments = splitTextIntoChunksWithOffsets(textContent, 0);
+    const chunks = segments.map((segment, idx) => ({
       chunkIndex: idx,
-      content,
-      metadata: { source: "connector_ingestion" },
+      content: segment.content,
+      metadata: {
+        source: "connector_ingestion",
+        sourceType: "text",
+        chunkType: "text",
+        sectionName: "connector_message",
+        sectionId: `sec:connector|doc:${queuePayload.documentId}|chunk:${idx}`,
+        startChar: segment.startChar,
+        endChar: segment.endChar,
+        documentId: queuePayload.documentId,
+        versionId: queuePayload.documentId,
+        rootDocumentId: queuePayload.documentId,
+        isLatestVersion: true,
+      },
     }));
 
     const claimResult = await documentStateManager.claimForEnrichment(

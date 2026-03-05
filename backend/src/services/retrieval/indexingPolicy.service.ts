@@ -44,11 +44,13 @@ function parseRuntimeModeAllowed(rawValue: unknown): IndexingRuntimeMode[] {
   if (raw === "v1" || raw === "legacy") return ["v1"];
   if (raw === "v2") return ["v2"];
   if (raw === "v1,v2" || raw === "v2,v1") return ["v1", "v2"];
-  return ["v1", "v2"];
+  // Fail closed for unknown values.
+  return [];
 }
 
 function resolveRuntimeMode(env: NodeJS.ProcessEnv): IndexingRuntimeMode {
-  const enabled = parseBooleanFlag(env[VECTOR_EMBEDDING_SELECTOR_FLAG], false);
+  // Default to v2 unless explicitly disabled for rollback scenarios.
+  const enabled = parseBooleanFlag(env[VECTOR_EMBEDDING_SELECTOR_FLAG], true);
   return enabled ? "v2" : "v1";
 }
 
