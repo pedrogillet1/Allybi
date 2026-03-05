@@ -710,6 +710,40 @@ function toEngineEvidencePack(pack: EvidencePack | null) {
       },
       locationKey: item.locationKey,
       snippet: item.snippet,
+      table: item.table
+        ? {
+            header: Array.isArray(item.table.header)
+              ? item.table.header
+                  .map((value) => String(value ?? "").trim())
+                  .filter(Boolean)
+              : [],
+            rows: Array.isArray(item.table.rows)
+              ? item.table.rows.map((row) =>
+                  Array.isArray(row)
+                    ? row.map((value) =>
+                        value == null
+                          ? null
+                          : typeof value === "number"
+                            ? value
+                            : String(value),
+                      )
+                    : [],
+                )
+              : [],
+            unitAnnotation: item.table.unitAnnotation
+              ? {
+                  unitRaw: String(item.table.unitAnnotation.unitRaw || ""),
+                  unitNormalized: String(
+                    item.table.unitAnnotation.unitNormalized || "",
+                  ),
+                }
+              : null,
+            scaleFactor: item.table.scaleFactor ?? null,
+            footnotes: Array.isArray(item.table.footnotes)
+              ? item.table.footnotes.map((value) => String(value || ""))
+              : null,
+          }
+        : null,
       score: {
         finalScore: item.score.finalScore,
       },
@@ -1147,6 +1181,7 @@ const DEFAULT_BLOCKING_QUALITY_GATES = new Set<string>([
   "redaction_default_pii_identity_tax_banking",
   "medical_safety_boundaries",
   "privacy_minimal",
+  "quality_integration_hook_presence",
   "source_policy_navigation_mode",
   "contradiction_policy_enforcement",
   "ambiguity_single_question_policy",
@@ -1257,6 +1292,17 @@ function resolveRuntimeFailureMode(
 }
 
 function shouldForceStrictGovernanceFailClosed(): boolean {
+  const nodeEnv = String(process.env.NODE_ENV || "")
+    .trim()
+    .toLowerCase();
+  const runtimeEnv = String(process.env.RUNTIME_ENV || process.env.APP_ENV || "")
+    .trim()
+    .toLowerCase();
+  const protectedEnv =
+    nodeEnv === "production" ||
+    runtimeEnv === "production" ||
+    runtimeEnv === "staging";
+
   const explicit = String(process.env.CHAT_RUNTIME_STRICT_GOVERNANCE || "")
     .trim()
     .toLowerCase();
@@ -1264,19 +1310,10 @@ function shouldForceStrictGovernanceFailClosed(): boolean {
     return true;
   }
   if (explicit === "0" || explicit === "false" || explicit === "no") {
-    return false;
+    // Protected envs must remain fail-closed even if explicit opt-out is set.
+    return protectedEnv;
   }
-  const nodeEnv = String(process.env.NODE_ENV || "")
-    .trim()
-    .toLowerCase();
-  const runtimeEnv = String(process.env.RUNTIME_ENV || process.env.APP_ENV || "")
-    .trim()
-    .toLowerCase();
-  return (
-    nodeEnv === "production" ||
-    runtimeEnv === "production" ||
-    runtimeEnv === "staging"
-  );
+  return protectedEnv;
 }
 
 function detectDominantLanguageTag(text: string): "en" | "pt" | "es" | "unknown" {
@@ -1709,7 +1746,8 @@ export class CentralizedChatRuntimeDelegate {
     metricName:
       | "governance_gate_fail_total"
       | "language_lock_violation_total"
-      | "source_policy_violation_total";
+      | "source_policy_violation_total"
+      | "governance_fail_soft_mode_total";
     reasonCode?: string | null;
     gateName?: string | null;
     failureMode?: RuntimeFailureMode | null;
@@ -1793,6 +1831,16 @@ export class CentralizedChatRuntimeDelegate {
     const totalTokens =
       (inputTokensAndOutput.inputTokens ?? 0) +
       (inputTokensAndOutput.outputTokens ?? 0);
+    const telemetryEnvelope = asObject(params.telemetry);
+    const usageEnvelope = asObject(telemetryEnvelope.usage);
+    const estimatedCostUsdRaw =
+      telemetryEnvelope.costUsd ??
+      telemetryEnvelope.estimatedCostUsd ??
+      usageEnvelope.costUsd ??
+      usageEnvelope.estimatedCostUsd;
+    const estimatedCostUsd = Number.isFinite(Number(estimatedCostUsdRaw))
+      ? Number(estimatedCostUsdRaw)
+      : null;
     const evidenceAction =
       params.evidenceGateDecision?.suggestedAction ?? "answer";
     const evidenceStrength = this.mapEvidenceStrengthToScore(
@@ -1830,6 +1878,22 @@ export class CentralizedChatRuntimeDelegate {
         : retrievalAdequate
           ? "documents"
           : "general";
+    const routingDecision = asObject(meta.routingDecision);
+    const routingTelemetry = {
+      operatorChoice:
+        String(
+          routingDecision.operatorChoice || routingDecision.operator || resolvedOperator,
+        ).trim() || resolvedOperator,
+      scopeDecision: String(routingDecision.scopeDecision || "").trim() || "unknown",
+      disambiguation:
+        String(routingDecision.disambiguation || "").trim() || "none",
+      requiresClarification:
+        routingDecision.requiresClarification === true ||
+        meta.requiresClarification === true,
+      clarifyReason:
+        String(routingDecision.clarifyReason || meta.clarifyReason || "").trim() ||
+        null,
+    };
     const derivedTruncation = resolveTruncationState({
       telemetry: params.telemetry,
       finalText: params.assistantText,
@@ -1985,6 +2049,12 @@ export class CentralizedChatRuntimeDelegate {
               : retrievalAdequate
                 ? "answer_with_sources"
                 : "answer",
+        operatorChoice: routingTelemetry.operatorChoice,
+        scopeDecision: routingTelemetry.scopeDecision,
+        disambiguation: routingTelemetry.disambiguation,
+        routingReason: routingTelemetry.requiresClarification
+          ? `clarification_required:${routingTelemetry.clarifyReason || "unspecified"}`
+          : `operator_choice:${routingTelemetry.operatorChoice}`,
         chunksReturned: params.retrievalPack?.evidence.length ?? 0,
         distinctDocs: distinctDocIds.length,
         documentIds: distinctDocIds,
@@ -2015,6 +2085,7 @@ export class CentralizedChatRuntimeDelegate {
         inputTokens: inputTokensAndOutput.inputTokens,
         outputTokens: inputTokensAndOutput.outputTokens,
         totalTokens,
+        estimatedCostUsd,
         pipelineSignature: params.stream
           ? "chat_runtime_delegate:stream"
           : "chat_runtime_delegate:chat",
@@ -2046,6 +2117,7 @@ export class CentralizedChatRuntimeDelegate {
           requestId:
             typeof meta.requestId === "string" ? String(meta.requestId) : null,
           evidenceGateAction: evidenceAction,
+          routingTelemetry,
           retrievalStats: params.retrievalPack?.stats || null,
           retrievalRuleSummary:
             params.retrievalPack?.telemetry?.summary || null,
@@ -4100,6 +4172,19 @@ export class CentralizedChatRuntimeDelegate {
     const enforceQualityGates = shouldForceStrictGovernanceFailClosed()
       ? true
       : isRuntimeFlagEnabled("QUALITY_GATES_ENFORCING", true);
+    if (!enforceQualityGates) {
+      this.emitGovernanceMetric({
+        traceId,
+        req: params.req,
+        answerMode: params.answerMode,
+        metricName: "governance_fail_soft_mode_total",
+        reasonCode: "quality_gates_enforcing_disabled",
+        gateName: "quality_gates_enforcing",
+        failureMode: "fail_soft",
+        enforced: false,
+        blocked: false,
+      });
+    }
     const qualityGateSeverityByName = resolveQualityGateSeverityMap();
     try {
       const qualityRunner = new QualityGateRunnerService();

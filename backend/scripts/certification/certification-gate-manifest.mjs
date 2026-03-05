@@ -30,9 +30,12 @@ const BASE_REQUIRED_GATE_IDS = [
   "composition-analytical-structure",
   "builder-payload-budget",
   "gateway-json-routing",
+  "collision-matrix-exhaustive",
+  "telemetry-completeness",
   "turn-debug-packet",
   "security-auth",
   "observability-integrity",
+  "doc-identity-behavioral",
   "retrieval-behavioral",
 ];
 
@@ -40,6 +43,12 @@ const RETRIEVAL_SIGNOFF_REQUIRED_GATE_IDS = [
   "query-latency",
   "retrieval-golden-eval",
   "retrieval-realistic-eval",
+  "retrieval-openworld-eval",
+  "frontend-retrieval-evidence",
+  "indexing-live-integration",
+];
+
+const CI_RELEASE_REQUIRED_GATE_IDS = [
   "frontend-retrieval-evidence",
   "indexing-live-integration",
 ];
@@ -53,6 +62,10 @@ function normalizeBoolean(value) {
 
 function unique(items) {
   return Array.from(new Set(items.filter(Boolean)));
+}
+
+function difference(left, rightSet) {
+  return left.filter((item) => !rightSet.has(item));
 }
 
 export function resolveCertificationGateSet({
@@ -81,7 +94,11 @@ export function resolveCertificationGateSet({
   }
 
   const requiredGateIds = [...BASE_REQUIRED_GATE_IDS];
-  const optionalGateIds = ["query-latency", "indexing-live-integration"];
+  const optionalCandidates = [
+    "query-latency",
+    "frontend-retrieval-evidence",
+    "indexing-live-integration",
+  ];
   const skippedOptionalGates = [];
 
   const queryLatencyPolicy = resolveQueryLatencyPolicy({
@@ -101,8 +118,26 @@ export function resolveCertificationGateSet({
     });
   }
 
+  const frontendEvidenceOverride = normalizeBoolean(
+    env.CERT_REQUIRE_FRONTEND_RETRIEVAL_EVIDENCE,
+  );
+  const requireFrontendEvidence = profile === "retrieval_signoff" ||
+    profile === "ci" ||
+    profile === "release" ||
+    frontendEvidenceOverride === true;
+  if (requireFrontendEvidence) {
+    requiredGateIds.push("frontend-retrieval-evidence");
+  } else {
+    skippedOptionalGates.push({
+      gateId: "frontend-retrieval-evidence",
+      criticality: "optional",
+      reason: "profile_or_env_not_frontend_retrieval_evidence",
+    });
+  }
+
   const liveIndexingOverride = normalizeBoolean(env.CERT_REQUIRE_LIVE_INDEXING);
   const requireLiveIndexing = profile === "retrieval_signoff" ||
+    profile === "ci" ||
     profile === "release" ||
     liveIndexingOverride === true;
   if (requireLiveIndexing) {
@@ -115,13 +150,20 @@ export function resolveCertificationGateSet({
     });
   }
 
+  if (profile === "ci" || profile === "release") {
+    requiredGateIds.push(...CI_RELEASE_REQUIRED_GATE_IDS);
+  }
+
   if (profile === "retrieval_signoff") {
     requiredGateIds.push(...RETRIEVAL_SIGNOFF_REQUIRED_GATE_IDS);
   }
 
+  const requiredSet = new Set(unique(requiredGateIds));
+  const optionalGateIds = difference(optionalCandidates, requiredSet);
+
   return {
     scope: "cert",
-    requiredGateIds: unique(requiredGateIds),
+    requiredGateIds: Array.from(requiredSet),
     optionalGateIds,
     skippedOptionalGates,
     queryLatencyPolicy,

@@ -80,7 +80,9 @@ test("cert scope for ci requires latency and retrieval evidence gates", () => {
   assert.equal(out.requiredGateIds.includes("query-latency"), true);
   assert.equal(out.requiredGateIds.includes("frontend-retrieval-evidence"), true);
   assert.equal(out.requiredGateIds.includes("indexing-live-integration"), true);
-  assert.equal(out.optionalGateIds.includes("query-latency"), true);
+  assert.equal(out.optionalGateIds.includes("query-latency"), false);
+  assert.equal(out.optionalGateIds.includes("frontend-retrieval-evidence"), false);
+  assert.equal(out.optionalGateIds.includes("indexing-live-integration"), false);
 });
 
 test("cert scope for local keeps retrieval evidence gates optional", () => {
@@ -95,6 +97,9 @@ test("cert scope for local keeps retrieval evidence gates optional", () => {
   assert.equal(out.requiredGateIds.includes("frontend-retrieval-evidence"), false);
   assert.equal(out.requiredGateIds.includes("indexing-live-integration"), false);
   assert.equal(out.requiredGateIds.includes("doc-identity-behavioral"), true);
+  assert.equal(out.optionalGateIds.includes("query-latency"), true);
+  assert.equal(out.optionalGateIds.includes("frontend-retrieval-evidence"), true);
+  assert.equal(out.optionalGateIds.includes("indexing-live-integration"), true);
 });
 
 test("retrieval_signoff requires query-latency and retrieval evidence gates", () => {
@@ -111,6 +116,28 @@ test("retrieval_signoff requires query-latency and retrieval evidence gates", ()
   assert.equal(out.requiredGateIds.includes("retrieval-openworld-eval"), true);
   assert.equal(out.requiredGateIds.includes("frontend-retrieval-evidence"), true);
   assert.equal(out.requiredGateIds.includes("indexing-live-integration"), true);
+  assert.equal(out.optionalGateIds.includes("query-latency"), false);
+  assert.equal(out.optionalGateIds.includes("frontend-retrieval-evidence"), false);
+  assert.equal(out.optionalGateIds.includes("indexing-live-integration"), false);
+});
+
+test("required and optional gates are always disjoint", () => {
+  for (const profile of ["local", "ci", "release", "retrieval_signoff"]) {
+    const out = resolveCertificationGateSet({
+      scope: "cert",
+      strict: true,
+      profile,
+      hasQueryLatencyInput: true,
+      env: {},
+    });
+    for (const gateId of out.requiredGateIds) {
+      assert.equal(
+        out.optionalGateIds.includes(gateId),
+        false,
+        `gate '${gateId}' cannot be both required and optional for profile='${profile}'`,
+      );
+    }
+  }
 });
 
 test("every required strict gate has a runnable generator and referenced test paths exist", () => {

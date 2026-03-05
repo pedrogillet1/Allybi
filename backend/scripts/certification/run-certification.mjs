@@ -32,6 +32,7 @@ const certRoot = path.resolve(ROOT, "reports/cert");
 const gatesDir = path.join(certRoot, "gates");
 const summaryJsonPath = path.join(certRoot, "certification-summary.json");
 const summaryMdPath = path.join(certRoot, "certification-summary.md");
+const activeGateManifestPath = path.join(certRoot, "active-gates-manifest.json");
 const localCertRunPath = path.join(certRoot, "local-cert-run.json");
 const maxAgeHours = Number(process.env.CERT_GATE_MAX_AGE_HOURS || 24);
 const maxAgeMs = Number.isFinite(maxAgeHours) && maxAgeHours > 0
@@ -192,6 +193,14 @@ function getGate(gateId) {
   return { ...readJson(gatePath), gateId, missing: false, gatePath };
 }
 
+function safeReadJson(filePath) {
+  try {
+    return readJson(filePath);
+  } catch {
+    return null;
+  }
+}
+
 function analyzeFreshness(gate, commitHash) {
   const reasons = [];
   const generatedAt = String(gate?.generatedAt || "").trim();
@@ -316,6 +325,96 @@ function ensureGate(gateId, commitHash, regenerated) {
   return { gate, freshness: finalFreshness };
 }
 
+function buildActiveGateManifest({
+  generatedAt,
+  commitHash,
+  commitHashSource,
+  profile,
+  strict,
+  requiredGateIds,
+  optionalGateIds,
+  gates,
+}) {
+  const requiredSet = new Set(requiredGateIds);
+  const optionalSet = new Set(optionalGateIds);
+  const artifactEntries = fs.existsSync(gatesDir)
+    ? fs
+      .readdirSync(gatesDir, { withFileTypes: true })
+      .filter((entry) => entry.isFile() && entry.name.endsWith(".json"))
+      .map((entry) => {
+        const gateId = entry.name.replace(/\.json$/i, "");
+        const filePath = path.join(gatesDir, entry.name);
+        const parsed = safeReadJson(filePath);
+        const freshness = parsed
+          ? analyzeFreshness(parsed, commitHash)
+          : { stale: true, reasons: ["invalid_json"] };
+        return {
+          gateId,
+          filePath,
+          parseOk: Boolean(parsed),
+          freshness,
+          category: requiredSet.has(gateId)
+            ? "required"
+            : optionalSet.has(gateId)
+              ? "optional"
+              : "extra",
+          passed: parsed?.passed === true,
+          generatedAt: String(parsed?.generatedAt || "").trim() || null,
+          commitHash: String(parsed?.meta?.commitHash || "").trim() || null,
+        };
+      })
+    : [];
+
+  const byGateId = new Map(artifactEntries.map((entry) => [entry.gateId, entry]));
+  const requiredArtifacts = requiredGateIds.map((gateId) => {
+    const entry = byGateId.get(gateId);
+    if (entry) return entry;
+    return {
+      gateId,
+      filePath: path.join(gatesDir, `${gateId}.json`),
+      parseOk: false,
+      freshness: { stale: true, reasons: ["missing_artifact"] },
+      category: "required",
+      passed: false,
+      generatedAt: null,
+      commitHash: null,
+    };
+  });
+  const extraArtifacts = artifactEntries.filter((entry) => entry.category === "extra");
+  const staleExtraArtifacts = extraArtifacts.filter((entry) => entry.freshness?.stale);
+
+  const requiredSummary = Array.isArray(gates)
+    ? gates.map((gate) => ({
+      gateId: String(gate?.gateId || ""),
+      passed: gate?.passed === true,
+      freshness: gate?.freshness || null,
+    }))
+    : [];
+
+  return {
+    generatedAt,
+    commitHash,
+    commitHashSource,
+    profile,
+    strict,
+    requiredGateIds: [...requiredGateIds],
+    optionalGateIds: [...optionalGateIds],
+    requiredGateSummary: requiredSummary,
+    requiredGateArtifacts: requiredArtifacts,
+    extraGateArtifacts: extraArtifacts,
+    stats: {
+      totalArtifacts: artifactEntries.length,
+      requiredArtifacts: requiredArtifacts.length,
+      optionalArtifacts: artifactEntries.filter((entry) => entry.category === "optional").length,
+      extraArtifacts: extraArtifacts.length,
+      staleExtraArtifacts: staleExtraArtifacts.length,
+      missingRequiredArtifacts: requiredArtifacts.filter((entry) =>
+        entry.freshness?.reasons?.includes("missing_artifact")
+      ).length,
+    },
+  };
+}
+
 function toMarkdown(summary) {
   const lines = [];
   lines.push("# Certification Summary");
@@ -333,12 +432,22 @@ function toMarkdown(summary) {
   lines.push(`- Lineage profile: ${summary.lineage?.profile || "unknown"}`);
   lines.push(`- Passed: ${summary.passed ? "yes" : "no"}`);
   lines.push(`- Passed gates: ${summary.passedGates}/${summary.totalGates}`);
+  if (summary.artifactInventory) {
+    lines.push(
+      `- Active gate artifact inventory: total=${summary.artifactInventory.totalGateArtifacts}, extra=${summary.artifactInventory.extraGateArtifacts}, staleExtra=${summary.artifactInventory.staleExtraGateArtifacts}`,
+    );
+  }
   if (summary.localCertRun?.present) {
     const localRunAgeHours = typeof summary.localCertRun.ageMs === "number"
       ? (summary.localCertRun.ageMs / (60 * 60 * 1000)).toFixed(2)
       : "n/a";
     lines.push(
       `- Local cert run: ${summary.localCertRun.success ? "pass" : "fail"} (${summary.localCertRun.recent ? "recent" : "stale"}, ageHours=${localRunAgeHours})`,
+    );
+  }
+  if (summary.localHealth) {
+    lines.push(
+      `- Local cert health: ${summary.localHealth.status} (blocking=${summary.localHealth.blocking ? "yes" : "no"})`,
     );
   }
   if (Array.isArray(summary.skippedOptionalGates)) {
@@ -463,7 +572,7 @@ function main() {
     String(process.env.CERT_ALLOW_FAILED_LOCAL_RUN || "").trim().toLowerCase() ===
       "true" ||
     process.env.CERT_ALLOW_FAILED_LOCAL_RUN === "1" ||
-    !isCiRuntime(process.env);
+    (!isCiRuntime(process.env) && profile !== "local_hard");
   const localRunPolicy = resolveLocalCertRunPolicy({
     strict,
     profile,
@@ -471,6 +580,19 @@ function main() {
   });
   const enforceLocalRunHealth = localRunPolicy.enforce;
   const localCertRun = analyzeLocalCertRun();
+  const hasRecentLocalHealthSignal =
+    localCertRun.present === true && localCertRun.recent === true;
+  const localRunFailed =
+    hasRecentLocalHealthSignal && localCertRun.success !== true;
+  const localHealthBlocking =
+    strict && enforceLocalRunHealth && !allowFailedLocalRun;
+  const localHealthStatus = !hasRecentLocalHealthSignal
+    ? "unknown"
+    : localRunFailed && localHealthBlocking
+      ? "fail_blocking"
+      : localRunFailed
+        ? "fail_non_blocking"
+        : "pass";
   if (
     strict &&
     enforceLocalRunHealth &&
@@ -482,6 +604,17 @@ function main() {
       failures.push("RECENT_LOCAL_CERT_RUN_FAILED");
     }
   }
+
+  const activeGateManifest = buildActiveGateManifest({
+    generatedAt,
+    commitHash,
+    commitHashSource: commitMetadata.source,
+    profile,
+    strict,
+    requiredGateIds,
+    optionalGateIds,
+    gates,
+  });
 
   const summary = {
     generatedAt,
@@ -504,7 +637,21 @@ function main() {
     },
     optionalGates: optionalGateIds,
     skippedOptionalGates,
+    artifactInventory: {
+      manifestPath: path.relative(ROOT, activeGateManifestPath).replace(/\\/g, "/"),
+      totalGateArtifacts: activeGateManifest.stats.totalArtifacts,
+      extraGateArtifacts: activeGateManifest.stats.extraArtifacts,
+      staleExtraGateArtifacts: activeGateManifest.stats.staleExtraArtifacts,
+      missingRequiredArtifacts: activeGateManifest.stats.missingRequiredArtifacts,
+    },
     localCertRun,
+    localHealth: {
+      status: localHealthStatus,
+      hasRecentSignal: hasRecentLocalHealthSignal,
+      blocking: localHealthBlocking,
+      failed: localRunFailed,
+      policySource: localRunPolicy.source,
+    },
     passed: failures.length === 0,
     totalGates: requiredGateIds.length,
     passedGates: gates.filter((gate) => gate.passed).length,
@@ -515,16 +662,24 @@ function main() {
 
   const tmpJsonPath = `${summaryJsonPath}.tmp`;
   const tmpMdPath = `${summaryMdPath}.tmp`;
+  const tmpManifestPath = `${activeGateManifestPath}.tmp`;
   fs.writeFileSync(tmpJsonPath, `${JSON.stringify(summary, null, 2)}\n`, "utf8");
   fs.writeFileSync(tmpMdPath, `${toMarkdown(summary)}\n`, "utf8");
+  fs.writeFileSync(
+    tmpManifestPath,
+    `${JSON.stringify(activeGateManifest, null, 2)}\n`,
+    "utf8",
+  );
   fs.renameSync(tmpJsonPath, summaryJsonPath);
   fs.renameSync(tmpMdPath, summaryMdPath);
+  fs.renameSync(tmpManifestPath, activeGateManifestPath);
   const evidenceMetadata = verifyOnly
     ? null
     : packageCertificationEvidence(ROOT);
 
   console.log(`[certification] summary written: ${summaryJsonPath}`);
   console.log(`[certification] markdown written: ${summaryMdPath}`);
+  console.log(`[certification] active gate manifest: ${activeGateManifestPath}`);
   if (evidenceMetadata?.bundleDir) {
     console.log(
       `[certification] evidence bundle: ${evidenceMetadata.bundleDir}`,
