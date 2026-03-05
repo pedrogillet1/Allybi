@@ -6,6 +6,9 @@ import { describe, expect, jest, test, beforeEach } from "@jest/globals";
 
 const mockUploadFile = jest.fn();
 const mockDownloadFile = jest.fn();
+const mockDocumentFindFirst = jest.fn();
+const mockDocumentFindMany = jest.fn();
+const mockDocumentFindUnique = jest.fn();
 jest.mock("../../config/storage", () => ({
   uploadFile: (...args: any[]) => mockUploadFile(...args),
   downloadFile: (...args: any[]) => mockDownloadFile(...args),
@@ -36,8 +39,9 @@ jest.mock("../../config/database", () => ({
   __esModule: true,
   default: {
     document: {
-      findFirst: jest.fn().mockResolvedValue(null),
-      findMany: jest.fn().mockResolvedValue([]),
+      findFirst: (...args: any[]) => mockDocumentFindFirst(...args),
+      findMany: (...args: any[]) => mockDocumentFindMany(...args),
+      findUnique: (...args: any[]) => mockDocumentFindUnique(...args),
       update: jest.fn().mockResolvedValue({}),
     },
     $transaction: jest.fn(),
@@ -53,8 +57,35 @@ import { DocumentRevisionStoreService } from "./documentRevisionStore.service";
 describe("DocumentRevisionStoreService overwrite safety", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    process.env.EDITING_SAVE_MODE = "overwrite";
+    process.env.KODA_EDITING_SAVE_MODE = "overwrite";
     process.env.KEEP_UNDO_HISTORY = "true";
+    mockDocumentFindFirst.mockResolvedValue({
+      id: "doc-123",
+      encryptedFilename: "storage/doc-123.pdf",
+      filename: "doc.pdf",
+      mimeType: "application/pdf",
+      parentVersionId: null,
+    });
+    mockDocumentFindUnique.mockResolvedValue({
+      id: "doc-123",
+      parentVersionId: null,
+    });
+    mockDocumentFindMany.mockResolvedValue([
+      {
+        id: "doc-123",
+        encryptedFilename: "storage/doc-123.pdf",
+        filename: "doc.pdf",
+        mimeType: "application/pdf",
+        createdAt: new Date("2026-01-01T00:00:00.000Z"),
+      },
+      {
+        id: "rev-1",
+        encryptedFilename: "storage/rev-1.pdf",
+        filename: "doc.pdf",
+        mimeType: "application/pdf",
+        createdAt: new Date("2026-01-02T00:00:00.000Z"),
+      },
+    ]);
   });
 
   test("uploadFile is NOT called when backup createRevision throws", async () => {

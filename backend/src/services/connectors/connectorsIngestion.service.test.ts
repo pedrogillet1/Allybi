@@ -140,6 +140,44 @@ describe("ConnectorsIngestionService", () => {
     expect(mockMarkIndexed).not.toHaveBeenCalled();
   });
 
+  test("never persists connector plaintext body fields at rest", async () => {
+    const txDocumentCreate = jest.fn().mockResolvedValue({});
+    const txDocumentMetadataCreate = jest.fn().mockResolvedValue({});
+    mockTransaction.mockImplementation(async (fn: any) =>
+      fn({
+        document: { create: txDocumentCreate },
+        documentMetadata: { create: txDocumentMetadataCreate },
+      }),
+    );
+    mockVaultIsStrict.mockReturnValue(false);
+    mockVaultIsEnabled.mockReturnValue(false);
+
+    const service = new ConnectorsIngestionService();
+    const out = await service.ingestDocuments(
+      { userId: "user-1" },
+      [makeItem()],
+    );
+
+    expect(out).toHaveLength(1);
+    expect(out[0]?.status).toBe("created");
+    expect(txDocumentCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          rawText: null,
+          previewText: null,
+          renderableContent: null,
+        }),
+      }),
+    );
+    expect(txDocumentMetadataCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          extractedText: null,
+        }),
+      }),
+    );
+  });
+
   test("falls back to inline indexing with state-manager transitions when queue is unavailable", async () => {
     mockAddDocumentJob.mockRejectedValue(new Error("queue down"));
 

@@ -71,14 +71,7 @@ const SAFE_STRUCTURAL_METADATA_KEYS = new Set<string>([
   "tableId",
   "rowIndex",
   "columnIndex",
-  "rowLabel",
-  "colHeader",
-  "headerPath",
   "cellRef",
-  "valueRaw",
-  "unitRaw",
-  "unitNormalized",
-  "numericValue",
   "scaleRaw",
   "scaleMultiplier",
   "startChar",
@@ -235,11 +228,44 @@ function hasRequiredChunkMetadata(chunk: {
     typeof metadata.sourceType === "string" &&
     metadata.sourceType.trim().length > 0;
   if (!hasBase) return false;
+  const sourceType = String(metadata.sourceType || "")
+    .trim()
+    .toLowerCase();
+  const chunkType = String(metadata.chunkType || "")
+    .trim()
+    .toLowerCase();
+  const pageLike =
+    Number.isFinite(chunk.pageNumber) || Number.isFinite(metadata.pageNumber);
+
+  if (sourceType === "pdf") {
+    return Boolean(metadata.sectionId) && pageLike;
+  }
+
+  if (sourceType === "docx" || sourceType === "pptx") {
+    return Boolean(metadata.sectionId);
+  }
+
+  if (sourceType === "xlsx") {
+    const hasTableScope = Boolean(
+      metadata.tableId || metadata.sheetName || metadata.sectionId,
+    );
+    if (!hasTableScope) return false;
+    if (chunkType === "cell_fact") {
+      return Boolean(
+        metadata.cellRef ||
+          Number.isFinite(metadata.rowIndex) ||
+          Number.isFinite(metadata.columnIndex) ||
+          (metadata.rowLabel && metadata.colHeader),
+      );
+    }
+    return true;
+  }
+
   return Boolean(
     metadata.sectionId ||
       metadata.tableId ||
       metadata.sheetName ||
-      Number.isFinite(chunk.pageNumber),
+      pageLike,
   );
 }
 
@@ -590,13 +616,20 @@ export async function storeDocumentEmbeddings(
               : null,
           rowLabel: metadata.rowLabel || null,
           colHeader: metadata.colHeader || null,
-          valueRaw: metadata.valueRaw || null,
-          unitRaw: metadata.unitRaw || null,
-          unitNormalized: metadata.unitNormalized || null,
+          valueRaw:
+            encryptionMode === "encrypted_only" ? null : metadata.valueRaw || null,
+          unitRaw:
+            encryptionMode === "encrypted_only" ? null : metadata.unitRaw || null,
+          unitNormalized:
+            encryptionMode === "encrypted_only"
+              ? null
+              : metadata.unitNormalized || null,
           numericValue:
-            typeof metadata.numericValue === "number"
-              ? metadata.numericValue
-              : null,
+            encryptionMode === "encrypted_only"
+              ? null
+              : typeof metadata.numericValue === "number"
+                ? metadata.numericValue
+                : null,
           scaleRaw: metadata.scaleRaw || null,
           scaleMultiplier:
             typeof metadata.scaleMultiplier === "number"

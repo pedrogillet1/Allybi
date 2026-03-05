@@ -616,7 +616,7 @@ router.get(
         prisma.document.count({ where: { createdAt: { gte: monthAgo } } }),
         prisma.user.aggregate({ _sum: { storageUsedBytes: true } }),
         prisma.document.aggregate({ _avg: { fileSize: true } }),
-        prisma.documentChunk.count(),
+        prisma.documentChunk.count({ where: { isActive: true } as any }),
         prisma.document.aggregate({ _avg: { chunksCount: true } }),
         prisma.$queryRaw<{ date: Date; count: bigint }[]>`
         SELECT DATE(d."createdAt") as date, COUNT(*)::bigint as count

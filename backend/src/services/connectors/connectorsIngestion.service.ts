@@ -4,6 +4,7 @@ import prisma from "../../config/database";
 import { uploadFile } from "../../config/storage";
 import { splitTextIntoChunksWithOffsets } from "../ingestion/chunking.service";
 import vectorEmbeddingRuntimeService from "../retrieval/vectorEmbedding.runtime.service";
+import type { InputChunk } from "../retrieval/vectorEmbedding.service";
 import type { ConnectorProvider } from "./connectorsRegistry";
 import { documentContentVault } from "../documents/documentContentVault.service";
 import {
@@ -147,11 +148,10 @@ export class ConnectorsIngestionService {
               indexingState: "pending",
               indexingUpdatedAt: new Date(),
               displayTitle: normalized.title,
-              rawText: encryptDocumentText ? null : textContent,
-              previewText: encryptDocumentText
-                ? null
-                : textContent.slice(0, 4000),
-              renderableContent: encryptDocumentText ? null : textContent,
+              // Never persist connector body text in plaintext columns.
+              rawText: null,
+              previewText: null,
+              renderableContent: null,
               language: "en",
             },
           });
@@ -159,7 +159,8 @@ export class ConnectorsIngestionService {
           await tx.documentMetadata.create({
             data: {
               documentId,
-              extractedText: encryptDocumentText ? null : textContent,
+              // Connector extracted text remains encrypted-only / non-persistent.
+              extractedText: null,
               wordCount: wordCount(textContent),
               characterCount: textContent.length,
               summary: normalized.title,
@@ -293,7 +294,7 @@ export class ConnectorsIngestionService {
     }
 
     const segments = splitTextIntoChunksWithOffsets(textContent, 0);
-    const chunks = segments.map((segment, idx) => ({
+    const chunks: InputChunk[] = segments.map((segment, idx): InputChunk => ({
       chunkIndex: idx,
       content: segment.content,
       metadata: {

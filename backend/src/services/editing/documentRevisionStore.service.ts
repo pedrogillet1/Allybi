@@ -1805,7 +1805,10 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
         op === "PY_WRITEBACK";
 
       await prisma.$transaction(async (tx) => {
-        await tx.documentChunk.deleteMany({ where: { documentId: docId } });
+        await tx.documentChunk.updateMany({
+          where: { documentId: docId, isActive: true } as any,
+          data: { isActive: false } as any,
+        });
 
         if (isSlidesEdit || isSheetsEdit) {
           const base = (meta as any).pptxMetadata ?? null;
@@ -2071,7 +2074,10 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
       op.includes("WRITEBACK");
 
     await prisma.$transaction(async (tx) => {
-      await tx.documentChunk.deleteMany({ where: { documentId: docId } });
+      await tx.documentChunk.updateMany({
+        where: { documentId: docId, isActive: true } as any,
+        data: { isActive: false } as any,
+      });
 
       if (isSlidesEdit || isSheetsEdit) {
         const existingMeta = await tx.documentMetadata.findUnique({
@@ -2234,7 +2240,10 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
       );
 
       await prisma.$transaction([
-        prisma.documentChunk.deleteMany({ where: { documentId: docId } }),
+        (prisma.documentChunk as any).updateMany({
+          where: { documentId: docId, isActive: true },
+          data: { isActive: false },
+        }),
         prisma.documentMetadata.deleteMany({ where: { documentId: docId } }),
         prisma.documentProcessingMetrics.deleteMany({
           where: { documentId: docId },

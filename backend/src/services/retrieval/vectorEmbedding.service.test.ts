@@ -706,6 +706,30 @@ describe("vectorEmbedding.service", () => {
     ).rejects.toThrow(/Chunk metadata invariant failed/i);
   });
 
+  test("fails when xlsx cell_fact chunk metadata misses cell-level locator", async () => {
+    process.env.INDEXING_ENFORCE_CHUNK_METADATA = "true";
+    const chunks = [
+      {
+        chunkIndex: 0,
+        content: "Revenue Jan = 120",
+        metadata: {
+          chunkType: "cell_fact",
+          sourceType: "xlsx",
+          tableId: "sheet:summary",
+          sheetName: "Summary",
+        },
+      },
+    ];
+
+    await expect(
+      storeDocumentEmbeddings(DOC_ID, chunks as any, {
+        maxRetries: 1,
+        strictVerify: false,
+        encryptionMode: "plaintext",
+      }),
+    ).rejects.toThrow(/Chunk metadata invariant failed/i);
+  });
+
   /* ================================================================ */
   /*  Pinecone receives empty content + contentHash in encrypted mode  */
   /* ================================================================ */
