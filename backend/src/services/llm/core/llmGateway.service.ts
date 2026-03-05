@@ -792,9 +792,7 @@ export class LlmGatewayService {
           attempts,
           routed,
           executed,
-          fallbackUsed:
-            executed.provider !== routed.provider ||
-            executed.model !== routed.model,
+          fallbackUsed: idx > 0,
         };
       } catch (err) {
         lastError = err;
@@ -926,9 +924,7 @@ export class LlmGatewayService {
           attempts,
           routed,
           executed,
-          fallbackUsed:
-            executed.provider !== routed.provider ||
-            executed.model !== routed.model,
+          fallbackUsed: idx > 0,
         };
       } catch (err) {
         lastError = err;

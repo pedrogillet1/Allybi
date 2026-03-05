@@ -402,6 +402,17 @@ function main() {
     failures.push("P0-10_BANKS_INTEGRITY_FAILED");
   }
 
+  const modelsStrictPassed = runScript("audit:models:strict", commitHash);
+  checks.push({
+    gateId: "models-strict",
+    passed: modelsStrictPassed,
+    metrics: {},
+    freshness: { stale: false, reasons: [] },
+  });
+  if (!modelsStrictPassed) {
+    failures.push("P0-11_MODEL_GOVERNANCE_STRICT_FAILED");
+  }
+
   const summary = {
     generatedAt: new Date().toISOString(),
     strict,

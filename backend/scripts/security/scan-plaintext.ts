@@ -80,7 +80,6 @@ const SKIP_FILES = [
   // Non-database service files
   'geminiStreamAdapter.service.ts',
   'geminiToolAdapter.service.ts',
-  'anthropicStreamAdapter.service.ts',
   'promptConfig.service.ts',
   'localStreamAdapter.service.ts',
   // Navigation and display services (not DB writes)

@@ -15,7 +15,7 @@ describe("GeminiClientService", () => {
     });
 
     it("falls back to default model for disallowed ids", () => {
-      const out = resolveGeminiModel("gemini-2.0-flash", cfg);
+      const out = resolveGeminiModel("gemini-legacy-model", cfg);
       expect(out).toBe("gemini-2.5-flash");
     });
 

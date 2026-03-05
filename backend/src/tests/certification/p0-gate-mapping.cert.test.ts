@@ -35,4 +35,14 @@ describe("Certification: P0 runtime-wiring gate mapping", () => {
     expect(script).toContain("docint-bank-integrity.test.ts");
     expect(script).toContain("runtime-wiring.cert.test.ts");
   });
+
+  test("p0-gates enforces strict model governance audit", () => {
+    const backendRoot = resolveBackendRoot();
+    const gateScript = fs.readFileSync(
+      path.join(backendRoot, "scripts", "audit", "p0-gates.mjs"),
+      "utf8",
+    );
+    expect(gateScript).toMatch(/runScript\("audit:models:strict"/);
+    expect(gateScript).toMatch(/P0-11_MODEL_GOVERNANCE_STRICT_FAILED/);
+  });
 });

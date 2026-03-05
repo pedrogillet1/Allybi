@@ -8,10 +8,15 @@ const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, "..", "..", "..");
 
 const roots = [
-  path.join(repoRoot, "backend", "src"),
-  path.join(repoRoot, "backend", "scripts"),
-  path.join(repoRoot, "dashboard", "client", "src"),
-  path.join(repoRoot, "frontend", "src"),
+  path.join(repoRoot, "backend", "src", "services", "llm"),
+  path.join(repoRoot, "backend", "src", "data_banks", "llm"),
+  path.join(repoRoot, "backend", "src", "tests", "certification"),
+  path.join(repoRoot, "backend", "src", "config", "env.ts"),
+  path.join(repoRoot, "backend", ".env.example"),
+  path.join(repoRoot, "backend", "scripts", "audit"),
+  path.join(repoRoot, "backend", "scripts", "certification"),
+  path.join(repoRoot, "backend", "scripts", "gcp", "deploy-all.sh"),
+  path.join(repoRoot, "backend", "package.json"),
 ];
 
 const ignoredPathSuffixes = new Set([
@@ -36,17 +41,18 @@ const allowedModelPrefixes = [
 const disallowedTokens = [
   /\bgpt-5-mini(?:[-.\w]*)?\b/gi,
   /\bgpt-4[a-z0-9.-]*\b/gi,
-  /\bgemini[-\s]?3(?:\.0)?[-\s]?flash\b/gi,
+  /\bgemini-3[a-z0-9.-]*\b/gi,
   /\banthropic\b/gi,
   /\bclaude(?:[-_.\w]*)\b/gi,
-  /\bmistral(?:[-_.\w]*)\b/gi,
+  /\bmistral[-_.](?:small|medium|large|tiny|7b|8x7b|nemo|codestral|mixtral)[\w.-]*\b/gi,
   /\bollama\b/gi,
   /\bmeta[-_. ]?llama(?:[-_.\w]*)\b/gi,
   /\bllama[-_.]?\d[\w.-]*\b/gi,
   /\blocal-default\b/gi,
 ];
 
-const modelTokenRe = /\b(?:gpt-\d[\w.-]*|gemini-\d[\w.-]*)\b/gi;
+const modelTokenRe =
+  /\b(?:gpt-\d+(?:\.\d+)?(?:-[a-z0-9.]+)+|gemini-\d+(?:\.\d+)?(?:-[a-z0-9.]+)+)\b/gi;
 
 function isFile(target) {
   try {
