@@ -63,6 +63,9 @@ import { storeDocumentEmbeddings } from "../../services/retrieval/vectorEmbeddin
 
 describe("vectorEmbedding rollback", () => {
   beforeEach(() => {
+    process.env.INDEXING_ENCRYPTED_CHUNKS_ONLY = "false";
+    delete process.env.INDEXING_ENFORCE_CHUNK_METADATA;
+    delete process.env.INDEXING_ENFORCE_ENCRYPTED_ONLY;
     mockFindDocument.mockReset();
     mockFindDocumentMany.mockReset();
     mockUpdateDocument.mockReset();
@@ -117,7 +120,12 @@ describe("vectorEmbedding rollback", () => {
     await expect(
       storeDocumentEmbeddings(
         "doc-1",
-        [{ chunkIndex: 0, content: "quarterly revenue", embedding: [0.11] }],
+        [{
+          chunkIndex: 0,
+          content: "quarterly revenue",
+          embedding: [0.11],
+          metadata: { chunkType: "text", sourceType: "text", sectionId: "sec:rev" },
+        }],
         { maxRetries: 1, strictVerify: true, encryptionMode: "plaintext" },
       ),
     ).rejects.toThrow("Failed to store embeddings for document doc-1");
@@ -159,7 +167,12 @@ describe("vectorEmbedding rollback", () => {
 
     await storeDocumentEmbeddings(
       "doc-1",
-      [{ chunkIndex: 0, content: "quarterly revenue", embedding: [0.11] }],
+      [{
+        chunkIndex: 0,
+        content: "quarterly revenue",
+        embedding: [0.11],
+        metadata: { chunkType: "text", sourceType: "text", sectionId: "sec:rev" },
+      }],
       {
         maxRetries: 1,
         strictVerify: false,
@@ -173,5 +186,6 @@ describe("vectorEmbedding rollback", () => {
     expect(createdChunkRows).toHaveLength(1);
     expect(createdChunkRows[0].text).toBeNull();
     expect(createdChunkRows[0].textEncrypted).toBe('{"v":1}');
+    expect(createdChunkRows[0].metadataEncrypted).toBe('{"v":1}');
   });
 });

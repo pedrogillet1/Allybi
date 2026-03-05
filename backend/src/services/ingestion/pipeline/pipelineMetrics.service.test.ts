@@ -6,6 +6,7 @@ import {
   recordExtractionAttempt,
   recordTableDuplication,
   recordOcrUsage,
+  recordIndexingQualityMetrics,
   getIngestionPercentiles,
   getExtractorPercentiles,
   getMetricsSummary,
@@ -158,6 +159,51 @@ describe("pipelineMetrics", () => {
       expect(summary.emptyTextRate).toBeDefined();
       expect(summary.tableDuplicationCount).toBe(0);
       expect(summary.ocrFallbackUsage).toEqual({});
+      expect(summary.indexingMetadataCompleteness).toEqual({
+        complete: 0,
+        total: 0,
+        rate: 0,
+      });
+      expect(summary.tableScaleCapture).toEqual({
+        detected: 0,
+        captured: 0,
+        rate: 0,
+      });
+      expect(summary.indexEncryptionCompliance).toEqual({
+        compliant: 0,
+        total: 0,
+        rate: 0,
+      });
+    });
+  });
+
+  describe("recordIndexingQualityMetrics", () => {
+    it("aggregates metadata/scale/encryption quality rates", () => {
+      recordIndexingQualityMetrics({
+        metadataComplete: 9,
+        metadataTotal: 10,
+        scaleDetected: 5,
+        scaleCaptured: 4,
+        encryptionCompliant: 8,
+        encryptionTotal: 8,
+      });
+
+      const summary = getMetricsSummary();
+      expect(summary.indexingMetadataCompleteness).toEqual({
+        complete: 9,
+        total: 10,
+        rate: 0.9,
+      });
+      expect(summary.tableScaleCapture).toEqual({
+        detected: 5,
+        captured: 4,
+        rate: 0.8,
+      });
+      expect(summary.indexEncryptionCompliance).toEqual({
+        compliant: 8,
+        total: 8,
+        rate: 1,
+      });
     });
   });
 });

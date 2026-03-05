@@ -8,6 +8,7 @@ process.env.RETRIEVAL_LATEST_VERSION_ONLY = "true";
 
 const mockDocumentFindMany = jest.fn();
 const mockDocumentFindFirst = jest.fn();
+const mockDocumentLinkFindMany = jest.fn();
 const mockChunkFindMany = jest.fn();
 const mockDecryptChunksBatch = jest.fn();
 const mockSearchSimilarChunks = jest.fn();
@@ -20,6 +21,9 @@ jest.mock("../../../config/database", () => ({
     document: {
       findMany: (...args: any[]) => mockDocumentFindMany(...args),
       findFirst: (...args: any[]) => mockDocumentFindFirst(...args),
+    },
+    documentLink: {
+      findMany: (...args: any[]) => mockDocumentLinkFindMany(...args),
     },
     documentChunk: {
       findMany: (...args: any[]) => mockChunkFindMany(...args),
@@ -55,12 +59,16 @@ describe("PrismaRetrievalAdapterFactory encrypted chunk hydration", () => {
     process.env.RETRIEVAL_LEXICAL_FROM_EMBEDDINGS = "false";
     mockDocumentFindMany.mockReset();
     mockDocumentFindFirst.mockReset();
+    mockDocumentLinkFindMany.mockReset();
     mockChunkFindMany.mockReset();
     mockDecryptChunksBatch.mockReset();
     mockSearchSimilarChunks.mockReset();
     mockPineconeAvailable.mockReset();
     mockGenerateQueryEmbedding.mockReset();
+    delete process.env.RETRIEVAL_INCLUDE_RELATED_DOCS;
+    delete process.env.RETRIEVAL_INCLUDE_RELATED_DOCS_STRICT;
     mockDocumentFindMany.mockResolvedValue([]);
+    mockDocumentLinkFindMany.mockResolvedValue([]);
   });
 
   test("lexical search decrypts encrypted chunk text when plaintext is not stored", async () => {
@@ -468,5 +476,29 @@ describe("PrismaRetrievalAdapterFactory encrypted chunk hydration", () => {
 
     expect(hits).toHaveLength(1);
     expect(hits[0].docId).toBe("doc-root");
+  });
+
+  test("strict related-doc expansion mode throws when link lookup fails", async () => {
+    process.env.RETRIEVAL_INCLUDE_RELATED_DOCS = "true";
+    process.env.RETRIEVAL_INCLUDE_RELATED_DOCS_STRICT = "true";
+    mockPineconeAvailable.mockReturnValue(true);
+    mockGenerateQueryEmbedding.mockResolvedValue({
+      embedding: [0.11, 0.22],
+      model: "text-embedding-3-small",
+      tokens: 8,
+    });
+    mockDocumentFindMany.mockResolvedValueOnce([
+      { id: "doc-root", parentVersionId: null },
+    ]);
+    mockDocumentLinkFindMany.mockRejectedValue(new Error("link_store_down"));
+
+    const deps = new PrismaRetrievalAdapterFactory().createForUser("user-1");
+    await expect(
+      deps.semanticIndex.search({
+        query: "latest clause update",
+        docIds: ["doc-root"],
+        k: 2,
+      }),
+    ).rejects.toThrow(/related document expansion failed/i);
   });
 });

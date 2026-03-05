@@ -145,6 +145,11 @@ function makeChunks(
   return Array.from({ length: count }, (_, i) => ({
     chunkIndex: i,
     content: `${opts.contentPrefix ?? "chunk content that is long enough"} ${i}`,
+    metadata: {
+      chunkType: "text",
+      sourceType: "text",
+      sectionId: `sec:test-${i}`,
+    },
     ...(opts.withEmbedding ? { embedding: [0.1, 0.2, 0.3] } : {}),
   }));
 }
@@ -206,8 +211,10 @@ describe("vectorEmbedding.service", () => {
 
     // Env defaults for test isolation
     delete process.env.INDEXING_STRICT_FAIL_CLOSED;
-    delete process.env.INDEXING_ENCRYPTED_CHUNKS_ONLY;
+    process.env.INDEXING_ENCRYPTED_CHUNKS_ONLY = "false";
     delete process.env.EMBEDDING_FAILCLOSE_V1;
+    delete process.env.INDEXING_ENFORCE_ENCRYPTED_ONLY;
+    delete process.env.INDEXING_ENFORCE_CHUNK_METADATA;
   });
 
   /* ================================================================ */
@@ -233,8 +240,16 @@ describe("vectorEmbedding.service", () => {
   /* ================================================================ */
   test("filters chunks below minContentChars", async () => {
     const chunks = [
-      { chunkIndex: 0, content: "ab" }, // too short (< 8)
-      { chunkIndex: 1, content: "This is a valid chunk with enough characters" },
+      {
+        chunkIndex: 0,
+        content: "ab",
+        metadata: { chunkType: "text", sourceType: "text", sectionId: "sec:short" },
+      }, // too short (< 8)
+      {
+        chunkIndex: 1,
+        content: "This is a valid chunk with enough characters",
+        metadata: { chunkType: "text", sourceType: "text", sectionId: "sec:valid" },
+      },
     ];
     mockGenerateBatchEmbeddings.mockResolvedValue(makeBatchResult(1));
     mockChunkCount.mockResolvedValue(1);
@@ -260,9 +275,21 @@ describe("vectorEmbedding.service", () => {
   /* ================================================================ */
   test("deduplicates chunks by chunkIndex", async () => {
     const chunks = [
-      { chunkIndex: 0, content: "first occurrence is long enough to pass" },
-      { chunkIndex: 0, content: "duplicate chunkIndex also long enough" },
-      { chunkIndex: 1, content: "second chunk content is also valid here" },
+      {
+        chunkIndex: 0,
+        content: "first occurrence is long enough to pass",
+        metadata: { chunkType: "text", sourceType: "text", sectionId: "sec:first" },
+      },
+      {
+        chunkIndex: 0,
+        content: "duplicate chunkIndex also long enough",
+        metadata: { chunkType: "text", sourceType: "text", sectionId: "sec:dup" },
+      },
+      {
+        chunkIndex: 1,
+        content: "second chunk content is also valid here",
+        metadata: { chunkType: "text", sourceType: "text", sectionId: "sec:second" },
+      },
     ];
     mockGenerateBatchEmbeddings.mockResolvedValue(makeBatchResult(2));
     mockChunkCount.mockResolvedValue(2);
@@ -377,6 +404,8 @@ describe("vectorEmbedding.service", () => {
         content: "Revenue / Jan = $125.00",
         metadata: {
           chunkType: "cell_fact",
+          sourceType: "xlsx",
+          sectionId: "sec:sheet1|row:revenue|col:jan",
           tableChunkForm: "cell_centric",
           tableId: "sheet:Sheet1",
           sheetName: "Sheet1",
@@ -429,7 +458,11 @@ describe("vectorEmbedding.service", () => {
 
     await storeDocumentEmbeddings(
       DOC_ID,
-      [{ chunkIndex: 0, content: "chunk body content long enough" }],
+      [{
+        chunkIndex: 0,
+        content: "chunk body content long enough",
+        metadata: { chunkType: "text", sourceType: "text", sectionId: "sec:body" },
+      }],
       {
         maxRetries: 1,
         strictVerify: false,
@@ -471,6 +504,7 @@ describe("vectorEmbedding.service", () => {
     const chunkData = mockTx.documentChunk.createMany.mock.calls[0][0].data;
     expect(chunkData[0].text).toBeNull();
     expect(chunkData[0].textEncrypted).toBe("encrypted-payload");
+    expect(chunkData[0].metadataEncrypted).toBe("encrypted-payload");
   });
 
   /* ================================================================ */
@@ -632,6 +666,37 @@ describe("vectorEmbedding.service", () => {
     expect(mockChunkCount).toHaveBeenCalledWith({
       where: { documentId: DOC_ID },
     });
+  });
+
+  test("fails closed when encrypted-only policy is enabled and plaintext mode is requested", async () => {
+    process.env.INDEXING_ENCRYPTED_CHUNKS_ONLY = "true";
+    process.env.INDEXING_ENFORCE_ENCRYPTED_ONLY = "true";
+
+    await expect(
+      storeDocumentEmbeddings(DOC_ID, makeChunks(1), {
+        maxRetries: 1,
+        strictVerify: false,
+        encryptionMode: "plaintext",
+      }),
+    ).rejects.toThrow(/plaintext embedding mode is not allowed/i);
+  });
+
+  test("fails when required chunk metadata is missing", async () => {
+    process.env.INDEXING_ENFORCE_CHUNK_METADATA = "true";
+    const chunks = [
+      {
+        chunkIndex: 0,
+        content: "valid length chunk but no metadata",
+        metadata: {},
+      },
+    ];
+    await expect(
+      storeDocumentEmbeddings(DOC_ID, chunks as any, {
+        maxRetries: 1,
+        strictVerify: false,
+        encryptionMode: "plaintext",
+      }),
+    ).rejects.toThrow(/Chunk metadata invariant failed/i);
   });
 
   /* ================================================================ */

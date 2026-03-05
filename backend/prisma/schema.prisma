@@ -325,6 +325,7 @@ model DocumentChunk {
   sectionLevel  Int?     @map("section_level")
   sourceType    String?  @map("source_type")
   ocrConfidence Float?   @map("ocr_confidence")
+  metadataEncrypted String? @map("metadata_encrypted")
   metadata      Json?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt

@@ -350,6 +350,11 @@ function toSnippet(text: string | null): string {
   return clean.length > 1200 ? `${clean.slice(0, 1199)}...` : clean;
 }
 
+function isStrictRelatedDocExpansionError(error: unknown): boolean {
+  const message = String((error as any)?.message || error || "");
+  return /\[retrieval\] related document expansion failed/i.test(message);
+}
+
 function filenameFromStorageKey(
   storageKey: string | null | undefined,
 ): string | null {
@@ -388,6 +393,10 @@ class PrismaRetrievalUserAdapter
     return isRuntimeFlagEnabled("RETRIEVAL_INCLUDE_RELATED_DOCS", false);
   }
 
+  private isRelatedDocExpansionStrictEnabled(): boolean {
+    return isRuntimeFlagEnabled("RETRIEVAL_INCLUDE_RELATED_DOCS_STRICT", false);
+  }
+
   private async expandWithRelatedDocIds(docIds: string[]): Promise<string[]> {
     const seed = uniq(docIds);
     if (!seed.length || !this.isRelatedDocExpansionEnabled()) return seed;
@@ -423,7 +432,13 @@ class PrismaRetrievalUserAdapter
       });
       const allowedDocs = Array.isArray(allowedDocsRaw) ? allowedDocsRaw : [];
       return uniq(allowedDocs.map((doc) => String(doc.id || "").trim()));
-    } catch {
+    } catch (error: any) {
+      if (this.isRelatedDocExpansionStrictEnabled()) {
+        const message = String(error?.message || error || "unknown_error");
+        throw new Error(
+          `[retrieval] related document expansion failed: ${message}`,
+        );
+      }
       return seed;
     }
   }
@@ -696,7 +711,10 @@ class PrismaRetrievalUserAdapter
       try {
         const semanticResults = await this.runPineconeSemanticSearch(opts);
         if (semanticResults.length > 0) return semanticResults;
-      } catch {
+      } catch (error) {
+        if (isStrictRelatedDocExpansionError(error)) {
+          throw error;
+        }
         // Fail closed to DB lexical fallback for availability.
       }
       if (!allowDbFallback) return [];

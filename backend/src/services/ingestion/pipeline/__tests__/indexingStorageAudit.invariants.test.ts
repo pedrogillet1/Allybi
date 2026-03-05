@@ -175,3 +175,85 @@ describe("Audit Invariant 6: xlsx cell_fact chunks preserve scale metadata", () 
     expect(cell!.metadata.sectionId).toBeTruthy();
   });
 });
+
+describe("Audit Invariant 7: non-xlsx cell_fact chunks preserve inferred scale metadata", () => {
+  test("pdf extracted tables infer scale from headers for cell facts", () => {
+    const extraction: any = {
+      sourceType: "pdf",
+      text: "Financial table",
+      pages: [{ page: 1, text: "Financial table" }],
+      extractedTables: [
+        {
+          tableId: "pdf:p1:t0",
+          pageOrSlide: 1,
+          markdown: "",
+          rows: [
+            {
+              rowIndex: 0,
+              isHeader: true,
+              cells: [
+                { text: "Metric", colIndex: 0 },
+                { text: "FY24 (mn)", colIndex: 1 },
+              ],
+            },
+            {
+              rowIndex: 1,
+              isHeader: false,
+              cells: [
+                { text: "Revenue", colIndex: 0 },
+                { text: "12.5", colIndex: 1 },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+
+    const chunks = buildInputChunks(extraction, extraction.text);
+    const cell = chunks.find(
+      (c) =>
+        c.metadata.chunkType === "cell_fact" &&
+        c.metadata.columnIndex === 1 &&
+        c.metadata.rowIndex === 1,
+    );
+    expect(cell).toBeDefined();
+    expect(cell!.metadata.scaleRaw).toBe("mn");
+    expect(cell!.metadata.scaleMultiplier).toBe(1000000);
+    expect(cell!.metadata.sectionId).toBeTruthy();
+  });
+});
+
+describe("Audit Invariant 8: section ids remain unique for long section labels", () => {
+  test("long section names do not collide due deterministic hash suffix", () => {
+    const sharedPrefix = "Long section heading ".repeat(20);
+    const extraction: any = {
+      sourceType: "docx",
+      text: "body one\nbody two",
+      sections: [
+        {
+          heading: `${sharedPrefix} alpha`,
+          level: 1,
+          content: "body one",
+          path: [`${sharedPrefix} alpha`],
+        },
+        {
+          heading: `${sharedPrefix} beta`,
+          level: 1,
+          content: "body two",
+          path: [`${sharedPrefix} beta`],
+        },
+      ],
+    };
+
+    const chunks = buildInputChunks(extraction, extraction.text);
+    const headingChunks = chunks.filter((c) => c.metadata.chunkType === "heading");
+    expect(headingChunks).toHaveLength(2);
+    const firstSectionId = headingChunks[0]!.metadata.sectionId;
+    const secondSectionId = headingChunks[1]!.metadata.sectionId;
+    expect(firstSectionId).toBeTruthy();
+    expect(secondSectionId).toBeTruthy();
+    expect(firstSectionId).not.toBe(secondSectionId);
+    expect(firstSectionId).toMatch(/\|h:[a-z0-9]+$/);
+    expect(secondSectionId).toMatch(/\|h:[a-z0-9]+$/);
+  });
+});

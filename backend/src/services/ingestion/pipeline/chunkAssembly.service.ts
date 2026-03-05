@@ -44,6 +44,15 @@ function emitCellFactChunks(
         // Build headerPath from the first row (headers)
         const headerRow = table.rows.find((r) => r.isHeader);
         const colHeader = headerRow?.cells.find((c) => c.colIndex === cell.colIndex)?.text || "";
+        const rowLabel = row.isHeader
+          ? ""
+          : String(row.cells.find((c) => c.colIndex === 0)?.text || "").trim();
+        const unit = normalizeCellUnit({
+          value: cell.text,
+          colHeader,
+          rowLabel,
+        });
+        const headerPath = toHeaderPath(rowLabel, colHeader);
         out.push({
           chunkIndex: idx++,
           content: `${row.isHeader ? "Header" : "Cell"}: ${cell.text}`,
@@ -62,8 +71,15 @@ function emitCellFactChunks(
             tableId: table.tableId,
             rowIndex: row.rowIndex,
             columnIndex: cell.colIndex,
+            rowLabel: rowLabel || undefined,
             colHeader: colHeader || undefined,
-            headerPath: colHeader ? [colHeader] : undefined,
+            headerPath: headerPath.length ? headerPath : undefined,
+            valueRaw: cell.text,
+            unitRaw: unit.unitRaw ?? undefined,
+            unitNormalized: unit.unitNormalized ?? undefined,
+            numericValue: unit.numericValue ?? undefined,
+            scaleRaw: unit.scaleRaw ?? undefined,
+            scaleMultiplier: unit.scaleMultiplier ?? undefined,
             sourceType,
           },
         });
@@ -136,6 +152,15 @@ function toSectionToken(value: unknown): string | null {
   return token || null;
 }
 
+function stableSectionHash(input: string): string {
+  let hash = 2166136261;
+  for (let i = 0; i < input.length; i += 1) {
+    hash ^= input.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return (hash >>> 0).toString(36);
+}
+
 function buildSectionId(params: {
   sourceType: string;
   sectionPath?: string[];
@@ -183,7 +208,10 @@ function buildSectionId(params: {
   }
 
   if (parts.length <= 1) return undefined;
-  return `sec:${parts.join("|").slice(0, 220)}`;
+  const canonical = parts.join("|");
+  const hash = stableSectionHash(canonical).slice(0, 8);
+  const base = canonical.length > 200 ? canonical.slice(0, 200) : canonical;
+  return `sec:${base}|h:${hash}`;
 }
 
 /**
@@ -430,7 +458,10 @@ export function buildInputChunks(
 
         // Aggregate dominant unit from row's cell facts
         const unitCounts = new Map<string, number>();
+        const scaleCounts = new Map<string, number>();
         let dominantUnit: { unitRaw?: string; unitNormalized?: string } = {};
+        let dominantScale: { scaleRaw?: string; scaleMultiplier?: number } = {};
+        let dominantScaleCount = 0;
         for (const f of facts) {
           const u = normalizeCellUnit({
             value: String(f.displayValue || f.value || ""),
@@ -442,6 +473,18 @@ export function buildInputChunks(
             unitCounts.set(u.unitNormalized, count);
             if (!dominantUnit.unitNormalized || count > (unitCounts.get(dominantUnit.unitNormalized!) || 0)) {
               dominantUnit = { unitRaw: u.unitRaw ?? undefined, unitNormalized: u.unitNormalized };
+            }
+          }
+          if (u.scaleRaw && typeof u.scaleMultiplier === "number") {
+            const scaleKey = `${u.scaleRaw}:${u.scaleMultiplier}`;
+            const scaleCount = (scaleCounts.get(scaleKey) || 0) + 1;
+            scaleCounts.set(scaleKey, scaleCount);
+            if (scaleCount > dominantScaleCount) {
+              dominantScale = {
+                scaleRaw: u.scaleRaw,
+                scaleMultiplier: u.scaleMultiplier,
+              };
+              dominantScaleCount = scaleCount;
             }
           }
         }
@@ -475,6 +518,8 @@ export function buildInputChunks(
             headerPath: rowLabel ? [rowLabel] : undefined,
             unitRaw: dominantUnit.unitRaw,
             unitNormalized: dominantUnit.unitNormalized,
+            scaleRaw: dominantScale.scaleRaw,
+            scaleMultiplier: dominantScale.scaleMultiplier,
             isFinancial: sheetFinancialMap.get(sheetName) ?? extraction.isFinancial ?? false,
             sourceType: "xlsx",
             unitConsistencyWarning: consistency.consistent

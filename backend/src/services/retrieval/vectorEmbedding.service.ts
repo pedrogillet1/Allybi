@@ -25,7 +25,7 @@ import { EncryptionService } from "../security/encryption.service";
 import { EnvelopeService } from "../security/envelope.service";
 import { TenantKeyService } from "../security/tenantKey.service";
 import embeddingService from "./embedding.service";
-import { resolveIndexingPolicySnapshot } from "./indexingPolicy.service";
+import { parseBooleanFlag, resolveIndexingPolicySnapshot } from "./indexingPolicy.service";
 import pineconeService from "./pinecone.service";
 import type { InputChunk as PipelineInputChunk } from "../ingestion/pipeline/pipelineTypes";
 import { recordIndexingQualityMetrics } from "../ingestion/pipeline/pipelineMetrics.service";
@@ -53,6 +53,43 @@ interface ChunkEncryptionServices {
   docKeys: DocumentKeyService;
   docCrypto: DocumentCryptoService;
 }
+
+const SAFE_STRUCTURAL_METADATA_KEYS = new Set<string>([
+  "documentId",
+  "versionId",
+  "rootDocumentId",
+  "parentVersionId",
+  "isLatestVersion",
+  "chunkType",
+  "sourceType",
+  "sectionId",
+  "sectionName",
+  "sectionLevel",
+  "sectionPath",
+  "sheetName",
+  "tableChunkForm",
+  "tableId",
+  "rowIndex",
+  "columnIndex",
+  "rowLabel",
+  "colHeader",
+  "headerPath",
+  "cellRef",
+  "valueRaw",
+  "unitRaw",
+  "unitNormalized",
+  "numericValue",
+  "scaleRaw",
+  "scaleMultiplier",
+  "startChar",
+  "endChar",
+  "pageNumber",
+  "slideTitle",
+  "hasNotes",
+  "isFinancial",
+  "ocrConfidence",
+  "unitConsistencyWarning",
+]);
 
 function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
@@ -149,6 +186,30 @@ function dedupeByChunkIndex<T extends { chunkIndex: number }>(items: T[]): T[] {
   return out;
 }
 
+function sanitizeStoredChunkMetadata(
+  metadata: Record<string, any>,
+): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(metadata || {})) {
+    if (!SAFE_STRUCTURAL_METADATA_KEYS.has(key)) continue;
+    if (value === undefined) continue;
+    out[key] = value;
+  }
+  return out;
+}
+
+function toPrismaJsonValue(value: unknown): Prisma.InputJsonValue {
+  return JSON.parse(JSON.stringify(value ?? {})) as Prisma.InputJsonValue;
+}
+
+function serializeMetadata(value: unknown): string {
+  try {
+    return JSON.stringify(value ?? {});
+  } catch {
+    return "{}";
+  }
+}
+
 function inferScaleSignal(metadata: Record<string, any>): boolean {
   if (!metadata || typeof metadata !== "object") return false;
   if (typeof metadata.scaleRaw === "string" && metadata.scaleRaw.trim()) return true;
@@ -180,6 +241,18 @@ function hasRequiredChunkMetadata(chunk: {
       metadata.sheetName ||
       Number.isFinite(chunk.pageNumber),
   );
+}
+
+function collectMissingMetadataIndices(
+  chunks: Array<{ chunkIndex: number; pageNumber?: number; metadata?: Record<string, any> }>,
+): number[] {
+  const missing: number[] = [];
+  for (const chunk of chunks) {
+    if (!hasRequiredChunkMetadata(chunk)) {
+      missing.push(chunk.chunkIndex);
+    }
+  }
+  return missing;
 }
 
 function pickMostRecentDocId(
@@ -238,10 +311,27 @@ export async function storeDocumentEmbeddings(
       : "plaintext",
   } = options;
   const strictFailClosed = indexingPolicy.strictFailClosed;
+  const enforceEncryptedOnlyInvariant = parseBooleanFlag(
+    process.env.INDEXING_ENFORCE_ENCRYPTED_ONLY,
+    true,
+  );
+  const enforceChunkMetadataInvariant = parseBooleanFlag(
+    process.env.INDEXING_ENFORCE_CHUNK_METADATA,
+    true,
+  );
 
   if (!documentId) throw new Error("documentId is required");
   if (!chunks || chunks.length === 0) {
     throw new Error(`CRITICAL: No chunks provided for document ${documentId}`);
+  }
+  if (
+    enforceEncryptedOnlyInvariant &&
+    indexingPolicy.encryptedChunksOnly &&
+    encryptionMode !== "encrypted_only"
+  ) {
+    throw new Error(
+      "INDEXING_ENCRYPTED_CHUNKS_ONLY is enabled; plaintext embedding mode is not allowed.",
+    );
   }
 
   const document = await prisma.document.findUnique({
@@ -265,11 +355,10 @@ export async function storeDocumentEmbeddings(
 
   // De-dupe chunkIndex to avoid DB uniqueness conflicts (and Pinecone id collisions)
   const usableChunks = dedupeByChunkIndex(normalized);
+  const missingMetadataChunkIndices = collectMissingMetadataIndices(usableChunks);
 
   const metadataTotal = usableChunks.length;
-  const metadataComplete = usableChunks.filter((chunk) =>
-    hasRequiredChunkMetadata(chunk),
-  ).length;
+  const metadataComplete = metadataTotal - missingMetadataChunkIndices.length;
   const scaleDetected = usableChunks.filter((chunk) =>
     inferScaleSignal(chunk.metadata || {}),
   ).length;
@@ -298,6 +387,12 @@ export async function storeDocumentEmbeddings(
     encryptionCompliant,
     encryptionTotal,
   });
+  if (enforceChunkMetadataInvariant && missingMetadataChunkIndices.length > 0) {
+    const sample = missingMetadataChunkIndices.slice(0, 10).join(",");
+    throw new Error(
+      `Chunk metadata invariant failed for document ${documentId}. Missing required locator metadata on chunk indexes: ${sample}${missingMetadataChunkIndices.length > 10 ? ",..." : ""}`,
+    );
+  }
 
   // Generate embeddings for chunks that don't have them (true batch for efficiency)
   const needsEmbedding = usableChunks.filter(
@@ -405,7 +500,9 @@ export async function storeDocumentEmbeddings(
         content: encryptionMode === "encrypted_only" ? "" : c.content,
         embedding: c.embedding || [],
         metadata: {
-          ...(c.metadata || {}),
+          ...(encryptionMode === "encrypted_only"
+            ? sanitizeStoredChunkMetadata(c.metadata || {})
+            : (c.metadata || {})),
           ...sharedIndexingMetadata,
           ...(encryptionMode === "encrypted_only"
             ? { contentHash: createHash("sha256").update(c.content).digest("hex") }
@@ -444,9 +541,21 @@ export async function storeDocumentEmbeddings(
         const id = randomUUID();
         const plaintext = c.content;
         const metadata = c.metadata || {};
-        const metadataJson = JSON.parse(
-          JSON.stringify(metadata || {}),
-        ) as Prisma.InputJsonValue;
+        const storedMetadata =
+          encryptionMode === "encrypted_only"
+            ? sanitizeStoredChunkMetadata(metadata)
+            : metadata;
+        const metadataJson = toPrismaJsonValue(storedMetadata);
+        const metadataEncrypted =
+          encryptionMode === "encrypted_only"
+            ? chunkEncryptors!.docCrypto.encryptChunkText(
+                document.userId,
+                documentId,
+                `${id}:meta`,
+                serializeMetadata(metadata),
+                documentKey!,
+              )
+            : null;
         const textEncrypted =
           encryptionMode === "encrypted_only"
             ? chunkEncryptors!.docCrypto.encryptChunkText(
@@ -502,6 +611,7 @@ export async function storeDocumentEmbeddings(
               ? metadata.ocrConfidence
               : null,
           metadata: metadataJson,
+          metadataEncrypted,
         };
       });
 

@@ -18,6 +18,9 @@ describe("Certification: indexing live integration", () => {
     if (!snapshot.strictFailClosed) {
       failures.push("STRICT_FAIL_CLOSED_DISABLED");
     }
+    if (!snapshot.encryptedChunksOnly) {
+      failures.push("ENCRYPTED_CHUNKS_ONLY_DISABLED");
+    }
     if (!snapshot.verifyRequired) {
       failures.push("VERIFY_REQUIRED_DISABLED");
     }
@@ -29,12 +32,14 @@ describe("Certification: indexing live integration", () => {
         runtimeModeAllowed: runtimeMetadata.modeAllowed,
         allowedModes: runtimeMetadata.allowedModes,
         strictFailClosed: snapshot.strictFailClosed,
+        encryptedChunksOnly: snapshot.encryptedChunksOnly,
         verifyRequired: snapshot.verifyRequired,
       },
       thresholds: {
         runtimeMode: "v2",
         runtimeModeAllowed: true,
         strictFailClosed: true,
+        encryptedChunksOnly: true,
         verifyRequired: true,
       },
       failures,
