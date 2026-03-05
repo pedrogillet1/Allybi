@@ -1,0 +1,66 @@
+name: Integrations Runtime Gates
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - "backend/src/controllers/integrations.controller.ts"
+      - "backend/src/entrypoints/http/routes/integrations.routes.ts"
+      - "backend/src/services/core/handlers/connectorHandler.service.ts"
+      - "backend/src/services/chat/handlers/connectorTurn.handler.ts"
+      - "backend/src/services/connectors/**"
+      - "backend/src/queues/connector.queue.ts"
+      - "backend/src/workers/connector-worker.ts"
+      - "backend/scripts/integrations/**"
+      - ".github/workflows/integrations-runtime-gates.yml"
+  push:
+    branches: [ main, develop ]
+    paths:
+      - "backend/src/controllers/integrations.controller.ts"
+      - "backend/src/entrypoints/http/routes/integrations.routes.ts"
+      - "backend/src/services/core/handlers/connectorHandler.service.ts"
+      - "backend/src/services/chat/handlers/connectorTurn.handler.ts"
+      - "backend/src/services/connectors/**"
+      - "backend/src/queues/connector.queue.ts"
+      - "backend/src/workers/connector-worker.ts"
+      - "backend/scripts/integrations/**"
+      - ".github/workflows/integrations-runtime-gates.yml"
+  workflow_dispatch:
+
+jobs:
+  integrations-runtime:
+    name: Integrations runtime + bank-grade strict gates
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install backend dependencies
+        working-directory: ./backend
+        run: npm ci
+
+      - name: Run integrations data-bank strict grade
+        working-directory: ./backend
+        run: npm run integrations:agents:grade:strict
+
+      - name: Run integrations runtime strict grade
+        working-directory: ./backend
+        run: npm run integrations:runtime:grade:strict
+
+      - name: Upload integrations reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: integrations-reports
+          path: |
+            backend/reports/integrations/integration-bank-parallel-grade.json
+            backend/reports/integrations/integration-bank-parallel-grade.md
+            backend/reports/integrations/integration-runtime-grade.json
+            backend/reports/integrations/integration-runtime-grade.md
+          retention-days: 14

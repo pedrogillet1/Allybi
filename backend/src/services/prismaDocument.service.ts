@@ -3,7 +3,7 @@
  * Implements the interface expected by DocumentController.
  */
 
-import { randomUUID } from "crypto";
+import { createHash, randomUUID } from "crypto";
 import prisma from "../config/database";
 import { downloadFile, getSignedUrl, uploadFile } from "../config/storage";
 import { addDocumentJob } from "../queues/document.queue";
@@ -107,6 +107,33 @@ function toRecord(doc: any): DocumentRecord {
   };
 }
 
+type DocumentCursor = { id: string; updatedAt: Date };
+
+function encodeDocumentCursor(row: {
+  id: string;
+  updatedAt: Date | string;
+}): string {
+  const payload = JSON.stringify({
+    id: row.id,
+    updatedAt: new Date(row.updatedAt).toISOString(),
+  });
+  return Buffer.from(payload, "utf8").toString("base64url");
+}
+
+function decodeDocumentCursor(raw: string): DocumentCursor | null {
+  try {
+    const json = Buffer.from(raw, "base64url").toString("utf8");
+    const parsed = JSON.parse(json) as { id?: unknown; updatedAt?: unknown };
+    if (typeof parsed?.id !== "string") return null;
+    if (typeof parsed?.updatedAt !== "string") return null;
+    const updatedAt = new Date(parsed.updatedAt);
+    if (Number.isNaN(updatedAt.getTime())) return null;
+    return { id: parsed.id, updatedAt };
+  } catch {
+    return null;
+  }
+}
+
 export class PrismaDocumentService implements DocumentService {
   async list(input: {
     userId: string;
@@ -117,37 +144,69 @@ export class PrismaDocumentService implements DocumentService {
     docTypes?: string[];
   }): Promise<{ items: DocumentRecord[]; nextCursor?: string }> {
     const limit = Math.min(input.limit ?? 50, 10000);
-    const where: any = {
-      userId: input.userId,
-      // Show documents in all states (processing/ready/failed) except "skipped".
-      // This keeps the library stable while background indexing runs.
-      status: { not: "skipped" },
-      // Never show revision artifacts in the main library ("Recently Added").
-      // Revisions are internal history and should only be reachable via explicit IDs/undo flows.
-      parentVersionId: null,
-      // Hide connector-ingested artifacts (emails/slack) from the user document library.
-      encryptedFilename: { not: { contains: "/connectors/" } },
-    };
+    const filters: any[] = [
+      {
+        userId: input.userId,
+        // Show documents in all states (processing/ready/failed) except "skipped".
+        // This keeps the library stable while background indexing runs.
+        status: { not: "skipped" },
+        // Never show revision artifacts in the main library ("Recently Added").
+        // Revisions are internal history and should only be reachable via explicit IDs/undo flows.
+        parentVersionId: null,
+        // Hide connector-ingested artifacts (emails/slack) from the user document library.
+        encryptedFilename: { not: { contains: "/connectors/" } },
+      },
+    ];
 
-    if (input.folderId) where.folderId = input.folderId;
+    if (input.folderId) filters.push({ folderId: input.folderId });
     if (input.q) {
-      where.OR = [
-        { filename: { contains: input.q, mode: "insensitive" } },
-        { displayTitle: { contains: input.q, mode: "insensitive" } },
-      ];
+      filters.push({
+        OR: [
+          { filename: { contains: input.q, mode: "insensitive" } },
+          { displayTitle: { contains: input.q, mode: "insensitive" } },
+        ],
+      });
     }
+
+    let decodedCursor = input.cursor ? decodeDocumentCursor(input.cursor) : null;
+    if (input.cursor && !decodedCursor) {
+      // Backward compatibility for legacy id-only cursors.
+      const anchor = await prisma.document.findFirst({
+        where: {
+          AND: [...filters, { id: input.cursor }],
+        },
+        select: { id: true, updatedAt: true },
+      });
+      if (anchor) decodedCursor = { id: anchor.id, updatedAt: anchor.updatedAt };
+    }
+    if (decodedCursor) {
+      filters.push({
+        OR: [
+          { updatedAt: { lt: decodedCursor.updatedAt } },
+          {
+            AND: [
+              { updatedAt: decodedCursor.updatedAt },
+              { id: { lt: decodedCursor.id } },
+            ],
+          },
+        ],
+      });
+    }
+
+    const where: any = { AND: filters };
 
     const docs = await prisma.document.findMany({
       where,
       take: limit + 1,
-      ...(input.cursor ? { cursor: { id: input.cursor }, skip: 1 } : {}),
-      orderBy: { updatedAt: "desc" },
+      orderBy: [{ updatedAt: "desc" }, { id: "desc" }],
       include: { folder: { select: { path: true } } },
     });
 
     const hasMore = docs.length > limit;
-    const items = (hasMore ? docs.slice(0, limit) : docs).map(toRecord);
-    const nextCursor = hasMore ? items[items.length - 1]?.id : undefined;
+    const page = hasMore ? docs.slice(0, limit) : docs;
+    const items = page.map(toRecord);
+    const nextCursor =
+      hasMore && page.length > 0 ? encodeDocumentCursor(page[page.length - 1]) : undefined;
 
     return { items, nextCursor };
   }
@@ -180,6 +239,9 @@ export class PrismaDocumentService implements DocumentService {
     }
 
     const fileSize = input.data.sizeBytes ?? 0;
+    const fileHash = input.data.buffer
+      ? createHash("sha256").update(input.data.buffer).digest("hex")
+      : `pending-${docId}`;
 
     // Create document and update user storage in a transaction
     const doc = await prisma.$transaction(
@@ -192,10 +254,10 @@ export class PrismaDocumentService implements DocumentService {
             filename: input.data.filename,
             encryptedFilename: input.data.buffer
               ? storageKey
-              : input.data.filename,
+              : input.data.storageKey || input.data.filename,
             mimeType: input.data.mimeType,
             fileSize,
-            fileHash: "",
+            fileHash,
             folderId: input.data.folderId ?? null,
             status: "uploaded",
             indexingState: "pending",
@@ -252,31 +314,36 @@ export class PrismaDocumentService implements DocumentService {
     documentId: string;
     source?: string;
   }): Promise<{ deleted: true }> {
-    // Get document size before deleting to update user storage
-    const doc = await prisma.document.findFirst({
-      where: { id: input.documentId, userId: input.userId },
-      select: { fileSize: true },
-    });
-
     const deleteSource = input.source || "unknown";
     console.info("[DocumentDelete] Request received", {
       documentId: input.documentId,
       userId: input.userId,
       source: deleteSource,
-      exists: !!doc,
     });
 
     let deletedCount = 0;
+    let deletedBytes = 0;
     await prisma.$transaction(
       async (tx) => {
+        const doc = await tx.document.findFirst({
+          where: { id: input.documentId, userId: input.userId },
+          select: { fileSize: true },
+        });
+        if (!doc) {
+          deletedCount = 0;
+          deletedBytes = 0;
+          return;
+        }
+
         // Delete the document
         const deleted = await tx.document.deleteMany({
           where: { id: input.documentId, userId: input.userId },
         });
         deletedCount = deleted.count;
+        deletedBytes = doc.fileSize;
 
         // Decrement user's storage usage if document existed
-        if (doc && doc.fileSize > 0) {
+        if (deleted.count > 0 && doc.fileSize > 0) {
           await tx.user.update({
             where: { id: input.userId },
             data: {
@@ -311,6 +378,7 @@ export class PrismaDocumentService implements DocumentService {
       userId: input.userId,
       source: deleteSource,
       deletedCount,
+      deletedBytes,
     });
 
     return { deleted: true };

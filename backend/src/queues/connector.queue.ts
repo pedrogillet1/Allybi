@@ -1,6 +1,7 @@
 import { Queue, Worker, type Job } from "bullmq";
 
 import { config } from "../config/env";
+import { logger } from "../utils/logger";
 
 export interface ConnectorSyncJobData {
   userId: string;
@@ -84,16 +85,21 @@ export function startConnectorWorker(
   );
 
   connectorWorker.on("ready", () => {
-    console.log("[ConnectorWorker] Worker READY and listening for jobs");
+    logger.info("[ConnectorWorker] Worker READY and listening for jobs");
   });
   connectorWorker.on("completed", (job) => {
-    console.log(`[ConnectorWorker] Job ${job.id} COMPLETED`);
+    logger.info("[ConnectorWorker] Job completed", { jobId: job.id });
   });
   connectorWorker.on("failed", (job, err) => {
-    console.error(`[ConnectorWorker] Job ${job?.id} FAILED: ${err.message}`);
+    logger.error("[ConnectorWorker] Job failed", {
+      jobId: job?.id || null,
+      error: err?.message || "unknown_error",
+    });
   });
   connectorWorker.on("error", (err) => {
-    console.error(`[ConnectorWorker] Worker ERROR: ${String(err)}`);
+    logger.error("[ConnectorWorker] Worker error", {
+      error: String(err),
+    });
   });
 }
 

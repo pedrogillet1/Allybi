@@ -63,8 +63,9 @@ if (!followupCoverage.ok || !followupCoverage.report) {
   failures.push("followup-source-coverage:missing_gate_report");
 } else {
   const coveredSourceCount = Number(
-    followupCoverage.report.metrics?.coveredSourceCount || 0,
+    followupCoverage.report.metrics?.coveredSourceCount ?? 0,
   );
+  const caseCount = Number(followupCoverage.report.metrics?.caseCount ?? 0);
   const passed =
     followupCoverage.report.passed === true && coveredSourceCount >= 4;
   checks.push({
@@ -72,15 +73,16 @@ if (!followupCoverage.ok || !followupCoverage.report) {
     passed,
     metrics: {
       coveredSourceCount,
+      caseCount,
       coveredSources: String(
         followupCoverage.report.metrics?.coveredSources || "",
       ),
       followupPrecision: Number(
-        followupCoverage.report.metrics?.followupPrecision || 0,
+        followupCoverage.report.metrics?.followupPrecision ?? 0,
       ),
-      followupRecall: Number(followupCoverage.report.metrics?.followupRecall || 0),
+      followupRecall: Number(followupCoverage.report.metrics?.followupRecall ?? 0),
       followupFalsePositiveRate: Number(
-        followupCoverage.report.metrics?.followupFalsePositiveRate || 1,
+        followupCoverage.report.metrics?.followupFalsePositiveRate ?? 1,
       ),
     },
   });
@@ -91,18 +93,19 @@ if (!followupCoverage.ok || !followupCoverage.report) {
     failures.push("followup-source-coverage:gate_failed");
   }
   const minPrecision = Number(
-    followupCoverage.report.thresholds?.minFollowupPrecision || 0.9,
+    followupCoverage.report.thresholds?.minFollowupPrecision ?? 0.9,
   );
   const minRecall = Number(
-    followupCoverage.report.thresholds?.minFollowupRecall || 0.9,
+    followupCoverage.report.thresholds?.minFollowupRecall ?? 0.9,
   );
+  const minCaseCount = Number(followupCoverage.report.thresholds?.minCaseCount ?? 0);
   const maxFalsePositiveRate = Number(
-    followupCoverage.report.thresholds?.maxFollowupFalsePositiveRate || 0.15,
+    followupCoverage.report.thresholds?.maxFollowupFalsePositiveRate ?? 0.15,
   );
-  const precision = Number(followupCoverage.report.metrics?.followupPrecision || 0);
-  const recall = Number(followupCoverage.report.metrics?.followupRecall || 0);
+  const precision = Number(followupCoverage.report.metrics?.followupPrecision ?? 0);
+  const recall = Number(followupCoverage.report.metrics?.followupRecall ?? 0);
   const falsePositiveRate = Number(
-    followupCoverage.report.metrics?.followupFalsePositiveRate || 1,
+    followupCoverage.report.metrics?.followupFalsePositiveRate ?? 1,
   );
   if (!(precision >= minPrecision)) {
     failures.push("followup-source-coverage:precision_below_threshold");
@@ -112,6 +115,9 @@ if (!followupCoverage.ok || !followupCoverage.report) {
   }
   if (!(falsePositiveRate <= maxFalsePositiveRate)) {
     failures.push("followup-source-coverage:false_positive_rate_above_threshold");
+  }
+  if (!(caseCount >= minCaseCount)) {
+    failures.push("followup-source-coverage:case_count_below_threshold");
   }
 }
 

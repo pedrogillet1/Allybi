@@ -51,6 +51,7 @@ const profile = resolveCertificationProfile({
     process.env.CERT_PROFILE,
 });
 const strict = summary?.strict === true;
+const isRetrievalSignoff = profile === "retrieval_signoff";
 
 const failures = [];
 if (!mdGenerated) failures.push("MD_MISSING_GENERATED");
@@ -91,8 +92,10 @@ const runtimeWiringGate = Array.isArray(summary.gates)
 if (!runtimeWiringGate) {
   failures.push("RUNTIME_WIRING_GATE_MISSING_IN_SUMMARY");
 } else {
-  const requireLiveMode = requireLiveRuntimeGraphEvidence({ profile });
+  const requireLiveMode = requireLiveRuntimeGraphEvidence({ profile, strict });
   const commandMode = String(runtimeWiringGate?.metrics?.commandMode || "").trim();
+  const embeddingRuntimeModeAllowed =
+    runtimeWiringGate?.metrics?.embeddingRuntimeModeAllowed;
   if (
     (requireLiveMode && commandMode !== "live") ||
     (!requireLiveMode && commandMode !== "live" && commandMode !== "cached")
@@ -101,17 +104,23 @@ if (!runtimeWiringGate) {
       `RUNTIME_WIRING_DEGRADED_EVIDENCE_MODE:${commandMode || "missing"}`,
     );
   }
-  const gateRequireLive = runtimeWiringGate?.metrics?.requireLiveMode;
-  if (strict && typeof gateRequireLive === "boolean" && gateRequireLive !== requireLiveMode) {
-    failures.push("RUNTIME_WIRING_REQUIRE_LIVE_MODE_MISMATCH");
+  if (strict && embeddingRuntimeModeAllowed !== true) {
+    failures.push("RUNTIME_WIRING_EMBEDDING_RUNTIME_MODE_NOT_ALLOWED");
   }
 }
 
 const allowFailedLocalRun =
   String(process.env.CERT_ALLOW_FAILED_LOCAL_RUN || "").trim().toLowerCase() ===
     "true" || process.env.CERT_ALLOW_FAILED_LOCAL_RUN === "1";
-const localRunPolicy = resolveLocalCertRunPolicy({ strict, profile });
+const localRunPolicy = resolveLocalCertRunPolicy({
+  strict,
+  profile,
+  verifyOnly: summary?.verifyOnly === true,
+});
 const enforceLocalRunHealth = localRunPolicy.enforce;
+if (enforceLocalRunHealth && !fs.existsSync(localCertRunPath)) {
+  failures.push("MISSING_LOCAL_CERT_RUN_JSON");
+}
 if (fs.existsSync(localCertRunPath)) {
   try {
     const localRun = JSON.parse(fs.readFileSync(localCertRunPath, "utf8"));
@@ -140,6 +149,36 @@ if (fs.existsSync(localCertRunPath)) {
     }
   } catch {
     if (enforceLocalRunHealth) failures.push("INVALID_LOCAL_CERT_RUN_JSON");
+  }
+}
+
+if (isRetrievalSignoff) {
+  const skippedOptional = Array.isArray(summary?.skippedOptionalGates)
+    ? summary.skippedOptionalGates
+    : [];
+  if (skippedOptional.length > 0) {
+    failures.push("SIGNOFF_OPTIONAL_GATES_SKIPPED");
+  }
+
+  const requiredSignoffGates = new Set([
+    "query-latency",
+    "retrieval-golden-eval",
+    "retrieval-realistic-eval",
+    "frontend-retrieval-evidence",
+    "indexing-live-integration",
+  ]);
+  const presentGateIds = new Set(
+    Array.isArray(summary?.gates)
+      ? summary.gates.map((gate) => String(gate?.gateId || ""))
+      : [],
+  );
+  const missingRequiredSignoffGates = Array.from(requiredSignoffGates).filter(
+    (gateId) => !presentGateIds.has(gateId),
+  );
+  if (missingRequiredSignoffGates.length > 0) {
+    failures.push(
+      `SIGNOFF_REQUIRED_GATES_MISSING:${missingRequiredSignoffGates.join(",")}`,
+    );
   }
 }
 

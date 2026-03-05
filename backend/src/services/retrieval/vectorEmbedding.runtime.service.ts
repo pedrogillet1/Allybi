@@ -1,29 +1,16 @@
 import vectorEmbeddingServiceV1 from "./vectorEmbedding.service";
 import vectorEmbeddingServiceV2 from "./vectorEmbedding.v2.service";
+import { resolveIndexingPolicySnapshot } from "./indexingPolicy.service";
 
-const VECTOR_EMBEDDING_SELECTOR_FLAG = "RETRIEVAL_V2_VECTOR_EMBEDDING";
-
-function isFlagEnabled(flagName: string, defaultValue: boolean): boolean {
-  const raw = String(process.env[flagName] || "")
-    .trim()
-    .toLowerCase();
-  if (!raw) return defaultValue;
-  if (["1", "true", "yes", "on"].includes(raw)) return true;
-  if (["0", "false", "no", "off"].includes(raw)) return false;
-  return defaultValue;
-}
-
-type VectorEmbeddingRuntimeMode = "v1" | "v2";
-
-function resolveVectorEmbeddingRuntimeMode(): VectorEmbeddingRuntimeMode {
-  return isFlagEnabled(VECTOR_EMBEDDING_SELECTOR_FLAG, false) ? "v2" : "v1";
-}
-
-const vectorEmbeddingRuntimeMode = resolveVectorEmbeddingRuntimeMode();
+const indexingPolicy = resolveIndexingPolicySnapshot();
+const vectorEmbeddingRuntimeMode = indexingPolicy.runtimeMode;
 
 export const vectorEmbeddingRuntimeMetadata = {
-  flag: VECTOR_EMBEDDING_SELECTOR_FLAG,
+  flag: indexingPolicy.runtimeSelectorFlag,
   mode: vectorEmbeddingRuntimeMode,
+  modeAllowed: indexingPolicy.runtimeModeAllowed,
+  allowedModes: indexingPolicy.allowedRuntimeModes,
+  modeAllowedEnv: indexingPolicy.runtimeModeAllowedEnv,
 } as const;
 
 export function getVectorEmbeddingRuntimeMetadata() {

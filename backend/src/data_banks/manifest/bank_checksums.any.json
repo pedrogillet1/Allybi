@@ -5825,7 +5825,7 @@
       "category": "overlays"
     },
     "overlays/ui_contracts.any.json": {
-      "sha256": "f3aab7f3f3b4ae3b5baaa4527957b4eca73aa3115eaa88308dfd763910052431",
+      "sha256": "2086ea9f1873368ba4ec7a334ed5fe30e655005d351e204ca2125ee887e5eef5",
       "required": false,
       "category": "overlays"
     },
@@ -6345,7 +6345,7 @@
       "category": "semantics"
     },
     "patterns/ui/receipt_shapes.any.json": {
-      "sha256": "a6d17b14de79bc7ac7998e3cfc4135e97168b4fe4df6f48073905c3e81bb19d8",
+      "sha256": "cfc59d5382f7d33771f2b837b21cf67d0d8995ce9c72b6db80a6fcc8d3b8bd2e",
       "required": false,
       "category": "semantics"
     },
@@ -6360,7 +6360,7 @@
       "category": "policies"
     },
     "policies/clarification_policy.any.json": {
-      "sha256": "b381d387054384e1a4fbb1e37b575fb3d0b3ee6eb396018f36760a669b62557f",
+      "sha256": "43bfa500bb8584720f223de2d79ba619bd14fbdb92e3fd00b9a4868eb0042541",
       "required": true,
       "category": "policies"
     },
@@ -6385,7 +6385,7 @@
       "category": "policies"
     },
     "policies/fallback_policy.any.json": {
-      "sha256": "3b3e798f93560ed5e2f4d2fa3c5ba88f3c943a105ed50a1a7322da37f1478b4d",
+      "sha256": "aab65f7620923dbe1ad8ba5e03d4f60881ad41c5d7a07af989844a6821fbf79d",
       "required": true,
       "category": "policies"
     },
@@ -6505,7 +6505,7 @@
       "category": "policies"
     },
     "policies/refusal_policy.any.json": {
-      "sha256": "d182fa4c10c883b085ec0b441a351d9c47f9c765b14e536b5ebf6b4bc6d87796",
+      "sha256": "e3659c6d09d2c755c9dfd95d237c97b0760a9adb38e237726e309c3687340907",
       "required": true,
       "category": "policies"
     },

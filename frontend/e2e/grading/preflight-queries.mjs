@@ -9,6 +9,7 @@ const FRONTEND_DIR = path.resolve(__dirname, '..', '..');
 const BACKEND_DIR = path.resolve(FRONTEND_DIR, '..', 'backend');
 const REPORTS_DIR = path.resolve(FRONTEND_DIR, 'e2e', 'reports');
 const LATEST_DIR = path.join(REPORTS_DIR, 'latest');
+const PLAYWRIGHT_RESULTS_FILE = path.join(REPORTS_DIR, 'results.json');
 
 const args = new Set(process.argv.slice(2));
 const include100 = args.has('--run-100');
@@ -85,6 +86,60 @@ function loadLatestScorecard() {
   return JSON.parse(fs.readFileSync(p, 'utf8'));
 }
 
+function assertFileExistsNonEmpty(filePath, label) {
+  if (!fs.existsSync(filePath)) {
+    throw new Error(`Missing ${label}: ${filePath}`);
+  }
+  const stats = fs.statSync(filePath);
+  if (!Number.isFinite(stats.size) || stats.size < 8) {
+    throw new Error(`Invalid/empty ${label}: ${filePath} (size=${stats.size})`);
+  }
+}
+
+function collectPlaywrightTests(report) {
+  const out = [];
+  const visit = (suite) => {
+    const specs = Array.isArray(suite?.specs) ? suite.specs : [];
+    for (const spec of specs) {
+      const tests = Array.isArray(spec?.tests) ? spec.tests : [];
+      out.push(...tests);
+    }
+    const children = Array.isArray(suite?.suites) ? suite.suites : [];
+    for (const child of children) visit(child);
+  };
+  const roots = Array.isArray(report?.suites) ? report.suites : [];
+  for (const suite of roots) visit(suite);
+  return out;
+}
+
+function assertPlaywrightRunHealth(label) {
+  assertFileExistsNonEmpty(PLAYWRIGHT_RESULTS_FILE, `${label} playwright results`);
+  let report = null;
+  try {
+    report = JSON.parse(fs.readFileSync(PLAYWRIGHT_RESULTS_FILE, 'utf8'));
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`Invalid playwright JSON for ${label}: ${message}`);
+  }
+  const expected = Number(report?.stats?.expected || 0);
+  const skipped = Number(report?.stats?.skipped || 0);
+  if (expected < 1) {
+    throw new Error(
+      `${label} produced no expected tests (expected=${expected}, skipped=${skipped}). Refusing to grade.`,
+    );
+  }
+  if (skipped > 0) {
+    throw new Error(
+      `${label} contains skipped tests (skipped=${skipped}). Refusing to grade.`,
+    );
+  }
+  const tests = collectPlaywrightTests(report);
+  const skippedTest = tests.find((testEntry) => String(testEntry?.status || '').toLowerCase() === 'skipped');
+  if (skippedTest) {
+    throw new Error(`${label} includes a skipped test entry. Refusing to grade.`);
+  }
+}
+
 function assertGo(scorecard, pack) {
   const verdict = String(scorecard?.summary?.verdict || 'NO_GO');
   const finalScore = Number(scorecard?.summary?.finalScore || 0);
@@ -124,11 +179,15 @@ async function main() {
     summary.steps.push({ step: 'frontend_a11y_semantic_click_audit', status: 'PASS' });
 
     // 3) Report hygiene
-    run('node', ['e2e/grading/report-hygiene.mjs', '--prepare', '--reset-latest'], FRONTEND_DIR);
+    run('node', ['e2e/grading/report-hygiene.mjs', '--prepare'], FRONTEND_DIR);
     summary.steps.push({ step: 'report_hygiene_prepare', status: 'PASS' });
 
     // 4) Pack 40
     run('node', ['e2e/regression-runner.mjs', '--base', API_BASE], FRONTEND_DIR);
+    assertFileExistsNonEmpty(
+      path.join(REPORTS_DIR, 'queries-40-run.json'),
+      'pack40 regression artifact',
+    );
     summary.steps.push({ step: 'pack40_run', status: 'PASS' });
 
     run('node', ['e2e/grading/run-harsh-rubric.mjs', '--pack', '40', '--input', 'e2e/reports/queries-40-run.json'], FRONTEND_DIR);
@@ -143,6 +202,11 @@ async function main() {
 
     // 6) Pack 50
     run('npx', ['playwright', 'test', 'e2e/query-test-50-gate.spec.ts', '--project=chromium'], FRONTEND_DIR);
+    assertPlaywrightRunHealth('pack50');
+    assertFileExistsNonEmpty(
+      path.join(REPORTS_DIR, 'query-test-50-gate-results.json'),
+      'pack50 artifact',
+    );
     summary.steps.push({ step: 'pack50_run', status: 'PASS' });
 
     run('node', ['e2e/grading/run-harsh-rubric.mjs', '--pack', '50', '--input', 'e2e/reports/query-test-50-gate-results.json'], FRONTEND_DIR);
@@ -154,6 +218,11 @@ async function main() {
     // 7) Optional pack 100
     if (include100) {
       run('npx', ['playwright', 'test', 'e2e/query-test-100.spec.ts', '--project=chromium'], FRONTEND_DIR);
+      assertPlaywrightRunHealth('pack100');
+      assertFileExistsNonEmpty(
+        path.join(REPORTS_DIR, 'query-test-100-results.json'),
+        'pack100 artifact',
+      );
       summary.steps.push({ step: 'pack100_run', status: 'PASS' });
 
       run('node', ['e2e/grading/run-harsh-rubric.mjs', '--pack', '100', '--input', 'e2e/reports/query-test-100-results.json'], FRONTEND_DIR);

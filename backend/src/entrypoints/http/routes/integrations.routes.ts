@@ -5,53 +5,27 @@ import { authorizeByMethod } from "../../../middleware/authorize.middleware";
 import { rateLimitMiddleware } from "../../../middleware/rateLimit.middleware";
 import { createIntegrationsController } from "../../../controllers/integrations.controller";
 
-import { registerConnector } from "../../../services/connectors/connectorsRegistry";
+import { logger } from "../../../utils/logger";
 import { GmailOAuthService } from "../../../services/connectors/gmail/gmailOAuth.service";
 import { GmailClientService } from "../../../services/connectors/gmail/gmailClient.service";
-import { GmailSyncService } from "../../../services/connectors/gmail/gmailSync.service";
 import { OutlookOAuthService } from "../../../services/connectors/outlook/outlookOAuth.service";
 import GraphClientService from "../../../services/connectors/outlook/graphClient.service";
-import { OutlookSyncService } from "../../../services/connectors/outlook/outlookSync.service";
-import { SlackOAuthService } from "../../../services/connectors/slack/slackOAuth.service";
-import { SlackClientService } from "../../../services/connectors/slack/slackClient.service";
-import { SlackSyncService } from "../../../services/connectors/slack/slackSync.service";
 import SlackEventsController from "../../../services/connectors/slack/slackEvents.controller";
 import prisma from "../../../platform/db/prismaClient";
 import { TokenVaultService } from "../../../services/connectors/tokenVault.service";
 import { getConnectorQueueStats } from "../../../queues/connector.queue";
 import { signEmailSendConfirmationToken } from "../../../services/connectors/emailSendConfirmation.service";
 import { PrismaDocumentService } from "../../../services/prismaDocument.service";
+import {
+  buildIntegrationErrorRef,
+  normalizeIntegrationErrorMessage,
+} from "../../../services/connectors/integrationRuntimePolicy.service";
+import { registerDefaultConnectors } from "../../../services/connectors/registerDefaultConnectors";
 
 const router = Router();
 const authorizeIntegrations = authorizeByMethod("integrations");
 
-registerConnector("gmail", {
-  capabilities: { oauth: true, sync: true, search: true },
-  oauthService: new GmailOAuthService(),
-  clientService: new GmailClientService(),
-  syncService: new GmailSyncService(),
-});
-
-registerConnector("outlook", {
-  capabilities: { oauth: true, sync: true, search: true },
-  oauthService: new OutlookOAuthService(),
-  clientService: new GraphClientService(),
-  syncService: new OutlookSyncService(),
-});
-
-registerConnector("slack", {
-  capabilities: {
-    oauth: true,
-    sync: true,
-    search: true,
-    realtime:
-      String(process.env.CONNECTORS_INGEST_AS_DOCUMENTS || "").toLowerCase() ===
-      "true",
-  },
-  oauthService: new SlackOAuthService(),
-  clientService: new SlackClientService(),
-  syncService: new SlackSyncService(),
-});
+registerDefaultConnectors();
 
 const controller = createIntegrationsController();
 const slackEvents = new SlackEventsController();
@@ -130,6 +104,62 @@ function extractGmailAttachments(message: any): Array<{
     seen.add(a.attachmentId);
     return true;
   });
+}
+
+function correlationIdFromReq(req: any): string | null {
+  const fromHeader = req?.headers?.["x-correlation-id"];
+  if (typeof fromHeader === "string" && fromHeader.trim()) {
+    return fromHeader.trim();
+  }
+  const fromBody = req?.body?.correlationId;
+  if (typeof fromBody === "string" && fromBody.trim()) {
+    return fromBody.trim();
+  }
+  return null;
+}
+
+function sendInternalRouteError(
+  req: any,
+  res: any,
+  code: string,
+  publicMessage: string,
+  error: unknown,
+  context: string,
+) {
+  const ref = buildIntegrationErrorRef(correlationIdFromReq(req));
+  logger.error(`[IntegrationsRoute] ${context} failed`, {
+    ref,
+    code,
+    error: normalizeIntegrationErrorMessage(error),
+  });
+  return res.status(500).json({
+    ok: false,
+    error: {
+      code,
+      message: publicMessage,
+      details: { ref },
+    },
+  });
+}
+
+function safeAttachmentFailureMessage(error: unknown): string {
+  const message = normalizeIntegrationErrorMessage(error);
+  if (/attachment not found on message/i.test(message)) {
+    return "Attachment not found on message.";
+  }
+  if (/only file attachments are supported/i.test(message)) {
+    return "Only file attachments are supported right now.";
+  }
+  if (/attachment content is missing/i.test(message)) {
+    return "Attachment content is missing.";
+  }
+  if (/too large/i.test(message)) {
+    return "Attachment is too large (max 25MB).";
+  }
+  if (/failed to download attachment/i.test(message)) {
+    return "Failed to download attachment.";
+  }
+  return "Failed to save attachment.";
 }
 
 // Slack Events API (public, signature-verified). Must be mounted under /api/integrations.
@@ -230,13 +260,14 @@ router.post(
         },
       });
     } catch (e: any) {
-      return res.status(500).json({
-        ok: false,
-        error: {
-          code: "TOKEN_MINT_FAILED",
-          message: e?.message || "Failed to create confirmation token.",
-        },
-      });
+      return sendInternalRouteError(
+        req,
+        res,
+        "TOKEN_MINT_FAILED",
+        "Failed to create confirmation token.",
+        e,
+        "email/send-token",
+      );
     }
   },
 );
@@ -251,13 +282,14 @@ router.get(
       const stats = await getConnectorQueueStats();
       return res.json({ ok: true, data: stats });
     } catch (e: any) {
-      return res.status(500).json({
-        ok: false,
-        error: {
-          code: "QUEUE_STATS_FAILED",
-          message: e?.message || "Failed to read connector queue stats.",
-        },
-      });
+      return sendInternalRouteError(
+        _req,
+        res,
+        "QUEUE_STATS_FAILED",
+        "Failed to read connector queue stats.",
+        e,
+        "queue/stats",
+      );
     }
   },
 );
@@ -396,13 +428,14 @@ router.get(
         },
       });
     } catch (e: any) {
-      return res.status(500).json({
-        ok: false,
-        error: {
-          code: "EMAIL_FETCH_FAILED",
-          message: e?.message || "Failed to fetch email.",
-        },
-      });
+      return sendInternalRouteError(
+        req,
+        res,
+        "EMAIL_FETCH_FAILED",
+        "Failed to fetch email.",
+        e,
+        "email/messages/fetch",
+      );
     }
   },
 );
@@ -555,13 +588,14 @@ router.post(
 
       return res.json({ ok: true, data: { document: doc } });
     } catch (e: any) {
-      return res.status(500).json({
-        ok: false,
-        error: {
-          code: "SAVE_ATTACHMENT_FAILED",
-          message: e?.message || "Failed to save attachment.",
-        },
-      });
+      return sendInternalRouteError(
+        req,
+        res,
+        "SAVE_ATTACHMENT_FAILED",
+        "Failed to save attachment.",
+        e,
+        "email/attachments/save",
+      );
     }
   },
 );
@@ -691,19 +725,23 @@ router.post(
           });
           successes.push({ attachmentId, document: doc });
         } catch (err: any) {
-          failures.push({ attachmentId, error: err?.message || "Failed" });
+          failures.push({
+            attachmentId,
+            error: safeAttachmentFailureMessage(err),
+          });
         }
       }
 
       return res.json({ ok: true, data: { successes, failures } });
     } catch (e: any) {
-      return res.status(500).json({
-        ok: false,
-        error: {
-          code: "SAVE_ATTACHMENTS_FAILED",
-          message: e?.message || "Failed to save attachments.",
-        },
-      });
+      return sendInternalRouteError(
+        req,
+        res,
+        "SAVE_ATTACHMENTS_FAILED",
+        "Failed to save attachments.",
+        e,
+        "email/attachments/save-all",
+      );
     }
   },
 );

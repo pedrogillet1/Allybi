@@ -46,6 +46,7 @@
     "test:e2e:harness:headed": "npx playwright test -c playwright.harness.config.ts --headed",
     "reports:hygiene:prepare": "node e2e/grading/report-hygiene.mjs --prepare --reset-latest",
     "reports:hygiene:check": "node e2e/grading/report-hygiene.mjs --check",
+    "reports:lineage:bootstrap": "node e2e/grading/bootstrap-report-lineage.mjs",
     "reports:lineage:check": "node e2e/grading/validate-report-lineage.mjs",
     "audit:a11y:semantic-click": "node e2e/grading/a11y-semantic-click-audit.mjs --max-violations 225",
     "grade:harsh": "node e2e/grading/run-harsh-rubric.mjs",

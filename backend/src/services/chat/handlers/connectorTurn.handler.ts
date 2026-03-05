@@ -1350,12 +1350,14 @@ export class ConnectorTurnHandler {
         const text = `Latest email in ${providerLabel(provider)}: ${latest.subject}. ${summary}`;
         return this.compose(base, {
           assistantText: text,
+          answerMode: "action_receipt",
           attachments: [latest],
         });
       }
 
       return this.compose(base, {
         assistantText: `Latest email in ${providerLabel(provider)} is shown below.`,
+        answerMode: "action_receipt",
         attachments: [latest],
       });
     }

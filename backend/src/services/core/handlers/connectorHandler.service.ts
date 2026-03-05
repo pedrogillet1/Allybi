@@ -7,6 +7,7 @@ import {
   type ConnectorProvider,
 } from "../../connectors/connectorsRegistry";
 import { TokenVaultService } from "../../connectors/tokenVault.service";
+import { logger } from "../../../utils/logger";
 
 type ConnectorAction =
   | "connect"
@@ -363,9 +364,11 @@ export class ConnectorHandlerService {
       };
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      console.error(
-        `[ConnectorHandler] Direct sync failed for ${provider}: ${msg}`,
-      );
+      logger.error("[ConnectorHandler] Direct sync failed", {
+        provider,
+        userId: req.context.userId,
+        error: msg,
+      });
       return {
         ok: false,
         action: "sync",
@@ -400,9 +403,11 @@ export class ConnectorHandlerService {
         forceResync,
       });
 
-      console.log(
-        `[ConnectorHandler] Sync job enqueued for ${provider}: ${job?.id}`,
-      );
+      logger.info("[ConnectorHandler] Sync job enqueued", {
+        provider,
+        userId,
+        jobId: job?.id ?? null,
+      });
 
       return {
         ok: true,
@@ -415,9 +420,11 @@ export class ConnectorHandlerService {
       };
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      console.warn(
-        `[ConnectorHandler] Queue unavailable for ${provider}, falling back to direct sync: ${msg}`,
-      );
+      logger.warn("[ConnectorHandler] Queue unavailable, falling back to direct sync", {
+        provider,
+        userId,
+        error: msg,
+      });
       return {
         ok: false,
         action: "sync",

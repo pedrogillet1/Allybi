@@ -335,6 +335,99 @@ function uiContractSchemaIntegrityIssues(input: {
   const hasConfigContracts = Object.keys(configContracts).length > 0;
   const hasLegacyContracts = Object.keys(legacyContracts).length > 0;
 
+  const allowedTopConfigKeys = new Set([
+    "enabled",
+    "actionsContract",
+    "contracts",
+    "deterministic",
+    "dedupe",
+    "sortBy",
+  ]);
+  for (const key of Object.keys(config)) {
+    if (allowedTopConfigKeys.has(key)) continue;
+    issues.push(
+      makeIssue({
+        code: "ui_contracts_decorative_config_field",
+        severity: "error",
+        message: `ui_contracts config has unsupported field: ${key}`,
+        filePath: input.filePath,
+        bankId: input.bankId,
+      }),
+    );
+  }
+
+  const actionsContract = asObject(config.actionsContract);
+  if (Object.keys(actionsContract).length > 0) {
+    const allowedActionContractKeys = new Set([
+      "combination",
+      "conflictResolution",
+      "thresholds",
+    ]);
+    for (const key of Object.keys(actionsContract)) {
+      if (allowedActionContractKeys.has(key)) continue;
+      issues.push(
+        makeIssue({
+          code: "ui_contracts_decorative_actions_contract_field",
+          severity: "error",
+          message: `ui_contracts actionsContract has unsupported field: ${key}`,
+          filePath: input.filePath,
+          bankId: input.bankId,
+        }),
+      );
+    }
+
+    const combination = asObject(actionsContract.combination);
+    const allowedCombinationKeys = new Set(["multipleMatches", "hardBlockIsTerminal"]);
+    for (const key of Object.keys(combination)) {
+      if (allowedCombinationKeys.has(key)) continue;
+      issues.push(
+        makeIssue({
+          code: "ui_contracts_decorative_combination_field",
+          severity: "error",
+          message: `ui_contracts actionsContract.combination has unsupported field: ${key}`,
+          filePath: input.filePath,
+          bankId: input.bankId,
+        }),
+      );
+    }
+
+    const conflictResolution = asObject(actionsContract.conflictResolution);
+    const allowedConflictKeys = new Set([
+      "ifActionsAndNoToolExecution",
+      "ifMultipleViolations",
+    ]);
+    for (const key of Object.keys(conflictResolution)) {
+      if (allowedConflictKeys.has(key)) continue;
+      issues.push(
+        makeIssue({
+          code: "ui_contracts_decorative_conflict_resolution_field",
+          severity: "error",
+          message: `ui_contracts actionsContract.conflictResolution has unsupported field: ${key}`,
+          filePath: input.filePath,
+          bankId: input.bankId,
+        }),
+      );
+    }
+
+    const thresholds = asObject(actionsContract.thresholds);
+    const allowedThresholdKeys = new Set([
+      "maxIntroSentencesNavPills",
+      "maxClarificationQuestions",
+    ]);
+    for (const key of Object.keys(thresholds)) {
+      if (allowedThresholdKeys.has(key)) continue;
+      issues.push(
+        makeIssue({
+          code: "ui_contracts_decorative_threshold_field",
+          severity: "error",
+          message: `ui_contracts actionsContract.thresholds has unsupported field: ${key}`,
+          filePath: input.filePath,
+          bankId: input.bankId,
+        }),
+      );
+    }
+  }
+
   if (!hasConfigContracts && hasLegacyContracts) {
     issues.push(
       makeIssue({

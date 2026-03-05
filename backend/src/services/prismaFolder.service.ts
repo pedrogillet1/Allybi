@@ -99,6 +99,17 @@ export class PrismaFolderService implements FolderService {
     this.crypto = crypto;
   }
 
+  private async assertOwnedFolder(
+    userId: string,
+    folderId: string,
+  ): Promise<void> {
+    const owned = await prisma.folder.findFirst({
+      where: { id: folderId, userId },
+      select: { id: true },
+    });
+    if (!owned) throw new Error("Folder not found");
+  }
+
   /**
    * Decrypt folder name if encrypted, otherwise return plaintext name
    */
@@ -352,6 +363,8 @@ export class PrismaFolderService implements FolderService {
     folderId: string;
     name: string;
   }): Promise<FolderRecord> {
+    await this.assertOwnedFolder(input.userId, input.folderId);
+
     if (this.crypto) {
       // Encrypt the new name
       const fk = await this.crypto.folderKeys.getFolderKey(
@@ -412,6 +425,11 @@ export class PrismaFolderService implements FolderService {
     folderId: string;
     newParentId?: string | null;
   }): Promise<FolderRecord> {
+    await this.assertOwnedFolder(input.userId, input.folderId);
+    if (input.newParentId) {
+      await this.assertOwnedFolder(input.userId, input.newParentId);
+    }
+
     const f = await prisma.folder.update({
       where: { id: input.folderId },
       data: { parentFolderId: input.newParentId ?? null },
@@ -442,6 +460,8 @@ export class PrismaFolderService implements FolderService {
     folderId: string;
     mode?: "soft" | "hard" | "cascade" | "folderOnly";
   }): Promise<{ deleted: true; movedDocs?: number; movedToFolderId?: string }> {
+    await this.assertOwnedFolder(input.userId, input.folderId);
+
     const mode = input.mode || "cascade";
 
     if (mode === "folderOnly") {

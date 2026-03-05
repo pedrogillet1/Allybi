@@ -211,7 +211,6 @@ describe("ResponseContractEnforcerService v2", () => {
   });
 
   test("fails closed when ui_contracts is invalid and strict mode is enabled", async () => {
-    process.env.UI_CONTRACTS_FAIL_CLOSED = "true";
     mockGetBank.mockImplementation((bankId: string) => {
       if (bankId === "ui_contracts") return { malformed: true };
       return bankById(bankId);
@@ -241,6 +240,9 @@ describe("ResponseContractEnforcerService v2", () => {
       { answerMode: "general_answer", language: "en" },
     );
     expect(out.enforcement.blocked).toBe(false);
+    expect(out.enforcement.warnings).toContain(
+      "UI_CONTRACTS_FAIL_OPEN_OVERRIDE_ENABLED",
+    );
     expect(out.enforcement.warnings).toContain(
       "UI_CONTRACTS_PARSE_FAILED_FAIL_OPEN_FALLBACK",
     );

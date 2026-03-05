@@ -1,4 +1,4 @@
-{
+﻿{
   "_meta": {
     "id": "ui_contracts",
     "version": "1.0.0",
@@ -30,10 +30,6 @@
   },
   "config": {
     "enabled": true,
-    "applyStage": "post_routing_pre_render",
-    "enforceStrictNavPills": true,
-    "enforceNoActionHallucination": true,
-    "enforceSingleClarificationQuestion": true,
     "actionsContract": {
       "combination": {
         "multipleMatches": "apply_most_restrictive",
@@ -41,12 +37,9 @@
       },
       "thresholds": {
         "maxIntroSentencesNavPills": 1,
-        "maxClarificationQuestions": 1,
-        "maxButtonsSoft": 5,
-        "maxButtonsHard": 8
+        "maxClarificationQuestions": 1
       },
       "conflictResolution": {
-        "ifNavPillsAndDocGrounded": "nav_pills_wins_for_terminal_ops",
         "ifActionsAndNoToolExecution": "suppress_actions",
         "ifMultipleViolations": "hard_block"
       }
@@ -285,3 +278,4 @@
     ]
   }
 }
+

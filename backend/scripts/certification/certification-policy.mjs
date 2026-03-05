@@ -8,9 +8,18 @@ function normalizeBooleanOverride(rawValue) {
   return null;
 }
 
+function isKnownProfile(raw) {
+  return (
+    raw === "ci" ||
+    raw === "release" ||
+    raw === "local" ||
+    raw === "retrieval_signoff"
+  );
+}
+
 export function resolveCertificationProfile(env = process.env) {
   const raw = String(env.CERT_PROFILE || "").trim().toLowerCase();
-  if (raw === "ci" || raw === "release" || raw === "local") return raw;
+  if (isKnownProfile(raw)) return raw;
   return "local";
 }
 
@@ -23,7 +32,7 @@ export function resolveCertificationProfileFromArgs({
     .find((arg) => arg.startsWith("--profile="));
   if (profileArg) {
     const raw = profileArg.split("=", 2)[1]?.trim().toLowerCase() || "";
-    if (raw === "ci" || raw === "release" || raw === "local") return raw;
+    if (isKnownProfile(raw)) return raw;
   }
   return resolveCertificationProfile(env);
 }
@@ -37,10 +46,17 @@ export function isCiRuntime(env = process.env) {
 
 export function requireLiveRuntimeGraphEvidence({
   profile = resolveCertificationProfile(),
+  strict = false,
   env = process.env,
 } = {}) {
   const override = normalizeBooleanOverride(env.CERT_REQUIRE_RUNTIME_GRAPH_LIVE);
   if (override != null) return override;
+  if (profile === "retrieval_signoff") return true;
+  // Local strict runs may rely on cached runtime-graph evidence.
+  // Live evidence is mandatory in CI/release and retrieval signoff.
+  if (strict === true && (profile === "ci" || profile === "release")) {
+    return true;
+  }
   if (profile === "ci" || profile === "release") return true;
   return false;
 }
@@ -53,7 +69,8 @@ export function resolveQueryLatencyPolicy({
 }) {
   const force = normalizeBooleanOverride(env.CERT_REQUIRE_QUERY_LATENCY) === true;
   const requiredByProfile =
-    strict === true && (profile === "ci" || profile === "release");
+    profile === "retrieval_signoff" ||
+    (strict === true && (profile === "ci" || profile === "release"));
   const required = force || requiredByProfile || hasLatencyInput === true;
   return {
     force,
@@ -65,12 +82,16 @@ export function resolveQueryLatencyPolicy({
 export function resolveLocalCertRunPolicy({
   strict,
   profile = resolveCertificationProfile(),
+  verifyOnly = false,
   env = process.env,
 }) {
+  if (verifyOnly === true && profile !== "retrieval_signoff") {
+    return { enforce: false, source: "verify_only_mode" };
+  }
   const override = normalizeBooleanOverride(env.CERT_ENFORCE_LOCAL_CERT_RUN);
   if (override != null) return { enforce: override, source: "env_override" };
   const enforce =
-    strict === true &&
-    (profile === "ci" || profile === "release");
+    profile === "retrieval_signoff" ||
+    (strict === true && (profile === "ci" || profile === "release"));
   return { enforce, source: "default_profile_strict" };
 }

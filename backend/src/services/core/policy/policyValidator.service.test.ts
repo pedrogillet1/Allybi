@@ -391,4 +391,91 @@ describe("PolicyValidatorService", () => {
       ),
     ).toBe(true);
   });
+
+  test("fails decorative top-level ui_contract config fields", () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "policy-validator-"));
+    const filePath = path.join(dir, "ui_contracts.any.json");
+    fs.writeFileSync(
+      filePath,
+      JSON.stringify(
+        {
+          _meta: {
+            id: "ui_contracts",
+            version: "1.0.0",
+            description: "ui contracts",
+            lastUpdated: "2026-03-05",
+            owner: "runtime-certification",
+            reviewCadenceDays: 30,
+            criticality: "high",
+          },
+          config: {
+            enabled: true,
+            applyStage: "post_routing_pre_render",
+            contracts: {
+              nav_pills: {
+                maxIntroSentences: 1,
+              },
+            },
+          },
+          tests: { cases: [{ id: "UI1" }] },
+        },
+        null,
+        2,
+      ),
+    );
+
+    const service = new PolicyValidatorService();
+    const result = service.validateFile(filePath);
+    expect(
+      result.issues.some(
+        (issue) => issue.code === "ui_contracts_decorative_config_field",
+      ),
+    ).toBe(true);
+  });
+
+  test("fails decorative actionsContract threshold fields", () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "policy-validator-"));
+    const filePath = path.join(dir, "ui_contracts.any.json");
+    fs.writeFileSync(
+      filePath,
+      JSON.stringify(
+        {
+          _meta: {
+            id: "ui_contracts",
+            version: "1.0.0",
+            description: "ui contracts",
+            lastUpdated: "2026-03-05",
+            owner: "runtime-certification",
+            reviewCadenceDays: 30,
+            criticality: "high",
+          },
+          config: {
+            enabled: true,
+            contracts: {
+              nav_pills: {
+                maxIntroSentences: 1,
+              },
+            },
+            actionsContract: {
+              thresholds: {
+                maxIntroSentencesNavPills: 1,
+                maxButtonsSoft: 5,
+              },
+            },
+          },
+          tests: { cases: [{ id: "UI1" }] },
+        },
+        null,
+        2,
+      ),
+    );
+
+    const service = new PolicyValidatorService();
+    const result = service.validateFile(filePath);
+    expect(
+      result.issues.some(
+        (issue) => issue.code === "ui_contracts_decorative_threshold_field",
+      ),
+    ).toBe(true);
+  });
 });

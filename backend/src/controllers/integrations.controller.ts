@@ -14,6 +14,14 @@ import {
 } from "../services/connectors/connectorsRegistry";
 import { verifyEmailSendConfirmationToken } from "../services/connectors/emailSendConfirmation.service";
 import { addConnectorSyncJob } from "../queues/connector.queue";
+import { logger } from "../utils/logger";
+import {
+  buildIntegrationErrorRef,
+  buildOAuthCompletionPayload,
+  clientSafeIntegrationMessage,
+  normalizeIntegrationErrorMessage,
+  resolveOAuthPostMessageOrigin,
+} from "../services/connectors/integrationRuntimePolicy.service";
 
 interface ApiError {
   code: string;
@@ -77,6 +85,8 @@ function oauthResultHtml(opts: {
   ok: boolean;
   title: string;
   detail?: string;
+  postMessageOrigin: string | null;
+  completionPayload: Record<string, unknown>;
 }): string {
   const provider = String(opts.provider || "");
   const title = String(opts.title || "");
@@ -84,7 +94,11 @@ function oauthResultHtml(opts: {
   const providerSafe = escapeHtml(provider);
   const titleSafe = escapeHtml(title);
   const detailSafe = escapeHtml(detail);
-  const providerJs = escapeJsString(provider);
+  const postMessageOriginJs = escapeJsString(opts.postMessageOrigin || "");
+  const completionPayloadJson = JSON.stringify(opts.completionPayload || {})
+    .replace(/</g, "\\u003c")
+    .replace(/>/g, "\\u003e")
+    .replace(/&/g, "\\u0026");
   const statusColor = opts.ok ? "#16A34A" : "#DC2626";
   const statusText = opts.ok ? "Connected" : "Failed";
 
@@ -127,10 +141,12 @@ function oauthResultHtml(opts: {
           try { window.close(); } catch (e) {}
         });
       }
+      var completion = ${completionPayloadJson};
+      var targetOrigin = '${postMessageOriginJs}';
       var sent = false;
       try {
-        if (window.opener && !window.opener.closed) {
-          window.opener.postMessage({ type: 'koda_oauth_done', provider: '${providerJs}', ok: ${opts.ok ? "true" : "false"} }, '*');
+        if (targetOrigin && window.opener && !window.opener.closed) {
+          window.opener.postMessage(completion, targetOrigin);
           try { window.opener.focus(); } catch (e) {}
           sent = true;
         }
@@ -138,7 +154,7 @@ function oauthResultHtml(opts: {
       // Fallback: write to localStorage so the parent can detect via 'storage' event.
       // This works even when window.opener is null (cross-origin navigation kills it).
       try {
-        localStorage.setItem('koda_oauth_complete', JSON.stringify({ provider: '${providerJs}', ok: ${opts.ok ? "true" : "false"}, t: Date.now() }));
+        localStorage.setItem('koda_oauth_complete', JSON.stringify(completion));
       } catch (e) {}
       function closeSelf() {
         try { window.close(); } catch (e) {}
@@ -213,6 +229,15 @@ function contextFromReq(
     `integrations:${userId}`;
 
   return { userId, correlationId, clientMessageId, conversationId };
+}
+
+function errorRefFromReq(req: Request): string {
+  const correlation =
+    asString(req.headers["x-correlation-id"]) ||
+    asString(
+      (req.body as Record<string, unknown> | undefined)?.correlationId,
+    );
+  return buildIntegrationErrorRef(correlation);
 }
 
 function mapHandlerError(error: string): { code: string; status: number } {
@@ -309,10 +334,15 @@ export class IntegrationsController {
 
     if (!result.ok) {
       const mapped = mapHandlerError(result.error || "integration error");
+      const message = clientSafeIntegrationMessage(
+        mapped.status,
+        "Failed to start connector flow.",
+        result.error,
+      );
       return sendErr(
         res,
         mapped.code,
-        result.error || "Failed to start connector flow.",
+        message,
         mapped.status,
       );
     }
@@ -337,6 +367,7 @@ export class IntegrationsController {
 
     const code = asString(req.query.code);
     const state = asString(req.query.state);
+    const postMessageOrigin = resolveOAuthPostMessageOrigin();
     if (!code) {
       if (wantsHtml(req)) {
         return sendOauthHtml(
@@ -347,6 +378,8 @@ export class IntegrationsController {
             ok: false,
             title: "Authorization code missing",
             detail: "Retry connecting from Allybi.",
+            postMessageOrigin,
+            completionPayload: buildOAuthCompletionPayload(providerRaw, false),
           }),
         );
       }
@@ -448,6 +481,8 @@ export class IntegrationsController {
             ok: true,
             title: "You are connected",
             detail: "Allybi can now access this connector.",
+            postMessageOrigin,
+            completionPayload: buildOAuthCompletionPayload(providerRaw, true),
           }),
         );
       }
@@ -463,6 +498,18 @@ export class IntegrationsController {
           ? error.message
           : "Connector OAuth callback failed.";
       const mapped = mapHandlerError(message);
+      const ref = errorRefFromReq(req);
+      logger.error("[Integrations] OAuth callback failed", {
+        provider: providerRaw,
+        ref,
+        error: normalizeIntegrationErrorMessage(error),
+        status: mapped.status,
+      });
+      const clientMessage = clientSafeIntegrationMessage(
+        mapped.status,
+        "Connector authorization failed.",
+        message,
+      );
       if (wantsHtml(req)) {
         return sendOauthHtml(
           res,
@@ -471,11 +518,13 @@ export class IntegrationsController {
             provider: providerRaw,
             ok: false,
             title: "Connection failed",
-            detail: message || "Something went wrong when authorizing Allybi.",
+            detail: clientMessage,
+            postMessageOrigin,
+            completionPayload: buildOAuthCompletionPayload(providerRaw, false),
           }),
         );
       }
-      return sendErr(res, mapped.code, message, mapped.status);
+      return sendErr(res, mapped.code, clientMessage, mapped.status, { ref });
     }
   };
 
@@ -513,17 +562,30 @@ export class IntegrationsController {
                       (result.data?.providerAccountId as string | null) || null,
                   },
                 }
-              : { error: result.error }),
+              : {
+                  error: clientSafeIntegrationMessage(
+                    mapHandlerError(result.error || "status failed").status,
+                    "Status check failed.",
+                    result.error,
+                  ),
+                }),
           };
         } catch (e) {
           // Don't let one provider failure break the entire status response
           const env = validateConnectorEnv(provider);
+          const ref = errorRefFromReq(req);
+          logger.error("[Integrations] Provider status check failed", {
+            provider,
+            ref,
+            error: normalizeIntegrationErrorMessage(e),
+          });
           return {
             provider,
             capabilities: getConnectorCapabilities(provider),
             env,
             ok: false,
-            error: e instanceof Error ? e.message : "Status check failed",
+            error: "Status check failed.",
+            details: { ref },
           };
         }
       }),
@@ -560,20 +622,32 @@ export class IntegrationsController {
         forceResync,
       });
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Sync failed unexpectedly";
-      console.error(`[Integrations] Sync error for ${providerRaw}:`, msg);
-      return sendErr(res, "SYNC_FAILED", msg, 500);
+      const ref = errorRefFromReq(req);
+      logger.error("[Integrations] Sync execution failed", {
+        provider: providerRaw,
+        ref,
+        error: normalizeIntegrationErrorMessage(e),
+      });
+      return sendErr(res, "SYNC_FAILED", "Failed to schedule sync.", 500, {
+        ref,
+      });
     }
 
     if (!result.ok) {
       const mapped = mapHandlerError(result.error || "sync failed");
-      console.warn(
-        `[Integrations] Sync failed for ${providerRaw}: ${result.error}`,
-      );
+      logger.warn("[Integrations] Sync request failed", {
+        provider: providerRaw,
+        status: mapped.status,
+        error: result.error || null,
+      });
       return sendErr(
         res,
         mapped.code,
-        result.error || "Failed to schedule sync.",
+        clientSafeIntegrationMessage(
+          mapped.status,
+          "Failed to schedule sync.",
+          result.error,
+        ),
         mapped.status,
       );
     }
@@ -628,7 +702,24 @@ export class IntegrationsController {
       const message =
         e instanceof Error ? e.message : "Connector search timed out.";
       const mapped = mapHandlerError(message);
-      return sendErr(res, mapped.code, message, mapped.status);
+      const ref = errorRefFromReq(req);
+      logger.error("[Integrations] Search failed", {
+        provider: providerRaw,
+        ref,
+        status: mapped.status,
+        error: normalizeIntegrationErrorMessage(e),
+      });
+      return sendErr(
+        res,
+        mapped.code,
+        clientSafeIntegrationMessage(
+          mapped.status,
+          "Connector search failed.",
+          message,
+        ),
+        mapped.status,
+        mapped.status >= 500 ? { ref } : undefined,
+      );
     }
 
     if (!result.ok) {
@@ -636,7 +727,11 @@ export class IntegrationsController {
       return sendErr(
         res,
         mapped.code,
-        result.error || "Connector search failed.",
+        clientSafeIntegrationMessage(
+          mapped.status,
+          "Connector search failed.",
+          result.error,
+        ),
         mapped.status,
       );
     }
@@ -735,7 +830,20 @@ export class IntegrationsController {
     } catch (e) {
       const message = e instanceof Error ? e.message : "Failed to send email.";
       const mapped = mapHandlerError(message);
-      return sendErr(res, mapped.code, message, mapped.status);
+      const ref = errorRefFromReq(req);
+      logger.error("[Integrations] Send failed", {
+        provider: providerRaw,
+        ref,
+        status: mapped.status,
+        error: normalizeIntegrationErrorMessage(e),
+      });
+      return sendErr(
+        res,
+        mapped.code,
+        clientSafeIntegrationMessage(mapped.status, "Failed to send email.", message),
+        mapped.status,
+        mapped.status >= 500 ? { ref } : undefined,
+      );
     }
 
     if (!result.ok) {
@@ -743,7 +851,11 @@ export class IntegrationsController {
       return sendErr(
         res,
         mapped.code,
-        result.error || "Failed to send email.",
+        clientSafeIntegrationMessage(
+          mapped.status,
+          "Failed to send email.",
+          result.error,
+        ),
         mapped.status,
       );
     }
@@ -780,7 +892,11 @@ export class IntegrationsController {
       return sendErr(
         res,
         mapped.code,
-        result.error || "Failed to disconnect provider.",
+        clientSafeIntegrationMessage(
+          mapped.status,
+          "Failed to disconnect provider.",
+          result.error,
+        ),
         mapped.status,
       );
     }

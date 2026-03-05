@@ -49,6 +49,81 @@ describe("Certification: follow-up source coverage", () => {
     let falsePositives = 0;
     let falseNegatives = 0;
 
+    const makeIndicatorsBank = (params: {
+      enabled?: boolean;
+      score?: number;
+      threshold?: number;
+      overrideNewTurn?: boolean;
+      requirePriorTurn?: boolean;
+      requireExplicitDocRef?: boolean;
+      pattern?: string;
+    }) => {
+      if (params.enabled === false) {
+        return { config: { enabled: false }, rules: [] };
+      }
+      const whenAll: Array<{ path: string; op: string; value: unknown }> = [];
+      if (params.requirePriorTurn) {
+        whenAll.push({ path: "signals.hasPriorTurn", op: "eq", value: true });
+      }
+      if (params.requireExplicitDocRef) {
+        whenAll.push({ path: "signals.explicitDocRef", op: "eq", value: true });
+      }
+      const pattern = params.pattern || "\\b(and also|also|now|continue|next|then)\\b";
+      const rules: Array<Record<string, unknown>> = [
+        {
+          id: "continuation_markers",
+          triggerPatterns: { en: [pattern] },
+          ...(whenAll.length > 0 ? { when: { all: whenAll } } : {}),
+          action: { type: "add_followup_score", score: params.score ?? 0.7 },
+          reasonCode: "followup_continuation_marker",
+        },
+      ];
+      if (params.overrideNewTurn) {
+        rules.push({
+          id: "new_turn_override",
+          triggerPatterns: { en: [pattern] },
+          action: { type: "set_followup_override", override: "new_turn" },
+          reasonCode: "followup_override_new_turn",
+        });
+      }
+      return {
+        config: {
+          enabled: true,
+          actionsContract: { thresholds: { followupScoreMin: params.threshold ?? 0.65 } },
+        },
+        rules,
+      };
+    };
+
+    const makePatternBank = (params: {
+      enabled?: boolean;
+      en?: string[];
+      pt?: string[];
+      es?: string[];
+    }) => {
+      if (params.enabled === false) {
+        return { config: { enabled: false }, overlays: {}, operators: {} };
+      }
+      return {
+        config: {
+          enabled: true,
+          matching: {
+            caseSensitive: false,
+            stripDiacriticsForMatching: true,
+            collapseWhitespace: true,
+          },
+        },
+        overlays: {
+          followupIndicators: {
+            en: params.en ?? ["^(and|also|now|then)\\b"],
+            pt: params.pt ?? ["^(e tambem|tambem|agora|entao)\\b"],
+            es: params.es ?? ["^(y tambien|tambien|ahora|entonces)\\b"],
+          },
+        },
+        operators: {},
+      };
+    };
+
     const runCase = (params: {
       name: string;
       ctx: TurnContext;
@@ -91,181 +166,314 @@ describe("Certification: follow-up source coverage", () => {
       }
     };
 
-    runCase({
-      name: "context_source",
-      expectSource: "context",
-      expectIsFollowup: true,
-      ctx: makeCtx("and also the margin", {
-        request: {
-          userId: "followup-cert-user",
-          message: "and also the margin",
-          context: {
-            signals: {
-              isFollowup: true,
-              followupConfidence: 0.92,
+    const cases: Array<{
+      name: string;
+      expectSource: "context" | "followup_indicators" | "intent_patterns" | "none";
+      expectIsFollowup: boolean;
+      ctx: TurnContext;
+      bankProvider: (bankId: string) => any | null;
+    }> = [
+      {
+        name: "context_true_priority",
+        expectSource: "context",
+        expectIsFollowup: true,
+        ctx: makeCtx("and also the margin", {
+          request: {
+            userId: "followup-cert-user",
+            message: "and also the margin",
+            context: {
+              signals: {
+                isFollowup: true,
+                followupConfidence: 0.92,
+              },
             },
           },
+        }),
+        bankProvider: (bankId) => {
+          if (bankId === "followup_indicators") return makeIndicatorsBank({ score: 0.8 });
+          if (bankId === "intent_patterns") return makePatternBank({});
+          return null;
         },
-      }),
-      bankProvider: () => null,
-    });
-
-    runCase({
-      name: "followup_indicators_source",
-      expectSource: "followup_indicators",
-      expectIsFollowup: true,
-      ctx: makeCtx("and also the margin", {
-        request: {
-          userId: "followup-cert-user",
-          message: "and also the margin",
-          context: {
-            intentState: {
-              lastRoutingDecision: { intentFamily: "documents" },
+      },
+      {
+        name: "context_false_priority",
+        expectSource: "context",
+        expectIsFollowup: false,
+        ctx: makeCtx("and also the margin", {
+          request: {
+            userId: "followup-cert-user",
+            message: "and also the margin",
+            context: {
+              signals: {
+                isFollowup: false,
+                followupConfidence: 0.12,
+              },
             },
           },
+        }),
+        bankProvider: (bankId) => {
+          if (bankId === "followup_indicators") return makeIndicatorsBank({ score: 0.9 });
+          if (bankId === "intent_patterns") return makePatternBank({});
+          return null;
         },
-        attachedDocuments: [{ id: "doc-1", mime: "application/pdf" }],
-      }),
-      bankProvider: (bankId) => {
-        if (bankId === "followup_indicators") {
-          return {
-            config: {
-              enabled: true,
-              actionsContract: { thresholds: { followupScoreMin: 0.65 } },
-            },
-            rules: [
-              {
-                id: "continuation_markers",
-                triggerPatterns: { en: ["\\b(and also|also|now|continue)\\b"] },
-                action: { type: "add_followup_score", score: 0.7 },
-                reasonCode: "followup_continuation_marker",
-              },
-            ],
-          };
-        }
-        return null;
       },
-    });
-
-    runCase({
-      name: "followup_indicators_override_new_turn",
-      expectSource: "followup_indicators",
-      expectIsFollowup: false,
-      ctx: makeCtx("and also the margin", {
-        request: {
-          userId: "followup-cert-user",
-          message: "and also the margin",
-          context: {
-            intentState: {
-              lastRoutingDecision: { intentFamily: "documents" },
+      {
+        name: "followup_indicators_requires_prior_turn_positive",
+        expectSource: "followup_indicators",
+        expectIsFollowup: true,
+        ctx: makeCtx("and also the margin", {
+          request: {
+            userId: "followup-cert-user",
+            message: "and also the margin",
+            context: {
+              intentState: {
+                lastRoutingDecision: { intentFamily: "documents" },
+              },
             },
           },
+        }),
+        bankProvider: (bankId) => {
+          if (bankId === "followup_indicators") {
+            return makeIndicatorsBank({
+              requirePriorTurn: true,
+              score: 0.8,
+            });
+          }
+          if (bankId === "intent_patterns") return makePatternBank({ enabled: false });
+          return null;
         },
-      }),
-      bankProvider: (bankId) => {
-        if (bankId === "followup_indicators") {
-          return {
-            config: {
-              enabled: true,
-              actionsContract: { thresholds: { followupScoreMin: 0.65 } },
-            },
-            rules: [
-              {
-                id: "continuation_markers",
-                triggerPatterns: { en: ["\\b(and also|also|now|continue)\\b"] },
-                action: { type: "add_followup_score", score: 0.9 },
-              },
-              {
-                id: "new_turn_override",
-                triggerPatterns: { en: ["\\b(and also|also|now|continue)\\b"] },
-                action: { type: "set_followup_override", override: "new_turn" },
-                reasonCode: "followup_override_new_turn",
-              },
-            ],
-          };
-        }
-        return null;
       },
-    });
+      {
+        name: "followup_indicators_requires_prior_turn_negative",
+        expectSource: "followup_indicators",
+        expectIsFollowup: false,
+        ctx: makeCtx("and also the margin"),
+        bankProvider: (bankId) => {
+          if (bankId === "followup_indicators") {
+            return makeIndicatorsBank({
+              requirePriorTurn: true,
+              score: 0.8,
+            });
+          }
+          if (bankId === "intent_patterns") return makePatternBank({ enabled: false });
+          return null;
+        },
+      },
+      {
+        name: "followup_indicators_requires_explicit_docref_positive",
+        expectSource: "followup_indicators",
+        expectIsFollowup: true,
+        ctx: makeCtx("and also summarize contract.pdf"),
+        bankProvider: (bankId) => {
+          if (bankId === "followup_indicators") {
+            return makeIndicatorsBank({
+              requireExplicitDocRef: true,
+              score: 0.8,
+            });
+          }
+          if (bankId === "intent_patterns") return makePatternBank({ enabled: false });
+          return null;
+        },
+      },
+      {
+        name: "followup_indicators_override_new_turn",
+        expectSource: "followup_indicators",
+        expectIsFollowup: false,
+        ctx: makeCtx("and also the margin", {
+          request: {
+            userId: "followup-cert-user",
+            message: "and also the margin",
+            context: {
+              intentState: {
+                lastRoutingDecision: { intentFamily: "documents" },
+              },
+            },
+          },
+        }),
+        bankProvider: (bankId) => {
+          if (bankId === "followup_indicators") {
+            return makeIndicatorsBank({
+              score: 0.9,
+              overrideNewTurn: true,
+            });
+          }
+          if (bankId === "intent_patterns") return makePatternBank({ enabled: false });
+          return null;
+        },
+      },
+      {
+        name: "followup_indicators_below_threshold",
+        expectSource: "followup_indicators",
+        expectIsFollowup: false,
+        ctx: makeCtx("and also the margin", {
+          request: {
+            userId: "followup-cert-user",
+            message: "and also the margin",
+            context: {
+              intentState: {
+                lastRoutingDecision: { intentFamily: "documents" },
+              },
+            },
+          },
+        }),
+        bankProvider: (bankId) => {
+          if (bankId === "followup_indicators") {
+            return makeIndicatorsBank({
+              score: 0.5,
+              threshold: 0.65,
+            });
+          }
+          if (bankId === "intent_patterns") return makePatternBank({ enabled: false });
+          return null;
+        },
+      },
+      {
+        name: "intent_patterns_source_en",
+        expectSource: "intent_patterns",
+        expectIsFollowup: true,
+        ctx: makeCtx("and also"),
+        bankProvider: (bankId) => {
+          if (bankId === "followup_indicators") return makeIndicatorsBank({ enabled: false });
+          if (bankId === "intent_patterns") return makePatternBank({});
+          return null;
+        },
+      },
+      {
+        name: "intent_patterns_source_pt",
+        expectSource: "intent_patterns",
+        expectIsFollowup: true,
+        ctx: makeCtx("e tambem", { locale: "pt" }),
+        bankProvider: (bankId) => {
+          if (bankId === "followup_indicators") return makeIndicatorsBank({ enabled: false });
+          if (bankId === "intent_patterns") return makePatternBank({});
+          return null;
+        },
+      },
+      {
+        name: "intent_patterns_source_es",
+        expectSource: "intent_patterns",
+        expectIsFollowup: true,
+        ctx: makeCtx("y tambien", { locale: "es" }),
+        bankProvider: (bankId) => {
+          if (bankId === "followup_indicators") return makeIndicatorsBank({ enabled: false });
+          if (bankId === "intent_patterns") return makePatternBank({});
+          return null;
+        },
+      },
+      {
+        name: "none_source_nonmatch_overlay",
+        expectSource: "none",
+        expectIsFollowup: false,
+        ctx: makeCtx("hello there"),
+        bankProvider: (bankId) => {
+          if (bankId === "followup_indicators") return makeIndicatorsBank({ enabled: false });
+          if (bankId === "intent_patterns") {
+            return makePatternBank({
+              en: ["^__never_match__$"],
+              pt: ["^__never_match__$"],
+              es: ["^__never_match__$"],
+            });
+          }
+          return null;
+        },
+      },
+      {
+        name: "none_source_overlay_missing",
+        expectSource: "none",
+        expectIsFollowup: false,
+        ctx: makeCtx("and also this one"),
+        bankProvider: (bankId) => {
+          if (bankId === "followup_indicators") return makeIndicatorsBank({ enabled: false });
+          if (bankId === "intent_patterns") {
+            return {
+              config: { enabled: true, matching: {} },
+              overlays: {
+                followupIndicators: {
+                  en: [],
+                },
+              },
+              operators: {},
+            };
+          }
+          return null;
+        },
+      },
+      {
+        name: "none_source_all_detectors_disabled",
+        expectSource: "none",
+        expectIsFollowup: false,
+        ctx: makeCtx("new request unrelated"),
+        bankProvider: (bankId) => {
+          if (bankId === "followup_indicators") return makeIndicatorsBank({ enabled: false });
+          if (bankId === "intent_patterns") return makePatternBank({ enabled: false });
+          return null;
+        },
+      },
+      {
+        name: "bank_priority_over_patterns",
+        expectSource: "followup_indicators",
+        expectIsFollowup: true,
+        ctx: makeCtx("and also"),
+        bankProvider: (bankId) => {
+          if (bankId === "followup_indicators") return makeIndicatorsBank({ score: 0.8 });
+          if (bankId === "intent_patterns") return makePatternBank({});
+          return null;
+        },
+      },
+      {
+        name: "context_priority_over_bank_new_turn_override",
+        expectSource: "context",
+        expectIsFollowup: true,
+        ctx: makeCtx("and also", {
+          request: {
+            userId: "followup-cert-user",
+            message: "and also",
+            context: {
+              signals: {
+                isFollowup: true,
+                followupConfidence: 0.95,
+              },
+            },
+          },
+        }),
+        bankProvider: (bankId) => {
+          if (bankId === "followup_indicators") {
+            return makeIndicatorsBank({
+              score: 0.95,
+              overrideNewTurn: true,
+            });
+          }
+          if (bankId === "intent_patterns") return makePatternBank({});
+          return null;
+        },
+      },
+      {
+        name: "context_priority_false_over_bank_positive",
+        expectSource: "context",
+        expectIsFollowup: false,
+        ctx: makeCtx("and also", {
+          request: {
+            userId: "followup-cert-user",
+            message: "and also",
+            context: {
+              signals: {
+                isFollowup: false,
+                followupConfidence: 0.22,
+              },
+            },
+          },
+        }),
+        bankProvider: (bankId) => {
+          if (bankId === "followup_indicators") return makeIndicatorsBank({ score: 0.9 });
+          if (bankId === "intent_patterns") return makePatternBank({});
+          return null;
+        },
+      },
+    ];
 
-    runCase({
-      name: "intent_patterns_source",
-      expectSource: "intent_patterns",
-      expectIsFollowup: true,
-      ctx: makeCtx("and also"),
-      bankProvider: (bankId) => {
-        if (bankId === "followup_indicators") {
-          return { config: { enabled: false }, rules: [] };
-        }
-        if (bankId === "intent_patterns") {
-          return {
-            config: {
-              enabled: true,
-              matching: {
-                caseSensitive: false,
-                stripDiacriticsForMatching: true,
-                collapseWhitespace: true,
-              },
-            },
-            overlays: {
-              followupIndicators: {
-                en: ["^(and|also|now|then)\\b"],
-              },
-            },
-            operators: {},
-          };
-        }
-        return null;
-      },
-    });
-
-    runCase({
-      name: "none_source",
-      expectSource: "none",
-      expectIsFollowup: false,
-      ctx: makeCtx("hello there"),
-      bankProvider: (bankId) => {
-        if (bankId === "followup_indicators") {
-          return { config: { enabled: false }, rules: [] };
-        }
-        if (bankId === "intent_patterns") {
-          return {
-            config: { enabled: true, matching: {} },
-            overlays: {
-              followupIndicators: {
-                en: ["^__never_match__$"],
-              },
-            },
-            operators: {},
-          };
-        }
-        return null;
-      },
-    });
-
-    runCase({
-      name: "none_overlay_missing",
-      expectSource: "none",
-      expectIsFollowup: false,
-      ctx: makeCtx("and also this one"),
-      bankProvider: (bankId) => {
-        if (bankId === "followup_indicators") {
-          return { config: { enabled: false }, rules: [] };
-        }
-        if (bankId === "intent_patterns") {
-          return {
-            config: { enabled: true, matching: {} },
-            overlays: {
-              followupIndicators: {
-                en: [],
-              },
-            },
-            operators: {},
-          };
-        }
-        return null;
-      },
-    });
+    for (const testCase of cases) {
+      runCase(testCase);
+    }
 
     const expectedSources = [
       "context",
@@ -289,6 +497,7 @@ describe("Certification: follow-up source coverage", () => {
     const minFollowupPrecision = 0.9;
     const minFollowupRecall = 0.9;
     const maxFollowupFalsePositiveRate = 0.15;
+    const minCaseCount = 14;
 
     if (followupPrecision < minFollowupPrecision) {
       failures.push("followup_precision_below_threshold");
@@ -299,10 +508,14 @@ describe("Certification: follow-up source coverage", () => {
     if (followupFalsePositiveRate > maxFollowupFalsePositiveRate) {
       failures.push("followup_false_positive_rate_above_threshold");
     }
+    if (cases.length < minCaseCount) {
+      failures.push("followup_case_count_below_threshold");
+    }
 
     writeCertificationGateReport("followup-source-coverage", {
       passed: failures.length === 0,
       metrics: {
+        caseCount: cases.length,
         coveredSources: Array.from(covered).sort().join(","),
         coveredSourceCount: covered.size,
         expectedSourceCount: expectedSources.length,
@@ -315,6 +528,7 @@ describe("Certification: follow-up source coverage", () => {
         followupFalsePositiveRate: Number(followupFalsePositiveRate.toFixed(4)),
       },
       thresholds: {
+        minCaseCount,
         expectedSourceCount: expectedSources.length,
         minFollowupPrecision,
         minFollowupRecall,

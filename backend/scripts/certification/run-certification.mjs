@@ -9,8 +9,8 @@ import {
   requireLiveRuntimeGraphEvidence,
   resolveCertificationProfileFromArgs,
   resolveLocalCertRunPolicy,
-  resolveQueryLatencyPolicy,
 } from "./certification-policy.mjs";
+import { resolveCertificationGateSet } from "./certification-gate-manifest.mjs";
 
 const strict = !process.argv.includes("--no-strict");
 const repairMode =
@@ -19,6 +19,7 @@ const repairMode =
 const verifyOnly =
   process.argv.includes("--verify-only") ||
   process.argv.includes("--mode=verify");
+const mode = repairMode ? "repair" : "verify";
 const autoRefresh = repairMode
   ? true
   : !verifyOnly &&
@@ -35,32 +36,6 @@ const maxAgeHours = Number(process.env.CERT_GATE_MAX_AGE_HOURS || 24);
 const maxAgeMs = Number.isFinite(maxAgeHours) && maxAgeHours > 0
   ? maxAgeHours * 60 * 60 * 1000
   : 24 * 60 * 60 * 1000;
-
-const baseRequiredGates = [
-  "wrong-doc",
-  "truncation",
-  "persistence-restart",
-  "editing-roundtrip",
-  "editing-capabilities",
-  "editing-eval-suite",
-  "editing-slo",
-  "runtime-wiring",
-  "enforcer-failclosed",
-  "evidence-fidelity",
-  "provenance-strictness",
-  "prompt-mode-coverage",
-  "composition-routing",
-  "composition-fallback-order",
-  "composition-pinned-model-resolution",
-  "composition-telemetry-integrity",
-  "composition-analytical-structure",
-  "builder-payload-budget",
-  "gateway-json-routing",
-  "turn-debug-packet",
-  "security-auth",
-  "observability-integrity",
-  "retrieval-behavioral",
-];
 
 const gateGenerators = {
   "wrong-doc": "test:cert:wrong-doc",
@@ -87,6 +62,11 @@ const gateGenerators = {
   "security-auth": "test:cert:security-auth",
   "observability-integrity": "test:cert:observability-integrity",
   "retrieval-behavioral": "test:cert:retrieval-behavioral",
+  "retrieval-golden-eval": "test:cert:retrieval-golden-eval",
+  "retrieval-realistic-eval": "test:cert:retrieval-realistic-eval",
+  "frontend-retrieval-evidence": "test:cert:frontend-retrieval-evidence",
+  "indexing-live-integration":
+    "jest:path:src/tests/certification/indexing-live-integration.cert.test.ts",
 };
 
 function readJson(filePath) {
@@ -195,33 +175,6 @@ function resolvePerQueryReportPath() {
   return null;
 }
 
-function resolveGateSet(profile, hasLatencyInput) {
-  const requiredGates = [...baseRequiredGates];
-  const optionalGates = ["query-latency"];
-  const skippedOptionalGates = [];
-  const queryLatencyPolicy = resolveQueryLatencyPolicy({
-    strict,
-    profile,
-    hasLatencyInput,
-  });
-  if (queryLatencyPolicy.required) {
-    requiredGates.push("query-latency");
-  } else {
-    skippedOptionalGates.push({
-      gateId: "query-latency",
-      criticality: "optional",
-      reason: "missing_per_query_report",
-    });
-  }
-
-  return {
-    requiredGates,
-    optionalGates,
-    skippedOptionalGates,
-    queryLatencyPolicy,
-  };
-}
-
 function currentCommitMetadata() {
   return resolveCommitHash(ROOT);
 }
@@ -261,8 +214,40 @@ function analyzeFreshness(gate, commitHash) {
 function runGateGenerator(scriptName, commitHash) {
   const childEnv = {
     ...process.env,
+    CERT_MODE: repairMode ? "repair" : "verify",
+    CERT_STRICT: strict ? "1" : "0",
     ...(commitHash ? { GIT_COMMIT_HASH: commitHash } : {}),
   };
+  if (scriptName.startsWith("jest:path:")) {
+    const testPath = scriptName.slice("jest:path:".length).trim();
+    if (!testPath) return false;
+    const args = [
+      "run",
+      "-s",
+      "test",
+      "--",
+      "--runInBand",
+      "--runTestsByPath",
+      testPath,
+    ];
+    const jestResult = process.platform === "win32"
+      ? spawnSync("npm.cmd", args, {
+        cwd: ROOT,
+        stdio: "inherit",
+        env: childEnv,
+      })
+      : spawnSync("npm", args, {
+        cwd: ROOT,
+        stdio: "inherit",
+        env: childEnv,
+      });
+    if (jestResult.error) {
+      console.error(
+        `[certification] failed to execute inline jest gate '${scriptName}': ${jestResult.error.message}`,
+      );
+    }
+    return jestResult.status === 0;
+  }
   const result = process.platform === "win32"
     ? spawnSync("cmd.exe", ["/d", "/s", "/c", `npm.cmd run -s ${scriptName}`], {
       cwd: ROOT,
@@ -377,9 +362,22 @@ function main() {
   const commitMetadata = currentCommitMetadata();
   const commitHash = commitMetadata.commitHash;
   const profile = resolveCertificationProfileFromArgs({ args: process.argv });
+  process.env.CERT_PROFILE = profile;
+  process.env.CERT_MODE = mode;
+  process.env.CERT_STRICT = strict ? "true" : "false";
   const hasLatencyInput = hasQueryLatencyInput();
-  const { requiredGates, optionalGates, skippedOptionalGates, queryLatencyPolicy } =
-    resolveGateSet(profile, hasLatencyInput);
+  const {
+    requiredGateIds,
+    optionalGateIds,
+    skippedOptionalGates,
+    queryLatencyPolicy,
+  } = resolveCertificationGateSet({
+    scope: "cert",
+    strict,
+    profile,
+    hasQueryLatencyInput: hasLatencyInput,
+    env: process.env,
+  });
   const generatedAt = new Date().toISOString();
   const reportPath = resolvePerQueryReportPath();
   const lineage = {
@@ -403,7 +401,7 @@ function main() {
     failures.push("MISSING_QUERY_LATENCY_INPUT");
   }
 
-  for (const gateId of requiredGates) {
+  for (const gateId of requiredGateIds) {
     const state = ensureGate(gateId, commitHash, regenerated);
     const report = state.gate;
     if (report.missing) {
@@ -425,6 +423,8 @@ function main() {
     }
     if (strict && gateId === "runtime-wiring") {
       const commandMode = String(report?.metrics?.commandMode || "").trim();
+      const embeddingRuntimeModeAllowed =
+        report?.metrics?.embeddingRuntimeModeAllowed;
       const liveEvidenceRequired = requireLiveRuntimeGraphEvidence({
         profile,
         strict,
@@ -437,13 +437,22 @@ function main() {
           `DEGRADED_GATE_EVIDENCE:${gateId}:commandMode_${commandMode || "missing"}`,
         );
       }
+      if (embeddingRuntimeModeAllowed !== true) {
+        failures.push(
+          `DEGRADED_GATE_EVIDENCE:${gateId}:embedding_runtime_mode_not_allowed`,
+        );
+      }
     }
   }
 
   const allowFailedLocalRun =
     String(process.env.CERT_ALLOW_FAILED_LOCAL_RUN || "").trim().toLowerCase() ===
       "true" || process.env.CERT_ALLOW_FAILED_LOCAL_RUN === "1";
-  const localRunPolicy = resolveLocalCertRunPolicy({ strict, profile });
+  const localRunPolicy = resolveLocalCertRunPolicy({
+    strict,
+    profile,
+    verifyOnly,
+  });
   const enforceLocalRunHealth = localRunPolicy.enforce;
   const localCertRun = analyzeLocalCertRun();
   if (
@@ -462,7 +471,7 @@ function main() {
     generatedAt,
     strict,
     profile,
-    mode: repairMode ? "repair" : "verify",
+    mode,
     verifyOnly: verifyOnly || !repairMode,
     autoRefresh,
     commitHash,
@@ -477,13 +486,13 @@ function main() {
         requireLiveMode: requireLiveRuntimeGraphEvidence({ profile, strict }),
       },
     },
-    optionalGates,
+    optionalGates: optionalGateIds,
     skippedOptionalGates,
     localCertRun,
     passed: failures.length === 0,
-    totalGates: requiredGates.length,
+    totalGates: requiredGateIds.length,
     passedGates: gates.filter((gate) => gate.passed).length,
-    failedGates: requiredGates.length - gates.filter((gate) => gate.passed).length,
+    failedGates: requiredGateIds.length - gates.filter((gate) => gate.passed).length,
     failures,
     gates,
   };

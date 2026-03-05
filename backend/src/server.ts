@@ -55,6 +55,7 @@ import { DocumentKeyService } from "./services/documents/documentKey.service";
 import { DocumentCryptoService } from "./services/documents/documentCrypto.service";
 import { EncryptedDocumentRepo } from "./services/documents/encryptedDocumentRepo.service";
 import { ChunkCryptoService } from "./services/retrieval/chunkCrypto.service";
+import { resolveIndexingPolicySnapshot } from "./services/retrieval/indexingPolicy.service";
 
 const driveStorage = {
   provider: "drive",
@@ -89,6 +90,10 @@ async function startServer() {
     const container = getContainer();
     console.log(`[Server] Container ready: ${container.isInitialized()}`);
     const sharedConversationMemory = container.getConversationMemory();
+    const indexingPolicy = resolveIndexingPolicySnapshot();
+    console.log(
+      `[Server] Indexing policy mode=${indexingPolicy.runtimeMode} allowed=${indexingPolicy.runtimeModeAllowed} allowedModes=${indexingPolicy.allowedRuntimeModes.join(",")} strictFailClosed=${indexingPolicy.strictFailClosed} encryptedOnly=${indexingPolicy.encryptedChunksOnly}`,
+    );
 
     // 2. Connect to database
     try {

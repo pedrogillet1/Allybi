@@ -580,7 +580,9 @@ describe("vectorEmbedding.service", () => {
 
     await deleteDocumentEmbeddings(DOC_ID);
 
-    expect(mockPineconeDeleteDocumentEmbeddings).toHaveBeenCalledWith(DOC_ID);
+    expect(mockPineconeDeleteDocumentEmbeddings).toHaveBeenCalledWith(DOC_ID, {
+      userId: USER_ID,
+    });
     expect(mockTransaction).toHaveBeenCalledTimes(1);
   });
 

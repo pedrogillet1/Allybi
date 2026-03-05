@@ -1178,6 +1178,39 @@ function writeAtomic(filePath, content) {
   fs.renameSync(tmpPath, filePath);
 }
 
+function publishLatestAtomically(latestArtifacts) {
+  const stamp = `${Date.now()}-${process.pid}`;
+  const tmpLatestDir = path.join(REPORTS_DIR, `latest.__tmp__${stamp}`);
+  const backupLatestDir = path.join(REPORTS_DIR, `latest.__bak__${stamp}`);
+  fs.mkdirSync(REPORTS_DIR, { recursive: true });
+  fs.mkdirSync(tmpLatestDir, { recursive: true });
+
+  for (const artifact of latestArtifacts) {
+    writeAtomic(path.join(tmpLatestDir, artifact.fileName), artifact.content);
+  }
+
+  const latestExists = fs.existsSync(LATEST_DIR);
+  if (latestExists) {
+    fs.renameSync(LATEST_DIR, backupLatestDir);
+  }
+
+  try {
+    fs.renameSync(tmpLatestDir, LATEST_DIR);
+  } catch (error) {
+    if (fs.existsSync(backupLatestDir) && !fs.existsSync(LATEST_DIR)) {
+      fs.renameSync(backupLatestDir, LATEST_DIR);
+    }
+    if (fs.existsSync(tmpLatestDir)) {
+      fs.rmSync(tmpLatestDir, { recursive: true, force: true });
+    }
+    throw error;
+  }
+
+  if (fs.existsSync(backupLatestDir)) {
+    fs.rmSync(backupLatestDir, { recursive: true, force: true });
+  }
+}
+
 function writeLatestAndArchiveArtifacts(result, scoredRows) {
   const runId = String(result?.meta?.runId || '').trim();
   const datasetId = String(result?.meta?.datasetId || '').trim();
@@ -1189,7 +1222,6 @@ function writeLatestAndArchiveArtifacts(result, scoredRows) {
   }
   const archiveRoot = path.join(REPORTS_DIR, 'archive');
   const runArchiveDir = path.join(archiveRoot, runId);
-  fs.mkdirSync(LATEST_DIR, { recursive: true });
   fs.mkdirSync(runArchiveDir, { recursive: true });
 
   const scorecardJson = `${JSON.stringify(result, null, 2)}\n`;
@@ -1203,12 +1235,13 @@ function writeLatestAndArchiveArtifacts(result, scoredRows) {
     { key: 'deepDive', fileName: 'a-plus-gap-deep-dive.md', content: deepDiveMd },
     { key: 'perQuery', fileName: 'per_query.json', content: perQueryJson },
   ];
+  const latestArtifacts = [];
   const lineageArtifacts = {};
   for (const artifact of artifacts) {
     const latestPath = path.join(LATEST_DIR, artifact.fileName);
     const archivePath = path.join(runArchiveDir, artifact.fileName);
-    writeAtomic(latestPath, artifact.content);
     writeAtomic(archivePath, artifact.content);
+    latestArtifacts.push({ fileName: artifact.fileName, content: artifact.content });
     const digest = sha256(artifact.content);
     const bytes = Buffer.byteLength(artifact.content, 'utf8');
     lineageArtifacts[artifact.key] = {
@@ -1237,8 +1270,9 @@ function writeLatestAndArchiveArtifacts(result, scoredRows) {
     archiveScorecardPath: path.resolve(runArchiveDir, 'scorecard.json'),
   };
   const lineageJson = `${JSON.stringify(lineage, null, 2)}\n`;
-  writeAtomic(path.join(LATEST_DIR, 'lineage.json'), lineageJson);
   writeAtomic(path.join(runArchiveDir, 'lineage.json'), lineageJson);
+  latestArtifacts.push({ fileName: 'lineage.json', content: lineageJson });
+  publishLatestAtomically(latestArtifacts);
 }
 
 function renderAPlusGapDeepDive(result) {

@@ -1,4 +1,5 @@
 import prisma from "../../config/database";
+import { resolveIndexingPolicySnapshot } from "./indexingPolicy.service";
 import pineconeService from "./pinecone.service";
 import {
   deleteChunkEmbeddings as deleteChunkEmbeddingsV1,
@@ -7,16 +8,6 @@ import {
   type InputChunk,
   type StoreEmbeddingsOptions,
 } from "./vectorEmbedding.service";
-
-function isFlagEnabled(flagName: string, defaultValue: boolean): boolean {
-  const raw = String(process.env[flagName] || "")
-    .trim()
-    .toLowerCase();
-  if (!raw) return defaultValue;
-  if (["1", "true", "yes", "on"].includes(raw)) return true;
-  if (["0", "false", "no", "off"].includes(raw)) return false;
-  return defaultValue;
-}
 
 async function verifyIndexedVectorCount(params: {
   documentId: string;
@@ -55,6 +46,7 @@ export async function storeDocumentEmbeddings(
   chunks: InputChunk[],
   options: StoreEmbeddingsOptions = {},
 ): Promise<void> {
+  const indexingPolicy = resolveIndexingPolicySnapshot();
   const docBefore = await prisma.document.findUnique({
     where: { id: documentId },
     select: { id: true, userId: true, indexingOperationId: true },
@@ -64,17 +56,10 @@ export async function storeDocumentEmbeddings(
   }
 
   const previousOperationId = String(docBefore.indexingOperationId || "").trim();
-  const strictVerify =
-    options.strictVerify ??
-    isFlagEnabled("INDEXING_STRICT_FAIL_CLOSED", true);
-  const requireVerificationBeforeCleanup = isFlagEnabled(
-    "INDEXING_VERIFY_REQUIRED",
-    true,
-  );
-  const allowUnverifiedPreviousOpDelete = isFlagEnabled(
-    "INDEXING_ALLOW_UNVERIFIED_PREVOP_DELETE",
-    false,
-  );
+  const strictVerify = options.strictVerify ?? indexingPolicy.strictFailClosed;
+  const requireVerificationBeforeCleanup = indexingPolicy.verifyRequired;
+  const allowUnverifiedPreviousOpDelete =
+    indexingPolicy.allowUnverifiedPreviousOperationDelete;
 
   await storeDocumentEmbeddingsV1(documentId, chunks, {
     ...options,

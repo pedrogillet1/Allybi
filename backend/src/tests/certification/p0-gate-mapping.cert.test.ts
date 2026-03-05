@@ -67,11 +67,17 @@ describe("Certification: P0 runtime-wiring gate mapping", () => {
     expect(String(pkg?.scripts?.["audit:p0:verify:strict"] || "")).toContain(
       "--verify-only --no-auto-refresh --profile=ci",
     );
+    expect(String(pkg?.scripts?.["audit:p0:verify:strict"] || "")).toContain(
+      "--scope=p0",
+    );
     expect(String(pkg?.scripts?.["audit:cert:verify:strict"] || "")).toContain(
       "run-certification.mjs --verify-only --no-auto-refresh --profile=ci",
     );
+    expect(String(pkg?.scripts?.["audit:cert:verify:strict"] || "")).toContain(
+      "--scope=cert",
+    );
     expect(String(pkg?.scripts?.["cert:preflight:freshness"] || "")).toContain(
-      "preflight-gate-freshness.mjs --strict --profile=ci",
+      "preflight-gate-freshness.mjs --strict --profile=ci --scope=cert",
     );
   });
 

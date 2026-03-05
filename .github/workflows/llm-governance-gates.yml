@@ -1,0 +1,63 @@
+name: LLM Governance Gates
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - "backend/scripts/audit/model-governance-*"
+      - "backend/scripts/certification/**"
+      - "backend/src/services/llm/**"
+      - "backend/src/data_banks/llm/**"
+      - "backend/src/tests/certification/**"
+      - "backend/package.json"
+      - "backend/package-lock.json"
+      - ".github/workflows/llm-governance-gates.yml"
+  push:
+    branches: [ main, develop ]
+    paths:
+      - "backend/scripts/audit/model-governance-*"
+      - "backend/scripts/certification/**"
+      - "backend/src/services/llm/**"
+      - "backend/src/data_banks/llm/**"
+      - "backend/src/tests/certification/**"
+      - "backend/package.json"
+      - "backend/package-lock.json"
+      - ".github/workflows/llm-governance-gates.yml"
+  workflow_dispatch:
+
+jobs:
+  governance:
+    name: Governance + Certification Verify
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify certification policy contracts
+        run: npm run test:cert:policy
+
+      - name: Strict model governance checks
+        run: |
+          npm run audit:models:strict
+          npm run audit:models:consistency
+          npm run audit:models:deps
+
+      - name: Strict P0 verify checks
+        run: npm run audit:p0:verify:strict
+
+      - name: Strict certification verify checks
+        run: npm run audit:cert:verify:strict

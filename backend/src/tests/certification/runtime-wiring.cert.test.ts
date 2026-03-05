@@ -3,6 +3,7 @@ import fs from "fs";
 import path from "path";
 import { spawnSync } from "child_process";
 import { pathToFileURL } from "url";
+import { getVectorEmbeddingRuntimeMetadata } from "../../services/retrieval/vectorEmbedding.runtime.service";
 
 import { writeCertificationGateReport } from "./reporting";
 
@@ -69,22 +70,49 @@ function isCiRuntime(): boolean {
   return flags.some((value) => value === "1" || value === "true");
 }
 
-function resolveCertificationProfile(): "local" | "ci" | "release" {
+function parseBooleanFlag(value: string | undefined): boolean | null {
+  const raw = String(value || "").trim().toLowerCase();
+  if (!raw) return null;
+  if (raw === "1" || raw === "true") return true;
+  if (raw === "0" || raw === "false") return false;
+  return null;
+}
+
+function resolveCertificationProfile():
+  | "local"
+  | "ci"
+  | "release"
+  | "retrieval_signoff" {
   const raw = String(process.env.CERT_PROFILE || "")
     .trim()
     .toLowerCase();
-  if (raw === "ci" || raw === "release" || raw === "local") return raw;
+  if (
+    raw === "ci" ||
+    raw === "release" ||
+    raw === "local" ||
+    raw === "retrieval_signoff"
+  ) {
+    return raw;
+  }
   return "local";
 }
 
+function resolveStrictMode(): boolean {
+  return parseBooleanFlag(process.env.CERT_STRICT) === true;
+}
+
 function requireLiveRuntimeGraphEvidence(): boolean {
-  const override = String(process.env.CERT_REQUIRE_RUNTIME_GRAPH_LIVE || "")
-    .trim()
-    .toLowerCase();
-  if (override === "1" || override === "true") return true;
-  if (override === "0" || override === "false") return false;
+  const override = parseBooleanFlag(process.env.CERT_REQUIRE_RUNTIME_GRAPH_LIVE);
+  if (override != null) return override;
+  if (resolveStrictMode()) return true;
   const profile = resolveCertificationProfile();
-  if (profile === "ci" || profile === "release") return true;
+  if (
+    profile === "ci" ||
+    profile === "release" ||
+    profile === "retrieval_signoff"
+  ) {
+    return true;
+  }
   return isCiRuntime();
 }
 
@@ -200,6 +228,9 @@ describe("Certification: runtime wiring reachability", () => {
     );
 
     const failures: string[] = [];
+    const embeddingRuntimeMetadata = getVectorEmbeddingRuntimeMetadata();
+    const embeddingRuntimeModeAllowed =
+      embeddingRuntimeMetadata.modeAllowed !== false;
     if (!run.ok) failures.push("RUNTIME_GRAPH_COMMAND_FAILED");
     const requireLiveMode = requireLiveRuntimeGraphEvidence();
     if (requireLiveMode && run.mode !== "live") {
@@ -221,6 +252,9 @@ describe("Certification: runtime wiring reachability", () => {
     if (missingCriticalPaths.length > 0) {
       failures.push("MISSING_CRITICAL_WIRING_TEST_PATHS");
     }
+    if (!embeddingRuntimeModeAllowed) {
+      failures.push("INDEXING_EMBEDDING_RUNTIME_MODE_NOT_ALLOWED");
+    }
 
     writeCertificationGateReport("runtime-wiring", {
       passed: failures.length === 0,
@@ -235,6 +269,9 @@ describe("Certification: runtime wiring reachability", () => {
         missingLocalRefs,
         legacyRouteWrappers,
         missingCriticalPaths: missingCriticalPaths.length,
+        embeddingRuntimeMode: embeddingRuntimeMetadata.mode,
+        embeddingRuntimeAllowedModes: embeddingRuntimeMetadata.allowedModes,
+        embeddingRuntimeModeAllowed,
       },
       thresholds,
       failures,

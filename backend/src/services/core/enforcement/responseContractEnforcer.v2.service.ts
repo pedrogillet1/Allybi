@@ -2289,7 +2289,7 @@ export class ResponseContractEnforcerService {
   private shouldFailClosedUiContracts(): boolean {
     const override = String(process.env.UI_CONTRACTS_FAIL_CLOSED || "").trim();
     if (override) return parseBoolish(override);
-    return process.env.NODE_ENV === "production" || parseBoolish(process.env.CI);
+    return true;
   }
 
   private shouldAllowLegacyUiContracts(): boolean {
@@ -2340,6 +2340,9 @@ export class ResponseContractEnforcerService {
     this.renderPolicy = getBank<RenderPolicyBank>("render_policy");
     this.uiContractsLoadWarnings = [];
     const strictUiContracts = this.shouldFailClosedUiContracts();
+    if (!strictUiContracts) {
+      this.uiContractsLoadWarnings.push("UI_CONTRACTS_FAIL_OPEN_OVERRIDE_ENABLED");
+    }
     try {
       let rawUiContracts: unknown;
       try {
@@ -2753,6 +2756,20 @@ export class ResponseContractEnforcerService {
         content = strippedByContract.text;
       }
     }
+    if (ctx.answerMode !== "nav_pills" && !String(content || "").trim()) {
+      return {
+        content: "",
+        attachments,
+        enforcement: {
+          repairs: [...repairs, "UI_CONTRACT_EMPTY_AFTER_SUPPRESSION"],
+          warnings: [...warnings, "UI_CONTRACT_CONTENT_EMPTIED_BY_SUPPRESSION"],
+          blocked: true,
+          reasonCode: "ui_contract_content_empty_after_suppression",
+          ...buildUiTrace(),
+          ...(provenanceEnforcement ? { provenance: provenanceEnforcement } : {}),
+        },
+      };
+    }
     const attachmentPolicyApplied = filterAttachmentsByUiPolicy(attachments, {
       allowedTypes: resolvedUiDecision.attachmentPolicy.allowedTypes,
       disallowedTypes: resolvedUiDecision.attachmentPolicy.disallowedTypes,
@@ -2794,6 +2811,10 @@ export class ResponseContractEnforcerService {
       );
       if (intro !== content) repairs.push("NAV_PILLS_BODY_TRIMMED");
       content = intro;
+      if (!content.trim()) {
+        content = this.navNotFoundLine(ctx.language);
+        repairs.push("NAV_PILLS_EMPTY_BODY_FALLBACK");
+      }
 
       // Must have source_buttons attachment (otherwise downstream fallback engine handles)
       if (getSourceButtonsCount(attachments) < 1) {

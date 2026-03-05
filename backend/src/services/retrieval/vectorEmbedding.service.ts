@@ -25,6 +25,7 @@ import { EncryptionService } from "../security/encryption.service";
 import { EnvelopeService } from "../security/envelope.service";
 import { TenantKeyService } from "../security/tenantKey.service";
 import embeddingService from "./embedding.service";
+import { resolveIndexingPolicySnapshot } from "./indexingPolicy.service";
 import pineconeService from "./pinecone.service";
 import type { InputChunk as PipelineInputChunk } from "../ingestion/pipeline/pipelineTypes";
 
@@ -54,16 +55,6 @@ interface ChunkEncryptionServices {
 
 function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
-}
-
-function isFlagEnabled(flagName: string, defaultValue: boolean): boolean {
-  const raw = String(process.env[flagName] || "")
-    .trim()
-    .toLowerCase();
-  if (!raw) return defaultValue;
-  if (["1", "true", "yes", "on"].includes(raw)) return true;
-  if (["0", "false", "no", "off"].includes(raw)) return false;
-  return defaultValue;
 }
 
 function buildEmbeddingOperationId(documentId: string): string {
@@ -200,18 +191,19 @@ export async function storeDocumentEmbeddings(
   chunks: InputChunk[],
   options: StoreEmbeddingsOptions = {},
 ): Promise<void> {
+  const indexingPolicy = resolveIndexingPolicySnapshot();
   const {
     maxRetries = 3,
     verifyAfterStore = false,
     batchSize = 100,
     minContentChars = 8,
-    strictVerify = isFlagEnabled("INDEXING_STRICT_FAIL_CLOSED", true),
+    strictVerify = indexingPolicy.strictFailClosed,
     preDeleteVectors = true,
-    encryptionMode = isFlagEnabled("INDEXING_ENCRYPTED_CHUNKS_ONLY", true)
+    encryptionMode = indexingPolicy.encryptedChunksOnly
       ? "encrypted_only"
       : "plaintext",
   } = options;
-  const strictFailClosed = isFlagEnabled("INDEXING_STRICT_FAIL_CLOSED", true);
+  const strictFailClosed = indexingPolicy.strictFailClosed;
 
   if (!documentId) throw new Error("documentId is required");
   if (!chunks || chunks.length === 0) {
@@ -287,8 +279,7 @@ export async function storeDocumentEmbeddings(
     const texts = needsEmbedding.map((c) => c.content);
     const batchResult = await embeddingService.generateBatchEmbeddings(texts);
     if (batchResult.failedCount > 0) {
-      const failClose = isFlagEnabled("EMBEDDING_FAILCLOSE_V1", true);
-      if (failClose) {
+      if (indexingPolicy.embeddingFailCloseV1) {
         throw new Error(
           `Embedding generation failed for ${batchResult.failedCount}/${batchResult.totalProcessed} chunks`,
         );
@@ -600,10 +591,19 @@ export async function deleteDocumentEmbeddings(
 
   logger.info("[vectorEmbedding] Deleting embeddings", { documentId });
 
+  const doc = await prisma.document.findUnique({
+    where: { id: documentId },
+    select: { userId: true },
+  });
+  const userId = String(doc?.userId || "").trim();
+
   // Best-effort Pinecone delete (don’t block doc deletion if it fails)
   try {
-    if (typeof pineconeService.deleteDocumentEmbeddings === "function") {
-      await pineconeService.deleteDocumentEmbeddings(documentId);
+    if (
+      userId &&
+      typeof pineconeService.deleteDocumentEmbeddings === "function"
+    ) {
+      await pineconeService.deleteDocumentEmbeddings(documentId, { userId });
     }
   } catch (e: any) {
     logger.warn("[vectorEmbedding] Pinecone delete failed", {

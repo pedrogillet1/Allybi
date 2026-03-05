@@ -1,0 +1,5 @@
+# Relative paths (from repository root) excluded by audit:orphan-entrypoints.
+# One path per line. Lines beginning with "#" are ignored.
+
+# Example:
+# backend/check-doc-status.js

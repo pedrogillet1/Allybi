@@ -19,6 +19,7 @@ const repairMode =
 const verifyOnly =
   process.argv.includes("--verify-only") ||
   process.argv.includes("--mode=verify");
+const mode = repairMode ? "repair" : "verify";
 const autoRefresh = repairMode
   ? true
   : !strict &&
@@ -197,6 +198,9 @@ function main() {
   const checks = [];
   const regenerated = [];
   const profile = resolveCertificationProfileFromArgs({ args: process.argv });
+  process.env.CERT_PROFILE = profile;
+  process.env.CERT_MODE = mode;
+  process.env.CERT_STRICT = strict ? "true" : "false";
   const commitMetadata = currentCommitHash();
   const commitHash = commitMetadata.commitHash;
   verifyRuntimeWiringContract(failures);
@@ -362,10 +366,12 @@ function main() {
     }
     const commandStatus = Number(runtimeWiring?.metrics?.commandStatus ?? 1);
     const commandMode = String(runtimeWiring?.metrics?.commandMode || "").trim();
+    const embeddingRuntimeModeAllowed =
+      runtimeWiring?.metrics?.embeddingRuntimeModeAllowed;
     checks.push({
       gateId: "runtime-wiring",
       passed: runtimeWiring?.passed === true,
-      metrics: { commandStatus, commandMode },
+      metrics: { commandStatus, commandMode, embeddingRuntimeModeAllowed },
       freshness: runtimeWiringState.freshness,
     });
     if (runtimeWiring?.passed !== true) {
@@ -385,6 +391,9 @@ function main() {
             ? "P0-9_RUNTIME_WIRING_EVIDENCE_MODE_NOT_LIVE"
             : "P0-9_RUNTIME_WIRING_EVIDENCE_MODE_INVALID",
         );
+      }
+      if (embeddingRuntimeModeAllowed !== true) {
+        failures.push("P0-9_RUNTIME_WIRING_EMBEDDING_MODE_NOT_ALLOWED");
       }
     }
   }

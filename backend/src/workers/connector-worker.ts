@@ -7,41 +7,12 @@ import {
   stopConnectorWorker,
   type ConnectorSyncJobData,
 } from "../queues/connector.queue";
-import {
-  registerConnector,
-  getConnector,
-} from "../services/connectors/connectorsRegistry";
+import { getConnector } from "../services/connectors/connectorsRegistry";
 import { ConnectorIdentityMapService } from "../services/connectors/connectorIdentityMap.service";
-import { GmailOAuthService } from "../services/connectors/gmail/gmailOAuth.service";
-import { GmailClientService } from "../services/connectors/gmail/gmailClient.service";
-import { GmailSyncService } from "../services/connectors/gmail/gmailSync.service";
-import { OutlookOAuthService } from "../services/connectors/outlook/outlookOAuth.service";
-import GraphClientService from "../services/connectors/outlook/graphClient.service";
-import { OutlookSyncService } from "../services/connectors/outlook/outlookSync.service";
-import { SlackOAuthService } from "../services/connectors/slack/slackOAuth.service";
-import { SlackClientService } from "../services/connectors/slack/slackClient.service";
-import { SlackSyncService } from "../services/connectors/slack/slackSync.service";
+import { registerDefaultConnectors } from "../services/connectors/registerDefaultConnectors";
+import { logger } from "../utils/logger";
 
-registerConnector("gmail", {
-  capabilities: { oauth: true, sync: true, search: true },
-  oauthService: new GmailOAuthService(),
-  clientService: new GmailClientService(),
-  syncService: new GmailSyncService(),
-});
-
-registerConnector("outlook", {
-  capabilities: { oauth: true, sync: true, search: true },
-  oauthService: new OutlookOAuthService(),
-  clientService: new GraphClientService(),
-  syncService: new OutlookSyncService(),
-});
-
-registerConnector("slack", {
-  capabilities: { oauth: true, sync: true, search: true, realtime: true },
-  oauthService: new SlackOAuthService(),
-  clientService: new SlackClientService(),
-  syncService: new SlackSyncService(),
-});
+registerDefaultConnectors();
 
 const CURSOR_ROOT = path.resolve(
   process.cwd(),
@@ -131,9 +102,12 @@ async function runJob(job: Job<ConnectorSyncJobData>): Promise<void> {
     await persistFileCursorToDb(userId, provider);
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    console.error(
-      `[ConnectorWorker] Sync job ${job.id} failed for ${provider}: ${msg}`,
-    );
+    logger.error("[ConnectorWorker] Sync job failed", {
+      jobId: job.id,
+      provider,
+      userId,
+      error: msg,
+    });
     throw err;
   }
 }
