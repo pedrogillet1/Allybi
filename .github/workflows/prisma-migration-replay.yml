@@ -62,5 +62,10 @@ jobs:
       - name: Validate + replay migrations
         run: npm run prisma:replay:check
 
+      - name: Verify RLS profile (CI soft profile)
+        run: npm run prisma:rls:verify
+        env:
+          PRISMA_RLS_PROFILE: "ci"
+
       - name: Run Prisma invariant tests
         run: npm run test:prisma:invariants

@@ -852,4 +852,88 @@ describe("chunkAssembly.service — buildInputChunks", () => {
     expect(rowAgg).toBeDefined();
     expect(rowAgg!.metadata?.unitConsistencyWarning).toMatch(/mixed_units/);
   });
+
+  test("cell_fact chunks include tableMethod from extractedTables", () => {
+    const extraction: any = {
+      sourceType: "pdf",
+      text: "table text",
+      pages: [{ page: 1, text: "table text" }],
+      extractedTables: [
+        {
+          tableId: "pdf:p1:t0",
+          pageOrSlide: 1,
+          tableMethod: "heuristic",
+          markdown: "| Name | Value |",
+          rows: [
+            {
+              rowIndex: 0,
+              isHeader: true,
+              cells: [
+                { colIndex: 0, text: "Name" },
+                { colIndex: 1, text: "Value" },
+              ],
+            },
+            {
+              rowIndex: 1,
+              isHeader: false,
+              cells: [
+                { colIndex: 0, text: "Revenue" },
+                { colIndex: 1, text: "100" },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+
+    const chunks = buildInputChunks(extraction, extraction.text);
+    const cellFact = chunks.find(
+      (c) => c.metadata?.chunkType === "cell_fact" && c.metadata?.rowIndex === 1,
+    );
+
+    expect(cellFact).toBeDefined();
+    expect(cellFact!.metadata?.tableMethod).toBe("heuristic");
+  });
+
+  test("cell_fact chunks for document_ai tables have correct tableMethod", () => {
+    const extraction: any = {
+      sourceType: "pdf",
+      text: "table text",
+      pages: [{ page: 1, text: "table text" }],
+      extractedTables: [
+        {
+          tableId: "pdf:p1:t0",
+          pageOrSlide: 1,
+          tableMethod: "document_ai",
+          markdown: "| Metric | Amount |",
+          rows: [
+            {
+              rowIndex: 0,
+              isHeader: true,
+              cells: [
+                { colIndex: 0, text: "Metric" },
+                { colIndex: 1, text: "Amount" },
+              ],
+            },
+            {
+              rowIndex: 1,
+              isHeader: false,
+              cells: [
+                { colIndex: 0, text: "EBITDA" },
+                { colIndex: 1, text: "500" },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+
+    const chunks = buildInputChunks(extraction, extraction.text);
+    const cellFact = chunks.find(
+      (c) => c.metadata?.chunkType === "cell_fact" && c.metadata?.rowIndex === 1,
+    );
+
+    expect(cellFact).toBeDefined();
+    expect(cellFact!.metadata?.tableMethod).toBe("document_ai");
+  });
 });

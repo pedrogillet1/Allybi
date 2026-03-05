@@ -304,6 +304,13 @@ export class DataBankLoaderService {
     if (this.opts.validateSchemas) {
       this.ajv = tryCreateAjv();
       if (!this.ajv) {
+        if (this.opts.strict) {
+          throw new DataBankError(
+            "AJV is required for schema validation in strict mode but could not be loaded. " +
+            "Install ajv: npm install ajv",
+            { code: "AJV_REQUIRED_IN_STRICT" },
+          );
+        }
         this.logger.warn(
           "AJV not available; falling back to minimal contract validation only.",
         );
@@ -1726,8 +1733,13 @@ export class DataBankLoaderService {
     }
 
     // Fallback: "schema-lite" validation (presence of required sections already done).
-    // If you store JSON-schema-ish definitions, add custom validators here.
-    // We keep it conservative to avoid false failures.
+    if (this.opts.strict && this.opts.validateSchemas) {
+      throw new DataBankError(
+        `Schema validation skipped for bank "${entry.id}" because AJV is unavailable, ` +
+        `but strict mode requires schema validation.`,
+        { code: "AJV_REQUIRED_FOR_VALIDATION", bankId: entry.id },
+      );
+    }
     return;
   }
 

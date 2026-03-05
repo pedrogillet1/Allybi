@@ -1,4 +1,14 @@
 {
+  "_meta": {
+    "id": "legacy_doc_type_aliases",
+    "version": "1.0.0",
+    "description": "Legacy doc-type aliases used by eval pack validation to map old IDs to canonical catalog IDs.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-05",
+    "owner": "eval-governance"
+  },
   "education": {
     "education_diploma_certificate": "edu_diploma_certificate",
     "education_enrollment_letter": "edu_enrollment_letter",
@@ -21,6 +31,18 @@
     "insurance_claim_form": "ins_claim_submission",
     "insurance_policy_document": "ins_policy_document",
     "insurance_premium_notice": "ins_premium_invoice"
+  },
+  "legal": {
+    "board_resolution": "legal_board_resolution",
+    "dpa": "legal_dpa",
+    "employment_agreement": "legal_employment_agreement",
+    "lease": "legal_lease_agreement",
+    "litigation_memo": "legal_litigation_memo",
+    "msa": "legal_msa",
+    "nda": "legal_nda",
+    "privacy_policy": "legal_privacy_policy",
+    "sow": "legal_sow",
+    "terms": "legal_terms_of_service"
   },
   "tax": {
     "tax_payment_receipt": "tax_payment_slip",

@@ -12,6 +12,10 @@ describe("isMimeTypeSupportedForExtraction", () => {
     ).toBe(true);
     expect(isMimeTypeSupportedForExtraction("text/csv")).toBe(true);
     expect(isMimeTypeSupportedForExtraction("image/png")).toBe(true);
+    expect(isMimeTypeSupportedForExtraction("message/rfc822")).toBe(true);
+    expect(
+      isMimeTypeSupportedForExtraction("application/x-slack-message"),
+    ).toBe(true);
   });
 
   it("rejects unsupported non-extractable mime types", () => {
@@ -22,4 +26,3 @@ describe("isMimeTypeSupportedForExtraction", () => {
     );
   });
 });
-

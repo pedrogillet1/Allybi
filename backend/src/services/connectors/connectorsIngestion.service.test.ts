@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, jest, test } from "@jest/globals";
 
 const mockFindFirst = jest.fn();
+const mockFindUnique = jest.fn();
 const mockUpdate = jest.fn();
 const mockTransaction = jest.fn();
 
@@ -23,6 +24,7 @@ jest.mock("../../config/database", () => ({
   default: {
     document: {
       findFirst: (...args: any[]) => mockFindFirst(...args),
+      findUnique: (...args: any[]) => mockFindUnique(...args),
       update: (...args: any[]) => mockUpdate(...args),
     },
     $transaction: (...args: any[]) => mockTransaction(...args),
@@ -101,6 +103,7 @@ describe("ConnectorsIngestionService", () => {
     process.env.CONNECTORS_INGEST_AS_DOCUMENTS = "true";
 
     mockFindFirst.mockReset().mockResolvedValue(null);
+    mockFindUnique.mockReset().mockResolvedValue(null);
     mockUpdate.mockReset().mockResolvedValue({});
     mockUploadFile.mockReset().mockResolvedValue(undefined);
     mockSplitTextIntoChunksWithOffsets.mockReset().mockReturnValue([
@@ -177,6 +180,7 @@ describe("ConnectorsIngestionService", () => {
       id: "doc-existing-1",
       fileHash,
       encryptedFilename: "users/user-1/connectors/gmail/doc-existing-1/gmail_msg-1.txt",
+      userId: "user-1",
     });
 
     const service = new ConnectorsIngestionService();
@@ -193,6 +197,7 @@ describe("ConnectorsIngestionService", () => {
       id: "doc-existing-2",
       fileHash: "stale-hash",
       encryptedFilename: "users/user-1/connectors/gmail/doc-existing-2/gmail_msg-1.txt",
+      userId: "user-1",
     });
 
     const txDocumentUpdate = jest.fn().mockResolvedValue({});
@@ -335,5 +340,54 @@ describe("ConnectorsIngestionService", () => {
     expect(out[0]?.status).toBe("failed");
     expect(out[0]?.error).toContain("Inline indexing failed and markFailed transition failed");
     expect(mockMarkFailed).toHaveBeenCalledTimes(1);
+  });
+
+  test("handles concurrent unique create collision as existing", async () => {
+    const item = makeItem();
+    const sourceMeta = {
+      sourceType: item.sourceType,
+      sourceId: item.sourceId,
+      timestamp: item.timestamp.toISOString(),
+      actors: item.actors,
+      labelsOrChannel: item.labelsOrChannel,
+      sourceMeta: item.sourceMeta ?? {},
+    };
+    const payload = [
+      `Title: ${item.title}`,
+      `Source: ${item.sourceType}`,
+      `Source ID: ${item.sourceId}`,
+      `Timestamp: ${item.timestamp.toISOString()}`,
+      `Actors: ${item.actors.join(", ")}`,
+      `Labels/Channel: ${item.labelsOrChannel.join(", ")}`,
+      "",
+      item.body,
+      "",
+      `Source Metadata: ${JSON.stringify(sourceMeta)}`,
+    ].join("\n");
+    const fileHash = require("crypto")
+      .createHash("sha256")
+      .update(payload)
+      .digest("hex");
+
+    const uniqueError: any = new Error("unique constraint failed");
+    uniqueError.code = "P2002";
+    mockTransaction.mockRejectedValue(uniqueError);
+    mockFindUnique
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce({
+        id: "doc-race-1",
+        fileHash,
+        encryptedFilename:
+          "users/user-1/connectors/gmail/doc-race-1/gmail_msg-1.txt",
+        userId: "user-1",
+      });
+
+    const service = new ConnectorsIngestionService();
+    const out = await service.ingestDocuments({ userId: "user-1" }, [item]);
+
+    expect(out).toHaveLength(1);
+    expect(out[0]?.status).toBe("existing");
+    expect(out[0]?.documentId).toBe("doc-race-1");
+    expect(mockAddDocumentJob).not.toHaveBeenCalled();
   });
 });

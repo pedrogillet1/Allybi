@@ -22,6 +22,7 @@
     "requireExplicitComparisonScope": true,
     "allowImplicitDiscoveryOnly": false,
     "minDocsForCompare": 2,
+    "minEvidencePerDocForCompare": 1,
     "deterministic": true,
     "dedupe": true,
     "sortBy": "id"

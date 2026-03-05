@@ -34,6 +34,7 @@ export interface BaseExtractionResult {
 export interface ExtractedTable {
   tableId: string;
   pageOrSlide?: number;
+  tableMethod?: string;
   markdown: string;
   rows: Array<{
     rowIndex: number;

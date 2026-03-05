@@ -396,6 +396,9 @@ export class ScopeGateService {
     const stopwordsDocnames = this.safeGetBank<Record<string, unknown>>("stopwords_docnames");
     const ambiguityPolicies = this.safeGetBank<Record<string, unknown>>("disambiguation_policies");
     const rankFeatures = this.safeGetBank<Record<string, unknown>>("ambiguity_rank_features");
+    const sectionDisambiguationPolicy = this.safeGetBank<Record<string, unknown>>(
+      "section_disambiguation_policy",
+    );
 
     // Quality trigger banks (post-retrieval quality gates, loaded on-demand).
     const qualityTriggers = {
@@ -687,6 +690,47 @@ export class ScopeGateService {
       ambiguityPolicyConfig.actionsContract,
     );
     const ambiguityThresholds = asObject(ambiguityActionsContract.thresholds);
+    const sectionPolicyConfig = asObject(sectionDisambiguationPolicy?.config);
+    const sectionPolicyThresholds = asObject(
+      sectionPolicyConfig.sectionMatchThresholds,
+    );
+    const sectionRules = Array.isArray(sectionDisambiguationPolicy?.rules)
+      ? (sectionDisambiguationPolicy?.rules as Array<Record<string, unknown>>)
+      : [];
+    const sectionAskRule =
+      sectionRules.find((rule) => {
+        const action = String(rule?.action || "").trim().toUpperCase();
+        const candidateType = String(rule?.candidateType || "")
+          .trim()
+          .toLowerCase();
+        return action === "ASK_WHICH_SECTION" && candidateType === "section";
+      }) ?? null;
+    const sectionPolicyEnabled = sectionPolicyConfig.enabled !== false;
+    const sectionAutopickMinConfidence = clamp01(
+      Number(sectionPolicyThresholds.autopickMinConfidence ?? 0.9),
+    );
+    const sectionAutopickMinGap = clamp01(
+      Number(sectionPolicyThresholds.autopickMinGap ?? 0.3),
+    );
+    const sectionDisambiguateIfBelow = clamp01(
+      Number(sectionPolicyThresholds.disambiguateIfBelow ?? 0.75),
+    );
+    const sectionDisambiguationMaxOptions = Math.max(
+      1,
+      Math.floor(
+        Number(
+          sectionAskRule?.maxOptions ??
+            ambiguityThresholds.maxOptions ??
+            4,
+        ),
+      ),
+    );
+    const sectionDisambiguationMaxQuestions = Math.max(
+      1,
+      Math.floor(
+        Number(sectionPolicyConfig.maxQuestions ?? sectionAskRule?.maxQuestions ?? 1),
+      ),
+    );
     let needsDocChoice = false;
     let disambiguationOptions: ScopeCandidate[] = [];
 
@@ -751,8 +795,16 @@ export class ScopeGateService {
           const sectionGap = topSectionScore - secondSectionScore;
 
           // Autopick if top section clearly wins
-          if (topSectionScore >= 0.9 && sectionGap >= 0.3) {
+          const canAutopickSection = sectionPolicyEnabled
+            ? topSectionScore >= sectionAutopickMinConfidence &&
+              sectionGap >= sectionAutopickMinGap &&
+              topSectionScore >= sectionDisambiguateIfBelow
+            : topSectionScore >= 0.9 && sectionGap >= 0.3;
+          if (canAutopickSection) {
             activeSectionHint = sectionResult.candidates[0].label;
+            if (sectionPolicyEnabled) {
+              debug.appliedRules.push("section_disambiguation_policy_autopick");
+            }
             debug.appliedRules.push("autopick_safe_section_choice");
           } else {
             needsSectionChoice = true;
@@ -762,6 +814,9 @@ export class ScopeGateService {
               title: c.label,
               filename: null,
             }));
+            if (sectionPolicyEnabled) {
+              debug.appliedRules.push("section_disambiguation_policy_disambiguate");
+            }
             debug.appliedRules.push("needs_section_choice_ambiguous_ref");
           }
         } else if (sectionResult.candidates.length === 1) {
@@ -852,7 +907,7 @@ export class ScopeGateService {
 
     // 13b) Section disambiguation routing
     if (needsSectionChoice) {
-      const maxOptions = Number(ambiguityThresholds.maxOptions ?? 4);
+      const maxOptions = sectionDisambiguationMaxOptions;
 
       return this.finish(state, input, {
         action: "route",
@@ -886,7 +941,7 @@ export class ScopeGateService {
           candidateType: "section",
           options: sectionDisambiguationOptions.slice(0, maxOptions),
           maxOptions,
-          maxQuestions: 1,
+          maxQuestions: sectionDisambiguationMaxQuestions,
           reasonCode: "needs_section_choice",
         },
         debug: isProd(input.env) ? undefined : debug,

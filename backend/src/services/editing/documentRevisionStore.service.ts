@@ -88,10 +88,25 @@ function allowOverwriteInProtectedEnv(
     .toLowerCase() === "true";
 }
 
+function isOverwriteGloballyEnabled(
+  rawValue: string | undefined = process.env.KODA_EDITING_ENABLE_OVERWRITE,
+): boolean {
+  return String(rawValue || "")
+    .trim()
+    .toLowerCase() === "true";
+}
+
 function editingSaveMode(): EditingSaveMode {
   const raw = String(process.env.KODA_EDITING_SAVE_MODE || "revision")
     .trim()
     .toLowerCase();
+  if (raw === "overwrite" && !isOverwriteGloballyEnabled()) {
+    logger.error(
+      "[RevisionStore] KODA_EDITING_SAVE_MODE=overwrite is blocked unless KODA_EDITING_ENABLE_OVERWRITE=true; forcing revision mode",
+      { nodeEnv: process.env.NODE_ENV || null },
+    );
+    return "revision";
+  }
   if (
     raw === "overwrite" &&
     isProtectedRuntimeEnv() &&
@@ -103,7 +118,7 @@ function editingSaveMode(): EditingSaveMode {
     );
     return "revision";
   }
-  return raw === "revision" ? "revision" : "overwrite";
+  return raw === "overwrite" ? "overwrite" : "revision";
 }
 
 function keepUndoHistory(): boolean {
@@ -516,6 +531,45 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
       } catch {
         // ignore
       }
+    }
+  }
+
+  private async attemptStorageRollback(input: {
+    documentId: string;
+    userId: string;
+    storageKey: string;
+    mimeType: string | null | undefined;
+    rollbackBytes: Buffer;
+    reason: string;
+    cause: unknown;
+  }): Promise<boolean> {
+    const causeMessage =
+      input.cause instanceof Error ? input.cause.message : String(input.cause);
+    try {
+      await uploadFile(
+        input.storageKey,
+        input.rollbackBytes,
+        input.mimeType || "application/octet-stream",
+      );
+      logger.error("[RevisionStore] Storage/DB divergence recovered", {
+        documentId: input.documentId,
+        userId: input.userId,
+        storageKey: input.storageKey,
+        reason: input.reason,
+        cause: causeMessage,
+      });
+      return true;
+    } catch (rollbackErr) {
+      logger.error("[RevisionStore] Storage/DB divergence rollback failed", {
+        documentId: input.documentId,
+        userId: input.userId,
+        storageKey: input.storageKey,
+        reason: input.reason,
+        cause: causeMessage,
+        rollbackError:
+          rollbackErr instanceof Error ? rollbackErr.message : String(rollbackErr),
+      });
+      return false;
     }
   }
 
@@ -1869,146 +1923,166 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
         op === "PY_COMPUTE" ||
         op === "PY_WRITEBACK";
 
-      await prisma.$transaction(async (tx) => {
-        await tx.documentChunk.updateMany({
-          where: { documentId: docId, isActive: true } as any,
-          data: { isActive: false } as any,
+      try {
+        await prisma.$transaction(async (tx) => {
+          await tx.documentChunk.updateMany({
+            where: { documentId: docId, isActive: true },
+            data: { isActive: false },
+          });
+
+          if (isSlidesEdit || isSheetsEdit) {
+            const base = (meta as any).pptxMetadata ?? null;
+            let nextPptxMetadata: string | null =
+              typeof base === "string"
+                ? base
+                : base == null
+                  ? null
+                  : String(base);
+
+            if ((meta as any).slidesPresentationId) {
+              nextPptxMetadata = setSlidesLinkInPptxMetadata(nextPptxMetadata, {
+                presentationId: String((meta as any).slidesPresentationId),
+                url:
+                  String((meta as any).slidesPresentationUrl || "").trim() ||
+                  `https://docs.google.com/presentation/d/${String((meta as any).slidesPresentationId)}/edit`,
+              });
+            }
+
+            if ((meta as any).sheetsSpreadsheetId) {
+              nextPptxMetadata = setSheetsLinkInPptxMetadata(nextPptxMetadata, {
+                spreadsheetId: String((meta as any).sheetsSpreadsheetId),
+                url:
+                  String((meta as any).sheetsSpreadsheetUrl || "").trim() ||
+                  `https://docs.google.com/spreadsheets/d/${String((meta as any).sheetsSpreadsheetId)}/edit`,
+              });
+            }
+
+            const chartEntries = Array.isArray((meta as any).__sheetsChartEntries)
+              ? (meta as any).__sheetsChartEntries
+              : [];
+            for (const entry of chartEntries) {
+              const range = String(entry?.range || "").trim();
+              if (!range) continue;
+              nextPptxMetadata = addSheetsChartToPptxMetadata(nextPptxMetadata, {
+                chartId:
+                  typeof entry?.chartId === "number" ? entry.chartId : undefined,
+                type: String(entry?.type || "LINE"),
+                range,
+                ...(entry?.title ? { title: String(entry.title) } : {}),
+                ...(entry?.settings && typeof entry.settings === "object"
+                  ? { settings: entry.settings }
+                  : {}),
+                ...(entry?.createdAtIso
+                  ? { createdAtIso: String(entry.createdAtIso) }
+                  : {}),
+              });
+            }
+
+            const tableEntries = Array.isArray((meta as any).__sheetsTableEntries)
+              ? (meta as any).__sheetsTableEntries
+              : [];
+            for (const entry of tableEntries) {
+              const range = String(entry?.range || "").trim();
+              if (!range) continue;
+              nextPptxMetadata = addSheetsTableToPptxMetadata(nextPptxMetadata, {
+                range,
+                ...(entry?.sheetName
+                  ? { sheetName: String(entry.sheetName) }
+                  : {}),
+                hasHeader: entry?.hasHeader !== false,
+                ...(entry?.style ? { style: String(entry.style) } : {}),
+                ...(entry?.colors && typeof entry.colors === "object"
+                  ? { colors: entry.colors }
+                  : {}),
+                ...(entry?.createdAtIso
+                  ? { createdAtIso: String(entry.createdAtIso) }
+                  : {}),
+              });
+            }
+
+            await tx.documentMetadata.upsert({
+              where: { documentId: docId },
+              update: {
+                // Clear derived preview artifacts so the preview pipeline re-renders.
+                markdownContent: null,
+                markdownUrl: null,
+                markdownStructure: null,
+                sheetCount: null,
+                slideCount: null,
+                slidesData: null,
+                pptxMetadata: nextPptxMetadata,
+                slideGenerationStatus: isSlidesEdit ? "pending" : undefined,
+                slideGenerationError: isSlidesEdit ? null : undefined,
+                previewPdfStatus: "pending",
+                previewPdfKey: null,
+                previewPdfError: null,
+                previewPdfAttempts: 0,
+                previewPdfUpdatedAt: null,
+              } as any,
+              create: {
+                documentId: docId,
+                pptxMetadata: nextPptxMetadata,
+              } as any,
+            });
+          } else {
+            await tx.documentMetadata.deleteMany({
+              where: { documentId: docId },
+            });
+          }
+
+          await tx.documentProcessingMetrics.deleteMany({
+            where: { documentId: docId },
+          });
+          await tx.document.update({
+            where: { id: docId },
+            data: {
+              fileSize: edited.length,
+              fileHash: sha256(edited),
+              status: "uploaded",
+              indexingState: "pending",
+              indexingOperationId: null,
+              indexingError: null,
+              indexingUpdatedAt: new Date(),
+              chunksCount: 0,
+              embeddingsGenerated: false,
+              error: null,
+              rawText: null,
+              previewText: null,
+              renderableContent: null,
+              extractedTextEncrypted: null,
+              previewTextEncrypted: null,
+              renderableContentEncrypted: null,
+            },
+          });
         });
 
-        if (isSlidesEdit || isSheetsEdit) {
-          const base = (meta as any).pptxMetadata ?? null;
-          let nextPptxMetadata: string | null =
-            typeof base === "string"
-              ? base
-              : base == null
-                ? null
-                : String(base);
-
-          if ((meta as any).slidesPresentationId) {
-            nextPptxMetadata = setSlidesLinkInPptxMetadata(nextPptxMetadata, {
-              presentationId: String((meta as any).slidesPresentationId),
-              url:
-                String((meta as any).slidesPresentationUrl || "").trim() ||
-                `https://docs.google.com/presentation/d/${String((meta as any).slidesPresentationId)}/edit`,
-            });
-          }
-
-          if ((meta as any).sheetsSpreadsheetId) {
-            nextPptxMetadata = setSheetsLinkInPptxMetadata(nextPptxMetadata, {
-              spreadsheetId: String((meta as any).sheetsSpreadsheetId),
-              url:
-                String((meta as any).sheetsSpreadsheetUrl || "").trim() ||
-                `https://docs.google.com/spreadsheets/d/${String((meta as any).sheetsSpreadsheetId)}/edit`,
-            });
-          }
-
-          const chartEntries = Array.isArray((meta as any).__sheetsChartEntries)
-            ? (meta as any).__sheetsChartEntries
-            : [];
-          for (const entry of chartEntries) {
-            const range = String(entry?.range || "").trim();
-            if (!range) continue;
-            nextPptxMetadata = addSheetsChartToPptxMetadata(nextPptxMetadata, {
-              chartId:
-                typeof entry?.chartId === "number" ? entry.chartId : undefined,
-              type: String(entry?.type || "LINE"),
-              range,
-              ...(entry?.title ? { title: String(entry.title) } : {}),
-              ...(entry?.settings && typeof entry.settings === "object"
-                ? { settings: entry.settings }
-                : {}),
-              ...(entry?.createdAtIso
-                ? { createdAtIso: String(entry.createdAtIso) }
-                : {}),
-            });
-          }
-
-          const tableEntries = Array.isArray((meta as any).__sheetsTableEntries)
-            ? (meta as any).__sheetsTableEntries
-            : [];
-          for (const entry of tableEntries) {
-            const range = String(entry?.range || "").trim();
-            if (!range) continue;
-            nextPptxMetadata = addSheetsTableToPptxMetadata(nextPptxMetadata, {
-              range,
-              ...(entry?.sheetName
-                ? { sheetName: String(entry.sheetName) }
-                : {}),
-              hasHeader: entry?.hasHeader !== false,
-              ...(entry?.style ? { style: String(entry.style) } : {}),
-              ...(entry?.colors && typeof entry.colors === "object"
-                ? { colors: entry.colors }
-                : {}),
-              ...(entry?.createdAtIso
-                ? { createdAtIso: String(entry.createdAtIso) }
-                : {}),
-            });
-          }
-
-          await tx.documentMetadata.upsert({
-            where: { documentId: docId },
-            update: {
-              // Clear derived preview artifacts so the preview pipeline re-renders.
-              markdownContent: null,
-              markdownUrl: null,
-              markdownStructure: null,
-              sheetCount: null,
-              slideCount: null,
-              slidesData: null,
-              pptxMetadata: nextPptxMetadata,
-              slideGenerationStatus: isSlidesEdit ? "pending" : undefined,
-              slideGenerationError: isSlidesEdit ? null : undefined,
-              previewPdfStatus: "pending",
-              previewPdfKey: null,
-              previewPdfError: null,
-              previewPdfAttempts: 0,
-              previewPdfUpdatedAt: null,
-            } as any,
-            create: {
-              documentId: docId,
-              pptxMetadata: nextPptxMetadata,
-            } as any,
-          });
-        } else {
-          await tx.documentMetadata.deleteMany({
-            where: { documentId: docId },
-          });
+        // Reprocess automatically after apply so extraction/index/preview stay in sync with edited content.
+        await this.reprocessEditedDocument({
+          documentId: docId,
+          userId,
+          filename: doc.filename || "document",
+          mimeType: doc.mimeType || "application/octet-stream",
+          encryptedFilename: doc.encryptedFilename,
+        });
+      } catch (persistErr) {
+        const recovered = await this.attemptStorageRollback({
+          documentId: docId,
+          userId,
+          storageKey: doc.encryptedFilename,
+          mimeType: doc.mimeType,
+          rollbackBytes: original,
+          reason: "overwrite_persistence_failed",
+          cause: persistErr,
+        });
+        if (recovered) {
+          throw new Error(
+            "OVERWRITE_PERSISTENCE_FAILED_RECOVERED: storage content was rolled back after DB failure.",
+          );
         }
-
-        await tx.documentProcessingMetrics.deleteMany({
-          where: { documentId: docId },
-        });
-        await tx.document.update({
-          where: { id: docId },
-          data: {
-            fileSize: edited.length,
-            fileHash: sha256(edited),
-            status: "uploaded",
-            indexingState: "pending",
-            indexingOperationId: null,
-            indexingError: null,
-            indexingUpdatedAt: new Date(),
-            chunksCount: 0,
-            embeddingsGenerated: false,
-            error: null,
-            rawText: null,
-            previewText: null,
-            renderableContent: null,
-            extractedTextEncrypted: null,
-            previewTextEncrypted: null,
-            renderableContentEncrypted: null,
-          },
-        });
-      });
-
-      // Reprocess automatically after apply so extraction/index/preview stay in sync with edited content.
-      await this.reprocessEditedDocument({
-        documentId: docId,
-        userId,
-        filename: doc.filename || "document",
-        mimeType: doc.mimeType || "application/octet-stream",
-        encryptedFilename: doc.encryptedFilename,
-      });
+        throw new Error(
+          "OVERWRITE_PERSISTENCE_FAILED_WITH_ROLLBACK_FAILURE: storage and DB may be divergent.",
+        );
+      }
 
       if (idempotencyKey) {
         const dedupeKey = `${userId}:${docId}:${idempotencyKey}`;
@@ -2096,6 +2170,11 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
     fileHashBefore: string;
     fileHashAfter: string;
   }> {
+    if (!isOverwriteGloballyEnabled()) {
+      throw new Error(
+        "OVERWRITE_DISABLED: storeEditedBuffer requires KODA_EDITING_ENABLE_OVERWRITE=true.",
+      );
+    }
     if (isProtectedRuntimeEnv() && !allowOverwriteInProtectedEnv()) {
       throw new Error(
         "OVERWRITE_DISABLED_IN_PROTECTED_ENV: storeEditedBuffer requires KODA_EDITING_ALLOW_OVERWRITE_PROTECTED=true.",
@@ -2168,74 +2247,94 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
       op.includes("COMPUTE") ||
       op.includes("WRITEBACK");
 
-    await prisma.$transaction(async (tx) => {
-      await tx.documentChunk.updateMany({
-        where: { documentId: docId, isActive: true } as any,
-        data: { isActive: false } as any,
+    try {
+      await prisma.$transaction(async (tx) => {
+        await tx.documentChunk.updateMany({
+          where: { documentId: docId, isActive: true },
+          data: { isActive: false },
+        });
+
+        if (isSlidesEdit || isSheetsEdit) {
+          const existingMeta = await tx.documentMetadata.findUnique({
+            where: { documentId: docId },
+            select: { pptxMetadata: true },
+          });
+          await tx.documentMetadata.upsert({
+            where: { documentId: docId },
+            update: {
+              markdownContent: null,
+              markdownUrl: null,
+              markdownStructure: null,
+              sheetCount: null,
+              slideCount: null,
+              slidesData: null,
+              pptxMetadata: (existingMeta as any)?.pptxMetadata ?? null,
+              slideGenerationStatus: isSlidesEdit ? "pending" : undefined,
+              slideGenerationError: isSlidesEdit ? null : undefined,
+              previewPdfStatus: "pending",
+              previewPdfKey: null,
+              previewPdfError: null,
+              previewPdfAttempts: 0,
+              previewPdfUpdatedAt: null,
+            } as any,
+            create: { documentId: docId } as any,
+          });
+        } else {
+          await tx.documentMetadata.deleteMany({ where: { documentId: docId } });
+        }
+
+        await tx.documentProcessingMetrics.deleteMany({
+          where: { documentId: docId },
+        });
+        await tx.document.update({
+          where: { id: docId },
+          data: {
+            fileSize: input.editedBuffer.length,
+            fileHash: fileHashAfter,
+            status: "uploaded",
+            indexingState: "pending",
+            indexingOperationId: null,
+            indexingError: null,
+            indexingUpdatedAt: new Date(),
+            chunksCount: 0,
+            embeddingsGenerated: false,
+            error: null,
+            rawText: null,
+            previewText: null,
+            renderableContent: null,
+            extractedTextEncrypted: null,
+            previewTextEncrypted: null,
+            renderableContentEncrypted: null,
+          },
+        });
       });
 
-      if (isSlidesEdit || isSheetsEdit) {
-        const existingMeta = await tx.documentMetadata.findUnique({
-          where: { documentId: docId },
-          select: { pptxMetadata: true },
-        });
-        await tx.documentMetadata.upsert({
-          where: { documentId: docId },
-          update: {
-            markdownContent: null,
-            markdownUrl: null,
-            markdownStructure: null,
-            sheetCount: null,
-            slideCount: null,
-            slidesData: null,
-            pptxMetadata: (existingMeta as any)?.pptxMetadata ?? null,
-            slideGenerationStatus: isSlidesEdit ? "pending" : undefined,
-            slideGenerationError: isSlidesEdit ? null : undefined,
-            previewPdfStatus: "pending",
-            previewPdfKey: null,
-            previewPdfError: null,
-            previewPdfAttempts: 0,
-            previewPdfUpdatedAt: null,
-          } as any,
-          create: { documentId: docId } as any,
-        });
-      } else {
-        await tx.documentMetadata.deleteMany({ where: { documentId: docId } });
+      await this.reprocessEditedDocument({
+        documentId: docId,
+        userId,
+        filename: doc.filename || "document",
+        mimeType: doc.mimeType || "application/octet-stream",
+        encryptedFilename: doc.encryptedFilename,
+      });
+    } catch (persistErr) {
+      const recovered = await this.attemptStorageRollback({
+        documentId: docId,
+        userId,
+        storageKey: doc.encryptedFilename,
+        mimeType: doc.mimeType,
+        rollbackBytes: original,
+        reason: "store_edited_buffer_persistence_failed",
+        cause: persistErr,
+      });
+      if (recovered) {
+        throw new Error(
+          "STORE_BUFFER_PERSISTENCE_FAILED_RECOVERED: storage content was rolled back after DB failure.",
+        );
       }
-
-      await tx.documentProcessingMetrics.deleteMany({
-        where: { documentId: docId },
-      });
-      await tx.document.update({
-        where: { id: docId },
-        data: {
-          fileSize: input.editedBuffer.length,
-          fileHash: fileHashAfter,
-          status: "uploaded",
-          indexingState: "pending",
-          indexingOperationId: null,
-          indexingError: null,
-          indexingUpdatedAt: new Date(),
-          chunksCount: 0,
-          embeddingsGenerated: false,
-          error: null,
-          rawText: null,
-          previewText: null,
-          renderableContent: null,
-          extractedTextEncrypted: null,
-          previewTextEncrypted: null,
-          renderableContentEncrypted: null,
-        },
-      });
-    });
-
-    await this.reprocessEditedDocument({
-      documentId: docId,
-      userId,
-      filename: doc.filename || "document",
-      mimeType: doc.mimeType || "application/octet-stream",
-      encryptedFilename: doc.encryptedFilename,
-    });
+      throw new Error(
+        "STORE_BUFFER_PERSISTENCE_FAILED_WITH_ROLLBACK_FAILURE: storage and DB may be divergent.",
+      );
+    }
 
     return { revisionId: docId, fileHashBefore, fileHashAfter };
   }
@@ -2334,45 +2433,65 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
         target.mimeType || "application/octet-stream",
       );
 
-      await prisma.$transaction([
-        (prisma.documentChunk as any).updateMany({
-          where: { documentId: docId, isActive: true },
-          data: { isActive: false },
-        }),
-        prisma.documentMetadata.deleteMany({ where: { documentId: docId } }),
-        prisma.documentProcessingMetrics.deleteMany({
-          where: { documentId: docId },
-        }),
-        prisma.document.update({
-          where: { id: docId },
-          data: {
-            fileSize: bytes.length,
-            fileHash: sha256(bytes),
-            status: "uploaded",
-            indexingState: "pending",
-            indexingOperationId: null,
-            indexingError: null,
-            indexingUpdatedAt: new Date(),
-            chunksCount: 0,
-            embeddingsGenerated: false,
-            error: null,
-            rawText: null,
-            previewText: null,
-            renderableContent: null,
-            extractedTextEncrypted: null,
-            previewTextEncrypted: null,
-            renderableContentEncrypted: null,
-          },
-        }),
-      ]);
+      try {
+        await prisma.$transaction(async (tx) => {
+          await tx.documentChunk.updateMany({
+            where: { documentId: docId, isActive: true },
+            data: { isActive: false },
+          });
+          await tx.documentMetadata.deleteMany({ where: { documentId: docId } });
+          await tx.documentProcessingMetrics.deleteMany({
+            where: { documentId: docId },
+          });
+          await tx.document.update({
+            where: { id: docId },
+            data: {
+              fileSize: bytes.length,
+              fileHash: sha256(bytes),
+              status: "uploaded",
+              indexingState: "pending",
+              indexingOperationId: null,
+              indexingError: null,
+              indexingUpdatedAt: new Date(),
+              chunksCount: 0,
+              embeddingsGenerated: false,
+              error: null,
+              rawText: null,
+              previewText: null,
+              renderableContent: null,
+              extractedTextEncrypted: null,
+              previewTextEncrypted: null,
+              renderableContentEncrypted: null,
+            },
+          });
+        });
 
-      await this.reprocessEditedDocument({
-        documentId: docId,
-        userId,
-        filename: target.filename || "document",
-        mimeType: target.mimeType || "application/octet-stream",
-        encryptedFilename: target.encryptedFilename,
-      });
+        await this.reprocessEditedDocument({
+          documentId: docId,
+          userId,
+          filename: target.filename || "document",
+          mimeType: target.mimeType || "application/octet-stream",
+          encryptedFilename: target.encryptedFilename,
+        });
+      } catch (persistErr) {
+        const recovered = await this.attemptStorageRollback({
+          documentId: docId,
+          userId,
+          storageKey: target.encryptedFilename,
+          mimeType: target.mimeType,
+          rollbackBytes: currentBytes,
+          reason: "undo_restore_persistence_failed",
+          cause: persistErr,
+        });
+        if (recovered) {
+          throw new Error(
+            "UNDO_PERSISTENCE_FAILED_RECOVERED: storage content was rolled back after DB failure.",
+          );
+        }
+        throw new Error(
+          "UNDO_PERSISTENCE_FAILED_WITH_ROLLBACK_FAILURE: storage and DB may be divergent.",
+        );
+      }
 
       const restoredBytes = await downloadFile(target.encryptedFilename);
       const verification = verifyBitwise({

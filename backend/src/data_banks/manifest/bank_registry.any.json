@@ -63,11 +63,11 @@
     "manifest": "bank_schema",
     "schemas": "bank_schema",
     "normalizers": "bank_schema",
-    "routing": "bank_schema",
+    "routing": "routing_rule_schema",
     "operators": "bank_schema",
     "semantics": "bank_schema",
     "scope": "bank_schema",
-    "retrieval": "bank_schema",
+    "retrieval": "retrieval_ranker_schema",
     "formatting": "bank_schema",
     "microcopy": "bank_schema",
     "overlays": "bank_schema",
@@ -103,8 +103,8 @@
         "local": true
       },
       "requiredByEnv": {
-        "production": false,
-        "staging": false,
+        "production": true,
+        "staging": true,
         "dev": false,
         "local": false
       },
@@ -651,7 +651,7 @@
       "filename": "anti_robotic_style_rules.any.json",
       "path": "document_intelligence/compose/anti_robotic_style_rules.any.json",
       "version": "1.0.0",
-      "schemaId": "bank_schema",
+      "schemaId": "compose_microcopy_schema",
       "contentType": "json",
       "dependsOn": [],
       "enabledByEnv": {
@@ -1311,7 +1311,7 @@
       "filename": "citation_policy.any.json",
       "version": "1.0.0",
       "contentType": "json",
-      "schemaId": "bank_schema",
+      "schemaId": "compose_microcopy_schema",
       "dependsOn": [],
       "enabledByEnv": {
         "production": true,
@@ -1432,7 +1432,7 @@
       "filename": "clarification_prompts.any.json",
       "version": "1.0.0",
       "contentType": "json",
-      "schemaId": "bank_schema",
+      "schemaId": "compose_microcopy_schema",
       "dependsOn": [],
       "enabledByEnv": {
         "production": true,
@@ -1455,7 +1455,7 @@
       "filename": "closers.any.json",
       "path": "document_intelligence/compose/closers.any.json",
       "version": "1.0.0",
-      "schemaId": "bank_schema",
+      "schemaId": "compose_microcopy_schema",
       "contentType": "json",
       "dependsOn": [],
       "enabledByEnv": {
@@ -22220,7 +22220,7 @@
       "filename": "empathy_and_support_language.any.json",
       "path": "document_intelligence/compose/empathy_and_support_language.any.json",
       "version": "1.0.0",
-      "schemaId": "bank_schema",
+      "schemaId": "compose_microcopy_schema",
       "contentType": "json",
       "dependsOn": [],
       "enabledByEnv": {
@@ -22294,7 +22294,7 @@
       "filename": "error_explanations.any.json",
       "path": "document_intelligence/compose/error_explanations.any.json",
       "version": "1.0.0",
-      "schemaId": "bank_schema",
+      "schemaId": "compose_microcopy_schema",
       "contentType": "json",
       "dependsOn": [],
       "enabledByEnv": {
@@ -22955,7 +22955,7 @@
       "filename": "fallback_messages.any.json",
       "path": "document_intelligence/compose/fallback_messages.any.json",
       "version": "1.0.0",
-      "schemaId": "bank_schema",
+      "schemaId": "compose_microcopy_schema",
       "contentType": "json",
       "dependsOn": [],
       "enabledByEnv": {
@@ -23292,7 +23292,7 @@
       "filename": "followup_suggestions.any.json",
       "path": "document_intelligence/compose/followup_suggestions.any.json",
       "version": "1.0.0",
-      "schemaId": "bank_schema",
+      "schemaId": "compose_microcopy_schema",
       "contentType": "json",
       "dependsOn": [],
       "enabledByEnv": {
@@ -23340,7 +23340,7 @@
       "filename": "format_guardrails.any.json",
       "path": "document_intelligence/compose/format_guardrails.any.json",
       "version": "1.0.0",
-      "schemaId": "bank_schema",
+      "schemaId": "compose_microcopy_schema",
       "contentType": "json",
       "dependsOn": [],
       "enabledByEnv": {
@@ -23438,7 +23438,7 @@
       "filename": "hedging_and_uncertainty_language.any.json",
       "path": "document_intelligence/compose/hedging_and_uncertainty_language.any.json",
       "version": "1.0.0",
-      "schemaId": "bank_schema",
+      "schemaId": "compose_microcopy_schema",
       "contentType": "json",
       "dependsOn": [],
       "enabledByEnv": {
@@ -23462,7 +23462,7 @@
       "filename": "help_microcopy.any.json",
       "path": "document_intelligence/compose/help_microcopy.any.json",
       "version": "1.0.0",
-      "schemaId": "bank_schema",
+      "schemaId": "compose_microcopy_schema",
       "contentType": "json",
       "dependsOn": [],
       "enabledByEnv": {
@@ -23732,7 +23732,7 @@
       "filename": "jargon_control.any.json",
       "path": "document_intelligence/compose/jargon_control.any.json",
       "version": "1.0.0",
-      "schemaId": "bank_schema",
+      "schemaId": "compose_microcopy_schema",
       "contentType": "json",
       "dependsOn": [],
       "enabledByEnv": {
@@ -30339,7 +30339,7 @@
       "filename": "openers.any.json",
       "path": "document_intelligence/compose/openers.any.json",
       "version": "1.0.0",
-      "schemaId": "bank_schema",
+      "schemaId": "compose_microcopy_schema",
       "contentType": "json",
       "dependsOn": [],
       "enabledByEnv": {
@@ -34657,7 +34657,7 @@
       "filename": "response_templates.any.json",
       "version": "1.0.0",
       "contentType": "json",
-      "schemaId": "bank_schema",
+      "schemaId": "compose_microcopy_schema",
       "dependsOn": [],
       "enabledByEnv": {
         "production": true,
@@ -34723,6 +34723,81 @@
       },
       "lastUpdated": "2026-02-28",
       "checksumSha256": "914966758838a6434f5cbd1677dfa89f07daf12c05bb7f212e3362ba6f84d6e5"
+    },
+    {
+      "id": "retrieval_ranker_schema",
+      "category": "schemas",
+      "path": "schemas/retrieval_ranker_schema.any.json",
+      "filename": "retrieval_ranker_schema.any.json",
+      "version": "1.0.0",
+      "contentType": "schema",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "bank_registry"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "lastUpdated": "2026-03-05"
+    },
+    {
+      "id": "routing_rule_schema",
+      "category": "schemas",
+      "path": "schemas/routing_rule_schema.any.json",
+      "filename": "routing_rule_schema.any.json",
+      "version": "1.0.0",
+      "contentType": "schema",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "bank_registry"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "lastUpdated": "2026-03-05"
+    },
+    {
+      "id": "compose_microcopy_schema",
+      "category": "schemas",
+      "path": "schemas/compose_microcopy_schema.any.json",
+      "filename": "compose_microcopy_schema.any.json",
+      "version": "1.0.0",
+      "contentType": "schema",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "bank_registry"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "lastUpdated": "2026-03-05"
     },
     {
       "id": "retrieval_negatives",
@@ -34823,7 +34898,7 @@
       "filename": "safety_tone_overrides.any.json",
       "path": "document_intelligence/compose/safety_tone_overrides.any.json",
       "version": "1.0.0",
-      "schemaId": "bank_schema",
+      "schemaId": "compose_microcopy_schema",
       "contentType": "json",
       "dependsOn": [],
       "enabledByEnv": {
@@ -36282,7 +36357,7 @@
       "filename": "table_render_policy.any.json",
       "version": "1.0.0",
       "contentType": "json",
-      "schemaId": "bank_schema",
+      "schemaId": "compose_microcopy_schema",
       "dependsOn": [],
       "enabledByEnv": {
         "production": true,
@@ -36422,7 +36497,7 @@
       "filename": "tone_profiles.any.json",
       "version": "1.0.0",
       "contentType": "json",
-      "schemaId": "bank_schema",
+      "schemaId": "compose_microcopy_schema",
       "dependsOn": [],
       "enabledByEnv": {
         "production": true,
@@ -36468,7 +36543,7 @@
       "filename": "transition_phrases.any.json",
       "path": "document_intelligence/compose/transition_phrases.any.json",
       "version": "1.0.0",
-      "schemaId": "bank_schema",
+      "schemaId": "compose_microcopy_schema",
       "contentType": "json",
       "dependsOn": [],
       "enabledByEnv": {
@@ -36634,7 +36709,7 @@
       "filename": "verb_phrase_bank.any.json",
       "path": "document_intelligence/compose/verb_phrase_bank.any.json",
       "version": "1.0.0",
-      "schemaId": "bank_schema",
+      "schemaId": "compose_microcopy_schema",
       "contentType": "json",
       "dependsOn": [],
       "enabledByEnv": {
@@ -36658,7 +36733,7 @@
       "filename": "verbosity_ladder.any.json",
       "path": "document_intelligence/compose/verbosity_ladder.any.json",
       "version": "1.0.0",
-      "schemaId": "bank_schema",
+      "schemaId": "compose_microcopy_schema",
       "contentType": "json",
       "dependsOn": [],
       "enabledByEnv": {
@@ -36812,7 +36887,7 @@
       "filename": "voice_personality_profiles.any.json",
       "path": "document_intelligence/compose/voice_personality_profiles.any.json",
       "version": "1.0.0",
-      "schemaId": "bank_schema",
+      "schemaId": "compose_microcopy_schema",
       "contentType": "json",
       "dependsOn": [],
       "enabledByEnv": {

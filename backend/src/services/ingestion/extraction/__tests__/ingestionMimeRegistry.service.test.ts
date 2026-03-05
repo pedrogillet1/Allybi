@@ -48,6 +48,10 @@ describe("ingestionMimeRegistry", () => {
     ).toBe(true);
     expect(isMimeTypeSupportedForExtraction("image/png")).toBe(true);
     expect(isMimeTypeSupportedForExtraction("text/csv")).toBe(true);
+    expect(isMimeTypeSupportedForExtraction("message/rfc822")).toBe(true);
+    expect(
+      isMimeTypeSupportedForExtraction("application/x-slack-message"),
+    ).toBe(true);
   });
 
   test("uses the same office registry for preview conversion checks", () => {

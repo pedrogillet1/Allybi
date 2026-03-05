@@ -1,7 +1,7 @@
 {
   "_meta": {
     "id": "followup_suggestions_v1c6269cc",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Deep follow-up suggestions for document intelligence flows.",
     "languages": [
       "any",
@@ -9,7 +9,7 @@
       "pt",
       "es"
     ],
-    "lastUpdated": "2026-03-03",
+    "lastUpdated": "2026-03-05",
     "owner": "data-bank-governance",
     "usedBy": [
       "services/core/banks/dataBankLoader.service.ts"
@@ -116,6 +116,36 @@
       "language": "es",
       "text": "Muestra contexto alrededor de esta seccion para validar la interpretacion.",
       "query": "Muestra 2 secciones arriba y abajo de la seccion en {{document}}."
+    },
+    {
+      "id": "FS_010_summary_drill_down",
+      "audiences": [
+        "any"
+      ],
+      "intent": "summary",
+      "language": "en",
+      "text": "Break this summary down by section to see which areas drive the conclusion.",
+      "query": "Break down the summary of {{document}} by section."
+    },
+    {
+      "id": "FS_011_summary_drill_down_pt",
+      "audiences": [
+        "any"
+      ],
+      "intent": "summary",
+      "language": "pt",
+      "text": "Detalhe este resumo por secao para ver quais areas sustentam a conclusao.",
+      "query": "Detalhe o resumo de {{document}} por secao."
+    },
+    {
+      "id": "FS_012_summary_drill_down_es",
+      "audiences": [
+        "any"
+      ],
+      "intent": "summary",
+      "language": "es",
+      "text": "Desglosa este resumen por seccion para ver que areas sustentan la conclusion.",
+      "query": "Desglosa el resumen de {{document}} por seccion."
     }
   ],
   "rules": [

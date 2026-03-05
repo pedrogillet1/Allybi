@@ -71,6 +71,7 @@ let tableScaleCapturedCount = 0;
 let indexEncryptionCompliantCount = 0;
 let indexEncryptionTotalCount = 0;
 let indexPlaintextSensitiveFieldViolationCount = 0;
+let indexPlaintextOverrideActivationCount = 0;
 let indexingActiveOperationConflictCount = 0;
 
 // ---------------------------------------------------------------------------
@@ -121,6 +122,21 @@ export function recordTableDuplication(): void {
   tableDuplicationCount++;
 }
 
+let xlsxRowsTruncatedTotal = 0;
+
+export function recordXlsxRowsTruncated(count: number): void {
+  xlsxRowsTruncatedTotal += Math.max(0, Math.trunc(count));
+}
+
+const tableExtractionMethodCounts = new Map<string, number>();
+
+export function recordTableExtractionMethod(method: string): void {
+  tableExtractionMethodCounts.set(
+    method,
+    (tableExtractionMethodCounts.get(method) || 0) + 1,
+  );
+}
+
 export function recordOcrUsage(provider: string, success: boolean): void {
   if (!ocrFallbackUsage.has(provider)) {
     ocrFallbackUsage.set(provider, { success: 0, failure: 0 });
@@ -156,6 +172,10 @@ export function recordIndexingPlaintextSensitiveFieldViolation(
   count = 1,
 ): void {
   indexPlaintextSensitiveFieldViolationCount += Math.max(0, Math.trunc(count));
+}
+
+export function recordIndexingPlaintextOverrideActivation(count = 1): void {
+  indexPlaintextOverrideActivationCount += Math.max(0, Math.trunc(count));
 }
 
 export function recordIndexingActiveOperationConflict(count = 1): void {
@@ -217,7 +237,10 @@ export function getMetricsSummary(): {
   tableScaleCapture: { detected: number; captured: number; rate: number };
   indexEncryptionCompliance: { compliant: number; total: number; rate: number };
   indexPlaintextSensitiveFieldViolations: number;
+  indexPlaintextOverrideActivations: number;
   indexingActiveOperationConflicts: number;
+  xlsxRowsTruncatedTotal: number;
+  tableExtractionMethodCounts: Record<string, number>;
 } {
   const rate =
     totalExtractionAttempts > 0
@@ -267,7 +290,10 @@ export function getMetricsSummary(): {
     },
     indexPlaintextSensitiveFieldViolations:
       indexPlaintextSensitiveFieldViolationCount,
+    indexPlaintextOverrideActivations: indexPlaintextOverrideActivationCount,
     indexingActiveOperationConflicts: indexingActiveOperationConflictCount,
+    xlsxRowsTruncatedTotal,
+    tableExtractionMethodCounts: Object.fromEntries(tableExtractionMethodCounts),
   };
 }
 
@@ -294,5 +320,8 @@ export function resetMetrics(): void {
   indexEncryptionCompliantCount = 0;
   indexEncryptionTotalCount = 0;
   indexPlaintextSensitiveFieldViolationCount = 0;
+  indexPlaintextOverrideActivationCount = 0;
   indexingActiveOperationConflictCount = 0;
+  xlsxRowsTruncatedTotal = 0;
+  tableExtractionMethodCounts.clear();
 }

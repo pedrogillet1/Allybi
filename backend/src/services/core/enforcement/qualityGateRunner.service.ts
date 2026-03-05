@@ -16,6 +16,10 @@ import {
 } from "../banks/documentIntelligenceBanks.service";
 import { getOptionalBank } from "../banks/bankLoader.service";
 import { evaluateRuleBooleanExpression } from "./qualityGateRunner.expression";
+import {
+  resolveGovernanceFailClosed,
+  resolveGovernanceRuntimeEnv,
+} from "./governanceFailClosedPolicy";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -109,6 +113,7 @@ type DocumentIntelligenceQualityBank = {
   _meta?: { id?: string; version?: string };
   config?: { enabled?: boolean };
   rules?: DocumentIntelligenceRule[];
+  contradictionChecks?: DocumentIntelligenceRule[];
 };
 
 type DocumentIntelligenceScope = {
@@ -319,21 +324,6 @@ const REQUIRED_QUALITY_HOOK_KEYS = [
   "privacyMinimalRulesBankId",
   "piiLabelsBankId",
 ] as const;
-
-function resolveRuntimeEnv(): "production" | "staging" | "dev" | "local" {
-  const raw = String(
-    process.env.RUNTIME_ENV ||
-      process.env.APP_ENV ||
-      process.env.NODE_ENV ||
-      "",
-  )
-    .trim()
-    .toLowerCase();
-  if (raw === "production" || raw === "prod") return "production";
-  if (raw === "staging" || raw === "stage") return "staging";
-  if (raw === "local") return "local";
-  return "dev";
-}
 
 function splitSentences(text: string): string[] {
   return String(text || "")
@@ -760,13 +750,19 @@ export class QualityGateRunnerService {
   private isStrictFailClosedMode(
     qualityBank: QualityGatesBank | null,
   ): boolean {
-    const env = resolveRuntimeEnv();
+    const env = resolveGovernanceRuntimeEnv({
+      nodeEnv: process.env.NODE_ENV,
+      runtimeEnv: process.env.RUNTIME_ENV || process.env.APP_ENV,
+    });
     const byEnv = qualityBank?.config?.modes?.byEnv;
     const configured = byEnv?.[env];
-    if (typeof configured?.failClosed === "boolean") {
-      return configured.failClosed;
-    }
-    return env === "production" || env === "staging";
+    return resolveGovernanceFailClosed({
+      nodeEnv: process.env.NODE_ENV,
+      runtimeEnv: process.env.RUNTIME_ENV || process.env.APP_ENV,
+      certProfile: process.env.CERT_PROFILE,
+      strictGovernanceFlag: process.env.CHAT_RUNTIME_STRICT_GOVERNANCE,
+      configuredFailClosed: configured?.failClosed,
+    }).failClosed;
   }
 
   private validateRequiredHookBanks(
@@ -1767,12 +1763,16 @@ export class QualityGateRunnerService {
     bankId: string,
     bank: DocumentIntelligenceQualityBank,
     scope: DocumentIntelligenceScope,
-  ): { failures: QualityGateResult[]; errors: string[] } {
+  ): {
+    failures: QualityGateResult[];
+    errors: string[];
+    structuralErrors: string[];
+  } {
+    const resolvedRules = this.resolveDocumentIntelligenceRules(bankId, bank);
     const failures: QualityGateResult[] = [];
-    const errors: string[] = [];
-    const rules = Array.isArray(bank.rules) ? bank.rules : [];
+    const errors: string[] = [...resolvedRules.structuralErrors];
 
-    for (const rule of rules) {
+    for (const rule of resolvedRules.rules) {
       const ruleId = String(rule?.id || "").trim();
       const check = String(rule?.check || "").trim();
       if (!ruleId || !check) continue;
@@ -1800,13 +1800,40 @@ export class QualityGateRunnerService {
       });
     }
 
-    return { failures, errors };
+    return { failures, errors, structuralErrors: resolvedRules.structuralErrors };
+  }
+
+  private resolveDocumentIntelligenceRules(
+    bankId: string,
+    bank: DocumentIntelligenceQualityBank,
+  ): {
+    rules: DocumentIntelligenceRule[];
+    structuralErrors: string[];
+  } {
+    if (Array.isArray(bank.rules)) {
+      return { rules: bank.rules, structuralErrors: [] };
+    }
+    if (Array.isArray(bank.contradictionChecks)) {
+      return { rules: bank.contradictionChecks, structuralErrors: [] };
+    }
+
+    if (String(bankId || "").trim().toLowerCase() === "contradiction_policy") {
+      return {
+        rules: [],
+        structuralErrors: [
+          "Invalid contradiction_policy bank shape: expected an array at 'rules' or 'contradictionChecks'.",
+        ],
+      };
+    }
+
+    return { rules: [], structuralErrors: [] };
   }
 
   private runDocumentIntelligencePolicyGates(
     response: string,
     ctx: QualityGateContext,
     qualityBank: QualityGatesBank | null,
+    strictFailClosed: boolean,
   ): QualityGateResult[] {
     const results: QualityGateResult[] = [];
     const responseText = String(response || "");
@@ -1861,6 +1888,9 @@ export class QualityGateRunnerService {
         contradictionPolicyBank,
         scope,
       );
+      if (strictFailClosed && contradictionPolicy.structuralErrors.length > 0) {
+        throw new Error(contradictionPolicy.structuralErrors.join(" | "));
+      }
       results.push(...contradictionPolicy.failures);
       const contradictionCount =
         firstFiniteNumber([
@@ -2368,7 +2398,12 @@ export class QualityGateRunnerService {
     }
 
     results.push(
-      ...this.runDocumentIntelligencePolicyGates(response, ctx, qualityBank),
+      ...this.runDocumentIntelligencePolicyGates(
+        response,
+        ctx,
+        qualityBank,
+        strictFailClosed,
+      ),
     );
     results.push(...this.runDomainSpecificOverrideGates(response, ctx));
 

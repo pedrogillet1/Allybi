@@ -19,6 +19,7 @@ import { TenantKeyService } from "../../security/tenantKey.service";
 import { DocumentKeyService } from "../../documents/documentKey.service";
 import { DocumentCryptoService } from "../../documents/documentCrypto.service";
 import { EncryptedDocumentRepo } from "../../documents/encryptedDocumentRepo.service";
+import { resolveIndexingPolicySnapshot } from "../../retrieval/indexingPolicy.service";
 
 /**
  * Encrypt extracted text and filename, storing them in the DB.
@@ -32,11 +33,7 @@ export async function runEncryptionStep(params: {
 }): Promise<void> {
   const { userId, documentId, fullText, filename } = params;
   const hasEncryptionKey = !!process.env.KODA_MASTER_KEY_BASE64;
-
-  const encryptedOnly =
-    String(process.env.INDEXING_ENCRYPTED_CHUNKS_ONLY || "")
-      .trim()
-      .toLowerCase() === "true";
+  const encryptedOnly = resolveIndexingPolicySnapshot().encryptedChunksOnly;
 
   if (!hasEncryptionKey) {
     if (encryptedOnly) {

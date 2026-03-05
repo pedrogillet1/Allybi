@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '../../constants/routes';
 import { useIntegrationStatus } from '../../hooks/useIntegrationStatus';
@@ -299,51 +299,10 @@ function ProviderCard({ provider, status, onConnect, onDisconnect, onSync, t }) 
 export default function IntegrationsPage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const [searchParams, setSearchParams] = useSearchParams();
   const isMobile = useIsMobile();
-  const { providers, loading, connectProvider, disconnectProvider, syncNow, refetch } = useIntegrationStatus();
+  const { providers, loading, connectProvider, disconnectProvider, syncNow } = useIntegrationStatus();
   const [showNotificationsPopup, setShowNotificationsPopup] = useState(false);
 
-  // Handle OAuth callback redirect: when the backend redirects the popup here
-  // with ?oauth_connected=<provider>, signal the opener and close the popup.
-  useEffect(() => {
-    const connectedProvider = searchParams.get('oauth_connected');
-    const errorProvider = searchParams.get('oauth_error');
-    if (!connectedProvider && !errorProvider) return;
-
-    const provider = connectedProvider || errorProvider;
-    const ok = Boolean(connectedProvider);
-
-    // Try postMessage to opener (works if window.opener survived cross-origin nav).
-    try {
-      if (window.opener && !window.opener.closed) {
-        window.opener.postMessage(
-          { type: 'koda_oauth_done', provider, ok },
-          window.location.origin,
-        );
-      }
-    } catch {}
-
-    // Clean the query params so a page refresh doesn't re-trigger.
-    setSearchParams({}, { replace: true });
-
-    // If we're in a popup, close it after a short delay.
-    const isPopup = window.opener || window.name.startsWith('koda_');
-    if (isPopup) {
-      const closeSelf = () => {
-        try {
-          if (window.opener && !window.opener.closed) window.opener.focus();
-        } catch {}
-        try { window.close(); } catch {}
-        try { window.open('', '_self'); window.close(); } catch {}
-      };
-      setTimeout(closeSelf, 200);
-      setTimeout(closeSelf, 900);
-    } else {
-      // Not a popup — user navigated directly. Just refresh status.
-      refetch();
-    }
-  }, [searchParams, setSearchParams, refetch]);
 
   return (
     <div style={{

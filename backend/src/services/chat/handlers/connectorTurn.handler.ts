@@ -23,6 +23,7 @@ import {
   type SlackMessage,
 } from "../../connectors/slack/slackClient.service";
 import { verifyEmailSendConfirmationToken } from "../../connectors/emailSendConfirmation.service";
+import { consumeEmailSendConfirmationTokenOnce } from "../../connectors/emailSendReplayGuard.service";
 import prisma from "../../../config/database";
 
 type Provider = "gmail" | "outlook" | "slack";
@@ -932,6 +933,31 @@ export class ConnectorTurnHandler {
           answerMode: "action_receipt",
           status: "blocked",
           failureCode: "INVALID_CONFIRMATION_USER",
+        });
+      }
+
+      let confirmationAvailable = false;
+      try {
+        confirmationAvailable = await consumeEmailSendConfirmationTokenOnce(
+          confirmationToken,
+          payload,
+        );
+      } catch {
+        return this.compose(base, {
+          assistantText:
+            "Unable to validate the confirmation token right now. Please retry.",
+          answerMode: "action_receipt",
+          status: "failed",
+          failureCode: "CONFIRMATION_VALIDATION_FAILED",
+        });
+      }
+      if (!confirmationAvailable) {
+        return this.compose(base, {
+          assistantText:
+            "This confirmation token was already used. Create a new draft before sending again.",
+          answerMode: "action_receipt",
+          status: "blocked",
+          failureCode: "CONFIRMATION_ALREADY_USED",
         });
       }
 

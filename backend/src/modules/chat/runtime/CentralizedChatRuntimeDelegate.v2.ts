@@ -78,6 +78,7 @@ import {
   getResponseContractEnforcer,
   type ResponseContractContext,
 } from "../../../services/core/enforcement/responseContractEnforcer.service";
+import { resolveGovernanceFailClosed } from "../../../services/core/enforcement/governanceFailClosedPolicy";
 import { trimTextToTokenBudget } from "../../../services/core/enforcement/tokenBudget.service";
 import {
   SEMANTIC_TRUNCATION_DETECTOR_VERSION,
@@ -256,6 +257,14 @@ function parseStoredMetadata(
 function asObject(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== "object" || Array.isArray(value)) return {};
   return value as Record<string, unknown>;
+}
+
+function firstNonEmptyRecord(...candidates: unknown[]): Record<string, unknown> {
+  for (const candidate of candidates) {
+    const record = asObject(candidate);
+    if (Object.keys(record).length > 0) return record;
+  }
+  return {};
 }
 
 function toStringArray(value: unknown): string[] {
@@ -707,13 +716,22 @@ function buildEmptyAssistantText(params: {
   if (reason === "missing_provenance") {
     return "";
   }
-  return resolveRuntimeFallbackMessage({
+  const fallback = resolveRuntimeFallbackMessage({
     language: params.language,
     reasonCode: params.reasonCode,
     seed: params.seed,
     context: params.context,
     routeHints: params.routeHints,
   });
+  if (String(fallback || "").trim()) return fallback;
+  const lang = normalizeChatLanguage(params.language || "en");
+  if (lang === "pt") {
+    return "Nao consegui concluir essa resposta com seguranca.";
+  }
+  if (lang === "es") {
+    return "No pude finalizar esta respuesta de forma segura.";
+  }
+  return "I could not safely finalize this answer.";
 }
 
 function buildFallbackMicrocopyParams(input: {
@@ -1173,6 +1191,7 @@ function resolveQualityGateSeverity(
   if (normalized.startsWith("numeric_integrity")) return "block";
   if (normalized.startsWith("redaction_")) return "block";
   if (normalized.startsWith("medical_")) return "block";
+  if (normalized.startsWith("domain_safety_rule_violation:")) return "block";
   return "warn";
 }
 
@@ -1253,37 +1272,12 @@ function resolveRuntimeFailureMode(
 }
 
 function shouldForceStrictGovernanceFailClosed(): boolean {
-  const nodeEnv = String(process.env.NODE_ENV || "")
-    .trim()
-    .toLowerCase();
-  const runtimeEnv = String(process.env.RUNTIME_ENV || process.env.APP_ENV || "")
-    .trim()
-    .toLowerCase();
-  const certProfile = String(process.env.CERT_PROFILE || "")
-    .trim()
-    .toLowerCase();
-  const strictCertProfile =
-    certProfile === "ci" ||
-    certProfile === "release" ||
-    certProfile === "retrieval_signoff" ||
-    certProfile === "local_hard";
-  const protectedEnv =
-    nodeEnv === "production" ||
-    runtimeEnv === "production" ||
-    runtimeEnv === "staging" ||
-    strictCertProfile;
-
-  const explicit = String(process.env.CHAT_RUNTIME_STRICT_GOVERNANCE || "")
-    .trim()
-    .toLowerCase();
-  if (explicit === "1" || explicit === "true" || explicit === "yes") {
-    return true;
-  }
-  if (explicit === "0" || explicit === "false" || explicit === "no") {
-    // Protected envs must remain fail-closed even if explicit opt-out is set.
-    return protectedEnv;
-  }
-  return protectedEnv;
+  return resolveGovernanceFailClosed({
+    nodeEnv: process.env.NODE_ENV,
+    runtimeEnv: process.env.RUNTIME_ENV || process.env.APP_ENV,
+    certProfile: process.env.CERT_PROFILE,
+    strictGovernanceFlag: process.env.CHAT_RUNTIME_STRICT_GOVERNANCE,
+  }).failClosed;
 }
 
 function detectDominantLanguageTag(text: string): "en" | "pt" | "es" | "unknown" {
@@ -4231,8 +4225,54 @@ export class CentralizedChatRuntimeDelegate {
       const contextSignals = asObject(
         (params.req.context as Record<string, unknown> | null)?.signals ?? null,
       );
-      const retrievalSummaryForGates = asObject(
-        asObject(asObject(params.retrievalPack).telemetry).summary,
+      const retrievalPackForGates = asObject(params.retrievalPack);
+      const retrievalTelemetryForGates = asObject(retrievalPackForGates.telemetry);
+      const retrievalSummaryForGates = asObject(retrievalTelemetryForGates.summary);
+      const diPolicyContextForGates = firstNonEmptyRecord(
+        contextSignals.diPolicyContext,
+        contextSignals.policyContext,
+        retrievalSummaryForGates.diPolicyContext,
+        retrievalSummaryForGates.policyContext,
+        retrievalTelemetryForGates.diPolicyContext,
+        retrievalTelemetryForGates.policyContext,
+        retrievalPackForGates.diPolicyContext,
+        contextSignals,
+      );
+      const diPolicyOutputForGates = firstNonEmptyRecord(
+        contextSignals.diPolicyOutput,
+        contextSignals.policyOutput,
+        retrievalSummaryForGates.diPolicyOutput,
+        retrievalSummaryForGates.policyOutput,
+        retrievalTelemetryForGates.diPolicyOutput,
+        retrievalTelemetryForGates.policyOutput,
+        retrievalPackForGates.diPolicyOutput,
+      );
+      const diPolicySourceForGates = firstNonEmptyRecord(
+        contextSignals.diPolicySource,
+        contextSignals.policySource,
+        retrievalSummaryForGates.diPolicySource,
+        retrievalSummaryForGates.policySource,
+        retrievalTelemetryForGates.diPolicySource,
+        retrievalTelemetryForGates.policySource,
+        retrievalPackForGates.diPolicySource,
+      );
+      const diPolicyAttachmentsForGates = firstNonEmptyRecord(
+        contextSignals.diPolicyAttachments,
+        contextSignals.policyAttachments,
+        retrievalSummaryForGates.diPolicyAttachments,
+        retrievalSummaryForGates.policyAttachments,
+        retrievalTelemetryForGates.diPolicyAttachments,
+        retrievalTelemetryForGates.policyAttachments,
+        retrievalPackForGates.diPolicyAttachments,
+      );
+      const diPolicyConfigForGates = firstNonEmptyRecord(
+        contextSignals.diPolicyConfig,
+        contextSignals.policyConfig,
+        retrievalSummaryForGates.diPolicyConfig,
+        retrievalSummaryForGates.policyConfig,
+        retrievalTelemetryForGates.diPolicyConfig,
+        retrievalTelemetryForGates.policyConfig,
+        retrievalPackForGates.diPolicyConfig,
       );
       const classifiedDomainForGates =
         String(retrievalSummaryForGates.classifiedDomain || "")
@@ -4272,6 +4312,14 @@ export class CentralizedChatRuntimeDelegate {
           (params.req.attachedDocumentIds || []).length === 1,
         sourceButtonsCount: sourceDocumentIdsFromSources.length,
         userRequestedShort: params.req.truncationRetry === true,
+        diPolicyContext: diPolicyContextForGates,
+        diPolicyOutput: diPolicyOutputForGates,
+        diPolicySource: diPolicySourceForGates,
+        diPolicyAttachments: diPolicyAttachmentsForGates,
+        diPolicyConfig:
+          Object.keys(diPolicyConfigForGates).length > 0
+            ? diPolicyConfigForGates
+            : null,
       };
       const gateResult = await qualityRunner.runGates(text, gateCtx);
       if (!gateResult.allPassed) {
@@ -6148,7 +6196,7 @@ export class CentralizedChatRuntimeDelegate {
     const hasEvidence = (opts?.evidenceCount ?? 0) > 0;
 
     if (decision.suggestedAction === "clarify") {
-      if (hasAttachedDocs) {
+      if (hasAttachedDocs && hasEvidence) {
         // Don't bypass — let the LLM attempt an answer with the evidence.
         // The hedge mechanism will add uncertainty prefix if needed.
         return null;
@@ -6180,7 +6228,7 @@ export class CentralizedChatRuntimeDelegate {
       // RC8 fix: When documents ARE attached and retrieval returned evidence,
       // do not block entirely — let the LLM hedge instead of refusing.
       // The user already provided documents; a full refusal is a false negative.
-      if (hasAttachedDocs) {
+      if (hasAttachedDocs && hasEvidence) {
         return null;
       }
       const text =

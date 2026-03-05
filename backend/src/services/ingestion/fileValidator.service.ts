@@ -82,6 +82,16 @@ const MAGIC_BYTES: Record<string, { signature: number[]; offset?: number }[]> =
       { signature: [0x47, 0x49, 0x46, 0x38, 0x37, 0x61] }, // GIF87a
       { signature: [0x47, 0x49, 0x46, 0x38, 0x39, 0x61] }, // GIF89a
     ],
+    "image/tiff": [
+      { signature: [0x49, 0x49, 0x2a, 0x00] }, // TIFF little-endian (II)
+      { signature: [0x4d, 0x4d, 0x00, 0x2a] }, // TIFF big-endian (MM)
+    ],
+    "image/bmp": [
+      { signature: [0x42, 0x4d] }, // BM
+    ],
+    "image/webp": [
+      { signature: [0x52, 0x49, 0x46, 0x46] }, // RIFF (WebP container)
+    ],
   };
 
 /** Legacy formats that should be rejected with a specific conversion suggestion. */
@@ -109,6 +119,9 @@ class FileValidatorService {
     "image/png",
     "image/jpg",
     "image/gif",
+    "image/tiff",
+    "image/bmp",
+    "image/webp",
   ];
 
   /**

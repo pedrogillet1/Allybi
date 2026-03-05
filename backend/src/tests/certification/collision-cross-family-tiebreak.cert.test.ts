@@ -4,11 +4,14 @@ import { TurnRouterService } from "../../services/chat/turnRouter.service";
 import type { TurnContext } from "../../services/chat/chat.types";
 import type { IntentDecisionOutput } from "../../services/config/intentConfig.service";
 
-function makeCtx(messageText: string): TurnContext {
+function makeCtx(
+  messageText: string,
+  locale: "en" | "pt" | "es" = "en",
+): TurnContext {
   return {
     userId: "user-1",
     messageText,
-    locale: "en",
+    locale,
     now: new Date(),
     attachedDocuments: [],
     connectors: { connected: {} },
@@ -61,13 +64,21 @@ function makeRouter(): TurnRouterService {
             intentFamily: "calc",
             priority: 90,
             minConfidence: 0.7,
-            patterns: { en: ["\\bsummarize\\b"] },
+            patterns: {
+              en: ["\\bsummarize\\b"],
+              pt: ["\\bresumir\\b"],
+              es: ["\\bresumir\\b"],
+            },
           },
           open: {
             intentFamily: "navigation",
             priority: 89,
             minConfidence: 0.7,
-            patterns: { en: ["\\bopen\\b"] },
+            patterns: {
+              en: ["\\bopen\\b"],
+              pt: ["\\babrir\\b"],
+              es: ["\\babrir\\b"],
+            },
           },
         },
       };
@@ -97,17 +108,25 @@ function makeRouter(): TurnRouterService {
 }
 
 describe("Certification: collision-cross-family-tiebreak", () => {
-  test("signal collision suppresses calc and keeps navigation route", () => {
+  test.each([
+    { locale: "en" as const, query: "open the file and summarize it" },
+    { locale: "pt" as const, query: "abrir o arquivo e resumir" },
+    { locale: "es" as const, query: "abrir el archivo y resumir" },
+  ])("signal collision suppresses calc and keeps navigation route ($locale)", ({ locale, query }) => {
     const router = makeRouter();
-    const route = router.decide(makeCtx("open the file and summarize it"));
+    const route = router.decide(makeCtx(query, locale));
     expect(route).toBe("KNOWLEDGE");
   });
 
-  test("decision is deterministic across repeated mixed-intent prompts", () => {
+  test.each([
+    { locale: "en" as const, query: "open the file and summarize it" },
+    { locale: "pt" as const, query: "abrir o arquivo e resumir" },
+    { locale: "es" as const, query: "abrir el archivo y resumir" },
+  ])("decision is deterministic across repeated mixed-intent prompts ($locale)", ({ locale, query }) => {
     const router = makeRouter();
     const observed = new Set<string>();
     for (let i = 0; i < 120; i++) {
-      observed.add(router.decide(makeCtx("open the file and summarize it")));
+      observed.add(router.decide(makeCtx(query, locale)));
     }
     expect([...observed]).toEqual(["KNOWLEDGE"]);
   });
@@ -116,19 +135,29 @@ describe("Certification: collision-cross-family-tiebreak", () => {
     const failures: string[] = [];
     const router = makeRouter();
 
-    const observed = new Set<string>();
-    for (let i = 0; i < 120; i++) {
-      observed.add(router.decide(makeCtx("open the file and summarize it")));
-    }
-    if (!(observed.size === 1 && observed.has("KNOWLEDGE"))) {
-      failures.push("NON_DETERMINISTIC_MIXED_INTENT_ROUTE");
+    const localeQueries = [
+      { locale: "en" as const, query: "open the file and summarize it" },
+      { locale: "pt" as const, query: "abrir o arquivo e resumir" },
+      { locale: "es" as const, query: "abrir el archivo y resumir" },
+    ];
+
+    let checks = 0;
+    for (const probe of localeQueries) {
+      const observed = new Set<string>();
+      for (let i = 0; i < 120; i++) {
+        observed.add(router.decide(makeCtx(probe.query, probe.locale)));
+      }
+      checks += 1;
+      if (!(observed.size === 1 && observed.has("KNOWLEDGE"))) {
+        failures.push(`NON_DETERMINISTIC_MIXED_INTENT_ROUTE_${probe.locale}`);
+      }
     }
 
     writeCertificationGateReport("collision-cross-family-tiebreak", {
       passed: failures.length === 0,
       metrics: {
         iterations: 120,
-        uniqueRoutes: observed.size,
+        localeCases: checks,
       },
       thresholds: {
         maxFailures: 0,

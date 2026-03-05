@@ -93,9 +93,20 @@ describe("Certification: routing-determinism-runtime-e2e", () => {
       { name: "en-doc-query", ctx: makeCtx({ messageText: "extract all dates" }, "en") },
       { name: "pt-doc-query", ctx: makeCtx({ messageText: "extrair todas as datas" }, "pt") },
       { name: "es-nav-query", ctx: makeCtx({ messageText: "open budget report" }, "es") },
+      { name: "en-calc-query", ctx: makeCtx({ messageText: "calculate total revenue for q3" }, "en") },
+      { name: "pt-calc-query", ctx: makeCtx({ messageText: "calcular receita total do q3" }, "pt") },
+      { name: "en-edit-query", ctx: makeCtx({ messageText: "edit paragraph 2" }, "en") },
+      { name: "pt-edit-query", ctx: makeCtx({ messageText: "editar paragrafo 2" }, "pt") },
       {
         name: "connector-query",
         ctx: makeCtx({ messageText: "connect my gmail account", attachedDocuments: [] }, "en"),
+      },
+      {
+        name: "es-connector-query",
+        ctx: makeCtx(
+          { messageText: "conectar mi cuenta gmail", attachedDocuments: [] },
+          "es",
+        ),
       },
     ];
 
@@ -126,15 +137,38 @@ describe("Certification: routing-determinism-runtime-e2e", () => {
     }
   });
 
+  test("TurnRouterService remains stable across equivalent normalized prompts", () => {
+    const router = new TurnRouterService({ isConnectorTurn: () => false } as any);
+    const variants: Array<{ locale: "en" | "pt" | "es"; query: string }> = [
+      { locale: "en", query: "open budget report" },
+      { locale: "en", query: "  OPEN   budget   report  " },
+      { locale: "pt", query: "citar a secao 4 literalmente" },
+      { locale: "pt", query: "CITAR A SECAO 4 LITERALMENTE" },
+      { locale: "es", query: "conectar mi cuenta gmail" },
+      { locale: "es", query: "  conectar   mi cuenta   gmail  " },
+    ];
+    for (let i = 0; i < variants.length; i += 2) {
+      const a = variants[i];
+      const b = variants[i + 1];
+      const decisionA = router.decideWithIntent(makeCtx({ messageText: a.query }, a.locale));
+      const decisionB = router.decideWithIntent(makeCtx({ messageText: b.query }, b.locale));
+      expect(JSON.stringify(decisionA)).toBe(JSON.stringify(decisionB));
+    }
+  });
+
   test("write certification gate report", async () => {
     const failures: string[] = [];
     let assertions = 0;
     const router = new TurnRouterService({ isConnectorTurn: () => false } as any);
-
     const routerCases: TurnContext[] = [
       makeCtx({ messageText: "quote section 4 verbatim" }, "en"),
-      makeCtx({ messageText: "citar a seção 4 literalmente" }, "pt"),
+      makeCtx({ messageText: "citar a secao 4 literalmente" }, "pt"),
       makeCtx({ messageText: "locate file budget report" }, "es"),
+      makeCtx({ messageText: "calculate total revenue for q3" }, "en"),
+      makeCtx({ messageText: "calcular receita total do q3" }, "pt"),
+      makeCtx({ messageText: "edit paragraph 2" }, "en"),
+      makeCtx({ messageText: "editar paragrafo 2" }, "pt"),
+      makeCtx({ messageText: "conectar mi cuenta gmail" }, "es"),
     ];
 
     for (const ctx of routerCases) {
@@ -161,6 +195,30 @@ describe("Certification: routing-determinism-runtime-e2e", () => {
         query: "go to section 3",
         env: "dev" as const,
         signals: { intentFamily: "documents", operator: "locate_content" },
+      },
+      {
+        query: "compare section 1 and section 2",
+        env: "dev" as const,
+        signals: { intentFamily: "documents", operator: "compare" },
+      },
+      {
+        query: "compare section 1 and section 2",
+        env: "dev" as const,
+        signals: {
+          intentFamily: "documents",
+          operator: "compare",
+          corpusSearchAllowed: true,
+        },
+      },
+      {
+        query: "explain this document",
+        env: "dev" as const,
+        signals: {
+          explicitDocRef: true,
+          resolvedDocId: "doc-a",
+          explicitDocLock: true,
+          activeDocId: "doc-a",
+        },
       },
     ];
 
@@ -195,3 +253,5 @@ describe("Certification: routing-determinism-runtime-e2e", () => {
     expect(failures).toEqual([]);
   });
 });
+
+

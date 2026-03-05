@@ -321,6 +321,7 @@ describe("PrismaRetrievalAdapterFactory encrypted chunk hydration", () => {
   });
 
   test("scoped root doc ids resolve to latest ready revision before semantic search", async () => {
+    process.env.RETRIEVAL_INCLUDE_RELATED_DOCS = "false";
     mockPineconeAvailable.mockReturnValue(true);
     mockGenerateQueryEmbedding.mockResolvedValue({
       embedding: [0.11, 0.22],

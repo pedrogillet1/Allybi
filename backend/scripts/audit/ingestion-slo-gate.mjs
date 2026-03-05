@@ -2,6 +2,10 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import { createRequire } from "module";
+
+const require = createRequire(import.meta.url);
+const { evaluateIngestionSloMetrics } = require("../../src/services/admin/ingestionSloContract.shared.js");
 
 function arg(name, fallback = "") {
   const idx = process.argv.indexOf(name);
@@ -47,29 +51,41 @@ for (const row of byMimeSize) {
   weightedFailure += count * (failureRate / 100);
 }
 const globalFailureRate = docsProcessed > 0 ? (weightedFailure / docsProcessed) * 100 : 0;
-
-const failures = [];
-if (docsProcessed < minDocs) {
-  failures.push(`INSUFFICIENT_SAMPLE: ${docsProcessed} < ${minDocs}`);
-}
-if (p95LatencyMs > maxP95) {
-  failures.push(`GLOBAL_P95_EXCEEDED: ${p95LatencyMs} > ${maxP95}`);
-}
-if (globalFailureRate > maxFailureRate) {
-  failures.push(
-    `GLOBAL_FAILURE_RATE_EXCEEDED: ${globalFailureRate.toFixed(2)}% > ${maxFailureRate}%`,
-  );
-}
+const p95PeakRssMb = num(report?.p95PeakRssMb, 0);
+const maxPeakRssMb = num(
+  arg(
+    "--max-global-p95-peak-rss-mb",
+    process.env.INGESTION_SLO_MAX_GLOBAL_P95_PEAK_RSS_MB || "1536",
+  ),
+  1536,
+);
+const evaluation = evaluateIngestionSloMetrics(
+  {
+    docsProcessed,
+    p95LatencyMs,
+    p95PeakRssMb,
+    byMimeSize,
+  },
+  {
+    minDocsProcessed: minDocs,
+    maxGlobalP95LatencyMs: maxP95,
+    maxGlobalFailureRatePct: maxFailureRate,
+    maxGlobalP95PeakRssMb: maxPeakRssMb,
+  },
+);
+const failures = evaluation.failures;
 
 const summary = {
   passed: failures.length === 0,
   docsProcessed,
   p95LatencyMs,
+  p95PeakRssMb,
   globalFailureRate: Number(globalFailureRate.toFixed(2)),
   thresholds: {
     minDocs,
     maxP95,
     maxFailureRate,
+    maxPeakRssMb,
   },
   failures,
   reportPath: path.relative(repoRoot, reportPath),

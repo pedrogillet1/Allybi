@@ -41,6 +41,14 @@ function isLikelyTableRow(line: string): boolean {
     return false;
   }
 
+  const trimmed = line.trim();
+  const isMarkdownSeparator = /^:?-{3,}:?(?:\s*\|\s*:?-{3,}:?)+$/.test(
+    trimmed.replace(/^\|/, "").replace(/\|$/, ""),
+  );
+  if (isMarkdownSeparator) {
+    return true;
+  }
+
   // Check for multiple space-separated columns (3+ spaces between values)
   const hasMultipleSpaces = /\s{3,}/.test(line);
 
@@ -50,15 +58,30 @@ function isLikelyTableRow(line: string): boolean {
   // Check for pipe-separated values (already markdown table)
   const hasPipes = /\|.*\|/.test(line);
 
-  // Count potential columns (separated by 3+ spaces or tabs)
-  const columns = line.split(/\s{3,}|\t/).filter((c) => c.trim().length > 0);
+  // Count potential columns (separated by 3+ spaces, tabs, or markdown pipes)
+  const columns = hasPipes
+    ? line
+        .split("|")
+        .map((c) => c.trim())
+        .filter((c) => c.length > 0)
+    : line.split(/\s{3,}|\t+/).filter((c) => c.trim().length > 0);
   const hasMultipleColumns = columns.length >= 2;
+  if (!hasMultipleColumns) {
+    return false;
+  }
 
   // Check if line has numbers (common in data tables)
   const hasNumbers = /\d/.test(line);
+  const numericColumnCount = columns.filter((c) =>
+    /[-+]?[$€£]?\d[\d,.\s%]*$/.test(c.trim()),
+  ).length;
 
   // Check if line starts with a number or bullet (common row indicator)
   const startsWithNumber = /^\s*\d+[\.\)\s]/.test(line);
+
+  // Check for list-like patterns (numbered lists, bullet points)
+  const isNumberedList = /^\s*\d+[\.\)]\s/.test(line);
+  const isBulletList = /^\s*[-•*]\s/.test(line);
 
   // Calculate score
   let score = 0;
@@ -67,9 +90,18 @@ function isLikelyTableRow(line: string): boolean {
   if (hasPipes) score += 3;
   if (hasMultipleColumns) score += 2;
   if (hasNumbers) score += 1;
-  if (startsWithNumber) score += 1;
+  if (numericColumnCount > 0) score += 1;
+  if (startsWithNumber && !isNumberedList) score += 1;
 
-  return score >= 3;
+  // Penalize list-like patterns to reduce false positives
+  if (isNumberedList) score -= 2;
+  if (isBulletList) score -= 1;
+
+  // Penalize prose-like lines with one very long sentence.
+  const wordCount = trimmed.split(/\s+/).length;
+  if (wordCount > 22 && numericColumnCount === 0 && !hasPipes) score -= 2;
+
+  return score >= 4 && (hasMultipleSpaces || hasTabs || hasPipes);
 }
 
 /**
@@ -124,10 +156,20 @@ function detectColumnPositions(rows: string[]): number[] {
  * Split a row into cells based on detected column positions
  */
 function splitRowIntoCells(row: string, columnPositions: number[]): string[] {
+  if (/\|/.test(row)) {
+    const piped = row
+      .split("|")
+      .map((c) => c.trim())
+      .filter((c) => c.length > 0);
+    if (piped.length >= 2) {
+      return piped;
+    }
+  }
+
   if (columnPositions.length === 0) {
-    // Fallback: split by multiple spaces
+    // Fallback: split by multiple spaces/tabs
     return row
-      .split(/\s{3,}/)
+      .split(/\s{3,}|\t+/)
       .map((c) => c.trim())
       .filter((c) => c.length > 0);
   }
@@ -275,19 +317,24 @@ export function extractTablesFromText(text: string): TableExtractionResult {
     }
   }
 
-  // Replace table regions in text with markdown tables
-  let resultText = text;
+  // Deterministic reconstruction avoids accidental replacement collisions when
+  // source text contains repeated table blocks.
+  const resultLines: string[] = [];
+  let cursor = 0;
+  const sortedTables = [...tables].sort((a, b) => a.startLine - b.startLine);
 
-  // Process tables in reverse order to maintain line positions
-  for (let i = tables.length - 1; i >= 0; i--) {
-    const table = tables[i];
-    const tableLines = lines.slice(table.startLine, table.endLine + 1);
-    const originalText = tableLines.join("\n");
-
-    // Add a marker before and after for clarity
-    const markdownBlock = `\n${table.markdown}`;
-    resultText = resultText.replace(originalText, markdownBlock);
+  for (const table of sortedTables) {
+    if (table.startLine > cursor) {
+      resultLines.push(...lines.slice(cursor, table.startLine));
+    }
+    resultLines.push("", table.markdown.trimEnd());
+    cursor = table.endLine + 1;
   }
+  if (cursor < lines.length) {
+    resultLines.push(...lines.slice(cursor));
+  }
+
+  const resultText = resultLines.join("\n");
 
   return {
     text: resultText,
@@ -322,14 +369,16 @@ function processTableLines(
   // If column counts vary too much, this might not be a table
   if (maxColumns - minColumns > 2) {
     // Try to salvage by filtering rows with wrong column count
+    const freq = new Map<number, number>();
+    for (const count of columnCounts) {
+      freq.set(count, (freq.get(count) || 0) + 1);
+    }
     const mode =
-      columnCounts
-        .sort(
-          (a, b) =>
-            columnCounts.filter((v) => v === a).length -
-            columnCounts.filter((v) => v === b).length,
-        )
-        .pop() || maxColumns;
+      [...freq.entries()]
+        .sort((a, b) => {
+          if (b[1] !== a[1]) return b[1] - a[1];
+          return b[0] - a[0];
+        })[0]?.[0] || maxColumns;
 
     const filteredRows = rows.filter((r) => Math.abs(r.length - mode) <= 1);
     if (filteredRows.length < 2) {

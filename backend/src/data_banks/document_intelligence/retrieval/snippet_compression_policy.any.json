@@ -24,6 +24,46 @@
     "preserveContextWindowChars": 240,
     "maxSnippetChars": 2200,
     "maxTablePreviewChars": 2600,
+    "negationLexicon": {
+      "en": [
+        "not",
+        "no",
+        "never",
+        "without",
+        "excluding",
+        "none",
+        "loss",
+        "deficit",
+        "decline",
+        "decrease",
+        "failed"
+      ],
+      "pt": [
+        "nao",
+        "não",
+        "sem",
+        "nunca",
+        "nenhum",
+        "queda",
+        "perda",
+        "deficit",
+        "déficit",
+        "falhou"
+      ],
+      "es": [
+        "no",
+        "nunca",
+        "sin",
+        "ninguno",
+        "ninguna",
+        "caida",
+        "caída",
+        "perdida",
+        "pérdida",
+        "fallo",
+        "falló"
+      ]
+    },
     "fallbackMode": "expand_if_ambiguous",
     "deterministic": true,
     "dedupe": true,

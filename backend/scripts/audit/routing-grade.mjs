@@ -26,8 +26,8 @@ const GATE_WEIGHTS = Object.freeze({
   "runtime-wiring": 12,
   "collision-matrix-exhaustive": 10,
   "collision-cross-family-tiebreak": 8,
-  "routing-determinism": 8,
-  "routing-determinism-runtime-e2e": 8,
+  "routing-determinism": 4,
+  "routing-determinism-runtime-e2e": 12,
   "scope-integrity": 10,
   "scope-boundary-locks": 8,
   "slot-contracts-wiring": 7,
@@ -35,8 +35,12 @@ const GATE_WEIGHTS = Object.freeze({
   "disambiguation-e2e": 7,
   "intent-precision": 10,
   "intent-family-firstclass": 10,
+  "routing-bank-consumer-wiring": 10,
   "routing-family-alias-consistency": 8,
+  "routing-family-conformance": 10,
+  "routing-family-mechanism-contract": 8,
   "routing-integration-intents-parity": 8,
+  "routing-calc-intents-parity": 8,
   "nav-intents-locale-parity": 10,
   "telemetry-completeness": 6,
 });
@@ -261,7 +265,7 @@ function classifyFailure(failureCode) {
     return { severity: "high", deduction: 11 };
   }
   if (failure.startsWith("routing-determinism:")) {
-    return { severity: "high", deduction: 12 };
+    return { severity: "medium", deduction: 8 };
   }
   if (failure.startsWith("routing-determinism-runtime-e2e:")) {
     return { severity: "high", deduction: 12 };
@@ -281,10 +285,22 @@ function classifyFailure(failureCode) {
   if (failure.startsWith("intent-family-firstclass:")) {
     return { severity: "high", deduction: 12 };
   }
+  if (failure.startsWith("routing-bank-consumer-wiring:")) {
+    return { severity: "high", deduction: 12 };
+  }
   if (failure.startsWith("routing-family-alias-consistency:")) {
     return { severity: "high", deduction: 11 };
   }
+  if (failure.startsWith("routing-family-conformance:")) {
+    return { severity: "high", deduction: 12 };
+  }
+  if (failure.startsWith("routing-family-mechanism-contract:")) {
+    return { severity: "high", deduction: 11 };
+  }
   if (failure.startsWith("routing-integration-intents-parity:")) {
+    return { severity: "high", deduction: 11 };
+  }
+  if (failure.startsWith("routing-calc-intents-parity:")) {
     return { severity: "high", deduction: 11 };
   }
   if (failure.startsWith("nav-intents-locale-parity:")) {

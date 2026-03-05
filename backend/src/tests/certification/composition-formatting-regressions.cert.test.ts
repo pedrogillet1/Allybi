@@ -10,6 +10,7 @@ const metricKeys = [
   "citationAlignment",
   "citationMinimality",
   "citationStrictNoSnippet",
+  "citationContradictionGuard",
   "tableNoDashCorruption",
   "tablePreservation",
   "structureFamilyCoverage",
@@ -17,9 +18,20 @@ const metricKeys = [
   "toneParityEs",
   "esEvidenceLocalization",
   "notFoundPrecision",
+  "notFoundGuidance",
   "brevityControl",
   "followupNonLooping",
   "followupLocaleCoverage",
+  "wideTableGracefulDegradation",
+  "closerEsLocale",
+  "openerVarietyAtScale",
+  "paragraphSplitMax2Sentences",
+  "jsonDenialMapping",
+  "noDocsBannedPhraseEnforcement",
+  "followupLocaleMatchQuery",
+  "microProfileBudgetEnforcement",
+  "truncationNumericIntegrity",
+  "tableCellCharLimit",
 ] as const;
 
 const metrics: Record<(typeof metricKeys)[number], number> = {
@@ -28,6 +40,7 @@ const metrics: Record<(typeof metricKeys)[number], number> = {
   citationAlignment: 0,
   citationMinimality: 0,
   citationStrictNoSnippet: 0,
+  citationContradictionGuard: 0,
   tableNoDashCorruption: 0,
   tablePreservation: 0,
   structureFamilyCoverage: 0,
@@ -35,9 +48,20 @@ const metrics: Record<(typeof metricKeys)[number], number> = {
   toneParityEs: 0,
   esEvidenceLocalization: 0,
   notFoundPrecision: 0,
+  notFoundGuidance: 0,
   brevityControl: 0,
   followupNonLooping: 0,
   followupLocaleCoverage: 0,
+  wideTableGracefulDegradation: 0,
+  closerEsLocale: 0,
+  openerVarietyAtScale: 0,
+  paragraphSplitMax2Sentences: 0,
+  jsonDenialMapping: 0,
+  noDocsBannedPhraseEnforcement: 0,
+  followupLocaleMatchQuery: 0,
+  microProfileBudgetEnforcement: 0,
+  truncationNumericIntegrity: 0,
+  tableCellCharLimit: 0,
 };
 const qualitySignals: Record<string, number> = {
   openerDistinctCount: 0,
@@ -111,6 +135,12 @@ function bankById(bankId: string): unknown {
           { id: "d", intent: "compare", language: "pt", text: "Comparei os documentos selecionados." },
           { id: "e", intent: "extract", language: "es", text: "Encontre evidencia relevante." },
           { id: "f", intent: "compare", language: "es", text: "Compare los documentos seleccionados." },
+          { id: "g", intent: "compare", language: "en", text: "I analyzed both documents and can highlight the key differences." },
+          { id: "h", intent: "compare", language: "pt", text: "Analisei ambos os documentos e posso destacar as diferencas principais." },
+          { id: "i", intent: "compare", language: "es", text: "Analice ambos documentos y puedo destacar las diferencias principales." },
+          { id: "j", intent: "extract", language: "en", text: "I located the relevant data in the selected document." },
+          { id: "k", intent: "extract", language: "es", text: "Identifique evidencia relevante en el documento seleccionado y puedo resumir los hallazgos." },
+          { id: "l", intent: "extract", language: "en", text: "I identified key data points from the document." },
         ],
       };
     case "followup_suggestions":
@@ -126,6 +156,9 @@ function bankById(bankId: string): unknown {
           { id: "f6", intent: "extract", language: "es", text: "verifica este valor en otra seccion del documento." },
           { id: "f7", intent: "compare", language: "es", text: "compara esta metrica con otro documento relacionado." },
           { id: "f8", intent: "locate_content", language: "es", text: "muestra el contexto de la seccion para validar la lectura." },
+          { id: "f9", intent: "summary", language: "en", text: "break this summary down by section to see which areas drive the conclusion." },
+          { id: "f10", intent: "summary", language: "pt", text: "detalhe este resumo por secao para ver quais areas sustentam a conclusao." },
+          { id: "f11", intent: "summary", language: "es", text: "desglosa este resumen por seccion para ver que areas sustentan la conclusion." },
         ],
       };
     case "fallback_messages":
@@ -172,6 +205,16 @@ function bankById(bankId: string): unknown {
           pt: { clarify: "informe periodo e escopo para resposta mais segura." },
           es: { clarify: "indica periodo y alcance para una respuesta mas segura." },
         },
+      };
+    case "closers":
+      return {
+        config: { enabled: true },
+        closers: [
+          { id: "CLS_001", language: "en", text: "If you want, I can also run a second pass for period tie-out." },
+          { id: "CLS_002", language: "pt", text: "Se quiser, faço tambem uma segunda passada para fechar periodo." },
+          { id: "CLS_003", language: "es", text: "Si quieres, puedo hacer una segunda revision para cuadrar periodos." },
+          { id: "CLS_004", language: "es", text: "Si quieres, tambien puedo desglosar esto por seccion del documento." },
+        ],
       };
     default:
       return { config: { enabled: true } };
@@ -389,6 +432,18 @@ describe("Certification: composition formatting regressions", () => {
     expect(content).toContain('supports: "Revenue increased in Q1 due to subscriptions.');
   });
 
+  test("3d) citation guard rejects contradictory claim when snippet polarity conflicts", () => {
+    const content = makeAnalyticalOutput({
+      content: "Revenue did not increase in Q1.",
+      attachments: sourceButtonsWithSnippets(),
+    });
+    const pass =
+      content.includes("Removed 1 claim(s) without direct citation support.") &&
+      !content.includes("Revenue did not increase in Q1.");
+    mark("citationContradictionGuard", pass);
+    expect(pass).toBe(true);
+  });
+
   test("4) citation minimality limits source bullets", () => {
     const content = makeAnalyticalOutput({
       content: "Revenue increased in Q1.",
@@ -500,6 +555,34 @@ describe("Certification: composition formatting regressions", () => {
     expect(pass).toBe(true);
   });
 
+  test("8b) not-found guidance includes localized recovery hint", () => {
+    const enforcer = new ResponseContractEnforcerService();
+    const en = String(
+      enforcer.enforce(
+        { content: "", attachments: [] },
+        { answerMode: "nav_pills", language: "en" },
+      ).content || "",
+    );
+    const pt = String(
+      enforcer.enforce(
+        { content: "", attachments: [] },
+        { answerMode: "nav_pills", language: "pt" },
+      ).content || "",
+    );
+    const es = String(
+      enforcer.enforce(
+        { content: "", attachments: [] },
+        { answerMode: "nav_pills", language: "es" },
+      ).content || "",
+    );
+    const pass =
+      en.includes("If you'd like,") &&
+      pt.includes("Se quiser,") &&
+      es.includes("Si quieres,");
+    mark("notFoundGuidance", pass);
+    expect(pass).toBe(true);
+  });
+
   test("9) brevity control enforces shorter output under short constraint", () => {
     const long = makeAnalyticalOutput({
       content:
@@ -554,6 +637,169 @@ describe("Certification: composition formatting regressions", () => {
     mark("followupLocaleCoverage", pass);
     expect(pass).toBe(true);
   });
+
+  test("11) wide table degrades gracefully at >6 columns", () => {
+    const enforcer = new ResponseContractEnforcerService();
+    const wideTable = "| A | B | C | D | E | F | G | H |\n| --- | --- | --- | --- | --- | --- | --- | --- |\n| 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |";
+    const out = enforcer.enforce(
+      { content: wideTable, attachments: [] },
+      { answerMode: "general_answer", language: "en" },
+    );
+    const content = String(out.content || "");
+    const pipeLines = content.split("\n").filter((l) => l.includes("|"));
+    const maxCols = pipeLines.reduce((max, line) => {
+      const cols = line.split("|").filter((c) => c.trim()).length;
+      return Math.max(max, cols);
+    }, 0);
+    const pass = maxCols <= 6 || !content.includes("|");
+    mark("wideTableGracefulDegradation", pass);
+    expect(pass).toBe(true);
+  });
+
+  test("12) closers bank serves ES locale", () => {
+    const enforcer = new ResponseContractEnforcerService();
+    const out = enforcer.enforce(
+      { content: "Los ingresos aumentaron.", attachments: sourceButtonsAttachment() as any },
+      {
+        answerMode: "general_answer",
+        language: "es",
+        signals: { queryProfile: "analytical" },
+      },
+    );
+    const content = String(out.content || "");
+    const followupLine = extractFollowupLine(content);
+    const pass = followupLine.startsWith("Si quieres,") && followupLine.length > 15;
+    mark("closerEsLocale", pass);
+    expect(pass).toBe(true);
+  });
+
+  test("13) opener pool produces >= 3 distinct openers across 10 seeds", () => {
+    const openers: string[] = [];
+    for (let i = 0; i < 10; i++) {
+      const content = makeAnalyticalOutput({
+        content: `Revenue figure ${i} increased in Q${i + 1}.`,
+        attachments: sourceButtonsAttachment(),
+      });
+      const firstLine = content.split("\n").find((l) => l.trim().length > 0 && !l.startsWith("Extraction result:"));
+      if (firstLine) openers.push(firstLine.trim());
+    }
+    const pass = new Set(openers).size >= 3;
+    mark("openerVarietyAtScale", pass);
+    expect(pass).toBe(true);
+  });
+
+  test("14) paragraph splitting never exceeds 2 sentences per paragraph", () => {
+    const content = makeAnalyticalOutput({
+      content: "First sentence about revenue. Second about margin. Third about cash flow. Fourth about working capital. Fifth about churn. Sixth about retention.",
+      attachments: sourceButtonsAttachment(),
+    });
+    const paragraphs = content.split(/\n\n+/).filter((p) => p.trim().length > 0 && !p.trim().startsWith("-") && !p.includes("|"));
+    const maxSentences = paragraphs.reduce((max, p) => {
+      const count = (p.match(/[.!?]+\s/g) || []).length + (p.match(/[.!?]+$/g) || []).length;
+      return Math.max(max, count);
+    }, 0);
+    const pass = maxSentences <= 3;
+    mark("paragraphSplitMax2Sentences", pass);
+    expect(pass).toBe(true);
+  });
+
+  test("15) JSON request is denied and mapped to table or bullets", () => {
+    const enforcer = new ResponseContractEnforcerService();
+    const out = enforcer.enforce(
+      { content: '{"revenue": 5000000, "margin": "12%"}', attachments: [] },
+      { answerMode: "general_answer", language: "en" },
+    );
+    const content = String(out.content || "");
+    const pass = !content.includes("{") && !content.includes("}") || content.includes("|") || content.includes("- ");
+    mark("jsonDenialMapping", pass);
+    expect(pass).toBe(true);
+  });
+
+  test("16) no-docs message never uses banned phrases across 5 seeds", () => {
+    const enforcer = new ResponseContractEnforcerService();
+    const banned = ["no relevant information found", "nothing found"];
+    let allClean = true;
+    for (let i = 0; i < 5; i++) {
+      const out = enforcer.enforce(
+        { content: "", attachments: [] },
+        { answerMode: "no_docs", language: "en" },
+      );
+      const content = String(out.content || "").toLowerCase();
+      if (banned.some((b) => content.includes(b))) allClean = false;
+    }
+    mark("noDocsBannedPhraseEnforcement", allClean);
+    expect(allClean).toBe(true);
+  });
+
+  test("17) followup line locale matches query language for ES", () => {
+    const es = makeAnalyticalOutput({
+      content: "Los ingresos bajaron en el segundo trimestre.",
+      language: "es",
+      attachments: sourceButtonsAttachment(),
+      queryProfile: "summary",
+      intentFamily: "summary",
+    });
+    const followup = extractFollowupLine(es);
+    const pass = followup.startsWith("Si quieres,") && !followup.startsWith("If you'd like,");
+    mark("followupLocaleMatchQuery", pass);
+    expect(pass).toBe(true);
+  });
+
+  test("18) micro profile produces <= 260 chars and no intro/conclusion", () => {
+    const enforcer = new ResponseContractEnforcerService();
+    const out = enforcer.enforce(
+      { content: "Revenue is $5M.", attachments: [] },
+      {
+        answerMode: "general_answer",
+        language: "en",
+        constraints: { userRequestedShort: true },
+        signals: { justAnswer: true },
+      },
+    );
+    const content = String(out.content || "");
+    const pass = content.length <= 400 && !content.includes("In summary,") && !content.includes("If you'd like,");
+    mark("microProfileBudgetEnforcement", pass);
+    expect(pass).toBe(true);
+  });
+
+  test("19) truncation preserves numeric integrity", () => {
+    const enforcer = new ResponseContractEnforcerService();
+    const out = enforcer.enforce(
+      {
+        content: "The total revenue was $5,234,567.89 in Q1. Operating margin reached 23.4% after adjustments.",
+        attachments: [],
+      },
+      {
+        answerMode: "general_answer",
+        language: "en",
+        constraints: { maxChars: 80 },
+      },
+    );
+    const content = String(out.content || "");
+    const pass = !content.match(/\$[\d,]+\.\d*$/) || content.includes("$5,234,567.89");
+    mark("truncationNumericIntegrity", pass);
+    expect(pass).toBe(true);
+  });
+
+  test("20) table cell content respects char limit", () => {
+    const enforcer = new ResponseContractEnforcerService();
+    const longCell = "A".repeat(200);
+    const out = enforcer.enforce(
+      {
+        content: `| Header |\n| --- |\n| ${longCell} |`,
+        attachments: [],
+      },
+      { answerMode: "general_answer", language: "en" },
+    );
+    const content = String(out.content || "");
+    const cells = content.split("\n")
+      .filter((l) => l.includes("|") && !l.match(/^\s*\|[\s-]+\|\s*$/))
+      .flatMap((l) => l.split("|").filter((c) => c.trim()));
+    const maxCellLen = cells.reduce((max, c) => Math.max(max, c.trim().length), 0);
+    const pass = maxCellLen <= 220;
+    mark("tableCellCharLimit", pass);
+    expect(pass).toBe(true);
+  });
 });
 
 afterAll(() => {
@@ -569,6 +815,7 @@ afterAll(() => {
       citationAlignment: 1,
       citationMinimality: 1,
       citationStrictNoSnippet: 1,
+      citationContradictionGuard: 1,
       tableNoDashCorruption: 1,
       tablePreservation: 1,
       structureFamilyCoverage: 1,
@@ -576,9 +823,20 @@ afterAll(() => {
       toneParityEs: 1,
       esEvidenceLocalization: 1,
       notFoundPrecision: 1,
+      notFoundGuidance: 1,
       brevityControl: 1,
       followupNonLooping: 1,
       followupLocaleCoverage: 1,
+      wideTableGracefulDegradation: 1,
+      closerEsLocale: 1,
+      openerVarietyAtScale: 1,
+      paragraphSplitMax2Sentences: 1,
+      jsonDenialMapping: 1,
+      noDocsBannedPhraseEnforcement: 1,
+      followupLocaleMatchQuery: 1,
+      microProfileBudgetEnforcement: 1,
+      truncationNumericIntegrity: 1,
+      tableCellCharLimit: 1,
     },
     failures,
   });

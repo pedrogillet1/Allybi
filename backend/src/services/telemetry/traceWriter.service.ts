@@ -159,6 +159,16 @@ export interface TurnDebugPacket {
       classifiedDomain: string | null;
       classifiedDocTypeId: string | null;
       classificationReasons: string[];
+      candidateDecisionDigest?: Array<{
+        chunkId: string;
+        docId: string;
+        finalScore: number;
+        semanticScore: number;
+        lexicalScore: number;
+        structuralScore: number;
+        penalties: number;
+        filterReason: string | null;
+      }>;
     };
     tableContextCoverage?: {
       tableEvidenceCount: number;

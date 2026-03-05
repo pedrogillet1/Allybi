@@ -20,6 +20,7 @@ import {
 } from "../extraction/extractionResult.types";
 import type { InputChunk, InputChunkMetadata } from "./pipelineTypes";
 import { normalizeCellUnit, checkRowUnitConsistency } from "./tableUnitNormalization.service";
+import { recordTableExtractionMethod } from "./pipelineMetrics.service";
 
 /**
  * Infer a section heading from the first line of a PDF page.
@@ -38,6 +39,9 @@ function emitCellFactChunks(
   const out: InputChunk[] = [];
   let idx = startIdx;
   for (const table of tables) {
+    if (table.tableMethod) {
+      recordTableExtractionMethod(table.tableMethod);
+    }
     for (const row of table.rows) {
       for (const cell of row.cells) {
         if (!cell.text.trim()) continue;
@@ -71,6 +75,7 @@ function emitCellFactChunks(
             chunkType: "cell_fact",
             tableChunkForm: "cell_centric",
             tableId: table.tableId,
+            tableMethod: table.tableMethod,
             rowIndex: row.rowIndex,
             columnIndex: cell.colIndex,
             rowSpan: cell.rowSpan,

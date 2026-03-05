@@ -17,6 +17,8 @@ jest.mock("../banks/bankLoader.service", () => ({
 
 describe("QualityGateRunnerService", () => {
   const originalNodeEnv = process.env.NODE_ENV;
+  const originalCertProfile = process.env.CERT_PROFILE;
+  const originalStrictGovernanceFlag = process.env.CHAT_RUNTIME_STRICT_GOVERNANCE;
 
   beforeEach(() => {
     jest.resetModules();
@@ -25,6 +27,8 @@ describe("QualityGateRunnerService", () => {
 
   afterEach(() => {
     process.env.NODE_ENV = originalNodeEnv;
+    process.env.CERT_PROFILE = originalCertProfile;
+    process.env.CHAT_RUNTIME_STRICT_GOVERNANCE = originalStrictGovernanceFlag;
   });
 
   test("fails closed in strict env when required quality hook bank is missing", async () => {
@@ -99,6 +103,40 @@ describe("QualityGateRunnerService", () => {
       ),
     ).toBe(true);
     expect(out.allPassed).toBe(false);
+  });
+
+  test("forces strict fail-closed when CERT_PROFILE is ci", async () => {
+    process.env.NODE_ENV = "development";
+    process.env.CERT_PROFILE = "ci";
+    mockGetOptionalBank.mockImplementation((bankId: string) => {
+      if (bankId === "quality_gates") {
+        return {
+          _meta: { id: "quality_gates" },
+          config: {
+            modes: {
+              byEnv: {
+                dev: { failClosed: false },
+              },
+            },
+            integrationHooks: {
+              hallucinationGuardsBankId: "hallucination_guards",
+            },
+          },
+          gateOrder: ["doc_grounding_minimums"],
+        };
+      }
+      return null;
+    });
+
+    const { QualityGateRunnerService } =
+      await import("./qualityGateRunner.service");
+    const runner = new QualityGateRunnerService({
+      getQualityGateBank: () => null,
+    } as any);
+
+    await expect(
+      runner.runGates("hello", { answerMode: "doc_grounded_single" }),
+    ).rejects.toThrow(/Required quality integration hook bank missing/i);
   });
 
   test("executes configured doc grounding gate and fails without evidence", async () => {
@@ -356,6 +394,87 @@ describe("QualityGateRunnerService", () => {
       out.results.find((g) => g.gateName === "contradiction_policy_enforcement")
         ?.passed,
     ).toBe(false);
+  });
+
+  test("supports contradiction_policy banks that provide contradictionChecks instead of rules", async () => {
+    process.env.NODE_ENV = "development";
+    mockGetOptionalBank.mockReturnValue(null);
+
+    const { QualityGateRunnerService } =
+      await import("./qualityGateRunner.service");
+    const runner = new QualityGateRunnerService({
+      getQualityGateBank: (type: string) =>
+        type === "contradiction_policy"
+          ? {
+              _meta: { id: "contradiction_policy" },
+              config: { enabled: true },
+              contradictionChecks: [
+                {
+                  id: "CP_002_alias_shape",
+                  trigger: "alias shape contradiction",
+                  check: "context.contradictions >= 1",
+                  failureAction: "BLOCK_AND_ASK_CLARIFY",
+                },
+              ],
+            }
+          : null,
+    } as any);
+
+    const out = await runner.runGates("summary text", {
+      answerMode: "doc_grounded_single",
+      diPolicyContext: { contradictions: 2 },
+    });
+
+    expect(
+      out.results.find((g) => g.gateName === "CP_002_alias_shape")?.passed,
+    ).toBe(false);
+    expect(
+      out.results.find((g) => g.gateName === "contradiction_policy_enforcement")
+        ?.passed,
+    ).toBe(false);
+  });
+
+  test("fails closed in strict mode when contradiction_policy bank shape is invalid", async () => {
+    process.env.NODE_ENV = "production";
+    mockGetOptionalBank.mockImplementation((bankId: string) => {
+      if (bankId === "quality_gates") {
+        return {
+          _meta: { id: "quality_gates" },
+          config: {
+            modes: {
+              byEnv: {
+                production: { failClosed: true },
+              },
+            },
+            integrationHooks: {},
+          },
+          gateOrder: ["doc_grounding_minimums"],
+        };
+      }
+      return null;
+    });
+
+    const { QualityGateRunnerService } =
+      await import("./qualityGateRunner.service");
+    const runner = new QualityGateRunnerService({
+      getQualityGateBank: (type: string) =>
+        type === "contradiction_policy"
+          ? {
+              _meta: { id: "contradiction_policy" },
+              config: { enabled: true },
+              contradictionChecks: {
+                id: "invalid",
+              } as any,
+            }
+          : null,
+    } as any);
+
+    await expect(
+      runner.runGates("summary text", {
+        answerMode: "doc_grounded_single",
+        diPolicyContext: { contradictions: 1 },
+      }),
+    ).rejects.toThrow(/Invalid contradiction_policy bank shape/i);
   });
 
   test("evaluates wrong_doc_lock and ambiguity rules from bank checks", async () => {

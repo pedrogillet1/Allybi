@@ -21,6 +21,18 @@ describe("Certification: indexing live integration", () => {
     if (!snapshot.encryptedChunksOnly) {
       failures.push("ENCRYPTED_CHUNKS_ONLY_DISABLED");
     }
+    if (snapshot.allowPlaintextChunksOverride) {
+      failures.push("PLAINTEXT_OVERRIDE_ENABLED");
+    }
+    if (!snapshot.enforceEncryptedOnlyInvariant) {
+      failures.push("ENFORCE_ENCRYPTED_ONLY_DISABLED");
+    }
+    if (!snapshot.enforceChunkMetadataInvariant) {
+      failures.push("ENFORCE_CHUNK_METADATA_DISABLED");
+    }
+    if (!snapshot.enforceVersionMetadataInvariant) {
+      failures.push("ENFORCE_VERSION_METADATA_DISABLED");
+    }
     if (!snapshot.verifyRequired) {
       failures.push("VERIFY_REQUIRED_DISABLED");
     }
@@ -33,6 +45,11 @@ describe("Certification: indexing live integration", () => {
         allowedModes: runtimeMetadata.allowedModes,
         strictFailClosed: snapshot.strictFailClosed,
         encryptedChunksOnly: snapshot.encryptedChunksOnly,
+        allowPlaintextChunksOverride: snapshot.allowPlaintextChunksOverride,
+        enforceEncryptedOnlyInvariant: snapshot.enforceEncryptedOnlyInvariant,
+        enforceChunkMetadataInvariant: snapshot.enforceChunkMetadataInvariant,
+        enforceVersionMetadataInvariant:
+          snapshot.enforceVersionMetadataInvariant,
         verifyRequired: snapshot.verifyRequired,
       },
       thresholds: {
@@ -40,6 +57,10 @@ describe("Certification: indexing live integration", () => {
         runtimeModeAllowed: true,
         strictFailClosed: true,
         encryptedChunksOnly: true,
+        allowPlaintextChunksOverride: false,
+        enforceEncryptedOnlyInvariant: true,
+        enforceChunkMetadataInvariant: true,
+        enforceVersionMetadataInvariant: true,
         verifyRequired: true,
       },
       failures,

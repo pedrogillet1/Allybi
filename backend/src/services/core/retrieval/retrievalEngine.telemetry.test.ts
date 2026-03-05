@@ -363,6 +363,12 @@ describe("RetrievalEngineService telemetry", () => {
     expect(pack.telemetry?.summary.selectedSectionRuleId).toBe(
       "finance_extract_section_priority",
     );
+    expect(
+      Array.isArray(pack.telemetry?.summary.candidateDecisionDigest),
+    ).toBe(true);
+    expect(
+      (pack.telemetry?.summary.candidateDecisionDigest || []).length,
+    ).toBeGreaterThan(0);
   });
 
   test("emits crossdoc gated telemetry when compare has fewer than required explicit docs", async () => {
@@ -473,6 +479,63 @@ describe("RetrievalEngineService telemetry", () => {
     expect(reason).toBe("cross_doc_period_alignment_required");
   });
 
+  test("post-packaging policy enforces min evidence per doc for compare from alignment policy", () => {
+    const engine = makeEngine();
+    const originalSafeGetBank = (engine as any).safeGetBank.bind(engine);
+    (engine as any).safeGetBank = (bankId: string) => {
+      if (bankId === "crossdoc_alignment_rules") {
+        return {
+          config: {
+            minEvidencePerDocForCompare: 2,
+          },
+        };
+      }
+      return originalSafeGetBank(bankId);
+    };
+
+    const evidence = [
+      {
+        evidenceType: "text",
+        docId: "fin-budget",
+        locationKey: "loc-1",
+        location: { sectionKey: "variance_analysis" },
+        snippet: "Budget variance by unit",
+        score: { finalScore: 0.9 },
+      },
+      {
+        evidenceType: "text",
+        docId: "fin-budget",
+        locationKey: "loc-2",
+        location: { sectionKey: "variance_analysis" },
+        snippet: "Budget quarterly detail",
+        score: { finalScore: 0.88 },
+      },
+      {
+        evidenceType: "text",
+        docId: "fin-budget",
+        locationKey: "loc-3",
+        location: { sectionKey: "variance_analysis" },
+        snippet: "Budget assumptions detail",
+        score: { finalScore: 0.84 },
+      },
+      {
+        evidenceType: "text",
+        docId: "fin-actual",
+        locationKey: "loc-4",
+        location: { sectionKey: "variance_analysis" },
+        snippet: "Actual variance by unit",
+        score: { finalScore: 0.86 },
+      },
+    ] as unknown as EvidenceItem[];
+
+    const reason = (engine as any).resolvePostPackagingPolicyReason({
+      evidence,
+      compareIntent: true,
+      signals: { intentFamily: "documents", operator: "compare" },
+    });
+    expect(reason).toBe("cross_doc_evidence_minimum_not_met");
+  });
+
   test("post-packaging policy blocks numeric table evidence without unit context when table is expected", () => {
     const engine = makeEngine();
     const evidence = [
@@ -498,6 +561,37 @@ describe("RetrievalEngineService telemetry", () => {
         intentFamily: "documents",
         operator: "extract",
         tableExpected: true,
+      },
+    });
+    expect(reason).toBe("numeric_context_missing");
+  });
+
+  test("post-packaging policy blocks numeric table evidence without unit context for extraction queries even when table mode is not explicit", () => {
+    const engine = makeEngine();
+    const evidence = [
+      {
+        evidenceType: "table",
+        docId: "fin-budget",
+        locationKey: "loc-1",
+        location: { sectionKey: "variance_analysis" },
+        score: { finalScore: 0.9 },
+        table: {
+          header: ["Metric", "FY25"],
+          rows: [["Revenue", 10]],
+          unitAnnotation: null,
+          scaleFactor: null,
+        },
+      },
+    ] as unknown as EvidenceItem[];
+
+    const reason = (engine as any).resolvePostPackagingPolicyReason({
+      evidence,
+      compareIntent: false,
+      signals: {
+        intentFamily: "documents",
+        operator: "extract",
+        tableExpected: false,
+        userAskedForTable: false,
       },
     });
     expect(reason).toBe("numeric_context_missing");

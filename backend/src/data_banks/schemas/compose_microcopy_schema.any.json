@@ -1,0 +1,131 @@
+{
+  "_meta": {
+    "id": "compose_microcopy_schema",
+    "version": "1.0.0",
+    "description": "Schema for compose microcopy banks (openers, closers, followup suggestions, etc.). Validates entry structure with language, text, and optional intent/tone fields.",
+    "languages": ["any"],
+    "lastUpdated": "2026-03-05",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true
+  },
+  "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "koda://schemas/compose_microcopy_schema.any.json",
+    "title": "Compose Microcopy Bank Schema",
+    "type": "object",
+    "required": ["_meta", "config"],
+    "additionalProperties": true,
+    "properties": {
+      "_meta": {
+        "type": "object",
+        "required": ["id", "version", "description", "languages", "lastUpdated"],
+        "additionalProperties": true
+      },
+      "config": {
+        "type": "object",
+        "required": ["enabled"],
+        "additionalProperties": true,
+        "properties": {
+          "enabled": { "type": "boolean" }
+        }
+      }
+    },
+    "allOf": [
+      {
+        "if": {
+          "required": ["openers"]
+        },
+        "then": {
+          "properties": {
+            "openers": {
+              "$ref": "#/$defs/microcopyEntryArray"
+            }
+          }
+        }
+      },
+      {
+        "if": {
+          "required": ["closers"]
+        },
+        "then": {
+          "properties": {
+            "closers": {
+              "$ref": "#/$defs/microcopyEntryArray"
+            }
+          }
+        }
+      },
+      {
+        "if": {
+          "required": ["entries"]
+        },
+        "then": {
+          "properties": {
+            "entries": {
+              "$ref": "#/$defs/microcopyEntryArray"
+            }
+          }
+        }
+      },
+      {
+        "if": {
+          "required": ["suggestions"]
+        },
+        "then": {
+          "properties": {
+            "suggestions": {
+              "$ref": "#/$defs/microcopyEntryArray"
+            }
+          }
+        }
+      },
+      {
+        "if": {
+          "required": ["rules"]
+        },
+        "then": {
+          "properties": {
+            "rules": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["id"],
+                "additionalProperties": true,
+                "properties": {
+                  "id": { "type": "string", "minLength": 1 },
+                  "language": { "type": "string" },
+                  "severity": { "type": "string" }
+                }
+              }
+            }
+          }
+        }
+      }
+    ],
+    "$defs": {
+      "microcopyEntryArray": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": ["id", "language", "text"],
+          "additionalProperties": true,
+          "properties": {
+            "id": { "type": "string", "minLength": 1 },
+            "language": { "type": "string", "minLength": 1 },
+            "text": { "type": "string", "minLength": 1 },
+            "intent": { "type": "string" },
+            "tone": { "type": "string" }
+          }
+        }
+      }
+    }
+  }
+}

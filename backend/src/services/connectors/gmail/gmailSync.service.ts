@@ -1,6 +1,3 @@
-import { promises as fs } from "fs";
-import path from "path";
-
 import { GmailClientError, GmailClientService } from "./gmailClient.service";
 import { GmailOAuthService } from "./gmailOAuth.service";
 import { TokenVaultService } from "../tokenVault.service";
@@ -8,6 +5,9 @@ import {
   ConnectorsIngestionService,
   type ConnectorDocument,
 } from "../connectorsIngestion.service";
+import {
+  ConnectorIdentityMapService,
+} from "../connectorIdentityMap.service";
 import { logger } from "../../../utils/logger";
 
 interface GmailSyncCursor {
@@ -48,12 +48,6 @@ export interface GmailSyncResult {
   lastSyncAt: string;
 }
 
-const CURSOR_ROOT = path.resolve(
-  process.cwd(),
-  "storage",
-  "connectors",
-  "cursors",
-);
 const BATCH_SIZE = 15;
 
 function decodeBase64Url(input?: string): string {
@@ -114,16 +108,19 @@ export class GmailSyncService {
   private readonly tokenVault: TokenVaultService;
   private readonly gmailOAuth: GmailOAuthService;
   private readonly ingestion: ConnectorsIngestionService;
+  private readonly identityMap: ConnectorIdentityMapService;
 
   constructor(
     gmailClient: GmailClientService = new GmailClientService(),
     tokenVault: TokenVaultService = new TokenVaultService(),
     ingestion: ConnectorsIngestionService = new ConnectorsIngestionService(),
+    identityMap: ConnectorIdentityMapService = new ConnectorIdentityMapService(),
     gmailOAuth?: GmailOAuthService,
   ) {
     this.gmailClient = gmailClient;
     this.tokenVault = tokenVault;
     this.ingestion = ingestion;
+    this.identityMap = identityMap;
     this.gmailOAuth = gmailOAuth ?? new GmailOAuthService(tokenVault);
   }
 
@@ -395,13 +392,38 @@ export class GmailSyncService {
   }
 
   private async readCursorFile(userId: string): Promise<ConnectorCursorFile> {
-    await fs.mkdir(CURSOR_ROOT, { recursive: true });
-    const filePath = path.join(CURSOR_ROOT, `${userId}.json`);
-
     try {
-      const raw = await fs.readFile(filePath, "utf8");
-      const parsed = JSON.parse(raw) as ConnectorCursorFile;
-      if (parsed?.version === 1 && parsed?.userId === userId) return parsed;
+      const raw = await this.identityMap.getSyncCursor(userId, "gmail");
+      if (!raw) return { version: 1, userId, providers: {} };
+      const parsed = JSON.parse(raw) as
+        | ConnectorCursorFile
+        | GmailSyncCursor
+        | null;
+      if (parsed && typeof parsed === "object") {
+        const providerCursor = (parsed as ConnectorCursorFile)?.providers?.gmail;
+        if (providerCursor) {
+          return {
+            version: 1,
+            userId,
+            providers: { gmail: providerCursor },
+          };
+        }
+
+        const rawHistoryId = (parsed as GmailSyncCursor).historyId;
+        const rawLastSyncAt = (parsed as GmailSyncCursor).lastSyncAt;
+        if (rawHistoryId || rawLastSyncAt) {
+          return {
+            version: 1,
+            userId,
+            providers: {
+              gmail: {
+                historyId: rawHistoryId,
+                lastSyncAt: rawLastSyncAt,
+              },
+            },
+          };
+        }
+      }
       return { version: 1, userId, providers: {} };
     } catch {
       return { version: 1, userId, providers: {} };
@@ -412,15 +434,12 @@ export class GmailSyncService {
     userId: string,
     payload: ConnectorCursorFile,
   ): Promise<void> {
-    await fs.mkdir(CURSOR_ROOT, { recursive: true });
-    const filePath = path.join(CURSOR_ROOT, `${userId}.json`);
-    const tmpPath = `${filePath}.tmp`;
-
-    await fs.writeFile(tmpPath, JSON.stringify(payload), {
-      encoding: "utf8",
-      mode: 0o600,
-    });
-    await fs.rename(tmpPath, filePath);
+    const gmail = payload.providers.gmail ?? {};
+    const cursor: GmailSyncCursor = {
+      historyId: gmail.historyId,
+      lastSyncAt: gmail.lastSyncAt,
+    };
+    await this.identityMap.updateSyncCursor(userId, "gmail", JSON.stringify(cursor));
   }
 }
 

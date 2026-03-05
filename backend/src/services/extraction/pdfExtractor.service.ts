@@ -18,8 +18,9 @@ import type {
 import type { PdfPageAnchor } from "../../types/extraction.types";
 import { createPdfPageAnchor } from "../../types/extraction.types";
 import googleVisionOCR from "./google-vision-ocr.service";
-import { extractPDFWithTables, extractTablesFromText } from "../../utils/pdfTableExtractor";
+import { extractTablesFromText } from "../../utils/pdfTableExtractor";
 import type { ExtractedTable } from "../ingestion/extraction/extractionResult.types";
+import { recordTableDuplication } from "../ingestion/pipeline/pipelineMetrics.service";
 import {
   extractTablesWithDocumentAI,
   type StructuredTable,
@@ -254,6 +255,7 @@ async function extractPagesNative(buffer: Buffer): Promise<{
   forceOcrAll: boolean;
   weakTextReasons: string[];
   nativeQualityScore: number;
+  nativeExtractionWarnings: string[];
 }> {
   // Use require for pdf-parse v2 (CommonJS module)
   const { PDFParse } = require("pdf-parse");
@@ -294,6 +296,7 @@ async function extractPagesNative(buffer: Buffer): Promise<{
       forceOcrAll: true,
       weakTextReasons: ["low_text_density"],
       nativeQualityScore: 0,
+      nativeExtractionWarnings: [],
     };
   }
 
@@ -312,10 +315,55 @@ async function extractPagesNative(buffer: Buffer): Promise<{
       pageTexts = fullText
         .split(PAGE_MARKER_REGEX)
         .filter((t) => t && t.trim());
+    } else if (pageCount > 1) {
+      // No clear page separators but we know there are multiple pages.
+      // Split text proportionally by estimated chars-per-page with
+      // sentence-boundary snapping so chunks don't break mid-sentence.
+      logger.warn("[PDF] No page separators found, using proportional split", {
+        pageCount,
+        textLength: fullText.length,
+      });
+      const charsPerPage = Math.ceil(fullText.length / pageCount);
+      pageTexts = [];
+      let offset = 0;
+      for (let p = 0; p < pageCount; p++) {
+        if (p === pageCount - 1) {
+          // Last page gets the remainder
+          pageTexts.push(fullText.slice(offset));
+        } else {
+          let targetEnd = offset + charsPerPage;
+          // Snap to nearest sentence boundary (. ! ? followed by space/newline)
+          // Search within ±20% of target to avoid very uneven splits
+          const searchStart = Math.max(offset, targetEnd - Math.floor(charsPerPage * 0.2));
+          const searchEnd = Math.min(fullText.length, targetEnd + Math.floor(charsPerPage * 0.2));
+          let bestBreak = targetEnd;
+          for (let i = searchStart; i < searchEnd; i++) {
+            const ch = fullText[i];
+            if ((ch === "." || ch === "!" || ch === "?") && i + 1 < fullText.length) {
+              const next = fullText[i + 1];
+              if (next === " " || next === "\n" || next === "\r") {
+                bestBreak = i + 1;
+                if (bestBreak >= targetEnd) break; // prefer first break at or after target
+              }
+            }
+          }
+          pageTexts.push(fullText.slice(offset, bestBreak));
+          offset = bestBreak;
+        }
+      }
     } else {
-      // No clear page separators - treat as single page
-      // This is less ideal but preserves functionality
+      // Single page — no split needed
       pageTexts = [fullText];
+    }
+  }
+
+  // Track warnings from page splitting
+  const nativeExtractionWarnings: string[] = [];
+  if (!fullText.includes(FORM_FEED) && pageCount > 1 && pageTexts.length === pageCount) {
+    // Check if we used proportional split (no form feeds and not marker-based)
+    const markerMatch = fullText.match(PAGE_MARKER_REGEX);
+    if (!markerMatch || markerMatch.length <= 1) {
+      nativeExtractionWarnings.push("no_page_separators_proportional_split");
     }
   }
 
@@ -361,6 +409,7 @@ async function extractPagesNative(buffer: Buffer): Promise<{
       forceOcrAll: true,
       weakTextReasons: quality.reasons,
       nativeQualityScore: quality.score,
+      nativeExtractionWarnings,
     };
   }
 
@@ -371,6 +420,7 @@ async function extractPagesNative(buffer: Buffer): Promise<{
     forceOcrAll: false,
     weakTextReasons: [],
     nativeQualityScore: quality.score,
+    nativeExtractionWarnings,
   };
 }
 
@@ -679,6 +729,137 @@ export function normalizeStructuredTableRows(
   return rows;
 }
 
+async function enhancePdfPagesWithTables(
+  buffer: Buffer,
+  pages: PdfExtractedPage[],
+): Promise<{
+  pages: PdfExtractedPage[];
+  extractedTables: ExtractedTable[];
+  warnings: string[];
+}> {
+  const docAiTablesByPage = new Map<
+    number,
+    { markdown: string[]; structured: StructuredTable[] }
+  >();
+  const warnings: string[] = [];
+  if (process.env.DOCUMENT_AI_ENABLED === "true") {
+    try {
+      const docAiResult = await Promise.race([
+        extractTablesWithDocumentAI(buffer),
+        new Promise<null>((resolve) =>
+          setTimeout(() => resolve(null), DOCUMENT_AI_TIMEOUT_MS),
+        ),
+      ]);
+
+      if (docAiResult && docAiResult.tableCount > 0) {
+        for (const entry of docAiResult.pages) {
+          docAiTablesByPage.set(entry.page, {
+            markdown: entry.tables || [],
+            structured: entry.structuredTables || [],
+          });
+        }
+
+        logger.info("[PDF] Document AI tables extracted", {
+          tableCount: docAiResult.tableCount,
+          pagesWithTables: docAiResult.pages.length,
+          tableConfidences: docAiResult.tableConfidences,
+        });
+      }
+    } catch (docAiErr: any) {
+      warnings.push(
+        `document_ai_table_extraction_failed: ${docAiErr?.message || "unknown"}`,
+      );
+      logger.warn(
+        "[PDF] Document AI table pass failed, falling back to heuristic for all pages",
+        {
+          error: docAiErr.message,
+        },
+      );
+    }
+  }
+
+  const allExtractedTables: ExtractedTable[] = [];
+  const tableIndexByPage = new Map<number, number>();
+  const enhancedPages = pages.map((page) => {
+    const pageNum = page.page ?? (page as any).pageNumber ?? 0;
+    const aiTables = docAiTablesByPage.get(pageNum);
+    const nextTableIndex = () => {
+      const current = tableIndexByPage.get(pageNum) || 0;
+      tableIndexByPage.set(pageNum, current + 1);
+      return current;
+    };
+
+    if (aiTables && aiTables.markdown.length > 0) {
+      for (const structuredTable of aiTables.structured) {
+        const rows = normalizeStructuredTableRows(structuredTable);
+        if (rows.length === 0) continue;
+        allExtractedTables.push({
+          tableId: `pdf:p${pageNum}:t${nextTableIndex()}`,
+          pageOrSlide: pageNum,
+          tableMethod: "document_ai",
+          markdown: structuredTable.markdown || "",
+          rows,
+        });
+      }
+
+      // Check if heuristic would also find tables (for duplication tracking)
+      try {
+        const heuristicCheck = extractTablesFromText(page.text);
+        if (heuristicCheck.tableCount > 0) {
+          recordTableDuplication();
+        }
+      } catch {
+        // best-effort duplication check
+      }
+
+      return {
+        ...page,
+        text: page.text + "\n\n" + aiTables.markdown.join("\n\n"),
+      };
+    }
+
+    try {
+      const tableResult = extractTablesFromText(page.text);
+      for (let tIdx = 0; tIdx < tableResult.tables.length; tIdx++) {
+        const t = tableResult.tables[tIdx];
+        if (t.structuredRows && t.structuredRows.length > 0) {
+          allExtractedTables.push({
+            tableId: `pdf:p${pageNum}:t${nextTableIndex()}`,
+            pageOrSlide: pageNum,
+            tableMethod: "heuristic",
+            markdown: t.markdown,
+            rows: t.structuredRows,
+          });
+        }
+      }
+      return {
+        ...page,
+        text: tableResult.tableCount > 0 ? tableResult.text : page.text,
+      };
+    } catch (error: any) {
+      warnings.push(
+        `pdf_table_heuristic_failed_page_${pageNum}: ${error?.message || "unknown"}`,
+      );
+      return page;
+    }
+  });
+
+  return {
+    pages: enhancedPages,
+    extractedTables: allExtractedTables,
+    warnings,
+  };
+}
+
+function toCanonicalPdfPages(
+  pages: PdfExtractedPage[],
+): Array<{ page: number; text: string }> {
+  return pages.map((page, index) => ({
+    page: Number(page.page ?? (page as any).pageNumber ?? index + 1),
+    text: String(page.text || ""),
+  }));
+}
+
 // ============================================================================
 // Main Export: Enhanced PDF Extraction
 // ============================================================================
@@ -711,95 +892,10 @@ export async function extractPdfWithAnchors(
     const nativeResult = await extractPagesNative(buffer);
 
     if (nativeResult.hasTextLayer && nativeResult.pages.length > 0) {
-
-      // Optional Document AI pass: try structured table extraction FIRST
-      // when DOCUMENT_AI_ENABLED=true — pages with Doc AI tables skip heuristic
-      const docAiTablesByPage = new Map<
-        number,
-        { markdown: string[]; structured: StructuredTable[] }
-      >();
-      if (process.env.DOCUMENT_AI_ENABLED === "true") {
-        try {
-          const docAiResult = await Promise.race([
-            extractTablesWithDocumentAI(buffer),
-            new Promise<null>((resolve) =>
-              setTimeout(() => resolve(null), DOCUMENT_AI_TIMEOUT_MS),
-            ),
-          ]);
-
-          if (docAiResult && docAiResult.tableCount > 0) {
-            for (const entry of docAiResult.pages) {
-              docAiTablesByPage.set(entry.page, {
-                markdown: entry.tables || [],
-                structured: entry.structuredTables || [],
-              });
-            }
-
-            logger.info("[PDF] Document AI tables extracted", {
-              tableCount: docAiResult.tableCount,
-              pagesWithTables: docAiResult.pages.length,
-              tableConfidences: docAiResult.tableConfidences,
-            });
-          }
-        } catch (docAiErr: any) {
-          logger.warn("[PDF] Document AI table pass failed, falling back to heuristic for all pages", {
-            error: docAiErr.message,
-          });
-        }
-      }
-
-      // Apply table preservation: Doc AI pages get Doc AI tables appended to
-      // RAW page text; other pages get heuristic table enhancement
-      const allExtractedTables: ExtractedTable[] = [];
-      const tableIndexByPage = new Map<number, number>();
-      let enhancedPages = nativeResult.pages.map((page) => {
-        const pageNum = page.page ?? (page as any).pageNumber ?? 0;
-        const aiTables = docAiTablesByPage.get(pageNum);
-        const nextTableIndex = () => {
-          const current = tableIndexByPage.get(pageNum) || 0;
-          tableIndexByPage.set(pageNum, current + 1);
-          return current;
-        };
-
-        if (aiTables && aiTables.markdown.length > 0) {
-          for (const structuredTable of aiTables.structured) {
-            const rows = normalizeStructuredTableRows(structuredTable);
-            if (rows.length === 0) continue;
-            allExtractedTables.push({
-              tableId: `pdf:p${pageNum}:t${nextTableIndex()}`,
-              pageOrSlide: pageNum,
-              markdown: structuredTable.markdown || "",
-              rows,
-            });
-          }
-
-          // Page covered by Document AI — append structured tables to raw text
-          return {
-            ...page,
-            text: page.text + "\n\n" + aiTables.markdown.join("\n\n"),
-          };
-        }
-
-        // No Document AI tables for this page — apply heuristic extraction
-        try {
-          const tableResult = extractTablesFromText(page.text);
-          // Collect structured tables for cell-level indexing
-          for (let tIdx = 0; tIdx < tableResult.tables.length; tIdx++) {
-            const t = tableResult.tables[tIdx];
-            if (t.structuredRows && t.structuredRows.length > 0) {
-              allExtractedTables.push({
-                tableId: `pdf:p${pageNum}:t${nextTableIndex()}`,
-                pageOrSlide: pageNum,
-                markdown: t.markdown,
-                rows: t.structuredRows,
-              });
-            }
-          }
-          return { ...page, text: tableResult.tableCount > 0 ? tableResult.text : page.text };
-        } catch {
-          return page;
-        }
-      });
+      const tableEnhanced = await enhancePdfPagesWithTables(
+        buffer,
+        nativeResult.pages,
+      );
 
       // Extract PDF outline / bookmarks (non-blocking)
       let outlines: Array<{ title: string; level: number; pageIndex: number }> | undefined;
@@ -814,8 +910,8 @@ export async function extractPdfWithAnchors(
         });
       }
 
-      const totalText = enhancedPages.map((p) => p.text).join("\n\n");
-      const totalWordCount = enhancedPages.reduce(
+      const totalText = tableEnhanced.pages.map((p) => p.text).join("\n\n");
+      const totalWordCount = tableEnhanced.pages.reduce(
         (sum, p) => sum + p.wordCount,
         0,
       );
@@ -830,7 +926,7 @@ export async function extractPdfWithAnchors(
         sourceType: "pdf",
         text: totalText,
         pageCount: nativeResult.pageCount,
-        pages: enhancedPages,
+        pages: toCanonicalPdfPages(tableEnhanced.pages),
         hasTextLayer: true,
         ocrAttempted: false,
         ocrApplied: false,
@@ -840,7 +936,18 @@ export async function extractPdfWithAnchors(
         textQuality: "high",
         textQualityScore: nativeResult.nativeQualityScore,
         ...(outlines ? { outlines } : {}),
-        ...(allExtractedTables.length > 0 ? { extractedTables: allExtractedTables } : {}),
+        ...(tableEnhanced.extractedTables.length > 0
+          ? { extractedTables: tableEnhanced.extractedTables }
+          : {}),
+        ...(nativeResult.nativeExtractionWarnings.length > 0 ||
+        tableEnhanced.warnings.length > 0
+          ? {
+              extractionWarnings: [
+                ...nativeResult.nativeExtractionWarnings,
+                ...tableEnhanced.warnings,
+              ],
+            }
+          : {}),
       };
     }
 
@@ -893,9 +1000,13 @@ export async function extractPdfWithAnchors(
           nativeResult.pageCount,
           nativeResult.forceOcrAll,
         );
+        const tableEnhanced = await enhancePdfPagesWithTables(
+          buffer,
+          ocrResult.pages,
+        );
 
-        const totalText = ocrResult.pages.map((p) => p.text).join("\n\n");
-        const totalWordCount = ocrResult.pages.reduce(
+        const totalText = tableEnhanced.pages.map((p) => p.text).join("\n\n");
+        const totalWordCount = tableEnhanced.pages.reduce(
           (sum, p) => sum + p.wordCount,
           0,
         );
@@ -914,7 +1025,7 @@ export async function extractPdfWithAnchors(
           sourceType: "pdf",
           text: totalText,
           pageCount: ocrResult.pageCount,
-          pages: ocrResult.pages,
+          pages: toCanonicalPdfPages(tableEnhanced.pages),
           hasTextLayer: ocrResult.ocrPageCount < ocrResult.pageCount,
           ocrAttempted: true,
           ocrApplied: ocrResult.ocrPageCount > 0,
@@ -930,8 +1041,11 @@ export async function extractPdfWithAnchors(
           textQuality: "ocr_enhanced",
           textQualityScore: ocrResult.overallConfidence,
           weakTextReasons: nativeResult.weakTextReasons,
-          extractionWarnings: ocrResult.warnings,
+          extractionWarnings: [...ocrResult.warnings, ...tableEnhanced.warnings],
           ...(ocrOutlines ? { outlines: ocrOutlines } : {}),
+          ...(tableEnhanced.extractedTables.length > 0
+            ? { extractedTables: tableEnhanced.extractedTables }
+            : {}),
         };
       } catch (ocrError: any) {
         fallbackOcrOutcome = "runtime_error";
@@ -968,7 +1082,7 @@ export async function extractPdfWithAnchors(
       sourceType: "pdf",
       text: fallbackText,
       pageCount: nativeResult.pageCount,
-      pages: nativeResult.pages,
+      pages: toCanonicalPdfPages(nativeResult.pages),
       hasTextLayer: false,
       ocrAttempted: fallbackOcrAttempted,
       ocrApplied: false,
@@ -1001,7 +1115,6 @@ export async function extractTextFromPDF(
   const result = await extractPdfWithAnchors(buffer);
   return {
     text: result.text,
-    pageCount: result.pageCount,
     wordCount: result.wordCount,
     confidence: result.confidence,
   };

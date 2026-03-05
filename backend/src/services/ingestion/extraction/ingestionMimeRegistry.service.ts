@@ -30,11 +30,17 @@ export const PREVIEW_CONVERTIBLE_OFFICE_MIMES: readonly string[] = [
   ...PPTX_MIMES,
 ];
 
+export const CONNECTOR_MIMES: readonly string[] = [
+  "message/rfc822",
+  "application/x-slack-message",
+];
+
 const EXTRACTABLE_MIME_SET = new Set<string>([
   ...PDF_MIMES,
   ...DOCX_MIMES,
   ...XLSX_MIMES,
   ...PPTX_MIMES,
+  ...CONNECTOR_MIMES,
 ]);
 
 const PREFERRED_EXTENSION_BY_MIME: Readonly<Record<string, string>> = {

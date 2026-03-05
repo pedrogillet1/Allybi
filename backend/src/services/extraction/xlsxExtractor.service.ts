@@ -17,19 +17,66 @@ import * as XLSX from "xlsx";
 import type {
   XlsxExtractionResult,
   XlsxSheetSummary,
-  XlsxCellFact,
   BaseExtractionResult,
 } from "../../types/extraction.types";
 import type { XlsxCellAnchor } from "../../types/extraction.types";
 import { createXlsxCellAnchor } from "../../types/extraction.types";
 import { logger } from "../../utils/logger";
+import { recordXlsxRowsTruncated } from "../ingestion/pipeline/pipelineMetrics.service";
 
 // ============================================================================
 // Constants
 // ============================================================================
 
-const MAX_RENDERED_DATA_ROWS = 400;
-const RENDERED_TAIL_ROWS = 80;
+type ExtractedXlsxCellFact = NonNullable<XlsxExtractionResult["cellFacts"]>[number];
+type XlsxTextRenderMode = "full" | "adaptive";
+
+const DEFAULT_XLSX_TEXT_RENDER_MODE: XlsxTextRenderMode = "full";
+const DEFAULT_XLSX_TEXT_RENDER_ROW_LIMIT = 300;
+
+function resolveXlsxTextRenderMode(): XlsxTextRenderMode {
+  const raw = String(process.env.XLSX_TEXT_RENDER_MODE || DEFAULT_XLSX_TEXT_RENDER_MODE)
+    .trim()
+    .toLowerCase();
+  return raw === "adaptive" ? "adaptive" : "full";
+}
+
+function resolveXlsxTextRenderRowLimit(): number {
+  const parsed = Number(process.env.XLSX_TEXT_RENDER_ROW_LIMIT);
+  if (!Number.isFinite(parsed)) return DEFAULT_XLSX_TEXT_RENDER_ROW_LIMIT;
+  return Math.max(25, Math.trunc(parsed));
+}
+
+function selectAdaptiveRowIndices(totalRows: number, maxRows: number): number[] {
+  if (totalRows <= maxRows) {
+    return Array.from({ length: totalRows }, (_, idx) => idx);
+  }
+
+  const clampedLimit = Math.max(3, maxRows);
+  const headCount = Math.max(1, Math.min(clampedLimit - 2, Math.floor(clampedLimit * 0.6)));
+  const tailCount = Math.max(1, Math.min(clampedLimit - headCount - 1, Math.floor(clampedLimit * 0.25)));
+  const middleBudget = Math.max(0, clampedLimit - headCount - tailCount);
+  const selected = new Set<number>();
+
+  for (let i = 0; i < headCount; i++) selected.add(i);
+
+  const middleStart = headCount;
+  const middleEnd = totalRows - tailCount;
+  const middleCount = Math.max(0, middleEnd - middleStart);
+  if (middleBudget > 0 && middleCount > 0) {
+    const stride = middleCount / (middleBudget + 1);
+    for (let i = 1; i <= middleBudget; i++) {
+      const candidate = middleStart + Math.floor(i * stride);
+      selected.add(Math.max(middleStart, Math.min(middleEnd - 1, candidate)));
+    }
+  }
+
+  for (let i = totalRows - tailCount; i < totalRows; i++) {
+    selected.add(i);
+  }
+
+  return Array.from(selected.values()).sort((a, b) => a - b);
+}
 
 /**
  * Financial metric keywords for row label detection
@@ -231,14 +278,48 @@ function getCellAddress(row: number, col: number): string {
   return `${colIndexToLetter(col)}${row + 1}`;
 }
 
+function applyMergedCellBackfill(
+  data: any[][],
+  sheet: XLSX.WorkSheet,
+): { normalized: any[][]; backfilledCount: number } {
+  const normalized = data.map((row) => (Array.isArray(row) ? [...row] : []));
+  const merges = (sheet["!merges"] as XLSX.Range[] | undefined) || [];
+  let backfilledCount = 0;
+
+  for (const merge of merges) {
+    const startRow = Math.max(0, Number(merge?.s?.r) || 0);
+    const endRow = Math.max(startRow, Number(merge?.e?.r) || startRow);
+    const startCol = Math.max(0, Number(merge?.s?.c) || 0);
+    const endCol = Math.max(startCol, Number(merge?.e?.c) || startCol);
+    const anchor = normalized[startRow]?.[startCol];
+    if (anchor === undefined || anchor === null || anchor === "") continue;
+
+    for (let row = startRow; row <= endRow; row++) {
+      if (!normalized[row]) normalized[row] = [];
+      for (let col = startCol; col <= endCol; col++) {
+        if (row === startRow && col === startCol) continue;
+        const current = normalized[row][col];
+        if (current === undefined || current === null || current === "") {
+          normalized[row][col] = anchor;
+          backfilledCount++;
+        }
+      }
+    }
+  }
+
+  return { normalized, backfilledCount };
+}
+
 // ============================================================================
 // Sheet Processing
 // ============================================================================
 
 interface ProcessedSheet {
   summary: XlsxSheetSummary;
-  cellFacts: XlsxCellFact[];
+  cellFacts: ExtractedXlsxCellFact[];
   textContent: string;
+  warnings: string[];
+  truncatedRows: number;
 }
 
 /**
@@ -271,15 +352,27 @@ function processSheet(
       },
       cellFacts: [],
       textContent: `=== Sheet: ${sheetName} (Empty) ===\n`,
+      warnings: [],
+      truncatedRows: 0,
     };
+  }
+  const { normalized: normalizedData, backfilledCount } = applyMergedCellBackfill(
+    data,
+    sheet,
+  );
+  const warnings: string[] = [];
+  if (backfilledCount > 0) {
+    warnings.push(
+      `xlsx_merged_cells_backfilled: sheet "${sheetName}" backfilled ${backfilledCount} merged cells`,
+    );
   }
 
   // Detect header row (first non-empty row with mostly strings)
   let headerRowIndex = 0;
   let headers: string[] = [];
 
-  for (let i = 0; i < Math.min(5, data.length); i++) {
-    const row = data[i];
+  for (let i = 0; i < Math.min(5, normalizedData.length); i++) {
+    const row = normalizedData[i];
     if (!row || row.length === 0) continue;
 
     const nonEmpty = row.filter(
@@ -288,9 +381,17 @@ function processSheet(
     const stringCount = nonEmpty.filter(
       (c) => typeof c === "string" && isNaN(Number(c)),
     ).length;
+    const fourDigitYearCount = nonEmpty.filter((c) =>
+      /^\d{4}$/.test(String(c).trim()),
+    ).length;
 
-    // Header row should have mostly string values
-    if (nonEmpty.length >= 2 && stringCount / nonEmpty.length > 0.5) {
+    // Header row is typically mostly string values, but allow temporal rows
+    // like ["Metric", "2024", "2025"] where numeric years are column headers.
+    if (
+      nonEmpty.length >= 2 &&
+      (stringCount / nonEmpty.length > 0.5 ||
+        (stringCount >= 1 && fourDigitYearCount >= 1))
+    ) {
       headerRowIndex = i;
       headers = row.map((c) =>
         c !== null && c !== undefined ? String(c).trim() : "",
@@ -301,8 +402,8 @@ function processSheet(
 
   // Extract row labels (first column values)
   const rowLabels: string[] = [];
-  for (let i = headerRowIndex + 1; i < data.length; i++) {
-    const row = data[i];
+  for (let i = headerRowIndex + 1; i < normalizedData.length; i++) {
+    const row = normalizedData[i];
     if (row && row[0] !== null && row[0] !== undefined && row[0] !== "") {
       const label = String(row[0]).trim();
       if (label && !rowLabels.includes(label)) {
@@ -312,19 +413,21 @@ function processSheet(
   }
 
   // Calculate dimensions
-  const columnCount = Math.max(...data.map((row) => (row ? row.length : 0)));
-  const rowCount = data.length;
+  const columnCount = Math.max(
+    ...normalizedData.map((row) => (row ? row.length : 0)),
+  );
+  const rowCount = normalizedData.length;
 
   // Check for temporal and financial content
   const temporal = hasTemporalHeaders(headers);
   const financial = rowLabels.some(isFinancialMetric);
 
   // Extract cell facts (for financial/metric data)
-  const cellFacts: XlsxCellFact[] = [];
+  const cellFacts: ExtractedXlsxCellFact[] = [];
 
   // Process data rows for structured cell facts on every sheet.
-  for (let rowIdx = headerRowIndex + 1; rowIdx < data.length; rowIdx++) {
-    const row = data[rowIdx];
+  for (let rowIdx = headerRowIndex + 1; rowIdx < normalizedData.length; rowIdx++) {
+    const row = normalizedData[rowIdx];
     if (!row) continue;
 
     const rowLabel =
@@ -359,7 +462,7 @@ function processSheet(
       // Parse period from column header when present.
       const period = parsePeriod(colHeader);
 
-      const fact: XlsxCellFact = {
+      const fact: ExtractedXlsxCellFact = {
         sheet: sheetName,
         cell: cellAddress,
         rowLabel,
@@ -385,18 +488,9 @@ function processSheet(
   }
 
   const dataStartRow = headerRowIndex + 1;
-  const dataRowCount = Math.max(0, data.length - dataStartRow);
-  const shouldTruncate = dataRowCount > MAX_RENDERED_DATA_ROWS;
-  const renderedHeadCount = shouldTruncate
-    ? Math.max(1, MAX_RENDERED_DATA_ROWS - RENDERED_TAIL_ROWS)
-    : dataRowCount;
-  const renderedTailCount = shouldTruncate
-    ? Math.min(RENDERED_TAIL_ROWS, dataRowCount - renderedHeadCount)
-    : 0;
-
-  // Add leading data rows.
-  for (let i = dataStartRow; i < dataStartRow + renderedHeadCount; i++) {
-    const row = data[i];
+  const renderableRows: Array<{ rowNumber: number; rowText: string }> = [];
+  for (let i = dataStartRow; i < normalizedData.length; i++) {
+    const row = normalizedData[i];
     if (!row || row.length === 0) continue;
 
     const rowText = row
@@ -407,28 +501,29 @@ function processSheet(
       .filter((c) => c)
       .join(" | ");
 
-    if (rowText) {
-      textContent += `Row ${i}: ${rowText}\n`;
-    }
+    if (!rowText) continue;
+    renderableRows.push({ rowNumber: i, rowText });
   }
 
-  // Add deterministic tail rows for large sheets.
-  if (renderedTailCount > 0) {
-    const omittedCount = dataRowCount - renderedHeadCount - renderedTailCount;
-    textContent += `... omitted ${omittedCount} middle rows for compact output ...\n`;
-    for (let i = data.length - renderedTailCount; i < data.length; i++) {
-      const row = data[i];
-      if (!row || row.length === 0) continue;
-      const rowText = row
-        .map((cell) => {
-          if (cell === null || cell === undefined || cell === "") return "";
-          return typeof cell === "string" ? `"${cell}"` : String(cell);
-        })
-        .filter((c) => c)
-        .join(" | ");
-      if (rowText) {
-        textContent += `Row ${i}: ${rowText}\n`;
-      }
+  const renderMode = resolveXlsxTextRenderMode();
+  const rowLimit = resolveXlsxTextRenderRowLimit();
+  let truncatedRows = 0;
+
+  if (renderMode === "adaptive" && renderableRows.length > rowLimit) {
+    const selected = new Set(selectAdaptiveRowIndices(renderableRows.length, rowLimit));
+    for (let i = 0; i < renderableRows.length; i++) {
+      if (!selected.has(i)) continue;
+      const row = renderableRows[i];
+      textContent += `Row ${row.rowNumber}: ${row.rowText}\n`;
+    }
+    truncatedRows = Math.max(0, renderableRows.length - selected.size);
+    warnings.push(
+      `xlsx_text_rows_truncated: sheet "${sheetName}" rendered ${selected.size}/${renderableRows.length} rows (mode=adaptive, limit=${rowLimit})`,
+    );
+    textContent += `[Adaptive mode: omitted ${truncatedRows} rows from text output]\n`;
+  } else {
+    for (const row of renderableRows) {
+      textContent += `Row ${row.rowNumber}: ${row.rowText}\n`;
     }
   }
 
@@ -445,6 +540,8 @@ function processSheet(
     },
     cellFacts,
     textContent,
+    warnings,
+    truncatedRows,
   };
 }
 
@@ -495,11 +592,12 @@ export async function extractXlsxWithAnchors(
 
     const sheetNames = workbook.SheetNames;
     const sheets: XlsxSheetSummary[] = [];
-    const allCellFacts: XlsxCellFact[] = [];
+    const allCellFacts: ExtractedXlsxCellFact[] = [];
     const allHeaders: Set<string> = new Set();
     const allRowLabels: Set<string> = new Set();
     let textContent = "";
     let isFinancial = false;
+    const allWarnings: string[] = [];
 
     // Process each sheet
     for (let i = 0; i < sheetNames.length; i++) {
@@ -518,6 +616,10 @@ export async function extractXlsxWithAnchors(
       });
       allCellFacts.push(...processed.cellFacts);
       textContent += processed.textContent + "\n\n";
+      allWarnings.push(...processed.warnings);
+      if (processed.truncatedRows > 0) {
+        recordXlsxRowsTruncated(processed.truncatedRows);
+      }
 
       // Aggregate headers and row labels
       processed.summary.headers.forEach((h: any) => allHeaders.add(h));
@@ -550,6 +652,7 @@ export async function extractXlsxWithAnchors(
       allRowLabels: Array.from(allRowLabels),
       wordCount,
       confidence: 1.0,
+      ...(allWarnings.length > 0 ? { extractionWarnings: allWarnings } : {}),
     };
   } catch (error: any) {
     logger.error("[XLSX] Extraction failed", { error: error.message });
@@ -602,9 +705,11 @@ export async function extractTextFromExcel(
 /**
  * Create an XLSX cell anchor for a cell fact.
  */
-export function createCellAnchorFromFact(fact: XlsxCellFact): XlsxCellAnchor {
+export function createCellAnchorFromFact(
+  fact: ExtractedXlsxCellFact,
+): XlsxCellAnchor {
   return createXlsxCellAnchor(
-    (fact as any).sheet ?? fact.sheetName,
+    fact.sheet,
     fact.cell,
     {
       rowLabel: fact.rowLabel,
@@ -619,7 +724,9 @@ export function createCellAnchorFromFact(fact: XlsxCellFact): XlsxCellAnchor {
  * Returns one anchor per cell fact.
  */
 export function getCellAnchors(result: XlsxExtractionResult): XlsxCellAnchor[] {
-  return result.cellFacts.map((fact: any) => createCellAnchorFromFact(fact));
+  return (result.cellFacts || []).map((fact: any) =>
+    createCellAnchorFromFact(fact),
+  );
 }
 
 /**
@@ -635,10 +742,10 @@ export function findCellFact(
     quarter?: number;
     sheet?: string;
   },
-): XlsxCellFact | undefined {
+): ExtractedXlsxCellFact | undefined {
   const { rowLabel, month, year, quarter, sheet } = options;
 
-  return result.cellFacts.find((fact: any) => {
+  return (result.cellFacts || []).find((fact: any) => {
     // Match sheet if specified
     if (sheet && fact.sheet.toLowerCase() !== sheet.toLowerCase()) {
       return false;

@@ -369,6 +369,16 @@ export interface EvidencePack {
       classifiedDomain: string | null;
       classifiedDocTypeId: string | null;
       classificationReasons: string[];
+      candidateDecisionDigest: Array<{
+        chunkId: string;
+        docId: string;
+        finalScore: number;
+        semanticScore: number;
+        lexicalScore: number;
+        structuralScore: number;
+        penalties: number;
+        filterReason: string | null;
+      }>;
     };
   };
 }
@@ -758,6 +768,7 @@ export class RetrievalEngineService {
           selectedSectionRuleId,
           crossDocGatedReason,
           classification,
+          candidateDecisions: [],
         }),
       );
     }
@@ -1129,6 +1140,7 @@ export class RetrievalEngineService {
       selectedSectionRuleId,
       crossDocGatedReason,
       classification,
+      candidateDecisions: pack.debug?.candidateDecisions || [],
     });
     const phaseFailureReasonCodes = Array.from(
       new Set(
@@ -1191,6 +1203,7 @@ export class RetrievalEngineService {
           selectedSectionRuleId,
           crossDocGatedReason: postPackagingPolicyReason,
           classification,
+          candidateDecisions: [],
         }),
       );
     }
@@ -3990,6 +4003,12 @@ export class RetrievalEngineService {
     if (evidence.length === 0) return null;
 
     if (params.compareIntent) {
+      const alignmentBank =
+        this.safeGetBank<Record<string, any>>("crossdoc_alignment_rules");
+      const minEvidencePerDocForCompare = Math.max(
+        1,
+        safeNumber(alignmentBank?.config?.minEvidencePerDocForCompare, 1),
+      );
       const unitSet = new Set<string>();
       const periodsByDoc = new Map<string, Set<string>>();
       for (const item of evidence) {
@@ -4009,6 +4028,26 @@ export class RetrievalEngineService {
           const bucket = periodsByDoc.get(item.docId) ?? new Set<string>();
           for (const token of periodTokens) bucket.add(token);
           periodsByDoc.set(item.docId, bucket);
+        }
+      }
+
+      if (
+        minEvidencePerDocForCompare > 1 &&
+        evidence.length >= minEvidencePerDocForCompare * 2
+      ) {
+        const evidenceCountByDoc = new Map<string, number>();
+        for (const item of evidence) {
+          const docId = String(item.docId || "").trim();
+          if (!docId) continue;
+          const count = evidenceCountByDoc.get(docId) ?? 0;
+          evidenceCountByDoc.set(docId, count + 1);
+        }
+        if (evidenceCountByDoc.size >= 2) {
+          for (const [, count] of evidenceCountByDoc) {
+            if (count < minEvidencePerDocForCompare) {
+              return "cross_doc_evidence_minimum_not_met";
+            }
+          }
         }
       }
 
@@ -4036,7 +4075,18 @@ export class RetrievalEngineService {
     const tableExpected = Boolean(
       params.signals.tableExpected || params.signals.userAskedForTable,
     );
-    if (!tableExpected) return null;
+    const requireNumericContext = this.shouldRequireNumericContext(
+      evidence,
+      params.signals,
+      tableExpected,
+    );
+    if (!requireNumericContext) return null;
+
+    const packagingBank =
+      this.safeGetBank<Record<string, any>>("evidence_packaging");
+    const requireUnitContextForNumeric =
+      packagingBank?.config?.numericContext?.requireUnitContextForNumeric !==
+      false;
 
     const tableEvidence = evidence.filter(
       (item) => item.evidenceType === "table" && item.table,
@@ -4056,11 +4106,38 @@ export class RetrievalEngineService {
           table.unitAnnotation?.unitRaw ||
           table.scaleFactor,
       );
-      if (headerCount < 2 || !hasUnitContext) {
+      const missingUnitContext =
+        requireUnitContextForNumeric && !hasUnitContext;
+      if (headerCount < 2 || missingUnitContext) {
         return "numeric_context_missing";
       }
     }
     return null;
+  }
+
+  private shouldRequireNumericContext(
+    evidence: EvidenceItem[],
+    signals: RetrievalRequest["signals"],
+    tableExpected: boolean,
+  ): boolean {
+    if (tableExpected) return true;
+    const answerMode = String(signals.answerMode || "")
+      .trim()
+      .toLowerCase();
+    if (answerMode === "doc_grounded_table") return true;
+
+    const operator = String(signals.operator || "")
+      .trim()
+      .toLowerCase();
+    const numericOperators = new Set(["extract", "summarize", "compare"]);
+    if (!numericOperators.has(operator)) return false;
+
+    return evidence.some(
+      (item) =>
+        item.evidenceType === "table" &&
+        Boolean(item.table) &&
+        this.tableHasNumericCells(item.table as NonNullable<EvidenceItem["table"]>),
+    );
   }
 
   private tableHasNumericCells(
@@ -4129,6 +4206,56 @@ export class RetrievalEngineService {
     return out;
   }
 
+  private resolveNegationPattern(): RegExp {
+    const fallbackTerms = [
+      "not",
+      "no",
+      "never",
+      "neither",
+      "nor",
+      "n't",
+      "without",
+      "excluding",
+      "zero",
+      "none",
+      "decline[ds]?",
+      "decrease[ds]?",
+      "loss",
+      "deficit",
+      "fell",
+      "dropped",
+      "failed",
+    ];
+    const scpBank = this.safeGetBank<Record<string, any>>(
+      "snippet_compression_policy",
+    );
+    const lexicon = scpBank?.config?.negationLexicon as
+      | Record<string, unknown>
+      | undefined;
+    const configuredTerms =
+      lexicon && typeof lexicon === "object"
+        ? Array.from(
+            new Set(
+              Object.values(lexicon)
+                .flatMap((value) =>
+                  Array.isArray(value)
+                    ? value.map((entry) => String(entry || "").trim())
+                    : [],
+                )
+                .filter((term) => term.length > 0),
+            ),
+          )
+        : [];
+    const terms = configuredTerms.length > 0 ? configuredTerms : fallbackTerms;
+    const escaped = terms.map((term) => {
+      if (term.startsWith("^") || term.endsWith("$") || term.includes("[")) {
+        return term;
+      }
+      return term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    });
+    return new RegExp(`\\b(?:${escaped.join("|")})\\b`, "gi");
+  }
+
   // -----------------------------
   // Snippet Compression (SCP_* rules)
   // -----------------------------
@@ -4188,8 +4315,7 @@ export class RetrievalEngineService {
 
     // SCP_005: Negation preservation — never truncate between a negation and its predicate
     {
-      const negationPattern =
-        /\b(not|no|never|neither|nor|n't|without|excluding|zero|none|decline[ds]?|decrease[ds]?|loss|deficit|fell|dropped|failed)\b/gi;
+      const negationPattern = this.resolveNegationPattern();
       let negMatch: RegExpExecArray | null;
       while ((negMatch = negationPattern.exec(snippet)) !== null) {
         const negStart = negMatch.index;
@@ -4535,8 +4661,7 @@ export class RetrievalEngineService {
     // Per-doc cap from bank config
     {
       const packMaxPerDoc = safeNumber(
-        (this.safeGetBank<Record<string, any>>("evidence_packaging_policy") as Record<string, any>)
-          ?.config?.maxPerDoc,
+        cfg?.maxPerDoc ?? cfg?.actionsContract?.thresholds?.maxEvidencePerDocHard,
         maxPerDocHard,
       );
       const docCounts = new Map<string, number>();
@@ -4761,6 +4886,15 @@ export class RetrievalEngineService {
     selectedSectionRuleId: string | null;
     crossDocGatedReason: string | null;
     classification: DocumentClassificationResult;
+    candidateDecisions: Array<{
+      chunkId: string;
+      docId: string;
+      scores: Record<string, number>;
+      boosts: Record<string, number>;
+      penalties: Record<string, number>;
+      filtered: boolean;
+      filterReason?: string;
+    }>;
   }): EvidencePack["telemetry"] {
     const dedupe = (values: string[]) =>
       Array.from(
@@ -4785,8 +4919,64 @@ export class RetrievalEngineService {
               .filter(Boolean),
           ),
         ).slice(0, 12),
+        candidateDecisionDigest: this.buildCandidateDecisionDigest(
+          params.candidateDecisions,
+        ),
       },
     };
+  }
+
+  private buildCandidateDecisionDigest(
+    decisions: Array<{
+      chunkId: string;
+      docId: string;
+      scores: Record<string, number>;
+      boosts: Record<string, number>;
+      penalties: Record<string, number>;
+      filtered: boolean;
+      filterReason?: string;
+    }>,
+  ): Array<{
+    chunkId: string;
+    docId: string;
+    finalScore: number;
+    semanticScore: number;
+    lexicalScore: number;
+    structuralScore: number;
+    penalties: number;
+    filterReason: string | null;
+  }> {
+    const out: Array<{
+      chunkId: string;
+      docId: string;
+      finalScore: number;
+      semanticScore: number;
+      lexicalScore: number;
+      structuralScore: number;
+      penalties: number;
+      filterReason: string | null;
+    }> = [];
+    const top = Array.isArray(decisions) ? decisions.slice(0, 12) : [];
+    for (const decision of top) {
+      out.push({
+        chunkId: String(decision.chunkId || ""),
+        docId: String(decision.docId || ""),
+        finalScore: clamp01(safeNumber(decision.scores?.final, 0)),
+        semanticScore: clamp01(safeNumber(decision.scores?.semantic, 0)),
+        lexicalScore: clamp01(safeNumber(decision.scores?.lexical, 0)),
+        structuralScore: clamp01(safeNumber(decision.scores?.structural, 0)),
+        penalties: clamp01(
+          safeNumber(
+            decision.penalties?.total,
+            safeNumber(decision.scores?.penalties, 0),
+          ),
+        ),
+        filterReason: decision.filterReason
+          ? String(decision.filterReason).trim()
+          : null,
+      });
+    }
+    return out;
   }
 
   private buildRetrievalCacheKey(params: {

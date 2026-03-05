@@ -5,6 +5,7 @@ import { SlidesClientService } from "../services/editing/slides/slidesClient.ser
 import { UPLOAD_CONFIG } from "../config/upload.config";
 import { createNanoBananaClientFromEnv } from "../services/creative/nanoBananaFactory";
 import RevisionService from "../services/documents/revision.service";
+import { documentUploadWriteService } from "../services/documents/documentUploadWrite.service";
 import DocumentRevisionStoreService from "../services/editing/documentRevisionStore.service";
 import * as crypto from "crypto";
 
@@ -34,6 +35,14 @@ function isProtectedRuntimeEnv(
 
 function allowOverwriteInProtectedEnv(
   rawValue: string | undefined = process.env.KODA_EDITING_ALLOW_OVERWRITE_PROTECTED,
+): boolean {
+  return String(rawValue || "")
+    .trim()
+    .toLowerCase() === "true";
+}
+
+function isOverwriteGloballyEnabled(
+  rawValue: string | undefined = process.env.KODA_EDITING_ENABLE_OVERWRITE,
 ): boolean {
   return String(rawValue || "")
     .trim()
@@ -207,10 +216,9 @@ async function ensureSlidesPresentationForDoc(params: {
     url: imported.url,
   });
 
-  await prisma.documentMetadata.upsert({
-    where: { documentId: doc.id },
-    update: { pptxMetadata: nextPptxMetadata } as any,
-    create: { documentId: doc.id, pptxMetadata: nextPptxMetadata } as any,
+  await documentUploadWriteService.upsertDocumentMetadata({
+    documentId: doc.id,
+    update: { pptxMetadata: nextPptxMetadata },
   });
 
   return {
@@ -1214,6 +1222,13 @@ router.post("/export", async (req: any, res: Response): Promise<void> => {
     const mode = String(req.body?.mode || "revision")
       .trim()
       .toLowerCase();
+    if (mode === "overwrite" && !isOverwriteGloballyEnabled()) {
+      res.status(403).json({
+        error:
+          "Overwrite export is disabled. Set KODA_EDITING_ENABLE_OVERWRITE=true or use revision mode.",
+      });
+      return;
+    }
     if (
       mode === "overwrite" &&
       isProtectedRuntimeEnv() &&

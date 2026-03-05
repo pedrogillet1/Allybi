@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { getAdminApiKey } from "../auth/adminKeyStore";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
 
@@ -37,10 +38,8 @@ function classifyProxyFailure(
 }
 
 function getAuthHeaders(): Record<string, string> {
-  const token = localStorage.getItem("auth_token");
-  const adminKey = localStorage.getItem("admin_key");
+  const adminKey = getAdminApiKey();
   return {
-    ...(token && { Authorization: `Bearer ${token}` }),
     ...(adminKey && { "X-Admin-Key": adminKey }),
   };
 }

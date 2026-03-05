@@ -92,6 +92,32 @@ function buildIntegrationPatternBank(locale: "en" | "pt"): any {
   };
 }
 
+function buildNavPatternBank(locale: "en" | "pt" | "es"): any {
+  const phraseByLocale: Record<"en" | "pt" | "es", string> = {
+    en: "locate file budget report from current context",
+    pt: "localizar arquivo relatorio de orcamento no contexto atual",
+    es: "localizar archivo informe de presupuesto en el contexto actual",
+  };
+  return {
+    config: {
+      enabled: true,
+      deterministic: true,
+      matching: {
+        caseInsensitive: true,
+        stripDiacritics: true,
+        collapseWhitespace: true,
+      },
+    },
+    patterns: [
+      {
+        id: `nav_bank_pattern_${locale}`,
+        [locale]: [phraseByLocale[locale]],
+        negatives: ["ignore this phrase"],
+      },
+    ],
+  };
+}
+
 describe("Certification: routing-bank-consumer-wiring", () => {
   const manifest = readJson("manifest/bank_registry.any.json");
   const runtimeRoots = [
@@ -103,6 +129,17 @@ describe("Certification: routing-bank-consumer-wiring", () => {
     fs.readFileSync(file, "utf8"),
   );
 
+  function hasRuntimeConsumer(bankId: string): boolean {
+    const defaultMarkers = [bankId];
+    const markerMap: Record<string, string[]> = {
+      nav_intents_en: ["nav_intents_${locale}", "getNavIntentsBank(locale)"],
+      nav_intents_pt: ["nav_intents_${locale}", "getNavIntentsBank(locale)"],
+      nav_intents_es: ["nav_intents_${locale}", "getNavIntentsBank(locale)"],
+    };
+    const markers = markerMap[bankId] || defaultMarkers;
+    return runtimeSources.some((src) => markers.some((marker) => src.includes(marker)));
+  }
+
   const REQUIRED_BANK_IDS = [
     "connect_intents_en",
     "connect_intents_pt",
@@ -112,9 +149,12 @@ describe("Certification: routing-bank-consumer-wiring", () => {
     "send_intents_pt",
     "sync_intents_en",
     "sync_intents_pt",
+    "nav_intents_en",
+    "nav_intents_pt",
+    "nav_intents_es",
   ] as const;
 
-  test("required integration intent banks exist in registry", () => {
+  test("required routing intent banks exist in registry", () => {
     const ids = new Set(
       (Array.isArray(manifest?.banks) ? manifest.banks : [])
         .map((entry: any) => String(entry?.id || "").trim())
@@ -125,9 +165,9 @@ describe("Certification: routing-bank-consumer-wiring", () => {
     }
   });
 
-  test("required integration intent banks have runtime consumer markers", () => {
+  test("required routing intent banks have runtime consumer markers", () => {
     for (const bankId of REQUIRED_BANK_IDS) {
-      const hasConsumer = runtimeSources.some((src) => src.includes(bankId));
+      const hasConsumer = hasRuntimeConsumer(bankId);
       expect(hasConsumer).toBe(true);
     }
   });
@@ -254,6 +294,62 @@ describe("Certification: routing-bank-consumer-wiring", () => {
     },
   );
 
+  test.each([
+    {
+      bankId: "nav_intents_en",
+      locale: "en" as const,
+      query: "locate file budget report from current context",
+    },
+    {
+      bankId: "nav_intents_pt",
+      locale: "pt" as const,
+      query: "localizar arquivo relatorio de orcamento no contexto atual",
+    },
+    {
+      bankId: "nav_intents_es",
+      locale: "es" as const,
+      query: "localizar archivo informe de presupuesto en el contexto actual",
+    },
+  ])(
+    "runtime executes navigation routing via $bankId",
+    ({ bankId, locale, query }) => {
+      const routePolicy = { isConnectorTurn: () => false };
+      const intentConfig = {
+        decide: (input: { candidates: Array<{ intentFamily?: string }> }) => {
+          const hasNavigation = input.candidates.some(
+            (candidate) => String(candidate.intentFamily || "") === "navigation",
+          );
+          return hasNavigation ? makeDecision("navigation") : makeDecision("help");
+        },
+      };
+      const router = new TurnRouterService(
+        routePolicy as any,
+        intentConfig as any,
+        (() => null) as any,
+        ((requestedBankId: string) => {
+          if (requestedBankId === bankId) {
+            return buildNavPatternBank(locale);
+          }
+          return null;
+        }) as any,
+      );
+
+      const route = router.decide(
+        makeCtx({
+          messageText: query,
+          locale,
+          request: {
+            userId: "user-1",
+            message: query,
+            context: {},
+            meta: {},
+          },
+        }),
+      );
+      expect(route).toBe("KNOWLEDGE");
+    },
+  );
+
   test("write certification gate report", () => {
     const failures: string[] = [];
     const ids = new Set(
@@ -263,7 +359,7 @@ describe("Certification: routing-bank-consumer-wiring", () => {
     );
     for (const bankId of REQUIRED_BANK_IDS) {
       if (!ids.has(bankId)) failures.push(`MISSING_REGISTRY_ENTRY_${bankId}`);
-      const hasConsumer = runtimeSources.some((src) => src.includes(bankId));
+      const hasConsumer = hasRuntimeConsumer(bankId);
       if (!hasConsumer) failures.push(`MISSING_RUNTIME_CONSUMER_${bankId}`);
     }
 
@@ -378,12 +474,63 @@ describe("Certification: routing-bank-consumer-wiring", () => {
       }
     }
 
+    // Executable probe: nav banks can trigger navigation-family routing.
+    for (const probe of [
+      {
+        bankId: "nav_intents_en",
+        locale: "en" as const,
+        query: "locate file budget report from current context",
+      },
+      {
+        bankId: "nav_intents_pt",
+        locale: "pt" as const,
+        query: "localizar arquivo relatorio de orcamento no contexto atual",
+      },
+      {
+        bankId: "nav_intents_es",
+        locale: "es" as const,
+        query: "localizar archivo informe de presupuesto en el contexto actual",
+      },
+    ]) {
+      const router = new TurnRouterService(
+        { isConnectorTurn: () => false } as any,
+        {
+          decide: (input: { candidates: Array<{ intentFamily?: string }> }) => {
+            const hasNavigation = input.candidates.some(
+              (candidate) => String(candidate.intentFamily || "") === "navigation",
+            );
+            return hasNavigation ? makeDecision("navigation") : makeDecision("help");
+          },
+        } as any,
+        (() => null) as any,
+        ((bankId: string) => {
+          if (bankId === probe.bankId) return buildNavPatternBank(probe.locale);
+          return null;
+        }) as any,
+      );
+      const route = router.decide(
+        makeCtx({
+          messageText: probe.query,
+          locale: probe.locale,
+          request: {
+            userId: "user-1",
+            message: probe.query,
+            context: {},
+            meta: {},
+          },
+        }),
+      );
+      if (route !== "KNOWLEDGE") {
+        failures.push(`BANK_NOT_EXECUTABLE_${probe.bankId}`);
+      }
+    }
+
     writeCertificationGateReport("routing-bank-consumer-wiring", {
       passed: failures.length === 0,
       metrics: {
         requiredBanks: REQUIRED_BANK_IDS.length,
         runtimeFilesScanned: runtimeFiles.length,
-        executableChecks: 1 + REQUIRED_BANK_IDS.length,
+        executableChecks: 1 + 8 + 3,
       },
       thresholds: {
         maxFailures: 0,

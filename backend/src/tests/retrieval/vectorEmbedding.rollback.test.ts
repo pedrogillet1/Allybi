@@ -5,6 +5,7 @@ process.env.KODA_MASTER_KEY_BASE64 = Buffer.alloc(32, 9).toString("base64");
 const mockFindDocument = jest.fn();
 const mockFindDocumentMany = jest.fn();
 const mockUpdateDocument = jest.fn();
+const mockUpdateDocumentMany = jest.fn();
 const mockChunkCount = jest.fn();
 const mockTransaction = jest.fn();
 const mockIsAvailable = jest.fn();
@@ -21,6 +22,7 @@ jest.mock("../../config/database", () => ({
       findUnique: (...args: any[]) => mockFindDocument(...args),
       findMany: (...args: any[]) => mockFindDocumentMany(...args),
       update: (...args: any[]) => mockUpdateDocument(...args),
+      updateMany: (...args: any[]) => mockUpdateDocumentMany(...args),
     },
     documentChunk: { count: (...args: any[]) => mockChunkCount(...args) },
     $transaction: (...args: any[]) => mockTransaction(...args),
@@ -64,11 +66,14 @@ import { storeDocumentEmbeddings } from "../../services/retrieval/vectorEmbeddin
 describe("vectorEmbedding rollback", () => {
   beforeEach(() => {
     process.env.INDEXING_ENCRYPTED_CHUNKS_ONLY = "false";
+    process.env.INDEXING_ALLOW_PLAINTEXT_CHUNKS = "true";
+    process.env.INDEXING_PLAINTEXT_OVERRIDE_REASON = "integration_test_override";
     delete process.env.INDEXING_ENFORCE_CHUNK_METADATA;
     delete process.env.INDEXING_ENFORCE_ENCRYPTED_ONLY;
     mockFindDocument.mockReset();
     mockFindDocumentMany.mockReset();
     mockUpdateDocument.mockReset();
+    mockUpdateDocumentMany.mockReset();
     mockChunkCount.mockReset();
     mockTransaction.mockReset();
     mockIsAvailable.mockReset();
@@ -89,6 +94,7 @@ describe("vectorEmbedding rollback", () => {
       folder: null,
     });
     mockUpdateDocument.mockResolvedValue({});
+    mockUpdateDocumentMany.mockResolvedValue({ count: 1 });
     mockFindDocumentMany.mockResolvedValue([
       { id: "doc-1", createdAt: new Date("2026-01-01T00:00:00.000Z") },
     ]);

@@ -202,8 +202,12 @@ recordSimpleGateCheck("slot-extraction-e2e");
 recordSimpleGateCheck("disambiguation-e2e");
 recordSimpleGateCheck("intent-precision");
 recordSimpleGateCheck("intent-family-firstclass");
+recordSimpleGateCheck("routing-bank-consumer-wiring");
 recordSimpleGateCheck("routing-family-alias-consistency");
+recordSimpleGateCheck("routing-family-conformance");
+recordSimpleGateCheck("routing-family-mechanism-contract");
 recordSimpleGateCheck("routing-integration-intents-parity");
+recordSimpleGateCheck("routing-calc-intents-parity");
 recordSimpleGateCheck("nav-intents-locale-parity");
 recordSimpleGateCheck("telemetry-completeness");
 

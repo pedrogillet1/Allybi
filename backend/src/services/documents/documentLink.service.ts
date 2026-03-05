@@ -28,6 +28,81 @@ export interface DocumentLinkRecord {
   createdAt: Date;
 }
 
+export interface MissingRevisionAmendsLinkRecord {
+  revisionDocumentId: string;
+  expectedTargetDocumentId: string;
+}
+
+export interface ReconcileRevisionAmendsLinksResult {
+  scanned: number;
+  missing: number;
+  repaired: number;
+  failed: number;
+  sampleFailures: Array<{ revisionDocumentId: string; error: string }>;
+}
+
+async function computeMissingRevisionAmendsLinks(params?: {
+  userId?: string;
+  limit?: number;
+}): Promise<{
+  scanned: number;
+  missing: MissingRevisionAmendsLinkRecord[];
+}> {
+  const limit = Math.max(1, Math.min(5000, Math.trunc(params?.limit ?? 1000)));
+  const revisions = await prisma.document.findMany({
+    where: {
+      ...(params?.userId ? { userId: params.userId } : {}),
+      parentVersionId: { not: null },
+    } as any,
+    select: { id: true, parentVersionId: true },
+    orderBy: { createdAt: "desc" },
+    take: limit,
+  });
+  if (!revisions.length) {
+    return { scanned: 0, missing: [] };
+  }
+
+  const revisionIds = revisions.map((doc) => String(doc.id || "").trim()).filter(Boolean);
+  const links = await prisma.documentLink.findMany({
+    where: {
+      sourceDocumentId: { in: revisionIds },
+      relationshipType: "amends",
+      status: "active",
+    },
+    select: {
+      sourceDocumentId: true,
+      targetDocumentId: true,
+    },
+  });
+
+  const linkedTargetsBySource = new Map<string, Set<string>>();
+  for (const link of links) {
+    const sourceId = String(link.sourceDocumentId || "").trim();
+    const targetId = String(link.targetDocumentId || "").trim();
+    if (!sourceId || !targetId) continue;
+    if (!linkedTargetsBySource.has(sourceId)) {
+      linkedTargetsBySource.set(sourceId, new Set<string>());
+    }
+    linkedTargetsBySource.get(sourceId)!.add(targetId);
+  }
+
+  const missing: MissingRevisionAmendsLinkRecord[] = [];
+  for (const revision of revisions) {
+    const revisionId = String(revision.id || "").trim();
+    const expectedTargetId = String(revision.parentVersionId || "").trim();
+    if (!revisionId || !expectedTargetId) continue;
+    const linkedTargets = linkedTargetsBySource.get(revisionId);
+    if (!linkedTargets || !linkedTargets.has(expectedTargetId)) {
+      missing.push({
+        revisionDocumentId: revisionId,
+        expectedTargetDocumentId: expectedTargetId,
+      });
+    }
+  }
+
+  return { scanned: revisions.length, missing };
+}
+
 /**
  * Validates a document link input.
  * Throws on invalid relationship type or self-link.
@@ -172,6 +247,62 @@ export async function deactivateDocumentLink(linkId: string): Promise<void> {
   });
 
   logger.info("[DocumentLink] Deactivated", { linkId });
+}
+
+export async function listMissingRevisionAmendsLinks(params?: {
+  userId?: string;
+  limit?: number;
+}): Promise<MissingRevisionAmendsLinkRecord[]> {
+  const result = await computeMissingRevisionAmendsLinks(params);
+  return result.missing;
+}
+
+export async function reconcileRevisionAmendsLinks(params?: {
+  userId?: string;
+  limit?: number;
+}): Promise<ReconcileRevisionAmendsLinksResult> {
+  const { scanned, missing } = await computeMissingRevisionAmendsLinks(params);
+  let repaired = 0;
+  let failed = 0;
+  const sampleFailures: Array<{ revisionDocumentId: string; error: string }> = [];
+
+  for (const item of missing) {
+    try {
+      await prisma.documentLink.upsert({
+        where: {
+          sourceDocumentId_targetDocumentId_relationshipType: {
+            sourceDocumentId: item.revisionDocumentId,
+            targetDocumentId: item.expectedTargetDocumentId,
+            relationshipType: "amends",
+          },
+        },
+        update: { status: "active" },
+        create: {
+          sourceDocumentId: item.revisionDocumentId,
+          targetDocumentId: item.expectedTargetDocumentId,
+          relationshipType: "amends",
+          status: "active",
+        },
+      });
+      repaired += 1;
+    } catch (error: any) {
+      failed += 1;
+      if (sampleFailures.length < 10) {
+        sampleFailures.push({
+          revisionDocumentId: item.revisionDocumentId,
+          error: String(error?.message || error || "unknown_error"),
+        });
+      }
+    }
+  }
+
+  return {
+    scanned,
+    missing: missing.length,
+    repaired,
+    failed,
+    sampleFailures,
+  };
 }
 
 export const RELATIONSHIP_TYPES = VALID_RELATIONSHIP_TYPES;

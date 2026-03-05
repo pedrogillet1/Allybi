@@ -211,8 +211,10 @@ function main() {
       const toneParityEs = metricNumber(gate, "toneParityEs");
       const structureFamilyCoverage = metricNumber(gate, "structureFamilyCoverage");
       const citationStrictNoSnippet = metricNumber(gate, "citationStrictNoSnippet");
+      const citationContradictionGuard = metricNumber(gate, "citationContradictionGuard");
       const esEvidenceLocalization = metricNumber(gate, "esEvidenceLocalization");
       const followupLocaleCoverage = metricNumber(gate, "followupLocaleCoverage");
+      const notFoundGuidance = metricNumber(gate, "notFoundGuidance");
       if (!openerDistinctCount || openerDistinctCount < 2) {
         failures.push("compose_quality_floor_failed:openerDistinctCount");
         passed = false;
@@ -245,12 +247,20 @@ function main() {
         failures.push("compose_quality_floor_failed:citationStrictNoSnippet");
         passed = false;
       }
+      if (!citationContradictionGuard || citationContradictionGuard < 1) {
+        failures.push("compose_quality_floor_failed:citationContradictionGuard");
+        passed = false;
+      }
       if (!esEvidenceLocalization || esEvidenceLocalization < 1) {
         failures.push("compose_quality_floor_failed:esEvidenceLocalization");
         passed = false;
       }
       if (!followupLocaleCoverage || followupLocaleCoverage < 1) {
         failures.push("compose_quality_floor_failed:followupLocaleCoverage");
+        passed = false;
+      }
+      if (!notFoundGuidance || notFoundGuidance < 1) {
+        failures.push("compose_quality_floor_failed:notFoundGuidance");
         passed = false;
       }
     }

@@ -20,6 +20,7 @@ import {
   DOCX_MIMES,
   XLSX_MIMES,
   PPTX_MIMES,
+  CONNECTOR_MIMES,
   isImageMime,
   isMimeTypeSupportedForExtraction,
   normalizeMimeType,
@@ -216,6 +217,17 @@ export async function extractText(
   }
 
   // Plain text fallback
+  if (CONNECTOR_MIMES.includes(normalizedMime)) {
+    extractor = "connector_text";
+    const text = buffer.toString("utf-8");
+    return {
+      sourceType: "text",
+      text,
+      wordCount: text.trim() ? text.trim().split(/\s+/).length : 0,
+      confidence: 1.0,
+    };
+  }
+
   if (normalizedMime.startsWith("text/")) {
     extractor = "text";
     const text = buffer.toString("utf-8");
@@ -310,7 +322,10 @@ export async function extractText(
         sourceType: "image",
         text: ocrResult.text,
         wordCount: ocrResult.text.split(/\s+/).length,
-        confidence: ocrResult.confidence ?? 0.8,
+        confidence: ocrResult.confidence ?? 0.5,
+        ...(ocrResult.confidence === undefined || ocrResult.confidence === null
+          ? { extractionWarnings: ["ocr_confidence_estimated: provider returned no confidence score, using default 0.5"] }
+          : {}),
       };
     } catch (error) {
       recordOcrUsage("google_vision", false);

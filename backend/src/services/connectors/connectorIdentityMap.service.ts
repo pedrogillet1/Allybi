@@ -1,8 +1,14 @@
 import prisma from "../../config/database";
 import type { ConnectorProvider } from "./connectorsRegistry";
 
+const SYNC_CURSOR_WORKSPACE_PREFIX = "__sync_cursor__";
+
 function asString(value: unknown): string | null {
   return typeof value === "string" && value.trim() ? value.trim() : null;
+}
+
+function syncCursorWorkspaceId(provider: ConnectorProvider): string {
+  return `${SYNC_CURSOR_WORKSPACE_PREFIX}:${provider}`;
 }
 
 function delegate() {
@@ -92,12 +98,20 @@ export class ConnectorIdentityMapService {
     const d = delegate();
     if (!d) return null;
 
-    const row = await d.findFirst({
-      where: { userId, provider },
+    const cursorWorkspaceId = syncCursorWorkspaceId(provider);
+    const cursorRow = await d.findFirst({
+      where: { userId, provider, externalWorkspaceId: cursorWorkspaceId },
       select: { syncCursor: true },
       orderBy: { updatedAt: "desc" },
     });
-    return row?.syncCursor ?? null;
+    if (cursorRow?.syncCursor) return cursorRow.syncCursor;
+
+    const fallbackRow = await d.findFirst({
+      where: { userId, provider, syncCursor: { not: null } },
+      select: { syncCursor: true },
+      orderBy: { updatedAt: "desc" },
+    });
+    return fallbackRow?.syncCursor ?? null;
   }
 
   async updateSyncCursor(
@@ -108,9 +122,26 @@ export class ConnectorIdentityMapService {
     const d = delegate();
     if (!d) return;
 
-    await d.updateMany({
-      where: { userId, provider },
-      data: { syncCursor: cursor, lastSyncAt: new Date() },
+    const cursorWorkspaceId = syncCursorWorkspaceId(provider);
+    await d.upsert({
+      where: {
+        provider_externalWorkspaceId_userId: {
+          provider,
+          externalWorkspaceId: cursorWorkspaceId,
+          userId,
+        },
+      },
+      create: {
+        userId,
+        provider,
+        externalWorkspaceId: cursorWorkspaceId,
+        syncCursor: cursor,
+        lastSyncAt: new Date(),
+      },
+      update: {
+        syncCursor: cursor,
+        lastSyncAt: new Date(),
+      },
     });
   }
 }

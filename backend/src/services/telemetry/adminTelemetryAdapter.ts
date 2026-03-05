@@ -58,8 +58,21 @@ function asObject(input: unknown): Record<string, unknown> {
 }
 
 function toFiniteNumber(input: unknown): number | null {
+  if (input == null) return null;
+  if (typeof input === "string" && input.trim() === "") return null;
   const parsed = Number(input);
   return Number.isFinite(parsed) ? parsed : null;
+}
+
+function resolveEvidenceStrength(params: {
+  topRelevanceScore?: unknown;
+  retrievalAdequate?: unknown;
+}): number {
+  const topScore = toFiniteNumber(params.topRelevanceScore);
+  if (topScore != null) {
+    return Math.max(0, Math.min(1, topScore));
+  }
+  return params.retrievalAdequate === true ? 0.85 : 0.4;
 }
 
 export const QUALITY_SLO_THRESHOLDS = {
@@ -565,12 +578,10 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
             : r.hadFallback
               ? "weak"
               : "blocked",
-          evidenceStrength:
-            Number.isFinite(Number(r.topRelevanceScore))
-              ? Number(r.topRelevanceScore)
-              : r.retrievalAdequate
-                ? 0.85
-                : 0.4,
+          evidenceStrength: resolveEvidenceStrength({
+            topRelevanceScore: r.topRelevanceScore,
+            retrievalAdequate: r.retrievalAdequate,
+          }),
           sourcesCount: r.distinctDocs ?? null,
           evidenceGateAction: r.evidenceGateAction ?? null,
           providers: [r.model?.split("-")[0] || "unknown"],
@@ -1198,6 +1209,7 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
             failureCategory: true,
             citationCount: true,
             answerLength: true,
+            topRelevanceScore: true,
             retrievalAdequate: true,
           },
         });
@@ -1213,7 +1225,10 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
           userId: q.userId,
           timestamp: q.timestamp.toISOString(),
           outcome: q.isUseful ? "adequate" : q.hadFallback ? "weak" : "blocked",
-          evidenceStrength: q.retrievalAdequate ? 0.85 : 0.4,
+          evidenceStrength: resolveEvidenceStrength({
+            topRelevanceScore: q.topRelevanceScore,
+            retrievalAdequate: q.retrievalAdequate,
+          }),
           citationCount: q.citationCount,
           answerLength: q.answerLength,
           failureReason: q.failureCategory,

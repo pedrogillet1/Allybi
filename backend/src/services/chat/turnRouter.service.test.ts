@@ -138,6 +138,25 @@ describe("TurnRouterService.decide()", () => {
     expect(router.decide(ctx)).toBe("CONNECTOR");
   });
 
+  test("returns KNOWLEDGE when connector intent is detected in editor mode", () => {
+    const routePolicy = {
+      isConnectorTurn: jest.fn<() => boolean>().mockReturnValue(true),
+    };
+    const intentConfig = { decide: jest.fn<() => IntentDecisionOutput>() };
+
+    const router = new TurnRouterService(routePolicy, intentConfig);
+    const ctx = makeCtx({
+      messageText: "send this by email",
+      viewer: {
+        mode: "editor",
+        documentId: "doc-1",
+        fileType: "docx",
+      },
+    });
+
+    expect(router.decide(ctx)).toBe("KNOWLEDGE");
+  });
+
   // -------------------------------------------------------------------------
   // 3. Viewer mode without connector intent → KNOWLEDGE (editor route removed)
   // -------------------------------------------------------------------------
@@ -679,6 +698,49 @@ describe("TurnRouterService.decide()", () => {
     );
 
     router.decide(makeCtx({ messageText: "open budget report" }));
+    const hasNavigation = capturedCandidates.some(
+      (candidate) => candidate.intentFamily === "navigation",
+    );
+    expect(hasNavigation).toBe(true);
+  });
+
+  test("emits navigation candidate when nav bank matches and keyword heuristic does not", () => {
+    const routePolicy = {
+      isConnectorTurn: jest.fn<() => boolean>().mockReturnValue(false),
+    };
+    let capturedCandidates: Array<{ intentFamily?: string }> = [];
+    const intentConfig = {
+      decide: jest.fn((input: { candidates: Array<{ intentFamily?: string }> }) => {
+        capturedCandidates = input.candidates;
+        return makeDecisionOutput("help");
+      }),
+    };
+    const routingBankProvider = (bankId: string) => {
+      if (bankId !== "nav_intents_en") return null;
+      return {
+        config: { enabled: true, deterministic: true },
+        patterns: [
+          {
+            id: "NAV_BANK_EXECUTION_PROBE",
+            en: ["locate file budget report from current context"],
+            negatives: ["ignore this phrase"],
+          },
+        ],
+      };
+    };
+    const router = new TurnRouterService(
+      routePolicy,
+      intentConfig as any,
+      (() => null) as any,
+      routingBankProvider as any,
+    );
+
+    router.decide(
+      makeCtx({
+        locale: "en",
+        messageText: "locate file budget report from current context",
+      }),
+    );
     const hasNavigation = capturedCandidates.some(
       (candidate) => candidate.intentFamily === "navigation",
     );

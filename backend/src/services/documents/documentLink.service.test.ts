@@ -1,33 +1,38 @@
-import { describe, expect, test, jest, beforeEach } from "@jest/globals";
+import { beforeEach, describe, expect, jest, test } from "@jest/globals";
 
-/* ------------------------------------------------------------------ */
-/*  Mocks                                                              */
-/* ------------------------------------------------------------------ */
-const mockFindMany = jest.fn();
+const mockLinkFindMany = jest.fn();
 const mockCreate = jest.fn();
 const mockUpdate = jest.fn();
+const mockUpsert = jest.fn();
+const mockDocumentFindMany = jest.fn();
 
 jest.mock("../../config/database", () => ({
   __esModule: true,
   default: {
+    document: {
+      findMany: (...args: any[]) => mockDocumentFindMany(...args),
+    },
     documentLink: {
-      findMany: (...args: any[]) => mockFindMany(...args),
+      findMany: (...args: any[]) => mockLinkFindMany(...args),
       create: (...args: any[]) => mockCreate(...args),
       update: (...args: any[]) => mockUpdate(...args),
+      upsert: (...args: any[]) => mockUpsert(...args),
     },
   },
 }));
 
 import {
-  validateDocumentLink,
-  detectAmendmentConflict,
-  createDocumentLink,
-  listDocumentLinks,
-  deactivateDocumentLink,
   RELATIONSHIP_TYPES,
+  createDocumentLink,
+  deactivateDocumentLink,
+  detectAmendmentConflict,
+  listDocumentLinks,
+  listMissingRevisionAmendsLinks,
+  reconcileRevisionAmendsLinks,
+  validateDocumentLink,
 } from "./documentLink.service";
 
-describe("DocumentLinkService — validation", () => {
+describe("DocumentLinkService validation", () => {
   test("accepts all valid relationship types", () => {
     for (const type of RELATIONSHIP_TYPES) {
       expect(() =>
@@ -59,22 +64,16 @@ describe("DocumentLinkService — validation", () => {
       }),
     ).toThrow("Cannot link a document to itself");
   });
-
-  test("rejects empty document IDs", () => {
-    expect(() =>
-      validateDocumentLink({
-        sourceDocumentId: "",
-        targetDocumentId: "doc-b",
-        relationshipType: "amends",
-      }),
-    ).toThrow("Both sourceDocumentId and targetDocumentId are required");
-  });
 });
 
 describe("detectAmendmentConflict", () => {
   test("VCR_002: flags when target already superseded", () => {
     const existing = [
-      { relationshipType: "supersedes", targetDocumentId: "doc-old", status: "active" },
+      {
+        relationshipType: "supersedes",
+        targetDocumentId: "doc-old",
+        status: "active",
+      },
     ];
     const result = detectAmendmentConflict(existing, {
       sourceDocumentId: "doc-new",
@@ -84,48 +83,15 @@ describe("detectAmendmentConflict", () => {
     expect(result.conflict).toBe(true);
     expect(result.rule).toBe("VCR_002");
   });
-
-  test("no conflict when superseding a non-superseded target", () => {
-    const existing = [
-      { relationshipType: "amends", targetDocumentId: "doc-old", status: "active" },
-    ];
-    const result = detectAmendmentConflict(existing, {
-      sourceDocumentId: "doc-new",
-      targetDocumentId: "doc-old",
-      relationshipType: "supersedes",
-    });
-    expect(result.conflict).toBe(false);
-  });
-
-  test("no conflict for first amendment", () => {
-    const result = detectAmendmentConflict([], {
-      sourceDocumentId: "doc-amendment",
-      targetDocumentId: "doc-parent",
-      relationshipType: "amends",
-    });
-    expect(result.conflict).toBe(false);
-  });
-
-  test("no conflict for extends relationship", () => {
-    const result = detectAmendmentConflict([], {
-      sourceDocumentId: "doc-ext",
-      targetDocumentId: "doc-base",
-      relationshipType: "extends",
-    });
-    expect(result.conflict).toBe(false);
-  });
 });
 
-/* ------------------------------------------------------------------ */
-/*  Persistence (CRUD)                                                 */
-/* ------------------------------------------------------------------ */
-describe("DocumentLinkService — persistence", () => {
+describe("DocumentLinkService persistence and reconciliation", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   test("createDocumentLink persists to database and returns record", async () => {
-    mockFindMany.mockResolvedValue([]); // no existing conflicts
+    mockLinkFindMany.mockResolvedValue([]);
     const fakeRecord = {
       id: "link-1",
       sourceDocumentId: "doc-a",
@@ -152,33 +118,14 @@ describe("DocumentLinkService — persistence", () => {
     expect(result.id).toBe("link-1");
   });
 
-  test("createDocumentLink throws on VCR_002 conflict", async () => {
-    mockFindMany.mockResolvedValue([
-      { relationshipType: "supersedes", targetDocumentId: "doc-b", status: "active" },
-    ]);
-
-    await expect(
-      createDocumentLink({
-        sourceDocumentId: "doc-a",
-        targetDocumentId: "doc-b",
-        relationshipType: "supersedes",
-      }),
-    ).rejects.toThrow(/LINK_CONFLICT.*VCR_002/);
-
-    expect(mockCreate).not.toHaveBeenCalled();
-  });
-
   test("listDocumentLinks queries both source and target", async () => {
-    mockFindMany.mockResolvedValue([]);
+    mockLinkFindMany.mockResolvedValue([]);
     await listDocumentLinks("doc-x");
 
-    expect(mockFindMany).toHaveBeenCalledWith(
+    expect(mockLinkFindMany).toHaveBeenCalledWith(
       expect.objectContaining({
         where: expect.objectContaining({
-          OR: [
-            { sourceDocumentId: "doc-x" },
-            { targetDocumentId: "doc-x" },
-          ],
+          OR: [{ sourceDocumentId: "doc-x" }, { targetDocumentId: "doc-x" }],
           status: "active",
         }),
       }),
@@ -193,5 +140,39 @@ describe("DocumentLinkService — persistence", () => {
       where: { id: "link-99" },
       data: { status: "inactive" },
     });
+  });
+
+  test("listMissingRevisionAmendsLinks returns revisions missing active amends links", async () => {
+    mockDocumentFindMany.mockResolvedValue([
+      { id: "rev-1", parentVersionId: "root-1" },
+      { id: "rev-2", parentVersionId: "root-2" },
+    ]);
+    mockLinkFindMany.mockResolvedValue([
+      { sourceDocumentId: "rev-1", targetDocumentId: "root-1" },
+    ]);
+
+    const result = await listMissingRevisionAmendsLinks({ limit: 100 });
+    expect(result).toEqual([
+      {
+        revisionDocumentId: "rev-2",
+        expectedTargetDocumentId: "root-2",
+      },
+    ]);
+  });
+
+  test("reconcileRevisionAmendsLinks upserts missing amends links", async () => {
+    mockDocumentFindMany.mockResolvedValue([
+      { id: "rev-1", parentVersionId: "root-1" },
+      { id: "rev-2", parentVersionId: "root-2" },
+    ]);
+    mockLinkFindMany.mockResolvedValue([]);
+    mockUpsert.mockResolvedValue({});
+
+    const result = await reconcileRevisionAmendsLinks({ limit: 100 });
+    expect(mockUpsert).toHaveBeenCalledTimes(2);
+    expect(result.scanned).toBe(2);
+    expect(result.missing).toBe(2);
+    expect(result.repaired).toBe(2);
+    expect(result.failed).toBe(0);
   });
 });

@@ -123,7 +123,7 @@ function makeDocIntelligenceBanks() {
     getMergedDocAliasesBank: () => ({
       config: { minAliasConfidence: 0.75 },
     }),
-    getDocAliasPhrases: () => ["quarterly report"],
+    getDocAliasPhrases: () => ["quarterly report", "relatorio trimestral"],
     getDocTaxonomy: () => ({ typeDefinitions: [] }),
   } as any;
 }
@@ -159,6 +159,23 @@ describe("Certification: disambiguation-e2e", () => {
     expect(decision.signals.needsDocChoice).toBe(true);
     expect(decision.disambiguation).toBeDefined();
     expect(decision.disambiguation!.options.length).toBeGreaterThanOrEqual(2);
+    expect(decision.disambiguation!.maxQuestions).toBe(1);
+  });
+
+  test("step 1b: ambiguous PT query triggers needs_doc_choice with maxQuestions=1", async () => {
+    const service = makeService();
+    const ptState = buildState({
+      session: { env: "dev", userLanguage: "pt" },
+    } as any);
+    const decision = await service.evaluate(ptState, {
+      query: "abrir o relatorio trimestral",
+      env: "dev",
+      signals: {},
+    });
+
+    expect(decision.reasonCodes).toContain("needs_doc_choice");
+    expect(decision.signals.needsDocChoice).toBe(true);
+    expect(decision.disambiguation).toBeDefined();
     expect(decision.disambiguation!.maxQuestions).toBe(1);
   });
 
@@ -278,6 +295,19 @@ describe("Certification: disambiguation-e2e", () => {
     const step1MaxQ = step1.disambiguation?.maxQuestions === 1;
     if (!step1MaxQ) failures.push("STEP1_MAX_QUESTIONS_NOT_1");
 
+    const step1PtState = buildState({
+      session: { env: "dev", userLanguage: "pt" },
+    } as any);
+    const step1Pt = await service.evaluate(step1PtState, {
+      query: "abrir o relatorio trimestral",
+      env: "dev",
+      signals: {},
+    });
+    const step1PtNeedsChoice = step1Pt.reasonCodes.includes("needs_doc_choice");
+    if (!step1PtNeedsChoice) failures.push("STEP1_PT_NO_DOC_CHOICE");
+    const step1PtMaxQ = step1Pt.disambiguation?.maxQuestions === 1;
+    if (!step1PtMaxQ) failures.push("STEP1_PT_MAX_QUESTIONS_NOT_1");
+
     // Step 2
     const step2State = buildState({
       lastDisambiguation: { chosenDocumentId: "doc-Q2" },
@@ -327,6 +357,8 @@ describe("Certification: disambiguation-e2e", () => {
       metrics: {
         step1NeedsChoice,
         step1MaxQ,
+        step1PtNeedsChoice,
+        step1PtMaxQ,
         step2Resolved,
         step3Inherited,
         step4AutoPicked,

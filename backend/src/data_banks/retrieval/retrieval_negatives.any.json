@@ -34,7 +34,7 @@
         "softPenaltyThreshold": 0.35,
         "minRelevanceScore": 0.55,
         "minChunkRelevance": 0.55,
-        "scopedMinChunkRelevance": 0.2,
+        "scopedMinChunkRelevance": 0.12,
         "minDocRelevance": 0.5,
         "maxCrossDocWhenSingleDocIntent": 1
       },

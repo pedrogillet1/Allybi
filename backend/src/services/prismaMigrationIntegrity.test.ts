@@ -3,6 +3,36 @@ import { join } from "node:path";
 
 describe("Prisma migration integrity guards", () => {
   const root = process.cwd();
+  const routeRoots = [
+    join(root, "src", "entrypoints", "http", "routes"),
+    join(root, "src", "routes"),
+  ];
+
+  function toRepoRelativePath(absolutePath: string): string {
+    return absolutePath
+      .replace(/\\/g, "/")
+      .replace(`${root.replace(/\\/g, "/")}/`, "");
+  }
+
+  function collectRouteTsFiles(): string[] {
+    const queue: string[] = [...routeRoots];
+    const files: string[] = [];
+
+    while (queue.length > 0) {
+      const current = queue.pop() as string;
+      for (const name of readdirSync(current)) {
+        const full = join(current, name);
+        if (statSync(full).isDirectory()) {
+          queue.push(full);
+          continue;
+        }
+        if (!name.endsWith(".ts") || name.endsWith(".test.ts")) continue;
+        files.push(full);
+      }
+    }
+
+    return files;
+  }
 
   test("legacy evidence-strength migration is existence-guarded", () => {
     const sql = readFileSync(
@@ -227,6 +257,26 @@ describe("Prisma migration integrity guards", () => {
     );
   });
 
+  test("telemetry double-scaling compensation migration is guarded + reversible subset only", () => {
+    const sql = readFileSync(
+      join(
+        root,
+        "prisma",
+        "migrations",
+        "20260306120000_compensate_double_telemetry_scaling",
+        "migration.sql",
+      ),
+      "utf8",
+    );
+
+    expect(sql).toContain('FROM "_prisma_migrations"');
+    expect(sql).toContain("20260205_fix_evidence_strength");
+    expect(sql).toContain("20260305113000_fix_telemetry_table_name_drift");
+    expect(sql).toContain('AND "evidenceStrength" < 0.5');
+    expect(sql).toContain('AND "topRelevanceScore" < 0.5');
+    expect(sql).toContain("* 6.0 / 100.0");
+  });
+
   test("prisma client alias remains a pass-through to config/database", () => {
     const prismaAlias = readFileSync(
       join(root, "src", "platform", "db", "prismaClient.ts"),
@@ -246,6 +296,47 @@ describe("Prisma migration integrity guards", () => {
     expect(runbook).toContain("20251006005348_add_cloud_integrations");
     expect(runbook).toContain("20251006005424_add_cloud_integrations");
     expect(runbook).toContain("prisma.documentMetadata.upsert");
+    expect(runbook).toContain("prisma:rls:verify");
+    expect(runbook).toContain("prisma:telemetry:repair:audit");
+    expect(runbook).toContain("auth.routes.ts");
+    expect(runbook).toContain("admin-analytics.routes.ts");
+    expect(runbook).toContain("PRISMA_RLS_PROFILE");
+  });
+
+  test("package scripts include prisma dependency parity + rls verification checks", () => {
+    const pkg = readFileSync(join(root, "package.json"), "utf8");
+    expect(pkg).toContain('"prisma:deps:check"');
+    expect(pkg).toContain('"prisma:rls:verify"');
+    expect(pkg).toContain('"prisma:telemetry:repair:audit"');
+  });
+
+  test("rls verification script supports service_role profile enforcement", () => {
+    const script = readFileSync(
+      join(root, "scripts", "prisma", "verify-rls.mjs"),
+      "utf8",
+    );
+    expect(script).toContain("PRISMA_RLS_PROFILE");
+    expect(script).toContain("PRISMA_RLS_REQUIRE_SERVICE_ROLE");
+    expect(script).toContain("service_role_all");
+    expect(script).toContain("relforcerowsecurity");
+  });
+
+  test("telemetry repair audit script exists for ambiguous-clamp visibility", () => {
+    const script = readFileSync(
+      join(root, "scripts", "prisma", "audit-telemetry-repair.mjs"),
+      "utf8",
+    );
+    expect(script).toContain("PRISMA_TELEMETRY_AUDIT_FAIL_ON_AMBIGUOUS");
+    expect(script).toContain("20260306120000_compensate_double_telemetry_scaling");
+    expect(script).toContain("exactOneRowsMayContainClampedValues");
+  });
+
+  test("migration replay workflow pins CI RLS profile", () => {
+    const workflow = readFileSync(
+      join(root, "..", ".github", "workflows", "prisma-migration-replay.yml"),
+      "utf8",
+    );
+    expect(workflow).toContain('PRISMA_RLS_PROFILE: "ci"');
   });
 
   test("post-baseline migrations do not include sqlite-only tokens", () => {
@@ -290,25 +381,107 @@ describe("Prisma migration integrity guards", () => {
     expect(offenders).toEqual([]);
   });
 
-  test("http route files do not import config/database directly", () => {
-    const routesRoot = join(root, "src", "entrypoints", "http", "routes");
-    const queue: string[] = [routesRoot];
+  test("route files do not import config/database directly", () => {
     const offenders: string[] = [];
-
-    while (queue.length > 0) {
-      const current = queue.pop() as string;
-      for (const name of readdirSync(current)) {
-        const full = join(current, name);
-        if (statSync(full).isDirectory()) {
-          queue.push(full);
-          continue;
-        }
-        if (!name.endsWith(".ts")) continue;
-        const source = readFileSync(full, "utf8");
-        if (source.includes("config/database")) offenders.push(full);
+    for (const full of collectRouteTsFiles()) {
+      const source = readFileSync(full, "utf8");
+      if (source.includes("config/database")) {
+        offenders.push(toRepoRelativePath(full));
       }
     }
 
     expect(offenders).toEqual([]);
+  });
+
+  test("route prisma mutations stay on explicit allowlist", () => {
+    const offenders: string[] = [];
+    const allowlisted = new Set([
+      "src/entrypoints/http/routes/auth.routes.ts:user.update",
+      "src/entrypoints/http/routes/auth.routes.ts:user.create",
+      "src/entrypoints/http/routes/auth.routes.ts:session.create",
+      "src/entrypoints/http/routes/multipart-upload.routes.ts:ingestionEvent.create",
+    ]);
+    const mutationRegex =
+      /prisma\.(\w+)\.(create|createMany|update|updateMany|delete|deleteMany|upsert)\s*\(/g;
+
+    for (const full of collectRouteTsFiles()) {
+      const source = readFileSync(full, "utf8");
+      const rel = toRepoRelativePath(full);
+      let match: RegExpExecArray | null = null;
+      while ((match = mutationRegex.exec(source)) !== null) {
+        const key = `${rel}:${match[1]}.${match[2]}`;
+        if (!allowlisted.has(key)) offenders.push(key);
+      }
+      mutationRegex.lastIndex = 0;
+    }
+
+    expect(offenders).toEqual([]);
+  });
+
+  test("route raw SQL stays on explicit allowlist", () => {
+    const offenders: string[] = [];
+    const allowlistedRawSql = new Set([
+      "src/entrypoints/http/routes/admin-analytics.routes.ts",
+    ]);
+
+    for (const full of collectRouteTsFiles()) {
+      const source = readFileSync(full, "utf8");
+      const hasRawSql =
+        source.includes("prisma.$queryRaw") ||
+        source.includes("prisma.$queryRawUnsafe") ||
+        source.includes("prisma.$executeRaw") ||
+        source.includes("prisma.$executeRawUnsafe");
+      if (!hasRawSql) continue;
+
+      const rel = toRepoRelativePath(full);
+      if (!allowlistedRawSql.has(rel)) offenders.push(rel);
+    }
+
+    expect(offenders).toEqual([]);
+  });
+
+  test("critical prisma paths avoid unsafe cast patterns for chunk indexing fields", () => {
+    const retrievalAdapter = readFileSync(
+      join(
+        root,
+        "src",
+        "services",
+        "core",
+        "retrieval",
+        "prismaRetrievalAdapters.service.ts",
+      ),
+      "utf8",
+    );
+    const revisionStore = readFileSync(
+      join(root, "src", "services", "editing", "documentRevisionStore.service.ts"),
+      "utf8",
+    );
+
+    expect(retrievalAdapter).not.toContain("as unknown as PrismaClient");
+    expect(retrievalAdapter).not.toContain("(where as any).isActive");
+    expect(retrievalAdapter).not.toContain("(fallbackWhere as any).isActive");
+    expect(retrievalAdapter).not.toContain("(broadWhere as any).isActive");
+    expect(retrievalAdapter).not.toContain("} as any,\n      select:");
+    expect(revisionStore).not.toContain("(prisma.documentChunk as any).updateMany");
+    expect(revisionStore).not.toContain("where: { documentId: docId, isActive: true } as any");
+    expect(revisionStore).not.toContain("data: { isActive: false } as any");
+  });
+
+  test("slides studio route uses write service for metadata persistence", () => {
+    const slidesRoute = readFileSync(
+      join(root, "src", "routes", "slidesStudio.routes.ts"),
+      "utf8",
+    );
+    expect(slidesRoute).toContain("documentUploadWriteService.upsertDocumentMetadata(");
+    expect(slidesRoute).not.toContain("prisma.documentMetadata.upsert(");
+  });
+
+  test("admin analytics raw SQL count stays under governance budget", () => {
+    const adminAnalytics = readFileSync(
+      join(root, "src", "entrypoints", "http", "routes", "admin-analytics.routes.ts"),
+      "utf8",
+    );
+    const matches = adminAnalytics.match(/prisma\.\$queryRaw/g) ?? [];
+    expect(matches.length).toBeLessThanOrEqual(27);
   });
 });

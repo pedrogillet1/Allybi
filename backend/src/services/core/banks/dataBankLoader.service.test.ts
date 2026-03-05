@@ -737,4 +737,338 @@ describe("DataBankLoaderService hardening", () => {
 
     await expect(loader.loadAll()).rejects.toThrow(/orphan banks detected/i);
   });
+
+  test("rejects retrieval bank with invalid weight type against retrieval_ranker_schema", async () => {
+    const root = fs.mkdtempSync(
+      path.join(os.tmpdir(), "koda-banks-retrieval-schema-"),
+    );
+
+    writeJson(path.join(root, "manifest/bank_registry.any.json"), {
+      _meta: makeMeta("bank_registry"),
+      config: { enabled: true },
+      loadOrder: ["schemas", "retrieval"],
+      schemaMap: { retrieval: "retrieval_ranker_schema", schemas: "bank_schema" },
+      banks: [
+        {
+          id: "retrieval_ranker_schema",
+          category: "schemas",
+          path: "schemas/retrieval_ranker_schema.any.json",
+          filename: "retrieval_ranker_schema.any.json",
+          version: "1.0.0",
+          enabledByEnv: envAll(true),
+          requiredByEnv: envAll(true),
+        },
+        {
+          id: "bad_retrieval_bank",
+          category: "retrieval",
+          path: "retrieval/bad_retrieval_bank.any.json",
+          filename: "bad_retrieval_bank.any.json",
+          version: "1.0.0",
+          enabledByEnv: envAll(true),
+          requiredByEnv: envAll(true),
+        },
+      ],
+    });
+
+    writeJson(path.join(root, "schemas/retrieval_ranker_schema.any.json"), {
+      _meta: makeMeta("retrieval_ranker_schema"),
+      config: { enabled: true },
+      schema: {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        type: "object",
+        required: ["_meta", "config"],
+        additionalProperties: true,
+        properties: {
+          _meta: { type: "object" },
+          config: {
+            type: "object",
+            required: ["enabled"],
+            additionalProperties: true,
+            properties: {
+              enabled: { type: "boolean" },
+              weights: {
+                type: "object",
+                additionalProperties: { type: "number" },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    writeJson(path.join(root, "retrieval/bad_retrieval_bank.any.json"), {
+      _meta: makeMeta("bad_retrieval_bank"),
+      config: {
+        enabled: true,
+        weights: {
+          semantic: "banana",
+          lexical: 0.16,
+        },
+      },
+    });
+
+    const loader = new DataBankLoaderService({
+      rootDir: root,
+      env: "dev",
+      strict: true,
+      validateSchemas: true,
+      allowEmptyChecksumsInNonProd: true,
+    });
+
+    await expect(loader.loadAll()).rejects.toThrow(DataBankError);
+    await expect(loader.loadAll()).rejects.toThrow(/schema validation failed/i);
+  });
+
+  test("rejects routing bank with invalid when field against routing_rule_schema", async () => {
+    const root = fs.mkdtempSync(
+      path.join(os.tmpdir(), "koda-banks-routing-schema-"),
+    );
+
+    writeJson(path.join(root, "manifest/bank_registry.any.json"), {
+      _meta: makeMeta("bank_registry"),
+      config: { enabled: true },
+      loadOrder: ["schemas", "routing"],
+      schemaMap: { routing: "routing_rule_schema", schemas: "bank_schema" },
+      banks: [
+        {
+          id: "routing_rule_schema",
+          category: "schemas",
+          path: "schemas/routing_rule_schema.any.json",
+          filename: "routing_rule_schema.any.json",
+          version: "1.0.0",
+          enabledByEnv: envAll(true),
+          requiredByEnv: envAll(true),
+        },
+        {
+          id: "bad_routing_bank",
+          category: "routing",
+          path: "routing/bad_routing_bank.any.json",
+          filename: "bad_routing_bank.any.json",
+          version: "1.0.0",
+          enabledByEnv: envAll(true),
+          requiredByEnv: envAll(true),
+        },
+      ],
+    });
+
+    writeJson(path.join(root, "schemas/routing_rule_schema.any.json"), {
+      _meta: makeMeta("routing_rule_schema"),
+      config: { enabled: true },
+      schema: {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        type: "object",
+        required: ["_meta", "config"],
+        additionalProperties: true,
+        properties: {
+          _meta: { type: "object" },
+          config: {
+            type: "object",
+            required: ["enabled"],
+            additionalProperties: true,
+            properties: {
+              enabled: { type: "boolean" },
+            },
+          },
+          rules: {
+            type: "array",
+            items: {
+              type: "object",
+              required: ["ruleId"],
+              additionalProperties: true,
+              properties: {
+                ruleId: { type: "string" },
+                priority: { type: "number" },
+                when: { type: "object" },
+                then: { type: "object" },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    writeJson(path.join(root, "routing/bad_routing_bank.any.json"), {
+      _meta: makeMeta("bad_routing_bank"),
+      config: { enabled: true },
+      rules: [
+        {
+          ruleId: "R_001",
+          priority: 100,
+          when: "not_an_object",
+          then: { intent: "TEST" },
+        },
+      ],
+    });
+
+    const loader = new DataBankLoaderService({
+      rootDir: root,
+      env: "dev",
+      strict: true,
+      validateSchemas: true,
+      allowEmptyChecksumsInNonProd: true,
+    });
+
+    await expect(loader.loadAll()).rejects.toThrow(DataBankError);
+    await expect(loader.loadAll()).rejects.toThrow(/schema validation failed/i);
+  });
+
+  test("rejects compose microcopy bank with invalid entries against compose_microcopy_schema", async () => {
+    const root = fs.mkdtempSync(
+      path.join(os.tmpdir(), "koda-banks-compose-schema-"),
+    );
+
+    writeJson(path.join(root, "manifest/bank_registry.any.json"), {
+      _meta: makeMeta("bank_registry"),
+      config: { enabled: true },
+      loadOrder: ["schemas", "semantics"],
+      schemaMap: { schemas: "bank_schema" },
+      banks: [
+        {
+          id: "compose_microcopy_schema",
+          category: "schemas",
+          path: "schemas/compose_microcopy_schema.any.json",
+          filename: "compose_microcopy_schema.any.json",
+          version: "1.0.0",
+          enabledByEnv: envAll(true),
+          requiredByEnv: envAll(true),
+        },
+        {
+          id: "bad_compose_bank",
+          category: "semantics",
+          path: "semantics/bad_compose_bank.any.json",
+          filename: "bad_compose_bank.any.json",
+          version: "1.0.0",
+          schemaId: "compose_microcopy_schema",
+          enabledByEnv: envAll(true),
+          requiredByEnv: envAll(true),
+        },
+      ],
+    });
+
+    writeJson(path.join(root, "schemas/compose_microcopy_schema.any.json"), {
+      _meta: makeMeta("compose_microcopy_schema"),
+      config: { enabled: true },
+      schema: {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        type: "object",
+        required: ["_meta", "config"],
+        additionalProperties: true,
+        properties: {
+          _meta: { type: "object" },
+          config: {
+            type: "object",
+            required: ["enabled"],
+            additionalProperties: true,
+            properties: { enabled: { type: "boolean" } },
+          },
+        },
+        if: {
+          required: ["entries"],
+        },
+        then: {
+          properties: {
+            entries: {
+              type: "array",
+              items: {
+                type: "object",
+                required: ["id", "language", "text"],
+                additionalProperties: true,
+                properties: {
+                  id: { type: "string" },
+                  language: { type: "string" },
+                  text: { type: "string" },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    writeJson(path.join(root, "semantics/bad_compose_bank.any.json"), {
+      _meta: makeMeta("bad_compose_bank"),
+      config: { enabled: true },
+      entries: [
+        {
+          id: "E_001",
+          language: 42,
+          text: "valid text",
+        },
+      ],
+    });
+
+    const loader = new DataBankLoaderService({
+      rootDir: root,
+      env: "dev",
+      strict: true,
+      validateSchemas: true,
+      allowEmptyChecksumsInNonProd: true,
+    });
+
+    await expect(loader.loadAll()).rejects.toThrow(DataBankError);
+    await expect(loader.loadAll()).rejects.toThrow(/schema validation failed/i);
+  });
+
+  test("throws in strict mode when AJV is unavailable", async () => {
+    const root = fs.mkdtempSync(
+      path.join(os.tmpdir(), "koda-banks-ajv-strict-"),
+    );
+
+    writeJson(path.join(root, "manifest/bank_registry.any.json"), {
+      _meta: makeMeta("bank_registry"),
+      config: { enabled: true },
+      loadOrder: ["schemas", "semantics"],
+      schemaMap: { semantics: "bank_schema", schemas: "bank_schema" },
+      banks: [
+        {
+          id: "bank_schema",
+          category: "schemas",
+          path: "schemas/bank_schema.any.json",
+          filename: "bank_schema.any.json",
+          version: "1.0.0",
+          enabledByEnv: envAll(true),
+          requiredByEnv: envAll(true),
+        },
+        {
+          id: "some_bank",
+          category: "semantics",
+          path: "semantics/some_bank.any.json",
+          filename: "some_bank.any.json",
+          version: "1.0.0",
+          enabledByEnv: envAll(true),
+          requiredByEnv: envAll(true),
+        },
+      ],
+    });
+
+    writeJson(path.join(root, "schemas/bank_schema.any.json"), {
+      _meta: makeMeta("bank_schema"),
+      config: { enabled: true },
+      $schema: "https://json-schema.org/draft/2020-12/schema",
+      type: "object",
+      required: ["_meta", "config"],
+      additionalProperties: true,
+    });
+
+    writeJson(path.join(root, "semantics/some_bank.any.json"), {
+      _meta: makeMeta("some_bank"),
+      config: { enabled: true },
+    });
+
+    const loader = new DataBankLoaderService({
+      rootDir: root,
+      env: "dev",
+      strict: true,
+      validateSchemas: true,
+      allowEmptyChecksumsInNonProd: true,
+    });
+
+    // Simulate AJV being unavailable
+    (loader as any).ajv = null;
+
+    await expect(loader.loadAll()).rejects.toThrow(DataBankError);
+    await expect(loader.loadAll()).rejects.toThrow(
+      /AJV is required.*strict mode/i,
+    );
+  });
 });

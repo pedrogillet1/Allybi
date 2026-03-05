@@ -1,6 +1,6 @@
 # Integration Runtime Grade
 
-- Generated: 2026-03-05T18:59:08.049Z
+- Generated: 2026-03-05T20:56:37.193Z
 - Final score: **100**
 - Final grade: **A+**
 - Verdict: **ready**
@@ -15,6 +15,8 @@
 | frontend_oauth_callback_no_url_token_ingest | high | 20 | yes | Frontend OAuth callback must not read tokens from URL query or write auth tokens to localStorage. |
 | frontend_oauth_completion_no_localstorage_signal | medium | 10 | yes | Frontend integrations OAuth completion flow must not rely on localStorage cross-window signaling. |
 | frontend_oauth_message_origin_validation | high | 15 | yes | OAuth completion messages must enforce trusted origin checks in integrations and chat surfaces. |
+| editor_mode_blocks_connector_routing | high | 20 | yes | Editor mode must not execute connector actions; routing must stay in KNOWLEDGE/editor lane. |
+| connector_mime_extractability_contract | high | 20 | yes | Connector-ingested MIME types must be extraction-supported to avoid ingestion pipeline failures. |
 | no_console_runtime_paths | medium | 15 | yes | Runtime integrations paths should use structured logger. |
 | critical_tests_present | medium | 10 | yes | Required integrations runtime tests must exist. |
 | runtime_test_pack_passes | high | 35 | yes | Target runtime integrations test pack passed. |

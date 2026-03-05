@@ -55,6 +55,9 @@ export const RUNTIME_REQUIRED_BANKS = [
   "send_intents_pt",
   "sync_intents_en",
   "sync_intents_pt",
+  "nav_intents_en",
+  "nav_intents_pt",
+  "nav_intents_es",
   "operator_families",
   "operator_contracts",
   "operator_output_shapes",
@@ -123,6 +126,9 @@ const RUNTIME_REQUIRED_ROUTING_BANKS = [
   "send_intents_pt",
   "sync_intents_en",
   "sync_intents_pt",
+  "nav_intents_en",
+  "nav_intents_pt",
+  "nav_intents_es",
 ] as const;
 const RUNTIME_ROUTING_BANK_CONSUMER_MARKERS: Record<string, string[]> = {
   viewer_assistant_routing: ["viewer_assistant_routing"],
@@ -134,6 +140,9 @@ const RUNTIME_ROUTING_BANK_CONSUMER_MARKERS: Record<string, string[]> = {
   send_intents_pt: ["send_intents_pt"],
   sync_intents_en: ["sync_intents_en"],
   sync_intents_pt: ["sync_intents_pt"],
+  nav_intents_en: ["nav_intents_${locale}", "getNavIntentsBank(locale)"],
+  nav_intents_pt: ["nav_intents_${locale}", "getNavIntentsBank(locale)"],
+  nav_intents_es: ["nav_intents_${locale}", "getNavIntentsBank(locale)"],
 };
 
 export const RUNTIME_REQUIRED_LLM_ROUTING_BANKS = [

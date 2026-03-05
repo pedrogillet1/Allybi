@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 
 import prisma from "../../../config/database";
 import { DocumentCryptoService } from "../../documents/documentCrypto.service";
@@ -195,16 +195,16 @@ function getChunkCryptoServiceSafe(): ChunkCryptoService | null {
   try {
     const encryption = new EncryptionService();
     const envelope = new EnvelopeService(encryption);
-    const tenantKeys = new TenantKeyService(prisma as unknown as PrismaClient, encryption);
+    const tenantKeys = new TenantKeyService(prisma, encryption);
     const docKeys = new DocumentKeyService(
-      prisma as unknown as PrismaClient,
+      prisma,
       encryption,
       tenantKeys,
       envelope,
     );
     const docCrypto = new DocumentCryptoService(encryption);
     chunkCryptoServiceSingleton = new ChunkCryptoService(
-      prisma as unknown as PrismaClient,
+      prisma,
       docKeys,
       docCrypto,
     );
@@ -438,7 +438,7 @@ class PrismaRetrievalUserAdapter
   }
 
   private isRelatedDocExpansionEnabled(): boolean {
-    return isRuntimeFlagEnabled("RETRIEVAL_INCLUDE_RELATED_DOCS", false);
+    return isRuntimeFlagEnabled("RETRIEVAL_INCLUDE_RELATED_DOCS", true);
   }
 
   private isRelatedDocExpansionStrictEnabled(): boolean {
@@ -839,7 +839,7 @@ class PrismaRetrievalUserAdapter
         status: { in: [...READY_DOCUMENT_STATUSES] },
       },
     };
-    (where as any).isActive = true;
+    where.isActive = true;
 
     if (scopedDocIds && scopedDocIds.length > 0) {
       where.documentId = { in: scopedDocIds };
@@ -954,7 +954,7 @@ class PrismaRetrievalUserAdapter
             status: { in: [...READY_DOCUMENT_STATUSES] },
           },
         };
-        (fallbackWhere as any).isActive = true;
+        fallbackWhere.isActive = true;
         const fallbackRows = (await prisma.documentChunk.findMany({
           where: fallbackWhere,
           take: perDocLimit * docsToBackfill.length,
@@ -1057,7 +1057,7 @@ class PrismaRetrievalUserAdapter
         { valueRaw: { contains: token, mode: "insensitive" } },
       ]),
     };
-    (where as any).isActive = true;
+    where.isActive = true;
     if (scopedDocIds && scopedDocIds.length > 0) {
       where.documentId = { in: scopedDocIds };
     }
@@ -1089,7 +1089,7 @@ class PrismaRetrievalUserAdapter
           status: { in: [...READY_DOCUMENT_STATUSES] },
         },
       };
-      (broadWhere as any).isActive = true;
+      broadWhere.isActive = true;
       if (scopedDocIds && scopedDocIds.length > 0) {
         broadWhere.documentId = { in: scopedDocIds };
       }
@@ -1552,15 +1552,16 @@ class PrismaRetrievalUserAdapter
       }));
     if (!ors.length) return new Map();
 
+    const where: Prisma.DocumentChunkWhereInput = {
+      OR: ors,
+      isActive: true,
+      document: {
+        userId: this.userId,
+        status: { in: [...READY_DOCUMENT_STATUSES] },
+      },
+    };
     const rows = (await prisma.documentChunk.findMany({
-      where: {
-        OR: ors,
-        isActive: true,
-        document: {
-          userId: this.userId,
-          status: { in: [...READY_DOCUMENT_STATUSES] },
-        },
-      } as any,
+      where,
       select: {
         id: true,
         documentId: true,

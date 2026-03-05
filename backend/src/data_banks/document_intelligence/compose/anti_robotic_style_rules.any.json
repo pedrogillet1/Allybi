@@ -1,7 +1,7 @@
 {
   "_meta": {
     "id": "anti_robotic_style_rules",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Humanizing output style rules.",
     "languages": [
       "any",
@@ -9,7 +9,7 @@
       "pt",
       "es"
     ],
-    "lastUpdated": "2026-03-03",
+    "lastUpdated": "2026-03-05",
     "owner": "data-bank-governance",
     "usedBy": [
       "services/core/banks/dataBankLoader.service.ts"
@@ -24,6 +24,24 @@
       "trigger": "More than two identical sentence starters",
       "check": "output.duplicateStarterRatio > 0.2",
       "failureAction": "REPHRASE_STARTER"
+    },
+    {
+      "id": "ARS_002",
+      "trigger": "All bullet items start with the same word",
+      "check": "output.bulletFirstWordRepeatRatio > 0.5 AND output.bulletCount >= 3",
+      "failureAction": "VARY_BULLET_OPENERS"
+    },
+    {
+      "id": "ARS_003",
+      "trigger": "Sentence length uniformity suggests template-generated text",
+      "check": "output.sentenceLengthStdDev < 8 AND output.sentenceCount >= 4",
+      "failureAction": "VARY_SENTENCE_LENGTH"
+    },
+    {
+      "id": "ARS_004",
+      "trigger": "Same transition phrase used more than once in output",
+      "check": "output.transitionPhraseRepeatCount > 1",
+      "failureAction": "ROTATE_TRANSITION_PHRASES"
     }
   ],
   "config": {

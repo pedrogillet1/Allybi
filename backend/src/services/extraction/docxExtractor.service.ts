@@ -368,6 +368,7 @@ function processTableNode(
       const tIdx = tableCounter ? tableCounter.count++ : collectedTables.length;
       collectedTables.push({
         tableId: `docx:t${tIdx}`,
+        tableMethod: "ooxml_native",
         markdown,
         rows: structuredRows,
       });

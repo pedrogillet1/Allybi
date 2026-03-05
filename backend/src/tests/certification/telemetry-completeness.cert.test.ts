@@ -70,6 +70,7 @@ function buildRetrievalPack(): EvidencePack {
         classifiedDomain: "finance",
         classifiedDocTypeId: "variance_report",
         classificationReasons: ["keyword_match"],
+        candidateDecisionDigest: [],
       },
     },
   };
@@ -121,6 +122,12 @@ describe("Certification: telemetry completeness", () => {
     const failures: string[] = [];
     const wiringCoverage: Record<string, boolean> = {};
     const negativeFixtureCoverage: Record<string, boolean> = {};
+    const intentCoverage: Record<string, boolean> = {};
+    const evidenceCoverage: Record<string, boolean> = {};
+    const costCoverage: Record<string, boolean> = {};
+    const latencyCoverage: Record<string, boolean> = {};
+    const negativeLatencyNullCoverage: Record<string, boolean> = {};
+    const negativeCostNullCoverage: Record<string, boolean> = {};
 
     for (const { key, instance } of delegates) {
       const traceWriter = makeTraceWriterMock();
@@ -236,6 +243,24 @@ describe("Certification: telemetry completeness", () => {
         upsertPayload?.estimatedCostUsd === 0.018 &&
         retrievalPayload?.evidenceStrength === 0.9 &&
         retrievalPayload?.sourcesCount === 2;
+      intentCoverage[key] =
+        upsertPayload?.intent === "answer" &&
+        upsertPayload?.evidenceGateAction === "answer" &&
+        upsertPayload?.scopeDecision === "attached_only" &&
+        upsertPayload?.disambiguation === "none";
+      evidenceCoverage[key] =
+        retrievalPayload?.evidenceStrength === 0.9 &&
+        retrievalPayload?.sourcesCount === 2 &&
+        retrievalPayload?.wrongDocPrevented === true;
+      costCoverage[key] =
+        upsertPayload?.inputTokens === 330 &&
+        upsertPayload?.outputTokens === 220 &&
+        upsertPayload?.totalTokens === 550 &&
+        upsertPayload?.estimatedCostUsd === 0.018;
+      latencyCoverage[key] =
+        upsertPayload?.totalMs === 900 &&
+        upsertPayload?.retrievalMs === 210 &&
+        upsertPayload?.llmMs === 510;
 
       await (instance as any).persistTraceArtifacts({
         traceId: `tr_cert_telemetry_${key}_negative`,
@@ -301,10 +326,25 @@ describe("Certification: telemetry completeness", () => {
         negativeUpsert?.hadFallback === true &&
         negativeUpsert?.fallbackScenario === "missing_provenance" &&
         negativeRetrieval?.fallbackReasonCode === "missing_provenance";
+      negativeLatencyNullCoverage[key] =
+        negativeUpsert?.retrievalMs === null && negativeUpsert?.llmMs === null;
+      negativeCostNullCoverage[key] = negativeUpsert?.estimatedCostUsd === null;
     }
 
     const delegateCoverageCount = Object.values(wiringCoverage).filter(Boolean).length;
     const negativeCoverageCount = Object.values(negativeFixtureCoverage).filter(
+      Boolean,
+    ).length;
+    const intentCoverageCount = Object.values(intentCoverage).filter(Boolean).length;
+    const evidenceCoverageCount = Object.values(evidenceCoverage).filter(
+      Boolean,
+    ).length;
+    const costCoverageCount = Object.values(costCoverage).filter(Boolean).length;
+    const latencyCoverageCount = Object.values(latencyCoverage).filter(Boolean).length;
+    const negativeLatencyNullCount = Object.values(negativeLatencyNullCoverage).filter(
+      Boolean,
+    ).length;
+    const negativeCostNullCount = Object.values(negativeCostNullCoverage).filter(
       Boolean,
     ).length;
 
@@ -315,10 +355,40 @@ describe("Certification: telemetry completeness", () => {
         delegatesExpected: delegates.length,
         negativeFixturesCovered: negativeCoverageCount,
         negativeFixturesExpected: delegates.length,
+        intentFieldsCovered: intentCoverageCount,
+        intentFieldsExpected: delegates.length,
+        evidenceFieldsCovered: evidenceCoverageCount,
+        evidenceFieldsExpected: delegates.length,
+        costFieldsCovered: costCoverageCount,
+        costFieldsExpected: delegates.length,
+        latencyFieldsCovered: latencyCoverageCount,
+        latencyFieldsExpected: delegates.length,
+        negativeLatencyNullCovered: negativeLatencyNullCount,
+        negativeLatencyNullExpected: delegates.length,
+        negativeCostNullCovered: negativeCostNullCount,
+        negativeCostNullExpected: delegates.length,
+        intentCoverageRate:
+          delegates.length > 0 ? intentCoverageCount / delegates.length : 0,
+        evidenceCoverageRate:
+          delegates.length > 0 ? evidenceCoverageCount / delegates.length : 0,
+        costCoverageRate:
+          delegates.length > 0 ? costCoverageCount / delegates.length : 0,
+        latencyCoverageRate:
+          delegates.length > 0 ? latencyCoverageCount / delegates.length : 0,
       },
       thresholds: {
         delegatesCovered: delegates.length,
         negativeFixturesCovered: delegates.length,
+        intentFieldsCovered: delegates.length,
+        evidenceFieldsCovered: delegates.length,
+        costFieldsCovered: delegates.length,
+        latencyFieldsCovered: delegates.length,
+        negativeLatencyNullCovered: delegates.length,
+        negativeCostNullCovered: delegates.length,
+        intentCoverageRateMin: 1,
+        evidenceCoverageRateMin: 1,
+        costCoverageRateMin: 1,
+        latencyCoverageRateMin: 1,
       },
       failures,
     });

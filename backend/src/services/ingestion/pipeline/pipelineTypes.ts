@@ -69,6 +69,7 @@ export interface InputChunkMetadata {
     | "row_aggregate"
     | "cell_centric";
   tableId?: string;
+  tableMethod?: string;
   rowIndex?: number;
   columnIndex?: number;
   rowSpan?: number;

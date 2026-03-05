@@ -78,6 +78,54 @@ describe("DocumentIntelligenceBanksService", () => {
     expect((sections as any).sections[0].id).toBe("s1");
   });
 
+  test("falls back to version-suffixed legal doc-type packs when unsuffixed ids are absent", () => {
+    const svc = new DocumentIntelligenceBanksService(
+      makeLoader({
+        legal_nda_sections_v215acb2d: {
+          sections: [{ id: "termination" }],
+        },
+        legal_nda_tables_v215acb2d: {
+          tables: [{ id: "obligations_table" }],
+        },
+        legal_nda_extraction_hints_v94b17eb1: {
+          hints: [{ id: "extract_confidentiality_term" }],
+        },
+      }) as any,
+    );
+
+    expect(svc.getDocTypeSections("legal", "legal_nda")).toBeTruthy();
+    expect(svc.getDocTypeTables("legal", "legal_nda")).toBeTruthy();
+    expect(svc.getDocTypeExtractionHints("legal", "legal_nda")).toBeTruthy();
+  });
+
+  test("supports legacy legal double-prefix bank ids for malformed canonical ids", () => {
+    const svc = new DocumentIntelligenceBanksService(
+      makeLoader({
+        legal_legal_lease_agreement_sections: {
+          sections: [{ id: "rent_schedule" }],
+        },
+      }) as any,
+    );
+
+    const sections = svc.getDocTypeSections("legal", "legal_lease_agreement");
+    expect(sections).toBeTruthy();
+    expect((sections as any).sections[0].id).toBe("rent_schedule");
+  });
+
+  test("maps legal alias doc types to canonical section packs", () => {
+    const svc = new DocumentIntelligenceBanksService(
+      makeLoader({
+        legal_terms_of_service_sections: {
+          sections: [{ id: "governing_law" }],
+        },
+      }) as any,
+    );
+
+    const sections = svc.getDocTypeSections("legal", "terms");
+    expect(sections).toBeTruthy();
+    expect((sections as any).sections[0].id).toBe("governing_law");
+  });
+
   test("returns diagnostics warning when required core bank is missing", () => {
     const svc = new DocumentIntelligenceBanksService(
       makeLoader({

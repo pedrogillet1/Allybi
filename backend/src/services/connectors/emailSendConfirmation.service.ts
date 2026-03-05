@@ -42,12 +42,10 @@ function emailSendSecret(): string {
   const s =
     process.env.CONNECTOR_ACTION_SECRET ||
     process.env.KODA_ACTION_SECRET ||
-    process.env.JWT_ACCESS_SECRET ||
-    process.env.ENCRYPTION_KEY ||
     "";
   if (!s.trim()) {
     throw new Error(
-      "Missing CONNECTOR_ACTION_SECRET (or KODA_ACTION_SECRET / JWT_ACCESS_SECRET / ENCRYPTION_KEY).",
+      "Missing CONNECTOR_ACTION_SECRET (or KODA_ACTION_SECRET).",
     );
   }
   return s;

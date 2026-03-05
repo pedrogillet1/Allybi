@@ -1,14 +1,15 @@
 {
   "_meta": {
     "id": "closers",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Close responses with useful next-step language.",
     "languages": [
       "any",
       "en",
-      "pt"
+      "pt",
+      "es"
     ],
-    "lastUpdated": "2026-03-03",
+    "lastUpdated": "2026-03-05",
     "owner": "data-bank-governance",
     "usedBy": [
       "services/core/banks/dataBankLoader.service.ts"
@@ -30,6 +31,16 @@
       "id": "CLS_002",
       "language": "pt",
       "text": "Se quiser, faço tambem uma segunda passada para fechar periodo."
+    },
+    {
+      "id": "CLS_003",
+      "language": "es",
+      "text": "Si quieres, puedo hacer una segunda revision para cuadrar periodos."
+    },
+    {
+      "id": "CLS_004",
+      "language": "es",
+      "text": "Si quieres, tambien puedo desglosar esto por seccion del documento."
     }
   ]
 }

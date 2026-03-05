@@ -39,7 +39,7 @@
         "maxEvidencePerDocHard": 10,
         "maxDistinctDocsNonCompare": 1,
         "maxDistinctDocsExploratoryNonCompare": 3,
-        "maxPerSectionHard": 1,
+        "maxPerSectionHard": 2,
         "maxPerSectionExploratoryHard": 2,
         "maxNearDuplicatesPerDocPackaging": 1,
         "maxNearDuplicatesExploratoryPerDocPackaging": 2,
@@ -47,7 +47,7 @@
         "nearDuplicateWindowChars": 280,
         "minChunkRelevance": 0.2,
         "minFinalScore": 0.28,
-        "scopedMinFinalScore": 0.18,
+        "scopedMinFinalScore": 0.14,
         "minProvenanceFields": 3
       },
       "conflictResolution": {
@@ -125,6 +125,7 @@
     "dedupe": true,
     "numericIntegrity": {
       "enabled": true,
+      "requireUnitContextForNumeric": true,
       "attachWarnings": true,
       "warningSignals": [
         "truncated_currency",

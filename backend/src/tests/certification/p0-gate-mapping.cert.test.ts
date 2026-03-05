@@ -120,10 +120,49 @@ describe("Certification: P0 runtime-wiring gate mapping", () => {
     expect(sloScript).toMatch(/recordSimpleGateCheck\("disambiguation-e2e"\)/);
     expect(sloScript).toMatch(/recordSimpleGateCheck\("intent-precision"\)/);
     expect(sloScript).toMatch(/recordSimpleGateCheck\("intent-family-firstclass"\)/);
+    expect(sloScript).toMatch(/recordSimpleGateCheck\("routing-bank-consumer-wiring"\)/);
     expect(sloScript).toMatch(/recordSimpleGateCheck\("routing-family-alias-consistency"\)/);
+    expect(sloScript).toMatch(/recordSimpleGateCheck\("routing-family-mechanism-contract"\)/);
     expect(sloScript).toMatch(/recordSimpleGateCheck\("routing-integration-intents-parity"\)/);
     expect(sloScript).toMatch(/recordSimpleGateCheck\("nav-intents-locale-parity"\)/);
     expect(sloScript).toMatch(/recordSimpleGateCheck\("telemetry-completeness"\)/);
+  });
+
+  test("routing runbook gate inventory stays aligned with enforced SLO gate set", () => {
+    const backendRoot = resolveBackendRoot();
+    const runbook = fs.readFileSync(
+      path.join(backendRoot, "docs", "runtime", "routing-quality-runbook.md"),
+      "utf8",
+    );
+    const requiredGateIds = [
+      "routing-behavioral",
+      "followup-source-coverage",
+      "followup-overlay-integrity",
+      "routing-precedence-parity",
+      "collision-matrix-exhaustive",
+      "collision-cross-family-tiebreak",
+      "routing-determinism",
+      "routing-determinism-runtime-e2e",
+      "scope-integrity",
+      "scope-boundary-locks",
+      "slot-contracts-wiring",
+      "slot-extraction-e2e",
+      "disambiguation-e2e",
+      "intent-precision",
+      "intent-family-firstclass",
+      "routing-bank-consumer-wiring",
+      "routing-family-alias-consistency",
+      "routing-family-conformance",
+      "routing-family-mechanism-contract",
+      "routing-integration-intents-parity",
+      "routing-calc-intents-parity",
+      "nav-intents-locale-parity",
+      "telemetry-completeness",
+      "runtime-wiring",
+    ];
+    for (const gateId of requiredGateIds) {
+      expect(runbook).toContain(`reports/cert/gates/${gateId}.json`);
+    }
   });
 
   test("test:cert:wiring includes routing collision/determinism/scope/slot/disambiguation/precision gates", () => {
@@ -143,7 +182,9 @@ describe("Certification: P0 runtime-wiring gate mapping", () => {
     expect(script).toContain("disambiguation-e2e.cert.test.ts");
     expect(script).toContain("intent-precision.cert.test.ts");
     expect(script).toContain("intent-family-firstclass.cert.test.ts");
+    expect(script).toContain("routing-bank-consumer-wiring.cert.test.ts");
     expect(script).toContain("routing-family-alias-consistency.cert.test.ts");
+    expect(script).toContain("routing-family-mechanism-contract.cert.test.ts");
     expect(script).toContain("routing-integration-intents-parity.cert.test.ts");
     expect(script).toContain("nav-intents-locale-parity.cert.test.ts");
     expect(script).toContain("routing-determinism-runtime-e2e.cert.test.ts");

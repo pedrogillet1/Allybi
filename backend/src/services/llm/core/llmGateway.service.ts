@@ -448,11 +448,14 @@ export class LlmGatewayService {
         getOptionalBank<CostTable>("llm_cost_table"),
       );
       if (estCost > costWarningThreshold) {
-        console.warn("[LLM_COST_WARNING]", {
+        const warningPayload = JSON.stringify({
           estimatedCostUsd: estCost,
           threshold: costWarningThreshold,
           provider: prepared.route.provider,
           model: prepared.route.model,
+        });
+        process.emitWarning(`[LLM_COST_WARNING] ${warningPayload}`, {
+          code: "LLM_COST_WARNING",
         });
       }
     }

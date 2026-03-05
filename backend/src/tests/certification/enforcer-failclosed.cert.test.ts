@@ -2,6 +2,20 @@ import "reflect-metadata";
 import path from "path";
 import { beforeAll, describe, expect, jest, test } from "@jest/globals";
 
+jest.mock("../../services/core/retrieval/evidenceGate.service", () => ({
+  EvidenceGateService: class {
+    checkEvidence() {
+      return {
+        hasEvidence: true,
+        evidenceStrength: "strong",
+        suggestedAction: "answer",
+        missingEvidence: [],
+        foundEvidence: [],
+      };
+    }
+  },
+}));
+
 import { CentralizedChatRuntimeDelegate } from "../../modules/chat/runtime/CentralizedChatRuntimeDelegate";
 import type { ChatEngine } from "../../modules/chat/domain/chat.contracts";
 import { initializeBanks } from "../../services/core/banks/bankLoader.service";

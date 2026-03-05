@@ -2,6 +2,13 @@
 /* eslint-disable no-console */
 import fs from "node:fs";
 import path from "node:path";
+import { createRequire } from "node:module";
+
+const require = createRequire(import.meta.url);
+const {
+  summarizeIngestionSloEvents,
+  evaluateIngestionSloMetrics,
+} = require("../../src/services/admin/ingestionSloContract.shared.js");
 
 function arg(flag, fallback = null) {
   const idx = process.argv.indexOf(flag);
@@ -14,105 +21,10 @@ function toNumber(value, fallback) {
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
-function round2(value) {
-  return Math.round(value * 100) / 100;
-}
-
-function p95(values) {
-  if (!Array.isArray(values) || values.length === 0) return 0;
-  const sorted = [...values].sort((a, b) => a - b);
-  const idx = Math.ceil(0.95 * sorted.length) - 1;
-  return sorted[Math.max(0, idx)];
-}
-
-function asRecord(value) {
-  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
-  return value;
-}
-
 function shouldRequireByProfile(profile) {
   return (
     profile === "ci" || profile === "release" || profile === "retrieval_signoff"
   );
-}
-
-function summaryFromEvents(events) {
-  const durations = [];
-  const bucketMap = new Map();
-
-  for (const event of events) {
-    const status = String(event?.status || "").trim().toLowerCase();
-    const mimeType = String(event?.mimeType || "unknown").trim().toLowerCase();
-    const meta = asRecord(event?.meta);
-    const sizeBucket = String(meta?.sizeBucket || "unknown").trim().toLowerCase() || "unknown";
-    const key = `${mimeType}||${sizeBucket}`;
-    if (!bucketMap.has(key)) {
-      bucketMap.set(key, { count: 0, failures: 0, latencies: [] });
-    }
-    const bucket = bucketMap.get(key);
-    bucket.count += 1;
-    if (status === "fail") bucket.failures += 1;
-    if (typeof event?.durationMs === "number" && event.durationMs > 0) {
-      bucket.latencies.push(event.durationMs);
-      durations.push(event.durationMs);
-    }
-  }
-
-  const byMimeSize = Array.from(bucketMap.entries())
-    .map(([key, bucket]) => {
-      const [mimeType, sizeBucket] = key.split("||");
-      return {
-        mimeType,
-        sizeBucket,
-        count: bucket.count,
-        p95LatencyMs: p95(bucket.latencies),
-        failureRate:
-          bucket.count > 0 ? round2((bucket.failures / bucket.count) * 100) : 0,
-      };
-    })
-    .sort((a, b) => b.count - a.count);
-
-  return {
-    docsProcessed: events.length,
-    p95LatencyMs: p95(durations),
-    byMimeSize,
-  };
-}
-
-function evaluateSummary(summary, thresholds) {
-  const failures = [];
-  const docsProcessed = Number(summary?.docsProcessed || 0);
-  const p95LatencyMs = Number(summary?.p95LatencyMs || 0);
-  const byMimeSize = Array.isArray(summary?.byMimeSize) ? summary.byMimeSize : [];
-  const minDocs = Math.max(0, Number(thresholds.minDocs || 0));
-  const maxP95 = Math.max(1, Number(thresholds.maxP95 || 1));
-  const maxFailureRate = Math.max(0, Number(thresholds.maxFailureRate || 0));
-
-  let weightedFailure = 0;
-  for (const row of byMimeSize) {
-    const count = Number(row?.count || 0);
-    const failureRate = Number(row?.failureRate || 0);
-    weightedFailure += count * (failureRate / 100);
-  }
-  const globalFailureRate =
-    docsProcessed > 0 ? round2((weightedFailure / docsProcessed) * 100) : 0;
-
-  if (docsProcessed < minDocs) {
-    failures.push(`INSUFFICIENT_SAMPLE: ${docsProcessed} < ${minDocs}`);
-  }
-  if (p95LatencyMs > maxP95) {
-    failures.push(`GLOBAL_P95_EXCEEDED: ${p95LatencyMs} > ${maxP95}`);
-  }
-  if (globalFailureRate > maxFailureRate) {
-    failures.push(
-      `GLOBAL_FAILURE_RATE_EXCEEDED: ${globalFailureRate}% > ${maxFailureRate}%`,
-    );
-  }
-
-  return {
-    failures,
-    globalFailureRate,
-  };
 }
 
 async function collectEvents(windowHours) {
@@ -156,25 +68,38 @@ async function main() {
     24,
   );
   const reportRel = arg("--report", "reports/cert/ingestion-slo-summary.json");
+  const fallbackReportRel = arg(
+    "--fallback-report",
+    process.env.INGESTION_SLO_FALLBACK_REPORT ||
+      "src/data_banks/manifest/ingestion_slo_baseline_summary.any.json",
+  );
   const outRel = arg("--out", "reports/cert/ingestion-slo-gate.json");
   const reportPath = path.resolve(rootDir, reportRel);
+  const fallbackReportPath = path.resolve(rootDir, fallbackReportRel);
   const outPath = path.resolve(rootDir, outRel);
 
   const thresholds = {
-    minDocs: toNumber(
+    minDocsProcessed: toNumber(
       arg("--min-docs", process.env.INGESTION_SLO_MIN_DOCS || "100"),
       100,
     ),
-    maxP95: toNumber(
+    maxGlobalP95LatencyMs: toNumber(
       arg("--max-global-p95-ms", process.env.INGESTION_SLO_MAX_GLOBAL_P95_MS || "120000"),
       120000,
     ),
-    maxFailureRate: toNumber(
+    maxGlobalFailureRatePct: toNumber(
       arg(
         "--max-global-failure-rate",
         process.env.INGESTION_SLO_MAX_GLOBAL_FAILURE_RATE || "5",
       ),
       5,
+    ),
+    maxGlobalP95PeakRssMb: toNumber(
+      arg(
+        "--max-global-p95-peak-rss-mb",
+        process.env.INGESTION_SLO_MAX_GLOBAL_P95_PEAK_RSS_MB || "1536",
+      ),
+      1536,
     ),
   };
 
@@ -183,11 +108,12 @@ async function main() {
   let collectionError = null;
   let summary = null;
   let collectedWindow = null;
+  let fallbackUsed = false;
 
   try {
     const collected = await collectEvents(windowHours);
     collectedWindow = { from: collected.from, to: collected.to };
-    summary = summaryFromEvents(collected.events);
+    summary = summarizeIngestionSloEvents(collected.events);
     fs.mkdirSync(path.dirname(reportPath), { recursive: true });
     fs.writeFileSync(
       reportPath,
@@ -214,6 +140,17 @@ async function main() {
       }
     }
     if (!summary) {
+      if (fs.existsSync(fallbackReportPath)) {
+        try {
+          summary = JSON.parse(fs.readFileSync(fallbackReportPath, "utf8"));
+          fallbackUsed = true;
+          warnings.push("COLLECTION_FAILED_USING_FALLBACK_REPORT");
+        } catch {
+          warnings.push("COLLECTION_FAILED_INVALID_FALLBACK_REPORT");
+        }
+      }
+    }
+    if (!summary) {
       warnings.push("COLLECTION_FAILED_NO_REPORT");
     }
   }
@@ -223,9 +160,9 @@ async function main() {
       failures.push("MISSING_INGESTION_SLO_REPORT");
     }
   } else {
-    const evaluation = evaluateSummary(summary, thresholds);
+    const evaluation = evaluateIngestionSloMetrics(summary, thresholds);
     if (
-      Number(summary.docsProcessed || 0) < thresholds.minDocs &&
+      Number(summary.docsProcessed || 0) < thresholds.minDocsProcessed &&
       !required
     ) {
       warnings.push("INSUFFICIENT_SAMPLE_NON_BLOCKING");
@@ -242,12 +179,17 @@ async function main() {
     windowHours,
     collectedWindow,
     reportPath: path.relative(rootDir, reportPath).replace(/\\/g, "/"),
+    fallbackReportPath: path
+      .relative(rootDir, fallbackReportPath)
+      .replace(/\\/g, "/"),
     outPath: path.relative(rootDir, outPath).replace(/\\/g, "/"),
     collectionError,
+    fallbackUsed,
     thresholds,
     metrics: {
       docsProcessed: Number(summary?.docsProcessed || 0),
       p95LatencyMs: Number(summary?.p95LatencyMs || 0),
+      p95PeakRssMb: Number(summary?.p95PeakRssMb || 0),
       byMimeSizeCount: Array.isArray(summary?.byMimeSize)
         ? summary.byMimeSize.length
         : 0,

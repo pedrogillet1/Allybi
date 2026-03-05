@@ -56,6 +56,8 @@ import { DocumentCryptoService } from "./services/documents/documentCrypto.servi
 import { EncryptedDocumentRepo } from "./services/documents/encryptedDocumentRepo.service";
 import { ChunkCryptoService } from "./services/retrieval/chunkCrypto.service";
 import { resolveIndexingPolicySnapshot } from "./services/retrieval/indexingPolicy.service";
+import { recordIndexingPlaintextOverrideActivation } from "./services/ingestion/pipeline/pipelineMetrics.service";
+import { startRevisionLinkReconciler } from "./services/documents/revisionLinkReconciler.service";
 
 const driveStorage = {
   provider: "drive",
@@ -92,8 +94,14 @@ async function startServer() {
     const sharedConversationMemory = container.getConversationMemory();
     const indexingPolicy = resolveIndexingPolicySnapshot();
     console.log(
-      `[Server] Indexing policy mode=${indexingPolicy.runtimeMode} allowed=${indexingPolicy.runtimeModeAllowed} allowedModes=${indexingPolicy.allowedRuntimeModes.join(",")} strictFailClosed=${indexingPolicy.strictFailClosed} encryptedOnly=${indexingPolicy.encryptedChunksOnly}`,
+      `[Server] Indexing policy mode=${indexingPolicy.runtimeMode} allowed=${indexingPolicy.runtimeModeAllowed} allowedModes=${indexingPolicy.allowedRuntimeModes.join(",")} strictFailClosed=${indexingPolicy.strictFailClosed} encryptedOnly=${indexingPolicy.encryptedChunksOnly} allowPlaintextOverride=${indexingPolicy.allowPlaintextChunksOverride} enforceEncryptedOnly=${indexingPolicy.enforceEncryptedOnlyInvariant} enforceChunkMetadata=${indexingPolicy.enforceChunkMetadataInvariant} enforceVersionMetadata=${indexingPolicy.enforceVersionMetadataInvariant}`,
     );
+    if (!indexingPolicy.encryptedChunksOnly && indexingPolicy.allowPlaintextChunksOverride) {
+      recordIndexingPlaintextOverrideActivation();
+      console.warn(
+        "[Server] ALERT: plaintext chunk indexing override is active (INDEXING_ALLOW_PLAINTEXT_CHUNKS=true).",
+      );
+    }
 
     // 2. Connect to database
     try {
@@ -394,6 +402,13 @@ async function startServer() {
         console.log("[Server] Edit worker started");
       } catch {
         console.warn("[Server] Edit worker not available");
+      }
+
+      // 10. Start revision-link reconciler (non-fatal if disabled/misconfigured)
+      try {
+        startRevisionLinkReconciler();
+      } catch {
+        console.warn("[Server] Revision link reconciler not available");
       }
     }
 

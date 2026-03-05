@@ -32,6 +32,8 @@ interface SlideWithImages {
 const PPTX_IMAGE_OCR_LIMIT = 10;
 
 export class PPTXImageExtractorService {
+  // Legacy slide-image utility.
+  // Canonical ingestion extraction lives in services/extraction/pptxExtractor.service.ts.
   /**
    * Extract all images from PPTX and organize by slide
    */

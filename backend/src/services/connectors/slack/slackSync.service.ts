@@ -1,10 +1,10 @@
-import { promises as fs } from "fs";
-import path from "path";
-
 import {
   ConnectorsIngestionService,
   type ConnectorDocument,
 } from "../connectorsIngestion.service";
+import {
+  ConnectorIdentityMapService,
+} from "../connectorIdentityMap.service";
 import { TokenVaultService } from "../tokenVault.service";
 import {
   SlackClientService,
@@ -44,14 +44,6 @@ interface SlackSyncCursor {
   updatedAt: string;
 }
 
-const DEFAULT_CURSOR_ROOT = path.resolve(
-  process.cwd(),
-  "storage",
-  "connectors",
-  "cursors",
-  "slack",
-);
-
 function asTs(value: string | undefined): number {
   if (!value) return 0;
   const parsed = Number(value);
@@ -66,18 +58,18 @@ export class SlackSyncService {
   private readonly tokenVault: TokenVaultService;
   private readonly slackClient: SlackClientService;
   private readonly ingestion: ConnectorsIngestionService;
-  private readonly cursorRoot: string;
+  private readonly identityMap: ConnectorIdentityMapService;
 
   constructor(opts?: {
     tokenVault?: TokenVaultService;
     slackClient?: SlackClientService;
     ingestion?: ConnectorsIngestionService;
-    cursorRoot?: string;
+    identityMap?: ConnectorIdentityMapService;
   }) {
     this.tokenVault = opts?.tokenVault ?? new TokenVaultService();
     this.slackClient = opts?.slackClient ?? new SlackClientService();
     this.ingestion = opts?.ingestion ?? new ConnectorsIngestionService();
-    this.cursorRoot = opts?.cursorRoot ?? DEFAULT_CURSOR_ROOT;
+    this.identityMap = opts?.identityMap ?? new ConnectorIdentityMapService();
   }
 
   async sync(input: SlackSyncInput): Promise<SlackSyncResult> {
@@ -333,19 +325,35 @@ export class SlackSyncService {
     };
   }
 
-  private cursorPath(userId: string): string {
-    return path.join(this.cursorRoot, `${userId}.json`);
-  }
-
   private async readCursor(userId: string): Promise<SlackSyncCursor | null> {
-    await fs.mkdir(this.cursorRoot, { recursive: true });
-
     try {
-      const raw = await fs.readFile(this.cursorPath(userId), "utf8");
-      const parsed = JSON.parse(raw) as SlackSyncCursor;
-      if (!parsed || parsed.userId !== userId || !parsed.lastSyncAt)
-        return null;
-      return parsed;
+      const raw = await this.identityMap.getSyncCursor(userId, "slack");
+      if (!raw) return null;
+      const parsed = JSON.parse(raw) as
+        | SlackSyncCursor
+        | { providers?: { slack?: Partial<SlackSyncCursor> } }
+        | null;
+      if (!parsed || typeof parsed !== "object") return null;
+
+      const direct = parsed as SlackSyncCursor;
+      if (direct.userId === userId && direct.lastSyncAt) return direct;
+
+      const providerCursor = (parsed as any)?.providers?.slack;
+      if (providerCursor?.lastSyncAt) {
+        return {
+          userId,
+          lastSyncAt: String(providerCursor.lastSyncAt),
+          lastMessageTs:
+            typeof providerCursor.lastMessageTs === "string"
+              ? providerCursor.lastMessageTs
+              : undefined,
+          updatedAt:
+            typeof providerCursor.updatedAt === "string"
+              ? providerCursor.updatedAt
+              : String(providerCursor.lastSyncAt),
+        };
+      }
+      return null;
     } catch {
       return null;
     }
@@ -355,15 +363,11 @@ export class SlackSyncService {
     userId: string,
     cursor: SlackSyncCursor,
   ): Promise<void> {
-    await fs.mkdir(this.cursorRoot, { recursive: true });
-    const filePath = this.cursorPath(userId);
-    const tempPath = `${filePath}.tmp`;
-
-    await fs.writeFile(tempPath, JSON.stringify(cursor), {
-      encoding: "utf8",
-      mode: 0o600,
-    });
-    await fs.rename(tempPath, filePath);
+    await this.identityMap.updateSyncCursor(
+      userId,
+      "slack",
+      JSON.stringify(cursor),
+    );
   }
 }
 

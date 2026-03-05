@@ -18,6 +18,7 @@ import { getOptionalBank } from "./bankLoader.service";
 import {
   RuntimeWiringIntegrityService,
   RUNTIME_REQUIRED_BANKS,
+  RUNTIME_REQUIRED_POLICIES,
 } from "./runtimeWiringIntegrity.service";
 import {
   COMPOSE_ANSWER_TEMPLATE_MODES,
@@ -398,6 +399,19 @@ describe("RuntimeWiringIntegrityService – missing banks", () => {
     expect(result.ok).toBe(false);
   });
 
+  test("missingBanks includes nav_intents_en when the bank is absent", () => {
+    const banks = makeCleanBanks();
+    delete (banks as Record<string, unknown>)["nav_intents_en"];
+
+    mockedGetOptionalBank.mockImplementation(
+      (id: string) => (banks[id] ?? null) as ReturnType<typeof getOptionalBank>,
+    );
+
+    const result = buildService().validate();
+    expect(result.missingBanks).toContain("nav_intents_en");
+    expect(result.ok).toBe(false);
+  });
+
   test("missingBanks is empty when all required banks are present", () => {
     wireCleanBanks();
     const result = buildService().validate();
@@ -425,8 +439,79 @@ describe("RuntimeWiringIntegrityService – missing banks", () => {
 });
 
 
+// ==============================================================================
+// 4. Runtime policy requiredByEnv integrity
+// ==============================================================================
+
+describe("RuntimeWiringIntegrityService - runtimePolicyEnvGaps", () => {
+  function wireRegistry(
+    requiredByEnvForPolicy: (
+      policyId: string,
+    ) => { production: boolean; staging: boolean },
+  ): void {
+    const registry = {
+      banks: RUNTIME_REQUIRED_POLICIES.map((id) => ({
+        id,
+        requiredByEnv: requiredByEnvForPolicy(id),
+      })),
+    };
+
+    mockedExistsSync.mockImplementation((p) => {
+      const normalized = String(p || "").replace(/\\/g, "/");
+      if (hasMemoryPolicySuffix(normalized)) return true;
+      return normalized.endsWith(
+        "/backend/src/data_banks/manifest/bank_registry.any.json",
+      );
+    });
+    mockedReadFileSync.mockImplementation((p) => {
+      const normalized = String(p || "").replace(/\\/g, "/");
+      if (hasMemoryPolicySuffix(normalized)) {
+        return CLEAN_MEMORY_POLICY_CONTENT as unknown as Buffer;
+      }
+      if (
+        normalized.endsWith(
+          "/backend/src/data_banks/manifest/bank_registry.any.json",
+        )
+      ) {
+        return JSON.stringify(registry) as unknown as Buffer;
+      }
+      return "" as unknown as Buffer;
+    });
+  }
+
+  test("runtimePolicyEnvGaps is empty when runtime policies are required in production and staging", () => {
+    wireCleanBanks();
+    wireRegistry(() => ({ production: true, staging: true }));
+
+    const result = buildService().validate();
+
+    expect(result.runtimePolicyEnvGaps).toHaveLength(0);
+    expect(result.ok).toBe(true);
+  });
+
+  test("runtimePolicyEnvGaps flags access_control_policy when requiredByEnv is false for production/staging", () => {
+    wireCleanBanks();
+    wireRegistry((policyId) =>
+      policyId === "access_control_policy"
+        ? { production: false, staging: false }
+        : { production: true, staging: true },
+    );
+
+    const result = buildService().validate();
+
+    expect(result.runtimePolicyEnvGaps).toContain(
+      "access_control_policy:requiredByEnv.production!=true",
+    );
+    expect(result.runtimePolicyEnvGaps).toContain(
+      "access_control_policy:requiredByEnv.staging!=true",
+    );
+    expect(result.ok).toBe(false);
+  });
+});
+
+
 // ============================================================================== 
-// 4. Routing bank consumer wiring
+// 5. Routing bank consumer wiring
 // ==============================================================================
 
 describe("RuntimeWiringIntegrityService – routing bank consumer wiring", () => {
@@ -500,6 +585,8 @@ describe("RuntimeWiringIntegrityService – routing bank consumer wiring", () =>
         'const sendPt = this.routingBankProvider("send_intents_pt");',
         'const syncEn = this.routingBankProvider("sync_intents_en");',
         'const syncPt = this.routingBankProvider("sync_intents_pt");',
+        'const navBank = this.getNavIntentsBank(locale);',
+        'const navRaw = `nav_intents_${locale}`;',
       ].join("\n"),
     );
 
@@ -1404,4 +1491,5 @@ describe("RuntimeWiringIntegrityService – ok flag invariant", () => {
     expect(result.ok).toBe(true);
   });
 });
+
 

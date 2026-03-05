@@ -7,8 +7,11 @@ import {
   recordTableDuplication,
   recordOcrUsage,
   recordIndexingActiveOperationConflict,
+  recordIndexingPlaintextOverrideActivation,
   recordIndexingPlaintextSensitiveFieldViolation,
   recordIndexingQualityMetrics,
+  recordXlsxRowsTruncated,
+  recordTableExtractionMethod,
   getIngestionPercentiles,
   getExtractorPercentiles,
   getMetricsSummary,
@@ -177,6 +180,7 @@ describe("pipelineMetrics", () => {
         rate: 0,
       });
       expect(summary.indexPlaintextSensitiveFieldViolations).toBe(0);
+      expect(summary.indexPlaintextOverrideActivations).toBe(0);
       expect(summary.indexingActiveOperationConflicts).toBe(0);
     });
   });
@@ -211,6 +215,41 @@ describe("pipelineMetrics", () => {
     });
   });
 
+  describe("recordXlsxRowsTruncated", () => {
+    it("accumulates XLSX truncation counts", () => {
+      recordXlsxRowsTruncated(2);
+      recordXlsxRowsTruncated(3);
+      const summary = getMetricsSummary();
+      expect(summary.xlsxRowsTruncatedTotal).toBe(5);
+    });
+
+    it("returns 0 when no truncation recorded", () => {
+      const summary = getMetricsSummary();
+      expect(summary.xlsxRowsTruncatedTotal).toBe(0);
+    });
+  });
+
+  describe("recordTableExtractionMethod", () => {
+    it("tracks table extraction method counts", () => {
+      recordTableExtractionMethod("heuristic");
+      recordTableExtractionMethod("heuristic");
+      recordTableExtractionMethod("document_ai");
+      recordTableExtractionMethod("ooxml_native");
+
+      const summary = getMetricsSummary();
+      expect(summary.tableExtractionMethodCounts).toEqual({
+        heuristic: 2,
+        document_ai: 1,
+        ooxml_native: 1,
+      });
+    });
+
+    it("returns empty object when no methods recorded", () => {
+      const summary = getMetricsSummary();
+      expect(summary.tableExtractionMethodCounts).toEqual({});
+    });
+  });
+
   describe("indexing security/concurrency counters", () => {
     it("tracks plaintext sensitive field violations", () => {
       recordIndexingPlaintextSensitiveFieldViolation(3);
@@ -223,6 +262,13 @@ describe("pipelineMetrics", () => {
       recordIndexingActiveOperationConflict(2);
       const summary = getMetricsSummary();
       expect(summary.indexingActiveOperationConflicts).toBe(2);
+    });
+
+    it("tracks plaintext override activations", () => {
+      recordIndexingPlaintextOverrideActivation(2);
+      recordIndexingPlaintextOverrideActivation();
+      const summary = getMetricsSummary();
+      expect(summary.indexPlaintextOverrideActivations).toBe(3);
     });
   });
 });

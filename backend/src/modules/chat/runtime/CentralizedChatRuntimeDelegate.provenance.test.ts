@@ -25,6 +25,7 @@ jest.mock("../../../services/core/retrieval/evidenceGate.service", () => ({
 }));
 
 import { CentralizedChatRuntimeDelegate } from "./CentralizedChatRuntimeDelegate";
+import { CentralizedChatRuntimeDelegate as CentralizedChatRuntimeDelegateV2 } from "./CentralizedChatRuntimeDelegate.v2";
 import type { ChatEngine } from "../domain/chat.contracts";
 import { initializeBanks } from "../../../services/core/banks/bankLoader.service";
 import * as enforcerModule from "../../../services/core/enforcement/responseContractEnforcer.service";
@@ -35,6 +36,7 @@ describe("CentralizedChatRuntimeDelegate provenance enforcement", () => {
     | jest.SpiedFunction<typeof enforcerModule.getResponseContractEnforcer>
     | null = null;
   let restoreGenerateFollowups: jest.SpiedFunction<any> | null = null;
+  let restoreGenerateFollowupsV2: jest.SpiedFunction<any> | null = null;
   let restoreQualityRunner:
     | jest.SpiedFunction<QualityGateRunnerService["runGates"]>
     | null = null;
@@ -80,6 +82,12 @@ describe("CentralizedChatRuntimeDelegate provenance enforcement", () => {
         "generateFollowups",
       )
       .mockResolvedValue([]);
+    restoreGenerateFollowupsV2 = jest
+      .spyOn(
+        CentralizedChatRuntimeDelegateV2.prototype as any,
+        "generateFollowups",
+      )
+      .mockResolvedValue([]);
     restoreQualityRunner = jest
       .spyOn(QualityGateRunnerService.prototype, "runGates")
       .mockResolvedValue({
@@ -94,6 +102,8 @@ describe("CentralizedChatRuntimeDelegate provenance enforcement", () => {
     restoreEnforcer = null;
     restoreGenerateFollowups?.mockRestore();
     restoreGenerateFollowups = null;
+    restoreGenerateFollowupsV2?.mockRestore();
+    restoreGenerateFollowupsV2 = null;
     restoreQualityRunner?.mockRestore();
     restoreQualityRunner = null;
     if (priorFailSoftFlag === undefined) {
@@ -412,6 +422,183 @@ describe("CentralizedChatRuntimeDelegate provenance enforcement", () => {
     );
   });
 
+  test("treats domain_safety_rule_violation gates as blocking", async () => {
+    process.env.CHAT_RUNTIME_FAIL_SOFT_WARNINGS = "true";
+    restoreQualityRunner?.mockResolvedValue({
+      allPassed: false,
+      finalScore: 0,
+      results: [
+        {
+          passed: false,
+          gateName: "domain_safety_rule_violation:legal_safe_005_harmful_guidance",
+          issues: ["blocked for test"],
+        },
+      ],
+    });
+
+    const engine: ChatEngine = {
+      async generate() {
+        return { text: "unused" };
+      },
+      async stream() {
+        return { text: "unused", chunks: [] };
+      },
+    } as ChatEngine;
+
+    const delegate = new CentralizedChatRuntimeDelegate(engine, {
+      conversationMemory: {} as any,
+    });
+
+    const finalized = await (delegate as any).finalizeChatTurn({
+      assistantText: "This text should be replaced by fallback.",
+      req: {
+        userId: "user-domain-safety",
+        message: "summarize this",
+        preferredLanguage: "en",
+      },
+      answerMode: "general_answer",
+      answerClass: "GENERAL",
+      retrievalPack: null,
+      sources: [],
+      telemetry: { model: "unit-test-model" },
+    });
+
+    expect(finalized.failureCode).toBe("quality_gate_blocked");
+    expect(finalized.assistantText).not.toBe(
+      "This text should be replaced by fallback.",
+    );
+  });
+
+  test("forwards DI policy context payloads into quality gate runner context", async () => {
+    let capturedCtx: Record<string, unknown> | null = null;
+    restoreQualityRunner?.mockImplementation(async (_response: string, ctx: any) => {
+      capturedCtx = ctx;
+      return {
+        allPassed: true,
+        finalScore: 1,
+        results: [],
+      };
+    });
+
+    const engine: ChatEngine = {
+      async generate() {
+        return { text: "unused" };
+      },
+      async stream() {
+        return { text: "unused", chunks: [] };
+      },
+    } as ChatEngine;
+
+    const delegate = new CentralizedChatRuntimeDelegate(engine, {
+      conversationMemory: {} as any,
+    });
+
+    await (delegate as any).finalizeChatTurn({
+      assistantText: "Grounded answer text.",
+      req: {
+        userId: "user-di-policy-context",
+        message: "summarize this",
+        preferredLanguage: "en",
+        context: {
+          signals: {
+            diPolicyContext: { contradictions: 2, confidence: 0.4 },
+            diPolicyAttachments: { sourceButtonsCount: 3 },
+          },
+        },
+      },
+      answerMode: "general_answer",
+      answerClass: "GENERAL",
+      retrievalPack: {
+        evidence: [],
+        telemetry: {
+          summary: {
+            diPolicyOutput: { statedTotal: 7, statedParts: [2, 2] },
+            diPolicySource: { statedTotal: 8 },
+            diPolicyConfig: { limits: { maxSourcesButtonsHard: 8 } },
+          },
+        },
+      },
+      sources: [],
+      telemetry: { model: "unit-test-model" },
+    });
+
+    expect(capturedCtx).not.toBeNull();
+    expect((capturedCtx as any).diPolicyContext).toEqual(
+      expect.objectContaining({ contradictions: 2 }),
+    );
+    expect((capturedCtx as any).diPolicyOutput).toEqual(
+      expect.objectContaining({ statedTotal: 7 }),
+    );
+    expect((capturedCtx as any).diPolicySource).toEqual(
+      expect.objectContaining({ statedTotal: 8 }),
+    );
+    expect((capturedCtx as any).diPolicyAttachments).toEqual(
+      expect.objectContaining({ sourceButtonsCount: 3 }),
+    );
+    expect((capturedCtx as any).diPolicyConfig).toEqual(
+      expect.objectContaining({ limits: { maxSourcesButtonsHard: 8 } }),
+    );
+  });
+
+  test("only bypasses evidence clarification when attached docs also have evidence", async () => {
+    const engine: ChatEngine = {
+      async generate() {
+        return { text: "unused" };
+      },
+      async stream() {
+        return { text: "unused", chunks: [] };
+      },
+    } as ChatEngine;
+
+    const delegate = new CentralizedChatRuntimeDelegate(engine, {
+      conversationMemory: {} as any,
+    });
+
+    const clarifyWithoutEvidence = (delegate as any).resolveEvidenceGateBypass(
+      {
+        suggestedAction: "clarify",
+        clarifyQuestion: "Which exact period should I use?",
+      },
+      "en",
+      {
+        attachedDocumentIds: ["doc-1"],
+        evidenceCount: 0,
+      },
+    );
+
+    const clarifyWithEvidence = (delegate as any).resolveEvidenceGateBypass(
+      {
+        suggestedAction: "clarify",
+        clarifyQuestion: "Which exact period should I use?",
+      },
+      "en",
+      {
+        attachedDocumentIds: ["doc-1"],
+        evidenceCount: 2,
+      },
+    );
+
+    const apologizeWithoutEvidence = (delegate as any).resolveEvidenceGateBypass(
+      {
+        suggestedAction: "apologize",
+      },
+      "en",
+      {
+        attachedDocumentIds: ["doc-1"],
+        evidenceCount: 0,
+      },
+    );
+
+    expect(clarifyWithoutEvidence?.failureCode).toBe(
+      "EVIDENCE_NEEDS_CLARIFICATION",
+    );
+    expect(clarifyWithoutEvidence?.text).toContain(
+      "Which exact period should I use?",
+    );
+    expect(clarifyWithEvidence).toBeNull();
+    expect(apologizeWithoutEvidence?.failureCode).toBe("EVIDENCE_INSUFFICIENT");
+  });
+
   test("fails closed on enforcer runtime errors even with fail-soft enabled", async () => {
     process.env.CHAT_RUNTIME_FAIL_SOFT_WARNINGS = "true";
     restoreEnforcer?.mockRestore();
@@ -510,5 +697,219 @@ describe("CentralizedChatRuntimeDelegate provenance enforcement", () => {
     expect(finalized.assistantText).not.toBe(
       "This text should be replaced by fallback.",
     );
+  });
+
+  test("v2 fails closed when quality gates are disabled by flag in production", async () => {
+    process.env.CHAT_RUNTIME_FAIL_SOFT_WARNINGS = "true";
+    process.env.QUALITY_GATES_ENFORCING = "false";
+    process.env.NODE_ENV = "production";
+    restoreQualityRunner?.mockResolvedValue({
+      allPassed: false,
+      finalScore: 0,
+      results: [
+        {
+          passed: false,
+          gateName: "privacy_minimal",
+          issues: ["blocked for test"],
+        },
+      ],
+    });
+
+    const engine: ChatEngine = {
+      async generate() {
+        return { text: "unused" };
+      },
+      async stream() {
+        return { text: "unused", chunks: [] };
+      },
+    } as ChatEngine;
+
+    const delegate = new CentralizedChatRuntimeDelegateV2(engine, {
+      conversationMemory: {} as any,
+    });
+
+    const finalized = await (delegate as any).finalizeChatTurn({
+      assistantText: "This text should be replaced by fallback.",
+      req: {
+        userId: "user-quality-production-v2",
+        message: "summarize this",
+        preferredLanguage: "en",
+      },
+      answerMode: "general_answer",
+      answerClass: "GENERAL",
+      retrievalPack: null,
+      sources: [],
+      telemetry: { model: "unit-test-model" },
+    });
+
+    expect(finalized.failureCode).toBe("quality_gate_blocked");
+    expect(finalized.assistantText).not.toBe(
+      "This text should be replaced by fallback.",
+    );
+  });
+
+  test("v2 forwards DI policy context payloads into quality gate runner context", async () => {
+    let capturedCtx: Record<string, unknown> | null = null;
+    restoreQualityRunner?.mockImplementation(async (_response: string, ctx: any) => {
+      capturedCtx = ctx;
+      return {
+        allPassed: true,
+        finalScore: 1,
+        results: [],
+      };
+    });
+
+    const engine: ChatEngine = {
+      async generate() {
+        return { text: "unused" };
+      },
+      async stream() {
+        return { text: "unused", chunks: [] };
+      },
+    } as ChatEngine;
+
+    const delegate = new CentralizedChatRuntimeDelegateV2(engine, {
+      conversationMemory: {} as any,
+    });
+
+    await (delegate as any).finalizeChatTurn({
+      assistantText: "Grounded answer text.",
+      req: {
+        userId: "user-di-policy-context-v2",
+        message: "summarize this",
+        preferredLanguage: "en",
+        context: {
+          signals: {
+            diPolicyContext: { contradictions: 2, confidence: 0.4 },
+            diPolicyAttachments: { sourceButtonsCount: 3 },
+          },
+        },
+      },
+      answerMode: "general_answer",
+      answerClass: "GENERAL",
+      retrievalPack: {
+        evidence: [],
+        telemetry: {
+          summary: {
+            diPolicyOutput: { statedTotal: 7, statedParts: [2, 2] },
+            diPolicySource: { statedTotal: 8 },
+            diPolicyConfig: { limits: { maxSourcesButtonsHard: 8 } },
+          },
+        },
+      },
+      sources: [],
+      telemetry: { model: "unit-test-model" },
+    });
+
+    expect(capturedCtx).not.toBeNull();
+    expect((capturedCtx as any).diPolicyContext).toEqual(
+      expect.objectContaining({ contradictions: 2 }),
+    );
+    expect((capturedCtx as any).diPolicyOutput).toEqual(
+      expect.objectContaining({ statedTotal: 7 }),
+    );
+    expect((capturedCtx as any).diPolicySource).toEqual(
+      expect.objectContaining({ statedTotal: 8 }),
+    );
+    expect((capturedCtx as any).diPolicyAttachments).toEqual(
+      expect.objectContaining({ sourceButtonsCount: 3 }),
+    );
+    expect((capturedCtx as any).diPolicyConfig).toEqual(
+      expect.objectContaining({ limits: { maxSourcesButtonsHard: 8 } }),
+    );
+  });
+
+  test("v2 treats domain_safety_rule_violation gates as blocking", async () => {
+    process.env.CHAT_RUNTIME_FAIL_SOFT_WARNINGS = "true";
+    restoreQualityRunner?.mockResolvedValue({
+      allPassed: false,
+      finalScore: 0,
+      results: [
+        {
+          passed: false,
+          gateName: "domain_safety_rule_violation:legal_safe_005_harmful_guidance",
+          issues: ["blocked for test"],
+        },
+      ],
+    });
+
+    const engine: ChatEngine = {
+      async generate() {
+        return { text: "unused" };
+      },
+      async stream() {
+        return { text: "unused", chunks: [] };
+      },
+    } as ChatEngine;
+
+    const delegate = new CentralizedChatRuntimeDelegateV2(engine, {
+      conversationMemory: {} as any,
+    });
+
+    const finalized = await (delegate as any).finalizeChatTurn({
+      assistantText: "This text should be replaced by fallback.",
+      req: {
+        userId: "user-domain-safety-v2",
+        message: "summarize this",
+        preferredLanguage: "en",
+      },
+      answerMode: "general_answer",
+      answerClass: "GENERAL",
+      retrievalPack: null,
+      sources: [],
+      telemetry: { model: "unit-test-model" },
+    });
+
+    expect(finalized.failureCode).toBe("quality_gate_blocked");
+    expect(finalized.assistantText).not.toBe(
+      "This text should be replaced by fallback.",
+    );
+  });
+
+  test("v2 only bypasses evidence clarification when attached docs also have evidence", async () => {
+    const engine: ChatEngine = {
+      async generate() {
+        return { text: "unused" };
+      },
+      async stream() {
+        return { text: "unused", chunks: [] };
+      },
+    } as ChatEngine;
+
+    const delegate = new CentralizedChatRuntimeDelegateV2(engine, {
+      conversationMemory: {} as any,
+    });
+
+    const clarifyWithoutEvidence = (delegate as any).resolveEvidenceGateBypass(
+      {
+        suggestedAction: "clarify",
+        clarifyQuestion: "Which exact period should I use?",
+      },
+      "en",
+      {
+        attachedDocumentIds: ["doc-1"],
+        evidenceCount: 0,
+      },
+    );
+
+    const clarifyWithEvidence = (delegate as any).resolveEvidenceGateBypass(
+      {
+        suggestedAction: "clarify",
+        clarifyQuestion: "Which exact period should I use?",
+      },
+      "en",
+      {
+        attachedDocumentIds: ["doc-1"],
+        evidenceCount: 2,
+      },
+    );
+
+    expect(clarifyWithoutEvidence?.failureCode).toBe(
+      "EVIDENCE_NEEDS_CLARIFICATION",
+    );
+    expect(clarifyWithoutEvidence?.text).toContain(
+      "Which exact period should I use?",
+    );
+    expect(clarifyWithEvidence).toBeNull();
   });
 });

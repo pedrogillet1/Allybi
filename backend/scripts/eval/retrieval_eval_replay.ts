@@ -19,6 +19,17 @@ type ReplayDoc = {
   sectionKey: string;
   keywords: string[];
   content: string;
+  tableSpec?: {
+    tableId?: string;
+    sectionKey?: string;
+    header: string[];
+    rows: Array<Array<string | number | null>>;
+    unitRaw?: string;
+    unitNormalized?: string;
+    scaleFactor?: string;
+    periodTokens?: string[];
+    footnotes?: string[];
+  };
 };
 
 type ReplayCase = {
@@ -28,6 +39,8 @@ type ReplayCase = {
   operator: string;
   intent: string;
   expectedDocIds: string[];
+  expectedSectionKeys?: string[];
+  expectedTableIds?: string[];
 };
 
 type ReplayFixture = {
@@ -40,13 +53,18 @@ type ReplayMetrics = {
   compareCases: number;
   nonCompareCases: number;
   top1HitRate: number;
+  top1SectionHitRate: number;
   recallAt5: number;
+  sectionRecallAt5: number;
   recallAt10: number;
   precisionAtK: number;
   contaminationRate: number;
   compareContaminationRate: number;
   nonCompareContaminationRate: number;
   noEvidenceRate: number;
+  tableCases: number;
+  tableTop1HitRate: number;
+  tableRecallAt5: number;
 };
 
 type ReplayMode = "scoped" | "open_world" | "open_world_strict";
@@ -146,6 +164,34 @@ function asCandidate(
   score: number,
   source: "semantic" | "lexical" | "structural",
 ) {
+  const tableId = String(doc.tableSpec?.tableId || "").trim();
+  const table = doc.tableSpec
+    ? {
+        header: Array.isArray(doc.tableSpec.header)
+          ? doc.tableSpec.header
+          : [],
+        rows: Array.isArray(doc.tableSpec.rows) ? doc.tableSpec.rows : [],
+        unitAnnotation:
+          doc.tableSpec.unitRaw || doc.tableSpec.unitNormalized
+            ? {
+                unitRaw: String(
+                  doc.tableSpec.unitRaw || doc.tableSpec.unitNormalized || "",
+                ).trim(),
+                unitNormalized: String(
+                  doc.tableSpec.unitNormalized || doc.tableSpec.unitRaw || "",
+                ).trim(),
+              }
+            : null,
+        scaleFactor: String(doc.tableSpec.scaleFactor || "").trim() || null,
+        periodTokens: Array.isArray(doc.tableSpec.periodTokens)
+          ? doc.tableSpec.periodTokens
+          : null,
+        footnotes: Array.isArray(doc.tableSpec.footnotes)
+          ? doc.tableSpec.footnotes
+          : null,
+        warnings: tableId ? [`table_id:${tableId}`] : undefined,
+      }
+    : undefined;
   return {
     docId: doc.docId,
     location: {
@@ -154,6 +200,7 @@ function asCandidate(
     },
     snippet: `${query} :: ${doc.content}`,
     score,
+    table,
     locationKey: `d:${doc.docId}|p:1|sec:${doc.sectionKey}|c:${source}`,
     chunkId: `${doc.docId}-${source}`,
   };
@@ -198,6 +245,55 @@ function round(value: number, digits = 4): number {
   return Math.round(value * f) / f;
 }
 
+function normalizeValueList(values: string[] | undefined): string[] {
+  if (!Array.isArray(values)) return [];
+  return values
+    .map((value) => String(value || "").trim().toLowerCase())
+    .filter(Boolean);
+}
+
+function resolveExpectedSectionKeys(
+  evalCase: ReplayCase,
+  docsById: Map<string, ReplayDoc>,
+): string[] {
+  const explicit = normalizeValueList(evalCase.expectedSectionKeys);
+  if (explicit.length > 0) return explicit;
+  const inferred = evalCase.expectedDocIds
+    .map((docId) => docsById.get(docId))
+    .filter(Boolean)
+    .map((doc) => String(doc?.sectionKey || "").trim().toLowerCase())
+    .filter(Boolean);
+  return Array.from(new Set(inferred));
+}
+
+function resolveExpectedTableIds(
+  evalCase: ReplayCase,
+  docsById: Map<string, ReplayDoc>,
+): string[] {
+  const explicit = normalizeValueList(evalCase.expectedTableIds);
+  if (explicit.length > 0) return explicit;
+  return [];
+}
+
+function resolveEvidenceTableId(item: any): string | null {
+  if (!item || item.evidenceType !== "table" || !item.table) return null;
+  const warnings = Array.isArray(item.table?.warnings) ? item.table.warnings : [];
+  for (const warning of warnings) {
+    const raw = String(warning || "").trim();
+    if (!raw.toLowerCase().startsWith("table_id:")) continue;
+    const id = raw.slice("table_id:".length).trim().toLowerCase();
+    if (id) return id;
+  }
+  const section = String(
+    item.location?.sectionKey || item.location?.section || "__none__",
+  )
+    .trim()
+    .toLowerCase();
+  const docId = String(item.docId || "").trim().toLowerCase();
+  if (!docId) return null;
+  return `${docId}::${section || "__none__"}::table1`;
+}
+
 export async function runRetrievalReplayEval(opts?: {
   fixturePath?: string;
   k?: number;
@@ -210,13 +306,17 @@ export async function runRetrievalReplayEval(opts?: {
   metrics: ReplayMetrics;
   thresholds: {
     minTop1HitRate: number;
+    minTop1SectionHitRate: number;
     minRecallAt5: number;
+    minSectionRecallAt5: number;
     minRecallAt10: number;
     minPrecisionAtK: number;
     maxContaminationRate: number;
     maxCompareContaminationRate: number;
     maxNonCompareContaminationRate: number;
     maxNoEvidenceRate: number;
+    minTableTop1HitRate: number;
+    minTableRecallAt5: number;
   };
   passed: boolean;
   failures: string[];
@@ -226,6 +326,14 @@ export async function runRetrievalReplayEval(opts?: {
     topDocId: string | null;
     topDocHit: boolean;
     expectedDocIds: string[];
+    topSectionKey: string | null;
+    topSectionHit: boolean;
+    expectedSectionKeys: string[];
+    topKSectionKeys: string[];
+    topTableId: string | null;
+    topTableHit: boolean;
+    expectedTableIds: string[];
+    topKTableIds: string[];
     topKDocIds: string[];
     top5DocIds: string[];
     top10DocIds: string[];
@@ -378,6 +486,14 @@ export async function runRetrievalReplayEval(opts?: {
     topDocId: string | null;
     topDocHit: boolean;
     expectedDocIds: string[];
+    topSectionKey: string | null;
+    topSectionHit: boolean;
+    expectedSectionKeys: string[];
+    topKSectionKeys: string[];
+    topTableId: string | null;
+    topTableHit: boolean;
+    expectedTableIds: string[];
+    topKTableIds: string[];
     topKDocIds: string[];
     top5DocIds: string[];
     top10DocIds: string[];
@@ -387,7 +503,9 @@ export async function runRetrievalReplayEval(opts?: {
   }> = [];
 
   let top1Hits = 0;
+  let top1SectionHits = 0;
   let recallAt5Hits = 0;
+  let sectionRecallAt5Hits = 0;
   let recallAt10Hits = 0;
   let compareCases = 0;
   let nonCompareCases = 0;
@@ -397,12 +515,18 @@ export async function runRetrievalReplayEval(opts?: {
   let totalTopK = 0;
   let contaminationCount = 0;
   let noEvidence = 0;
+  let sectionCases = 0;
+  let tableCases = 0;
+  let tableTop1Hits = 0;
+  let tableRecallAt5Hits = 0;
 
   for (const evalCase of fixture.cases) {
     const expectedSet = new Set(evalCase.expectedDocIds);
-    const distractor = fixture.docs.find(
-      (doc) => doc.domain === evalCase.domain && !expectedSet.has(doc.docId),
-    );
+    const distractor = evalCase.operator === "compare"
+      ? null
+      : fixture.docs.find(
+          (doc) => doc.domain === evalCase.domain && !expectedSet.has(doc.docId),
+        );
     const scopedDocIds = distractor
       ? [...evalCase.expectedDocIds, distractor.docId]
       : [...evalCase.expectedDocIds];
@@ -422,6 +546,70 @@ export async function runRetrievalReplayEval(opts?: {
     const top5 = pack.evidence.slice(0, 5).map((item) => item.docId);
     const top10 = pack.evidence.slice(0, 10).map((item) => item.docId);
     const expected = new Set(evalCase.expectedDocIds);
+    const expectedSectionKeys = resolveExpectedSectionKeys(evalCase, docsById);
+    const expectedSectionSet = new Set(expectedSectionKeys);
+    const topKSectionKeys = Array.from(
+      new Set(
+        pack.evidence
+          .slice(0, effectiveTopK)
+          .map((item) =>
+            String(item.location?.sectionKey || item.location?.section || "")
+              .trim()
+              .toLowerCase(),
+          )
+          .filter(Boolean),
+      ),
+    );
+    const top5SectionKeys = Array.from(
+      new Set(
+        pack.evidence
+          .slice(0, 5)
+          .map((item) =>
+            String(item.location?.sectionKey || item.location?.section || "")
+              .trim()
+              .toLowerCase(),
+          )
+          .filter(Boolean),
+      ),
+    );
+    const topSectionKey = topKSectionKeys[0] || null;
+    const topSectionHit = Boolean(
+      topSectionKey && expectedSectionSet.has(topSectionKey),
+    );
+    if (expectedSectionKeys.length > 0) {
+      sectionCases += 1;
+      if (topSectionHit) top1SectionHits += 1;
+      if (top5SectionKeys.some((sectionKey) => expectedSectionSet.has(sectionKey))) {
+        sectionRecallAt5Hits += 1;
+      }
+    }
+    const expectedTableIds = resolveExpectedTableIds(evalCase, docsById);
+    const expectedTableSet = new Set(expectedTableIds);
+    const topKTableIds = Array.from(
+      new Set(
+        pack.evidence
+          .slice(0, effectiveTopK)
+          .map((item) => resolveEvidenceTableId(item))
+          .filter((value): value is string => Boolean(value)),
+      ),
+    );
+    const top5TableIds = Array.from(
+      new Set(
+        pack.evidence
+          .slice(0, 5)
+          .map((item) => resolveEvidenceTableId(item))
+          .filter((value): value is string => Boolean(value)),
+      ),
+    );
+    const topTableId = topKTableIds[0] || null;
+    const topTableHit = Boolean(topTableId && expectedTableSet.has(topTableId));
+    if (expectedTableIds.length > 0) {
+      tableCases += 1;
+      if (topTableHit) tableTop1Hits += 1;
+      if (top5TableIds.some((tableId) => expectedTableSet.has(tableId))) {
+        tableRecallAt5Hits += 1;
+      }
+    }
     const topDocId = top1[0] || null;
     const topDocHit = Boolean(topDocId && expected.has(topDocId));
     if (topDocHit) top1Hits += 1;
@@ -447,6 +635,14 @@ export async function runRetrievalReplayEval(opts?: {
       topDocId,
       topDocHit,
       expectedDocIds: evalCase.expectedDocIds,
+      topSectionKey,
+      topSectionHit,
+      expectedSectionKeys,
+      topKSectionKeys,
+      topTableId,
+      topTableHit,
+      expectedTableIds,
+      topKTableIds,
       topKDocIds: topK,
       top5DocIds: top5,
       top10DocIds: top10,
@@ -461,7 +657,9 @@ export async function runRetrievalReplayEval(opts?: {
     compareCases,
     nonCompareCases,
     top1HitRate: round(top1Hits / Math.max(1, fixture.cases.length)),
+    top1SectionHitRate: round(top1SectionHits / Math.max(1, sectionCases)),
     recallAt5: round(recallAt5Hits / Math.max(1, fixture.cases.length)),
+    sectionRecallAt5: round(sectionRecallAt5Hits / Math.max(1, sectionCases)),
     recallAt10: round(recallAt10Hits / Math.max(1, fixture.cases.length)),
     precisionAtK: round(relevantTopK / Math.max(1, totalTopK)),
     contaminationRate: round(contaminationCount / Math.max(1, fixture.cases.length)),
@@ -472,25 +670,38 @@ export async function runRetrievalReplayEval(opts?: {
       nonCompareContaminationCases / Math.max(1, nonCompareCases),
     ),
     noEvidenceRate: round(noEvidence / Math.max(1, fixture.cases.length)),
+    tableCases,
+    tableTop1HitRate: round(tableTop1Hits / Math.max(1, tableCases)),
+    tableRecallAt5: round(tableRecallAt5Hits / Math.max(1, tableCases)),
   };
 
   const thresholds = {
     minTop1HitRate: 0.95,
+    minTop1SectionHitRate: 0.95,
     minRecallAt5: 0.95,
+    minSectionRecallAt5: 0.95,
     minRecallAt10: 0.95,
     minPrecisionAtK: 0.85,
     maxContaminationRate: 0.05,
     maxCompareContaminationRate: 0,
     maxNonCompareContaminationRate: 0,
     maxNoEvidenceRate: 0.05,
+    minTableTop1HitRate: 0.9,
+    minTableRecallAt5: 0.9,
   };
 
   const failures: string[] = [];
   if (metrics.top1HitRate < thresholds.minTop1HitRate) {
     failures.push("TOP1_HIT_RATE_BELOW_THRESHOLD");
   }
+  if (sectionCases > 0 && metrics.top1SectionHitRate < thresholds.minTop1SectionHitRate) {
+    failures.push("TOP1_SECTION_HIT_RATE_BELOW_THRESHOLD");
+  }
   if (metrics.recallAt5 < thresholds.minRecallAt5) {
     failures.push("RECALL_AT_5_BELOW_THRESHOLD");
+  }
+  if (sectionCases > 0 && metrics.sectionRecallAt5 < thresholds.minSectionRecallAt5) {
+    failures.push("SECTION_RECALL_AT_5_BELOW_THRESHOLD");
   }
   if (metrics.recallAt10 < thresholds.minRecallAt10) {
     failures.push("RECALL_AT_10_BELOW_THRESHOLD");
@@ -512,6 +723,12 @@ export async function runRetrievalReplayEval(opts?: {
   }
   if (metrics.noEvidenceRate > thresholds.maxNoEvidenceRate) {
     failures.push("NO_EVIDENCE_RATE_ABOVE_THRESHOLD");
+  }
+  if (tableCases > 0 && metrics.tableTop1HitRate < thresholds.minTableTop1HitRate) {
+    failures.push("TABLE_TOP1_HIT_RATE_BELOW_THRESHOLD");
+  }
+  if (tableCases > 0 && metrics.tableRecallAt5 < thresholds.minTableRecallAt5) {
+    failures.push("TABLE_RECALL_AT_5_BELOW_THRESHOLD");
   }
 
   return {

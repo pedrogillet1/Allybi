@@ -37,6 +37,12 @@ const globalDepsPath = path.join(dataBanksRoot, "manifest", "bank_dependencies.a
 const diDepsPath = path.join(diRoot, "manifest", "dependency_graph.any.json");
 const usageManifestPath = path.join(diRoot, "manifest", "usage_manifest.any.json");
 const orphanAllowlistPath = path.join(diRoot, "manifest", "orphan_allowlist.any.json");
+const legacyDocTypeAliasesPath = path.join(
+  diRoot,
+  "eval",
+  "suites",
+  "legacy_doc_type_aliases.any.json",
+);
 const diBanksServicePath = path.join(
   repoRoot,
   "src",
@@ -86,7 +92,20 @@ let errors = 0;
 
 const NON_REGISTRY_DI_REL_PATHS = new Set([
   "document_intelligence/__implementation_report.any.json",
+  "document_intelligence/eval/suites/legacy_doc_type_aliases.any.json",
 ]);
+
+function isLegacyLegalDocTypeAliasPath(relPath) {
+  return /^document_intelligence\/domains\/legal\/doc_types\/(extraction|sections|tables)\/(?!legal_)[^/]+\.(extraction_hints|sections|tables)\.any\.json$/.test(
+    relPath,
+  );
+}
+
+function shouldRequireRegistryEntry(relPath) {
+  if (NON_REGISTRY_DI_REL_PATHS.has(relPath)) return false;
+  if (isLegacyLegalDocTypeAliasPath(relPath)) return false;
+  return true;
+}
 
 function pass(msg) {
   passed++;
@@ -194,7 +213,7 @@ for (const b of registry.banks || []) {
 
 // Only non-entity-schema DI banks need registry entries.
 const diBanksForRegistry = parsedBanks.filter(
-  (b) => !b.isEntitySchema && !NON_REGISTRY_DI_REL_PATHS.has(b.relPath),
+  (b) => !b.isEntitySchema && shouldRequireRegistryEntry(b.relPath),
 );
 
 const missingInRegistry = [];
@@ -398,7 +417,7 @@ if (depErrors.length) {
 const allDiBankIds = new Set();
 for (const { data, isEntitySchema, relPath } of parsedBanks) {
   if (isEntitySchema) continue;
-  if (NON_REGISTRY_DI_REL_PATHS.has(relPath)) continue;
+  if (!shouldRequireRegistryEntry(relPath)) continue;
   const id = data?._meta?.id;
   if (id) allDiBankIds.add(String(id));
 }
@@ -738,6 +757,118 @@ if (domainConsistencyErrors.length) {
   for (const issue of domainConsistencyErrors) console.log(`    - ${issue}`);
 } else {
   pass("Domain taxonomy consistency OK across ontology, map, runtime constants, and references");
+}
+
+// 8. DOC TYPE SSOT CONSISTENCY (taxonomy clusters vs domain catalogs)
+const docTypeSsotErrors = [];
+
+try {
+  const taxonomy = readJson(
+    path.join(dataBanksRoot, "semantics", "taxonomy", "doc_taxonomy.any.json"),
+  );
+  const clusters =
+    taxonomy?.clusters && typeof taxonomy.clusters === "object"
+      ? taxonomy.clusters
+      : {};
+
+  const legacyAliases = fs.existsSync(legacyDocTypeAliasesPath)
+    ? readJson(legacyDocTypeAliasesPath)
+    : {};
+
+  const domainDirs = fs.existsSync(domainsDir)
+    ? fs.readdirSync(domainsDir, { withFileTypes: true })
+        .filter((d) => d.isDirectory())
+        .map((d) => d.name)
+    : [];
+
+  const taxonomyDomains = Object.keys(clusters).map((d) => String(d || "").trim());
+  const allDomains = [...new Set([...domainDirs, ...taxonomyDomains])]
+    .map((d) => String(d || "").trim())
+    .filter(Boolean)
+    .sort();
+
+  for (const domain of allDomains) {
+    const canonicalSet = new Set(
+      Array.isArray(clusters[domain])
+        ? clusters[domain].map((v) => String(v || "").trim()).filter(Boolean)
+        : [],
+    );
+    if (!canonicalSet.size) {
+      docTypeSsotErrors.push(`doc_taxonomy.clusters missing or empty for domain: ${domain}`);
+      continue;
+    }
+
+    const catalogPath = path.join(
+      domainsDir,
+      domain,
+      "doc_types",
+      "doc_type_catalog.any.json",
+    );
+    if (!fs.existsSync(catalogPath)) {
+      docTypeSsotErrors.push(`missing doc_type_catalog.any.json for domain: ${domain}`);
+      continue;
+    }
+
+    const catalog = readJson(catalogPath);
+    const catalogIds = new Set(
+      (Array.isArray(catalog?.docTypes) ? catalog.docTypes : [])
+        .map((row) => String(row?.id || "").trim())
+        .filter(Boolean),
+    );
+
+    const aliasMapRaw =
+      legacyAliases && typeof legacyAliases[domain] === "object"
+        ? legacyAliases[domain]
+        : {};
+    const aliasMap = Object.fromEntries(
+      Object.entries(aliasMapRaw || {}).map(([k, v]) => [
+        String(k || "").trim(),
+        String(v || "").trim(),
+      ]),
+    );
+
+    const aliasKeys = new Set(Object.keys(aliasMap).filter(Boolean));
+    const aliasTargets = new Set(Object.values(aliasMap).filter(Boolean));
+
+    const invalidAliasTargets = [...aliasTargets]
+      .filter((target) => !canonicalSet.has(target))
+      .sort();
+    if (invalidAliasTargets.length) {
+      docTypeSsotErrors.push(
+        `legacy aliases for ${domain} map to unknown canonical IDs: ${invalidAliasTargets.join(", ")}`,
+      );
+    }
+
+    const undeclaredCatalogIds = [...catalogIds]
+      .filter((id) => !canonicalSet.has(id) && !aliasKeys.has(id))
+      .sort();
+    if (undeclaredCatalogIds.length) {
+      docTypeSsotErrors.push(
+        `${domain} catalog has IDs not declared in taxonomy or legacy aliases: ${undeclaredCatalogIds.join(", ")}`,
+      );
+    }
+
+    const missingCanonicalIds = [...canonicalSet]
+      .filter((id) => !catalogIds.has(id) && !aliasTargets.has(id))
+      .sort();
+    if (missingCanonicalIds.length) {
+      docTypeSsotErrors.push(
+        `${domain} catalog missing canonical taxonomy IDs: ${missingCanonicalIds.join(", ")}`,
+      );
+    }
+
+  }
+} catch (err) {
+  docTypeSsotErrors.push(
+    `Failed to evaluate doc type SSOT consistency: ${err?.message || err}`,
+  );
+}
+
+if (docTypeSsotErrors.length) {
+  fail(`Doc type SSOT consistency issues (${docTypeSsotErrors.length}):`);
+  for (const issue of docTypeSsotErrors) console.log(`    - ${issue}`);
+} else {
+  pass("Doc type SSOT consistency OK across taxonomy clusters, domain catalogs, and legacy aliases");
 }
 
 // ══════════════════════════════════════════════════════════════════════════════

@@ -123,8 +123,10 @@ function maybeComputeCompositionRubricScore(
   if (gateId !== "composition-formatting-regressions") return undefined;
   const structure = (
     (metric01(metrics, "openerVariation") +
-      metric01(metrics, "noForcedAnalyticalForSimple")) /
-    2
+      metric01(metrics, "noForcedAnalyticalForSimple") +
+      metric01(metrics, "paragraphSplitMax2Sentences") +
+      metric01(metrics, "jsonDenialMapping")) /
+    4
   ) * 20;
   const citations = (
     (metric01(metrics, "citationAlignment") +
@@ -133,17 +135,37 @@ function maybeComputeCompositionRubricScore(
   ) * 20;
   const tableSafety = (
     (metric01(metrics, "tableNoDashCorruption") +
-      metric01(metrics, "tablePreservation")) /
-    2
+      metric01(metrics, "tablePreservation") +
+      metric01(metrics, "wideTableGracefulDegradation") +
+      metric01(metrics, "tableCellCharLimit")) /
+    4
   ) * 15;
-  const naturalVoice = metric01(metrics, "openerVariation") * 10;
-  const followups = metric01(metrics, "followupNonLooping") * 10;
-  const brevity = metric01(metrics, "brevityControl") * 10;
-  const multilingual = (
-    (metric01(metrics, "toneParityEnPt") + metric01(metrics, "toneParityEs")) /
+  const naturalVoice = (
+    (metric01(metrics, "openerVariation") +
+      metric01(metrics, "openerVarietyAtScale")) /
     2
   ) * 10;
-  const notFound = metric01(metrics, "notFoundPrecision") * 5;
+  const followups = (
+    (metric01(metrics, "followupNonLooping") +
+      metric01(metrics, "followupLocaleMatchQuery")) /
+    2
+  ) * 10;
+  const brevity = (
+    (metric01(metrics, "brevityControl") +
+      metric01(metrics, "microProfileBudgetEnforcement")) /
+    2
+  ) * 10;
+  const multilingual = (
+    (metric01(metrics, "toneParityEnPt") +
+      metric01(metrics, "toneParityEs") +
+      metric01(metrics, "closerEsLocale")) /
+    3
+  ) * 10;
+  const notFound = (
+    (metric01(metrics, "notFoundPrecision") +
+      metric01(metrics, "noDocsBannedPhraseEnforcement")) /
+    2
+  ) * 5;
   const rubric = {
     structure,
     citations,

@@ -21,6 +21,16 @@ function toNumber(value, fallback) {
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
+function normalizeQualityFailPolicy(value) {
+  const normalized = String(value || "")
+    .trim()
+    .toLowerCase();
+  if (normalized === "blocking" || normalized === "advisory") {
+    return normalized;
+  }
+  return null;
+}
+
 function percentile(values, p) {
   if (!Array.isArray(values) || values.length === 0) return null;
   const sorted = [...values].sort((a, b) => a - b);
@@ -120,6 +130,18 @@ function main() {
   const requiredByProfile =
     profile === "ci" || profile === "release" || profile === "retrieval_signoff";
   const requireInput = forceRequired || (strict && requiredByProfile);
+  const defaultQualityFailPolicy =
+    profile === "release" || profile === "retrieval_signoff"
+      ? "blocking"
+      : "advisory";
+  const qualityFailPolicyRaw = String(
+    arg(
+      "--quality-fail-policy",
+      process.env.QUERY_QUALITY_FAIL_POLICY || defaultQualityFailPolicy,
+    ) || "",
+  );
+  const qualityFailPolicy =
+    normalizeQualityFailPolicy(qualityFailPolicyRaw) || defaultQualityFailPolicy;
 
   const rootDir = path.resolve(process.cwd());
   const reportPath = resolvePerQueryReportPath(rootDir, arg("--report"));
@@ -200,6 +222,18 @@ function main() {
     arg("--max-p99-regression-pct"),
     toNumber(thresholds.maxP99RegressionPct, 0.1),
   );
+  const maxQualityFailRate = toNumber(
+    arg("--max-quality-fail-rate", process.env.QUERY_MAX_QUALITY_FAIL_RATE),
+    toNumber(thresholds.maxQualityFailRate, 0.25),
+  );
+
+  if (!normalizeQualityFailPolicy(qualityFailPolicyRaw)) {
+    warnings.push(
+      `INVALID_QUALITY_FAIL_POLICY_FALLBACK:${String(
+        qualityFailPolicyRaw || "<empty>",
+      )}`,
+    );
+  }
 
   if (rows.length > 0) {
     if (total < minTotalQueries) failures.push("TOTAL_QUERIES_BELOW_MINIMUM");
@@ -220,6 +254,14 @@ function main() {
       const regression = (p99Ms - baselineP99) / baselineP99;
       if (regression > maxP99RegressionPct) failures.push("P99_REGRESSION_EXCEEDED");
     }
+
+    if (qualityFailRate > maxQualityFailRate) {
+      if (qualityFailPolicy === "blocking") {
+        failures.push("QUALITY_FAIL_RATE_EXCEEDED");
+      } else {
+        warnings.push("QUALITY_FAIL_RATE_EXCEEDED_ADVISORY");
+      }
+    }
   }
 
   const summary = {
@@ -230,6 +272,7 @@ function main() {
     requireInput,
     reportPath,
     baselinePath: baselineResolved?.baselinePath || null,
+    qualityFailPolicy,
     thresholds: {
       minTotalQueries,
       maxP95Ms,
@@ -238,6 +281,7 @@ function main() {
       maxTimeoutRate,
       maxP95RegressionPct,
       maxP99RegressionPct,
+      maxQualityFailRate,
     },
     metrics: {
       totalQueries: total,

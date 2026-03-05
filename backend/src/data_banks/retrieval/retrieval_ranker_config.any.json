@@ -61,11 +61,11 @@
       }
     },
     "weights": {
-      "semantic": 0.46,
-      "lexical": 0.2,
-      "structural": 0.12,
+      "semantic": 0.42,
+      "lexical": 0.16,
+      "structural": 0.16,
       "titleBoost": 0.06,
-      "documentIntelligenceBoost": 0.08,
+      "documentIntelligenceBoost": 0.12,
       "routingPriorityBoost": 0.04,
       "typeBoost": 0.02,
       "recencyBoost": 0.02
@@ -116,6 +116,12 @@
         "id": "prefer_title_match",
         "type": "score_component",
         "component": "titleBoost",
+        "direction": "desc"
+      },
+      {
+        "id": "prefer_validated_table",
+        "type": "signal",
+        "signal": "tableValidated",
         "direction": "desc"
       },
       {
@@ -299,6 +305,7 @@
         "tieBreakers": [
           "prefer_scoped",
           "prefer_title_match",
+          "prefer_validated_table",
           "prefer_higher_semantic",
           "prefer_structural_anchor"
         ],

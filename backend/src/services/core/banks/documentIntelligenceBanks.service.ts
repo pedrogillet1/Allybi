@@ -166,6 +166,11 @@ const DOMAIN_ALIASES: Record<string, DocumentIntelligenceDomain> = {
   procurement: "ops",
 };
 
+const LEGAL_DOC_TYPE_LOOKUP_ALIASES: Record<string, string[]> = {
+  lease: ["legal_lease_agreement"],
+  terms: ["legal_terms_of_service"],
+};
+
 function isDocumentIntelligenceDomain(
   value: unknown,
 ): value is DocumentIntelligenceDomain {
@@ -223,6 +228,7 @@ function domainBankPrefix(domain: DocumentIntelligenceDomain): string {
 
 export class DocumentIntelligenceBanksService {
   private readonly cache = new Map<string, unknown | typeof MISSING>();
+  private versionedBankIndex: Map<string, string[]> | null = null;
 
   constructor(
     private readonly bankLoader: BankLoaderLike = getBankLoaderInstance(),
@@ -230,6 +236,7 @@ export class DocumentIntelligenceBanksService {
 
   invalidateCache(): void {
     this.cache.clear();
+    this.versionedBankIndex = null;
   }
 
   private getCachedRequired<T = unknown>(bankId: string): T {
@@ -311,30 +318,119 @@ export class DocumentIntelligenceBanksService {
     ]);
   }
 
+  private getVersionedBankIndex(): Map<string, string[]> {
+    if (this.versionedBankIndex) {
+      return this.versionedBankIndex;
+    }
+
+    const index = new Map<string, string[]>();
+    let loadedIds: string[] = [];
+    try {
+      loadedIds = this.bankLoader.listLoaded();
+    } catch {
+      loadedIds = [];
+    }
+
+    for (const id of loadedIds) {
+      const normalized = String(id || "").trim();
+      if (!normalized) continue;
+      const match = normalized.match(/^(.*)_v[0-9a-z]+$/i);
+      if (!match) continue;
+      const baseId = String(match[1] || "").trim();
+      if (!baseId) continue;
+      const bucket = index.get(baseId) ?? [];
+      bucket.push(normalized);
+      index.set(baseId, bucket);
+    }
+
+    for (const [baseId, variants] of index.entries()) {
+      index.set(baseId, uniqueSorted(variants));
+    }
+
+    this.versionedBankIndex = index;
+    return index;
+  }
+
+  private expandVersionedCandidates(bankIds: string[]): string[] {
+    const index = this.getVersionedBankIndex();
+    const expanded: string[] = [];
+    const seen = new Set<string>();
+    for (const rawId of bankIds) {
+      const bankId = String(rawId || "").trim();
+      if (!bankId || seen.has(bankId)) continue;
+      expanded.push(bankId);
+      seen.add(bankId);
+      const variants = uniqueSorted(index.get(bankId) ?? []);
+      for (const variant of variants) {
+        if (!variant || seen.has(variant)) continue;
+        expanded.push(variant);
+        seen.add(variant);
+      }
+    }
+    return expanded;
+  }
+
+  private resolveDocTypeLookupKeys(
+    domain: DocumentIntelligenceDomain,
+    docType: string,
+  ): string[] {
+    const normalizedDocType = String(docType || "")
+      .trim()
+      .toLowerCase();
+    if (!normalizedDocType) return [];
+    if (domain !== "legal") return [normalizedDocType];
+
+    const keys = normalizedDocType.startsWith("legal_")
+      ? [normalizedDocType.slice("legal_".length), normalizedDocType]
+      : [normalizedDocType, `legal_${normalizedDocType}`];
+    const aliasSource = normalizedDocType.startsWith("legal_")
+      ? normalizedDocType.slice("legal_".length)
+      : normalizedDocType;
+    const aliasTargets = LEGAL_DOC_TYPE_LOOKUP_ALIASES[aliasSource] ?? [];
+    for (const target of aliasTargets) {
+      keys.push(target);
+      if (target.startsWith("legal_")) {
+        keys.push(target.slice("legal_".length));
+      }
+    }
+    const deduped: string[] = [];
+    for (const key of keys) {
+      const candidate = String(key || "").trim();
+      if (!candidate || deduped.includes(candidate)) continue;
+      deduped.push(candidate);
+    }
+    return deduped;
+  }
+
   private getDomainDocTypeBankIds(
     domain: DocumentIntelligenceDomain,
     docType: string,
     suffix: "sections" | "extraction_hints" | "tables",
   ): string[] {
-    const normalizedDocType = this.resolveDocTypeLookupKey(
-      this.normalizeDomainOrThrow(domain, "doc-type lookup"),
-      docType,
-    );
-    if (!normalizedDocType) return [];
-
     const normalizedDomain = this.normalizeDomainOrThrow(
       domain,
       "doc type family lookup",
     );
+    const lookupKeys = this.resolveDocTypeLookupKeys(normalizedDomain, docType);
+    if (!lookupKeys.length) return [];
+
     const prefix = domainBankPrefix(normalizedDomain);
-    const candidates = uniqueSorted([
-      `${prefix}_${normalizedDocType}_${suffix}`,
-      `${prefix}_${suffix}_${normalizedDocType}`,
-    ]);
-    if (suffix === "extraction_hints") {
-      candidates.push(`${prefix}_extraction_${normalizedDocType}`);
+    const candidates: string[] = [];
+    for (const lookupKey of lookupKeys) {
+      candidates.push(`${prefix}_${lookupKey}_${suffix}`);
+      candidates.push(`${prefix}_${suffix}_${lookupKey}`);
+      if (normalizedDomain === "legal") {
+        candidates.push(`${lookupKey}_${suffix}`);
+        candidates.push(`${suffix}_${lookupKey}`);
+      }
+      if (suffix === "extraction_hints") {
+        candidates.push(`${prefix}_extraction_${lookupKey}`);
+        if (normalizedDomain === "legal") {
+          candidates.push(`extraction_${lookupKey}`);
+        }
+      }
     }
-    return uniqueSorted(candidates);
+    return this.expandVersionedCandidates(candidates);
   }
 
   getDocumentIntelligenceMap(): Record<string, any> | null {
@@ -720,10 +816,9 @@ export class DocumentIntelligenceBanksService {
       domain,
       "getDocTypeSections",
     );
-    const lookupDocType = this.resolveDocTypeLookupKey(normalized, docType);
-    if (!lookupDocType) return null;
+    if (!this.resolveDocTypeLookupKeys(normalized, docType).length) return null;
     return this.getFirstAvailableBank<Record<string, any>>(
-      this.getDomainDocTypeBankIds(normalized, lookupDocType, "sections"),
+      this.getDomainDocTypeBankIds(normalized, docType, "sections"),
     );
   }
 
@@ -735,10 +830,9 @@ export class DocumentIntelligenceBanksService {
       domain,
       "getDocTypeExtractionHints",
     );
-    const lookupDocType = this.resolveDocTypeLookupKey(normalized, docType);
-    if (!lookupDocType) return null;
+    if (!this.resolveDocTypeLookupKeys(normalized, docType).length) return null;
     return this.getFirstAvailableBank<Record<string, any>>(
-      this.getDomainDocTypeBankIds(normalized, lookupDocType, "extraction_hints"),
+      this.getDomainDocTypeBankIds(normalized, docType, "extraction_hints"),
     );
   }
 
@@ -747,25 +841,10 @@ export class DocumentIntelligenceBanksService {
     docType: string,
   ): Record<string, any> | null {
     const normalized = this.normalizeDomainOrThrow(domain, "getDocTypeTables");
-    const lookupDocType = this.resolveDocTypeLookupKey(normalized, docType);
-    if (!lookupDocType) return null;
+    if (!this.resolveDocTypeLookupKeys(normalized, docType).length) return null;
     return this.getFirstAvailableBank<Record<string, any>>(
-      this.getDomainDocTypeBankIds(normalized, lookupDocType, "tables"),
+      this.getDomainDocTypeBankIds(normalized, docType, "tables"),
     );
-  }
-
-  private resolveDocTypeLookupKey(
-    domain: DocumentIntelligenceDomain,
-    docType: string,
-  ): string {
-    const normalizedDocType = String(docType || "")
-      .trim()
-      .toLowerCase();
-    if (!normalizedDocType) return "";
-    if (domain === "legal" && normalizedDocType.startsWith("legal_")) {
-      return normalizedDocType.slice("legal_".length);
-    }
-    return normalizedDocType;
   }
 
   // ── Document Intelligence Ontology Banks ────────────────────────────

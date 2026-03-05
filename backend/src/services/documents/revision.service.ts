@@ -3,7 +3,6 @@ import prisma from "../../config/database";
 import { uploadFile } from "../../config/storage";
 import { addDocumentJob } from "../../queues/document.queue";
 import { logger } from "../../utils/logger";
-import { createDocumentLink } from "./documentLink.service";
 
 export interface RevisionContext {
   correlationId?: string;
@@ -222,6 +221,25 @@ export class RevisionService {
           },
         });
 
+        await tx.documentLink.upsert({
+          where: {
+            sourceDocumentId_targetDocumentId_relationshipType: {
+              sourceDocumentId: doc.id,
+              targetDocumentId: rootDocumentId,
+              relationshipType: "amends",
+            },
+          },
+          update: {
+            status: "active",
+          },
+          create: {
+            sourceDocumentId: doc.id,
+            targetDocumentId: rootDocumentId,
+            relationshipType: "amends",
+            status: "active",
+          },
+        });
+
         return { revisionNumber: revNum, created: doc, revisionFilename };
       },
       { isolationLevel: "Serializable" },
@@ -236,22 +254,6 @@ export class RevisionService {
         mimeType: created.mimeType,
         userId,
         thumbnailUrl: null,
-      });
-    }
-
-    // Non-blocking: persist cross-doc link with conflict detection
-    try {
-      await createDocumentLink({
-        sourceDocumentId: created.id,
-        targetDocumentId: rootDocumentId,
-        relationshipType: "amends",
-      });
-    } catch (linkErr: any) {
-      // Link creation is non-blocking — log but don't fail the revision
-      logger.warn("[RevisionService] cross-doc link creation warning", {
-        documentId: created.id,
-        rootDocumentId,
-        error: linkErr.message,
       });
     }
 

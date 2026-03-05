@@ -1054,10 +1054,13 @@ export class LlmRequestBuilderService {
       const evidenceId = `${e.docId}:${locationKey}`;
 
       const snippet = (e.snippet || "").trim().replace(/\s+/g, " ");
-      const clipped = this.clipSnippetPreservingSemantics(
-        snippet,
-        maxSnippetChars,
-      );
+      // Retrieval already applies snippet compression. Only re-clip
+      // exceptionally long snippets to avoid a second lossy pass.
+      const clipThreshold = Math.max(maxSnippetChars * 3, 1200);
+      const clipped =
+        snippet.length > clipThreshold
+          ? this.clipSnippetPreservingSemantics(snippet, maxSnippetChars)
+          : snippet;
       const renderedBody = (() => {
         if (e.evidenceType === "table" && e.table) {
           const tableContext = this.serializeTableContext(

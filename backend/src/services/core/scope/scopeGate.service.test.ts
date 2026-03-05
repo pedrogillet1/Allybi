@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { describe, expect, test, it } from "@jest/globals";
+import { describe, expect, test, it, jest } from "@jest/globals";
 import {
   ScopeGateService,
   type ConversationStateLike,
@@ -143,6 +143,164 @@ describe("ScopeGateService", () => {
       expect(src).toContain('"section"');
       expect(src).toContain("activeSectionHint");
       expect(src).toContain("needs_section_choice");
+    });
+  });
+
+  describe("section_disambiguation_policy wiring", () => {
+    function makeSectionPolicyService(sectionPolicy: Record<string, unknown>) {
+      const docs: DocMeta[] = [
+        { docId: "doc-1", filename: "MSA_Acme_2024.pdf", title: "MSA Acme 2024" },
+      ];
+      const bankLoader = {
+        getBank: (bankId: string): any => {
+          if (bankId === "scope_hints") {
+            return {
+              config: { actionsContract: { thresholds: { minHintConfidence: 0.75 } } },
+            };
+          }
+          if (bankId === "scope_resolution") {
+            return {
+              config: {
+                enabled: true,
+                policy: { preferExplicitDocRefOverState: true },
+              },
+              resolution: {
+                apply_hard_locked_doc: { enabled: true },
+              },
+            };
+          }
+          if (bankId === "section_disambiguation_policy") {
+            return sectionPolicy;
+          }
+          return {};
+        },
+      };
+      const docStore = {
+        listDocs: async () => docs,
+        getDocMeta: async () => docs[0],
+      };
+      return new ScopeGateService(
+        bankLoader as any,
+        docStore as any,
+        {
+          getMergedDocAliasesBank: () => ({ config: { minAliasConfidence: 0.75 } }),
+          getDocAliasPhrases: () => [],
+          getDocTaxonomy: () => ({ typeDefinitions: [] }),
+          getDiOntology: () => ({ sections: [] }),
+        } as any,
+      );
+    }
+
+    it("autopicks ambiguous section when policy gap threshold allows it", async () => {
+      const service = makeSectionPolicyService({
+        config: {
+          enabled: true,
+          maxQuestions: 1,
+          sectionMatchThresholds: {
+            autopickMinConfidence: 0.9,
+            autopickMinGap: 0.05,
+            disambiguateIfBelow: 0.75,
+          },
+        },
+        rules: [
+          {
+            id: "SDP_002_section_alias_ambiguity",
+            action: "ASK_WHICH_SECTION",
+            candidateType: "section",
+            maxOptions: 2,
+            maxQuestions: 1,
+          },
+        ],
+      });
+
+      const sectionSpy = jest
+        .spyOn(service as any, "extractSectionHint")
+        .mockReturnValue({
+          candidates: [
+            { sectionId: "doc-1#termination", label: "termination", score: 0.93 },
+            { sectionId: "doc-1#term_and_renewal", label: "term and renewal", score: 0.87 },
+          ],
+        });
+
+      const decision = await service.evaluate(
+        buildState({
+          persistent: {
+            scope: {
+              activeDocId: "doc-1",
+              hardDocLock: true,
+              hardSheetLock: false,
+            },
+          },
+        } as any),
+        {
+          query: "show the termination clause",
+          env: "dev",
+          signals: {},
+        },
+      );
+
+      expect(decision.action).toBe("allow");
+      expect(decision.signals.activeSectionHint).toBe("termination");
+      expect(decision.reasonCodes).not.toContain("needs_section_choice");
+      sectionSpy.mockRestore();
+    });
+
+    it("routes section disambiguation and honors policy maxOptions/maxQuestions", async () => {
+      const service = makeSectionPolicyService({
+        config: {
+          enabled: true,
+          maxQuestions: 1,
+          sectionMatchThresholds: {
+            autopickMinConfidence: 0.9,
+            autopickMinGap: 0.25,
+            disambiguateIfBelow: 0.75,
+          },
+        },
+        rules: [
+          {
+            id: "SDP_002_section_alias_ambiguity",
+            action: "ASK_WHICH_SECTION",
+            candidateType: "section",
+            maxOptions: 2,
+            maxQuestions: 1,
+          },
+        ],
+      });
+
+      const sectionSpy = jest
+        .spyOn(service as any, "extractSectionHint")
+        .mockReturnValue({
+          candidates: [
+            { sectionId: "doc-1#liability_and_indemnity", label: "liability and indemnity", score: 0.93 },
+            { sectionId: "doc-1#limitation_of_liability", label: "limitation of liability", score: 0.87 },
+            { sectionId: "doc-1#warranty", label: "warranty", score: 0.79 },
+          ],
+        });
+
+      const decision = await service.evaluate(
+        buildState({
+          persistent: {
+            scope: {
+              activeDocId: "doc-1",
+              hardDocLock: true,
+              hardSheetLock: false,
+            },
+          },
+        } as any),
+        {
+          query: "show the liability clause",
+          env: "dev",
+          signals: {},
+        },
+      );
+
+      expect(decision.action).toBe("route");
+      expect(decision.reasonCodes).toContain("needs_section_choice");
+      expect(decision.disambiguation?.candidateType).toBe("section");
+      expect(decision.disambiguation?.maxOptions).toBe(2);
+      expect(decision.disambiguation?.maxQuestions).toBe(1);
+      expect(decision.disambiguation?.options.length).toBe(2);
+      sectionSpy.mockRestore();
     });
   });
 

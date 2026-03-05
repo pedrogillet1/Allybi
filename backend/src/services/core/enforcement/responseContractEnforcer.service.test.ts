@@ -738,7 +738,11 @@ describe("ResponseContractEnforcerService nav_pills contract", () => {
     expect(out.enforcement.repairs).toContain(
       "ANALYTICAL_CLAIM_CITATION_GUARD_APPLIED",
     );
-    expect(out.content).toContain("Revenue increased 12% year over year.");
+    expect(out.content).toContain(
+      "Removed 2 claim(s) without direct citation support.",
+    );
+    expect(out.content).toContain("I couldn't find that file.");
+    expect(out.content).not.toContain("Revenue increased 12% year over year.");
     expect(out.content).not.toContain("EBITDA margin reached 80%.");
     expect(out.content).not.toContain("Cash conversion remained stable.");
   });

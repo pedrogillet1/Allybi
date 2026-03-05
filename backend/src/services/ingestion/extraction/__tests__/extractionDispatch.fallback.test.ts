@@ -95,6 +95,16 @@ describe("extractText image fallback", () => {
     expect((result as any).skipReason).toContain("low_variance");
   });
 
+  it("extracts connector mime payloads as plain text", async () => {
+    const payload = "Title: Quarterly update\nSource: gmail\nBody text here";
+    const buffer = Buffer.from(payload, "utf8");
+    const result = await extractText(buffer, "message/rfc822", "gmail_msg-1.txt");
+
+    expect(result.sourceType).toBe("text");
+    expect(result.text).toContain("Quarterly update");
+    expect(result.wordCount).toBeGreaterThan(0);
+  });
+
   describe("Tesseract multi-language support", () => {
     it("uses eng+por by default when no filename is provided", async () => {
       const buffer = Buffer.alloc(20 * 1024);

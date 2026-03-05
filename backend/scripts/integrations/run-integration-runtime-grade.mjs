@@ -118,6 +118,29 @@ async function main() {
     "handlers",
     "connectorHandler.service.ts",
   );
+  const turnRouterPath = path.join(
+    backendRoot,
+    "src",
+    "services",
+    "chat",
+    "turnRouter.service.ts",
+  );
+  const mimeRegistryPath = path.join(
+    backendRoot,
+    "src",
+    "services",
+    "ingestion",
+    "extraction",
+    "ingestionMimeRegistry.service.ts",
+  );
+  const extractionDispatchPath = path.join(
+    backendRoot,
+    "src",
+    "services",
+    "ingestion",
+    "extraction",
+    "extractionDispatch.service.ts",
+  );
   const frontendOAuthCallbackPath = path.join(
     backendRoot,
     "..",
@@ -151,6 +174,9 @@ async function main() {
   const queueText = readFileSafe(queuePath);
   const workerText = readFileSafe(workerPath);
   const handlerText = readFileSafe(handlerPath);
+  const turnRouterText = readFileSafe(turnRouterPath);
+  const mimeRegistryText = readFileSafe(mimeRegistryPath);
+  const extractionDispatchText = readFileSafe(extractionDispatchPath);
   const frontendOAuthCallbackText = readFileSafe(frontendOAuthCallbackPath);
   const frontendIntegrationsHookText = readFileSafe(frontendIntegrationsHookPath);
   const frontendChatText = readFileSafe(frontendChatPath);
@@ -217,6 +243,32 @@ async function main() {
   });
 
   checks.push({
+    id: "editor_mode_blocks_connector_routing",
+    severity: "high",
+    weight: 20,
+    pass:
+      /viewerMode\s*===\s*["']editor["']/.test(turnRouterText) &&
+      /if\s*\(\s*viewerMode\s*===\s*["']editor["']\s*\)\s*\{\s*return\s*\{\s*route:\s*["']KNOWLEDGE["']/s.test(
+        turnRouterText,
+      ),
+    detail:
+      "Editor mode must not execute connector actions; routing must stay in KNOWLEDGE/editor lane.",
+  });
+
+  checks.push({
+    id: "connector_mime_extractability_contract",
+    severity: "high",
+    weight: 20,
+    pass:
+      /CONNECTOR_MIMES/.test(mimeRegistryText) &&
+      /message\/rfc822/.test(mimeRegistryText) &&
+      /application\/x-slack-message/.test(mimeRegistryText) &&
+      /CONNECTOR_MIMES\.includes\(normalizedMime\)/.test(extractionDispatchText),
+    detail:
+      "Connector-ingested MIME types must be extraction-supported to avoid ingestion pipeline failures.",
+  });
+
+  checks.push({
     id: "no_console_runtime_paths",
     severity: "medium",
     weight: 15,
@@ -236,6 +288,25 @@ async function main() {
       "services",
       "connectors",
       "integrationRuntimePolicy.service.test.ts",
+    ),
+    path.join(backendRoot, "src", "services", "chat", "turnRouter.service.test.ts"),
+    path.join(
+      backendRoot,
+      "src",
+      "services",
+      "ingestion",
+      "extraction",
+      "__tests__",
+      "ingestionMimeRegistry.service.test.ts",
+    ),
+    path.join(
+      backendRoot,
+      "src",
+      "services",
+      "ingestion",
+      "extraction",
+      "__tests__",
+      "extractionDispatch.fallback.test.ts",
     ),
   ];
   checks.push({
@@ -260,6 +331,9 @@ async function main() {
       "src/services/chat/handlers/connectorTurn.handler.test.ts",
       "src/services/core/handlers/connectorHandler.service.test.ts",
       "src/services/connectors/slack/slackEvents.controller.test.ts",
+      "src/services/chat/turnRouter.service.test.ts",
+      "src/services/ingestion/extraction/__tests__/ingestionMimeRegistry.service.test.ts",
+      "src/services/ingestion/extraction/__tests__/extractionDispatch.fallback.test.ts",
     ],
     backendRoot,
   );

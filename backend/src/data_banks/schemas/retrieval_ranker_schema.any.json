@@ -1,0 +1,113 @@
+{
+  "_meta": {
+    "id": "retrieval_ranker_schema",
+    "version": "1.0.0",
+    "description": "Schema for retrieval ranker configuration banks. Validates weights, normalization, tieBreakers, negativeConstraints, and rule structure.",
+    "languages": ["any"],
+    "lastUpdated": "2026-03-05",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true
+  },
+  "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "koda://schemas/retrieval_ranker_schema.any.json",
+    "title": "Retrieval Ranker Bank Schema",
+    "type": "object",
+    "required": ["_meta", "config"],
+    "additionalProperties": true,
+    "properties": {
+      "_meta": {
+        "type": "object",
+        "required": ["id", "version", "description", "languages", "lastUpdated"],
+        "additionalProperties": true
+      },
+      "config": {
+        "type": "object",
+        "required": ["enabled"],
+        "additionalProperties": true,
+        "properties": {
+          "enabled": { "type": "boolean" },
+          "mode": { "type": "string" },
+          "neverInventEvidence": { "type": "boolean" },
+          "deterministic": { "type": "boolean" },
+          "dedupe": { "type": "boolean" },
+          "sortBy": { "type": "string" },
+          "weights": {
+            "type": "object",
+            "additionalProperties": { "type": "number" },
+            "properties": {
+              "semantic": { "type": "number", "minimum": 0, "maximum": 20 },
+              "lexical": { "type": "number", "minimum": 0, "maximum": 20 },
+              "structural": { "type": "number", "minimum": 0, "maximum": 20 },
+              "titleBoost": { "type": "number", "minimum": 0, "maximum": 20 },
+              "documentIntelligenceBoost": { "type": "number", "minimum": 0, "maximum": 20 },
+              "routingPriorityBoost": { "type": "number", "minimum": 0, "maximum": 20 },
+              "typeBoost": { "type": "number", "minimum": 0, "maximum": 20 },
+              "recencyBoost": { "type": "number", "minimum": 0, "maximum": 20 }
+            }
+          },
+          "normalization": { "type": "object", "additionalProperties": true },
+          "tieBreakers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "id": { "type": "string" },
+                "type": { "type": "string" },
+                "direction": { "type": "string", "enum": ["asc", "desc"] }
+              }
+            }
+          },
+          "negativeConstraints": { "type": "object", "additionalProperties": true },
+          "diversification": { "type": "object", "additionalProperties": true },
+          "actionsContract": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+              "thresholds": {
+                "type": "object",
+                "additionalProperties": true,
+                "properties": {
+                  "minFinalScore": { "type": "number" },
+                  "minSemanticScore": { "type": "number" },
+                  "minLexicalScore": { "type": "number" }
+                }
+              }
+            }
+          },
+          "scoreDeterminism": { "type": "object", "additionalProperties": true },
+          "slotExtraction": { "type": "object", "additionalProperties": true },
+          "memoryContinuity": { "type": "object", "additionalProperties": true },
+          "integrationHooks": { "type": "object", "additionalProperties": true }
+        }
+      },
+      "rules": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": ["id"],
+          "additionalProperties": true,
+          "properties": {
+            "id": { "type": "string", "minLength": 1 },
+            "scope": { "type": "string" },
+            "description": { "type": "string" },
+            "appliesTo": { "type": "array", "items": { "type": "string" } },
+            "severity": { "type": "string", "enum": ["critical", "high", "medium", "low"] },
+            "reasonCode": { "type": "string" },
+            "action": { "type": "object", "additionalProperties": true }
+          }
+        }
+      },
+      "tests": { "type": "object", "additionalProperties": true }
+    }
+  }
+}

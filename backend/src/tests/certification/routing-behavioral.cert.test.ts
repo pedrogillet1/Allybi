@@ -100,6 +100,18 @@ describe("Certification: routing behavioral determinism", () => {
         }),
         expectedRoute: "CONNECTOR",
       },
+      {
+        id: "connector_blocked_in_editor",
+        router: connectorRouter,
+        ctx: makeCtx("send this by email", {
+          viewer: {
+            mode: "editor",
+            documentId: "doc-editor",
+            fileType: "docx",
+          },
+        }),
+        expectedRoute: "KNOWLEDGE",
+      },
     ];
 
     for (const scenario of scenarios) {
@@ -220,6 +232,17 @@ describe("Certification: routing behavioral determinism", () => {
             mode: "viewer",
             documentId: "doc-v2",
             fileType: "pdf",
+          },
+        }),
+        router: connectorRouter,
+      },
+      {
+        id: "connector_editor",
+        ctx: makeCtx("send this by email", {
+          viewer: {
+            mode: "editor",
+            documentId: "doc-editor",
+            fileType: "docx",
           },
         }),
         router: connectorRouter,

@@ -87,6 +87,19 @@ function buildRetrievalPack(): EvidencePack {
         classifiedDomain: "finance",
         classifiedDocTypeId: "variance_report",
         classificationReasons: ["keyword_match", "doc_type_hint"],
+        candidateDecisionDigest: [
+          {
+            chunkId: "doc-a:chunk-1",
+            docId: "doc-a",
+            locationKey: "doc-a:p1",
+            source: "semantic",
+            selected: true,
+            reasons: ["ranked_top"],
+            finalScore: 0.92,
+            finalRank: 1,
+            evidenceRank: 1,
+          },
+        ],
       },
     },
   };
@@ -201,6 +214,12 @@ describe("Certification: turn debug packet", () => {
     if ((packet?.retrieval?.evidenceSelection?.length || 0) < 1) {
       failures.push("RETRIEVAL_EVIDENCE_SELECTION_MISSING");
     }
+    if (
+      (packet?.retrieval?.selectionRationale?.candidateDecisionDigest?.length ||
+        0) < 1
+    ) {
+      failures.push("RETRIEVAL_CANDIDATE_DIGEST_MISSING");
+    }
     if (!packet?.provenance?.evidenceMapHash)
       failures.push("PROVENANCE_HASH_MISSING");
     if (!packet?.budget?.requestedMaxOutputTokens)
@@ -219,6 +238,9 @@ describe("Certification: turn debug packet", () => {
         hasSelectionRationale: Boolean(packet?.retrieval?.selectionRationale),
         selectedSectionRuleId:
           packet?.retrieval?.selectionRationale?.selectedSectionRuleId || null,
+        candidateDecisionDigestCount:
+          packet?.retrieval?.selectionRationale?.candidateDecisionDigest
+            ?.length ?? null,
         tableEvidenceCount:
           packet?.retrieval?.tableContextCoverage?.tableEvidenceCount ?? null,
         evidenceSelectionCount:
@@ -236,6 +258,7 @@ describe("Certification: turn debug packet", () => {
         minRetrievalSelected: 1,
         hasSelectionRationale: true,
         selectedSectionRuleId: "variance_analysis",
+        minCandidateDecisionDigestCount: 1,
         minTableEvidenceCount: 1,
         minEvidenceSelectionCount: 1,
         hasEvidenceMapHash: true,

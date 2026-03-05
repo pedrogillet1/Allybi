@@ -22,6 +22,7 @@ import {
   normalizeIntegrationErrorMessage,
   resolveOAuthPostMessageOrigin,
 } from "../services/connectors/integrationRuntimePolicy.service";
+import { consumeEmailSendConfirmationTokenOnce } from "../services/connectors/emailSendReplayGuard.service";
 
 interface ApiError {
   code: string;
@@ -791,6 +792,36 @@ export class IntegrationsController {
         "INVALID_CONFIRMATION_PROVIDER",
         "Confirmation token provider does not match the selected provider.",
         400,
+      );
+    }
+
+    let confirmationAvailable = false;
+    try {
+      confirmationAvailable = await consumeEmailSendConfirmationTokenOnce(
+        confirmationTokenRaw,
+        confirmed,
+      );
+    } catch (e) {
+      const ref = errorRefFromReq(req);
+      logger.error("[Integrations] Confirmation token replay check failed", {
+        provider: providerRaw,
+        ref,
+        error: normalizeIntegrationErrorMessage(e),
+      });
+      return sendErr(
+        res,
+        "CONFIRMATION_VALIDATION_FAILED",
+        "Unable to validate confirmation token right now.",
+        503,
+        { ref },
+      );
+    }
+    if (!confirmationAvailable) {
+      return sendErr(
+        res,
+        "CONFIRMATION_ALREADY_USED",
+        "Confirmation token was already used. Mint a new send token and try again.",
+        409,
       );
     }
 

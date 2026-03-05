@@ -6,10 +6,30 @@
 - Runtime graph evidence quality mode (`live` vs `cached`).
 
 ## Signals
+- Canonical enforced gate set source: `scripts/audit/routing-quality-slo.mjs`
 - Gate: `reports/cert/gates/routing-behavioral.json`
 - Gate: `reports/cert/gates/followup-source-coverage.json`
 - Gate: `reports/cert/gates/followup-overlay-integrity.json`
 - Gate: `reports/cert/gates/routing-precedence-parity.json`
+- Gate: `reports/cert/gates/collision-matrix-exhaustive.json`
+- Gate: `reports/cert/gates/collision-cross-family-tiebreak.json`
+- Gate: `reports/cert/gates/routing-determinism.json`
+- Gate: `reports/cert/gates/routing-determinism-runtime-e2e.json`
+- Gate: `reports/cert/gates/scope-integrity.json`
+- Gate: `reports/cert/gates/scope-boundary-locks.json`
+- Gate: `reports/cert/gates/slot-contracts-wiring.json`
+- Gate: `reports/cert/gates/slot-extraction-e2e.json`
+- Gate: `reports/cert/gates/disambiguation-e2e.json`
+- Gate: `reports/cert/gates/intent-precision.json`
+- Gate: `reports/cert/gates/intent-family-firstclass.json`
+- Gate: `reports/cert/gates/routing-bank-consumer-wiring.json`
+- Gate: `reports/cert/gates/routing-family-alias-consistency.json`
+- Gate: `reports/cert/gates/routing-family-conformance.json`
+- Gate: `reports/cert/gates/routing-family-mechanism-contract.json`
+- Gate: `reports/cert/gates/routing-integration-intents-parity.json`
+- Gate: `reports/cert/gates/routing-calc-intents-parity.json`
+- Gate: `reports/cert/gates/nav-intents-locale-parity.json`
+- Gate: `reports/cert/gates/telemetry-completeness.json`
 - Gate: `reports/cert/gates/runtime-wiring.json`
 - SLO summary: `reports/cert/routing-quality-slo.json`
 - Grade summary: `reports/cert/routing-grade.json`
@@ -23,6 +43,7 @@
 - `followup-overlay-integrity.metrics.missingLocaleCount` must be `0`.
 - `followup-overlay-integrity.metrics.validModeCount` must be >= `thresholds.expectedValidModeCount`.
 - `routing-precedence-parity.passed` must be `true`.
+- Every gate listed in **Signals** above must report `passed: true`.
 - `runtime-wiring.metrics.commandMode`:
   - CI/release: must be `live`.
   - Local: `live` or `cached`.

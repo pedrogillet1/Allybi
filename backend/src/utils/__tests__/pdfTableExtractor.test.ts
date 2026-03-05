@@ -26,6 +26,26 @@ describe("pdfTableExtractor", () => {
       expect(result.tableCount).toBe(1);
     });
 
+    it("does not detect numbered lists as tables", () => {
+      const text = [
+        "1. First item in the list     with some extra space",
+        "2. Second item in the list    with some extra space",
+        "3. Third item in the list     with some extra space",
+      ].join("\n");
+      const result = extractTablesFromText(text);
+      expect(result.tableCount).toBe(0);
+    });
+
+    it("does not detect bullet lists as tables", () => {
+      const text = [
+        "- Item alpha                  description here",
+        "- Item beta                   description here",
+        "- Item gamma                  description here",
+      ].join("\n");
+      const result = extractTablesFromText(text);
+      expect(result.tableCount).toBe(0);
+    });
+
     it("does not detect plain prose as a table", () => {
       const text = [
         "This is a paragraph of text that discusses various topics.",
@@ -110,6 +130,24 @@ describe("pdfTableExtractor", () => {
       expect(result.tableCount).toBe(1);
       const firstRow = result.tables[0].rows[0];
       expect(firstRow.length).toBeGreaterThanOrEqual(3);
+    });
+  });
+
+  describe("deterministic replacement", () => {
+    it("replaces repeated table blocks without collapsing distinct regions", () => {
+      const block = [
+        "Metric     2024   2023",
+        "Revenue    120    100",
+      ].join("\n");
+      const text = [block, "", "Narrative line", "", block].join("\n");
+      const result = extractTablesFromText(text);
+
+      expect(result.tableCount).toBe(2);
+      const firstIdx = result.text.indexOf("| Metric");
+      const secondIdx = result.text.indexOf("| Metric", firstIdx + 1);
+      expect(firstIdx).toBeGreaterThanOrEqual(0);
+      expect(secondIdx).toBeGreaterThan(firstIdx);
+      expect(result.text).toContain("Narrative line");
     });
   });
 });

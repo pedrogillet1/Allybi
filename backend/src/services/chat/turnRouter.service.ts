@@ -109,6 +109,14 @@ function allowIntentDecisionFailOpen(): boolean {
   return raw === "1" || raw === "true" || raw === "yes";
 }
 
+function isTestRuntimeEnv(): boolean {
+  const nodeEnv = String(process.env.NODE_ENV || "")
+    .trim()
+    .toLowerCase();
+  if (nodeEnv === "test") return true;
+  return String(process.env.JEST_WORKER_ID || "").trim().length > 0;
+}
+
 function low(value: string): string {
   return String(value || "").toLowerCase();
 }
@@ -396,6 +404,71 @@ export class TurnRouterService {
         }
         return true;
       }
+    }
+    return false;
+  }
+
+  private patternListMatches(
+    normalizedQuery: string,
+    patterns: string[],
+    opts?: { caseSensitive?: boolean },
+  ): boolean {
+    if (patterns.length === 0) return false;
+    if (this.regexMatchesAny(normalizedQuery, patterns, opts)) return true;
+    for (const pattern of patterns) {
+      const normalizedPattern = normalizeForMatching(pattern, {
+        caseInsensitive: opts?.caseSensitive !== true,
+        stripDiacritics: true,
+        collapseWhitespace: true,
+      });
+      if (!normalizedPattern) continue;
+      if (normalizedQuery.includes(normalizedPattern)) return true;
+    }
+    return false;
+  }
+
+  private detectNavIntentFromBank(
+    query: string,
+    locale: "en" | "pt" | "es",
+  ): boolean {
+    const bank = this.getNavIntentsBank(locale);
+    if (!bank?.config?.enabled) return false;
+
+    const matching = asRecord(bank?.config?.matching);
+    const normalized = normalizeForMatching(query, {
+      caseInsensitive: matching.caseInsensitive !== false,
+      stripDiacritics: matching.stripDiacritics !== false,
+      collapseWhitespace: matching.collapseWhitespace !== false,
+    });
+    if (!normalized) return false;
+
+    const isCaseSensitive = matching.caseInsensitive === false;
+    const regexOpts = { caseSensitive: isCaseSensitive };
+    const patterns = Array.isArray(bank?.patterns) ? bank.patterns : [];
+    for (const entry of patterns) {
+      const localized = this.getLocalizedPatterns(entry || {}, locale);
+      if (
+        !this.patternListMatches(normalized, localized, regexOpts)
+      ) {
+        continue;
+      }
+      const negatives = Array.isArray(entry?.negatives)
+        ? entry.negatives.map((value: unknown) =>
+            normalizeForMatching(String(value || ""), {
+              caseInsensitive: true,
+              stripDiacritics: true,
+              collapseWhitespace: true,
+            }),
+          )
+        : [];
+      if (
+        negatives.some(
+          (token) => token && normalized.includes(token),
+        )
+      ) {
+        continue;
+      }
+      return true;
     }
     return false;
   }
@@ -724,7 +797,7 @@ export class TurnRouterService {
           `[turn-router] followup detection overlay missing for locale=${locale}`,
         );
       }
-      if (!TurnRouterService._followupMisconfigWarned) {
+      if (!TurnRouterService._followupMisconfigWarned && !isTestRuntimeEnv()) {
         TurnRouterService._followupMisconfigWarned = true;
         console.warn("[turn-router] followup detection disabled: overlayPatterns is empty for locale", locale);
       }
@@ -1300,7 +1373,9 @@ export class TurnRouterService {
   ): RouterCandidate[] {
     const query = String(ctx.messageText || "");
     const locale = ctx.locale || "en";
-    const nav = isNavQuery(query);
+    const navByKeyword = isNavQuery(query);
+    const navByBank = this.detectNavIntentFromBank(query, locale);
+    const nav = navByKeyword || navByBank;
     const discovery = isDiscoveryQuery(query);
     const howTo = isHowToQuery(query);
     const calc = isCalcQuery(query);
@@ -1628,7 +1703,15 @@ export class TurnRouterService {
         ? true
         : false);
 
-    if (ctx.viewer?.mode) {
+    const viewerModeRaw = ctx.viewer?.mode as unknown;
+    const viewerMode =
+      typeof viewerModeRaw === "string"
+        ? viewerModeRaw.trim().toLowerCase()
+        : viewerModeRaw
+          ? "viewer"
+          : "";
+
+    if (viewerMode === "viewer") {
       if (connectorDecision) {
         return {
           route: "CONNECTOR",
@@ -1648,6 +1731,12 @@ export class TurnRouterService {
           intentDecision: null,
         };
       }
+      return {
+        route: "KNOWLEDGE",
+        intentDecision: null,
+      };
+    }
+    if (viewerMode === "editor") {
       return {
         route: "KNOWLEDGE",
         intentDecision: null,

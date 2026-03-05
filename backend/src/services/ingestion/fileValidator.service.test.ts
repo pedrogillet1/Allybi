@@ -29,6 +29,10 @@ const JPEG_HEADER = Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46,
 const PNG_HEADER = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00]);
 const GIF_HEADER = Buffer.from([0x47, 0x49, 0x46, 0x38, 0x39, 0x61, 0x01, 0x00, 0x01, 0x00]);
 const OLE_HEADER = Buffer.from([0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1, 0x00, 0x00]);
+const TIFF_LE_HEADER = Buffer.from([0x49, 0x49, 0x2a, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00]);
+const TIFF_BE_HEADER = Buffer.from([0x4d, 0x4d, 0x00, 0x2a, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00]);
+const BMP_HEADER = Buffer.from([0x42, 0x4d, 0x36, 0x10, 0x0e, 0x00, 0x00, 0x00, 0x00, 0x00]);
+const WEBP_HEADER = Buffer.from([0x52, 0x49, 0x46, 0x46, 0x24, 0x00, 0x00, 0x00, 0x57, 0x45]);
 
 describe("FileValidatorService", () => {
   // -------------------------------------------------------------------------
@@ -113,6 +117,26 @@ describe("FileValidatorService", () => {
       );
       expect(result.isValid).toBe(true);
     });
+
+    it("accepts valid TIFF magic bytes (little-endian)", () => {
+      const result = fileValidator.validateFileHeader(TIFF_LE_HEADER, "image/tiff");
+      expect(result.isValid).toBe(true);
+    });
+
+    it("accepts valid TIFF magic bytes (big-endian)", () => {
+      const result = fileValidator.validateFileHeader(TIFF_BE_HEADER, "image/tiff");
+      expect(result.isValid).toBe(true);
+    });
+
+    it("accepts valid BMP magic bytes", () => {
+      const result = fileValidator.validateFileHeader(BMP_HEADER, "image/bmp");
+      expect(result.isValid).toBe(true);
+    });
+
+    it("accepts valid WEBP magic bytes (RIFF)", () => {
+      const result = fileValidator.validateFileHeader(WEBP_HEADER, "image/webp");
+      expect(result.isValid).toBe(true);
+    });
   });
 
   // -------------------------------------------------------------------------
@@ -186,6 +210,33 @@ describe("FileValidatorService", () => {
         type: "image/jpg",
         size: 1000,
         name: "photo.jpg",
+      });
+      expect(result.isValid).toBe(true);
+    });
+
+    it("accepts image/tiff", () => {
+      const result = fileValidator.validateClientSide({
+        type: "image/tiff",
+        size: 1000,
+        name: "scan.tiff",
+      });
+      expect(result.isValid).toBe(true);
+    });
+
+    it("accepts image/bmp", () => {
+      const result = fileValidator.validateClientSide({
+        type: "image/bmp",
+        size: 1000,
+        name: "image.bmp",
+      });
+      expect(result.isValid).toBe(true);
+    });
+
+    it("accepts image/webp", () => {
+      const result = fileValidator.validateClientSide({
+        type: "image/webp",
+        size: 1000,
+        name: "photo.webp",
       });
       expect(result.isValid).toBe(true);
     });

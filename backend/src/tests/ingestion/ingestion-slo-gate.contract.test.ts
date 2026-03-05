@@ -10,19 +10,19 @@ describe("ingestion SLO gate contract", () => {
         status: "ok",
         mimeType: "application/pdf",
         durationMs: 1200,
-        meta: { sizeBucket: "1_to_10mb" },
+        meta: { sizeBucket: "1_to_10mb", peakRssMb: 760 },
       },
       {
         status: "ok",
         mimeType: "application/pdf",
         durationMs: 1500,
-        meta: { sizeBucket: "1_to_10mb" },
+        meta: { sizeBucket: "1_to_10mb", peakRssMb: 810 },
       },
       {
         status: "ok",
         mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         durationMs: 800,
-        meta: { sizeBucket: "lt_1mb" },
+        meta: { sizeBucket: "lt_1mb", peakRssMb: 420 },
       },
     ]);
 
@@ -30,6 +30,7 @@ describe("ingestion SLO gate contract", () => {
       minDocsProcessed: 3,
       maxGlobalP95LatencyMs: 2000,
       maxGlobalFailureRatePct: 5,
+      maxGlobalP95PeakRssMb: 1000,
       maxBucketP95LatencyMsByKey: {
         "application/pdf||1_to_10mb": 2000,
       },
@@ -48,19 +49,19 @@ describe("ingestion SLO gate contract", () => {
         status: "ok",
         mimeType: "application/pdf",
         durationMs: 3200,
-        meta: { sizeBucket: "1_to_10mb" },
+        meta: { sizeBucket: "1_to_10mb", peakRssMb: 1000 },
       },
       {
         status: "fail",
         mimeType: "application/pdf",
         durationMs: 3400,
-        meta: { sizeBucket: "1_to_10mb" },
+        meta: { sizeBucket: "1_to_10mb", peakRssMb: 1200 },
       },
       {
         status: "ok",
         mimeType: "application/pdf",
         durationMs: 3600,
-        meta: { sizeBucket: "1_to_10mb" },
+        meta: { sizeBucket: "1_to_10mb", peakRssMb: 1600 },
       },
     ]);
 
@@ -68,6 +69,7 @@ describe("ingestion SLO gate contract", () => {
       minDocsProcessed: 3,
       maxGlobalP95LatencyMs: 2000,
       maxGlobalFailureRatePct: 10,
+      maxGlobalP95PeakRssMb: 1500,
       maxBucketFailureRatePctByKey: {
         "application/pdf||1_to_10mb": 20,
       },
@@ -77,6 +79,9 @@ describe("ingestion SLO gate contract", () => {
     expect(result.failures.join(" | ")).toContain("GLOBAL_P95_EXCEEDED");
     expect(result.failures.join(" | ")).toContain(
       "BUCKET_FAILURE_RATE_EXCEEDED:application/pdf||1_to_10mb",
+    );
+    expect(result.failures.join(" | ")).toContain(
+      "GLOBAL_P95_PEAK_RSS_EXCEEDED",
     );
   });
 });

@@ -57,6 +57,11 @@ describe("indexingPolicy.service", () => {
       RETRIEVAL_V2_VECTOR_EMBEDDING: "1",
       INDEXING_STRICT_FAIL_CLOSED: "false",
       INDEXING_ENCRYPTED_CHUNKS_ONLY: "false",
+      INDEXING_ALLOW_PLAINTEXT_CHUNKS: "true",
+      INDEXING_PLAINTEXT_OVERRIDE_REASON: "integration_test_override",
+      INDEXING_ENFORCE_ENCRYPTED_ONLY: "false",
+      INDEXING_ENFORCE_CHUNK_METADATA: "false",
+      INDEXING_ENFORCE_VERSION_METADATA: "false",
       INDEXING_VERIFY_REQUIRED: "0",
       INDEXING_ALLOW_UNVERIFIED_PREVOP_DELETE: "1",
       EMBEDDING_FAILCLOSE_V1: "0",
@@ -65,9 +70,33 @@ describe("indexingPolicy.service", () => {
     expect(policy.runtimeMode).toBe("v2");
     expect(policy.strictFailClosed).toBe(false);
     expect(policy.encryptedChunksOnly).toBe(false);
+    expect(policy.allowPlaintextChunksOverride).toBe(true);
+    expect(policy.plaintextOverrideReason).toBe("integration_test_override");
+    expect(policy.enforceEncryptedOnlyInvariant).toBe(false);
+    expect(policy.enforceChunkMetadataInvariant).toBe(false);
+    expect(policy.enforceVersionMetadataInvariant).toBe(false);
     expect(policy.verifyRequired).toBe(false);
     expect(policy.allowUnverifiedPreviousOperationDelete).toBe(true);
     expect(policy.embeddingFailCloseV1).toBe(false);
+  });
+
+  test("fails closed when encrypted-only is disabled without explicit plaintext override", () => {
+    expect(() =>
+      resolveIndexingPolicySnapshot({
+        NODE_ENV: "development",
+        INDEXING_ENCRYPTED_CHUNKS_ONLY: "false",
+      } as NodeJS.ProcessEnv),
+    ).toThrow(/INDEXING_ALLOW_PLAINTEXT_CHUNKS=true/);
+  });
+
+  test("fails closed when plaintext override is enabled without an explicit reason", () => {
+    expect(() =>
+      resolveIndexingPolicySnapshot({
+        NODE_ENV: "development",
+        INDEXING_ENCRYPTED_CHUNKS_ONLY: "false",
+        INDEXING_ALLOW_PLAINTEXT_CHUNKS: "true",
+      } as NodeJS.ProcessEnv),
+    ).toThrow(/INDEXING_PLAINTEXT_OVERRIDE_REASON/);
   });
 
   test("fails closed when encrypted-only is disabled in protected environments", () => {
@@ -75,8 +104,22 @@ describe("indexingPolicy.service", () => {
       resolveIndexingPolicySnapshot({
         NODE_ENV: "production",
         INDEXING_ENCRYPTED_CHUNKS_ONLY: "false",
+        INDEXING_ALLOW_PLAINTEXT_CHUNKS: "true",
+        INDEXING_PLAINTEXT_OVERRIDE_REASON: "integration_test_override",
       } as NodeJS.ProcessEnv),
     ).toThrow(/INDEXING_ENCRYPTED_CHUNKS_ONLY=false/);
+  });
+
+  test("allows encrypted-only disablement in non-protected environments with explicit override", () => {
+    const policy = resolveIndexingPolicySnapshot({
+      NODE_ENV: "development",
+      INDEXING_ENCRYPTED_CHUNKS_ONLY: "false",
+      INDEXING_ALLOW_PLAINTEXT_CHUNKS: "true",
+      INDEXING_PLAINTEXT_OVERRIDE_REASON: "integration_test_override",
+    } as NodeJS.ProcessEnv);
+    expect(policy.encryptedChunksOnly).toBe(false);
+    expect(policy.allowPlaintextChunksOverride).toBe(true);
+    expect(policy.plaintextOverrideReason).toBe("integration_test_override");
   });
 
   test("allows encrypted-only policy in protected environments", () => {

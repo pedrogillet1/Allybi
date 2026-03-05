@@ -1,5 +1,9 @@
 import type { PrismaClient } from "@prisma/client";
 import type { OcrOutcome } from "../extraction/ocrSignals.service";
+import {
+  evaluateIngestionSloMetrics,
+  summarizeIngestionSloEvents,
+} from "./ingestionSloContract.shared.js";
 
 export interface GoogleCloudSqlMetrics {
   connected: boolean;
@@ -62,12 +66,14 @@ export interface GoogleIngestionSloBucket {
   sizeBucket: string;
   count: number;
   p95LatencyMs: number;
+  p95PeakRssMb: number;
   failureRate: number;
 }
 
 export interface GoogleIngestionSloMetrics {
   docsProcessed: number;
   p95LatencyMs: number;
+  p95PeakRssMb: number;
   byMimeSize: GoogleIngestionSloBucket[];
 }
 
@@ -75,8 +81,10 @@ export interface IngestionSloThresholds {
   maxGlobalP95LatencyMs: number;
   maxGlobalFailureRatePct: number;
   minDocsProcessed?: number;
+  maxGlobalP95PeakRssMb?: number;
   maxBucketP95LatencyMsByKey?: Record<string, number>;
   maxBucketFailureRatePctByKey?: Record<string, number>;
+  maxBucketP95PeakRssMbByKey?: Record<string, number>;
 }
 
 export interface IngestionSloEvaluation {
@@ -252,123 +260,17 @@ export function summarizeOcrEvents(events: OcrEventLike[]): GoogleOcrMetrics {
 export function summarizeIngestionLatencyByMimeSize(
   events: IngestionEventLike[],
 ): GoogleIngestionSloMetrics {
-  const durations: number[] = [];
-  const bucketMap = new Map<
-    string,
-    { count: number; failures: number; latencies: number[] }
-  >();
-
-  for (const event of events) {
-    const status = String(event.status || "").toLowerCase();
-    const mimeType = String(event.mimeType || "unknown").toLowerCase();
-    const meta = asRecord(event.meta);
-    const sizeBucketRaw = String(meta?.sizeBucket || "").trim().toLowerCase();
-    const sizeBucket = sizeBucketRaw || "unknown";
-    const key = `${mimeType}||${sizeBucket}`;
-
-    if (!bucketMap.has(key)) {
-      bucketMap.set(key, { count: 0, failures: 0, latencies: [] });
-    }
-
-    const entry = bucketMap.get(key)!;
-    entry.count += 1;
-    if (status === "fail") entry.failures += 1;
-
-    if (typeof event.durationMs === "number" && event.durationMs > 0) {
-      entry.latencies.push(event.durationMs);
-      durations.push(event.durationMs);
-    }
-  }
-
-  const byMimeSize: GoogleIngestionSloBucket[] = Array.from(bucketMap.entries())
-    .map(([key, entry]) => {
-      const [mimeType, sizeBucket] = key.split("||");
-      return {
-        mimeType: mimeType || "unknown",
-        sizeBucket: sizeBucket || "unknown",
-        count: entry.count,
-        p95LatencyMs: p95(entry.latencies),
-        failureRate: entry.count > 0 ? round2((entry.failures / entry.count) * 100) : 0,
-      };
-    })
-    .sort((a, b) => b.count - a.count);
-
-  return {
-    docsProcessed: events.length,
-    p95LatencyMs: p95(durations),
-    byMimeSize,
-  };
+  return summarizeIngestionSloEvents(events);
 }
 
 export function evaluateIngestionSlo(
   metrics: GoogleIngestionSloMetrics,
   thresholds: IngestionSloThresholds,
 ): IngestionSloEvaluation {
-  const failures: string[] = [];
-  const minDocsProcessed = Math.max(0, Number(thresholds.minDocsProcessed ?? 1));
-  const maxGlobalP95 = Math.max(1, Number(thresholds.maxGlobalP95LatencyMs || 1));
-  const maxGlobalFailureRate = Math.max(0, Number(thresholds.maxGlobalFailureRatePct || 0));
-
-  if (metrics.docsProcessed < minDocsProcessed) {
-    failures.push(
-      `INSUFFICIENT_SAMPLE: docsProcessed=${metrics.docsProcessed} < ${minDocsProcessed}`,
-    );
-  }
-
-  if (metrics.p95LatencyMs > maxGlobalP95) {
-    failures.push(
-      `GLOBAL_P95_EXCEEDED: ${metrics.p95LatencyMs} > ${maxGlobalP95}`,
-    );
-  }
-
-  const estimatedGlobalFailureRate = (() => {
-    if (metrics.docsProcessed <= 0) return 0;
-    let weightedFailure = 0;
-    for (const bucket of metrics.byMimeSize) {
-      weightedFailure += bucket.count * (bucket.failureRate / 100);
-    }
-    return round2((weightedFailure / metrics.docsProcessed) * 100);
-  })();
-
-  if (estimatedGlobalFailureRate > maxGlobalFailureRate) {
-    failures.push(
-      `GLOBAL_FAILURE_RATE_EXCEEDED: ${estimatedGlobalFailureRate}% > ${maxGlobalFailureRate}%`,
-    );
-  }
-
-  const p95ByKey = thresholds.maxBucketP95LatencyMsByKey || {};
-  for (const [key, max] of Object.entries(p95ByKey)) {
-    const [mimeType, sizeBucket] = key.split("||");
-    const bucket = metrics.byMimeSize.find(
-      (entry) =>
-        entry.mimeType === String(mimeType || "").toLowerCase() &&
-        entry.sizeBucket === String(sizeBucket || "").toLowerCase(),
-    );
-    if (!bucket) continue;
-    if (bucket.p95LatencyMs > max) {
-      failures.push(`BUCKET_P95_EXCEEDED:${key}: ${bucket.p95LatencyMs} > ${max}`);
-    }
-  }
-
-  const failureRateByKey = thresholds.maxBucketFailureRatePctByKey || {};
-  for (const [key, max] of Object.entries(failureRateByKey)) {
-    const [mimeType, sizeBucket] = key.split("||");
-    const bucket = metrics.byMimeSize.find(
-      (entry) =>
-        entry.mimeType === String(mimeType || "").toLowerCase() &&
-        entry.sizeBucket === String(sizeBucket || "").toLowerCase(),
-    );
-    if (!bucket) continue;
-    if (bucket.failureRate > max) {
-      failures.push(
-        `BUCKET_FAILURE_RATE_EXCEEDED:${key}: ${bucket.failureRate}% > ${max}%`,
-      );
-    }
-  }
-
+  const evaluation = evaluateIngestionSloMetrics(metrics, thresholds);
   return {
-    passed: failures.length === 0,
-    failures,
+    passed: evaluation.passed,
+    failures: evaluation.failures,
   };
 }
 

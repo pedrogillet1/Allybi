@@ -1,6 +1,3 @@
-import { promises as fs } from "fs";
-import path from "path";
-
 import GraphClientService, {
   type GraphMessageItem,
 } from "./graphClient.service";
@@ -10,6 +7,9 @@ import {
   ConnectorsIngestionService,
   type ConnectorDocument,
 } from "../connectorsIngestion.service";
+import {
+  ConnectorIdentityMapService,
+} from "../connectorIdentityMap.service";
 import { logger } from "../../../utils/logger";
 
 interface OutlookCursorData {
@@ -50,13 +50,6 @@ export interface OutlookSyncResult {
   foldersScanned: number;
 }
 
-const CURSOR_ROOT = path.resolve(
-  process.cwd(),
-  "storage",
-  "connectors",
-  "cursors",
-);
-
 function safeDate(input?: string): Date | null {
   if (!input) return null;
   const parsed = new Date(input);
@@ -68,16 +61,19 @@ export class OutlookSyncService {
   private readonly tokenVault: TokenVaultService;
   private readonly outlookOAuth: OutlookOAuthService;
   private readonly ingestion: ConnectorsIngestionService;
+  private readonly identityMap: ConnectorIdentityMapService;
 
   constructor(
     graphClient: GraphClientService = new GraphClientService(),
     tokenVault: TokenVaultService = new TokenVaultService(),
     ingestion: ConnectorsIngestionService = new ConnectorsIngestionService(),
+    identityMap: ConnectorIdentityMapService = new ConnectorIdentityMapService(),
     outlookOAuth?: OutlookOAuthService,
   ) {
     this.graphClient = graphClient;
     this.tokenVault = tokenVault;
     this.ingestion = ingestion;
+    this.identityMap = identityMap;
     this.outlookOAuth = outlookOAuth ?? new OutlookOAuthService({ tokenVault });
   }
 
@@ -298,13 +294,35 @@ export class OutlookSyncService {
   }
 
   private async readCursorFile(userId: string): Promise<ConnectorCursorFile> {
-    await fs.mkdir(CURSOR_ROOT, { recursive: true });
-    const filePath = path.join(CURSOR_ROOT, `${userId}.json`);
-
     try {
-      const raw = await fs.readFile(filePath, "utf8");
-      const parsed = JSON.parse(raw) as ConnectorCursorFile;
-      if (parsed?.version === 1 && parsed?.userId === userId) return parsed;
+      const raw = await this.identityMap.getSyncCursor(userId, "outlook");
+      if (!raw) return { version: 1, userId, providers: {} };
+      const parsed = JSON.parse(raw) as
+        | ConnectorCursorFile
+        | OutlookCursorData
+        | null;
+      if (parsed && typeof parsed === "object") {
+        const providerCursor = (parsed as ConnectorCursorFile)?.providers?.outlook;
+        if (providerCursor) {
+          return {
+            version: 1,
+            userId,
+            providers: { outlook: providerCursor },
+          };
+        }
+
+        const rawCursor = parsed as OutlookCursorData;
+        if (
+          rawCursor.lastSyncAt ||
+          (rawCursor.folders && Object.keys(rawCursor.folders).length > 0)
+        ) {
+          return {
+            version: 1,
+            userId,
+            providers: { outlook: rawCursor },
+          };
+        }
+      }
       return { version: 1, userId, providers: {} };
     } catch {
       return { version: 1, userId, providers: {} };
@@ -315,15 +333,12 @@ export class OutlookSyncService {
     userId: string,
     payload: ConnectorCursorFile,
   ): Promise<void> {
-    await fs.mkdir(CURSOR_ROOT, { recursive: true });
-    const filePath = path.join(CURSOR_ROOT, `${userId}.json`);
-    const tmpPath = `${filePath}.tmp`;
-
-    await fs.writeFile(tmpPath, JSON.stringify(payload), {
-      encoding: "utf8",
-      mode: 0o600,
-    });
-    await fs.rename(tmpPath, filePath);
+    const outlook = payload.providers.outlook ?? {};
+    await this.identityMap.updateSyncCursor(
+      userId,
+      "outlook",
+      JSON.stringify(outlook),
+    );
   }
 }
 

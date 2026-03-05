@@ -218,6 +218,8 @@ describe("vectorEmbedding.service", () => {
     // Env defaults for test isolation
     delete process.env.INDEXING_STRICT_FAIL_CLOSED;
     process.env.INDEXING_ENCRYPTED_CHUNKS_ONLY = "false";
+    process.env.INDEXING_ALLOW_PLAINTEXT_CHUNKS = "true";
+    process.env.INDEXING_PLAINTEXT_OVERRIDE_REASON = "integration_test_override";
     delete process.env.EMBEDDING_FAILCLOSE_V1;
     delete process.env.INDEXING_ENFORCE_ENCRYPTED_ONLY;
     delete process.env.INDEXING_ENFORCE_CHUNK_METADATA;
@@ -748,6 +750,52 @@ describe("vectorEmbedding.service", () => {
         encryptionMode: "plaintext",
       }),
     ).rejects.toThrow(/Chunk metadata invariant failed/i);
+  });
+
+  test("fails when non-xlsx cell_fact chunk metadata misses tableId", async () => {
+    process.env.INDEXING_ENFORCE_CHUNK_METADATA = "true";
+    const chunks = [
+      {
+        chunkIndex: 0,
+        content: "Revenue Jan = 120",
+        pageNumber: 1,
+        metadata: {
+          chunkType: "cell_fact",
+          sourceType: "pdf",
+          sectionId: "sec:financials",
+          rowIndex: 2,
+          columnIndex: 3,
+        },
+      },
+    ];
+
+    await expect(
+      storeDocumentEmbeddings(DOC_ID, chunks as any, {
+        maxRetries: 1,
+        strictVerify: false,
+        encryptionMode: "plaintext",
+      }),
+    ).rejects.toThrow(/Chunk metadata invariant failed/i);
+  });
+
+  test("persists canonical version metadata on chunk rows", async () => {
+    const chunks = makeChunks(1);
+    mockGenerateBatchEmbeddings.mockResolvedValue(makeBatchResult(1));
+    mockChunkCount.mockResolvedValue(1);
+
+    await storeDocumentEmbeddings(DOC_ID, chunks, {
+      maxRetries: 1,
+      strictVerify: false,
+      encryptionMode: "plaintext",
+    });
+
+    expect(mockChunkCreateMany).toHaveBeenCalledTimes(1);
+    const createManyArgs = mockChunkCreateMany.mock.calls[0]?.[0] || {};
+    const firstRow = createManyArgs?.data?.[0] || {};
+    expect(firstRow.metadata?.documentId).toBe(DOC_ID);
+    expect(firstRow.metadata?.versionId).toBe(DOC_ID);
+    expect(firstRow.metadata?.rootDocumentId).toBe(DOC_ID);
+    expect(typeof firstRow.metadata?.isLatestVersion).toBe("boolean");
   });
 
   /* ================================================================ */

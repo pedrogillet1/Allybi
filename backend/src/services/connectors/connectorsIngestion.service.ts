@@ -106,17 +106,33 @@ export class ConnectorsIngestionService {
         const fileHash = createHash("sha256").update(textContent).digest("hex");
         const resolvedMime = resolveConnectorMimeType(normalized.sourceType);
         const resolvedDocType = resolveConnectorDocType(normalized.sourceType);
-        const existing = await prisma.document.findFirst({
-          where: {
-            userId: ctx.userId,
-            filename,
-          },
+        let existing = await prisma.document.findUnique({
+          where: { id: documentId },
           select: {
             id: true,
             fileHash: true,
             encryptedFilename: true,
+            userId: true,
           },
         });
+        // Backward-compat path for historical rows created before deterministic connector IDs.
+        if (!existing) {
+          existing = await prisma.document.findFirst({
+            where: {
+              userId: ctx.userId,
+              filename,
+            },
+            select: {
+              id: true,
+              fileHash: true,
+              encryptedFilename: true,
+              userId: true,
+            },
+          });
+        }
+        if (existing && existing.userId !== ctx.userId) {
+          throw new Error("Connector document ownership mismatch.");
+        }
 
         if (existing) {
           if (existing.fileHash === fileHash) {
@@ -156,47 +172,92 @@ export class ConnectorsIngestionService {
           resolvedMime,
         );
 
-        await prisma.$transaction(async (tx) => {
-          await tx.document.create({
-            data: {
-              id: documentId,
-              userId: ctx.userId,
-              filename,
-              encryptedFilename: storageKey,
-              fileSize: Buffer.byteLength(textContent, "utf8"),
-              mimeType: resolvedMime,
-              fileHash,
-              status: "uploaded",
-              indexingState: "pending",
-              indexingUpdatedAt: new Date(),
-              displayTitle: normalized.title,
-              // Never persist connector body text in plaintext columns.
-              rawText: null,
-              previewText: null,
-              renderableContent: null,
-              language: "en",
-            },
-          });
+        try {
+          await prisma.$transaction(async (tx) => {
+            await tx.document.create({
+              data: {
+                id: documentId,
+                userId: ctx.userId,
+                filename,
+                encryptedFilename: storageKey,
+                fileSize: Buffer.byteLength(textContent, "utf8"),
+                mimeType: resolvedMime,
+                fileHash,
+                status: "uploaded",
+                indexingState: "pending",
+                indexingUpdatedAt: new Date(),
+                displayTitle: normalized.title,
+                // Never persist connector body text in plaintext columns.
+                rawText: null,
+                previewText: null,
+                renderableContent: null,
+                language: "en",
+              },
+            });
 
-          await tx.documentMetadata.create({
-            data: {
-              documentId,
-              // Connector extracted text remains encrypted-only / non-persistent.
-              extractedText: null,
-              wordCount: wordCount(textContent),
-              characterCount: textContent.length,
-              summary: normalized.title,
-              creationDate: normalized.timestamp,
-              modificationDate: normalized.timestamp,
-              entities: JSON.stringify({
-                actors: normalized.actors,
-                labelsOrChannel: normalized.labelsOrChannel,
-              }),
-              classification: resolvedDocType,
-              topics: JSON.stringify(normalized.labelsOrChannel),
+            await tx.documentMetadata.create({
+              data: {
+                documentId,
+                // Connector extracted text remains encrypted-only / non-persistent.
+                extractedText: null,
+                wordCount: wordCount(textContent),
+                characterCount: textContent.length,
+                summary: normalized.title,
+                creationDate: normalized.timestamp,
+                modificationDate: normalized.timestamp,
+                entities: JSON.stringify({
+                  actors: normalized.actors,
+                  labelsOrChannel: normalized.labelsOrChannel,
+                }),
+                classification: resolvedDocType,
+                topics: JSON.stringify(normalized.labelsOrChannel),
+              },
+            });
+          });
+        } catch (createError) {
+          if (!isUniqueViolation(createError)) {
+            throw createError;
+          }
+
+          const concurrent = await prisma.document.findUnique({
+            where: { id: documentId },
+            select: {
+              id: true,
+              fileHash: true,
+              encryptedFilename: true,
+              userId: true,
             },
           });
-        });
+          if (!concurrent || concurrent.userId !== ctx.userId) {
+            throw createError;
+          }
+
+          if (concurrent.fileHash === fileHash) {
+            results.push({
+              sourceId: normalized.sourceId,
+              documentId: concurrent.id,
+              status: "existing",
+            });
+            continue;
+          }
+
+          await this.reconcileExistingDocument(
+            ctx,
+            normalized,
+            concurrent,
+            filename,
+            textContent,
+            fileHash,
+            resolvedMime,
+            resolvedDocType,
+          );
+          results.push({
+            sourceId: normalized.sourceId,
+            documentId: concurrent.id,
+            status: "updated",
+          });
+          continue;
+        }
 
         if (encryptDocumentText) {
           await documentContentVault.encryptDocumentFields(
@@ -489,6 +550,12 @@ function deterministicDocumentId(
 
 function wordCount(input: string): number {
   return input.trim() ? input.trim().split(/\s+/).length : 0;
+}
+
+function isUniqueViolation(error: unknown): boolean {
+  const code = String((error as any)?.code || "");
+  const message = String((error as any)?.message || "");
+  return code === "P2002" || /unique constraint/i.test(message);
 }
 
 export default ConnectorsIngestionService;

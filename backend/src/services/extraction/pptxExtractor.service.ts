@@ -20,6 +20,43 @@ import { createPptSlideAnchor } from "../../types/extraction.types";
 import { formatAsMarkdownTable } from "../../utils/pdfTableExtractor";
 import { logger } from "../../utils/logger";
 import type { ExtractedTable } from "../ingestion/extraction/extractionResult.types";
+import { extractWithTesseract } from "./tesseractFallback.service";
+
+const PPTX_IMAGE_OCR_LIMIT = 10;
+const MIN_PPTX_IMAGE_OCR_TEXT_LEN = 10;
+const DEFAULT_PPTX_IMAGE_OCR_MIN_CONFIDENCE = 0.6;
+const DEFAULT_PPTX_SLIDE_PARSE_FAILURE_POLICY = "warn";
+const DEFAULT_PPTX_SLIDE_PARSE_FAILURE_MAX_RATIO = 0.25;
+
+type PptxParseFailurePolicy = "warn" | "fail";
+
+function clamp01(value: number): number {
+  if (!Number.isFinite(value)) return 0;
+  if (value < 0) return 0;
+  if (value > 1) return 1;
+  return value;
+}
+
+function resolvePptxImageOcrMinConfidence(): number {
+  const parsed = Number(process.env.PPTX_IMAGE_OCR_MIN_CONFIDENCE);
+  if (!Number.isFinite(parsed)) return DEFAULT_PPTX_IMAGE_OCR_MIN_CONFIDENCE;
+  return clamp01(parsed);
+}
+
+function resolvePptxParseFailurePolicy(): PptxParseFailurePolicy {
+  const raw = String(
+    process.env.PPTX_SLIDE_PARSE_FAILURE_POLICY || DEFAULT_PPTX_SLIDE_PARSE_FAILURE_POLICY,
+  )
+    .trim()
+    .toLowerCase();
+  return raw === "fail" ? "fail" : "warn";
+}
+
+function resolvePptxParseFailureMaxRatio(): number {
+  const parsed = Number(process.env.PPTX_SLIDE_PARSE_FAILURE_MAX_RATIO);
+  if (!Number.isFinite(parsed)) return DEFAULT_PPTX_SLIDE_PARSE_FAILURE_MAX_RATIO;
+  return clamp01(parsed);
+}
 
 // ============================================================================
 // Post-processing
@@ -351,6 +388,132 @@ function extractNotesText(notesXml: any): string {
   return collected.bodyParts.join("\n\n");
 }
 
+function buildCombinedPresentationText(
+  slides: Array<{ title?: string; text?: string; notes?: string }>,
+): string {
+  const fragments = slides
+    .map((s) => {
+      let slideText = "";
+      if (s.title) slideText += `${s.title}\n\n`;
+      slideText += s.text || "";
+      if (s.notes) slideText += `\n\nNotes: ${s.notes}`;
+      return slideText.trim();
+    })
+    .filter((fragment) => fragment.length > 0);
+  return fragments.join("\n\n---\n\n");
+}
+
+function toCanonicalPptxSlides(
+  slides: PptxExtractedSlide[],
+): Array<{ slide: number; title?: string; text: string; notes?: string }> {
+  return slides.map((slide, index) => ({
+    slide: Number(slide.slide ?? (slide as any).slideNumber ?? index + 1),
+    title: slide.title || undefined,
+    text: String(slide.text || ""),
+    notes: slide.notes || undefined,
+  }));
+}
+
+function collectSlideImageRefs(
+  zipEntries: Array<{ entryName: string; getData: () => Buffer }>,
+): Map<number, string[]> {
+  const out = new Map<number, string[]>();
+  const relRegex =
+    /<Relationship[^>]+Type="[^"]*\/image"[^>]+Target="([^"]+)"/gi;
+
+  for (const entry of zipEntries) {
+    const match = entry.entryName.match(/ppt\/slides\/_rels\/slide(\d+)\.xml\.rels$/);
+    if (!match) continue;
+
+    const slideNum = Number(match[1]);
+    const refs: string[] = [];
+    const xml = entry.getData().toString("utf8");
+    let relMatch: RegExpExecArray | null;
+    while ((relMatch = relRegex.exec(xml)) !== null) {
+      const rawTarget = String(relMatch[1] || "").trim();
+      const filename = rawTarget.split("/").pop();
+      if (!filename) continue;
+      refs.push(`ppt/media/${filename}`.toLowerCase());
+    }
+    if (refs.length > 0) {
+      out.set(slideNum, Array.from(new Set(refs)));
+    }
+  }
+
+  return out;
+}
+
+async function extractSlideImageOcrFromZip(
+  zipEntries: Array<{ entryName: string; getData: () => Buffer }>,
+): Promise<{ imageOcrMap: Map<number, string[]>; warnings: string[] }> {
+  if (process.env.PPTX_IMAGE_OCR_ENABLED !== "true") {
+    return { imageOcrMap: new Map(), warnings: [] };
+  }
+
+  const mediaByPath = new Map<string, Buffer>();
+  for (const entry of zipEntries) {
+    if (!entry.entryName.startsWith("ppt/media/")) continue;
+    if (entry.entryName.endsWith("/")) continue;
+    mediaByPath.set(entry.entryName.toLowerCase(), entry.getData());
+  }
+  if (mediaByPath.size === 0) {
+    return { imageOcrMap: new Map(), warnings: [] };
+  }
+
+  const refsBySlide = collectSlideImageRefs(zipEntries);
+  if (refsBySlide.size === 0) {
+    return { imageOcrMap: new Map(), warnings: [] };
+  }
+
+  const warnings: string[] = [];
+  const imageOcrMap = new Map<number, string[]>();
+  let processed = 0;
+  const minConfidence = resolvePptxImageOcrMinConfidence();
+
+  const slideNumbers = Array.from(refsBySlide.keys()).sort((a, b) => a - b);
+  for (const slideNum of slideNumbers) {
+    const refs = refsBySlide.get(slideNum) || [];
+    for (const mediaRef of refs) {
+      if (processed >= PPTX_IMAGE_OCR_LIMIT) break;
+      const imageBuffer = mediaByPath.get(mediaRef);
+      if (!imageBuffer) {
+        warnings.push(
+          `pptx_image_reference_missing: slide ${slideNum} references ${mediaRef}`,
+        );
+        continue;
+      }
+      processed++;
+      try {
+        const ocr = await extractWithTesseract(imageBuffer, "eng+por");
+        const ocrText = postProcessText(String(ocr?.text || ""));
+        if (ocrText.length <= MIN_PPTX_IMAGE_OCR_TEXT_LEN) continue;
+        const confidence = clamp01(Number(ocr?.confidence ?? 0));
+        if (confidence < minConfidence) {
+          warnings.push(
+            `pptx_image_ocr_low_confidence: slide ${slideNum} (${confidence.toFixed(2)} < ${minConfidence.toFixed(2)})`,
+          );
+          continue;
+        }
+        if (!imageOcrMap.has(slideNum)) imageOcrMap.set(slideNum, []);
+        imageOcrMap.get(slideNum)!.push(ocrText);
+      } catch (error: any) {
+        warnings.push(
+          `pptx_image_ocr_failed: slide ${slideNum} (${error?.message || "unknown"})`,
+        );
+      }
+    }
+    if (processed >= PPTX_IMAGE_OCR_LIMIT) break;
+  }
+
+  logger.info("[PPTX] Image OCR pass complete", {
+    enabled: true,
+    processed,
+    slidesWithOcrText: imageOcrMap.size,
+  });
+
+  return { imageOcrMap, warnings };
+}
+
 // ============================================================================
 // Main Extraction
 // ============================================================================
@@ -433,6 +596,8 @@ export async function extractPptxWithAnchors(
     const slideTitles: (string | null)[] = [];
     let hasNotes = false;
     let presentationTitle: string | undefined;
+    const extractionWarnings: string[] = [];
+    const parseFailureSlides: number[] = [];
 
     // Parse ALL slides in parallel (each gets its own parser instance)
     const slideParseResults = await Promise.all(
@@ -498,9 +663,10 @@ export async function extractPptxWithAnchors(
             slideNum,
             slideData: {
               slide: slideNum,
-              text: "[Failed to parse slide content]",
+              text: "",
             } as PptxExtractedSlide,
             hasNotes: false,
+            parseFailed: true,
           };
         }
       }),
@@ -513,7 +679,16 @@ export async function extractPptxWithAnchors(
 
     // Reassemble results in slide order (Promise.all preserves order)
     const allPptxExtractedTables: ExtractedTable[] = [];
-    for (const { slideData, hasNotes: slideHasNotes, slideTables } of slideParseResults) {
+    for (const {
+      slideNum,
+      slideData,
+      hasNotes: slideHasNotes,
+      slideTables,
+      parseFailed,
+    } of slideParseResults) {
+      if (parseFailed) {
+        parseFailureSlides.push(slideNum);
+      }
       if (slideTables) allPptxExtractedTables.push(...slideTables);
       slides.push(slideData);
       slideTitles.push(slideData.title || null);
@@ -522,17 +697,38 @@ export async function extractPptxWithAnchors(
         presentationTitle = slideData.title;
       }
     }
+    if (parseFailureSlides.length > 0) {
+      extractionWarnings.push(
+        `pptx_slide_parse_failed: slides ${parseFailureSlides.join(",")}`,
+      );
+    }
+    const parseFailureCount = parseFailureSlides.length;
+    if (parseFailureCount > 0) {
+      const parseFailureRatio = parseFailureCount / slides.length;
+      const parseFailurePolicy = resolvePptxParseFailurePolicy();
+      const parseFailureMaxRatio = resolvePptxParseFailureMaxRatio();
+      if (parseFailureRatio > parseFailureMaxRatio) {
+        const ratioPct = (parseFailureRatio * 100).toFixed(2);
+        const thresholdPct = (parseFailureMaxRatio * 100).toFixed(2);
+        const summary = `${parseFailureCount}/${slides.length} slides (${ratioPct}% > ${thresholdPct}%)`;
+        if (parseFailurePolicy === "fail") {
+          throw new Error(
+            `PPTX slide parse failure ratio exceeded threshold: ${summary}`,
+          );
+        }
+        extractionWarnings.push(
+          `pptx_slide_parse_failure_ratio_exceeded: ${summary}`,
+        );
+      }
+    }
+
+    const imageOcrResult = await extractSlideImageOcrFromZip(
+      zipEntries as Array<{ entryName: string; getData: () => Buffer }>,
+    );
+    extractionWarnings.push(...imageOcrResult.warnings);
 
     // Build combined text for legacy compatibility
-    const allText = slides
-      .map((s) => {
-        let slideText = "";
-        if (s.title) slideText += `${s.title}\n\n`;
-        slideText += s.text;
-        if (s.notes) slideText += `\n\nNotes: ${s.notes}`;
-        return slideText;
-      })
-      .join("\n\n---\n\n");
+    const allText = buildCombinedPresentationText(slides);
 
     const totalWordCount = slides.reduce(
       (sum, s) =>
@@ -548,18 +744,23 @@ export async function extractPptxWithAnchors(
       hasNotes,
     });
 
-    return {
+    const result: PptxExtractionResult = {
       sourceType: "pptx",
       text: postProcessText(allText),
       slideCount: slides.length,
-      slides,
+      slides: toCanonicalPptxSlides(slides),
       slideTitles,
       hasNotes,
       presentationTitle,
       wordCount: totalWordCount,
       confidence: 1.0,
       ...(allPptxExtractedTables.length > 0 ? { extractedTables: allPptxExtractedTables } : {}),
+      ...(extractionWarnings.length > 0 ? { extractionWarnings } : {}),
     };
+    if (imageOcrResult.imageOcrMap.size > 0) {
+      mergeImageOcrText(result, imageOcrResult.imageOcrMap);
+    }
+    return result;
   } catch (error: any) {
     logger.error("[PPTX] Extraction failed", { error: error.message });
 
@@ -590,7 +791,6 @@ export async function extractTextFromPowerPoint(
   const result = await extractPptxWithAnchors(buffer);
   return {
     text: result.text,
-    pageCount: result.slideCount,
     wordCount: result.wordCount,
     confidence: result.confidence,
   };
@@ -660,17 +860,7 @@ export function mergeImageOcrText(
   }
 
   // Rebuild combined text for legacy compatibility
-  const allText = result.slides
-    .map((s: (typeof result.slides)[number]) => {
-      let slideText = "";
-      if (s.title) slideText += `${s.title}\n\n`;
-      slideText += s.text;
-      if (s.notes) slideText += `\n\nNotes: ${s.notes}`;
-      return slideText;
-    })
-    .join("\n\n---\n\n");
-
-  result.text = postProcessText(allText);
+  result.text = postProcessText(buildCombinedPresentationText(result.slides));
 
   return result;
 }

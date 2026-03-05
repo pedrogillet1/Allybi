@@ -25,7 +25,7 @@ import { EncryptionService } from "../security/encryption.service";
 import { EnvelopeService } from "../security/envelope.service";
 import { TenantKeyService } from "../security/tenantKey.service";
 import embeddingService from "./embedding.service";
-import { parseBooleanFlag, resolveIndexingPolicySnapshot } from "./indexingPolicy.service";
+import { resolveIndexingPolicySnapshot } from "./indexingPolicy.service";
 import pineconeService from "./pinecone.service";
 import type { InputChunk as PipelineInputChunk } from "../ingestion/pipeline/pipelineTypes";
 import {
@@ -259,6 +259,12 @@ function hasRequiredChunkMetadata(chunk: {
     .toLowerCase();
   const pageLike =
     Number.isFinite(chunk.pageNumber) || Number.isFinite(metadata.pageNumber);
+  const hasCellCoordinates =
+    Number.isFinite(metadata.rowIndex) && Number.isFinite(metadata.columnIndex);
+  const hasCellLabels = Boolean(metadata.rowLabel && metadata.colHeader);
+  if (chunkType === "cell_fact") {
+    return Boolean(metadata.tableId) && (Boolean(metadata.cellRef) || hasCellCoordinates || hasCellLabels);
+  }
 
   if (sourceType === "pdf") {
     return Boolean(metadata.sectionId) && pageLike;
@@ -292,6 +298,41 @@ function hasRequiredChunkMetadata(chunk: {
   );
 }
 
+function withCanonicalVersionMetadata(
+  chunk: {
+    chunkIndex: number;
+    pageNumber?: number;
+    content: string;
+    embedding?: number[];
+    metadata?: Record<string, any>;
+  },
+  canonical: {
+    documentId: string;
+    versionId: string;
+    rootDocumentId: string;
+    parentVersionId?: string;
+    isLatestVersion: boolean;
+  },
+): {
+  chunkIndex: number;
+  pageNumber?: number;
+  content: string;
+  embedding?: number[];
+  metadata: Record<string, any>;
+} {
+  return {
+    ...chunk,
+    metadata: {
+      ...(chunk.metadata || {}),
+      documentId: canonical.documentId,
+      versionId: canonical.versionId,
+      rootDocumentId: canonical.rootDocumentId,
+      parentVersionId: canonical.parentVersionId,
+      isLatestVersion: canonical.isLatestVersion,
+    },
+  };
+}
+
 function collectMissingMetadataIndices(
   chunks: Array<{ chunkIndex: number; pageNumber?: number; metadata?: Record<string, any> }>,
 ): number[] {
@@ -300,6 +341,25 @@ function collectMissingMetadataIndices(
     if (!hasRequiredChunkMetadata(chunk)) {
       missing.push(chunk.chunkIndex);
     }
+  }
+  return missing;
+}
+
+function collectMissingVersionMetadataIndices(
+  chunks: Array<{ chunkIndex: number; metadata?: Record<string, any> }>,
+): number[] {
+  const missing: number[] = [];
+  for (const chunk of chunks) {
+    const metadata = chunk.metadata || {};
+    const hasVersionMetadata =
+      typeof metadata.documentId === "string" &&
+      metadata.documentId.trim().length > 0 &&
+      typeof metadata.versionId === "string" &&
+      metadata.versionId.trim().length > 0 &&
+      typeof metadata.rootDocumentId === "string" &&
+      metadata.rootDocumentId.trim().length > 0 &&
+      typeof metadata.isLatestVersion === "boolean";
+    if (!hasVersionMetadata) missing.push(chunk.chunkIndex);
   }
   return missing;
 }
@@ -360,14 +420,12 @@ export async function storeDocumentEmbeddings(
       : "plaintext",
   } = options;
   const strictFailClosed = indexingPolicy.strictFailClosed;
-  const enforceEncryptedOnlyInvariant = parseBooleanFlag(
-    process.env.INDEXING_ENFORCE_ENCRYPTED_ONLY,
-    true,
-  );
-  const enforceChunkMetadataInvariant = parseBooleanFlag(
-    process.env.INDEXING_ENFORCE_CHUNK_METADATA,
-    true,
-  );
+  const enforceEncryptedOnlyInvariant =
+    indexingPolicy.enforceEncryptedOnlyInvariant;
+  const enforceChunkMetadataInvariant =
+    indexingPolicy.enforceChunkMetadataInvariant;
+  const enforceVersionMetadataInvariant =
+    indexingPolicy.enforceVersionMetadataInvariant;
 
   if (!documentId) throw new Error("documentId is required");
   if (!chunks || chunks.length === 0) {
@@ -402,9 +460,41 @@ export async function storeDocumentEmbeddings(
     );
   }
 
+  const operationId = buildEmbeddingOperationId(documentId);
+  const indexedAtMs = Date.now();
+  const rootDocumentId = await resolveRootDocumentId(document.id);
+  const familyDocs = await prisma.document.findMany({
+    where: {
+      userId: document.userId,
+      OR: [{ id: rootDocumentId }, { parentVersionId: rootDocumentId }],
+    },
+    select: {
+      id: true,
+      createdAt: true,
+    },
+  });
+  const latestVersionId = pickMostRecentDocId(familyDocs, document.id);
+  const isLatestVersion = latestVersionId === document.id;
+  const canonicalVersionMetadata = {
+    documentId: document.id,
+    versionId: document.id,
+    rootDocumentId,
+    parentVersionId: document.parentVersionId || undefined,
+    isLatestVersion,
+  };
+  const sharedIndexingMetadata = {
+    operationId,
+    indexedAtMs,
+    ...canonicalVersionMetadata,
+  };
+
   // De-dupe chunkIndex to avoid DB uniqueness conflicts (and Pinecone id collisions)
-  const usableChunks = dedupeByChunkIndex(normalized);
+  const usableChunks = dedupeByChunkIndex(normalized).map((chunk) =>
+    withCanonicalVersionMetadata(chunk, canonicalVersionMetadata),
+  );
   const missingMetadataChunkIndices = collectMissingMetadataIndices(usableChunks);
+  const missingVersionMetadataChunkIndices =
+    collectMissingVersionMetadataIndices(usableChunks);
 
   const metadataTotal = usableChunks.length;
   const metadataComplete = metadataTotal - missingMetadataChunkIndices.length;
@@ -442,34 +532,20 @@ export async function storeDocumentEmbeddings(
       `Chunk metadata invariant failed for document ${documentId}. Missing required locator metadata on chunk indexes: ${sample}${missingMetadataChunkIndices.length > 10 ? ",..." : ""}`,
     );
   }
+  if (
+    enforceVersionMetadataInvariant &&
+    missingVersionMetadataChunkIndices.length > 0
+  ) {
+    const sample = missingVersionMetadataChunkIndices.slice(0, 10).join(",");
+    throw new Error(
+      `Chunk version metadata invariant failed for document ${documentId}. Missing canonical version metadata on chunk indexes: ${sample}${missingVersionMetadataChunkIndices.length > 10 ? ",..." : ""}`,
+    );
+  }
 
   // Generate embeddings for chunks that don't have them (true batch for efficiency)
   const needsEmbedding = usableChunks.filter(
     (c) => !c.embedding || c.embedding.length === 0,
   );
-  const operationId = buildEmbeddingOperationId(documentId);
-  const indexedAtMs = Date.now();
-  const rootDocumentId = await resolveRootDocumentId(document.id);
-  const familyDocs = await prisma.document.findMany({
-    where: {
-      userId: document.userId,
-      OR: [{ id: rootDocumentId }, { parentVersionId: rootDocumentId }],
-    },
-    select: {
-      id: true,
-      createdAt: true,
-    },
-  });
-  const latestVersionId = pickMostRecentDocId(familyDocs, document.id);
-  const isLatestVersion = latestVersionId === document.id;
-  const sharedIndexingMetadata = {
-    operationId,
-    indexedAtMs,
-    versionId: document.id,
-    rootDocumentId,
-    parentVersionId: document.parentVersionId || undefined,
-    isLatestVersion,
-  };
 
   const previousOperationId = document.indexingOperationId ?? null;
   const claim = await prisma.document.updateMany({

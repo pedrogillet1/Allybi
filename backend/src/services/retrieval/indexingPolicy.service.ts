@@ -8,6 +8,11 @@ export interface IndexingPolicySnapshot {
   runtimeModeAllowed: boolean;
   strictFailClosed: boolean;
   encryptedChunksOnly: boolean;
+  allowPlaintextChunksOverride: boolean;
+  plaintextOverrideReason: string | null;
+  enforceEncryptedOnlyInvariant: boolean;
+  enforceChunkMetadataInvariant: boolean;
+  enforceVersionMetadataInvariant: boolean;
   verifyRequired: boolean;
   allowUnverifiedPreviousOperationDelete: boolean;
   embeddingFailCloseV1: boolean;
@@ -70,9 +75,31 @@ export function resolveIndexingPolicySnapshot(
     env.INDEXING_ENCRYPTED_CHUNKS_ONLY,
     true,
   );
-  if (isProtectedRuntimeEnv(env.NODE_ENV) && !encryptedChunksOnly) {
+  const allowPlaintextChunksOverride = parseBooleanFlag(
+    env.INDEXING_ALLOW_PLAINTEXT_CHUNKS,
+    false,
+  );
+  const plaintextOverrideReason = String(
+    env.INDEXING_PLAINTEXT_OVERRIDE_REASON || "",
+  ).trim();
+
+  if (!encryptedChunksOnly && isProtectedRuntimeEnv(env.NODE_ENV)) {
     throw new Error(
       "[indexing] INDEXING_ENCRYPTED_CHUNKS_ONLY=false is not allowed in production/staging.",
+    );
+  }
+  if (!encryptedChunksOnly && !allowPlaintextChunksOverride) {
+    throw new Error(
+      "[indexing] INDEXING_ENCRYPTED_CHUNKS_ONLY=false requires INDEXING_ALLOW_PLAINTEXT_CHUNKS=true.",
+    );
+  }
+  if (
+    !encryptedChunksOnly &&
+    allowPlaintextChunksOverride &&
+    !plaintextOverrideReason
+  ) {
+    throw new Error(
+      "[indexing] INDEXING_ALLOW_PLAINTEXT_CHUNKS=true requires INDEXING_PLAINTEXT_OVERRIDE_REASON to be set.",
     );
   }
 
@@ -84,6 +111,20 @@ export function resolveIndexingPolicySnapshot(
     runtimeModeAllowed: allowedRuntimeModes.includes(runtimeMode),
     strictFailClosed: parseBooleanFlag(env.INDEXING_STRICT_FAIL_CLOSED, true),
     encryptedChunksOnly,
+    allowPlaintextChunksOverride,
+    plaintextOverrideReason: plaintextOverrideReason || null,
+    enforceEncryptedOnlyInvariant: parseBooleanFlag(
+      env.INDEXING_ENFORCE_ENCRYPTED_ONLY,
+      true,
+    ),
+    enforceChunkMetadataInvariant: parseBooleanFlag(
+      env.INDEXING_ENFORCE_CHUNK_METADATA,
+      true,
+    ),
+    enforceVersionMetadataInvariant: parseBooleanFlag(
+      env.INDEXING_ENFORCE_VERSION_METADATA,
+      true,
+    ),
     verifyRequired: parseBooleanFlag(env.INDEXING_VERIFY_REQUIRED, true),
     allowUnverifiedPreviousOperationDelete: parseBooleanFlag(
       env.INDEXING_ALLOW_UNVERIFIED_PREVOP_DELETE,

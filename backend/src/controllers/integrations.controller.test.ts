@@ -7,6 +7,7 @@ jest.mock("../queues/connector.queue", () => ({
 import { createIntegrationsController } from "./integrations.controller";
 import { registerConnector } from "../services/connectors/connectorsRegistry";
 import { signEmailSendConfirmationToken } from "../services/connectors/emailSendConfirmation.service";
+import { resetEmailSendReplayCacheForTests } from "../services/connectors/emailSendReplayGuard.service";
 
 function makeJsonRes() {
   const state: { body?: any; status?: number } = {};
@@ -33,6 +34,7 @@ function makeJsonRes() {
 describe("IntegrationsController", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    resetEmailSendReplayCacheForTests();
   });
 
   test("sync sanitizes thrown runtime errors and returns a correlation ref", async () => {
@@ -191,5 +193,49 @@ describe("IntegrationsController", () => {
     const gmail = providers.find((p: any) => p.provider === "gmail");
     expect(gmail?.status?.ingestionEnabled).toBe(true);
     expect(gmail?.status?.indexedDocuments).toBe(3);
+  });
+
+  test("send rejects replayed confirmation token", async () => {
+    process.env.CONNECTOR_ACTION_SECRET = "test-action-secret";
+    const now = Date.now();
+    const confirmationId = signEmailSendConfirmationToken({
+      v: 2,
+      t: "email_send",
+      userId: "user-1",
+      provider: "gmail",
+      to: "person@example.com",
+      subject: "Subject",
+      body: "Body",
+      attachmentDocumentIds: [],
+      iat: now,
+      exp: now + 5 * 60 * 1000,
+    });
+
+    const handler = {
+      execute: jest.fn(async () => ({
+        ok: true,
+        action: "send",
+        provider: "gmail",
+        data: { sent: true, receipt: {} },
+      })),
+    };
+
+    const controller = createIntegrationsController(handler as any);
+    const first = makeJsonRes();
+    const second = makeJsonRes();
+    const req: any = {
+      params: { provider: "gmail" },
+      user: { id: "user-1" },
+      headers: {},
+      body: { confirmationId },
+    };
+
+    await controller.send(req, first.res);
+    await controller.send(req, second.res);
+
+    expect(first.state.status).toBe(200);
+    expect(second.state.status).toBe(409);
+    expect(second.state.body?.error?.code).toBe("CONFIRMATION_ALREADY_USED");
+    expect(handler.execute).toHaveBeenCalledTimes(1);
   });
 });

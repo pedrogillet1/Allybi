@@ -82,6 +82,7 @@ describe("DocumentRevisionStoreService overwrite safety", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     process.env.KODA_EDITING_SAVE_MODE = "overwrite";
+    process.env.KODA_EDITING_ENABLE_OVERWRITE = "true";
     process.env.KEEP_UNDO_HISTORY = "true";
     process.env.NODE_ENV = "test";
     delete process.env.KODA_EDITING_ALLOW_OVERWRITE_PROTECTED;
@@ -159,6 +160,26 @@ describe("DocumentRevisionStoreService overwrite safety", () => {
     expect(mockUploadFile).not.toHaveBeenCalled();
   });
 
+  test("storeEditedBuffer is blocked when overwrite is not globally enabled", async () => {
+    process.env.KODA_EDITING_ENABLE_OVERWRITE = "false";
+    mockCreateRevision.mockResolvedValue({ id: "backup-1" });
+    mockDownloadFile.mockResolvedValue(Buffer.from("original bytes"));
+
+    const service = new DocumentRevisionStoreService();
+
+    await expect(
+      service.storeEditedBuffer({
+        documentId: "doc-123",
+        userId: "user-456",
+        editedBuffer: Buffer.from("edited bytes"),
+        operator: "EXPORT_SLIDES",
+      }),
+    ).rejects.toThrow(/OVERWRITE_DISABLED/);
+
+    expect(mockCreateRevision).not.toHaveBeenCalled();
+    expect(mockUploadFile).not.toHaveBeenCalled();
+  });
+
   test("storeEditedBuffer blocks overwrite when backup creation fails", async () => {
     mockCreateRevision.mockRejectedValue(new Error("storage unavailable"));
     mockDownloadFile.mockResolvedValue(Buffer.from("original bytes"));
@@ -217,5 +238,25 @@ describe("DocumentRevisionStoreService overwrite safety", () => {
 
     expect(mockCreateRevision).not.toHaveBeenCalled();
     expect(mockUploadFile).not.toHaveBeenCalled();
+  });
+
+  test("storeEditedBuffer rolls storage back when prisma persistence fails", async () => {
+    mockCreateRevision.mockResolvedValue({ id: "backup-1" });
+    mockDownloadFile.mockResolvedValue(Buffer.from("original bytes"));
+    mockTransaction.mockRejectedValue(new Error("db transaction failed"));
+
+    const service = new DocumentRevisionStoreService();
+
+    await expect(
+      service.storeEditedBuffer({
+        documentId: "doc-123",
+        userId: "user-456",
+        editedBuffer: Buffer.from("edited bytes"),
+        operator: "EXPORT_SLIDES",
+      }),
+    ).rejects.toThrow(/STORE_BUFFER_PERSISTENCE_FAILED_RECOVERED/);
+
+    // first upload = edited bytes, second upload = rollback to original bytes
+    expect(mockUploadFile).toHaveBeenCalledTimes(2);
   });
 });

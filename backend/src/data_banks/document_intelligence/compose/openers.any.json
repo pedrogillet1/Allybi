@@ -1,7 +1,7 @@
 {
   "_meta": {
     "id": "openers",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Openers for natural, grounded responses.",
     "languages": [
       "any",
@@ -9,7 +9,7 @@
       "pt",
       "es"
     ],
-    "lastUpdated": "2026-03-03",
+    "lastUpdated": "2026-03-05",
     "owner": "data-bank-governance",
     "usedBy": [
       "services/core/banks/dataBankLoader.service.ts"
@@ -63,6 +63,36 @@
       "intent": "extract",
       "language": "pt",
       "text": "Identifiquei evidencias no documento selecionado e posso resumir os achados com seguranca."
+    },
+    {
+      "id": "OPN_008",
+      "intent": "compare",
+      "language": "en",
+      "text": "I analyzed both documents and can highlight the key differences."
+    },
+    {
+      "id": "OPN_009",
+      "intent": "compare",
+      "language": "pt",
+      "text": "Analisei ambos os documentos e posso destacar as diferencas principais."
+    },
+    {
+      "id": "OPN_010",
+      "intent": "compare",
+      "language": "es",
+      "text": "Analice ambos documentos y puedo destacar las diferencias principales."
+    },
+    {
+      "id": "OPN_011",
+      "intent": "extract",
+      "language": "en",
+      "text": "I located the relevant data in the selected document."
+    },
+    {
+      "id": "OPN_012",
+      "intent": "extract",
+      "language": "es",
+      "text": "Identifique evidencia relevante en el documento seleccionado y puedo resumir los hallazgos."
     }
   ]
 }

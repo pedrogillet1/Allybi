@@ -1,0 +1,97 @@
+{
+  "_meta": {
+    "id": "routing_rule_schema",
+    "version": "1.0.0",
+    "description": "Schema for routing rule banks. Validates rule structure including ruleId, priority, when/then objects, and config.",
+    "languages": ["any"],
+    "lastUpdated": "2026-03-05",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true
+  },
+  "schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "koda://schemas/routing_rule_schema.any.json",
+    "title": "Routing Rule Bank Schema",
+    "type": "object",
+    "required": ["_meta", "config"],
+    "additionalProperties": true,
+    "properties": {
+      "_meta": {
+        "type": "object",
+        "required": ["id", "version", "description", "languages", "lastUpdated"],
+        "additionalProperties": true
+      },
+      "config": {
+        "type": "object",
+        "required": ["enabled"],
+        "additionalProperties": true,
+        "properties": {
+          "enabled": { "type": "boolean" },
+          "strict": { "type": "boolean" },
+          "deterministic": { "type": "boolean" },
+          "dedupe": { "type": "boolean" },
+          "sortBy": { "type": "string" },
+          "matching": { "type": "object", "additionalProperties": true },
+          "defaults": { "type": "object", "additionalProperties": true },
+          "thresholds": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+              "minConfidence": { "type": "number" },
+              "highConfidence": { "type": "number" },
+              "minDecisionMargin": { "type": "number" }
+            }
+          },
+          "guardrails": { "type": "object", "additionalProperties": true }
+        }
+      },
+      "providers": { "type": "object", "additionalProperties": true },
+      "operators": { "type": "object", "additionalProperties": true },
+      "rules": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": ["ruleId"],
+          "additionalProperties": true,
+          "properties": {
+            "ruleId": { "type": "string", "minLength": 1 },
+            "priority": { "type": "number" },
+            "supportedLocales": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "when": {
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "any": { "type": "array" },
+                "all": { "type": "array" }
+              }
+            },
+            "then": {
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "intent": { "type": "string" },
+                "operator": { "type": "string" },
+                "domain": { "type": "string" },
+                "scope": { "type": "string" }
+              }
+            },
+            "confidenceBoost": { "type": "number" },
+            "reasonCode": { "type": "string" }
+          }
+        }
+      },
+      "tests": { "type": "object", "additionalProperties": true }
+    }
+  }
+}

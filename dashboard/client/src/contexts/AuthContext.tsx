@@ -1,4 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import {
+  clearAdminApiKey,
+  setAdminApiKey,
+} from "../auth/adminKeyStore";
 
 interface Admin {
   id: string;
@@ -34,35 +38,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Initialize from localStorage or auto-detect nginx-injected auth
+  // Initialize from cookie session or API-key mode.
   useEffect(() => {
     const initAuth = async () => {
-      const storedToken = localStorage.getItem("auth_token");
-      const storedAdmin = localStorage.getItem("auth_admin");
-      const storedApiKey = localStorage.getItem("admin_key");
-
-      if (storedToken && storedAdmin) {
-        try {
-          setToken(storedToken);
-          setAdmin(JSON.parse(storedAdmin));
-          setIsLoading(false);
-          return;
-        } catch {
-          localStorage.removeItem("auth_token");
-          localStorage.removeItem("auth_admin");
-        }
-      } else if (storedApiKey) {
-        // API key auth - set placeholder values
-        setToken("api-key-auth");
-        setAdmin({
-          id: "api-key-admin",
-          username: "admin",
-          name: "API Key Admin",
-          role: "admin",
-        });
-        setIsLoading(false);
-        return;
-      }
+      // Legacy cleanup: admin_key localStorage is no longer used.
+      localStorage.removeItem("admin_key");
 
       // Try auto-detect: nginx may be injecting admin key
       try {
@@ -81,9 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             role: "admin",
           };
           setAdmin(adminData);
-          setToken("nginx-injected");
-          localStorage.setItem("auth_token", "nginx-injected");
-          localStorage.setItem("auth_admin", JSON.stringify(adminData));
+          setToken("cookie-session");
         }
       } catch {
         // API not accessible - require manual login
@@ -110,11 +88,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const { admin: adminData, tokens } = data.data;
 
-    setToken(tokens.accessToken);
+    setToken(tokens?.accessToken || "cookie-session");
     setAdmin(adminData);
-    localStorage.setItem("auth_token", tokens.accessToken);
-    localStorage.setItem("auth_admin", JSON.stringify(adminData));
-    localStorage.setItem("refresh_token", tokens.refreshToken);
   }, []);
 
   const loginWithApiKey = useCallback(async (apiKey: string) => {
@@ -132,7 +107,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     // API key is valid - store it and set authenticated state
-    localStorage.setItem("admin_key", apiKey);
+    setAdminApiKey(apiKey);
     // Set a placeholder admin for API key auth
     const adminData: Admin = {
       id: "api-key-admin",
@@ -142,16 +117,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
     setAdmin(adminData);
     setToken("api-key-auth"); // Placeholder token to indicate authenticated
-    localStorage.setItem("auth_token", "api-key-auth");
-    localStorage.setItem("auth_admin", JSON.stringify(adminData));
   }, []);
 
   const logout = useCallback(() => {
     setToken(null);
     setAdmin(null);
-    localStorage.removeItem("auth_token");
-    localStorage.removeItem("auth_admin");
-    localStorage.removeItem("refresh_token");
+    clearAdminApiKey();
     localStorage.removeItem("admin_key");
   }, []);
 
@@ -160,7 +131,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       value={{
         admin,
         token,
-        isAuthenticated: !!token || !!localStorage.getItem("admin_key"),
+        isAuthenticated: !!token,
         isLoading,
         login,
         loginWithApiKey,
