@@ -265,12 +265,22 @@ export class UiContractInterpreterService {
         .trim()
         .toLowerCase() === "apply_first_match";
     const hardBlockIsTerminal = combination.hardBlockIsTerminal !== false;
+    const rawMetrics = asObject(input.metrics);
+    const providedClarificationCount = Number(
+      rawMetrics.clarificationQuestionCount,
+    );
+    const inferredClarificationCount = countQuestions(input.content);
+    const effectiveClarificationCount = Number.isFinite(
+      providedClarificationCount,
+    )
+      ? Math.max(Math.floor(providedClarificationCount), inferredClarificationCount)
+      : inferredClarificationCount;
     const runtime = {
       answerMode: String(input.answerMode || "").trim(),
       signals: asObject(input.signals),
       metrics: {
-        ...asObject(input.metrics),
-        clarificationQuestionCount: countQuestions(input.content),
+        ...rawMetrics,
+        clarificationQuestionCount: effectiveClarificationCount,
       },
     } as Record<string, unknown>;
 
@@ -331,7 +341,14 @@ export class UiContractInterpreterService {
       const ruleId = String(rule?.id || "").trim();
       if (!evalWhen(rule.when, runtime)) continue;
       const trigger = languagePatterns(rule.triggerPatterns, input.language);
-      if (trigger.length > 0 && !regexMatchesAny(input.content, trigger)) continue;
+      const contentText = String(input.content || "");
+      if (
+        trigger.length > 0 &&
+        contentText.trim().length > 0 &&
+        !regexMatchesAny(contentText, trigger)
+      ) {
+        continue;
+      }
       if (ruleId) decision.appliedRuleIds.push(ruleId);
       const actionType = String(rule?.action?.type || "")
         .trim()
@@ -374,13 +391,14 @@ export class UiContractInterpreterService {
       const contract = asObject(contracts[contractId]);
       const allowedTypes = normalizedTypeList(contract.allowedAttachments);
       if (allowedTypes.length > 0) {
-        const allowedSet = new Set(allowedTypes);
+        const allowedSet: Set<string> = new Set<string>(allowedTypes);
         if (!allowedAccumulator) {
           allowedAccumulator = allowedSet;
         } else {
-          allowedAccumulator = new Set(
-            [...allowedAccumulator].filter((value) => allowedSet.has(value)),
+          const intersection: string[] = Array.from(allowedAccumulator).filter(
+            (value: string) => allowedSet.has(value),
           );
+          allowedAccumulator = new Set(intersection);
         }
       }
       for (const type of normalizedTypeList(contract.disallowedAttachments)) {

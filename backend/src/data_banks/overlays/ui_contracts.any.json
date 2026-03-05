@@ -66,9 +66,9 @@
           "actions"
         ],
         "disallowedTextPatterns": [
-          "\\bSources?:\\b",
-          "\\bFontes?:\\b",
-          "\\bFuentes?:\\b"
+          "\\bSources?:",
+          "\\bFontes?:",
+          "\\bFuentes?:"
         ]
       },
       "doc_grounded": {
@@ -151,13 +151,13 @@
       ],
       "triggerPatterns": {
         "en": [
-          "\\bSources?:\\b"
+          "\\bSources?:"
         ],
         "pt": [
-          "\\bFontes?:\\b"
+          "\\bFontes?:"
         ],
         "es": [
-          "\\bFuentes?:\\b"
+          "\\bFuentes?:"
         ]
       },
       "when": {

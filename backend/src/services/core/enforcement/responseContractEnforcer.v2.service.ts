@@ -32,7 +32,7 @@
 //   (let fallback engine decide the microcopy).
 
 import type { Attachment } from "../../../types/handlerResult.types";
-import { getBank, getOptionalBank, getTypedBank } from "../banks/bankLoader.service";
+import { getBank, getOptionalBank } from "../banks/bankLoader.service";
 import {
   UIContractsSchema,
   UIReceiptShapesSchema,
@@ -2231,13 +2231,54 @@ export class ResponseContractEnforcerService {
     this.reloadBanks();
   }
 
+  private buildFallbackUiContracts(): UIContractsBank {
+    return {
+      _meta: {
+        id: "ui_contracts_fallback",
+        version: "0.0.0-fallback",
+      },
+      config: {
+        enabled: false,
+        contracts: {},
+      },
+      contracts: {},
+      rules: [],
+    };
+  }
+
   reloadBanks(): void {
     this.renderPolicy = getBank<RenderPolicyBank>("render_policy");
-    this.uiContracts = getTypedBank("ui_contracts", UIContractsSchema) as UIContractsBank;
+    try {
+      this.uiContracts = UIContractsSchema.parse(
+        getBank<unknown>("ui_contracts"),
+      ) as UIContractsBank;
+    } catch {
+      const optionalUiContracts = getOptionalBank<unknown>("ui_contracts");
+      if (optionalUiContracts) {
+        try {
+          this.uiContracts = UIContractsSchema.parse(
+            optionalUiContracts,
+          ) as UIContractsBank;
+        } catch {
+          this.uiContracts = this.buildFallbackUiContracts();
+        }
+      } else {
+        this.uiContracts = this.buildFallbackUiContracts();
+      }
+    }
     const uiReceiptRaw = getOptionalBank<unknown>("ui_receipt_shapes");
-    this.uiReceiptShapes = uiReceiptRaw
-      ? (UIReceiptShapesSchema.parse(uiReceiptRaw) as UiReceiptShapesBank)
-      : undefined;
+    if (!uiReceiptRaw) {
+      this.uiReceiptShapes = undefined;
+    } else {
+      try {
+        this.uiReceiptShapes = UIReceiptShapesSchema.parse(
+          uiReceiptRaw,
+        ) as UiReceiptShapesBank;
+      } catch {
+        // Optional bank: fail open on schema mismatch, runtime guardrails still apply.
+        this.uiReceiptShapes = uiReceiptRaw as UiReceiptShapesBank;
+      }
+    }
     this.bannedPhrases = getBank<BannedPhrasesBank>("banned_phrases");
     this.truncation = getBank<TruncationLimitsBank>("truncation_and_limits");
     this.bulletRules = getBank<BulletRulesBank>("bullet_rules");

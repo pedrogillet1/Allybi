@@ -2,13 +2,11 @@ import { beforeEach, describe, expect, jest, test } from "@jest/globals";
 
 const mockGetBank = jest.fn();
 const mockGetOptionalBank = jest.fn();
-const mockGetTypedBank = jest.fn();
 
 jest.mock("../banks/bankLoader.service", () => ({
   __esModule: true,
   getBank: (...args: unknown[]) => mockGetBank(...args),
   getOptionalBank: (...args: unknown[]) => mockGetOptionalBank(...args),
-  getTypedBank: (...args: unknown[]) => mockGetTypedBank(...args),
 }));
 
 function bankById(bankId: string): unknown {
@@ -88,10 +86,8 @@ describe("ResponseContractEnforcerService v2", () => {
   beforeEach(() => {
     mockGetBank.mockReset();
     mockGetOptionalBank.mockReset();
-    mockGetTypedBank.mockReset();
     mockGetBank.mockImplementation((bankId: string) => bankById(bankId));
     mockGetOptionalBank.mockImplementation((bankId: string) => bankById(bankId));
-    mockGetTypedBank.mockImplementation((bankId: string) => bankById(bankId));
   });
 
   test("blocks nav_pills response when source_buttons attachment is missing", async () => {

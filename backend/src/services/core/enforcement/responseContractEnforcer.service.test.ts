@@ -2,13 +2,11 @@ import { beforeEach, describe, expect, jest, test } from "@jest/globals";
 
 const mockGetBank = jest.fn();
 const mockGetOptionalBank = jest.fn();
-const mockGetTypedBank = jest.fn();
 
 jest.mock("../banks/bankLoader.service", () => ({
   __esModule: true,
   getBank: (...args: unknown[]) => mockGetBank(...args),
   getOptionalBank: (...args: unknown[]) => mockGetOptionalBank(...args),
-  getTypedBank: (...args: unknown[]) => mockGetTypedBank(...args),
 }));
 
 function bankById(bankId: string): unknown {
@@ -170,12 +168,10 @@ describe("ResponseContractEnforcerService nav_pills contract", () => {
   beforeEach(() => {
     mockGetBank.mockReset();
     mockGetOptionalBank.mockReset();
-    mockGetTypedBank.mockReset();
     mockGetBank.mockImplementation((bankId: string) => bankById(bankId));
     mockGetOptionalBank.mockImplementation((bankId: string) =>
       bankById(bankId),
     );
-    mockGetTypedBank.mockImplementation((bankId: string) => bankById(bankId));
   });
 
   test("blocks nav_pills response when source_buttons attachment is missing", async () => {
@@ -230,7 +226,7 @@ describe("ResponseContractEnforcerService nav_pills contract", () => {
   });
 
   test("hard blocks when ui_contract rule with hard_block action matches", async () => {
-    mockGetTypedBank.mockImplementation((bankId: string) => {
+    mockGetBank.mockImplementation((bankId: string) => {
       if (bankId !== "ui_contracts") return bankById(bankId);
       return {
         ...bankById("ui_contracts"),
@@ -268,7 +264,7 @@ describe("ResponseContractEnforcerService nav_pills contract", () => {
   });
 
   test("suppresses action confirmation language when ui_contract rule matches", async () => {
-    mockGetTypedBank.mockImplementation((bankId: string) => {
+    mockGetBank.mockImplementation((bankId: string) => {
       if (bankId !== "ui_contracts") return bankById(bankId);
       return {
         ...bankById("ui_contracts"),
@@ -410,7 +406,7 @@ describe("ResponseContractEnforcerService nav_pills contract", () => {
   });
 
   test("filters disallowed action attachments from ui contract policy", async () => {
-    mockGetTypedBank.mockImplementation((bankId: string) => {
+    mockGetBank.mockImplementation((bankId: string) => {
       if (bankId !== "ui_contracts") return bankById(bankId);
       return {
         ...bankById("ui_contracts"),
