@@ -4,7 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import {
   requireLiveRuntimeGraphEvidence,
-  resolveCertificationProfile,
+  resolveCertificationProfileFromArgs,
 } from "../certification/certification-policy.mjs";
 
 const strict = process.argv.includes("--strict");
@@ -43,7 +43,8 @@ function getGate(gateId) {
 
 const failures = [];
 const checks = [];
-const profile = resolveCertificationProfile();
+const profile = resolveCertificationProfileFromArgs({ args: process.argv });
+process.env.CERT_PROFILE = profile;
 
 const routingBehavioral = getGate("routing-behavioral");
 if (!routingBehavioral.ok || !routingBehavioral.report) {
@@ -118,6 +119,45 @@ if (!followupCoverage.ok || !followupCoverage.report) {
   }
   if (!(caseCount >= minCaseCount)) {
     failures.push("followup-source-coverage:case_count_below_threshold");
+  }
+}
+
+const followupOverlayIntegrity = getGate("followup-overlay-integrity");
+if (!followupOverlayIntegrity.ok || !followupOverlayIntegrity.report) {
+  failures.push("followup-overlay-integrity:missing_gate_report");
+} else {
+  const missingLocaleCount = Number(
+    followupOverlayIntegrity.report.metrics?.missingLocaleCount ?? 0,
+  );
+  const validModeCount = Number(
+    followupOverlayIntegrity.report.metrics?.validModeCount ?? 0,
+  );
+  const expectedValidModeCount = Number(
+    followupOverlayIntegrity.report.thresholds?.expectedValidModeCount ?? 2,
+  );
+  const passed =
+    followupOverlayIntegrity.report.passed === true &&
+    missingLocaleCount === 0 &&
+    validModeCount >= expectedValidModeCount;
+  checks.push({
+    gateId: "followup-overlay-integrity",
+    passed,
+    metrics: {
+      missingLocaleCount,
+      requiredLocales: String(
+        followupOverlayIntegrity.report.metrics?.requiredLocales || "",
+      ),
+      validModeCount,
+    },
+  });
+  if (missingLocaleCount !== 0) {
+    failures.push("followup-overlay-integrity:missing_required_locale_patterns");
+  }
+  if (!(validModeCount >= expectedValidModeCount)) {
+    failures.push("followup-overlay-integrity:invalid_runtime_modes");
+  }
+  if (followupOverlayIntegrity.report.passed !== true) {
+    failures.push("followup-overlay-integrity:gate_failed");
   }
 }
 

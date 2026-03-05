@@ -25,6 +25,14 @@ test("resolve profile from args supports retrieval_signoff", () => {
   assert.equal(profile, "retrieval_signoff");
 });
 
+test("resolve profile from args supports routing_only", () => {
+  const profile = resolveCertificationProfileFromArgs({
+    args: ["node", "script", "--profile=routing_only"],
+    env: {},
+  });
+  assert.equal(profile, "routing_only");
+});
+
 test("query latency is always required for retrieval_signoff", () => {
   const policy = resolveQueryLatencyPolicy({
     strict: false,
@@ -71,6 +79,35 @@ test("runtime graph live evidence override forces strict local mode", () => {
     env: { CERT_REQUIRE_RUNTIME_GRAPH_LIVE: "1" },
   });
   assert.equal(required, true);
+});
+
+test("routing_only profile does not require live runtime graph evidence by default", () => {
+  const required = requireLiveRuntimeGraphEvidence({
+    profile: "routing_only",
+    strict: true,
+    env: {},
+  });
+  assert.equal(required, false);
+});
+
+test("routing_only profile does not enforce local cert run health", () => {
+  const policy = resolveLocalCertRunPolicy({
+    strict: true,
+    profile: "routing_only",
+    verifyOnly: false,
+    env: {},
+  });
+  assert.equal(policy.enforce, false);
+});
+
+test("routing_only profile does not require query latency", () => {
+  const policy = resolveQueryLatencyPolicy({
+    strict: true,
+    profile: "routing_only",
+    hasLatencyInput: false,
+    env: {},
+  });
+  assert.equal(policy.required, false);
 });
 
 console.log("[cert-policy:test] all checks passed");

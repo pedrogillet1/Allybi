@@ -12,6 +12,7 @@ const args = new Set(process.argv.slice(2));
 const checkOnly = args.has('--check');
 const prepare = args.has('--prepare');
 const resetLatest = args.has('--reset-latest');
+const forceResetLatest = args.has('--force-reset-latest');
 const dryRun = args.has('--dry-run');
 
 function ensureDir(dir) {
@@ -79,6 +80,34 @@ function archiveNonCanonical(entries) {
   return runArchiveDir;
 }
 
+function latestHasArtifacts() {
+  if (!fs.existsSync(LATEST_DIR)) return false;
+  const names = fs
+    .readdirSync(LATEST_DIR, { withFileTypes: true })
+    .filter((entry) => entry.isFile())
+    .map((entry) => entry.name)
+    .filter((name) => name !== '.gitkeep');
+  return names.length > 0;
+}
+
+function hasCompleteArchiveRun() {
+  if (!fs.existsSync(ARCHIVE_DIR)) return false;
+  const required = [
+    'scorecard.json',
+    'grading.md',
+    'a-plus-gap-deep-dive.md',
+    'per_query.json',
+    'lineage.json',
+  ];
+  const dirs = fs
+    .readdirSync(ARCHIVE_DIR, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => path.join(ARCHIVE_DIR, entry.name));
+  return dirs.some((dirPath) =>
+    required.every((artifactName) => fs.existsSync(path.join(dirPath, artifactName))),
+  );
+}
+
 ensureDir(REPORTS_DIR);
 ensureDir(LATEST_DIR);
 ensureDir(ARCHIVE_DIR);
@@ -107,6 +136,19 @@ if (checkOnly) {
 
 if (prepare) {
   const archivedTo = archiveNonCanonical(nonCanonical);
+  if (resetLatest && !forceResetLatest) {
+    const latestHasData = latestHasArtifacts();
+    const recoverable = hasCompleteArchiveRun();
+    if (latestHasData && !recoverable) {
+      console.error(
+        '[report-hygiene] refusing to reset latest: no complete archive run exists for recovery.',
+      );
+      console.error(
+        '[report-hygiene] re-run with --force-reset-latest only if you intentionally want to discard latest artifacts.',
+      );
+      process.exit(1);
+    }
+  }
   if (resetLatest) {
     if (!dryRun) removeContents(LATEST_DIR);
   }

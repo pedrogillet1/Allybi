@@ -86,7 +86,7 @@ function oauthResultHtml(opts: {
   title: string;
   detail?: string;
   postMessageOrigin: string | null;
-  completionPayload: Record<string, unknown>;
+  completionPayload: unknown;
 }): string {
   const provider = String(opts.provider || "");
   const title = String(opts.title || "");

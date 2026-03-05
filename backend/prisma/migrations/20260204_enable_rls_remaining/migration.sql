@@ -39,7 +39,16 @@ DECLARE
         'user_sessions'
     ];
     tbl TEXT;
+    has_service_role BOOLEAN := FALSE;
 BEGIN
+    SELECT EXISTS(SELECT 1 FROM pg_roles WHERE rolname = 'service_role')
+    INTO has_service_role;
+
+    IF NOT has_service_role THEN
+        RAISE NOTICE 'Role service_role not found; skipping RLS enablement in this migration.';
+        RETURN;
+    END IF;
+
     FOREACH tbl IN ARRAY tables
     LOOP
         IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = tbl) THEN

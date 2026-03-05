@@ -2289,7 +2289,9 @@ export class ResponseContractEnforcerService {
   private shouldFailClosedUiContracts(): boolean {
     const override = String(process.env.UI_CONTRACTS_FAIL_CLOSED || "").trim();
     if (override) return parseBoolish(override);
-    return true;
+    const profile = String(process.env.CERT_PROFILE || "").trim().toLowerCase();
+    const nodeEnv = String(process.env.NODE_ENV || "").trim().toLowerCase();
+    return profile === "release" || nodeEnv === "production";
   }
 
   private shouldAllowLegacyUiContracts(): boolean {

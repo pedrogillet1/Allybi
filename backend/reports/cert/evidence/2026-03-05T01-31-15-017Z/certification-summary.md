@@ -1,6 +1,6 @@
 # Certification Summary
 
-- Generated: 2026-03-05T01:32:53.918Z
+- Generated: 2026-03-05T01:28:21.351Z
 - Strict mode: yes
 - Certification profile: local
 - Mode: verify
@@ -8,12 +8,12 @@
 - Auto refresh: yes
 - Commit hash: 80d1257e9fdcc908646b1a5d7e80ff60bd42f348
 - Commit hash source: git-files
-- Lineage run id: cert_2026-03-05T01-32-53-918Z
+- Lineage run id: cert_2026-03-05T01-28-21-351Z
 - Lineage dataset id: none
 - Lineage profile: local
-- Passed: yes
+- Passed: no
 - Passed gates: 23/23
-- Local cert run: fail (recent, ageHours=3.39)
+- Local cert run: fail (recent, ageHours=3.36)
 - Optional gate skipped: query-latency (missing_per_query_report)
 - Optional gate skipped: indexing-live-integration (profile_or_env_not_live_indexing)
 
@@ -28,14 +28,14 @@
 | editing-slo | required | yes | yes | 0 |
 | runtime-wiring | required | yes | yes | 0 |
 | enforcer-failclosed | required | yes | yes | 0 |
-| evidence-fidelity | required | yes | yes | 0 |
+| evidence-fidelity | required | yes | no | 0 |
 | provenance-strictness | required | yes | yes | 0 |
 | prompt-mode-coverage | required | yes | yes | 0 |
-| composition-routing | required | yes | yes | 0 |
+| composition-routing | required | yes | no | 0 |
 | composition-fallback-order | required | yes | yes | 0 |
 | composition-pinned-model-resolution | required | yes | yes | 0 |
 | composition-telemetry-integrity | required | yes | yes | 0 |
-| composition-analytical-structure | required | yes | yes | 0 |
+| composition-analytical-structure | required | yes | no | 0 |
 | builder-payload-budget | required | yes | yes | 0 |
 | gateway-json-routing | required | yes | yes | 0 |
 | turn-debug-packet | required | yes | yes | 0 |
@@ -99,7 +99,7 @@
 
 ## evidence-fidelity
 - Passed: yes
-- Freshness: fresh
+- Freshness: stale (commit_hash_mismatch)
 - Failures: none
 - Metrics: `{"missingMapBlocked":true,"missingMapReasonCode":"missing_evidence_map","hashMismatchBlocked":true,"hashMismatchReasonCode":"evidence_map_hash_mismatch","validMapPasses":true}`
 
@@ -117,7 +117,7 @@
 
 ## composition-routing
 - Passed: yes
-- Freshness: fresh
+- Freshness: stale (commit_hash_mismatch)
 - Failures: none
 - Metrics: `{"finalRouteProviderOpenAI":1,"finalRouteModelFamilyMatch":1,"draftRouteProviderGemini":1}`
 
@@ -141,7 +141,7 @@
 
 ## composition-analytical-structure
 - Passed: yes
-- Freshness: fresh
+- Freshness: stale (commit_hash_mismatch)
 - Failures: none
 - Metrics: `{"hasDirectAnswer":1,"hasSynthesisMarker":1,"hasFollowupMarker":1}`
 

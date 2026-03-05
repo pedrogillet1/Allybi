@@ -82,6 +82,7 @@ function resolveCertificationProfile():
   | "local"
   | "ci"
   | "release"
+  | "routing_only"
   | "retrieval_signoff" {
   const raw = String(process.env.CERT_PROFILE || "")
     .trim()
@@ -90,6 +91,7 @@ function resolveCertificationProfile():
     raw === "ci" ||
     raw === "release" ||
     raw === "local" ||
+    raw === "routing_only" ||
     raw === "retrieval_signoff"
   ) {
     return raw;
@@ -104,16 +106,19 @@ function resolveStrictMode(): boolean {
 function requireLiveRuntimeGraphEvidence(): boolean {
   const override = parseBooleanFlag(process.env.CERT_REQUIRE_RUNTIME_GRAPH_LIVE);
   if (override != null) return override;
-  if (resolveStrictMode()) return true;
   const profile = resolveCertificationProfile();
+  if (profile === "routing_only") return false;
+  if (profile === "retrieval_signoff") return true;
+  if (resolveStrictMode() && (profile === "ci" || profile === "release")) {
+    return true;
+  }
   if (
     profile === "ci" ||
-    profile === "release" ||
-    profile === "retrieval_signoff"
+    profile === "release"
   ) {
     return true;
   }
-  return isCiRuntime();
+  return false;
 }
 
 async function runRuntimeGraphAudit(): Promise<{

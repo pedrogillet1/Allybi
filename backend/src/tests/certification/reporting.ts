@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { spawnSync } from "child_process";
 import type { CertificationGateReport } from "./types";
 
 const CERT_DIR = path.resolve(process.cwd(), "reports/cert");
@@ -75,6 +76,22 @@ function resolveCommitHash(): string | null {
       return hash.toLowerCase();
     }
   }
+
+  // Fallback for workspace layouts where `.git` is not discoverable from cwd.
+  try {
+    const result = spawnSync("git", ["rev-parse", "HEAD"], {
+      cwd: rootDir,
+      stdio: ["ignore", "pipe", "ignore"],
+      encoding: "utf8",
+    });
+    if (result.status === 0) {
+      const hash = String(result.stdout || "").trim().toLowerCase();
+      if (/^[0-9a-f]{40}$/.test(hash)) return hash;
+    }
+  } catch {
+    // Ignore and return null below.
+  }
+
   return null;
 }
 

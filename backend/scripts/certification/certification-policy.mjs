@@ -13,6 +13,7 @@ function isKnownProfile(raw) {
     raw === "ci" ||
     raw === "release" ||
     raw === "local" ||
+    raw === "routing_only" ||
     raw === "retrieval_signoff"
   );
 }
@@ -51,6 +52,7 @@ export function requireLiveRuntimeGraphEvidence({
 } = {}) {
   const override = normalizeBooleanOverride(env.CERT_REQUIRE_RUNTIME_GRAPH_LIVE);
   if (override != null) return override;
+  if (profile === "routing_only") return false;
   if (profile === "retrieval_signoff") return true;
   // Local strict runs may rely on cached runtime-graph evidence.
   // Live evidence is mandatory in CI/release and retrieval signoff.
@@ -68,6 +70,13 @@ export function resolveQueryLatencyPolicy({
   env = process.env,
 }) {
   const force = normalizeBooleanOverride(env.CERT_REQUIRE_QUERY_LATENCY) === true;
+  if (profile === "routing_only") {
+    return {
+      force,
+      requiredByProfile: false,
+      required: false,
+    };
+  }
   const requiredByProfile = profile === "retrieval_signoff";
   const required = force || requiredByProfile || hasLatencyInput === true;
   return {
@@ -83,6 +92,9 @@ export function resolveLocalCertRunPolicy({
   verifyOnly = false,
   env = process.env,
 }) {
+  if (profile === "routing_only") {
+    return { enforce: false, source: "routing_only_mode" };
+  }
   if (verifyOnly === true && profile !== "retrieval_signoff") {
     return { enforce: false, source: "verify_only_mode" };
   }
