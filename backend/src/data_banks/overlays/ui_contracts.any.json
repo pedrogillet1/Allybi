@@ -9,7 +9,7 @@
       "pt",
       "es"
     ],
-    "lastUpdated": "2026-01-26",
+    "lastUpdated": "2026-03-05",
     "owner": "koda-overlays",
     "reviewCadenceDays": 30,
     "criticality": "high",
@@ -17,7 +17,9 @@
     "changeLog": [
       "Added strict nav_pills contract (single intro sentence, no sources label, no actions)",
       "Added output-shape compatibility rules per answer mode",
-      "Added regression tests for known UI failures"
+      "Added regression tests for known UI failures",
+      "Removed decorative contract-only fields with no runtime enforcement",
+      "Standardized canonical config.contracts path for runtime validation"
     ],
     "usedBy": [
       "services/core/banks/dataBankLoader.service.ts"
@@ -51,7 +53,6 @@
     },
     "contracts": {
       "nav_pills": {
-        "bodyPolicy": "intro_only",
         "maxIntroSentences": 1,
         "maxIntroChars": 90,
         "noSourcesHeader": true,
@@ -72,11 +73,6 @@
         ]
       },
       "doc_grounded": {
-        "bodyPolicy": "structured",
-        "requireIntro": true,
-        "requireConclusion": true,
-        "paragraphSentencesSoft": 2,
-        "paragraphSentencesHard": 4,
         "allowedOutputShapes": [
           "paragraph",
           "bullets",
@@ -84,14 +80,11 @@
           "quote",
           "breadcrumbs"
         ],
-        "citationsPolicy": "evidence_based_no_sources_header",
         "disallowedTextPatterns": [
           "\\bNo relevant information found\\b"
         ]
       },
       "conversation": {
-        "bodyPolicy": "minimal",
-        "maxSentences": 1,
         "allowedOutputShapes": [
           "paragraph"
         ],

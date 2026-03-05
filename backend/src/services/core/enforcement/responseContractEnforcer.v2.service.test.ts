@@ -77,6 +77,28 @@ function bankById(bankId: string): unknown {
       };
     case "ui_receipt_shapes":
       return { config: { enabled: true }, mappings: [] };
+    case "operator_contracts":
+      return {
+        operators: [
+          {
+            id: "open",
+            preferredAnswerMode: "nav_pills",
+            outputs: {
+              primaryShape: "button_only",
+              allowedShapes: ["button_only"],
+            },
+          },
+        ],
+      };
+    case "operator_output_shapes":
+      return {
+        mapping: {
+          open: {
+            defaultShape: "button_only",
+            allowedShapes: ["button_only"],
+          },
+        },
+      };
     default:
       return { config: { enabled: true } };
   }
@@ -86,6 +108,8 @@ describe("ResponseContractEnforcerService v2", () => {
   beforeEach(() => {
     mockGetBank.mockReset();
     mockGetOptionalBank.mockReset();
+    delete process.env.UI_CONTRACTS_FAIL_CLOSED;
+    delete process.env.UI_CONTRACTS_ALLOW_LEGACY;
     mockGetBank.mockImplementation((bankId: string) => bankById(bankId));
     mockGetOptionalBank.mockImplementation((bankId: string) => bankById(bankId));
   });
@@ -184,5 +208,108 @@ describe("ResponseContractEnforcerService v2", () => {
     expect(out.enforcement.blocked).toBe(false);
     const sentenceCount = (out.content.match(/[.!?]+(?:\s|$)/g) || []).length;
     expect(sentenceCount).toBeLessThanOrEqual(3);
+  });
+
+  test("fails closed when ui_contracts is invalid and strict mode is enabled", async () => {
+    process.env.UI_CONTRACTS_FAIL_CLOSED = "true";
+    mockGetBank.mockImplementation((bankId: string) => {
+      if (bankId === "ui_contracts") return { malformed: true };
+      return bankById(bankId);
+    });
+
+    const { ResponseContractEnforcerService } = await import(
+      "./responseContractEnforcer.v2.service"
+    );
+    expect(() => new ResponseContractEnforcerService()).toThrow(
+      /ui_contracts load failed in strict mode/i,
+    );
+  });
+
+  test("falls back in non-strict mode when ui_contracts is invalid and emits warning", async () => {
+    process.env.UI_CONTRACTS_FAIL_CLOSED = "false";
+    mockGetBank.mockImplementation((bankId: string) => {
+      if (bankId === "ui_contracts") return { malformed: true };
+      return bankById(bankId);
+    });
+
+    const { ResponseContractEnforcerService } = await import(
+      "./responseContractEnforcer.v2.service"
+    );
+    const enforcer = new ResponseContractEnforcerService();
+    const out = enforcer.enforce(
+      { content: "Hello", attachments: [] },
+      { answerMode: "general_answer", language: "en" },
+    );
+    expect(out.enforcement.blocked).toBe(false);
+    expect(out.enforcement.warnings).toContain(
+      "UI_CONTRACTS_PARSE_FAILED_FAIL_OPEN_FALLBACK",
+    );
+  });
+
+  test("defaults shape from ui contract allowlist when operator shape is absent", async () => {
+    mockGetBank.mockImplementation((bankId: string) => {
+      if (bankId !== "ui_contracts") return bankById(bankId);
+      return {
+        _meta: { id: "ui_contracts", version: "1.0.0" },
+        config: {
+          enabled: true,
+          contracts: {
+            conversation: {
+              allowedOutputShapes: ["quote"],
+            },
+          },
+        },
+        rules: [],
+      };
+    });
+    mockGetOptionalBank.mockImplementation((bankId: string) => {
+      if (bankId === "operator_contracts" || bankId === "operator_output_shapes") {
+        return { config: { enabled: true } };
+      }
+      return bankById(bankId);
+    });
+
+    const { ResponseContractEnforcerService } = await import(
+      "./responseContractEnforcer.v2.service"
+    );
+    const enforcer = new ResponseContractEnforcerService();
+    const out = enforcer.enforce(
+      { content: "Quoted statement.", attachments: [] },
+      { answerMode: "general_answer", language: "en" },
+    );
+    expect(out.enforcement.blocked).toBe(false);
+    expect(out.enforcement.warnings).toContain(
+      "OUTPUT_SHAPE_DEFAULTED_FROM_UI_CONTRACT",
+    );
+    expect(out.enforcement.repairs).toContain("QUOTE_SHAPE_ENFORCED");
+  });
+
+  test("blocks when ui and operator shape contracts conflict with no intersection", async () => {
+    mockGetBank.mockImplementation((bankId: string) => {
+      if (bankId !== "ui_contracts") return bankById(bankId);
+      return {
+        _meta: { id: "ui_contracts", version: "1.0.0" },
+        config: {
+          enabled: true,
+          contracts: {
+            conversation: {
+              allowedOutputShapes: ["quote"],
+            },
+          },
+        },
+        rules: [],
+      };
+    });
+
+    const { ResponseContractEnforcerService } = await import(
+      "./responseContractEnforcer.v2.service"
+    );
+    const enforcer = new ResponseContractEnforcerService();
+    const out = enforcer.enforce(
+      { content: "Open this.", attachments: [] },
+      { answerMode: "general_answer", language: "en", operator: "open" },
+    );
+    expect(out.enforcement.blocked).toBe(true);
+    expect(out.enforcement.reasonCode).toBe("output_shape_contract_conflict");
   });
 });

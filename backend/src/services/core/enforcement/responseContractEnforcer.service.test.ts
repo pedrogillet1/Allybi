@@ -306,6 +306,53 @@ describe("ResponseContractEnforcerService nav_pills contract", () => {
     );
   });
 
+  test("hard blocks when multiple ui contract violations are configured as terminal", async () => {
+    mockGetBank.mockImplementation((bankId: string) => {
+      if (bankId !== "ui_contracts") return bankById(bankId);
+      return {
+        ...bankById("ui_contracts"),
+        config: {
+          ...(bankById("ui_contracts") as any).config,
+          actionsContract: {
+            combination: { multipleMatches: "apply_most_restrictive" },
+            conflictResolution: { ifMultipleViolations: "hard_block" },
+          },
+        },
+        rules: [
+          {
+            id: "R1",
+            when: { all: [{ path: "answerMode", op: "eq", value: "general_answer" }] },
+            triggerPatterns: { en: [".+"] },
+            action: { type: "enforce_ui_contract", contract: "nav_pills" },
+          },
+          {
+            id: "R2",
+            when: { all: [{ path: "answerMode", op: "eq", value: "general_answer" }] },
+            triggerPatterns: { en: [".+"] },
+            action: { type: "suppress_action_language" },
+          },
+        ],
+      };
+    });
+
+    const { ResponseContractEnforcerService } =
+      await import("./responseContractEnforcer.service");
+    const enforcer = new ResponseContractEnforcerService();
+    const out = enforcer.enforce(
+      {
+        content: "Done. I opened the file.",
+        attachments: [],
+      },
+      {
+        answerMode: "general_answer",
+        language: "en",
+      },
+    );
+
+    expect(out.enforcement.blocked).toBe(true);
+    expect(out.enforcement.reasonCode).toBe("ui_contract_multiple_violations");
+  });
+
   test("enforces ui_receipt_shapes when hard enforcement signal is enabled", async () => {
     mockGetOptionalBank.mockImplementation((bankId: string) => {
       if (bankId !== "ui_receipt_shapes") return bankById(bankId);

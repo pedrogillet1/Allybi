@@ -97,6 +97,7 @@ export type UiContractDecision = {
     disallowedTextPatterns: string[];
     allowedOutputShapes: string[];
   };
+  activeContractDisallowedTextPatterns: string[];
 };
 
 type ResolveInput = {
@@ -244,6 +245,21 @@ function normalizedTypeList(value: unknown): string[] {
     .filter(Boolean);
 }
 
+function normalizedTextPatternList(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((entry) => String(entry || "").trim())
+    .filter(Boolean);
+}
+
+function answerModeContractId(answerMode: string): string | null {
+  const normalized = String(answerMode || "").trim().toLowerCase();
+  if (!normalized) return null;
+  if (normalized.startsWith("doc_grounded")) return "doc_grounded";
+  if (normalized === "general_answer") return "conversation";
+  return normalized;
+}
+
 export class UiContractInterpreterService {
   resolve(input: ResolveInput): UiContractDecision {
     const bank = input.bank || null;
@@ -252,7 +268,7 @@ export class UiContractInterpreterService {
     const contractsFromLegacy = asObject((bank as UiContractsBank | null)?.contracts);
     const hasConfigContracts = Object.keys(contractsFromConfig).length > 0;
     const hasLegacyContracts = Object.keys(contractsFromLegacy).length > 0;
-    const contracts = hasConfigContracts ? contractsFromConfig : contractsFromLegacy;
+    const contracts = contractsFromConfig;
     const navBank = asObject(contracts.nav_pills);
     const thresholds = asObject(
       asObject(asObject(config.actionsContract).thresholds),
@@ -324,14 +340,11 @@ export class UiContractInterpreterService {
               .filter(Boolean)
           : [],
       },
+      activeContractDisallowedTextPatterns: [],
     };
 
-    if (hasConfigContracts && hasLegacyContracts) {
-      decision.warnings.push(
-        "UI_CONTRACT_DUPLICATE_CONTRACT_PATHS_CONFIG_WINS",
-      );
-    } else if (!hasConfigContracts && hasLegacyContracts) {
-      decision.warnings.push("UI_CONTRACT_LEGACY_CONTRACT_PATH");
+    if (!hasConfigContracts && hasLegacyContracts) {
+      decision.warnings.push("UI_CONTRACT_LEGACY_CONTRACT_PATH_IGNORED");
     }
 
     if (!bank || !decision.enabled) return decision;
@@ -382,11 +395,22 @@ export class UiContractInterpreterService {
     }
 
     decision.appliedRuleIds = Array.from(new Set(decision.appliedRuleIds));
+    const modeContractId = answerModeContractId(String(runtime.answerMode || ""));
+    const modeContractRaw = modeContractId ? contracts[modeContractId] : null;
+    if (
+      modeContractId &&
+      modeContractRaw &&
+      typeof modeContractRaw === "object" &&
+      !Array.isArray(modeContractRaw)
+    ) {
+      decision.appliedContracts.push(modeContractId);
+    }
     decision.appliedContracts = Array.from(new Set(decision.appliedContracts));
     decision.suppressRegexes = Array.from(new Set(decision.suppressRegexes));
 
     let allowedAccumulator: Set<string> | null = null;
     const disallowed = new Set<string>();
+    const disallowedTextPatterns = new Set<string>();
     for (const contractId of decision.appliedContracts) {
       const contract = asObject(contracts[contractId]);
       const allowedTypes = normalizedTypeList(contract.allowedAttachments);
@@ -403,6 +427,9 @@ export class UiContractInterpreterService {
       }
       for (const type of normalizedTypeList(contract.disallowedAttachments)) {
         disallowed.add(type);
+      }
+      for (const pattern of normalizedTextPatternList(contract.disallowedTextPatterns)) {
+        disallowedTextPatterns.add(pattern);
       }
       if (parseBoolish(contract.suppressActions)) {
         decision.attachmentPolicy.suppressActions = true;
@@ -441,6 +468,9 @@ export class UiContractInterpreterService {
       : [];
     decision.attachmentPolicy.disallowedTypes = Array.from(disallowed).sort(
       (a, b) => a.localeCompare(b),
+    );
+    decision.activeContractDisallowedTextPatterns = Array.from(
+      disallowedTextPatterns,
     );
     decision.warnings = Array.from(new Set(decision.warnings));
     return decision;

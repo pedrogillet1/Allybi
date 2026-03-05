@@ -143,6 +143,21 @@ function expectedActionFromCase(row: PolicyTestCase): string | null {
   return action || null;
 }
 
+function parseDateValue(value: unknown): Date | null {
+  const raw = asTrimmed(value);
+  if (!raw) return null;
+  const parsedMs = Date.parse(raw);
+  if (!Number.isFinite(parsedMs)) return null;
+  const parsed = new Date(parsedMs);
+  if (Number.isNaN(parsed.getTime())) return null;
+  return parsed;
+}
+
+function elapsedDaysSince(value: Date): number {
+  const deltaMs = Date.now() - value.getTime();
+  return Math.floor(deltaMs / 86_400_000);
+}
+
 function normalizeUiLanguage(value: unknown): "en" | "pt" | "es" {
   const normalized = asTrimmed(value).toLowerCase();
   if (normalized === "pt") return "pt";
@@ -307,6 +322,86 @@ function uiContractBehaviorIssuesForCases(input: {
   return issues;
 }
 
+function uiContractSchemaIntegrityIssues(input: {
+  bank: PolicyBankContract;
+  filePath: string;
+  bankId: string;
+}): PolicyValidationIssue[] {
+  if (input.bankId !== "ui_contracts") return [];
+  const issues: PolicyValidationIssue[] = [];
+  const config = asObject(input.bank.config);
+  const configContracts = asObject(config.contracts);
+  const legacyContracts = asObject((input.bank as Record<string, unknown>).contracts);
+  const hasConfigContracts = Object.keys(configContracts).length > 0;
+  const hasLegacyContracts = Object.keys(legacyContracts).length > 0;
+
+  if (!hasConfigContracts && hasLegacyContracts) {
+    issues.push(
+      makeIssue({
+        code: "ui_contracts_legacy_contracts_path",
+        severity: "error",
+        message:
+          "ui_contracts must use config.contracts; legacy top-level contracts path is not allowed",
+        filePath: input.filePath,
+        bankId: input.bankId,
+      }),
+    );
+  }
+  if (hasConfigContracts && hasLegacyContracts) {
+    issues.push(
+      makeIssue({
+        code: "ui_contracts_duplicate_contract_paths",
+        severity: "error",
+        message:
+          "ui_contracts contains both config.contracts and legacy contracts path; keep only config.contracts",
+        filePath: input.filePath,
+        bankId: input.bankId,
+      }),
+    );
+  }
+  if (!hasConfigContracts) {
+    issues.push(
+      makeIssue({
+        code: "ui_contracts_missing_config_contracts",
+        severity: "error",
+        message: "ui_contracts config.contracts is required",
+        filePath: input.filePath,
+        bankId: input.bankId,
+      }),
+    );
+    return issues;
+  }
+
+  const allowedContractKeys = new Set([
+    "maxIntroSentences",
+    "maxIntroChars",
+    "noSourcesHeader",
+    "noInlineCitations",
+    "disallowedTextPatterns",
+    "allowedOutputShapes",
+    "allowedAttachments",
+    "disallowedAttachments",
+    "suppressActions",
+  ]);
+  for (const [contractId, contractValue] of Object.entries(configContracts)) {
+    const contract = asObject(contractValue);
+    for (const key of Object.keys(contract)) {
+      if (allowedContractKeys.has(key)) continue;
+      issues.push(
+        makeIssue({
+          code: "ui_contracts_decorative_contract_field",
+          severity: "error",
+          message: `ui_contracts contract ${contractId} has unsupported decorative field: ${key}`,
+          filePath: input.filePath,
+          bankId: input.bankId,
+        }),
+      );
+    }
+  }
+
+  return issues;
+}
+
 function makeIssue(input: {
   code: string;
   severity: "error" | "warning";
@@ -377,6 +472,45 @@ export class PolicyValidatorService {
       return value != null && value > 0;
     });
     requireMeta("criticality", (v) => normalizeCriticality(v) !== "unknown");
+
+    const parsedLastUpdated = parseDateValue(meta.lastUpdated);
+    if (asTrimmed(meta.lastUpdated) && !parsedLastUpdated) {
+      issues.push(
+        makeIssue({
+          code: "meta_invalid_lastUpdated",
+          severity: "error",
+          message: "_meta.lastUpdated must be a valid date string",
+          filePath,
+          bankId,
+        }),
+      );
+    }
+    const reviewCadenceDays = toInt(meta.reviewCadenceDays);
+    const staleGraceDays = Math.max(
+      0,
+      toInt(process.env.POLICY_REVIEW_STALE_GRACE_DAYS) || 0,
+    );
+    if (
+      parsedLastUpdated &&
+      reviewCadenceDays != null &&
+      reviewCadenceDays > 0
+    ) {
+      const ageDays = elapsedDaysSince(parsedLastUpdated);
+      if (ageDays > reviewCadenceDays + staleGraceDays) {
+        issues.push(
+          makeIssue({
+            code: "meta_review_stale",
+            severity:
+              criticality === "critical" || criticality === "high"
+                ? "error"
+                : "warning",
+            message: `policy review stale by ${ageDays - reviewCadenceDays} day(s): lastUpdated=${asTrimmed(meta.lastUpdated)} reviewCadenceDays=${reviewCadenceDays}`,
+            filePath,
+            bankId,
+          }),
+        );
+      }
+    }
 
     const config = asObject(bank.config);
     if (
@@ -474,6 +608,13 @@ export class PolicyValidatorService {
     );
     issues.push(
       ...uiContractBehaviorIssuesForCases({
+        bank,
+        filePath,
+        bankId,
+      }),
+    );
+    issues.push(
+      ...uiContractSchemaIntegrityIssues({
         bank,
         filePath,
         bankId,

@@ -237,4 +237,158 @@ describe("PolicyValidatorService", () => {
       result.issues.some((issue) => issue.code === "behavior_case_block_mismatch"),
     ).toBe(true);
   });
+
+  test("flags stale critical policy review metadata", () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "policy-validator-"));
+    const filePath = path.join(dir, "stale_policy.any.json");
+    fs.writeFileSync(
+      filePath,
+      JSON.stringify(
+        {
+          _meta: {
+            id: "stale_policy",
+            version: "1.0.0",
+            description: "stale metadata policy",
+            lastUpdated: "2025-01-01",
+            owner: "runtime-certification",
+            reviewCadenceDays: 30,
+            criticality: "critical",
+          },
+          config: { enabled: true, configModeOnly: true },
+          tests: { cases: [{ id: "S1" }, { id: "S2" }] },
+        },
+        null,
+        2,
+      ),
+    );
+
+    const service = new PolicyValidatorService();
+    const result = service.validateFile(filePath);
+    expect(result.issues.some((issue) => issue.code === "meta_review_stale")).toBe(
+      true,
+    );
+  });
+
+  test("fails ui_contracts legacy contracts path", () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "policy-validator-"));
+    const filePath = path.join(dir, "ui_contracts.any.json");
+    fs.writeFileSync(
+      filePath,
+      JSON.stringify(
+        {
+          _meta: {
+            id: "ui_contracts",
+            version: "1.0.0",
+            description: "ui contracts",
+            lastUpdated: "2026-03-05",
+            owner: "runtime-certification",
+            reviewCadenceDays: 30,
+            criticality: "high",
+          },
+          config: { enabled: true },
+          contracts: {
+            nav_pills: { maxIntroSentences: 1 },
+          },
+          tests: { cases: [{ id: "UI1" }] },
+        },
+        null,
+        2,
+      ),
+    );
+
+    const service = new PolicyValidatorService();
+    const result = service.validateFile(filePath);
+    expect(
+      result.issues.some(
+        (issue) => issue.code === "ui_contracts_legacy_contracts_path",
+      ),
+    ).toBe(true);
+    expect(
+      result.issues.some(
+        (issue) => issue.code === "ui_contracts_missing_config_contracts",
+      ),
+    ).toBe(true);
+  });
+
+  test("fails ui_contracts duplicate canonical and legacy contracts paths", () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "policy-validator-"));
+    const filePath = path.join(dir, "ui_contracts.any.json");
+    fs.writeFileSync(
+      filePath,
+      JSON.stringify(
+        {
+          _meta: {
+            id: "ui_contracts",
+            version: "1.0.0",
+            description: "ui contracts",
+            lastUpdated: "2026-03-05",
+            owner: "runtime-certification",
+            reviewCadenceDays: 30,
+            criticality: "high",
+          },
+          config: {
+            enabled: true,
+            contracts: {
+              nav_pills: { maxIntroSentences: 1 },
+            },
+          },
+          contracts: {
+            nav_pills: { maxIntroSentences: 1 },
+          },
+          tests: { cases: [{ id: "UI1" }] },
+        },
+        null,
+        2,
+      ),
+    );
+
+    const service = new PolicyValidatorService();
+    const result = service.validateFile(filePath);
+    expect(
+      result.issues.some(
+        (issue) => issue.code === "ui_contracts_duplicate_contract_paths",
+      ),
+    ).toBe(true);
+  });
+
+  test("fails decorative ui_contract fields that are not runtime-enforced", () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "policy-validator-"));
+    const filePath = path.join(dir, "ui_contracts.any.json");
+    fs.writeFileSync(
+      filePath,
+      JSON.stringify(
+        {
+          _meta: {
+            id: "ui_contracts",
+            version: "1.0.0",
+            description: "ui contracts",
+            lastUpdated: "2026-03-05",
+            owner: "runtime-certification",
+            reviewCadenceDays: 30,
+            criticality: "high",
+          },
+          config: {
+            enabled: true,
+            contracts: {
+              nav_pills: {
+                maxIntroSentences: 1,
+                bodyPolicy: "intro_only",
+              },
+            },
+          },
+          tests: { cases: [{ id: "UI1" }] },
+        },
+        null,
+        2,
+      ),
+    );
+
+    const service = new PolicyValidatorService();
+    const result = service.validateFile(filePath);
+    expect(
+      result.issues.some(
+        (issue) => issue.code === "ui_contracts_decorative_contract_field",
+      ),
+    ).toBe(true);
+  });
 });

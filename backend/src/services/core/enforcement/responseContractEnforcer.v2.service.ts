@@ -2041,6 +2041,46 @@ function parseBoolish(input: unknown): boolean {
   );
 }
 
+function resolveUiContractsMap(
+  bank: UIContractsBank | undefined,
+): Record<string, Record<string, unknown>> {
+  const config = asObjectRecord(bank?.config);
+  const contracts = asObjectRecord(config?.contracts);
+  if (!contracts) return {};
+  const out: Record<string, Record<string, unknown>> = {};
+  for (const [key, value] of Object.entries(contracts)) {
+    const asRecord = asObjectRecord(value);
+    if (!asRecord) continue;
+    out[String(key || "").trim().toLowerCase()] = asRecord;
+  }
+  return out;
+}
+
+function resolveUiContractIdFromAnswerMode(answerMode: unknown): string | null {
+  const normalized = String(answerMode || "").trim().toLowerCase();
+  if (!normalized) return null;
+  if (normalized.startsWith("doc_grounded")) return "doc_grounded";
+  if (normalized === "general_answer") return "conversation";
+  return normalized;
+}
+
+function resolveUiModeContract(
+  bank: UIContractsBank | undefined,
+  answerMode: unknown,
+): Record<string, unknown> | null {
+  const contractId = resolveUiContractIdFromAnswerMode(answerMode);
+  if (!contractId) return null;
+  const contracts = resolveUiContractsMap(bank);
+  return contracts[contractId] || null;
+}
+
+function normalizeShapeList(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((entry) => normalizeShape(entry))
+    .filter(Boolean);
+}
+
 function shouldEnforceAnalyticalStructure(
   ctx: ResponseContractContext,
 ): boolean {
@@ -2224,6 +2264,7 @@ export class ResponseContractEnforcerService {
   private boldingRules?: BoldingRulesBank;
   private operatorContracts?: OperatorContractsBank;
   private operatorOutputShapes?: OperatorOutputShapesBank;
+  private uiContractsLoadWarnings: string[] = [];
   private readonly uiContractInterpreter = new UiContractInterpreterService();
   private readonly uiReceiptValidator = new UiReceiptContractValidatorService();
 
@@ -2241,30 +2282,91 @@ export class ResponseContractEnforcerService {
         enabled: false,
         contracts: {},
       },
-      contracts: {},
       rules: [],
     };
   }
 
+  private shouldFailClosedUiContracts(): boolean {
+    const override = String(process.env.UI_CONTRACTS_FAIL_CLOSED || "").trim();
+    if (override) return parseBoolish(override);
+    return process.env.NODE_ENV === "production" || parseBoolish(process.env.CI);
+  }
+
+  private shouldAllowLegacyUiContracts(): boolean {
+    return parseBoolish(process.env.UI_CONTRACTS_ALLOW_LEGACY);
+  }
+
+  private validateUiContractsCanonicalShape(
+    bank: UIContractsBank,
+    strictMode: boolean,
+  ): string[] {
+    const warnings: string[] = [];
+    const configContracts = asObjectRecord(asObjectRecord(bank.config)?.contracts);
+    const legacyContracts = asObjectRecord(bank.contracts);
+    const hasConfigContracts =
+      !!configContracts && Object.keys(configContracts).length > 0;
+    const hasLegacyContracts =
+      !!legacyContracts && Object.keys(legacyContracts).length > 0;
+
+    if (hasConfigContracts && hasLegacyContracts) {
+      warnings.push("UI_CONTRACT_DUPLICATE_CONTRACT_PATHS_CONFIG_WINS");
+      if (!this.shouldAllowLegacyUiContracts() && strictMode) {
+        throw new Error(
+          "ui_contracts contains both config.contracts and legacy contracts path",
+        );
+      }
+    } else if (!hasConfigContracts && hasLegacyContracts) {
+      warnings.push("UI_CONTRACT_LEGACY_CONTRACT_PATH");
+      if (!this.shouldAllowLegacyUiContracts()) {
+        if (strictMode) {
+          throw new Error(
+            "ui_contracts legacy contracts path is not allowed in strict mode",
+          );
+        }
+        warnings.push("UI_CONTRACT_LEGACY_CONTRACT_PATH_NOT_ALLOWED");
+      }
+    }
+
+    if (!hasConfigContracts && !hasLegacyContracts) {
+      const message = "ui_contracts has no contracts configured";
+      if (strictMode) throw new Error(message);
+      warnings.push("UI_CONTRACT_MISSING_CONTRACTS");
+    }
+
+    return warnings;
+  }
+
   reloadBanks(): void {
     this.renderPolicy = getBank<RenderPolicyBank>("render_policy");
+    this.uiContractsLoadWarnings = [];
+    const strictUiContracts = this.shouldFailClosedUiContracts();
     try {
-      this.uiContracts = UIContractsSchema.parse(
-        getBank<unknown>("ui_contracts"),
-      ) as UIContractsBank;
-    } catch {
-      const optionalUiContracts = getOptionalBank<unknown>("ui_contracts");
-      if (optionalUiContracts) {
-        try {
-          this.uiContracts = UIContractsSchema.parse(
-            optionalUiContracts,
-          ) as UIContractsBank;
-        } catch {
-          this.uiContracts = this.buildFallbackUiContracts();
-        }
-      } else {
-        this.uiContracts = this.buildFallbackUiContracts();
+      let rawUiContracts: unknown;
+      try {
+        rawUiContracts = getBank<unknown>("ui_contracts");
+      } catch {
+        rawUiContracts = getOptionalBank<unknown>("ui_contracts");
       }
+      if (!rawUiContracts) {
+        throw new Error("ui_contracts bank not found");
+      }
+      this.uiContracts = UIContractsSchema.parse(rawUiContracts) as UIContractsBank;
+      this.uiContractsLoadWarnings.push(
+        ...this.validateUiContractsCanonicalShape(
+          this.uiContracts,
+          strictUiContracts,
+        ),
+      );
+    } catch (error) {
+      if (strictUiContracts) {
+        const reason =
+          error instanceof Error ? error.message : "unknown ui_contracts load failure";
+        throw new Error(`ui_contracts load failed in strict mode: ${reason}`);
+      }
+      this.uiContracts = this.buildFallbackUiContracts();
+      this.uiContractsLoadWarnings.push(
+        "UI_CONTRACTS_PARSE_FAILED_FAIL_OPEN_FALLBACK",
+      );
     }
     const uiReceiptRaw = getOptionalBank<unknown>("ui_receipt_shapes");
     if (!uiReceiptRaw) {
@@ -2431,7 +2533,7 @@ export class ResponseContractEnforcerService {
     ctx: ResponseContractContext,
   ): EnforcedResponse {
     const repairs: string[] = [];
-    const warnings: string[] = [];
+    const warnings: string[] = [...this.uiContractsLoadWarnings];
     let attachments: Attachment[] = Array.isArray(draft.attachments)
       ? draft.attachments
       : [];
@@ -2479,14 +2581,6 @@ export class ResponseContractEnforcerService {
     ) {
       warnings.push("ANSWER_MODE_CONTRACT_DRIFT");
     }
-    if (
-      effectiveOutputShape &&
-      operatorContract.allowedShapes.length > 0 &&
-      !operatorContract.allowedShapes.includes(effectiveOutputShape)
-    ) {
-      warnings.push("OUTPUT_SHAPE_NOT_ALLOWED_FOR_OPERATOR");
-      effectiveOutputShape = operatorContract.defaultShape;
-    }
 
     // 0) Normalize whitespace/newlines
     const maxNL =
@@ -2504,6 +2598,71 @@ export class ResponseContractEnforcerService {
     const resolvedUiDecision = uiDecision;
     if (resolvedUiDecision.warnings.length > 0) {
       warnings.push(...resolvedUiDecision.warnings);
+    }
+    const uiModeContract = resolveUiModeContract(this.uiContracts, ctx.answerMode);
+    const uiAllowedShapes = normalizeShapeList(uiModeContract?.allowedOutputShapes);
+    if (uiAllowedShapes.length > 0) {
+      if (!effectiveOutputShape) {
+        effectiveOutputShape = uiAllowedShapes[0] || null;
+        warnings.push("OUTPUT_SHAPE_DEFAULTED_FROM_UI_CONTRACT");
+      } else if (!uiAllowedShapes.includes(effectiveOutputShape)) {
+        warnings.push("OUTPUT_SHAPE_NOT_ALLOWED_FOR_UI_CONTRACT");
+        effectiveOutputShape = uiAllowedShapes[0] || null;
+      }
+    }
+    if (
+      effectiveOutputShape &&
+      operatorContract.allowedShapes.length > 0 &&
+      !operatorContract.allowedShapes.includes(effectiveOutputShape)
+    ) {
+      warnings.push("OUTPUT_SHAPE_NOT_ALLOWED_FOR_OPERATOR");
+      const intersection = operatorContract.allowedShapes
+        .map((shape) => normalizeShape(shape))
+        .filter((shape) =>
+          uiAllowedShapes.length > 0 ? uiAllowedShapes.includes(shape) : true,
+        );
+      if (intersection.length > 0) {
+        effectiveOutputShape = intersection[0];
+        warnings.push("OUTPUT_SHAPE_CONTRACT_INTERSECTION_APPLIED");
+      } else {
+        effectiveOutputShape = normalizeShape(operatorContract.defaultShape);
+      }
+    }
+    if (
+      effectiveOutputShape &&
+      uiAllowedShapes.length > 0 &&
+      !uiAllowedShapes.includes(effectiveOutputShape)
+    ) {
+      return {
+        content: "",
+        attachments,
+        enforcement: {
+          repairs,
+          warnings: [...warnings, "OUTPUT_SHAPE_CONTRACT_CONFLICT"],
+          blocked: true,
+          reasonCode: "output_shape_contract_conflict",
+          ...buildUiTrace(),
+          ...(provenanceEnforcement ? { provenance: provenanceEnforcement } : {}),
+        },
+      };
+    }
+    if (
+      String(ctx.answerMode || "").trim() === "nav_pills" &&
+      uiAllowedShapes.length > 0 &&
+      !uiAllowedShapes.includes("button_only")
+    ) {
+      return {
+        content: "",
+        attachments,
+        enforcement: {
+          repairs,
+          warnings: [...warnings, "NAV_PILLS_OUTPUT_SHAPE_CONTRACT_CONFLICT"],
+          blocked: true,
+          reasonCode: "nav_pills_output_shape_contract_conflict",
+          ...buildUiTrace(),
+          ...(provenanceEnforcement ? { provenance: provenanceEnforcement } : {}),
+        },
+      };
     }
     const uiReceiptValidation = this.uiReceiptValidator.validate({
       bank: this.uiReceiptShapes,
@@ -2579,6 +2738,19 @@ export class ResponseContractEnforcerService {
       if (suppressed.changed) {
         repairs.push("UI_ACTION_LANGUAGE_SUPPRESSED");
         content = suppressed.text;
+      }
+    }
+    if (
+      ctx.answerMode !== "nav_pills" &&
+      resolvedUiDecision.activeContractDisallowedTextPatterns.length > 0
+    ) {
+      const strippedByContract = applyDisallowedPatterns(
+        content,
+        resolvedUiDecision.activeContractDisallowedTextPatterns,
+      );
+      if (strippedByContract.changed) {
+        repairs.push("UI_CONTRACT_DISALLOWED_PATTERNS_STRIPPED");
+        content = strippedByContract.text;
       }
     }
     const attachmentPolicyApplied = filterAttachmentsByUiPolicy(attachments, {
