@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { execSync } from "node:child_process";
 
 type GateReport = {
   gateId: string;
@@ -128,6 +129,23 @@ function gradeFromScore(score: number): string {
   return "C_or_lower";
 }
 
+function resolveCurrentCommitHash(): string | null {
+  const fromEnv = String(process.env.GIT_COMMIT_HASH || "").trim().toLowerCase();
+  if (/^[0-9a-f]{40}$/i.test(fromEnv)) return fromEnv;
+  try {
+    const fromGit = execSync("git rev-parse HEAD", {
+      cwd: ROOT,
+      stdio: ["ignore", "pipe", "ignore"],
+      encoding: "utf8",
+    })
+      .trim()
+      .toLowerCase();
+    return /^[0-9a-f]{40}$/i.test(fromGit) ? fromGit : null;
+  } catch {
+    return null;
+  }
+}
+
 function main() {
   const failures: string[] = [];
   const gateRows: Array<{
@@ -137,6 +155,7 @@ function main() {
     fresh: boolean;
     failures: number;
   }> = [];
+  const expectedCommitHash = resolveCurrentCommitHash();
 
   let passedCount = 0;
   for (const gateId of REQUIRED_GATES) {
@@ -155,11 +174,23 @@ function main() {
 
     let passed = gate.passed === true;
     const fresh = gateFresh(gate);
+    const gateCommitHash = String((gate as Record<string, unknown>)?.meta && typeof (gate as Record<string, unknown>).meta === "object"
+      ? ((gate as Record<string, unknown>).meta as Record<string, unknown>).commitHash || ""
+      : "").trim().toLowerCase();
+    const commitMatches =
+      expectedCommitHash === null
+        ? gateCommitHash.length > 0
+        : gateCommitHash === expectedCommitHash;
+    if (!commitMatches) {
+      failures.push(`gate_commit_mismatch:${gateId}`);
+      passed = false;
+    }
     if (gateId === "composition-formatting-regressions") {
       const openerDistinctCount = metricNumber(gate, "openerDistinctCount");
       const followupDistinctCount = metricNumber(gate, "followupDistinctCount");
       const shortToLongRatio = metricNumber(gate, "shortToLongRatio");
       const claimGuardEvidenceCount = metricNumber(gate, "claimGuardEvidenceCount");
+      const toneParityEs = metricNumber(gate, "toneParityEs");
       if (!openerDistinctCount || openerDistinctCount < 2) {
         failures.push("compose_quality_floor_failed:openerDistinctCount");
         passed = false;
@@ -178,6 +209,10 @@ function main() {
       }
       if (!claimGuardEvidenceCount || claimGuardEvidenceCount < 1) {
         failures.push("compose_quality_floor_failed:claimGuardEvidenceCount");
+        passed = false;
+      }
+      if (!toneParityEs || toneParityEs < 1) {
+        failures.push("compose_quality_floor_failed:toneParityEs");
         passed = false;
       }
     }

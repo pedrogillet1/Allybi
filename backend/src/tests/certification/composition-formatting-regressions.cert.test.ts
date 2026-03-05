@@ -12,6 +12,7 @@ const metricKeys = [
   "tableNoDashCorruption",
   "tablePreservation",
   "toneParityEnPt",
+  "toneParityEs",
   "notFoundPrecision",
   "brevityControl",
   "followupNonLooping",
@@ -25,6 +26,7 @@ const metrics: Record<(typeof metricKeys)[number], number> = {
   tableNoDashCorruption: 0,
   tablePreservation: 0,
   toneParityEnPt: 0,
+  toneParityEs: 0,
   notFoundPrecision: 0,
   brevityControl: 0,
   followupNonLooping: 0,
@@ -326,6 +328,23 @@ describe("Certification: composition formatting regressions", () => {
     expect(pass).toBe(true);
   });
 
+  test("7b) ES tone parity keeps localized analytical structure", () => {
+    const es = makeAnalyticalOutput({
+      content: "Los ingresos aumentaron en el primer trimestre.",
+      language: "es",
+      attachments: sourceButtonsAttachment(),
+    });
+    const pass =
+      es.includes("Respuesta directa:") &&
+      es.includes("Evidencia clave:") &&
+      es.includes("Fuentes utilizadas:") &&
+      es.includes("En resumen,") &&
+      es.includes("Si quieres,") &&
+      !es.includes("Direct answer:");
+    mark("toneParityEs", pass);
+    expect(pass).toBe(true);
+  });
+
   test("8) not-found behavior is precise and bank-driven", () => {
     const enforcer = new ResponseContractEnforcerService();
     const out = enforcer.enforce(
@@ -389,6 +408,7 @@ afterAll(() => {
       tableNoDashCorruption: 1,
       tablePreservation: 1,
       toneParityEnPt: 1,
+      toneParityEs: 1,
       notFoundPrecision: 1,
       brevityControl: 1,
       followupNonLooping: 1,

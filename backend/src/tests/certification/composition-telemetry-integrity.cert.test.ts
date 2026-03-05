@@ -128,6 +128,10 @@ describe("Certification: composition telemetry integrity", () => {
       __dirname,
       "../../controllers/adminTelemetry.controller.ts",
     );
+    const runbookPath = path.resolve(
+      __dirname,
+      "../../../docs/runtime/composition-quality-runbook.md",
+    );
     const routesSource = fs.readFileSync(routesPath, "utf8");
     const controllerSource = fs.readFileSync(controllerPath, "utf8");
     const hasTruncationEndpoint =
@@ -150,6 +154,25 @@ describe("Certification: composition telemetry integrity", () => {
       QUALITY_SLO_THRESHOLDS.regenerationRateMaxPct > 0 &&
       QUALITY_SLO_THRESHOLDS.regenerationRateMaxPct <= 100;
     if (!hasQualityThresholds) failures.push("MISSING_QUALITY_SLO_THRESHOLDS");
+    const runbookSource = fs.existsSync(runbookPath)
+      ? fs.readFileSync(runbookPath, "utf8")
+      : "";
+    const runbookHasThresholds =
+      runbookSource.includes("reaskRateMaxPct") &&
+      runbookSource.includes(
+        String(QUALITY_SLO_THRESHOLDS.reaskRateMaxPct),
+      ) &&
+      runbookSource.includes("truncationRateMaxPct") &&
+      runbookSource.includes(
+        String(QUALITY_SLO_THRESHOLDS.truncationRateMaxPct),
+      ) &&
+      runbookSource.includes("regenerationRateMaxPct") &&
+      runbookSource.includes(
+        String(QUALITY_SLO_THRESHOLDS.regenerationRateMaxPct),
+      );
+    if (!runbookHasThresholds) {
+      failures.push("MISSING_COMPOSITION_QUALITY_RUNBOOK_THRESHOLDS");
+    }
 
     writeCertificationGateReport("composition-telemetry-integrity", {
       passed: failures.length === 0,
@@ -160,6 +183,7 @@ describe("Certification: composition telemetry integrity", () => {
         hasTruncationRateEndpoint: hasTruncationEndpoint ? 1 : 0,
         hasRegenerationRateEndpoint: hasRegenerationEndpoint ? 1 : 0,
         hasQualitySloThresholds: hasQualityThresholds ? 1 : 0,
+        hasRunbookThresholds: runbookHasThresholds ? 1 : 0,
       },
       thresholds: {
         hasRouteLane: 1,
@@ -168,6 +192,7 @@ describe("Certification: composition telemetry integrity", () => {
         hasTruncationRateEndpoint: 1,
         hasRegenerationRateEndpoint: 1,
         hasQualitySloThresholds: 1,
+        hasRunbookThresholds: 1,
       },
       failures,
     });
