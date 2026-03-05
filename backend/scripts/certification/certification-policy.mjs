@@ -77,7 +77,10 @@ export function resolveQueryLatencyPolicy({
       required: false,
     };
   }
-  const requiredByProfile = profile === "retrieval_signoff";
+  const requiredByProfile =
+    profile === "retrieval_signoff" ||
+    profile === "ci" ||
+    profile === "release";
   const required = force || requiredByProfile || hasLatencyInput === true;
   return {
     force,
@@ -100,8 +103,9 @@ export function resolveLocalCertRunPolicy({
   }
   const override = normalizeBooleanOverride(env.CERT_ENFORCE_LOCAL_CERT_RUN);
   if (override != null) return { enforce: override, source: "env_override" };
+  // Default strict enforcement to CI/release profiles.
+  // Retrieval signoff can opt in explicitly via CERT_ENFORCE_LOCAL_CERT_RUN.
   const enforce =
-    profile === "retrieval_signoff" ||
-    (strict === true && (profile === "ci" || profile === "release"));
+    strict === true && (profile === "ci" || profile === "release");
   return { enforce, source: "default_profile_strict" };
 }

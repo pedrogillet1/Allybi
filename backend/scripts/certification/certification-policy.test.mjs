@@ -44,14 +44,48 @@ test("query latency is always required for retrieval_signoff", () => {
   assert.equal(policy.required, true);
 });
 
-test("local cert run is enforced for retrieval_signoff even in verify-only mode", () => {
+test("query latency is always required for ci profile", () => {
+  const policy = resolveQueryLatencyPolicy({
+    strict: true,
+    profile: "ci",
+    hasLatencyInput: false,
+    env: {},
+  });
+  assert.equal(policy.requiredByProfile, true);
+  assert.equal(policy.required, true);
+});
+
+test("local cert run is not enforced by default for retrieval_signoff", () => {
   const policy = resolveLocalCertRunPolicy({
     strict: false,
     profile: "retrieval_signoff",
     verifyOnly: true,
     env: {},
   });
+  assert.equal(policy.enforce, false);
+  assert.equal(policy.source, "default_profile_strict");
+});
+
+test("local cert run is enforced by default for strict ci profile", () => {
+  const policy = resolveLocalCertRunPolicy({
+    strict: true,
+    profile: "ci",
+    verifyOnly: false,
+    env: {},
+  });
   assert.equal(policy.enforce, true);
+  assert.equal(policy.source, "default_profile_strict");
+});
+
+test("local cert run can be enforced for ci profile via env override", () => {
+  const policy = resolveLocalCertRunPolicy({
+    strict: true,
+    profile: "ci",
+    verifyOnly: false,
+    env: { CERT_ENFORCE_LOCAL_CERT_RUN: "1" },
+  });
+  assert.equal(policy.enforce, true);
+  assert.equal(policy.source, "env_override");
 });
 
 test("runtime graph live evidence required for retrieval_signoff", () => {

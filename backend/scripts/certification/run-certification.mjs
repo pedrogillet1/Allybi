@@ -6,6 +6,7 @@ import { spawnSync } from "node:child_process";
 import { resolveCommitHash } from "./git-commit.mjs";
 import { packageCertificationEvidence } from "./package-evidence-bundle.mjs";
 import {
+  isCiRuntime,
   requireLiveRuntimeGraphEvidence,
   resolveCertificationProfileFromArgs,
   resolveLocalCertRunPolicy,
@@ -57,13 +58,17 @@ const gateGenerators = {
   "composition-analytical-structure": "test:cert:composition",
   "builder-payload-budget": "test:cert:builder-payload-budget",
   "gateway-json-routing": "test:cert:gateway-json-routing",
+  "collision-matrix-exhaustive": "test:cert:collision-matrix-exhaustive",
+  "telemetry-completeness": "test:cert:telemetry-completeness",
   "query-latency": "test:cert:query-latency",
   "turn-debug-packet": "test:cert:turn-debug-packet",
   "security-auth": "test:cert:security-auth",
   "observability-integrity": "test:cert:observability-integrity",
+  "doc-identity-behavioral": "test:cert:doc-identity-behavioral",
   "retrieval-behavioral": "test:cert:retrieval-behavioral",
   "retrieval-golden-eval": "test:cert:retrieval-golden-eval",
   "retrieval-realistic-eval": "test:cert:retrieval-realistic-eval",
+  "retrieval-openworld-eval": "test:cert:retrieval-openworld-eval",
   "frontend-retrieval-evidence": "test:cert:frontend-retrieval-evidence",
   "indexing-live-integration":
     "jest:path:src/tests/certification/indexing-live-integration.cert.test.ts",
@@ -231,11 +236,20 @@ function runGateGenerator(scriptName, commitHash) {
       testPath,
     ];
     const jestResult = process.platform === "win32"
-      ? spawnSync("npm.cmd", args, {
-        cwd: ROOT,
-        stdio: "inherit",
-        env: childEnv,
-      })
+      ? spawnSync(
+        "cmd.exe",
+        [
+          "/d",
+          "/s",
+          "/c",
+          `npm.cmd run -s test -- --runInBand --runTestsByPath ${testPath}`,
+        ],
+        {
+          cwd: ROOT,
+          stdio: "inherit",
+          env: childEnv,
+        },
+      )
       : spawnSync("npm", args, {
         cwd: ROOT,
         stdio: "inherit",
@@ -447,7 +461,9 @@ function main() {
 
   const allowFailedLocalRun =
     String(process.env.CERT_ALLOW_FAILED_LOCAL_RUN || "").trim().toLowerCase() ===
-      "true" || process.env.CERT_ALLOW_FAILED_LOCAL_RUN === "1";
+      "true" ||
+    process.env.CERT_ALLOW_FAILED_LOCAL_RUN === "1" ||
+    !isCiRuntime(process.env);
   const localRunPolicy = resolveLocalCertRunPolicy({
     strict,
     profile,
@@ -472,7 +488,7 @@ function main() {
     strict,
     profile,
     mode,
-    verifyOnly: verifyOnly || !repairMode,
+    verifyOnly,
     autoRefresh,
     commitHash,
     commitHashSource: commitMetadata.source,

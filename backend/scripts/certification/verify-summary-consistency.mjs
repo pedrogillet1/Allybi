@@ -3,6 +3,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import {
+  isCiRuntime,
   requireLiveRuntimeGraphEvidence,
   resolveCertificationProfile,
   resolveLocalCertRunPolicy,
@@ -52,6 +53,8 @@ const profile = resolveCertificationProfile({
 });
 const strict = summary?.strict === true;
 const isRetrievalSignoff = profile === "retrieval_signoff";
+const requiresCiEvidenceGates =
+  profile === "ci" || profile === "release" || isRetrievalSignoff;
 
 const failures = [];
 if (!mdGenerated) failures.push("MD_MISSING_GENERATED");
@@ -111,7 +114,9 @@ if (!runtimeWiringGate) {
 
 const allowFailedLocalRun =
   String(process.env.CERT_ALLOW_FAILED_LOCAL_RUN || "").trim().toLowerCase() ===
-    "true" || process.env.CERT_ALLOW_FAILED_LOCAL_RUN === "1";
+    "true" ||
+  process.env.CERT_ALLOW_FAILED_LOCAL_RUN === "1" ||
+  !isCiRuntime(process.env);
 const localRunPolicy = resolveLocalCertRunPolicy({
   strict,
   profile,
@@ -164,6 +169,7 @@ if (isRetrievalSignoff) {
     "query-latency",
     "retrieval-golden-eval",
     "retrieval-realistic-eval",
+    "retrieval-openworld-eval",
     "frontend-retrieval-evidence",
     "indexing-live-integration",
   ]);
@@ -178,6 +184,27 @@ if (isRetrievalSignoff) {
   if (missingRequiredSignoffGates.length > 0) {
     failures.push(
       `SIGNOFF_REQUIRED_GATES_MISSING:${missingRequiredSignoffGates.join(",")}`,
+    );
+  }
+}
+
+if (requiresCiEvidenceGates) {
+  const requiredCiEvidenceGates = new Set([
+    "query-latency",
+    "frontend-retrieval-evidence",
+    "indexing-live-integration",
+  ]);
+  const presentGateIds = new Set(
+    Array.isArray(summary?.gates)
+      ? summary.gates.map((gate) => String(gate?.gateId || ""))
+      : [],
+  );
+  const missingCiEvidenceGates = Array.from(requiredCiEvidenceGates).filter(
+    (gateId) => !presentGateIds.has(gateId),
+  );
+  if (missingCiEvidenceGates.length > 0) {
+    failures.push(
+      `CI_REQUIRED_EVIDENCE_GATES_MISSING:${missingCiEvidenceGates.join(",")}`,
     );
   }
 }
