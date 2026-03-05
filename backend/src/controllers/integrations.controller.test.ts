@@ -1,5 +1,9 @@
 import { beforeEach, describe, expect, jest, test } from "@jest/globals";
 
+jest.mock("../queues/connector.queue", () => ({
+  addConnectorSyncJob: jest.fn(async () => ({ id: "job-mock-1" })),
+}));
+
 import { createIntegrationsController } from "./integrations.controller";
 import { registerConnector } from "../services/connectors/connectorsRegistry";
 

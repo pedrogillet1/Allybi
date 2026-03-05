@@ -174,13 +174,13 @@ async function main() {
     detail: "Required integrations runtime tests must exist.",
   });
 
-  const npmCmd = process.platform === "win32" ? "npm.cmd" : "npm";
+  const jestCli = path.join(backendRoot, "node_modules", "jest", "bin", "jest.js");
   const testCmd = await runCommand(
-    npmCmd,
+    process.execPath,
     [
-      "run",
-      "test",
-      "--",
+      jestCli,
+      "--config",
+      "jest.config.cjs",
       "--runInBand",
       "--runTestsByPath",
       "src/controllers/integrations.controller.test.ts",

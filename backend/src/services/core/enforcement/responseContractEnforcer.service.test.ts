@@ -306,6 +306,49 @@ describe("ResponseContractEnforcerService nav_pills contract", () => {
     );
   });
 
+  test("blocks when suppression empties non-nav content", async () => {
+    mockGetBank.mockImplementation((bankId: string) => {
+      if (bankId !== "ui_contracts") return bankById(bankId);
+      return {
+        ...bankById("ui_contracts"),
+        rules: [
+          {
+            id: "suppress_everything",
+            reasonCode: "suppress_all",
+            when: {
+              all: [{ path: "answerMode", op: "eq", value: "general_answer" }],
+            },
+            triggerPatterns: { en: [".+"] },
+            action: { type: "suppress_action_language" },
+          },
+        ],
+      };
+    });
+
+    const { ResponseContractEnforcerService } =
+      await import("./responseContractEnforcer.service");
+    const enforcer = new ResponseContractEnforcerService();
+
+    const out = enforcer.enforce(
+      {
+        content: "Done. Completed.",
+        attachments: [],
+      },
+      {
+        answerMode: "general_answer",
+        language: "en",
+      },
+    );
+
+    expect(out.enforcement.blocked).toBe(true);
+    expect(out.enforcement.reasonCode).toBe(
+      "ui_contract_content_empty_after_suppression",
+    );
+    expect(out.enforcement.warnings).toContain(
+      "UI_CONTRACT_CONTENT_EMPTIED_BY_SUPPRESSION",
+    );
+  });
+
   test("hard blocks when multiple ui contract violations are configured as terminal", async () => {
     mockGetBank.mockImplementation((bankId: string) => {
       if (bankId !== "ui_contracts") return bankById(bankId);

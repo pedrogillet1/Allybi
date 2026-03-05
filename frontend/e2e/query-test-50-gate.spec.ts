@@ -1,6 +1,11 @@
 import { test, expect, Page } from "@playwright/test";
 import * as fs from "fs";
 import * as path from "path";
+import {
+  createQueryIndexByText,
+  resolveScopedDocsForRequest,
+} from "./support/attachment-scope";
+import { captureAssistantMessage } from "./support/response-capture";
 
 const TEST_EMAIL = process.env.E2E_TEST_EMAIL || "test@koda.com";
 const TEST_PASSWORD = process.env.E2E_TEST_PASSWORD || "test123";
@@ -76,6 +81,7 @@ const QUERIES_50: string[] = [
   "Agora compara esse trabalho com o capítulo de scrum.",
   "E diz se a execução proposta está aderente ao framework.",
 ];
+const QUERY_INDEX_BY_TEXT = createQueryIndexByText(QUERIES_50, 0);
 
 interface TransportMeta {
   httpStatus: number | null;
@@ -258,6 +264,7 @@ async function ensureChatComposerVisible(page: Page) {
 }
 
 async function setupDocumentAttachmentInjector(page: Page) {
+  const scopedState = { fallbackTurn: 0 };
   await page.route("**/api/chat/stream", async (route) => {
     const request = route.request();
     if (request.method() !== "POST") { await route.continue(); return; }
@@ -269,8 +276,14 @@ async function setupDocumentAttachmentInjector(page: Page) {
       }
       const postData = JSON.parse(raw);
       const hadDocs = postData.attachedDocuments?.length > 0;
+      const scope = resolveScopedDocsForRequest({
+        postData,
+        queryIndexByText: QUERY_INDEX_BY_TEXT,
+        queryStartIndex: 0,
+        state: scopedState,
+      });
       if (!hadDocs) {
-        postData.attachedDocuments = TARGET_DOCUMENTS;
+        postData.attachedDocuments = scope.scopedDocs;
       }
       await route.continue({ postData: JSON.stringify(postData) });
     } catch {
@@ -300,32 +313,9 @@ async function sendQueryAndCapture(
     await page.locator('button[aria-label="Send"]').waitFor({ state: "visible", timeout: MAX_RESPONSE_WAIT_MS });
     await page.waitForTimeout(1500);
 
-    const markdownEl = lastMsg.locator('.markdown-preview-container');
-    const contentEl = lastMsg.locator('[data-testid="assistant-message-content"]');
-    let responseText = "";
-    if (await markdownEl.isVisible({ timeout: 3000 }).catch(() => false)) {
-      responseText = await markdownEl.evaluate((el) => el.innerText);
-    } else if (await contentEl.isVisible({ timeout: 3000 }).catch(() => false)) {
-      responseText = await contentEl.evaluate((el) => el.innerText);
-    } else {
-      responseText = await lastMsg.evaluate((el) => el.innerText);
-    }
-
-    const sourcePills = lastMsg.locator(".koda-source-pill__text");
-    const pillCount = await sourcePills.count();
-    const sources: string[] = [];
-    for (let i = 0; i < pillCount; i++) {
-      const txt = await sourcePills.nth(i).textContent();
-      if (txt) sources.push(txt.trim());
-    }
-    if (pillCount === 0) {
-      const altPills = lastMsg.locator(".koda-source-pill, .source-pill, [class*='source']");
-      const altCount = await altPills.count();
-      for (let i = 0; i < altCount; i++) {
-        const txt = await altPills.nth(i).evaluate((el) => el.innerText);
-        if (txt && txt.trim()) sources.push(txt.trim());
-      }
-    }
+    const captured = await captureAssistantMessage(lastMsg);
+    const responseText = captured.responseText;
+    const sources = captured.sources;
 
     let truncation: string | null = null;
     const truncEl = lastMsg.locator('span:has-text("truncated")');

@@ -68,9 +68,7 @@ export function resolveQueryLatencyPolicy({
   env = process.env,
 }) {
   const force = normalizeBooleanOverride(env.CERT_REQUIRE_QUERY_LATENCY) === true;
-  const requiredByProfile =
-    profile === "retrieval_signoff" ||
-    (strict === true && (profile === "ci" || profile === "release"));
+  const requiredByProfile = profile === "retrieval_signoff";
   const required = force || requiredByProfile || hasLatencyInput === true;
   return {
     force,

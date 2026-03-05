@@ -478,4 +478,16 @@ describe("PolicyValidatorService", () => {
       ),
     ).toBe(true);
   });
+
+  test("ui_contracts bank has no mojibake artifacts", () => {
+    const bankPath = path.resolve(
+      process.cwd(),
+      "src/data_banks/overlays/ui_contracts.any.json",
+    );
+    const raw = fs.readFileSync(bankPath, "utf8");
+    const mojibakeMarkers = ["Ã", "â€”", "â€“", "â€", "�"];
+    for (const marker of mojibakeMarkers) {
+      expect(raw.includes(marker)).toBe(false);
+    }
+  });
 });
