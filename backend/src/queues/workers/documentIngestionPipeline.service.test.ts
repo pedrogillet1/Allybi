@@ -42,7 +42,6 @@ const mockMarkIndexed = jest.fn();
 const mockMarkReady = jest.fn();
 const mockMarkFailed = jest.fn();
 const mockMarkSkipped = jest.fn();
-const mockMarkReadyWithoutContent = jest.fn();
 
 jest.mock("../../services/documents/documentStateManager.service", () => ({
   __esModule: true,
@@ -52,7 +51,6 @@ jest.mock("../../services/documents/documentStateManager.service", () => ({
     markReady: (...args: any[]) => mockMarkReady(...args),
     markFailed: (...args: any[]) => mockMarkFailed(...args),
     markSkipped: (...args: any[]) => mockMarkSkipped(...args),
-    markReadyWithoutContent: (...args: any[]) => mockMarkReadyWithoutContent(...args),
   },
   default: {
     claimForEnrichment: (...args: any[]) => mockClaimForEnrichment(...args),
@@ -60,7 +58,6 @@ jest.mock("../../services/documents/documentStateManager.service", () => ({
     markReady: (...args: any[]) => mockMarkReady(...args),
     markFailed: (...args: any[]) => mockMarkFailed(...args),
     markSkipped: (...args: any[]) => mockMarkSkipped(...args),
-    markReadyWithoutContent: (...args: any[]) => mockMarkReadyWithoutContent(...args),
   },
 }));
 
@@ -82,11 +79,7 @@ jest.mock("../../services/ingestion/progress/documentProgress.service", () => ({
 }));
 
 jest.mock("../../services/ingestion/extraction/extractionDispatch.service", () => ({
-  XLSX_MIMES: [
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    "application/vnd.ms-excel",
-  ],
-  isImageMime: (mime: string) => mime.startsWith("image/"),
+  isMimeTypeSupportedForExtraction: () => true,
 }));
 
 const mockIsPipelineSkipped = jest.fn();
@@ -159,12 +152,15 @@ function makeTimings(overrides: Record<string, unknown> = {}) {
     textLength: 5000,
     ocrUsed: false,
     ocrSuccess: false,
+    ocrAttempted: false,
+    ocrOutcome: "not_attempted",
     ocrConfidence: null,
     ocrMode: null,
     ocrPageCount: 0,
     textQuality: "good",
     textQualityScore: 0.9,
     extractionWarnings: [],
+    peakRssMb: 512.3,
     fileHash: null,
     ...overrides,
   };
@@ -186,7 +182,6 @@ describe("documentIngestionPipeline", () => {
     mockMarkReady.mockReset();
     mockMarkFailed.mockReset();
     mockMarkSkipped.mockReset();
-    mockMarkReadyWithoutContent.mockReset();
     mockProcessDocumentAsync.mockReset();
     mockEmitToUser.mockReset();
     mockEmitProcessingUpdate.mockReset();
@@ -265,13 +260,12 @@ describe("documentIngestionPipeline", () => {
       "doc-1",
       "No extractable text content",
     );
-    expect(mockMarkReadyWithoutContent).not.toHaveBeenCalled();
   });
 
   // -----------------------------------------------------------------------
-  // 5. Marks readyWithoutContent for XLSX with zero chunks
+  // 5. Marks skipped for XLSX with zero chunks (strict no-content policy)
   // -----------------------------------------------------------------------
-  test("marks readyWithoutContent for XLSX with zero chunks", async () => {
+  test("marks skipped for XLSX with zero chunks", async () => {
     const xlsxMime =
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     mockDocFindUnique.mockResolvedValue(
@@ -282,16 +276,31 @@ describe("documentIngestionPipeline", () => {
       makeTimings({ chunkCount: 0 }),
     );
     mockIsPipelineSkipped.mockReturnValue(false);
-    mockMarkReadyWithoutContent.mockResolvedValue({ success: true });
+    mockMarkSkipped.mockResolvedValue({ success: true });
 
     const result = await runDocumentIngestionPipeline(
       makeJobData({ mimeType: xlsxMime }),
     );
 
     expect(result.skipped).toBe(true);
-    expect(mockMarkReadyWithoutContent).toHaveBeenCalledTimes(1);
-    expect(mockMarkReadyWithoutContent).toHaveBeenCalledWith("doc-1");
-    expect(mockMarkSkipped).not.toHaveBeenCalled();
+    expect(mockMarkSkipped).toHaveBeenCalledTimes(1);
+    expect(mockMarkSkipped).toHaveBeenCalledWith(
+      "doc-1",
+      "No extractable text content",
+    );
+    expect(mockIngestionEventCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          status: "skipped",
+          meta: expect.objectContaining({
+            ocrAttempted: false,
+            ocrOutcome: "not_attempted",
+            peakRssMb: 512.3,
+            sizeBucket: "lt_1mb",
+          }),
+        }),
+      }),
+    );
   });
 
   // -----------------------------------------------------------------------
@@ -311,6 +320,17 @@ describe("documentIngestionPipeline", () => {
     expect(result.chunks).toBe(15);
     expect(mockMarkIndexed).toHaveBeenCalledTimes(1);
     expect(mockMarkIndexed).toHaveBeenCalledWith("doc-1", 15);
+    expect(mockIngestionEventCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          status: "ok",
+          meta: expect.objectContaining({
+            ocrAttempted: false,
+            ocrOutcome: "not_attempted",
+          }),
+        }),
+      }),
+    );
   });
 
   // -----------------------------------------------------------------------

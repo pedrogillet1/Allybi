@@ -10,6 +10,7 @@ on:
       - "backend/src/services/llm/core/**"
       - "backend/scripts/runtime-slo/**"
       - "backend/notes/RUNTIME_SLO_BASELINE.json"
+      - "frontend/e2e/query-packs/test1-bilingual-100.json"
       - ".github/workflows/runtime-slo-gates.yml"
   push:
     branches: [ main, develop ]
@@ -20,13 +21,46 @@ on:
       - "backend/src/services/llm/core/**"
       - "backend/scripts/runtime-slo/**"
       - "backend/notes/RUNTIME_SLO_BASELINE.json"
+      - "frontend/e2e/query-packs/test1-bilingual-100.json"
       - ".github/workflows/runtime-slo-gates.yml"
   workflow_dispatch:
 
 jobs:
+  check-secrets:
+    name: Verify runtime SLO secrets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check runtime SLO secret set
+        id: check
+        env:
+          RUNTIME_SLO_API_BASE: ${{ secrets.RUNTIME_SLO_API_BASE }}
+          RUNTIME_SLO_TEST_EMAIL: ${{ secrets.RUNTIME_SLO_TEST_EMAIL }}
+          RUNTIME_SLO_TEST_PASSWORD: ${{ secrets.RUNTIME_SLO_TEST_PASSWORD }}
+        shell: bash
+        run: |
+          missing=0
+          if [ -z "$RUNTIME_SLO_API_BASE" ]; then
+            echo "::warning::Missing required secret: RUNTIME_SLO_API_BASE"
+            missing=1
+          fi
+          if [ -z "$RUNTIME_SLO_TEST_EMAIL" ]; then
+            echo "::warning::Missing required secret: RUNTIME_SLO_TEST_EMAIL"
+            missing=1
+          fi
+          if [ -z "$RUNTIME_SLO_TEST_PASSWORD" ]; then
+            echo "::warning::Missing required secret: RUNTIME_SLO_TEST_PASSWORD"
+            missing=1
+          fi
+          if [ "$missing" = "1" ]; then
+            echo "::error::Runtime SLO gate is blocked because required secrets are missing."
+            exit 1
+          else
+            echo "has-secrets=true" >> "$GITHUB_OUTPUT"
+          fi
+
   runtime-slo:
     name: Runtime latency + reliability budget gate
-    if: ${{ secrets.RUNTIME_SLO_API_BASE != '' && secrets.RUNTIME_SLO_TEST_EMAIL != '' && secrets.RUNTIME_SLO_TEST_PASSWORD != '' }}
+    needs: check-secrets
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -43,6 +77,10 @@ jobs:
         working-directory: ./backend
         run: npm ci
 
+      - name: Validate runtime SLO query pack fixture
+        run: |
+          node -e "const fs=require('fs');const p='frontend/e2e/query-packs/test1-bilingual-100.json';const v=JSON.parse(fs.readFileSync(p,'utf8'));if(!Array.isArray(v.queries)||v.queries.length<40){throw new Error('query pack must include at least 40 queries')}const pt=v.queries.filter((q)=>q.language==='pt').length;const en=v.queries.filter((q)=>q.language==='en').length;if(pt===0||en===0){throw new Error('query pack must include EN and PT queries')}console.log('pack ok',v.queries.length,pt,en);"
+
       - name: Run E2E query pack for runtime SLO sample
         run: |
           node frontend/e2e/run-query-pack.mjs \
@@ -51,6 +89,8 @@ jobs:
             --password "${{ secrets.RUNTIME_SLO_TEST_PASSWORD }}" \
             --pack "frontend/e2e/query-packs/test1-bilingual-100.json" \
             --out "frontend/e2e/reports/latest/runtime_slo_results.json" \
+            --scope-policy permissive \
+            --require-documents false \
             --max-queries 40 \
             --quiet
 

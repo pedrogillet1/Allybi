@@ -80,6 +80,13 @@ describe("CentralizedChatRuntimeDelegate provenance enforcement", () => {
         "generateFollowups",
       )
       .mockResolvedValue([]);
+    restoreQualityRunner = jest
+      .spyOn(QualityGateRunnerService.prototype, "runGates")
+      .mockResolvedValue({
+        allPassed: true,
+        finalScore: 1,
+        results: [],
+      });
   });
 
   afterEach(() => {
@@ -259,19 +266,17 @@ describe("CentralizedChatRuntimeDelegate provenance enforcement", () => {
 
   test("fails closed on quality gate blocks even when fail-soft flag is enabled", async () => {
     process.env.CHAT_RUNTIME_FAIL_SOFT_WARNINGS = "true";
-    restoreQualityRunner = jest
-      .spyOn(QualityGateRunnerService.prototype, "runGates")
-      .mockResolvedValue({
-        allPassed: false,
-        finalScore: 0,
-        results: [
-          {
-            passed: false,
-            gateName: "privacy_minimal",
-            issues: ["blocked for test"],
-          },
-        ],
-      });
+    restoreQualityRunner?.mockResolvedValue({
+      allPassed: false,
+      finalScore: 0,
+      results: [
+        {
+          passed: false,
+          gateName: "privacy_minimal",
+          issues: ["blocked for test"],
+        },
+      ],
+    });
 
     const engine: ChatEngine = {
       async generate() {
@@ -312,19 +317,17 @@ describe("CentralizedChatRuntimeDelegate provenance enforcement", () => {
 
   test("fails closed on quality gate blocks when fail-soft flag is disabled", async () => {
     process.env.CHAT_RUNTIME_FAIL_SOFT_WARNINGS = "false";
-    restoreQualityRunner = jest
-      .spyOn(QualityGateRunnerService.prototype, "runGates")
-      .mockResolvedValue({
-        allPassed: false,
-        finalScore: 0,
-        results: [
-          {
-            passed: false,
-            gateName: "privacy_minimal",
-            issues: ["blocked for test"],
-          },
-        ],
-      });
+    restoreQualityRunner?.mockResolvedValue({
+      allPassed: false,
+      finalScore: 0,
+      results: [
+        {
+          passed: false,
+          gateName: "privacy_minimal",
+          issues: ["blocked for test"],
+        },
+      ],
+    });
 
     const engine: ChatEngine = {
       async generate() {
@@ -364,19 +367,17 @@ describe("CentralizedChatRuntimeDelegate provenance enforcement", () => {
     process.env.CHAT_RUNTIME_FAIL_SOFT_WARNINGS = "true";
     process.env.QUALITY_GATES_ENFORCING = "false";
     process.env.NODE_ENV = "production";
-    restoreQualityRunner = jest
-      .spyOn(QualityGateRunnerService.prototype, "runGates")
-      .mockResolvedValue({
-        allPassed: false,
-        finalScore: 0,
-        results: [
-          {
-            passed: false,
-            gateName: "privacy_minimal",
-            issues: ["blocked for test"],
-          },
-        ],
-      });
+    restoreQualityRunner?.mockResolvedValue({
+      allPassed: false,
+      finalScore: 0,
+      results: [
+        {
+          passed: false,
+          gateName: "privacy_minimal",
+          issues: ["blocked for test"],
+        },
+      ],
+    });
 
     const engine: ChatEngine = {
       async generate() {

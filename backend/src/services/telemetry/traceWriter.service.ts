@@ -72,6 +72,12 @@ export interface QueryTelemetryWriteInput {
   domain?: string | null;
   answerMode?: string | null;
   operatorFamily?: string | null;
+  operatorChoice?: string | null;
+  scopeDecision?: string | null;
+  disambiguation?: string | null;
+  routingReason?: string | null;
+  queryScope?: string | null;
+  subIntent?: string | null;
   chunksReturned?: number | null;
   distinctDocs?: number | null;
   documentIds?: string[];
@@ -98,6 +104,7 @@ export interface QueryTelemetryWriteInput {
   inputTokens?: number | null;
   outputTokens?: number | null;
   totalTokens?: number | null;
+  estimatedCostUsd?: number | null;
   pipelineSignature?: string | null;
   environment?: string | null;
   errors?: Record<string, unknown> | null;
@@ -143,6 +150,36 @@ export interface TurnDebugPacket {
     scopeCandidatesDropped: number;
     evidenceIds: string[];
     documentIds: string[];
+    selectionRationale?: {
+      matchedBoostRuleIds: string[];
+      appliedBoostRuleIds: string[];
+      rewriteRuleIds: string[];
+      selectedSectionRuleId: string | null;
+      crossDocGatedReason: string | null;
+      classifiedDomain: string | null;
+      classifiedDocTypeId: string | null;
+      classificationReasons: string[];
+    };
+    tableContextCoverage?: {
+      tableEvidenceCount: number;
+      tableWithHeadersCount: number;
+      tableWithUnitCount: number;
+      tableWithScaleCount: number;
+      tableWithFootnotesCount: number;
+    };
+    evidenceSelection?: Array<{
+      evidenceId: string;
+      docId: string;
+      locationKey: string;
+      sectionKey: string | null;
+      evidenceType: "text" | "table" | "image";
+      finalScore: number | null;
+      semanticScore: number | null;
+      lexicalScore: number | null;
+      structuralScore: number | null;
+      hasUnitContext: boolean;
+      hasTableHeader: boolean;
+    }>;
   };
   provenance: {
     schemaVersion: string;
@@ -471,6 +508,12 @@ export class TraceWriterService {
     const outputTokens = toIntOrNull(input.outputTokens) ?? 0;
     const totalTokens =
       toIntOrNull(input.totalTokens) ?? Math.max(0, inputTokens + outputTokens);
+    const operatorChoice = cleanShort(input.operatorChoice, 64);
+    const scopeDecision = cleanShort(input.scopeDecision || input.queryScope, 64);
+    const disambiguation = cleanShort(input.disambiguation || input.subIntent, 64);
+    const routingReason =
+      cleanShort(input.routingReason, 120) ||
+      (operatorChoice ? `operator_choice:${operatorChoice}` : null);
 
     const createData = {
       queryId: traceId,
@@ -486,7 +529,10 @@ export class TraceWriterService {
       intentConfidence: clamp01OrNull(input.intentConfidence) ?? 0.8,
       domain: cleanShort(input.domain, 64),
       answerMode: cleanShort(input.answerMode, 64),
-      operatorFamily: cleanShort(input.operatorFamily, 64),
+      queryScope: scopeDecision,
+      subIntent: disambiguation,
+      routingReason,
+      operatorFamily: cleanShort(input.operatorFamily, 64) || operatorChoice,
       chunksReturned: toIntOrNull(input.chunksReturned) ?? 0,
       distinctDocs: toIntOrNull(input.distinctDocs) ?? 0,
       documentIds: Array.isArray(input.documentIds)
@@ -529,6 +575,7 @@ export class TraceWriterService {
       inputTokens,
       outputTokens,
       totalTokens,
+      estimatedCostUsd: toFloatOrNull(input.estimatedCostUsd) ?? 0,
       pipelineSignature: cleanShort(input.pipelineSignature, 120),
       pipelineFamily: "chat_runtime_delegate",
       errors: input.errors || null,

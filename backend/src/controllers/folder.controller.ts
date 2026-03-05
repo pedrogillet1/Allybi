@@ -48,6 +48,8 @@ export interface FolderService {
     userId: string;
     name: string;
     parentId?: string | null;
+    path?: string | null;
+    emoji?: string | null;
   }): Promise<FolderRecord>;
 
   rename(input: {
@@ -60,6 +62,12 @@ export interface FolderService {
     userId: string;
     folderId: string;
     newParentId?: string | null;
+  }): Promise<FolderRecord>;
+
+  setEmoji?(input: {
+    userId: string;
+    folderId: string;
+    emoji?: string | null;
   }): Promise<FolderRecord>;
 
   delete(input: {
@@ -212,7 +220,11 @@ export class FolderController {
       return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
 
     const name = asString((req.body as any)?.name);
-    const parentId = asString((req.body as any)?.parentId) ?? null;
+    const parentId =
+      asString((req.body as any)?.parentId) ??
+      asString((req.body as any)?.parentFolderId) ??
+      null;
+    const emoji = asString((req.body as any)?.emoji) ?? null;
 
     if (!name)
       return err(
@@ -223,7 +235,7 @@ export class FolderController {
       );
 
     try {
-      const created = await this.folders.create({ userId, name, parentId });
+      const created = await this.folders.create({ userId, name, parentId, emoji });
       return ok(res, created, 201);
     } catch (e) {
       const mapped = mapError(e);
@@ -246,15 +258,18 @@ export class FolderController {
       );
 
     const name = asString((req.body as any)?.name);
+    const emojiRaw = (req.body as any)?.emoji;
+    const emoji =
+      emojiRaw === undefined ? undefined : (asString(emojiRaw) ?? null);
     const parentIdRaw = (req.body as any)?.parentId;
     const parentId =
       parentIdRaw === undefined ? undefined : (asString(parentIdRaw) ?? null);
 
-    if (!name && parentId === undefined) {
+    if (!name && parentId === undefined && emoji === undefined) {
       return err(
         res,
         "VALIDATION_UPDATE_REQUIRED",
-        "Provide at least one of: name, parentId.",
+        "Provide at least one of: name, parentId, emoji.",
         400,
       );
     }
@@ -271,6 +286,14 @@ export class FolderController {
           userId,
           folderId,
           newParentId: parentId,
+        });
+      }
+
+      if (emoji !== undefined && this.folders.setEmoji) {
+        out = await this.folders.setEmoji({
+          userId,
+          folderId,
+          emoji,
         });
       }
 

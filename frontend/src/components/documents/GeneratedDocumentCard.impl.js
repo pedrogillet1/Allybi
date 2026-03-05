@@ -6,10 +6,8 @@ import remarkGfm from 'remark-gfm';
 import remarkEmoji from 'remark-emoji';
 import '../chat/streaming/MarkdownStyles.css';
 import copyDuplicateIcon from '../../assets/copy-duplicate.svg';
-const AUTH_LOCALSTORAGE_COMPAT = process.env.REACT_APP_AUTH_LOCALSTORAGE_COMPAT === 'true';
 const getCompatAccessToken = () => {
-  if (!AUTH_LOCALSTORAGE_COMPAT) return null;
-  return localStorage.getItem('accessToken') || localStorage.getItem('token');
+  return null;
 };
 
 /**
@@ -494,3 +492,4 @@ const GeneratedDocumentCard = ({ chatDocument }) => {
 };
 
 export default GeneratedDocumentCard;
+

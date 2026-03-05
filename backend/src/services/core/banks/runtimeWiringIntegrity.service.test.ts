@@ -10,6 +10,7 @@ jest.mock("./bankLoader.service", () => ({
 jest.mock("fs", () => ({
   existsSync: jest.fn(),
   readFileSync: jest.fn(),
+  readdirSync: jest.fn(),
 }));
 
 // Import after mocks are registered so the service picks up the mocked versions.
@@ -33,6 +34,9 @@ const mockedExistsSync = fs.existsSync as jest.MockedFunction<
 >;
 const mockedReadFileSync = fs.readFileSync as jest.MockedFunction<
   typeof fs.readFileSync
+>;
+const mockedReaddirSync = fs.readdirSync as jest.MockedFunction<
+  typeof fs.readdirSync
 >;
 
 // ---- minimal "clean" bank fixtures -------------------------------------------
@@ -215,6 +219,9 @@ beforeEach(() => {
     }
     return "" as unknown as Buffer;
   });
+  mockedReaddirSync.mockImplementation(() => {
+    throw new Error("ENOENT");
+  });
 });
 
 // ---- helper ------------------------------------------------------------------
@@ -244,6 +251,7 @@ describe("RuntimeWiringIntegrityService – structural contract", () => {
       "missingBanks",
       "missingLlmRoutingPolicyBanks",
       "missingRuntimePolicyConsumers",
+      "missingRoutingBankConsumers",
       "runtimePolicyEnvGaps",
       "missingOperatorContracts",
       "missingOperatorOutputShapes",
@@ -266,6 +274,7 @@ describe("RuntimeWiringIntegrityService – structural contract", () => {
       "answerModeContractDrift",
       "productHelpRuntimeUsageMissing",
       "followupOverlayCoverageGaps",
+      "composeMicrocopyBankUsageGaps",
     ];
 
     for (const field of expectedFields) {
@@ -376,6 +385,19 @@ describe("RuntimeWiringIntegrityService – missing banks", () => {
     expect(result.ok).toBe(false);
   });
 
+  test("missingBanks includes viewer_assistant_routing when the bank is absent", () => {
+    const banks = makeCleanBanks();
+    delete (banks as Record<string, unknown>)["viewer_assistant_routing"];
+
+    mockedGetOptionalBank.mockImplementation(
+      (id: string) => (banks[id] ?? null) as ReturnType<typeof getOptionalBank>,
+    );
+
+    const result = buildService().validate();
+    expect(result.missingBanks).toContain("viewer_assistant_routing");
+    expect(result.ok).toBe(false);
+  });
+
   test("missingBanks is empty when all required banks are present", () => {
     wireCleanBanks();
     const result = buildService().validate();
@@ -402,6 +424,101 @@ describe("RuntimeWiringIntegrityService – missing banks", () => {
   });
 });
 
+
+// ============================================================================== 
+// 4. Routing bank consumer wiring
+// ==============================================================================
+
+describe("RuntimeWiringIntegrityService – routing bank consumer wiring", () => {
+  function dirEntry(name: string): fs.Dirent {
+    return {
+      name,
+      isDirectory: () => true,
+      isFile: () => false,
+    } as unknown as fs.Dirent;
+  }
+
+  function fileEntry(name: string): fs.Dirent {
+    return {
+      name,
+      isDirectory: () => false,
+      isFile: () => true,
+    } as unknown as fs.Dirent;
+  }
+
+  function wireSingleRouterSourceFile(content: string): void {
+    mockedExistsSync.mockImplementation((p) => {
+      const normalized = String(p || "").replace(/\\/g, "/");
+      if (hasMemoryPolicySuffix(normalized)) return true;
+      return (
+        normalized.endsWith("/backend/src") ||
+        normalized.endsWith("/backend/src/services") ||
+        normalized.endsWith("/backend/src/services/chat")
+      );
+    });
+    mockedReaddirSync.mockImplementation((p) => {
+      const normalized = String(p || "").replace(/\\/g, "/");
+      if (normalized.endsWith("/backend/src")) return [dirEntry("services")] as any;
+      if (normalized.endsWith("/backend/src/services")) return [dirEntry("chat")] as any;
+      if (normalized.endsWith("/backend/src/services/chat")) {
+        return [fileEntry("turnRouter.service.ts")] as any;
+      }
+      return [] as any;
+    });
+    mockedReadFileSync.mockImplementation((p) => {
+      if (hasMemoryPolicySuffix(p)) {
+        return CLEAN_MEMORY_POLICY_CONTENT as unknown as Buffer;
+      }
+      if (String(p || "").replace(/\\/g, "/").endsWith("/turnRouter.service.ts")) {
+        return content as unknown as Buffer;
+      }
+      return "" as unknown as Buffer;
+    });
+  }
+
+  test("missingRoutingBankConsumers flags viewer_assistant_routing when runtime consumer marker is absent", () => {
+    wireCleanBanks();
+    wireSingleRouterSourceFile("export class TurnRouterService {}");
+
+    const result = buildService().validate();
+
+    expect(result.missingRoutingBankConsumers).toContain(
+      "viewer_assistant_routing",
+    );
+  });
+
+  test("missingRoutingBankConsumers clears when runtime source references all required routing banks", () => {
+    wireCleanBanks();
+    wireSingleRouterSourceFile(
+      [
+        'const viewer = this.routingBankProvider("viewer_assistant_routing");',
+        'const cEn = this.routingBankProvider("connect_intents_en");',
+        'const cPt = this.routingBankProvider("connect_intents_pt");',
+        'const sEn = this.routingBankProvider("search_intents_en");',
+        'const sPt = this.routingBankProvider("search_intents_pt");',
+        'const sendEn = this.routingBankProvider("send_intents_en");',
+        'const sendPt = this.routingBankProvider("send_intents_pt");',
+        'const syncEn = this.routingBankProvider("sync_intents_en");',
+        'const syncPt = this.routingBankProvider("sync_intents_pt");',
+      ].join("\n"),
+    );
+
+    const result = buildService().validate();
+
+    expect(result.missingRoutingBankConsumers).toHaveLength(0);
+  });
+
+  test("missingRoutingBankConsumers flags integration intent bank when its marker is absent", () => {
+    wireCleanBanks();
+    wireSingleRouterSourceFile(
+      'const bank = this.routingBankProvider("viewer_assistant_routing");',
+    );
+
+    const result = buildService().validate();
+
+    expect(result.missingRoutingBankConsumers).toContain("connect_intents_en");
+  });
+});
 // ==============================================================================
 // 4. Operator cross-checks (contracts & output shapes)
 // ==============================================================================
@@ -1287,3 +1404,4 @@ describe("RuntimeWiringIntegrityService – ok flag invariant", () => {
     expect(result.ok).toBe(true);
   });
 });
+

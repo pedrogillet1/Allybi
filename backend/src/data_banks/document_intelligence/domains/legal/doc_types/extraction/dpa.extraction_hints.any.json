@@ -1,0 +1,569 @@
+{
+  "_meta": {
+    "id": "dpa_extraction_hints_vc1cbb882",
+    "version": "1.0.0",
+    "description": "Extraction hints for Data Processing Agreement.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "legal",
+    "docType": "legal_dpa"
+  },
+  "hints": [
+    {
+      "id": "dpa_hint_01",
+      "entity": "address",
+      "anchors": [
+        "address",
+        "data processing agreement address",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "abstract",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in appendix",
+        "can be buried in annex ii"
+      ]
+    },
+    {
+      "id": "dpa_hint_02",
+      "entity": "article_number",
+      "anchors": [
+        "article number",
+        "data processing agreement article number",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "action_items",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in appendix a",
+        "can be buried in exhibit"
+      ]
+    },
+    {
+      "id": "dpa_hint_03",
+      "entity": "case_number",
+      "anchors": [
+        "case number",
+        "data processing agreement case number",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "appendix",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in appendix b",
+        "can be buried in exhibit a"
+      ]
+    },
+    {
+      "id": "dpa_hint_04",
+      "entity": "city",
+      "anchors": [
+        "city",
+        "data processing agreement city",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "approvals",
+      "extractionMethod": "metadata_or_heading",
+      "whereItHides": [
+        "often in annex",
+        "can be buried in exhibit b"
+      ]
+    },
+    {
+      "id": "dpa_hint_05",
+      "entity": "clause_reference",
+      "anchors": [
+        "clause reference",
+        "data processing agreement clause reference",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "assumptions",
+      "extractionMethod": "cross_section_link",
+      "whereItHides": [
+        "often in annex i",
+        "can be buried in footnote"
+      ]
+    },
+    {
+      "id": "dpa_hint_06",
+      "entity": "company_name",
+      "anchors": [
+        "company name",
+        "data processing agreement company name",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "attachments",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in annex ii",
+        "can be buried in endnote"
+      ]
+    },
+    {
+      "id": "dpa_hint_07",
+      "entity": "counterparty",
+      "anchors": [
+        "counterparty",
+        "data processing agreement counterparty",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "audit_trail",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in exhibit",
+        "can be buried in schedule"
+      ]
+    },
+    {
+      "id": "dpa_hint_08",
+      "entity": "country",
+      "anchors": [
+        "country",
+        "data processing agreement country",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "authorization",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in exhibit a",
+        "can be buried in attachment"
+      ]
+    },
+    {
+      "id": "dpa_hint_09",
+      "entity": "court_name",
+      "anchors": [
+        "court name",
+        "data processing agreement court name",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "certifications",
+      "extractionMethod": "metadata_or_heading",
+      "whereItHides": [
+        "often in exhibit b",
+        "can be buried in addendum"
+      ]
+    },
+    {
+      "id": "dpa_hint_10",
+      "entity": "currency_amount",
+      "anchors": [
+        "currency amount",
+        "data processing agreement currency amount",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "compliance_section",
+      "extractionMethod": "cross_section_link",
+      "whereItHides": [
+        "often in footnote",
+        "can be buried in rider"
+      ]
+    },
+    {
+      "id": "dpa_hint_11",
+      "entity": "currency_code",
+      "anchors": [
+        "currency code",
+        "data processing agreement currency code",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "confidentiality_clause",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in endnote",
+        "can be buried in supplement"
+      ]
+    },
+    {
+      "id": "dpa_hint_12",
+      "entity": "document_number",
+      "anchors": [
+        "document number",
+        "data processing agreement document number",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "criteria",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in schedule",
+        "can be buried in definitions section"
+      ]
+    },
+    {
+      "id": "dpa_hint_13",
+      "entity": "effective_date",
+      "anchors": [
+        "effective date",
+        "data processing agreement effective date",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "data_tables",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in attachment",
+        "can be buried in signature block"
+      ]
+    },
+    {
+      "id": "dpa_hint_14",
+      "entity": "execution_date",
+      "anchors": [
+        "execution date",
+        "data processing agreement execution date",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "definitions",
+      "extractionMethod": "metadata_or_heading",
+      "whereItHides": [
+        "often in addendum",
+        "can be buried in metadata header"
+      ]
+    },
+    {
+      "id": "dpa_hint_15",
+      "entity": "expiration_date",
+      "anchors": [
+        "expiration date",
+        "data processing agreement expiration date",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "detailed_analysis",
+      "extractionMethod": "cross_section_link",
+      "whereItHides": [
+        "often in rider",
+        "can be buried in revision history"
+      ]
+    },
+    {
+      "id": "dpa_hint_16",
+      "entity": "filing_date",
+      "anchors": [
+        "filing date",
+        "data processing agreement filing date",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "disclaimers",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in supplement",
+        "can be buried in appendix"
+      ]
+    },
+    {
+      "id": "dpa_hint_17",
+      "entity": "interest_rate",
+      "anchors": [
+        "interest rate",
+        "data processing agreement interest rate",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "discussion",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in definitions section",
+        "can be buried in appendix a"
+      ]
+    },
+    {
+      "id": "dpa_hint_18",
+      "entity": "jurisdiction",
+      "anchors": [
+        "jurisdiction",
+        "data processing agreement jurisdiction",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "dispute_resolution",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in signature block",
+        "can be buried in appendix b"
+      ]
+    },
+    {
+      "id": "dpa_hint_19",
+      "entity": "period_reference",
+      "anchors": [
+        "period reference",
+        "data processing agreement period reference",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "distribution_list",
+      "extractionMethod": "metadata_or_heading",
+      "whereItHides": [
+        "often in metadata header",
+        "can be buried in annex"
+      ]
+    },
+    {
+      "id": "dpa_hint_20",
+      "entity": "person_name",
+      "anchors": [
+        "person name",
+        "data processing agreement person name",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "document_metadata",
+      "extractionMethod": "cross_section_link",
+      "whereItHides": [
+        "often in revision history",
+        "can be buried in annex i"
+      ]
+    },
+    {
+      "id": "dpa_hint_21",
+      "entity": "person_role",
+      "anchors": [
+        "person role",
+        "data processing agreement person role",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "executive_summary",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in appendix",
+        "can be buried in annex ii"
+      ]
+    },
+    {
+      "id": "dpa_hint_22",
+      "entity": "person_title",
+      "anchors": [
+        "person title",
+        "data processing agreement person title",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "exhibits",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in appendix a",
+        "can be buried in exhibit"
+      ]
+    },
+    {
+      "id": "dpa_hint_23",
+      "entity": "reference_code",
+      "anchors": [
+        "reference code",
+        "data processing agreement reference code",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "findings",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in appendix b",
+        "can be buried in exhibit a"
+      ]
+    },
+    {
+      "id": "dpa_hint_24",
+      "entity": "registration_number",
+      "anchors": [
+        "registration number",
+        "data processing agreement registration number",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "glossary",
+      "extractionMethod": "metadata_or_heading",
+      "whereItHides": [
+        "often in annex",
+        "can be buried in exhibit b"
+      ]
+    },
+    {
+      "id": "dpa_hint_25",
+      "entity": "regulatory_body",
+      "anchors": [
+        "regulatory body",
+        "data processing agreement regulatory body",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "governing_law",
+      "extractionMethod": "cross_section_link",
+      "whereItHides": [
+        "often in annex i",
+        "can be buried in footnote"
+      ]
+    },
+    {
+      "id": "dpa_hint_26",
+      "entity": "signatory",
+      "anchors": [
+        "signatory",
+        "data processing agreement signatory",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in annex ii",
+        "can be buried in endnote"
+      ]
+    },
+    {
+      "id": "dpa_hint_27",
+      "entity": "state_province",
+      "anchors": [
+        "state province",
+        "data processing agreement state province",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "indemnification",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in exhibit",
+        "can be buried in schedule"
+      ]
+    },
+    {
+      "id": "dpa_hint_28",
+      "entity": "statute_citation",
+      "anchors": [
+        "statute citation",
+        "data processing agreement statute citation",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "introduction",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in exhibit a",
+        "can be buried in attachment"
+      ]
+    },
+    {
+      "id": "dpa_hint_29",
+      "entity": "subsidiary",
+      "anchors": [
+        "subsidiary",
+        "data processing agreement subsidiary",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "limitations",
+      "extractionMethod": "metadata_or_heading",
+      "whereItHides": [
+        "often in exhibit b",
+        "can be buried in addendum"
+      ]
+    },
+    {
+      "id": "dpa_hint_30",
+      "entity": "tax_id",
+      "anchors": [
+        "tax id",
+        "data processing agreement tax id",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "methodology",
+      "extractionMethod": "cross_section_link",
+      "whereItHides": [
+        "often in footnote",
+        "can be buried in rider"
+      ]
+    },
+    {
+      "id": "dpa_hint_31",
+      "entity": "tax_rate",
+      "anchors": [
+        "tax rate",
+        "data processing agreement tax rate",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "procedures",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in endnote",
+        "can be buried in supplement"
+      ]
+    },
+    {
+      "id": "dpa_hint_32",
+      "entity": "witness",
+      "anchors": [
+        "witness",
+        "data processing agreement witness",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "recitals",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in schedule",
+        "can be buried in definitions section"
+      ]
+    },
+    {
+      "id": "dpa_hint_33",
+      "entity": "address",
+      "anchors": [
+        "address",
+        "data processing agreement address",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "recommendations",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in attachment",
+        "can be buried in signature block"
+      ]
+    },
+    {
+      "id": "dpa_hint_34",
+      "entity": "article_number",
+      "anchors": [
+        "article number",
+        "data processing agreement article number",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "red_flags",
+      "extractionMethod": "metadata_or_heading",
+      "whereItHides": [
+        "often in addendum",
+        "can be buried in metadata header"
+      ]
+    }
+  ]
+}

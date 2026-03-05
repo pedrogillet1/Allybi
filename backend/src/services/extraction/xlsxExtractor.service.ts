@@ -28,6 +28,9 @@ import { logger } from "../../utils/logger";
 // Constants
 // ============================================================================
 
+const MAX_RENDERED_DATA_ROWS = 400;
+const RENDERED_TAIL_ROWS = 80;
+
 /**
  * Financial metric keywords for row label detection
  */
@@ -319,57 +322,55 @@ function processSheet(
   // Extract cell facts (for financial/metric data)
   const cellFacts: XlsxCellFact[] = [];
 
-  if (financial || temporal) {
-    // Process data rows
-    for (let rowIdx = headerRowIndex + 1; rowIdx < data.length; rowIdx++) {
-      const row = data[rowIdx];
-      if (!row) continue;
+  // Process data rows for structured cell facts on every sheet.
+  for (let rowIdx = headerRowIndex + 1; rowIdx < data.length; rowIdx++) {
+    const row = data[rowIdx];
+    if (!row) continue;
 
-      const rowLabel =
-        row[0] !== null && row[0] !== undefined ? String(row[0]).trim() : "";
-      if (!rowLabel) continue;
+    const rowLabel =
+      row[0] !== null && row[0] !== undefined ? String(row[0]).trim() : "";
+    if (!rowLabel) continue;
 
-      // Process each cell in the row
-      for (let colIdx = 1; colIdx < row.length; colIdx++) {
-        const cellValue = row[colIdx];
-        if (cellValue === null || cellValue === undefined || cellValue === "") {
-          continue;
-        }
-
-        const colHeader = headers[colIdx] || "";
-        const cellAddress = getCellAddress(rowIdx, colIdx);
-
-        // Determine value type
-        let value: number | string = cellValue;
-        let valueType: "number" | "string" | "date" | "formula" = "string";
-
-        if (typeof cellValue === "number") {
-          value = cellValue;
-          valueType = "number";
-        } else if (!isNaN(Number(cellValue))) {
-          value = Number(cellValue);
-          valueType = "number";
-        } else if (cellValue instanceof Date) {
-          value = cellValue.toISOString();
-          valueType = "date";
-        }
-
-        // Parse period from column header
-        const period = parsePeriod(colHeader);
-
-        const fact: XlsxCellFact = {
-          sheet: sheetName,
-          cell: cellAddress,
-          rowLabel,
-          colHeader,
-          value: String(value),
-          displayValue: String(cellValue),
-          period,
-          valueType,
-        };
-
-        cellFacts.push(fact);
+    // Process each cell in the row
+    for (let colIdx = 1; colIdx < row.length; colIdx++) {
+      const cellValue = row[colIdx];
+      if (cellValue === null || cellValue === undefined || cellValue === "") {
+        continue;
       }
+
+      const colHeader = headers[colIdx] || "";
+      const cellAddress = getCellAddress(rowIdx, colIdx);
+
+      // Determine value type
+      let value: number | string = cellValue;
+      let valueType: "number" | "string" | "date" | "formula" = "string";
+
+      if (typeof cellValue === "number") {
+        value = cellValue;
+        valueType = "number";
+      } else if (!isNaN(Number(cellValue))) {
+        value = Number(cellValue);
+        valueType = "number";
+      } else if (cellValue instanceof Date) {
+        value = cellValue.toISOString();
+        valueType = "date";
+      }
+
+      // Parse period from column header when present.
+      const period = parsePeriod(colHeader);
+
+      const fact: XlsxCellFact = {
+        sheet: sheetName,
+        cell: cellAddress,
+        rowLabel,
+        colHeader,
+        value: String(value),
+        displayValue: String(cellValue),
+        period,
+        valueType,
+      };
+
+      cellFacts.push(fact);
     }
   }
 
@@ -383,8 +384,18 @@ function processSheet(
     textContent += "-".repeat(60) + "\n";
   }
 
-  // Add data rows
-  for (let i = headerRowIndex + 1; i < Math.min(data.length, 100); i++) {
+  const dataStartRow = headerRowIndex + 1;
+  const dataRowCount = Math.max(0, data.length - dataStartRow);
+  const shouldTruncate = dataRowCount > MAX_RENDERED_DATA_ROWS;
+  const renderedHeadCount = shouldTruncate
+    ? Math.max(1, MAX_RENDERED_DATA_ROWS - RENDERED_TAIL_ROWS)
+    : dataRowCount;
+  const renderedTailCount = shouldTruncate
+    ? Math.min(RENDERED_TAIL_ROWS, dataRowCount - renderedHeadCount)
+    : 0;
+
+  // Add leading data rows.
+  for (let i = dataStartRow; i < dataStartRow + renderedHeadCount; i++) {
     const row = data[i];
     if (!row || row.length === 0) continue;
 
@@ -401,8 +412,24 @@ function processSheet(
     }
   }
 
-  if (data.length > 100) {
-    textContent += `... and ${data.length - 100} more rows\n`;
+  // Add deterministic tail rows for large sheets.
+  if (renderedTailCount > 0) {
+    const omittedCount = dataRowCount - renderedHeadCount - renderedTailCount;
+    textContent += `... omitted ${omittedCount} middle rows for compact output ...\n`;
+    for (let i = data.length - renderedTailCount; i < data.length; i++) {
+      const row = data[i];
+      if (!row || row.length === 0) continue;
+      const rowText = row
+        .map((cell) => {
+          if (cell === null || cell === undefined || cell === "") return "";
+          return typeof cell === "string" ? `"${cell}"` : String(cell);
+        })
+        .filter((c) => c)
+        .join(" | ");
+      if (rowText) {
+        textContent += `Row ${i}: ${rowText}\n`;
+      }
+    }
   }
 
   return {
@@ -485,7 +512,10 @@ export async function extractXlsxWithAnchors(
       }
 
       const processed = processSheet(sheet, sheetName, i);
-      sheets.push(processed.summary);
+      sheets.push({
+        ...processed.summary,
+        textContent: processed.textContent,
+      });
       allCellFacts.push(...processed.cellFacts);
       textContent += processed.textContent + "\n\n";
 

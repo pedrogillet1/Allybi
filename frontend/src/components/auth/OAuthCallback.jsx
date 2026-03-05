@@ -6,8 +6,6 @@ import { DEFAULT_AUTH_REDIRECT, STORAGE_KEYS, buildRoute, AUTH_MODES } from '../
 import { useAuthModal } from '../../context/AuthModalContext';
 import { fetchBootstrapSession } from '../../services/authBootstrap';
 
-const AUTH_LOCALSTORAGE_COMPAT = process.env.REACT_APP_AUTH_LOCALSTORAGE_COMPAT === 'true';
-
 const OAuthCallback = ({ variant = 'page' }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -41,14 +39,6 @@ const OAuthCallback = ({ variant = 'page' }) => {
 
         navigate(`${buildRoute.auth(AUTH_MODES.LOGIN)}?error=${errorMessage}`);
         return;
-      }
-
-      // Compat-only support for legacy backend redirects.
-      const accessToken = searchParams.get('accessToken');
-      const refreshToken = searchParams.get('refreshToken');
-      if (AUTH_LOCALSTORAGE_COMPAT && accessToken && refreshToken) {
-        localStorage.setItem('accessToken', accessToken);
-        localStorage.setItem('refreshToken', refreshToken);
       }
 
       // Cookie-first bootstrap: backend sets httpOnly cookies during OAuth callback.

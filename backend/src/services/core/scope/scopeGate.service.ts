@@ -268,6 +268,16 @@ function lower(s: string): string {
   return normSpace(s).toLowerCase();
 }
 
+function foldDiacritics(s: string): string {
+  return lower(s)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function escapeRegex(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 function asObject(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== "object" || Array.isArray(value)) return {};
   return value as Record<string, unknown>;
@@ -321,7 +331,10 @@ export class ScopeGateService {
     private readonly docStore: DocStore,
     private readonly documentIntelligenceBanks: Pick<
       DocumentIntelligenceBanksService,
-      "getMergedDocAliasesBank" | "getDocAliasPhrases" | "getDocTaxonomy"
+      | "getMergedDocAliasesBank"
+      | "getDocAliasPhrases"
+      | "getDocTaxonomy"
+      | "getDiOntology"
     > = getDocumentIntelligenceBanksInstance(),
   ) {}
 
@@ -373,6 +386,12 @@ export class ScopeGateService {
       docTaxonomyBank = this.documentIntelligenceBanks.getDocTaxonomy();
     } catch {
       docTaxonomyBank = null;
+    }
+    let diSectionOntologyBank: Record<string, unknown> | null = null;
+    try {
+      diSectionOntologyBank = this.documentIntelligenceBanks.getDiOntology("section");
+    } catch {
+      diSectionOntologyBank = null;
     }
     const stopwordsDocnames = this.safeGetBank<Record<string, unknown>>("stopwords_docnames");
     const ambiguityPolicies = this.safeGetBank<Record<string, unknown>>("disambiguation_policies");
@@ -716,7 +735,13 @@ export class ScopeGateService {
     }> = [];
 
     if (activeDocId && !needsDocChoice) {
-      const sectionResult = this.extractSectionHint(qLower, activeDocId, docs);
+      const sectionResult = this.extractSectionHint(
+        qLower,
+        activeDocId,
+        docs,
+        docTaxonomyBank,
+        diSectionOntologyBank,
+      );
       if (sectionResult) {
         activeSectionHint = sectionResult.candidates[0]?.label ?? null;
 
@@ -927,6 +952,22 @@ export class ScopeGateService {
     confidence: number;
     method: "upstream" | "filename" | "alias" | "none";
   }> {
+    const queryLower = lower(args.qNorm);
+
+    // Query contains full filename mention(s) (common natural phrasing like "open X.pdf").
+    // Only auto-resolve when exactly one filename is mentioned.
+    const filenameMentions = args.docs.filter((d) => {
+      const fn = lower(d.filename ?? "");
+      return Boolean(fn) && queryLower.includes(fn);
+    });
+    if (filenameMentions.length === 1) {
+      return {
+        docId: filenameMentions[0].docId,
+        confidence: 0.95,
+        method: "filename",
+      };
+    }
+
     // Upstream resolved docId
     if (args.upstreamResolvedDocId)
       return {
@@ -1140,69 +1181,177 @@ export class ScopeGateService {
     normalizedQuery: string,
     activeDocId: string,
     docs: DocMeta[],
+    docTaxonomyBank: Record<string, unknown> | null,
+    diSectionOntologyBank: Record<string, unknown> | null,
   ): { candidates: Array<{ sectionId: string; label: string; score: number }> } | null {
-    // Section keywords in EN, PT, ES
+    const queryFolded = foldDiacritics(normalizedQuery);
     const sectionKeywords =
-      /\b(clause|section|part|article|cl[aá]usula|se[çc][aã]o|artigo)\b/i;
-    const match = normalizedQuery.match(sectionKeywords);
+      /\b(clause|section|part|article|clausula|secao|artigo)\b/i;
+    const match = queryFolded.match(sectionKeywords);
     if (!match) return null;
 
-    // Extract the fragment following the keyword (e.g., "section 3.1" -> "3.1", "clause A" -> "A")
-    const keywordIndex = match.index ?? 0;
-    const afterKeyword = normalizedQuery
-      .slice(keywordIndex + match[0].length)
-      .trim();
-    // Capture a section identifier: digits, dots, letters (e.g., "3.1", "IV", "A", "12.3.4")
-    const identifierMatch = afterKeyword.match(
-      /^[\s:]*([A-Za-z0-9]+(?:\.[A-Za-z0-9]+)*)/,
-    );
-    if (!identifierMatch) return null;
-
-    const sectionRef = identifierMatch[1].toLowerCase();
-
-    // Find matching doc to inspect (we only look at the active doc)
     const activeDoc = docs.find((d) => d.docId === activeDocId);
     if (!activeDoc) return null;
 
-    // Build synthetic section candidates based on numeric/alpha proximity.
-    // Without a full section index, we generate plausible ambiguous candidates
-    // when the reference is short or could match multiple headings.
-    const candidates: Array<{ sectionId: string; label: string; score: number }> = [];
+    const keywordIndex = match.index ?? 0;
+    const afterKeyword = queryFolded
+      .slice(keywordIndex + match[0].length)
+      .trim();
+    const identifierMatch = afterKeyword.match(
+      /^[\s:#-]*([a-z0-9]+(?:\.[a-z0-9]+)*)\b/i,
+    );
+    const sectionRef = String(identifierMatch?.[1] || "").toLowerCase();
 
-    // If the reference is a bare number or short alpha, it may be ambiguous
-    // (e.g., "section 3" could match "3", "3.1", "3.2", etc.)
-    const isBareNumber = /^\d+$/.test(sectionRef);
-    const isBareAlpha = /^[a-z]$/i.test(sectionRef);
+    const isRomanRef = /^(?:[ivxlcdm]+)$/i.test(sectionRef);
+    const isNumericRef = /^\d+(?:\.\d+)*$/.test(sectionRef);
+    const isShortAlphaRef = /^[a-z]$/i.test(sectionRef);
+    const isExplicitSectionRef =
+      Boolean(sectionRef) && (isNumericRef || isRomanRef || isShortAlphaRef);
 
-    if (isBareNumber || isBareAlpha) {
-      // Generate candidate variants representing potential sub-sections
-      const base = sectionRef;
-      candidates.push({
-        sectionId: `${activeDocId}#${base}`,
-        label: `${match[0]} ${base}`,
-        score: 0.7,
-      });
-      // Add plausible sub-section candidates
-      for (let i = 1; i <= 3; i++) {
+    if (isExplicitSectionRef) {
+      const candidates: Array<{ sectionId: string; label: string; score: number }> = [];
+      if (/^\d+$/.test(sectionRef) || isShortAlphaRef) {
         candidates.push({
-          sectionId: `${activeDocId}#${base}.${i}`,
-          label: `${match[0]} ${base}.${i}`,
-          score: clamp01(0.65 - i * 0.05),
+          sectionId: `${activeDocId}#${sectionRef}`,
+          label: `${match[0]} ${sectionRef}`,
+          score: 0.7,
+        });
+        for (let i = 1; i <= 3; i++) {
+          candidates.push({
+            sectionId: `${activeDocId}#${sectionRef}.${i}`,
+            label: `${match[0]} ${sectionRef}.${i}`,
+            score: clamp01(0.65 - i * 0.05),
+          });
+        }
+      } else {
+        candidates.push({
+          sectionId: `${activeDocId}#${sectionRef}`,
+          label: `${match[0]} ${sectionRef}`,
+          score: 0.95,
         });
       }
-    } else {
-      // Specific enough reference (e.g., "3.1") -> single high-confidence candidate
-      candidates.push({
-        sectionId: `${activeDocId}#${sectionRef}`,
-        label: `${match[0]} ${sectionRef}`,
-        score: 0.95,
+      candidates.sort((a, b) => b.score - a.score);
+      return candidates.length > 0 ? { candidates } : null;
+    }
+
+    const descriptor = afterKeyword
+      .replace(/^[\s:,-]*/, "")
+      .replace(
+        /^(about|regarding|on|for|the|a|an|de|do|da|dos|das|sobre|acerca|del|de la|de los)\b[\s:,-]*/i,
+        "",
+      )
+      .replace(/[?.!,;:]+$/g, "")
+      .trim();
+    if (!descriptor) return null;
+
+    const sectionStopwords = new Set([
+      "clause",
+      "section",
+      "part",
+      "article",
+      "clausula",
+      "secao",
+      "artigo",
+      "where",
+      "what",
+      "which",
+    ]);
+    const descriptorTokens = foldDiacritics(descriptor)
+      .split(/[^a-z0-9]+/)
+      .map((token) => token.trim())
+      .filter(Boolean)
+      .filter(
+        (token) => token.length >= 3 && !sectionStopwords.has(token),
+      );
+    if (!descriptorTokens.length) return null;
+
+    const phraseMap = new Map<string, string>();
+    const appendPhrase = (value: unknown) => {
+      const raw = String(value || "").trim();
+      if (!raw) return;
+      const normalized = foldDiacritics(raw).replace(/\s+/g, " ").trim();
+      if (!normalized || normalized.length < 3) return;
+      if (!phraseMap.has(normalized)) phraseMap.set(normalized, raw);
+    };
+
+    const typeDefinitions = Array.isArray(docTaxonomyBank?.typeDefinitions)
+      ? (docTaxonomyBank.typeDefinitions as Array<Record<string, unknown>>)
+      : [];
+    for (const definition of typeDefinitions) {
+      const requiredSections = Array.isArray(definition?.requiredSections)
+        ? definition.requiredSections
+        : [];
+      const aliases = Array.isArray(definition?.aliases) ? definition.aliases : [];
+      requiredSections.forEach(appendPhrase);
+      aliases.forEach(appendPhrase);
+    }
+
+    const ontologySections = Array.isArray(diSectionOntologyBank?.sections)
+      ? (diSectionOntologyBank.sections as Array<Record<string, unknown>>)
+      : [];
+    for (const section of ontologySections) {
+      appendPhrase(section?.label);
+      appendPhrase(section?.labelPt);
+      appendPhrase(section?.category);
+      const variants = asObject(section?.headerVariants);
+      Object.values(variants).forEach((entries) => {
+        if (!Array.isArray(entries)) return;
+        entries.forEach(appendPhrase);
       });
     }
 
-    // Sort by score descending
-    candidates.sort((a, b) => b.score - a.score);
+    const descriptorText = descriptorTokens.join(" ");
+    const descriptorSet = new Set(descriptorTokens);
+    const semanticCandidates: Array<{ sectionId: string; label: string; score: number }> = [];
 
-    return candidates.length > 0 ? { candidates } : null;
+    for (const [phraseNormalized, phraseLabel] of phraseMap.entries()) {
+      const phraseTokens = phraseNormalized
+        .split(/[^a-z0-9]+/)
+        .map((token) => token.trim())
+        .filter(Boolean)
+        .filter((token) => token.length >= 3);
+      if (!phraseTokens.length) continue;
+      const overlap = phraseTokens.filter((token) => descriptorSet.has(token)).length;
+      const overlapRatio = overlap / Math.max(descriptorSet.size, phraseTokens.length);
+      const exactInQuery = new RegExp(
+        `(^|\\b)${escapeRegex(phraseNormalized)}(\\b|$)`,
+        "i",
+      ).test(queryFolded);
+
+      let score = 0;
+      if (exactInQuery) {
+        score = 0.95;
+      } else if (overlapRatio >= 0.66) {
+        score = 0.84 + Math.min(0.1, overlapRatio * 0.12);
+      } else if (descriptorSet.size === 1 && overlap >= 1) {
+        score = 0.78;
+      }
+      if (score < 0.75) continue;
+
+      semanticCandidates.push({
+        sectionId: `${activeDocId}#${phraseNormalized.replace(/\s+/g, "_").slice(0, 96)}`,
+        label: phraseLabel,
+        score: clamp01(score),
+      });
+    }
+
+    if (!semanticCandidates.length) {
+      return {
+        candidates: [
+          {
+            sectionId: `${activeDocId}#${descriptorText.replace(/\s+/g, "_").slice(0, 96)}`,
+            label: descriptor,
+            score: 0.78,
+          },
+        ],
+      };
+    }
+
+    semanticCandidates.sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score;
+      return a.label.localeCompare(b.label);
+    });
+    return { candidates: semanticCandidates.slice(0, 4) };
   }
 
   // -----------------------------

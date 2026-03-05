@@ -7,7 +7,6 @@ import unifiedUploadService from '../services/unifiedUploadService';
 import { UPLOAD_CONFIG } from '../config/upload.config';
 import { encryptData, decryptData } from '../utils/security/encryption';
 import { useAuth } from './AuthContext';
-const AUTH_LOCALSTORAGE_COMPAT = process.env.REACT_APP_AUTH_LOCALSTORAGE_COMPAT === 'true';
 const SKIPPED_PROBE_WINDOW_MS = 30 * 60 * 1000; // 30 minutes
 
 const DocumentsContext = createContext();
@@ -650,9 +649,7 @@ export const DocumentsProvider = ({ children }) => {
     if (!initialized || !isAuthenticated) return;
 
     // Cookie-first auth: only use localStorage token in explicit compat mode.
-    const token = AUTH_LOCALSTORAGE_COMPAT
-      ? (localStorage.getItem('accessToken') || localStorage.getItem('token'))
-      : null;
+    const token = null;
 
     // Get user ID from localStorage (set during login)
     const userStr = localStorage.getItem('user');
@@ -1920,3 +1917,4 @@ export const DocumentsProvider = ({ children }) => {
     </DocumentsContext.Provider>
   );
 };
+

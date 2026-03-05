@@ -18,6 +18,9 @@ export interface RuleMatchContext {
   isCompareIntent?: boolean;
   candidateDocIds?: string[];
   explicitDocDomains?: string[];
+  explicitDocScope?: "single" | "docset" | "none" | null;
+  comparePeriodsNormalized?: boolean | null;
+  compareCurrencySetSize?: number | null;
 }
 
 export interface BoostRuleCondition {
@@ -1109,6 +1112,7 @@ function resolveCrossDocRule(
 export function enforceCrossDocPolicy(
   ctx: RuleMatchContext,
   policyBank: any,
+  alignmentBank?: any,
 ): CrossDocGatingDecision {
   const candidateDocIds = dedupeKeepOrder(
     normalizeStringList(ctx.candidateDocIds || []),
@@ -1124,9 +1128,20 @@ export function enforceCrossDocPolicy(
     compareIntent &&
     ctx.explicitDocsCount <= 1 &&
     candidateDocIds.length <= 1;
-  const crossDocRequested =
+  const crossDocRequestedBase =
     (!compareLikelyIntraDoc && compareIntent) || ctx.explicitDocsCount > 1;
   const selectedRule = resolveCrossDocRule(ctx, policyBank);
+  const alignmentEnabled =
+    alignmentBank &&
+    typeof alignmentBank === "object" &&
+    alignmentBank?.config?.enabled !== false;
+  const alignmentRequireExplicitScope = Boolean(
+    alignmentBank?.config?.requireExplicitComparisonScope ?? false,
+  );
+  const alignmentMinDocsForCompare = Math.max(
+    1,
+    Math.floor(Number(alignmentBank?.config?.minDocsForCompare ?? 2)),
+  );
 
   if (!policyBank || typeof policyBank !== "object") {
     return {
@@ -1174,6 +1189,34 @@ export function enforceCrossDocPolicy(
     1,
     Math.floor(Number(selectedRule?.minExplicitResolvedDocs ?? 2)),
   );
+  const requiredDocsForCompare = Math.max(
+    minExplicitForCompare,
+    alignmentEnabled && alignmentRequireExplicitScope
+      ? alignmentMinDocsForCompare
+      : 1,
+  );
+  const crossDocRequested =
+    crossDocRequestedBase ||
+    (alignmentEnabled && alignmentRequireExplicitScope && compareIntent);
+  const enforceExplicitCompareScope =
+    !compareLikelyIntraDoc ||
+    (alignmentEnabled && alignmentRequireExplicitScope);
+
+  if (
+    alignmentEnabled &&
+    ctx.explicitDocScope === "single" &&
+    candidateDocIds.length > 1
+  ) {
+    return {
+      allow: false,
+      reasonCode: "cross_doc_blocked_single_scope",
+      askDisambiguation: true,
+      allowedCandidateDocIds: explicitDocIds.slice(0, 1),
+      maxCandidates,
+      requiredExplicitDocs: requiredDocsForCompare,
+      actualExplicitDocs: ctx.explicitDocsCount,
+    };
+  }
 
   if (!crossDocRequested) {
     return {
@@ -1198,15 +1241,15 @@ export function enforceCrossDocPolicy(
       askDisambiguation: true,
       allowedCandidateDocIds: explicitDocIds.slice(0, 1),
       maxCandidates,
-      requiredExplicitDocs: minExplicitForCompare,
+      requiredExplicitDocs: requiredDocsForCompare,
       actualExplicitDocs: ctx.explicitDocsCount,
     };
   }
 
   if (
-    !compareLikelyIntraDoc &&
     compareIntent &&
-    ctx.explicitDocsCount < minExplicitForCompare
+    enforceExplicitCompareScope &&
+    ctx.explicitDocsCount < requiredDocsForCompare
   ) {
     return {
       allow: false,
@@ -1214,7 +1257,39 @@ export function enforceCrossDocPolicy(
       askDisambiguation: true,
       allowedCandidateDocIds: explicitDocIds,
       maxCandidates,
-      requiredExplicitDocs: minExplicitForCompare,
+      requiredExplicitDocs: requiredDocsForCompare,
+      actualExplicitDocs: ctx.explicitDocsCount,
+    };
+  }
+
+  if (
+    alignmentEnabled &&
+    compareIntent &&
+    ctx.comparePeriodsNormalized === false
+  ) {
+    return {
+      allow: false,
+      reasonCode: "cross_doc_period_alignment_required",
+      askDisambiguation: true,
+      allowedCandidateDocIds: explicitDocIds.slice(0, maxCandidates),
+      maxCandidates,
+      requiredExplicitDocs: requiredDocsForCompare,
+      actualExplicitDocs: ctx.explicitDocsCount,
+    };
+  }
+
+  if (
+    alignmentEnabled &&
+    compareIntent &&
+    Number(ctx.compareCurrencySetSize || 0) > 1
+  ) {
+    return {
+      allow: false,
+      reasonCode: "cross_doc_currency_alignment_required",
+      askDisambiguation: true,
+      allowedCandidateDocIds: explicitDocIds.slice(0, maxCandidates),
+      maxCandidates,
+      requiredExplicitDocs: requiredDocsForCompare,
       actualExplicitDocs: ctx.explicitDocsCount,
     };
   }
@@ -1226,7 +1301,7 @@ export function enforceCrossDocPolicy(
       askDisambiguation: true,
       allowedCandidateDocIds: explicitDocIds.slice(0, maxCandidates),
       maxCandidates,
-      requiredExplicitDocs: minExplicitForCompare,
+      requiredExplicitDocs: requiredDocsForCompare,
       actualExplicitDocs: ctx.explicitDocsCount,
     };
   }
@@ -1243,7 +1318,7 @@ export function enforceCrossDocPolicy(
     askDisambiguation: false,
     allowedCandidateDocIds,
     maxCandidates,
-    requiredExplicitDocs: minExplicitForCompare,
+    requiredExplicitDocs: requiredDocsForCompare,
     actualExplicitDocs: ctx.explicitDocsCount,
   };
 }

@@ -11,9 +11,12 @@
  */
 
 import { readFileSync, writeFileSync, readdirSync, statSync } from "fs";
-import { join, relative } from "path";
+import { fileURLToPath } from "url";
+import { dirname, join, relative, resolve } from "path";
 
-const ROOT = new URL("../src", import.meta.url).pathname;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const ROOT = resolve(__dirname, "../src");
 const BANKS_DIR = join(ROOT, "data_banks");
 const REGISTRY_PATH = join(BANKS_DIR, "manifest/bank_registry.any.json");
 
@@ -92,7 +95,7 @@ for (const file of tsFiles) {
 
       // If the string matches a registered bank ID, check context
       if (isBankRefContext(ctxWindow, line, s)) {
-        const loc = `${relative(ROOT, file)}:${i + 1}`;
+        const loc = `${relative(ROOT, file).replace(/\\/g, "/")}:${i + 1}`;
         if (!foundInCode.has(s)) foundInCode.set(s, new Set());
         foundInCode.get(s).add(loc);
       }
@@ -243,6 +246,6 @@ const manifest = {
   usedBankIds: usedBanks.map((b) => b.id).sort(),
 };
 
-const outPath = new URL("unused-banks.json", import.meta.url).pathname;
+const outPath = resolve(__dirname, "unused-banks.json");
 writeFileSync(outPath, JSON.stringify(manifest, null, 2) + "\n");
 console.log(`\n✓ Removal manifest written to ${outPath}`);

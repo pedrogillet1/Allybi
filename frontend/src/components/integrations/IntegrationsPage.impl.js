@@ -10,6 +10,7 @@ import { ReactComponent as ArrowLeft } from '../../assets/arrow-narrow-left.svg'
 import gmailSvg from '../../assets/Gmail.svg';
 import outlookSvg from '../../assets/outlook.svg';
 import slackSvg from '../../assets/slack.svg';
+import { INTEGRATION_PROVIDERS } from '../../constants/integrationProviders';
 
 const FONT = 'Plus Jakarta Sans, sans-serif';
 
@@ -313,14 +314,6 @@ export default function IntegrationsPage() {
     const provider = connectedProvider || errorProvider;
     const ok = Boolean(connectedProvider);
 
-    // Write to localStorage so the opener (polling it) picks up the signal.
-    try {
-      localStorage.setItem(
-        'koda_oauth_complete',
-        JSON.stringify({ provider, ok, t: Date.now() }),
-      );
-    } catch {}
-
     // Try postMessage to opener (works if window.opener survived cross-origin nav).
     try {
       if (window.opener && !window.opener.closed) {
@@ -447,7 +440,7 @@ export default function IntegrationsPage() {
               gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(340px, 1fr))',
               gap: 20,
             }}>
-              {['gmail', 'outlook', 'slack'].map(provider => (
+              {INTEGRATION_PROVIDERS.map(provider => (
                 <ProviderCard
                   key={provider}
                   provider={provider}

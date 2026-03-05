@@ -580,6 +580,118 @@
         "followup_and_disposition"
       ],
       "priority": 81
+    },
+    {
+      "id": "med_lab_report",
+      "name": {
+        "en": "Med Lab Report",
+        "pt": "Med Lab Report"
+      },
+      "description": "Auto-generated catalog entry for med_lab_report from canonical taxonomy.",
+      "detectionPatterns": [
+        "\\bmed\\\\s\\+lab\\\\s\\+report\\b",
+        "\\blab\\\\s\\+report\\b"
+      ],
+      "commonSections": [
+        "Patient Identification",
+        "Identificação do Paciente",
+        "Clinical History",
+        "Histórico Clínico",
+        "Findings",
+        "Achados",
+        "Assessment",
+        "Avaliação",
+        "Plan",
+        "Plano",
+        "Provider Signature",
+        "Assinatura do Profissional"
+      ],
+      "extractionPriority": 85,
+      "riskTier": "medium"
+    },
+    {
+      "id": "med_list",
+      "name": {
+        "en": "Med List",
+        "pt": "Med List"
+      },
+      "description": "Auto-generated catalog entry for med_list from canonical taxonomy.",
+      "detectionPatterns": [
+        "\\bmed\\\\s\\+list\\b",
+        "\\blist\\b"
+      ],
+      "commonSections": [
+        "Patient Identification",
+        "Identificação do Paciente",
+        "Clinical History",
+        "Histórico Clínico",
+        "Findings",
+        "Achados",
+        "Assessment",
+        "Avaliação",
+        "Plan",
+        "Plano",
+        "Provider Signature",
+        "Assinatura do Profissional"
+      ],
+      "extractionPriority": 85,
+      "riskTier": "medium"
+    },
+    {
+      "id": "med_patient_intake_form",
+      "name": {
+        "en": "Med Patient Intake Form",
+        "pt": "Med Patient Intake Form"
+      },
+      "description": "Auto-generated catalog entry for med_patient_intake_form from canonical taxonomy.",
+      "detectionPatterns": [
+        "\\bmed\\\\s\\+patient\\\\s\\+intake\\\\s\\+form\\b",
+        "\\bpatient\\\\s\\+intake\\\\s\\+form\\b"
+      ],
+      "commonSections": [
+        "Patient Identification",
+        "Identificação do Paciente",
+        "Clinical History",
+        "Histórico Clínico",
+        "Findings",
+        "Achados",
+        "Assessment",
+        "Avaliação",
+        "Plan",
+        "Plano",
+        "Provider Signature",
+        "Assinatura do Profissional"
+      ],
+      "extractionPriority": 85,
+      "riskTier": "medium"
+    },
+    {
+      "id": "med_referral_note",
+      "name": {
+        "en": "Med Referral Note",
+        "pt": "Med Referral Note"
+      },
+      "description": "Auto-generated catalog entry for med_referral_note from canonical taxonomy.",
+      "detectionPatterns": [
+        "\\bmed\\\\s\\+referral\\\\s\\+note\\b",
+        "\\breferral\\\\s\\+note\\b"
+      ],
+      "commonSections": [
+        "Patient Identification",
+        "Identificação do Paciente",
+        "Clinical History",
+        "Histórico Clínico",
+        "Findings",
+        "Achados",
+        "Assessment",
+        "Avaliação",
+        "Plan",
+        "Plano",
+        "Provider Signature",
+        "Assinatura do Profissional"
+      ],
+      "extractionPriority": 85,
+      "riskTier": "medium"
     }
   ]
 }

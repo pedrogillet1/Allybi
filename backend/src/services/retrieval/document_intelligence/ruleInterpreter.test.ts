@@ -180,6 +180,116 @@ describe("ruleInterpreter", () => {
     expect(decision.allowedCandidateDocIds).toEqual(["doc-a"]);
   });
 
+  test("alignment policy can require explicit two-doc scope even for intra-doc compare phrasing", () => {
+    const decision = enforceCrossDocPolicy(
+      baseCtx({
+        explicitDocsCount: 1,
+        explicitDocIds: ["doc-a"],
+        candidateDocIds: ["doc-a"],
+      }),
+      {
+        config: { enabled: true },
+        retrievalPolicy: {
+          maxSourceDocuments: 5,
+        },
+      },
+      {
+        config: {
+          enabled: true,
+          requireExplicitComparisonScope: true,
+          minDocsForCompare: 2,
+        },
+      },
+    );
+
+    expect(decision.allow).toBe(false);
+    expect(decision.reasonCode).toBe("cross_doc_compare_needs_explicit_docs");
+    expect(decision.requiredExplicitDocs).toBe(2);
+  });
+
+  test("cross-doc precedence uses the stricter explicit-doc minimum across grounding and alignment policies", () => {
+    const decision = enforceCrossDocPolicy(
+      baseCtx({
+        explicitDocsCount: 2,
+        explicitDocIds: ["doc-a", "doc-b"],
+        candidateDocIds: ["doc-a", "doc-b"],
+      }),
+      {
+        config: { enabled: true },
+        retrievalPolicy: { maxSourceDocuments: 5 },
+        rules: [
+          {
+            id: "compare_rule",
+            intents: ["documents"],
+            operators: ["compare"],
+            minExplicitResolvedDocs: 2,
+          },
+        ],
+      },
+      {
+        config: {
+          enabled: true,
+          requireExplicitComparisonScope: true,
+          minDocsForCompare: 3,
+        },
+      },
+    );
+
+    expect(decision.allow).toBe(false);
+    expect(decision.reasonCode).toBe("cross_doc_compare_needs_explicit_docs");
+    expect(decision.requiredExplicitDocs).toBe(3);
+  });
+
+  test("alignment policy blocks compare when period normalization is missing", () => {
+    const decision = enforceCrossDocPolicy(
+      baseCtx({
+        explicitDocsCount: 2,
+        explicitDocIds: ["doc-a", "doc-b"],
+        candidateDocIds: ["doc-a", "doc-b"],
+        comparePeriodsNormalized: false,
+      }),
+      {
+        config: { enabled: true },
+        retrievalPolicy: { maxSourceDocuments: 5 },
+      },
+      {
+        config: {
+          enabled: true,
+          requireExplicitComparisonScope: true,
+          minDocsForCompare: 2,
+        },
+      },
+    );
+
+    expect(decision.allow).toBe(false);
+    expect(decision.reasonCode).toBe("cross_doc_period_alignment_required");
+  });
+
+  test("alignment policy blocks compare when currency set is mixed", () => {
+    const decision = enforceCrossDocPolicy(
+      baseCtx({
+        explicitDocsCount: 2,
+        explicitDocIds: ["doc-a", "doc-b"],
+        candidateDocIds: ["doc-a", "doc-b"],
+        compareCurrencySetSize: 2,
+      }),
+      {
+        config: { enabled: true },
+        retrievalPolicy: { maxSourceDocuments: 5 },
+      },
+      {
+        config: {
+          enabled: true,
+          requireExplicitComparisonScope: true,
+          minDocsForCompare: 2,
+        },
+      },
+    );
+
+    expect(decision.allow).toBe(false);
+    expect(decision.reasonCode).toBe("cross_doc_currency_alignment_required");
+  });
+
   test("docset lock with multiple explicit docs is not blocked by docLock gate", () => {
     const decision = enforceCrossDocPolicy(
       baseCtx({

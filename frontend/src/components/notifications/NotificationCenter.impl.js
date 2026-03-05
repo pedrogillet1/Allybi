@@ -1,12 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
-const AUTH_LOCALSTORAGE_COMPAT = process.env.REACT_APP_AUTH_LOCALSTORAGE_COMPAT === 'true';
 
 const buildAuthHeader = () => {
-  if (!AUTH_LOCALSTORAGE_COMPAT) return {};
-  const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
-  return token ? { Authorization: `Bearer ${token}` } : {};
+  return {};
 };
 
 const NotificationCenter = () => {
@@ -366,3 +363,4 @@ const NotificationCenter = () => {
 };
 
 export default NotificationCenter;
+

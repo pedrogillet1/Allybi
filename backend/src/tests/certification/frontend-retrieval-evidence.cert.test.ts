@@ -4,31 +4,99 @@ import { describe, expect, test } from "@jest/globals";
 
 import { writeCertificationGateReport } from "./reporting";
 
-const REQUIRED_LATEST_FILES = [
-  "scorecard.json",
-  "grading.md",
-  "a-plus-gap-deep-dive.md",
-  "per_query.json",
-  "lineage.json",
-];
-
 function resolveRepoRoot(): string {
   return path.resolve(__dirname, "../../..");
+}
+
+function readEvidenceContract(repoRoot: string): {
+  requiredLatestFiles: string[];
+  forbiddenFallbackDatasetMarkers: string[];
+} {
+  const contractPath = path.resolve(
+    repoRoot,
+    "scripts/certification/retrieval-evidence-contract.json",
+  );
+  const parsed = JSON.parse(fs.readFileSync(contractPath, "utf8")) as Record<
+    string,
+    unknown
+  >;
+  const requiredLatestFiles = Array.isArray(parsed?.requiredLatestFiles)
+    ? parsed.requiredLatestFiles
+      .map((value) => String(value || "").trim())
+      .filter((value) => value.length > 0)
+    : [];
+  if (requiredLatestFiles.length === 0) {
+    throw new Error(
+      "retrieval evidence contract missing requiredLatestFiles entries",
+    );
+  }
+  const forbiddenFallbackDatasetMarkers = Array.isArray(
+    parsed?.forbiddenFallbackDatasetMarkers,
+  )
+    ? parsed.forbiddenFallbackDatasetMarkers
+      .map((value) => String(value || "").trim().toLowerCase())
+      .filter((value) => value.length > 0)
+    : [];
+  return { requiredLatestFiles, forbiddenFallbackDatasetMarkers };
+}
+
+function resolveCertProfile(): string {
+  return String(process.env.CERT_PROFILE || "")
+    .trim()
+    .toLowerCase();
+}
+
+function isStrictRetrievalProfile(profile: string): boolean {
+  return profile === "ci" || profile === "release" ||
+    profile === "retrieval_signoff" || profile === "local_hard";
+}
+
+function normalizeLineageFields(input: unknown): string[] {
+  const record = input && typeof input === "object"
+    ? (input as Record<string, unknown>)
+    : {};
+  return [
+    String(record.datasetId || "").trim().toLowerCase(),
+    String(record.inputFile || "").trim().toLowerCase(),
+    String(record.source || "").trim().toLowerCase(),
+    String(record.runId || "").trim().toLowerCase(),
+  ];
+}
+
+function resolveLineageMarkerViolation(
+  lineage: unknown,
+  markers: string[],
+): string | null {
+  if (!Array.isArray(markers) || markers.length === 0) return null;
+  const fields = normalizeLineageFields(lineage);
+  for (const marker of markers) {
+    const normalizedMarker = String(marker || "").trim().toLowerCase();
+    if (!normalizedMarker) continue;
+    if (fields.some((field) => field.includes(normalizedMarker))) {
+      return normalizedMarker;
+    }
+  }
+  return null;
 }
 
 describe("Certification: frontend retrieval evidence completeness", () => {
   test("latest grading artifacts and playwright results are complete and non-skipped", () => {
     const repoRoot = resolveRepoRoot();
+    const contract = readEvidenceContract(repoRoot);
     const frontendReportsRoot = path.resolve(repoRoot, "../frontend/e2e/reports");
     const latestDir = path.join(frontendReportsRoot, "latest");
     const resultsPath = path.join(frontendReportsRoot, "results.json");
+    const scorecardPath = path.join(latestDir, "scorecard.json");
+    const lineagePath = path.join(latestDir, "lineage.json");
     const failures: string[] = [];
+    const certProfile = resolveCertProfile();
+    const strictRetrievalProfile = isStrictRetrievalProfile(certProfile);
 
     if (!fs.existsSync(latestDir)) {
       failures.push("LATEST_REPORT_DIR_MISSING");
     }
 
-    const missingLatestFiles = REQUIRED_LATEST_FILES.filter(
+    const missingLatestFiles = contract.requiredLatestFiles.filter(
       (fileName) => !fs.existsSync(path.join(latestDir, fileName)),
     );
     if (missingLatestFiles.length > 0) {
@@ -37,13 +105,72 @@ describe("Certification: frontend retrieval evidence completeness", () => {
 
     const perQueryPath = path.join(latestDir, "per_query.json");
     let perQueryRows = 0;
+    let rowsWithNonEmptyQuery = 0;
+    let rowsWithResponseField = 0;
     if (fs.existsSync(perQueryPath)) {
       try {
         const parsed = JSON.parse(fs.readFileSync(perQueryPath, "utf8"));
-        perQueryRows = Array.isArray(parsed) ? parsed.length : 0;
+        const rows = Array.isArray(parsed) ? parsed : [];
+        perQueryRows = rows.length;
+        for (const row of rows) {
+          const record = row && typeof row === "object"
+            ? (row as Record<string, unknown>)
+            : {};
+          const query = String(record.query || "").trim();
+          if (query.length > 0) rowsWithNonEmptyQuery += 1;
+          if (
+            typeof record.responseText === "string" ||
+            typeof record.assistantText === "string" ||
+            typeof record.response === "string"
+          ) {
+            rowsWithResponseField += 1;
+          }
+        }
         if (perQueryRows <= 0) failures.push("PER_QUERY_EMPTY");
       } catch {
         failures.push("PER_QUERY_INVALID_JSON");
+      }
+    }
+
+    let scorecardPack: string | null = null;
+    let scorecardTotalQueries = 0;
+    let scorecardAllowedDocs = 0;
+    if (!fs.existsSync(scorecardPath)) {
+      failures.push("SCORECARD_MISSING");
+    } else {
+      try {
+        const scorecard = JSON.parse(
+          fs.readFileSync(scorecardPath, "utf8"),
+        ) as Record<string, unknown>;
+        scorecardPack = String(scorecard.pack || "").trim() || null;
+        const meta = scorecard.meta &&
+            typeof scorecard.meta === "object"
+          ? (scorecard.meta as Record<string, unknown>)
+          : {};
+        scorecardTotalQueries = Number(meta.totalQueries || 0);
+        scorecardAllowedDocs =
+          Number(meta.allowedDocIdsCount || 0) +
+          Number(meta.allowedDocNamesCount || 0);
+      } catch {
+        failures.push("SCORECARD_INVALID_JSON");
+      }
+    }
+
+    let lineageViolation: string | null = null;
+    if (!fs.existsSync(lineagePath)) {
+      failures.push("LINEAGE_MISSING");
+    } else {
+      try {
+        const lineage = JSON.parse(fs.readFileSync(lineagePath, "utf8"));
+        lineageViolation = resolveLineageMarkerViolation(
+          lineage,
+          contract.forbiddenFallbackDatasetMarkers,
+        );
+        if (lineageViolation) {
+          failures.push(`LINEAGE_FORBIDDEN_MARKER:${lineageViolation}`);
+        }
+      } catch {
+        failures.push("LINEAGE_INVALID_JSON");
       }
     }
 
@@ -63,18 +190,46 @@ describe("Certification: frontend retrieval evidence completeness", () => {
       }
     }
 
+    const queryCoverage =
+      perQueryRows > 0 ? rowsWithNonEmptyQuery / perQueryRows : 0;
+    const responseFieldCoverage =
+      perQueryRows > 0 ? rowsWithResponseField / perQueryRows : 0;
+    if (strictRetrievalProfile) {
+      if (scorecardPack !== "100") failures.push("STRICT_SCORECARD_PACK_NOT_100");
+      if (scorecardAllowedDocs <= 0) failures.push("STRICT_SCORECARD_DOC_SCOPE_MISSING");
+      if (scorecardTotalQueries < 100) failures.push("STRICT_SCORECARD_TOTAL_QUERIES_TOO_LOW");
+      if (queryCoverage < 0.98) failures.push("STRICT_PER_QUERY_QUERY_COVERAGE_TOO_LOW");
+      if (responseFieldCoverage < 0.98) {
+        failures.push("STRICT_PER_QUERY_RESPONSE_FIELD_COVERAGE_TOO_LOW");
+      }
+    }
+
     writeCertificationGateReport("frontend-retrieval-evidence", {
       passed: failures.length === 0,
       metrics: {
         latestDir,
         missingLatestFiles,
         perQueryRows,
+        rowsWithNonEmptyQuery,
+        rowsWithResponseField,
+        queryCoverage,
+        responseFieldCoverage,
+        scorecardPack,
+        scorecardTotalQueries,
+        scorecardAllowedDocs,
+        certProfile,
+        strictRetrievalProfile,
+        lineageViolation,
         playwrightExpected,
         playwrightSkipped,
       },
       thresholds: {
-        requiredLatestFiles: REQUIRED_LATEST_FILES,
+        requiredLatestFiles: contract.requiredLatestFiles,
+        forbiddenFallbackDatasetMarkers: contract.forbiddenFallbackDatasetMarkers,
         minPerQueryRows: 1,
+        strictPack: "100",
+        strictMinQueryCoverage: 0.98,
+        strictMinResponseFieldCoverage: 0.98,
         minPlaywrightExpected: 1,
         maxPlaywrightSkipped: 0,
       },

@@ -1072,7 +1072,10 @@ export class QualityGateRunnerService {
       };
     }
 
-    return null;
+    const configuredBy = qualityBank?._meta?.id || "quality_gates";
+    throw new Error(
+      `Configured quality gate '${gateName}' is not implemented in gate registry (${configuredBy}).`,
+    );
   }
 
   private buildDocumentIntelligenceScope(
@@ -1850,7 +1853,7 @@ export class QualityGateRunnerService {
 
     const contradictionPolicyBank =
       this.documentIntelligenceBanks.getQualityGateBank(
-        "contradiction_policy" as any,
+        "contradiction_policy",
       ) as DocumentIntelligenceQualityBank | null;
     if (contradictionPolicyBank?.config?.enabled) {
       const contradictionPolicy = this.runDocumentIntelligenceRuleBank(
@@ -2193,6 +2196,66 @@ export class QualityGateRunnerService {
           }
         }
       }
+
+      if (
+        safetyBank?.config?.enabled &&
+        Array.isArray(safetyBank?.safetyRules)
+      ) {
+        for (const rule of safetyBank.safetyRules) {
+          const action = String(rule?.action || "")
+            .trim()
+            .toUpperCase();
+          if (!action.includes("BLOCK")) continue;
+          const ruleId = String(rule?.id || "").trim() || "rule";
+          const ruleText = [
+            String(rule?.id || ""),
+            String(rule?.trigger || ""),
+            String(rule?.description || ""),
+          ]
+            .join(" ")
+            .toLowerCase();
+          let violationIssue: string | null = null;
+
+          if (
+            domain === "medical" &&
+            /(diagnos|treat|prescrib|clinical)/.test(ruleText)
+          ) {
+            const diagnosisLike =
+              /\b(you have|you are diagnosed|diagnosis|diagnosed|prescribe|prescribed|start taking|treatment plan)\b/i
+                .test(response);
+            if (diagnosisLike) {
+              violationIssue =
+                "Domain safety policy blocked diagnosis/treatment advice language.";
+            }
+          }
+
+          if (
+            !violationIssue &&
+            domain === "legal" &&
+            /(harmful|bypass|evade|obligation|contract)/.test(ruleText)
+          ) {
+            const evasiveGuidance =
+              /\b(bypass|evade|circumvent|ignore|hide|omit)\b.{0,40}\b(obligation|contract|clause|requirement)\b/i
+                .test(response) ||
+              /\b(obligation|contract|clause|requirement)\b.{0,40}\b(bypass|evade|circumvent|ignore|hide|omit)\b/i
+                .test(response);
+            if (evasiveGuidance) {
+              violationIssue =
+                "Domain safety policy blocked harmful legal evasion guidance.";
+            }
+          }
+
+          if (!violationIssue) continue;
+          results.push({
+            gateName: `domain_safety_rule_violation:${ruleId}`,
+            passed: false,
+            score: 0,
+            issues: [violationIssue],
+            sourceBankId: safetyBank?._meta?.id,
+          });
+          break;
+        }
+      }
     }
 
     return results;
@@ -2327,10 +2390,12 @@ export class QualityGateRunnerService {
     const gateFn = GATE_REGISTRY[gateName];
     if (!gateFn) {
       return {
-        passed: true,
+        passed: false,
         gateName,
-        score: 1.0,
-        issues: [`Gate '${gateName}' not found`],
+        score: 0,
+        issues: [`Gate '${gateName}' not found in quality gate registry`],
+        actionOnFail: "fail_closed_unknown_gate",
+        sourceBankId: "quality_gates",
       };
     }
     return gateFn(response, ctx);

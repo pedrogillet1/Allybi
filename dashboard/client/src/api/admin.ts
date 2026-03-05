@@ -333,11 +333,11 @@ export const adminApi = {
     onError?: (error: Error) => void
   ): () => void {
     const params = buildQueryString({ categories });
-    const url = `${API_BASE_URL}/admin/live/stream${params}`;
+    const url = `${API_BASE_URL}/admin/live/events${params}`;
     
     const eventSource = new EventSource(url, { withCredentials: true });
 
-    eventSource.onmessage = (event) => {
+    const parseAndEmit = (event: MessageEvent<string>) => {
       try {
         const data = JSON.parse(event.data);
         onEvent(data);
@@ -345,6 +345,10 @@ export const adminApi = {
         console.error("Failed to parse SSE event:", e);
       }
     };
+    eventSource.onmessage = parseAndEmit;
+    eventSource.addEventListener("telemetry", parseAndEmit as EventListener);
+    eventSource.addEventListener("connected", parseAndEmit as EventListener);
+    eventSource.addEventListener("ping", parseAndEmit as EventListener);
 
     eventSource.onerror = (error) => {
       console.error("SSE error:", error);

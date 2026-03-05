@@ -7,6 +7,7 @@ import {
   type ConnectorProvider,
 } from "../../connectors/connectorsRegistry";
 import { TokenVaultService } from "../../connectors/tokenVault.service";
+import { documentContentVault } from "../../documents/documentContentVault.service";
 import { logger } from "../../../utils/logger";
 
 type ConnectorAction =
@@ -61,6 +62,16 @@ export interface ConnectorHandlerResult {
   error?: string;
 }
 
+interface ConnectorSendReceipt {
+  provider: ConnectorProvider;
+  providerMessageId: string | null;
+  providerThreadId: string | null;
+  acceptedAt: string;
+  to: string;
+  subject: string;
+  attachmentCount: number;
+}
+
 function isFn(value: unknown): value is (...args: unknown[]) => unknown {
   return typeof value === "function";
 }
@@ -73,6 +84,30 @@ export class ConnectorHandlerService {
   }
 
   async execute(req: ConnectorHandlerRequest): Promise<ConnectorHandlerResult> {
+    const startedAt = Date.now();
+    const providerTag = String(req.provider || "").trim().toLowerCase() || "unknown";
+    let result: ConnectorHandlerResult;
+    try {
+      result = await this.executeInternal(req);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Connector action failed";
+      result = {
+        ok: false,
+        action: req.action,
+        error: message,
+      };
+    }
+
+    this.recordActionMetric(req, providerTag, startedAt, result).catch(() => {
+      // Observability must fail-open.
+    });
+    return result;
+  }
+
+  private async executeInternal(
+    req: ConnectorHandlerRequest,
+  ): Promise<ConnectorHandlerResult> {
     if (!isConnectorProvider(req.provider)) {
       return {
         ok: false,
@@ -188,6 +223,9 @@ export class ConnectorHandlerService {
         provider,
         capabilities: caps,
         connected: ensured.connected,
+        ingestionEnabled:
+          String(process.env.CONNECTORS_INGEST_AS_DOCUMENTS || "").toLowerCase() ===
+          "true",
         reason: ensured.connected ? null : ensured.reason || "not_connected",
         tokenUpdatedAt: tokenMeta?.updatedAt?.toISOString?.() ?? null,
         tokenExpiresAt: tokenMeta?.expiresAt?.toISOString?.() ?? null,
@@ -461,46 +499,59 @@ export class ConnectorHandlerService {
       where: {
         userId: req.context.userId,
         encryptedFilename: { contains: `/connectors/${provider}/` },
-        OR: [
-          { filename: { contains: q, mode: "insensitive" } },
-          { displayTitle: { contains: q, mode: "insensitive" } },
-          { rawText: { contains: q, mode: "insensitive" } },
-          { previewText: { contains: q, mode: "insensitive" } },
-          {
-            metadata: {
-              is: {
-                extractedText: { contains: q, mode: "insensitive" },
-              },
-            },
-          },
-        ],
       },
       orderBy: { updatedAt: "desc" },
-      take,
+      take: Math.min(Math.max(take * 4, 20), 200),
       select: {
         id: true,
         filename: true,
         displayTitle: true,
         rawText: true,
         previewText: true,
-        metadata: { select: { extractedText: true } },
+        renderableContent: true,
+        extractedTextEncrypted: true,
+        previewTextEncrypted: true,
+        renderableContentEncrypted: true,
       },
     });
 
-    const hits: ConnectorSearchHit[] = docs.map((doc) => ({
-      documentId: doc.id,
-      title: doc.displayTitle || doc.filename || "(untitled)",
-      snippet: this.buildSnippet(
-        doc.rawText ||
-          doc.previewText ||
-          doc.metadata?.extractedText ||
-          doc.displayTitle ||
-          doc.filename ||
-          "",
-        q,
-      ),
-      source: provider,
-    }));
+    const queryLower = q.toLowerCase();
+    const hits: ConnectorSearchHit[] = [];
+    for (const doc of docs) {
+      let resolvedContent: string | null = null;
+      try {
+        resolvedContent = await documentContentVault.resolvePreviewText(
+          req.context.userId,
+          doc.id,
+          {
+            rawText: doc.rawText,
+            previewText: doc.previewText,
+            renderableContent: doc.renderableContent,
+            extractedTextEncrypted: doc.extractedTextEncrypted,
+            previewTextEncrypted: doc.previewTextEncrypted,
+            renderableContentEncrypted: doc.renderableContentEncrypted,
+          },
+        );
+      } catch (err) {
+        logger.warn("[ConnectorHandler] Failed to resolve encrypted connector text", {
+          documentId: doc.id,
+          provider,
+          error: err instanceof Error ? err.message : String(err),
+        });
+      }
+
+      const title = doc.displayTitle || doc.filename || "(untitled)";
+      const searchCorpus = `${title}\n${resolvedContent || ""}`.toLowerCase();
+      if (!searchCorpus.includes(queryLower)) continue;
+
+      hits.push({
+        documentId: doc.id,
+        title,
+        snippet: this.buildSnippet(resolvedContent || title, q),
+        source: provider,
+      });
+      if (hits.length >= take) break;
+    }
 
     if (hits.length > 0) {
       return {
@@ -654,12 +705,64 @@ export class ConnectorHandlerService {
       ),
     );
 
+    const receipt = this.normalizeSendReceipt(
+      provider,
+      result,
+      req.to || "",
+      req.subject || "",
+      resolvedAttachments.length,
+    );
+
     return {
       ok: true,
       action: "send",
       provider,
-      data: { sent: true, result: result ?? null },
+      data: {
+        sent: true,
+        receipt,
+        result: result ?? null,
+      },
     };
+  }
+
+  private normalizeSendReceipt(
+    provider: ConnectorProvider,
+    providerResult: unknown,
+    to: string,
+    subject: string,
+    attachmentCount: number,
+  ): ConnectorSendReceipt {
+    const payload =
+      providerResult && typeof providerResult === "object"
+        ? (providerResult as Record<string, unknown>)
+        : {};
+
+    const providerMessageId =
+      this.readFirstString(payload, ["id", "messageId", "internetMessageId"]) ||
+      null;
+    const providerThreadId =
+      this.readFirstString(payload, ["threadId", "conversationId"]) || null;
+
+    return {
+      provider,
+      providerMessageId,
+      providerThreadId,
+      acceptedAt: new Date().toISOString(),
+      to,
+      subject,
+      attachmentCount,
+    };
+  }
+
+  private readFirstString(
+    payload: Record<string, unknown>,
+    keys: string[],
+  ): string | null {
+    for (const key of keys) {
+      const value = payload[key];
+      if (typeof value === "string" && value.trim()) return value.trim();
+    }
+    return null;
   }
 
   private buildState(
@@ -1064,6 +1167,7 @@ export class ConnectorHandlerService {
     const ingestedCount = Number(record.ingestedCount);
     const createdCount = Number(record.createdCount);
     const existingCount = Number(record.existingCount);
+    const updatedCount = Number(record.updatedCount);
     const syncedCount = Number(record.syncedCount);
 
     const metrics: Record<string, unknown> = {};
@@ -1071,9 +1175,50 @@ export class ConnectorHandlerService {
     if (Number.isFinite(ingestedCount)) metrics.ingestedCount = ingestedCount;
     if (Number.isFinite(createdCount)) metrics.createdCount = createdCount;
     if (Number.isFinite(existingCount)) metrics.existingCount = existingCount;
+    if (Number.isFinite(updatedCount)) metrics.updatedCount = updatedCount;
     if (Number.isFinite(syncedCount)) metrics.syncedCount = syncedCount;
 
     const hasAny = Object.keys(metrics).length > 0;
     return hasAny ? metrics : null;
+  }
+
+  private async recordActionMetric(
+    req: ConnectorHandlerRequest,
+    providerTag: string,
+    startedAtMs: number,
+    result: ConnectorHandlerResult,
+  ): Promise<void> {
+    const model = (prisma as unknown as { aPIPerformanceLog?: { create?: (args: unknown) => Promise<unknown> } })
+      ?.aPIPerformanceLog;
+    if (!model || typeof model.create !== "function") return;
+
+    const completedAt = new Date();
+    const startedAt = new Date(startedAtMs);
+    const latency = Math.max(0, completedAt.getTime() - startedAtMs);
+    const success = Boolean(result.ok);
+
+    await model.create({
+      data: {
+        service: `connector:${providerTag}`,
+        endpoint: `/integrations/${providerTag}/${req.action}`,
+        method: String(req.action || "unknown").toUpperCase(),
+        statusCode: success ? 200 : 500,
+        success,
+        errorMessage: success
+          ? null
+          : String(result.error || "connector_action_failed").slice(0, 500),
+        startedAt,
+        completedAt,
+        latency,
+        userId: req.context?.userId || null,
+        conversationId: req.context?.conversationId || null,
+        requestData: {
+          action: req.action,
+          provider: providerTag,
+          forceResync: req.forceResync === true,
+          limit: Number.isFinite(Number(req.limit)) ? Number(req.limit) : null,
+        },
+      },
+    });
   }
 }

@@ -15,6 +15,7 @@ import { UPLOAD_CONFIG } from "../../../config/upload.config";
 import * as chatService from "../../../services/chatService";
 import * as integrationsService from "../../../services/integrationsService";
 import api from "../../../services/api";
+import { getApiBaseUrl } from "../../../services/runtimeConfig";
 import cleanDocumentName from "../../../utils/cleanDocumentName";
 import {
   CHAT_STREAM_ENDPOINT as ENDPOINT,
@@ -124,6 +125,7 @@ const CONNECTOR_OPTIONS = [
   { provider: "outlook", label: "Outlook", family: "email", icon: outlookSvg },
   { provider: "slack", label: "Slack", family: "messages", icon: slackSvg },
 ];
+const CONNECTOR_PROVIDER_SET = new Set(CONNECTOR_OPTIONS.map((option) => option.provider));
 
 const VIEWER_STARTER_PROMPTS = {
   docx: [
@@ -2264,6 +2266,22 @@ export default function ChatInterface({
     };
   }, [connectorStatus]);
 
+  const connectorMessageOrigins = useMemo(() => {
+    const origins = new Set();
+    if (typeof window !== "undefined" && window.location?.origin) {
+      origins.add(window.location.origin);
+      try {
+        const apiBase = getApiBaseUrl();
+        if (apiBase) {
+          origins.add(new URL(apiBase, window.location.origin).origin);
+        }
+      } catch {
+        // Ignore invalid runtime config values.
+      }
+    }
+    return origins;
+  }, []);
+
   // Abort streaming
   const abortRef = useRef(null);
   const oauthPollRef = useRef(null);
@@ -2844,32 +2862,32 @@ export default function ChatInterface({
 
   useEffect(() => {
     const onMessage = (e) => {
+      if (!connectorMessageOrigins.has(String(e?.origin || ""))) return;
       const data = e?.data;
       if (!data || typeof data !== "object") return;
       if (data.type !== "koda_oauth_done") return;
+      const provider = String(data.provider || "").toLowerCase();
+      if (!CONNECTOR_PROVIDER_SET.has(provider)) return;
       setActivatingConnector(null);
       // Optimistically mark provider as connected so the pill appears instantly
-      if (data.ok && data.provider) {
+      if (data.ok) {
         setConnectorStatus((prev) => ({
           ...prev,
-          [data.provider]: { ...prev[data.provider], connected: true, expired: false },
+          [provider]: { ...prev[provider], connected: true, expired: false },
         }));
         // Auto-activate the connector that was just connected.
-        const p = String(data.provider || '').toLowerCase();
-        if (p) {
-          setActiveConnectors((prev) => (Array.isArray(prev) && prev.includes(p) ? prev : [...(prev || []), p]));
-          connectorReplayProviderRef.current = p;
-        }
+        setActiveConnectors((prev) => (Array.isArray(prev) && prev.includes(provider) ? prev : [...(prev || []), provider]));
+        connectorReplayProviderRef.current = provider;
         // Auto-sync immediately after connect so the user never has to type "sync gmail/outlook".
         // (Debounced by cooldown.)
-        maybeAutoSyncConnector(String(data.provider));
+        maybeAutoSyncConnector(provider);
       }
       refreshConnectorStatus();
     };
 
     window.addEventListener("message", onMessage);
     return () => window.removeEventListener("message", onMessage);
-  }, [maybeAutoSyncConnector, refreshConnectorStatus]);
+  }, [connectorMessageOrigins, maybeAutoSyncConnector, refreshConnectorStatus]);
 
   // Persist active connector pills across refreshes. Only the user closing a pill should remove it.
   useEffect(() => {

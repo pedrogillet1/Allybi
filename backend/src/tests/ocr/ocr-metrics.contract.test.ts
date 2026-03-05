@@ -73,4 +73,28 @@ describe("OCR metrics contract", () => {
     expect(summary.ocrSkipRate).toBe(0);
     expect(summary.ocrErrorRate).toBe(0);
   });
+
+  test("canonical meta fields override conflicting legacy top-level flags", () => {
+    const summary = summarizeOcrEvents([
+      {
+        status: "ok",
+        ocrUsed: true,
+        ocrConfidence: 0.9,
+        meta: { ocrAttempted: false, ocrOutcome: "not_attempted" },
+      },
+      {
+        status: "ok",
+        ocrUsed: false,
+        ocrConfidence: null,
+        meta: { ocrOutcome: "skipped_heuristic" },
+      },
+    ]);
+
+    expect(summary.docsProcessed).toBe(2);
+    expect(summary.ocrAttempted).toBe(0);
+    expect(summary.ocrAttemptRate).toBe(0);
+    expect(summary.ocrAppliedRate).toBe(50);
+    expect(summary.ocrSkipRate).toBe(50);
+    expect(summary.ocrErrorRate).toBe(0);
+  });
 });

@@ -3,7 +3,6 @@ import { io } from 'socket.io-client';
 import { encryptData, decryptData } from '../utils/security/encryption';
 import { getApiBaseUrl, getWsBaseUrl } from './runtimeConfig';
 import { emitAuthModalOpen } from '../utils/authModalBus';
-const AUTH_LOCALSTORAGE_COMPAT = process.env.REACT_APP_AUTH_LOCALSTORAGE_COMPAT === 'true';
 const CSRF_COOKIE_NAME = 'koda_csrf';
 
 const API_URL = getApiBaseUrl();
@@ -18,8 +17,7 @@ const normalizeSocketOrigin = (raw) => {
 const WS_URL = normalizeSocketOrigin(getWsBaseUrl());
 
 const getCompatAccessToken = () => {
-  if (!AUTH_LOCALSTORAGE_COMPAT) return null;
-  return localStorage.getItem('accessToken') || localStorage.getItem('token');
+  return null;
 };
 
 const getCookieValue = (name) => {
@@ -87,10 +85,6 @@ let _chatAuthDead = false;
 api.interceptors.response.use(undefined, (error) => {
   if (error.response?.status === 401 && !_chatAuthDead) {
     _chatAuthDead = true;
-    if (AUTH_LOCALSTORAGE_COMPAT) {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-    }
     localStorage.removeItem('user');
     emitAuthModalOpen({ mode: 'login', reason: 'session_expired' });
   }
@@ -1051,3 +1045,4 @@ export default {
   removeTitleListeners,
   queryWithRAG,
 };
+

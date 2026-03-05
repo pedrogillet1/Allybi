@@ -237,10 +237,6 @@ const UnifiedAuth = ({ variant = 'page' }) => {
         navigate(ROUTES.AUTHENTICATION, { state: { email: response.email } });
       } else if (response.user && response.accessToken) {
         // Direct creation flow: user is already created and logged in
-        if (AUTH_LOCALSTORAGE_COMPAT) {
-          localStorage.setItem('accessToken', response.accessToken);
-          localStorage.setItem('refreshToken', response.refreshToken);
-        }
         localStorage.setItem('user', JSON.stringify(response.user));
 
         setAuthState(response.user);
@@ -689,4 +685,4 @@ const UnifiedAuth = ({ variant = 'page' }) => {
 };
 
 export default UnifiedAuth;
-const AUTH_LOCALSTORAGE_COMPAT = process.env.REACT_APP_AUTH_LOCALSTORAGE_COMPAT === 'true';
+

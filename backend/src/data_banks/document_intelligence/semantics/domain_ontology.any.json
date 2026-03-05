@@ -16,26 +16,28 @@
     "tests": [
       "tests/patternWiringProof.test.ts"
     ],
-    "dependsOn": ["domain_ontology"],
+    "dependsOn": [
+      "domain_ontology"
+    ],
     "ssotRole": "di_enumeration"
   },
   "config": {
     "enabled": true,
     "canonicalDomainIds": [
-      "finance",
-      "legal",
-      "medical",
       "accounting",
-      "tax",
-      "billing",
       "banking",
-      "insurance",
-      "ops",
-      "hr_payroll",
-      "identity",
+      "billing",
       "education",
       "everyday",
+      "finance",
       "housing",
+      "hr_payroll",
+      "identity",
+      "insurance",
+      "legal",
+      "medical",
+      "ops",
+      "tax",
       "travel"
     ],
     "domainAliases": {
@@ -68,7 +70,23 @@
       "housing": "housing",
       "residência": "housing",
       "travel": "travel",
-      "viagem": "travel"
+      "viagem": "travel",
+      "compliance": "legal",
+      "regulatory": "legal",
+      "regulation": "legal",
+      "conformidade": "legal",
+      "connector": "ops",
+      "connectors": "ops",
+      "integration": "ops",
+      "integrations": "ops",
+      "education_research": "education",
+      "research": "education",
+      "academic_research": "education",
+      "pesquisa": "education",
+      "procurement": "ops",
+      "purchasing": "ops",
+      "sourcing": "ops",
+      "compras": "ops"
     }
   },
   "domains": [

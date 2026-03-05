@@ -17,6 +17,8 @@ export {
   EditingPolicyService,
   AllybiEditing,
 } from "../../../services/editing";
+export { ViewerLockedChatPolicyService } from "../../../services/core/policy/viewerLockedChatPolicy.service";
+export { GovernanceRuntimePolicyService } from "../../../services/core/policy/governanceRuntimePolicy.service";
 
 export type {
   DocxParagraphNode,

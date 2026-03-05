@@ -39,23 +39,45 @@
         "Line Items",
         "Itens de Linha"
       ],
-      "headings": [],
+      "headings": [
+        "individual income return",
+        "tax individual income return",
+        "tax",
+        "tax summary",
+        "document id",
+        "identificacao"
+      ],
       "expectedTableFamilies": [
         "Individual Income Return line-item table",
-        "Individual Income Return summary matrix"
+        "Individual Income Return summary matrix",
+        "Individual Income Return line items",
+        "Individual Income Return itens",
+        "Individual Income Return summary",
+        "Individual Income Return resumo"
       ],
       "fieldFamilies": [
         "Primary identifiers",
         "Dates and periods",
-        "Amounts and statuses"
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
       ],
       "redFlags": [
         "Missing mandatory section anchors",
-        "Conflicting summary totals"
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
       ],
       "missingQuestions": [
         "Which individual income return variant should be prioritized?",
-        "Should extraction prefer header metadata or detailed section data?"
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Individual Income Return variant should be prioritized?",
+        "Qual variante de Individual Income Return deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
       ]
     },
     {
@@ -75,23 +97,45 @@
         "Line Items",
         "Itens de Linha"
       ],
-      "headings": [],
+      "headings": [
+        "property tax bill",
+        "tax property tax bill",
+        "tax",
+        "tax summary",
+        "document id",
+        "identificacao"
+      ],
       "expectedTableFamilies": [
         "Property Tax Bill line-item table",
-        "Property Tax Bill summary matrix"
+        "Property Tax Bill summary matrix",
+        "Property Tax Bill line items",
+        "Property Tax Bill itens",
+        "Property Tax Bill summary",
+        "Property Tax Bill resumo"
       ],
       "fieldFamilies": [
         "Primary identifiers",
         "Dates and periods",
-        "Amounts and statuses"
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
       ],
       "redFlags": [
         "Missing mandatory section anchors",
-        "Conflicting summary totals"
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
       ],
       "missingQuestions": [
         "Which property tax bill variant should be prioritized?",
-        "Should extraction prefer header metadata or detailed section data?"
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Property Tax Bill variant should be prioritized?",
+        "Qual variante de Property Tax Bill deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
       ]
     },
     {
@@ -111,23 +155,935 @@
         "Line Items",
         "Itens de Linha"
       ],
-      "headings": [],
+      "headings": [
+        "assessment notice",
+        "tax assessment notice",
+        "tax",
+        "tax summary",
+        "document id",
+        "identificacao"
+      ],
       "expectedTableFamilies": [
         "Assessment Notice line-item table",
-        "Assessment Notice summary matrix"
+        "Assessment Notice summary matrix",
+        "Assessment Notice line items",
+        "Assessment Notice itens",
+        "Assessment Notice summary",
+        "Assessment Notice resumo"
       ],
       "fieldFamilies": [
         "Primary identifiers",
         "Dates and periods",
-        "Amounts and statuses"
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
       ],
       "redFlags": [
         "Missing mandatory section anchors",
-        "Conflicting summary totals"
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
       ],
       "missingQuestions": [
         "Which assessment notice variant should be prioritized?",
-        "Should extraction prefer header metadata or detailed section data?"
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Assessment Notice variant should be prioritized?",
+        "Qual variante de Assessment Notice deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "tax_payment_slip",
+      "label": "Payment Slip",
+      "expectedSections": [
+        "Document Identification",
+        "Identificacao do Documento",
+        "Individual Income Tax Return Issuer Information",
+        "Informações do Emissor de Declaracao de Imposto de Renda Pessoa Fisica",
+        "Party Identification",
+        "Identificacao das Partes",
+        "Period and Jurisdiction",
+        "Período e Jurisdicao",
+        "Status and Summary",
+        "Status e Resumo",
+        "Line Items",
+        "Itens de Linha"
+      ],
+      "headings": [
+        "payment slip",
+        "tax payment slip",
+        "tax",
+        "tax summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Individual Income Return line-item table",
+        "Individual Income Return summary matrix",
+        "Payment Slip line items",
+        "Payment Slip itens",
+        "Payment Slip summary",
+        "Payment Slip resumo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
+      ],
+      "missingQuestions": [
+        "Which individual income return variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Payment Slip variant should be prioritized?",
+        "Qual variante de Payment Slip deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "tax_assessment_followup_notice",
+      "label": "Assessment Followup Notice",
+      "expectedSections": [
+        "Supplement Tax 01 Header",
+        "Cabecalho Supplement Tax 01",
+        "Supplement Tax 01 Parties",
+        "Partes Supplement Tax 01",
+        "Supplement Tax 01 Timeline",
+        "Linha do tempo Supplement Tax 01"
+      ],
+      "headings": [
+        "supplement tax 01",
+        "tax supplement 01",
+        "tax",
+        "tax summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Tax 01 line items",
+        "Supplement Tax 01 itens",
+        "Supplement Tax 01 summary",
+        "Supplement Tax 01 resumo",
+        "Supplement Tax 01 balance",
+        "Supplement Tax 01 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Tax 01 variant should be prioritized?",
+        "Qual variante de Supplement Tax 01 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "tax_payment_status_update",
+      "label": "Payment Status Update",
+      "expectedSections": [
+        "Supplement Tax 02 Header",
+        "Cabecalho Supplement Tax 02",
+        "Supplement Tax 02 Parties",
+        "Partes Supplement Tax 02",
+        "Supplement Tax 02 Timeline",
+        "Linha do tempo Supplement Tax 02"
+      ],
+      "headings": [
+        "supplement tax 02",
+        "tax supplement 02",
+        "tax",
+        "tax summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Tax 02 line items",
+        "Supplement Tax 02 itens",
+        "Supplement Tax 02 summary",
+        "Supplement Tax 02 resumo",
+        "Supplement Tax 02 balance",
+        "Supplement Tax 02 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Tax 02 variant should be prioritized?",
+        "Qual variante de Supplement Tax 02 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "tax_filing_exception_note",
+      "label": "Filing Exception Note",
+      "expectedSections": [
+        "Supplement Tax 03 Header",
+        "Cabecalho Supplement Tax 03",
+        "Supplement Tax 03 Parties",
+        "Partes Supplement Tax 03",
+        "Supplement Tax 03 Timeline",
+        "Linha do tempo Supplement Tax 03"
+      ],
+      "headings": [
+        "supplement tax 03",
+        "tax supplement 03",
+        "tax",
+        "tax summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Tax 03 line items",
+        "Supplement Tax 03 itens",
+        "Supplement Tax 03 summary",
+        "Supplement Tax 03 resumo",
+        "Supplement Tax 03 balance",
+        "Supplement Tax 03 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Tax 03 variant should be prioritized?",
+        "Qual variante de Supplement Tax 03 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "tax_deduction_review_notice",
+      "label": "Deduction Review Notice",
+      "expectedSections": [
+        "Supplement Tax 04 Header",
+        "Cabecalho Supplement Tax 04",
+        "Supplement Tax 04 Parties",
+        "Partes Supplement Tax 04",
+        "Supplement Tax 04 Timeline",
+        "Linha do tempo Supplement Tax 04"
+      ],
+      "headings": [
+        "supplement tax 04",
+        "tax supplement 04",
+        "tax",
+        "tax summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Tax 04 line items",
+        "Supplement Tax 04 itens",
+        "Supplement Tax 04 summary",
+        "Supplement Tax 04 resumo",
+        "Supplement Tax 04 balance",
+        "Supplement Tax 04 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Tax 04 variant should be prioritized?",
+        "Qual variante de Supplement Tax 04 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "tax_tax_rate_change_notice",
+      "label": "Tax Rate Change Notice",
+      "expectedSections": [
+        "Supplement Tax 05 Header",
+        "Cabecalho Supplement Tax 05",
+        "Supplement Tax 05 Parties",
+        "Partes Supplement Tax 05",
+        "Supplement Tax 05 Timeline",
+        "Linha do tempo Supplement Tax 05"
+      ],
+      "headings": [
+        "supplement tax 05",
+        "tax supplement 05",
+        "tax",
+        "tax summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Tax 05 line items",
+        "Supplement Tax 05 itens",
+        "Supplement Tax 05 summary",
+        "Supplement Tax 05 resumo",
+        "Supplement Tax 05 balance",
+        "Supplement Tax 05 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Tax 05 variant should be prioritized?",
+        "Qual variante de Supplement Tax 05 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "tax_compliance_status_note",
+      "label": "Compliance Status Note",
+      "expectedSections": [
+        "Supplement Tax 06 Header",
+        "Cabecalho Supplement Tax 06",
+        "Supplement Tax 06 Parties",
+        "Partes Supplement Tax 06",
+        "Supplement Tax 06 Timeline",
+        "Linha do tempo Supplement Tax 06"
+      ],
+      "headings": [
+        "supplement tax 06",
+        "tax supplement 06",
+        "tax",
+        "tax summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Tax 06 line items",
+        "Supplement Tax 06 itens",
+        "Supplement Tax 06 summary",
+        "Supplement Tax 06 resumo",
+        "Supplement Tax 06 balance",
+        "Supplement Tax 06 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Tax 06 variant should be prioritized?",
+        "Qual variante de Supplement Tax 06 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "tax_penalty_update_notice",
+      "label": "Penalty Update Notice",
+      "expectedSections": [
+        "Supplement Tax 07 Header",
+        "Cabecalho Supplement Tax 07",
+        "Supplement Tax 07 Parties",
+        "Partes Supplement Tax 07",
+        "Supplement Tax 07 Timeline",
+        "Linha do tempo Supplement Tax 07"
+      ],
+      "headings": [
+        "supplement tax 07",
+        "tax supplement 07",
+        "tax",
+        "tax summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Tax 07 line items",
+        "Supplement Tax 07 itens",
+        "Supplement Tax 07 summary",
+        "Supplement Tax 07 resumo",
+        "Supplement Tax 07 balance",
+        "Supplement Tax 07 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Tax 07 variant should be prioritized?",
+        "Qual variante de Supplement Tax 07 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "tax_filing_deadline_notice",
+      "label": "Filing Deadline Notice",
+      "expectedSections": [
+        "Supplement Tax 08 Header",
+        "Cabecalho Supplement Tax 08",
+        "Supplement Tax 08 Parties",
+        "Partes Supplement Tax 08",
+        "Supplement Tax 08 Timeline",
+        "Linha do tempo Supplement Tax 08"
+      ],
+      "headings": [
+        "supplement tax 08",
+        "tax supplement 08",
+        "tax",
+        "tax summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Tax 08 line items",
+        "Supplement Tax 08 itens",
+        "Supplement Tax 08 summary",
+        "Supplement Tax 08 resumo",
+        "Supplement Tax 08 balance",
+        "Supplement Tax 08 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Tax 08 variant should be prioritized?",
+        "Qual variante de Supplement Tax 08 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "tax_jurisdiction_note",
+      "label": "Jurisdiction Note",
+      "expectedSections": [
+        "Supplement Tax 09 Header",
+        "Cabecalho Supplement Tax 09",
+        "Supplement Tax 09 Parties",
+        "Partes Supplement Tax 09",
+        "Supplement Tax 09 Timeline",
+        "Linha do tempo Supplement Tax 09"
+      ],
+      "headings": [
+        "supplement tax 09",
+        "tax supplement 09",
+        "tax",
+        "tax summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Tax 09 line items",
+        "Supplement Tax 09 itens",
+        "Supplement Tax 09 summary",
+        "Supplement Tax 09 resumo",
+        "Supplement Tax 09 balance",
+        "Supplement Tax 09 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Tax 09 variant should be prioritized?",
+        "Qual variante de Supplement Tax 09 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "tax_refund_status_update",
+      "label": "Refund Status Update",
+      "expectedSections": [
+        "Supplement Tax 10 Header",
+        "Cabecalho Supplement Tax 10",
+        "Supplement Tax 10 Parties",
+        "Partes Supplement Tax 10",
+        "Supplement Tax 10 Timeline",
+        "Linha do tempo Supplement Tax 10"
+      ],
+      "headings": [
+        "supplement tax 10",
+        "tax supplement 10",
+        "tax",
+        "tax summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Tax 10 line items",
+        "Supplement Tax 10 itens",
+        "Supplement Tax 10 summary",
+        "Supplement Tax 10 resumo",
+        "Supplement Tax 10 balance",
+        "Supplement Tax 10 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Tax 10 variant should be prioritized?",
+        "Qual variante de Supplement Tax 10 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "tax_credit_adjustment_notice",
+      "label": "Credit Adjustment Notice",
+      "expectedSections": [
+        "Supplement Tax 11 Header",
+        "Cabecalho Supplement Tax 11",
+        "Supplement Tax 11 Parties",
+        "Partes Supplement Tax 11",
+        "Supplement Tax 11 Timeline",
+        "Linha do tempo Supplement Tax 11"
+      ],
+      "headings": [
+        "supplement tax 11",
+        "tax supplement 11",
+        "tax",
+        "tax summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Tax 11 line items",
+        "Supplement Tax 11 itens",
+        "Supplement Tax 11 summary",
+        "Supplement Tax 11 resumo",
+        "Supplement Tax 11 balance",
+        "Supplement Tax 11 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Tax 11 variant should be prioritized?",
+        "Qual variante de Supplement Tax 11 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "tax_audit_followup_note",
+      "label": "Audit Followup Note",
+      "expectedSections": [
+        "Supplement Tax 12 Header",
+        "Cabecalho Supplement Tax 12",
+        "Supplement Tax 12 Parties",
+        "Partes Supplement Tax 12",
+        "Supplement Tax 12 Timeline",
+        "Linha do tempo Supplement Tax 12"
+      ],
+      "headings": [
+        "supplement tax 12",
+        "tax supplement 12",
+        "tax",
+        "tax summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Tax 12 line items",
+        "Supplement Tax 12 itens",
+        "Supplement Tax 12 summary",
+        "Supplement Tax 12 resumo",
+        "Supplement Tax 12 balance",
+        "Supplement Tax 12 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Tax 12 variant should be prioritized?",
+        "Qual variante de Supplement Tax 12 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "tax_return_correction_notice",
+      "label": "Return Correction Notice",
+      "expectedSections": [
+        "Supplement Tax 13 Header",
+        "Cabecalho Supplement Tax 13",
+        "Supplement Tax 13 Parties",
+        "Partes Supplement Tax 13",
+        "Supplement Tax 13 Timeline",
+        "Linha do tempo Supplement Tax 13"
+      ],
+      "headings": [
+        "supplement tax 13",
+        "tax supplement 13",
+        "tax",
+        "tax summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Tax 13 line items",
+        "Supplement Tax 13 itens",
+        "Supplement Tax 13 summary",
+        "Supplement Tax 13 resumo",
+        "Supplement Tax 13 balance",
+        "Supplement Tax 13 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Tax 13 variant should be prioritized?",
+        "Qual variante de Supplement Tax 13 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "tax_taxpayer_notice",
+      "label": "Taxpayer Notice",
+      "expectedSections": [
+        "Supplement Tax 14 Header",
+        "Cabecalho Supplement Tax 14",
+        "Supplement Tax 14 Parties",
+        "Partes Supplement Tax 14",
+        "Supplement Tax 14 Timeline",
+        "Linha do tempo Supplement Tax 14"
+      ],
+      "headings": [
+        "supplement tax 14",
+        "tax supplement 14",
+        "tax",
+        "tax summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Tax 14 line items",
+        "Supplement Tax 14 itens",
+        "Supplement Tax 14 summary",
+        "Supplement Tax 14 resumo",
+        "Supplement Tax 14 balance",
+        "Supplement Tax 14 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Tax 14 variant should be prioritized?",
+        "Qual variante de Supplement Tax 14 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "tax_assessment_revision_note",
+      "label": "Assessment Revision Note",
+      "expectedSections": [
+        "Supplement Tax 15 Header",
+        "Cabecalho Supplement Tax 15",
+        "Supplement Tax 15 Parties",
+        "Partes Supplement Tax 15",
+        "Supplement Tax 15 Timeline",
+        "Linha do tempo Supplement Tax 15"
+      ],
+      "headings": [
+        "supplement tax 15",
+        "tax supplement 15",
+        "tax",
+        "tax summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Tax 15 line items",
+        "Supplement Tax 15 itens",
+        "Supplement Tax 15 summary",
+        "Supplement Tax 15 resumo",
+        "Supplement Tax 15 balance",
+        "Supplement Tax 15 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Tax 15 variant should be prioritized?",
+        "Qual variante de Supplement Tax 15 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "tax_collection_notice",
+      "label": "Collection Notice",
+      "expectedSections": [
+        "Supplement Tax 16 Header",
+        "Cabecalho Supplement Tax 16",
+        "Supplement Tax 16 Parties",
+        "Partes Supplement Tax 16",
+        "Supplement Tax 16 Timeline",
+        "Linha do tempo Supplement Tax 16"
+      ],
+      "headings": [
+        "supplement tax 16",
+        "tax supplement 16",
+        "tax",
+        "tax summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Tax 16 line items",
+        "Supplement Tax 16 itens",
+        "Supplement Tax 16 summary",
+        "Supplement Tax 16 resumo",
+        "Supplement Tax 16 balance",
+        "Supplement Tax 16 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Tax 16 variant should be prioritized?",
+        "Qual variante de Supplement Tax 16 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
       ]
     }
   ]

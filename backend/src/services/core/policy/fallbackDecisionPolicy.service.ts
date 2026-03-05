@@ -52,6 +52,10 @@ type FallbackRouterBank = {
     defaults?: {
       action?: string;
       telemetryReason?: string;
+      retryPolicy?: {
+        maxAttempts?: number;
+        backoffMs?: number;
+      };
     };
   };
   rules?: Array<{
@@ -61,6 +65,12 @@ type FallbackRouterBank = {
     do?: {
       action?: string;
       telemetryReason?: string;
+      fallbackProvider?: string;
+      fallbackModelKey?: string;
+      retryPolicy?: {
+        maxAttempts?: number;
+        backoffMs?: number;
+      };
     };
   }>;
 };
@@ -77,6 +87,9 @@ type MatchResult = {
 type RouterDecision = {
   action: string;
   telemetryReason: string;
+  fallbackProvider: string | null;
+  fallbackModelKey: string | null;
+  retryPolicy: { maxAttempts: number; backoffMs: number } | null;
 };
 
 type FallbackRuntime = {
@@ -113,6 +126,9 @@ export type FallbackDecisionPolicyResult = {
   fallbackType: string | null;
   routerAction: string;
   routerTelemetryReason: string;
+  fallbackProvider: string | null;
+  fallbackModelKey: string | null;
+  retryPolicy: { maxAttempts: number; backoffMs: number } | null;
 };
 
 const RULE_BANK_IDS = [
@@ -248,6 +264,20 @@ function normalizeReasonCode(reasonCode: string): string {
   return REASON_ALIASES[key] || key;
 }
 
+function normalizeRetryPolicy(
+  value: unknown,
+): { maxAttempts: number; backoffMs: number } | null {
+  const policy = asObject(value);
+  const maxAttempts = toNumber(policy.maxAttempts);
+  const backoffMs = toNumber(policy.backoffMs);
+  if (maxAttempts == null || backoffMs == null) return null;
+  if (maxAttempts < 1 || backoffMs < 0) return null;
+  return {
+    maxAttempts: Math.floor(maxAttempts),
+    backoffMs: Math.floor(backoffMs),
+  };
+}
+
 export class FallbackDecisionPolicyService {
   resolveReasonCode(
     req: ChatRequest,
@@ -277,6 +307,9 @@ export class FallbackDecisionPolicyService {
         fallbackType: null,
         routerAction: router.action,
         routerTelemetryReason: router.telemetryReason,
+        fallbackProvider: router.fallbackProvider,
+        fallbackModelKey: router.fallbackModelKey,
+        retryPolicy: router.retryPolicy,
       };
     }
 
@@ -301,6 +334,9 @@ export class FallbackDecisionPolicyService {
         fallbackType: selected.fallbackType,
         routerAction: router.action,
         routerTelemetryReason: router.telemetryReason,
+        fallbackProvider: router.fallbackProvider,
+        fallbackModelKey: router.fallbackModelKey,
+        retryPolicy: router.retryPolicy,
       };
     }
 
@@ -315,6 +351,9 @@ export class FallbackDecisionPolicyService {
       fallbackType: null,
       routerAction: router.action,
       routerTelemetryReason: router.telemetryReason,
+      fallbackProvider: router.fallbackProvider,
+      fallbackModelKey: router.fallbackModelKey,
+      retryPolicy: router.retryPolicy,
     };
   }
 
@@ -393,6 +432,9 @@ export class FallbackDecisionPolicyService {
       return {
         action: "ask_one_question",
         telemetryReason: "UNKNOWN",
+        fallbackProvider: null,
+        fallbackModelKey: null,
+        retryPolicy: null,
       };
     }
 
@@ -412,6 +454,11 @@ export class FallbackDecisionPolicyService {
       return {
         action,
         telemetryReason: telemetryReason || "UNKNOWN",
+        fallbackProvider:
+          String(rule?.do?.fallbackProvider || "").trim().toLowerCase() || null,
+        fallbackModelKey:
+          String(rule?.do?.fallbackModelKey || "").trim() || null,
+        retryPolicy: normalizeRetryPolicy(rule?.do?.retryPolicy),
       };
     }
 
@@ -420,6 +467,9 @@ export class FallbackDecisionPolicyService {
       telemetryReason: String(
         router.config?.defaults?.telemetryReason || "UNKNOWN",
       ),
+      fallbackProvider: null,
+      fallbackModelKey: null,
+      retryPolicy: normalizeRetryPolicy(router.config?.defaults?.retryPolicy),
     };
   }
 

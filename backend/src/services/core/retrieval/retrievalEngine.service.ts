@@ -227,6 +227,7 @@ export interface CandidateChunk {
     unitAnnotation?: { unitRaw: string; unitNormalized: string } | null;
     scaleFactor?: string | null;
     footnotes?: string[] | null;
+    periodTokens?: string[] | null;
   } | null;
 
   // Scoring components (0..1)
@@ -575,13 +576,18 @@ export class RetrievalEngineService {
       | "getDocTypeCatalog"
       | "getDocTypeSections"
       | "getDocTypeTables"
+      | "getDocArchetypes"
+      | "getTableHeaderOntology"
       | "getDomainDetectionRules"
       | "getRetrievalBoostRules"
       | "getQueryRewriteRules"
       | "getSectionPriorityRules"
     > &
       Partial<
-        Pick<DocumentIntelligenceBanksService, "getDocTypeExtractionHints">
+        Pick<
+          DocumentIntelligenceBanksService,
+          "getDocTypeExtractionHints" | "getCrossDocAlignmentRules"
+        >
       > = getDocumentIntelligenceBanksInstance(),
   ) {}
 
@@ -610,6 +616,8 @@ export class RetrievalEngineService {
     const packaging = this.getRequiredBank<any>("evidence_packaging");
     const crossDocGrounding =
       this.documentIntelligenceBanks.getCrossDocGroundingPolicy();
+    const crossDocAlignment =
+      this.documentIntelligenceBanks.getCrossDocAlignmentRules?.() ?? null;
 
     // 2) Normalize query (bank-driven normalization should happen upstream, but we support it here too)
     const norm = await this.normalizeQuery(req);
@@ -710,8 +718,22 @@ export class RetrievalEngineService {
         ...ruleCtx,
         candidateDocIds: scope.candidateDocIds,
         isCompareIntent: compareIntent,
+        explicitDocScope:
+          signals.docScopeLock?.mode === "single_doc"
+            ? "single"
+            : signals.docScopeLock?.mode === "docset"
+              ? "docset"
+              : "none",
+        comparePeriodsNormalized:
+          compareIntent && signals.explicitYearOrQuarterComparison
+            ? Boolean(signals.timeConstraintsPresent)
+            : null,
+        compareCurrencySetSize: compareIntent
+          ? this.detectCompareCurrencySetSize(queryNormalized)
+          : null,
       },
       crossDocGrounding,
+      crossDocAlignment,
     );
     if (!crossDocDecision.allow) {
       crossDocGatedReason = crossDocDecision.reasonCode || "cross_doc_blocked";
@@ -1145,6 +1167,33 @@ export class RetrievalEngineService {
       "post_packaging",
       scopeMetrics,
     );
+    const postPackagingPolicyReason = this.resolvePostPackagingPolicyReason({
+      evidence: pack.evidence,
+      compareIntent,
+      signals,
+    });
+    if (postPackagingPolicyReason) {
+      emitRuleEvent("retrieval.crossdoc_gated", {
+        reason: postPackagingPolicyReason,
+        source: "post_packaging_contract",
+      });
+      return this.emptyPack(
+        req,
+        {
+          reasonCodes: [postPackagingPolicyReason],
+          note: "Evidence packaging contract blocked retrieval output.",
+        },
+        this.buildTelemetryDiagnostics({
+          ruleEvents: retrievalRuleEvents,
+          matchedBoostRuleIds,
+          appliedBoostRuleIds,
+          rewriteRuleIds,
+          selectedSectionRuleId,
+          crossDocGatedReason: postPackagingPolicyReason,
+          classification,
+        }),
+      );
+    }
 
     // 12) Final safety: never include raw debug in production (still keep internal stats)
     if (pack.evidence.length === 0 && scope.hardScopeActive) {
@@ -1576,6 +1625,46 @@ export class RetrievalEngineService {
     );
   }
 
+  private detectCompareCurrencySetSize(normalizedQuery: string): number {
+    const matches = String(normalizedQuery || "").match(
+      /\b(?:usd|eur|gbp|brl|jpy|dollars?|reais?|euros?|yen|pounds?)\b|r\$|\$|€|£|¥/gi,
+    );
+    if (!matches || matches.length === 0) return 0;
+    const currencies = new Set<string>();
+    for (const token of matches) {
+      const normalized = String(token || "").trim().toLowerCase();
+      if (!normalized) continue;
+      if (normalized === "r$" || normalized === "brl" || normalized.startsWith("reai")) {
+        currencies.add("brl");
+      } else if (
+        normalized === "$" ||
+        normalized === "usd" ||
+        normalized.startsWith("dollar")
+      ) {
+        currencies.add("usd");
+      } else if (
+        normalized === "€" ||
+        normalized === "eur" ||
+        normalized.startsWith("euro")
+      ) {
+        currencies.add("eur");
+      } else if (
+        normalized === "£" ||
+        normalized === "gbp" ||
+        normalized.startsWith("pound")
+      ) {
+        currencies.add("gbp");
+      } else if (
+        normalized === "¥" ||
+        normalized === "jpy" ||
+        normalized === "yen"
+      ) {
+        currencies.add("jpy");
+      }
+    }
+    return currencies.size;
+  }
+
   private normalizeDocType(value: unknown): string | null {
     const normalized = String(value || "")
       .trim()
@@ -1840,6 +1929,19 @@ export class RetrievalEngineService {
       typeof provider.getDocTypeTables === "function"
         ? provider.getDocTypeTables(domain, normalizedDocType)
         : null;
+    let archetypesBank: Record<string, any> | null = null;
+    try {
+      archetypesBank =
+        typeof provider.getDocArchetypes === "function"
+          ? provider.getDocArchetypes(domain)
+          : null;
+    } catch {
+      archetypesBank = null;
+    }
+    const tableHeaderOntology =
+      typeof provider.getTableHeaderOntology === "function"
+        ? provider.getTableHeaderOntology(domain)
+        : null;
     const sections = Array.isArray(sectionsBank?.sections)
       ? sectionsBank.sections
       : [];
@@ -1847,6 +1949,12 @@ export class RetrievalEngineService {
       ? tablesBank.tableHeaderMappings
       : [];
     const tables = Array.isArray(tablesBank?.tables) ? tablesBank.tables : [];
+    const archetypes = Array.isArray(archetypesBank?.archetypes)
+      ? archetypesBank.archetypes
+      : [];
+    const domainHeaders = Array.isArray(tableHeaderOntology?.headers)
+      ? tableHeaderOntology.headers
+      : [];
 
     const sectionAnchors: string[] = sections
       .map((section: unknown): { order: number; values: string[] } => {
@@ -1869,6 +1977,20 @@ export class RetrievalEngineService {
       })
       .sort((a: { order: number }, b: { order: number }) => a.order - b.order)
       .flatMap((entry: { values: string[] }) => entry.values);
+    const archetypeSectionAnchors: string[] = archetypes.flatMap((archetype: unknown) => {
+      const row = archetype as Record<string, any>;
+      const headings = Array.isArray(row?.headings) ? row.headings : [];
+      const expectedSections = Array.isArray(row?.expectedSections)
+        ? row.expectedSections
+        : [];
+      return [...headings, ...expectedSections]
+        .map((value: unknown) =>
+          String(value || "")
+            .trim()
+            .toLowerCase(),
+        )
+        .filter(Boolean);
+    });
 
     const tableAnchors: string[] = [
       ...tableMappings.flatMap((mapping: unknown) => {
@@ -1904,12 +2026,27 @@ export class RetrievalEngineService {
             )
           : []),
       ]),
+      ...domainHeaders.flatMap((header: unknown) => {
+        const row = header as Record<string, any>;
+        const canonical = String(row?.canonical || "")
+          .trim()
+          .toLowerCase();
+        const synonyms = Array.isArray(row?.synonyms)
+          ? row.synonyms
+              .map((value: unknown) =>
+                String(value || "")
+                  .trim()
+                  .toLowerCase(),
+              )
+              .filter(Boolean)
+          : [];
+        return [canonical, ...synonyms].filter(Boolean);
+      }),
     ].filter((value): value is string => Boolean(value));
 
-    const normalizedSectionAnchors = Array.from(new Set(sectionAnchors)).slice(
-      0,
-      16,
-    );
+    const normalizedSectionAnchors = Array.from(
+      new Set([...sectionAnchors, ...archetypeSectionAnchors]),
+    ).slice(0, 16);
     const normalizedTableAnchors = Array.from(new Set(tableAnchors)).slice(
       0,
       16,
@@ -1923,6 +2060,8 @@ export class RetrievalEngineService {
       reasons: [
         `doc_type_sections:${normalizedSectionAnchors.length}`,
         `doc_type_tables:${normalizedTableAnchors.length}`,
+        `doc_archetypes:${archetypes.length}`,
+        `table_header_ontology:${domainHeaders.length}`,
       ],
     };
   }
@@ -2586,6 +2725,32 @@ export class RetrievalEngineService {
             )
         : [];
       if (header.length || rows.length) {
+        const explicitUnitRaw = String(
+          explicitTable?.unitAnnotation?.unitRaw ?? "",
+        ).trim();
+        const explicitUnitNormalized = String(
+          explicitTable?.unitAnnotation?.unitNormalized ?? "",
+        ).trim();
+        const metadataUnitRaw = String(hit?.metadata?.unitRaw ?? "").trim();
+        const metadataUnitNormalized = String(
+          hit?.metadata?.unitNormalized ?? "",
+        ).trim();
+        const normalizedPeriodTokens = Array.isArray(explicitTable.periodTokens)
+          ? explicitTable.periodTokens
+              .map((value: unknown) =>
+                String(value ?? "")
+                  .toUpperCase()
+                  .replace(/\s+/g, "")
+                  .trim(),
+              )
+              .filter((value: string) => value.length > 0)
+          : [];
+        const explicitFootnotes = Array.isArray(explicitTable.footnotes)
+          ? explicitTable.footnotes
+              .map((value: unknown) => String(value || "").trim())
+              .filter(Boolean)
+          : null;
+        const explicitScaleFactor = String(explicitTable.scaleFactor || "").trim();
         return {
           header,
           rows,
@@ -2601,18 +2766,41 @@ export class RetrievalEngineService {
                 .filter(Boolean)
             : undefined,
           unitAnnotation:
-            hit?.metadata?.unitRaw || hit?.metadata?.unitNormalized
+            explicitUnitRaw || explicitUnitNormalized
               ? {
-                  unitRaw: String(hit.metadata.unitRaw ?? ""),
-                  unitNormalized: String(hit.metadata.unitNormalized ?? ""),
+                  unitRaw: explicitUnitRaw || explicitUnitNormalized,
+                  unitNormalized: explicitUnitNormalized || explicitUnitRaw,
                 }
+              : metadataUnitRaw || metadataUnitNormalized
+                ? {
+                    unitRaw: metadataUnitRaw || metadataUnitNormalized,
+                    unitNormalized: metadataUnitNormalized || metadataUnitRaw,
+                  }
               : null,
           scaleFactor:
-            hit?.scaleFactor ?? hit?.metadata?.scaleFactor ?? null,
-          footnotes: Array.isArray(hit?.footnotes)
-            ? hit.footnotes
-            : Array.isArray(hit?.metadata?.footnotes)
-              ? hit.metadata.footnotes
+            explicitScaleFactor ||
+            hit?.scaleFactor ||
+            hit?.metadata?.scaleFactor ||
+            hit?.metadata?.scaleRaw ||
+            null,
+          footnotes: explicitFootnotes
+            ? explicitFootnotes
+            : Array.isArray(hit?.footnotes)
+              ? hit.footnotes
+              : Array.isArray(hit?.metadata?.footnotes)
+                ? hit.metadata.footnotes
+                : null,
+          periodTokens: normalizedPeriodTokens.length
+            ? normalizedPeriodTokens
+            : Array.isArray(hit?.metadata?.periodTokens)
+              ? hit.metadata.periodTokens
+                  .map((value: unknown) =>
+                    String(value ?? "")
+                      .toUpperCase()
+                      .replace(/\s+/g, "")
+                      .trim(),
+                  )
+                  .filter(Boolean)
               : null,
         };
       }
@@ -2621,50 +2809,11 @@ export class RetrievalEngineService {
     const tableExpected = Boolean(
       req.signals.tableExpected || req.signals.userAskedForTable,
     );
-    const snippet = String(hit?.snippet || "").trim();
-    if (!tableExpected || !snippet) return null;
-    const lines = snippet
-      .split(/\r?\n/)
-      .map((line) => line.trim())
-      .filter(Boolean);
-    if (lines.length < 2) return null;
-    // Only use pipe or tab delimiters — comma is too noisy (conflicts with
-    // numeric formatting like "$1,250") and produces false-positive tables.
-    const delimiter = lines.some((line) => line.includes("|"))
-      ? "|"
-      : lines.some((line) => line.includes("\t"))
-        ? "\t"
-        : "";
-    if (!delimiter) return null;
-
-    const parsed = lines
-      .map((line) =>
-        line
-          .split(delimiter)
-          .map((value) => value.trim())
-          .filter(Boolean),
-      )
-      .filter((cells) => cells.length >= 2);
-    if (parsed.length < 2) return null;
-    const header = parsed[0];
-    const rows = parsed.slice(1, maxRows + 1).map((row) =>
-      row.map((cell) => {
-        // Preserve cells that contain unit indicators (currency, percent, etc.)
-        const hasUnitIndicator = /[$%€£¥R\$]/.test(cell);
-        if (hasUnitIndicator) return cell;
-        const stripped = cell.replace(/,/g, "");
-        const numeric = Number(stripped);
-        if (Number.isFinite(numeric) && cell.match(/[0-9]/)) return numeric;
-        return cell;
-      }),
-    );
-    return {
-      header,
-      rows,
-      structureScore: 0.65,
-      numericIntegrityScore: 0.6,
-      warnings: ["heuristic_table_from_snippet"],
-    };
+    if (tableExpected) {
+      // P0 policy: never reconstruct synthetic tables from plain snippets.
+      return null;
+    }
+    return null;
   }
 
   // -----------------------------
@@ -3750,27 +3899,17 @@ export class RetrievalEngineService {
     }> = [];
 
     const docMetrics = new Map<string, Map<string, number>>();
-    const numPattern = /(?:[\w\s]{1,40}?)\s*([-+]?\d[\d.,]*)/g;
 
     for (const item of evidence) {
-      const text = String(item.snippet || "");
-      if (!text) continue;
-      let match: RegExpExecArray | null;
-      while ((match = numPattern.exec(text)) !== null) {
-        const fullMatch = match[0].trim();
-        const numStr = match[1].replace(/,/g, "");
-        const value = parseFloat(numStr);
-        if (!Number.isFinite(value)) continue;
-        const words = fullMatch.replace(/[-+]?\d[\d.,]*/g, "").trim().toLowerCase();
-        const metricKey = words.split(/\s+/).slice(-10).join(" ").trim();
-        if (!metricKey || metricKey.length < 3) continue;
-
-        const docMap = docMetrics.get(item.docId) ?? new Map<string, number>();
+      const tableMetrics = this.extractTableMetrics(item);
+      if (tableMetrics.size === 0) continue;
+      const docMap = docMetrics.get(item.docId) ?? new Map<string, number>();
+      for (const [metricKey, value] of tableMetrics.entries()) {
         if (!docMap.has(metricKey)) {
           docMap.set(metricKey, value);
         }
-        docMetrics.set(item.docId, docMap);
       }
+      docMetrics.set(item.docId, docMap);
     }
 
     const docIds = Array.from(docMetrics.keys());
@@ -3798,6 +3937,196 @@ export class RetrievalEngineService {
     }
 
     return conflicts;
+  }
+
+  private extractTableMetrics(item: EvidenceItem): Map<string, number> {
+    const out = new Map<string, number>();
+    const table = item.table;
+    if (!table || !Array.isArray(table.rows) || table.rows.length === 0) {
+      return out;
+    }
+
+    const header = Array.isArray(table.header)
+      ? table.header.map((value) => String(value ?? "").trim().toLowerCase())
+      : [];
+
+    const readNumeric = (value: unknown): number | null => {
+      if (typeof value === "number" && Number.isFinite(value)) return value;
+      if (typeof value !== "string") return null;
+      const raw = value.trim();
+      if (!raw) return null;
+      const compact = raw.replace(/[,\s]/g, "");
+      const numeric = Number(compact);
+      if (!Number.isFinite(numeric)) return null;
+      return numeric;
+    };
+
+    for (const rawRow of table.rows) {
+      if (!Array.isArray(rawRow) || rawRow.length === 0) continue;
+      const row = rawRow as unknown[];
+      const rowLabel = String(row[0] ?? "").trim().toLowerCase();
+      if (!rowLabel) continue;
+      for (let col = 1; col < row.length; col += 1) {
+        const numeric = readNumeric(row[col]);
+        if (numeric == null) continue;
+        const colLabel = String(header[col] ?? `col_${col + 1}`).trim();
+        const metricKey = `${rowLabel} :: ${colLabel}`.trim();
+        if (metricKey.length < 3) continue;
+        if (!out.has(metricKey)) {
+          out.set(metricKey, numeric);
+        }
+      }
+    }
+
+    return out;
+  }
+
+  private resolvePostPackagingPolicyReason(params: {
+    evidence: EvidenceItem[];
+    compareIntent: boolean;
+    signals: RetrievalRequest["signals"];
+  }): string | null {
+    const evidence = Array.isArray(params.evidence) ? params.evidence : [];
+    if (evidence.length === 0) return null;
+
+    if (params.compareIntent) {
+      const unitSet = new Set<string>();
+      const periodsByDoc = new Map<string, Set<string>>();
+      for (const item of evidence) {
+        if (item.evidenceType !== "table" || !item.table) continue;
+        const normalizedUnit = String(
+          item.table.unitAnnotation?.unitNormalized ||
+            item.table.unitAnnotation?.unitRaw ||
+            "",
+        )
+          .trim()
+          .toLowerCase();
+        if (normalizedUnit) {
+          unitSet.add(normalizedUnit);
+        }
+        const periodTokens = this.extractPeriodTokensFromTable(item.table);
+        if (periodTokens.size > 0) {
+          const bucket = periodsByDoc.get(item.docId) ?? new Set<string>();
+          for (const token of periodTokens) bucket.add(token);
+          periodsByDoc.set(item.docId, bucket);
+        }
+      }
+
+      if (unitSet.size > 1) {
+        return "cross_doc_currency_alignment_required";
+      }
+
+      const perDocPeriods = Array.from(periodsByDoc.values()).filter(
+        (tokens) => tokens.size > 0,
+      );
+      if (perDocPeriods.length >= 2) {
+        let shared = new Set<string>(perDocPeriods[0]);
+        for (let idx = 1; idx < perDocPeriods.length; idx += 1) {
+          const current = perDocPeriods[idx];
+          shared = new Set(
+            Array.from(shared).filter((token) => current.has(token)),
+          );
+          if (shared.size === 0) {
+            return "cross_doc_period_alignment_required";
+          }
+        }
+      }
+    }
+
+    const tableExpected = Boolean(
+      params.signals.tableExpected || params.signals.userAskedForTable,
+    );
+    if (!tableExpected) return null;
+
+    const tableEvidence = evidence.filter(
+      (item) => item.evidenceType === "table" && item.table,
+    );
+    for (const item of tableEvidence) {
+      const table = item.table;
+      if (!table) continue;
+      const hasNumeric = this.tableHasNumericCells(table);
+      if (!hasNumeric) continue;
+      const headerCount = Array.isArray(table.header)
+        ? table.header
+            .map((value) => String(value || "").trim())
+            .filter(Boolean).length
+        : 0;
+      const hasUnitContext = Boolean(
+        table.unitAnnotation?.unitNormalized ||
+          table.unitAnnotation?.unitRaw ||
+          table.scaleFactor,
+      );
+      if (headerCount < 2 || !hasUnitContext) {
+        return "numeric_context_missing";
+      }
+    }
+    return null;
+  }
+
+  private tableHasNumericCells(
+    table: NonNullable<EvidenceItem["table"]>,
+  ): boolean {
+    if (!Array.isArray(table.rows) || table.rows.length === 0) return false;
+    for (const row of table.rows) {
+      if (!Array.isArray(row)) continue;
+      for (const cell of row) {
+        if (typeof cell === "number" && Number.isFinite(cell)) return true;
+        if (typeof cell !== "string") continue;
+        const raw = cell.trim();
+        if (!raw) continue;
+        const normalized = raw.replace(/[,\s]/g, "");
+        const parsed = Number(normalized);
+        if (Number.isFinite(parsed)) return true;
+      }
+    }
+    return false;
+  }
+
+  private extractPeriodTokensFromTable(
+    table: NonNullable<EvidenceItem["table"]>,
+  ): Set<string> {
+    const out = new Set<string>();
+    if (Array.isArray(table.periodTokens)) {
+      for (const token of table.periodTokens) {
+        const normalized = String(token ?? "")
+          .toUpperCase()
+          .replace(/\s+/g, "")
+          .trim();
+        if (normalized) out.add(normalized);
+      }
+    }
+    const canonicalizeToken = (token: string): string => {
+      const upper = String(token || "").toUpperCase();
+      const fyYearMatch = upper.match(/^FY(20\d{2})$/);
+      if (fyYearMatch) return `Y${fyYearMatch[1]}`;
+      const fyShortMatch = upper.match(/^FY(\d{2})$/);
+      if (fyShortMatch) return `Y20${fyShortMatch[1]}`;
+      const shortYearMatch = upper.match(/^\d{2}$/);
+      if (shortYearMatch) return `Y20${shortYearMatch[0]}`;
+      if (/^20\d{2}$/.test(upper)) return `Y${upper}`;
+      return upper;
+    };
+    const pushTokens = (value: unknown) => {
+      const source = String(value ?? "")
+        .toUpperCase()
+        .replace(/\s+/g, " ");
+      if (!source) return;
+      const matches =
+        source.match(/\b(?:FY)?\d{2,4}\b|\bQ[1-4]\b|\b(?:20\d{2})\b/g) || [];
+      for (const token of matches) {
+        out.add(canonicalizeToken(token));
+      }
+    };
+    if (Array.isArray(table.header)) {
+      for (const cell of table.header) pushTokens(cell);
+    }
+    if (Array.isArray(table.rows)) {
+      for (const row of table.rows) {
+        if (!Array.isArray(row) || row.length === 0) continue;
+        pushTokens(row[0]);
+      }
+    }
+    return out;
   }
 
   // -----------------------------
@@ -4572,3 +4901,4 @@ export class RetrievalEngineService {
     };
   }
 }
+

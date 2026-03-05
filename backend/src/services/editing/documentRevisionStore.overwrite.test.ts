@@ -9,9 +9,21 @@ const mockDownloadFile = jest.fn();
 const mockDocumentFindFirst = jest.fn();
 const mockDocumentFindMany = jest.fn();
 const mockDocumentFindUnique = jest.fn();
+const mockDocumentUpdate = jest.fn();
+const mockDocumentChunkUpdateMany = jest.fn();
+const mockDocumentMetadataFindUnique = jest.fn();
+const mockDocumentMetadataUpsert = jest.fn();
+const mockDocumentMetadataDeleteMany = jest.fn();
+const mockDocumentProcessingMetricsDeleteMany = jest.fn();
+const mockTransaction = jest.fn();
 jest.mock("../../config/storage", () => ({
   uploadFile: (...args: any[]) => mockUploadFile(...args),
   downloadFile: (...args: any[]) => mockDownloadFile(...args),
+}));
+
+jest.mock("../cache.service", () => ({
+  __esModule: true,
+  default: { del: jest.fn().mockResolvedValue(undefined) },
 }));
 
 jest.mock("../../queues/document.queue", () => ({
@@ -42,9 +54,21 @@ jest.mock("../../config/database", () => ({
       findFirst: (...args: any[]) => mockDocumentFindFirst(...args),
       findMany: (...args: any[]) => mockDocumentFindMany(...args),
       findUnique: (...args: any[]) => mockDocumentFindUnique(...args),
-      update: jest.fn().mockResolvedValue({}),
+      update: (...args: any[]) => mockDocumentUpdate(...args),
     },
-    $transaction: jest.fn(),
+    documentChunk: {
+      updateMany: (...args: any[]) => mockDocumentChunkUpdateMany(...args),
+    },
+    documentMetadata: {
+      findUnique: (...args: any[]) => mockDocumentMetadataFindUnique(...args),
+      upsert: (...args: any[]) => mockDocumentMetadataUpsert(...args),
+      deleteMany: (...args: any[]) => mockDocumentMetadataDeleteMany(...args),
+    },
+    documentProcessingMetrics: {
+      deleteMany: (...args: any[]) =>
+        mockDocumentProcessingMetricsDeleteMany(...args),
+    },
+    $transaction: (...args: any[]) => mockTransaction(...args),
   },
 }));
 
@@ -59,11 +83,14 @@ describe("DocumentRevisionStoreService overwrite safety", () => {
     jest.clearAllMocks();
     process.env.KODA_EDITING_SAVE_MODE = "overwrite";
     process.env.KEEP_UNDO_HISTORY = "true";
+    process.env.NODE_ENV = "test";
+    delete process.env.KODA_EDITING_ALLOW_OVERWRITE_PROTECTED;
     mockDocumentFindFirst.mockResolvedValue({
       id: "doc-123",
       encryptedFilename: "storage/doc-123.pdf",
       filename: "doc.pdf",
       mimeType: "application/pdf",
+      fileHash: "before-hash",
       parentVersionId: null,
     });
     mockDocumentFindUnique.mockResolvedValue({
@@ -86,6 +113,30 @@ describe("DocumentRevisionStoreService overwrite safety", () => {
         createdAt: new Date("2026-01-02T00:00:00.000Z"),
       },
     ]);
+    mockDocumentUpdate.mockResolvedValue({});
+    mockDocumentChunkUpdateMany.mockResolvedValue({ count: 1 });
+    mockDocumentMetadataFindUnique.mockResolvedValue({ pptxMetadata: null });
+    mockDocumentMetadataUpsert.mockResolvedValue({});
+    mockDocumentMetadataDeleteMany.mockResolvedValue({ count: 1 });
+    mockDocumentProcessingMetricsDeleteMany.mockResolvedValue({ count: 1 });
+    mockTransaction.mockImplementation(async (arg: any) => {
+      if (typeof arg === "function") {
+        return arg({
+          documentChunk: { updateMany: mockDocumentChunkUpdateMany },
+          documentMetadata: {
+            findUnique: mockDocumentMetadataFindUnique,
+            upsert: mockDocumentMetadataUpsert,
+            deleteMany: mockDocumentMetadataDeleteMany,
+          },
+          documentProcessingMetrics: {
+            deleteMany: mockDocumentProcessingMetricsDeleteMany,
+          },
+          document: { update: mockDocumentUpdate },
+        });
+      }
+      if (Array.isArray(arg)) return Promise.all(arg);
+      return arg;
+    });
   });
 
   test("uploadFile is NOT called when backup createRevision throws", async () => {
@@ -105,6 +156,66 @@ describe("DocumentRevisionStoreService overwrite safety", () => {
     ).rejects.toThrow(/BACKUP_FAILED/);
 
     // The critical assertion: uploadFile must never be called if backup failed
+    expect(mockUploadFile).not.toHaveBeenCalled();
+  });
+
+  test("storeEditedBuffer blocks overwrite when backup creation fails", async () => {
+    mockCreateRevision.mockRejectedValue(new Error("storage unavailable"));
+    mockDownloadFile.mockResolvedValue(Buffer.from("original bytes"));
+
+    const service = new DocumentRevisionStoreService();
+
+    await expect(
+      service.storeEditedBuffer({
+        documentId: "doc-123",
+        userId: "user-456",
+        editedBuffer: Buffer.from("edited bytes"),
+        operator: "EXPORT_SLIDES",
+        metadata: { source: "pptx_studio" },
+      }),
+    ).rejects.toThrow(/BACKUP_FAILED/);
+
+    expect(mockUploadFile).not.toHaveBeenCalled();
+  });
+
+  test("storeEditedBuffer proceeds only after backup creation succeeds", async () => {
+    mockCreateRevision.mockResolvedValue({ id: "backup-1" });
+    mockDownloadFile.mockResolvedValue(Buffer.from("original bytes"));
+
+    const service = new DocumentRevisionStoreService();
+
+    const result = await service.storeEditedBuffer({
+      documentId: "doc-123",
+      userId: "user-456",
+      editedBuffer: Buffer.from("edited bytes"),
+      operator: "EXPORT_SLIDES",
+      metadata: { source: "pptx_studio" },
+    });
+
+    expect(mockCreateRevision).toHaveBeenCalledTimes(1);
+    expect(mockUploadFile).toHaveBeenCalledTimes(1);
+    expect(result.revisionId).toBe("doc-123");
+  });
+
+  test("storeEditedBuffer is blocked in protected envs unless explicit override is enabled", async () => {
+    process.env.NODE_ENV = "production";
+    delete process.env.KODA_EDITING_ALLOW_OVERWRITE_PROTECTED;
+
+    mockCreateRevision.mockResolvedValue({ id: "backup-1" });
+    mockDownloadFile.mockResolvedValue(Buffer.from("original bytes"));
+
+    const service = new DocumentRevisionStoreService();
+
+    await expect(
+      service.storeEditedBuffer({
+        documentId: "doc-123",
+        userId: "user-456",
+        editedBuffer: Buffer.from("edited bytes"),
+        operator: "EXPORT_SLIDES",
+      }),
+    ).rejects.toThrow(/OVERWRITE_DISABLED_IN_PROTECTED_ENV/);
+
+    expect(mockCreateRevision).not.toHaveBeenCalled();
     expect(mockUploadFile).not.toHaveBeenCalled();
   });
 });

@@ -19,6 +19,7 @@ import {
   getSignedUrl,
 } from "../../config/storage";
 import prisma from "../../config/database";
+import { isPptxMime } from "../ingestion/extraction/ingestionMimeRegistry.service";
 
 export interface SlideImageData {
   slideNumber: number;
@@ -182,11 +183,7 @@ export async function generateSlideImagesForDocument(
     }
 
     // 2. Verify it's a PPTX
-    const isPptx =
-      document.mimeType ===
-        "application/vnd.openxmlformats-officedocument.presentationml.presentation" ||
-      document.mimeType?.includes("presentation") ||
-      document.mimeType?.includes("powerpoint");
+    const isPptx = isPptxMime(document.mimeType);
 
     if (!isPptx) {
       return { success: false, error: "Not a PowerPoint file" };
@@ -318,11 +315,7 @@ export function needsSlideImageGeneration(
   slidesData: any,
   slideGenerationStatus: string | null,
 ): boolean {
-  const isPptx =
-    mimeType ===
-      "application/vnd.openxmlformats-officedocument.presentationml.presentation" ||
-    mimeType?.includes("presentation") ||
-    mimeType?.includes("powerpoint");
+  const isPptx = isPptxMime(mimeType);
 
   if (!isPptx) return false;
 

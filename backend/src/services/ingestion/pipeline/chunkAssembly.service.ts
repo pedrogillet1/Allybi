@@ -53,9 +53,10 @@ function emitCellFactChunks(
           rowLabel,
         });
         const headerPath = toHeaderPath(rowLabel, colHeader);
+        const leftSide = headerPath.length ? headerPath.join(" / ") : "Cell";
         out.push({
           chunkIndex: idx++,
-          content: `${row.isHeader ? "Header" : "Cell"}: ${cell.text}`,
+          content: `${leftSide} = ${cell.text}`,
           pageNumber: table.pageOrSlide,
           metadata: {
             ...ctxMeta,
@@ -63,6 +64,7 @@ function emitCellFactChunks(
               sourceType,
               pageNumber: table.pageOrSlide,
               tableId: table.tableId,
+              rowLabel,
               rowIndex: row.rowIndex,
               columnIndex: cell.colIndex,
             }),
@@ -71,6 +73,9 @@ function emitCellFactChunks(
             tableId: table.tableId,
             rowIndex: row.rowIndex,
             columnIndex: cell.colIndex,
+            rowSpan: cell.rowSpan,
+            colSpan: cell.colSpan,
+            isMergedContinuation: cell.isMergedContinuation,
             rowLabel: rowLabel || undefined,
             colHeader: colHeader || undefined,
             headerPath: headerPath.length ? headerPath : undefined,
@@ -141,6 +146,110 @@ function toHeaderPath(
     return [row, ...headerHierarchy].filter(Boolean);
   }
   return [row, String(colHeader || "").trim()].filter(Boolean);
+}
+
+type PeriodParts = { year?: number; month?: number; quarter?: number };
+
+function toBoundedInt(
+  value: unknown,
+  min: number,
+  max: number,
+): number | undefined {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return undefined;
+  const normalized = Math.trunc(parsed);
+  if (normalized < min || normalized > max) return undefined;
+  return normalized;
+}
+
+function normalizePeriodParts(period: unknown): PeriodParts {
+  if (!period || typeof period !== "object") return {};
+  const source = period as Record<string, unknown>;
+  const year = toBoundedInt(source.year, 1900, 2200);
+  const month = toBoundedInt(source.month, 1, 12);
+  const quarter = toBoundedInt(source.quarter, 1, 4);
+  return { year, month, quarter };
+}
+
+function toCanonicalPeriodTokens(parts: PeriodParts): string[] {
+  const out = new Set<string>();
+  if (parts.year) out.add(`Y${parts.year}`);
+  if (parts.quarter) {
+    out.add(`Q${parts.quarter}`);
+    if (parts.year) out.add(`Y${parts.year}Q${parts.quarter}`);
+  }
+  if (parts.month) {
+    const padded = String(parts.month).padStart(2, "0");
+    out.add(`M${padded}`);
+    if (parts.year) out.add(`Y${parts.year}M${padded}`);
+  }
+  return [...out].sort();
+}
+
+function pickDominantNumeric(counts: Map<number, number>): number | undefined {
+  let dominant: number | undefined;
+  let maxCount = 0;
+  for (const [value, count] of counts) {
+    if (count > maxCount) {
+      dominant = value;
+      maxCount = count;
+    }
+  }
+  return dominant;
+}
+
+function extractPeriodMetadataFromFact(
+  fact: { period?: unknown },
+): Pick<
+  InputChunkMetadata,
+  "periodYear" | "periodMonth" | "periodQuarter" | "periodTokens"
+> {
+  const period = normalizePeriodParts(fact.period);
+  const periodTokens = toCanonicalPeriodTokens(period);
+  return {
+    periodYear: period.year,
+    periodMonth: period.month,
+    periodQuarter: period.quarter,
+    periodTokens: periodTokens.length > 0 ? periodTokens : undefined,
+  };
+}
+
+function extractRowAggregatePeriodMetadata(
+  facts: Array<{ period?: unknown }>,
+): Pick<
+  InputChunkMetadata,
+  "periodYear" | "periodMonth" | "periodQuarter" | "periodTokens"
+> {
+  const yearCounts = new Map<number, number>();
+  const monthCounts = new Map<number, number>();
+  const quarterCounts = new Map<number, number>();
+  const tokenSet = new Set<string>();
+
+  for (const fact of facts) {
+    const period = normalizePeriodParts(fact.period);
+    if (period.year) {
+      yearCounts.set(period.year, (yearCounts.get(period.year) ?? 0) + 1);
+    }
+    if (period.month) {
+      monthCounts.set(period.month, (monthCounts.get(period.month) ?? 0) + 1);
+    }
+    if (period.quarter) {
+      quarterCounts.set(
+        period.quarter,
+        (quarterCounts.get(period.quarter) ?? 0) + 1,
+      );
+    }
+    for (const token of toCanonicalPeriodTokens(period)) {
+      tokenSet.add(token);
+    }
+  }
+
+  return {
+    periodYear: pickDominantNumeric(yearCounts),
+    periodMonth: pickDominantNumeric(monthCounts),
+    periodQuarter: pickDominantNumeric(quarterCounts),
+    periodTokens: tokenSet.size > 0 ? [...tokenSet].sort() : undefined,
+  };
 }
 
 function toSectionToken(value: unknown): string | null {
@@ -408,6 +517,7 @@ export function buildInputChunks(
         const summaryLeft = headerPath.length
           ? headerPath.join(" / ")
           : cell || "Cell";
+        const periodMeta = extractPeriodMetadataFromFact(fact);
 
         const metadata: InputChunkMetadata = {
           ...ctxMeta,
@@ -425,6 +535,10 @@ export function buildInputChunks(
           unitRaw: unit.unitRaw ?? undefined,
           unitNormalized: unit.unitNormalized ?? undefined,
           numericValue: unit.numericValue ?? undefined,
+          periodYear: periodMeta.periodYear,
+          periodMonth: periodMeta.periodMonth,
+          periodQuarter: periodMeta.periodQuarter,
+          periodTokens: periodMeta.periodTokens,
           scaleRaw: unit.scaleRaw ?? undefined,
           scaleMultiplier: unit.scaleMultiplier ?? undefined,
           isFinancial: sheetFinancialMap.get(sheetName) ?? extraction.isFinancial ?? false,
@@ -498,6 +612,7 @@ export function buildInputChunks(
           return { unitNormalized: u.unitNormalized, cellRef: String(f.cell || "") };
         });
         const consistency = checkRowUnitConsistency(cellUnits);
+        const rowPeriodMeta = extractRowAggregatePeriodMetadata(facts);
 
         out.push({
           chunkIndex: idx++,
@@ -518,6 +633,10 @@ export function buildInputChunks(
             headerPath: rowLabel ? [rowLabel] : undefined,
             unitRaw: dominantUnit.unitRaw,
             unitNormalized: dominantUnit.unitNormalized,
+            periodYear: rowPeriodMeta.periodYear,
+            periodMonth: rowPeriodMeta.periodMonth,
+            periodQuarter: rowPeriodMeta.periodQuarter,
+            periodTokens: rowPeriodMeta.periodTokens,
             scaleRaw: dominantScale.scaleRaw,
             scaleMultiplier: dominantScale.scaleMultiplier,
             isFinancial: sheetFinancialMap.get(sheetName) ?? extraction.isFinancial ?? false,

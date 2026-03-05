@@ -1,14 +1,1 @@
-{
-  "_meta": {
-    "id": "compiled_doctype_signature_index",
-    "version": "1.0.0",
-    "description": "Auto-registered bank payload for .compiled/docType_signature_index.any.json",
-    "languages": [
-      "any"
-    ],
-    "lastUpdated": "2026-03-03"
-  },
-  "config": {
-    "enabled": true
-  }
-}
+{}

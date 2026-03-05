@@ -97,6 +97,11 @@ describe("Certification: composition analytical structure", () => {
     if (!content.includes("In summary,")) failures.push("MISSING_SYNTHESIS_MARKER");
     if (!content.includes("If you'd like,")) failures.push("MISSING_FOLLOWUP_MARKER");
     if (!content.includes("Page 14")) failures.push("MISSING_LOCATION_RICHNESS");
+    if (/(backend\/|src\/|data_banks|\.any\.json)/i.test(content)) {
+      failures.push("LEAKS_INTERNAL_INFRA_IDENTIFIERS");
+    }
+    const questionCount = (content.match(/\?/g) || []).length;
+    if (questionCount > 1) failures.push("TOO_MANY_QUESTIONS");
 
     writeCertificationGateReport("composition-analytical-structure", {
       passed: failures.length === 0,
@@ -104,11 +109,17 @@ describe("Certification: composition analytical structure", () => {
         hasDirectAnswer: content.includes("Direct answer:") ? 1 : 0,
         hasSynthesisMarker: content.includes("In summary,") ? 1 : 0,
         hasFollowupMarker: content.includes("If you'd like,") ? 1 : 0,
+        leaksInternalInfraIdentifiers: /(backend\/|src\/|data_banks|\.any\.json)/i.test(content)
+          ? 1
+          : 0,
+        questionCount,
       },
       thresholds: {
         hasDirectAnswer: 1,
         hasSynthesisMarker: 1,
         hasFollowupMarker: 1,
+        leaksInternalInfraIdentifiers: 0,
+        questionCountMax: 1,
       },
       failures,
     });

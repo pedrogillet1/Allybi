@@ -54,7 +54,7 @@ export interface ConnectorIngestionContext {
 export interface ConnectorIngestionResultItem {
   sourceId: string;
   documentId?: string;
-  status: "created" | "existing" | "failed";
+  status: "created" | "existing" | "updated" | "failed";
   error?: string;
 }
 
@@ -101,32 +101,54 @@ export class ConnectorsIngestionService {
 
         // Idempotency by deterministic filename per source item.
         const filename = this.buildFilename(normalized);
+        const documentId = deterministicDocumentId(ctx.userId, normalized);
+        const textContent = this.buildTextPayload(normalized);
+        const fileHash = createHash("sha256").update(textContent).digest("hex");
+        const resolvedMime = resolveConnectorMimeType(normalized.sourceType);
+        const resolvedDocType = resolveConnectorDocType(normalized.sourceType);
         const existing = await prisma.document.findFirst({
           where: {
             userId: ctx.userId,
             filename,
           },
-          select: { id: true },
+          select: {
+            id: true,
+            fileHash: true,
+            encryptedFilename: true,
+          },
         });
 
         if (existing) {
+          if (existing.fileHash === fileHash) {
+            results.push({
+              sourceId: normalized.sourceId,
+              documentId: existing.id,
+              status: "existing",
+            });
+            continue;
+          }
+
+          await this.reconcileExistingDocument(
+            ctx,
+            normalized,
+            existing,
+            filename,
+            textContent,
+            fileHash,
+            resolvedMime,
+            resolvedDocType,
+          );
           results.push({
             sourceId: normalized.sourceId,
             documentId: existing.id,
-            status: "existing",
+            status: "updated",
           });
           continue;
         }
 
-        const documentId = deterministicDocumentId(ctx.userId, normalized);
-        const textContent = this.buildTextPayload(normalized);
         const storageKey = `users/${ctx.userId}/connectors/${normalized.sourceType}/${documentId}/${filename}`;
-        const fileHash = createHash("sha256").update(textContent).digest("hex");
         const encryptDocumentText =
           documentContentVault.isEnabled() || documentContentVault.isStrict();
-
-        const resolvedMime = resolveConnectorMimeType(normalized.sourceType);
-        const resolvedDocType = resolveConnectorDocType(normalized.sourceType);
 
         await uploadFile(
           storageKey,
@@ -220,6 +242,104 @@ export class ConnectorsIngestionService {
     }
 
     return results;
+  }
+
+  private async reconcileExistingDocument(
+    ctx: ConnectorIngestionContext,
+    item: ConnectorDocument,
+    existing: {
+      id: string;
+      fileHash: string | null;
+      encryptedFilename: string | null;
+    },
+    filename: string,
+    textContent: string,
+    fileHash: string,
+    resolvedMime: string,
+    resolvedDocType: string,
+  ): Promise<void> {
+    const encryptDocumentText =
+      documentContentVault.isEnabled() || documentContentVault.isStrict();
+    const storageKey =
+      existing.encryptedFilename ||
+      `users/${ctx.userId}/connectors/${item.sourceType}/${existing.id}/${filename}`;
+
+    await uploadFile(storageKey, Buffer.from(textContent, "utf8"), resolvedMime);
+
+    await prisma.$transaction(async (tx) => {
+      await tx.document.update({
+        where: { id: existing.id },
+        data: {
+          filename,
+          encryptedFilename: storageKey,
+          fileSize: Buffer.byteLength(textContent, "utf8"),
+          mimeType: resolvedMime,
+          fileHash,
+          status: "uploaded",
+          indexingState: "pending",
+          indexingUpdatedAt: new Date(),
+          displayTitle: item.title,
+          rawText: null,
+          previewText: null,
+          renderableContent: null,
+          language: "en",
+          embeddingsGenerated: false,
+          chunksCount: 0,
+        },
+      });
+
+      await tx.documentMetadata.upsert({
+        where: { documentId: existing.id },
+        create: {
+          documentId: existing.id,
+          extractedText: null,
+          wordCount: wordCount(textContent),
+          characterCount: textContent.length,
+          summary: item.title,
+          creationDate: item.timestamp,
+          modificationDate: item.timestamp,
+          entities: JSON.stringify({
+            actors: item.actors,
+            labelsOrChannel: item.labelsOrChannel,
+          }),
+          classification: resolvedDocType,
+          topics: JSON.stringify(item.labelsOrChannel),
+        },
+        update: {
+          extractedText: null,
+          wordCount: wordCount(textContent),
+          characterCount: textContent.length,
+          summary: item.title,
+          modificationDate: item.timestamp,
+          entities: JSON.stringify({
+            actors: item.actors,
+            labelsOrChannel: item.labelsOrChannel,
+          }),
+          classification: resolvedDocType,
+          topics: JSON.stringify(item.labelsOrChannel),
+        },
+      });
+    });
+
+    if (encryptDocumentText) {
+      await documentContentVault.encryptDocumentFields(ctx.userId, existing.id, {
+        rawText: textContent,
+        previewText: textContent.slice(0, 4000),
+        renderableContent: textContent,
+      });
+    }
+
+    await this.enqueueOrIndexFallback(
+      {
+        documentId: existing.id,
+        userId: ctx.userId,
+        filename,
+        mimeType: resolvedMime,
+        encryptedFilename: storageKey,
+        connectorDocType: resolvedDocType,
+      },
+      textContent,
+    );
   }
 
   private normalize(item: ConnectorDocument): ConnectorDocument {

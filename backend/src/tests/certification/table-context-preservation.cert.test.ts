@@ -1,6 +1,10 @@
 import { describe, expect, test } from "@jest/globals";
 import { writeCertificationGateReport } from "./reporting";
 import type { CandidateChunk } from "../../services/core/retrieval/retrievalEngine.service";
+import {
+  LlmRequestBuilderService,
+  type PromptRegistryService,
+} from "../../services/llm/core/llmRequestBuilder.service";
 
 describe("Certification: table context preservation", () => {
   test("table payload preserves unitAnnotation", () => {
@@ -85,5 +89,58 @@ describe("Certification: table context preservation", () => {
       },
       failures: [],
     });
+  });
+
+  test("structured table context is included in LLM evidence payload", () => {
+    const prompts: PromptRegistryService = {
+      buildPrompt: () => ({
+        messages: [{ role: "system", content: "Use evidence only." }],
+      }),
+    };
+    const builder = new LlmRequestBuilderService(prompts);
+    const req = builder.build({
+      env: "dev" as any,
+      route: {
+        provider: "openai",
+        model: "gpt-5.2",
+        reason: "quality_finish",
+        stage: "final",
+        constraints: {},
+      },
+      outputLanguage: "en",
+      userText: "Summarize the table.",
+      signals: {
+        answerMode: "doc_grounded_table",
+        intentFamily: "documents",
+        operator: "summarize",
+        explicitDocLock: false,
+        activeDocId: null,
+        fallback: { triggered: false },
+        disambiguation: null,
+        navType: null,
+      },
+      evidencePack: {
+        evidence: [
+          {
+            docId: "doc-1",
+            locationKey: "d:doc-1|p:1|sec:income",
+            evidenceType: "table",
+            table: {
+              header: ["Metric", "Q1"],
+              rows: [["Revenue", 1250]],
+              unitAnnotation: { unitRaw: "$M", unitNormalized: "USD_MILLIONS" },
+              scaleFactor: "millions",
+              footnotes: ["(1) Restated"],
+            },
+          },
+        ],
+      },
+    });
+
+    const userMessage = req.messages.find((msg) => msg.role === "user");
+    const payload = String(userMessage?.content || "");
+    expect(payload).toContain("tableContext=");
+    expect(payload).toContain("headers=[Metric | Q1]");
+    expect(payload).toContain("unit=$M/USD_MILLIONS");
   });
 });

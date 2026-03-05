@@ -48,6 +48,7 @@ import { BRAND_NAME } from "../../../config/brand";
 import { resolveOutputTokenBudget } from "../../core/enforcement/tokenBudget.service";
 import { ReasoningPolicyService } from "../../core/policy/reasoningPolicy.service";
 import { getOptionalBank } from "../../core/banks/bankLoader.service";
+import { UNIT_PATTERNS } from "../../ingestion/pipeline/tableUnitNormalization.service";
 
 export type LangCode = "any" | "en" | "pt" | "es";
 
@@ -90,6 +91,13 @@ export interface EvidencePackLike {
     };
     locationKey?: string;
     snippet?: string;
+    table?: {
+      header?: string[];
+      rows?: Array<Array<string | number | null>>;
+      unitAnnotation?: { unitRaw: string; unitNormalized: string } | null;
+      scaleFactor?: string | null;
+      footnotes?: string[] | null;
+    } | null;
     score?: { finalScore?: number };
     evidenceType?: "text" | "table" | "image";
   }>;
@@ -1046,12 +1054,22 @@ export class LlmRequestBuilderService {
       const evidenceId = `${e.docId}:${locationKey}`;
 
       const snippet = (e.snippet || "").trim().replace(/\s+/g, " ");
-      const clipped =
-        snippet.length > maxSnippetChars
-          ? snippet.slice(0, maxSnippetChars - 1) + "…"
-          : snippet;
+      const clipped = this.clipSnippetPreservingSemantics(
+        snippet,
+        maxSnippetChars,
+      );
+      const renderedBody = (() => {
+        if (e.evidenceType === "table" && e.table) {
+          const tableContext = this.serializeTableContext(
+            e.table,
+            maxSnippetChars,
+          );
+          if (tableContext) return `tableContext=${tableContext}`;
+        }
+        return `snippet=${clipped}`;
+      })();
 
-      const line = `- evidenceId=${evidenceId} | documentId=${e.docId} | locationKey=${locationKey} | title=${title}${loc ? ` | location=${loc}` : ""} | snippet=${clipped}`;
+      const line = `- evidenceId=${evidenceId} | documentId=${e.docId} | locationKey=${locationKey} | title=${title}${loc ? ` | location=${loc}` : ""} | ${renderedBody}`;
       if (sectionChars + line.length + 1 > maxSectionChars) {
         break;
       }
@@ -1086,10 +1104,7 @@ export class LlmRequestBuilderService {
     for (const item of evidencePack.evidence) {
       const documentId = String(item.docId || "").trim();
       const locationKey = String(item.locationKey || "").trim();
-      const snippet = String(item.snippet || "")
-        .toLowerCase()
-        .replace(/\s+/g, " ")
-        .trim();
+      const snippet = this.resolveEvidenceTextForHash(item);
       if (!documentId || !locationKey || !snippet) continue;
       const evidenceId = `${documentId}:${locationKey}`;
       out.push({
@@ -1100,6 +1115,135 @@ export class LlmRequestBuilderService {
       });
     }
     return out;
+  }
+
+  private resolveEvidenceTextForHash(
+    item: EvidencePackLike["evidence"][number],
+  ): string {
+    const snippet = String(item.snippet || "")
+      .toLowerCase()
+      .replace(/\s+/g, " ")
+      .trim();
+    if (snippet) return snippet;
+    if (item.evidenceType !== "table" || !item.table) return "";
+    const serialized = this.serializeTableContext(item.table, 1200);
+    return serialized
+      .toLowerCase()
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  private clipSnippetPreservingSemantics(
+    snippet: string,
+    maxChars: number,
+  ): string {
+    const normalized = String(snippet || "").trim();
+    if (!normalized) return "";
+    if (normalized.length <= maxChars) return normalized;
+
+    let truncPoint = Math.max(1, maxChars);
+
+    const unitAlternatives = UNIT_PATTERNS.flatMap((entry) =>
+      entry.patterns.map((pattern) => pattern.source),
+    ).join("|");
+    const unitPattern = new RegExp(
+      `\\d[\\d.,]*\\s*(?:${unitAlternatives})`,
+      "gi",
+    );
+    let unitMatch: RegExpExecArray | null;
+    while ((unitMatch = unitPattern.exec(normalized)) !== null) {
+      const tokenStart = unitMatch.index;
+      const tokenEnd = tokenStart + unitMatch[0].length;
+      if (tokenStart < truncPoint && tokenEnd > truncPoint) {
+        truncPoint = tokenEnd;
+        break;
+      }
+    }
+
+    const negationPattern =
+      /\b(not|no|never|neither|nor|n't|without|excluding|zero|none|decline[ds]?|decrease[ds]?|loss|deficit|fell|dropped|failed)\b/gi;
+    let negMatch: RegExpExecArray | null;
+    while ((negMatch = negationPattern.exec(normalized)) !== null) {
+      const negStart = negMatch.index;
+      const negEnd = negStart + negMatch[0].length;
+      if (negStart < truncPoint && negStart > truncPoint - 60) {
+        truncPoint = Math.min(normalized.length, negEnd + 30);
+        break;
+      }
+    }
+
+    const sentenceBoundary = normalized.lastIndexOf(". ", truncPoint);
+    const newlineBoundary = normalized.lastIndexOf("\n", truncPoint);
+    const boundary = Math.max(sentenceBoundary, newlineBoundary);
+    if (boundary > maxChars * 0.5) {
+      truncPoint = boundary + 1;
+    }
+
+    const trimmed = normalized.slice(0, truncPoint).trimEnd();
+    return trimmed.length < normalized.length ? `${trimmed}…` : trimmed;
+  }
+
+  private serializeTableContext(
+    table: NonNullable<EvidencePackLike["evidence"][number]["table"]>,
+    maxChars: number,
+  ): string {
+    const parts: string[] = [];
+    const header = Array.isArray(table.header)
+      ? table.header
+          .map((value) => String(value || "").trim())
+          .filter(Boolean)
+          .slice(0, 8)
+      : [];
+    if (header.length > 0) {
+      parts.push(`headers=[${header.join(" | ")}]`);
+    }
+
+    const rows = Array.isArray(table.rows)
+      ? table.rows
+          .slice(0, 3)
+          .map((row) =>
+            Array.isArray(row)
+              ? row
+                  .slice(0, Math.max(2, header.length || 4))
+                  .map((value) =>
+                    value == null ? "" : String(value).replace(/\s+/g, " ").trim(),
+                  )
+                  .join(" | ")
+              : "",
+          )
+          .filter(Boolean)
+      : [];
+    if (rows.length > 0) {
+      parts.push(`rows=[${rows.join(" ; ")}]`);
+    }
+
+    if (table.unitAnnotation) {
+      const raw = String(table.unitAnnotation.unitRaw || "").trim();
+      const normalized = String(table.unitAnnotation.unitNormalized || "").trim();
+      const unitParts = [raw, normalized].filter(Boolean);
+      if (unitParts.length > 0) {
+        parts.push(`unit=${unitParts.join("/")}`);
+      }
+    }
+
+    const scaleFactor = String(table.scaleFactor || "").trim();
+    if (scaleFactor) {
+      parts.push(`scale=${scaleFactor}`);
+    }
+
+    const footnotes = Array.isArray(table.footnotes)
+      ? table.footnotes
+          .map((value) => String(value || "").trim())
+          .filter(Boolean)
+          .slice(0, 2)
+      : [];
+    if (footnotes.length > 0) {
+      parts.push(`footnotes=[${footnotes.join(" ; ")}]`);
+    }
+
+    if (parts.length === 0) return "";
+    const serialized = parts.join(" | ");
+    return this.clipSnippetPreservingSemantics(serialized, maxChars);
   }
 
   private hashSnippet(input: string): string {

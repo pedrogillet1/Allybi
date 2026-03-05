@@ -21,6 +21,8 @@ export interface StructuredCell {
   rowIndex: number;
   colIndex: number;
   isHeader: boolean;
+  colSpan?: number;
+  rowSpan?: number;
 }
 
 export interface StructuredTable {
@@ -148,17 +150,37 @@ function parseTableRowsStructured(
   const cells: StructuredCell[] = [];
   let rowIndex = 0;
   let maxCol = 0;
+  let maxRow = 0;
 
   for (const hRow of headerRows || []) {
     const rowCells = hRow.cells || [];
     for (let colIndex = 0; colIndex < rowCells.length; colIndex++) {
+      const rowSpan = Math.max(
+        1,
+        Number(
+          rowCells[colIndex]?.rowSpan ??
+            rowCells[colIndex]?.layout?.rowSpan ??
+            1,
+        ) || 1,
+      );
+      const colSpan = Math.max(
+        1,
+        Number(
+          rowCells[colIndex]?.colSpan ??
+            rowCells[colIndex]?.layout?.colSpan ??
+            1,
+        ) || 1,
+      );
       cells.push({
         text: getCellText(rowCells[colIndex], documentText),
         rowIndex,
         colIndex,
         isHeader: true,
+        ...(colSpan > 1 ? { colSpan } : {}),
+        ...(rowSpan > 1 ? { rowSpan } : {}),
       });
-      maxCol = Math.max(maxCol, colIndex + 1);
+      maxCol = Math.max(maxCol, colIndex + colSpan);
+      maxRow = Math.max(maxRow, rowIndex + rowSpan);
     }
     rowIndex++;
   }
@@ -166,18 +188,37 @@ function parseTableRowsStructured(
   for (const bRow of bodyRows || []) {
     const rowCells = bRow.cells || [];
     for (let colIndex = 0; colIndex < rowCells.length; colIndex++) {
+      const rowSpan = Math.max(
+        1,
+        Number(
+          rowCells[colIndex]?.rowSpan ??
+            rowCells[colIndex]?.layout?.rowSpan ??
+            1,
+        ) || 1,
+      );
+      const colSpan = Math.max(
+        1,
+        Number(
+          rowCells[colIndex]?.colSpan ??
+            rowCells[colIndex]?.layout?.colSpan ??
+            1,
+        ) || 1,
+      );
       cells.push({
         text: getCellText(rowCells[colIndex], documentText),
         rowIndex,
         colIndex,
         isHeader: false,
+        ...(colSpan > 1 ? { colSpan } : {}),
+        ...(rowSpan > 1 ? { rowSpan } : {}),
       });
-      maxCol = Math.max(maxCol, colIndex + 1);
+      maxCol = Math.max(maxCol, colIndex + colSpan);
+      maxRow = Math.max(maxRow, rowIndex + rowSpan);
     }
     rowIndex++;
   }
 
-  return { cells, rowCount: rowIndex, colCount: maxCol };
+  return { cells, rowCount: Math.max(rowIndex, maxRow), colCount: maxCol };
 }
 
 // ---------------------------------------------------------------------------

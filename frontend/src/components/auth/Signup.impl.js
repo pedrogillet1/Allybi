@@ -8,8 +8,6 @@ import appleIcon from '../../assets/Social icon.svg';
 import hideIcon from '../../assets/Hide.svg';
 import { ROUTES } from '../../constants/routes';
 
-const AUTH_LOCALSTORAGE_COMPAT = process.env.REACT_APP_AUTH_LOCALSTORAGE_COMPAT === 'true';
-
 const SignUp = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -76,10 +74,6 @@ const SignUp = () => {
         navigate(ROUTES.AUTHENTICATION, { state: { email: response.email } });
       } else if (response.user && response.accessToken) {
         // Direct creation flow: user is already created and logged in
-        if (AUTH_LOCALSTORAGE_COMPAT) {
-          localStorage.setItem('accessToken', response.accessToken);
-          localStorage.setItem('refreshToken', response.refreshToken);
-        }
         localStorage.setItem('user', JSON.stringify(response.user));
 
         // Set auth state
@@ -294,3 +288,4 @@ const SignUp = () => {
 };
 
 export default SignUp;
+

@@ -44,10 +44,8 @@ import mp4Icon from '../../assets/mp4.png';
 import mp3Icon from '../../assets/mp3.svg';
 import filesIcon from '../../assets/files-icon.svg';
 
-const AUTH_LOCALSTORAGE_COMPAT = process.env.REACT_APP_AUTH_LOCALSTORAGE_COMPAT === 'true';
 const getCompatAccessToken = () => {
-  if (!AUTH_LOCALSTORAGE_COMPAT) return null;
-  return localStorage.getItem('accessToken') || localStorage.getItem('token');
+  return null;
 };
 
 // Document Thumbnail Component - simplified to just show file icons (thumbnails not in use)
@@ -3333,3 +3331,4 @@ const CategoryDetail = () => {
 };
 
 export default CategoryDetail;
+

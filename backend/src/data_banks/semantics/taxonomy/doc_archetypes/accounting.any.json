@@ -1636,6 +1636,3474 @@
         "Are non-controlling interest calculations consistent with ownership percentages?",
         "Os cálculos de participação minoritária são consistentes com os percentuais de participação?"
       ]
+    },
+    {
+      "id": "acct_account_reconciliation",
+      "label": "Account Reconciliation",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_accrual_rollforward",
+      "label": "Accrual Rollforward",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_accruals_schedule",
+      "label": "Accruals Schedule",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_amortization_schedule",
+      "label": "Amortization Schedule",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_ap_aging",
+      "label": "Ap Aging",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_ar_aging",
+      "label": "Ar Aging",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_audit_confirmation",
+      "label": "Audit Confirmation",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_audit_workpaper",
+      "label": "Audit Workpaper",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_bank_rec",
+      "label": "Bank Rec",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_bank_reconciliation",
+      "label": "Bank Reconciliation",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_budget_pack",
+      "label": "Budget Pack",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_capex_register",
+      "label": "Capex Register",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_cash_flow",
+      "label": "Cash Flow",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_cashbook",
+      "label": "Cashbook",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_chart_of_accounts",
+      "label": "Chart Of Accounts",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_controls_narrative",
+      "label": "Controls Narrative",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_credit_card_reconciliation",
+      "label": "Credit Card Reconciliation",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_depreciation_schedule",
+      "label": "Depreciation Schedule",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_financial_statement",
+      "label": "Financial Statement",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_fixed_asset_register",
+      "label": "Fixed Asset Register",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_forecast_pack",
+      "label": "Forecast Pack",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_foreign_currency",
+      "label": "Foreign Currency",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_general_ledger",
+      "label": "General Ledger",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_gl_export",
+      "label": "Gl Export",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_intercompany_reconciliation",
+      "label": "Intercompany Reconciliation",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_inventory_valuation",
+      "label": "Inventory Valuation",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_inventory_valuation_report",
+      "label": "Inventory Valuation Report",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_invoice_register",
+      "label": "Invoice Register",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_je_support",
+      "label": "Je Support",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_journal_entry_adjusting",
+      "label": "Journal Entry Adjusting",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_journal_entry_support",
+      "label": "Journal Entry Support",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_lease_accounting_schedule",
+      "label": "Lease Accounting Schedule",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_leasing_schedule",
+      "label": "Leasing Schedule",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_management_rep_letter",
+      "label": "Management Rep Letter",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_management_representation",
+      "label": "Management Representation",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_month_end_close",
+      "label": "Month End Close",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_payment_run",
+      "label": "Payment Run",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_payment_run_report",
+      "label": "Payment Run Report",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_pbc_list",
+      "label": "Pbc List",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_prepaid_rollforward",
+      "label": "Prepaid Rollforward",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_prepaids_amortization_schedule",
+      "label": "Prepaids Amortization Schedule",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_revenue_recognition",
+      "label": "Revenue Recognition",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_revenue_recognition_schedule",
+      "label": "Revenue Recognition Schedule",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_subledger_customer",
+      "label": "Subledger Customer",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_subledger_vendor",
+      "label": "Subledger Vendor",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_tax_reconciliation",
+      "label": "Tax Reconciliation",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_trial_balance",
+      "label": "Trial Balance",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_trial_balance_reclass",
+      "label": "Trial Balance Reclass",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_variance_pack",
+      "label": "Variance Pack",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_workpaper",
+      "label": "Workpaper",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
+    },
+    {
+      "id": "acct_year_end_close",
+      "label": "Year End Close",
+      "expectedSections": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "headings": [
+        "Account Classification Overview",
+        "Visão Geral da Classificação de Contas",
+        "Asset Accounts",
+        "Contas de Ativo",
+        "Liability Accounts",
+        "Contas de Passivo",
+        "Equity Accounts",
+        "Contas de Patrimônio Líquido",
+        "Revenue Accounts",
+        "Contas de Receita",
+        "Expense Accounts",
+        "Contas de Despesa"
+      ],
+      "expectedTableFamilies": [
+        "Account number hierarchy with parent-child mapping",
+        "Hierarquia de números de conta com mapeamento pai-filho",
+        "Account type and normal balance matrix",
+        "Matriz de tipo de conta e saldo normal",
+        "Sub-account detail listing",
+        "Listagem detalhada de subcontas"
+      ],
+      "fieldFamilies": [
+        "Account number and name",
+        "Número e nome da conta",
+        "Account type and classification",
+        "Tipo e classificação da conta",
+        "Normal balance indicator (debit/credit)",
+        "Indicador de saldo normal (débito/crédito)",
+        "Active/inactive status",
+        "Status ativo/inativo"
+      ],
+      "redFlags": [
+        "Duplicate account numbers",
+        "Números de conta duplicados",
+        "Accounts with no classification",
+        "Contas sem classificação",
+        "Orphaned sub-accounts without parent",
+        "Subcontas órfãs sem conta pai",
+        "Inactive accounts with open balances",
+        "Contas inativas com saldos abertos"
+      ],
+      "missingQuestions": [
+        "Does the chart follow GAAP or IFRS classification hierarchy?",
+        "O plano segue a hierarquia de classificação GAAP ou IFRS?",
+        "Are all accounts mapped to financial statement line items?",
+        "Todas as contas estão mapeadas para linhas das demonstrações financeiras?",
+        "When was the chart of accounts last reviewed for obsolete entries?",
+        "Quando o plano de contas foi revisado pela última vez para entradas obsoletas?"
+      ]
     }
   ]
 }

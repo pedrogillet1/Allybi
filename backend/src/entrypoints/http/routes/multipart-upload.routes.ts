@@ -7,6 +7,7 @@ import { Router, Response } from "express";
 import { authMiddleware } from "../../../middleware/auth.middleware";
 import { multipartUploadLimiter } from "../../../middleware/rateLimit.middleware";
 import prisma from "../../../platform/db/prismaClient";
+import { documentUploadWriteService } from "../../../services/documents/documentUploadWrite.service";
 import { GcsStorageService } from "../../../services/retrieval/gcsStorage.service";
 import { UPLOAD_CONFIG } from "../../../config/upload.config";
 import { randomUUID } from "crypto";
@@ -50,6 +51,19 @@ function buildStorageKey(
 ): string {
   const ext = fileName.includes(".") ? "." + fileName.split(".").pop() : "";
   return `users/${userId}/docs/${docId}/${docId}${ext}`;
+}
+
+function isUserStorageKey(userId: string, storageKey: unknown): boolean {
+  if (typeof storageKey !== "string" || storageKey.trim().length === 0) {
+    return false;
+  }
+  const key = storageKey.trim();
+  if (!key.startsWith(`users/${userId}/docs/`)) return false;
+  const segments = key.split("/");
+  if (segments.some((seg) => seg === "." || seg === ".." || seg.length === 0)) {
+    return false;
+  }
+  return true;
 }
 
 /**
@@ -112,21 +126,15 @@ router.post(
       const totalParts = Math.ceil(fileSize / chunkSize);
 
       // Create document record
-      await prisma.document.create({
-        data: {
-          id: docId,
-          userId,
-          folderId,
-          filename: fileName,
-          encryptedFilename: storageKey,
-          fileSize,
-          mimeType,
-          fileHash: `multipart-pending-${docId}`,
-          status: "uploading",
-          indexingState: "pending",
-          indexingError: null,
-          indexingUpdatedAt: new Date(),
-        },
+      await documentUploadWriteService.createUploadingDocument({
+        id: docId,
+        userId,
+        folderId,
+        filename: fileName,
+        encryptedFilename: storageKey,
+        fileSize,
+        mimeType,
+        fileHash: `multipart-pending-${docId}`,
       });
 
       // Start GCS resumable upload (pass browser origin for CORS)
@@ -151,6 +159,10 @@ router.post(
         chunkSize,
       });
     } catch (e: any) {
+      if (String(e?.message || "").includes("Folder not found")) {
+        res.status(404).json({ error: "Folder not found" });
+        return;
+      }
       logger.error("[MultipartUpload] init error", {
         path: "/init",
         error: e?.message || String(e),
@@ -195,9 +207,18 @@ router.post(
         res.status(404).json({ error: "Document not found" });
         return;
       }
+      if (!doc.encryptedFilename || storageKey !== doc.encryptedFilename) {
+        res.status(400).json({ error: "storageKey does not match document" });
+        return;
+      }
+      if (!isUserStorageKey(userId, doc.encryptedFilename)) {
+        res.status(400).json({ error: "Invalid storage key scope" });
+        return;
+      }
+      const canonicalStorageKey = doc.encryptedFilename;
 
       // Verify object exists in GCS (and size if provided)
-      const meta = await gcs().getFileMetadata({ key: storageKey });
+      const meta = await gcs().getFileMetadata({ key: canonicalStorageKey });
       if (!meta?.size || meta.size <= 0) {
         res.status(400).json({ error: "Upload not found in storage" });
         return;
@@ -217,14 +238,10 @@ router.post(
       }
 
       // Update document status
-      await prisma.document.update({
-        where: { id: documentId },
-        data: {
-          status: "uploaded",
-          indexingState: "pending",
-          indexingError: null,
-          indexingUpdatedAt: new Date(),
-        },
+      await documentUploadWriteService.markUploadedPendingById({
+        userId,
+        documentId,
+        at: new Date(),
       });
 
       // Enqueue for processing (extraction → chunking → embedding)
@@ -233,7 +250,7 @@ router.post(
           await publishExtractJob(
             doc.id,
             userId,
-            doc.encryptedFilename || storageKey,
+            canonicalStorageKey,
             doc.mimeType || "application/octet-stream",
             doc.filename || undefined,
           );
@@ -246,7 +263,7 @@ router.post(
             userId,
             filename: doc.filename || "unknown",
             mimeType: doc.mimeType || "application/octet-stream",
-            encryptedFilename: doc.encryptedFilename || undefined,
+            encryptedFilename: canonicalStorageKey,
           });
           logger.info("[MultipartUpload] queued for processing", {
             documentId,
@@ -259,14 +276,11 @@ router.post(
           error: queueMessage,
         });
         try {
-          await prisma.document.update({
-            where: { id: documentId },
-            data: {
-              status: "uploaded",
-              indexingState: "failed",
-              indexingError: `Queue scheduling failed: ${String(queueMessage).slice(0, 300)}`,
-              indexingUpdatedAt: new Date(),
-            },
+          await documentUploadWriteService.markQueueSchedulingFailed({
+            userId,
+            documentId,
+            queueMessage,
+            at: new Date(),
           });
           await prisma.ingestionEvent.create({
             data: {
@@ -280,7 +294,7 @@ router.post(
               at: new Date(),
               meta: {
                 route: "multipart.complete",
-                storageKey,
+                storageKey: canonicalStorageKey,
               },
             },
           });
@@ -332,6 +346,10 @@ router.post(
     const { documentId, uploadId, storageKey } = req.body || {};
 
     try {
+      if (storageKey && !isUserStorageKey(userId, storageKey)) {
+        res.status(400).json({ error: "Invalid storage key scope" });
+        return;
+      }
       // Best-effort delete the object (GCS resumable sessions cannot be explicitly aborted)
       if (storageKey) {
         await gcs().deleteFile({ key: storageKey });
@@ -339,9 +357,9 @@ router.post(
 
       // Mark document as failed
       if (documentId) {
-        await prisma.document.updateMany({
-          where: { id: documentId, userId },
-          data: { status: "failed" },
+        await documentUploadWriteService.markFailedBatch({
+          userId,
+          documentIds: [documentId],
         });
       }
 

@@ -61,6 +61,7 @@ const gateGenerators = {
   "gateway-json-routing": "test:cert:gateway-json-routing",
   "collision-matrix-exhaustive": "test:cert:collision-matrix-exhaustive",
   "telemetry-completeness": "test:cert:telemetry-completeness",
+  "rollout-safety": "test:cert:rollout-safety",
   "query-latency": "test:cert:query-latency",
   "turn-debug-packet": "test:cert:turn-debug-packet",
   "security-auth": "test:cert:security-auth",

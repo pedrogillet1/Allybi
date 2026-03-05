@@ -59,6 +59,7 @@ describe("SlackSyncService cursor advancement", () => {
 
     expect(result.failedCount).toBe(1);
     expect(result.ingestedCount).toBe(0);
+    expect(result.updatedCount).toBe(0);
     expect(writeSpy).toHaveBeenCalledWith(
       "user-1",
       expect.objectContaining({
@@ -89,11 +90,38 @@ describe("SlackSyncService cursor advancement", () => {
 
     expect(result.failedCount).toBe(0);
     expect(result.ingestedCount).toBe(1);
+    expect(result.updatedCount).toBe(0);
     expect(writeSpy).toHaveBeenCalledWith(
       "user-1",
       expect.objectContaining({
         lastMessageTs: "1710000001.000100",
       }),
     );
+  });
+
+  test("tracks updatedCount for reconciled Slack messages", async () => {
+    const { service } = makeService([
+      {
+        sourceId: "C1:1710000001.000100",
+        documentId: "doc-1",
+        status: "updated",
+      },
+    ]);
+    jest.spyOn(service as any, "readCursor").mockResolvedValue({
+      userId: "user-1",
+      lastSyncAt: "2026-01-01T00:00:00.000Z",
+      lastMessageTs: "1710000000.000100",
+      updatedAt: "2026-01-01T00:00:00.000Z",
+    });
+    jest
+      .spyOn(service as any, "writeCursor")
+      .mockResolvedValue(undefined);
+
+    const result = await service.sync({ userId: "user-1" });
+
+    expect(result.ingestedCount).toBe(1);
+    expect(result.createdCount).toBe(0);
+    expect(result.existingCount).toBe(0);
+    expect(result.updatedCount).toBe(1);
   });
 });

@@ -147,6 +147,44 @@
       "scope": "table_header:travel",
       "disambiguationRuleId": "headers_disambiguation_travel_visa_requirements",
       "curationReason": "weighted:visa_requirements:domain_travel"
+    },
+    {
+      "canonical": "expense_breakdown",
+      "synonyms": [
+        "expense breakdown",
+        "Expense Breakdown field",
+        "campo expense_breakdown",
+        "expense_breakdown value",
+        "Expense Breakdown valor"
+      ],
+      "related": [
+        "flight_segments",
+        "hotel_charges"
+      ],
+      "normalizationNotes": "Map expense_breakdown to normalized canonical expense_breakdown.",
+      "priority": 506,
+      "scope": "table_header:travel",
+      "disambiguationRuleId": "headers_disambiguation_travel_expense_breakdown",
+      "curationReason": "weighted:expense_breakdown:domain_travel"
+    },
+    {
+      "canonical": "booking_status",
+      "synonyms": [
+        "booking status",
+        "Booking Status field",
+        "campo booking_status",
+        "booking_status value",
+        "Booking Status valor"
+      ],
+      "related": [
+        "flight_segments",
+        "hotel_charges"
+      ],
+      "normalizationNotes": "Map booking_status to normalized canonical booking_status.",
+      "priority": 507,
+      "scope": "table_header:travel",
+      "disambiguationRuleId": "headers_disambiguation_travel_booking_status",
+      "curationReason": "weighted:booking_status:domain_travel"
     }
   ]
 }

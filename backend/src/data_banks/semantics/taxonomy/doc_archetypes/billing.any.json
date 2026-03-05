@@ -59,20 +59,35 @@
       ],
       "expectedTableFamilies": [
         "Invoice Business line-item table",
-        "Invoice Business summary matrix"
+        "Invoice Business summary matrix",
+        "Invoice Business line items",
+        "Invoice Business itens",
+        "Invoice Business summary",
+        "Invoice Business resumo"
       ],
       "fieldFamilies": [
         "Primary identifiers",
         "Dates and periods",
-        "Amounts and statuses"
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
       ],
       "redFlags": [
         "Missing mandatory section anchors",
-        "Conflicting summary totals"
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
       ],
       "missingQuestions": [
         "Which invoice business variant should be prioritized?",
-        "Should extraction prefer header metadata or detailed section data?"
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Invoice Business variant should be prioritized?",
+        "Qual variante de Invoice Business deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
       ]
     },
     {
@@ -112,20 +127,35 @@
       ],
       "expectedTableFamilies": [
         "Electricity Bill line-item table",
-        "Electricity Bill summary matrix"
+        "Electricity Bill summary matrix",
+        "Electricity Bill line items",
+        "Electricity Bill itens",
+        "Electricity Bill summary",
+        "Electricity Bill resumo"
       ],
       "fieldFamilies": [
         "Primary identifiers",
         "Dates and periods",
-        "Amounts and statuses"
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
       ],
       "redFlags": [
         "Missing mandatory section anchors",
-        "Conflicting summary totals"
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
       ],
       "missingQuestions": [
         "Which electricity bill variant should be prioritized?",
-        "Should extraction prefer header metadata or detailed section data?"
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Electricity Bill variant should be prioritized?",
+        "Qual variante de Electricity Bill deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
       ]
     },
     {
@@ -165,20 +195,967 @@
       ],
       "expectedTableFamilies": [
         "Retail Receipt line-item table",
-        "Retail Receipt summary matrix"
+        "Retail Receipt summary matrix",
+        "Retail Receipt line items",
+        "Retail Receipt itens",
+        "Retail Receipt summary",
+        "Retail Receipt resumo"
       ],
       "fieldFamilies": [
         "Primary identifiers",
         "Dates and periods",
-        "Amounts and statuses"
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
       ],
       "redFlags": [
         "Missing mandatory section anchors",
-        "Conflicting summary totals"
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
       ],
       "missingQuestions": [
         "Which retail receipt variant should be prioritized?",
-        "Should extraction prefer header metadata or detailed section data?"
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Retail Receipt variant should be prioritized?",
+        "Qual variante de Retail Receipt deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "billing_internet_bill",
+      "label": "Internet Bill",
+      "expectedSections": [
+        "Header",
+        "Cabeçalho",
+        "Issuer and Customer",
+        "Emissor e Cliente",
+        "Period",
+        "Período",
+        "Summary",
+        "Resumo",
+        "Charges and Fees",
+        "Cobrancas e Taxas",
+        "Usage or Activity",
+        "Uso ou Atividade"
+      ],
+      "headings": [
+        "account",
+        "statement",
+        "invoice",
+        "bill",
+        "po",
+        "net terms",
+        "business",
+        "tax",
+        "issuer",
+        "provider",
+        "customer",
+        "subscriber",
+        "name",
+        "id",
+        "billing period",
+        "statement period"
+      ],
+      "expectedTableFamilies": [
+        "Invoice Business line-item table",
+        "Invoice Business summary matrix",
+        "Internet Bill line items",
+        "Internet Bill itens",
+        "Internet Bill summary",
+        "Internet Bill resumo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
+      ],
+      "missingQuestions": [
+        "Which invoice business variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Internet Bill variant should be prioritized?",
+        "Qual variante de Internet Bill deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "billing_phone_bill_mobile",
+      "label": "Phone Bill Mobile",
+      "expectedSections": [
+        "Header",
+        "Cabeçalho",
+        "Issuer and Customer",
+        "Emissor e Cliente",
+        "Period",
+        "Período",
+        "Summary",
+        "Resumo",
+        "Charges and Fees",
+        "Cobrancas e Taxas",
+        "Usage or Activity",
+        "Uso ou Atividade"
+      ],
+      "headings": [
+        "account",
+        "statement",
+        "invoice",
+        "bill",
+        "po",
+        "net terms",
+        "business",
+        "tax",
+        "issuer",
+        "provider",
+        "customer",
+        "subscriber",
+        "name",
+        "id",
+        "billing period",
+        "statement period"
+      ],
+      "expectedTableFamilies": [
+        "Invoice Business line-item table",
+        "Invoice Business summary matrix",
+        "Phone Bill Mobile line items",
+        "Phone Bill Mobile itens",
+        "Phone Bill Mobile summary",
+        "Phone Bill Mobile resumo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
+      ],
+      "missingQuestions": [
+        "Which invoice business variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Phone Bill Mobile variant should be prioritized?",
+        "Qual variante de Phone Bill Mobile deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "billing_water_sewer_bill",
+      "label": "Water Sewer Bill",
+      "expectedSections": [
+        "Header",
+        "Cabeçalho",
+        "Issuer and Customer",
+        "Emissor e Cliente",
+        "Period",
+        "Período",
+        "Summary",
+        "Resumo",
+        "Charges and Fees",
+        "Cobrancas e Taxas",
+        "Usage or Activity",
+        "Uso ou Atividade"
+      ],
+      "headings": [
+        "account",
+        "statement",
+        "invoice",
+        "bill",
+        "po",
+        "net terms",
+        "business",
+        "tax",
+        "issuer",
+        "provider",
+        "customer",
+        "subscriber",
+        "name",
+        "id",
+        "billing period",
+        "statement period"
+      ],
+      "expectedTableFamilies": [
+        "Invoice Business line-item table",
+        "Invoice Business summary matrix",
+        "Water Sewer Bill line items",
+        "Water Sewer Bill itens",
+        "Water Sewer Bill summary",
+        "Water Sewer Bill resumo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
+      ],
+      "missingQuestions": [
+        "Which invoice business variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Water Sewer Bill variant should be prioritized?",
+        "Qual variante de Water Sewer Bill deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "billing_service_charge_summary",
+      "label": "Service Charge Summary",
+      "expectedSections": [
+        "Supplement Billing 01 Header",
+        "Cabecalho Supplement Billing 01",
+        "Supplement Billing 01 Parties",
+        "Partes Supplement Billing 01",
+        "Supplement Billing 01 Timeline",
+        "Linha do tempo Supplement Billing 01"
+      ],
+      "headings": [
+        "supplement billing 01",
+        "billing supplement 01",
+        "billing",
+        "billing summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Billing 01 line items",
+        "Supplement Billing 01 itens",
+        "Supplement Billing 01 summary",
+        "Supplement Billing 01 resumo",
+        "Supplement Billing 01 balance",
+        "Supplement Billing 01 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Billing 01 variant should be prioritized?",
+        "Qual variante de Supplement Billing 01 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "billing_late_fee_notice",
+      "label": "Late Fee Notice",
+      "expectedSections": [
+        "Supplement Billing 02 Header",
+        "Cabecalho Supplement Billing 02",
+        "Supplement Billing 02 Parties",
+        "Partes Supplement Billing 02",
+        "Supplement Billing 02 Timeline",
+        "Linha do tempo Supplement Billing 02"
+      ],
+      "headings": [
+        "supplement billing 02",
+        "billing supplement 02",
+        "billing",
+        "billing summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Billing 02 line items",
+        "Supplement Billing 02 itens",
+        "Supplement Billing 02 summary",
+        "Supplement Billing 02 resumo",
+        "Supplement Billing 02 balance",
+        "Supplement Billing 02 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Billing 02 variant should be prioritized?",
+        "Qual variante de Supplement Billing 02 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "billing_usage_breakdown_notice",
+      "label": "Usage Breakdown Notice",
+      "expectedSections": [
+        "Supplement Billing 03 Header",
+        "Cabecalho Supplement Billing 03",
+        "Supplement Billing 03 Parties",
+        "Partes Supplement Billing 03",
+        "Supplement Billing 03 Timeline",
+        "Linha do tempo Supplement Billing 03"
+      ],
+      "headings": [
+        "supplement billing 03",
+        "billing supplement 03",
+        "billing",
+        "billing summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Billing 03 line items",
+        "Supplement Billing 03 itens",
+        "Supplement Billing 03 summary",
+        "Supplement Billing 03 resumo",
+        "Supplement Billing 03 balance",
+        "Supplement Billing 03 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Billing 03 variant should be prioritized?",
+        "Qual variante de Supplement Billing 03 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "billing_tax_adjustment_notice",
+      "label": "Tax Adjustment Notice",
+      "expectedSections": [
+        "Supplement Billing 04 Header",
+        "Cabecalho Supplement Billing 04",
+        "Supplement Billing 04 Parties",
+        "Partes Supplement Billing 04",
+        "Supplement Billing 04 Timeline",
+        "Linha do tempo Supplement Billing 04"
+      ],
+      "headings": [
+        "supplement billing 04",
+        "billing supplement 04",
+        "billing",
+        "billing summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Billing 04 line items",
+        "Supplement Billing 04 itens",
+        "Supplement Billing 04 summary",
+        "Supplement Billing 04 resumo",
+        "Supplement Billing 04 balance",
+        "Supplement Billing 04 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Billing 04 variant should be prioritized?",
+        "Qual variante de Supplement Billing 04 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "billing_discount_adjustment_notice",
+      "label": "Discount Adjustment Notice",
+      "expectedSections": [
+        "Supplement Billing 05 Header",
+        "Cabecalho Supplement Billing 05",
+        "Supplement Billing 05 Parties",
+        "Partes Supplement Billing 05",
+        "Supplement Billing 05 Timeline",
+        "Linha do tempo Supplement Billing 05"
+      ],
+      "headings": [
+        "supplement billing 05",
+        "billing supplement 05",
+        "billing",
+        "billing summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Billing 05 line items",
+        "Supplement Billing 05 itens",
+        "Supplement Billing 05 summary",
+        "Supplement Billing 05 resumo",
+        "Supplement Billing 05 balance",
+        "Supplement Billing 05 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Billing 05 variant should be prioritized?",
+        "Qual variante de Supplement Billing 05 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "billing_billing_dispute_note",
+      "label": "Billing Dispute Note",
+      "expectedSections": [
+        "Supplement Billing 06 Header",
+        "Cabecalho Supplement Billing 06",
+        "Supplement Billing 06 Parties",
+        "Partes Supplement Billing 06",
+        "Supplement Billing 06 Timeline",
+        "Linha do tempo Supplement Billing 06"
+      ],
+      "headings": [
+        "supplement billing 06",
+        "billing supplement 06",
+        "billing",
+        "billing summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Billing 06 line items",
+        "Supplement Billing 06 itens",
+        "Supplement Billing 06 summary",
+        "Supplement Billing 06 resumo",
+        "Supplement Billing 06 balance",
+        "Supplement Billing 06 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Billing 06 variant should be prioritized?",
+        "Qual variante de Supplement Billing 06 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "billing_plan_change_notice",
+      "label": "Plan Change Notice",
+      "expectedSections": [
+        "Supplement Billing 07 Header",
+        "Cabecalho Supplement Billing 07",
+        "Supplement Billing 07 Parties",
+        "Partes Supplement Billing 07",
+        "Supplement Billing 07 Timeline",
+        "Linha do tempo Supplement Billing 07"
+      ],
+      "headings": [
+        "supplement billing 07",
+        "billing supplement 07",
+        "billing",
+        "billing summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Billing 07 line items",
+        "Supplement Billing 07 itens",
+        "Supplement Billing 07 summary",
+        "Supplement Billing 07 resumo",
+        "Supplement Billing 07 balance",
+        "Supplement Billing 07 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Billing 07 variant should be prioritized?",
+        "Qual variante de Supplement Billing 07 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "billing_meter_reading_notice",
+      "label": "Meter Reading Notice",
+      "expectedSections": [
+        "Supplement Billing 08 Header",
+        "Cabecalho Supplement Billing 08",
+        "Supplement Billing 08 Parties",
+        "Partes Supplement Billing 08",
+        "Supplement Billing 08 Timeline",
+        "Linha do tempo Supplement Billing 08"
+      ],
+      "headings": [
+        "supplement billing 08",
+        "billing supplement 08",
+        "billing",
+        "billing summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Billing 08 line items",
+        "Supplement Billing 08 itens",
+        "Supplement Billing 08 summary",
+        "Supplement Billing 08 resumo",
+        "Supplement Billing 08 balance",
+        "Supplement Billing 08 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Billing 08 variant should be prioritized?",
+        "Qual variante de Supplement Billing 08 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "billing_payment_plan_notice",
+      "label": "Payment Plan Notice",
+      "expectedSections": [
+        "Supplement Billing 09 Header",
+        "Cabecalho Supplement Billing 09",
+        "Supplement Billing 09 Parties",
+        "Partes Supplement Billing 09",
+        "Supplement Billing 09 Timeline",
+        "Linha do tempo Supplement Billing 09"
+      ],
+      "headings": [
+        "supplement billing 09",
+        "billing supplement 09",
+        "billing",
+        "billing summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Billing 09 line items",
+        "Supplement Billing 09 itens",
+        "Supplement Billing 09 summary",
+        "Supplement Billing 09 resumo",
+        "Supplement Billing 09 balance",
+        "Supplement Billing 09 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Billing 09 variant should be prioritized?",
+        "Qual variante de Supplement Billing 09 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "billing_statement_addendum",
+      "label": "Statement Addendum",
+      "expectedSections": [
+        "Supplement Billing 10 Header",
+        "Cabecalho Supplement Billing 10",
+        "Supplement Billing 10 Parties",
+        "Partes Supplement Billing 10",
+        "Supplement Billing 10 Timeline",
+        "Linha do tempo Supplement Billing 10"
+      ],
+      "headings": [
+        "supplement billing 10",
+        "billing supplement 10",
+        "billing",
+        "billing summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Billing 10 line items",
+        "Supplement Billing 10 itens",
+        "Supplement Billing 10 summary",
+        "Supplement Billing 10 resumo",
+        "Supplement Billing 10 balance",
+        "Supplement Billing 10 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Billing 10 variant should be prioritized?",
+        "Qual variante de Supplement Billing 10 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "billing_cycle_change_notice",
+      "label": "Cycle Change Notice",
+      "expectedSections": [
+        "Supplement Billing 11 Header",
+        "Cabecalho Supplement Billing 11",
+        "Supplement Billing 11 Parties",
+        "Partes Supplement Billing 11",
+        "Supplement Billing 11 Timeline",
+        "Linha do tempo Supplement Billing 11"
+      ],
+      "headings": [
+        "supplement billing 11",
+        "billing supplement 11",
+        "billing",
+        "billing summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Billing 11 line items",
+        "Supplement Billing 11 itens",
+        "Supplement Billing 11 summary",
+        "Supplement Billing 11 resumo",
+        "Supplement Billing 11 balance",
+        "Supplement Billing 11 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Billing 11 variant should be prioritized?",
+        "Qual variante de Supplement Billing 11 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "billing_chargeback_notice",
+      "label": "Chargeback Notice",
+      "expectedSections": [
+        "Supplement Billing 12 Header",
+        "Cabecalho Supplement Billing 12",
+        "Supplement Billing 12 Parties",
+        "Partes Supplement Billing 12",
+        "Supplement Billing 12 Timeline",
+        "Linha do tempo Supplement Billing 12"
+      ],
+      "headings": [
+        "supplement billing 12",
+        "billing supplement 12",
+        "billing",
+        "billing summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Billing 12 line items",
+        "Supplement Billing 12 itens",
+        "Supplement Billing 12 summary",
+        "Supplement Billing 12 resumo",
+        "Supplement Billing 12 balance",
+        "Supplement Billing 12 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Billing 12 variant should be prioritized?",
+        "Qual variante de Supplement Billing 12 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "billing_service_charge_summary_2",
+      "label": "Service Charge Summary 2",
+      "expectedSections": [
+        "Supplement Billing 13 Header",
+        "Cabecalho Supplement Billing 13",
+        "Supplement Billing 13 Parties",
+        "Partes Supplement Billing 13",
+        "Supplement Billing 13 Timeline",
+        "Linha do tempo Supplement Billing 13"
+      ],
+      "headings": [
+        "supplement billing 13",
+        "billing supplement 13",
+        "billing",
+        "billing summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Billing 13 line items",
+        "Supplement Billing 13 itens",
+        "Supplement Billing 13 summary",
+        "Supplement Billing 13 resumo",
+        "Supplement Billing 13 balance",
+        "Supplement Billing 13 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Billing 13 variant should be prioritized?",
+        "Qual variante de Supplement Billing 13 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "billing_late_fee_notice_2",
+      "label": "Late Fee Notice 2",
+      "expectedSections": [
+        "Supplement Billing 14 Header",
+        "Cabecalho Supplement Billing 14",
+        "Supplement Billing 14 Parties",
+        "Partes Supplement Billing 14",
+        "Supplement Billing 14 Timeline",
+        "Linha do tempo Supplement Billing 14"
+      ],
+      "headings": [
+        "supplement billing 14",
+        "billing supplement 14",
+        "billing",
+        "billing summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Billing 14 line items",
+        "Supplement Billing 14 itens",
+        "Supplement Billing 14 summary",
+        "Supplement Billing 14 resumo",
+        "Supplement Billing 14 balance",
+        "Supplement Billing 14 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Billing 14 variant should be prioritized?",
+        "Qual variante de Supplement Billing 14 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
       ]
     }
   ]

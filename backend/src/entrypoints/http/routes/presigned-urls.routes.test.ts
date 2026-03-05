@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, jest, test } from "@jest/globals";
 const mockCreateMany = jest.fn();
 const mockUpdateMany = jest.fn();
 const mockFindMany = jest.fn();
+const mockFolderFindMany = jest.fn();
 const mockPresignUpload = jest.fn();
 
 jest.mock("../../../middleware/auth.middleware", () => ({
@@ -22,8 +23,7 @@ jest.mock("../../../platform/db/prismaClient", () => ({
       findMany: (...args: any[]) => mockFindMany(...args),
     },
     folder: {
-      findMany: jest.fn().mockResolvedValue([]),
-      createMany: jest.fn().mockResolvedValue({ count: 0 }),
+      findMany: (...args: any[]) => mockFolderFindMany(...args),
     },
   },
 }));
@@ -93,6 +93,13 @@ describe("presigned-urls routes", () => {
     mockCreateMany.mockReset().mockResolvedValue({ count: 1 });
     mockUpdateMany.mockReset().mockResolvedValue({ count: 0 });
     mockFindMany.mockReset().mockResolvedValue([]);
+    mockFolderFindMany.mockReset().mockImplementation((args: any) => {
+      const requested = args?.where?.id?.in;
+      if (Array.isArray(requested)) {
+        return Promise.resolve(requested.map((id: string) => ({ id })));
+      }
+      return Promise.resolve([]);
+    });
     mockPresignUpload.mockReset().mockResolvedValue({
       url: "https://storage.example/upload/1",
     });
@@ -128,6 +135,70 @@ describe("presigned-urls routes", () => {
     expect(mockCreateMany).toHaveBeenCalledTimes(1);
   });
 
+  test("POST /bulk resolves nested folders through folder service", async () => {
+    const handler = getRouteHandler("/bulk");
+    const createFolder = jest
+      .fn()
+      .mockResolvedValueOnce({ id: "folder-a" })
+      .mockResolvedValueOnce({ id: "folder-b" });
+    const req: any = {
+      user: { id: "user-1" },
+      body: {
+        files: [
+          {
+            fileName: "deep.txt",
+            fileType: "text/plain",
+            fileSize: 42,
+            relativePath: "A/B/deep.txt",
+          },
+        ],
+      },
+      headers: {},
+      app: {
+        locals: {
+          services: {
+            folders: {
+              create: createFolder,
+            },
+          },
+        },
+      },
+    };
+    const res = makeRes();
+
+    await handler(req, res as any);
+
+    expect(res.statusCode).toBe(200);
+    expect(createFolder).toHaveBeenCalledTimes(2);
+    expect(mockCreateMany).toHaveBeenCalledTimes(1);
+    const payload = mockCreateMany.mock.calls[0][0];
+    expect(payload.data[0].folderId).toBe("folder-b");
+  });
+
+  test("POST /bulk fails closed when nested folder creation is required but service is missing", async () => {
+    const handler = getRouteHandler("/bulk");
+    const req: any = {
+      user: { id: "user-1" },
+      body: {
+        files: [
+          {
+            fileName: "deep.txt",
+            fileType: "text/plain",
+            fileSize: 42,
+            relativePath: "A/B/deep.txt",
+          },
+        ],
+      },
+      headers: {},
+    };
+    const res = makeRes();
+
+    await handler(req, res as any);
+
+    expect(res.statusCode).toBe(503);
+    expect(res.body).toEqual({ error: "Folder service unavailable" });
+  });
+
   test("POST /bulk rejects empty files list", async () => {
     const handler = getRouteHandler("/bulk");
     const req: any = {
@@ -141,6 +212,32 @@ describe("presigned-urls routes", () => {
 
     expect(res.statusCode).toBe(400);
     expect(res.body).toEqual({ error: "No files provided" });
+  });
+
+  test("POST /bulk returns 404 when provided folderId is not owned", async () => {
+    const handler = getRouteHandler("/bulk");
+    mockFolderFindMany.mockResolvedValueOnce([]);
+    const req: any = {
+      user: { id: "user-1" },
+      body: {
+        folderId: "foreign-folder",
+        files: [
+          {
+            fileName: "proof.txt",
+            fileType: "text/plain",
+            fileSize: 42,
+          },
+        ],
+      },
+      headers: {},
+    };
+    const res = makeRes();
+
+    await handler(req, res as any);
+
+    expect(res.statusCode).toBe(404);
+    expect(res.body).toEqual({ error: "Folder not found" });
+    expect(mockCreateMany).not.toHaveBeenCalled();
   });
 
   test("POST /complete-bulk handles empty documentIds", async () => {

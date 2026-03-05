@@ -6,6 +6,7 @@ jest.mock("../queues/connector.queue", () => ({
 
 import { createIntegrationsController } from "./integrations.controller";
 import { registerConnector } from "../services/connectors/connectorsRegistry";
+import { signEmailSendConfirmationToken } from "../services/connectors/emailSendConfirmation.service";
 
 function makeJsonRes() {
   const state: { body?: any; status?: number } = {};
@@ -88,6 +89,107 @@ describe("IntegrationsController", () => {
     expect(html).toContain("var targetOrigin = 'https://app.example.com';");
     expect(html).toContain("window.opener.postMessage(completion, targetOrigin);");
     expect(html).not.toContain(", '*')");
+    expect(html).not.toContain("koda_oauth_complete");
+    expect(html).not.toContain("localStorage.setItem(");
     expect(html).toContain("\"sig\":");
+  });
+
+  test("send returns normalized receipt payload", async () => {
+    process.env.CONNECTOR_ACTION_SECRET = "test-action-secret";
+    const now = Date.now();
+    const confirmationId = signEmailSendConfirmationToken({
+      v: 2,
+      t: "email_send",
+      userId: "user-1",
+      provider: "gmail",
+      to: "person@example.com",
+      subject: "Subject",
+      body: "Body",
+      attachmentDocumentIds: ["doc-1"],
+      iat: now,
+      exp: now + 5 * 60 * 1000,
+    });
+
+    const handler = {
+      execute: jest.fn(async () => ({
+        ok: true,
+        action: "send",
+        provider: "gmail",
+        data: {
+          sent: true,
+          receipt: {
+            provider: "gmail",
+            providerMessageId: "gmail-msg-1",
+            providerThreadId: "thread-1",
+            acceptedAt: new Date().toISOString(),
+            to: "person@example.com",
+            subject: "Subject",
+            attachmentCount: 1,
+          },
+        },
+      })),
+    };
+
+    const controller = createIntegrationsController(handler as any);
+    const { res, state } = makeJsonRes();
+    const req: any = {
+      params: { provider: "gmail" },
+      user: { id: "user-1" },
+      headers: {},
+      body: { confirmationId },
+    };
+
+    await controller.send(req, res);
+
+    expect(state.status).toBe(200);
+    expect(state.body?.ok).toBe(true);
+    expect(state.body?.data).toEqual(
+      expect.objectContaining({
+        provider: "gmail",
+        sent: true,
+        receipt: expect.objectContaining({
+          provider: "gmail",
+          providerMessageId: "gmail-msg-1",
+          to: "person@example.com",
+          attachmentCount: 1,
+        }),
+      }),
+    );
+  });
+
+  test("status surfaces ingestionEnabled from handler status payload", async () => {
+    registerConnector("gmail", {
+      capabilities: { oauth: true, sync: true, search: true },
+      oauthService: {},
+    });
+
+    const handler = {
+      execute: jest.fn(async ({ provider, action }: { provider: string; action: string }) => ({
+        ok: true,
+        action,
+        provider,
+        data: {
+          connected: true,
+          ingestionEnabled: true,
+          indexedDocuments: 3,
+          providerAccountId: "acct-1",
+        },
+      })),
+    };
+    const controller = createIntegrationsController(handler as any);
+    const { res, state } = makeJsonRes();
+    const req: any = {
+      user: { id: "user-1" },
+      headers: {},
+      body: {},
+    };
+
+    await controller.status(req, res);
+
+    expect(state.status).toBe(200);
+    const providers = state.body?.data?.providers || [];
+    const gmail = providers.find((p: any) => p.provider === "gmail");
+    expect(gmail?.status?.ingestionEnabled).toBe(true);
+    expect(gmail?.status?.indexedDocuments).toBe(3);
   });
 });

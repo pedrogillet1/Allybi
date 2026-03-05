@@ -283,10 +283,26 @@ class DocumentStateManagerService {
   }
 
   /**
-   * Mark a document as ready without content (e.g., XLSX / image with 0 chunks).
+   * Deprecated unsafe path.
+   *
+   * Historically this allowed zero-content documents to become "ready", which
+   * can hide extraction failures. Keep the method for compatibility, but fail
+   * closed so callers must use markSkipped with an explicit reason.
    */
   async markReadyWithoutContent(documentId: string): Promise<TransitionResult> {
-    return this.transition(documentId, "enriching", "ready", { chunksCount: 0 });
+    const reason =
+      "markReadyWithoutContent is deprecated; use markSkipped with explicit reason";
+    logger.error("[DocumentStateManager] Deprecated transition blocked", {
+      documentId,
+      reason,
+    });
+    return {
+      success: false,
+      documentId,
+      fromStatus: "enriching",
+      toStatus: "ready",
+      reason,
+    };
   }
 }
 

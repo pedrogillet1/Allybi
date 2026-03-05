@@ -54,6 +54,14 @@ function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, "utf8"));
 }
 
+function toPosixPath(input) {
+  return String(input || "").replace(/\\/g, "/");
+}
+
+function toPosixRelativePath(from, to) {
+  return toPosixPath(path.relative(from, to));
+}
+
 /**
  * Recursively collect all .json files under a directory.
  */
@@ -111,7 +119,7 @@ const parsedBanks = []; // { filePath, relPath, data, isEntitySchema }
 const parseErrors = [];
 
 for (const filePath of allDiFiles) {
-  const relPath = path.relative(dataBanksRoot, filePath);
+  const relPath = toPosixRelativePath(dataBanksRoot, filePath);
   const isEntitySchema = filePath.endsWith(".entities.schema.json");
 
   let data;
@@ -180,7 +188,7 @@ try {
 const registryByPath = new Map();
 const registryById = new Map();
 for (const b of registry.banks || []) {
-  if (b.path) registryByPath.set(String(b.path), b);
+  if (b.path) registryByPath.set(toPosixPath(b.path), b);
   if (b.id) registryById.set(String(b.id), b);
 }
 
@@ -207,7 +215,7 @@ for (const { relPath, data } of diBanksForRegistry) {
 // Registry entries pointing to DI paths that have no file on disk.
 const diRegistryPaths = [...registryByPath.entries()]
   .filter(([p]) => p.startsWith("document_intelligence/"))
-  .map(([p]) => p);
+  .map(([p]) => toPosixPath(p));
 const diskRelPaths = new Set(parsedBanks.map((b) => b.relPath));
 const missingOnDisk = diRegistryPaths.filter((p) => !diskRelPaths.has(p));
 

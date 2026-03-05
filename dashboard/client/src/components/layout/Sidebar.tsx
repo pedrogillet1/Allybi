@@ -9,6 +9,8 @@ import {
   DollarSign,
   Activity,
   Shield,
+  Radar,
+  Bell,
 } from "lucide-react";
 
 interface NavItem {
@@ -26,6 +28,8 @@ const navItems: NavItem[] = [
   { label: "LLM / Cost", href: "/admin/llm", icon: DollarSign },
   { label: "Reliability", href: "/admin/reliability", icon: Activity },
   { label: "Security", href: "/admin/security", icon: Shield },
+  { label: "Trace Tail", href: "/admin/live/traces", icon: Radar },
+  { label: "Alerts", href: "/admin/alerts", icon: Bell },
 ];
 
 export function Sidebar() {

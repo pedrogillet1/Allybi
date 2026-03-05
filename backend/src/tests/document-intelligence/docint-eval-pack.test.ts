@@ -15,40 +15,22 @@ const domainCatalogRoot = path.join(
   "document_intelligence",
   "domains",
 );
+const legacyDocTypeAliasesPath = path.join(
+  evalRoot,
+  "suites",
+  "legacy_doc_type_aliases.any.json",
+);
 
-const LEGACY_DOC_TYPE_ALIASES: Record<string, Record<string, string>> = {
-  education: {
-    education_diploma_certificate: "edu_diploma_certificate",
-    education_enrollment_letter: "edu_enrollment_letter",
-    education_transcript: "edu_transcript",
-  },
-  housing: {
-    housing_lease_agreement: "housing_lease_summary",
-  },
-  hr_payroll: {
-    hr_payroll_employment_contract: "hr_employment_verification_letter",
-    hr_payroll_payslip: "hr_pay_stub",
-    hr_payroll_timesheet: "hr_timesheet",
-  },
-  identity: {
-    identity_driver_license: "id_driver_license",
-    identity_national_id: "id_business_registration_certificate",
-    identity_passport: "id_passport",
-  },
-  insurance: {
-    insurance_claim_form: "ins_claim_submission",
-    insurance_policy_document: "ins_policy_document",
-    insurance_premium_notice: "ins_premium_invoice",
-  },
-  tax: {
-    tax_payment_receipt: "tax_payment_slip",
-    tax_return_business: "tax_assessment_notice",
-    tax_return_individual: "tax_individual_income_return",
-  },
-  travel: {
-    travel_hotel_receipt: "travel_hotel_booking_confirmation",
-  },
-};
+function loadLegacyDocTypeAliases(): Record<string, Record<string, string>> {
+  if (!fs.existsSync(legacyDocTypeAliasesPath)) return {};
+  const parsed = JSON.parse(
+    fs.readFileSync(legacyDocTypeAliasesPath, "utf8"),
+  ) as unknown;
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return {};
+  return parsed as Record<string, Record<string, string>>;
+}
+
+const LEGACY_DOC_TYPE_ALIASES = loadLegacyDocTypeAliases();
 
 // ── Helpers ────────────────────────────────────────────────────────────
 
@@ -213,6 +195,7 @@ describe("Document Intelligence Eval Pack", () => {
     Number.isFinite(Number(registry?.config?.parityTolerancePercent))
       ? Number(registry.config.parityTolerancePercent) / 100
       : 0.1;
+  const parityTolerancePctLabel = Math.round(parityTolerance * 100);
   const docTypeCatalogs = loadDocTypeCatalogs();
   const suites: Suite[] = registry.suites || [];
   const knownDomains = new Set(
@@ -225,6 +208,10 @@ describe("Document Intelligence Eval Pack", () => {
 
   test("suite registry exists and has suites", () => {
     expect(suites.length).toBeGreaterThan(0);
+  });
+
+  test("legacy doc-type alias SSOT exists", () => {
+    expect(fs.existsSync(legacyDocTypeAliasesPath)).toBe(true);
   });
 
   test("suite registry schema definition is present", () => {
@@ -334,7 +321,7 @@ describe("Document Intelligence Eval Pack", () => {
         expect(ratio).toBeGreaterThanOrEqual(MIN_NEGATIVE_RATIO);
       });
 
-      test("EN/PT parity within 10% tolerance", () => {
+      test(`EN/PT parity within ${parityTolerancePctLabel}% tolerance`, () => {
         const enCount = cases.filter((c) => c.lang === "en").length;
         const ptCount = cases.filter((c) => c.lang === "pt").length;
         if (cases.length === 0) return;

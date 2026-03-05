@@ -1,6 +1,7 @@
 /**
  * Pipeline types — typed timings, progress helpers, and shared interfaces.
  */
+import type { SkipCode } from "./skipCodes";
 
 // ---------------------------------------------------------------------------
 // PipelineTimings — discriminated union with `skipped` flag
@@ -25,6 +26,7 @@ interface BasePipelineTimings {
   chunkCount: number;
   embeddingMs: number;
   pageCount: number | null;
+  peakRssMb?: number | null;
   /** SHA256 of the raw file buffer, computed after download */
   fileHash?: string;
 }
@@ -33,7 +35,7 @@ export interface SkippedPipelineTimings extends BasePipelineTimings {
   skipped: true;
   skipReason: string;
   /** Structured error code for categorized tracking (e.g. "NO_TEXT_CONTENT", "FILE_CORRUPTED") */
-  skipCode?: string;
+  skipCode?: SkipCode;
 }
 
 export interface CompletedPipelineTimings extends BasePipelineTimings {
@@ -69,10 +71,17 @@ export interface InputChunkMetadata {
   tableId?: string;
   rowIndex?: number;
   columnIndex?: number;
+  rowSpan?: number;
+  colSpan?: number;
+  isMergedContinuation?: boolean;
   headerPath?: string[];
   unitRaw?: string;
   unitNormalized?: string;
   numericValue?: number;
+  periodYear?: number;
+  periodMonth?: number;
+  periodQuarter?: number;
+  periodTokens?: string[];
   scaleRaw?: string;
   scaleMultiplier?: number;
   startChar?: number;

@@ -1764,6 +1764,1670 @@
         "Are obligations and remedies clearly defined?",
         "As obrigações e remédios estão claramente definidos?"
       ]
+    },
+    {
+      "id": "legal_acceptable_use_policy",
+      "label": "Acceptable Use Policy",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "expectedTableFamilies": [
+        "Defined terms table",
+        "Tabela de termos definidos",
+        "Obligation matrix",
+        "Matriz de obrigações",
+        "Dates and notices schedule",
+        "Cronograma de datas e notificações"
+      ],
+      "fieldFamilies": [
+        "Party identifiers",
+        "Identificadores das partes",
+        "Clause references",
+        "Referências de cláusulas",
+        "Dates and deadlines",
+        "Datas e prazos",
+        "Signatures and witnesses",
+        "Assinaturas e testemunhas"
+      ],
+      "redFlags": [
+        "Missing governing law",
+        "Ausência de lei aplicável",
+        "Uncapped liability",
+        "Responsabilidade sem limite",
+        "Ambiguous termination rights",
+        "Direitos de rescisão ambíguos",
+        "Unsigned annexes",
+        "Anexos sem assinatura"
+      ],
+      "missingQuestions": [
+        "Are all parties correctly identified and represented?",
+        "Todas as partes estão corretamente identificadas e representadas?",
+        "Which clauses carry unusual liability exposure?",
+        "Quais cláusulas trazem exposição de responsabilidade incomum?",
+        "Is the execution block complete and valid?",
+        "O bloco de assinatura está completo e válido?"
+      ]
+    },
+    {
+      "id": "legal_baa",
+      "label": "Baa",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "expectedTableFamilies": [
+        "Defined terms table",
+        "Tabela de termos definidos",
+        "Obligation matrix",
+        "Matriz de obrigações",
+        "Dates and notices schedule",
+        "Cronograma de datas e notificações"
+      ],
+      "fieldFamilies": [
+        "Party identifiers",
+        "Identificadores das partes",
+        "Clause references",
+        "Referências de cláusulas",
+        "Dates and deadlines",
+        "Datas e prazos",
+        "Signatures and witnesses",
+        "Assinaturas e testemunhas"
+      ],
+      "redFlags": [
+        "Missing governing law",
+        "Ausência de lei aplicável",
+        "Uncapped liability",
+        "Responsabilidade sem limite",
+        "Ambiguous termination rights",
+        "Direitos de rescisão ambíguos",
+        "Unsigned annexes",
+        "Anexos sem assinatura"
+      ],
+      "missingQuestions": [
+        "Are all parties correctly identified and represented?",
+        "Todas as partes estão corretamente identificadas e representadas?",
+        "Which clauses carry unusual liability exposure?",
+        "Quais cláusulas trazem exposição de responsabilidade incomum?",
+        "Is the execution block complete and valid?",
+        "O bloco de assinatura está completo e válido?"
+      ]
+    },
+    {
+      "id": "legal_board_minutes",
+      "label": "Board Minutes",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "expectedTableFamilies": [
+        "Defined terms table",
+        "Tabela de termos definidos",
+        "Obligation matrix",
+        "Matriz de obrigações",
+        "Dates and notices schedule",
+        "Cronograma de datas e notificações"
+      ],
+      "fieldFamilies": [
+        "Party identifiers",
+        "Identificadores das partes",
+        "Clause references",
+        "Referências de cláusulas",
+        "Dates and deadlines",
+        "Datas e prazos",
+        "Signatures and witnesses",
+        "Assinaturas e testemunhas"
+      ],
+      "redFlags": [
+        "Missing governing law",
+        "Ausência de lei aplicável",
+        "Uncapped liability",
+        "Responsabilidade sem limite",
+        "Ambiguous termination rights",
+        "Direitos de rescisão ambíguos",
+        "Unsigned annexes",
+        "Anexos sem assinatura"
+      ],
+      "missingQuestions": [
+        "Are all parties correctly identified and represented?",
+        "Todas as partes estão corretamente identificadas e representadas?",
+        "Which clauses carry unusual liability exposure?",
+        "Quais cláusulas trazem exposição de responsabilidade incomum?",
+        "Is the execution block complete and valid?",
+        "O bloco de assinatura está completo e válido?"
+      ]
+    },
+    {
+      "id": "legal_bylaws_charter",
+      "label": "Bylaws Charter",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "expectedTableFamilies": [
+        "Defined terms table",
+        "Tabela de termos definidos",
+        "Obligation matrix",
+        "Matriz de obrigações",
+        "Dates and notices schedule",
+        "Cronograma de datas e notificações"
+      ],
+      "fieldFamilies": [
+        "Party identifiers",
+        "Identificadores das partes",
+        "Clause references",
+        "Referências de cláusulas",
+        "Dates and deadlines",
+        "Datas e prazos",
+        "Signatures and witnesses",
+        "Assinaturas e testemunhas"
+      ],
+      "redFlags": [
+        "Missing governing law",
+        "Ausência de lei aplicável",
+        "Uncapped liability",
+        "Responsabilidade sem limite",
+        "Ambiguous termination rights",
+        "Direitos de rescisão ambíguos",
+        "Unsigned annexes",
+        "Anexos sem assinatura"
+      ],
+      "missingQuestions": [
+        "Are all parties correctly identified and represented?",
+        "Todas as partes estão corretamente identificadas e representadas?",
+        "Which clauses carry unusual liability exposure?",
+        "Quais cláusulas trazem exposição de responsabilidade incomum?",
+        "Is the execution block complete and valid?",
+        "O bloco de assinatura está completo e válido?"
+      ]
+    },
+    {
+      "id": "legal_code_of_conduct",
+      "label": "Code Of Conduct",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "expectedTableFamilies": [
+        "Defined terms table",
+        "Tabela de termos definidos",
+        "Obligation matrix",
+        "Matriz de obrigações",
+        "Dates and notices schedule",
+        "Cronograma de datas e notificações"
+      ],
+      "fieldFamilies": [
+        "Party identifiers",
+        "Identificadores das partes",
+        "Clause references",
+        "Referências de cláusulas",
+        "Dates and deadlines",
+        "Datas e prazos",
+        "Signatures and witnesses",
+        "Assinaturas e testemunhas"
+      ],
+      "redFlags": [
+        "Missing governing law",
+        "Ausência de lei aplicável",
+        "Uncapped liability",
+        "Responsabilidade sem limite",
+        "Ambiguous termination rights",
+        "Direitos de rescisão ambíguos",
+        "Unsigned annexes",
+        "Anexos sem assinatura"
+      ],
+      "missingQuestions": [
+        "Are all parties correctly identified and represented?",
+        "Todas as partes estão corretamente identificadas e representadas?",
+        "Which clauses carry unusual liability exposure?",
+        "Quais cláusulas trazem exposição de responsabilidade incomum?",
+        "Is the execution block complete and valid?",
+        "O bloco de assinatura está completo e válido?"
+      ]
+    },
+    {
+      "id": "legal_contractor_agreement",
+      "label": "Contractor Agreement",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "expectedTableFamilies": [
+        "Defined terms table",
+        "Tabela de termos definidos",
+        "Obligation matrix",
+        "Matriz de obrigações",
+        "Dates and notices schedule",
+        "Cronograma de datas e notificações"
+      ],
+      "fieldFamilies": [
+        "Party identifiers",
+        "Identificadores das partes",
+        "Clause references",
+        "Referências de cláusulas",
+        "Dates and deadlines",
+        "Datas e prazos",
+        "Signatures and witnesses",
+        "Assinaturas e testemunhas"
+      ],
+      "redFlags": [
+        "Missing governing law",
+        "Ausência de lei aplicável",
+        "Uncapped liability",
+        "Responsabilidade sem limite",
+        "Ambiguous termination rights",
+        "Direitos de rescisão ambíguos",
+        "Unsigned annexes",
+        "Anexos sem assinatura"
+      ],
+      "missingQuestions": [
+        "Are all parties correctly identified and represented?",
+        "Todas as partes estão corretamente identificadas e representadas?",
+        "Which clauses carry unusual liability exposure?",
+        "Quais cláusulas trazem exposição de responsabilidade incomum?",
+        "Is the execution block complete and valid?",
+        "O bloco de assinatura está completo e válido?"
+      ]
+    },
+    {
+      "id": "legal_cookie_policy",
+      "label": "Cookie Policy",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "expectedTableFamilies": [
+        "Defined terms table",
+        "Tabela de termos definidos",
+        "Obligation matrix",
+        "Matriz de obrigações",
+        "Dates and notices schedule",
+        "Cronograma de datas e notificações"
+      ],
+      "fieldFamilies": [
+        "Party identifiers",
+        "Identificadores das partes",
+        "Clause references",
+        "Referências de cláusulas",
+        "Dates and deadlines",
+        "Datas e prazos",
+        "Signatures and witnesses",
+        "Assinaturas e testemunhas"
+      ],
+      "redFlags": [
+        "Missing governing law",
+        "Ausência de lei aplicável",
+        "Uncapped liability",
+        "Responsabilidade sem limite",
+        "Ambiguous termination rights",
+        "Direitos de rescisão ambíguos",
+        "Unsigned annexes",
+        "Anexos sem assinatura"
+      ],
+      "missingQuestions": [
+        "Are all parties correctly identified and represented?",
+        "Todas as partes estão corretamente identificadas e representadas?",
+        "Which clauses carry unusual liability exposure?",
+        "Quais cláusulas trazem exposição de responsabilidade incomum?",
+        "Is the execution block complete and valid?",
+        "O bloco de assinatura está completo e válido?"
+      ]
+    },
+    {
+      "id": "legal_court_order",
+      "label": "Court Order",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "expectedTableFamilies": [
+        "Defined terms table",
+        "Tabela de termos definidos",
+        "Obligation matrix",
+        "Matriz de obrigações",
+        "Dates and notices schedule",
+        "Cronograma de datas e notificações"
+      ],
+      "fieldFamilies": [
+        "Party identifiers",
+        "Identificadores das partes",
+        "Clause references",
+        "Referências de cláusulas",
+        "Dates and deadlines",
+        "Datas e prazos",
+        "Signatures and witnesses",
+        "Assinaturas e testemunhas"
+      ],
+      "redFlags": [
+        "Missing governing law",
+        "Ausência de lei aplicável",
+        "Uncapped liability",
+        "Responsabilidade sem limite",
+        "Ambiguous termination rights",
+        "Direitos de rescisão ambíguos",
+        "Unsigned annexes",
+        "Anexos sem assinatura"
+      ],
+      "missingQuestions": [
+        "Are all parties correctly identified and represented?",
+        "Todas as partes estão corretamente identificadas e representadas?",
+        "Which clauses carry unusual liability exposure?",
+        "Quais cláusulas trazem exposição de responsabilidade incomum?",
+        "Is the execution block complete and valid?",
+        "O bloco de assinatura está completo e válido?"
+      ]
+    },
+    {
+      "id": "legal_data_retention_policy",
+      "label": "Data Retention Policy",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "expectedTableFamilies": [
+        "Defined terms table",
+        "Tabela de termos definidos",
+        "Obligation matrix",
+        "Matriz de obrigações",
+        "Dates and notices schedule",
+        "Cronograma de datas e notificações"
+      ],
+      "fieldFamilies": [
+        "Party identifiers",
+        "Identificadores das partes",
+        "Clause references",
+        "Referências de cláusulas",
+        "Dates and deadlines",
+        "Datas e prazos",
+        "Signatures and witnesses",
+        "Assinaturas e testemunhas"
+      ],
+      "redFlags": [
+        "Missing governing law",
+        "Ausência de lei aplicável",
+        "Uncapped liability",
+        "Responsabilidade sem limite",
+        "Ambiguous termination rights",
+        "Direitos de rescisão ambíguos",
+        "Unsigned annexes",
+        "Anexos sem assinatura"
+      ],
+      "missingQuestions": [
+        "Are all parties correctly identified and represented?",
+        "Todas as partes estão corretamente identificadas e representadas?",
+        "Which clauses carry unusual liability exposure?",
+        "Quais cláusulas trazem exposição de responsabilidade incomum?",
+        "Is the execution block complete and valid?",
+        "O bloco de assinatura está completo e válido?"
+      ]
+    },
+    {
+      "id": "legal_dpa",
+      "label": "Dpa",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "expectedTableFamilies": [
+        "Defined terms table",
+        "Tabela de termos definidos",
+        "Obligation matrix",
+        "Matriz de obrigações",
+        "Dates and notices schedule",
+        "Cronograma de datas e notificações"
+      ],
+      "fieldFamilies": [
+        "Party identifiers",
+        "Identificadores das partes",
+        "Clause references",
+        "Referências de cláusulas",
+        "Dates and deadlines",
+        "Datas e prazos",
+        "Signatures and witnesses",
+        "Assinaturas e testemunhas"
+      ],
+      "redFlags": [
+        "Missing governing law",
+        "Ausência de lei aplicável",
+        "Uncapped liability",
+        "Responsabilidade sem limite",
+        "Ambiguous termination rights",
+        "Direitos de rescisão ambíguos",
+        "Unsigned annexes",
+        "Anexos sem assinatura"
+      ],
+      "missingQuestions": [
+        "Are all parties correctly identified and represented?",
+        "Todas as partes estão corretamente identificadas e representadas?",
+        "Which clauses carry unusual liability exposure?",
+        "Quais cláusulas trazem exposição de responsabilidade incomum?",
+        "Is the execution block complete and valid?",
+        "O bloco de assinatura está completo e válido?"
+      ]
+    },
+    {
+      "id": "legal_eula",
+      "label": "Eula",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "expectedTableFamilies": [
+        "Defined terms table",
+        "Tabela de termos definidos",
+        "Obligation matrix",
+        "Matriz de obrigações",
+        "Dates and notices schedule",
+        "Cronograma de datas e notificações"
+      ],
+      "fieldFamilies": [
+        "Party identifiers",
+        "Identificadores das partes",
+        "Clause references",
+        "Referências de cláusulas",
+        "Dates and deadlines",
+        "Datas e prazos",
+        "Signatures and witnesses",
+        "Assinaturas e testemunhas"
+      ],
+      "redFlags": [
+        "Missing governing law",
+        "Ausência de lei aplicável",
+        "Uncapped liability",
+        "Responsabilidade sem limite",
+        "Ambiguous termination rights",
+        "Direitos de rescisão ambíguos",
+        "Unsigned annexes",
+        "Anexos sem assinatura"
+      ],
+      "missingQuestions": [
+        "Are all parties correctly identified and represented?",
+        "Todas as partes estão corretamente identificadas e representadas?",
+        "Which clauses carry unusual liability exposure?",
+        "Quais cláusulas trazem exposição de responsabilidade incomum?",
+        "Is the execution block complete and valid?",
+        "O bloco de assinatura está completo e válido?"
+      ]
+    },
+    {
+      "id": "legal_license_agreement",
+      "label": "License Agreement",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "expectedTableFamilies": [
+        "Defined terms table",
+        "Tabela de termos definidos",
+        "Obligation matrix",
+        "Matriz de obrigações",
+        "Dates and notices schedule",
+        "Cronograma de datas e notificações"
+      ],
+      "fieldFamilies": [
+        "Party identifiers",
+        "Identificadores das partes",
+        "Clause references",
+        "Referências de cláusulas",
+        "Dates and deadlines",
+        "Datas e prazos",
+        "Signatures and witnesses",
+        "Assinaturas e testemunhas"
+      ],
+      "redFlags": [
+        "Missing governing law",
+        "Ausência de lei aplicável",
+        "Uncapped liability",
+        "Responsabilidade sem limite",
+        "Ambiguous termination rights",
+        "Direitos de rescisão ambíguos",
+        "Unsigned annexes",
+        "Anexos sem assinatura"
+      ],
+      "missingQuestions": [
+        "Are all parties correctly identified and represented?",
+        "Todas as partes estão corretamente identificadas e representadas?",
+        "Which clauses carry unusual liability exposure?",
+        "Quais cláusulas trazem exposição de responsabilidade incomum?",
+        "Is the execution block complete and valid?",
+        "O bloco de assinatura está completo e válido?"
+      ]
+    },
+    {
+      "id": "legal_litigation_memo",
+      "label": "Litigation Memo",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "expectedTableFamilies": [
+        "Defined terms table",
+        "Tabela de termos definidos",
+        "Obligation matrix",
+        "Matriz de obrigações",
+        "Dates and notices schedule",
+        "Cronograma de datas e notificações"
+      ],
+      "fieldFamilies": [
+        "Party identifiers",
+        "Identificadores das partes",
+        "Clause references",
+        "Referências de cláusulas",
+        "Dates and deadlines",
+        "Datas e prazos",
+        "Signatures and witnesses",
+        "Assinaturas e testemunhas"
+      ],
+      "redFlags": [
+        "Missing governing law",
+        "Ausência de lei aplicável",
+        "Uncapped liability",
+        "Responsabilidade sem limite",
+        "Ambiguous termination rights",
+        "Direitos de rescisão ambíguos",
+        "Unsigned annexes",
+        "Anexos sem assinatura"
+      ],
+      "missingQuestions": [
+        "Are all parties correctly identified and represented?",
+        "Todas as partes estão corretamente identificadas e representadas?",
+        "Which clauses carry unusual liability exposure?",
+        "Quais cláusulas trazem exposição de responsabilidade incomum?",
+        "Is the execution block complete and valid?",
+        "O bloco de assinatura está completo e válido?"
+      ]
+    },
+    {
+      "id": "legal_motion_brief",
+      "label": "Motion Brief",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "expectedTableFamilies": [
+        "Defined terms table",
+        "Tabela de termos definidos",
+        "Obligation matrix",
+        "Matriz de obrigações",
+        "Dates and notices schedule",
+        "Cronograma de datas e notificações"
+      ],
+      "fieldFamilies": [
+        "Party identifiers",
+        "Identificadores das partes",
+        "Clause references",
+        "Referências de cláusulas",
+        "Dates and deadlines",
+        "Datas e prazos",
+        "Signatures and witnesses",
+        "Assinaturas e testemunhas"
+      ],
+      "redFlags": [
+        "Missing governing law",
+        "Ausência de lei aplicável",
+        "Uncapped liability",
+        "Responsabilidade sem limite",
+        "Ambiguous termination rights",
+        "Direitos de rescisão ambíguos",
+        "Unsigned annexes",
+        "Anexos sem assinatura"
+      ],
+      "missingQuestions": [
+        "Are all parties correctly identified and represented?",
+        "Todas as partes estão corretamente identificadas e representadas?",
+        "Which clauses carry unusual liability exposure?",
+        "Quais cláusulas trazem exposição de responsabilidade incomum?",
+        "Is the execution block complete and valid?",
+        "O bloco de assinatura está completo e válido?"
+      ]
+    },
+    {
+      "id": "legal_msa",
+      "label": "Msa",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "expectedTableFamilies": [
+        "Defined terms table",
+        "Tabela de termos definidos",
+        "Obligation matrix",
+        "Matriz de obrigações",
+        "Dates and notices schedule",
+        "Cronograma de datas e notificações"
+      ],
+      "fieldFamilies": [
+        "Party identifiers",
+        "Identificadores das partes",
+        "Clause references",
+        "Referências de cláusulas",
+        "Dates and deadlines",
+        "Datas e prazos",
+        "Signatures and witnesses",
+        "Assinaturas e testemunhas"
+      ],
+      "redFlags": [
+        "Missing governing law",
+        "Ausência de lei aplicável",
+        "Uncapped liability",
+        "Responsabilidade sem limite",
+        "Ambiguous termination rights",
+        "Direitos de rescisão ambíguos",
+        "Unsigned annexes",
+        "Anexos sem assinatura"
+      ],
+      "missingQuestions": [
+        "Are all parties correctly identified and represented?",
+        "Todas as partes estão corretamente identificadas e representadas?",
+        "Which clauses carry unusual liability exposure?",
+        "Quais cláusulas trazem exposição de responsabilidade incomum?",
+        "Is the execution block complete and valid?",
+        "O bloco de assinatura está completo e válido?"
+      ]
+    },
+    {
+      "id": "legal_nda",
+      "label": "Nda",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "expectedTableFamilies": [
+        "Defined terms table",
+        "Tabela de termos definidos",
+        "Obligation matrix",
+        "Matriz de obrigações",
+        "Dates and notices schedule",
+        "Cronograma de datas e notificações"
+      ],
+      "fieldFamilies": [
+        "Party identifiers",
+        "Identificadores das partes",
+        "Clause references",
+        "Referências de cláusulas",
+        "Dates and deadlines",
+        "Datas e prazos",
+        "Signatures and witnesses",
+        "Assinaturas e testemunhas"
+      ],
+      "redFlags": [
+        "Missing governing law",
+        "Ausência de lei aplicável",
+        "Uncapped liability",
+        "Responsabilidade sem limite",
+        "Ambiguous termination rights",
+        "Direitos de rescisão ambíguos",
+        "Unsigned annexes",
+        "Anexos sem assinatura"
+      ],
+      "missingQuestions": [
+        "Are all parties correctly identified and represented?",
+        "Todas as partes estão corretamente identificadas e representadas?",
+        "Which clauses carry unusual liability exposure?",
+        "Quais cláusulas trazem exposição de responsabilidade incomum?",
+        "Is the execution block complete and valid?",
+        "O bloco de assinatura está completo e válido?"
+      ]
+    },
+    {
+      "id": "legal_offer_letter",
+      "label": "Offer Letter",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "expectedTableFamilies": [
+        "Defined terms table",
+        "Tabela de termos definidos",
+        "Obligation matrix",
+        "Matriz de obrigações",
+        "Dates and notices schedule",
+        "Cronograma de datas e notificações"
+      ],
+      "fieldFamilies": [
+        "Party identifiers",
+        "Identificadores das partes",
+        "Clause references",
+        "Referências de cláusulas",
+        "Dates and deadlines",
+        "Datas e prazos",
+        "Signatures and witnesses",
+        "Assinaturas e testemunhas"
+      ],
+      "redFlags": [
+        "Missing governing law",
+        "Ausência de lei aplicável",
+        "Uncapped liability",
+        "Responsabilidade sem limite",
+        "Ambiguous termination rights",
+        "Direitos de rescisão ambíguos",
+        "Unsigned annexes",
+        "Anexos sem assinatura"
+      ],
+      "missingQuestions": [
+        "Are all parties correctly identified and represented?",
+        "Todas as partes estão corretamente identificadas e representadas?",
+        "Which clauses carry unusual liability exposure?",
+        "Quais cláusulas trazem exposição de responsabilidade incomum?",
+        "Is the execution block complete and valid?",
+        "O bloco de assinatura está completo e válido?"
+      ]
+    },
+    {
+      "id": "legal_partnership_jv",
+      "label": "Partnership Jv",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "expectedTableFamilies": [
+        "Defined terms table",
+        "Tabela de termos definidos",
+        "Obligation matrix",
+        "Matriz de obrigações",
+        "Dates and notices schedule",
+        "Cronograma de datas e notificações"
+      ],
+      "fieldFamilies": [
+        "Party identifiers",
+        "Identificadores das partes",
+        "Clause references",
+        "Referências de cláusulas",
+        "Dates and deadlines",
+        "Datas e prazos",
+        "Signatures and witnesses",
+        "Assinaturas e testemunhas"
+      ],
+      "redFlags": [
+        "Missing governing law",
+        "Ausência de lei aplicável",
+        "Uncapped liability",
+        "Responsabilidade sem limite",
+        "Ambiguous termination rights",
+        "Direitos de rescisão ambíguos",
+        "Unsigned annexes",
+        "Anexos sem assinatura"
+      ],
+      "missingQuestions": [
+        "Are all parties correctly identified and represented?",
+        "Todas as partes estão corretamente identificadas e representadas?",
+        "Which clauses carry unusual liability exposure?",
+        "Quais cláusulas trazem exposição de responsabilidade incomum?",
+        "Is the execution block complete and valid?",
+        "O bloco de assinatura está completo e válido?"
+      ]
+    },
+    {
+      "id": "legal_privacy_policy",
+      "label": "Privacy Policy",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "expectedTableFamilies": [
+        "Defined terms table",
+        "Tabela de termos definidos",
+        "Obligation matrix",
+        "Matriz de obrigações",
+        "Dates and notices schedule",
+        "Cronograma de datas e notificações"
+      ],
+      "fieldFamilies": [
+        "Party identifiers",
+        "Identificadores das partes",
+        "Clause references",
+        "Referências de cláusulas",
+        "Dates and deadlines",
+        "Datas e prazos",
+        "Signatures and witnesses",
+        "Assinaturas e testemunhas"
+      ],
+      "redFlags": [
+        "Missing governing law",
+        "Ausência de lei aplicável",
+        "Uncapped liability",
+        "Responsabilidade sem limite",
+        "Ambiguous termination rights",
+        "Direitos de rescisão ambíguos",
+        "Unsigned annexes",
+        "Anexos sem assinatura"
+      ],
+      "missingQuestions": [
+        "Are all parties correctly identified and represented?",
+        "Todas as partes estão corretamente identificadas e representadas?",
+        "Which clauses carry unusual liability exposure?",
+        "Quais cláusulas trazem exposição de responsabilidade incomum?",
+        "Is the execution block complete and valid?",
+        "O bloco de assinatura está completo e válido?"
+      ]
+    },
+    {
+      "id": "legal_reseller_distribution",
+      "label": "Reseller Distribution",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "expectedTableFamilies": [
+        "Defined terms table",
+        "Tabela de termos definidos",
+        "Obligation matrix",
+        "Matriz de obrigações",
+        "Dates and notices schedule",
+        "Cronograma de datas e notificações"
+      ],
+      "fieldFamilies": [
+        "Party identifiers",
+        "Identificadores das partes",
+        "Clause references",
+        "Referências de cláusulas",
+        "Dates and deadlines",
+        "Datas e prazos",
+        "Signatures and witnesses",
+        "Assinaturas e testemunhas"
+      ],
+      "redFlags": [
+        "Missing governing law",
+        "Ausência de lei aplicável",
+        "Uncapped liability",
+        "Responsabilidade sem limite",
+        "Ambiguous termination rights",
+        "Direitos de rescisão ambíguos",
+        "Unsigned annexes",
+        "Anexos sem assinatura"
+      ],
+      "missingQuestions": [
+        "Are all parties correctly identified and represented?",
+        "Todas as partes estão corretamente identificadas e representadas?",
+        "Which clauses carry unusual liability exposure?",
+        "Quais cláusulas trazem exposição de responsabilidade incomum?",
+        "Is the execution block complete and valid?",
+        "O bloco de assinatura está completo e válido?"
+      ]
+    },
+    {
+      "id": "legal_security_policy",
+      "label": "Security Policy",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "expectedTableFamilies": [
+        "Defined terms table",
+        "Tabela de termos definidos",
+        "Obligation matrix",
+        "Matriz de obrigações",
+        "Dates and notices schedule",
+        "Cronograma de datas e notificações"
+      ],
+      "fieldFamilies": [
+        "Party identifiers",
+        "Identificadores das partes",
+        "Clause references",
+        "Referências de cláusulas",
+        "Dates and deadlines",
+        "Datas e prazos",
+        "Signatures and witnesses",
+        "Assinaturas e testemunhas"
+      ],
+      "redFlags": [
+        "Missing governing law",
+        "Ausência de lei aplicável",
+        "Uncapped liability",
+        "Responsabilidade sem limite",
+        "Ambiguous termination rights",
+        "Direitos de rescisão ambíguos",
+        "Unsigned annexes",
+        "Anexos sem assinatura"
+      ],
+      "missingQuestions": [
+        "Are all parties correctly identified and represented?",
+        "Todas as partes estão corretamente identificadas e representadas?",
+        "Which clauses carry unusual liability exposure?",
+        "Quais cláusulas trazem exposição de responsabilidade incomum?",
+        "Is the execution block complete and valid?",
+        "O bloco de assinatura está completo e válido?"
+      ]
+    },
+    {
+      "id": "legal_settlement_agreement",
+      "label": "Settlement Agreement",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "expectedTableFamilies": [
+        "Defined terms table",
+        "Tabela de termos definidos",
+        "Obligation matrix",
+        "Matriz de obrigações",
+        "Dates and notices schedule",
+        "Cronograma de datas e notificações"
+      ],
+      "fieldFamilies": [
+        "Party identifiers",
+        "Identificadores das partes",
+        "Clause references",
+        "Referências de cláusulas",
+        "Dates and deadlines",
+        "Datas e prazos",
+        "Signatures and witnesses",
+        "Assinaturas e testemunhas"
+      ],
+      "redFlags": [
+        "Missing governing law",
+        "Ausência de lei aplicável",
+        "Uncapped liability",
+        "Responsabilidade sem limite",
+        "Ambiguous termination rights",
+        "Direitos de rescisão ambíguos",
+        "Unsigned annexes",
+        "Anexos sem assinatura"
+      ],
+      "missingQuestions": [
+        "Are all parties correctly identified and represented?",
+        "Todas as partes estão corretamente identificadas e representadas?",
+        "Which clauses carry unusual liability exposure?",
+        "Quais cláusulas trazem exposição de responsabilidade incomum?",
+        "Is the execution block complete and valid?",
+        "O bloco de assinatura está completo e válido?"
+      ]
+    },
+    {
+      "id": "legal_sla",
+      "label": "Sla",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "expectedTableFamilies": [
+        "Defined terms table",
+        "Tabela de termos definidos",
+        "Obligation matrix",
+        "Matriz de obrigações",
+        "Dates and notices schedule",
+        "Cronograma de datas e notificações"
+      ],
+      "fieldFamilies": [
+        "Party identifiers",
+        "Identificadores das partes",
+        "Clause references",
+        "Referências de cláusulas",
+        "Dates and deadlines",
+        "Datas e prazos",
+        "Signatures and witnesses",
+        "Assinaturas e testemunhas"
+      ],
+      "redFlags": [
+        "Missing governing law",
+        "Ausência de lei aplicável",
+        "Uncapped liability",
+        "Responsabilidade sem limite",
+        "Ambiguous termination rights",
+        "Direitos de rescisão ambíguos",
+        "Unsigned annexes",
+        "Anexos sem assinatura"
+      ],
+      "missingQuestions": [
+        "Are all parties correctly identified and represented?",
+        "Todas as partes estão corretamente identificadas e representadas?",
+        "Which clauses carry unusual liability exposure?",
+        "Quais cláusulas trazem exposição de responsabilidade incomum?",
+        "Is the execution block complete and valid?",
+        "O bloco de assinatura está completo e válido?"
+      ]
+    },
+    {
+      "id": "legal_sow",
+      "label": "Sow",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "expectedTableFamilies": [
+        "Defined terms table",
+        "Tabela de termos definidos",
+        "Obligation matrix",
+        "Matriz de obrigações",
+        "Dates and notices schedule",
+        "Cronograma de datas e notificações"
+      ],
+      "fieldFamilies": [
+        "Party identifiers",
+        "Identificadores das partes",
+        "Clause references",
+        "Referências de cláusulas",
+        "Dates and deadlines",
+        "Datas e prazos",
+        "Signatures and witnesses",
+        "Assinaturas e testemunhas"
+      ],
+      "redFlags": [
+        "Missing governing law",
+        "Ausência de lei aplicável",
+        "Uncapped liability",
+        "Responsabilidade sem limite",
+        "Ambiguous termination rights",
+        "Direitos de rescisão ambíguos",
+        "Unsigned annexes",
+        "Anexos sem assinatura"
+      ],
+      "missingQuestions": [
+        "Are all parties correctly identified and represented?",
+        "Todas as partes estão corretamente identificadas e representadas?",
+        "Which clauses carry unusual liability exposure?",
+        "Quais cláusulas trazem exposição de responsabilidade incomum?",
+        "Is the execution block complete and valid?",
+        "O bloco de assinatura está completo e válido?"
+      ]
+    },
+    {
+      "id": "legal_terms_of_service",
+      "label": "Terms Of Service",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "expectedTableFamilies": [
+        "Defined terms table",
+        "Tabela de termos definidos",
+        "Obligation matrix",
+        "Matriz de obrigações",
+        "Dates and notices schedule",
+        "Cronograma de datas e notificações"
+      ],
+      "fieldFamilies": [
+        "Party identifiers",
+        "Identificadores das partes",
+        "Clause references",
+        "Referências de cláusulas",
+        "Dates and deadlines",
+        "Datas e prazos",
+        "Signatures and witnesses",
+        "Assinaturas e testemunhas"
+      ],
+      "redFlags": [
+        "Missing governing law",
+        "Ausência de lei aplicável",
+        "Uncapped liability",
+        "Responsabilidade sem limite",
+        "Ambiguous termination rights",
+        "Direitos de rescisão ambíguos",
+        "Unsigned annexes",
+        "Anexos sem assinatura"
+      ],
+      "missingQuestions": [
+        "Are all parties correctly identified and represented?",
+        "Todas as partes estão corretamente identificadas e representadas?",
+        "Which clauses carry unusual liability exposure?",
+        "Quais cláusulas trazem exposição de responsabilidade incomum?",
+        "Is the execution block complete and valid?",
+        "O bloco de assinatura está completo e válido?"
+      ]
+    },
+    {
+      "id": "legal_written_consent",
+      "label": "Written Consent",
+      "expectedSections": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "headings": [
+        "Document Metadata",
+        "Metadados do Documento",
+        "Parties and Capacity",
+        "Partes e Capacidade",
+        "Core Clauses",
+        "Cláusulas Principais",
+        "Exceptions",
+        "Exceções",
+        "Execution Block",
+        "Bloco de Assinatura"
+      ],
+      "expectedTableFamilies": [
+        "Defined terms table",
+        "Tabela de termos definidos",
+        "Obligation matrix",
+        "Matriz de obrigações",
+        "Dates and notices schedule",
+        "Cronograma de datas e notificações"
+      ],
+      "fieldFamilies": [
+        "Party identifiers",
+        "Identificadores das partes",
+        "Clause references",
+        "Referências de cláusulas",
+        "Dates and deadlines",
+        "Datas e prazos",
+        "Signatures and witnesses",
+        "Assinaturas e testemunhas"
+      ],
+      "redFlags": [
+        "Missing governing law",
+        "Ausência de lei aplicável",
+        "Uncapped liability",
+        "Responsabilidade sem limite",
+        "Ambiguous termination rights",
+        "Direitos de rescisão ambíguos",
+        "Unsigned annexes",
+        "Anexos sem assinatura"
+      ],
+      "missingQuestions": [
+        "Are all parties correctly identified and represented?",
+        "Todas as partes estão corretamente identificadas e representadas?",
+        "Which clauses carry unusual liability exposure?",
+        "Quais cláusulas trazem exposição de responsabilidade incomum?",
+        "Is the execution block complete and valid?",
+        "O bloco de assinatura está completo e válido?"
+      ]
     }
   ]
 }

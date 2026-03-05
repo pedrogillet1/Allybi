@@ -619,6 +619,258 @@
         "\\bencerramento\\s+do\\s+ano\\b"
       ],
       "priority": 73
+    },
+    {
+      "id": "acct_accruals_schedule",
+      "name": {
+        "en": "Acct Accruals Schedule",
+        "pt": "Acct Accruals Schedule"
+      },
+      "description": "Auto-generated catalog entry for acct_accruals_schedule from canonical taxonomy.",
+      "detectionPatterns": [
+        "\\bacct\\\\s\\+accruals\\\\s\\+schedule\\b",
+        "\\baccruals\\\\s\\+schedule\\b"
+      ],
+      "commonSections": [
+        "Executive Summary",
+        "Resumo Executivo",
+        "Scope",
+        "Escopo",
+        "Account Structure",
+        "Estrutura de Contas",
+        "Reconciliation",
+        "Reconciliação",
+        "Controls",
+        "Controles",
+        "Appendix",
+        "Anexos"
+      ],
+      "extractionPriority": 85,
+      "riskTier": "medium"
+    },
+    {
+      "id": "acct_bank_rec",
+      "name": {
+        "en": "Acct Bank Rec",
+        "pt": "Acct Bank Rec"
+      },
+      "description": "Auto-generated catalog entry for acct_bank_rec from canonical taxonomy.",
+      "detectionPatterns": [
+        "\\bacct\\\\s\\+bank\\\\s\\+rec\\b",
+        "\\bbank\\\\s\\+rec\\b"
+      ],
+      "commonSections": [
+        "Executive Summary",
+        "Resumo Executivo",
+        "Scope",
+        "Escopo",
+        "Account Structure",
+        "Estrutura de Contas",
+        "Reconciliation",
+        "Reconciliação",
+        "Controls",
+        "Controles",
+        "Appendix",
+        "Anexos"
+      ],
+      "extractionPriority": 85,
+      "riskTier": "medium"
+    },
+    {
+      "id": "acct_credit_card_reconciliation",
+      "name": {
+        "en": "Acct Credit Card Reconciliation",
+        "pt": "Acct Credit Card Reconciliation"
+      },
+      "description": "Auto-generated catalog entry for acct_credit_card_reconciliation from canonical taxonomy.",
+      "detectionPatterns": [
+        "\\bacct\\\\s\\+credit\\\\s\\+card\\\\s\\+reconciliation\\b",
+        "\\bcredit\\\\s\\+card\\\\s\\+reconciliation\\b"
+      ],
+      "commonSections": [
+        "Executive Summary",
+        "Resumo Executivo",
+        "Scope",
+        "Escopo",
+        "Account Structure",
+        "Estrutura de Contas",
+        "Reconciliation",
+        "Reconciliação",
+        "Controls",
+        "Controles",
+        "Appendix",
+        "Anexos"
+      ],
+      "extractionPriority": 85,
+      "riskTier": "medium"
+    },
+    {
+      "id": "acct_inventory_valuation_report",
+      "name": {
+        "en": "Acct Inventory Valuation Report",
+        "pt": "Acct Inventory Valuation Report"
+      },
+      "description": "Auto-generated catalog entry for acct_inventory_valuation_report from canonical taxonomy.",
+      "detectionPatterns": [
+        "\\bacct\\\\s\\+inventory\\\\s\\+valuation\\\\s\\+report\\b",
+        "\\binventory\\\\s\\+valuation\\\\s\\+report\\b"
+      ],
+      "commonSections": [
+        "Executive Summary",
+        "Resumo Executivo",
+        "Scope",
+        "Escopo",
+        "Account Structure",
+        "Estrutura de Contas",
+        "Reconciliation",
+        "Reconciliação",
+        "Controls",
+        "Controles",
+        "Appendix",
+        "Anexos"
+      ],
+      "extractionPriority": 85,
+      "riskTier": "medium"
+    },
+    {
+      "id": "acct_lease_accounting_schedule",
+      "name": {
+        "en": "Acct Lease Accounting Schedule",
+        "pt": "Acct Lease Accounting Schedule"
+      },
+      "description": "Auto-generated catalog entry for acct_lease_accounting_schedule from canonical taxonomy.",
+      "detectionPatterns": [
+        "\\bacct\\\\s\\+lease\\\\s\\+accounting\\\\s\\+schedule\\b",
+        "\\blease\\\\s\\+accounting\\\\s\\+schedule\\b"
+      ],
+      "commonSections": [
+        "Executive Summary",
+        "Resumo Executivo",
+        "Scope",
+        "Escopo",
+        "Account Structure",
+        "Estrutura de Contas",
+        "Reconciliation",
+        "Reconciliação",
+        "Controls",
+        "Controles",
+        "Appendix",
+        "Anexos"
+      ],
+      "extractionPriority": 85,
+      "riskTier": "medium"
+    },
+    {
+      "id": "acct_management_rep_letter",
+      "name": {
+        "en": "Acct Management Rep Letter",
+        "pt": "Acct Management Rep Letter"
+      },
+      "description": "Auto-generated catalog entry for acct_management_rep_letter from canonical taxonomy.",
+      "detectionPatterns": [
+        "\\bacct\\\\s\\+management\\\\s\\+rep\\\\s\\+letter\\b",
+        "\\bmanagement\\\\s\\+rep\\\\s\\+letter\\b"
+      ],
+      "commonSections": [
+        "Executive Summary",
+        "Resumo Executivo",
+        "Scope",
+        "Escopo",
+        "Account Structure",
+        "Estrutura de Contas",
+        "Reconciliation",
+        "Reconciliação",
+        "Controls",
+        "Controles",
+        "Appendix",
+        "Anexos"
+      ],
+      "extractionPriority": 85,
+      "riskTier": "medium"
+    },
+    {
+      "id": "acct_payment_run_report",
+      "name": {
+        "en": "Acct Payment Run Report",
+        "pt": "Acct Payment Run Report"
+      },
+      "description": "Auto-generated catalog entry for acct_payment_run_report from canonical taxonomy.",
+      "detectionPatterns": [
+        "\\bacct\\\\s\\+payment\\\\s\\+run\\\\s\\+report\\b",
+        "\\bpayment\\\\s\\+run\\\\s\\+report\\b"
+      ],
+      "commonSections": [
+        "Executive Summary",
+        "Resumo Executivo",
+        "Scope",
+        "Escopo",
+        "Account Structure",
+        "Estrutura de Contas",
+        "Reconciliation",
+        "Reconciliação",
+        "Controls",
+        "Controles",
+        "Appendix",
+        "Anexos"
+      ],
+      "extractionPriority": 85,
+      "riskTier": "medium"
+    },
+    {
+      "id": "acct_prepaids_amortization_schedule",
+      "name": {
+        "en": "Acct Prepaids Amortization Schedule",
+        "pt": "Acct Prepaids Amortization Schedule"
+      },
+      "description": "Auto-generated catalog entry for acct_prepaids_amortization_schedule from canonical taxonomy.",
+      "detectionPatterns": [
+        "\\bacct\\\\s\\+prepaids\\\\s\\+amortization\\\\s\\+schedule\\b",
+        "\\bprepaids\\\\s\\+amortization\\\\s\\+schedule\\b"
+      ],
+      "commonSections": [
+        "Executive Summary",
+        "Resumo Executivo",
+        "Scope",
+        "Escopo",
+        "Account Structure",
+        "Estrutura de Contas",
+        "Reconciliation",
+        "Reconciliação",
+        "Controls",
+        "Controles",
+        "Appendix",
+        "Anexos"
+      ],
+      "extractionPriority": 85,
+      "riskTier": "medium"
+    },
+    {
+      "id": "acct_revenue_recognition_schedule",
+      "name": {
+        "en": "Acct Revenue Recognition Schedule",
+        "pt": "Acct Revenue Recognition Schedule"
+      },
+      "description": "Auto-generated catalog entry for acct_revenue_recognition_schedule from canonical taxonomy.",
+      "detectionPatterns": [
+        "\\bacct\\\\s\\+revenue\\\\s\\+recognition\\\\s\\+schedule\\b",
+        "\\brevenue\\\\s\\+recognition\\\\s\\+schedule\\b"
+      ],
+      "commonSections": [
+        "Executive Summary",
+        "Resumo Executivo",
+        "Scope",
+        "Escopo",
+        "Account Structure",
+        "Estrutura de Contas",
+        "Reconciliation",
+        "Reconciliação",
+        "Controls",
+        "Controles",
+        "Appendix",
+        "Anexos"
+      ],
+      "extractionPriority": 85,
+      "riskTier": "medium"
     }
   ]
 }

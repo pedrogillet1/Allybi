@@ -2,6 +2,7 @@ import { describe, expect, test } from "@jest/globals";
 
 import {
   RetrievalEngineService,
+  type EvidenceItem,
   type RetrievalRequest,
 } from "./retrievalEngine.service";
 
@@ -230,6 +231,15 @@ function makeEngine(): RetrievalEngineService {
         ],
       };
     },
+    getCrossDocAlignmentRules() {
+      return {
+        config: {
+          enabled: true,
+          requireExplicitComparisonScope: true,
+          minDocsForCompare: 2,
+        },
+      };
+    },
     getRetrievalBoostRules(domain: Domain) {
       if (domain !== "finance") return { config: {}, rules: [] };
       return {
@@ -381,5 +391,115 @@ describe("RetrievalEngineService telemetry", () => {
     );
     expect(gatedEvent?.payload.requiredExplicitDocs).toBe(2);
     expect(gatedEvent?.payload.actualExplicitDocs).toBe(1);
+  });
+
+  test("post-packaging policy blocks compare when table evidence mixes currency units", () => {
+    const engine = makeEngine();
+    const evidence = [
+      {
+        evidenceType: "table",
+        docId: "fin-budget",
+        locationKey: "loc-1",
+        location: { sectionKey: "variance_analysis" },
+        score: { finalScore: 0.9 },
+        table: {
+          header: ["Metric", "FY25"],
+          rows: [["Revenue", 10]],
+          unitAnnotation: { unitRaw: "$", unitNormalized: "currency_usd" },
+          scaleFactor: "millions",
+        },
+      },
+      {
+        evidenceType: "table",
+        docId: "fin-actual",
+        locationKey: "loc-2",
+        location: { sectionKey: "variance_analysis" },
+        score: { finalScore: 0.86 },
+        table: {
+          header: ["Metric", "FY25"],
+          rows: [["Revenue", 12]],
+          unitAnnotation: { unitRaw: "EUR", unitNormalized: "currency_eur" },
+          scaleFactor: "millions",
+        },
+      },
+    ] as unknown as EvidenceItem[];
+
+    const reason = (engine as any).resolvePostPackagingPolicyReason({
+      evidence,
+      compareIntent: true,
+      signals: { intentFamily: "documents", operator: "compare" },
+    });
+    expect(reason).toBe("cross_doc_currency_alignment_required");
+  });
+
+  test("post-packaging policy uses canonical period tokens to block misaligned compare evidence", () => {
+    const engine = makeEngine();
+    const evidence = [
+      {
+        evidenceType: "table",
+        docId: "fin-budget",
+        locationKey: "loc-1",
+        location: { sectionKey: "variance_analysis" },
+        score: { finalScore: 0.9 },
+        table: {
+          header: ["Metric", "Amount"],
+          rows: [["Revenue", 10]],
+          unitAnnotation: { unitRaw: "$", unitNormalized: "currency_usd" },
+          scaleFactor: "millions",
+          periodTokens: ["Y2025Q1"],
+        },
+      },
+      {
+        evidenceType: "table",
+        docId: "fin-actual",
+        locationKey: "loc-2",
+        location: { sectionKey: "variance_analysis" },
+        score: { finalScore: 0.86 },
+        table: {
+          header: ["Metric", "Amount"],
+          rows: [["Revenue", 12]],
+          unitAnnotation: { unitRaw: "$", unitNormalized: "currency_usd" },
+          scaleFactor: "millions",
+          periodTokens: ["Y2025Q2"],
+        },
+      },
+    ] as unknown as EvidenceItem[];
+
+    const reason = (engine as any).resolvePostPackagingPolicyReason({
+      evidence,
+      compareIntent: true,
+      signals: { intentFamily: "documents", operator: "compare" },
+    });
+    expect(reason).toBe("cross_doc_period_alignment_required");
+  });
+
+  test("post-packaging policy blocks numeric table evidence without unit context when table is expected", () => {
+    const engine = makeEngine();
+    const evidence = [
+      {
+        evidenceType: "table",
+        docId: "fin-budget",
+        locationKey: "loc-1",
+        location: { sectionKey: "variance_analysis" },
+        score: { finalScore: 0.9 },
+        table: {
+          header: ["Metric", "FY25"],
+          rows: [["Revenue", 10]],
+          unitAnnotation: null,
+          scaleFactor: null,
+        },
+      },
+    ] as unknown as EvidenceItem[];
+
+    const reason = (engine as any).resolvePostPackagingPolicyReason({
+      evidence,
+      compareIntent: false,
+      signals: {
+        intentFamily: "documents",
+        operator: "extract",
+        tableExpected: true,
+      },
+    });
+    expect(reason).toBe("numeric_context_missing");
   });
 });

@@ -177,6 +177,116 @@
         "issue_date",
         "issuer_name"
       ]
+    },
+    {
+      "id": "id_birth_certificate",
+      "name": {
+        "en": "Id Birth Certificate",
+        "pt": "Id Birth Certificate"
+      },
+      "description": "Auto-generated catalog entry for id_birth_certificate from canonical taxonomy.",
+      "detectionPatterns": [
+        "\\bid\\\\s\\+birth\\\\s\\+certificate\\b",
+        "\\bbirth\\\\s\\+certificate\\b"
+      ],
+      "commonSections": [
+        "Personal Information",
+        "Informações Pessoais",
+        "Document Details",
+        "Detalhes do Documento",
+        "Validity",
+        "Validade"
+      ],
+      "extractionPriority": 85,
+      "riskTier": "medium"
+    },
+    {
+      "id": "id_marriage_license",
+      "name": {
+        "en": "Id Marriage License",
+        "pt": "Id Marriage License"
+      },
+      "description": "Auto-generated catalog entry for id_marriage_license from canonical taxonomy.",
+      "detectionPatterns": [
+        "\\bid\\\\s\\+marriage\\\\s\\+license\\b",
+        "\\bmarriage\\\\s\\+license\\b"
+      ],
+      "commonSections": [
+        "Personal Information",
+        "Informações Pessoais",
+        "Document Details",
+        "Detalhes do Documento",
+        "Validity",
+        "Validade"
+      ],
+      "extractionPriority": 85,
+      "riskTier": "medium"
+    },
+    {
+      "id": "id_social_security_card",
+      "name": {
+        "en": "Id Social Security Card",
+        "pt": "Id Social Security Card"
+      },
+      "description": "Auto-generated catalog entry for id_social_security_card from canonical taxonomy.",
+      "detectionPatterns": [
+        "\\bid\\\\s\\+social\\\\s\\+security\\\\s\\+card\\b",
+        "\\bsocial\\\\s\\+security\\\\s\\+card\\b"
+      ],
+      "commonSections": [
+        "Personal Information",
+        "Informações Pessoais",
+        "Document Details",
+        "Detalhes do Documento",
+        "Validity",
+        "Validade"
+      ],
+      "extractionPriority": 85,
+      "riskTier": "medium"
+    },
+    {
+      "id": "id_visa",
+      "name": {
+        "en": "Id Visa",
+        "pt": "Id Visa"
+      },
+      "description": "Auto-generated catalog entry for id_visa from canonical taxonomy.",
+      "detectionPatterns": [
+        "\\bid\\\\s\\+visa\\b",
+        "\\bvisa\\b"
+      ],
+      "commonSections": [
+        "Personal Information",
+        "Informações Pessoais",
+        "Document Details",
+        "Detalhes do Documento",
+        "Validity",
+        "Validade"
+      ],
+      "extractionPriority": 85,
+      "riskTier": "medium"
+    },
+    {
+      "id": "id_voter_registration",
+      "name": {
+        "en": "Id Voter Registration",
+        "pt": "Id Voter Registration"
+      },
+      "description": "Auto-generated catalog entry for id_voter_registration from canonical taxonomy.",
+      "detectionPatterns": [
+        "\\bid\\\\s\\+voter\\\\s\\+registration\\b",
+        "\\bvoter\\\\s\\+registration\\b"
+      ],
+      "commonSections": [
+        "Personal Information",
+        "Informações Pessoais",
+        "Document Details",
+        "Detalhes do Documento",
+        "Validity",
+        "Validade"
+      ],
+      "extractionPriority": 85,
+      "riskTier": "medium"
     }
   ]
 }

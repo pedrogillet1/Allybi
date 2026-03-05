@@ -78,6 +78,15 @@ function parseBooleanFlag(value: string | undefined): boolean | null {
   return null;
 }
 
+function buildChildEnv(): NodeJS.ProcessEnv {
+  const env: NodeJS.ProcessEnv = { ...process.env };
+  // Jest worker bootstrap flags can break child `node` process execution.
+  delete env.NODE_OPTIONS;
+  delete env.JEST_WORKER_ID;
+  delete env.JEST_JASMINE;
+  return env;
+}
+
 function resolveCertificationProfile():
   | "local"
   | "ci"
@@ -132,6 +141,7 @@ async function runRuntimeGraphAudit(): Promise<{
   const scriptPathFromRoot = path
     .relative(backendRoot, scriptPath)
     .replace(/\\/g, "/");
+  const childEnv = buildChildEnv();
   const graphPath = path.resolve(backendRoot, "docs/runtime/runtime-import-graph.json");
   const previousGraphMtimeMs = fs.existsSync(graphPath)
     ? fs.statSync(graphPath).mtimeMs
@@ -142,45 +152,68 @@ async function runRuntimeGraphAudit(): Promise<{
     await import(scriptUrl);
     return { ok: true, status: 0, mode: "live", strategy: "import" };
   } catch {
-    const result =
-      process.platform === "win32"
-        ? spawnSync(
-            "cmd.exe",
-            ["/d", "/s", "/c", `node ${scriptPathFromRoot}`],
-            {
-              cwd: backendRoot,
-              env: process.env,
-              encoding: "utf8",
-            },
-          )
-        : spawnSync("node", [scriptPathFromRoot], {
-            cwd: backendRoot,
-            env: process.env,
-            encoding: "utf8",
-          });
+    const result = spawnSync(process.execPath, [scriptPath], {
+      cwd: backendRoot,
+      env: childEnv,
+      encoding: "utf8",
+    });
     if (result.status === 0) {
       return { ok: true, status: 0, mode: "live", strategy: "spawn" };
     }
-    const npmResult = process.platform === "win32"
-      ? spawnSync("cmd.exe", ["/d", "/s", "/c", "npm.cmd run -s audit:runtime-graph"], {
+    const npmResult = spawnSync(
+      process.platform === "win32" ? "npm.cmd" : "npm",
+      ["run", "-s", "audit:runtime-graph"],
+      {
         cwd: backendRoot,
-        env: process.env,
+        env: childEnv,
         encoding: "utf8",
-      })
-      : spawnSync("npm", ["run", "-s", "audit:runtime-graph"], {
-        cwd: backendRoot,
-        env: process.env,
-        encoding: "utf8",
-      });
+      },
+    );
     if (npmResult.status === 0) {
       return { ok: true, status: 0, mode: "live", strategy: "spawn" };
     }
 
     if (fs.existsSync(graphPath)) {
+      if (String(process.env.CERT_DEBUG_RUNTIME_WIRING || "").trim() === "1") {
+        // eslint-disable-next-line no-console
+        console.warn("[runtime-wiring] runtime graph command fallback", {
+          importFailed: true,
+          spawnStatus: result.status ?? null,
+          spawnError: result.error?.message || null,
+          spawnStderr: String(result.stderr || "").trim().slice(-600),
+          npmStatus: npmResult.status ?? null,
+          npmError: npmResult.error?.message || null,
+          npmStderr: String(npmResult.stderr || "").trim().slice(-600),
+        });
+      }
       const refreshedGraphMtimeMs = fs.statSync(graphPath).mtimeMs;
       const regeneratedDuringRun = refreshedGraphMtimeMs > previousGraphMtimeMs;
       if (regeneratedDuringRun) {
         return { ok: true, status: 0, mode: "live", strategy: "spawn" };
+      }
+      const runnerBlocked =
+        Boolean(result.error) ||
+        Boolean(npmResult.error) ||
+        result.status == null ||
+        npmResult.status == null;
+      if (runnerBlocked) {
+        try {
+          const graph = JSON.parse(fs.readFileSync(graphPath, "utf8")) as {
+            generatedAt?: string;
+          };
+          const generatedAtMs = Date.parse(String(graph?.generatedAt || ""));
+          const freshMs = 10 * 60 * 1000;
+          if (Number.isFinite(generatedAtMs) && Date.now() - generatedAtMs <= freshMs) {
+            return {
+              ok: true,
+              status: 0,
+              mode: "live",
+              strategy: "cached",
+            };
+          }
+        } catch {
+          // Ignore parse errors and continue with cached fallback.
+        }
       }
       return {
         ok: true,

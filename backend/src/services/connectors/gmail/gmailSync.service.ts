@@ -41,6 +41,7 @@ export interface GmailSyncResult {
   failedCount: number;
   createdCount: number;
   existingCount: number;
+  updatedCount: number;
   skippedCount: number;
   historyId?: string;
   mode: "initial" | "incremental";
@@ -237,6 +238,9 @@ export class GmailSyncService {
     const existingCount = ingested.filter(
       (item) => item.status === "existing",
     ).length;
+    const updatedCount = ingested.filter(
+      (item) => item.status === "updated",
+    ).length;
     const fetchedCount = docs.length;
     const ingestedCount = successfulItems.length;
     const skippedCount = Math.max(
@@ -268,6 +272,7 @@ export class GmailSyncService {
       failedCount,
       createdCount,
       existingCount,
+      updatedCount,
       skippedCount,
       historyId: cursorFile.providers.gmail.historyId,
       mode,

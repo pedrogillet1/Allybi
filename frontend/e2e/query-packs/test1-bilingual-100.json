@@ -1,0 +1,922 @@
+{
+    "meta":  {
+                 "generatedAt":  "2026-03-05T02:20:00.000Z",
+                 "source":  "static-ci-fixture",
+                 "totalQueries":  100,
+                 "languages":  [
+                                   "pt",
+                                   "en"
+                               ],
+                 "scopePolicy":  "permissive",
+                 "domainHint":  "general_runtime",
+                 "queryProfile":  "latency_probe"
+             },
+    "documents":  [
+
+                  ],
+    "coverage":  {
+
+                 },
+    "queries":  [
+                    {
+                        "id":  "Q001",
+                        "text":  "Consulta 1: forneca uma resposta objetiva sobre o tema 1 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "overview"
+                    },
+                    {
+                        "id":  "Q002",
+                        "text":  "Consulta 2: forneca uma resposta objetiva sobre o tema 2 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "overview"
+                    },
+                    {
+                        "id":  "Q003",
+                        "text":  "Consulta 3: forneca uma resposta objetiva sobre o tema 3 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "overview"
+                    },
+                    {
+                        "id":  "Q004",
+                        "text":  "Consulta 4: forneca uma resposta objetiva sobre o tema 4 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "overview"
+                    },
+                    {
+                        "id":  "Q005",
+                        "text":  "Consulta 5: forneca uma resposta objetiva sobre o tema 5 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "overview"
+                    },
+                    {
+                        "id":  "Q006",
+                        "text":  "Consulta 6: forneca uma resposta objetiva sobre o tema 6 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "overview"
+                    },
+                    {
+                        "id":  "Q007",
+                        "text":  "Consulta 7: forneca uma resposta objetiva sobre o tema 7 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "overview"
+                    },
+                    {
+                        "id":  "Q008",
+                        "text":  "Consulta 8: forneca uma resposta objetiva sobre o tema 8 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "overview"
+                    },
+                    {
+                        "id":  "Q009",
+                        "text":  "Consulta 9: forneca uma resposta objetiva sobre o tema 9 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "overview"
+                    },
+                    {
+                        "id":  "Q010",
+                        "text":  "Consulta 10: forneca uma resposta objetiva sobre o tema 10 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "overview"
+                    },
+                    {
+                        "id":  "Q011",
+                        "text":  "Consulta 11: forneca uma resposta objetiva sobre o tema 1 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "overview"
+                    },
+                    {
+                        "id":  "Q012",
+                        "text":  "Consulta 12: forneca uma resposta objetiva sobre o tema 2 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "overview"
+                    },
+                    {
+                        "id":  "Q013",
+                        "text":  "Consulta 13: forneca uma resposta objetiva sobre o tema 3 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "overview"
+                    },
+                    {
+                        "id":  "Q014",
+                        "text":  "Consulta 14: forneca uma resposta objetiva sobre o tema 4 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "overview"
+                    },
+                    {
+                        "id":  "Q015",
+                        "text":  "Consulta 15: forneca uma resposta objetiva sobre o tema 5 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "overview"
+                    },
+                    {
+                        "id":  "Q016",
+                        "text":  "Consulta 16: forneca uma resposta objetiva sobre o tema 6 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "overview"
+                    },
+                    {
+                        "id":  "Q017",
+                        "text":  "Consulta 17: forneca uma resposta objetiva sobre o tema 7 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "overview"
+                    },
+                    {
+                        "id":  "Q018",
+                        "text":  "Consulta 18: forneca uma resposta objetiva sobre o tema 8 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "overview"
+                    },
+                    {
+                        "id":  "Q019",
+                        "text":  "Consulta 19: forneca uma resposta objetiva sobre o tema 9 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "overview"
+                    },
+                    {
+                        "id":  "Q020",
+                        "text":  "Consulta 20: forneca uma resposta objetiva sobre o tema 10 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "overview"
+                    },
+                    {
+                        "id":  "Q021",
+                        "text":  "Consulta 21: forneca uma resposta objetiva sobre o tema 1 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "overview"
+                    },
+                    {
+                        "id":  "Q022",
+                        "text":  "Consulta 22: forneca uma resposta objetiva sobre o tema 2 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "overview"
+                    },
+                    {
+                        "id":  "Q023",
+                        "text":  "Consulta 23: forneca uma resposta objetiva sobre o tema 3 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "overview"
+                    },
+                    {
+                        "id":  "Q024",
+                        "text":  "Consulta 24: forneca uma resposta objetiva sobre o tema 4 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "overview"
+                    },
+                    {
+                        "id":  "Q025",
+                        "text":  "Consulta 25: forneca uma resposta objetiva sobre o tema 5 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "overview"
+                    },
+                    {
+                        "id":  "Q026",
+                        "text":  "Consulta 26: forneca uma resposta objetiva sobre o tema 6 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "comparison"
+                    },
+                    {
+                        "id":  "Q027",
+                        "text":  "Consulta 27: forneca uma resposta objetiva sobre o tema 7 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "comparison"
+                    },
+                    {
+                        "id":  "Q028",
+                        "text":  "Consulta 28: forneca uma resposta objetiva sobre o tema 8 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "comparison"
+                    },
+                    {
+                        "id":  "Q029",
+                        "text":  "Consulta 29: forneca uma resposta objetiva sobre o tema 9 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "comparison"
+                    },
+                    {
+                        "id":  "Q030",
+                        "text":  "Consulta 30: forneca uma resposta objetiva sobre o tema 10 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "comparison"
+                    },
+                    {
+                        "id":  "Q031",
+                        "text":  "Consulta 31: forneca uma resposta objetiva sobre o tema 1 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "comparison"
+                    },
+                    {
+                        "id":  "Q032",
+                        "text":  "Consulta 32: forneca uma resposta objetiva sobre o tema 2 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "comparison"
+                    },
+                    {
+                        "id":  "Q033",
+                        "text":  "Consulta 33: forneca uma resposta objetiva sobre o tema 3 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "comparison"
+                    },
+                    {
+                        "id":  "Q034",
+                        "text":  "Consulta 34: forneca uma resposta objetiva sobre o tema 4 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "comparison"
+                    },
+                    {
+                        "id":  "Q035",
+                        "text":  "Consulta 35: forneca uma resposta objetiva sobre o tema 5 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "comparison"
+                    },
+                    {
+                        "id":  "Q036",
+                        "text":  "Consulta 36: forneca uma resposta objetiva sobre o tema 6 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "comparison"
+                    },
+                    {
+                        "id":  "Q037",
+                        "text":  "Consulta 37: forneca uma resposta objetiva sobre o tema 7 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "comparison"
+                    },
+                    {
+                        "id":  "Q038",
+                        "text":  "Consulta 38: forneca uma resposta objetiva sobre o tema 8 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "comparison"
+                    },
+                    {
+                        "id":  "Q039",
+                        "text":  "Consulta 39: forneca uma resposta objetiva sobre o tema 9 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "comparison"
+                    },
+                    {
+                        "id":  "Q040",
+                        "text":  "Consulta 40: forneca uma resposta objetiva sobre o tema 10 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "comparison"
+                    },
+                    {
+                        "id":  "Q041",
+                        "text":  "Consulta 41: forneca uma resposta objetiva sobre o tema 1 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "comparison"
+                    },
+                    {
+                        "id":  "Q042",
+                        "text":  "Consulta 42: forneca uma resposta objetiva sobre o tema 2 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "comparison"
+                    },
+                    {
+                        "id":  "Q043",
+                        "text":  "Consulta 43: forneca uma resposta objetiva sobre o tema 3 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "comparison"
+                    },
+                    {
+                        "id":  "Q044",
+                        "text":  "Consulta 44: forneca uma resposta objetiva sobre o tema 4 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "comparison"
+                    },
+                    {
+                        "id":  "Q045",
+                        "text":  "Consulta 45: forneca uma resposta objetiva sobre o tema 5 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "comparison"
+                    },
+                    {
+                        "id":  "Q046",
+                        "text":  "Consulta 46: forneca uma resposta objetiva sobre o tema 6 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "comparison"
+                    },
+                    {
+                        "id":  "Q047",
+                        "text":  "Consulta 47: forneca uma resposta objetiva sobre o tema 7 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "comparison"
+                    },
+                    {
+                        "id":  "Q048",
+                        "text":  "Consulta 48: forneca uma resposta objetiva sobre o tema 8 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "comparison"
+                    },
+                    {
+                        "id":  "Q049",
+                        "text":  "Consulta 49: forneca uma resposta objetiva sobre o tema 9 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "comparison"
+                    },
+                    {
+                        "id":  "Q050",
+                        "text":  "Consulta 50: forneca uma resposta objetiva sobre o tema 10 com evidencias quando disponivel.",
+                        "language":  "pt",
+                        "targets":  [
+
+                                    ],
+                        "type":  "comparison"
+                    },
+                    {
+                        "id":  "Q051",
+                        "text":  "Query 51: provide a concise answer for topic 1 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "risk"
+                    },
+                    {
+                        "id":  "Q052",
+                        "text":  "Query 52: provide a concise answer for topic 2 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "risk"
+                    },
+                    {
+                        "id":  "Q053",
+                        "text":  "Query 53: provide a concise answer for topic 3 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "risk"
+                    },
+                    {
+                        "id":  "Q054",
+                        "text":  "Query 54: provide a concise answer for topic 4 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "risk"
+                    },
+                    {
+                        "id":  "Q055",
+                        "text":  "Query 55: provide a concise answer for topic 5 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "risk"
+                    },
+                    {
+                        "id":  "Q056",
+                        "text":  "Query 56: provide a concise answer for topic 6 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "risk"
+                    },
+                    {
+                        "id":  "Q057",
+                        "text":  "Query 57: provide a concise answer for topic 7 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "risk"
+                    },
+                    {
+                        "id":  "Q058",
+                        "text":  "Query 58: provide a concise answer for topic 8 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "risk"
+                    },
+                    {
+                        "id":  "Q059",
+                        "text":  "Query 59: provide a concise answer for topic 9 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "risk"
+                    },
+                    {
+                        "id":  "Q060",
+                        "text":  "Query 60: provide a concise answer for topic 10 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "risk"
+                    },
+                    {
+                        "id":  "Q061",
+                        "text":  "Query 61: provide a concise answer for topic 1 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "risk"
+                    },
+                    {
+                        "id":  "Q062",
+                        "text":  "Query 62: provide a concise answer for topic 2 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "risk"
+                    },
+                    {
+                        "id":  "Q063",
+                        "text":  "Query 63: provide a concise answer for topic 3 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "risk"
+                    },
+                    {
+                        "id":  "Q064",
+                        "text":  "Query 64: provide a concise answer for topic 4 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "risk"
+                    },
+                    {
+                        "id":  "Q065",
+                        "text":  "Query 65: provide a concise answer for topic 5 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "risk"
+                    },
+                    {
+                        "id":  "Q066",
+                        "text":  "Query 66: provide a concise answer for topic 6 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "risk"
+                    },
+                    {
+                        "id":  "Q067",
+                        "text":  "Query 67: provide a concise answer for topic 7 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "risk"
+                    },
+                    {
+                        "id":  "Q068",
+                        "text":  "Query 68: provide a concise answer for topic 8 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "risk"
+                    },
+                    {
+                        "id":  "Q069",
+                        "text":  "Query 69: provide a concise answer for topic 9 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "risk"
+                    },
+                    {
+                        "id":  "Q070",
+                        "text":  "Query 70: provide a concise answer for topic 10 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "risk"
+                    },
+                    {
+                        "id":  "Q071",
+                        "text":  "Query 71: provide a concise answer for topic 1 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "risk"
+                    },
+                    {
+                        "id":  "Q072",
+                        "text":  "Query 72: provide a concise answer for topic 2 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "risk"
+                    },
+                    {
+                        "id":  "Q073",
+                        "text":  "Query 73: provide a concise answer for topic 3 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "risk"
+                    },
+                    {
+                        "id":  "Q074",
+                        "text":  "Query 74: provide a concise answer for topic 4 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "risk"
+                    },
+                    {
+                        "id":  "Q075",
+                        "text":  "Query 75: provide a concise answer for topic 5 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "risk"
+                    },
+                    {
+                        "id":  "Q076",
+                        "text":  "Query 76: provide a concise answer for topic 6 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "summary"
+                    },
+                    {
+                        "id":  "Q077",
+                        "text":  "Query 77: provide a concise answer for topic 7 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "summary"
+                    },
+                    {
+                        "id":  "Q078",
+                        "text":  "Query 78: provide a concise answer for topic 8 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "summary"
+                    },
+                    {
+                        "id":  "Q079",
+                        "text":  "Query 79: provide a concise answer for topic 9 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "summary"
+                    },
+                    {
+                        "id":  "Q080",
+                        "text":  "Query 80: provide a concise answer for topic 10 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "summary"
+                    },
+                    {
+                        "id":  "Q081",
+                        "text":  "Query 81: provide a concise answer for topic 1 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "summary"
+                    },
+                    {
+                        "id":  "Q082",
+                        "text":  "Query 82: provide a concise answer for topic 2 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "summary"
+                    },
+                    {
+                        "id":  "Q083",
+                        "text":  "Query 83: provide a concise answer for topic 3 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "summary"
+                    },
+                    {
+                        "id":  "Q084",
+                        "text":  "Query 84: provide a concise answer for topic 4 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "summary"
+                    },
+                    {
+                        "id":  "Q085",
+                        "text":  "Query 85: provide a concise answer for topic 5 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "summary"
+                    },
+                    {
+                        "id":  "Q086",
+                        "text":  "Query 86: provide a concise answer for topic 6 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "summary"
+                    },
+                    {
+                        "id":  "Q087",
+                        "text":  "Query 87: provide a concise answer for topic 7 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "summary"
+                    },
+                    {
+                        "id":  "Q088",
+                        "text":  "Query 88: provide a concise answer for topic 8 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "summary"
+                    },
+                    {
+                        "id":  "Q089",
+                        "text":  "Query 89: provide a concise answer for topic 9 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "summary"
+                    },
+                    {
+                        "id":  "Q090",
+                        "text":  "Query 90: provide a concise answer for topic 10 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "summary"
+                    },
+                    {
+                        "id":  "Q091",
+                        "text":  "Query 91: provide a concise answer for topic 1 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "summary"
+                    },
+                    {
+                        "id":  "Q092",
+                        "text":  "Query 92: provide a concise answer for topic 2 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "summary"
+                    },
+                    {
+                        "id":  "Q093",
+                        "text":  "Query 93: provide a concise answer for topic 3 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "summary"
+                    },
+                    {
+                        "id":  "Q094",
+                        "text":  "Query 94: provide a concise answer for topic 4 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "summary"
+                    },
+                    {
+                        "id":  "Q095",
+                        "text":  "Query 95: provide a concise answer for topic 5 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "summary"
+                    },
+                    {
+                        "id":  "Q096",
+                        "text":  "Query 96: provide a concise answer for topic 6 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "summary"
+                    },
+                    {
+                        "id":  "Q097",
+                        "text":  "Query 97: provide a concise answer for topic 7 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "summary"
+                    },
+                    {
+                        "id":  "Q098",
+                        "text":  "Query 98: provide a concise answer for topic 8 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "summary"
+                    },
+                    {
+                        "id":  "Q099",
+                        "text":  "Query 99: provide a concise answer for topic 9 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "summary"
+                    },
+                    {
+                        "id":  "Q100",
+                        "text":  "Query 100: provide a concise answer for topic 10 with evidence when available.",
+                        "language":  "en",
+                        "targets":  [
+
+                                    ],
+                        "type":  "summary"
+                    }
+                ]
+}

@@ -59,20 +59,35 @@
       ],
       "expectedTableFamilies": [
         "Transcript line-item table",
-        "Transcript summary matrix"
+        "Transcript summary matrix",
+        "Transcript line items",
+        "Transcript itens",
+        "Transcript summary",
+        "Transcript resumo"
       ],
       "fieldFamilies": [
         "Primary identifiers",
         "Dates and periods",
-        "Amounts and statuses"
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
       ],
       "redFlags": [
         "Missing mandatory section anchors",
-        "Conflicting summary totals"
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
       ],
       "missingQuestions": [
         "Which transcript variant should be prioritized?",
-        "Should extraction prefer header metadata or detailed section data?"
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Transcript variant should be prioritized?",
+        "Qual variante de Transcript deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
       ]
     },
     {
@@ -112,20 +127,35 @@
       ],
       "expectedTableFamilies": [
         "Diploma Certificate line-item table",
-        "Diploma Certificate summary matrix"
+        "Diploma Certificate summary matrix",
+        "Diploma Certificate line items",
+        "Diploma Certificate itens",
+        "Diploma Certificate summary",
+        "Diploma Certificate resumo"
       ],
       "fieldFamilies": [
         "Primary identifiers",
         "Dates and periods",
-        "Amounts and statuses"
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
       ],
       "redFlags": [
         "Missing mandatory section anchors",
-        "Conflicting summary totals"
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
       ],
       "missingQuestions": [
         "Which diploma certificate variant should be prioritized?",
-        "Should extraction prefer header metadata or detailed section data?"
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Diploma Certificate variant should be prioritized?",
+        "Qual variante de Diploma Certificate deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
       ]
     },
     {
@@ -165,20 +195,967 @@
       ],
       "expectedTableFamilies": [
         "Course Syllabus line-item table",
-        "Course Syllabus summary matrix"
+        "Course Syllabus summary matrix",
+        "Course Syllabus line items",
+        "Course Syllabus itens",
+        "Course Syllabus summary",
+        "Course Syllabus resumo"
       ],
       "fieldFamilies": [
         "Primary identifiers",
         "Dates and periods",
-        "Amounts and statuses"
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
       ],
       "redFlags": [
         "Missing mandatory section anchors",
-        "Conflicting summary totals"
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
       ],
       "missingQuestions": [
         "Which course syllabus variant should be prioritized?",
-        "Should extraction prefer header metadata or detailed section data?"
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Course Syllabus variant should be prioritized?",
+        "Qual variante de Course Syllabus deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "edu_enrollment_letter",
+      "label": "Enrollment Letter",
+      "expectedSections": [
+        "Header",
+        "Cabeçalho",
+        "Issuer Profile",
+        "Perfil do Emissor",
+        "Recipient Profile",
+        "Perfil do Destinatario",
+        "Account or Reference",
+        "Conta ou Referencia",
+        "Period or Schedule",
+        "Período ou Agenda",
+        "Line Items or Events",
+        "Itens ou Eventos"
+      ],
+      "headings": [
+        "statement",
+        "document",
+        "header",
+        "issuer",
+        "provider",
+        "organization",
+        "emitente",
+        "recipient",
+        "holder",
+        "student",
+        "employee",
+        "destinatario",
+        "account",
+        "reference",
+        "numero",
+        "id"
+      ],
+      "expectedTableFamilies": [
+        "Transcript line-item table",
+        "Transcript summary matrix",
+        "Enrollment Letter line items",
+        "Enrollment Letter itens",
+        "Enrollment Letter summary",
+        "Enrollment Letter resumo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
+      ],
+      "missingQuestions": [
+        "Which transcript variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Enrollment Letter variant should be prioritized?",
+        "Qual variante de Enrollment Letter deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "edu_student_financial_aid_award",
+      "label": "Student Financial Aid Award",
+      "expectedSections": [
+        "Header",
+        "Cabeçalho",
+        "Issuer Profile",
+        "Perfil do Emissor",
+        "Recipient Profile",
+        "Perfil do Destinatario",
+        "Account or Reference",
+        "Conta ou Referencia",
+        "Period or Schedule",
+        "Período ou Agenda",
+        "Line Items or Events",
+        "Itens ou Eventos"
+      ],
+      "headings": [
+        "statement",
+        "document",
+        "header",
+        "issuer",
+        "provider",
+        "organization",
+        "emitente",
+        "recipient",
+        "holder",
+        "student",
+        "employee",
+        "destinatario",
+        "account",
+        "reference",
+        "numero",
+        "id"
+      ],
+      "expectedTableFamilies": [
+        "Transcript line-item table",
+        "Transcript summary matrix",
+        "Student Financial Aid Award line items",
+        "Student Financial Aid Award itens",
+        "Student Financial Aid Award summary",
+        "Student Financial Aid Award resumo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
+      ],
+      "missingQuestions": [
+        "Which transcript variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Student Financial Aid Award variant should be prioritized?",
+        "Qual variante de Student Financial Aid Award deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "edu_student_schedule",
+      "label": "Student Schedule",
+      "expectedSections": [
+        "Header",
+        "Cabeçalho",
+        "Issuer Profile",
+        "Perfil do Emissor",
+        "Recipient Profile",
+        "Perfil do Destinatario",
+        "Account or Reference",
+        "Conta ou Referencia",
+        "Period or Schedule",
+        "Período ou Agenda",
+        "Line Items or Events",
+        "Itens ou Eventos"
+      ],
+      "headings": [
+        "statement",
+        "document",
+        "header",
+        "issuer",
+        "provider",
+        "organization",
+        "emitente",
+        "recipient",
+        "holder",
+        "student",
+        "employee",
+        "destinatario",
+        "account",
+        "reference",
+        "numero",
+        "id"
+      ],
+      "expectedTableFamilies": [
+        "Transcript line-item table",
+        "Transcript summary matrix",
+        "Student Schedule line items",
+        "Student Schedule itens",
+        "Student Schedule summary",
+        "Student Schedule resumo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
+      ],
+      "missingQuestions": [
+        "Which transcript variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Student Schedule variant should be prioritized?",
+        "Qual variante de Student Schedule deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "education_grade_scale_notice",
+      "label": "Grade Scale Notice",
+      "expectedSections": [
+        "Supplement Education 01 Header",
+        "Cabecalho Supplement Education 01",
+        "Supplement Education 01 Parties",
+        "Partes Supplement Education 01",
+        "Supplement Education 01 Timeline",
+        "Linha do tempo Supplement Education 01"
+      ],
+      "headings": [
+        "supplement education 01",
+        "education supplement 01",
+        "education",
+        "education summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Education 01 line items",
+        "Supplement Education 01 itens",
+        "Supplement Education 01 summary",
+        "Supplement Education 01 resumo",
+        "Supplement Education 01 balance",
+        "Supplement Education 01 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Education 01 variant should be prioritized?",
+        "Qual variante de Supplement Education 01 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "education_course_credit_summary",
+      "label": "Course Credit Summary",
+      "expectedSections": [
+        "Supplement Education 02 Header",
+        "Cabecalho Supplement Education 02",
+        "Supplement Education 02 Parties",
+        "Partes Supplement Education 02",
+        "Supplement Education 02 Timeline",
+        "Linha do tempo Supplement Education 02"
+      ],
+      "headings": [
+        "supplement education 02",
+        "education supplement 02",
+        "education",
+        "education summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Education 02 line items",
+        "Supplement Education 02 itens",
+        "Supplement Education 02 summary",
+        "Supplement Education 02 resumo",
+        "Supplement Education 02 balance",
+        "Supplement Education 02 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Education 02 variant should be prioritized?",
+        "Qual variante de Supplement Education 02 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "education_attendance_record_note",
+      "label": "Attendance Record Note",
+      "expectedSections": [
+        "Supplement Education 03 Header",
+        "Cabecalho Supplement Education 03",
+        "Supplement Education 03 Parties",
+        "Partes Supplement Education 03",
+        "Supplement Education 03 Timeline",
+        "Linha do tempo Supplement Education 03"
+      ],
+      "headings": [
+        "supplement education 03",
+        "education supplement 03",
+        "education",
+        "education summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Education 03 line items",
+        "Supplement Education 03 itens",
+        "Supplement Education 03 summary",
+        "Supplement Education 03 resumo",
+        "Supplement Education 03 balance",
+        "Supplement Education 03 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Education 03 variant should be prioritized?",
+        "Qual variante de Supplement Education 03 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "education_tuition_adjustment_notice",
+      "label": "Tuition Adjustment Notice",
+      "expectedSections": [
+        "Supplement Education 04 Header",
+        "Cabecalho Supplement Education 04",
+        "Supplement Education 04 Parties",
+        "Partes Supplement Education 04",
+        "Supplement Education 04 Timeline",
+        "Linha do tempo Supplement Education 04"
+      ],
+      "headings": [
+        "supplement education 04",
+        "education supplement 04",
+        "education",
+        "education summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Education 04 line items",
+        "Supplement Education 04 itens",
+        "Supplement Education 04 summary",
+        "Supplement Education 04 resumo",
+        "Supplement Education 04 balance",
+        "Supplement Education 04 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Education 04 variant should be prioritized?",
+        "Qual variante de Supplement Education 04 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "education_program_completion_note",
+      "label": "Program Completion Note",
+      "expectedSections": [
+        "Supplement Education 05 Header",
+        "Cabecalho Supplement Education 05",
+        "Supplement Education 05 Parties",
+        "Partes Supplement Education 05",
+        "Supplement Education 05 Timeline",
+        "Linha do tempo Supplement Education 05"
+      ],
+      "headings": [
+        "supplement education 05",
+        "education supplement 05",
+        "education",
+        "education summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Education 05 line items",
+        "Supplement Education 05 itens",
+        "Supplement Education 05 summary",
+        "Supplement Education 05 resumo",
+        "Supplement Education 05 balance",
+        "Supplement Education 05 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Education 05 variant should be prioritized?",
+        "Qual variante de Supplement Education 05 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "education_scholarship_change_notice",
+      "label": "Scholarship Change Notice",
+      "expectedSections": [
+        "Supplement Education 06 Header",
+        "Cabecalho Supplement Education 06",
+        "Supplement Education 06 Parties",
+        "Partes Supplement Education 06",
+        "Supplement Education 06 Timeline",
+        "Linha do tempo Supplement Education 06"
+      ],
+      "headings": [
+        "supplement education 06",
+        "education supplement 06",
+        "education",
+        "education summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Education 06 line items",
+        "Supplement Education 06 itens",
+        "Supplement Education 06 summary",
+        "Supplement Education 06 resumo",
+        "Supplement Education 06 balance",
+        "Supplement Education 06 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Education 06 variant should be prioritized?",
+        "Qual variante de Supplement Education 06 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "education_schedule_revision_notice",
+      "label": "Schedule Revision Notice",
+      "expectedSections": [
+        "Supplement Education 07 Header",
+        "Cabecalho Supplement Education 07",
+        "Supplement Education 07 Parties",
+        "Partes Supplement Education 07",
+        "Supplement Education 07 Timeline",
+        "Linha do tempo Supplement Education 07"
+      ],
+      "headings": [
+        "supplement education 07",
+        "education supplement 07",
+        "education",
+        "education summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Education 07 line items",
+        "Supplement Education 07 itens",
+        "Supplement Education 07 summary",
+        "Supplement Education 07 resumo",
+        "Supplement Education 07 balance",
+        "Supplement Education 07 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Education 07 variant should be prioritized?",
+        "Qual variante de Supplement Education 07 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "education_academic_status_notice",
+      "label": "Academic Status Notice",
+      "expectedSections": [
+        "Supplement Education 08 Header",
+        "Cabecalho Supplement Education 08",
+        "Supplement Education 08 Parties",
+        "Partes Supplement Education 08",
+        "Supplement Education 08 Timeline",
+        "Linha do tempo Supplement Education 08"
+      ],
+      "headings": [
+        "supplement education 08",
+        "education supplement 08",
+        "education",
+        "education summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Education 08 line items",
+        "Supplement Education 08 itens",
+        "Supplement Education 08 summary",
+        "Supplement Education 08 resumo",
+        "Supplement Education 08 balance",
+        "Supplement Education 08 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Education 08 variant should be prioritized?",
+        "Qual variante de Supplement Education 08 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "education_advisor_note",
+      "label": "Advisor Note",
+      "expectedSections": [
+        "Supplement Education 09 Header",
+        "Cabecalho Supplement Education 09",
+        "Supplement Education 09 Parties",
+        "Partes Supplement Education 09",
+        "Supplement Education 09 Timeline",
+        "Linha do tempo Supplement Education 09"
+      ],
+      "headings": [
+        "supplement education 09",
+        "education supplement 09",
+        "education",
+        "education summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Education 09 line items",
+        "Supplement Education 09 itens",
+        "Supplement Education 09 summary",
+        "Supplement Education 09 resumo",
+        "Supplement Education 09 balance",
+        "Supplement Education 09 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Education 09 variant should be prioritized?",
+        "Qual variante de Supplement Education 09 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "education_enrollment_status_update",
+      "label": "Enrollment Status Update",
+      "expectedSections": [
+        "Supplement Education 10 Header",
+        "Cabecalho Supplement Education 10",
+        "Supplement Education 10 Parties",
+        "Partes Supplement Education 10",
+        "Supplement Education 10 Timeline",
+        "Linha do tempo Supplement Education 10"
+      ],
+      "headings": [
+        "supplement education 10",
+        "education supplement 10",
+        "education",
+        "education summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Education 10 line items",
+        "Supplement Education 10 itens",
+        "Supplement Education 10 summary",
+        "Supplement Education 10 resumo",
+        "Supplement Education 10 balance",
+        "Supplement Education 10 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Education 10 variant should be prioritized?",
+        "Qual variante de Supplement Education 10 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "education_exam_result_notice",
+      "label": "Exam Result Notice",
+      "expectedSections": [
+        "Supplement Education 11 Header",
+        "Cabecalho Supplement Education 11",
+        "Supplement Education 11 Parties",
+        "Partes Supplement Education 11",
+        "Supplement Education 11 Timeline",
+        "Linha do tempo Supplement Education 11"
+      ],
+      "headings": [
+        "supplement education 11",
+        "education supplement 11",
+        "education",
+        "education summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Education 11 line items",
+        "Supplement Education 11 itens",
+        "Supplement Education 11 summary",
+        "Supplement Education 11 resumo",
+        "Supplement Education 11 balance",
+        "Supplement Education 11 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Education 11 variant should be prioritized?",
+        "Qual variante de Supplement Education 11 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "education_registration_exception_note",
+      "label": "Registration Exception Note",
+      "expectedSections": [
+        "Supplement Education 12 Header",
+        "Cabecalho Supplement Education 12",
+        "Supplement Education 12 Parties",
+        "Partes Supplement Education 12",
+        "Supplement Education 12 Timeline",
+        "Linha do tempo Supplement Education 12"
+      ],
+      "headings": [
+        "supplement education 12",
+        "education supplement 12",
+        "education",
+        "education summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Education 12 line items",
+        "Supplement Education 12 itens",
+        "Supplement Education 12 summary",
+        "Supplement Education 12 resumo",
+        "Supplement Education 12 balance",
+        "Supplement Education 12 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Education 12 variant should be prioritized?",
+        "Qual variante de Supplement Education 12 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "education_grade_scale_notice_2",
+      "label": "Grade Scale Notice 2",
+      "expectedSections": [
+        "Supplement Education 13 Header",
+        "Cabecalho Supplement Education 13",
+        "Supplement Education 13 Parties",
+        "Partes Supplement Education 13",
+        "Supplement Education 13 Timeline",
+        "Linha do tempo Supplement Education 13"
+      ],
+      "headings": [
+        "supplement education 13",
+        "education supplement 13",
+        "education",
+        "education summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Education 13 line items",
+        "Supplement Education 13 itens",
+        "Supplement Education 13 summary",
+        "Supplement Education 13 resumo",
+        "Supplement Education 13 balance",
+        "Supplement Education 13 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Education 13 variant should be prioritized?",
+        "Qual variante de Supplement Education 13 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "education_course_credit_summary_2",
+      "label": "Course Credit Summary 2",
+      "expectedSections": [
+        "Supplement Education 14 Header",
+        "Cabecalho Supplement Education 14",
+        "Supplement Education 14 Parties",
+        "Partes Supplement Education 14",
+        "Supplement Education 14 Timeline",
+        "Linha do tempo Supplement Education 14"
+      ],
+      "headings": [
+        "supplement education 14",
+        "education supplement 14",
+        "education",
+        "education summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Education 14 line items",
+        "Supplement Education 14 itens",
+        "Supplement Education 14 summary",
+        "Supplement Education 14 resumo",
+        "Supplement Education 14 balance",
+        "Supplement Education 14 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Education 14 variant should be prioritized?",
+        "Qual variante de Supplement Education 14 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
       ]
     }
   ]

@@ -107,7 +107,7 @@ function oauthResultHtml(opts: {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>${title}</title>
+    <title>${titleSafe}</title>
     <style>
       :root { color-scheme: light; }
       body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background: #F5F5F5; color: #18181B; }
@@ -150,11 +150,6 @@ function oauthResultHtml(opts: {
           try { window.opener.focus(); } catch (e) {}
           sent = true;
         }
-      } catch (e) {}
-      // Fallback: write to localStorage so the parent can detect via 'storage' event.
-      // This works even when window.opener is null (cross-origin navigation kills it).
-      try {
-        localStorage.setItem('koda_oauth_complete', JSON.stringify(completion));
       } catch (e) {}
       function closeSelf() {
         try { window.close(); } catch (e) {}
@@ -556,6 +551,8 @@ export class IntegrationsController {
                     reason:
                       (result.data?.reason as string | null | undefined) ||
                       null,
+                    ingestionEnabled:
+                      Boolean(result.data?.ingestionEnabled) || false,
                     indexedDocuments:
                       Number(result.data?.indexedDocuments || 0) || 0,
                     providerAccountId:
@@ -863,6 +860,9 @@ export class IntegrationsController {
     return sendOk(res, {
       provider: providerRaw,
       sent: true,
+      receipt:
+        (result.data?.receipt as Record<string, unknown> | null | undefined) ??
+        null,
     });
   };
 

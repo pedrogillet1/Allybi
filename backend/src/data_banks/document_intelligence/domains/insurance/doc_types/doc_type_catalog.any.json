@@ -177,6 +177,94 @@
         "total_due",
         "due_date"
       ]
+    },
+    {
+      "id": "ins_auto_declaration",
+      "name": {
+        "en": "Ins Auto Declaration",
+        "pt": "Ins Auto Declaration"
+      },
+      "description": "Auto-generated catalog entry for ins_auto_declaration from canonical taxonomy.",
+      "detectionPatterns": [
+        "\\bins\\\\s\\+auto\\\\s\\+declaration\\b",
+        "\\bauto\\\\s\\+declaration\\b"
+      ],
+      "commonSections": [
+        "Policy Information",
+        "Informações da Apólice",
+        "Coverage Details",
+        "Detalhes da Cobertura",
+        "Claimant Information",
+        "Informações do Reclamante"
+      ],
+      "extractionPriority": 85,
+      "riskTier": "medium"
+    },
+    {
+      "id": "ins_dental_plan",
+      "name": {
+        "en": "Ins Dental Plan",
+        "pt": "Ins Dental Plan"
+      },
+      "description": "Auto-generated catalog entry for ins_dental_plan from canonical taxonomy.",
+      "detectionPatterns": [
+        "\\bins\\\\s\\+dental\\\\s\\+plan\\b",
+        "\\bdental\\\\s\\+plan\\b"
+      ],
+      "commonSections": [
+        "Policy Information",
+        "Informações da Apólice",
+        "Coverage Details",
+        "Detalhes da Cobertura",
+        "Claimant Information",
+        "Informações do Reclamante"
+      ],
+      "extractionPriority": 85,
+      "riskTier": "medium"
+    },
+    {
+      "id": "ins_disability",
+      "name": {
+        "en": "Ins Disability",
+        "pt": "Ins Disability"
+      },
+      "description": "Auto-generated catalog entry for ins_disability from canonical taxonomy.",
+      "detectionPatterns": [
+        "\\bins\\\\s\\+disability\\b",
+        "\\bdisability\\b"
+      ],
+      "commonSections": [
+        "Policy Information",
+        "Informações da Apólice",
+        "Coverage Details",
+        "Detalhes da Cobertura",
+        "Claimant Information",
+        "Informações do Reclamante"
+      ],
+      "extractionPriority": 85,
+      "riskTier": "medium"
+    },
+    {
+      "id": "ins_umbrella_policy",
+      "name": {
+        "en": "Ins Umbrella Policy",
+        "pt": "Ins Umbrella Policy"
+      },
+      "description": "Auto-generated catalog entry for ins_umbrella_policy from canonical taxonomy.",
+      "detectionPatterns": [
+        "\\bins\\\\s\\+umbrella\\\\s\\+policy\\b",
+        "\\bumbrella\\\\s\\+policy\\b"
+      ],
+      "commonSections": [
+        "Policy Information",
+        "Informações da Apólice",
+        "Coverage Details",
+        "Detalhes da Cobertura",
+        "Claimant Information",
+        "Informações do Reclamante"
+      ],
+      "extractionPriority": 85,
+      "riskTier": "medium"
     }
   ]
 }

@@ -718,7 +718,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "12223a0ec5fef65ffe39b9ba83937ec1c7a0542003cf72b5bec1ce36b04655db",
+      "checksumSha256": "8ef986d6a3da536dc6396cffafc2fc70d1634335cf0549fc415b74592f105d6f",
       "lastUpdated": "2026-01-25"
     },
     {
@@ -752,7 +752,7 @@
       "version": "1.0.0",
       "schemaId": "bank_schema",
       "lastUpdated": "2026-01-26",
-      "checksumSha256": "2b53628b062b4786382c57035fc7aae0f51bd7828aa36ec1b4b1ec794f93e568",
+      "checksumSha256": "f5ad503f7609ba1b34d1d29e8d202366329bbf9148719021eb4490663b3d2f7d",
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -1614,7 +1614,7 @@
         "dev": false,
         "local": false
       },
-      "checksumSha256": "06a337547289afcae108227c07a0bc0f99ce3f1adb694394b15567ca1a7b3e8a",
+      "checksumSha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
       "lastUpdated": "2026-03-03"
     },
     {
@@ -1638,7 +1638,7 @@
         "dev": false,
         "local": false
       },
-      "checksumSha256": "81e4996193f76e6b8c57a78329c4b1934c3d37535f28061c81f6938b7c221ede",
+      "checksumSha256": "8a9f7027994ed07f84a58a9102096daf92dd6752c6eb517a2f6382f8e7c351cd",
       "lastUpdated": "2026-03-03"
     },
     {
@@ -1662,7 +1662,7 @@
         "dev": false,
         "local": false
       },
-      "checksumSha256": "172f8c87de6c99fb889e482fe15bb5adbb4b59fed561d9425aa3c4bc650adf7d",
+      "checksumSha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
       "lastUpdated": "2026-03-03"
     },
     {
@@ -1686,7 +1686,7 @@
         "dev": false,
         "local": false
       },
-      "checksumSha256": "37815fda14745b128a27101b1d8cdc16a4518b14df598577fe79cac4682946ca",
+      "checksumSha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
       "lastUpdated": "2026-03-03"
     },
     {
@@ -1710,7 +1710,7 @@
         "dev": false,
         "local": false
       },
-      "checksumSha256": "04b4200a66963bc091316d64d64289de300fc127350edd91d24827c0788c67a3",
+      "checksumSha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
       "lastUpdated": "2026-03-03"
     },
     {
@@ -21588,7 +21588,7 @@
         "dev": false,
         "local": false
       },
-      "checksumSha256": "8db97cc2cd1fea16ee977dd08298ecfe96baa2167caad60099dbbd7fc858a6e5",
+      "checksumSha256": "e5dcb5b7054c262df64852f2f547fcf7ebc60a564ad9c1b62a38c4e22c81c648",
       "lastUpdated": "2026-02-27",
       "dependsOn": []
     },
@@ -21615,7 +21615,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "7920326b5809608a1a066c07d863d983547bacf6dca2a09ad6672f821375746c",
+      "checksumSha256": "899eecec4809eae0a05f73ff1481f08934149cc93aa70931f40892a11dc01486",
       "lastUpdated": "2026-03-01"
     },
     {
@@ -21799,7 +21799,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "afe1952bbbeb8959a73d68524d5341d7363580590f1dce3475ca3bb64d02f160",
+      "checksumSha256": "943f7f9c218b612f0ce8ca3126dd4380cad6ad68e7f6cf0f14c144160798e1ea",
       "lastUpdated": "2026-02-28"
     },
     {
@@ -23134,7 +23134,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "70bbf107fe9c0b35799bd1c190ee946dba1adc6a192d7427a4a9db1dcef16d8f",
+      "checksumSha256": "a0ecf5bb7998b691cc1edecf9c2130368d5691800b9b2461253c4cd9e2ce6c85",
       "lastUpdated": "2026-01-25"
     },
     {
@@ -23601,7 +23601,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "bdb00b0e0395a2b2f9d5d916f46484e110bae258d5e0a5941e96c2e85c5108e7",
+      "checksumSha256": "eec38a166a72e1e961c1668169890e4e4ac6a35345c37821e2a9e943c1cfa822",
       "lastUpdated": "2026-01-26"
     },
     {
@@ -30137,6 +30137,30 @@
       },
       "checksumSha256": "61103b4a1050db212a9d3c9cf6fcc32ff1c3a666aa2ed8a389acb9e1630e1a7c",
       "lastUpdated": "2026-03-03"
+    },
+    {
+      "id": "nav_intents_es",
+      "category": "semantics",
+      "filename": "nav_intents.es.any.json",
+      "path": "patterns/navigation/nav_intents.es.any.json",
+      "version": "1.0.0",
+      "schemaId": "bank_schema",
+      "contentType": "json",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "8ddb98069739fdba5a97ffa4a93c5952176b019ac8adb8c391143ae118e728ee",
+      "lastUpdated": "2026-03-05"
     },
     {
       "id": "negative_retrieval_patterns",

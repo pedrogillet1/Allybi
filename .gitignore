@@ -56,6 +56,8 @@ temp/
 !backend/src/services/**/*.json
 !backend/prisma/*.json
 !frontend/public/manifest.json
+!frontend/e2e/query-packs/*.json
+!frontend/e2e/reports/archive/**/*.json
 
 # SQLite
 *.db

@@ -14,6 +14,7 @@ import {
 } from "../../../middleware/validate.middleware";
 import {
   documentIdsSchema,
+  documentPatchSchema,
   listQuerySchema,
 } from "../../../schemas/request.schemas";
 import {
@@ -31,6 +32,7 @@ import { generateExcelHtmlPreview } from "../../../services/ingestion/excelHtmlP
 import * as XLSX from "xlsx";
 import { ensurePreview } from "../../../services/preview/previewOrchestrator.service";
 import { generateSlideImagesForDocument } from "../../../services/preview/pptxSlideImageGenerator.service";
+import { documentUploadWriteService } from "../../../services/documents/documentUploadWrite.service";
 import {
   publishExtractJob,
   isPubSubAvailable,
@@ -507,10 +509,10 @@ router.get(
           return JSON.stringify(base);
         })();
 
-        await prisma.documentMetadata.upsert({
-          where: { documentId: doc.id },
-          update: { pptxMetadata: nextPptxMetadata } as any,
-          create: { documentId: doc.id, pptxMetadata: nextPptxMetadata } as any,
+        await documentUploadWriteService.upsertDocumentMetadata({
+          documentId: doc.id,
+          update: { pptxMetadata: nextPptxMetadata },
+          create: { pptxMetadata: nextPptxMetadata },
         });
       }
 
@@ -1794,10 +1796,10 @@ router.get(
             const charts = buildChartsPayload(buffer);
 
             // Cache the HTML in metadata for next time
-            await prisma.documentMetadata.upsert({
-              where: { documentId: doc.id },
+            await documentUploadWriteService.upsertDocumentMetadata({
+              documentId: doc.id,
               update: { markdownContent: htmlContent },
-              create: { documentId: doc.id, markdownContent: htmlContent },
+              create: { markdownContent: htmlContent },
             });
 
             res.json({
@@ -1839,13 +1841,10 @@ router.get(
               sheets = preview.sheets.map((s) => s.name);
               const charts = buildChartsPayload(buffer);
               // Re-cache with sheet markers
-              await prisma.documentMetadata.upsert({
-                where: { documentId: doc.id },
+              await documentUploadWriteService.upsertDocumentMetadata({
+                documentId: doc.id,
                 update: { markdownContent: preview.htmlContent },
-                create: {
-                  documentId: doc.id,
-                  markdownContent: preview.htmlContent,
-                },
+                create: { markdownContent: preview.htmlContent },
               });
               htmlContent = preview.htmlContent;
               res.json({
@@ -2041,6 +2040,7 @@ router.get("/:id/download", rateLimitMiddleware, (req, res) =>
 router.patch(
   "/:id",
   rateLimitMiddleware,
+  validate(documentPatchSchema),
   async (req: any, res: Response): Promise<void> => {
     const userId = req.user?.id;
     if (!userId) {
@@ -2055,33 +2055,36 @@ router.patch(
     }
 
     try {
-      const doc = await prisma.document.findFirst({
-        where: { id: documentId, userId },
-        select: { id: true },
-      });
-      if (!doc) {
-        res.status(404).json({ error: "Document not found" });
-        return;
-      }
-
-      const updateData: any = {};
-      if (req.body.folderId !== undefined)
-        updateData.folderId = req.body.folderId || null;
-      if (req.body.filename !== undefined)
-        updateData.filename = req.body.filename;
+      const updateData: {
+        folderId?: string | null;
+        filename?: string;
+        displayTitle?: string | null;
+      } = {};
+      if (req.body.folderId !== undefined) updateData.folderId = req.body.folderId;
+      if (req.body.filename !== undefined) updateData.filename = req.body.filename;
       if (req.body.displayTitle !== undefined)
         updateData.displayTitle = req.body.displayTitle;
 
-      if (Object.keys(updateData).length === 0) {
+      if (
+        updateData.folderId === undefined &&
+        updateData.filename === undefined &&
+        updateData.displayTitle === undefined
+      ) {
         res.status(400).json({ error: "No valid fields to update" });
         return;
       }
 
-      const updated = await prisma.document.update({
-        where: { id: documentId },
-        data: updateData,
-        include: { folder: { select: { path: true } } },
-      });
+      const updated = await documentUploadWriteService.updateDocumentFieldsForUser(
+        {
+          userId,
+          documentId,
+          ...updateData,
+        },
+      );
+      if (!updated) {
+        res.status(404).json({ error: "Document not found" });
+        return;
+      }
 
       res.json({ ok: true, data: updated });
     } catch (e: any) {
@@ -2391,8 +2394,8 @@ router.get(
               console.warn(
                 `[Slides] Slide file not found in current storage (${probe.storagePath}), clearing stale data and regenerating...`,
               );
-              await prisma.documentMetadata.update({
-                where: { documentId: doc.id },
+              await documentUploadWriteService.updateDocumentMetadata({
+                documentId: doc.id,
                 data: {
                   slidesData: null,
                   slideGenerationStatus: "pending",
@@ -2558,15 +2561,14 @@ router.post(
       }
 
       // Clear existing slides data so regeneration starts fresh
-      await prisma.documentMetadata.upsert({
-        where: { documentId: doc.id },
+      await documentUploadWriteService.upsertDocumentMetadata({
+        documentId: doc.id,
         update: {
           slidesData: null,
           slideGenerationStatus: "pending",
           slideGenerationError: null,
         },
         create: {
-          documentId: doc.id,
           slideGenerationStatus: "pending",
         },
       });
@@ -2616,16 +2618,15 @@ router.post(
       }
 
       // Reset all stage statuses and document status
-      await prisma.document.update({
-        where: { id: doc.id },
-        data: {
-          status: "uploaded",
-          indexingState: "pending",
-          indexingError: null,
-          indexingUpdatedAt: new Date(),
-          error: null,
-        },
+      const resetCount = await documentUploadWriteService.resetForReprocess({
+        userId,
+        documentId: doc.id,
+        at: new Date(),
       });
+      if (resetCount === 0) {
+        res.status(404).json({ error: "Document not found" });
+        return;
+      }
 
       // Publish extract job to start the pipeline
       if (env.USE_GCP_WORKERS && isPubSubAvailable()) {
@@ -2678,10 +2679,10 @@ router.patch(
         return;
       }
 
-      const metadata = await prisma.documentMetadata.upsert({
-        where: { documentId: doc.id },
+      const metadata = await documentUploadWriteService.upsertDocumentMetadata({
+        documentId: doc.id,
         update: { markdownContent },
-        create: { documentId: doc.id, markdownContent },
+        create: { markdownContent },
       });
 
       res.json({ message: "Markdown updated successfully", metadata });

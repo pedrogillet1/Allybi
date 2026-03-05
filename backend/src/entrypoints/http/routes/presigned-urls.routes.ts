@@ -8,6 +8,8 @@ import { Router, Response, Request } from "express";
 import { authMiddleware } from "../../../middleware/auth.middleware";
 import { presignedUrlLimiter } from "../../../middleware/rateLimit.middleware";
 import prisma from "../../../platform/db/prismaClient";
+import type { FolderService } from "../../../controllers/folder.controller";
+import { documentUploadWriteService } from "../../../services/documents/documentUploadWrite.service";
 import { GcsStorageService } from "../../../services/retrieval/gcsStorage.service";
 import { UPLOAD_CONFIG } from "../../../config/upload.config";
 import { randomUUID } from "crypto";
@@ -278,6 +280,28 @@ function resolveRelativePath(file: Record<string, any>): string | null {
   return normalized;
 }
 
+async function assertOwnedFolderIds(
+  userId: string,
+  folderIds: Array<string | null | undefined>,
+): Promise<void> {
+  const uniqueIds = Array.from(
+    new Set(
+      folderIds
+        .filter((id): id is string => typeof id === "string" && id.trim().length > 0)
+        .map((id) => id.trim()),
+    ),
+  );
+  if (uniqueIds.length === 0) return;
+
+  const owned = await prisma.folder.findMany({
+    where: { id: { in: uniqueIds }, userId, isDeleted: false },
+    select: { id: true },
+  });
+  if (owned.length !== uniqueIds.length) {
+    throw new Error("Folder not found");
+  }
+}
+
 /**
  * Server-side folder hierarchy creation from relativePath.
  *
@@ -294,7 +318,8 @@ function resolveRelativePath(file: Record<string, any>): string | null {
 async function createFolderHierarchy(
   files: Array<Record<string, any>>,
   userId: string,
-  rootFolderId?: string | null,
+  rootFolderId: string | null | undefined,
+  folderService: Pick<FolderService, "create">,
 ): Promise<Map<string, string>> {
   const t0 = Date.now();
   const folderMap = new Map<string, string>();
@@ -402,14 +427,11 @@ async function createFolderHierarchy(
       const created = await Promise.all(
         toCreate.map((item) =>
           dbConcurrencyLimit(async () => {
-            const folder = await prisma.folder.create({
-              data: {
-                userId,
-                name: item.folderName,
-                parentFolderId: item.parentFolderId,
-                path: item.dbPath,
-              },
-              select: { id: true, name: true, parentFolderId: true },
+            const folder = await folderService.create({
+              userId,
+              name: item.folderName,
+              parentId: item.parentFolderId,
+              path: item.dbPath,
             });
             return { ...item, id: folder.id };
           }),
@@ -472,6 +494,16 @@ router.post(
     }
 
     try {
+      await assertOwnedFolderIds(
+        userId,
+        [
+          folderId,
+          ...files.map((file: any) =>
+            typeof file?.folderId === "string" ? file.folderId : null,
+          ),
+        ],
+      );
+
       const presignedUrls: string[] = [];
       const documentIds: string[] = [];
       const skippedFiles: string[] = [];
@@ -496,11 +528,18 @@ router.post(
       const canSkipFolderHierarchy = nestedFilesMissingFolderId.length === 0;
       const shouldSkipFolderHierarchy =
         Boolean(skipFolderHierarchy) || canSkipFolderHierarchy;
+      const folderService = req.app?.locals?.services?.folders as
+        | FolderService
+        | undefined;
+      if (!shouldSkipFolderHierarchy && !folderService?.create) {
+        res.status(503).json({ error: "Folder service unavailable" });
+        return;
+      }
 
       const tFolders = Date.now();
       const folderMap = shouldSkipFolderHierarchy
         ? new Map<string, string>()
-        : await createFolderHierarchy(files, userId, folderId);
+        : await createFolderHierarchy(files, userId, folderId, folderService!);
       logger.info(
         `[presigned-urls/bulk] FOLDERS: ${Date.now() - tFolders}ms (${shouldSkipFolderHierarchy ? "skipped" : "resolved"})`,
       );
@@ -575,20 +614,19 @@ router.post(
 
       // PHASE 2: Bulk insert all documents in ONE query (avoids connection pool exhaustion)
       if (validFiles.length > 0) {
-        await prisma.document.createMany({
-          data: validFiles.map((f) => ({
+        await documentUploadWriteService.createUploadingDocumentsBulk(
+          userId,
+          validFiles.map((f) => ({
             id: f.docId,
-            userId,
             folderId: f.targetFolderId,
             filename: f.fileName,
             encryptedFilename: f.storageKey,
             fileSize: f.fileSize,
             mimeType: f.mimeType,
             fileHash: `pending-${f.docId}`,
-            status: "uploading",
-            uploadSessionId: uploadSessionId || null,
           })),
-        });
+          uploadSessionId || null,
+        );
       }
 
       // PHASE 3: Generate presigned URLs (controlled concurrency to avoid provider throttling)
@@ -643,6 +681,10 @@ router.post(
         storageMode: isLocalStorage ? "local" : "gcs",
       });
     } catch (e: any) {
+      if (String(e?.message || "").includes("Folder not found")) {
+        res.status(404).json({ error: "Folder not found" });
+        return;
+      }
       logger.error("POST /presigned-urls/bulk error:", e);
       res.status(500).json({ error: "Failed to generate presigned URLs" });
     }
@@ -701,18 +743,17 @@ router.post(
       const now = new Date();
 
       // 1) Transition uploading -> uploaded (idempotent: docs not in 'uploading' are left unchanged)
-      const updateResult = await prisma.document.updateMany({
-        where: { id: { in: documentIds }, userId, status: "uploading" },
-        data: {
-          status: "uploaded",
-          indexingState: "pending",
-          indexingError: null,
-          indexingUpdatedAt: now,
-          updatedAt: now,
-        },
-      });
+      const transitionedCount =
+        await documentUploadWriteService.transitionUploadingToUploadedBatch({
+          userId,
+          documentIds,
+          at: now,
+          touchUpdatedAt: true,
+        });
 
-      // 2) Fetch current truth for these docs (covers repeat calls, retries, and partial sessions)
+      const updateResult = {
+        count: transitionedCount,
+      };
       const docs = await prisma.document.findMany({
         where: { id: { in: documentIds }, userId },
         select: {
@@ -891,9 +932,9 @@ router.post(
 
       // Mark orphaned documents as failed_incomplete
       if (orphanedDocuments.length > 0) {
-        await prisma.document.updateMany({
-          where: { id: { in: orphanedDocuments }, userId },
-          data: { status: "failed" },
+        await documentUploadWriteService.markFailedBatch({
+          userId,
+          documentIds: orphanedDocuments,
         });
       }
 
@@ -950,15 +991,15 @@ router.post(
       // Track docs that actually transitioned (not already uploaded/enriching/ready)
       for (const docId of documentIds) {
         try {
-          const result = await prisma.document.updateMany({
-            where: { id: docId, userId, status: "uploading" }, // Only from uploading
-            data: {
-              status: "uploaded",
-              indexingState: "pending",
-              indexingError: null,
-              indexingUpdatedAt: new Date(),
-            },
-          });
+          const transitioned =
+            await documentUploadWriteService.transitionUploadingToUploadedSingle({
+              userId,
+              documentId: docId,
+              at: new Date(),
+            });
+          const result = {
+            count: transitioned,
+          };
           if (result.count > 0) {
             confirmed.push(docId); // Only add if actually transitioned
           }
@@ -1085,14 +1126,10 @@ router.post(
       await saveToLocalStorage(storageKey, file.buffer);
 
       // Update document status
-      await prisma.document.update({
-        where: { id: documentId },
-        data: {
-          status: "uploaded",
-          indexingState: "pending",
-          indexingError: null,
-          indexingUpdatedAt: new Date(),
-        },
+      await documentUploadWriteService.markUploadedPendingById({
+        userId,
+        documentId,
+        at: new Date(),
       });
 
       // Queue for processing

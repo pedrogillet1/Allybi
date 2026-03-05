@@ -72,6 +72,8 @@ model ConnectorIdentityMap {
   externalWorkspaceId String
   externalUserId      String?
   externalAccountEmail String?
+  syncCursor          String?
+  lastSyncAt          DateTime?
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
   user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)

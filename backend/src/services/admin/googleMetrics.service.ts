@@ -1,4 +1,5 @@
 import type { PrismaClient } from "@prisma/client";
+import type { OcrOutcome } from "../extraction/ocrSignals.service";
 
 export interface GoogleCloudSqlMetrics {
   connected: boolean;
@@ -56,11 +57,39 @@ export interface GoogleOcrMetrics {
   failures: number;
 }
 
+export interface GoogleIngestionSloBucket {
+  mimeType: string;
+  sizeBucket: string;
+  count: number;
+  p95LatencyMs: number;
+  failureRate: number;
+}
+
+export interface GoogleIngestionSloMetrics {
+  docsProcessed: number;
+  p95LatencyMs: number;
+  byMimeSize: GoogleIngestionSloBucket[];
+}
+
+export interface IngestionSloThresholds {
+  maxGlobalP95LatencyMs: number;
+  maxGlobalFailureRatePct: number;
+  minDocsProcessed?: number;
+  maxBucketP95LatencyMsByKey?: Record<string, number>;
+  maxBucketFailureRatePctByKey?: Record<string, number>;
+}
+
+export interface IngestionSloEvaluation {
+  passed: boolean;
+  failures: string[];
+}
+
 export interface GoogleMetricsBundle {
   cloudSql: GoogleCloudSqlMetrics;
   cloudRun: GoogleCloudRunMetrics;
   gemini: GoogleGeminiMetrics;
   ocr: GoogleOcrMetrics;
+  ingestionSlo: GoogleIngestionSloMetrics;
 }
 
 interface WindowParams {
@@ -89,18 +118,17 @@ function toNum(value: unknown): number {
   return 0;
 }
 
-type OcrOutcome =
-  | "not_attempted"
-  | "applied"
-  | "no_text"
-  | "skipped_heuristic"
-  | "provider_unavailable"
-  | "runtime_error";
-
 interface OcrEventLike {
   status?: string | null;
   ocrUsed?: boolean | null;
   ocrConfidence?: number | null;
+  meta?: unknown;
+}
+
+interface IngestionEventLike {
+  status?: string | null;
+  mimeType?: string | null;
+  durationMs?: number | null;
   meta?: unknown;
 }
 
@@ -166,13 +194,23 @@ export function summarizeOcrEvents(events: OcrEventLike[]): GoogleOcrMetrics {
 
     const meta = asRecord(event.meta);
     const attemptedFromMeta = readBoolean(meta?.ocrAttempted);
-    const attempted = attemptedFromMeta ?? used;
+    const explicitOutcome = normalizeOcrOutcome(meta?.ocrOutcome);
+    const hasCanonicalSignals =
+      attemptedFromMeta !== null || explicitOutcome !== null;
+
+    const attempted =
+      attemptedFromMeta ??
+      (explicitOutcome
+        ? explicitOutcome !== "not_attempted" &&
+          explicitOutcome !== "skipped_heuristic"
+        : used);
     if (attempted) ocrAttempted += 1;
 
-    const explicitOutcome = normalizeOcrOutcome(meta?.ocrOutcome);
     let outcome: OcrOutcome = explicitOutcome ?? "not_attempted";
     if (!explicitOutcome) {
-      if (used) outcome = "applied";
+      if (hasCanonicalSignals && attemptedFromMeta === false) {
+        outcome = "not_attempted";
+      } else if (used) outcome = "applied";
       else if (attempted && status === "fail") outcome = "runtime_error";
       else if (attempted) outcome = "no_text";
     }
@@ -207,6 +245,129 @@ export function summarizeOcrEvents(events: OcrEventLike[]): GoogleOcrMetrics {
     ocrErrorRate: toRate(ocrErrors, docsProcessed),
     ocrCoverageRate: toRate(ocrUsed, docsProcessed),
     avgConfidence,
+    failures,
+  };
+}
+
+export function summarizeIngestionLatencyByMimeSize(
+  events: IngestionEventLike[],
+): GoogleIngestionSloMetrics {
+  const durations: number[] = [];
+  const bucketMap = new Map<
+    string,
+    { count: number; failures: number; latencies: number[] }
+  >();
+
+  for (const event of events) {
+    const status = String(event.status || "").toLowerCase();
+    const mimeType = String(event.mimeType || "unknown").toLowerCase();
+    const meta = asRecord(event.meta);
+    const sizeBucketRaw = String(meta?.sizeBucket || "").trim().toLowerCase();
+    const sizeBucket = sizeBucketRaw || "unknown";
+    const key = `${mimeType}||${sizeBucket}`;
+
+    if (!bucketMap.has(key)) {
+      bucketMap.set(key, { count: 0, failures: 0, latencies: [] });
+    }
+
+    const entry = bucketMap.get(key)!;
+    entry.count += 1;
+    if (status === "fail") entry.failures += 1;
+
+    if (typeof event.durationMs === "number" && event.durationMs > 0) {
+      entry.latencies.push(event.durationMs);
+      durations.push(event.durationMs);
+    }
+  }
+
+  const byMimeSize: GoogleIngestionSloBucket[] = Array.from(bucketMap.entries())
+    .map(([key, entry]) => {
+      const [mimeType, sizeBucket] = key.split("||");
+      return {
+        mimeType: mimeType || "unknown",
+        sizeBucket: sizeBucket || "unknown",
+        count: entry.count,
+        p95LatencyMs: p95(entry.latencies),
+        failureRate: entry.count > 0 ? round2((entry.failures / entry.count) * 100) : 0,
+      };
+    })
+    .sort((a, b) => b.count - a.count);
+
+  return {
+    docsProcessed: events.length,
+    p95LatencyMs: p95(durations),
+    byMimeSize,
+  };
+}
+
+export function evaluateIngestionSlo(
+  metrics: GoogleIngestionSloMetrics,
+  thresholds: IngestionSloThresholds,
+): IngestionSloEvaluation {
+  const failures: string[] = [];
+  const minDocsProcessed = Math.max(0, Number(thresholds.minDocsProcessed ?? 1));
+  const maxGlobalP95 = Math.max(1, Number(thresholds.maxGlobalP95LatencyMs || 1));
+  const maxGlobalFailureRate = Math.max(0, Number(thresholds.maxGlobalFailureRatePct || 0));
+
+  if (metrics.docsProcessed < minDocsProcessed) {
+    failures.push(
+      `INSUFFICIENT_SAMPLE: docsProcessed=${metrics.docsProcessed} < ${minDocsProcessed}`,
+    );
+  }
+
+  if (metrics.p95LatencyMs > maxGlobalP95) {
+    failures.push(
+      `GLOBAL_P95_EXCEEDED: ${metrics.p95LatencyMs} > ${maxGlobalP95}`,
+    );
+  }
+
+  const estimatedGlobalFailureRate = (() => {
+    if (metrics.docsProcessed <= 0) return 0;
+    let weightedFailure = 0;
+    for (const bucket of metrics.byMimeSize) {
+      weightedFailure += bucket.count * (bucket.failureRate / 100);
+    }
+    return round2((weightedFailure / metrics.docsProcessed) * 100);
+  })();
+
+  if (estimatedGlobalFailureRate > maxGlobalFailureRate) {
+    failures.push(
+      `GLOBAL_FAILURE_RATE_EXCEEDED: ${estimatedGlobalFailureRate}% > ${maxGlobalFailureRate}%`,
+    );
+  }
+
+  const p95ByKey = thresholds.maxBucketP95LatencyMsByKey || {};
+  for (const [key, max] of Object.entries(p95ByKey)) {
+    const [mimeType, sizeBucket] = key.split("||");
+    const bucket = metrics.byMimeSize.find(
+      (entry) =>
+        entry.mimeType === String(mimeType || "").toLowerCase() &&
+        entry.sizeBucket === String(sizeBucket || "").toLowerCase(),
+    );
+    if (!bucket) continue;
+    if (bucket.p95LatencyMs > max) {
+      failures.push(`BUCKET_P95_EXCEEDED:${key}: ${bucket.p95LatencyMs} > ${max}`);
+    }
+  }
+
+  const failureRateByKey = thresholds.maxBucketFailureRatePctByKey || {};
+  for (const [key, max] of Object.entries(failureRateByKey)) {
+    const [mimeType, sizeBucket] = key.split("||");
+    const bucket = metrics.byMimeSize.find(
+      (entry) =>
+        entry.mimeType === String(mimeType || "").toLowerCase() &&
+        entry.sizeBucket === String(sizeBucket || "").toLowerCase(),
+    );
+    if (!bucket) continue;
+    if (bucket.failureRate > max) {
+      failures.push(
+        `BUCKET_FAILURE_RATE_EXCEEDED:${key}: ${bucket.failureRate}% > ${max}%`,
+      );
+    }
+  }
+
+  return {
+    passed: failures.length === 0,
     failures,
   };
 }
@@ -440,15 +601,40 @@ async function getOcrMetrics(
   }
 }
 
+async function getIngestionSloMetrics(
+  prisma: PrismaClient,
+  window: WindowParams,
+): Promise<GoogleIngestionSloMetrics> {
+  try {
+    const events = await prisma.ingestionEvent.findMany({
+      where: {
+        at: { gte: window.from, lt: window.to },
+      },
+      select: {
+        status: true,
+        mimeType: true,
+        durationMs: true,
+        meta: true,
+      },
+      take: 100000,
+    });
+
+    return summarizeIngestionLatencyByMimeSize(events);
+  } catch {
+    return summarizeIngestionLatencyByMimeSize([]);
+  }
+}
+
 export async function getGoogleMetrics(
   prisma: PrismaClient,
   window: WindowParams,
 ): Promise<GoogleMetricsBundle> {
-  const [cloudSql, cloudRun, gemini, ocr] = await Promise.all([
+  const [cloudSql, cloudRun, gemini, ocr, ingestionSlo] = await Promise.all([
     getCloudSqlMetrics(prisma),
     getCloudRunMetrics(prisma, window),
     getGeminiMetrics(prisma, window),
     getOcrMetrics(prisma, window),
+    getIngestionSloMetrics(prisma, window),
   ]);
 
   return {
@@ -456,5 +642,6 @@ export async function getGoogleMetrics(
     cloudRun,
     gemini,
     ocr,
+    ingestionSlo,
   };
 }

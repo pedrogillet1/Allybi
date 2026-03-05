@@ -7,6 +7,8 @@ const mockAddDocumentJob = jest.fn();
 const mockPublishExtractJob = jest.fn();
 const mockIsPubSubAvailable = jest.fn();
 const mockGetFileMetadata = jest.fn();
+const mockMarkUploadedPendingById = jest.fn();
+const mockMarkQueueSchedulingFailed = jest.fn();
 
 jest.mock("../../../middleware/auth.middleware", () => ({
   authMiddleware: (_req: any, _res: any, next: any) => next(),
@@ -28,6 +30,17 @@ jest.mock("../../../platform/db/prismaClient", () => ({
     ingestionEvent: {
       create: (...args: any[]) => mockIngestionEventCreate(...args),
     },
+  },
+}));
+
+jest.mock("../../../services/documents/documentUploadWrite.service", () => ({
+  documentUploadWriteService: {
+    createUploadingDocument: jest.fn(),
+    markUploadedPendingById: (...args: any[]) =>
+      mockMarkUploadedPendingById(...args),
+    markQueueSchedulingFailed: (...args: any[]) =>
+      mockMarkQueueSchedulingFailed(...args),
+    markFailedBatch: jest.fn(),
   },
 }));
 
@@ -107,6 +120,8 @@ describe("multipart-upload /complete", () => {
     mockPublishExtractJob.mockReset();
     mockIsPubSubAvailable.mockReset().mockReturnValue(false);
     mockGetFileMetadata.mockReset();
+    mockMarkUploadedPendingById.mockReset().mockResolvedValue(1);
+    mockMarkQueueSchedulingFailed.mockReset().mockResolvedValue(1);
   });
 
   test("returns ok=true when scheduling succeeds", async () => {
@@ -137,6 +152,12 @@ describe("multipart-upload /complete", () => {
     expect(res.statusCode).toBe(200);
     expect(res.body).toEqual({ ok: true, documentId: "doc-1" });
     expect(mockAddDocumentJob).toHaveBeenCalledTimes(1);
+    expect(mockMarkUploadedPendingById).toHaveBeenCalledWith(
+      expect.objectContaining({
+        userId: "user-1",
+        documentId: "doc-1",
+      }),
+    );
   });
 
   test("returns 503 and marks indexing failed when scheduling fails", async () => {
@@ -171,7 +192,8 @@ describe("multipart-upload /complete", () => {
         documentId: "doc-1",
       }),
     );
-    expect(mockUpdate).toHaveBeenCalledTimes(2);
+    expect(mockMarkUploadedPendingById).toHaveBeenCalledTimes(1);
+    expect(mockMarkQueueSchedulingFailed).toHaveBeenCalledTimes(1);
     expect(mockIngestionEventCreate).toHaveBeenCalledTimes(1);
     expect(mockIngestionEventCreate).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -181,14 +203,38 @@ describe("multipart-upload /complete", () => {
         }),
       }),
     );
-    expect(mockUpdate).toHaveBeenLastCalledWith(
+    expect(mockMarkQueueSchedulingFailed).toHaveBeenLastCalledWith(
       expect.objectContaining({
-        where: { id: "doc-1" },
-        data: expect.objectContaining({
-          status: "uploaded",
-          indexingState: "failed",
-        }),
+        userId: "user-1",
+        documentId: "doc-1",
       }),
     );
+  });
+
+  test("returns 400 when provided storageKey does not match document key", async () => {
+    const handler = getCompleteHandler();
+    mockFindFirst.mockResolvedValue({
+      id: "doc-1",
+      userId: "user-1",
+      filename: "report.pdf",
+      mimeType: "application/pdf",
+      encryptedFilename: "users/user-1/docs/doc-1/doc-1.pdf",
+    });
+
+    const req: any = {
+      user: { id: "user-1" },
+      body: {
+        documentId: "doc-1",
+        storageKey: "users/user-1/docs/doc-1/other.pdf",
+      },
+      headers: {},
+    };
+    const res = makeRes();
+
+    await handler(req, res as any);
+
+    expect(res.statusCode).toBe(400);
+    expect(res.body).toEqual({ error: "storageKey does not match document" });
+    expect(mockMarkUploadedPendingById).not.toHaveBeenCalled();
   });
 });

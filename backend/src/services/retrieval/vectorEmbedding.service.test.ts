@@ -7,6 +7,7 @@ import { beforeEach, describe, expect, jest, test } from "@jest/globals";
 const mockDocumentFindUnique = jest.fn();
 const mockDocumentFindMany = jest.fn();
 const mockDocumentUpdate = jest.fn();
+const mockDocumentUpdateMany = jest.fn();
 const mockChunkCreateMany = jest.fn();
 const mockChunkCount = jest.fn();
 const mockChunkDeleteMany = jest.fn();
@@ -35,6 +36,7 @@ jest.mock("../../config/database", () => ({
       findUnique: (...args: any[]) => mockDocumentFindUnique(...args),
       findMany: (...args: any[]) => mockDocumentFindMany(...args),
       update: (...args: any[]) => mockDocumentUpdate(...args),
+      updateMany: (...args: any[]) => mockDocumentUpdateMany(...args),
     },
     documentChunk: {
       createMany: (...args: any[]) => mockChunkCreateMany(...args),
@@ -189,6 +191,7 @@ describe("vectorEmbedding.service", () => {
       },
     ]);
     mockDocumentUpdate.mockResolvedValue({});
+    mockDocumentUpdateMany.mockResolvedValue({ count: 1 });
     mockPineconeIsAvailable.mockReturnValue(true);
     mockUpsertDocumentEmbeddings.mockResolvedValue(undefined);
     mockPineconeDeleteDocumentEmbeddings.mockResolvedValue(undefined);
@@ -508,6 +511,23 @@ describe("vectorEmbedding.service", () => {
     expect(chunkData[0].text).toBeNull();
     expect(chunkData[0].textEncrypted).toBe("encrypted-payload");
     expect(chunkData[0].metadataEncrypted).toBe("encrypted-payload");
+    expect(chunkData[0].rowLabel).toBeNull();
+    expect(chunkData[0].colHeader).toBeNull();
+    expect(chunkData[0].valueRaw).toBeNull();
+    expect(chunkData[0].unitRaw).toBeNull();
+  });
+
+  test("fails when document operation claim loses a concurrency race", async () => {
+    mockDocumentUpdateMany.mockResolvedValueOnce({ count: 0 });
+    await expect(
+      storeDocumentEmbeddings(DOC_ID, makeChunks(1), {
+        maxRetries: 1,
+        strictVerify: false,
+        encryptionMode: "plaintext",
+      }),
+    ).rejects.toThrow(/Concurrent indexing operation detected/i);
+    expect(mockChunkCreateMany).not.toHaveBeenCalled();
+    expect(mockUpsertDocumentEmbeddings).not.toHaveBeenCalled();
   });
 
   /* ================================================================ */

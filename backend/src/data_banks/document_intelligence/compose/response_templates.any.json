@@ -1,14 +1,15 @@
 {
   "_meta": {
     "id": "response_templates",
-    "version": "1.0.0",
-    "description": "Composable response templates for doc-grounded, comparison, and clarification outputs.",
+    "version": "1.1.0",
+    "description": "Composable response templates for doc-grounded, comparison, extraction, location, and clarification outputs.",
     "languages": [
       "any",
       "en",
-      "pt"
+      "pt",
+      "es"
     ],
-    "lastUpdated": "2026-03-03",
+    "lastUpdated": "2026-03-05",
     "owner": "data-bank-governance",
     "usedBy": [
       "services/core/banks/dataBankLoader.service.ts"
@@ -55,6 +56,62 @@
       ]
     },
     {
+      "id": "TML_DOC_SINGLE_SUMMARY_ES",
+      "domain": "any",
+      "intent": "summary",
+      "language": "es",
+      "tone": "conciso",
+      "template": "En {{document}}, encontre {{evidenceCount}} evidencias. {{result}} {{confidence}}",
+      "requiredParts": [
+        "document",
+        "result",
+        "evidenceCount",
+        "confidence"
+      ]
+    },
+    {
+      "id": "TML_DOC_EXTRACT_RESULT",
+      "domain": "any",
+      "intent": "extract",
+      "language": "en",
+      "tone": "direct",
+      "template": "In {{document}}, the extracted result is {{result}}. Evidence count: {{evidenceCount}}. {{confidence}}",
+      "requiredParts": [
+        "document",
+        "result",
+        "evidenceCount",
+        "confidence"
+      ]
+    },
+    {
+      "id": "TML_DOC_EXTRACT_RESULT_PT",
+      "domain": "any",
+      "intent": "extract",
+      "language": "pt",
+      "tone": "direto",
+      "template": "Em {{document}}, o resultado extraido e {{result}}. Evidencias: {{evidenceCount}}. {{confidence}}",
+      "requiredParts": [
+        "document",
+        "result",
+        "evidenceCount",
+        "confidence"
+      ]
+    },
+    {
+      "id": "TML_DOC_EXTRACT_RESULT_ES",
+      "domain": "any",
+      "intent": "extract",
+      "language": "es",
+      "tone": "directo",
+      "template": "En {{document}}, el resultado extraido es {{result}}. Evidencias: {{evidenceCount}}. {{confidence}}",
+      "requiredParts": [
+        "document",
+        "result",
+        "evidenceCount",
+        "confidence"
+      ]
+    },
+    {
       "id": "TML_COMPARE_RESULT",
       "domain": "any",
       "intent": "compare",
@@ -76,7 +133,23 @@
       "intent": "compare",
       "language": "pt",
       "tone": "estruturado",
-      "template": "Comparei {{leftDoc}} e {{rightDoc}} em {{topic}}. Diferenças-chave: {{differences}}. Evidencias: {{evidenceCount}}. {{confidence}}",
+      "template": "Comparei {{leftDoc}} e {{rightDoc}} em {{topic}}. Diferencas-chave: {{differences}}. Evidencias: {{evidenceCount}}. {{confidence}}",
+      "requiredParts": [
+        "leftDoc",
+        "rightDoc",
+        "topic",
+        "differences",
+        "evidenceCount",
+        "confidence"
+      ]
+    },
+    {
+      "id": "TML_COMPARE_RESULT_ES",
+      "domain": "any",
+      "intent": "compare",
+      "language": "es",
+      "tone": "estructurado",
+      "template": "Compare {{leftDoc}} y {{rightDoc}} en {{topic}}. Diferencias clave: {{differences}}. Evidencias: {{evidenceCount}}. {{confidence}}",
       "requiredParts": [
         "leftDoc",
         "rightDoc",
@@ -107,6 +180,92 @@
       "requiredParts": [
         "question"
       ]
+    },
+    {
+      "id": "TML_QUESTION_CLARIFY_ES",
+      "domain": "any",
+      "intent": "clarify",
+      "language": "es",
+      "tone": "servicial",
+      "template": "Necesito una aclaracion para responder con seguridad: {{question}}",
+      "requiredParts": [
+        "question"
+      ]
+    },
+    {
+      "id": "TML_LOCATE_CONTEXT",
+      "domain": "any",
+      "intent": "locate_content",
+      "language": "en",
+      "tone": "structured",
+      "template": "I found this in {{document}} at {{location}}. Nearby context: {{contextSummary}}.",
+      "requiredParts": [
+        "document",
+        "location",
+        "contextSummary"
+      ]
+    },
+    {
+      "id": "TML_LOCATE_CONTEXT_PT",
+      "domain": "any",
+      "intent": "locate_content",
+      "language": "pt",
+      "tone": "estruturado",
+      "template": "Encontrei isso em {{document}} em {{location}}. Contexto proximo: {{contextSummary}}.",
+      "requiredParts": [
+        "document",
+        "location",
+        "contextSummary"
+      ]
+    },
+    {
+      "id": "TML_LOCATE_CONTEXT_ES",
+      "domain": "any",
+      "intent": "locate_content",
+      "language": "es",
+      "tone": "estructurado",
+      "template": "Encontre esto en {{document}} en {{location}}. Contexto cercano: {{contextSummary}}.",
+      "requiredParts": [
+        "document",
+        "location",
+        "contextSummary"
+      ]
+    },
+    {
+      "id": "TML_SCOPED_NOT_FOUND",
+      "domain": "any",
+      "intent": "not_found",
+      "language": "en",
+      "tone": "direct",
+      "template": "I could not find matching evidence in {{documentScope}}. {{nextStep}}",
+      "requiredParts": [
+        "documentScope",
+        "nextStep"
+      ]
+    },
+    {
+      "id": "TML_SCOPED_NOT_FOUND_PT",
+      "domain": "any",
+      "intent": "not_found",
+      "language": "pt",
+      "tone": "direto",
+      "template": "Nao encontrei evidencia correspondente em {{documentScope}}. {{nextStep}}",
+      "requiredParts": [
+        "documentScope",
+        "nextStep"
+      ]
+    },
+    {
+      "id": "TML_SCOPED_NOT_FOUND_ES",
+      "domain": "any",
+      "intent": "not_found",
+      "language": "es",
+      "tone": "directo",
+      "template": "No encontre evidencia coincidente en {{documentScope}}. {{nextStep}}",
+      "requiredParts": [
+        "documentScope",
+        "nextStep"
+      ]
     }
   ],
   "rules": [
@@ -125,8 +284,8 @@
     {
       "id": "RT_003_language_template_alignment",
       "trigger": "template language not aligned with user language",
-      "check": "context.userLanguage == 'pt' AND context.templateLanguage != 'pt'",
-      "failureAction": "SWITCH_TEMPLATE_LANGUAGE_PT"
+      "check": "context.userLanguage IN ['pt','es'] AND context.templateLanguage != context.userLanguage",
+      "failureAction": "SWITCH_TEMPLATE_LANGUAGE_FOR_USER"
     },
     {
       "id": "RT_004_evidence_confidence_binding",
@@ -145,3 +304,4 @@
     "\\b(query|document|evidence)\\b"
   ]
 }
+

@@ -1,14 +1,1 @@
-{
-  "_meta": {
-    "id": "compiled_table_header_hash_index",
-    "version": "1.0.0",
-    "description": "Auto-registered bank payload for .compiled/table_header_hash_index.any.json",
-    "languages": [
-      "any"
-    ],
-    "lastUpdated": "2026-03-03"
-  },
-  "config": {
-    "enabled": true
-  }
-}
+{}

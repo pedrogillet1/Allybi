@@ -66,6 +66,20 @@ const expected = [
     hook: 'useSecurity',
     hookFile: 'client/src/hooks/useTelemetry.ts',
   },
+  {
+    route: '/admin/live/traces',
+    pageRef: 'TraceTailPage',
+    pageFile: 'client/src/pages/live/TraceTailPage.tsx',
+    hook: 'useLiveStream',
+    hookFile: 'client/src/hooks/useAdminApi.ts',
+  },
+  {
+    route: '/admin/alerts',
+    pageRef: 'AlertsPage',
+    pageFile: 'client/src/pages/overview/AlertsPage.tsx',
+    hook: 'useOverview',
+    hookFile: 'client/src/hooks/useAdminApi.ts',
+  },
 ];
 
 const appSource = fs.readFileSync(appPath, 'utf8');

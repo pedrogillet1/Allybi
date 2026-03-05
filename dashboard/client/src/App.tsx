@@ -10,7 +10,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 
 // Pages
 import LoginPage from "./pages/Login";
-import { OverviewPage } from "./pages/overview";
+import { AlertsPage, OverviewPage } from "./pages/overview";
 import { UsersPage } from "./pages/users";
 import { FilesPage } from "./pages/files";
 import { QueriesPage } from "./pages/queries";
@@ -18,6 +18,7 @@ import { QualityPage } from "./pages/quality";
 import { LLMPage } from "./pages/llm";
 import { ReliabilityPage } from "./pages/reliability";
 import { SecurityPage } from "./pages/security";
+import { TraceTailPage } from "./pages/live";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -94,6 +95,16 @@ function Router() {
       <Route path="/admin/security">
         <ProtectedRoute>
           <SecurityPage />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/admin/live/traces">
+        <ProtectedRoute>
+          <TraceTailPage />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/admin/alerts">
+        <ProtectedRoute>
+          <AlertsPage />
         </ProtectedRoute>
       </Route>
 

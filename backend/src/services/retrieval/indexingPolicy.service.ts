@@ -54,6 +54,11 @@ function resolveRuntimeMode(env: NodeJS.ProcessEnv): IndexingRuntimeMode {
   return enabled ? "v2" : "v1";
 }
 
+function isProtectedRuntimeEnv(nodeEnv: unknown): boolean {
+  const normalized = normalize(nodeEnv);
+  return normalized === "production" || normalized === "staging";
+}
+
 export function resolveIndexingPolicySnapshot(
   env: NodeJS.ProcessEnv = process.env,
 ): IndexingPolicySnapshot {
@@ -61,6 +66,15 @@ export function resolveIndexingPolicySnapshot(
   const allowedRuntimeModes = parseRuntimeModeAllowed(
     env[INDEXING_RUNTIME_MODE_ALLOWED_ENV],
   );
+  const encryptedChunksOnly = parseBooleanFlag(
+    env.INDEXING_ENCRYPTED_CHUNKS_ONLY,
+    true,
+  );
+  if (isProtectedRuntimeEnv(env.NODE_ENV) && !encryptedChunksOnly) {
+    throw new Error(
+      "[indexing] INDEXING_ENCRYPTED_CHUNKS_ONLY=false is not allowed in production/staging.",
+    );
+  }
 
   return {
     runtimeSelectorFlag: VECTOR_EMBEDDING_SELECTOR_FLAG,
@@ -69,10 +83,7 @@ export function resolveIndexingPolicySnapshot(
     allowedRuntimeModes,
     runtimeModeAllowed: allowedRuntimeModes.includes(runtimeMode),
     strictFailClosed: parseBooleanFlag(env.INDEXING_STRICT_FAIL_CLOSED, true),
-    encryptedChunksOnly: parseBooleanFlag(
-      env.INDEXING_ENCRYPTED_CHUNKS_ONLY,
-      true,
-    ),
+    encryptedChunksOnly,
     verifyRequired: parseBooleanFlag(env.INDEXING_VERIFY_REQUIRED, true),
     allowUnverifiedPreviousOperationDelete: parseBooleanFlag(
       env.INDEXING_ALLOW_UNVERIFIED_PREVOP_DELETE,

@@ -5,6 +5,7 @@ import { authMiddleware } from "../../../middleware/auth.middleware";
 import { rateLimitMiddleware } from "../../../middleware/rateLimit.middleware";
 import {
   FolderController,
+  type FolderService,
   createFolderController,
 } from "../../../controllers/folder.controller";
 import { validate } from "../../../middleware/validate.middleware";
@@ -12,9 +13,9 @@ import {
   folderCreateSchema,
   folderBulkSchema,
   folderUpdateSchema,
-  folderMoveSchema,
 } from "../../../schemas/request.schemas";
 import prisma from "../../../platform/db/prismaClient";
+import { VISIBLE_DOCUMENT_FILTER } from "../../../services/documents/documentVisibilityFilter";
 import { logger } from "../../../utils/logger";
 import AdmZip from "adm-zip";
 import { downloadFile } from "../../../config/storage";
@@ -70,6 +71,14 @@ router.post(
     }
 
     try {
+      const folderService = req.app?.locals?.services?.folders as
+        | FolderService
+        | undefined;
+      if (!folderService?.create) {
+        res.status(503).json({ error: "Folder service unavailable" });
+        return;
+      }
+
       // Sort by depth so parents are created before children
       const sorted = [...folderTree].sort(
         (a, b) => (a.depth ?? 0) - (b.depth ?? 0),
@@ -85,14 +94,11 @@ router.post(
           resolvedParentId = folderMap[entry.parentPath];
         }
 
-        const folder = await prisma.folder.create({
-          data: {
-            userId,
-            name: entry.name,
-            emoji: defaultEmoji,
-            parentFolderId: resolvedParentId,
-            path: entry.path || entry.name,
-          },
+        const folder = await folderService.create({
+          userId,
+          name: entry.name,
+          parentId: resolvedParentId,
+          emoji: defaultEmoji,
         });
 
         folderMap[entry.path || entry.name] = folder.id;
@@ -117,74 +123,7 @@ router.post(
   authMiddleware,
   rateLimitMiddleware,
   validate(folderCreateSchema),
-  async (req: any, res: Response): Promise<void> => {
-    const userId = req.user?.id;
-    if (!userId) {
-      res.status(401).json({
-        ok: false,
-        error: { code: "AUTH_UNAUTHORIZED", message: "Not authenticated." },
-      });
-      return;
-    }
-
-    const { name, emoji } = req.body;
-    const parentFolderId =
-      (req.body?.parentFolderId ?? req.body?.parentId) || null;
-    if (!name?.trim()) {
-      res.status(400).json({
-        ok: false,
-        error: {
-          code: "VALIDATION_NAME_REQUIRED",
-          message: "Folder name is required.",
-        },
-      });
-      return;
-    }
-
-    try {
-      const folder = await prisma.folder.create({
-        data: {
-          userId,
-          name: name.trim(),
-          emoji: emoji || null,
-          parentFolderId,
-        },
-        include: { _count: { select: { documents: true, subfolders: true } } },
-      });
-
-      res.status(201).json({ ok: true, data: folder });
-    } catch (e: any) {
-      if (e.code === "P2002") {
-        // Return the existing folder instead of just an error — enables upsert behavior
-        const existing = await prisma.folder.findFirst({
-          where: { userId, name: name.trim(), parentFolderId },
-          include: {
-            _count: { select: { documents: true, subfolders: true } },
-          },
-        });
-        if (existing) {
-          res.status(200).json({ ok: true, data: existing });
-          return;
-        }
-        res.status(409).json({
-          ok: false,
-          error: {
-            code: "FOLDER_NAME_CONFLICT",
-            message: "A folder with this name already exists.",
-          },
-        });
-        return;
-      }
-      logger.error("[Folders] create error", { error: e.message });
-      res.status(500).json({
-        ok: false,
-        error: {
-          code: "FOLDER_ERROR",
-          message: e.message || "Failed to create folder",
-        },
-      });
-    }
-  },
+  (req, res) => ctrl(req).create(req, res),
 );
 router.get("/:id", authMiddleware, rateLimitMiddleware, (req, res) =>
   ctrl(req).get(req, res),
@@ -194,89 +133,7 @@ router.patch(
   authMiddleware,
   rateLimitMiddleware,
   validate(folderUpdateSchema),
-  async (req: any, res: Response): Promise<void> => {
-    const userId = req.user?.id;
-    if (!userId) {
-      res.status(401).json({
-        ok: false,
-        error: { code: "AUTH_UNAUTHORIZED", message: "Not authenticated." },
-      });
-      return;
-    }
-
-    const folderId = req.params.id;
-    if (!folderId) {
-      res.status(400).json({
-        ok: false,
-        error: {
-          code: "VALIDATION_FOLDER_ID_REQUIRED",
-          message: "Folder id is required.",
-        },
-      });
-      return;
-    }
-
-    const { name, emoji, parentId } = req.body;
-
-    if (!name && emoji === undefined && parentId === undefined) {
-      res.status(400).json({
-        ok: false,
-        error: {
-          code: "VALIDATION_UPDATE_REQUIRED",
-          message: "Provide at least one of: name, emoji, parentId.",
-        },
-      });
-      return;
-    }
-
-    try {
-      // Verify folder belongs to user
-      const existing = await prisma.folder.findFirst({
-        where: { id: folderId, userId },
-      });
-      if (!existing) {
-        res.status(404).json({
-          ok: false,
-          error: { code: "FOLDER_NOT_FOUND", message: "Folder not found." },
-        });
-        return;
-      }
-
-      // Prevent moving a folder into itself
-      if (parentId && parentId === folderId) {
-        res.status(400).json({
-          ok: false,
-          error: {
-            code: "INVALID_PARENT",
-            message: "Cannot move a folder into itself.",
-          },
-        });
-        return;
-      }
-
-      const updateData: any = {};
-      if (name) updateData.name = name.trim();
-      if (emoji !== undefined) updateData.emoji = emoji || null;
-      if (parentId !== undefined) updateData.parentFolderId = parentId || null;
-
-      const folder = await prisma.folder.update({
-        where: { id: folderId },
-        data: updateData,
-        include: { _count: { select: { documents: true, subfolders: true } } },
-      });
-
-      res.json({ ok: true, data: folder });
-    } catch (e: any) {
-      logger.error("[Folders] update error", { error: e.message });
-      res.status(500).json({
-        ok: false,
-        error: {
-          code: "FOLDER_ERROR",
-          message: e.message || "Failed to update folder",
-        },
-      });
-    }
-  },
+  (req, res) => ctrl(req).update(req, res),
 );
 router.delete("/:id", authMiddleware, rateLimitMiddleware, (req, res) =>
   ctrl(req).delete(req, res),
@@ -331,7 +188,11 @@ router.get(
       // Get all documents in these folders
       const folderIds = folderEntries.map((f) => f.id);
       const documents = await prisma.document.findMany({
-        where: { folderId: { in: folderIds }, userId },
+        where: {
+          folderId: { in: folderIds },
+          userId,
+          ...VISIBLE_DOCUMENT_FILTER,
+        },
         select: {
           id: true,
           filename: true,

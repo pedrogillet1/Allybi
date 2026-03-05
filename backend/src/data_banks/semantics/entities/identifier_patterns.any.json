@@ -216,7 +216,7 @@
     {
       "id": "ident_009",
       "name": "identifier_rule_9",
-      "pattern": "\\b(?:+d{1,3}[-. ]?)?(?:(d{2,3})[-. ]?)?d{2,5}[-. ]?d{4}[-. ]?d{4}\\b",
+      "pattern": "\\b(?:\\+?\\d{1,3}[-. ]?)?(?:\\(?\\d{2,3}\\)?[-. ]?)?\\d{3,5}[-. ]?\\d{4}\\b",
       "examples": [
         "PHONELIKE-2026-01",
         "+55 11 90000 0000",
@@ -492,7 +492,7 @@
     {
       "id": "ident_021",
       "name": "identifier_rule_21",
-      "pattern": "\\b(?:+d{1,3}[-. ]?)?(?:(d{2,3})[-. ]?)?d{2,5}[-. ]?d{4}[-. ]?d{4}\\b",
+      "pattern": "\\b(?:\\+?\\d{1,3}[-. ]?)?(?:\\(?\\d{2,3}\\)?[-. ]?)?\\d{3,5}[-. ]?\\d{4}\\b",
       "examples": [
         "PHONELIKE-2026-01",
         "+55 11 90000 0000",
@@ -768,7 +768,7 @@
     {
       "id": "ident_033",
       "name": "identifier_rule_33",
-      "pattern": "\\b(?:+d{1,3}[-. ]?)?(?:(d{2,3})[-. ]?)?d{2,5}[-. ]?d{4}[-. ]?d{4}\\b",
+      "pattern": "\\b(?:\\+?\\d{1,3}[-. ]?)?(?:\\(?\\d{2,3}\\)?[-. ]?)?\\d{3,5}[-. ]?\\d{4}\\b",
       "examples": [
         "PHONELIKE-2026-01",
         "+55 11 90000 0000",
@@ -1044,7 +1044,7 @@
     {
       "id": "ident_045",
       "name": "identifier_rule_45",
-      "pattern": "\\b(?:+d{1,3}[-. ]?)?(?:(d{2,3})[-. ]?)?d{2,5}[-. ]?d{4}[-. ]?d{4}\\b",
+      "pattern": "\\b(?:\\+?\\d{1,3}[-. ]?)?(?:\\(?\\d{2,3}\\)?[-. ]?)?\\d{3,5}[-. ]?\\d{4}\\b",
       "examples": [
         "PHONELIKE-2026-01",
         "+55 11 90000 0000",
@@ -1320,7 +1320,7 @@
     {
       "id": "ident_057",
       "name": "identifier_rule_57",
-      "pattern": "\\b(?:+d{1,3}[-. ]?)?(?:(d{2,3})[-. ]?)?d{2,5}[-. ]?d{4}[-. ]?d{4}\\b",
+      "pattern": "\\b(?:\\+?\\d{1,3}[-. ]?)?(?:\\(?\\d{2,3}\\)?[-. ]?)?\\d{3,5}[-. ]?\\d{4}\\b",
       "examples": [
         "PHONELIKE-2026-01",
         "+55 11 90000 0000",
@@ -1596,7 +1596,7 @@
     {
       "id": "ident_069",
       "name": "identifier_rule_69",
-      "pattern": "\\b(?:+d{1,3}[-. ]?)?(?:(d{2,3})[-. ]?)?d{2,5}[-. ]?d{4}[-. ]?d{4}\\b",
+      "pattern": "\\b(?:\\+?\\d{1,3}[-. ]?)?(?:\\(?\\d{2,3}\\)?[-. ]?)?\\d{3,5}[-. ]?\\d{4}\\b",
       "examples": [
         "PHONELIKE-2026-01",
         "+55 11 90000 0000",
@@ -1872,7 +1872,7 @@
     {
       "id": "ident_081",
       "name": "identifier_rule_81",
-      "pattern": "\\b(?:+d{1,3}[-. ]?)?(?:(d{2,3})[-. ]?)?d{2,5}[-. ]?d{4}[-. ]?d{4}\\b",
+      "pattern": "\\b(?:\\+?\\d{1,3}[-. ]?)?(?:\\(?\\d{2,3}\\)?[-. ]?)?\\d{3,5}[-. ]?\\d{4}\\b",
       "examples": [
         "PHONELIKE-2026-01",
         "+55 11 90000 0000",
@@ -2148,7 +2148,7 @@
     {
       "id": "ident_093",
       "name": "identifier_rule_93",
-      "pattern": "\\b(?:+d{1,3}[-. ]?)?(?:(d{2,3})[-. ]?)?d{2,5}[-. ]?d{4}[-. ]?d{4}\\b",
+      "pattern": "\\b(?:\\+?\\d{1,3}[-. ]?)?(?:\\(?\\d{2,3}\\)?[-. ]?)?\\d{3,5}[-. ]?\\d{4}\\b",
       "examples": [
         "PHONELIKE-2026-01",
         "+55 11 90000 0000",
@@ -2424,7 +2424,7 @@
     {
       "id": "ident_105",
       "name": "identifier_rule_105",
-      "pattern": "\\b(?:+d{1,3}[-. ]?)?(?:(d{2,3})[-. ]?)?d{2,5}[-. ]?d{4}[-. ]?d{4}\\b",
+      "pattern": "\\b(?:\\+?\\d{1,3}[-. ]?)?(?:\\(?\\d{2,3}\\)?[-. ]?)?\\d{3,5}[-. ]?\\d{4}\\b",
       "examples": [
         "PHONELIKE-2026-01",
         "+55 11 90000 0000",
@@ -2700,7 +2700,7 @@
     {
       "id": "ident_117",
       "name": "identifier_rule_117",
-      "pattern": "\\b(?:+d{1,3}[-. ]?)?(?:(d{2,3})[-. ]?)?d{2,5}[-. ]?d{4}[-. ]?d{4}\\b",
+      "pattern": "\\b(?:\\+?\\d{1,3}[-. ]?)?(?:\\(?\\d{2,3}\\)?[-. ]?)?\\d{3,5}[-. ]?\\d{4}\\b",
       "examples": [
         "PHONELIKE-2026-01",
         "+55 11 90000 0000",
@@ -2976,7 +2976,7 @@
     {
       "id": "ident_129",
       "name": "identifier_rule_129",
-      "pattern": "\\b(?:+d{1,3}[-. ]?)?(?:(d{2,3})[-. ]?)?d{2,5}[-. ]?d{4}[-. ]?d{4}\\b",
+      "pattern": "\\b(?:\\+?\\d{1,3}[-. ]?)?(?:\\(?\\d{2,3}\\)?[-. ]?)?\\d{3,5}[-. ]?\\d{4}\\b",
       "examples": [
         "PHONELIKE-2026-01",
         "+55 11 90000 0000",
@@ -3247,6 +3247,219 @@
           "document_scope"
         ],
         "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_adv_address_like",
+      "name": "identifier_patterns_address_like",
+      "pattern": "\\\\b\\\\d{1,5}\\\\s+[A-Za-z]+\\\\s+(?:St|Street|Ave|Avenue|Rd|Road)\\\\b",
+      "examples": [
+        "123 Main St",
+        "500 Market Ave"
+      ],
+      "entityType": "invoice_id",
+      "locale": "pt",
+      "notes": "Bridge rule for adversarial address-like span.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:contextual_overlap"
+      }
+    },
+    {
+      "id": "ident_adv_date_slash",
+      "name": "identifier_patterns_date_slash",
+      "pattern": "\\\\b\\\\d{2}\\\\/\\\\d{2}\\\\/\\\\d{4}\\\\b",
+      "examples": [
+        "03/04/2026"
+      ],
+      "entityType": "invoice_id",
+      "locale": "pt",
+      "notes": "Bridge rule for adversarial date slash format.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:contextual_overlap"
+      }
+    },
+    {
+      "id": "ident_adv_invoice_like",
+      "name": "identifier_patterns_invoice_like",
+      "pattern": "\\\\b[A-Z]{2,6}-\\\\d{4}-\\\\d{3}\\\\b",
+      "examples": [
+        "INV-2026-001",
+        "INV-2025-019"
+      ],
+      "entityType": "invoice_id",
+      "locale": "pt",
+      "notes": "Bridge rule for adversarial invoice-like identifier.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:contextual_overlap"
+      }
+    },
+    {
+      "id": "ident_adv_phone_like",
+      "name": "identifier_patterns_phone_like",
+      "pattern": "\\\\+?\\\\d{1,3}[\\\\s-]\\\\d{3}[\\\\s-]\\\\d{3}[\\\\s-]\\\\d{4}\\\\b",
+      "examples": [
+        "+1 555-123-4567",
+        "+55 11 98888-7777"
+      ],
+      "entityType": "invoice_id",
+      "locale": "pt",
+      "notes": "Bridge rule for adversarial phone-like span.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:contextual_overlap"
+      }
+    },
+    {
+      "id": "ident_adv_year_month",
+      "name": "identifier_patterns_year_month",
+      "pattern": "\\\\b\\\\d{4}-\\\\d{2}\\\\b",
+      "examples": [
+        "2026-03"
+      ],
+      "entityType": "invoice_id",
+      "locale": "pt",
+      "notes": "Bridge rule for adversarial year-month format.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:contextual_overlap"
+      }
+    },
+    {
+      "id": "ident_contextual_slash_date",
+      "name": "ident_contextual_slash_date",
+      "pattern": "\\b\\d{2}\\/\\d{2}\\/\\d{4}\\b",
+      "examples": [
+        "03/04/2026",
+        "11/12/2025"
+      ],
+      "notes": "Contextual overlap rule for robust multi-domain disambiguation.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "document_scope",
+          "identifier_context"
+        ],
+        "curationReason": "signals:contextual_overlap"
+      }
+    },
+    {
+      "id": "ident_contextual_year_month",
+      "name": "ident_contextual_year_month",
+      "pattern": "\\b\\d{4}-\\d{2}\\b",
+      "examples": [
+        "2026-03",
+        "2025-11"
+      ],
+      "notes": "Contextual overlap rule for robust multi-domain disambiguation.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "document_scope",
+          "identifier_context"
+        ],
+        "curationReason": "signals:contextual_overlap"
+      }
+    },
+    {
+      "id": "ident_contextual_invoice_code",
+      "name": "ident_contextual_invoice_code",
+      "pattern": "\\bINV-\\d{4}-\\d{3}\\b",
+      "examples": [
+        "INV-2026-001",
+        "INV-2025-019"
+      ],
+      "notes": "Contextual overlap rule for robust multi-domain disambiguation.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "document_scope",
+          "identifier_context"
+        ],
+        "curationReason": "signals:contextual_overlap"
+      }
+    },
+    {
+      "id": "ident_contextual_address_line",
+      "name": "ident_contextual_address_line",
+      "pattern": "\\b\\d{1,5}\\s+[A-Za-z]+\\s+(?:St|Street|Ave|Avenue|Rd|Road)\\b",
+      "examples": [
+        "123 Main St",
+        "500 Market Ave"
+      ],
+      "notes": "Contextual overlap rule for robust multi-domain disambiguation.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "document_scope",
+          "address_context"
+        ],
+        "curationReason": "signals:contextual_overlap"
+      }
+    },
+    {
+      "id": "ident_contextual_phone_number",
+      "name": "ident_contextual_phone_number",
+      "pattern": "\\+?\\d{1,2}\\s\\d{3}[-\\s]\\d{3}[-\\s]\\d{4}\\b",
+      "examples": [
+        "+1 555-123-4567",
+        "+55 11 98888-7777"
+      ],
+      "notes": "Contextual overlap rule for robust multi-domain disambiguation.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "document_scope",
+          "contact_context"
+        ],
+        "curationReason": "signals:contextual_overlap"
       }
     }
   ]

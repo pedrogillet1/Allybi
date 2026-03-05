@@ -140,21 +140,27 @@ function extractParagraphText(pNode: any): string {
  * Walks w:tr -> w:tc -> w:p, reusing extractParagraphText for cell content.
  * The first row is treated as the header row with a --- separator line.
  */
-function extractTableText(tblNode: any): { markdown: string; rows2d: string[][] } {
-  const rows: string[][] = [];
+function extractTableText(tblNode: any): {
+  markdown: string;
+  rows2d: string[][];
+  structuredRows: ExtractedTable["rows"];
+} {
+  const rows: ExtractedTable["rows"] = [];
 
   const trNodes = tblNode["w:tr"];
-  if (!trNodes) return { markdown: "", rows2d: [] };
+  if (!trNodes) return { markdown: "", rows2d: [], structuredRows: [] };
 
   const trArray = Array.isArray(trNodes) ? trNodes : [trNodes];
 
+  let rowIndex = 0;
   for (const tr of trArray) {
     if (!tr) continue;
-    const cells: string[] = [];
+    const rowCells: ExtractedTable["rows"][number]["cells"] = [];
 
     const tcNodes = tr["w:tc"];
     if (!tcNodes) {
-      rows.push([]);
+      rows.push({ rowIndex, isHeader: rowIndex === 0, cells: rowCells });
+      rowIndex++;
       continue;
     }
 
@@ -162,7 +168,7 @@ function extractTableText(tblNode: any): { markdown: string; rows2d: string[][] 
 
     for (const tc of tcArray) {
       if (!tc) {
-        cells.push("");
+        rowCells.push({ text: "", colIndex: rowCells.length });
         continue;
       }
 
@@ -180,17 +186,39 @@ function extractTableText(tblNode: any): { markdown: string; rows2d: string[][] 
       const isVMergeContinue = vMergeVal !== undefined && !isVMergeRestart;
 
       if (isVMergeContinue) {
-        cells.push(""); // Continuation cell — visually merged with cell above
-        for (let s = 1; s < gridSpan; s++) cells.push("");
+        const startCol = rowCells.length;
+        rowCells.push({
+          text: "",
+          colIndex: startCol,
+          isMergedContinuation: true,
+          ...(gridSpan > 1 ? { colSpan: gridSpan } : {}),
+        });
+        for (let s = 1; s < gridSpan; s++) {
+          rowCells.push({
+            text: "",
+            colIndex: startCol + s,
+            isMergedContinuation: true,
+          });
+        }
         continue;
       }
 
       // Each cell can contain multiple w:p paragraphs
       const pNodes = tc["w:p"];
       if (!pNodes) {
-        cells.push("");
-        // Pad for spanned columns
-        for (let s = 1; s < gridSpan; s++) cells.push("");
+        const startCol = rowCells.length;
+        rowCells.push({
+          text: "",
+          colIndex: startCol,
+          ...(gridSpan > 1 ? { colSpan: gridSpan } : {}),
+        });
+        for (let s = 1; s < gridSpan; s++) {
+          rowCells.push({
+            text: "",
+            colIndex: startCol + s,
+            isMergedContinuation: true,
+          });
+        }
         continue;
       }
 
@@ -206,45 +234,65 @@ function extractTableText(tblNode: any): { markdown: string; rows2d: string[][] 
       }
 
       // Join multi-paragraph cell content with a space (markdown table cells are single-line)
-      cells.push(cellTextParts.join(" ").trim());
+      const startCol = rowCells.length;
+      rowCells.push({
+        text: cellTextParts.join(" ").trim(),
+        colIndex: startCol,
+        ...(gridSpan > 1 ? { colSpan: gridSpan } : {}),
+      });
 
-      // Pad empty cells for spanned columns
-      for (let s = 1; s < gridSpan; s++) cells.push("");
+      for (let s = 1; s < gridSpan; s++) {
+        rowCells.push({
+          text: "",
+          colIndex: startCol + s,
+          isMergedContinuation: true,
+        });
+      }
     }
 
-    rows.push(cells);
+    rows.push({
+      rowIndex,
+      isHeader: rowIndex === 0,
+      cells: rowCells,
+    });
+    rowIndex++;
   }
 
-  if (rows.length === 0) return { markdown: "", rows2d: [] };
+  if (rows.length === 0) return { markdown: "", rows2d: [], structuredRows: [] };
 
-  // Determine the max number of columns across all rows
-  const maxCols = Math.max(...rows.map((r) => r.length));
-  if (maxCols === 0) return { markdown: "", rows2d: [] };
+  const maxCols = Math.max(...rows.map((r) => r.cells.length));
+  if (maxCols === 0) return { markdown: "", rows2d: [], structuredRows: [] };
 
-  // Normalize each row to have the same number of columns
   const normalized = rows.map((row) => {
-    while (row.length < maxCols) {
-      row.push("");
+    const cells = [...row.cells];
+    while (cells.length < maxCols) {
+      cells.push({
+        text: "",
+        colIndex: cells.length,
+      });
     }
-    return row;
+    return {
+      ...row,
+      cells,
+    };
   });
 
-  // Build markdown table
   const lines: string[] = [];
-
-  // Header row
-  const header = normalized[0];
+  const header = normalized[0].cells.map((c) => c.text);
   lines.push("| " + header.map((c) => c || " ").join(" | ") + " |");
-
-  // Separator
   lines.push("| " + header.map(() => "---").join(" | ") + " |");
 
-  // Data rows
   for (let i = 1; i < normalized.length; i++) {
-    lines.push("| " + normalized[i].map((c) => c || " ").join(" | ") + " |");
+    lines.push(
+      "| " + normalized[i].cells.map((c) => c.text || " ").join(" | ") + " |",
+    );
   }
 
-  return { markdown: lines.join("\n"), rows2d: normalized };
+  return {
+    markdown: lines.join("\n"),
+    rows2d: normalized.map((row) => row.cells.map((cell) => cell.text)),
+    structuredRows: normalized,
+  };
 }
 
 /**
@@ -307,7 +355,7 @@ function processTableNode(
   tableCounter?: { count: number },
 ): void {
   if (!tblNode) return;
-  const { markdown, rows2d } = extractTableText(tblNode);
+  const { markdown, structuredRows } = extractTableText(tblNode);
   if (markdown) {
     paragraphs.push({
       text: markdown,
@@ -316,16 +364,12 @@ function processTableNode(
       index,
     });
     // Collect structured table data for cell-level indexing
-    if (collectedTables && rows2d.length > 0) {
+    if (collectedTables && structuredRows.length > 0) {
       const tIdx = tableCounter ? tableCounter.count++ : collectedTables.length;
       collectedTables.push({
         tableId: `docx:t${tIdx}`,
         markdown,
-        rows: rows2d.map((row, rIdx) => ({
-          rowIndex: rIdx,
-          isHeader: rIdx === 0,
-          cells: row.map((text, cIdx) => ({ text, colIndex: cIdx })),
-        })),
+        rows: structuredRows,
       });
     }
   }
@@ -761,3 +805,4 @@ export default {
   getHeadingAnchors,
   findSectionByHeading,
 };
+

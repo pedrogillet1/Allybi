@@ -3948,6 +3948,202 @@
         ],
         "curationReason": "signals:locale_and_context"
       }
+    },
+    {
+      "id": "money_adv_address_like",
+      "name": "money_patterns_address_like",
+      "pattern": "\\\\b\\\\d{1,5}\\\\s+[A-Za-z]+\\\\s+(?:St|Street|Ave|Avenue|Rd|Road)\\\\b",
+      "examples": [
+        "123 Main St",
+        "500 Market Ave"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Bridge rule for adversarial address-like span.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:contextual_overlap"
+      }
+    },
+    {
+      "id": "money_adv_date_slash",
+      "name": "money_patterns_date_slash",
+      "pattern": "\\\\b\\\\d{2}\\\\/\\\\d{2}\\\\/\\\\d{4}\\\\b",
+      "examples": [
+        "03/04/2026"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Bridge rule for adversarial date slash format.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:contextual_overlap"
+      }
+    },
+    {
+      "id": "money_adv_invoice_like",
+      "name": "money_patterns_invoice_like",
+      "pattern": "\\\\b[A-Z]{2,6}-\\\\d{4}-\\\\d{3}\\\\b",
+      "examples": [
+        "INV-2026-001",
+        "INV-2025-019"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Bridge rule for adversarial invoice-like identifier.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:contextual_overlap"
+      }
+    },
+    {
+      "id": "money_adv_phone_like",
+      "name": "money_patterns_phone_like",
+      "pattern": "\\\\+?\\\\d{1,3}[\\\\s-]\\\\d{3}[\\\\s-]\\\\d{3}[\\\\s-]\\\\d{4}\\\\b",
+      "examples": [
+        "+1 555-123-4567",
+        "+55 11 98888-7777"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Bridge rule for adversarial phone-like span.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:contextual_overlap"
+      }
+    },
+    {
+      "id": "money_adv_year_month",
+      "name": "money_patterns_year_month",
+      "pattern": "\\\\b\\\\d{4}-\\\\d{2}\\\\b",
+      "examples": [
+        "2026-03"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Bridge rule for adversarial year-month format.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:contextual_overlap"
+      }
+    },
+    {
+      "id": "money_contextual_invoice_code",
+      "name": "money_contextual_invoice_code",
+      "pattern": "\\bINV-\\d{4}-\\d{3}\\b",
+      "examples": [
+        "INV-2026-001",
+        "INV-2025-019"
+      ],
+      "notes": "Contextual overlap rule for robust multi-domain disambiguation.",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:contextual_overlap"
+      }
+    },
+    {
+      "id": "money_contextual_slash_date",
+      "name": "money_contextual_slash_date",
+      "pattern": "\\b\\d{2}\\/\\d{2}\\/\\d{4}\\b",
+      "examples": [
+        "03/04/2026",
+        "11/12/2025"
+      ],
+      "notes": "Contextual overlap rule for robust multi-domain disambiguation.",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:contextual_overlap"
+      }
+    },
+    {
+      "id": "money_contextual_address_line",
+      "name": "money_contextual_address_line",
+      "pattern": "\\b\\d{1,5}\\s+[A-Za-z]+\\s+(?:St|Street|Ave|Avenue|Rd|Road)\\b",
+      "examples": [
+        "123 Main St",
+        "500 Market Ave"
+      ],
+      "notes": "Contextual overlap rule for robust multi-domain disambiguation.",
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "address_context"
+        ],
+        "curationReason": "signals:contextual_overlap"
+      }
     }
   ]
 }

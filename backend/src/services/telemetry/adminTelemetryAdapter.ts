@@ -556,6 +556,8 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
           domain: r.domain || "unknown",
           createdAt: r.timestamp.toISOString(),
           totalLatencyMs: r.totalMs || 0,
+          retrievalMs: r.retrievalMs ?? null,
+          llmMs: r.llmMs ?? null,
           totalTokens: r.totalTokens,
           totalCost: r.estimatedCostUsd,
           qualityOutcome: r.isUseful
@@ -563,8 +565,14 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
             : r.hadFallback
               ? "weak"
               : "blocked",
-          evidenceStrength: r.retrievalAdequate ? 0.85 : 0.4,
-          sourcesCount: r.distinctDocs,
+          evidenceStrength:
+            Number.isFinite(Number(r.topRelevanceScore))
+              ? Number(r.topRelevanceScore)
+              : r.retrievalAdequate
+                ? 0.85
+                : 0.4,
+          sourcesCount: r.distinctDocs ?? null,
+          evidenceGateAction: r.evidenceGateAction ?? null,
           providers: [r.model?.split("-")[0] || "unknown"],
           hadFallback: r.hadFallback,
           fallbackReason: r.fallbackScenario,

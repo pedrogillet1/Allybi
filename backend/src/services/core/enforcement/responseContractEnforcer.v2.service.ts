@@ -2098,7 +2098,40 @@ function shouldEnforceAnalyticalStructure(
   )
     .trim()
     .toLowerCase();
-  return queryProfile === "analytical";
+  return [
+    "analytical",
+    "extract",
+    "compare",
+    "locate_content",
+    "summary",
+  ].includes(queryProfile);
+}
+
+function resolveAnalyticalIntentFamily(ctx: ResponseContractContext): string {
+  const explicitIntent = String(ctx.intentFamily || "")
+    .trim()
+    .toLowerCase();
+  if (explicitIntent) return explicitIntent;
+  const signals =
+    ctx.signals && typeof ctx.signals === "object" ? ctx.signals : null;
+  const queryProfile = String(
+    (signals as Record<string, unknown> | null)?.queryProfile || "",
+  )
+    .trim()
+    .toLowerCase();
+  if (
+    [
+      "extract",
+      "compare",
+      "locate_content",
+      "summary",
+      "not_found",
+    ].includes(queryProfile)
+  ) {
+    return queryProfile;
+  }
+  if (queryProfile === "analytical") return "extract";
+  return "extract";
 }
 
 function parseLocationFromLocationKey(rawLocationKey: unknown): {
@@ -2255,6 +2288,52 @@ function hasSnippetSupport(sentence: string, snippets: string[]): boolean {
   return false;
 }
 
+function quoteClaimFragment(sentence: string): string {
+  const text = String(sentence || "").trim().replace(/\s+/g, " ");
+  if (!text) return "";
+  const maxChars = 88;
+  return text.length > maxChars ? `${text.slice(0, maxChars - 3).trim()}...` : text;
+}
+
+function claimSupportLabel(
+  sentence: string,
+  sourceButtons: Array<Record<string, unknown>>,
+): string | null {
+  for (const button of sourceButtons) {
+    const snippets = sourceSnippetPool([button]);
+    if (!snippets.length) continue;
+    if (!hasSnippetSupport(sentence, snippets)) continue;
+    const label = buildSourceLabel(button);
+    if (label) return label;
+  }
+  return null;
+}
+
+function buildClaimLinkedEvidenceLines(
+  directAnswer: string,
+  sourceButtons: Array<Record<string, unknown>>,
+  evidencePrefix: string,
+  maxSourceLines: number,
+): string[] {
+  if (!sourceButtons.length || maxSourceLines <= 0) return [];
+  const out: string[] = [];
+  const seen = new Set<string>();
+  const claims = splitSentences(directAnswer).filter(isClaimLikeSentence);
+  for (const claim of claims) {
+    const label = claimSupportLabel(claim, sourceButtons);
+    if (!label) continue;
+    const fragment = quoteClaimFragment(claim);
+    const line = fragment
+      ? `${evidencePrefix} ${label} (supports: "${fragment}").`
+      : `${evidencePrefix} ${label}.`;
+    if (seen.has(line)) continue;
+    seen.add(line);
+    out.push(line);
+    if (out.length >= maxSourceLines) break;
+  }
+  return out;
+}
+
 function applyAnalyticalClaimCitationGuard(
   directAnswer: string,
   sourceButtons: Array<Record<string, unknown>>,
@@ -2277,24 +2356,16 @@ function applyAnalyticalClaimCitationGuard(
     };
   }
   if (snippets.length === 0) {
-    // When snippet text is unavailable, enforce a conservative fallback:
-    // - with no sources: do not keep factual claims
-    // - with source metadata only: keep at most one factual sentence
-    const sourceMetadataOnly = sourceButtons.length > 0;
+    // When snippet text is unavailable, enforce a strict fallback and keep
+    // only non-claim narrative so factual statements stay citation-backed.
     const kept: string[] = [];
-    let keptClaim = 0;
     let droppedClaims = 0;
     for (const sentence of sentences) {
       if (!isClaimLikeSentence(sentence)) {
         kept.push(sentence);
         continue;
       }
-      if (sourceMetadataOnly && keptClaim === 0) {
-        kept.push(sentence);
-        keptClaim += 1;
-      } else {
-        droppedClaims += 1;
-      }
+      droppedClaims += 1;
     }
     if (droppedClaims <= 0) {
       return {
@@ -2401,6 +2472,7 @@ function enforceAnalyticalStructuredTemplate(
   const seenSources = new Set<string>();
   const sourceButtons = listSourceButtons(attachments);
   const maxSourceLines = Math.max(1, Math.min(copy?.maxSourceLines || 2, 5));
+  const evidencePrefix = copy?.evidenceLinePrefix || "Evidence referenced from";
   const claimGuard = applyAnalyticalClaimCitationGuard(
     directAnswer,
     sourceButtons,
@@ -2408,10 +2480,24 @@ function enforceAnalyticalStructuredTemplate(
   );
   directAnswer = claimGuard.directAnswer;
 
+  const claimLinkedEvidence = buildClaimLinkedEvidenceLines(
+    directAnswer,
+    sourceButtons,
+    evidencePrefix,
+    maxSourceLines,
+  );
+  for (const line of claimLinkedEvidence) {
+    if (seenEvidence.has(line)) continue;
+    seenEvidence.add(line);
+    evidenceLines.push(line);
+    if (evidenceLines.length >= maxSourceLines) break;
+  }
+
   for (const button of sourceButtons) {
+    if (evidenceLines.length >= maxSourceLines) break;
     const label = buildSourceLabel(button);
     const evidenceLine = label
-      ? `${copy?.evidenceLinePrefix || "Evidence referenced from"} ${label}.`
+      ? `${evidencePrefix} ${label}.`
       : null;
     if (evidenceLine && !seenEvidence.has(evidenceLine)) {
       seenEvidence.add(evidenceLine);
@@ -2442,6 +2528,7 @@ function enforceAnalyticalStructuredTemplate(
 
   const structuredText = [
     copy?.openerLine || null,
+    copy?.familyHeadingLine || null,
     `${copy?.directAnswerLabel || "Direct answer"}: ${directAnswer}`,
     `${copy?.keyEvidenceLabel || "Key evidence"}:`,
     ...evidenceLines.map((line) => `- ${line}`),
@@ -2503,7 +2590,13 @@ export class ResponseContractEnforcerService {
     if (override) return parseBoolish(override);
     const profile = String(process.env.CERT_PROFILE || "").trim().toLowerCase();
     const nodeEnv = String(process.env.NODE_ENV || "").trim().toLowerCase();
-    return profile === "release" || nodeEnv === "production";
+    return (
+      profile === "release" ||
+      profile === "ci" ||
+      profile === "retrieval_signoff" ||
+      profile === "local_hard" ||
+      nodeEnv === "production"
+    );
   }
 
   private shouldAllowLegacyUiContracts(): boolean {
@@ -3523,7 +3616,7 @@ export class ResponseContractEnforcerService {
             String(ctx.operator || ""),
             content,
           ].join("|"),
-          intent: String(ctx.intentFamily || "extract"),
+          intent: resolveAnalyticalIntentFamily(ctx),
         });
         const structured = enforceAnalyticalStructuredTemplate(
           content,

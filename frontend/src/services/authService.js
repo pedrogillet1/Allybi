@@ -1,8 +1,6 @@
 import api, { resetAuthDead } from './api';
 import { getApiBaseUrl } from './runtimeConfig';
 
-const AUTH_LOCALSTORAGE_COMPAT = process.env.REACT_APP_AUTH_LOCALSTORAGE_COMPAT === 'true';
-
 const authService = {
   /**
    * Register a new user (creates pending user, requires verification)
@@ -36,10 +34,6 @@ const authService = {
 
       // Email verification now completes registration and returns tokens
       if (response.data.tokens && response.data.tokens.accessToken) {
-        if (AUTH_LOCALSTORAGE_COMPAT) {
-          localStorage.setItem('accessToken', response.data.tokens.accessToken);
-          localStorage.setItem('refreshToken', response.data.tokens.refreshToken);
-        }
         localStorage.setItem('user', JSON.stringify(response.data.user));
         localStorage.removeItem('pendingEmail'); // Clean up
       }
@@ -91,10 +85,6 @@ const authService = {
       // Backend returns { user, tokens: { accessToken, refreshToken } }
       const tokens = response.data.tokens;
       if (tokens && tokens.accessToken) {
-        if (AUTH_LOCALSTORAGE_COMPAT) {
-          localStorage.setItem('accessToken', tokens.accessToken);
-          localStorage.setItem('refreshToken', tokens.refreshToken);
-        }
         localStorage.setItem('user', JSON.stringify(response.data.user));
         localStorage.removeItem('pendingEmail'); // Clean up
       }
@@ -125,10 +115,6 @@ const authService = {
 
       // Otherwise, store tokens and user data
       if (response.data.accessToken) {
-        if (AUTH_LOCALSTORAGE_COMPAT) {
-          localStorage.setItem('accessToken', response.data.accessToken);
-          localStorage.setItem('refreshToken', response.data.refreshToken);
-        }
         localStorage.setItem('user', JSON.stringify(response.data.user));
         resetAuthDead(); // allow interceptor to retry requests again
       }
@@ -149,10 +135,6 @@ const authService = {
       const response = await api.post('/api/auth/2fa/verify-login', data);
 
       if (response.data.accessToken) {
-        if (AUTH_LOCALSTORAGE_COMPAT) {
-          localStorage.setItem('accessToken', response.data.accessToken);
-          localStorage.setItem('refreshToken', response.data.refreshToken);
-        }
         localStorage.setItem('user', JSON.stringify(response.data.user));
       }
 
@@ -168,18 +150,14 @@ const authService = {
    */
   async logout() {
     try {
-      const payload = AUTH_LOCALSTORAGE_COMPAT
-        ? { refreshToken: localStorage.getItem('refreshToken') || undefined }
-        : {};
+      const payload = {};
       await api.post('/api/auth/logout', payload);
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
       // Clear local storage regardless of API call success
-      if (AUTH_LOCALSTORAGE_COMPAT) {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-      }
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
       localStorage.removeItem('user');
     }
   },
@@ -290,10 +268,7 @@ const authService = {
   isAuthenticated() {
     const user = this.getCurrentUser();
     if (user) return true;
-    if (!AUTH_LOCALSTORAGE_COMPAT) return false;
-    const accessToken = localStorage.getItem('accessToken');
-    const refreshToken = localStorage.getItem('refreshToken');
-    return !!(accessToken && refreshToken);
+    return false;
   },
 
   /**
@@ -332,3 +307,4 @@ const authService = {
 };
 
 export default authService;
+

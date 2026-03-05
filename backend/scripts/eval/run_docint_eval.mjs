@@ -29,39 +29,11 @@ const suiteFilter = (() => {
 const failures = [];
 const warnings = [];
 
-const LEGACY_DOC_TYPE_ALIASES = {
-  education: {
-    education_diploma_certificate: "edu_diploma_certificate",
-    education_enrollment_letter: "edu_enrollment_letter",
-    education_transcript: "edu_transcript",
-  },
-  housing: {
-    housing_lease_agreement: "housing_lease_summary",
-  },
-  hr_payroll: {
-    hr_payroll_employment_contract: "hr_employment_verification_letter",
-    hr_payroll_payslip: "hr_pay_stub",
-    hr_payroll_timesheet: "hr_timesheet",
-  },
-  identity: {
-    identity_driver_license: "id_driver_license",
-    identity_national_id: "id_business_registration_certificate",
-    identity_passport: "id_passport",
-  },
-  insurance: {
-    insurance_claim_form: "ins_claim_submission",
-    insurance_policy_document: "ins_policy_document",
-    insurance_premium_notice: "ins_premium_invoice",
-  },
-  tax: {
-    tax_payment_receipt: "tax_payment_slip",
-    tax_return_business: "tax_assessment_notice",
-    tax_return_individual: "tax_individual_income_return",
-  },
-  travel: {
-    travel_hotel_receipt: "travel_hotel_booking_confirmation",
-  },
-};
+const LEGACY_DOC_TYPE_ALIASES_PATH = path.join(
+  evalRoot,
+  "suites",
+  "legacy_doc_type_aliases.any.json",
+);
 
 function fail(msg) {
   failures.push(msg);
@@ -69,6 +41,32 @@ function fail(msg) {
 function warn(msg) {
   warnings.push(msg);
 }
+
+function loadLegacyDocTypeAliases() {
+  if (!fs.existsSync(LEGACY_DOC_TYPE_ALIASES_PATH)) {
+    warn(`Missing legacy doc type aliases at ${LEGACY_DOC_TYPE_ALIASES_PATH}`);
+    return {};
+  }
+  try {
+    const parsed = JSON.parse(
+      fs.readFileSync(LEGACY_DOC_TYPE_ALIASES_PATH, "utf8"),
+    );
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      fail(
+        `Invalid legacy doc type aliases payload at ${LEGACY_DOC_TYPE_ALIASES_PATH}`,
+      );
+      return {};
+    }
+    return parsed;
+  } catch (error) {
+    fail(
+      `Invalid JSON in legacy doc type aliases: ${LEGACY_DOC_TYPE_ALIASES_PATH} — ${error.message}`,
+    );
+    return {};
+  }
+}
+
+const LEGACY_DOC_TYPE_ALIASES = loadLegacyDocTypeAliases();
 
 // ── Load doc type catalogs (core + extended) ───────────────────────────
 function loadCoreTaxonomyByDomain() {

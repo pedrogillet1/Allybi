@@ -24,12 +24,82 @@ const maxAgeMs = Number.isFinite(maxAgeHours) && maxAgeHours > 0
 
 const root = process.cwd();
 const gatesDir = path.resolve(root, "reports/cert/gates");
-const commitMetadata = resolveCommitHash(root);
-const commitHash = commitMetadata.commitHash;
+const summaryPath = path.resolve(root, "reports/cert/certification-summary.json");
+const activeManifestPath = path.resolve(root, "reports/cert/active-gates-manifest.json");
+
+function isValidCommitHash(value) {
+  return /^[0-9a-f]{40}$/i.test(String(value || "").trim());
+}
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, "utf8"));
 }
+
+function safeReadJson(filePath) {
+  try {
+    return readJson(filePath);
+  } catch {
+    return null;
+  }
+}
+
+function toIsoTimestamp(value) {
+  const ts = Date.parse(String(value || "").trim());
+  return Number.isFinite(ts) ? ts : 0;
+}
+
+function resolveExpectedCommitMetadata() {
+  const candidates = [];
+
+  if (fs.existsSync(activeManifestPath)) {
+    const manifest = safeReadJson(activeManifestPath);
+    const manifestCommitHash = String(manifest?.commitHash || "")
+      .trim()
+      .toLowerCase();
+    const manifestProfile = String(manifest?.profile || "").trim();
+    const manifestStrict = manifest?.strict === true;
+    if (
+      isValidCommitHash(manifestCommitHash) &&
+      manifestProfile === profile &&
+      manifestStrict === strict
+    ) {
+      candidates.push({
+        commitHash: manifestCommitHash,
+        source: "active-gates-manifest",
+        ts: toIsoTimestamp(manifest?.generatedAt),
+      });
+    }
+  }
+
+  if (fs.existsSync(summaryPath)) {
+    const summary = safeReadJson(summaryPath);
+    const summaryCommitHash = String(summary?.commitHash || "").trim().toLowerCase();
+    const summaryProfile = String(summary?.profile || "").trim();
+    const summaryStrict = summary?.strict === true;
+    if (
+      isValidCommitHash(summaryCommitHash) &&
+      summaryProfile === profile &&
+      summaryStrict === strict
+    ) {
+      candidates.push({
+        commitHash: summaryCommitHash,
+        source: "certification-summary",
+        ts: toIsoTimestamp(summary?.generatedAt),
+      });
+    }
+  }
+
+  if (candidates.length > 0) {
+    candidates.sort((a, b) => b.ts - a.ts);
+    const selected = candidates[0];
+    return { commitHash: selected.commitHash, source: selected.source };
+  }
+
+  return resolveCommitHash(root);
+}
+
+const commitMetadata = resolveExpectedCommitMetadata();
+const commitHash = commitMetadata.commitHash;
 
 function hasQueryLatencyInput() {
   const reportsRoots = [
@@ -135,14 +205,14 @@ function main() {
 
   if (failures.length > 0) {
     console.error(
-      `[cert:preflight] FAIL strict=${strict} profile=${profile} scope=${scope} required=${gateSet.requiredGateIds.length} commit=${commitHash || "unknown"}`,
+      `[cert:preflight] FAIL strict=${strict} profile=${profile} scope=${scope} required=${gateSet.requiredGateIds.length} commit=${commitHash || "unknown"} commitSource=${commitMetadata.source || "unknown"}`,
     );
     for (const failure of failures) console.error(`- ${failure}`);
     process.exit(1);
   }
 
   console.log(
-    `[cert:preflight] PASS strict=${strict} profile=${profile} scope=${scope} required=${gateSet.requiredGateIds.length} commit=${commitHash || "unknown"}`,
+    `[cert:preflight] PASS strict=${strict} profile=${profile} scope=${scope} required=${gateSet.requiredGateIds.length} commit=${commitHash || "unknown"} commitSource=${commitMetadata.source || "unknown"}`,
   );
 }
 

@@ -2397,6 +2397,202 @@
         "risk_disclosure",
         "appendix"
       ]
+    },
+    {
+      "id": "fin_covenant",
+      "name": {
+        "en": "Fin Covenant",
+        "pt": "Fin Covenant"
+      },
+      "description": "Auto-generated catalog entry for fin_covenant from canonical taxonomy.",
+      "detectionPatterns": [
+        "\\bfin\\\\s\\+covenant\\b",
+        "\\bcovenant\\b"
+      ],
+      "commonSections": [
+        "Executive Summary",
+        "Resumo Executivo",
+        "Scope",
+        "Escopo",
+        "Assumptions",
+        "Premissas",
+        "Financial Highlights",
+        "Destaques Financeiros",
+        "Controls and Approvals",
+        "Controles e Aprovações",
+        "Appendix",
+        "Anexos"
+      ],
+      "extractionPriority": 85,
+      "riskTier": "medium"
+    },
+    {
+      "id": "fin_covenant_report",
+      "name": {
+        "en": "Fin Covenant Report",
+        "pt": "Fin Covenant Report"
+      },
+      "description": "Auto-generated catalog entry for fin_covenant_report from canonical taxonomy.",
+      "detectionPatterns": [
+        "\\bfin\\\\s\\+covenant\\\\s\\+report\\b",
+        "\\bcovenant\\\\s\\+report\\b"
+      ],
+      "commonSections": [
+        "Executive Summary",
+        "Resumo Executivo",
+        "Scope",
+        "Escopo",
+        "Assumptions",
+        "Premissas",
+        "Financial Highlights",
+        "Destaques Financeiros",
+        "Controls and Approvals",
+        "Controles e Aprovações",
+        "Appendix",
+        "Anexos"
+      ],
+      "extractionPriority": 85,
+      "riskTier": "medium"
+    },
+    {
+      "id": "fin_esg_report",
+      "name": {
+        "en": "Fin Esg Report",
+        "pt": "Fin Esg Report"
+      },
+      "description": "Auto-generated catalog entry for fin_esg_report from canonical taxonomy.",
+      "detectionPatterns": [
+        "\\bfin\\\\s\\+esg\\\\s\\+report\\b",
+        "\\besg\\\\s\\+report\\b"
+      ],
+      "commonSections": [
+        "Executive Summary",
+        "Resumo Executivo",
+        "Scope",
+        "Escopo",
+        "Assumptions",
+        "Premissas",
+        "Financial Highlights",
+        "Destaques Financeiros",
+        "Controls and Approvals",
+        "Controles e Aprovações",
+        "Appendix",
+        "Anexos"
+      ],
+      "extractionPriority": 85,
+      "riskTier": "medium"
+    },
+    {
+      "id": "fin_pipeline_report",
+      "name": {
+        "en": "Fin Pipeline Report",
+        "pt": "Fin Pipeline Report"
+      },
+      "description": "Auto-generated catalog entry for fin_pipeline_report from canonical taxonomy.",
+      "detectionPatterns": [
+        "\\bfin\\\\s\\+pipeline\\\\s\\+report\\b",
+        "\\bpipeline\\\\s\\+report\\b"
+      ],
+      "commonSections": [
+        "Executive Summary",
+        "Resumo Executivo",
+        "Scope",
+        "Escopo",
+        "Assumptions",
+        "Premissas",
+        "Financial Highlights",
+        "Destaques Financeiros",
+        "Controls and Approvals",
+        "Controles e Aprovações",
+        "Appendix",
+        "Anexos"
+      ],
+      "extractionPriority": 85,
+      "riskTier": "medium"
+    },
+    {
+      "id": "fin_statements_pack",
+      "name": {
+        "en": "Fin Statements Pack",
+        "pt": "Fin Statements Pack"
+      },
+      "description": "Auto-generated catalog entry for fin_statements_pack from canonical taxonomy.",
+      "detectionPatterns": [
+        "\\bfin\\\\s\\+statements\\\\s\\+pack\\b",
+        "\\bstatements\\\\s\\+pack\\b"
+      ],
+      "commonSections": [
+        "Executive Summary",
+        "Resumo Executivo",
+        "Scope",
+        "Escopo",
+        "Assumptions",
+        "Premissas",
+        "Financial Highlights",
+        "Destaques Financeiros",
+        "Controls and Approvals",
+        "Controles e Aprovações",
+        "Appendix",
+        "Anexos"
+      ],
+      "extractionPriority": 85,
+      "riskTier": "medium"
+    },
+    {
+      "id": "fin_variance",
+      "name": {
+        "en": "Fin Variance",
+        "pt": "Fin Variance"
+      },
+      "description": "Auto-generated catalog entry for fin_variance from canonical taxonomy.",
+      "detectionPatterns": [
+        "\\bfin\\\\s\\+variance\\b",
+        "\\bvariance\\b"
+      ],
+      "commonSections": [
+        "Executive Summary",
+        "Resumo Executivo",
+        "Scope",
+        "Escopo",
+        "Assumptions",
+        "Premissas",
+        "Financial Highlights",
+        "Destaques Financeiros",
+        "Controls and Approvals",
+        "Controles e Aprovações",
+        "Appendix",
+        "Anexos"
+      ],
+      "extractionPriority": 85,
+      "riskTier": "medium"
+    },
+    {
+      "id": "fin_variance_report",
+      "name": {
+        "en": "Fin Variance Report",
+        "pt": "Fin Variance Report"
+      },
+      "description": "Auto-generated catalog entry for fin_variance_report from canonical taxonomy.",
+      "detectionPatterns": [
+        "\\bfin\\\\s\\+variance\\\\s\\+report\\b",
+        "\\bvariance\\\\s\\+report\\b"
+      ],
+      "commonSections": [
+        "Executive Summary",
+        "Resumo Executivo",
+        "Scope",
+        "Escopo",
+        "Assumptions",
+        "Premissas",
+        "Financial Highlights",
+        "Destaques Financeiros",
+        "Controls and Approvals",
+        "Controles e Aprovações",
+        "Appendix",
+        "Anexos"
+      ],
+      "extractionPriority": 85,
+      "riskTier": "medium"
     }
   ]
 }

@@ -1,0 +1,33 @@
+{
+  "education": {
+    "education_diploma_certificate": "edu_diploma_certificate",
+    "education_enrollment_letter": "edu_enrollment_letter",
+    "education_transcript": "edu_transcript"
+  },
+  "housing": {
+    "housing_lease_agreement": "housing_lease_summary"
+  },
+  "hr_payroll": {
+    "hr_payroll_employment_contract": "hr_employment_verification_letter",
+    "hr_payroll_payslip": "hr_pay_stub",
+    "hr_payroll_timesheet": "hr_timesheet"
+  },
+  "identity": {
+    "identity_driver_license": "id_driver_license",
+    "identity_national_id": "id_business_registration_certificate",
+    "identity_passport": "id_passport"
+  },
+  "insurance": {
+    "insurance_claim_form": "ins_claim_submission",
+    "insurance_policy_document": "ins_policy_document",
+    "insurance_premium_notice": "ins_premium_invoice"
+  },
+  "tax": {
+    "tax_payment_receipt": "tax_payment_slip",
+    "tax_return_business": "tax_assessment_notice",
+    "tax_return_individual": "tax_individual_income_return"
+  },
+  "travel": {
+    "travel_hotel_receipt": "travel_hotel_booking_confirmation"
+  }
+}

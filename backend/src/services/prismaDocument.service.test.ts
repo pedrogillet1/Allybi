@@ -26,6 +26,13 @@ jest.mock("../queues/document.queue", () => ({
   addDocumentJob: jest.fn(),
 }));
 
+jest.mock("../config/storage", () => ({
+  uploadFile: jest.fn(),
+  downloadFile: jest.fn(),
+  getSignedUrl: jest.fn(),
+  deleteFile: jest.fn(),
+}));
+
 jest.mock("../config/env", () => ({
   env: {
     USE_GCP_WORKERS: false,

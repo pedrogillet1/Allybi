@@ -109,6 +109,82 @@
       "scope": "table_header:identity",
       "disambiguationRuleId": "headers_disambiguation_identity_issuing_authority",
       "curationReason": "weighted:issuing_authority:domain_identity"
+    },
+    {
+      "canonical": "address_history",
+      "synonyms": [
+        "address history",
+        "Address History field",
+        "campo address_history",
+        "address_history value",
+        "Address History valor"
+      ],
+      "related": [
+        "document_fields",
+        "biometric_data"
+      ],
+      "normalizationNotes": "Map address_history to normalized canonical address_history.",
+      "priority": 504,
+      "scope": "table_header:identity",
+      "disambiguationRuleId": "headers_disambiguation_identity_address_history",
+      "curationReason": "weighted:address_history:domain_identity"
+    },
+    {
+      "canonical": "document_status",
+      "synonyms": [
+        "document status",
+        "Document Status field",
+        "campo document_status",
+        "document_status value",
+        "Document Status valor"
+      ],
+      "related": [
+        "document_fields",
+        "biometric_data"
+      ],
+      "normalizationNotes": "Map document_status to normalized canonical document_status.",
+      "priority": 505,
+      "scope": "table_header:identity",
+      "disambiguationRuleId": "headers_disambiguation_identity_document_status",
+      "curationReason": "weighted:document_status:domain_identity"
+    },
+    {
+      "canonical": "verification_events",
+      "synonyms": [
+        "verification events",
+        "Verification Events field",
+        "campo verification_events",
+        "verification_events value",
+        "Verification Events valor"
+      ],
+      "related": [
+        "document_fields",
+        "biometric_data"
+      ],
+      "normalizationNotes": "Map verification_events to normalized canonical verification_events.",
+      "priority": 506,
+      "scope": "table_header:identity",
+      "disambiguationRuleId": "headers_disambiguation_identity_verification_events",
+      "curationReason": "weighted:verification_events:domain_identity"
+    },
+    {
+      "canonical": "signature_block",
+      "synonyms": [
+        "signature block",
+        "Signature Block field",
+        "campo signature_block",
+        "signature_block value",
+        "Signature Block valor"
+      ],
+      "related": [
+        "document_fields",
+        "biometric_data"
+      ],
+      "normalizationNotes": "Map signature_block to normalized canonical signature_block.",
+      "priority": 507,
+      "scope": "table_header:identity",
+      "disambiguationRuleId": "headers_disambiguation_identity_signature_block",
+      "curationReason": "weighted:signature_block:domain_identity"
     }
   ]
 }

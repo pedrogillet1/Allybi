@@ -72,6 +72,25 @@
       ]
     },
     {
+      "id": "response_contract_enforcer",
+      "path": "src/services/core/enforcement/responseContractEnforcer.v2.service.ts",
+      "uses": [
+        "anti_robotic_style_rules",
+        "citation_policy",
+        "closers",
+        "fallback_messages",
+        "followup_suggestions_v1c6269cc",
+        "format_guardrails",
+        "help_microcopy",
+        "openers",
+        "response_templates",
+        "table_render_policy",
+        "tone_profiles",
+        "verbosity_ladder",
+        "voice_personality_profiles"
+      ]
+    },
+    {
       "id": "scope_gate",
       "path": "src/services/core/scope/scopeGate.service.ts",
       "uses": [
@@ -99,6 +118,9 @@
     "accounting_rules",
     "ambiguity_questions",
     "assumption_policy",
+    "anti_robotic_style_rules",
+    "citation_policy",
+    "closers",
     "doc_taxonomy",
     "document_intelligence_bank_map",
     "document_intelligence_dependency_graph",
@@ -106,9 +128,13 @@
     "document_intelligence_runtime_wiring_gates",
     "document_intelligence_schema_registry",
     "document_intelligence_usage_manifest",
+    "fallback_messages",
     "finance_doc_logic",
     "finance_kpi_ontology",
+    "followup_suggestions_v1c6269cc",
+    "format_guardrails",
     "headings_map",
+    "help_microcopy",
     "layout_cues",
     "legal_clause_ontology",
     "legal_reference_rules",
@@ -117,10 +143,16 @@
     "medical_report_ontology",
     "medical_safety_boundaries",
     "numeric_integrity",
+    "openers",
     "ops_doc_logic",
     "ops_kpi_ontology",
+    "response_templates",
     "sheetname_patterns",
     "source_policy",
+    "table_render_policy",
+    "tone_profiles",
+    "verbosity_ladder",
+    "voice_personality_profiles",
     "wrong_doc_lock"
   ],
   "consumedIdPrefixes": [

@@ -5,6 +5,8 @@
  * Type guards below eliminate the need for `(extraction as any)` casts.
  */
 
+import type { OcrOutcome } from "../../extraction/ocrSignals.service";
+
 // ---------------------------------------------------------------------------
 // Base fields shared by all extraction results
 // ---------------------------------------------------------------------------
@@ -13,10 +15,12 @@ export interface BaseExtractionResult {
   text: string;
   wordCount: number;
   confidence: number;
+  ocrAttempted?: boolean;
   ocrApplied?: boolean;
   ocrConfidence?: number;
   ocrPageCount?: number;
   ocrMode?: string;
+  ocrOutcome?: OcrOutcome;
   textQuality?: string;
   textQualityScore?: number;
   weakTextReasons?: string[];
@@ -34,7 +38,13 @@ export interface ExtractedTable {
   rows: Array<{
     rowIndex: number;
     isHeader: boolean;
-    cells: Array<{ text: string; colIndex: number }>;
+    cells: Array<{
+      text: string;
+      colIndex: number;
+      colSpan?: number;
+      rowSpan?: number;
+      isMergedContinuation?: boolean;
+    }>;
   }>;
 }
 

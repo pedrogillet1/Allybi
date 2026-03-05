@@ -95,6 +95,7 @@ describe("GmailSyncService cursor advancement", () => {
 
     expect(result.failedCount).toBe(1);
     expect(result.ingestedCount).toBe(0);
+    expect(result.updatedCount).toBe(0);
     expect(result.historyId).toBe("old-history-id");
     expect(writeSpy).toHaveBeenCalledWith(
       "user-1",
@@ -127,6 +128,7 @@ describe("GmailSyncService cursor advancement", () => {
 
     expect(result.failedCount).toBe(0);
     expect(result.ingestedCount).toBe(1);
+    expect(result.updatedCount).toBe(0);
     expect(result.historyId).toBe("new-history-id");
     expect(writeSpy).toHaveBeenCalledWith(
       "user-1",
@@ -138,5 +140,28 @@ describe("GmailSyncService cursor advancement", () => {
         }),
       }),
     );
+  });
+
+  test("counts updated connector documents separately from created/existing", async () => {
+    const { service } = makeService([
+      { sourceId: "msg-1", documentId: "doc-1", status: "updated" },
+    ]);
+    jest.spyOn(service as any, "readCursorFile").mockResolvedValue({
+      version: 1,
+      userId: "user-1",
+      providers: {
+        gmail: { historyId: "old-history-id", lastSyncAt: "2026-01-01T00:00:00.000Z" },
+      },
+    });
+    jest
+      .spyOn(service as any, "writeCursorFile")
+      .mockResolvedValue(undefined);
+
+    const result = await service.sync({ userId: "user-1" });
+
+    expect(result.ingestedCount).toBe(1);
+    expect(result.createdCount).toBe(0);
+    expect(result.existingCount).toBe(0);
+    expect(result.updatedCount).toBe(1);
   });
 });

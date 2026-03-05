@@ -55,6 +55,36 @@ export class ChatKernelService {
     return Array.from(codes).slice(0, 6);
   }
 
+  private parseRoutingSingleValueNote(
+    notes: string[] | undefined,
+    prefix: string,
+  ): string | null {
+    if (!Array.isArray(notes)) return null;
+    for (const note of notes) {
+      const value = String(note || "").trim();
+      if (!value.startsWith(prefix)) continue;
+      const parsed = value.slice(prefix.length).trim();
+      if (parsed) return parsed;
+    }
+    return null;
+  }
+
+  private parseRoutingDisambiguation(
+    notes: string[] | undefined,
+    requiresClarification: boolean,
+    clarifyReason: string | null,
+  ): string {
+    const explicit = this.parseRoutingSingleValueNote(
+      notes,
+      "routing:disambiguation:",
+    );
+    if (explicit) return explicit;
+    if (requiresClarification) {
+      return `required:${clarifyReason || "unspecified"}`;
+    }
+    return "none";
+  }
+
   private sanitizeRoutingNotes(notes: string[] | undefined): string[] {
     if (!Array.isArray(notes)) return [];
     return notes
@@ -81,6 +111,11 @@ export class ChatKernelService {
     const meta = this.asRecord(req.meta);
     const context = this.asRecord(req.context);
     const intentState = this.asRecord((context as any).intentState);
+    const requiresClarification = intentDecision.requiresClarification === true;
+    const clarifyReason =
+      typeof intentDecision.clarifyReason === "string"
+        ? intentDecision.clarifyReason
+        : null;
     const routingDecision = {
       route,
       locale,
@@ -91,6 +126,21 @@ export class ChatKernelService {
       followupSource: this.parseRoutingFollowupSource(intentDecision.decisionNotes),
       followupReasonCodes: this.parseRoutingFollowupReasonCodes(
         intentDecision.decisionNotes,
+      ),
+      operatorChoice:
+        this.parseRoutingSingleValueNote(
+          intentDecision.decisionNotes,
+          "routing:operator_choice:",
+        ) || intentDecision.operatorId,
+      scopeDecision:
+        this.parseRoutingSingleValueNote(
+          intentDecision.decisionNotes,
+          "routing:scope_decision:",
+        ) || "unknown",
+      disambiguation: this.parseRoutingDisambiguation(
+        intentDecision.decisionNotes,
+        requiresClarification,
+        clarifyReason,
       ),
       notes: this.sanitizeRoutingNotes(intentDecision.decisionNotes),
     };
@@ -103,11 +153,8 @@ export class ChatKernelService {
         operator: intentDecision.operatorId,
         domain: intentDecision.domainId,
         domainId: intentDecision.domainId,
-        requiresClarification: intentDecision.requiresClarification === true,
-        clarifyReason:
-          typeof intentDecision.clarifyReason === "string"
-            ? intentDecision.clarifyReason
-            : null,
+        requiresClarification,
+        clarifyReason,
         routingDecision,
       },
       context: {

@@ -1,0 +1,9 @@
+{
+  "runId": "fixture-cert-proof-20260305",
+  "datasetId": "fixture:per_query:100",
+  "profile": "ci",
+  "archivePerQueryPath": "frontend/e2e/reports/archive/2026-03-05T02-15-00-000Z/per_query.json",
+  "archiveScorecardPath": "frontend/e2e/reports/archive/2026-03-05T02-15-00-000Z/scorecard.json",
+  "latestPerQueryPath": "frontend/e2e/reports/latest/per_query.json",
+  "scorecardPath": "frontend/e2e/reports/latest/scorecard.json"
+}

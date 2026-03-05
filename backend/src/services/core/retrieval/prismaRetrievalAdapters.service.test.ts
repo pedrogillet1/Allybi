@@ -236,6 +236,11 @@ describe("PrismaRetrievalAdapterFactory encrypted chunk hydration", () => {
         valueRaw: "42%",
         unitRaw: "%",
         unitNormalized: "percent",
+        metadata: {
+          periodYear: 2025,
+          periodQuarter: 1,
+          periodTokens: ["y2025q1", "q1"],
+        },
         document: {
           id: "doc-11",
           parentVersionId: null,
@@ -260,6 +265,9 @@ describe("PrismaRetrievalAdapterFactory encrypted chunk hydration", () => {
     expect(hits[0].table?.header).toEqual(["EBITDA", "Q1"]);
     expect(hits[0].table?.rows?.[0]?.[0]).toBe("42%");
     expect(hits[0].table?.numericIntegrityScore).toBeGreaterThan(0.9);
+    expect(hits[0].table?.periodTokens).toEqual(
+      expect.arrayContaining(["Y2025", "Q1", "Y2025Q1"]),
+    );
     expect(hits[0].location.sheet).toBe("KPI Dashboard");
     expect(hits[0].location.sectionKey).toBe("tbl_kpi");
     expect(hits[0].locationKey).toContain("|s:KPI Dashboard|");

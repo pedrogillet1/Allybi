@@ -6,7 +6,6 @@ import { getApiBaseUrl } from '../services/runtimeConfig';
 import { fetchBootstrapSession } from '../services/authBootstrap';
 
 const AuthContext = createContext(null);
-const AUTH_LOCALSTORAGE_COMPAT = process.env.REACT_APP_AUTH_LOCALSTORAGE_COMPAT === 'true';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -41,100 +40,15 @@ export const AuthProvider = ({ children }) => {
       const authenticated = authService.isAuthenticated();
 
       if (storedUser && authenticated) {
-        // Validate cookie session (or legacy bearer token in compat mode).
-        const token = AUTH_LOCALSTORAGE_COMPAT ? localStorage.getItem('accessToken') : null;
-        if (AUTH_LOCALSTORAGE_COMPAT && token) {
-          try {
-            const check = await fetch(`${API_BASE}/api/auth/me`, {
-              headers: { 'Authorization': `Bearer ${token}` },
-              credentials: 'include',
-            });
-            if (!check.ok) throw new Error('stale');
-          } catch {
-            // Token rejected — clear stale data, fall through to login
-            if (AUTH_LOCALSTORAGE_COMPAT) {
-              localStorage.removeItem('accessToken');
-              localStorage.removeItem('refreshToken');
-            }
-            localStorage.removeItem('user');
-            setLoading(false);
-            return;
-          }
-        }
         setUser(storedUser);
         setIsAuthenticated(true);
         setLoading(false);
         return;
       }
 
-      // OAuth race condition: we have tokens but user data isn't in localStorage yet
-      // This can happen during rapid OAuth redirect - fetch user from /me endpoint
-      const accessToken = AUTH_LOCALSTORAGE_COMPAT ? localStorage.getItem('accessToken') : null;
-      if (AUTH_LOCALSTORAGE_COMPAT && accessToken && !storedUser) {
-        try {
-          const meResponse = await fetch(`${API_BASE}/api/auth/me`, {
-            headers: { 'Authorization': `Bearer ${accessToken}` },
-            credentials: 'include',
-          });
-
-          if (meResponse.ok) {
-            const meData = await meResponse.json();
-            if (meData.user) {
-              localStorage.setItem('user', JSON.stringify(meData.user));
-              setUser(meData.user);
-              setIsAuthenticated(true);
-              setLoading(false);
-              return;
-            }
-          }
-        } catch (error) {
-          console.warn('Failed to fetch user with accessToken:', error);
-        }
-      }
-
-      // If we have a refreshToken, try to restore the session
-      try {
-        const refreshToken = AUTH_LOCALSTORAGE_COMPAT ? localStorage.getItem('refreshToken') : null;
-
-        if (AUTH_LOCALSTORAGE_COMPAT && refreshToken) {
-          const response = await fetch(`${API_BASE}/api/auth/refresh`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify({ refreshToken }),
-          });
-
-          if (response.ok) {
-            const data = await response.json();
-
-            if (data.accessToken && data.user) {
-              if (AUTH_LOCALSTORAGE_COMPAT) {
-                localStorage.setItem('accessToken', data.accessToken);
-                localStorage.setItem('refreshToken', data.refreshToken);
-              }
-              localStorage.setItem('user', JSON.stringify(data.user));
-
-              setUser(data.user);
-              setIsAuthenticated(true);
-              setLoading(false);
-              return;
-            } else {
-              if (AUTH_LOCALSTORAGE_COMPAT) localStorage.removeItem('refreshToken');
-            }
-          } else {
-            if (AUTH_LOCALSTORAGE_COMPAT) localStorage.removeItem('refreshToken');
-          }
-        }
-      } catch (error) {
-        console.warn('Session restore failed:', error);
-        if (AUTH_LOCALSTORAGE_COMPAT) localStorage.removeItem('refreshToken');
-      }
-
-      // No valid session — clear any stale data and show login
-      if (AUTH_LOCALSTORAGE_COMPAT) {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-      }
+      // No valid session: clear any stale user/auth remnants and show login.
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
       localStorage.removeItem('user');
       setLoading(false);
     };
@@ -449,3 +363,4 @@ export const useAuth = () => {
 };
 
 export default AuthContext;
+

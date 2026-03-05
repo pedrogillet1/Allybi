@@ -96,17 +96,19 @@ jobs:
         working-directory: backend
         run: npm ci
 
-      - name: Setup database schema
+      - name: Apply Prisma migrations
         working-directory: backend
-        run: npx prisma db push --accept-data-loss
+        run: npx prisma migrate deploy
         env:
           DATABASE_URL: postgresql://koda:koda_password@localhost:5432/koda_db
+          DIRECT_DATABASE_URL: postgresql://koda:koda_password@localhost:5432/koda_db
 
       - name: Generate Prisma client
         working-directory: backend
         run: npx prisma generate
         env:
           DATABASE_URL: postgresql://koda:koda_password@localhost:5432/koda_db
+          DIRECT_DATABASE_URL: postgresql://koda:koda_password@localhost:5432/koda_db
 
       - name: Create MinIO bucket
         run: |

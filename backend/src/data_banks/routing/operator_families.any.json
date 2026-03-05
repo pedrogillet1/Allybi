@@ -245,6 +245,64 @@
       }
     },
     {
+      "id": "navigation",
+      "intentFamily": "navigation",
+      "description": "Navigation-first file actions for path/tree/open/locate flows.",
+      "priority": 89,
+      "defaultAnswerMode": "nav_pills",
+      "defaultOutputShape": "file_list",
+      "operators": [
+        "list",
+        "filter",
+        "sort",
+        "group",
+        "open",
+        "locate_file",
+        "count_files"
+      ],
+      "allowedAnswerModes": [
+        "nav_pills",
+        "general_answer"
+      ],
+      "allowedOutputShapes": [
+        "file_list",
+        "button_only",
+        "paragraph"
+      ],
+      "familyRules": {
+        "requireDocs": false,
+        "allowFollowups": false,
+        "maxFollowups": 0
+      }
+    },
+    {
+      "id": "calc",
+      "intentFamily": "calc",
+      "description": "Calculation-oriented document queries and numeric analysis requests.",
+      "priority": 88,
+      "defaultAnswerMode": "doc_grounded_table",
+      "defaultOutputShape": "table",
+      "operators": [
+        "compute",
+        "extract",
+        "summarize"
+      ],
+      "allowedAnswerModes": [
+        "doc_grounded_single",
+        "doc_grounded_table"
+      ],
+      "allowedOutputShapes": [
+        "table",
+        "paragraph",
+        "bullets"
+      ],
+      "familyRules": {
+        "requireDocs": true,
+        "allowFollowups": true,
+        "maxFollowups": 1
+      }
+    },
+    {
       "id": "editing",
       "intentFamily": "editing",
       "description": "Document editing operations. Returns edit_session attachments and may require confirmation for destructive changes.",
@@ -318,6 +376,33 @@
             "paragraph"
           ]
         }
+      }
+    },
+    {
+      "id": "integrations",
+      "intentFamily": "integrations",
+      "description": "Integration lifecycle actions with connected systems.",
+      "priority": 93,
+      "defaultAnswerMode": "action_receipt",
+      "defaultOutputShape": "paragraph",
+      "operators": [
+        "CONNECT_START",
+        "CONNECTOR_SYNC",
+        "CONNECTOR_SEARCH",
+        "CONNECTOR_STATUS",
+        "CONNECTOR_DISCONNECT"
+      ],
+      "allowedAnswerModes": [
+        "action_receipt",
+        "action_confirmation"
+      ],
+      "allowedOutputShapes": [
+        "paragraph"
+      ],
+      "familyRules": {
+        "requireDocs": false,
+        "allowFollowups": false,
+        "maxFollowups": 0
       }
     },
     {

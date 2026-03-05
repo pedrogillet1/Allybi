@@ -79,5 +79,4 @@ nul
 
 # Local dev storage / generated artifacts (do not commit)
 storage/
-workers_gcp/
 .env.local.bak

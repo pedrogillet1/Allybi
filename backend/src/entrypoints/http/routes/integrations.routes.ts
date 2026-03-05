@@ -21,6 +21,7 @@ import {
   normalizeIntegrationErrorMessage,
 } from "../../../services/connectors/integrationRuntimePolicy.service";
 import { registerDefaultConnectors } from "../../../services/connectors/registerDefaultConnectors";
+import { createDocumentLink } from "../../../services/documents/documentLink.service";
 
 const router = Router();
 const authorizeIntegrations = authorizeByMethod("integrations");
@@ -160,6 +161,41 @@ function safeAttachmentFailureMessage(error: unknown): string {
     return "Failed to download attachment.";
   }
   return "Failed to save attachment.";
+}
+
+async function linkAttachmentBundleDocuments(input: {
+  provider: "gmail" | "outlook";
+  messageId: string;
+  documentIds: string[];
+}): Promise<void> {
+  const ids = [...new Set(input.documentIds.map((id) => String(id || "").trim()))]
+    .filter(Boolean);
+  if (ids.length < 2) return;
+
+  const anchorId = ids[0];
+  for (let i = 1; i < ids.length; i += 1) {
+    const docId = ids[i];
+    try {
+      await createDocumentLink({
+        sourceDocumentId: docId,
+        targetDocumentId: anchorId,
+        relationshipType: "extends",
+        metadata: {
+          source: "connector_email_attachment_bundle",
+          provider: input.provider,
+          messageId: input.messageId,
+        },
+      });
+    } catch (error) {
+      logger.warn("[IntegrationsRoute] Attachment bundle link warning", {
+        provider: input.provider,
+        messageId: input.messageId,
+        sourceDocumentId: docId,
+        targetDocumentId: anchorId,
+        error: normalizeIntegrationErrorMessage(error),
+      });
+    }
+  }
 }
 
 // Slack Events API (public, signature-verified). Must be mounted under /api/integrations.
@@ -731,6 +767,14 @@ router.post(
           });
         }
       }
+
+      await linkAttachmentBundleDocuments({
+        provider: provider as "gmail" | "outlook",
+        messageId,
+        documentIds: successes
+          .map((item) => String(item?.document?.id || "").trim())
+          .filter(Boolean),
+      });
 
       return res.json({ ok: true, data: { successes, failures } });
     } catch (e: any) {

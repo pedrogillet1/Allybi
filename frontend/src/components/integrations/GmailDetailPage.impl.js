@@ -165,7 +165,21 @@ function InboxPanel({ emails, selectedId, onSelect, loading, searchQuery, onSear
 }
 
 // Email preview + composer (center column)
-function EmailPreviewPanel({ email, showComposer, onToggleComposer, composerData, onComposerChange, onSend, sending }) {
+function EmailPreviewPanel({
+  email,
+  showComposer,
+  onToggleComposer,
+  composerData,
+  onComposerChange,
+  availableDocuments,
+  attachmentIds,
+  onAttachmentChange,
+  attachmentsLoading,
+  onSend,
+  sending,
+  sendError,
+  sendReceipt,
+}) {
   if (!email) {
     return (
       <div style={{
@@ -309,6 +323,43 @@ function EmailPreviewPanel({ email, showComposer, onToggleComposer, composerData
               onFocus={e => { e.target.style.borderColor = '#A2A2A7'; }}
               onBlur={e => { e.target.style.borderColor = '#E6E6EC'; }}
             />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: '#55534E', fontFamily: FONT }}>
+                Attach documents (optional)
+              </div>
+              <select
+                multiple
+                value={attachmentIds}
+                onChange={e => {
+                  const ids = Array.from(e.target.selectedOptions || [])
+                    .map(option => option.value)
+                    .filter(Boolean);
+                  onAttachmentChange(ids);
+                }}
+                style={{
+                  minHeight: 88,
+                  padding: 8,
+                  borderRadius: 8,
+                  border: '1px solid #E6E6EC',
+                  outline: 'none',
+                  fontSize: 13,
+                  fontFamily: FONT,
+                  color: '#32302C',
+                  background: 'white',
+                }}
+              >
+                {(availableDocuments || []).map(doc => (
+                  <option key={doc.id} value={doc.id}>
+                    {doc.filename || doc.displayTitle || doc.id}
+                  </option>
+                ))}
+              </select>
+              <div style={{ fontSize: 11, color: '#6C6B6E', fontFamily: FONT }}>
+                {attachmentsLoading
+                  ? 'Loading documents...'
+                  : `${attachmentIds.length} file(s) selected`}
+              </div>
+            </div>
             <div style={{ display: 'flex', gap: 8 }}>
               <button
                 onClick={onSend}
@@ -357,6 +408,20 @@ function EmailPreviewPanel({ email, showComposer, onToggleComposer, composerData
                 Cancel
               </button>
             </div>
+            {!!sendError && (
+              <div style={{ fontSize: 12, color: '#D92D20', fontFamily: FONT, lineHeight: '18px' }}>
+                {sendError}
+              </div>
+            )}
+            {!!sendReceipt && (
+              <div style={{ fontSize: 12, color: '#34A853', fontFamily: FONT, lineHeight: '18px' }}>
+                Sent successfully
+                {sendReceipt.providerMessageId ? ` (id: ${sendReceipt.providerMessageId})` : ''}
+                {Number.isFinite(Number(sendReceipt.attachmentCount))
+                  ? ` with ${Number(sendReceipt.attachmentCount)} attachment(s)`
+                  : ''}.
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -602,7 +667,12 @@ export default function GmailDetailPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showComposer, setShowComposer] = useState(false);
   const [composerData, setComposerData] = useState({ to: '', subject: '', body: '' });
+  const [availableDocuments, setAvailableDocuments] = useState([]);
+  const [attachmentsLoading, setAttachmentsLoading] = useState(false);
+  const [attachmentIds, setAttachmentIds] = useState([]);
   const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState('');
+  const [sendReceipt, setSendReceipt] = useState(null);
   const [showNotificationsPopup, setShowNotificationsPopup] = useState(false);
 
   // Try to fetch real emails if connected
@@ -624,6 +694,23 @@ export default function GmailDetailPage() {
 
   const selectedEmail = emails.find(e => e.id === selectedEmailId);
 
+  const ensureAttachableDocumentsLoaded = async () => {
+    if (attachmentsLoading || availableDocuments.length > 0) return;
+    setAttachmentsLoading(true);
+    try {
+      const response = await api.get('/api/documents?limit=100');
+      const docs = Array.isArray(response?.data?.documents) ? response.data.documents : [];
+      const filtered = docs
+        .filter(doc => doc && doc.id && !String(doc.encryptedFilename || '').includes('/connectors/'))
+        .slice(0, 100);
+      setAvailableDocuments(filtered);
+    } catch {
+      setAvailableDocuments([]);
+    } finally {
+      setAttachmentsLoading(false);
+    }
+  };
+
   const filteredEmails = searchQuery
     ? emails.filter(e =>
         e.from?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -636,6 +723,9 @@ export default function GmailDetailPage() {
     setSelectedEmailId(id);
     setShowComposer(false);
     setComposerData({ to: '', subject: '', body: '' });
+    setAttachmentIds([]);
+    setSendError('');
+    setSendReceipt(null);
   };
 
   const handleToggleComposer = () => {
@@ -645,19 +735,46 @@ export default function GmailDetailPage() {
         subject: `Re: ${selectedEmail.subject}`,
         body: '',
       });
+      void ensureAttachableDocumentsLoaded();
+      setAttachmentIds([]);
     }
+    setSendError('');
+    setSendReceipt(null);
     setShowComposer(!showComposer);
   };
 
   const handleSend = async () => {
     if (!composerData.to || !composerData.body) return;
     setSending(true);
+    setSendError('');
+    setSendReceipt(null);
     try {
-      await api.post('/api/integrations/gmail/send', composerData);
+      const tokenResponse = await api.post('/api/integrations/email/send-token', {
+        provider: 'gmail',
+        to: composerData.to,
+        subject: composerData.subject || '',
+        body: composerData.body || '',
+        attachmentDocumentIds: attachmentIds,
+      });
+      const confirmationId = tokenResponse?.data?.data?.confirmationId;
+      if (!confirmationId) {
+        throw new Error('Failed to mint send confirmation token.');
+      }
+
+      const sendResponse = await api.post('/api/integrations/gmail/send', {
+        confirmationId,
+      });
+      setSendReceipt(sendResponse?.data?.data?.receipt || null);
       setShowComposer(false);
       setComposerData({ to: '', subject: '', body: '' });
-    } catch {
-      // Silently handle - composer stays open for retry
+      setAttachmentIds([]);
+    } catch (error) {
+      const message =
+        error?.response?.data?.error?.message ||
+        error?.response?.data?.message ||
+        error?.message ||
+        'Failed to send email.';
+      setSendError(String(message));
     } finally {
       setSending(false);
     }
@@ -724,8 +841,14 @@ export default function GmailDetailPage() {
             onToggleComposer={handleToggleComposer}
             composerData={composerData}
             onComposerChange={setComposerData}
+            availableDocuments={availableDocuments}
+            attachmentIds={attachmentIds}
+            onAttachmentChange={setAttachmentIds}
+            attachmentsLoading={attachmentsLoading}
             onSend={handleSend}
             sending={sending}
+            sendError={sendError}
+            sendReceipt={sendReceipt}
           />
         )}
       </div>
@@ -805,8 +928,14 @@ export default function GmailDetailPage() {
             onToggleComposer={handleToggleComposer}
             composerData={composerData}
             onComposerChange={setComposerData}
+            availableDocuments={availableDocuments}
+            attachmentIds={attachmentIds}
+            onAttachmentChange={setAttachmentIds}
+            attachmentsLoading={attachmentsLoading}
             onSend={handleSend}
             sending={sending}
+            sendError={sendError}
+            sendReceipt={sendReceipt}
           />
           <AllybiPanel
             email={selectedEmail}

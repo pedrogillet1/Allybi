@@ -77,7 +77,11 @@ describe("FallbackDecisionPolicyService", () => {
         return {
           config: {
             enabled: true,
-            defaults: { action: "ask_one_question", telemetryReason: "UNKNOWN" },
+            defaults: {
+              action: "ask_one_question",
+              telemetryReason: "UNKNOWN",
+              retryPolicy: { maxAttempts: 1, backoffMs: 250 },
+            },
           },
           rules: [
             {
@@ -88,6 +92,9 @@ describe("FallbackDecisionPolicyService", () => {
               when: { reasonCodeIn: ["low_confidence"] },
               do: {
                 action: "regen_with_stricter_model",
+                fallbackProvider: "openai",
+                fallbackModelKey: "GPT_5_2",
+                retryPolicy: { maxAttempts: 2, backoffMs: 400 },
                 telemetryReason: "WEAK_EVIDENCE",
               },
             },
@@ -145,5 +152,28 @@ describe("FallbackDecisionPolicyService", () => {
       }),
     );
     expect(reason).toBe("low_confidence");
+  });
+
+  test("propagates router provider/model/retry metadata for stricter-model action", () => {
+    const service = new FallbackDecisionPolicyService();
+    const decision = service.resolve(
+      {
+        userId: "u_1",
+        message: "answer",
+      } as any,
+      buildPack({
+        stats: { topScore: 0.3 },
+        evidence: [],
+      }),
+    );
+
+    expect(decision?.reasonCode).toBe("low_confidence");
+    expect(decision?.routerAction).toBe("regen_with_stricter_model");
+    expect(decision?.fallbackProvider).toBe("openai");
+    expect(decision?.fallbackModelKey).toBe("GPT_5_2");
+    expect(decision?.retryPolicy).toEqual({
+      maxAttempts: 2,
+      backoffMs: 400,
+    });
   });
 });

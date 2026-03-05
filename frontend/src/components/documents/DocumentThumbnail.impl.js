@@ -12,10 +12,8 @@ import movIcon from '../../assets/mov.png';
 import mp4Icon from '../../assets/mp4.png';
 import mp3Icon from '../../assets/mp3.svg';
 import { hasCanvasSupport, safeCanvasOperation } from '../../utils/browser/browserUtils';
-const AUTH_LOCALSTORAGE_COMPAT = process.env.REACT_APP_AUTH_LOCALSTORAGE_COMPAT === 'true';
 const getCompatAccessToken = () => {
-    if (!AUTH_LOCALSTORAGE_COMPAT) return null;
-    return localStorage.getItem('accessToken') || localStorage.getItem('token');
+    return null;
 };
 
 // Set PDF.js worker - use jsdelivr CDN matching the installed pdfjs-dist version
@@ -330,3 +328,4 @@ const DocumentThumbnail = ({ document, width = 120, height = 160, showIcon = fal
 };
 
 export default DocumentThumbnail;
+

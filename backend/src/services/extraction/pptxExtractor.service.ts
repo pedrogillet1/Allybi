@@ -135,33 +135,91 @@ function extractTextFromRuns(runs: any): string {
  * Walks a:tbl > a:tr > a:tc > a:txBody to build a 2D string array,
  * then formats via the shared formatAsMarkdownTable helper.
  */
-function extractTableMarkdown(tblNode: any): { markdown: string; rows2d: string[][] } {
+function extractTableMarkdown(tblNode: any): {
+  markdown: string;
+  rows2d: string[][];
+  structuredRows: ExtractedTable["rows"];
+} {
   const tbl = Array.isArray(tblNode) ? tblNode[0] : tblNode;
-  if (!tbl) return { markdown: "", rows2d: [] };
+  if (!tbl) return { markdown: "", rows2d: [], structuredRows: [] };
 
   const trNodes = tbl["a:tr"];
-  if (!trNodes) return { markdown: "", rows2d: [] };
+  if (!trNodes) return { markdown: "", rows2d: [], structuredRows: [] };
 
   const trArray = Array.isArray(trNodes) ? trNodes : [trNodes];
-  const rows: string[][] = [];
+  const rows: ExtractedTable["rows"] = [];
+  let rowIndex = 0;
 
   for (const tr of trArray) {
     const tcNodes = tr["a:tc"];
     if (!tcNodes) {
-      rows.push([]);
+      rows.push({ rowIndex, isHeader: rowIndex === 0, cells: [] });
+      rowIndex++;
       continue;
     }
     const tcArray = Array.isArray(tcNodes) ? tcNodes : [tcNodes];
-    const cells: string[] = [];
+    const cells: ExtractedTable["rows"][number]["cells"] = [];
     for (const tc of tcArray) {
       const { text } = extractTextFromBody(tc["a:txBody"]);
-      cells.push(text.trim());
+      const tcPr = tc["a:tcPr"];
+      const tcPrNode = Array.isArray(tcPr) ? tcPr[0] : tcPr;
+      const attrs = tcPrNode?.$ || {};
+      const colSpan = Math.max(
+        1,
+        Number(attrs.gridSpan ?? attrs["gridSpan"] ?? 1) || 1,
+      );
+      const rowSpan = Math.max(
+        1,
+        Number(attrs.rowSpan ?? attrs["rowSpan"] ?? 1) || 1,
+      );
+      const hMerge = Boolean(attrs.hMerge ?? attrs["hMerge"]);
+      const vMerge = Boolean(attrs.vMerge ?? attrs["vMerge"]);
+      const startCol = cells.length;
+      cells.push({
+        text: text.trim(),
+        colIndex: startCol,
+        ...(colSpan > 1 ? { colSpan } : {}),
+        ...(rowSpan > 1 ? { rowSpan } : {}),
+        ...(hMerge || vMerge ? { isMergedContinuation: true } : {}),
+      });
+      for (let s = 1; s < colSpan; s++) {
+        cells.push({
+          text: "",
+          colIndex: startCol + s,
+          isMergedContinuation: true,
+        });
+      }
     }
-    rows.push(cells);
+    rows.push({
+      rowIndex,
+      isHeader: rowIndex === 0,
+      cells,
+    });
+    rowIndex++;
   }
 
-  if (rows.length === 0) return { markdown: "", rows2d: [] };
-  return { markdown: formatAsMarkdownTable(rows), rows2d: rows };
+  if (rows.length === 0) return { markdown: "", rows2d: [], structuredRows: [] };
+
+  const maxCols = Math.max(...rows.map((r) => r.cells.length), 0);
+  const normalized = rows.map((row) => {
+    const cells = [...row.cells];
+    while (cells.length < maxCols) {
+      cells.push({
+        text: "",
+        colIndex: cells.length,
+      });
+    }
+    return {
+      ...row,
+      cells,
+    };
+  });
+  const rows2d = normalized.map((row) => row.cells.map((cell) => cell.text));
+  return {
+    markdown: formatAsMarkdownTable(rows2d),
+    rows2d,
+    structuredRows: normalized,
+  };
 }
 
 /**
@@ -227,21 +285,17 @@ function findTextBodies(
       ? node["a:tbl"]
       : [node["a:tbl"]];
     for (const tbl of tblNodes) {
-      const { markdown, rows2d } = extractTableMarkdown(tbl);
+      const { markdown, structuredRows } = extractTableMarkdown(tbl);
       if (markdown.trim()) {
         collected.bodyParts.push(markdown.trim());
         // Collect structured table for cell-level indexing
-        if (collected.extractedTables && slideCtx && rows2d.length > 0) {
+        if (collected.extractedTables && slideCtx && structuredRows.length > 0) {
           const tIdx = slideCtx.tableCounter.count++;
           collected.extractedTables.push({
             tableId: `pptx:s${slideCtx.slideNum}:t${tIdx}`,
             pageOrSlide: slideCtx.slideNum,
             markdown,
-            rows: rows2d.map((row, rIdx) => ({
-              rowIndex: rIdx,
-              isHeader: rIdx === 0,
-              cells: row.map((text, cIdx) => ({ text, colIndex: cIdx })),
-            })),
+            rows: structuredRows,
           });
         }
       }
@@ -249,6 +303,22 @@ function findTextBodies(
   }
 
   // Recurse into container elements (table keys excluded — handled above)
+  // Preserve sibling order when xml2js exposes ordered children via "$$".
+  // This keeps text shapes and tables interleaved as authored on the slide.
+  const orderedChildren = node["$$"];
+  const hasDirectRenderableContent =
+    Boolean(node["p:txBody"]) || Boolean(node["a:p"]) || Boolean(node["a:tbl"]);
+  if (
+    Array.isArray(orderedChildren) &&
+    orderedChildren.length > 0 &&
+    !hasDirectRenderableContent
+  ) {
+    for (const child of orderedChildren) {
+      findTextBodies(child, collected, slideCtx);
+    }
+    return;
+  }
+
   const containerKeys = [
     "p:sld",
     "p:cSld",
@@ -367,7 +437,11 @@ export async function extractPptxWithAnchors(
     // Parse ALL slides in parallel (each gets its own parser instance)
     const slideParseResults = await Promise.all(
       slideEntries.map(async ({ slideNum, entry }) => {
-        const parser = new xml2js.Parser();
+        const parser = new xml2js.Parser({
+          explicitArray: true,
+          explicitChildren: true,
+          preserveChildrenOrder: true,
+        });
         const slideXml = entry.getData().toString("utf8");
 
         try {

@@ -18,6 +18,10 @@ export interface CertificationGateReport {
   metrics: CertificationGateMetrics;
   thresholds: CertificationGateThresholds;
   failures: string[];
+  scoring?: {
+    rubricScore100: number;
+    rubric: Record<string, number>;
+  };
 }
 
 export interface CertificationSummary {

@@ -46,6 +46,20 @@ function resolveCommitHash(): string | null {
     .toLowerCase();
   if (/^[0-9a-f]{40}$/.test(fromEnv)) return fromEnv;
 
+  try {
+    const fromCwd = spawnSync("git", ["rev-parse", "HEAD"], {
+      cwd: process.cwd(),
+      stdio: ["ignore", "pipe", "ignore"],
+      encoding: "utf8",
+    });
+    if (fromCwd.status === 0) {
+      const hash = String(fromCwd.stdout || "").trim().toLowerCase();
+      if (/^[0-9a-f]{40}$/.test(hash)) return hash;
+    }
+  } catch {
+    // Continue with file-based fallback below.
+  }
+
   const rootDir = findRepoRoot(process.cwd()) || process.cwd();
   const gitDir = resolveGitDir(rootDir);
   if (!gitDir) return null;
@@ -95,6 +109,60 @@ function resolveCommitHash(): string | null {
   return null;
 }
 
+function metric01(metrics: CertificationGateReport["metrics"], key: string): number {
+  const raw = Number(metrics?.[key]);
+  if (!Number.isFinite(raw)) return 0;
+  if (raw <= 0) return 0;
+  return raw >= 1 ? 1 : raw;
+}
+
+function maybeComputeCompositionRubricScore(
+  gateId: string,
+  metrics: CertificationGateReport["metrics"],
+): CertificationGateReport["scoring"] | undefined {
+  if (gateId !== "composition-formatting-regressions") return undefined;
+  const structure = (
+    (metric01(metrics, "openerVariation") +
+      metric01(metrics, "noForcedAnalyticalForSimple")) /
+    2
+  ) * 20;
+  const citations = (
+    (metric01(metrics, "citationAlignment") +
+      metric01(metrics, "citationMinimality")) /
+    2
+  ) * 20;
+  const tableSafety = (
+    (metric01(metrics, "tableNoDashCorruption") +
+      metric01(metrics, "tablePreservation")) /
+    2
+  ) * 15;
+  const naturalVoice = metric01(metrics, "openerVariation") * 10;
+  const followups = metric01(metrics, "followupNonLooping") * 10;
+  const brevity = metric01(metrics, "brevityControl") * 10;
+  const multilingual = (
+    (metric01(metrics, "toneParityEnPt") + metric01(metrics, "toneParityEs")) /
+    2
+  ) * 10;
+  const notFound = metric01(metrics, "notFoundPrecision") * 5;
+  const rubric = {
+    structure,
+    citations,
+    tableSafety,
+    naturalVoice,
+    followups,
+    brevity,
+    multilingual,
+    notFound,
+  };
+  const rubricScore100 = Math.round(
+    Object.values(rubric).reduce((sum, value) => sum + value, 0) * 100,
+  ) / 100;
+  return {
+    rubricScore100,
+    rubric,
+  };
+}
+
 export function writeCertificationGateReport(
   gateId: string,
   report: Omit<CertificationGateReport, "gateId" | "generatedAt">,
@@ -112,6 +180,7 @@ export function writeCertificationGateReport(
     metrics: report.metrics,
     thresholds: report.thresholds,
     failures: report.failures,
+    scoring: maybeComputeCompositionRubricScore(gateId, report.metrics),
   };
   const filePath = path.join(CERT_GATES_DIR, `${gateId}.json`);
   fs.writeFileSync(filePath, `${JSON.stringify(resolved, null, 2)}\n`, "utf8");

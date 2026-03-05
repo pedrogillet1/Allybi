@@ -166,6 +166,72 @@ describe("QualityGateRunnerService", () => {
     expect(gate?.passed).toBe(false);
   });
 
+  test("enforces blocking safetyRules for medical and legal domain outputs", async () => {
+    process.env.NODE_ENV = "development";
+    mockGetOptionalBank.mockReturnValue(null);
+
+    const { QualityGateRunnerService } =
+      await import("./qualityGateRunner.service");
+    const runner = new QualityGateRunnerService({
+      getQualityGateBank: () => null,
+      getValidationPolicies: () => null,
+      getRedactionAndSafetyRules: (domain: string) => {
+        if (domain === "medical") {
+          return {
+            _meta: { id: "medical_redaction_and_safety_rules" },
+            config: { enabled: true },
+            redactionRules: [],
+            safetyRules: [
+              {
+                id: "medical_safety_001",
+                trigger: "request_for_new_diagnosis_or_differential",
+                description: "Forbid diagnosis advice generation.",
+                action: "BLOCK_WITH_DISCLAIMER",
+              },
+            ],
+          };
+        }
+        if (domain === "legal") {
+          return {
+            _meta: { id: "legal_redaction_and_safety_rules" },
+            config: { enabled: true },
+            redactionRules: [],
+            safetyRules: [
+              {
+                id: "legal_safe_005_harmful_guidance",
+                trigger: "request to bypass obligations",
+                description: "Block harmful legal evasion guidance.",
+                action: "BLOCK_WITH_DISCLAIMER",
+              },
+            ],
+          };
+        }
+        return null;
+      },
+    } as any);
+
+    const medicalOut = await runner.runGates(
+      "You are diagnosed with pneumonia and should start treatment now.",
+      { domainHint: "medical" },
+    );
+    expect(
+      medicalOut.results.find(
+        (g) => g.gateName === "domain_safety_rule_violation:medical_safety_001",
+      )?.passed,
+    ).toBe(false);
+
+    const legalOut = await runner.runGates(
+      "You can bypass the contract obligation by hiding this clause.",
+      { domainHint: "legal" },
+    );
+    expect(
+      legalOut.results.find(
+        (g) =>
+          g.gateName === "domain_safety_rule_violation:legal_safe_005_harmful_guidance",
+      )?.passed,
+    ).toBe(false);
+  });
+
   test("evaluates source_policy bank rules expression-by-expression", async () => {
     process.env.NODE_ENV = "development";
     mockGetOptionalBank.mockReturnValue(null);
@@ -358,5 +424,57 @@ describe("QualityGateRunnerService", () => {
       out.results.find((g) => g.gateName === "ambiguity_single_question_policy")
         ?.passed,
     ).toBe(false);
+  });
+
+  test("fails closed when configured gate order contains unknown gate id", async () => {
+    process.env.NODE_ENV = "development";
+    mockGetOptionalBank.mockImplementation((bankId: string) => {
+      if (bankId === "quality_gates") {
+        return {
+          _meta: { id: "quality_gates" },
+          config: {
+            modes: {
+              byEnv: {
+                dev: { failClosed: false },
+              },
+            },
+            integrationHooks: {},
+          },
+          gateOrder: ["unknown_gate_for_test"],
+        };
+      }
+      return null;
+    });
+
+    const { QualityGateRunnerService } =
+      await import("./qualityGateRunner.service");
+    const runner = new QualityGateRunnerService({
+      getQualityGateBank: () => null,
+    } as any);
+
+    await expect(
+      runner.runGates("hello", { answerMode: "general_answer" }),
+    ).rejects.toThrow(/unknown_gate_for_test/i);
+  });
+
+  test("runGate returns explicit failure for unknown gate", async () => {
+    process.env.NODE_ENV = "development";
+    mockGetOptionalBank.mockReturnValue(null);
+
+    const { QualityGateRunnerService } =
+      await import("./qualityGateRunner.service");
+    const runner = new QualityGateRunnerService({
+      getQualityGateBank: () => null,
+    } as any);
+
+    const result = await runner.runGate(
+      "definitely_missing_gate",
+      "hello",
+      { answerMode: "general_answer" },
+    );
+
+    expect(result.passed).toBe(false);
+    expect(result.actionOnFail).toBe("fail_closed_unknown_gate");
+    expect(result.issues?.[0]).toMatch(/not found/i);
   });
 });

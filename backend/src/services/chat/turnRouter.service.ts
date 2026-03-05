@@ -59,6 +59,36 @@ type PersistedIntentState = {
   activeDomain?: string;
 };
 
+type ViewerRoutingMeta = {
+  viewerMode: boolean;
+  viewerIntent: string;
+};
+
+const INTEGRATION_INTENT_BANK_IDS = new Set([
+  "connect_intents_en",
+  "connect_intents_pt",
+  "search_intents_en",
+  "search_intents_pt",
+  "send_intents_en",
+  "send_intents_pt",
+  "sync_intents_en",
+  "sync_intents_pt",
+]);
+
+const INTENT_FAMILY_ALIASES: Record<string, string> = {
+  integration: "integrations",
+  integrations: "integrations",
+  nav: "navigation",
+  navigation: "navigation",
+  calculation: "calc",
+  calc: "calc",
+};
+
+function canonicalIntentFamily(intentFamily: string): string {
+  const normalized = low(intentFamily).trim();
+  return INTENT_FAMILY_ALIASES[normalized] || normalized;
+}
+
 function resolveEnv(): "production" | "staging" | "dev" | "local" {
   const raw = String(process.env.NODE_ENV || "").toLowerCase();
   if (raw === "production") return "production";
@@ -145,18 +175,43 @@ function isHowToQuery(message: string): boolean {
     low(message),
   );
 }
+function isCalcQuery(message: string): boolean {
+  return /\b(calculate|compute|sum|average|avg|total|percent|percentage|calcular|somar|media|m[eé]dia|total|porcentagem|sumar|promedio|porcentaje)\b/.test(
+    low(message),
+  );
+}
+
+function isEditingQuery(message: string): boolean {
+  return /\b(edit|rewrite|replace|insert|delete|remove|format|editar|reescrever|substituir|inserir|deletar|apagar|formatar|reescribir|reemplazar|insertar|eliminar|borrar|formatear)\b/.test(
+    low(message),
+  );
+}
+
+function isIntegrationQuery(message: string): boolean {
+  return /\b(connect|authorize|link|sync|synchronize|resync|disconnect|connector|integration|gmail|outlook|slack|inbox|channel|conectar|autorizar|vincular|sincronizar|ressincronizar|desconectar|conector|integra[cç][aã]o|caixa|canal|integraci[oó]n|bandeja)\b/.test(
+    low(message),
+  );
+}
 
 function mapIntentFamilyToRoute(
   intentFamily: string,
   docsAvailable: boolean,
 ): TurnRouteDecision {
-  const family = low(intentFamily);
-  if (family === "connectors" || family === "email") return "CONNECTOR";
+  const family = canonicalIntentFamily(intentFamily);
+  if (
+    family === "connectors" ||
+    family === "email" ||
+    family === "integrations"
+  ) {
+    return "CONNECTOR";
+  }
   if (
     family === "documents" ||
     family === "editing" ||
     family === "doc_stats" ||
-    family === "file_actions"
+    family === "file_actions" ||
+    family === "calc" ||
+    family === "navigation"
   ) {
     return "KNOWLEDGE";
   }
@@ -277,12 +332,168 @@ export class TurnRouterService {
     }
   }
 
-  private getPatterns(value: unknown): string[] {
+  private getIntegrationIntentBank(
+    kind: "connect" | "search" | "send" | "sync",
+    locale: "en" | "pt" | "es",
+  ): any | null {
+    const primaryBankId = `${kind}_intents_${locale}`;
+    if (!INTEGRATION_INTENT_BANK_IDS.has(primaryBankId)) {
+      return null;
+    }
+    try {
+      const primary = this.routingBankProvider(primaryBankId);
+      if (primary) return primary;
+    } catch {
+      // Fall back to EN below.
+    }
+    if (locale === "en") return null;
+    try {
+      const fallbackBankId = `${kind}_intents_en`;
+      if (!INTEGRATION_INTENT_BANK_IDS.has(fallbackBankId)) {
+        return null;
+      }
+      return this.routingBankProvider(fallbackBankId);
+    } catch {
+      return null;
+    }
+  }
+
+  private detectIntegrationIntentFromBanks(
+    query: string,
+    locale: "en" | "pt" | "es",
+  ): boolean {
+    const kinds: Array<"connect" | "search" | "send" | "sync"> = [
+      "connect",
+      "search",
+      "send",
+      "sync",
+    ];
+    for (const kind of kinds) {
+      const bank = this.getIntegrationIntentBank(kind, locale);
+      if (!bank?.config?.enabled) continue;
+      const matching = asRecord(bank?.config?.matching);
+      const normalized = normalizeForMatching(query, {
+        caseInsensitive: matching.caseInsensitive !== false,
+        stripDiacritics: matching.stripDiacritics !== false,
+        collapseWhitespace: matching.collapseWhitespace !== false,
+      });
+      if (!normalized) continue;
+      const patterns = Array.isArray(bank?.patterns) ? bank.patterns : [];
+      for (const entry of patterns) {
+        const localized = this.getLocalizedPatterns(entry || {}, locale);
+        if (localized.length === 0) continue;
+        if (!this.regexMatchesAny(normalized, localized)) continue;
+
+        const negatives = Array.isArray(entry?.negatives)
+          ? entry.negatives.map((value: unknown) =>
+              String(value || "")
+                .trim()
+                .toLowerCase(),
+            )
+          : [];
+        if (negatives.some((token) => token && normalized.includes(token))) {
+          continue;
+        }
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private getViewerAssistantRoutingBank(): any | null {
+    try {
+      return this.routingBankProvider("viewer_assistant_routing");
+    } catch {
+      return null;
+    }
+  }
+
+  private getViewerRoutingMeta(ctx: TurnContext): ViewerRoutingMeta {
+    const requestMeta = asRecord(ctx.request.meta);
+    const viewerIntent = low(String(requestMeta.viewerIntent || "").trim());
+    return {
+      viewerMode: Boolean(
+        ctx.viewer?.mode ||
+          requestMeta.viewerMode === true ||
+          requestMeta.viewerMode === "true",
+      ),
+      viewerIntent,
+    };
+  }
+
+  private matchesViewerRoutingWhenClause(
+    when: Record<string, unknown>,
+    meta: ViewerRoutingMeta,
+  ): boolean {
+    const allowedKeys = new Set([
+      "meta.viewerMode",
+      "meta.viewerIntent",
+      "meta.viewerIntent_not",
+    ]);
+    for (const key of Object.keys(when)) {
+      if (!allowedKeys.has(key)) return false;
+    }
+
+    if ("meta.viewerMode" in when) {
+      if (Boolean(when["meta.viewerMode"]) !== meta.viewerMode) return false;
+    }
+    if ("meta.viewerIntent" in when) {
+      const expected = low(String(when["meta.viewerIntent"] || "").trim());
+      if (expected && meta.viewerIntent !== expected) return false;
+    }
+    if ("meta.viewerIntent_not" in when) {
+      const blocked = low(String(when["meta.viewerIntent_not"] || "").trim());
+      if (blocked && meta.viewerIntent === blocked) return false;
+    }
+    return true;
+  }
+
+  private mapViewerRoutingPathToRoute(pathValue: string): TurnRouteDecision | null {
+    const path = low(pathValue);
+    if (path === "qa") return "KNOWLEDGE";
+    if (path === "connector" || path === "connectors" || path === "email") {
+      return "CONNECTOR";
+    }
+    if (path === "general") return "GENERAL";
+    if (path === "clarify") return "CLARIFY";
+    return null;
+  }
+
+  private resolveViewerModeRouteFromBank(ctx: TurnContext): TurnRouteDecision | null {
+    const bank = this.getViewerAssistantRoutingBank();
+    if (!bank?.config || bank.config.enabled === false) return null;
+    const rules = Array.isArray(bank.rules)
+      ? [...(bank.rules as Array<Record<string, unknown>>)]
+      : [];
+    if (rules.length === 0) return null;
+
+    rules.sort((a, b) => {
+      const priorityA = Number(a?.priority || 0);
+      const priorityB = Number(b?.priority || 0);
+      if (priorityB !== priorityA) return priorityB - priorityA;
+      const idA = String(a?.id || "").trim();
+      const idB = String(b?.id || "").trim();
+      return idA.localeCompare(idB);
+    });
+
+    const meta = this.getViewerRoutingMeta(ctx);
+    for (const rule of rules) {
+      const when = asRecord(rule?.when);
+      if (!this.matchesViewerRoutingWhenClause(when, meta)) continue;
+      const then = asRecord(rule?.then);
+      const route = this.mapViewerRoutingPathToRoute(String(then.path || ""));
+      if (route) return route;
+    }
+    return null;
+  }
+
+    private getPatterns(value: unknown): string[] {
     if (!value || typeof value !== "object") return [];
     const obj = value as Record<string, unknown>;
     return [
       ...(Array.isArray(obj.en) ? obj.en : []),
       ...(Array.isArray(obj.pt) ? obj.pt : []),
+      ...(Array.isArray(obj.es) ? obj.es : []),
       ...(Array.isArray(obj.any) ? obj.any : []),
     ]
       .map((item) => String(item || "").trim())
@@ -337,7 +548,7 @@ export class TurnRouterService {
   }
 
   private mapIntentFamilyToIntentId(intentFamily: string): string {
-    const family = low(intentFamily);
+    const family = canonicalIntentFamily(intentFamily);
     if (
       family === "documents" ||
       family === "file_actions" ||
@@ -347,7 +558,10 @@ export class TurnRouterService {
       family === "error" ||
       family === "connectors" ||
       family === "email" ||
-      family === "editing"
+      family === "editing" ||
+      family === "calc" ||
+      family === "navigation" ||
+      family === "integrations"
     ) {
       return family;
     }
@@ -358,6 +572,7 @@ export class TurnRouterService {
     query: string,
     locale: "en" | "pt" | "es",
     docsAvailable: boolean,
+    ctx?: TurnContext,
   ): RouterCandidate[] {
     const bank = this.routingBankProvider("intent_patterns");
     if (!bank?.config?.enabled) return [];
@@ -373,6 +588,15 @@ export class TurnRouterService {
       bank?.operators && typeof bank.operators === "object"
         ? (bank.operators as Record<string, any>)
         : {};
+    const isCaseSensitive = matching.caseSensitive === true;
+    const regexOpts = { caseSensitive: isCaseSensitive };
+    const collisionBank = this.getOperatorCollisionMatrixBank();
+    const collisionEnabled = collisionBank?.config?.enabled !== false;
+    const collisionRules = Array.isArray(collisionBank?.rules)
+      ? collisionBank.rules
+      : [];
+    const collisionSignals = this.extractCollisionSignals(query, ctx);
+
     const out: RouterCandidate[] = [];
     for (const [operatorId, entry] of Object.entries(operators)) {
       if (!entry || typeof entry !== "object" || operatorId.startsWith("_")) {
@@ -409,6 +633,19 @@ export class TurnRouterService {
             familyBoost,
         ),
       );
+      const operator = low(operatorId);
+      if (
+        this.isSuppressedByCollisionMatrix({
+          operator,
+          normalizedQuery: normalized,
+          regexOpts,
+          collisionEnabled,
+          collisionRules,
+          collisionSignals,
+        })
+      ) {
+        continue;
+      }
       out.push({
         intentId: this.mapIntentFamilyToIntentId(intentFamily),
         operatorId,
@@ -416,7 +653,7 @@ export class TurnRouterService {
         domainId:
           intentFamily === "email"
             ? "email"
-            : intentFamily === "connectors"
+            : intentFamily === "connectors" || intentFamily === "integrations"
               ? "connectors"
               : "general",
         score,
@@ -468,12 +705,25 @@ export class TurnRouterService {
         reasonCodes: [],
       };
     }
-    const overlayPatterns = this.getLocalizedPatterns(
+    let overlayPatterns = this.getLocalizedPatterns(
       bank?.overlays?.followupIndicators || {},
       locale,
     );
+    let usedFallbackLocale = false;
+    if (overlayPatterns.length === 0 && locale !== "en") {
+      overlayPatterns = this.getLocalizedPatterns(
+        bank?.overlays?.followupIndicators || {},
+        "en",
+      );
+      usedFallbackLocale = overlayPatterns.length > 0;
+    }
     if (overlayPatterns.length === 0) {
       const reasonCode = `followup_overlay_patterns_missing_${locale}`;
+      if (isStrictIntentConfigEnv()) {
+        throw new Error(
+          `[turn-router] followup detection overlay missing for locale=${locale}`,
+        );
+      }
       if (!TurnRouterService._followupMisconfigWarned) {
         TurnRouterService._followupMisconfigWarned = true;
         console.warn("[turn-router] followup detection disabled: overlayPatterns is empty for locale", locale);
@@ -490,7 +740,11 @@ export class TurnRouterService {
       isFollowup: matched,
       confidence: matched ? 0.64 : null,
       source: matched ? "intent_patterns" : "none",
-      reasonCodes: matched ? ["followup_overlay_pattern"] : [],
+      reasonCodes: matched
+        ? usedFallbackLocale
+          ? ["followup_overlay_pattern", "followup_overlay_locale_fallback_en"]
+          : ["followup_overlay_pattern"]
+        : [],
     };
   }
 
@@ -670,6 +924,49 @@ export class TurnRouterService {
     return notes;
   }
 
+  private resolveScopeDecisionLabel(
+    ctx: TurnContext,
+    signals: IntentSignals,
+  ): string {
+    const contextSignals = getContextSignals(ctx);
+    if (ctx.viewer?.mode) return "viewer_locked";
+    if (contextSignals.explicitDocLock === true) return "explicit_doc_lock";
+    if (signals.hasExplicitDocRef === true) return "explicit_doc_ref";
+    if (ctx.activeDocument?.id) return "active_document";
+    if (ctx.attachedDocuments.length > 1) return "attached_docset";
+    if (ctx.attachedDocuments.length === 1) return "attached_single_doc";
+    return "corpus";
+  }
+
+  private buildRoutingTelemetryNotes(params: {
+    ctx: TurnContext;
+    decision: IntentDecisionOutput;
+    signals: IntentSignals;
+  }): string[] {
+    const notes: string[] = [];
+    const operatorChoice = String(params.decision.operatorId || "").trim();
+    if (operatorChoice) {
+      pushUnique(notes, `routing:operator_choice:${operatorChoice}`);
+    }
+    pushUnique(
+      notes,
+      `routing:scope_decision:${this.resolveScopeDecisionLabel(
+        params.ctx,
+        params.signals,
+      )}`,
+    );
+    if (params.decision.requiresClarification === true) {
+      const reason = String(params.decision.clarifyReason || "").trim();
+      pushUnique(
+        notes,
+        `routing:disambiguation:required:${reason || "unspecified"}`,
+      );
+    } else {
+      pushUnique(notes, "routing:disambiguation:none");
+    }
+    return notes;
+  }
+
   private getTiebreakWeight(stageId: string): number {
     const bank = this.routingBankProvider("routing_priority");
     const stages = Array.isArray(bank?.tiebreakStages)
@@ -741,7 +1038,146 @@ export class TurnRouterService {
     return candidates;
   }
 
-  private detectFileAction(query: string): FileActionDetectionResult {
+  private extractCollisionSignals(
+    query: string,
+    ctx?: TurnContext,
+  ): Set<string> {
+    const out = new Set<string>();
+    const normalized = low(
+      normalizeForMatching(query, {
+        caseInsensitive: true,
+        stripDiacritics: true,
+        collapseWhitespace: true,
+      }),
+    );
+
+    if (query.includes("?")) out.add("question_mark");
+    if (/\b(what is|o que e|que es)\b/.test(normalized)) out.add("what_is");
+    if (
+      /\b(how much|quanto|cuanto|cu[aá]nto|how many|quantos|cuantos|cu[aá]ntos)\b/.test(
+        normalized,
+      )
+    ) {
+      out.add("how_much");
+    }
+    if (/\b(show me|me mostre|mu[eé]strame)\b/.test(normalized)) {
+      out.add("show_me");
+    }
+    if (/\b(summarize|summarise|resum|resumen)\b/.test(normalized)) {
+      out.add("summarize");
+      out.add("summary");
+    }
+    if (/\b(describe|descrever|describir)\b/.test(normalized)) {
+      out.add("describe");
+    }
+    if (/\b(explain|explicar)\b/.test(normalized)) {
+      out.add("explain");
+    }
+    if (/\b(how do i|how to|como|c[oó]mo)\b/.test(normalized)) {
+      out.add("how_do_i");
+    }
+    if (/\b(can you|pode|puedes|você pode)\b/.test(normalized)) {
+      out.add("can_you");
+    }
+    if (/\b(help me|me ajude|ayudame|ayúdame)\b/.test(normalized)) {
+      out.add("help_me");
+    }
+    if (/\b(calculate|calcular|calcula|compute|computar)\b/.test(normalized)) {
+      out.add("calculate");
+      out.add("compute");
+    }
+    if (/\b(sum|somar|soma|sumar)\b/.test(normalized)) {
+      out.add("sum");
+      out.add("total");
+    }
+    if (/\b(average|media|m[eé]dia|promedio)\b/.test(normalized)) {
+      out.add("average");
+    }
+    if (/\b(total)\b/.test(normalized)) out.add("total");
+
+    const activeMime = low(
+      String(
+        ctx?.activeDocument?.mime ||
+          ctx?.viewer?.fileType ||
+          asRecord(ctx?.request?.meta).fileType ||
+          "",
+      ),
+    );
+    const mentionsSlides =
+      /\b(slide|slides|presentation|apresenta[cç][aã]o|diapositiva|ppt|pptx)\b/.test(
+        normalized,
+      );
+    const mentionsDoc =
+      /\b(paragraph|section|clause|doc|document|arquivo|documento|par[aá]grafo|se[cç][aã]o)\b/.test(
+        normalized,
+      );
+    const isSlideFile = /ppt|presentation/.test(activeMime);
+    const isDocFile = /doc|pdf|text/.test(activeMime);
+    if ((mentionsSlides && isDocFile) || (mentionsDoc && isSlideFile)) {
+      out.add("active_file_type_mismatch");
+    }
+
+    return out;
+  }
+
+  private isSuppressedByCollisionMatrix(params: {
+    operator: string;
+    normalizedQuery: string;
+    regexOpts: { caseSensitive?: boolean };
+    collisionEnabled: boolean;
+    collisionRules: unknown[];
+    collisionSignals: Set<string>;
+  }): boolean {
+    if (!params.collisionEnabled || params.collisionRules.length === 0) {
+      return false;
+    }
+    for (const rule of params.collisionRules) {
+      if (!rule || typeof rule !== "object") continue;
+      const when = asRecord(asRecord(rule).when);
+      const operators = Array.isArray(when?.operators)
+        ? when.operators.map((value: unknown) =>
+            String(value || "")
+              .trim()
+              .toLowerCase(),
+          )
+        : [];
+      if (operators.length > 0 && !operators.includes(params.operator)) {
+        continue;
+      }
+
+      const patterns = this.getPatterns(when?.queryRegexAny || {});
+      const ruleSignals = Array.isArray(when?.signals)
+        ? when.signals.map((value: unknown) =>
+            String(value || "")
+              .trim()
+              .toLowerCase(),
+          )
+        : [];
+      const hasPatternCondition = patterns.length > 0;
+      const hasSignalCondition = ruleSignals.length > 0;
+      if (!hasPatternCondition && !hasSignalCondition) continue;
+
+      if (
+        hasPatternCondition &&
+        !this.regexMatchesAny(params.normalizedQuery, patterns, params.regexOpts)
+      ) {
+        continue;
+      }
+      if (
+        hasSignalCondition &&
+        !ruleSignals.some((signal) => params.collisionSignals.has(signal))
+      ) {
+        continue;
+      }
+      return true;
+    }
+    return false;
+  }
+
+  private detectFileAction(
+    query: string,
+    ctx?: TurnContext,
+  ): FileActionDetectionResult {
     const bank = this.getFileActionBank();
     const detection = bank?.config?.operatorDetection;
     if (!bank || !detection?.enabled) return { kind: "none" };
@@ -831,25 +1267,16 @@ export class TurnRouterService {
       ? collisionBank.rules
       : [];
 
-    const isSuppressedByCollisionMatrix = (operator: string): boolean => {
-      if (!collisionEnabled || collisionRules.length === 0) return false;
-      for (const rule of collisionRules) {
-        if (!rule || typeof rule !== "object") continue;
-        const when = asRecord(asRecord(rule).when);
-        const operators = Array.isArray(when?.operators)
-          ? when.operators.map((value: unknown) =>
-              String(value || "")
-                .trim()
-                .toLowerCase(),
-            )
-          : [];
-        if (operators.length > 0 && !operators.includes(operator)) continue;
-        const patterns = this.getPatterns(when?.queryRegexAny || {});
-        if (patterns.length === 0) continue;
-        if (this.regexMatchesAny(normalized, patterns, regexOpts)) return true;
-      }
-      return false;
-    };
+    const collisionSignals = this.extractCollisionSignals(query, ctx);
+    const isSuppressedByCollisionMatrix = (operator: string): boolean =>
+      this.isSuppressedByCollisionMatrix({
+        operator,
+        normalizedQuery: normalized,
+        regexOpts,
+        collisionEnabled,
+        collisionRules,
+        collisionSignals,
+      });
 
     for (const candidate of matches.slice(0, maxCandidates)) {
       if (candidate.confidence < minConfidence) continue;
@@ -876,7 +1303,15 @@ export class TurnRouterService {
     const nav = isNavQuery(query);
     const discovery = isDiscoveryQuery(query);
     const howTo = isHowToQuery(query);
-    const fileAction = this.detectFileAction(query);
+    const calc = isCalcQuery(query);
+    const editing = isEditingQuery(query);
+    const integrationByKeyword = isIntegrationQuery(query);
+    const integrationByBank = this.detectIntegrationIntentFromBanks(
+      query,
+      locale,
+    );
+    const integrationIntent = integrationByKeyword || integrationByBank;
+    const fileAction = this.detectFileAction(query, ctx);
     const docRef =
       typeof precomputed?.hasExplicitDocRef === "boolean"
         ? precomputed.hasExplicitDocRef
@@ -887,12 +1322,15 @@ export class TurnRouterService {
       query,
       locale,
       docsAvailable,
+      ctx,
     );
 
     const candidates: RouterCandidate[] = [...patternCandidates];
     const hasFamily = (family: string) =>
       candidates.some(
-        (candidate) => low(candidate.intentFamily || "") === low(family),
+        (candidate) =>
+          canonicalIntentFamily(String(candidate.intentFamily || "")) ===
+          canonicalIntentFamily(family),
       );
 
     const discoveryWithDocContext = discovery && (docsAvailable || docRef);
@@ -908,6 +1346,44 @@ export class TurnRouterService {
         score:
           (docsAvailable ? 0.82 : 0.72) +
           this.getRoutingPriorityBoost("documents"),
+      });
+    }
+    if (nav && !hasFamily("navigation")) {
+      const navBank = this.getNavIntentsBank(locale);
+      const navBoost = navBank?.config?.enabled ? 0.01 : 0;
+      candidates.push({
+        intentId: "navigation",
+        operatorId: "open",
+        intentFamily: "navigation",
+        domainId: "general",
+        score: 0.83 + this.getRoutingPriorityBoost("navigation") + navBoost,
+      });
+    }
+    if (calc && !hasFamily("calc")) {
+      candidates.push({
+        intentId: "calc",
+        operatorId: "compute",
+        intentFamily: "calc",
+        domainId: "general",
+        score: 0.8 + this.getRoutingPriorityBoost("calc"),
+      });
+    }
+    if (editing && docsAvailable && !hasFamily("editing")) {
+      candidates.push({
+        intentId: "editing",
+        operatorId: "EDIT_PARAGRAPH",
+        intentFamily: "editing",
+        domainId: "general",
+        score: 0.82 + this.getRoutingPriorityBoost("editing"),
+      });
+    }
+    if (integrationIntent && !hasFamily("integrations")) {
+      candidates.push({
+        intentId: "integrations",
+        operatorId: "CONNECTOR_STATUS",
+        intentFamily: "integrations",
+        domainId: "connectors",
+        score: 0.84 + this.getRoutingPriorityBoost("integrations"),
       });
     }
     if (fileAction.kind === "matched" && !hasFamily("file_actions")) {
@@ -1085,6 +1561,9 @@ export class TurnRouterService {
       for (const note of this.buildFollowupDecisionNotes(signals, ctx.locale)) {
         pushUnique(decisionNotes, note);
       }
+      for (const note of this.buildRoutingTelemetryNotes({ ctx, decision, signals })) {
+        pushUnique(decisionNotes, note);
+      }
       return {
         ...decision,
         decisionNotes,
@@ -1104,6 +1583,13 @@ export class TurnRouterService {
     const notes = [...decision.decisionNotes];
     if (decision.providerId) notes.push(`provider:${decision.providerId}`);
     if (decision.requiresConfirmation) notes.push("requires_confirmation");
+    pushUnique(notes, `routing:operator_choice:${decision.operatorId}`);
+    pushUnique(notes, "routing:scope_decision:connector_context");
+    if (decision.requiresConfirmation) {
+      pushUnique(notes, "routing:disambiguation:required:connector_confirmation");
+    } else {
+      pushUnique(notes, "routing:disambiguation:none");
+    }
     notes.push("source:turn_route_policy");
     return {
       intentId: decision.intentId,
@@ -1155,6 +1641,13 @@ export class TurnRouterService {
           intentDecision: null,
         };
       }
+      const viewerRoute = this.resolveViewerModeRouteFromBank(ctx);
+      if (viewerRoute) {
+        return {
+          route: viewerRoute,
+          intentDecision: null,
+        };
+      }
       return {
         route: "KNOWLEDGE",
         intentDecision: null,
@@ -1195,3 +1688,5 @@ export class TurnRouterService {
     return this.decideWithIntent(ctx).route;
   }
 }
+
+

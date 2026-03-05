@@ -2,8 +2,10 @@ import { beforeEach, describe, expect, jest, test } from "@jest/globals";
 
 const mockDocumentFindMany = jest.fn();
 const mockDocumentFindFirst = jest.fn();
+const mockFolderFindFirst = jest.fn();
 const mockTxDocumentFindFirst = jest.fn();
 const mockTxDocumentDeleteMany = jest.fn();
+const mockTxDocumentCreate = jest.fn();
 const mockTxUserUpdate = jest.fn();
 const mockTransaction = jest.fn();
 
@@ -13,6 +15,9 @@ jest.mock("../config/database", () => ({
     document: {
       findMany: (...args: any[]) => mockDocumentFindMany(...args),
       findFirst: (...args: any[]) => mockDocumentFindFirst(...args),
+    },
+    folder: {
+      findFirst: (...args: any[]) => mockFolderFindFirst(...args),
     },
     $transaction: (...args: any[]) => mockTransaction(...args),
   },
@@ -35,6 +40,7 @@ jest.mock("../config/storage", () => ({
   uploadFile: jest.fn(),
   downloadFile: jest.fn(),
   getSignedUrl: jest.fn(),
+  deleteFile: jest.fn(),
 }));
 
 jest.mock("../config/env", () => ({
@@ -58,8 +64,10 @@ describe("PrismaDocumentService list/delete invariants", () => {
   beforeEach(() => {
     mockDocumentFindMany.mockReset();
     mockDocumentFindFirst.mockReset();
+    mockFolderFindFirst.mockReset();
     mockTxDocumentFindFirst.mockReset();
     mockTxDocumentDeleteMany.mockReset();
+    mockTxDocumentCreate.mockReset();
     mockTxUserUpdate.mockReset();
     mockTransaction.mockReset();
   });
@@ -205,6 +213,109 @@ describe("PrismaDocumentService list/delete invariants", () => {
       expect.objectContaining({
         where: { id: "u-1" },
         data: { storageUsedBytes: { decrement: 256 } },
+      }),
+    );
+  });
+
+  test("upload rejects non-owned folder before DB transaction", async () => {
+    mockFolderFindFirst.mockResolvedValue(null);
+
+    const svc = new PrismaDocumentService();
+    await expect(
+      svc.upload({
+        userId: "u-1",
+        data: {
+          filename: "x.pdf",
+          mimeType: "application/pdf",
+          folderId: "foreign-folder",
+          storageKey: "users/u-1/docs/doc-1/x.pdf",
+        },
+      }),
+    ).rejects.toThrow("Folder not found");
+
+    expect(mockTransaction).not.toHaveBeenCalled();
+  });
+
+  test("upload rejects out-of-scope storageKey when buffer is not provided", async () => {
+    const svc = new PrismaDocumentService();
+    await expect(
+      svc.upload({
+        userId: "u-1",
+        data: {
+          filename: "x.pdf",
+          mimeType: "application/pdf",
+          storageKey: "users/other-user/docs/doc-1/x.pdf",
+        },
+      }),
+    ).rejects.toThrow("Invalid storage key scope");
+  });
+
+  test("upload requires storageKey when buffer is not provided", async () => {
+    const svc = new PrismaDocumentService();
+    await expect(
+      svc.upload({
+        userId: "u-1",
+        data: {
+          filename: "x.pdf",
+          mimeType: "application/pdf",
+        },
+      }),
+    ).rejects.toThrow("storageKey is required when buffer is not provided");
+  });
+
+  test("upload persists validated storageKey and increments storage in transaction", async () => {
+    mockFolderFindFirst.mockResolvedValue({ id: "folder-1" });
+    mockTransaction.mockImplementation(async (arg: any) => {
+      const tx = {
+        document: {
+          create: (...args: any[]) => mockTxDocumentCreate(...args),
+        },
+        user: {
+          update: (...args: any[]) => mockTxUserUpdate(...args),
+        },
+      };
+      if (typeof arg === "function") return arg(tx);
+      return null;
+    });
+    mockTxDocumentCreate.mockResolvedValue({
+      id: "doc-1",
+      filename: "x.pdf",
+      encryptedFilename: "users/u-1/docs/doc-1/x.pdf",
+      mimeType: "application/pdf",
+      fileSize: 123,
+      displayTitle: null,
+      folderId: "folder-1",
+      folder: { path: "/F" },
+      status: "uploaded",
+      createdAt: new Date("2026-03-05T00:00:00.000Z"),
+      updatedAt: new Date("2026-03-05T00:00:00.000Z"),
+    });
+    mockTxUserUpdate.mockResolvedValue({});
+
+    const svc = new PrismaDocumentService();
+    await svc.upload({
+      userId: "u-1",
+      data: {
+        filename: "x.pdf",
+        mimeType: "application/pdf",
+        folderId: "folder-1",
+        sizeBytes: 123,
+        storageKey: "users/u-1/docs/doc-1/x.pdf",
+      },
+    });
+
+    expect(mockTxDocumentCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          encryptedFilename: "users/u-1/docs/doc-1/x.pdf",
+          folderId: "folder-1",
+        }),
+      }),
+    );
+    expect(mockTxUserUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: "u-1" },
+        data: { storageUsedBytes: { increment: 123 } },
       }),
     );
   });

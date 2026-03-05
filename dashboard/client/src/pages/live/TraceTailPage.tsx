@@ -3,11 +3,20 @@
  * Real-time trace monitoring similar to "tail -f" for distributed traces
  */
 
-import { useState, useEffect, useRef } from "react";
-import { Terminal, Search, Pause, Play, Filter, ChevronDown, ChevronRight, ExternalLink } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import {
+  Terminal,
+  Search,
+  Pause,
+  Play,
+  ChevronDown,
+  ChevronRight,
+  ExternalLink,
+} from "lucide-react";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { Link } from "wouter";
 import type { TimeRange, Environment } from "@/types/admin";
+import { useLiveStream } from "@/hooks/useAdminApi";
 
 interface TraceSpan {
   traceId: string;
@@ -33,53 +42,44 @@ export function TraceTailPage() {
   const [expandedTrace, setExpandedTrace] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "success" | "error" | "slow">("all");
   const [search, setSearch] = useState("");
-  const streamRef = useRef<HTMLDivElement>(null);
+  const { events, isConnected, error } = useLiveStream([
+    "retrieval",
+    "llm",
+    "system",
+    "security",
+    "files",
+  ]);
 
-  // Simulated live trace generation
   useEffect(() => {
     if (isPaused) return;
+    const mapped = events
+      .map(mapEventToTrace)
+      .filter((entry): entry is TraceSpan => entry != null);
+    const deduped = new Map<string, TraceSpan>();
+    for (const entry of mapped) {
+      const key = `${entry.traceId}:${entry.timestamp}`;
+      if (!deduped.has(key)) deduped.set(key, entry);
+      if (deduped.size >= 200) break;
+    }
+    setTraces(Array.from(deduped.values()));
+  }, [events, isPaused]);
 
-    const domains = ["financial", "technical", "general", "marketing", "legal"];
-    const intents = ["question", "summary", "comparison", "explanation", "list"];
-    const steps = [
-      "ROUTER", "SCOPE", "RETRIEVAL", "RANKING", "PROMPT_BUILD",
-      "LLM_CALL", "POSTPROCESS", "QUALITY_CHECK", "FINALIZE"
-    ];
-
-    const interval = setInterval(() => {
-      const latency = Math.floor(Math.random() * 5000) + 500;
-      const hasError = Math.random() < 0.1;
-      const isSlow = latency > 3000;
-
-      const newTrace: TraceSpan = {
-        traceId: `trace_${Date.now().toString(36)}_${Math.random().toString(36).substr(2, 6)}`,
-        timestamp: new Date().toISOString(),
-        userId: `user_${Math.floor(Math.random() * 500)}`,
-        query: generateQuery(),
-        domain: domains[Math.floor(Math.random() * domains.length)],
-        intent: intents[Math.floor(Math.random() * intents.length)],
-        latencyMs: latency,
-        status: hasError ? "error" : isSlow ? "warning" : "success",
-        steps: steps.map(name => ({
-          name,
-          durationMs: Math.floor(Math.random() * 500) + 10,
-          status: hasError && Math.random() < 0.3 ? "error" : Math.random() < 0.1 ? "skipped" : "ok",
-        })),
-      };
-
-      setTraces(prev => [newTrace, ...prev].slice(0, 100));
-    }, 2000 + Math.random() * 3000);
-
-    return () => clearInterval(interval);
-  }, [isPaused]);
-
-  const filteredTraces = traces.filter(trace => {
-    if (filter === "success" && trace.status !== "success") return false;
-    if (filter === "error" && trace.status !== "error") return false;
-    if (filter === "slow" && trace.latencyMs < 3000) return false;
-    if (search && !trace.query.toLowerCase().includes(search.toLowerCase()) && !trace.traceId.includes(search)) return false;
-    return true;
-  });
+  const filteredTraces = useMemo(
+    () =>
+      traces.filter((trace) => {
+        if (filter === "success" && trace.status !== "success") return false;
+        if (filter === "error" && trace.status !== "error") return false;
+        if (filter === "slow" && trace.latencyMs < 3000) return false;
+        if (
+          search &&
+          !trace.query.toLowerCase().includes(search.toLowerCase()) &&
+          !trace.traceId.includes(search)
+        )
+          return false;
+        return true;
+      }),
+    [traces, filter, search],
+  );
 
   const getStatusColor = (status: TraceSpan["status"]) => {
     switch (status) {
@@ -100,12 +100,18 @@ export function TraceTailPage() {
   };
 
   // Stats
-  const stats = {
+  const stats = useMemo(
+    () => ({
     total: traces.length,
-    success: traces.filter(t => t.status === "success").length,
-    errors: traces.filter(t => t.status === "error").length,
-    avgLatency: traces.length > 0 ? Math.round(traces.reduce((s, t) => s + t.latencyMs, 0) / traces.length) : 0,
-  };
+    success: traces.filter((t) => t.status === "success").length,
+    errors: traces.filter((t) => t.status === "error").length,
+    avgLatency:
+      traces.length > 0
+        ? Math.round(traces.reduce((s, t) => s + t.latencyMs, 0) / traces.length)
+        : 0,
+  }),
+    [traces],
+  );
 
   return (
     <AdminLayout range={range} onRangeChange={setRange} env={env} onEnvChange={setEnv}>
@@ -114,9 +120,17 @@ export function TraceTailPage() {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-semibold text-[#111111]">Trace Tail</h1>
-            <span className={`flex items-center gap-1 px-2 py-1 text-xs rounded ${isPaused ? "bg-amber-100 text-amber-700" : "bg-green-100 text-green-700"}`}>
-              <Terminal className={`w-3 h-3 ${!isPaused && "animate-pulse"}`} />
-              {isPaused ? "Paused" : "Streaming"}
+            <span
+              className={`flex items-center gap-1 px-2 py-1 text-xs rounded ${
+                isPaused
+                  ? "bg-amber-100 text-amber-700"
+                  : isConnected
+                    ? "bg-green-100 text-green-700"
+                    : "bg-red-100 text-red-700"
+              }`}
+            >
+              <Terminal className={`w-3 h-3 ${!isPaused && isConnected && "animate-pulse"}`} />
+              {isPaused ? "Paused" : isConnected ? "Streaming" : "Disconnected"}
             </span>
           </div>
           <p className="text-sm text-[#6B7280] mt-1">
@@ -188,13 +202,14 @@ export function TraceTailPage() {
       </div>
 
       {/* Trace Stream */}
-      <div
-        ref={streamRef}
-        className="bg-white border border-[#E6E6EC] rounded-lg overflow-hidden"
-      >
+      <div className="bg-white border border-[#E6E6EC] rounded-lg overflow-hidden">
         {filteredTraces.length === 0 ? (
           <div className="p-8 text-center text-[#6B7280]">
-            {isPaused ? "Stream paused. Click Resume to continue." : "Waiting for traces..."}
+            {isPaused
+              ? "Stream paused. Click Resume to continue."
+              : error
+                ? `Live stream error: ${error.message}`
+                : "Waiting for traces..."}
           </div>
         ) : (
           <div className="divide-y divide-[#E6E6EC]">
@@ -277,22 +292,77 @@ export function TraceTailPage() {
   );
 }
 
-function generateQuery(): string {
-  const queries = [
-    "What are the key financial metrics for Q3?",
-    "How do I configure the API rate limits?",
-    "Explain the document processing pipeline",
-    "What's the pricing for enterprise plans?",
-    "Show me the latest user growth trends",
-    "How does the RAG system work?",
-    "What are the SLA guarantees?",
-    "Compare features between plans",
-    "Summarize the security compliance docs",
-    "How to integrate with Slack?",
-    "What's the data retention policy?",
-    "Explain the billing model",
-  ];
-  return queries[Math.floor(Math.random() * queries.length)];
+function toNumberOr(value: unknown, fallback: number): number {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function mapEventToTrace(event: unknown): TraceSpan | null {
+  if (!event || typeof event !== "object") return null;
+  const payload = event as Record<string, unknown>;
+  const type = String(payload.type || "").toLowerCase();
+  if (type === "ping" || type === "connected") return null;
+
+  const data =
+    payload.data && typeof payload.data === "object"
+      ? (payload.data as Record<string, unknown>)
+      : payload.details && typeof payload.details === "object"
+        ? (payload.details as Record<string, unknown>)
+        : {};
+
+  const traceId =
+    String(
+      payload.correlationId ||
+        data.traceId ||
+        payload.traceId ||
+        payload.id ||
+        "",
+    ).trim() || `trace_${Date.now()}`;
+  const timestamp =
+    String(payload.timestamp || data.timestamp || new Date().toISOString()).trim() ||
+    new Date().toISOString();
+  const latencyMs = toNumberOr(
+    data.totalMs ?? data.latencyMs ?? data.durationMs ?? data.llmMs ?? 0,
+    0,
+  );
+  const severity = String(payload.severity || "").toLowerCase();
+  const status: TraceSpan["status"] =
+    severity === "critical" || severity === "high" || type === "error"
+      ? "error"
+      : latencyMs > 3000
+        ? "warning"
+        : "success";
+
+  const steps = Array.isArray(data.steps)
+    ? data.steps
+        .map((step) => {
+          if (!step || typeof step !== "object") return null;
+          const safeStep = step as Record<string, unknown>;
+          const stepStatusRaw = String(safeStep.status || "ok").toLowerCase();
+          const stepStatus: "ok" | "error" | "skipped" =
+            stepStatusRaw === "error" || stepStatusRaw === "skipped"
+              ? (stepStatusRaw as "error" | "skipped")
+              : "ok";
+          return {
+            name: String(safeStep.name || safeStep.stepName || "STEP"),
+            durationMs: toNumberOr(safeStep.durationMs, 0),
+            status: stepStatus,
+          };
+        })
+        .filter((step): step is TraceSpan["steps"][number] => step != null)
+    : [];
+
+  return {
+    traceId,
+    timestamp,
+    userId: String(payload.userId || data.userId || "system"),
+    query: String(payload.summary || data.query || data.message || type || "Telemetry event"),
+    domain: String(data.domain || payload.category || type || "system"),
+    intent: String(data.intent || data.operator || type || "unknown"),
+    latencyMs,
+    status,
+    steps,
+  };
 }
 
 export default TraceTailPage;

@@ -30,7 +30,7 @@ describe("Certification: provenance-only source filtering", () => {
     const failures: string[] = [];
 
     for (const filePath of files) {
-      const rel = path.relative(srcRoot, filePath);
+      const rel = path.relative(srcRoot, filePath).replace(/\\/g, "/");
       if (rel === "tests/certification/no-lexical-evidence-reparse.cert.test.ts")
         continue;
 

@@ -65,40 +65,52 @@ export function deriveOcrSignals(input: {
   extraction: Record<string, unknown> | null | undefined;
   fullText: string;
 }): OcrSignals {
-  const extraction = input.extraction || {};
+  const extraction: {
+    ocrPageCount?: unknown;
+    ocrMode?: unknown;
+    ocrUsed?: unknown;
+    ocrApplied?: unknown;
+    ocrAttempted?: unknown;
+    ocrSuccess?: unknown;
+    ocrConfidence?: unknown;
+    confidence?: unknown;
+    ocrOutcome?: unknown;
+    skipReason?: unknown;
+    skipped?: unknown;
+  } = input.extraction || {};
   const isImageMime = String(input.mimeType || "").startsWith("image/");
   const fullText = String(input.fullText || "");
 
-  const ocrPageCount = Number.isFinite(Number((extraction as any).ocrPageCount))
-    ? Number((extraction as any).ocrPageCount)
+  const ocrPageCount = Number.isFinite(Number(extraction.ocrPageCount))
+    ? Number(extraction.ocrPageCount)
     : null;
   const ocrMode =
-    typeof (extraction as any).ocrMode === "string"
-      ? String((extraction as any).ocrMode)
+    typeof extraction.ocrMode === "string"
+      ? String(extraction.ocrMode)
       : null;
 
   const ocrUsed = Boolean(
-    (extraction as any).ocrUsed ||
-    (extraction as any).ocrApplied ||
+    extraction.ocrUsed ||
+    extraction.ocrApplied ||
     (ocrPageCount ?? 0) > 0,
   );
   const ocrAttempted =
-    typeof (extraction as any).ocrAttempted === "boolean"
-      ? Boolean((extraction as any).ocrAttempted)
+    typeof extraction.ocrAttempted === "boolean"
+      ? Boolean(extraction.ocrAttempted)
       : ocrUsed;
 
   const ocrSuccess =
-    typeof (extraction as any).ocrSuccess === "boolean"
-      ? Boolean((extraction as any).ocrSuccess)
+    typeof extraction.ocrSuccess === "boolean"
+      ? Boolean(extraction.ocrSuccess)
       : ocrUsed && fullText.trim().length > 0;
 
   // Confidence should be recorded only when OCR was actually applied.
   const confidenceCandidate =
-    (extraction as any).ocrConfidence ??
-    (ocrUsed && isImageMime ? (extraction as any).confidence : null);
+    extraction.ocrConfidence ??
+    (ocrUsed && isImageMime ? extraction.confidence : null);
   const ocrConfidence = ocrUsed ? clamp01(confidenceCandidate) : null;
 
-  const explicitOutcome = normalizeOutcome((extraction as any).ocrOutcome);
+  const explicitOutcome = normalizeOutcome(extraction.ocrOutcome);
   if (explicitOutcome) {
     return {
       ocrAttempted,
@@ -111,8 +123,8 @@ export function deriveOcrSignals(input: {
     };
   }
 
-  const skipReason = String((extraction as any).skipReason || "");
-  const skipped = Boolean((extraction as any).skipped);
+  const skipReason = String(extraction.skipReason || "");
+  const skipped = Boolean(extraction.skipped);
 
   let ocrOutcome: OcrOutcome = "not_attempted";
   if (ocrSuccess) {

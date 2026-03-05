@@ -21,11 +21,7 @@ export type DocumentIntelligenceDomain =
   | "insurance"
   | "tax"
   | "travel"
-  | "everyday"
-  | "compliance"
-  | "connectors"
-  | "education_research"
-  | "procurement";
+  | "everyday";
 
 export type DocumentIntelligenceOntologyType =
   | "doc_type"
@@ -60,6 +56,7 @@ export type DocumentIntelligenceOperator =
 
 export type DocumentIntelligenceQualityGateType =
   | "ambiguity_questions"
+  | "contradiction_policy"
   | "numeric_integrity"
   | "source_policy"
   | "wrong_doc_lock";
@@ -130,7 +127,6 @@ const CORE_DOMAINS: DocumentIntelligenceDomain[] = [
 const EXTENDED_DOMAINS: DocumentIntelligenceDomain[] = [
   "banking",
   "billing",
-  "connectors",
   "education",
   "housing",
   "hr_payroll",
@@ -139,9 +135,6 @@ const EXTENDED_DOMAINS: DocumentIntelligenceDomain[] = [
   "tax",
   "travel",
   "everyday",
-  "compliance",
-  "education_research",
-  "procurement",
 ];
 
 const DOMAINS: DocumentIntelligenceDomain[] = [
@@ -167,6 +160,10 @@ const MISSING = Symbol("document_intelligence_bank_missing");
 
 const DOMAIN_ALIASES: Record<string, DocumentIntelligenceDomain> = {
   operations: "ops",
+  compliance: "legal",
+  connectors: "ops",
+  education_research: "education",
+  procurement: "ops",
 };
 
 function isDocumentIntelligenceDomain(
@@ -527,8 +524,20 @@ export class DocumentIntelligenceBanksService {
     return this.getCachedOptional<Record<string, any>>(`section_priority_${normalized}`);
   }
 
+  getTableHeaderOntology(domain: DocumentIntelligenceDomain): Record<string, any> | null {
+    const normalized = this.normalizeDomainOrThrow(
+      domain,
+      "getTableHeaderOntology",
+    );
+    return this.getCachedOptional<Record<string, any>>(`table_header_ontology_${normalized}`);
+  }
+
   getCrossDocGroundingPolicy(): Record<string, any> | null {
     return this.getCachedOptional<Record<string, any>>("allybi_crossdoc_grounding");
+  }
+
+  getCrossDocAlignmentRules(): Record<string, any> | null {
+    return this.getCachedOptional<Record<string, any>>("crossdoc_alignment_rules");
   }
 
   getQualityGateBank(type: DocumentIntelligenceQualityGateType): Record<string, any> | null {

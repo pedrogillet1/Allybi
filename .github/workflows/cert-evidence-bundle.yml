@@ -3,13 +3,7 @@ name: Certification Evidence Bundle
 on:
   workflow_dispatch:
   pull_request:
-    paths:
-      - "backend/scripts/certification/**"
-      - "backend/scripts/audit/p0-gates.mjs"
-      - "backend/src/tests/certification/**"
-      - "backend/src/tests/document-intelligence/docint-bank-integrity.test.ts"
-      - "frontend/e2e/grading/**"
-      - ".github/workflows/cert-evidence-bundle.yml"
+    branches: [ main, develop ]
 
 jobs:
   cert-evidence:
@@ -32,13 +26,39 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run retrieval and P0 audits
+      - name: Bootstrap frontend grading lineage artifacts
+        run: node ../frontend/e2e/grading/bootstrap-report-lineage.mjs --strict
+
+      - name: Run wiring-proof and wrong-doc trap suites
+        run: |
+          npm run test:cert:wrong-doc
+          npm run test:cert:wiring
+          npm run test:cert:collision-matrix-exhaustive
+          npm run test:cert:telemetry-completeness
+          npm run test:cert:rollout-safety
+          npm run test:cert:turn-debug-packet
+
+      - name: Run eval pack integrity checks
+        run: |
+          npm run test:docint:eval-pack
+          npm run eval:docint:strict
+          npm run audit:docint:eval-governance:strict
+          npm run audit:banks:meta-tests
+          npm run audit:banks:meta-tests:all
+
+      - name: Run retrieval + certification audits (CI profile)
+        env:
+          CERT_PROFILE: ci
         run: |
           npm run audit:retrieval:strict
-          npm run audit:p0:strict
+          npm run audit:cert:strict
+          npm run audit:observability:ops-contract:strict
+          npm run audit:query-latency:stability:strict
 
-      - name: Build certification summary
-        run: npm run audit:cert:strict
+      - name: Verify immutable gate freshness and thresholds
+        run: |
+          npm run audit:p0:verify:strict
+          npm run audit:cert:verify:strict
 
       - name: Build immutable evidence bundle
         run: npm run cert:evidence:bundle

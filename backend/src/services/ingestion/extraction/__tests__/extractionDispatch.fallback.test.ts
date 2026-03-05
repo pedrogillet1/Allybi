@@ -24,6 +24,7 @@ jest.mock("../../../extraction/pptxExtractor.service", () => ({}));
 
 import { extractText } from "../extractionDispatch.service";
 import { extractWithTesseract } from "../../../extraction/tesseractFallback.service";
+import sharp from "sharp";
 
 describe("extractText image fallback", () => {
   beforeEach(() => {
@@ -72,6 +73,26 @@ describe("extractText image fallback", () => {
 
     expect(extractWithTesseract).not.toHaveBeenCalled();
     expect((result as any).skipped).toBe(true);
+  });
+
+  it("skips OCR for low-variance visual-only images without filename hints", async () => {
+    const buffer = await sharp({
+      create: {
+        width: 1024,
+        height: 1024,
+        channels: 3,
+        background: { r: 255, g: 255, b: 255 },
+      },
+    })
+      .png({ compressionLevel: 0 })
+      .toBuffer();
+
+    expect(buffer.length).toBeGreaterThan(10 * 1024);
+    const result = await extractText(buffer, "image/png", "solid-canvas.png");
+
+    expect(extractWithTesseract).not.toHaveBeenCalled();
+    expect((result as any).skipped).toBe(true);
+    expect((result as any).skipReason).toContain("low_variance");
   });
 
   describe("Tesseract multi-language support", () => {

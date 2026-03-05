@@ -1,4 +1,11 @@
 // src/types/extraction.types.ts
+import type {
+  BaseExtractionResult as CanonicalBaseExtractionResult,
+  DocxExtractionResult as CanonicalDocxExtractionResult,
+  PdfExtractionResult as CanonicalPdfExtractionResult,
+  PptxExtractionResult as CanonicalPptxExtractionResult,
+  XlsxExtractionResult as CanonicalXlsxExtractionResult,
+} from "../services/ingestion/extraction/extractionResult.types";
 
 /**
  * Extraction Types (Koda)
@@ -319,11 +326,11 @@ export type ExtractionErrorCode =
 // Specialized result aliases used by extractor services
 // ---------------------------------------------------------------------------
 
-export type BaseExtractionResult = ExtractionResult;
-export type DocxExtractionResult = ExtractionResult;
-export type PdfExtractionResult = ExtractionResult;
-export type PptxExtractionResult = ExtractionResult;
-export type XlsxExtractionResult = ExtractionResult;
+export type BaseExtractionResult = CanonicalBaseExtractionResult;
+export type DocxExtractionResult = CanonicalDocxExtractionResult;
+export type PdfExtractionResult = CanonicalPdfExtractionResult;
+export type PptxExtractionResult = CanonicalPptxExtractionResult;
+export type XlsxExtractionResult = CanonicalXlsxExtractionResult;
 
 // DOCX-specific types
 export interface DocxSection {

@@ -254,16 +254,14 @@ async function computeHourlyMetrics(
   metrics.llmTokensOut = Number(llmResult[0]?.tokensOut || 0);
 
   // ─── TTFT (from model_calls) ───
-  const ttftResult = await prisma.$queryRawUnsafe<[{ avg_ttft: number | null }]>(
-    `SELECT AVG("firstTokenMs") as avg_ttft
-     FROM "model_calls"
-     WHERE "at" >= $1 AND "at" < $2
-       AND "firstTokenMs" IS NOT NULL
-       AND "firstTokenMs" > 0
-       AND "status" = 'ok'`,
-    bucketStart,
-    bucketEnd,
-  );
+  const ttftResult = await prisma.$queryRaw<[{ avg_ttft: number | null }]>`
+    SELECT AVG("firstTokenMs") as avg_ttft
+    FROM "model_calls"
+    WHERE "at" >= ${bucketStart} AND "at" < ${bucketEnd}
+      AND "firstTokenMs" IS NOT NULL
+      AND "firstTokenMs" > 0
+      AND "status" = 'ok'
+  `;
   const ttftAvgMs = ttftResult[0]?.avg_ttft
     ? Math.round(ttftResult[0].avg_ttft * 100) / 100
     : null;

@@ -71,10 +71,38 @@ function assertPptxMime(
 
 type EditingSaveMode = "overwrite" | "revision";
 
+function isProtectedRuntimeEnv(
+  nodeEnv: string | undefined = process.env.NODE_ENV,
+): boolean {
+  const normalized = String(nodeEnv || "")
+    .trim()
+    .toLowerCase();
+  return normalized === "production" || normalized === "staging";
+}
+
+function allowOverwriteInProtectedEnv(
+  rawValue: string | undefined = process.env.KODA_EDITING_ALLOW_OVERWRITE_PROTECTED,
+): boolean {
+  return String(rawValue || "")
+    .trim()
+    .toLowerCase() === "true";
+}
+
 function editingSaveMode(): EditingSaveMode {
   const raw = String(process.env.KODA_EDITING_SAVE_MODE || "revision")
     .trim()
     .toLowerCase();
+  if (
+    raw === "overwrite" &&
+    isProtectedRuntimeEnv() &&
+    !allowOverwriteInProtectedEnv()
+  ) {
+    logger.error(
+      "[RevisionStore] KODA_EDITING_SAVE_MODE=overwrite is blocked in protected environments without KODA_EDITING_ALLOW_OVERWRITE_PROTECTED=true; forcing revision mode",
+      { nodeEnv: process.env.NODE_ENV || null },
+    );
+    return "revision";
+  }
   return raw === "revision" ? "revision" : "overwrite";
 }
 
@@ -488,6 +516,51 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
       } catch {
         // ignore
       }
+    }
+  }
+
+  private async createBackupRevisionOrThrow(input: {
+    userId: string;
+    documentId: string;
+    originalBytes: Buffer;
+    mimeType?: string | null;
+    filename?: string | null;
+    reason: string;
+    metadata?: Record<string, unknown>;
+    context?: {
+      correlationId?: string;
+      userId?: string;
+      conversationId?: string;
+      clientMessageId?: string;
+    };
+    logContext: {
+      operator: string;
+      action: "overwrite" | "storeEditedBuffer" | "undo_restore";
+    };
+  }): Promise<void> {
+    try {
+      await this.revisionService.createRevision(
+        {
+          userId: input.userId,
+          sourceDocumentId: input.documentId,
+          contentBuffer: input.originalBytes,
+          mimeType: input.mimeType || undefined,
+          filename: input.filename || undefined,
+          enqueueReindex: false,
+          reason: input.reason,
+          metadata: input.metadata,
+        },
+        input.context,
+      );
+    } catch (backupErr) {
+      logger.error("[RevisionStore] Backup failed, aborting overwrite", {
+        documentId: input.documentId,
+        operator: input.logContext.operator,
+        action: input.logContext.action,
+        error:
+          backupErr instanceof Error ? backupErr.message : String(backupErr),
+      });
+      throw new Error(`BACKUP_FAILED: Cannot overwrite without backup.`);
     }
   }
 
@@ -1732,38 +1805,30 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
     if (editingSaveMode() === "overwrite") {
       // Always create a backup before overwrite — destruction of the original
       // must never proceed without a successful backup.
-      try {
-        await this.revisionService.createRevision(
-          {
-            userId,
-            sourceDocumentId: docId,
-            contentBuffer: original,
-            mimeType: doc.mimeType || undefined,
-            filename: doc.filename || undefined,
-            enqueueReindex: false,
-            reason: `backup:${op}`,
-            metadata: {
-              ...meta,
-              appliedOperator: op,
-              appliedTargetId: targetId,
-              backupOf: docId,
-            },
-          },
-          {
-            correlationId: input.correlationId,
-            userId: input.userId,
-            conversationId: input.conversationId,
-            clientMessageId: input.clientMessageId,
-          },
-        );
-      } catch (backupErr) {
-        logger.error("[RevisionStore] Backup failed, aborting overwrite", {
-          documentId: docId,
+      await this.createBackupRevisionOrThrow({
+        userId,
+        documentId: docId,
+        originalBytes: original,
+        mimeType: doc.mimeType,
+        filename: doc.filename,
+        reason: `backup:${op}`,
+        metadata: {
+          ...meta,
+          appliedOperator: op,
+          appliedTargetId: targetId,
+          backupOf: docId,
+        },
+        context: {
+          correlationId: input.correlationId,
+          userId: input.userId,
+          conversationId: input.conversationId,
+          clientMessageId: input.clientMessageId,
+        },
+        logContext: {
           operator: op,
-          error: backupErr instanceof Error ? backupErr.message : String(backupErr),
-        });
-        throw new Error(`BACKUP_FAILED: Cannot overwrite without backup.`);
-      }
+          action: "overwrite",
+        },
+      });
 
       // Only after backup confirmed: overwrite content at the same storage key.
       await uploadFile(
@@ -2031,6 +2096,12 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
     fileHashBefore: string;
     fileHashAfter: string;
   }> {
+    if (isProtectedRuntimeEnv() && !allowOverwriteInProtectedEnv()) {
+      throw new Error(
+        "OVERWRITE_DISABLED_IN_PROTECTED_ENV: storeEditedBuffer requires KODA_EDITING_ALLOW_OVERWRITE_PROTECTED=true.",
+      );
+    }
+
     const docId = input.documentId.trim();
     const userId = input.userId.trim();
 
@@ -2052,6 +2123,31 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
     const fileHashBefore =
       String(doc.fileHash || "").trim() || sha256(original);
     const fileHashAfter = sha256(input.editedBuffer);
+    const op = String(input.operator || "").trim();
+
+    await this.createBackupRevisionOrThrow({
+      userId,
+      documentId: docId,
+      originalBytes: original,
+      mimeType: doc.mimeType,
+      filename: doc.filename,
+      reason: `backup:${op || "STORE_EDITED_BUFFER"}`,
+      metadata: {
+        ...(input.metadata || {}),
+        appliedOperator: op || "STORE_EDITED_BUFFER",
+        backupOf: docId,
+      },
+      context: {
+        correlationId: input.correlationId,
+        userId: input.userId,
+        conversationId: input.conversationId,
+        clientMessageId: input.clientMessageId,
+      },
+      logContext: {
+        operator: op || "STORE_EDITED_BUFFER",
+        action: "storeEditedBuffer",
+      },
+    });
 
     // Overwrite content at the same storage key.
     await uploadFile(
@@ -2063,7 +2159,6 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
       await cacheService.del(`document_buffer:${docId}`);
     } catch {}
 
-    const op = String(input.operator || "").trim();
     const isSlidesEdit = op.includes("SLIDE") || op === "EXPORT_SLIDES";
     const isSheetsEdit =
       op.includes("SHEET") ||

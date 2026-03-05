@@ -63,6 +63,100 @@ describe("chunkAssembly.service — buildInputChunks", () => {
     expect(chunks[0].metadata?.sectionName).toBeUndefined();
   });
 
+  test("PDF extractedTables cell_fact chunks include normalized unit/scale metadata", () => {
+    const extraction: any = {
+      sourceType: "pdf",
+      text: "table text",
+      pages: [{ page: 1, text: "table text" }],
+      extractedTables: [
+        {
+          tableId: "pdf:p1:t1",
+          pageOrSlide: 1,
+          markdown: "| Metric | Amount (USD millions) |",
+          rows: [
+            {
+              rowIndex: 0,
+              isHeader: true,
+              cells: [
+                { colIndex: 0, text: "Metric" },
+                { colIndex: 1, text: "Amount (USD millions)" },
+              ],
+            },
+            {
+              rowIndex: 1,
+              isHeader: false,
+              cells: [
+                { colIndex: 0, text: "Revenue" },
+                { colIndex: 1, text: "$1.5" },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+
+    const chunks = buildInputChunks(extraction, extraction.text);
+    const cellFact = chunks.find(
+      (c) =>
+        c.metadata?.chunkType === "cell_fact" &&
+        c.metadata?.columnIndex === 1 &&
+        c.metadata?.rowIndex === 1,
+    );
+
+    expect(cellFact).toBeDefined();
+    expect(cellFact!.content).toContain("Revenue / Amount (USD millions)");
+    expect(cellFact!.metadata?.unitNormalized).toBe("currency_usd");
+    expect(cellFact!.metadata?.scaleMultiplier).toBe(1_000_000);
+    expect(cellFact!.metadata?.numericValue).toBeCloseTo(1_500_000);
+  });
+
+  test("table cell span metadata is preserved on emitted cell_fact chunks", () => {
+    const extraction: any = {
+      sourceType: "pdf",
+      text: "table text",
+      pages: [{ page: 1, text: "table text" }],
+      extractedTables: [
+        {
+          tableId: "pdf:p1:t2",
+          pageOrSlide: 1,
+          markdown: "| Group | Metric | Value |\n| --- | --- | --- |\n| Revenue | ARR | 100 |",
+          rows: [
+            {
+              rowIndex: 0,
+              isHeader: true,
+              cells: [
+                { colIndex: 0, text: "Group", colSpan: 2 },
+                { colIndex: 1, text: "", isMergedContinuation: true },
+                { colIndex: 2, text: "Value" },
+              ],
+            },
+            {
+              rowIndex: 1,
+              isHeader: false,
+              cells: [
+                { colIndex: 0, text: "Revenue" },
+                { colIndex: 1, text: "ARR" },
+                { colIndex: 2, text: "100" },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+
+    const chunks = buildInputChunks(extraction, extraction.text);
+    const headerCell = chunks.find(
+      (c) =>
+        c.metadata?.chunkType === "cell_fact" &&
+        c.metadata?.rowIndex === 0 &&
+        c.metadata?.columnIndex === 0,
+    );
+
+    expect(headerCell).toBeDefined();
+    expect(headerCell!.metadata?.colSpan).toBe(2);
+    expect(headerCell!.metadata?.isMergedContinuation).toBeUndefined();
+  });
+
   // ---------------------------------------------------------------
   // DOCX path
   // ---------------------------------------------------------------
@@ -228,6 +322,60 @@ describe("chunkAssembly.service — buildInputChunks", () => {
     expect(cellCentric!.metadata?.numericValue).toBeCloseTo(1250.5);
     expect(cellCentric!.metadata?.rowIndex).toBe(10);
     expect(cellCentric!.metadata?.columnIndex).toBe(3);
+  });
+
+  test("XLSX cell facts propagate canonical period metadata to cell and row aggregate chunks", () => {
+    const extraction: any = {
+      sourceType: "xlsx",
+      text: "Revenue",
+      wordCount: 1,
+      confidence: 1,
+      sheetCount: 1,
+      sheets: [{ sheetName: "Sheet1", textContent: "" }],
+      cellFacts: [
+        {
+          sheet: "Sheet1",
+          cell: "B2",
+          rowLabel: "Revenue",
+          colHeader: "Jan Actual",
+          value: "100",
+          displayValue: "100",
+          period: { year: 2025, month: 1, quarter: 1 },
+        },
+        {
+          sheet: "Sheet1",
+          cell: "C2",
+          rowLabel: "Revenue",
+          colHeader: "Jan Budget",
+          value: "110",
+          displayValue: "110",
+          period: { year: 2025, month: 1, quarter: 1 },
+        },
+      ],
+    };
+
+    const chunks = buildInputChunks(extraction, extraction.text);
+    const cellChunk = chunks.find((c) => c.metadata?.cellRef === "B2");
+    expect(cellChunk).toBeDefined();
+    expect(cellChunk!.metadata?.periodYear).toBe(2025);
+    expect(cellChunk!.metadata?.periodMonth).toBe(1);
+    expect(cellChunk!.metadata?.periodQuarter).toBe(1);
+    expect(cellChunk!.metadata?.periodTokens).toEqual(
+      expect.arrayContaining(["Y2025", "Q1", "Y2025Q1", "M01", "Y2025M01"]),
+    );
+
+    const rowAggregate = chunks.find(
+      (c) =>
+        c.metadata?.tableChunkForm === "row_aggregate" &&
+        c.metadata?.rowLabel === "Revenue",
+    );
+    expect(rowAggregate).toBeDefined();
+    expect(rowAggregate!.metadata?.periodYear).toBe(2025);
+    expect(rowAggregate!.metadata?.periodMonth).toBe(1);
+    expect(rowAggregate!.metadata?.periodQuarter).toBe(1);
+    expect(rowAggregate!.metadata?.periodTokens).toEqual(
+      expect.arrayContaining(["Y2025", "Q1", "Y2025Q1"]),
+    );
   });
 
   // ---------------------------------------------------------------

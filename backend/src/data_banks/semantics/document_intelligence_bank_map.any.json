@@ -167,6 +167,13 @@
     "wrong_doc_lock"
   ],
   "optionalBankIds": [
+    "anti_robotic_style_rules",
+    "citation_policy",
+    "closers",
+    "fallback_messages",
+    "followup_suggestions_v1c6269cc",
+    "format_guardrails",
+    "help_microcopy",
     "keyword_taxonomy_finance",
     "keyword_taxonomy_legal",
     "keyword_taxonomy_medical",
@@ -227,7 +234,13 @@
     "pain_points_legal",
     "pain_points_medical",
     "pain_points_ops",
-    "pattern_library"
+    "pattern_library",
+    "openers",
+    "response_templates",
+    "table_render_policy",
+    "tone_profiles",
+    "verbosity_ladder",
+    "voice_personality_profiles"
   ],
   "groupedByArea": {
     "taxonomy": [
@@ -412,7 +425,7 @@
       },
       {
         "id": "DOCINT_0002_domains_present",
-        "assert": "domains includes accounting, banking, billing, education, finance, housing, hr_payroll, identity, insurance, legal, medical, ops, tax, travel"
+        "assert": "domains+extendedDomains includes accounting, banking, billing, education, everyday, finance, housing, hr_payroll, identity, insurance, legal, medical, ops, tax, travel"
       }
     ]
   },
@@ -425,9 +438,6 @@
     "hr_payroll",
     "identity",
     "insurance",
-    "compliance",
-    "education_research",
-    "procurement",
     "tax",
     "travel"
   ]

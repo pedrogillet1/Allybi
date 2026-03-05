@@ -11,7 +11,16 @@ type GateReport = {
 };
 
 const ROOT = process.cwd();
-const GATES_DIR = path.resolve(ROOT, "reports", "cert", "gates");
+function resolveBackendRoot(cwd: string): string {
+  const direct = path.resolve(cwd, "reports", "cert", "gates");
+  if (fs.existsSync(direct)) return cwd;
+  const nestedBackend = path.resolve(cwd, "backend");
+  const nestedGates = path.resolve(nestedBackend, "reports", "cert", "gates");
+  if (fs.existsSync(nestedGates)) return nestedBackend;
+  return cwd;
+}
+const RESOLVED_ROOT = resolveBackendRoot(ROOT);
+const GATES_DIR = path.resolve(RESOLVED_ROOT, "reports", "cert", "gates");
 const REQUIRED_GATES = [
   "composition-routing",
   "composition-fallback-order",
@@ -50,9 +59,11 @@ function metricNumber(gate: GateReport, key: string): number | null {
 
 function readJson(relativePath: string): unknown | null {
   const absolute = path.resolve(ROOT, relativePath);
-  if (!fs.existsSync(absolute)) return null;
+  const rooted = path.resolve(RESOLVED_ROOT, relativePath);
+  const target = fs.existsSync(absolute) ? absolute : rooted;
+  if (!fs.existsSync(target)) return null;
   try {
-    return JSON.parse(fs.readFileSync(absolute, "utf8")) as unknown;
+    return JSON.parse(fs.readFileSync(target, "utf8")) as unknown;
   } catch {
     return null;
   }
@@ -74,11 +85,18 @@ function enforceCanonicalComposeFollowup(failures: string[]): void {
     ROOT,
     "src/services/core/enforcement/composeMicrocopy.service.ts",
   );
-  if (!fs.existsSync(composeServicePath)) {
+  const fallbackComposeServicePath = path.resolve(
+    RESOLVED_ROOT,
+    "src/services/core/enforcement/composeMicrocopy.service.ts",
+  );
+  const effectiveComposeServicePath = fs.existsSync(composeServicePath)
+    ? composeServicePath
+    : fallbackComposeServicePath;
+  if (!fs.existsSync(effectiveComposeServicePath)) {
     failures.push("compose_followup_canonical_check_missing:composeMicrocopy");
     return;
   }
-  const composeSource = fs.readFileSync(composeServicePath, "utf8");
+  const composeSource = fs.readFileSync(effectiveComposeServicePath, "utf8");
   if (
     composeSource.includes(
       'getOptionalBank<FollowupSuggestionsBank>("followup_suggestions")',
@@ -134,7 +152,7 @@ function resolveCurrentCommitHash(): string | null {
   if (/^[0-9a-f]{40}$/i.test(fromEnv)) return fromEnv;
   try {
     const fromGit = execSync("git rev-parse HEAD", {
-      cwd: ROOT,
+      cwd: RESOLVED_ROOT,
       stdio: ["ignore", "pipe", "ignore"],
       encoding: "utf8",
     })
@@ -191,6 +209,10 @@ function main() {
       const shortToLongRatio = metricNumber(gate, "shortToLongRatio");
       const claimGuardEvidenceCount = metricNumber(gate, "claimGuardEvidenceCount");
       const toneParityEs = metricNumber(gate, "toneParityEs");
+      const structureFamilyCoverage = metricNumber(gate, "structureFamilyCoverage");
+      const citationStrictNoSnippet = metricNumber(gate, "citationStrictNoSnippet");
+      const esEvidenceLocalization = metricNumber(gate, "esEvidenceLocalization");
+      const followupLocaleCoverage = metricNumber(gate, "followupLocaleCoverage");
       if (!openerDistinctCount || openerDistinctCount < 2) {
         failures.push("compose_quality_floor_failed:openerDistinctCount");
         passed = false;
@@ -213,6 +235,22 @@ function main() {
       }
       if (!toneParityEs || toneParityEs < 1) {
         failures.push("compose_quality_floor_failed:toneParityEs");
+        passed = false;
+      }
+      if (!structureFamilyCoverage || structureFamilyCoverage < 1) {
+        failures.push("compose_quality_floor_failed:structureFamilyCoverage");
+        passed = false;
+      }
+      if (!citationStrictNoSnippet || citationStrictNoSnippet < 1) {
+        failures.push("compose_quality_floor_failed:citationStrictNoSnippet");
+        passed = false;
+      }
+      if (!esEvidenceLocalization || esEvidenceLocalization < 1) {
+        failures.push("compose_quality_floor_failed:esEvidenceLocalization");
+        passed = false;
+      }
+      if (!followupLocaleCoverage || followupLocaleCoverage < 1) {
+        failures.push("compose_quality_floor_failed:followupLocaleCoverage");
         passed = false;
       }
     }

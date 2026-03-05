@@ -6,6 +6,8 @@ import {
   recordExtractionAttempt,
   recordTableDuplication,
   recordOcrUsage,
+  recordIndexingActiveOperationConflict,
+  recordIndexingPlaintextSensitiveFieldViolation,
   recordIndexingQualityMetrics,
   getIngestionPercentiles,
   getExtractorPercentiles,
@@ -174,6 +176,8 @@ describe("pipelineMetrics", () => {
         total: 0,
         rate: 0,
       });
+      expect(summary.indexPlaintextSensitiveFieldViolations).toBe(0);
+      expect(summary.indexingActiveOperationConflicts).toBe(0);
     });
   });
 
@@ -204,6 +208,21 @@ describe("pipelineMetrics", () => {
         total: 8,
         rate: 1,
       });
+    });
+  });
+
+  describe("indexing security/concurrency counters", () => {
+    it("tracks plaintext sensitive field violations", () => {
+      recordIndexingPlaintextSensitiveFieldViolation(3);
+      recordIndexingPlaintextSensitiveFieldViolation();
+      const summary = getMetricsSummary();
+      expect(summary.indexPlaintextSensitiveFieldViolations).toBe(4);
+    });
+
+    it("tracks active operation conflicts", () => {
+      recordIndexingActiveOperationConflict(2);
+      const summary = getMetricsSummary();
+      expect(summary.indexingActiveOperationConflicts).toBe(2);
     });
   });
 });

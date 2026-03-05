@@ -3,6 +3,9 @@ import path from "path";
 import { Request, Response, NextFunction } from "express";
 import { UPLOAD_CONFIG } from "../config/upload.config";
 import { formatBytes } from "../utils";
+import {
+  isMimeTypeSupportedForExtraction,
+} from "../services/ingestion/extraction/ingestionMimeRegistry.service";
 
 // REMOVED: storageService - deleted service, using stub
 const storageService = {
@@ -52,95 +55,16 @@ const fileFilter = (
     cb(new Error(`System files not allowed: ${file.originalname}`));
     return;
   }
-  // Allowed file types
-  const allowedMimeTypes = [
-    // Documents
-    "application/pdf",
-    "application/msword",
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    "application/vnd.ms-excel",
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    "application/vnd.ms-powerpoint",
-    "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-    "text/plain",
-    "text/html",
-    "application/rtf",
-
-    // Images
-    "image/jpeg",
-    "image/png",
-    "image/gif",
-    "image/webp",
-    "image/tiff",
-    "image/bmp",
-    "image/svg+xml",
-    "image/x-icon",
-
-    // Design files
-    "image/vnd.adobe.photoshop",
-    "application/photoshop",
-    "application/psd",
-
-    // Video files
-    "video/mp4",
-    "video/webm",
-    "video/ogg",
-    "video/quicktime",
-
-    // Generic fallback for when browser can't detect MIME type
-    "application/octet-stream",
-  ];
-
-  // Allowed file extensions as fallback validation
-  const allowedExtensions = [
-    // Documents
-    ".pdf",
-    ".doc",
-    ".docx",
-    ".xls",
-    ".xlsx",
-    ".ppt",
-    ".pptx",
-    ".txt",
-    ".html",
-    ".rtf",
-    // Images
-    ".jpg",
-    ".jpeg",
-    ".png",
-    ".gif",
-    ".webp",
-    ".tiff",
-    ".tif",
-    ".bmp",
-    ".svg",
-    ".ico",
-    // Design files
-    ".psd",
-    ".ai",
-    ".sketch",
-    ".fig",
-    ".xd",
-    // Video files
-    ".mp4",
-    ".webm",
-    ".ogg",
-    ".mov",
-    ".avi",
-  ];
-
   const fileExtension = path.extname(file.originalname).toLowerCase();
+  const extractableMime = isMimeTypeSupportedForExtraction(file.mimetype);
 
-  // Accept if MIME type is in whitelist OR extension is allowed
-  if (
-    allowedMimeTypes.includes(file.mimetype) ||
-    allowedExtensions.includes(fileExtension)
-  ) {
+  // Strict contract: accepted uploads must be directly extractable by ingestion.
+  if (extractableMime) {
     cb(null, true);
   } else {
     cb(
       new Error(
-        `File type ${file.mimetype} with extension ${fileExtension} not allowed`,
+        `Unsupported document type ${file.mimetype} (${fileExtension || "no extension"})`,
       ),
     );
   }

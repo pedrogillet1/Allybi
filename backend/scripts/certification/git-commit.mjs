@@ -92,6 +92,11 @@ export function resolveCommitHash(rootDir = process.cwd()) {
     return { commitHash: fromEnv, source: "env" };
   }
 
+  const fromGitExecCwd = resolveFromGitExecutable(rootDir);
+  if (fromGitExecCwd) {
+    return { commitHash: fromGitExecCwd, source: "git-exec-cwd" };
+  }
+
   const repoRoot = findRepoRoot(rootDir) || rootDir;
   const fromGitFiles = resolveFromGitFiles(repoRoot);
   if (fromGitFiles) return { commitHash: fromGitFiles, source: "git-files" };

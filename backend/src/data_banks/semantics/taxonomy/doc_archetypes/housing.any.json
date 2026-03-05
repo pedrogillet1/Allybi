@@ -59,20 +59,35 @@
       ],
       "expectedTableFamilies": [
         "Mortgage Statement line-item table",
-        "Mortgage Statement summary matrix"
+        "Mortgage Statement summary matrix",
+        "Mortgage Statement line items",
+        "Mortgage Statement itens",
+        "Mortgage Statement summary",
+        "Mortgage Statement resumo"
       ],
       "fieldFamilies": [
         "Primary identifiers",
         "Dates and periods",
-        "Amounts and statuses"
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
       ],
       "redFlags": [
         "Missing mandatory section anchors",
-        "Conflicting summary totals"
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
       ],
       "missingQuestions": [
         "Which mortgage statement variant should be prioritized?",
-        "Should extraction prefer header metadata or detailed section data?"
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Mortgage Statement variant should be prioritized?",
+        "Qual variante de Mortgage Statement deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
       ]
     },
     {
@@ -112,20 +127,35 @@
       ],
       "expectedTableFamilies": [
         "Lease Summary line-item table",
-        "Lease Summary summary matrix"
+        "Lease Summary summary matrix",
+        "Lease Summary line items",
+        "Lease Summary itens",
+        "Lease Summary summary",
+        "Lease Summary resumo"
       ],
       "fieldFamilies": [
         "Primary identifiers",
         "Dates and periods",
-        "Amounts and statuses"
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
       ],
       "redFlags": [
         "Missing mandatory section anchors",
-        "Conflicting summary totals"
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
       ],
       "missingQuestions": [
         "Which lease summary variant should be prioritized?",
-        "Should extraction prefer header metadata or detailed section data?"
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Lease Summary variant should be prioritized?",
+        "Qual variante de Lease Summary deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
       ]
     },
     {
@@ -165,20 +195,967 @@
       ],
       "expectedTableFamilies": [
         "Property Tax Bill line-item table",
-        "Property Tax Bill summary matrix"
+        "Property Tax Bill summary matrix",
+        "Property Tax Bill line items",
+        "Property Tax Bill itens",
+        "Property Tax Bill summary",
+        "Property Tax Bill resumo"
       ],
       "fieldFamilies": [
         "Primary identifiers",
         "Dates and periods",
-        "Amounts and statuses"
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
       ],
       "redFlags": [
         "Missing mandatory section anchors",
-        "Conflicting summary totals"
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
       ],
       "missingQuestions": [
         "Which property tax bill variant should be prioritized?",
-        "Should extraction prefer header metadata or detailed section data?"
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Property Tax Bill variant should be prioritized?",
+        "Qual variante de Property Tax Bill deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "housing_hoa_statement",
+      "label": "Hoa Statement",
+      "expectedSections": [
+        "Header",
+        "Cabeçalho",
+        "Issuer Profile",
+        "Perfil do Emissor",
+        "Recipient Profile",
+        "Perfil do Destinatario",
+        "Account or Reference",
+        "Conta ou Referencia",
+        "Period or Schedule",
+        "Período ou Agenda",
+        "Line Items or Events",
+        "Itens ou Eventos"
+      ],
+      "headings": [
+        "statement",
+        "document",
+        "header",
+        "issuer",
+        "provider",
+        "organization",
+        "emitente",
+        "recipient",
+        "holder",
+        "student",
+        "employee",
+        "destinatario",
+        "account",
+        "reference",
+        "numero",
+        "id"
+      ],
+      "expectedTableFamilies": [
+        "Mortgage Statement line-item table",
+        "Mortgage Statement summary matrix",
+        "Hoa Statement line items",
+        "Hoa Statement itens",
+        "Hoa Statement summary",
+        "Hoa Statement resumo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
+      ],
+      "missingQuestions": [
+        "Which mortgage statement variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Hoa Statement variant should be prioritized?",
+        "Qual variante de Hoa Statement deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "housing_home_inspection_report",
+      "label": "Home Inspection Report",
+      "expectedSections": [
+        "Header",
+        "Cabeçalho",
+        "Issuer Profile",
+        "Perfil do Emissor",
+        "Recipient Profile",
+        "Perfil do Destinatario",
+        "Account or Reference",
+        "Conta ou Referencia",
+        "Period or Schedule",
+        "Período ou Agenda",
+        "Line Items or Events",
+        "Itens ou Eventos"
+      ],
+      "headings": [
+        "statement",
+        "document",
+        "header",
+        "issuer",
+        "provider",
+        "organization",
+        "emitente",
+        "recipient",
+        "holder",
+        "student",
+        "employee",
+        "destinatario",
+        "account",
+        "reference",
+        "numero",
+        "id"
+      ],
+      "expectedTableFamilies": [
+        "Mortgage Statement line-item table",
+        "Mortgage Statement summary matrix",
+        "Home Inspection Report line items",
+        "Home Inspection Report itens",
+        "Home Inspection Report summary",
+        "Home Inspection Report resumo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
+      ],
+      "missingQuestions": [
+        "Which mortgage statement variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Home Inspection Report variant should be prioritized?",
+        "Qual variante de Home Inspection Report deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "housing_rent_receipt",
+      "label": "Rent Receipt",
+      "expectedSections": [
+        "Header",
+        "Cabeçalho",
+        "Issuer Profile",
+        "Perfil do Emissor",
+        "Recipient Profile",
+        "Perfil do Destinatario",
+        "Account or Reference",
+        "Conta ou Referencia",
+        "Period or Schedule",
+        "Período ou Agenda",
+        "Line Items or Events",
+        "Itens ou Eventos"
+      ],
+      "headings": [
+        "statement",
+        "document",
+        "header",
+        "issuer",
+        "provider",
+        "organization",
+        "emitente",
+        "recipient",
+        "holder",
+        "student",
+        "employee",
+        "destinatario",
+        "account",
+        "reference",
+        "numero",
+        "id"
+      ],
+      "expectedTableFamilies": [
+        "Mortgage Statement line-item table",
+        "Mortgage Statement summary matrix",
+        "Rent Receipt line items",
+        "Rent Receipt itens",
+        "Rent Receipt summary",
+        "Rent Receipt resumo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
+      ],
+      "missingQuestions": [
+        "Which mortgage statement variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Rent Receipt variant should be prioritized?",
+        "Qual variante de Rent Receipt deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "housing_inspection_followup_notice",
+      "label": "Inspection Followup Notice",
+      "expectedSections": [
+        "Supplement Housing 01 Header",
+        "Cabecalho Supplement Housing 01",
+        "Supplement Housing 01 Parties",
+        "Partes Supplement Housing 01",
+        "Supplement Housing 01 Timeline",
+        "Linha do tempo Supplement Housing 01"
+      ],
+      "headings": [
+        "supplement housing 01",
+        "housing supplement 01",
+        "housing",
+        "housing summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Housing 01 line items",
+        "Supplement Housing 01 itens",
+        "Supplement Housing 01 summary",
+        "Supplement Housing 01 resumo",
+        "Supplement Housing 01 balance",
+        "Supplement Housing 01 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Housing 01 variant should be prioritized?",
+        "Qual variante de Supplement Housing 01 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "housing_rent_adjustment_notice",
+      "label": "Rent Adjustment Notice",
+      "expectedSections": [
+        "Supplement Housing 02 Header",
+        "Cabecalho Supplement Housing 02",
+        "Supplement Housing 02 Parties",
+        "Partes Supplement Housing 02",
+        "Supplement Housing 02 Timeline",
+        "Linha do tempo Supplement Housing 02"
+      ],
+      "headings": [
+        "supplement housing 02",
+        "housing supplement 02",
+        "housing",
+        "housing summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Housing 02 line items",
+        "Supplement Housing 02 itens",
+        "Supplement Housing 02 summary",
+        "Supplement Housing 02 resumo",
+        "Supplement Housing 02 balance",
+        "Supplement Housing 02 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Housing 02 variant should be prioritized?",
+        "Qual variante de Supplement Housing 02 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "housing_maintenance_charge_notice",
+      "label": "Maintenance Charge Notice",
+      "expectedSections": [
+        "Supplement Housing 03 Header",
+        "Cabecalho Supplement Housing 03",
+        "Supplement Housing 03 Parties",
+        "Partes Supplement Housing 03",
+        "Supplement Housing 03 Timeline",
+        "Linha do tempo Supplement Housing 03"
+      ],
+      "headings": [
+        "supplement housing 03",
+        "housing supplement 03",
+        "housing",
+        "housing summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Housing 03 line items",
+        "Supplement Housing 03 itens",
+        "Supplement Housing 03 summary",
+        "Supplement Housing 03 resumo",
+        "Supplement Housing 03 balance",
+        "Supplement Housing 03 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Housing 03 variant should be prioritized?",
+        "Qual variante de Supplement Housing 03 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "housing_hoa_policy_update",
+      "label": "Hoa Policy Update",
+      "expectedSections": [
+        "Supplement Housing 04 Header",
+        "Cabecalho Supplement Housing 04",
+        "Supplement Housing 04 Parties",
+        "Partes Supplement Housing 04",
+        "Supplement Housing 04 Timeline",
+        "Linha do tempo Supplement Housing 04"
+      ],
+      "headings": [
+        "supplement housing 04",
+        "housing supplement 04",
+        "housing",
+        "housing summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Housing 04 line items",
+        "Supplement Housing 04 itens",
+        "Supplement Housing 04 summary",
+        "Supplement Housing 04 resumo",
+        "Supplement Housing 04 balance",
+        "Supplement Housing 04 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Housing 04 variant should be prioritized?",
+        "Qual variante de Supplement Housing 04 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "housing_mortgage_rate_notice",
+      "label": "Mortgage Rate Notice",
+      "expectedSections": [
+        "Supplement Housing 05 Header",
+        "Cabecalho Supplement Housing 05",
+        "Supplement Housing 05 Parties",
+        "Partes Supplement Housing 05",
+        "Supplement Housing 05 Timeline",
+        "Linha do tempo Supplement Housing 05"
+      ],
+      "headings": [
+        "supplement housing 05",
+        "housing supplement 05",
+        "housing",
+        "housing summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Housing 05 line items",
+        "Supplement Housing 05 itens",
+        "Supplement Housing 05 summary",
+        "Supplement Housing 05 resumo",
+        "Supplement Housing 05 balance",
+        "Supplement Housing 05 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Housing 05 variant should be prioritized?",
+        "Qual variante de Supplement Housing 05 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "housing_property_condition_note",
+      "label": "Property Condition Note",
+      "expectedSections": [
+        "Supplement Housing 06 Header",
+        "Cabecalho Supplement Housing 06",
+        "Supplement Housing 06 Parties",
+        "Partes Supplement Housing 06",
+        "Supplement Housing 06 Timeline",
+        "Linha do tempo Supplement Housing 06"
+      ],
+      "headings": [
+        "supplement housing 06",
+        "housing supplement 06",
+        "housing",
+        "housing summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Housing 06 line items",
+        "Supplement Housing 06 itens",
+        "Supplement Housing 06 summary",
+        "Supplement Housing 06 resumo",
+        "Supplement Housing 06 balance",
+        "Supplement Housing 06 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Housing 06 variant should be prioritized?",
+        "Qual variante de Supplement Housing 06 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "housing_tenant_status_update",
+      "label": "Tenant Status Update",
+      "expectedSections": [
+        "Supplement Housing 07 Header",
+        "Cabecalho Supplement Housing 07",
+        "Supplement Housing 07 Parties",
+        "Partes Supplement Housing 07",
+        "Supplement Housing 07 Timeline",
+        "Linha do tempo Supplement Housing 07"
+      ],
+      "headings": [
+        "supplement housing 07",
+        "housing supplement 07",
+        "housing",
+        "housing summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Housing 07 line items",
+        "Supplement Housing 07 itens",
+        "Supplement Housing 07 summary",
+        "Supplement Housing 07 resumo",
+        "Supplement Housing 07 balance",
+        "Supplement Housing 07 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Housing 07 variant should be prioritized?",
+        "Qual variante de Supplement Housing 07 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "housing_utility_charge_notice",
+      "label": "Utility Charge Notice",
+      "expectedSections": [
+        "Supplement Housing 08 Header",
+        "Cabecalho Supplement Housing 08",
+        "Supplement Housing 08 Parties",
+        "Partes Supplement Housing 08",
+        "Supplement Housing 08 Timeline",
+        "Linha do tempo Supplement Housing 08"
+      ],
+      "headings": [
+        "supplement housing 08",
+        "housing supplement 08",
+        "housing",
+        "housing summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Housing 08 line items",
+        "Supplement Housing 08 itens",
+        "Supplement Housing 08 summary",
+        "Supplement Housing 08 resumo",
+        "Supplement Housing 08 balance",
+        "Supplement Housing 08 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Housing 08 variant should be prioritized?",
+        "Qual variante de Supplement Housing 08 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "housing_lease_extension_note",
+      "label": "Lease Extension Note",
+      "expectedSections": [
+        "Supplement Housing 09 Header",
+        "Cabecalho Supplement Housing 09",
+        "Supplement Housing 09 Parties",
+        "Partes Supplement Housing 09",
+        "Supplement Housing 09 Timeline",
+        "Linha do tempo Supplement Housing 09"
+      ],
+      "headings": [
+        "supplement housing 09",
+        "housing supplement 09",
+        "housing",
+        "housing summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Housing 09 line items",
+        "Supplement Housing 09 itens",
+        "Supplement Housing 09 summary",
+        "Supplement Housing 09 resumo",
+        "Supplement Housing 09 balance",
+        "Supplement Housing 09 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Housing 09 variant should be prioritized?",
+        "Qual variante de Supplement Housing 09 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "housing_deposit_reconciliation_note",
+      "label": "Deposit Reconciliation Note",
+      "expectedSections": [
+        "Supplement Housing 10 Header",
+        "Cabecalho Supplement Housing 10",
+        "Supplement Housing 10 Parties",
+        "Partes Supplement Housing 10",
+        "Supplement Housing 10 Timeline",
+        "Linha do tempo Supplement Housing 10"
+      ],
+      "headings": [
+        "supplement housing 10",
+        "housing supplement 10",
+        "housing",
+        "housing summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Housing 10 line items",
+        "Supplement Housing 10 itens",
+        "Supplement Housing 10 summary",
+        "Supplement Housing 10 resumo",
+        "Supplement Housing 10 balance",
+        "Supplement Housing 10 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Housing 10 variant should be prioritized?",
+        "Qual variante de Supplement Housing 10 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "housing_occupancy_summary_note",
+      "label": "Occupancy Summary Note",
+      "expectedSections": [
+        "Supplement Housing 11 Header",
+        "Cabecalho Supplement Housing 11",
+        "Supplement Housing 11 Parties",
+        "Partes Supplement Housing 11",
+        "Supplement Housing 11 Timeline",
+        "Linha do tempo Supplement Housing 11"
+      ],
+      "headings": [
+        "supplement housing 11",
+        "housing supplement 11",
+        "housing",
+        "housing summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Housing 11 line items",
+        "Supplement Housing 11 itens",
+        "Supplement Housing 11 summary",
+        "Supplement Housing 11 resumo",
+        "Supplement Housing 11 balance",
+        "Supplement Housing 11 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Housing 11 variant should be prioritized?",
+        "Qual variante de Supplement Housing 11 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "housing_moveout_charge_notice",
+      "label": "Moveout Charge Notice",
+      "expectedSections": [
+        "Supplement Housing 12 Header",
+        "Cabecalho Supplement Housing 12",
+        "Supplement Housing 12 Parties",
+        "Partes Supplement Housing 12",
+        "Supplement Housing 12 Timeline",
+        "Linha do tempo Supplement Housing 12"
+      ],
+      "headings": [
+        "supplement housing 12",
+        "housing supplement 12",
+        "housing",
+        "housing summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Housing 12 line items",
+        "Supplement Housing 12 itens",
+        "Supplement Housing 12 summary",
+        "Supplement Housing 12 resumo",
+        "Supplement Housing 12 balance",
+        "Supplement Housing 12 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Housing 12 variant should be prioritized?",
+        "Qual variante de Supplement Housing 12 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "housing_inspection_followup_notice_2",
+      "label": "Inspection Followup Notice 2",
+      "expectedSections": [
+        "Supplement Housing 13 Header",
+        "Cabecalho Supplement Housing 13",
+        "Supplement Housing 13 Parties",
+        "Partes Supplement Housing 13",
+        "Supplement Housing 13 Timeline",
+        "Linha do tempo Supplement Housing 13"
+      ],
+      "headings": [
+        "supplement housing 13",
+        "housing supplement 13",
+        "housing",
+        "housing summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Housing 13 line items",
+        "Supplement Housing 13 itens",
+        "Supplement Housing 13 summary",
+        "Supplement Housing 13 resumo",
+        "Supplement Housing 13 balance",
+        "Supplement Housing 13 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Housing 13 variant should be prioritized?",
+        "Qual variante de Supplement Housing 13 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "housing_rent_adjustment_notice_2",
+      "label": "Rent Adjustment Notice 2",
+      "expectedSections": [
+        "Supplement Housing 14 Header",
+        "Cabecalho Supplement Housing 14",
+        "Supplement Housing 14 Parties",
+        "Partes Supplement Housing 14",
+        "Supplement Housing 14 Timeline",
+        "Linha do tempo Supplement Housing 14"
+      ],
+      "headings": [
+        "supplement housing 14",
+        "housing supplement 14",
+        "housing",
+        "housing summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Housing 14 line items",
+        "Supplement Housing 14 itens",
+        "Supplement Housing 14 summary",
+        "Supplement Housing 14 resumo",
+        "Supplement Housing 14 balance",
+        "Supplement Housing 14 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Housing 14 variant should be prioritized?",
+        "Qual variante de Supplement Housing 14 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
       ]
     }
   ]

@@ -11,14 +11,17 @@ import prisma from "../../../config/database";
 import { downloadFile } from "../../../config/storage";
 import vectorEmbeddingRuntimeService from "../../retrieval/vectorEmbedding.runtime.service";
 import { extractText, PDF_MIMES, DOCX_MIMES, XLSX_MIMES, PPTX_MIMES } from "../extraction/extractionDispatch.service";
+import { normalizeMimeType } from "../extraction/ingestionMimeRegistry.service";
 import { isSkipped, hasPagesArray, hasSlidesArray } from "../extraction/extractionResult.types";
 import type { DispatchedExtractionResult, ImageSkippedResult } from "../extraction/extractionResult.types";
 import { buildInputChunks, deduplicateChunks } from "./chunkAssembly.service";
-import { clamp01, deriveTextQuality } from "./textQuality.service";
+import { deriveTextQuality } from "./textQuality.service";
 import { runEncryptionStep } from "./encryptionStep.service";
 import fileValidator from "../fileValidator.service";
 import type { PipelineTimings, InputChunk } from "./pipelineTypes";
 import { recordIngestionTiming, recordExtractionAttempt } from "./pipelineMetrics.service";
+import { deriveOcrSignals } from "../../extraction/ocrSignals.service";
+import { toSkipCode } from "./skipCodes";
 
 // Storage download concurrency limiter
 const pLimit = require("p-limit");
@@ -59,6 +62,25 @@ export function withTimeout<T>(promise: Promise<T>, ms: number, label: string): 
   });
 }
 
+export function resolveStrictPdfOcrRequired(
+  rawValue: string | undefined = process.env.STRICT_PDF_OCR_REQUIRED,
+  nodeEnv: string | undefined = process.env.NODE_ENV,
+): boolean {
+  const normalized = String(rawValue ?? "true").trim().toLowerCase();
+  const strictEnabled = normalized !== "false";
+  const protectedEnv = nodeEnv === "production" || nodeEnv === "staging";
+
+  if (protectedEnv && !strictEnabled) {
+    logger.error(
+      "[Pipeline] STRICT_PDF_OCR_REQUIRED=false is not allowed in production/staging; forcing strict mode",
+      { nodeEnv },
+    );
+    return true;
+  }
+
+  return strictEnabled;
+}
+
 /**
  * Run the full document processing pipeline.
  */
@@ -75,9 +97,17 @@ export async function processDocumentAsync(
       `No storage key (encryptedFilename) for document ${documentId}`,
     );
   }
+  let peakRssBytes = process.memoryUsage().rss;
+  const updatePeakRss = () => {
+    const current = process.memoryUsage().rss;
+    if (current > peakRssBytes) peakRssBytes = current;
+  };
+  const readPeakRssMb = () => Number((peakRssBytes / (1024 * 1024)).toFixed(1));
+  const normalizedMimeType = normalizeMimeType(mimeType);
 
   // 1) Download from storage (with memory backpressure)
   await waitForMemory();
+  updatePeakRss();
   const tDownload = Date.now();
   logger.info("[Pipeline] Downloading from storage", {
     documentId,
@@ -86,6 +116,7 @@ export async function processDocumentAsync(
   const fileBuffer = await storageDownloadLimit(() =>
     downloadFile(encryptedFilename),
   );
+  updatePeakRss();
   logger.info("[Pipeline] Storage download", {
     durationMs: Date.now() - tDownload,
     sizeMb: +(fileBuffer.length / 1024 / 1024).toFixed(1),
@@ -125,8 +156,10 @@ export async function processDocumentAsync(
       storageDownloadMs: Date.now() - tDownload,
       extractionMs: 0,
       extractionMethod: "text",
+      ocrAttempted: false,
       ocrUsed: false,
       ocrSuccess: false,
+      ocrOutcome: "not_attempted",
       ocrConfidence: null,
       ocrPageCount: null,
       ocrMode: null,
@@ -138,10 +171,11 @@ export async function processDocumentAsync(
       chunkCount: 0,
       embeddingMs: 0,
       pageCount: null,
+      peakRssMb: readPeakRssMb(),
       fileHash,
       skipped: true,
       skipReason: `${headerCheck.errorCode}: ${headerCheck.error}`,
-      skipCode: headerCheck.errorCode || "FILE_INVALID",
+      skipCode: toSkipCode(headerCheck.errorCode, "FILE_INVALID"),
     };
   }
 
@@ -157,6 +191,7 @@ export async function processDocumentAsync(
     EXTRACTION_TIMEOUT_MS,
     "Text extraction",
   );
+  updatePeakRss();
   logger.info("[Pipeline] Text extraction", {
     durationMs: Date.now() - tExtract,
     filename,
@@ -164,26 +199,18 @@ export async function processDocumentAsync(
 
   const fullText = extraction.text || "";
   const wasSkipped = extraction.sourceType === "image" && isSkipped(extraction);
-  const extractedOcrUsed = Boolean(
-    mimeType.startsWith("image/") ||
-    extraction.ocrApplied ||
-    (extraction.ocrPageCount ?? 0) > 0,
-  );
-  const ocrConfidence = extractedOcrUsed
-    ? clamp01(
-        extraction.ocrConfidence ??
-          (mimeType.startsWith("image/")
-            ? extraction.confidence
-            : null),
-      )
-    : null;
-  const ocrPageCount = Number.isFinite(Number(extraction.ocrPageCount))
-    ? Number(extraction.ocrPageCount)
-    : null;
-  const ocrMode =
-    typeof extraction.ocrMode === "string"
-      ? String(extraction.ocrMode)
-      : null;
+  const ocrSignals = deriveOcrSignals({
+    mimeType,
+    extraction: extraction as unknown as Record<string, unknown>,
+    fullText,
+  });
+  const ocrAttempted = ocrSignals.ocrAttempted;
+  const ocrUsed = ocrSignals.ocrUsed;
+  const ocrSuccess = ocrSignals.ocrSuccess;
+  const ocrOutcome = ocrSignals.ocrOutcome;
+  const ocrConfidence = ocrSignals.ocrConfidence;
+  const ocrPageCount = ocrSignals.ocrPageCount;
+  const ocrMode = ocrSignals.ocrMode;
   const textQuality = deriveTextQuality(extraction, fullText);
   const extractionWarnings = [
     ...(Array.isArray(extraction.weakTextReasons)
@@ -196,10 +223,10 @@ export async function processDocumentAsync(
 
   // Detect scanned PDF with no OCR applied — log structured warning for monitoring
   if (
-    PDF_MIMES.includes(mimeType) &&
+    PDF_MIMES.includes(normalizedMimeType) &&
     extraction.confidence !== undefined &&
     extraction.confidence < 0.5 &&
-    !extractedOcrUsed
+    !ocrUsed
   ) {
     logger.warn("[Pipeline] Low-confidence PDF without OCR — likely scanned", {
       documentId,
@@ -207,6 +234,53 @@ export async function processDocumentAsync(
       confidence: extraction.confidence,
       textLength: fullText.length,
     });
+  }
+
+  const strictPdfRequiresOcr = resolveStrictPdfOcrRequired();
+  if (
+    strictPdfRequiresOcr &&
+    PDF_MIMES.includes(normalizedMimeType) &&
+    extraction.confidence !== undefined &&
+    extraction.confidence < 0.5 &&
+    !ocrUsed
+  ) {
+    recordExtractionAttempt(false);
+    const skipReason =
+      "Weak PDF text quality and OCR was unavailable; extraction skipped to avoid unreliable indexing";
+    logger.warn("[Pipeline] Strict PDF OCR requirement triggered", {
+      documentId,
+      filename,
+      confidence: extraction.confidence,
+      ocrOutcome,
+    });
+    return {
+      storageDownloadMs: tExtract - tDownload,
+      extractionMs: Date.now() - tExtract,
+      extractionMethod: "pdf_text",
+      ocrAttempted,
+      ocrUsed,
+      ocrSuccess,
+      ocrOutcome,
+      ocrConfidence,
+      ocrPageCount,
+      ocrMode,
+      textQuality: textQuality.label,
+      textQualityScore: textQuality.score,
+      extractionWarnings: [
+        ...extractionWarnings,
+        "OCR required for weak PDF but unavailable",
+      ],
+      textLength: fullText.length,
+      rawChunkCount: 0,
+      chunkCount: 0,
+      embeddingMs: 0,
+      pageCount: hasPagesArray(extraction) ? extraction.pageCount : null,
+      peakRssMb: readPeakRssMb(),
+      fileHash,
+      skipped: true,
+      skipReason,
+      skipCode: "OCR_REQUIRED_UNAVAILABLE",
+    };
   }
 
   if (!fullText || fullText.trim().length < 10) {
@@ -225,9 +299,11 @@ export async function processDocumentAsync(
     return {
       storageDownloadMs: tExtract - tDownload,
       extractionMs: Date.now() - tExtract,
-      extractionMethod: mimeType.startsWith("image/") ? "ocr" : "text",
-      ocrUsed: extractedOcrUsed,
-      ocrSuccess: false,
+      extractionMethod: normalizedMimeType.startsWith("image/") ? "ocr" : "text",
+      ocrAttempted,
+      ocrUsed,
+      ocrSuccess,
+      ocrOutcome,
       ocrConfidence,
       ocrPageCount,
       ocrMode,
@@ -239,6 +315,7 @@ export async function processDocumentAsync(
       chunkCount: 0,
       embeddingMs: 0,
       pageCount: null,
+      peakRssMb: readPeakRssMb(),
       fileHash,
       skipped: true,
       skipReason,
@@ -282,6 +359,7 @@ export async function processDocumentAsync(
       EMBEDDING_TIMEOUT_MS,
       "Embedding storage",
     );
+    updatePeakRss();
     logger.info("[Pipeline] Embed+store complete", {
       durationMs: Date.now() - tEmbed,
       chunkCount: inputChunks.length,
@@ -296,15 +374,16 @@ export async function processDocumentAsync(
 
   // 5) Encrypt extracted text (blocking — must complete before marking indexed)
   await runEncryptionStep({ userId, documentId, fullText, filename });
+  updatePeakRss();
 
   // Determine extraction method
-  const isOcr = mimeType.startsWith("image/");
+  const isOcr = normalizedMimeType.startsWith("image/");
   let extractionMethod = "text";
-  if (PDF_MIMES.includes(mimeType))
-    extractionMethod = extractedOcrUsed ? "pdf_ocr" : "pdf_text";
-  else if (DOCX_MIMES.includes(mimeType)) extractionMethod = "docx";
-  else if (XLSX_MIMES.includes(mimeType)) extractionMethod = "xlsx";
-  else if (PPTX_MIMES.includes(mimeType)) extractionMethod = "pptx";
+  if (PDF_MIMES.includes(normalizedMimeType))
+    extractionMethod = ocrUsed ? "pdf_ocr" : "pdf_text";
+  else if (DOCX_MIMES.includes(normalizedMimeType)) extractionMethod = "docx";
+  else if (XLSX_MIMES.includes(normalizedMimeType)) extractionMethod = "xlsx";
+  else if (PPTX_MIMES.includes(normalizedMimeType)) extractionMethod = "pptx";
   else if (isOcr) extractionMethod = "ocr";
 
   const extractionMs = tEmbed - tExtract;
@@ -320,8 +399,10 @@ export async function processDocumentAsync(
     storageDownloadMs: tExtract - tDownload,
     extractionMs,
     extractionMethod,
-    ocrUsed: extractedOcrUsed,
-    ocrSuccess: extractedOcrUsed ? fullText.trim().length > 0 : false,
+    ocrAttempted,
+    ocrUsed,
+    ocrSuccess,
+    ocrOutcome,
     ocrConfidence,
     ocrPageCount,
     ocrMode,
@@ -335,6 +416,7 @@ export async function processDocumentAsync(
     pageCount:
       hasPagesArray(extraction) ? extraction.pageCount :
       hasSlidesArray(extraction) ? extraction.slideCount : null,
+    peakRssMb: readPeakRssMb(),
     fileHash,
   };
 }

@@ -69,4 +69,21 @@ describe("indexingPolicy.service", () => {
     expect(policy.allowUnverifiedPreviousOperationDelete).toBe(true);
     expect(policy.embeddingFailCloseV1).toBe(false);
   });
+
+  test("fails closed when encrypted-only is disabled in protected environments", () => {
+    expect(() =>
+      resolveIndexingPolicySnapshot({
+        NODE_ENV: "production",
+        INDEXING_ENCRYPTED_CHUNKS_ONLY: "false",
+      } as NodeJS.ProcessEnv),
+    ).toThrow(/INDEXING_ENCRYPTED_CHUNKS_ONLY=false/);
+  });
+
+  test("allows encrypted-only policy in protected environments", () => {
+    const policy = resolveIndexingPolicySnapshot({
+      NODE_ENV: "production",
+      INDEXING_ENCRYPTED_CHUNKS_ONLY: "true",
+    } as NodeJS.ProcessEnv);
+    expect(policy.encryptedChunksOnly).toBe(true);
+  });
 });

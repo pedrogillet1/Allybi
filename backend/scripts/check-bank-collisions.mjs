@@ -2,9 +2,10 @@
 
 import { readdirSync, readFileSync, statSync } from "fs";
 import { join } from "path";
+import { fileURLToPath } from "url";
 
-const ROOT = new URL("../src/data_banks", import.meta.url).pathname;
-const THRESHOLD = Number(process.env.BANK_COLLISION_THRESHOLD || 2500);
+const ROOT = fileURLToPath(new URL("../src/data_banks", import.meta.url));
+const THRESHOLD = Number(process.env.BANK_COLLISION_THRESHOLD || 250);
 
 function walk(dir, out = []) {
   for (const entry of readdirSync(dir)) {
@@ -27,12 +28,52 @@ function normalizePattern(value) {
     .replace(/\s+/g, " ");
 }
 
+function collectCandidateStrings(row) {
+  const out = [];
+  const pushIfString = (value) => {
+    if (typeof value === "string" && value.trim().length > 0) {
+      out.push(value);
+    }
+  };
+  const pushFromArray = (value) => {
+    if (!Array.isArray(value)) return;
+    for (const item of value) pushIfString(item);
+  };
+
+  pushIfString(row?.pattern);
+  pushIfString(row?.phrase);
+  pushIfString(row?.query);
+  pushIfString(row?.match);
+  pushIfString(row?.contains);
+  pushFromArray(row?.patterns);
+  pushFromArray(row?.queries);
+
+  const when = row?.when;
+  if (typeof when === "string") pushIfString(when);
+  if (when && typeof when === "object") {
+    pushFromArray(when.signals);
+    pushFromArray(when.operators);
+    const regexAny = when.queryRegexAny;
+    if (regexAny && typeof regexAny === "object") {
+      for (const patterns of Object.values(regexAny)) {
+        pushFromArray(patterns);
+      }
+    }
+  }
+
+  return out;
+}
+
 function main() {
   const files = walk(ROOT).filter(
-    (filePath) =>
-      filePath.includes("/intent_patterns/") ||
-      filePath.includes("/routing/") ||
-      filePath.includes("/retrieval/"),
+    (filePath) => {
+      const normalizedPath = String(filePath || "").replace(/\\/g, "/");
+      return (
+        normalizedPath.includes("/intent_patterns/") ||
+        normalizedPath.includes("/routing/") ||
+        normalizedPath.includes("/retrieval/")
+      );
+    },
   );
 
   const seen = new Map();
@@ -50,14 +91,7 @@ function main() {
         ? bank.rules
         : [];
     for (const row of rows) {
-      const candidateValues = [
-        row?.pattern,
-        row?.phrase,
-        row?.query,
-        row?.match,
-        row?.when,
-        row?.contains,
-      ];
+      const candidateValues = collectCandidateStrings(row);
       for (const raw of candidateValues) {
         const normalized = normalizePattern(raw);
         if (!normalized || normalized.length < 4) continue;

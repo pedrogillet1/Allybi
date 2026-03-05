@@ -1,12 +1,13 @@
 import api from './api';
 import { getApiBaseUrl } from './runtimeConfig';
+import {
+  INTEGRATION_CALLBACK_PATHS,
+  INTEGRATION_PROVIDERS,
+  isIntegrationProvider,
+} from '../constants/integrationProviders';
 
-const PROVIDERS = ['gmail', 'outlook', 'slack'];
-const CALLBACK_PATHS = {
-  gmail: '/api/integrations/gmail/callback',
-  outlook: '/api/integrations/outlook/callback',
-  slack: '/api/integrations/slack/callback',
-};
+const PROVIDERS = INTEGRATION_PROVIDERS;
+const CALLBACK_PATHS = INTEGRATION_CALLBACK_PATHS;
 
 function shouldSendCallbackUrlOverride() {
   // Always send the connector callback URL derived from the configured API base.
@@ -28,6 +29,7 @@ function normalizeProviderStatus(payload) {
       connected: false,
       expired: false,
       indexedDocuments: 0,
+      ingestionEnabled: false,
       lastSyncAt: null,
       ok: false,
       envConfigured: false,
@@ -49,6 +51,7 @@ function normalizeProviderStatus(payload) {
       connected: Boolean(row?.status?.connected || row?.data?.connected),
       expired: Boolean(row?.status?.expired || row?.data?.expired),
       indexedDocuments: Number(row?.status?.indexedDocuments || row?.data?.indexedDocuments || 0),
+      ingestionEnabled: Boolean(row?.status?.ingestionEnabled || row?.data?.ingestionEnabled),
       lastSyncAt: row?.status?.lastSyncAt || row?.data?.lastSyncAt || null,
       error: row?.error || null,
     };
@@ -64,7 +67,7 @@ async function getStatus() {
 
 async function startConnect(provider) {
   const normalized = String(provider || '').toLowerCase();
-  if (!PROVIDERS.includes(normalized)) {
+  if (!isIntegrationProvider(normalized)) {
     throw new Error(`Unsupported connector provider: ${provider}`);
   }
 
@@ -95,7 +98,7 @@ async function disconnect(provider) {
 
 async function sync(provider, opts = {}) {
   const normalized = String(provider || '').toLowerCase();
-  if (!PROVIDERS.includes(normalized)) {
+  if (!isIntegrationProvider(normalized)) {
     throw new Error(`Unsupported connector provider: ${provider}`);
   }
   const forceResync = Boolean(opts?.forceResync);

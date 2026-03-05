@@ -151,13 +151,17 @@ async function main() {
   const finalGrade = gradeFromScore(finalScore);
   const findings = summarizeFindings(results);
   const failedChecks = findings.length;
+  const highSeverityFindings = findings.filter(
+    (finding) => finding.severity === "high",
+  );
+  const hardFail = failedChecks > 0 || highSeverityFindings.length > 0;
 
   const report = {
     generatedAt: new Date().toISOString(),
     runtimeMs: Date.now() - startedAt,
     finalScore,
     finalGrade,
-    verdict: finalScore >= 90 ? "ready" : "needs_work",
+    verdict: finalScore >= 90 && !hardFail ? "ready" : "needs_work",
     agents: results.map((result) => ({
       id: result.id,
       title: result.title,
@@ -168,6 +172,8 @@ async function main() {
     })),
     findings,
     failedChecks,
+    highSeverityFindings: highSeverityFindings.length,
+    hardFail,
   };
 
   const outDir = path.join(repoRoot, "reports", "integrations");
@@ -183,7 +189,7 @@ async function main() {
   console.log(`[integration-agents] json=${path.relative(repoRoot, jsonPath)}`);
   console.log(`[integration-agents] md=${path.relative(repoRoot, mdPath)}`);
 
-  if (args.strict && finalScore < 90) {
+  if (args.strict && (finalScore < 90 || hardFail)) {
     process.exit(1);
   }
 }

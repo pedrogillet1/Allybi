@@ -87,6 +87,70 @@
         "goodbye",
         "ack"
       ]
+    },
+    "editing": {
+      "operatorsAllowed": [
+        "EDIT_PARAGRAPH",
+        "EDIT_SPAN",
+        "ADD_PARAGRAPH",
+        "EDIT_DOCX_BUNDLE",
+        "EDIT_CELL",
+        "EDIT_RANGE",
+        "ADD_SHEET",
+        "RENAME_SHEET",
+        "DELETE_SHEET",
+        "CREATE_CHART"
+      ]
+    },
+    "calc": {
+      "operatorsAllowed": [
+        "compute",
+        "extract",
+        "summarize"
+      ]
+    },
+    "navigation": {
+      "operatorsAllowed": [
+        "list",
+        "filter",
+        "sort",
+        "group",
+        "open",
+        "locate_file",
+        "count_files"
+      ]
+    },
+    "integrations": {
+      "operatorsAllowed": [
+        "CONNECT_START",
+        "CONNECTOR_SYNC",
+        "CONNECTOR_SEARCH",
+        "CONNECTOR_STATUS",
+        "CONNECTOR_DISCONNECT"
+      ]
+    },
+    "connectors": {
+      "operatorsAllowed": [
+        "CONNECT_START",
+        "CONNECTOR_SYNC",
+        "CONNECTOR_SEARCH",
+        "CONNECTOR_STATUS",
+        "CONNECTOR_DISCONNECT"
+      ]
+    },
+    "email": {
+      "operatorsAllowed": [
+        "EMAIL_LATEST",
+        "EMAIL_EXPLAIN_LATEST",
+        "EMAIL_SUMMARIZE_PREVIOUS",
+        "EMAIL_DRAFT",
+        "EMAIL_SEND"
+      ]
+    },
+    "error": {
+      "operatorsAllowed": [
+        "capabilities"
+      ]
     }
   },
   "operators": {

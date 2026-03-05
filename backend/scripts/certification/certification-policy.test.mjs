@@ -33,6 +33,14 @@ test("resolve profile from args supports routing_only", () => {
   assert.equal(profile, "routing_only");
 });
 
+test("resolve profile from args supports local_hard", () => {
+  const profile = resolveCertificationProfileFromArgs({
+    args: ["node", "script", "--profile=local_hard"],
+    env: {},
+  });
+  assert.equal(profile, "local_hard");
+});
+
 test("query latency is always required for retrieval_signoff", () => {
   const policy = resolveQueryLatencyPolicy({
     strict: false,
@@ -132,6 +140,28 @@ test("routing_only profile does not enforce local cert run health", () => {
     env: {},
   });
   assert.equal(policy.enforce, false);
+});
+
+test("local_hard profile enforces local cert run health in strict mode", () => {
+  const policy = resolveLocalCertRunPolicy({
+    strict: true,
+    profile: "local_hard",
+    verifyOnly: false,
+    env: {},
+  });
+  assert.equal(policy.enforce, true);
+  assert.equal(policy.source, "local_hard_profile");
+});
+
+test("local_hard profile can disable enforcement via env override", () => {
+  const policy = resolveLocalCertRunPolicy({
+    strict: true,
+    profile: "local_hard",
+    verifyOnly: false,
+    env: { CERT_ENFORCE_LOCAL_CERT_RUN: "0" },
+  });
+  assert.equal(policy.enforce, false);
+  assert.equal(policy.source, "env_override");
 });
 
 test("routing_only profile does not require query latency", () => {

@@ -84,6 +84,94 @@
         "\\bpix\\b"
       ],
       "priority": 97
+    },
+    {
+      "id": "banking_brokerage_statement",
+      "name": {
+        "en": "Banking Brokerage Statement",
+        "pt": "Banking Brokerage Statement"
+      },
+      "description": "Auto-generated catalog entry for banking_brokerage_statement from canonical taxonomy.",
+      "detectionPatterns": [
+        "\\bbanking\\\\s\\+brokerage\\\\s\\+statement\\b",
+        "\\bbrokerage\\\\s\\+statement\\b"
+      ],
+      "commonSections": [
+        "Account Summary",
+        "Resumo da Conta",
+        "Transactions",
+        "Transações",
+        "Statement Period",
+        "Período do Extrato"
+      ],
+      "extractionPriority": 85,
+      "riskTier": "medium"
+    },
+    {
+      "id": "banking_cd_statement",
+      "name": {
+        "en": "Banking Cd Statement",
+        "pt": "Banking Cd Statement"
+      },
+      "description": "Auto-generated catalog entry for banking_cd_statement from canonical taxonomy.",
+      "detectionPatterns": [
+        "\\bbanking\\\\s\\+cd\\\\s\\+statement\\b",
+        "\\bcd\\\\s\\+statement\\b"
+      ],
+      "commonSections": [
+        "Account Summary",
+        "Resumo da Conta",
+        "Transactions",
+        "Transações",
+        "Statement Period",
+        "Período do Extrato"
+      ],
+      "extractionPriority": 85,
+      "riskTier": "medium"
+    },
+    {
+      "id": "banking_investment_account_statement",
+      "name": {
+        "en": "Banking Investment Account Statement",
+        "pt": "Banking Investment Account Statement"
+      },
+      "description": "Auto-generated catalog entry for banking_investment_account_statement from canonical taxonomy.",
+      "detectionPatterns": [
+        "\\bbanking\\\\s\\+investment\\\\s\\+account\\\\s\\+statement\\b",
+        "\\binvestment\\\\s\\+account\\\\s\\+statement\\b"
+      ],
+      "commonSections": [
+        "Account Summary",
+        "Resumo da Conta",
+        "Transactions",
+        "Transações",
+        "Statement Period",
+        "Período do Extrato"
+      ],
+      "extractionPriority": 85,
+      "riskTier": "medium"
+    },
+    {
+      "id": "banking_wire_transfer_confirmation",
+      "name": {
+        "en": "Banking Wire Transfer Confirmation",
+        "pt": "Banking Wire Transfer Confirmation"
+      },
+      "description": "Auto-generated catalog entry for banking_wire_transfer_confirmation from canonical taxonomy.",
+      "detectionPatterns": [
+        "\\bbanking\\\\s\\+wire\\\\s\\+transfer\\\\s\\+confirmation\\b",
+        "\\bwire\\\\s\\+transfer\\\\s\\+confirmation\\b"
+      ],
+      "commonSections": [
+        "Account Summary",
+        "Resumo da Conta",
+        "Transactions",
+        "Transações",
+        "Statement Period",
+        "Período do Extrato"
+      ],
+      "extractionPriority": 85,
+      "riskTier": "medium"
     }
   ]
 }

@@ -89,6 +89,14 @@ export const documentMoveSchema = z
   })
   .strict();
 
+export const documentPatchSchema = z
+  .object({
+    folderId: z.string().uuid().nullable().optional(),
+    filename: z.string().min(1).max(1024).optional(),
+    displayTitle: z.string().min(1).max(255).nullable().optional(),
+  })
+  .strict();
+
 // ---------------------------------------------------------------------------
 // Auth schemas
 // ---------------------------------------------------------------------------
@@ -250,7 +258,7 @@ export const rangeSchema = z
 
 export const listQuerySchema = z
   .object({
-    limit: z.coerce.number().int().min(1).max(10000).optional().default(50),
+    limit: z.coerce.number().int().min(1).max(500).optional().default(50),
     cursor: z.string().max(512).optional(),
     folderId: z.string().uuid().optional(),
     q: z.string().max(500).optional(),

@@ -63,6 +63,9 @@ describe("ChatKernelService intent metadata propagation", () => {
         intentFamily: "documents",
         operator: "extract",
         domainId: "finance",
+        operatorChoice: "extract",
+        scopeDecision: "unknown",
+        disambiguation: "none",
       }),
     );
     expect(
@@ -196,6 +199,7 @@ describe("ChatKernelService intent metadata propagation", () => {
         locale: "en",
         intentFamily: "documents",
         operator: "extract",
+        disambiguation: "required:ambiguous_margin",
       }),
     );
   });
@@ -241,6 +245,49 @@ describe("ChatKernelService intent metadata propagation", () => {
           "followup_overlay_patterns_missing",
           "followup_overlay_patterns_missing_en",
         ],
+      }),
+    );
+  });
+
+  test("extracts operator/scope/disambiguation telemetry from routing notes", async () => {
+    const executor = {
+      chat: jest.fn(async () => makeResult()),
+      streamChat: jest.fn(async () => makeResult()),
+    };
+    const kernel = new ChatKernelService(executor);
+    (kernel as any).router = {
+      decideWithIntent: () => ({
+        route: "KNOWLEDGE",
+        intentDecision: {
+          intentId: "documents",
+          intentFamily: "documents",
+          operatorId: "extract",
+          domainId: "finance",
+          confidence: 0.93,
+          decisionNotes: [
+            "routing:operator_choice:extract",
+            "routing:scope_decision:attached_single_doc",
+            "routing:disambiguation:required:doc_selection",
+          ],
+          persistable: {
+            intentId: "documents",
+            operatorId: "extract",
+            intentFamily: "documents",
+            domainId: "finance",
+            confidence: 0.93,
+          },
+        },
+      }),
+    };
+
+    await kernel.handleTurn(makeRequest());
+
+    const forwardedReq = executor.chat.mock.calls[0][0] as ChatRequest;
+    expect((forwardedReq.meta as any)?.routingDecision).toEqual(
+      expect.objectContaining({
+        operatorChoice: "extract",
+        scopeDecision: "attached_single_doc",
+        disambiguation: "required:doc_selection",
       }),
     );
   });

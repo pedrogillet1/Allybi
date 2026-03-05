@@ -20,7 +20,12 @@ function ensureDir(dir) {
 }
 
 function isCanonicalTopLevel(name) {
-  return name === 'latest' || name === 'archive' || name === '.gitkeep';
+  return (
+    name === 'latest' ||
+    name === 'archive' ||
+    name === 'results.json' ||
+    name === '.gitkeep'
+  );
 }
 
 function listNonCanonicalEntries() {

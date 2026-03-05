@@ -39,23 +39,45 @@
         "Line Items",
         "Itens de Linha"
       ],
-      "headings": [],
+      "headings": [
+        "policy document",
+        "ins policy document",
+        "insurance",
+        "insurance summary",
+        "document id",
+        "identificacao"
+      ],
       "expectedTableFamilies": [
         "Policy Document line-item table",
-        "Policy Document summary matrix"
+        "Policy Document summary matrix",
+        "Policy Document line items",
+        "Policy Document itens",
+        "Policy Document summary",
+        "Policy Document resumo"
       ],
       "fieldFamilies": [
         "Primary identifiers",
         "Dates and periods",
-        "Amounts and statuses"
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
       ],
       "redFlags": [
         "Missing mandatory section anchors",
-        "Conflicting summary totals"
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
       ],
       "missingQuestions": [
         "Which policy document variant should be prioritized?",
-        "Should extraction prefer header metadata or detailed section data?"
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Policy Document variant should be prioritized?",
+        "Qual variante de Policy Document deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
       ]
     },
     {
@@ -75,23 +97,45 @@
         "Line Items",
         "Itens de Linha"
       ],
-      "headings": [],
+      "headings": [
+        "claim submission",
+        "ins claim submission",
+        "insurance",
+        "insurance summary",
+        "document id",
+        "identificacao"
+      ],
       "expectedTableFamilies": [
         "Claim Submission line-item table",
-        "Claim Submission summary matrix"
+        "Claim Submission summary matrix",
+        "Claim Submission line items",
+        "Claim Submission itens",
+        "Claim Submission summary",
+        "Claim Submission resumo"
       ],
       "fieldFamilies": [
         "Primary identifiers",
         "Dates and periods",
-        "Amounts and statuses"
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
       ],
       "redFlags": [
         "Missing mandatory section anchors",
-        "Conflicting summary totals"
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
       ],
       "missingQuestions": [
         "Which claim submission variant should be prioritized?",
-        "Should extraction prefer header metadata or detailed section data?"
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Claim Submission variant should be prioritized?",
+        "Qual variante de Claim Submission deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
       ]
     },
     {
@@ -111,23 +155,959 @@
         "Line Items",
         "Itens de Linha"
       ],
-      "headings": [],
+      "headings": [
+        "explanation of benefits",
+        "ins explanation of benefits",
+        "insurance",
+        "insurance summary",
+        "document id",
+        "identificacao"
+      ],
       "expectedTableFamilies": [
         "Explanation Of Benefits line-item table",
-        "Explanation Of Benefits summary matrix"
+        "Explanation Of Benefits summary matrix",
+        "Explanation Of Benefits line items",
+        "Explanation Of Benefits itens",
+        "Explanation Of Benefits summary",
+        "Explanation Of Benefits resumo"
       ],
       "fieldFamilies": [
         "Primary identifiers",
         "Dates and periods",
-        "Amounts and statuses"
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
       ],
       "redFlags": [
         "Missing mandatory section anchors",
-        "Conflicting summary totals"
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
       ],
       "missingQuestions": [
         "Which explanation of benefits variant should be prioritized?",
-        "Should extraction prefer header metadata or detailed section data?"
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Explanation Of Benefits variant should be prioritized?",
+        "Qual variante de Explanation Of Benefits deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "ins_auto_declaration",
+      "label": "Auto Declaration",
+      "expectedSections": [
+        "Document Identification",
+        "Identificacao do Documento",
+        "Insurance Policy Document Issuer Information",
+        "Informações do Emissor de Documento de Apolice de Seguro",
+        "Party Identification",
+        "Identificacao das Partes",
+        "Period and Jurisdiction",
+        "Período e Jurisdicao",
+        "Status and Summary",
+        "Status e Resumo",
+        "Line Items",
+        "Itens de Linha"
+      ],
+      "headings": [
+        "auto declaration",
+        "ins auto declaration",
+        "insurance",
+        "insurance summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Policy Document line-item table",
+        "Policy Document summary matrix",
+        "Auto Declaration line items",
+        "Auto Declaration itens",
+        "Auto Declaration summary",
+        "Auto Declaration resumo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
+      ],
+      "missingQuestions": [
+        "Which policy document variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Auto Declaration variant should be prioritized?",
+        "Qual variante de Auto Declaration deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "ins_dental_plan",
+      "label": "Dental Plan",
+      "expectedSections": [
+        "Document Identification",
+        "Identificacao do Documento",
+        "Insurance Policy Document Issuer Information",
+        "Informações do Emissor de Documento de Apolice de Seguro",
+        "Party Identification",
+        "Identificacao das Partes",
+        "Period and Jurisdiction",
+        "Período e Jurisdicao",
+        "Status and Summary",
+        "Status e Resumo",
+        "Line Items",
+        "Itens de Linha"
+      ],
+      "headings": [
+        "dental plan",
+        "ins dental plan",
+        "insurance",
+        "insurance summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Policy Document line-item table",
+        "Policy Document summary matrix",
+        "Dental Plan line items",
+        "Dental Plan itens",
+        "Dental Plan summary",
+        "Dental Plan resumo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
+      ],
+      "missingQuestions": [
+        "Which policy document variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Dental Plan variant should be prioritized?",
+        "Qual variante de Dental Plan deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "ins_disability",
+      "label": "Disability",
+      "expectedSections": [
+        "Document Identification",
+        "Identificacao do Documento",
+        "Insurance Policy Document Issuer Information",
+        "Informações do Emissor de Documento de Apolice de Seguro",
+        "Party Identification",
+        "Identificacao das Partes",
+        "Period and Jurisdiction",
+        "Período e Jurisdicao",
+        "Status and Summary",
+        "Status e Resumo",
+        "Line Items",
+        "Itens de Linha"
+      ],
+      "headings": [
+        "disability",
+        "ins disability",
+        "insurance",
+        "insurance summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Policy Document line-item table",
+        "Policy Document summary matrix",
+        "Disability line items",
+        "Disability itens",
+        "Disability summary",
+        "Disability resumo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
+      ],
+      "missingQuestions": [
+        "Which policy document variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Disability variant should be prioritized?",
+        "Qual variante de Disability deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "ins_premium_invoice",
+      "label": "Premium Invoice",
+      "expectedSections": [
+        "Document Identification",
+        "Identificacao do Documento",
+        "Insurance Policy Document Issuer Information",
+        "Informações do Emissor de Documento de Apolice de Seguro",
+        "Party Identification",
+        "Identificacao das Partes",
+        "Period and Jurisdiction",
+        "Período e Jurisdicao",
+        "Status and Summary",
+        "Status e Resumo",
+        "Line Items",
+        "Itens de Linha"
+      ],
+      "headings": [
+        "premium invoice",
+        "ins premium invoice",
+        "insurance",
+        "insurance summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Policy Document line-item table",
+        "Policy Document summary matrix",
+        "Premium Invoice line items",
+        "Premium Invoice itens",
+        "Premium Invoice summary",
+        "Premium Invoice resumo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
+      ],
+      "missingQuestions": [
+        "Which policy document variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Premium Invoice variant should be prioritized?",
+        "Qual variante de Premium Invoice deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "ins_umbrella_policy",
+      "label": "Umbrella Policy",
+      "expectedSections": [
+        "Document Identification",
+        "Identificacao do Documento",
+        "Insurance Policy Document Issuer Information",
+        "Informações do Emissor de Documento de Apolice de Seguro",
+        "Party Identification",
+        "Identificacao das Partes",
+        "Period and Jurisdiction",
+        "Período e Jurisdicao",
+        "Status and Summary",
+        "Status e Resumo",
+        "Line Items",
+        "Itens de Linha"
+      ],
+      "headings": [
+        "umbrella policy",
+        "ins umbrella policy",
+        "insurance",
+        "insurance summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Policy Document line-item table",
+        "Policy Document summary matrix",
+        "Umbrella Policy line items",
+        "Umbrella Policy itens",
+        "Umbrella Policy summary",
+        "Umbrella Policy resumo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
+      ],
+      "missingQuestions": [
+        "Which policy document variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Umbrella Policy variant should be prioritized?",
+        "Qual variante de Umbrella Policy deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "insurance_coverage_change_notice",
+      "label": "Coverage Change Notice",
+      "expectedSections": [
+        "Supplement Insurance 01 Header",
+        "Cabecalho Supplement Insurance 01",
+        "Supplement Insurance 01 Parties",
+        "Partes Supplement Insurance 01",
+        "Supplement Insurance 01 Timeline",
+        "Linha do tempo Supplement Insurance 01"
+      ],
+      "headings": [
+        "supplement insurance 01",
+        "insurance supplement 01",
+        "insurance",
+        "insurance summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Insurance 01 line items",
+        "Supplement Insurance 01 itens",
+        "Supplement Insurance 01 summary",
+        "Supplement Insurance 01 resumo",
+        "Supplement Insurance 01 balance",
+        "Supplement Insurance 01 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Insurance 01 variant should be prioritized?",
+        "Qual variante de Supplement Insurance 01 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "insurance_claim_followup_note",
+      "label": "Claim Followup Note",
+      "expectedSections": [
+        "Supplement Insurance 02 Header",
+        "Cabecalho Supplement Insurance 02",
+        "Supplement Insurance 02 Parties",
+        "Partes Supplement Insurance 02",
+        "Supplement Insurance 02 Timeline",
+        "Linha do tempo Supplement Insurance 02"
+      ],
+      "headings": [
+        "supplement insurance 02",
+        "insurance supplement 02",
+        "insurance",
+        "insurance summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Insurance 02 line items",
+        "Supplement Insurance 02 itens",
+        "Supplement Insurance 02 summary",
+        "Supplement Insurance 02 resumo",
+        "Supplement Insurance 02 balance",
+        "Supplement Insurance 02 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Insurance 02 variant should be prioritized?",
+        "Qual variante de Supplement Insurance 02 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "insurance_premium_adjustment_notice",
+      "label": "Premium Adjustment Notice",
+      "expectedSections": [
+        "Supplement Insurance 03 Header",
+        "Cabecalho Supplement Insurance 03",
+        "Supplement Insurance 03 Parties",
+        "Partes Supplement Insurance 03",
+        "Supplement Insurance 03 Timeline",
+        "Linha do tempo Supplement Insurance 03"
+      ],
+      "headings": [
+        "supplement insurance 03",
+        "insurance supplement 03",
+        "insurance",
+        "insurance summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Insurance 03 line items",
+        "Supplement Insurance 03 itens",
+        "Supplement Insurance 03 summary",
+        "Supplement Insurance 03 resumo",
+        "Supplement Insurance 03 balance",
+        "Supplement Insurance 03 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Insurance 03 variant should be prioritized?",
+        "Qual variante de Supplement Insurance 03 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "insurance_benefit_schedule_note",
+      "label": "Benefit Schedule Note",
+      "expectedSections": [
+        "Supplement Insurance 04 Header",
+        "Cabecalho Supplement Insurance 04",
+        "Supplement Insurance 04 Parties",
+        "Partes Supplement Insurance 04",
+        "Supplement Insurance 04 Timeline",
+        "Linha do tempo Supplement Insurance 04"
+      ],
+      "headings": [
+        "supplement insurance 04",
+        "insurance supplement 04",
+        "insurance",
+        "insurance summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Insurance 04 line items",
+        "Supplement Insurance 04 itens",
+        "Supplement Insurance 04 summary",
+        "Supplement Insurance 04 resumo",
+        "Supplement Insurance 04 balance",
+        "Supplement Insurance 04 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Insurance 04 variant should be prioritized?",
+        "Qual variante de Supplement Insurance 04 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "insurance_policy_endorsement_notice",
+      "label": "Policy Endorsement Notice",
+      "expectedSections": [
+        "Supplement Insurance 05 Header",
+        "Cabecalho Supplement Insurance 05",
+        "Supplement Insurance 05 Parties",
+        "Partes Supplement Insurance 05",
+        "Supplement Insurance 05 Timeline",
+        "Linha do tempo Supplement Insurance 05"
+      ],
+      "headings": [
+        "supplement insurance 05",
+        "insurance supplement 05",
+        "insurance",
+        "insurance summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Insurance 05 line items",
+        "Supplement Insurance 05 itens",
+        "Supplement Insurance 05 summary",
+        "Supplement Insurance 05 resumo",
+        "Supplement Insurance 05 balance",
+        "Supplement Insurance 05 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Insurance 05 variant should be prioritized?",
+        "Qual variante de Supplement Insurance 05 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "insurance_renewal_status_update",
+      "label": "Renewal Status Update",
+      "expectedSections": [
+        "Supplement Insurance 06 Header",
+        "Cabecalho Supplement Insurance 06",
+        "Supplement Insurance 06 Parties",
+        "Partes Supplement Insurance 06",
+        "Supplement Insurance 06 Timeline",
+        "Linha do tempo Supplement Insurance 06"
+      ],
+      "headings": [
+        "supplement insurance 06",
+        "insurance supplement 06",
+        "insurance",
+        "insurance summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Insurance 06 line items",
+        "Supplement Insurance 06 itens",
+        "Supplement Insurance 06 summary",
+        "Supplement Insurance 06 resumo",
+        "Supplement Insurance 06 balance",
+        "Supplement Insurance 06 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Insurance 06 variant should be prioritized?",
+        "Qual variante de Supplement Insurance 06 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "insurance_deductible_update_notice",
+      "label": "Deductible Update Notice",
+      "expectedSections": [
+        "Supplement Insurance 07 Header",
+        "Cabecalho Supplement Insurance 07",
+        "Supplement Insurance 07 Parties",
+        "Partes Supplement Insurance 07",
+        "Supplement Insurance 07 Timeline",
+        "Linha do tempo Supplement Insurance 07"
+      ],
+      "headings": [
+        "supplement insurance 07",
+        "insurance supplement 07",
+        "insurance",
+        "insurance summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Insurance 07 line items",
+        "Supplement Insurance 07 itens",
+        "Supplement Insurance 07 summary",
+        "Supplement Insurance 07 resumo",
+        "Supplement Insurance 07 balance",
+        "Supplement Insurance 07 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Insurance 07 variant should be prioritized?",
+        "Qual variante de Supplement Insurance 07 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "insurance_risk_profile_note",
+      "label": "Risk Profile Note",
+      "expectedSections": [
+        "Supplement Insurance 08 Header",
+        "Cabecalho Supplement Insurance 08",
+        "Supplement Insurance 08 Parties",
+        "Partes Supplement Insurance 08",
+        "Supplement Insurance 08 Timeline",
+        "Linha do tempo Supplement Insurance 08"
+      ],
+      "headings": [
+        "supplement insurance 08",
+        "insurance supplement 08",
+        "insurance",
+        "insurance summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Insurance 08 line items",
+        "Supplement Insurance 08 itens",
+        "Supplement Insurance 08 summary",
+        "Supplement Insurance 08 resumo",
+        "Supplement Insurance 08 balance",
+        "Supplement Insurance 08 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Insurance 08 variant should be prioritized?",
+        "Qual variante de Supplement Insurance 08 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "insurance_payment_status_notice",
+      "label": "Payment Status Notice",
+      "expectedSections": [
+        "Supplement Insurance 09 Header",
+        "Cabecalho Supplement Insurance 09",
+        "Supplement Insurance 09 Parties",
+        "Partes Supplement Insurance 09",
+        "Supplement Insurance 09 Timeline",
+        "Linha do tempo Supplement Insurance 09"
+      ],
+      "headings": [
+        "supplement insurance 09",
+        "insurance supplement 09",
+        "insurance",
+        "insurance summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Insurance 09 line items",
+        "Supplement Insurance 09 itens",
+        "Supplement Insurance 09 summary",
+        "Supplement Insurance 09 resumo",
+        "Supplement Insurance 09 balance",
+        "Supplement Insurance 09 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Insurance 09 variant should be prioritized?",
+        "Qual variante de Supplement Insurance 09 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "insurance_coverage_exception_note",
+      "label": "Coverage Exception Note",
+      "expectedSections": [
+        "Supplement Insurance 10 Header",
+        "Cabecalho Supplement Insurance 10",
+        "Supplement Insurance 10 Parties",
+        "Partes Supplement Insurance 10",
+        "Supplement Insurance 10 Timeline",
+        "Linha do tempo Supplement Insurance 10"
+      ],
+      "headings": [
+        "supplement insurance 10",
+        "insurance supplement 10",
+        "insurance",
+        "insurance summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Insurance 10 line items",
+        "Supplement Insurance 10 itens",
+        "Supplement Insurance 10 summary",
+        "Supplement Insurance 10 resumo",
+        "Supplement Insurance 10 balance",
+        "Supplement Insurance 10 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Insurance 10 variant should be prioritized?",
+        "Qual variante de Supplement Insurance 10 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "insurance_beneficiary_update_notice",
+      "label": "Beneficiary Update Notice",
+      "expectedSections": [
+        "Supplement Insurance 11 Header",
+        "Cabecalho Supplement Insurance 11",
+        "Supplement Insurance 11 Parties",
+        "Partes Supplement Insurance 11",
+        "Supplement Insurance 11 Timeline",
+        "Linha do tempo Supplement Insurance 11"
+      ],
+      "headings": [
+        "supplement insurance 11",
+        "insurance supplement 11",
+        "insurance",
+        "insurance summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Insurance 11 line items",
+        "Supplement Insurance 11 itens",
+        "Supplement Insurance 11 summary",
+        "Supplement Insurance 11 resumo",
+        "Supplement Insurance 11 balance",
+        "Supplement Insurance 11 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Insurance 11 variant should be prioritized?",
+        "Qual variante de Supplement Insurance 11 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "insurance_network_change_notice",
+      "label": "Network Change Notice",
+      "expectedSections": [
+        "Supplement Insurance 12 Header",
+        "Cabecalho Supplement Insurance 12",
+        "Supplement Insurance 12 Parties",
+        "Partes Supplement Insurance 12",
+        "Supplement Insurance 12 Timeline",
+        "Linha do tempo Supplement Insurance 12"
+      ],
+      "headings": [
+        "supplement insurance 12",
+        "insurance supplement 12",
+        "insurance",
+        "insurance summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Insurance 12 line items",
+        "Supplement Insurance 12 itens",
+        "Supplement Insurance 12 summary",
+        "Supplement Insurance 12 resumo",
+        "Supplement Insurance 12 balance",
+        "Supplement Insurance 12 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Insurance 12 variant should be prioritized?",
+        "Qual variante de Supplement Insurance 12 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
       ]
     }
   ]

@@ -6,7 +6,8 @@
     "languages": [
       "any",
       "en",
-      "pt"
+      "pt",
+      "es"
     ],
     "lastUpdated": "2026-03-03",
     "owner": "data-bank-governance",
@@ -25,6 +26,10 @@
     "pt": {
       "missingEvidence": "Nao consigo responder com base nas evidencias disponiveis.",
       "wrongDoc": "Encontrei um documento relacionado, mas nao o selecionado."
+    },
+    "es": {
+      "missingEvidence": "No puedo responder con base en la evidencia disponible.",
+      "wrongDoc": "Encontre un documento relacionado, pero no el que seleccionaste."
     }
   },
   "config": {

@@ -46,7 +46,10 @@ async function seedFileCursorFromDb(
       await fs.writeFile(filePath, JSON.stringify(existing), "utf8");
     }
   } catch {
-    // non-fatal: file cursor seeding is best-effort
+    logger.warn("[ConnectorWorker] Cursor seed from DB failed (non-fatal)", {
+      userId,
+      provider,
+    });
   }
 }
 
@@ -67,7 +70,13 @@ async function persistFileCursorToDb(
       );
     }
   } catch {
-    // non-fatal: cursor persistence is best-effort
+    logger.warn(
+      "[ConnectorWorker] Cursor persistence to DB failed (non-fatal)",
+      {
+        userId,
+        provider,
+      },
+    );
   }
 }
 

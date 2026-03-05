@@ -43,6 +43,7 @@ export interface OutlookSyncResult {
   failedCount: number;
   createdCount: number;
   existingCount: number;
+  updatedCount: number;
   skippedCount: number;
   mode: "initial" | "incremental";
   lastSyncAt: string;
@@ -110,6 +111,7 @@ export class OutlookSyncService {
     let totalFailed = 0;
     let totalCreated = 0;
     let totalExisting = 0;
+    let totalUpdated = 0;
 
     for (const folder of folders) {
       // For incremental sync, use the per-folder cursor.
@@ -170,6 +172,9 @@ export class OutlookSyncService {
       totalExisting += ingested.filter(
         (item) => item.status === "existing",
       ).length;
+      totalUpdated += ingested.filter(
+        (item) => item.status === "updated",
+      ).length;
 
       // Track per-folder high-water mark.
       const successfulSourceIds = new Set(
@@ -206,6 +211,7 @@ export class OutlookSyncService {
       failedCount: totalFailed,
       createdCount: totalCreated,
       existingCount: totalExisting,
+      updatedCount: totalUpdated,
       skippedCount: Math.max(0, totalFetched - totalIngested - totalFailed),
       mode,
       lastSyncAt,

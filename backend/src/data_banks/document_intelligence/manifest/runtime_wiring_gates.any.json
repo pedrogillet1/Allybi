@@ -230,6 +230,22 @@
           ]
         },
         {
+          "id": "compose_quality",
+          "sampleBankIds": [
+            "openers",
+            "response_templates",
+            "fallback_messages",
+            "table_render_policy"
+          ],
+          "bankIdPatterns": [
+            "^(openers|closers|followup_suggestions(?:_v[0-9a-f]+)?|verbosity_ladder|tone_profiles|voice_personality_profiles|citation_policy|response_templates|fallback_messages|help_microcopy|anti_robotic_style_rules|format_guardrails|table_render_policy)$"
+          ],
+          "proofTests": [
+            "src/tests/document-intelligence/docint-compose-wiring-proof.test.ts",
+            "src/tests/certification/composition-formatting-regressions.cert.test.ts"
+          ]
+        },
+        {
           "id": "marketing_optional",
           "bankIdPrefixes": [
             "keyword_taxonomy_",

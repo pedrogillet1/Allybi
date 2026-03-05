@@ -254,6 +254,63 @@ describe("Certification: security auth hardening", () => {
     }
     if (unmaskedPhoneLogging) failures.push("UNMASKED_PHONE_LOGGING");
 
+    // -- Static analysis: OAuth callback must not redirect with tokens in URL --
+    const authRoutesPath = path.resolve(
+      process.cwd(),
+      "src/entrypoints/http/routes/auth.routes.ts",
+    );
+    const authRoutesSource = fs.readFileSync(authRoutesPath, "utf8");
+    const hasUrlTokenCompatFlag = /AUTH_URL_TOKEN_COMPAT/.test(authRoutesSource);
+    const hasTokenQueryRedirect =
+      /URLSearchParams\s*\(\s*\{[\s\S]*accessToken[\s\S]*refreshToken[\s\S]*\}\s*\)/.test(
+        authRoutesSource,
+      ) || /accessToken=.*refreshToken=/.test(authRoutesSource);
+    if (hasUrlTokenCompatFlag) failures.push("AUTH_URL_TOKEN_COMPAT_PRESENT");
+    if (hasTokenQueryRedirect) failures.push("AUTH_TOKEN_QUERY_REDIRECT_PRESENT");
+
+    // -- Static analysis: frontend must not read auth tokens from localStorage --
+    const frontendRootCandidates = [
+      path.resolve(process.cwd(), "..", "frontend", "src"),
+      path.resolve(process.cwd(), "frontend", "src"),
+    ];
+    const frontendRoot = frontendRootCandidates.find((candidate) =>
+      fs.existsSync(candidate),
+    );
+    let frontendTokenReadPatterns = 0;
+    let frontendCompatFlagPatterns = 0;
+    if (frontendRoot) {
+      const walk = (dir: string): void => {
+        for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+          if (entry.name.toLowerCase() === "nul") continue;
+          const fullPath = path.join(dir, entry.name);
+          if (entry.isDirectory()) {
+            walk(fullPath);
+            continue;
+          }
+          if (!/\.(js|jsx|ts|tsx)$/.test(entry.name)) continue;
+          const src = fs.readFileSync(fullPath, "utf8");
+          if (/AUTH_LOCALSTORAGE_COMPAT/.test(src)) {
+            frontendCompatFlagPatterns++;
+          }
+          if (
+            /localStorage\.getItem\(["']token["']\)/.test(src) ||
+            /localStorage\.getItem\(["']accessToken["']\)/.test(src)
+          ) {
+            frontendTokenReadPatterns++;
+          }
+        }
+      };
+      walk(frontendRoot);
+    } else {
+      failures.push("FRONTEND_SRC_NOT_FOUND_FOR_SECURITY_SCAN");
+    }
+    if (frontendCompatFlagPatterns > 0) {
+      failures.push("FRONTEND_AUTH_LOCALSTORAGE_COMPAT_PRESENT");
+    }
+    if (frontendTokenReadPatterns > 0) {
+      failures.push("FRONTEND_TOKEN_LOCALSTORAGE_READ_PRESENT");
+    }
+
     // ── Static analysis: no plaintext extractedText writes ───────────────
     const servicesDir = path.resolve(process.cwd(), "src/services");
     let plaintextWritePathCount = 0;
@@ -323,6 +380,10 @@ describe("Certification: security auth hardening", () => {
           !crossNextCalled && crossResState.status === 401,
         unguardedDevCodeLogging,
         unmaskedPhoneLogging,
+        hasUrlTokenCompatFlag,
+        hasTokenQueryRedirect,
+        frontendCompatFlagPatterns,
+        frontendTokenReadPatterns,
         plaintextWritePathCount,
       },
       thresholds: {
@@ -337,6 +398,10 @@ describe("Certification: security auth hardening", () => {
         crossUserSessionRejected: true,
         unguardedDevCodeLogging: false,
         unmaskedPhoneLogging: false,
+        hasUrlTokenCompatFlag: false,
+        hasTokenQueryRedirect: false,
+        maxFrontendCompatFlagPatterns: 0,
+        maxFrontendTokenReadPatterns: 0,
         maxPlaintextWritePathCount: 0,
       },
       failures,

@@ -53,24 +53,38 @@ function resolveFromLineage(frontendReportsRoot: string): string | null {
 }
 
 function resolvePerQueryReportPath(): string | null {
+  const requireLatest = (() => {
+    const profile = String(process.env.CERT_PROFILE || "")
+      .trim()
+      .toLowerCase();
+    return (
+      profile === "retrieval_signoff" ||
+      profile === "ci" ||
+      profile === "release"
+    );
+  })();
   const explicitPath = String(process.env.CERT_QUERY_LATENCY_REPORT || "").trim();
+  if (explicitPath) {
+    const normalized = normalizePath(explicitPath);
+    if (!normalized || !fs.existsSync(normalized)) return null;
+    if (requireLatest) {
+      const lowered = normalized.replace(/\\/g, "/").toLowerCase();
+      if (!lowered.endsWith("/latest/per_query.json")) return null;
+    }
+    return normalized;
+  }
   const frontendReportsRoots = [
     path.resolve(process.cwd(), "../frontend/e2e/reports"),
     path.resolve(process.cwd(), "frontend/e2e/reports"),
   ];
-  const candidates: string[] = [];
-  if (explicitPath) candidates.push(normalizePath(explicitPath));
   for (const reportsRoot of frontendReportsRoots) {
-    candidates.push(path.join(reportsRoot, "latest", "per_query.json"));
+    const latestPath = path.join(reportsRoot, "latest", "per_query.json");
+    if (fs.existsSync(latestPath)) return latestPath;
+    if (requireLatest) continue;
     const lineageResolved = resolveFromLineage(reportsRoot);
-    if (lineageResolved) candidates.push(lineageResolved);
+    if (lineageResolved) return lineageResolved;
     const newestArchive = findNewestArchivePerQuery(reportsRoot);
-    if (newestArchive) candidates.push(newestArchive);
-  }
-  for (const candidate of candidates) {
-    if (candidate && fs.existsSync(candidate)) {
-      return candidate;
-    }
+    if (newestArchive) return newestArchive;
   }
   return null;
 }

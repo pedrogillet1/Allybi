@@ -59,20 +59,35 @@
       ],
       "expectedTableFamilies": [
         "Itinerary line-item table",
-        "Itinerary summary matrix"
+        "Itinerary summary matrix",
+        "Itinerary line items",
+        "Itinerary itens",
+        "Itinerary summary",
+        "Itinerary resumo"
       ],
       "fieldFamilies": [
         "Primary identifiers",
         "Dates and periods",
-        "Amounts and statuses"
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
       ],
       "redFlags": [
         "Missing mandatory section anchors",
-        "Conflicting summary totals"
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
       ],
       "missingQuestions": [
         "Which itinerary variant should be prioritized?",
-        "Should extraction prefer header metadata or detailed section data?"
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Itinerary variant should be prioritized?",
+        "Qual variante de Itinerary deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
       ]
     },
     {
@@ -112,20 +127,35 @@
       ],
       "expectedTableFamilies": [
         "Boarding Pass line-item table",
-        "Boarding Pass summary matrix"
+        "Boarding Pass summary matrix",
+        "Boarding Pass line items",
+        "Boarding Pass itens",
+        "Boarding Pass summary",
+        "Boarding Pass resumo"
       ],
       "fieldFamilies": [
         "Primary identifiers",
         "Dates and periods",
-        "Amounts and statuses"
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
       ],
       "redFlags": [
         "Missing mandatory section anchors",
-        "Conflicting summary totals"
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
       ],
       "missingQuestions": [
         "Which boarding pass variant should be prioritized?",
-        "Should extraction prefer header metadata or detailed section data?"
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Boarding Pass variant should be prioritized?",
+        "Qual variante de Boarding Pass deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
       ]
     },
     {
@@ -165,20 +195,967 @@
       ],
       "expectedTableFamilies": [
         "Hotel Booking Confirmation line-item table",
-        "Hotel Booking Confirmation summary matrix"
+        "Hotel Booking Confirmation summary matrix",
+        "Hotel Booking Confirmation line items",
+        "Hotel Booking Confirmation itens",
+        "Hotel Booking Confirmation summary",
+        "Hotel Booking Confirmation resumo"
       ],
       "fieldFamilies": [
         "Primary identifiers",
         "Dates and periods",
-        "Amounts and statuses"
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
       ],
       "redFlags": [
         "Missing mandatory section anchors",
-        "Conflicting summary totals"
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
       ],
       "missingQuestions": [
         "Which hotel booking confirmation variant should be prioritized?",
-        "Should extraction prefer header metadata or detailed section data?"
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Hotel Booking Confirmation variant should be prioritized?",
+        "Qual variante de Hotel Booking Confirmation deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "travel_car_rental_agreement",
+      "label": "Car Rental Agreement",
+      "expectedSections": [
+        "Header",
+        "Cabeçalho",
+        "Issuer Profile",
+        "Perfil do Emissor",
+        "Recipient Profile",
+        "Perfil do Destinatario",
+        "Account or Reference",
+        "Conta ou Referencia",
+        "Period or Schedule",
+        "Período ou Agenda",
+        "Line Items or Events",
+        "Itens ou Eventos"
+      ],
+      "headings": [
+        "statement",
+        "document",
+        "header",
+        "issuer",
+        "provider",
+        "organization",
+        "emitente",
+        "recipient",
+        "holder",
+        "student",
+        "employee",
+        "destinatario",
+        "account",
+        "reference",
+        "numero",
+        "id"
+      ],
+      "expectedTableFamilies": [
+        "Itinerary line-item table",
+        "Itinerary summary matrix",
+        "Car Rental Agreement line items",
+        "Car Rental Agreement itens",
+        "Car Rental Agreement summary",
+        "Car Rental Agreement resumo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
+      ],
+      "missingQuestions": [
+        "Which itinerary variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Car Rental Agreement variant should be prioritized?",
+        "Qual variante de Car Rental Agreement deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "travel_travel_insurance_policy",
+      "label": "Travel Insurance Policy",
+      "expectedSections": [
+        "Header",
+        "Cabeçalho",
+        "Issuer Profile",
+        "Perfil do Emissor",
+        "Recipient Profile",
+        "Perfil do Destinatario",
+        "Account or Reference",
+        "Conta ou Referencia",
+        "Period or Schedule",
+        "Período ou Agenda",
+        "Line Items or Events",
+        "Itens ou Eventos"
+      ],
+      "headings": [
+        "statement",
+        "document",
+        "header",
+        "issuer",
+        "provider",
+        "organization",
+        "emitente",
+        "recipient",
+        "holder",
+        "student",
+        "employee",
+        "destinatario",
+        "account",
+        "reference",
+        "numero",
+        "id"
+      ],
+      "expectedTableFamilies": [
+        "Itinerary line-item table",
+        "Itinerary summary matrix",
+        "Travel Insurance Policy line items",
+        "Travel Insurance Policy itens",
+        "Travel Insurance Policy summary",
+        "Travel Insurance Policy resumo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
+      ],
+      "missingQuestions": [
+        "Which itinerary variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Travel Insurance Policy variant should be prioritized?",
+        "Qual variante de Travel Insurance Policy deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "travel_visa_application_receipt",
+      "label": "Visa Application Receipt",
+      "expectedSections": [
+        "Header",
+        "Cabeçalho",
+        "Issuer Profile",
+        "Perfil do Emissor",
+        "Recipient Profile",
+        "Perfil do Destinatario",
+        "Account or Reference",
+        "Conta ou Referencia",
+        "Period or Schedule",
+        "Período ou Agenda",
+        "Line Items or Events",
+        "Itens ou Eventos"
+      ],
+      "headings": [
+        "statement",
+        "document",
+        "header",
+        "issuer",
+        "provider",
+        "organization",
+        "emitente",
+        "recipient",
+        "holder",
+        "student",
+        "employee",
+        "destinatario",
+        "account",
+        "reference",
+        "numero",
+        "id"
+      ],
+      "expectedTableFamilies": [
+        "Itinerary line-item table",
+        "Itinerary summary matrix",
+        "Visa Application Receipt line items",
+        "Visa Application Receipt itens",
+        "Visa Application Receipt summary",
+        "Visa Application Receipt resumo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
+      ],
+      "missingQuestions": [
+        "Which itinerary variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Visa Application Receipt variant should be prioritized?",
+        "Qual variante de Visa Application Receipt deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "travel_itinerary_change_notice",
+      "label": "Itinerary Change Notice",
+      "expectedSections": [
+        "Supplement Travel 01 Header",
+        "Cabecalho Supplement Travel 01",
+        "Supplement Travel 01 Parties",
+        "Partes Supplement Travel 01",
+        "Supplement Travel 01 Timeline",
+        "Linha do tempo Supplement Travel 01"
+      ],
+      "headings": [
+        "supplement travel 01",
+        "travel supplement 01",
+        "travel",
+        "travel summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Travel 01 line items",
+        "Supplement Travel 01 itens",
+        "Supplement Travel 01 summary",
+        "Supplement Travel 01 resumo",
+        "Supplement Travel 01 balance",
+        "Supplement Travel 01 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Travel 01 variant should be prioritized?",
+        "Qual variante de Supplement Travel 01 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "travel_fare_adjustment_notice",
+      "label": "Fare Adjustment Notice",
+      "expectedSections": [
+        "Supplement Travel 02 Header",
+        "Cabecalho Supplement Travel 02",
+        "Supplement Travel 02 Parties",
+        "Partes Supplement Travel 02",
+        "Supplement Travel 02 Timeline",
+        "Linha do tempo Supplement Travel 02"
+      ],
+      "headings": [
+        "supplement travel 02",
+        "travel supplement 02",
+        "travel",
+        "travel summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Travel 02 line items",
+        "Supplement Travel 02 itens",
+        "Supplement Travel 02 summary",
+        "Supplement Travel 02 resumo",
+        "Supplement Travel 02 balance",
+        "Supplement Travel 02 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Travel 02 variant should be prioritized?",
+        "Qual variante de Supplement Travel 02 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "travel_booking_status_update",
+      "label": "Booking Status Update",
+      "expectedSections": [
+        "Supplement Travel 03 Header",
+        "Cabecalho Supplement Travel 03",
+        "Supplement Travel 03 Parties",
+        "Partes Supplement Travel 03",
+        "Supplement Travel 03 Timeline",
+        "Linha do tempo Supplement Travel 03"
+      ],
+      "headings": [
+        "supplement travel 03",
+        "travel supplement 03",
+        "travel",
+        "travel summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Travel 03 line items",
+        "Supplement Travel 03 itens",
+        "Supplement Travel 03 summary",
+        "Supplement Travel 03 resumo",
+        "Supplement Travel 03 balance",
+        "Supplement Travel 03 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Travel 03 variant should be prioritized?",
+        "Qual variante de Supplement Travel 03 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "travel_visa_followup_note",
+      "label": "Visa Followup Note",
+      "expectedSections": [
+        "Supplement Travel 04 Header",
+        "Cabecalho Supplement Travel 04",
+        "Supplement Travel 04 Parties",
+        "Partes Supplement Travel 04",
+        "Supplement Travel 04 Timeline",
+        "Linha do tempo Supplement Travel 04"
+      ],
+      "headings": [
+        "supplement travel 04",
+        "travel supplement 04",
+        "travel",
+        "travel summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Travel 04 line items",
+        "Supplement Travel 04 itens",
+        "Supplement Travel 04 summary",
+        "Supplement Travel 04 resumo",
+        "Supplement Travel 04 balance",
+        "Supplement Travel 04 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Travel 04 variant should be prioritized?",
+        "Qual variante de Supplement Travel 04 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "travel_trip_expense_note",
+      "label": "Trip Expense Note",
+      "expectedSections": [
+        "Supplement Travel 05 Header",
+        "Cabecalho Supplement Travel 05",
+        "Supplement Travel 05 Parties",
+        "Partes Supplement Travel 05",
+        "Supplement Travel 05 Timeline",
+        "Linha do tempo Supplement Travel 05"
+      ],
+      "headings": [
+        "supplement travel 05",
+        "travel supplement 05",
+        "travel",
+        "travel summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Travel 05 line items",
+        "Supplement Travel 05 itens",
+        "Supplement Travel 05 summary",
+        "Supplement Travel 05 resumo",
+        "Supplement Travel 05 balance",
+        "Supplement Travel 05 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Travel 05 variant should be prioritized?",
+        "Qual variante de Supplement Travel 05 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "travel_coverage_status_notice",
+      "label": "Coverage Status Notice",
+      "expectedSections": [
+        "Supplement Travel 06 Header",
+        "Cabecalho Supplement Travel 06",
+        "Supplement Travel 06 Parties",
+        "Partes Supplement Travel 06",
+        "Supplement Travel 06 Timeline",
+        "Linha do tempo Supplement Travel 06"
+      ],
+      "headings": [
+        "supplement travel 06",
+        "travel supplement 06",
+        "travel",
+        "travel summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Travel 06 line items",
+        "Supplement Travel 06 itens",
+        "Supplement Travel 06 summary",
+        "Supplement Travel 06 resumo",
+        "Supplement Travel 06 balance",
+        "Supplement Travel 06 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Travel 06 variant should be prioritized?",
+        "Qual variante de Supplement Travel 06 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "travel_rental_policy_notice",
+      "label": "Rental Policy Notice",
+      "expectedSections": [
+        "Supplement Travel 07 Header",
+        "Cabecalho Supplement Travel 07",
+        "Supplement Travel 07 Parties",
+        "Partes Supplement Travel 07",
+        "Supplement Travel 07 Timeline",
+        "Linha do tempo Supplement Travel 07"
+      ],
+      "headings": [
+        "supplement travel 07",
+        "travel supplement 07",
+        "travel",
+        "travel summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Travel 07 line items",
+        "Supplement Travel 07 itens",
+        "Supplement Travel 07 summary",
+        "Supplement Travel 07 resumo",
+        "Supplement Travel 07 balance",
+        "Supplement Travel 07 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Travel 07 variant should be prioritized?",
+        "Qual variante de Supplement Travel 07 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "travel_checkin_status_note",
+      "label": "Checkin Status Note",
+      "expectedSections": [
+        "Supplement Travel 08 Header",
+        "Cabecalho Supplement Travel 08",
+        "Supplement Travel 08 Parties",
+        "Partes Supplement Travel 08",
+        "Supplement Travel 08 Timeline",
+        "Linha do tempo Supplement Travel 08"
+      ],
+      "headings": [
+        "supplement travel 08",
+        "travel supplement 08",
+        "travel",
+        "travel summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Travel 08 line items",
+        "Supplement Travel 08 itens",
+        "Supplement Travel 08 summary",
+        "Supplement Travel 08 resumo",
+        "Supplement Travel 08 balance",
+        "Supplement Travel 08 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Travel 08 variant should be prioritized?",
+        "Qual variante de Supplement Travel 08 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "travel_gate_change_notice",
+      "label": "Gate Change Notice",
+      "expectedSections": [
+        "Supplement Travel 09 Header",
+        "Cabecalho Supplement Travel 09",
+        "Supplement Travel 09 Parties",
+        "Partes Supplement Travel 09",
+        "Supplement Travel 09 Timeline",
+        "Linha do tempo Supplement Travel 09"
+      ],
+      "headings": [
+        "supplement travel 09",
+        "travel supplement 09",
+        "travel",
+        "travel summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Travel 09 line items",
+        "Supplement Travel 09 itens",
+        "Supplement Travel 09 summary",
+        "Supplement Travel 09 resumo",
+        "Supplement Travel 09 balance",
+        "Supplement Travel 09 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Travel 09 variant should be prioritized?",
+        "Qual variante de Supplement Travel 09 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "travel_trip_summary_addendum",
+      "label": "Trip Summary Addendum",
+      "expectedSections": [
+        "Supplement Travel 10 Header",
+        "Cabecalho Supplement Travel 10",
+        "Supplement Travel 10 Parties",
+        "Partes Supplement Travel 10",
+        "Supplement Travel 10 Timeline",
+        "Linha do tempo Supplement Travel 10"
+      ],
+      "headings": [
+        "supplement travel 10",
+        "travel supplement 10",
+        "travel",
+        "travel summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Travel 10 line items",
+        "Supplement Travel 10 itens",
+        "Supplement Travel 10 summary",
+        "Supplement Travel 10 resumo",
+        "Supplement Travel 10 balance",
+        "Supplement Travel 10 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Travel 10 variant should be prioritized?",
+        "Qual variante de Supplement Travel 10 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "travel_cancellation_notice",
+      "label": "Cancellation Notice",
+      "expectedSections": [
+        "Supplement Travel 11 Header",
+        "Cabecalho Supplement Travel 11",
+        "Supplement Travel 11 Parties",
+        "Partes Supplement Travel 11",
+        "Supplement Travel 11 Timeline",
+        "Linha do tempo Supplement Travel 11"
+      ],
+      "headings": [
+        "supplement travel 11",
+        "travel supplement 11",
+        "travel",
+        "travel summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Travel 11 line items",
+        "Supplement Travel 11 itens",
+        "Supplement Travel 11 summary",
+        "Supplement Travel 11 resumo",
+        "Supplement Travel 11 balance",
+        "Supplement Travel 11 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Travel 11 variant should be prioritized?",
+        "Qual variante de Supplement Travel 11 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "travel_rebooking_note",
+      "label": "Rebooking Note",
+      "expectedSections": [
+        "Supplement Travel 12 Header",
+        "Cabecalho Supplement Travel 12",
+        "Supplement Travel 12 Parties",
+        "Partes Supplement Travel 12",
+        "Supplement Travel 12 Timeline",
+        "Linha do tempo Supplement Travel 12"
+      ],
+      "headings": [
+        "supplement travel 12",
+        "travel supplement 12",
+        "travel",
+        "travel summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Travel 12 line items",
+        "Supplement Travel 12 itens",
+        "Supplement Travel 12 summary",
+        "Supplement Travel 12 resumo",
+        "Supplement Travel 12 balance",
+        "Supplement Travel 12 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Travel 12 variant should be prioritized?",
+        "Qual variante de Supplement Travel 12 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "travel_travel_advisory_note",
+      "label": "Travel Advisory Note",
+      "expectedSections": [
+        "Supplement Travel 13 Header",
+        "Cabecalho Supplement Travel 13",
+        "Supplement Travel 13 Parties",
+        "Partes Supplement Travel 13",
+        "Supplement Travel 13 Timeline",
+        "Linha do tempo Supplement Travel 13"
+      ],
+      "headings": [
+        "supplement travel 13",
+        "travel supplement 13",
+        "travel",
+        "travel summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Travel 13 line items",
+        "Supplement Travel 13 itens",
+        "Supplement Travel 13 summary",
+        "Supplement Travel 13 resumo",
+        "Supplement Travel 13 balance",
+        "Supplement Travel 13 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Travel 13 variant should be prioritized?",
+        "Qual variante de Supplement Travel 13 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "travel_lodging_policy_notice",
+      "label": "Lodging Policy Notice",
+      "expectedSections": [
+        "Supplement Travel 14 Header",
+        "Cabecalho Supplement Travel 14",
+        "Supplement Travel 14 Parties",
+        "Partes Supplement Travel 14",
+        "Supplement Travel 14 Timeline",
+        "Linha do tempo Supplement Travel 14"
+      ],
+      "headings": [
+        "supplement travel 14",
+        "travel supplement 14",
+        "travel",
+        "travel summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Travel 14 line items",
+        "Supplement Travel 14 itens",
+        "Supplement Travel 14 summary",
+        "Supplement Travel 14 resumo",
+        "Supplement Travel 14 balance",
+        "Supplement Travel 14 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Travel 14 variant should be prioritized?",
+        "Qual variante de Supplement Travel 14 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
       ]
     }
   ]

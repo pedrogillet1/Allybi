@@ -46,6 +46,23 @@ const checks = [];
 const profile = resolveCertificationProfileFromArgs({ args: process.argv });
 process.env.CERT_PROFILE = profile;
 
+function recordSimpleGateCheck(gateId, opts = {}) {
+  const gate = getGate(gateId);
+  if (!gate.ok || !gate.report) {
+    failures.push(`${gateId}:missing_gate_report`);
+    return;
+  }
+  const passed = gate.report.passed === true;
+  checks.push({
+    gateId,
+    passed,
+    metrics: gate.report.metrics || {},
+  });
+  if (!passed) {
+    failures.push(`${gateId}:${opts.failureCode || "gate_failed"}`);
+  }
+}
+
 const routingBehavioral = getGate("routing-behavioral");
 if (!routingBehavioral.ok || !routingBehavioral.report) {
   failures.push("routing-behavioral:missing_gate_report");
@@ -174,6 +191,22 @@ if (!precedenceParity.ok || !precedenceParity.report) {
   if (!passed) failures.push("routing-precedence-parity:gate_failed");
 }
 
+recordSimpleGateCheck("collision-matrix-exhaustive");
+recordSimpleGateCheck("collision-cross-family-tiebreak");
+recordSimpleGateCheck("routing-determinism");
+recordSimpleGateCheck("routing-determinism-runtime-e2e");
+recordSimpleGateCheck("scope-integrity");
+recordSimpleGateCheck("scope-boundary-locks");
+recordSimpleGateCheck("slot-contracts-wiring");
+recordSimpleGateCheck("slot-extraction-e2e");
+recordSimpleGateCheck("disambiguation-e2e");
+recordSimpleGateCheck("intent-precision");
+recordSimpleGateCheck("intent-family-firstclass");
+recordSimpleGateCheck("routing-family-alias-consistency");
+recordSimpleGateCheck("routing-integration-intents-parity");
+recordSimpleGateCheck("nav-intents-locale-parity");
+recordSimpleGateCheck("telemetry-completeness");
+
 const runtimeWiring = getGate("runtime-wiring");
 if (!runtimeWiring.ok || !runtimeWiring.report) {
   failures.push("runtime-wiring:missing_gate_report");
@@ -200,10 +233,14 @@ if (!runtimeWiring.ok || !runtimeWiring.report) {
         : "runtime-wiring:command_mode_invalid",
     );
   }
+  if (runtimeWiring.report.passed !== true) {
+    failures.push("runtime-wiring:gate_failed");
+  }
 }
 
 const summary = {
   generatedAt: new Date().toISOString(),
+  profile,
   strict,
   passed: failures.length === 0,
   checks,

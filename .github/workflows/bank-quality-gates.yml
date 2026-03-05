@@ -11,6 +11,8 @@ on:
       - "backend/scripts/audit-databanks.mjs"
       - "backend/scripts/compile-bank-artifacts.mjs"
       - "backend/scripts/check-bank-collisions.mjs"
+      - "backend/scripts/eval/check-eval-suite-governance.mjs"
+      - "backend/scripts/audit/validate-bank-meta-tests.mjs"
       - "backend/scripts/report-bank-staleness.mjs"
       - ".github/workflows/bank-quality-gates.yml"
   push:
@@ -23,6 +25,8 @@ on:
       - "backend/scripts/audit-databanks.mjs"
       - "backend/scripts/compile-bank-artifacts.mjs"
       - "backend/scripts/check-bank-collisions.mjs"
+      - "backend/scripts/eval/check-eval-suite-governance.mjs"
+      - "backend/scripts/audit/validate-bank-meta-tests.mjs"
       - "backend/scripts/report-bank-staleness.mjs"
       - ".github/workflows/bank-quality-gates.yml"
 
@@ -51,10 +55,21 @@ jobs:
         run: node scripts/audit-databanks.mjs > /tmp/databank-audit.md
 
       - name: Run bank collision threshold check
+        env:
+          BANK_COLLISION_THRESHOLD: "50"
         run: node scripts/check-bank-collisions.mjs > /tmp/databank-collisions.json
 
       - name: Verify document-intelligence bank wiring (strict)
         run: npm run docint:verify:banks:strict
+
+      - name: Verify eval suite governance (strict)
+        run: npm run audit:docint:eval-governance:strict
+
+      - name: Validate critical bank metadata test pointers
+        run: npm run audit:banks:meta-tests
+
+      - name: Inventory metadata test pointers across all banks
+        run: npm run audit:banks:meta-tests:all
 
       - name: Build compiled bank artifacts
         run: node scripts/compile-bank-artifacts.mjs

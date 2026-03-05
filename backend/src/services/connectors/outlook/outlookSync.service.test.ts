@@ -83,6 +83,7 @@ describe("OutlookSyncService folder cursor advancement", () => {
 
     expect(result.failedCount).toBe(1);
     expect(result.ingestedCount).toBe(0);
+    expect(result.updatedCount).toBe(0);
     expect(writeSpy).toHaveBeenCalledWith(
       "user-1",
       expect.objectContaining({
@@ -123,6 +124,7 @@ describe("OutlookSyncService folder cursor advancement", () => {
 
     expect(result.failedCount).toBe(0);
     expect(result.ingestedCount).toBe(1);
+    expect(result.updatedCount).toBe(0);
     expect(writeSpy).toHaveBeenCalledWith(
       "user-1",
       expect.objectContaining({
@@ -137,5 +139,33 @@ describe("OutlookSyncService folder cursor advancement", () => {
         }),
       }),
     );
+  });
+
+  test("reports updatedCount when ingestion reconciles an existing message", async () => {
+    const { service } = makeService([
+      { sourceId: "msg-1", documentId: "doc-1", status: "updated" },
+    ]);
+    jest.spyOn(service as any, "readCursorFile").mockResolvedValue({
+      version: 1,
+      userId: "user-1",
+      providers: {
+        outlook: {
+          lastSyncAt: "2026-01-01T00:00:00.000Z",
+          folders: {
+            "folder-1": { lastReceivedDateTime: "2026-01-15T00:00:00.000Z" },
+          },
+        },
+      },
+    });
+    jest
+      .spyOn(service as any, "writeCursorFile")
+      .mockResolvedValue(undefined);
+
+    const result = await service.sync({ userId: "user-1" });
+
+    expect(result.ingestedCount).toBe(1);
+    expect(result.createdCount).toBe(0);
+    expect(result.existingCount).toBe(0);
+    expect(result.updatedCount).toBe(1);
   });
 });

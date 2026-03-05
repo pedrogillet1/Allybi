@@ -1,0 +1,569 @@
+{
+  "_meta": {
+    "id": "employment_agreement_extraction_hints_v1ed74ca8",
+    "version": "1.0.0",
+    "description": "Extraction hints for Employment Agreement.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "legal",
+    "docType": "legal_employment_agreement"
+  },
+  "hints": [
+    {
+      "id": "employment_agreement_hint_01",
+      "entity": "address",
+      "anchors": [
+        "address",
+        "employment agreement address",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "abstract",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in appendix",
+        "can be buried in annex ii"
+      ]
+    },
+    {
+      "id": "employment_agreement_hint_02",
+      "entity": "article_number",
+      "anchors": [
+        "article number",
+        "employment agreement article number",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "action_items",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in appendix a",
+        "can be buried in exhibit"
+      ]
+    },
+    {
+      "id": "employment_agreement_hint_03",
+      "entity": "case_number",
+      "anchors": [
+        "case number",
+        "employment agreement case number",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "appendix",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in appendix b",
+        "can be buried in exhibit a"
+      ]
+    },
+    {
+      "id": "employment_agreement_hint_04",
+      "entity": "city",
+      "anchors": [
+        "city",
+        "employment agreement city",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "approvals",
+      "extractionMethod": "metadata_or_heading",
+      "whereItHides": [
+        "often in annex",
+        "can be buried in exhibit b"
+      ]
+    },
+    {
+      "id": "employment_agreement_hint_05",
+      "entity": "clause_reference",
+      "anchors": [
+        "clause reference",
+        "employment agreement clause reference",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "assumptions",
+      "extractionMethod": "cross_section_link",
+      "whereItHides": [
+        "often in annex i",
+        "can be buried in footnote"
+      ]
+    },
+    {
+      "id": "employment_agreement_hint_06",
+      "entity": "company_name",
+      "anchors": [
+        "company name",
+        "employment agreement company name",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "attachments",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in annex ii",
+        "can be buried in endnote"
+      ]
+    },
+    {
+      "id": "employment_agreement_hint_07",
+      "entity": "counterparty",
+      "anchors": [
+        "counterparty",
+        "employment agreement counterparty",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "audit_trail",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in exhibit",
+        "can be buried in schedule"
+      ]
+    },
+    {
+      "id": "employment_agreement_hint_08",
+      "entity": "country",
+      "anchors": [
+        "country",
+        "employment agreement country",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "authorization",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in exhibit a",
+        "can be buried in attachment"
+      ]
+    },
+    {
+      "id": "employment_agreement_hint_09",
+      "entity": "court_name",
+      "anchors": [
+        "court name",
+        "employment agreement court name",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "certifications",
+      "extractionMethod": "metadata_or_heading",
+      "whereItHides": [
+        "often in exhibit b",
+        "can be buried in addendum"
+      ]
+    },
+    {
+      "id": "employment_agreement_hint_10",
+      "entity": "currency_amount",
+      "anchors": [
+        "currency amount",
+        "employment agreement currency amount",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "compliance_section",
+      "extractionMethod": "cross_section_link",
+      "whereItHides": [
+        "often in footnote",
+        "can be buried in rider"
+      ]
+    },
+    {
+      "id": "employment_agreement_hint_11",
+      "entity": "currency_code",
+      "anchors": [
+        "currency code",
+        "employment agreement currency code",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "confidentiality_clause",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in endnote",
+        "can be buried in supplement"
+      ]
+    },
+    {
+      "id": "employment_agreement_hint_12",
+      "entity": "document_number",
+      "anchors": [
+        "document number",
+        "employment agreement document number",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "criteria",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in schedule",
+        "can be buried in definitions section"
+      ]
+    },
+    {
+      "id": "employment_agreement_hint_13",
+      "entity": "effective_date",
+      "anchors": [
+        "effective date",
+        "employment agreement effective date",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "data_tables",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in attachment",
+        "can be buried in signature block"
+      ]
+    },
+    {
+      "id": "employment_agreement_hint_14",
+      "entity": "execution_date",
+      "anchors": [
+        "execution date",
+        "employment agreement execution date",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "definitions",
+      "extractionMethod": "metadata_or_heading",
+      "whereItHides": [
+        "often in addendum",
+        "can be buried in metadata header"
+      ]
+    },
+    {
+      "id": "employment_agreement_hint_15",
+      "entity": "expiration_date",
+      "anchors": [
+        "expiration date",
+        "employment agreement expiration date",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "detailed_analysis",
+      "extractionMethod": "cross_section_link",
+      "whereItHides": [
+        "often in rider",
+        "can be buried in revision history"
+      ]
+    },
+    {
+      "id": "employment_agreement_hint_16",
+      "entity": "filing_date",
+      "anchors": [
+        "filing date",
+        "employment agreement filing date",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "disclaimers",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in supplement",
+        "can be buried in appendix"
+      ]
+    },
+    {
+      "id": "employment_agreement_hint_17",
+      "entity": "interest_rate",
+      "anchors": [
+        "interest rate",
+        "employment agreement interest rate",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "discussion",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in definitions section",
+        "can be buried in appendix a"
+      ]
+    },
+    {
+      "id": "employment_agreement_hint_18",
+      "entity": "jurisdiction",
+      "anchors": [
+        "jurisdiction",
+        "employment agreement jurisdiction",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "dispute_resolution",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in signature block",
+        "can be buried in appendix b"
+      ]
+    },
+    {
+      "id": "employment_agreement_hint_19",
+      "entity": "period_reference",
+      "anchors": [
+        "period reference",
+        "employment agreement period reference",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "distribution_list",
+      "extractionMethod": "metadata_or_heading",
+      "whereItHides": [
+        "often in metadata header",
+        "can be buried in annex"
+      ]
+    },
+    {
+      "id": "employment_agreement_hint_20",
+      "entity": "person_name",
+      "anchors": [
+        "person name",
+        "employment agreement person name",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "document_metadata",
+      "extractionMethod": "cross_section_link",
+      "whereItHides": [
+        "often in revision history",
+        "can be buried in annex i"
+      ]
+    },
+    {
+      "id": "employment_agreement_hint_21",
+      "entity": "person_role",
+      "anchors": [
+        "person role",
+        "employment agreement person role",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "executive_summary",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in appendix",
+        "can be buried in annex ii"
+      ]
+    },
+    {
+      "id": "employment_agreement_hint_22",
+      "entity": "person_title",
+      "anchors": [
+        "person title",
+        "employment agreement person title",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "exhibits",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in appendix a",
+        "can be buried in exhibit"
+      ]
+    },
+    {
+      "id": "employment_agreement_hint_23",
+      "entity": "reference_code",
+      "anchors": [
+        "reference code",
+        "employment agreement reference code",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "findings",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in appendix b",
+        "can be buried in exhibit a"
+      ]
+    },
+    {
+      "id": "employment_agreement_hint_24",
+      "entity": "registration_number",
+      "anchors": [
+        "registration number",
+        "employment agreement registration number",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "glossary",
+      "extractionMethod": "metadata_or_heading",
+      "whereItHides": [
+        "often in annex",
+        "can be buried in exhibit b"
+      ]
+    },
+    {
+      "id": "employment_agreement_hint_25",
+      "entity": "regulatory_body",
+      "anchors": [
+        "regulatory body",
+        "employment agreement regulatory body",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "governing_law",
+      "extractionMethod": "cross_section_link",
+      "whereItHides": [
+        "often in annex i",
+        "can be buried in footnote"
+      ]
+    },
+    {
+      "id": "employment_agreement_hint_26",
+      "entity": "signatory",
+      "anchors": [
+        "signatory",
+        "employment agreement signatory",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in annex ii",
+        "can be buried in endnote"
+      ]
+    },
+    {
+      "id": "employment_agreement_hint_27",
+      "entity": "state_province",
+      "anchors": [
+        "state province",
+        "employment agreement state province",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "indemnification",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in exhibit",
+        "can be buried in schedule"
+      ]
+    },
+    {
+      "id": "employment_agreement_hint_28",
+      "entity": "statute_citation",
+      "anchors": [
+        "statute citation",
+        "employment agreement statute citation",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "introduction",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in exhibit a",
+        "can be buried in attachment"
+      ]
+    },
+    {
+      "id": "employment_agreement_hint_29",
+      "entity": "subsidiary",
+      "anchors": [
+        "subsidiary",
+        "employment agreement subsidiary",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "limitations",
+      "extractionMethod": "metadata_or_heading",
+      "whereItHides": [
+        "often in exhibit b",
+        "can be buried in addendum"
+      ]
+    },
+    {
+      "id": "employment_agreement_hint_30",
+      "entity": "tax_id",
+      "anchors": [
+        "tax id",
+        "employment agreement tax id",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "methodology",
+      "extractionMethod": "cross_section_link",
+      "whereItHides": [
+        "often in footnote",
+        "can be buried in rider"
+      ]
+    },
+    {
+      "id": "employment_agreement_hint_31",
+      "entity": "tax_rate",
+      "anchors": [
+        "tax rate",
+        "employment agreement tax rate",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "procedures",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in endnote",
+        "can be buried in supplement"
+      ]
+    },
+    {
+      "id": "employment_agreement_hint_32",
+      "entity": "witness",
+      "anchors": [
+        "witness",
+        "employment agreement witness",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "recitals",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in schedule",
+        "can be buried in definitions section"
+      ]
+    },
+    {
+      "id": "employment_agreement_hint_33",
+      "entity": "address",
+      "anchors": [
+        "address",
+        "employment agreement address",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "recommendations",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in attachment",
+        "can be buried in signature block"
+      ]
+    },
+    {
+      "id": "employment_agreement_hint_34",
+      "entity": "article_number",
+      "anchors": [
+        "article number",
+        "employment agreement article number",
+        "see clause",
+        "refer to section"
+      ],
+      "location": "red_flags",
+      "extractionMethod": "metadata_or_heading",
+      "whereItHides": [
+        "often in addendum",
+        "can be buried in metadata header"
+      ]
+    }
+  ]
+}

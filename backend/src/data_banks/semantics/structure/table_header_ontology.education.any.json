@@ -147,6 +147,44 @@
       "scope": "table_header:education",
       "disambiguationRuleId": "headers_disambiguation_education_attendance_record",
       "curationReason": "weighted:attendance_record:domain_education"
+    },
+    {
+      "canonical": "exam_scores",
+      "synonyms": [
+        "exam scores",
+        "Exam Scores field",
+        "campo exam_scores",
+        "exam_scores value",
+        "Exam Scores valor"
+      ],
+      "related": [
+        "course_schedule",
+        "transcript_grades"
+      ],
+      "normalizationNotes": "Map exam_scores to normalized canonical exam_scores.",
+      "priority": 506,
+      "scope": "table_header:education",
+      "disambiguationRuleId": "headers_disambiguation_education_exam_scores",
+      "curationReason": "weighted:exam_scores:domain_education"
+    },
+    {
+      "canonical": "graduation_requirements",
+      "synonyms": [
+        "graduation requirements",
+        "Graduation Requirements field",
+        "campo graduation_requirements",
+        "graduation_requirements value",
+        "Graduation Requirements valor"
+      ],
+      "related": [
+        "course_schedule",
+        "transcript_grades"
+      ],
+      "normalizationNotes": "Map graduation_requirements to normalized canonical graduation_requirements.",
+      "priority": 507,
+      "scope": "table_header:education",
+      "disambiguationRuleId": "headers_disambiguation_education_graduation_requirements",
+      "curationReason": "weighted:graduation_requirements:domain_education"
     }
   ]
 }

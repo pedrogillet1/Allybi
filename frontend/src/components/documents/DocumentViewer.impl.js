@@ -66,10 +66,8 @@ import TargetsTab from './editor/TargetsTab';
 import ChangesTab from './editor/ChangesTab';
 import { getDocxViewerSelectionV2, getDocxViewerSelectionV2ClientRects, getDocxViewerSelectionV2FromRange } from '../../utils/editor/docxSelectionModel';
 
-const AUTH_LOCALSTORAGE_COMPAT = process.env.REACT_APP_AUTH_LOCALSTORAGE_COMPAT === 'true';
 const getCompatAccessToken = () => {
-  if (!AUTH_LOCALSTORAGE_COMPAT) return null;
-  return localStorage.getItem('accessToken') || localStorage.getItem('token');
+  return null;
 };
 
 // Keep this at module scope: React render ordering + const TDZ can otherwise throw in dev builds.
@@ -6178,3 +6176,4 @@ const DocumentViewer = () => {
 };
 
 export default DocumentViewer;
+

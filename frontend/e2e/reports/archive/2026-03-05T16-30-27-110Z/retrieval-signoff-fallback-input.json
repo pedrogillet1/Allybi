@@ -1,0 +1,460 @@
+{
+  "meta": {
+    "generatedAt": "2026-03-05T15:21:47.257Z",
+    "totalQueries": 50,
+    "source": "csv_fallback_for_signoff",
+    "documentsAttached": []
+  },
+  "results": [
+    {
+      "index": 1,
+      "query": "q001",
+      "response": "Stub response: 'The table was cut before completion. I can resend ...' — no usable content delivered; Sources: RF2_Gillet_Neto_Paulo.pdf, Breguet.pdf, Pedro-Gillet.pdf",
+      "answerMode": "doc_grounded_table",
+      "failureCode": null,
+      "status": "FAIL",
+      "latencyMs": 22223
+    },
+    {
+      "index": 2,
+      "query": "q002",
+      "response": "Response indicates retrieval could not find relevant content",
+      "answerMode": "help_steps",
+      "failureCode": "EVIDENCE_INSUFFICIENT",
+      "status": "FAIL",
+      "latencyMs": 18860
+    },
+    {
+      "index": 3,
+      "query": "q003",
+      "response": "Response indicates retrieval could not find relevant content; Sources: Breguet.pdf",
+      "answerMode": "doc_grounded_quote",
+      "failureCode": null,
+      "status": "FAIL",
+      "latencyMs": 18015
+    },
+    {
+      "index": 4,
+      "query": "q004",
+      "response": "Stub response: 'Let me try a different approach....' — no usable content delivered; Quality gate suppressed LLM output; Sources: SEVIS_RTI.pdf, RF2_Gillet_Neto_Paulo.pdf",
+      "answerMode": "doc_grounded_multi",
+      "failureCode": "quality_gate_blocked",
+      "status": "FAIL",
+      "latencyMs": 6979
+    },
+    {
+      "index": 5,
+      "query": "q005",
+      "response": "Stub response: 'Let me try a different approach....' — no usable content delivered; Quality gate suppressed LLM output; Sources: Mayfair Group_Investor Deck 2025.pdf",
+      "answerMode": "doc_grounded_multi",
+      "failureCode": "quality_gate_blocked",
+      "status": "FAIL",
+      "latencyMs": 23562
+    },
+    {
+      "index": 6,
+      "query": "q006",
+      "response": "Response in Portuguese despite English query; Response truncated (finishReason=stop); Sources: RF2_Gillet_Neto_Paulo.pdf",
+      "answerMode": "doc_grounded_quote",
+      "failureCode": null,
+      "status": "FAIL",
+      "latencyMs": 8044
+    },
+    {
+      "index": 7,
+      "query": "q007",
+      "response": "Stub response: 'I will re-check with a safer strategy....' — no usable content delivered; Sources: 214 Move Out Statement (2).pdf, Breguet.pdf, RF2_Gillet_Neto_Paulo.pdf",
+      "answerMode": "nav_pills",
+      "failureCode": "nav_pills_missing_buttons",
+      "status": "FAIL",
+      "latencyMs": 3535
+    },
+    {
+      "index": 8,
+      "query": "q008",
+      "response": "Response in Portuguese despite English query; Response truncated (finishReason=stop); Sources: RF2_Gillet_Neto_Paulo.pdf",
+      "answerMode": "doc_grounded_multi",
+      "failureCode": null,
+      "status": "FAIL",
+      "latencyMs": 5975
+    },
+    {
+      "index": 9,
+      "query": "q009",
+      "response": "Stub response: 'I will re-check with a safer strategy....' — no usable content delivered; Sources: 214 Move Out Statement (2).pdf, Breguet.pdf, SEVIS_RTI.pdf",
+      "answerMode": "nav_pills",
+      "failureCode": "nav_pills_missing_buttons",
+      "status": "FAIL",
+      "latencyMs": 6113
+    },
+    {
+      "index": 10,
+      "query": "q010",
+      "response": "Response in Portuguese despite English query; Response truncated (finishReason=length); Sources: ARM Montana & Arizona Summary_3.12.25.pdf",
+      "answerMode": "doc_grounded_multi",
+      "failureCode": null,
+      "status": "FAIL",
+      "latencyMs": 21723
+    },
+    {
+      "index": 11,
+      "query": "q011",
+      "response": "Response in Portuguese despite English query; Response truncated (finishReason=stop); Sources: Breguet.pdf, RF2_Gillet_Neto_Paulo.pdf",
+      "answerMode": "doc_grounded_table",
+      "failureCode": null,
+      "status": "FAIL",
+      "latencyMs": 9745
+    },
+    {
+      "index": 12,
+      "query": "q012",
+      "response": "Response indicates retrieval could not find relevant content; Sources: RF2_Gillet_Neto_Paulo.pdf, Pedro-Gillet.pdf",
+      "answerMode": "doc_grounded_multi",
+      "failureCode": null,
+      "status": "FAIL",
+      "latencyMs": 8685
+    },
+    {
+      "index": 13,
+      "query": "q013",
+      "response": "Response in Portuguese despite English query; Response truncated (finishReason=stop); Sources: Breguet.pdf",
+      "answerMode": "doc_grounded_multi",
+      "failureCode": null,
+      "status": "FAIL",
+      "latencyMs": 15020
+    },
+    {
+      "index": 14,
+      "query": "q014",
+      "response": "Response indicates retrieval could not find relevant content; Sources: Breguet.pdf",
+      "answerMode": "doc_grounded_multi",
+      "failureCode": null,
+      "status": "FAIL",
+      "latencyMs": 5127
+    },
+    {
+      "index": 15,
+      "query": "q015",
+      "response": "Response in Portuguese despite English query; Response truncated (finishReason=length); Sources: 214 Move Out Statement (2).pdf",
+      "answerMode": "doc_grounded_multi",
+      "failureCode": null,
+      "status": "FAIL",
+      "latencyMs": 27123
+    },
+    {
+      "index": 16,
+      "query": "q016",
+      "response": "Response in Portuguese despite English query; Response truncated (finishReason=length); Sources: 214 Move Out Statement (2).pdf",
+      "answerMode": "doc_grounded_quote",
+      "failureCode": null,
+      "status": "FAIL",
+      "latencyMs": 15785
+    },
+    {
+      "index": 17,
+      "query": "q017",
+      "response": "Response in Portuguese despite English query; Response truncated (finishReason=stop); Sources: Breguet.pdf, Pedro-Gillet.pdf, RF2_Gillet_Neto_Paulo.pdf",
+      "answerMode": "doc_grounded_quote",
+      "failureCode": null,
+      "status": "FAIL",
+      "latencyMs": 6087
+    },
+    {
+      "index": 18,
+      "query": "q018",
+      "response": "Response in Portuguese despite English query; Response truncated (finishReason=stop); Sources: 214 Move Out Statement (2).pdf",
+      "answerMode": "doc_grounded_multi",
+      "failureCode": null,
+      "status": "FAIL",
+      "latencyMs": 19135
+    },
+    {
+      "index": 19,
+      "query": "q019",
+      "response": "Stub response: 'The response was interrupted before completion. I ...' — no usable content delivered; Sources: 214 Move Out Statement (2).pdf",
+      "answerMode": "doc_grounded_multi",
+      "failureCode": null,
+      "status": "FAIL",
+      "latencyMs": 23897
+    },
+    {
+      "index": 20,
+      "query": "q020",
+      "response": "Stub response: 'Trying another method now....' — no usable content delivered; Quality gate suppressed LLM output; Sources: Breguet.pdf",
+      "answerMode": "doc_grounded_multi",
+      "failureCode": "quality_gate_blocked",
+      "status": "FAIL",
+      "latencyMs": 13618
+    },
+    {
+      "index": 21,
+      "query": "q021",
+      "response": "Response in Portuguese despite English query; Response truncated (finishReason=stop); Sources: Breguet.pdf",
+      "answerMode": "doc_grounded_multi",
+      "failureCode": null,
+      "status": "FAIL",
+      "latencyMs": 17544
+    },
+    {
+      "index": 22,
+      "query": "q022",
+      "response": "Sources: Breguet.pdf",
+      "answerMode": "doc_grounded_quote",
+      "failureCode": null,
+      "status": "FAIL",
+      "latencyMs": 14334
+    },
+    {
+      "index": 23,
+      "query": "q023",
+      "response": "Sources: Breguet.pdf",
+      "answerMode": "doc_grounded_multi",
+      "failureCode": null,
+      "status": "FAIL",
+      "latencyMs": 14030
+    },
+    {
+      "index": 24,
+      "query": "q024",
+      "response": "Stub response: 'I will re-check with a safer strategy....' — no usable content delivered; Sources: Breguet.pdf",
+      "answerMode": "doc_grounded_table",
+      "failureCode": "table_contract_violation",
+      "status": "FAIL",
+      "latencyMs": 23835
+    },
+    {
+      "index": 25,
+      "query": "q025",
+      "response": "Response in Portuguese despite English query; Response truncated (finishReason=stop); Provenance coverage flagged as insufficient despite grounded content",
+      "answerMode": "doc_grounded_multi",
+      "failureCode": "insufficient_provenance_coverage",
+      "status": "FAIL",
+      "latencyMs": 11536
+    },
+    {
+      "index": 26,
+      "query": "q026",
+      "response": "Response in Portuguese despite English query; Response truncated (finishReason=stop); Sources: Breguet.pdf, RF2_Gillet_Neto_Paulo.pdf, Pedro-Gillet.pdf",
+      "answerMode": "doc_grounded_multi",
+      "failureCode": null,
+      "status": "FAIL",
+      "latencyMs": 27421
+    },
+    {
+      "index": 27,
+      "query": "q027",
+      "response": "Response indicates retrieval could not find relevant content; Sources: Breguet.pdf, RF2_Gillet_Neto_Paulo.pdf",
+      "answerMode": "doc_grounded_quote",
+      "failureCode": null,
+      "status": "FAIL",
+      "latencyMs": 6259
+    },
+    {
+      "index": 28,
+      "query": "q028",
+      "response": "Response indicates retrieval could not find relevant content; Sources: Breguet.pdf, RF2_Gillet_Neto_Paulo.pdf",
+      "answerMode": "doc_grounded_quote",
+      "failureCode": null,
+      "status": "FAIL",
+      "latencyMs": 23546
+    },
+    {
+      "index": 29,
+      "query": "q029",
+      "response": "Sources: ATTBill_4977_Dec2023.pdf",
+      "answerMode": "doc_grounded_single",
+      "failureCode": null,
+      "status": "FAIL",
+      "latencyMs": 10563
+    },
+    {
+      "index": 30,
+      "query": "q030",
+      "response": "Response in Portuguese despite English query; Response truncated (finishReason=stop); Sources: Pedro-Gillet.pdf, RF2_Gillet_Neto_Paulo.pdf",
+      "answerMode": "doc_grounded_quote",
+      "failureCode": null,
+      "status": "FAIL",
+      "latencyMs": 13763
+    },
+    {
+      "index": 31,
+      "query": "q031",
+      "response": "Response in Portuguese despite English query; Response truncated (finishReason=stop); Sources: Breguet.pdf, RF2_Gillet_Neto_Paulo.pdf, Pedro-Gillet.pdf",
+      "answerMode": "doc_grounded_multi",
+      "failureCode": null,
+      "status": "FAIL",
+      "latencyMs": 19508
+    },
+    {
+      "index": 32,
+      "query": "q032",
+      "response": "Response indicates retrieval could not find relevant content; Sources: 214 Move Out Statement (2).pdf",
+      "answerMode": "doc_grounded_multi",
+      "failureCode": null,
+      "status": "FAIL",
+      "latencyMs": 6817
+    },
+    {
+      "index": 33,
+      "query": "q033",
+      "response": "Response indicates retrieval could not find relevant content; Sources: Breguet.pdf, Pedro-Gillet.pdf, RF2_Gillet_Neto_Paulo.pdf",
+      "answerMode": "doc_grounded_quote",
+      "failureCode": null,
+      "status": "FAIL",
+      "latencyMs": 21202
+    },
+    {
+      "index": 34,
+      "query": "q034",
+      "response": "Response truncated (finishReason=stop); Sources: AÉREO ALVARO + 2.pdf",
+      "answerMode": "doc_grounded_multi",
+      "failureCode": null,
+      "status": "FAIL",
+      "latencyMs": 11062
+    },
+    {
+      "index": 35,
+      "query": "q035",
+      "response": "Response in Portuguese despite English query; Response truncated (finishReason=stop); Sources: RF2_Gillet_Neto_Paulo.pdf, Breguet.pdf",
+      "answerMode": "doc_grounded_quote",
+      "failureCode": null,
+      "status": "FAIL",
+      "latencyMs": 10365
+    },
+    {
+      "index": 36,
+      "query": "q036",
+      "response": "Response truncated (finishReason=stop); Sources: Breguet.pdf",
+      "answerMode": "doc_grounded_single",
+      "failureCode": null,
+      "status": "FAIL",
+      "latencyMs": 16638
+    },
+    {
+      "index": 37,
+      "query": "q037",
+      "response": "Stub response: 'Let me try a different approach....' — no usable content delivered; Quality gate suppressed LLM output; Sources: Pedro-Gillet.pdf",
+      "answerMode": "doc_grounded_multi",
+      "failureCode": "quality_gate_blocked",
+      "status": "FAIL",
+      "latencyMs": 5700
+    },
+    {
+      "index": 38,
+      "query": "q038",
+      "response": "Stub response: 'The response was interrupted before completion. I ...' — no usable content delivered; Sources: Pedro-Gillet.pdf",
+      "answerMode": "doc_grounded_multi",
+      "failureCode": null,
+      "status": "FAIL",
+      "latencyMs": 15663
+    },
+    {
+      "index": 39,
+      "query": "q039",
+      "response": "Stub response: 'Trying another method now....' — no usable content delivered; Quality gate suppressed LLM output; Sources: Pedro-Gillet.pdf",
+      "answerMode": "doc_grounded_quote",
+      "failureCode": "quality_gate_blocked",
+      "status": "FAIL",
+      "latencyMs": 21090
+    },
+    {
+      "index": 40,
+      "query": "q040",
+      "response": "Response truncated (finishReason=stop); Sources: Certidao de nascimento Pedro.pdf, Pedro-Gillet.pdf",
+      "answerMode": "doc_grounded_multi",
+      "failureCode": null,
+      "status": "FAIL",
+      "latencyMs": 6405
+    },
+    {
+      "index": 41,
+      "query": "q041",
+      "response": "Sources: Breguet.pdf, Pedro-Gillet.pdf, RF2_Gillet_Neto_Paulo.pdf",
+      "answerMode": "doc_grounded_quote",
+      "failureCode": null,
+      "status": "FAIL",
+      "latencyMs": 7069
+    },
+    {
+      "index": 42,
+      "query": "q042",
+      "response": "Response in Portuguese despite English query; Response truncated (finishReason=stop); Sources: Certidao de nascimento Pedro.pdf, Pedro-Gillet.pdf",
+      "answerMode": "doc_grounded_quote",
+      "failureCode": null,
+      "status": "FAIL",
+      "latencyMs": 16469
+    },
+    {
+      "index": 43,
+      "query": "q043",
+      "response": "Response in Portuguese despite English query; Response truncated (finishReason=stop); Sources: SEVIS_RTI.pdf",
+      "answerMode": "doc_grounded_multi",
+      "failureCode": null,
+      "status": "FAIL",
+      "latencyMs": 21119
+    },
+    {
+      "index": 44,
+      "query": "q044",
+      "response": "Sources: SEVIS_RTI.pdf",
+      "answerMode": "doc_grounded_multi",
+      "failureCode": null,
+      "status": "FAIL",
+      "latencyMs": 17320
+    },
+    {
+      "index": 45,
+      "query": "q045",
+      "response": "Response in Portuguese despite English query; Response truncated (finishReason=stop); Sources: SEVIS_RTI.pdf",
+      "answerMode": "doc_grounded_multi",
+      "failureCode": null,
+      "status": "FAIL",
+      "latencyMs": 17172
+    },
+    {
+      "index": 46,
+      "query": "q046",
+      "response": "Stub response: 'The response was interrupted before completion. I ...' — no usable content delivered; Sources: Pedro-Gillet.pdf, RF2_Gillet_Neto_Paulo.pdf",
+      "answerMode": "doc_grounded_quote",
+      "failureCode": null,
+      "status": "FAIL",
+      "latencyMs": 17992
+    },
+    {
+      "index": 47,
+      "query": "q047",
+      "response": "Stub response: 'I will re-check with a safer strategy....' — no usable content delivered; Sources: RF2_Gillet_Neto_Paulo.pdf",
+      "answerMode": "doc_grounded_table",
+      "failureCode": "table_contract_violation",
+      "status": "FAIL",
+      "latencyMs": 24481
+    },
+    {
+      "index": 48,
+      "query": "q048",
+      "response": "Response in Portuguese despite English query; Response truncated (finishReason=stop); Sources: SEVIS_RTI.pdf",
+      "answerMode": "doc_grounded_multi",
+      "failureCode": null,
+      "status": "FAIL",
+      "latencyMs": 22198
+    },
+    {
+      "index": 49,
+      "query": "q049",
+      "response": "Response in Portuguese despite English query; Response truncated (finishReason=stop); Sources: RF2_Gillet_Neto_Paulo.pdf",
+      "answerMode": "doc_grounded_multi",
+      "failureCode": null,
+      "status": "FAIL",
+      "latencyMs": 12521
+    },
+    {
+      "index": 50,
+      "query": "q050",
+      "response": "Response in Portuguese despite English query; Response truncated (finishReason=stop); Sources: Breguet.pdf",
+      "answerMode": "doc_grounded_quote",
+      "failureCode": null,
+      "status": "FAIL",
+      "latencyMs": 17758
+    }
+  ]
+}

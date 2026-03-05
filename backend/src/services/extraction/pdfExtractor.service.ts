@@ -20,7 +20,10 @@ import { createPdfPageAnchor } from "../../types/extraction.types";
 import googleVisionOCR from "./google-vision-ocr.service";
 import { extractPDFWithTables, extractTablesFromText } from "../../utils/pdfTableExtractor";
 import type { ExtractedTable } from "../ingestion/extraction/extractionResult.types";
-import { extractTablesWithDocumentAI } from "./documentAiTableExtractor.service";
+import {
+  extractTablesWithDocumentAI,
+  type StructuredTable,
+} from "./documentAiTableExtractor.service";
 import { extractPdfOutline } from "./pdfOutlineExtractor.service";
 import { logger } from "../../utils/logger";
 
@@ -565,6 +568,117 @@ async function extractPagesOCR(buffer: Buffer): Promise<{
   };
 }
 
+export function normalizeStructuredTableRows(
+  table: StructuredTable,
+): ExtractedTable["rows"] {
+  const cells = Array.isArray(table.cells) ? table.cells : [];
+  const normalizedAnchors = new Map<
+    string,
+    {
+      rowIndex: number;
+      colIndex: number;
+      text: string;
+      isHeader: boolean;
+      rowSpan: number;
+      colSpan: number;
+    }
+  >();
+
+  for (const cell of cells) {
+    const rowIndex = Math.max(0, Number(cell.rowIndex) || 0);
+    const colIndex = Math.max(0, Number(cell.colIndex) || 0);
+    const text = String(cell.text || "");
+    const isHeader = Boolean(cell.isHeader);
+    const rowSpan = Math.max(1, Number((cell as any).rowSpan) || 1);
+    const colSpan = Math.max(1, Number((cell as any).colSpan) || 1);
+    const key = `${rowIndex}:${colIndex}`;
+
+    const prev = normalizedAnchors.get(key);
+    if (!prev) {
+      normalizedAnchors.set(key, {
+        rowIndex,
+        colIndex,
+        text,
+        isHeader,
+        rowSpan,
+        colSpan,
+      });
+      continue;
+    }
+
+    const prevLen = prev.text.trim().length;
+    const nextLen = text.trim().length;
+    const preferNext =
+      nextLen > prevLen ||
+      (nextLen === prevLen &&
+        text.localeCompare(prev.text, undefined, { sensitivity: "base" }) < 0);
+
+    normalizedAnchors.set(key, {
+      rowIndex,
+      colIndex,
+      text: preferNext ? text : prev.text,
+      isHeader: prev.isHeader || isHeader,
+      rowSpan: Math.max(prev.rowSpan, rowSpan),
+      colSpan: Math.max(prev.colSpan, colSpan),
+    });
+  }
+
+  let maxCellRow = -1;
+  let maxCellCol = -1;
+  for (const anchor of normalizedAnchors.values()) {
+    maxCellRow = Math.max(maxCellRow, anchor.rowIndex + anchor.rowSpan - 1);
+    maxCellCol = Math.max(maxCellCol, anchor.colIndex + anchor.colSpan - 1);
+  }
+
+  const rowCount = Math.max(0, Number(table.rowCount) || 0, maxCellRow + 1);
+  const colCount = Math.max(0, Number(table.colCount) || 0, maxCellCol + 1);
+
+  const headerRows = new Set<number>();
+  for (const anchor of normalizedAnchors.values()) {
+    if (anchor.isHeader) headerRows.add(anchor.rowIndex);
+  }
+
+  const rows: ExtractedTable["rows"] = [];
+  for (let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+    const rowCells: ExtractedTable["rows"][number]["cells"] = [];
+    for (let colIndex = 0; colIndex < colCount; colIndex++) {
+      rowCells.push({
+        text: "",
+        colIndex,
+      });
+    }
+    rows.push({
+      rowIndex,
+      isHeader: headerRows.has(rowIndex),
+      cells: rowCells,
+    });
+  }
+
+  for (const anchor of normalizedAnchors.values()) {
+    const row = rows[anchor.rowIndex];
+    if (!row) continue;
+    const slot = row.cells[anchor.colIndex];
+    if (!slot) continue;
+    slot.text = anchor.text;
+    if (anchor.colSpan > 1) slot.colSpan = anchor.colSpan;
+    if (anchor.rowSpan > 1) slot.rowSpan = anchor.rowSpan;
+
+    for (let rOff = 0; rOff < anchor.rowSpan; rOff++) {
+      for (let cOff = 0; cOff < anchor.colSpan; cOff++) {
+        if (rOff === 0 && cOff === 0) continue;
+        const targetRow = rows[anchor.rowIndex + rOff];
+        if (!targetRow) continue;
+        const targetCell = targetRow.cells[anchor.colIndex + cOff];
+        if (!targetCell) continue;
+        if (targetCell.text.trim().length > 0) continue;
+        targetCell.isMergedContinuation = true;
+      }
+    }
+  }
+
+  return rows;
+}
+
 // ============================================================================
 // Main Export: Enhanced PDF Extraction
 // ============================================================================
@@ -597,12 +711,13 @@ export async function extractPdfWithAnchors(
     const nativeResult = await extractPagesNative(buffer);
 
     if (nativeResult.hasTextLayer && nativeResult.pages.length > 0) {
-      // Track which pages got Document AI tables (used to skip heuristic on those pages)
-      const docAiPageSet = new Set<number>();
 
       // Optional Document AI pass: try structured table extraction FIRST
       // when DOCUMENT_AI_ENABLED=true — pages with Doc AI tables skip heuristic
-      let docAiTablesByPage = new Map<number, string[]>();
+      const docAiTablesByPage = new Map<
+        number,
+        { markdown: string[]; structured: StructuredTable[] }
+      >();
       if (process.env.DOCUMENT_AI_ENABLED === "true") {
         try {
           const docAiResult = await Promise.race([
@@ -614,8 +729,10 @@ export async function extractPdfWithAnchors(
 
           if (docAiResult && docAiResult.tableCount > 0) {
             for (const entry of docAiResult.pages) {
-              docAiTablesByPage.set(entry.page, entry.tables);
-              docAiPageSet.add(entry.page);
+              docAiTablesByPage.set(entry.page, {
+                markdown: entry.tables || [],
+                structured: entry.structuredTables || [],
+              });
             }
 
             logger.info("[PDF] Document AI tables extracted", {
@@ -634,15 +751,32 @@ export async function extractPdfWithAnchors(
       // Apply table preservation: Doc AI pages get Doc AI tables appended to
       // RAW page text; other pages get heuristic table enhancement
       const allExtractedTables: ExtractedTable[] = [];
+      const tableIndexByPage = new Map<number, number>();
       let enhancedPages = nativeResult.pages.map((page) => {
         const pageNum = page.page ?? (page as any).pageNumber ?? 0;
         const aiTables = docAiTablesByPage.get(pageNum);
+        const nextTableIndex = () => {
+          const current = tableIndexByPage.get(pageNum) || 0;
+          tableIndexByPage.set(pageNum, current + 1);
+          return current;
+        };
 
-        if (aiTables && aiTables.length > 0) {
+        if (aiTables && aiTables.markdown.length > 0) {
+          for (const structuredTable of aiTables.structured) {
+            const rows = normalizeStructuredTableRows(structuredTable);
+            if (rows.length === 0) continue;
+            allExtractedTables.push({
+              tableId: `pdf:p${pageNum}:t${nextTableIndex()}`,
+              pageOrSlide: pageNum,
+              markdown: structuredTable.markdown || "",
+              rows,
+            });
+          }
+
           // Page covered by Document AI — append structured tables to raw text
           return {
             ...page,
-            text: page.text + "\n\n" + aiTables.join("\n\n"),
+            text: page.text + "\n\n" + aiTables.markdown.join("\n\n"),
           };
         }
 
@@ -654,7 +788,7 @@ export async function extractPdfWithAnchors(
             const t = tableResult.tables[tIdx];
             if (t.structuredRows && t.structuredRows.length > 0) {
               allExtractedTables.push({
-                tableId: `pdf:p${pageNum}:t${tIdx}`,
+                tableId: `pdf:p${pageNum}:t${nextTableIndex()}`,
                 pageOrSlide: pageNum,
                 markdown: t.markdown,
                 rows: t.structuredRows,
@@ -698,7 +832,9 @@ export async function extractPdfWithAnchors(
         pageCount: nativeResult.pageCount,
         pages: enhancedPages,
         hasTextLayer: true,
+        ocrAttempted: false,
         ocrApplied: false,
+        ocrOutcome: "not_attempted",
         wordCount: totalWordCount,
         confidence: 1.0,
         textQuality: "high",
@@ -730,8 +866,16 @@ export async function extractPdfWithAnchors(
       // Outline extraction is best-effort; ignore failures
     }
 
+    let fallbackOcrAttempted = false;
+    let fallbackOcrOutcome:
+      | "provider_unavailable"
+      | "runtime_error"
+      | "not_attempted" = "not_attempted";
+    const fallbackWarnings: string[] = [];
+
     if (googleVisionOCR.isAvailable()) {
       try {
+        fallbackOcrAttempted = true;
         // Pad native pages array to match page count
         const paddedNativePages = [...nativeResult.pages];
         while (paddedNativePages.length < nativeResult.pageCount) {
@@ -772,7 +916,12 @@ export async function extractPdfWithAnchors(
           pageCount: ocrResult.pageCount,
           pages: ocrResult.pages,
           hasTextLayer: ocrResult.ocrPageCount < ocrResult.pageCount,
+          ocrAttempted: true,
           ocrApplied: ocrResult.ocrPageCount > 0,
+          ocrOutcome:
+            ocrResult.ocrPageCount > 0 && totalText.trim().length > 0
+              ? "applied"
+              : "no_text",
           ocrConfidence: ocrResult.overallConfidence,
           ocrPageCount: ocrResult.ocrPageCount,
           ocrMode: ocrResult.ocrMode,
@@ -785,9 +934,14 @@ export async function extractPdfWithAnchors(
           ...(ocrOutlines ? { outlines: ocrOutlines } : {}),
         };
       } catch (ocrError: any) {
+        fallbackOcrOutcome = "runtime_error";
+        fallbackWarnings.push(`OCR runtime error: ${ocrError.message}`);
         logger.error("[PDF] OCR failed", { error: ocrError.message });
       }
     } else {
+      fallbackOcrAttempted = true;
+      fallbackOcrOutcome = "provider_unavailable";
+      fallbackWarnings.push("OCR provider unavailable");
       const nativeTextLength = nativeResult.pages.reduce(
         (sum, p) => sum + (p.text?.length || 0), 0,
       );
@@ -816,12 +970,15 @@ export async function extractPdfWithAnchors(
       pageCount: nativeResult.pageCount,
       pages: nativeResult.pages,
       hasTextLayer: false,
+      ocrAttempted: fallbackOcrAttempted,
       ocrApplied: false,
+      ocrOutcome: fallbackOcrOutcome,
       wordCount: fallbackWordCount,
       confidence: 0.3,
       textQuality: "low",
       textQualityScore: nativeResult.nativeQualityScore,
       weakTextReasons: nativeResult.weakTextReasons,
+      extractionWarnings: fallbackWarnings,
       ...(ocrOutlines ? { outlines: ocrOutlines } : {}),
     };
   } catch (error: any) {

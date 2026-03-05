@@ -33,6 +33,10 @@ type TablePayload = {
   structureScore?: number;
   numericIntegrityScore?: number;
   warnings?: string[];
+  unitAnnotation?: { unitRaw: string; unitNormalized: string } | null;
+  scaleFactor?: string | null;
+  footnotes?: string[] | null;
+  periodTokens?: string[] | null;
 };
 
 type RetrievalHit = {
@@ -348,6 +352,50 @@ function toSnippet(text: string | null): string {
     .trim();
   if (!clean) return "";
   return clean.length > 1200 ? `${clean.slice(0, 1199)}...` : clean;
+}
+
+function normalizePeriodToken(value: unknown): string | null {
+  const raw = String(value || "")
+    .trim()
+    .toUpperCase()
+    .replace(/\s+/g, "");
+  return raw || null;
+}
+
+function extractPeriodTokensFromMetadata(
+  metadata: Record<string, unknown>,
+): string[] {
+  const out = new Set<string>();
+  const explicit = metadata.periodTokens;
+  if (Array.isArray(explicit)) {
+    for (const token of explicit) {
+      const normalized = normalizePeriodToken(token);
+      if (normalized) out.add(normalized);
+    }
+  }
+
+  const periodYear = parseNullableNumber(metadata.periodYear);
+  const periodMonth = parseNullableNumber(metadata.periodMonth);
+  const periodQuarter = parseNullableNumber(metadata.periodQuarter);
+
+  if (periodYear && periodYear >= 1900 && periodYear <= 2200) {
+    const year = Math.trunc(periodYear);
+    out.add(`Y${year}`);
+    if (periodQuarter && periodQuarter >= 1 && periodQuarter <= 4) {
+      out.add(`Y${year}Q${Math.trunc(periodQuarter)}`);
+    }
+    if (periodMonth && periodMonth >= 1 && periodMonth <= 12) {
+      out.add(`Y${year}M${String(Math.trunc(periodMonth)).padStart(2, "0")}`);
+    }
+  }
+  if (periodQuarter && periodQuarter >= 1 && periodQuarter <= 4) {
+    out.add(`Q${Math.trunc(periodQuarter)}`);
+  }
+  if (periodMonth && periodMonth >= 1 && periodMonth <= 12) {
+    out.add(`M${String(Math.trunc(periodMonth)).padStart(2, "0")}`);
+  }
+
+  return [...out].sort();
 }
 
 function isStrictRelatedDocExpansionError(error: unknown): boolean {
@@ -1337,6 +1385,21 @@ class PrismaRetrievalUserAdapter
     const scaleRaw = String(metadata.scaleRaw || "").trim();
     const scaleMultiplier = Number(metadata.scaleMultiplier);
     const hasScale = scaleRaw.length > 0 || Number.isFinite(scaleMultiplier);
+    const scaleFactor =
+      scaleRaw || String(metadata.scaleFactor || "").trim() || undefined;
+    const unitAnnotation =
+      unitRaw || unitNormalized
+        ? {
+            unitRaw: unitRaw || unitNormalized,
+            unitNormalized: unitNormalized || unitRaw,
+          }
+        : null;
+    const footnotes = Array.isArray(metadata.footnotes)
+      ? metadata.footnotes
+          .map((value) => String(value || "").trim())
+          .filter(Boolean)
+      : undefined;
+    const periodTokens = extractPeriodTokensFromMetadata(metadata);
 
     if (chunkForm === "cell_centric") {
       const header = [rowLabel, colHeader].filter(Boolean);
@@ -1350,6 +1413,10 @@ class PrismaRetrievalUserAdapter
           unitRaw || unitNormalized || hasScale
             ? undefined
             : ["unit_or_scale_missing_for_cell_fact"],
+        unitAnnotation,
+        scaleFactor: scaleFactor ?? null,
+        footnotes: footnotes?.length ? footnotes : null,
+        periodTokens: periodTokens.length ? periodTokens : null,
       };
     }
 
@@ -1359,6 +1426,10 @@ class PrismaRetrievalUserAdapter
         rows: [[snippet || null]],
         structureScore: 0.85,
         numericIntegrityScore: 0.8,
+        unitAnnotation,
+        scaleFactor: scaleFactor ?? null,
+        footnotes: footnotes?.length ? footnotes : null,
+        periodTokens: periodTokens.length ? periodTokens : null,
       };
     }
 
@@ -1371,6 +1442,10 @@ class PrismaRetrievalUserAdapter
         rows: [[snippet || null]],
         structureScore: 0.7,
         numericIntegrityScore: 0.7,
+        unitAnnotation,
+        scaleFactor: scaleFactor ?? null,
+        footnotes: footnotes?.length ? footnotes : null,
+        periodTokens: periodTokens.length ? periodTokens : null,
       };
     }
 

@@ -13,6 +13,7 @@ function isKnownProfile(raw) {
     raw === "ci" ||
     raw === "release" ||
     raw === "local" ||
+    raw === "local_hard" ||
     raw === "routing_only" ||
     raw === "retrieval_signoff"
   );
@@ -97,6 +98,11 @@ export function resolveLocalCertRunPolicy({
 }) {
   if (profile === "routing_only") {
     return { enforce: false, source: "routing_only_mode" };
+  }
+  if (profile === "local_hard") {
+    const override = normalizeBooleanOverride(env.CERT_ENFORCE_LOCAL_CERT_RUN);
+    if (override != null) return { enforce: override, source: "env_override" };
+    return { enforce: strict === true, source: "local_hard_profile" };
   }
   if (verifyOnly === true && profile !== "retrieval_signoff") {
     return { enforce: false, source: "verify_only_mode" };

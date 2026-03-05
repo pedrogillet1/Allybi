@@ -118,8 +118,14 @@ describe("ConnectorsIngestionService", () => {
 
     mockTransaction.mockReset().mockImplementation(async (fn: any) => {
       const tx = {
-        document: { create: jest.fn().mockResolvedValue({}) },
-        documentMetadata: { create: jest.fn().mockResolvedValue({}) },
+        document: {
+          create: jest.fn().mockResolvedValue({}),
+          update: jest.fn().mockResolvedValue({}),
+        },
+        documentMetadata: {
+          create: jest.fn().mockResolvedValue({}),
+          upsert: jest.fn().mockResolvedValue({}),
+        },
       };
       return fn(tx);
     });
@@ -138,6 +144,82 @@ describe("ConnectorsIngestionService", () => {
     expect(mockAddDocumentJob).toHaveBeenCalledTimes(1);
     expect(mockClaimForEnrichment).not.toHaveBeenCalled();
     expect(mockMarkIndexed).not.toHaveBeenCalled();
+  });
+
+  test("returns existing when connector payload hash is unchanged", async () => {
+    const item = makeItem();
+    const sourceMeta = {
+      sourceType: item.sourceType,
+      sourceId: item.sourceId,
+      timestamp: item.timestamp.toISOString(),
+      actors: item.actors,
+      labelsOrChannel: item.labelsOrChannel,
+      sourceMeta: item.sourceMeta ?? {},
+    };
+    const payload = [
+      `Title: ${item.title}`,
+      `Source: ${item.sourceType}`,
+      `Source ID: ${item.sourceId}`,
+      `Timestamp: ${item.timestamp.toISOString()}`,
+      `Actors: ${item.actors.join(", ")}`,
+      `Labels/Channel: ${item.labelsOrChannel.join(", ")}`,
+      "",
+      item.body,
+      "",
+      `Source Metadata: ${JSON.stringify(sourceMeta)}`,
+    ].join("\n");
+    const fileHash = require("crypto")
+      .createHash("sha256")
+      .update(payload)
+      .digest("hex");
+
+    mockFindFirst.mockResolvedValue({
+      id: "doc-existing-1",
+      fileHash,
+      encryptedFilename: "users/user-1/connectors/gmail/doc-existing-1/gmail_msg-1.txt",
+    });
+
+    const service = new ConnectorsIngestionService();
+    const out = await service.ingestDocuments({ userId: "user-1" }, [item]);
+
+    expect(out).toHaveLength(1);
+    expect(out[0]?.status).toBe("existing");
+    expect(mockUploadFile).not.toHaveBeenCalled();
+    expect(mockAddDocumentJob).not.toHaveBeenCalled();
+  });
+
+  test("updates existing connector document when payload hash changes", async () => {
+    mockFindFirst.mockResolvedValue({
+      id: "doc-existing-2",
+      fileHash: "stale-hash",
+      encryptedFilename: "users/user-1/connectors/gmail/doc-existing-2/gmail_msg-1.txt",
+    });
+
+    const txDocumentUpdate = jest.fn().mockResolvedValue({});
+    const txDocumentMetadataUpsert = jest.fn().mockResolvedValue({});
+    mockTransaction.mockImplementation(async (fn: any) =>
+      fn({
+        document: {
+          create: jest.fn().mockResolvedValue({}),
+          update: txDocumentUpdate,
+        },
+        documentMetadata: {
+          create: jest.fn().mockResolvedValue({}),
+          upsert: txDocumentMetadataUpsert,
+        },
+      }),
+    );
+
+    const service = new ConnectorsIngestionService();
+    const out = await service.ingestDocuments({ userId: "user-1" }, [makeItem()]);
+
+    expect(out).toHaveLength(1);
+    expect(out[0]?.status).toBe("updated");
+    expect(out[0]?.documentId).toBe("doc-existing-2");
+    expect(mockUploadFile).toHaveBeenCalledTimes(1);
+    expect(txDocumentUpdate).toHaveBeenCalledTimes(1);
+    expect(txDocumentMetadataUpsert).toHaveBeenCalledTimes(1);
+    expect(mockAddDocumentJob).toHaveBeenCalledTimes(1);
   });
 
   test("never persists connector plaintext body fields at rest", async () => {

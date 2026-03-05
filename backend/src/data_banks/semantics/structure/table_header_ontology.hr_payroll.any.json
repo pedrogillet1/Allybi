@@ -166,6 +166,25 @@
       "scope": "table_header:hr_payroll",
       "disambiguationRuleId": "headers_disambiguation_hr_payroll_expense_line_items",
       "curationReason": "weighted:expense_line_items:domain_hr_payroll"
+    },
+    {
+      "canonical": "net_pay_summary",
+      "synonyms": [
+        "net pay summary",
+        "Net Pay Summary field",
+        "campo net_pay_summary",
+        "net_pay_summary value",
+        "Net Pay Summary valor"
+      ],
+      "related": [
+        "earnings",
+        "deductions"
+      ],
+      "normalizationNotes": "Map net_pay_summary to normalized canonical net_pay_summary.",
+      "priority": 507,
+      "scope": "table_header:hr_payroll",
+      "disambiguationRuleId": "headers_disambiguation_hr_payroll_net_pay_summary",
+      "curationReason": "weighted:net_pay_summary:domain_hr_payroll"
     }
   ]
 }

@@ -56,7 +56,39 @@ function buildRetrievalPack(): EvidencePack {
         snippet: "payment terms and schedule",
         score: { finalScore: 0.81, semanticScore: 0.81 },
       },
+      {
+        evidenceType: "table",
+        docId: "doc-b",
+        title: "B Table",
+        filename: "b.pdf",
+        location: { page: 3, sectionKey: "variance_analysis" },
+        locationKey: "doc-b:p3:t1",
+        table: {
+          header: ["Metric", "Q1"],
+          rows: [["Revenue", 1250]],
+          unitAnnotation: {
+            unitRaw: "$M",
+            unitNormalized: "USD_MILLIONS",
+          },
+          scaleFactor: "millions",
+          footnotes: ["(1) restated"],
+        },
+        score: { finalScore: 0.79, semanticScore: 0.79 },
+      },
     ],
+    telemetry: {
+      ruleEvents: [],
+      summary: {
+        matchedBoostRuleIds: ["BOOST_FINANCE_VARIANCE"],
+        appliedBoostRuleIds: ["BOOST_FINANCE_VARIANCE"],
+        rewriteRuleIds: ["REWRITE_VARIANCE_TERMS"],
+        selectedSectionRuleId: "variance_analysis",
+        crossDocGatedReason: null,
+        classifiedDomain: "finance",
+        classifiedDocTypeId: "variance_report",
+        classificationReasons: ["keyword_match", "doc_type_hint"],
+      },
+    },
   };
 }
 
@@ -155,6 +187,20 @@ describe("Certification: turn debug packet", () => {
       failures.push("RETRIEVAL_CANDIDATES_MISSING");
     if ((packet?.retrieval?.selected || 0) < 1)
       failures.push("RETRIEVAL_SELECTED_MISSING");
+    if (!packet?.retrieval?.selectionRationale)
+      failures.push("RETRIEVAL_SELECTION_RATIONALE_MISSING");
+    if (
+      packet?.retrieval?.selectionRationale?.selectedSectionRuleId !==
+      "variance_analysis"
+    ) {
+      failures.push("RETRIEVAL_SECTION_RULE_MISSING");
+    }
+    if ((packet?.retrieval?.tableContextCoverage?.tableEvidenceCount || 0) < 1) {
+      failures.push("RETRIEVAL_TABLE_CONTEXT_COVERAGE_MISSING");
+    }
+    if ((packet?.retrieval?.evidenceSelection?.length || 0) < 1) {
+      failures.push("RETRIEVAL_EVIDENCE_SELECTION_MISSING");
+    }
     if (!packet?.provenance?.evidenceMapHash)
       failures.push("PROVENANCE_HASH_MISSING");
     if (!packet?.budget?.requestedMaxOutputTokens)
@@ -170,6 +216,13 @@ describe("Certification: turn debug packet", () => {
         allowedDocumentIdsCount: packet?.docScopeLock?.allowedDocumentIdsCount,
         retrievalCandidates: packet?.retrieval?.candidates ?? null,
         retrievalSelected: packet?.retrieval?.selected ?? null,
+        hasSelectionRationale: Boolean(packet?.retrieval?.selectionRationale),
+        selectedSectionRuleId:
+          packet?.retrieval?.selectionRationale?.selectedSectionRuleId || null,
+        tableEvidenceCount:
+          packet?.retrieval?.tableContextCoverage?.tableEvidenceCount ?? null,
+        evidenceSelectionCount:
+          packet?.retrieval?.evidenceSelection?.length ?? null,
         hasEvidenceMapHash: Boolean(packet?.provenance?.evidenceMapHash),
         hasTokenBudget:
           packet?.budget?.requestedMaxOutputTokens != null &&
@@ -181,6 +234,10 @@ describe("Certification: turn debug packet", () => {
         minAllowedDocumentIdsCount: 2,
         minRetrievalCandidates: 1,
         minRetrievalSelected: 1,
+        hasSelectionRationale: true,
+        selectedSectionRuleId: "variance_analysis",
+        minTableEvidenceCount: 1,
+        minEvidenceSelectionCount: 1,
         hasEvidenceMapHash: true,
         hasTokenBudget: true,
       },

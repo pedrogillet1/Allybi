@@ -6,7 +6,8 @@
     "languages": [
       "any",
       "en",
-      "pt"
+      "pt",
+      "es"
     ],
     "lastUpdated": "2026-03-03",
     "owner": "data-bank-governance",
@@ -85,6 +86,36 @@
       "language": "pt",
       "text": "Mostre o contexto desta secao para validar a interpretacao.",
       "query": "Mostre 2 secoes acima e abaixo da secao em {{document}}."
+    },
+    {
+      "id": "FS_007_verify_amount_es",
+      "audiences": [
+        "any"
+      ],
+      "intent": "extract",
+      "language": "es",
+      "text": "Verifica si el mismo valor aparece en otra seccion o periodo.",
+      "query": "Muestra ese valor en el periodo anterior en {{document}}."
+    },
+    {
+      "id": "FS_008_compare_doc_sides_es",
+      "audiences": [
+        "any"
+      ],
+      "intent": "compare",
+      "language": "es",
+      "text": "Compara esta metrica con otro documento y resalta solo diferencias materiales.",
+      "query": "Compara {{document}} con {{otherDocument}} para la misma metrica."
+    },
+    {
+      "id": "FS_009_expand_source_context_es",
+      "audiences": [
+        "any"
+      ],
+      "intent": "locate_content",
+      "language": "es",
+      "text": "Muestra contexto alrededor de esta seccion para validar la interpretacion.",
+      "query": "Muestra 2 secciones arriba y abajo de la seccion en {{document}}."
     }
   ],
   "rules": [
@@ -103,13 +134,13 @@
     {
       "id": "FS_003_context_followups_for_single_doc",
       "trigger": "single-doc extraction has no context expansion suggestion",
-      "check": "context.queryScope == 'singleDoc' AND output.followupSuggestions.any(s => s.id IN ['FS_005_expand_source_context','FS_006_expand_source_context_pt']) == false",
+      "check": "context.queryScope == 'singleDoc' AND output.followupSuggestions.any(s => s.id IN ['FS_005_expand_source_context','FS_006_expand_source_context_pt','FS_009_expand_source_context_es']) == false",
       "failureAction": "ADD_CONTEXT_EXPANSION_SUGGESTION"
     },
     {
       "id": "FS_004_localization_consistency",
       "trigger": "query language mismatches follow-up suggestion language",
-      "check": "context.userLanguage == 'pt' AND output.followupSuggestions.any(s => s.language != 'pt')",
+      "check": "(context.userLanguage == 'pt' AND output.followupSuggestions.any(s => s.language != 'pt')) OR (context.userLanguage == 'es' AND output.followupSuggestions.any(s => s.language != 'es'))",
       "failureAction": "LOCALIZE_FOLLOWUP_SUGGESTIONS"
     },
     {

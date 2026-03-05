@@ -2,7 +2,13 @@ import { describe, expect, test } from "@jest/globals";
 
 import { RetrievalEngineService } from "../../services/core/retrieval/retrievalEngine.service";
 
-function makeHeuristicTableEngine(): RetrievalEngineService {
+type HeuristicEngineRunner = (
+  snippet: string,
+  tableExpected: boolean,
+  explicitTable?: { header: string[]; rows: Array<Array<string | number>> },
+) => Promise<any>;
+
+function makeHeuristicTableEngine(): HeuristicEngineRunner {
   const banks: Record<string, unknown> = {
     semantic_search_config: {
       config: {
@@ -47,7 +53,11 @@ function makeHeuristicTableEngine(): RetrievalEngineService {
     },
   };
 
-  return (snippet: string, tableExpected: boolean) => {
+  return (
+    snippet: string,
+    tableExpected: boolean,
+    explicitTable?: { header: string[]; rows: Array<Array<string | number>> },
+  ) => {
     const bankLoader = {
       getBank<T = unknown>(bankId: string): T {
         const resolved = banks[bankId];
@@ -71,6 +81,7 @@ function makeHeuristicTableEngine(): RetrievalEngineService {
           docId: "doc-1",
           location: { page: 1 },
           snippet,
+          table: explicitTable,
           score: 0.95,
           locationKey: "d:doc-1|p:1|c:1",
           chunkId: "chunk-1",
@@ -99,29 +110,35 @@ function makeHeuristicTableEngine(): RetrievalEngineService {
 describe("Certification: heuristic table reparse guard", () => {
   const runEngine = makeHeuristicTableEngine();
 
-  test("heuristic table parse preserves currency symbols in cell values", async () => {
+  test("tableExpected never reconstructs table payload from plain snippet", async () => {
     const snippet = "Metric\tQ1\tQ2\nRevenue\t$1,250\t$2,300\nCost\t$800\t$900";
     const pack = await runEngine(snippet, true);
-    const tableEvidence = pack.evidence.find((e) => e.table);
-    if (tableEvidence?.table?.rows) {
-      const firstDataCell = String(tableEvidence.table.rows[0][1]);
-      expect(firstDataCell).toContain("$");
-    }
-  });
-
-  test("comma-delimited text is NOT parsed as a table (too noisy)", async () => {
-    const snippet = "Name,Amount,Date\nRevenue,$1,250,Jan\nCost,$800,Feb";
-    const pack = await runEngine(snippet, true);
-    // Comma is no longer a valid delimiter, so no table should be produced
     const tableEvidence = pack.evidence.find((e) => e.table);
     expect(tableEvidence?.table).toBeFalsy();
   });
 
-  test("pipe-delimited text is still parsed as a table", async () => {
+  test("comma-delimited text is not parsed as table evidence", async () => {
+    const snippet = "Name,Amount,Date\nRevenue,$1,250,Jan\nCost,$800,Feb";
+    const pack = await runEngine(snippet, true);
+    const tableEvidence = pack.evidence.find((e) => e.table);
+    expect(tableEvidence?.table).toBeFalsy();
+  });
+
+  test("pipe-delimited text is not parsed heuristically either", async () => {
     const snippet = "Metric | Q1 | Q2\nRevenue | 1250 | 2300\nCost | 800 | 900";
     const pack = await runEngine(snippet, true);
     const tableEvidence = pack.evidence.find((e) => e.table);
+    expect(tableEvidence?.table).toBeFalsy();
+  });
+
+  test("structured table payload is preserved when extractor provides it", async () => {
+    const pack = await runEngine("Revenue table", true, {
+      header: ["Metric", "Q1"],
+      rows: [["Revenue", "$1,250"]],
+    });
+    const tableEvidence = pack.evidence.find((e) => e.table);
     expect(tableEvidence?.table).toBeDefined();
-    expect(tableEvidence!.table!.header!.length).toBeGreaterThanOrEqual(2);
+    expect(tableEvidence?.table?.header).toEqual(["Metric", "Q1"]);
+    expect(tableEvidence?.table?.rows?.[0]?.[1]).toBe("$1,250");
   });
 });

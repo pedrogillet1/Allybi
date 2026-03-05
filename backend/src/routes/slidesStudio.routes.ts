@@ -23,6 +23,23 @@ function asString(v: unknown): string | undefined {
   return typeof v === "string" && v.trim() ? v.trim() : undefined;
 }
 
+function isProtectedRuntimeEnv(
+  nodeEnv: string | undefined = process.env.NODE_ENV,
+): boolean {
+  const normalized = String(nodeEnv || "")
+    .trim()
+    .toLowerCase();
+  return normalized === "production" || normalized === "staging";
+}
+
+function allowOverwriteInProtectedEnv(
+  rawValue: string | undefined = process.env.KODA_EDITING_ALLOW_OVERWRITE_PROTECTED,
+): boolean {
+  return String(rawValue || "")
+    .trim()
+    .toLowerCase() === "true";
+}
+
 function safeJsonParseObject(value: unknown): Record<string, any> {
   if (typeof value !== "string" || !value.trim()) return {};
   try {
@@ -1197,6 +1214,17 @@ router.post("/export", async (req: any, res: Response): Promise<void> => {
     const mode = String(req.body?.mode || "revision")
       .trim()
       .toLowerCase();
+    if (
+      mode === "overwrite" &&
+      isProtectedRuntimeEnv() &&
+      !allowOverwriteInProtectedEnv()
+    ) {
+      res.status(403).json({
+        error:
+          "Overwrite export is disabled in protected environments. Use revision mode or explicitly set KODA_EDITING_ALLOW_OVERWRITE_PROTECTED=true.",
+      });
+      return;
+    }
     const pptxBytes = await slidesClient.exportPresentationToPptx(
       presentationId,
       {

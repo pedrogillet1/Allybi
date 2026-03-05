@@ -1168,6 +1168,9 @@ function resolveQualityGateSeverity(
   if (!normalized) return "warn";
   if (severityByName[normalized]) return severityByName[normalized];
   if (DEFAULT_BLOCKING_QUALITY_GATES.has(normalized)) return "block";
+  if (normalized === "doc_grounding_minimums") return "block";
+  if (normalized === "hallucination_risk") return "block";
+  if (normalized.startsWith("numeric_integrity")) return "block";
   if (normalized.startsWith("redaction_")) return "block";
   if (normalized.startsWith("medical_")) return "block";
   return "warn";
@@ -1256,10 +1259,19 @@ function shouldForceStrictGovernanceFailClosed(): boolean {
   const runtimeEnv = String(process.env.RUNTIME_ENV || process.env.APP_ENV || "")
     .trim()
     .toLowerCase();
+  const certProfile = String(process.env.CERT_PROFILE || "")
+    .trim()
+    .toLowerCase();
+  const strictCertProfile =
+    certProfile === "ci" ||
+    certProfile === "release" ||
+    certProfile === "retrieval_signoff" ||
+    certProfile === "local_hard";
   const protectedEnv =
     nodeEnv === "production" ||
     runtimeEnv === "production" ||
-    runtimeEnv === "staging";
+    runtimeEnv === "staging" ||
+    strictCertProfile;
 
   const explicit = String(process.env.CHAT_RUNTIME_STRICT_GOVERNANCE || "")
     .trim()
@@ -4191,9 +4203,15 @@ export class CentralizedChatRuntimeDelegate {
     // 2. Run quality gates (format checks, brevity, markdown sanity)
     let qualityGateIssues: string[] = [];
     let qualityGates: ChatQualityGateState = { allPassed: true, failed: [] };
+    const isTestEnv =
+      String(process.env.NODE_ENV || "")
+        .trim()
+        .toLowerCase() === "test";
     const enforceQualityGates = shouldForceStrictGovernanceFailClosed()
       ? true
-      : isRuntimeFlagEnabled("QUALITY_GATES_ENFORCING", true);
+      : isTestEnv
+        ? isRuntimeFlagEnabled("QUALITY_GATES_ENFORCING", true)
+        : true;
     if (!enforceQualityGates) {
       this.emitGovernanceMetric({
         traceId,
@@ -4213,9 +4231,17 @@ export class CentralizedChatRuntimeDelegate {
       const contextSignals = asObject(
         (params.req.context as Record<string, unknown> | null)?.signals ?? null,
       );
+      const retrievalSummaryForGates = asObject(
+        asObject(asObject(params.retrievalPack).telemetry).summary,
+      );
+      const classifiedDomainForGates =
+        String(retrievalSummaryForGates.classifiedDomain || "")
+          .trim()
+          .toLowerCase() || undefined;
       const gateCtx: QualityGateContext = {
         answerMode: params.answerMode,
         answerClass: params.answerClass,
+        domainHint: classifiedDomainForGates,
         operator: String((params.req.meta as any)?.operator || "")
           .trim()
           .toLowerCase(),
@@ -4477,10 +4503,7 @@ export class CentralizedChatRuntimeDelegate {
           reasonCode: enforced.enforcement.reasonCode,
         });
         const reasonCode = enforced.enforcement.reasonCode;
-        const failureMode = resolveRuntimeFailureMode(
-          reasonCode,
-          failSoftWarningsEnabled,
-        );
+        const failureMode: RuntimeFailureMode = "fail_closed";
         if (
           String(reasonCode).trim().toLowerCase() === "nav_pills_missing_buttons"
         ) {
@@ -4492,7 +4515,7 @@ export class CentralizedChatRuntimeDelegate {
             reasonCode,
             gateName: "nav_pills_missing_buttons",
             violationType: "nav_pills_missing_buttons",
-            blocked: failureMode === "fail_closed",
+            blocked: true,
           });
         }
         this.emitGovernanceMetric({
@@ -4503,26 +4526,15 @@ export class CentralizedChatRuntimeDelegate {
           reasonCode,
           gateName: reasonCode,
           failureMode,
-          enforced: failureMode === "fail_closed",
-          blocked: failureMode === "fail_closed",
+          enforced: true,
+          blocked: true,
         });
-        if (failureMode === "fail_closed") {
-          failureCode = reasonCode;
-          text = buildEmptyAssistantText({
-            language: params.req.preferredLanguage,
-            reasonCode,
-            seed: `${params.req.userId}:enforcer:${reasonCode}`,
-          });
-        } else {
-          if (String(enforced.content || "").trim()) {
-            text = enforced.content;
-          }
-          addWarning({
-            code: reasonCode,
-            source: "enforcer",
-            severity: "warning",
-          });
-        }
+        failureCode = reasonCode;
+        text = buildEmptyAssistantText({
+          language: params.req.preferredLanguage,
+          reasonCode,
+          seed: `${params.req.userId}:enforcer:${reasonCode}`,
+        });
       } else {
         text = enforced.content;
       }
@@ -6608,6 +6620,9 @@ export class CentralizedChatRuntimeDelegate {
         fallbackType: decision.fallbackType,
         routerAction: decision.routerAction,
         routerTelemetryReason: decision.routerTelemetryReason,
+        fallbackProvider: decision.fallbackProvider,
+        fallbackModelKey: decision.fallbackModelKey,
+        retryPolicy: decision.retryPolicy,
         userFacingReasonCode: userFacingReasonCode || null,
         suppressedForPrompt: suppressPromptFallback,
         suppressionReason:

@@ -5,7 +5,12 @@
 
 import { createHash, randomUUID } from "crypto";
 import prisma from "../config/database";
-import { downloadFile, getSignedUrl, uploadFile } from "../config/storage";
+import {
+  deleteFile,
+  downloadFile,
+  getSignedUrl,
+  uploadFile,
+} from "../config/storage";
 import { addDocumentJob } from "../queues/document.queue";
 import { documentQueue } from "../queues/queueConfig";
 import { env } from "../config/env";
@@ -14,6 +19,7 @@ import {
   publishExtractJob,
 } from "./jobs/pubsubPublisher.service";
 import { documentContentVault } from "./documents/documentContentVault.service";
+import { VISIBLE_DOCUMENT_FILTER } from "./documents/documentVisibilityFilter";
 import type {
   DocumentService,
   DocumentRecord,
@@ -109,6 +115,19 @@ function toRecord(doc: any): DocumentRecord {
 
 type DocumentCursor = { id: string; updatedAt: Date };
 
+function assertValidUserStorageKey(userId: string, storageKey: string): void {
+  const key = String(storageKey || "").trim();
+  if (!key) throw new Error("storageKey is required");
+  const expectedPrefix = `users/${userId}/docs/`;
+  if (!key.startsWith(expectedPrefix)) {
+    throw new Error("Invalid storage key scope");
+  }
+  const segments = key.split("/");
+  if (segments.some((seg) => seg === "." || seg === ".." || seg.length === 0)) {
+    throw new Error("Invalid storage key path");
+  }
+}
+
 function encodeDocumentCursor(row: {
   id: string;
   updatedAt: Date | string;
@@ -135,6 +154,18 @@ function decodeDocumentCursor(raw: string): DocumentCursor | null {
 }
 
 export class PrismaDocumentService implements DocumentService {
+  private async assertOwnedFolder(
+    userId: string,
+    folderId?: string | null,
+  ): Promise<void> {
+    if (!folderId) return;
+    const folder = await prisma.folder.findFirst({
+      where: { id: folderId, userId, isDeleted: false },
+      select: { id: true },
+    });
+    if (!folder) throw new Error("Folder not found");
+  }
+
   async list(input: {
     userId: string;
     limit?: number;
@@ -143,18 +174,11 @@ export class PrismaDocumentService implements DocumentService {
     q?: string;
     docTypes?: string[];
   }): Promise<{ items: DocumentRecord[]; nextCursor?: string }> {
-    const limit = Math.min(input.limit ?? 50, 10000);
+    const limit = Math.min(input.limit ?? 50, 500);
     const filters: any[] = [
       {
         userId: input.userId,
-        // Show documents in all states (processing/ready/failed) except "skipped".
-        // This keeps the library stable while background indexing runs.
-        status: { not: "skipped" },
-        // Never show revision artifacts in the main library ("Recently Added").
-        // Revisions are internal history and should only be reachable via explicit IDs/undo flows.
-        parentVersionId: null,
-        // Hide connector-ingested artifacts (emails/slack) from the user document library.
-        encryptedFilename: { not: { contains: "/connectors/" } },
+        ...VISIBLE_DOCUMENT_FILTER,
       },
     ];
 
@@ -226,16 +250,30 @@ export class PrismaDocumentService implements DocumentService {
     userId: string;
     data: UploadInput;
   }): Promise<DocumentRecord> {
+    await this.assertOwnedFolder(input.userId, input.data.folderId ?? null);
+
     const docId = randomUUID();
     const safeName = input.data.filename.replace(
       /[^a-zA-Z0-9._\-\u00C0-\u024F\u1E00-\u1EFF]/g,
       "_",
     );
     const storageKey = `users/${input.userId}/docs/${docId}/${safeName}`;
+    const persistedStorageKey = input.data.buffer
+      ? storageKey
+      : (() => {
+          if (!input.data.storageKey) {
+            throw new Error("storageKey is required when buffer is not provided");
+          }
+          assertValidUserStorageKey(input.userId, input.data.storageKey);
+          return input.data.storageKey;
+        })();
+
+    let uploadedToStorage = false;
 
     // Upload buffer to storage (GCS/local) if provided
     if (input.data.buffer) {
       await uploadFile(storageKey, input.data.buffer, input.data.mimeType);
+      uploadedToStorage = true;
     }
 
     const fileSize = input.data.sizeBytes ?? 0;
@@ -244,40 +282,53 @@ export class PrismaDocumentService implements DocumentService {
       : `pending-${docId}`;
 
     // Create document and update user storage in a transaction
-    const doc = await prisma.$transaction(
-      async (tx) => {
-        // Create the document record
-        const document = await tx.document.create({
-          data: {
-            id: docId,
-            userId: input.userId,
-            filename: input.data.filename,
-            encryptedFilename: input.data.buffer
-              ? storageKey
-              : input.data.storageKey || input.data.filename,
-            mimeType: input.data.mimeType,
-            fileSize,
-            fileHash,
-            folderId: input.data.folderId ?? null,
-            status: "uploaded",
-            indexingState: "pending",
-            indexingUpdatedAt: new Date(),
-          },
-          include: { folder: { select: { path: true } } },
-        });
+    let doc: any;
+    try {
+      doc = await prisma.$transaction(
+        async (tx) => {
+          // Create the document record
+          const document = await tx.document.create({
+            data: {
+              id: docId,
+              userId: input.userId,
+              filename: input.data.filename,
+              encryptedFilename: persistedStorageKey,
+              mimeType: input.data.mimeType,
+              fileSize,
+              fileHash,
+              folderId: input.data.folderId ?? null,
+              status: "uploaded",
+              indexingState: "pending",
+              indexingUpdatedAt: new Date(),
+            },
+            include: { folder: { select: { path: true } } },
+          });
 
-        // Update user's storage usage
-        await tx.user.update({
-          where: { id: input.userId },
-          data: {
-            storageUsedBytes: { increment: fileSize },
-          },
-        });
+          // Update user's storage usage
+          await tx.user.update({
+            where: { id: input.userId },
+            data: {
+              storageUsedBytes: { increment: fileSize },
+            },
+          });
 
-        return document;
-      },
-      { maxWait: 10000, timeout: 60000 },
-    );
+          return document;
+        },
+        { maxWait: 10000, timeout: 60000 },
+      );
+    } catch (dbErr) {
+      if (uploadedToStorage) {
+        try {
+          await deleteFile(storageKey);
+        } catch (cleanupErr) {
+          console.warn(
+            `[PrismaDocumentService] Failed to cleanup uploaded blob after DB rollback for ${docId}:`,
+            cleanupErr,
+          );
+        }
+      }
+      throw dbErr;
+    }
 
     // Enqueue for processing (text extraction → chunking → embedding)
     try {
@@ -296,7 +347,7 @@ export class PrismaDocumentService implements DocumentService {
           userId: input.userId,
           filename: input.data.filename,
           mimeType: input.data.mimeType,
-          encryptedFilename: storageKey,
+          encryptedFilename: doc.encryptedFilename,
         });
       }
     } catch (e) {
@@ -522,6 +573,7 @@ export class PrismaDocumentService implements DocumentService {
 
     const storageKey = doc.encryptedFilename;
     if (!storageKey) throw new Error("Document has no storage key");
+    assertValidUserStorageKey(input.userId, storageKey);
 
     const buffer = await downloadFile(storageKey);
     return {
@@ -543,6 +595,7 @@ export class PrismaDocumentService implements DocumentService {
 
     const storageKey = doc.encryptedFilename;
     if (!storageKey) throw new Error("Document has no storage key");
+    assertValidUserStorageKey(input.userId, storageKey);
 
     const url = await getSignedUrl(storageKey, 3600);
     return { url, filename: doc.filename ?? "unknown" };

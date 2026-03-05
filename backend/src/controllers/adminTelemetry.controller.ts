@@ -56,6 +56,8 @@ type AdminTelemetryAppService = {
   }) => Promise<any>;
   qualityBreakdown: (params: { range: string }) => Promise<any>;
   reaskRate: (params: { range: string }) => Promise<any>;
+  truncationRate: (params: { range: string }) => Promise<any>;
+  regenerationRate: (params: { range: string }) => Promise<any>;
   llm: (params: {
     range: string;
     limit: number;
@@ -138,6 +140,115 @@ function parseCursor(input: unknown): string | undefined {
 function parseOptionalString(input: unknown): string | undefined {
   const v = String(input ?? "").trim();
   return v || undefined;
+}
+
+type LiveEventCategory = "retrieval" | "llm" | "security" | "files" | "system";
+type LiveEventSeverity = "low" | "medium" | "high" | "critical";
+
+type LiveTelemetryEvent = {
+  id: string;
+  timestamp: string;
+  category: LiveEventCategory;
+  type: string;
+  severity: LiveEventSeverity;
+  summary: string;
+  correlationId: string | null;
+  userId: string | null;
+  data: Record<string, unknown>;
+};
+
+const LIVE_EVENT_CATEGORIES = new Set<LiveEventCategory>([
+  "retrieval",
+  "llm",
+  "security",
+  "files",
+  "system",
+]);
+
+function parseLiveCategoryFilter(input: unknown): Set<LiveEventCategory> {
+  const raw = String(input ?? "")
+    .split(",")
+    .map((value) => value.trim().toLowerCase())
+    .filter(Boolean);
+  const out = new Set<LiveEventCategory>();
+  for (const value of raw) {
+    if (LIVE_EVENT_CATEGORIES.has(value as LiveEventCategory)) {
+      out.add(value as LiveEventCategory);
+    }
+  }
+  return out;
+}
+
+function normalizeIsoTimestamp(input: unknown): string {
+  const value = String(input || "").trim();
+  const parsed = Date.parse(value);
+  if (Number.isFinite(parsed)) return new Date(parsed).toISOString();
+  return new Date().toISOString();
+}
+
+function buildLiveTelemetryEvent(item: unknown): LiveTelemetryEvent | null {
+  if (!item || typeof item !== "object") return null;
+  const safe = item as Record<string, unknown>;
+  const traceId = String(safe.traceId || safe.id || "").trim();
+  if (!traceId) return null;
+
+  const queryText = String(safe.query || "").trim();
+  const totalLatencyMsRaw = Number(safe.totalLatencyMs);
+  const retrievalMsRaw = Number(safe.retrievalMs);
+  const llmMsRaw = Number(safe.llmMs);
+  const totalTokensRaw = Number(safe.totalTokens);
+  const totalCostRaw = Number(safe.totalCost);
+  const evidenceStrengthRaw = Number(safe.evidenceStrength);
+  const sourcesCountRaw = Number(safe.sourcesCount);
+  const totalLatencyMs = Number.isFinite(totalLatencyMsRaw) ? totalLatencyMsRaw : 0;
+  const retrievalMs = Number.isFinite(retrievalMsRaw) ? retrievalMsRaw : null;
+  const llmMs = Number.isFinite(llmMsRaw) ? llmMsRaw : null;
+  const totalTokens = Number.isFinite(totalTokensRaw) ? totalTokensRaw : null;
+  const totalCost = Number.isFinite(totalCostRaw) ? totalCostRaw : null;
+  const evidenceStrength = Number.isFinite(evidenceStrengthRaw)
+    ? evidenceStrengthRaw
+    : null;
+  const sourcesCount = Number.isFinite(sourcesCountRaw)
+    ? Math.max(0, Math.floor(sourcesCountRaw))
+    : null;
+  const hasProviders =
+    Array.isArray(safe.providers) && safe.providers.filter(Boolean).length > 0;
+  const hadFallback = Boolean(safe.hadFallback);
+  const category: LiveEventCategory = hasProviders ? "llm" : "retrieval";
+  const severity: LiveEventSeverity = hadFallback
+    ? "medium"
+    : totalLatencyMs >= 5000
+      ? "high"
+      : "low";
+  const timestamp = normalizeIsoTimestamp(safe.createdAt);
+
+  return {
+    id: `live:${traceId}:${timestamp}`,
+    timestamp,
+    category,
+    type: "query.telemetry",
+    severity,
+    summary: queryText || "Query telemetry event",
+    correlationId: traceId,
+    userId: String(safe.userId || "").trim() || null,
+    data: {
+      traceId,
+      query: queryText,
+      domain: String(safe.domain || "unknown"),
+      intent: String(safe.intent || "unknown"),
+      totalMs: Number.isFinite(totalLatencyMs) ? totalLatencyMs : 0,
+      retrievalMs,
+      llmMs,
+      totalTokens,
+      totalCost,
+      evidenceStrength,
+      sourcesCount,
+      evidenceGateAction: String(safe.evidenceGateAction || "").trim() || null,
+      hadFallback,
+      fallbackReason: safe.fallbackReason ?? null,
+      source: "queryTelemetry",
+    },
+  };
 }
 
 // ============================================================================
@@ -589,6 +700,36 @@ export async function adminTelemetryReaskRate(
   }
 }
 
+export async function adminTelemetryTruncationRate(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const svc = getSvc(req);
+    const range = parseRange(req.query.range, "7d");
+    const data = await svc.truncationRate({ range });
+    res.json({ ok: true, range, data });
+  } catch (e) {
+    next(e);
+  }
+}
+
+export async function adminTelemetryRegenerationRate(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const svc = getSvc(req);
+    const range = parseRange(req.query.range, "7d");
+    const data = await svc.regenerationRate({ range });
+    res.json({ ok: true, range, data });
+  } catch (e) {
+    next(e);
+  }
+}
+
 // ============================================================================
 // LLM / COST
 // ============================================================================
@@ -808,6 +949,70 @@ export async function adminTelemetryLiveFeed(
   res: Response,
   _next: NextFunction,
 ) {
+  const svc = getSvc(req);
+  const range = parseRange(req.query.range, "1d");
+  const limit = parseLimit(req.query.limit, 25);
+  const categoryFilter = parseLiveCategoryFilter(req.query.types);
+  const seenEventIds = new Set<string>();
+  const seenQueue: string[] = [];
+  const maxSeen = 1000;
+  let closed = false;
+  let polling = false;
+
+  function markSeen(eventId: string): void {
+    if (seenEventIds.has(eventId)) return;
+    seenEventIds.add(eventId);
+    seenQueue.push(eventId);
+    while (seenQueue.length > maxSeen) {
+      const oldest = seenQueue.shift();
+      if (oldest) seenEventIds.delete(oldest);
+    }
+  }
+
+  async function emitRecentEvents(): Promise<void> {
+    if (closed || polling) return;
+    polling = true;
+    try {
+      const data = await svc.queries({ range, limit });
+      const items = Array.isArray(data?.items)
+        ? (data.items as unknown[])
+        : [];
+      const events = items
+        .map((item) => buildLiveTelemetryEvent(item))
+        .filter((event): event is LiveTelemetryEvent => event != null)
+        .reverse();
+
+      for (const event of events) {
+        if (
+          categoryFilter.size > 0 &&
+          !categoryFilter.has(event.category)
+        ) {
+          continue;
+        }
+        if (seenEventIds.has(event.id)) continue;
+        markSeen(event.id);
+        res.write(`event: telemetry\ndata: ${JSON.stringify(event)}\n\n`);
+      }
+    } catch (error) {
+      const fallbackEvent: LiveTelemetryEvent = {
+        id: `live:error:${Date.now()}`,
+        timestamp: new Date().toISOString(),
+        category: "system",
+        type: "stream.error",
+        severity: "high",
+        summary: "Live telemetry stream fetch failed",
+        correlationId: null,
+        userId: null,
+        data: {
+          error: error instanceof Error ? error.message : String(error),
+        },
+      };
+      res.write(`event: telemetry\ndata: ${JSON.stringify(fallbackEvent)}\n\n`);
+    } finally {
+      polling = false;
+    }
+  }
+
   // Set SSE headers
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache");
@@ -817,7 +1022,7 @@ export async function adminTelemetryLiveFeed(
 
   // Send initial connection event
   res.write(
-    `event: connected\ndata: ${JSON.stringify({ connected: true, timestamp: new Date().toISOString() })}\n\n`,
+    `event: connected\ndata: ${JSON.stringify({ connected: true, timestamp: new Date().toISOString(), source: "queryTelemetry" })}\n\n`,
   );
 
   // Keep-alive ping every 30 seconds
@@ -827,22 +1032,14 @@ export async function adminTelemetryLiveFeed(
     );
   }, 30000);
 
-  // In a real implementation, you would subscribe to a message queue or pub/sub
-  // For now, we'll send simulated events
   const eventInterval = setInterval(() => {
-    const eventTypes = ["query", "llm", "retrieval", "ingestion", "error"];
-    const event = {
-      id: `evt_${Date.now()}`,
-      type: eventTypes[Math.floor(Math.random() * eventTypes.length)],
-      timestamp: new Date().toISOString(),
-      summary: "Live event",
-      details: {},
-    };
-    res.write(`event: telemetry\ndata: ${JSON.stringify(event)}\n\n`);
+    void emitRecentEvents();
   }, 5000);
+  void emitRecentEvents();
 
   // Cleanup on close
   req.on("close", () => {
+    closed = true;
     clearInterval(pingInterval);
     clearInterval(eventInterval);
     res.end();

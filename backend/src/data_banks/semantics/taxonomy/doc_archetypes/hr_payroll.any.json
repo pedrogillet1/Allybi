@@ -59,20 +59,35 @@
       ],
       "expectedTableFamilies": [
         "Pay Stub line-item table",
-        "Pay Stub summary matrix"
+        "Pay Stub summary matrix",
+        "Pay Stub line items",
+        "Pay Stub itens",
+        "Pay Stub summary",
+        "Pay Stub resumo"
       ],
       "fieldFamilies": [
         "Primary identifiers",
         "Dates and periods",
-        "Amounts and statuses"
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
       ],
       "redFlags": [
         "Missing mandatory section anchors",
-        "Conflicting summary totals"
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
       ],
       "missingQuestions": [
         "Which pay stub variant should be prioritized?",
-        "Should extraction prefer header metadata or detailed section data?"
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Pay Stub variant should be prioritized?",
+        "Qual variante de Pay Stub deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
       ]
     },
     {
@@ -112,20 +127,35 @@
       ],
       "expectedTableFamilies": [
         "Timesheet line-item table",
-        "Timesheet summary matrix"
+        "Timesheet summary matrix",
+        "Timesheet line items",
+        "Timesheet itens",
+        "Timesheet summary",
+        "Timesheet resumo"
       ],
       "fieldFamilies": [
         "Primary identifiers",
         "Dates and periods",
-        "Amounts and statuses"
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
       ],
       "redFlags": [
         "Missing mandatory section anchors",
-        "Conflicting summary totals"
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
       ],
       "missingQuestions": [
         "Which timesheet variant should be prioritized?",
-        "Should extraction prefer header metadata or detailed section data?"
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Timesheet variant should be prioritized?",
+        "Qual variante de Timesheet deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
       ]
     },
     {
@@ -165,20 +195,951 @@
       ],
       "expectedTableFamilies": [
         "Benefits Enrollment Summary line-item table",
-        "Benefits Enrollment Summary summary matrix"
+        "Benefits Enrollment Summary summary matrix",
+        "Benefits Enrollment Summary line items",
+        "Benefits Enrollment Summary itens",
+        "Benefits Enrollment Summary summary",
+        "Benefits Enrollment Summary resumo"
       ],
       "fieldFamilies": [
         "Primary identifiers",
         "Dates and periods",
-        "Amounts and statuses"
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
       ],
       "redFlags": [
         "Missing mandatory section anchors",
-        "Conflicting summary totals"
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
       ],
       "missingQuestions": [
         "Which benefits enrollment summary variant should be prioritized?",
-        "Should extraction prefer header metadata or detailed section data?"
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Benefits Enrollment Summary variant should be prioritized?",
+        "Qual variante de Benefits Enrollment Summary deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "hr_employment_verification_letter",
+      "label": "Employment Verification Letter",
+      "expectedSections": [
+        "Header",
+        "Cabeçalho",
+        "Issuer Profile",
+        "Perfil do Emissor",
+        "Recipient Profile",
+        "Perfil do Destinatario",
+        "Account or Reference",
+        "Conta ou Referencia",
+        "Period or Schedule",
+        "Período ou Agenda",
+        "Line Items or Events",
+        "Itens ou Eventos"
+      ],
+      "headings": [
+        "statement",
+        "document",
+        "header",
+        "issuer",
+        "provider",
+        "organization",
+        "emitente",
+        "recipient",
+        "holder",
+        "student",
+        "employee",
+        "destinatario",
+        "account",
+        "reference",
+        "numero",
+        "id"
+      ],
+      "expectedTableFamilies": [
+        "Pay Stub line-item table",
+        "Pay Stub summary matrix",
+        "Employment Verification Letter line items",
+        "Employment Verification Letter itens",
+        "Employment Verification Letter summary",
+        "Employment Verification Letter resumo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
+      ],
+      "missingQuestions": [
+        "Which pay stub variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Employment Verification Letter variant should be prioritized?",
+        "Qual variante de Employment Verification Letter deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "hr_expense_report",
+      "label": "Expense Report",
+      "expectedSections": [
+        "Header",
+        "Cabeçalho",
+        "Issuer Profile",
+        "Perfil do Emissor",
+        "Recipient Profile",
+        "Perfil do Destinatario",
+        "Account or Reference",
+        "Conta ou Referencia",
+        "Period or Schedule",
+        "Período ou Agenda",
+        "Line Items or Events",
+        "Itens ou Eventos"
+      ],
+      "headings": [
+        "statement",
+        "document",
+        "header",
+        "issuer",
+        "provider",
+        "organization",
+        "emitente",
+        "recipient",
+        "holder",
+        "student",
+        "employee",
+        "destinatario",
+        "account",
+        "reference",
+        "numero",
+        "id"
+      ],
+      "expectedTableFamilies": [
+        "Pay Stub line-item table",
+        "Pay Stub summary matrix",
+        "Expense Report line items",
+        "Expense Report itens",
+        "Expense Report summary",
+        "Expense Report resumo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
+      ],
+      "missingQuestions": [
+        "Which pay stub variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Expense Report variant should be prioritized?",
+        "Qual variante de Expense Report deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "hr_payroll_benefit_change_notice",
+      "label": "Benefit Change Notice",
+      "expectedSections": [
+        "Supplement Hr Payroll 01 Header",
+        "Cabecalho Supplement Hr Payroll 01",
+        "Supplement Hr Payroll 01 Parties",
+        "Partes Supplement Hr Payroll 01",
+        "Supplement Hr Payroll 01 Timeline",
+        "Linha do tempo Supplement Hr Payroll 01"
+      ],
+      "headings": [
+        "supplement hr payroll 01",
+        "hr payroll supplement 01",
+        "hr_payroll",
+        "hr_payroll summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Hr Payroll 01 line items",
+        "Supplement Hr Payroll 01 itens",
+        "Supplement Hr Payroll 01 summary",
+        "Supplement Hr Payroll 01 resumo",
+        "Supplement Hr Payroll 01 balance",
+        "Supplement Hr Payroll 01 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Hr Payroll 01 variant should be prioritized?",
+        "Qual variante de Supplement Hr Payroll 01 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "hr_payroll_payroll_exception_note",
+      "label": "Payroll Exception Note",
+      "expectedSections": [
+        "Supplement Hr Payroll 02 Header",
+        "Cabecalho Supplement Hr Payroll 02",
+        "Supplement Hr Payroll 02 Parties",
+        "Partes Supplement Hr Payroll 02",
+        "Supplement Hr Payroll 02 Timeline",
+        "Linha do tempo Supplement Hr Payroll 02"
+      ],
+      "headings": [
+        "supplement hr payroll 02",
+        "hr payroll supplement 02",
+        "hr_payroll",
+        "hr_payroll summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Hr Payroll 02 line items",
+        "Supplement Hr Payroll 02 itens",
+        "Supplement Hr Payroll 02 summary",
+        "Supplement Hr Payroll 02 resumo",
+        "Supplement Hr Payroll 02 balance",
+        "Supplement Hr Payroll 02 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Hr Payroll 02 variant should be prioritized?",
+        "Qual variante de Supplement Hr Payroll 02 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "hr_payroll_timesheet_adjustment_notice",
+      "label": "Timesheet Adjustment Notice",
+      "expectedSections": [
+        "Supplement Hr Payroll 03 Header",
+        "Cabecalho Supplement Hr Payroll 03",
+        "Supplement Hr Payroll 03 Parties",
+        "Partes Supplement Hr Payroll 03",
+        "Supplement Hr Payroll 03 Timeline",
+        "Linha do tempo Supplement Hr Payroll 03"
+      ],
+      "headings": [
+        "supplement hr payroll 03",
+        "hr payroll supplement 03",
+        "hr_payroll",
+        "hr_payroll summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Hr Payroll 03 line items",
+        "Supplement Hr Payroll 03 itens",
+        "Supplement Hr Payroll 03 summary",
+        "Supplement Hr Payroll 03 resumo",
+        "Supplement Hr Payroll 03 balance",
+        "Supplement Hr Payroll 03 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Hr Payroll 03 variant should be prioritized?",
+        "Qual variante de Supplement Hr Payroll 03 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "hr_payroll_tax_withholding_update",
+      "label": "Tax Withholding Update",
+      "expectedSections": [
+        "Supplement Hr Payroll 04 Header",
+        "Cabecalho Supplement Hr Payroll 04",
+        "Supplement Hr Payroll 04 Parties",
+        "Partes Supplement Hr Payroll 04",
+        "Supplement Hr Payroll 04 Timeline",
+        "Linha do tempo Supplement Hr Payroll 04"
+      ],
+      "headings": [
+        "supplement hr payroll 04",
+        "hr payroll supplement 04",
+        "hr_payroll",
+        "hr_payroll summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Hr Payroll 04 line items",
+        "Supplement Hr Payroll 04 itens",
+        "Supplement Hr Payroll 04 summary",
+        "Supplement Hr Payroll 04 resumo",
+        "Supplement Hr Payroll 04 balance",
+        "Supplement Hr Payroll 04 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Hr Payroll 04 variant should be prioritized?",
+        "Qual variante de Supplement Hr Payroll 04 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "hr_payroll_compensation_revision_notice",
+      "label": "Compensation Revision Notice",
+      "expectedSections": [
+        "Supplement Hr Payroll 05 Header",
+        "Cabecalho Supplement Hr Payroll 05",
+        "Supplement Hr Payroll 05 Parties",
+        "Partes Supplement Hr Payroll 05",
+        "Supplement Hr Payroll 05 Timeline",
+        "Linha do tempo Supplement Hr Payroll 05"
+      ],
+      "headings": [
+        "supplement hr payroll 05",
+        "hr payroll supplement 05",
+        "hr_payroll",
+        "hr_payroll summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Hr Payroll 05 line items",
+        "Supplement Hr Payroll 05 itens",
+        "Supplement Hr Payroll 05 summary",
+        "Supplement Hr Payroll 05 resumo",
+        "Supplement Hr Payroll 05 balance",
+        "Supplement Hr Payroll 05 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Hr Payroll 05 variant should be prioritized?",
+        "Qual variante de Supplement Hr Payroll 05 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "hr_payroll_leave_balance_note",
+      "label": "Leave Balance Note",
+      "expectedSections": [
+        "Supplement Hr Payroll 06 Header",
+        "Cabecalho Supplement Hr Payroll 06",
+        "Supplement Hr Payroll 06 Parties",
+        "Partes Supplement Hr Payroll 06",
+        "Supplement Hr Payroll 06 Timeline",
+        "Linha do tempo Supplement Hr Payroll 06"
+      ],
+      "headings": [
+        "supplement hr payroll 06",
+        "hr payroll supplement 06",
+        "hr_payroll",
+        "hr_payroll summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Hr Payroll 06 line items",
+        "Supplement Hr Payroll 06 itens",
+        "Supplement Hr Payroll 06 summary",
+        "Supplement Hr Payroll 06 resumo",
+        "Supplement Hr Payroll 06 balance",
+        "Supplement Hr Payroll 06 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Hr Payroll 06 variant should be prioritized?",
+        "Qual variante de Supplement Hr Payroll 06 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "hr_payroll_reimbursement_status_note",
+      "label": "Reimbursement Status Note",
+      "expectedSections": [
+        "Supplement Hr Payroll 07 Header",
+        "Cabecalho Supplement Hr Payroll 07",
+        "Supplement Hr Payroll 07 Parties",
+        "Partes Supplement Hr Payroll 07",
+        "Supplement Hr Payroll 07 Timeline",
+        "Linha do tempo Supplement Hr Payroll 07"
+      ],
+      "headings": [
+        "supplement hr payroll 07",
+        "hr payroll supplement 07",
+        "hr_payroll",
+        "hr_payroll summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Hr Payroll 07 line items",
+        "Supplement Hr Payroll 07 itens",
+        "Supplement Hr Payroll 07 summary",
+        "Supplement Hr Payroll 07 resumo",
+        "Supplement Hr Payroll 07 balance",
+        "Supplement Hr Payroll 07 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Hr Payroll 07 variant should be prioritized?",
+        "Qual variante de Supplement Hr Payroll 07 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "hr_payroll_employment_status_update",
+      "label": "Employment Status Update",
+      "expectedSections": [
+        "Supplement Hr Payroll 08 Header",
+        "Cabecalho Supplement Hr Payroll 08",
+        "Supplement Hr Payroll 08 Parties",
+        "Partes Supplement Hr Payroll 08",
+        "Supplement Hr Payroll 08 Timeline",
+        "Linha do tempo Supplement Hr Payroll 08"
+      ],
+      "headings": [
+        "supplement hr payroll 08",
+        "hr payroll supplement 08",
+        "hr_payroll",
+        "hr_payroll summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Hr Payroll 08 line items",
+        "Supplement Hr Payroll 08 itens",
+        "Supplement Hr Payroll 08 summary",
+        "Supplement Hr Payroll 08 resumo",
+        "Supplement Hr Payroll 08 balance",
+        "Supplement Hr Payroll 08 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Hr Payroll 08 variant should be prioritized?",
+        "Qual variante de Supplement Hr Payroll 08 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "hr_payroll_bonus_adjustment_notice",
+      "label": "Bonus Adjustment Notice",
+      "expectedSections": [
+        "Supplement Hr Payroll 09 Header",
+        "Cabecalho Supplement Hr Payroll 09",
+        "Supplement Hr Payroll 09 Parties",
+        "Partes Supplement Hr Payroll 09",
+        "Supplement Hr Payroll 09 Timeline",
+        "Linha do tempo Supplement Hr Payroll 09"
+      ],
+      "headings": [
+        "supplement hr payroll 09",
+        "hr payroll supplement 09",
+        "hr_payroll",
+        "hr_payroll summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Hr Payroll 09 line items",
+        "Supplement Hr Payroll 09 itens",
+        "Supplement Hr Payroll 09 summary",
+        "Supplement Hr Payroll 09 resumo",
+        "Supplement Hr Payroll 09 balance",
+        "Supplement Hr Payroll 09 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Hr Payroll 09 variant should be prioritized?",
+        "Qual variante de Supplement Hr Payroll 09 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "hr_payroll_deduction_change_notice",
+      "label": "Deduction Change Notice",
+      "expectedSections": [
+        "Supplement Hr Payroll 10 Header",
+        "Cabecalho Supplement Hr Payroll 10",
+        "Supplement Hr Payroll 10 Parties",
+        "Partes Supplement Hr Payroll 10",
+        "Supplement Hr Payroll 10 Timeline",
+        "Linha do tempo Supplement Hr Payroll 10"
+      ],
+      "headings": [
+        "supplement hr payroll 10",
+        "hr payroll supplement 10",
+        "hr_payroll",
+        "hr_payroll summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Hr Payroll 10 line items",
+        "Supplement Hr Payroll 10 itens",
+        "Supplement Hr Payroll 10 summary",
+        "Supplement Hr Payroll 10 resumo",
+        "Supplement Hr Payroll 10 balance",
+        "Supplement Hr Payroll 10 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Hr Payroll 10 variant should be prioritized?",
+        "Qual variante de Supplement Hr Payroll 10 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "hr_payroll_policy_acknowledgment_note",
+      "label": "Policy Acknowledgment Note",
+      "expectedSections": [
+        "Supplement Hr Payroll 11 Header",
+        "Cabecalho Supplement Hr Payroll 11",
+        "Supplement Hr Payroll 11 Parties",
+        "Partes Supplement Hr Payroll 11",
+        "Supplement Hr Payroll 11 Timeline",
+        "Linha do tempo Supplement Hr Payroll 11"
+      ],
+      "headings": [
+        "supplement hr payroll 11",
+        "hr payroll supplement 11",
+        "hr_payroll",
+        "hr_payroll summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Hr Payroll 11 line items",
+        "Supplement Hr Payroll 11 itens",
+        "Supplement Hr Payroll 11 summary",
+        "Supplement Hr Payroll 11 resumo",
+        "Supplement Hr Payroll 11 balance",
+        "Supplement Hr Payroll 11 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Hr Payroll 11 variant should be prioritized?",
+        "Qual variante de Supplement Hr Payroll 11 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "hr_payroll_pay_cycle_notice",
+      "label": "Pay Cycle Notice",
+      "expectedSections": [
+        "Supplement Hr Payroll 12 Header",
+        "Cabecalho Supplement Hr Payroll 12",
+        "Supplement Hr Payroll 12 Parties",
+        "Partes Supplement Hr Payroll 12",
+        "Supplement Hr Payroll 12 Timeline",
+        "Linha do tempo Supplement Hr Payroll 12"
+      ],
+      "headings": [
+        "supplement hr payroll 12",
+        "hr payroll supplement 12",
+        "hr_payroll",
+        "hr_payroll summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Hr Payroll 12 line items",
+        "Supplement Hr Payroll 12 itens",
+        "Supplement Hr Payroll 12 summary",
+        "Supplement Hr Payroll 12 resumo",
+        "Supplement Hr Payroll 12 balance",
+        "Supplement Hr Payroll 12 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Hr Payroll 12 variant should be prioritized?",
+        "Qual variante de Supplement Hr Payroll 12 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "hr_payroll_contract_update_notice",
+      "label": "Contract Update Notice",
+      "expectedSections": [
+        "Supplement Hr Payroll 13 Header",
+        "Cabecalho Supplement Hr Payroll 13",
+        "Supplement Hr Payroll 13 Parties",
+        "Partes Supplement Hr Payroll 13",
+        "Supplement Hr Payroll 13 Timeline",
+        "Linha do tempo Supplement Hr Payroll 13"
+      ],
+      "headings": [
+        "supplement hr payroll 13",
+        "hr payroll supplement 13",
+        "hr_payroll",
+        "hr_payroll summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Hr Payroll 13 line items",
+        "Supplement Hr Payroll 13 itens",
+        "Supplement Hr Payroll 13 summary",
+        "Supplement Hr Payroll 13 resumo",
+        "Supplement Hr Payroll 13 balance",
+        "Supplement Hr Payroll 13 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Hr Payroll 13 variant should be prioritized?",
+        "Qual variante de Supplement Hr Payroll 13 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "hr_payroll_attendance_exception_note",
+      "label": "Attendance Exception Note",
+      "expectedSections": [
+        "Supplement Hr Payroll 14 Header",
+        "Cabecalho Supplement Hr Payroll 14",
+        "Supplement Hr Payroll 14 Parties",
+        "Partes Supplement Hr Payroll 14",
+        "Supplement Hr Payroll 14 Timeline",
+        "Linha do tempo Supplement Hr Payroll 14"
+      ],
+      "headings": [
+        "supplement hr payroll 14",
+        "hr payroll supplement 14",
+        "hr_payroll",
+        "hr_payroll summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Hr Payroll 14 line items",
+        "Supplement Hr Payroll 14 itens",
+        "Supplement Hr Payroll 14 summary",
+        "Supplement Hr Payroll 14 resumo",
+        "Supplement Hr Payroll 14 balance",
+        "Supplement Hr Payroll 14 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Hr Payroll 14 variant should be prioritized?",
+        "Qual variante de Supplement Hr Payroll 14 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "hr_payroll_onboarding_status_note",
+      "label": "Onboarding Status Note",
+      "expectedSections": [
+        "Supplement Hr Payroll 15 Header",
+        "Cabecalho Supplement Hr Payroll 15",
+        "Supplement Hr Payroll 15 Parties",
+        "Partes Supplement Hr Payroll 15",
+        "Supplement Hr Payroll 15 Timeline",
+        "Linha do tempo Supplement Hr Payroll 15"
+      ],
+      "headings": [
+        "supplement hr payroll 15",
+        "hr payroll supplement 15",
+        "hr_payroll",
+        "hr_payroll summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Hr Payroll 15 line items",
+        "Supplement Hr Payroll 15 itens",
+        "Supplement Hr Payroll 15 summary",
+        "Supplement Hr Payroll 15 resumo",
+        "Supplement Hr Payroll 15 balance",
+        "Supplement Hr Payroll 15 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Hr Payroll 15 variant should be prioritized?",
+        "Qual variante de Supplement Hr Payroll 15 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
       ]
     }
   ]

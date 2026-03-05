@@ -46,6 +46,8 @@ import {
   adminTelemetryQuality,
   adminTelemetryQualityBreakdown,
   adminTelemetryReaskRate,
+  adminTelemetryTruncationRate,
+  adminTelemetryRegenerationRate,
   // LLM / Cost
   adminTelemetryLLM,
   adminTelemetryLLMProviders,
@@ -153,6 +155,8 @@ router.get("/interactions/:traceId", adminTelemetryInteractionDetail);
 router.get("/quality", adminTelemetryQuality);
 router.get("/quality/breakdown", adminTelemetryQualityBreakdown);
 router.get("/quality/reask-rate", adminTelemetryReaskRate);
+router.get("/quality/truncation-rate", adminTelemetryTruncationRate);
+router.get("/quality/regeneration-rate", adminTelemetryRegenerationRate);
 
 // ============================================================================
 // LLM / COST

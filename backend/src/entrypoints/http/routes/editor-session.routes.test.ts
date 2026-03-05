@@ -18,6 +18,32 @@ jest.mock("../../../modules/editing/application", () => ({
   EditingFacadeService: jest.fn().mockImplementation(() => ({
     executeWithAgent: executeWithAgentMock,
   })),
+  ViewerLockedChatPolicyService: jest.fn().mockImplementation(() => ({
+    resolve: () => ({
+      enabled: true,
+      strict: true,
+      defaultViewerIntent: "qa_locked",
+      defaultAnswerMode: "doc_grounded_single",
+      lockToActiveDocument: true,
+      emitScopeSignals: [
+        "explicitDocLock",
+        "singleDocIntent",
+        "hardScopeActive",
+      ],
+    }),
+  })),
+  GovernanceRuntimePolicyService: jest.fn().mockImplementation(() => ({
+    evaluate: () => ({
+      allowed: true,
+      blocks: [],
+      accessAction: "allow",
+      retentionAction: "retain",
+      exceptionAction: "approve_exception",
+      secretsAction: "ok",
+      incidentAction: "monitor",
+      modelReleaseAction: "allow",
+    }),
+  })),
 }));
 
 jest.mock("../../../controllers/editorSession.controller", () => ({

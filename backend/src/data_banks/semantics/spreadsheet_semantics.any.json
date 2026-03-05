@@ -21,11 +21,21 @@
       "operations": "ops"
     },
     "canonicalDomainCategories": [
+      "accounting",
+      "banking",
+      "billing",
+      "education",
+      "everyday",
       "finance",
+      "housing",
+      "hr_payroll",
+      "identity",
+      "insurance",
       "legal",
       "medical",
       "ops",
-      "accounting"
+      "tax",
+      "travel"
     ]
   },
   "kpiDefinitions": [

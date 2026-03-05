@@ -6,19 +6,12 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-03-04",
-    "owner": "data-bank-governance",
-    "usedBy": [
-      "services/core/banks/dataBankLoader.service.ts"
-    ],
-    "tests": [
-      "tests/patternWiringProof.test.ts"
-    ]
+    "lastUpdated": "2026-03-05"
   },
-  "generatedAt": "2026-03-04T14:22:45.646Z",
+  "generatedAt": "2026-03-05T15:09:15.417Z",
   "strict": true,
-  "loadedBankCount": 203,
-  "expectedBankCount": 203,
+  "loadedBankCount": 173,
+  "expectedBankCount": 173,
   "coverageByFamily": {
     "taxonomy": {
       "expected": 6,
@@ -71,25 +64,22 @@
       "coverage": 1
     },
     "doc_type_structures_legal_medical": {
-      "expected": 54,
-      "loaded": 54,
+      "expected": 24,
+      "loaded": 24,
       "coverage": 1
     }
   },
   "checks": {
     "strict": true,
     "requiredCore": 105,
-    "optional": 91,
-    "totalChecked": 196,
-    "loadedBankCount": 203,
-    "schemaValidatedCount": 203,
+    "optional": 61,
+    "totalChecked": 166,
+    "loadedBankCount": 173,
+    "schemaValidatedCount": 173,
     "warningCount": 0,
     "failureCount": 0
   },
   "failedChecks": [],
   "warnings": [],
-  "unresolvedBlockers": [],
-  "config": {
-    "enabled": true
-  }
+  "unresolvedBlockers": []
 }

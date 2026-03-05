@@ -1,15 +1,13 @@
 import { getApiBaseUrl } from '../../services/runtimeConfig';
 
 const API_URL = getApiBaseUrl();
-const AUTH_LOCALSTORAGE_COMPAT = process.env.REACT_APP_AUTH_LOCALSTORAGE_COMPAT === 'true';
 
 /**
  * Check if token is expired and refresh if needed
  * Returns a valid authentication token
  */
 export async function getValidToken() {
-  if (!AUTH_LOCALSTORAGE_COMPAT) return null;
-  return localStorage.getItem('accessToken') || localStorage.getItem('token');
+  return null;
 }
 
 /**
@@ -18,12 +16,11 @@ export async function getValidToken() {
  * we prepend the configured API base.
  */
 export async function fetchWithAuth(url, options = {}) {
-  const token = await getValidToken();
+  await getValidToken();
   const fullUrl = typeof url === 'string' && url.startsWith('/api/') ? `${API_URL}${url}` : url;
 
   const headers = {
     ...options.headers,
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
 
   const response = await fetch(fullUrl, {
@@ -48,3 +45,4 @@ export function handleAuthError(error) {
   }
   return false;
 }
+

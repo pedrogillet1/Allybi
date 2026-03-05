@@ -57,20 +57,35 @@
       ],
       "expectedTableFamilies": [
         "Passport line-item table",
-        "Passport summary matrix"
+        "Passport summary matrix",
+        "Passport line items",
+        "Passport itens",
+        "Passport summary",
+        "Passport resumo"
       ],
       "fieldFamilies": [
         "Primary identifiers",
         "Dates and periods",
-        "Amounts and statuses"
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
       ],
       "redFlags": [
         "Missing mandatory section anchors",
-        "Conflicting summary totals"
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
       ],
       "missingQuestions": [
         "Which passport variant should be prioritized?",
-        "Should extraction prefer header metadata or detailed section data?"
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Passport variant should be prioritized?",
+        "Qual variante de Passport deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
       ]
     },
     {
@@ -108,20 +123,35 @@
       ],
       "expectedTableFamilies": [
         "Driver License line-item table",
-        "Driver License summary matrix"
+        "Driver License summary matrix",
+        "Driver License line items",
+        "Driver License itens",
+        "Driver License summary",
+        "Driver License resumo"
       ],
       "fieldFamilies": [
         "Primary identifiers",
         "Dates and periods",
-        "Amounts and statuses"
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
       ],
       "redFlags": [
         "Missing mandatory section anchors",
-        "Conflicting summary totals"
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
       ],
       "missingQuestions": [
         "Which driver license variant should be prioritized?",
-        "Should extraction prefer header metadata or detailed section data?"
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Driver License variant should be prioritized?",
+        "Qual variante de Driver License deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
       ]
     },
     {
@@ -159,20 +189,1003 @@
       ],
       "expectedTableFamilies": [
         "Birth Certificate line-item table",
-        "Birth Certificate summary matrix"
+        "Birth Certificate summary matrix",
+        "Birth Certificate line items",
+        "Birth Certificate itens",
+        "Birth Certificate summary",
+        "Birth Certificate resumo"
       ],
       "fieldFamilies": [
         "Primary identifiers",
         "Dates and periods",
-        "Amounts and statuses"
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
       ],
       "redFlags": [
         "Missing mandatory section anchors",
-        "Conflicting summary totals"
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
       ],
       "missingQuestions": [
         "Which birth certificate variant should be prioritized?",
-        "Should extraction prefer header metadata or detailed section data?"
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Birth Certificate variant should be prioritized?",
+        "Qual variante de Birth Certificate deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "id_business_registration_certificate",
+      "label": "Business Registration Certificate",
+      "expectedSections": [
+        "Document Identification",
+        "Identificação do Documento",
+        "Holder Information",
+        "Informações do Titular",
+        "Biographic Data",
+        "Dados Biográficos",
+        "Validity and Issuance",
+        "Validade e Emissão",
+        "Machine Readable Zone",
+        "Zona de Leitura Mecânica"
+      ],
+      "headings": [
+        "Passport",
+        "Passaporte",
+        "Travel Document",
+        "Documento de Viagem",
+        "Personal Data",
+        "Dados Pessoais",
+        "Holder",
+        "Titular",
+        "Biographic",
+        "Date of Birth",
+        "Nationality",
+        "Data de Nascimento",
+        "Nacionalidade",
+        "Date of Issue",
+        "Date of Expiry",
+        "Issuing Authority"
+      ],
+      "expectedTableFamilies": [
+        "Passport line-item table",
+        "Passport summary matrix",
+        "Business Registration Certificate line items",
+        "Business Registration Certificate itens",
+        "Business Registration Certificate summary",
+        "Business Registration Certificate resumo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
+      ],
+      "missingQuestions": [
+        "Which passport variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Business Registration Certificate variant should be prioritized?",
+        "Qual variante de Business Registration Certificate deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "id_marriage_license",
+      "label": "Marriage License",
+      "expectedSections": [
+        "Document Identification",
+        "Identificação do Documento",
+        "Holder Information",
+        "Informações do Titular",
+        "Biographic Data",
+        "Dados Biográficos",
+        "Validity and Issuance",
+        "Validade e Emissão",
+        "Machine Readable Zone",
+        "Zona de Leitura Mecânica"
+      ],
+      "headings": [
+        "Passport",
+        "Passaporte",
+        "Travel Document",
+        "Documento de Viagem",
+        "Personal Data",
+        "Dados Pessoais",
+        "Holder",
+        "Titular",
+        "Biographic",
+        "Date of Birth",
+        "Nationality",
+        "Data de Nascimento",
+        "Nacionalidade",
+        "Date of Issue",
+        "Date of Expiry",
+        "Issuing Authority"
+      ],
+      "expectedTableFamilies": [
+        "Passport line-item table",
+        "Passport summary matrix",
+        "Marriage License line items",
+        "Marriage License itens",
+        "Marriage License summary",
+        "Marriage License resumo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
+      ],
+      "missingQuestions": [
+        "Which passport variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Marriage License variant should be prioritized?",
+        "Qual variante de Marriage License deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "id_proof_of_address",
+      "label": "Proof Of Address",
+      "expectedSections": [
+        "Document Identification",
+        "Identificação do Documento",
+        "Holder Information",
+        "Informações do Titular",
+        "Biographic Data",
+        "Dados Biográficos",
+        "Validity and Issuance",
+        "Validade e Emissão",
+        "Machine Readable Zone",
+        "Zona de Leitura Mecânica"
+      ],
+      "headings": [
+        "Passport",
+        "Passaporte",
+        "Travel Document",
+        "Documento de Viagem",
+        "Personal Data",
+        "Dados Pessoais",
+        "Holder",
+        "Titular",
+        "Biographic",
+        "Date of Birth",
+        "Nationality",
+        "Data de Nascimento",
+        "Nacionalidade",
+        "Date of Issue",
+        "Date of Expiry",
+        "Issuing Authority"
+      ],
+      "expectedTableFamilies": [
+        "Passport line-item table",
+        "Passport summary matrix",
+        "Proof Of Address line items",
+        "Proof Of Address itens",
+        "Proof Of Address summary",
+        "Proof Of Address resumo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
+      ],
+      "missingQuestions": [
+        "Which passport variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Proof Of Address variant should be prioritized?",
+        "Qual variante de Proof Of Address deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "id_social_security_card",
+      "label": "Social Security Card",
+      "expectedSections": [
+        "Document Identification",
+        "Identificação do Documento",
+        "Holder Information",
+        "Informações do Titular",
+        "Biographic Data",
+        "Dados Biográficos",
+        "Validity and Issuance",
+        "Validade e Emissão",
+        "Machine Readable Zone",
+        "Zona de Leitura Mecânica"
+      ],
+      "headings": [
+        "Passport",
+        "Passaporte",
+        "Travel Document",
+        "Documento de Viagem",
+        "Personal Data",
+        "Dados Pessoais",
+        "Holder",
+        "Titular",
+        "Biographic",
+        "Date of Birth",
+        "Nationality",
+        "Data de Nascimento",
+        "Nacionalidade",
+        "Date of Issue",
+        "Date of Expiry",
+        "Issuing Authority"
+      ],
+      "expectedTableFamilies": [
+        "Passport line-item table",
+        "Passport summary matrix",
+        "Social Security Card line items",
+        "Social Security Card itens",
+        "Social Security Card summary",
+        "Social Security Card resumo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
+      ],
+      "missingQuestions": [
+        "Which passport variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Social Security Card variant should be prioritized?",
+        "Qual variante de Social Security Card deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "id_visa",
+      "label": "Visa",
+      "expectedSections": [
+        "Document Identification",
+        "Identificação do Documento",
+        "Holder Information",
+        "Informações do Titular",
+        "Biographic Data",
+        "Dados Biográficos",
+        "Validity and Issuance",
+        "Validade e Emissão",
+        "Machine Readable Zone",
+        "Zona de Leitura Mecânica"
+      ],
+      "headings": [
+        "Passport",
+        "Passaporte",
+        "Travel Document",
+        "Documento de Viagem",
+        "Personal Data",
+        "Dados Pessoais",
+        "Holder",
+        "Titular",
+        "Biographic",
+        "Date of Birth",
+        "Nationality",
+        "Data de Nascimento",
+        "Nacionalidade",
+        "Date of Issue",
+        "Date of Expiry",
+        "Issuing Authority"
+      ],
+      "expectedTableFamilies": [
+        "Passport line-item table",
+        "Passport summary matrix",
+        "Visa line items",
+        "Visa itens",
+        "Visa summary",
+        "Visa resumo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
+      ],
+      "missingQuestions": [
+        "Which passport variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Visa variant should be prioritized?",
+        "Qual variante de Visa deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "id_voter_registration",
+      "label": "Voter Registration",
+      "expectedSections": [
+        "Document Identification",
+        "Identificação do Documento",
+        "Holder Information",
+        "Informações do Titular",
+        "Biographic Data",
+        "Dados Biográficos",
+        "Validity and Issuance",
+        "Validade e Emissão",
+        "Machine Readable Zone",
+        "Zona de Leitura Mecânica"
+      ],
+      "headings": [
+        "Passport",
+        "Passaporte",
+        "Travel Document",
+        "Documento de Viagem",
+        "Personal Data",
+        "Dados Pessoais",
+        "Holder",
+        "Titular",
+        "Biographic",
+        "Date of Birth",
+        "Nationality",
+        "Data de Nascimento",
+        "Nacionalidade",
+        "Date of Issue",
+        "Date of Expiry",
+        "Issuing Authority"
+      ],
+      "expectedTableFamilies": [
+        "Passport line-item table",
+        "Passport summary matrix",
+        "Voter Registration line items",
+        "Voter Registration itens",
+        "Voter Registration summary",
+        "Voter Registration resumo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
+      ],
+      "missingQuestions": [
+        "Which passport variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Voter Registration variant should be prioritized?",
+        "Qual variante de Voter Registration deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "identity_identity_verification_note",
+      "label": "Identity Verification Note",
+      "expectedSections": [
+        "Supplement Identity 01 Header",
+        "Cabecalho Supplement Identity 01",
+        "Supplement Identity 01 Parties",
+        "Partes Supplement Identity 01",
+        "Supplement Identity 01 Timeline",
+        "Linha do tempo Supplement Identity 01"
+      ],
+      "headings": [
+        "supplement identity 01",
+        "identity supplement 01",
+        "identity",
+        "identity summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Identity 01 line items",
+        "Supplement Identity 01 itens",
+        "Supplement Identity 01 summary",
+        "Supplement Identity 01 resumo",
+        "Supplement Identity 01 balance",
+        "Supplement Identity 01 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Identity 01 variant should be prioritized?",
+        "Qual variante de Supplement Identity 01 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "identity_address_validation_notice",
+      "label": "Address Validation Notice",
+      "expectedSections": [
+        "Supplement Identity 02 Header",
+        "Cabecalho Supplement Identity 02",
+        "Supplement Identity 02 Parties",
+        "Partes Supplement Identity 02",
+        "Supplement Identity 02 Timeline",
+        "Linha do tempo Supplement Identity 02"
+      ],
+      "headings": [
+        "supplement identity 02",
+        "identity supplement 02",
+        "identity",
+        "identity summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Identity 02 line items",
+        "Supplement Identity 02 itens",
+        "Supplement Identity 02 summary",
+        "Supplement Identity 02 resumo",
+        "Supplement Identity 02 balance",
+        "Supplement Identity 02 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Identity 02 variant should be prioritized?",
+        "Qual variante de Supplement Identity 02 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "identity_document_renewal_notice",
+      "label": "Document Renewal Notice",
+      "expectedSections": [
+        "Supplement Identity 03 Header",
+        "Cabecalho Supplement Identity 03",
+        "Supplement Identity 03 Parties",
+        "Partes Supplement Identity 03",
+        "Supplement Identity 03 Timeline",
+        "Linha do tempo Supplement Identity 03"
+      ],
+      "headings": [
+        "supplement identity 03",
+        "identity supplement 03",
+        "identity",
+        "identity summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Identity 03 line items",
+        "Supplement Identity 03 itens",
+        "Supplement Identity 03 summary",
+        "Supplement Identity 03 resumo",
+        "Supplement Identity 03 balance",
+        "Supplement Identity 03 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Identity 03 variant should be prioritized?",
+        "Qual variante de Supplement Identity 03 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "identity_compliance_identity_note",
+      "label": "Compliance Identity Note",
+      "expectedSections": [
+        "Supplement Identity 04 Header",
+        "Cabecalho Supplement Identity 04",
+        "Supplement Identity 04 Parties",
+        "Partes Supplement Identity 04",
+        "Supplement Identity 04 Timeline",
+        "Linha do tempo Supplement Identity 04"
+      ],
+      "headings": [
+        "supplement identity 04",
+        "identity supplement 04",
+        "identity",
+        "identity summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Identity 04 line items",
+        "Supplement Identity 04 itens",
+        "Supplement Identity 04 summary",
+        "Supplement Identity 04 resumo",
+        "Supplement Identity 04 balance",
+        "Supplement Identity 04 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Identity 04 variant should be prioritized?",
+        "Qual variante de Supplement Identity 04 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "identity_credential_update_notice",
+      "label": "Credential Update Notice",
+      "expectedSections": [
+        "Supplement Identity 05 Header",
+        "Cabecalho Supplement Identity 05",
+        "Supplement Identity 05 Parties",
+        "Partes Supplement Identity 05",
+        "Supplement Identity 05 Timeline",
+        "Linha do tempo Supplement Identity 05"
+      ],
+      "headings": [
+        "supplement identity 05",
+        "identity supplement 05",
+        "identity",
+        "identity summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Identity 05 line items",
+        "Supplement Identity 05 itens",
+        "Supplement Identity 05 summary",
+        "Supplement Identity 05 resumo",
+        "Supplement Identity 05 balance",
+        "Supplement Identity 05 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Identity 05 variant should be prioritized?",
+        "Qual variante de Supplement Identity 05 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "identity_identity_status_update",
+      "label": "Identity Status Update",
+      "expectedSections": [
+        "Supplement Identity 06 Header",
+        "Cabecalho Supplement Identity 06",
+        "Supplement Identity 06 Parties",
+        "Partes Supplement Identity 06",
+        "Supplement Identity 06 Timeline",
+        "Linha do tempo Supplement Identity 06"
+      ],
+      "headings": [
+        "supplement identity 06",
+        "identity supplement 06",
+        "identity",
+        "identity summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Identity 06 line items",
+        "Supplement Identity 06 itens",
+        "Supplement Identity 06 summary",
+        "Supplement Identity 06 resumo",
+        "Supplement Identity 06 balance",
+        "Supplement Identity 06 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Identity 06 variant should be prioritized?",
+        "Qual variante de Supplement Identity 06 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "identity_verification_exception_note",
+      "label": "Verification Exception Note",
+      "expectedSections": [
+        "Supplement Identity 07 Header",
+        "Cabecalho Supplement Identity 07",
+        "Supplement Identity 07 Parties",
+        "Partes Supplement Identity 07",
+        "Supplement Identity 07 Timeline",
+        "Linha do tempo Supplement Identity 07"
+      ],
+      "headings": [
+        "supplement identity 07",
+        "identity supplement 07",
+        "identity",
+        "identity summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Identity 07 line items",
+        "Supplement Identity 07 itens",
+        "Supplement Identity 07 summary",
+        "Supplement Identity 07 resumo",
+        "Supplement Identity 07 balance",
+        "Supplement Identity 07 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Identity 07 variant should be prioritized?",
+        "Qual variante de Supplement Identity 07 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "identity_proofing_result_note",
+      "label": "Proofing Result Note",
+      "expectedSections": [
+        "Supplement Identity 08 Header",
+        "Cabecalho Supplement Identity 08",
+        "Supplement Identity 08 Parties",
+        "Partes Supplement Identity 08",
+        "Supplement Identity 08 Timeline",
+        "Linha do tempo Supplement Identity 08"
+      ],
+      "headings": [
+        "supplement identity 08",
+        "identity supplement 08",
+        "identity",
+        "identity summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Identity 08 line items",
+        "Supplement Identity 08 itens",
+        "Supplement Identity 08 summary",
+        "Supplement Identity 08 resumo",
+        "Supplement Identity 08 balance",
+        "Supplement Identity 08 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Identity 08 variant should be prioritized?",
+        "Qual variante de Supplement Identity 08 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "identity_identity_history_note",
+      "label": "Identity History Note",
+      "expectedSections": [
+        "Supplement Identity 09 Header",
+        "Cabecalho Supplement Identity 09",
+        "Supplement Identity 09 Parties",
+        "Partes Supplement Identity 09",
+        "Supplement Identity 09 Timeline",
+        "Linha do tempo Supplement Identity 09"
+      ],
+      "headings": [
+        "supplement identity 09",
+        "identity supplement 09",
+        "identity",
+        "identity summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Identity 09 line items",
+        "Supplement Identity 09 itens",
+        "Supplement Identity 09 summary",
+        "Supplement Identity 09 resumo",
+        "Supplement Identity 09 balance",
+        "Supplement Identity 09 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Identity 09 variant should be prioritized?",
+        "Qual variante de Supplement Identity 09 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "identity_issuance_update_notice",
+      "label": "Issuance Update Notice",
+      "expectedSections": [
+        "Supplement Identity 10 Header",
+        "Cabecalho Supplement Identity 10",
+        "Supplement Identity 10 Parties",
+        "Partes Supplement Identity 10",
+        "Supplement Identity 10 Timeline",
+        "Linha do tempo Supplement Identity 10"
+      ],
+      "headings": [
+        "supplement identity 10",
+        "identity supplement 10",
+        "identity",
+        "identity summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Identity 10 line items",
+        "Supplement Identity 10 itens",
+        "Supplement Identity 10 summary",
+        "Supplement Identity 10 resumo",
+        "Supplement Identity 10 balance",
+        "Supplement Identity 10 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Identity 10 variant should be prioritized?",
+        "Qual variante de Supplement Identity 10 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "identity_record_alignment_note",
+      "label": "Record Alignment Note",
+      "expectedSections": [
+        "Supplement Identity 11 Header",
+        "Cabecalho Supplement Identity 11",
+        "Supplement Identity 11 Parties",
+        "Partes Supplement Identity 11",
+        "Supplement Identity 11 Timeline",
+        "Linha do tempo Supplement Identity 11"
+      ],
+      "headings": [
+        "supplement identity 11",
+        "identity supplement 11",
+        "identity",
+        "identity summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Identity 11 line items",
+        "Supplement Identity 11 itens",
+        "Supplement Identity 11 summary",
+        "Supplement Identity 11 resumo",
+        "Supplement Identity 11 balance",
+        "Supplement Identity 11 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Identity 11 variant should be prioritized?",
+        "Qual variante de Supplement Identity 11 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
       ]
     }
   ]

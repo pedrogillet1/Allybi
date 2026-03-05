@@ -223,22 +223,17 @@ describe("documentStateManager", () => {
   });
 
   // -----------------------------------------------------------------------
-  // 9. markReadyWithoutContent sets chunksCount:0
+  // 9. markReadyWithoutContent is blocked (deprecated unsafe path)
   // -----------------------------------------------------------------------
-  test("markReadyWithoutContent sets chunksCount:0", async () => {
+  test("markReadyWithoutContent is blocked and does not write", async () => {
     mockUpdateMany.mockResolvedValue({ count: 1 });
 
     const result = await documentStateManager.markReadyWithoutContent("doc-1");
 
-    expect(result.success).toBe(true);
+    expect(result.success).toBe(false);
     expect(result.toStatus).toBe("ready");
-    expect(mockUpdateMany).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: expect.objectContaining({
-          status: "ready",
-          chunksCount: 0,
-        }),
-      }),
-    );
+    expect(result.reason).toContain("deprecated");
+    expect(mockUpdateMany).not.toHaveBeenCalled();
+    expect(mockUpdate).not.toHaveBeenCalled();
   });
 });

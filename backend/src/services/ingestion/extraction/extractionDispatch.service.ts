@@ -12,26 +12,30 @@ import { extractXlsxWithAnchors } from "../../extraction/xlsxExtractor.service";
 import { extractPptxWithAnchors } from "../../extraction/pptxExtractor.service";
 import { getGoogleVisionOcrService } from "../../extraction/google-vision-ocr.service";
 import { extractWithTesseract } from "../../extraction/tesseractFallback.service";
+import sharp from "sharp";
 import type { DispatchedExtractionResult } from "./extractionResult.types";
-import { recordExtractorTiming, recordExtractionAttempt, recordOcrUsage } from "../pipeline/pipelineMetrics.service";
+import { recordExtractorTiming, recordOcrUsage } from "../pipeline/pipelineMetrics.service";
+import {
+  PDF_MIMES,
+  DOCX_MIMES,
+  XLSX_MIMES,
+  PPTX_MIMES,
+  isImageMime,
+  isMimeTypeSupportedForExtraction,
+  normalizeMimeType,
+} from "./ingestionMimeRegistry.service";
 
 // ---------------------------------------------------------------------------
 // MIME constants
 // ---------------------------------------------------------------------------
 
-export const PDF_MIMES = ["application/pdf"];
-export const DOCX_MIMES = [
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-  "application/msword",
-];
-export const XLSX_MIMES = [
-  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-  "application/vnd.ms-excel",
-];
-export const PPTX_MIMES = [
-  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-  "application/vnd.ms-powerpoint",
-];
+export {
+  PDF_MIMES,
+  DOCX_MIMES,
+  XLSX_MIMES,
+  PPTX_MIMES,
+  isMimeTypeSupportedForExtraction,
+};
 
 // ---------------------------------------------------------------------------
 // OLE binary detection (legacy .doc / .xls / .ppt)
@@ -45,10 +49,6 @@ function isOleBinary(buffer: Buffer): boolean {
 }
 
 /** Images are visual-first — they should remain visible even if OCR finds no text. */
-export function isImageMime(mime: string): boolean {
-  return mime.startsWith("image/");
-}
-
 // ---------------------------------------------------------------------------
 // Smart Image OCR Filter
 // ---------------------------------------------------------------------------
@@ -66,25 +66,84 @@ const SKIP_OCR_FILENAME_PATTERNS = [
 ];
 
 const MIN_IMAGE_SIZE_FOR_OCR = 10 * 1024; // 10KB
+const MIN_IMAGE_EDGE_FOR_OCR = 48;
+const MIN_IMAGE_PIXELS_FOR_OCR = 48 * 48;
+const LOW_VARIANCE_STDEV_THRESHOLD = 4.5;
+const LOW_ENTROPY_THRESHOLD = 1.15;
 
-export function shouldSkipImageOcr(
-  filename: string,
-  bufferSize: number,
-): { skip: boolean; reason?: string } {
-  for (const pattern of SKIP_OCR_FILENAME_PATTERNS) {
-    if (pattern.test(filename)) {
+async function analyzeImageVisualSignals(
+  buffer: Buffer,
+): Promise<{ skip: boolean; reason?: string }> {
+  try {
+    const image = sharp(buffer, { failOn: "none" });
+    const metadata = await image.metadata();
+    const width = metadata.width ?? 0;
+    const height = metadata.height ?? 0;
+
+    if (width === 0 || height === 0) {
+      return { skip: false };
+    }
+
+    const pixels = width * height;
+    if (Math.min(width, height) < MIN_IMAGE_EDGE_FOR_OCR || pixels < MIN_IMAGE_PIXELS_FOR_OCR) {
       return {
         skip: true,
-        reason: `filename matches skip pattern: ${pattern}`,
+        reason: `image dimensions too small (${width}x${height})`,
       };
+    }
+
+    const stats = await image.stats();
+    const channels = Array.isArray(stats.channels) ? stats.channels : [];
+    if (channels.length === 0) {
+      return { skip: false };
+    }
+
+    const avgChannelStdev =
+      channels.reduce((sum, ch) => sum + (ch.stdev ?? 0), 0) / channels.length;
+    const entropy = typeof stats.entropy === "number" ? stats.entropy : null;
+    const veryLowVariance = avgChannelStdev <= LOW_VARIANCE_STDEV_THRESHOLD;
+    const lowEntropy = entropy !== null && entropy <= LOW_ENTROPY_THRESHOLD;
+
+    if (veryLowVariance && lowEntropy) {
+      return {
+        skip: true,
+        reason: `visual-only image detected (low_variance=${avgChannelStdev.toFixed(2)}, entropy=${entropy.toFixed(2)})`,
+      };
+    }
+  } catch (error) {
+    logger.debug("[OCR] Unable to run image content analysis", {
+      reason: error instanceof Error ? error.message : String(error),
+    });
+  }
+
+  return { skip: false };
+}
+
+export async function shouldSkipImageOcr(
+  filename: string | undefined,
+  buffer: Buffer,
+): Promise<{ skip: boolean; reason?: string }> {
+  if (filename) {
+    for (const pattern of SKIP_OCR_FILENAME_PATTERNS) {
+      if (pattern.test(filename)) {
+        return {
+          skip: true,
+          reason: `filename matches skip pattern: ${pattern}`,
+        };
+      }
     }
   }
 
-  if (bufferSize < MIN_IMAGE_SIZE_FOR_OCR) {
+  if (buffer.length < MIN_IMAGE_SIZE_FOR_OCR) {
     return {
       skip: true,
-      reason: `image too small (${(bufferSize / 1024).toFixed(1)}KB < 10KB)`,
+      reason: `image too small (${(buffer.length / 1024).toFixed(1)}KB < 10KB)`,
     };
+  }
+
+  const visualSignals = await analyzeImageVisualSignals(buffer);
+  if (visualSignals.skip) {
+    return visualSignals;
   }
 
   return { skip: false };
@@ -114,15 +173,16 @@ export async function extractText(
 ): Promise<DispatchedExtractionResult> {
   const tStart = Date.now();
   let extractor = "unknown";
+  const normalizedMime = normalizeMimeType(mimeType);
 
   try {
-  if (PDF_MIMES.includes(mimeType)) {
+  if (PDF_MIMES.includes(normalizedMime)) {
     extractor = "pdf";
     const result = await extractPdfWithAnchors(buffer);
-    return { sourceType: "pdf", ...result } as unknown as DispatchedExtractionResult;
+    return result;
   }
 
-  if (DOCX_MIMES.includes(mimeType)) {
+  if (DOCX_MIMES.includes(normalizedMime)) {
     if (isOleBinary(buffer)) {
       throw new Error(
         "Legacy .doc format is not supported. Please convert to .docx (File > Save As > .docx) and re-upload.",
@@ -130,10 +190,10 @@ export async function extractText(
     }
     extractor = "docx";
     const result = await extractDocxWithAnchors(buffer);
-    return { sourceType: "docx", ...result } as unknown as DispatchedExtractionResult;
+    return result;
   }
 
-  if (XLSX_MIMES.includes(mimeType)) {
+  if (XLSX_MIMES.includes(normalizedMime)) {
     if (isOleBinary(buffer)) {
       throw new Error(
         "Legacy .xls format is not supported. Please convert to .xlsx (File > Save As > .xlsx) and re-upload.",
@@ -141,10 +201,10 @@ export async function extractText(
     }
     extractor = "xlsx";
     const result = await extractXlsxWithAnchors(buffer);
-    return { sourceType: "xlsx", ...result } as unknown as DispatchedExtractionResult;
+    return result;
   }
 
-  if (PPTX_MIMES.includes(mimeType)) {
+  if (PPTX_MIMES.includes(normalizedMime)) {
     if (isOleBinary(buffer)) {
       throw new Error(
         "Legacy .ppt format is not supported. Please convert to .pptx (File > Save As > .pptx) and re-upload.",
@@ -152,11 +212,11 @@ export async function extractText(
     }
     extractor = "pptx";
     const result = await extractPptxWithAnchors(buffer);
-    return { sourceType: "pptx", ...result } as unknown as DispatchedExtractionResult;
+    return result;
   }
 
   // Plain text fallback
-  if (mimeType.startsWith("text/")) {
+  if (normalizedMime.startsWith("text/")) {
     extractor = "text";
     const text = buffer.toString("utf-8");
     return {
@@ -168,24 +228,22 @@ export async function extractText(
   }
 
   // Image OCR via Google Cloud Vision
-  if (mimeType.startsWith("image/")) {
+  if (isImageMime(normalizedMime)) {
     extractor = "image_ocr";
-    if (filename) {
-      const skipCheck = shouldSkipImageOcr(filename, buffer.length);
-      if (skipCheck.skip) {
-        logger.info("[OCR] Skipping image OCR, saving as visual-only", {
-          filename,
-          reason: skipCheck.reason,
-        });
-        return {
-          sourceType: "image",
-          text: "",
-          wordCount: 0,
-          confidence: 0,
-          skipped: true,
-          skipReason: `Image saved as visual-only (${skipCheck.reason})`,
-        };
-      }
+    const skipCheck = await shouldSkipImageOcr(filename, buffer);
+    if (skipCheck.skip) {
+      logger.info("[OCR] Skipping image OCR, saving as visual-only", {
+        filename,
+        reason: skipCheck.reason,
+      });
+      return {
+        sourceType: "image",
+        text: "",
+        wordCount: 0,
+        confidence: 0,
+        skipped: true,
+        skipReason: `Image saved as visual-only (${skipCheck.reason})`,
+      };
     }
 
     const visionService = getGoogleVisionOcrService();
@@ -273,9 +331,8 @@ export async function extractText(
     }
   }
 
-  throw new Error(`Unsupported mimeType for extraction: ${mimeType}`);
+  throw new Error(`Unsupported mimeType for extraction: ${normalizedMime || mimeType}`);
   } catch (err) {
-    recordExtractionAttempt(false);
     throw err;
   } finally {
     const durationMs = Date.now() - tStart;

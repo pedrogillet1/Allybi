@@ -19,8 +19,7 @@ import {
   documentProgressService,
 } from "../../services/ingestion/progress/documentProgress.service";
 import {
-  XLSX_MIMES,
-  isImageMime,
+  isMimeTypeSupportedForExtraction,
 } from "../../services/ingestion/extraction/extractionDispatch.service";
 import { isPipelineSkipped } from "../../services/ingestion/pipeline/pipelineTypes";
 import {
@@ -102,6 +101,18 @@ function ensureTransitionSucceeded(
   throw new Error(
     `[IngestionPipeline] State transition failed during ${context}: ${reason}`,
   );
+}
+
+function toSizeBucket(sizeBytes: number | null | undefined): string | null {
+  if (!Number.isFinite(sizeBytes as number) || (sizeBytes as number) < 0)
+    return null;
+  const value = Number(sizeBytes);
+  const mb = value / (1024 * 1024);
+  if (mb < 1) return "lt_1mb";
+  if (mb < 10) return "1_to_10mb";
+  if (mb < 50) return "10_to_50mb";
+  if (mb < 200) return "50_to_200mb";
+  return "gte_200mb";
 }
 
 export interface IngestionPipelineOptions {
@@ -241,6 +252,11 @@ export async function runDocumentIngestionPipeline(
     if (!effectiveMimeType) {
       throw new Error(`No mimeType available for document ${documentId}`);
     }
+    if (!isMimeTypeSupportedForExtraction(effectiveMimeType)) {
+      throw new Error(
+        `Unsupported mimeType for ingestion: ${effectiveMimeType}`,
+      );
+    }
 
     const timings = await processDocumentAsync(
       documentId,
@@ -279,35 +295,21 @@ export async function runDocumentIngestionPipeline(
     // -----------------------------------------------------------------------
     const wasSkipped = isPipelineSkipped(timings);
     const skipReason = wasSkipped ? timings.skipReason : undefined;
+    const skipCode = wasSkipped ? timings.skipCode : undefined;
+    const sizeBucket = toSizeBucket(document.fileSize || null);
 
     if (wasSkipped || timings.chunkCount === 0) {
       const reason = skipReason || "No extractable text content";
-      const keepVisibleWithoutText =
-        XLSX_MIMES.includes(effectiveMimeType) ||
-        isImageMime(effectiveMimeType);
-
-      if (keepVisibleWithoutText) {
-        const transitionResult =
-          await documentStateManager.markReadyWithoutContent(documentId);
-        ensureTransitionSucceeded(transitionResult, "markReadyWithoutContent");
-        emitToUser(userId, "document-ready", {
-          documentId,
-          filename,
-          hasPreview: false,
-          hasContent: false,
-        });
-      } else {
-        const transitionResult = await documentStateManager.markSkipped(
-          documentId,
-          reason,
-        );
-        ensureTransitionSucceeded(transitionResult, "markSkipped");
-        emitToUser(userId, "document-skipped", {
-          documentId,
-          filename,
-          reason,
-        });
-      }
+      const transitionResult = await documentStateManager.markSkipped(
+        documentId,
+        reason,
+      );
+      ensureTransitionSucceeded(transitionResult, "markSkipped");
+      emitToUser(userId, "document-skipped", {
+        documentId,
+        filename,
+        reason,
+      });
 
       const totalTime = Date.now() - startTime;
       logger.info("[IngestionPipeline] Document skipped", {
@@ -336,8 +338,14 @@ export async function runDocumentIngestionPipeline(
             at: new Date(),
             meta: {
               skipReason: reason,
-              skipCode: (timings as any).skipCode ?? null,
+              skipCode: skipCode ?? null,
+              ocrAttempted: timings.ocrAttempted,
+              ocrOutcome: timings.ocrOutcome,
+              ocrMode: timings.ocrMode,
+              ocrPageCount: timings.ocrPageCount,
               textQuality: timings.textQuality,
+              peakRssMb: timings.peakRssMb ?? null,
+              sizeBucket,
             },
           },
         }),
@@ -432,6 +440,8 @@ export async function runDocumentIngestionPipeline(
           durationMs: totalTime,
           at: new Date(),
           meta: {
+            ocrAttempted: timings.ocrAttempted,
+            ocrOutcome: timings.ocrOutcome,
             ocrMode: timings.ocrMode,
             ocrPageCount: timings.ocrPageCount,
             textQuality: timings.textQuality,
@@ -440,6 +450,8 @@ export async function runDocumentIngestionPipeline(
             tablesDetected: (timings as any).tablesDetected ?? null,
             extractorDurationMs: (timings as any).extractorDurationMs ?? null,
             fileHash: timings.fileHash ?? null,
+            peakRssMb: timings.peakRssMb ?? null,
+            sizeBucket,
           },
         },
       }),

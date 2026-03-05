@@ -4,7 +4,6 @@ import { getApiBaseUrl } from './runtimeConfig';
 
 // Centralized API origin selection (defaults to production unless overridden).
 const API_URL = getApiBaseUrl();
-const AUTH_LOCALSTORAGE_COMPAT = process.env.REACT_APP_AUTH_LOCALSTORAGE_COMPAT === 'true';
 const CSRF_COOKIE_NAME = 'koda_csrf';
 
 function getCookieValue(name) {
@@ -41,13 +40,6 @@ const generateUUID = () => {
 // Request interceptor - attach access token and correlation ID to every request
 api.interceptors.request.use(
   (config) => {
-    if (AUTH_LOCALSTORAGE_COMPAT) {
-      const accessToken = localStorage.getItem('accessToken');
-      if (accessToken) {
-        config.headers.Authorization = `Bearer ${accessToken}`;
-      }
-    }
-
     // If we're sending FormData, do not force application/json.
     // The browser must set multipart boundaries; a wrong content-type causes multer to see "no files".
     if (typeof FormData !== 'undefined' && config.data instanceof FormData) {
@@ -172,18 +164,13 @@ api.interceptors.response.use(
       // We're the first 401 — attempt refresh.
       _refreshPromise = (async () => {
         try {
-          const refreshPayload = AUTH_LOCALSTORAGE_COMPAT
-            ? { refreshToken: localStorage.getItem('refreshToken') || undefined }
-            : {};
+          const refreshPayload = {};
           const response = await axios.post(
             `${API_URL}/api/auth/refresh`,
             refreshPayload,
             { withCredentials: true }
           );
           const { accessToken: newAccessToken } = response.data;
-          if (AUTH_LOCALSTORAGE_COMPAT && newAccessToken) {
-            localStorage.setItem('accessToken', newAccessToken);
-          }
           return newAccessToken;
         } catch (refreshError) {
           markAuthDead('refresh_failed');
@@ -208,3 +195,4 @@ api.interceptors.response.use(
 );
 
 export default api;
+

@@ -44,9 +44,12 @@
     "defaultOperatorByFamily": {
       "documents": "extract",
       "file_actions": "list",
+      "navigation": "open",
+      "calc": "compute",
       "doc_stats": "count_pages",
       "editing": "EDIT_PARAGRAPH",
       "connectors": "CONNECTOR_STATUS",
+      "integrations": "CONNECTOR_STATUS",
       "email": "EMAIL_LATEST",
       "help": "capabilities",
       "conversation": "ack",
@@ -121,6 +124,19 @@
       ]
     },
     {
+      "id": "integrations",
+      "priority": 93,
+      "description": "Integration lifecycle operations with connected systems.",
+      "requiresDocs": false,
+      "operatorsAllowed": [
+        "CONNECT_START",
+        "CONNECTOR_SYNC",
+        "CONNECTOR_SEARCH",
+        "CONNECTOR_STATUS",
+        "CONNECTOR_DISCONNECT"
+      ]
+    },
+    {
       "id": "email",
       "priority": 94,
       "description": "Email operations and email+document fusion: read/explain/summarize previous/draft/send.",
@@ -147,6 +163,32 @@
         "open",
         "locate_file",
         "count_files"
+      ]
+    },
+    {
+      "id": "navigation",
+      "priority": 89,
+      "description": "Navigation-first file actions for path/tree/open/locate flows.",
+      "requiresDocs": false,
+      "operatorsAllowed": [
+        "list",
+        "filter",
+        "sort",
+        "group",
+        "open",
+        "locate_file",
+        "count_files"
+      ]
+    },
+    {
+      "id": "calc",
+      "priority": 88,
+      "description": "Calculation-oriented document queries and numeric analysis requests.",
+      "requiresDocs": true,
+      "operatorsAllowed": [
+        "compute",
+        "extract",
+        "summarize"
       ]
     },
     {

@@ -123,7 +123,7 @@ function makeDocIntelligenceBanks() {
     getMergedDocAliasesBank: () => ({
       config: { minAliasConfidence: 0.75 },
     }),
-    getDocAliasPhrases: () => [],
+    getDocAliasPhrases: () => ["quarterly report"],
     getDocTaxonomy: () => ({ typeDefinitions: [] }),
   } as any;
 }

@@ -25,11 +25,20 @@ const GATE_WEIGHTS = Object.freeze({
   "routing-precedence-parity": 10,
   "runtime-wiring": 12,
   "collision-matrix-exhaustive": 10,
+  "collision-cross-family-tiebreak": 8,
   "routing-determinism": 8,
+  "routing-determinism-runtime-e2e": 8,
   "scope-integrity": 10,
+  "scope-boundary-locks": 8,
   "slot-contracts-wiring": 7,
+  "slot-extraction-e2e": 8,
   "disambiguation-e2e": 7,
   "intent-precision": 10,
+  "intent-family-firstclass": 10,
+  "routing-family-alias-consistency": 8,
+  "routing-integration-intents-parity": 8,
+  "nav-intents-locale-parity": 10,
+  "telemetry-completeness": 6,
 });
 
 function readJson(filePath) {
@@ -242,13 +251,25 @@ function classifyFailure(failureCode) {
   if (failure.startsWith("scope-integrity:")) {
     return { severity: "high", deduction: 13 };
   }
+  if (failure.startsWith("scope-boundary-locks:")) {
+    return { severity: "high", deduction: 12 };
+  }
   if (failure.startsWith("collision-matrix-exhaustive:")) {
     return { severity: "high", deduction: 12 };
+  }
+  if (failure.startsWith("collision-cross-family-tiebreak:")) {
+    return { severity: "high", deduction: 11 };
   }
   if (failure.startsWith("routing-determinism:")) {
     return { severity: "high", deduction: 12 };
   }
+  if (failure.startsWith("routing-determinism-runtime-e2e:")) {
+    return { severity: "high", deduction: 12 };
+  }
   if (failure.startsWith("slot-contracts-wiring:")) {
+    return { severity: "medium", deduction: 9 };
+  }
+  if (failure.startsWith("slot-extraction-e2e:")) {
     return { severity: "medium", deduction: 9 };
   }
   if (failure.startsWith("disambiguation-e2e:")) {
@@ -256,6 +277,21 @@ function classifyFailure(failureCode) {
   }
   if (failure.startsWith("intent-precision:")) {
     return { severity: "high", deduction: 12 };
+  }
+  if (failure.startsWith("intent-family-firstclass:")) {
+    return { severity: "high", deduction: 12 };
+  }
+  if (failure.startsWith("routing-family-alias-consistency:")) {
+    return { severity: "high", deduction: 11 };
+  }
+  if (failure.startsWith("routing-integration-intents-parity:")) {
+    return { severity: "high", deduction: 11 };
+  }
+  if (failure.startsWith("nav-intents-locale-parity:")) {
+    return { severity: "high", deduction: 12 };
+  }
+  if (failure.startsWith("telemetry-completeness:")) {
+    return { severity: "medium", deduction: 8 };
   }
   if (failure.startsWith("routing-precedence-parity:")) {
     return { severity: "medium", deduction: 9 };

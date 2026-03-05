@@ -17,6 +17,12 @@ import * as XLSX from "xlsx";
 import mammoth from "mammoth";
 import { UPLOAD_CONFIG } from "../../config/upload.config";
 import { logger } from "../../utils/logger";
+import {
+  PDF_MIMES,
+  DOCX_MIMES,
+  XLSX_MIMES,
+  PPTX_MIMES,
+} from "./extraction/ingestionMimeRegistry.service";
 
 export interface ValidationResult {
   isValid: boolean;
@@ -91,10 +97,10 @@ const LEGACY_FORMAT_SUGGESTIONS: Record<string, string> = {
 class FileValidatorService {
   // Supported file types (aligned with text extraction service)
   private supportedTypes = [
-    "application/pdf",
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
-    "application/vnd.openxmlformats-officedocument.presentationml.presentation", // .pptx
+    ...PDF_MIMES,
+    ...DOCX_MIMES,
+    ...XLSX_MIMES,
+    ...PPTX_MIMES,
     "text/plain", // .txt
     "text/html", // .html
     "text/csv", // .csv

@@ -1,11 +1,13 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { getStatus, startConnect, disconnect, sync } from '../services/integrationsService';
+import { getApiBaseUrl } from '../services/runtimeConfig';
+import { INTEGRATION_PROVIDERS } from '../constants/integrationProviders';
 
-const PROVIDERS = ['gmail', 'outlook', 'slack'];
+const PROVIDERS = INTEGRATION_PROVIDERS;
 
 /** Extract the most useful error message from an Axios error or generic Error. */
 function extractErrorMessage(err, fallback = 'Operation failed') {
-  // Axios response error — prefer the backend's error message
+  // Axios response error: prefer the backend's error message
   const respMsg =
     err?.response?.data?.error?.message ||
     err?.response?.data?.error ||
@@ -22,10 +24,29 @@ const DEFAULT_STATE = {
   expired: false,
   lastSyncAt: null,
   indexedDocuments: 0,
+  ingestionEnabled: false,
   syncing: false,
   connecting: false,
   error: null,
 };
+
+function resolveTrustedOAuthMessageOrigins() {
+  const origins = new Set();
+
+  if (typeof window !== 'undefined' && window.location?.origin) {
+    origins.add(window.location.origin);
+    try {
+      const apiBase = getApiBaseUrl();
+      if (apiBase) {
+        origins.add(new URL(apiBase, window.location.origin).origin);
+      }
+    } catch {
+      // Ignore invalid runtime URL values.
+    }
+  }
+
+  return origins;
+}
 
 /**
  * Hook to manage integration provider statuses.
@@ -60,6 +81,7 @@ export function useIntegrationStatus() {
             expired: Boolean(remote.expired),
             lastSyncAt: remote.lastSyncAt || null,
             indexedDocuments: remote.indexedDocuments || 0,
+            ingestionEnabled: Boolean(remote.ingestionEnabled),
             syncing: prev[p]?.syncing || false,
             connecting: prev[p]?.connecting || false,
             error: remote.error || null,
@@ -92,9 +114,8 @@ export function useIntegrationStatus() {
     let timeoutTimer = null;
     let statusPollTimer = null;
     let onMessage = null;
-    let onStorage = null;
-    let lsPollTimer = null;
     let cleaned = false;
+    const trustedOrigins = resolveTrustedOAuthMessageOrigins();
 
     // Shared cleanup for all completion signals.
     const cleanup = () => {
@@ -103,16 +124,13 @@ export function useIntegrationStatus() {
       if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
       if (timeoutTimer) { clearTimeout(timeoutTimer); timeoutTimer = null; }
       if (statusPollTimer) { clearInterval(statusPollTimer); statusPollTimer = null; }
-      if (lsPollTimer) { clearInterval(lsPollTimer); lsPollTimer = null; }
       if (onMessage) window.removeEventListener('message', onMessage);
-      if (onStorage) window.removeEventListener('storage', onStorage);
-      try { localStorage.removeItem('koda_oauth_complete'); } catch {}
     };
 
     const handleOAuthDone = () => {
       cleanup();
-      // Close the popup from the opener — more reliable than the popup
-      // trying window.close() on itself after cross-origin OAuth navigation.
+      // Close the popup from the opener. This is more reliable than the popup
+      // closing itself after cross-origin OAuth navigation.
       try { if (popup && !popup.closed) popup.close(); } catch {}
       if (mountedRef.current) {
         setProviders(prev => ({
@@ -120,6 +138,29 @@ export function useIntegrationStatus() {
           [provider]: { ...prev[provider], connecting: false },
         }));
         fetchStatus();
+      }
+    };
+
+    const handleOAuthFail = (message = 'OAuth did not complete. Please try again.') => {
+      cleanup();
+      try { if (popup && !popup.closed) popup.close(); } catch {}
+      if (!mountedRef.current) return;
+      setProviders(prev => ({
+        ...prev,
+        [provider]: {
+          ...prev[provider],
+          connecting: false,
+          error: message,
+        },
+      }));
+    };
+
+    const confirmProviderConnected = async () => {
+      try {
+        const statusMap = await getStatus();
+        return Boolean(statusMap?.[provider]?.connected);
+      } catch {
+        return false;
       }
     };
 
@@ -136,7 +177,7 @@ export function useIntegrationStatus() {
           popup.document.body.style.justifyContent = 'center';
           popup.document.body.style.height = '100vh';
           popup.document.body.style.color = '#32302C';
-          popup.document.body.innerHTML = '<div>Opening connector authorization…</div>';
+          popup.document.body.innerHTML = '<div>Opening connector authorization...</div>';
         } catch {
           // Best effort only; cross-window document writes can fail in some browsers.
         }
@@ -159,6 +200,9 @@ export function useIntegrationStatus() {
 
       // 1) Listen for completion from OAuth callback window via postMessage.
       onMessage = (event) => {
+        if (!trustedOrigins.has(String(event?.origin || ''))) return;
+        if (popup && event?.source && event.source !== popup) return;
+
         const data = event?.data;
         if (!data || typeof data !== 'object') return;
         const eventType = String(data.type || '');
@@ -169,48 +213,33 @@ export function useIntegrationStatus() {
           eventType === 'OAUTH_COMPLETE';
         if (!doneType) return;
         if (eventProvider && eventProvider !== String(provider).toLowerCase()) return;
-        handleOAuthDone();
+        if (data.ok === false) {
+          handleOAuthFail('Connection failed. Please try again.');
+          return;
+        }
+
+        Promise.resolve(confirmProviderConnected())
+          .then((connected) => {
+            if (!connected) return;
+            handleOAuthDone();
+          })
+          .catch(() => {});
       };
       window.addEventListener('message', onMessage);
 
-      // 2) Fallback: listen for localStorage change from the popup.
-      const checkLocalStorage = () => {
-        try {
-          const raw = localStorage.getItem('koda_oauth_complete');
-          if (!raw) return false;
-          const parsed = JSON.parse(raw);
-          if (String(parsed.provider).toLowerCase() === String(provider).toLowerCase()) {
-            handleOAuthDone();
-            return true;
-          }
-        } catch {}
-        return false;
-      };
-
-      onStorage = (event) => {
-        if (event.key !== 'koda_oauth_complete') return;
-        checkLocalStorage();
-      };
-      window.addEventListener('storage', onStorage);
-      lsPollTimer = setInterval(() => { checkLocalStorage(); }, 1000);
-
-      // 3) Fallback: poll the backend status endpoint every 3s.
-      //    This is the most reliable method — works even when postMessage
-      //    and localStorage both fail (cross-origin popup kills window.opener,
-      //    different ports in dev means different localStorage).
+      // 2) Fallback: poll backend status every 3s.
+      // This remains reliable even when popup cross-origin behavior blocks opener APIs.
       statusPollTimer = setInterval(async () => {
         try {
-          const statusMap = await getStatus();
-          const remote = statusMap[provider];
-          if (remote && remote.connected) {
+          if (await confirmProviderConnected()) {
             handleOAuthDone();
           }
         } catch {}
       }, 3000);
 
-      // 4) Fallback: poll for popup close.
-      //    Wrapped in try-catch because Cross-Origin-Opener-Policy can block
-      //    access to popup.closed after cross-origin navigation (e.g. Microsoft login).
+      // 3) Fallback: poll for popup close.
+      // Wrapped in try-catch because Cross-Origin-Opener-Policy can block
+      // access to popup.closed after cross-origin navigation.
       pollTimer = setInterval(() => {
         try {
           if (popup?.closed) {
@@ -224,24 +253,14 @@ export function useIntegrationStatus() {
             }
           }
         } catch {
-          // COOP blocks popup.closed — stop polling, rely on statusPoll instead.
+          // COOP blocks popup.closed. Stop polling and rely on statusPoll instead.
           if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
         }
       }, 500);
 
       // Hard timeout so UI cannot get stuck in Connecting...
       timeoutTimer = setTimeout(() => {
-        cleanup();
-        if (mountedRef.current) {
-          setProviders(prev => ({
-            ...prev,
-            [provider]: {
-              ...prev[provider],
-              connecting: false,
-              error: 'OAuth did not complete. Please try again.',
-            },
-          }));
-        }
+        handleOAuthFail('OAuth did not complete. Please try again.');
       }, 120000);
     } catch (err) {
       cleanup();

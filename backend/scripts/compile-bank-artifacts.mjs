@@ -2,9 +2,10 @@
 
 import { mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "fs";
 import { join } from "path";
+import { fileURLToPath } from "url";
 import crypto from "crypto";
 
-const BANK_ROOT = new URL("../src/data_banks", import.meta.url).pathname;
+const BANK_ROOT = fileURLToPath(new URL("../src/data_banks", import.meta.url));
 const OUT_DIR = join(BANK_ROOT, ".compiled");
 
 function readJson(filePath) {

@@ -7,9 +7,11 @@ import { rateLimitMiddleware } from "../../../middleware/rateLimit.middleware";
 import { createEditorSessionController } from "../../../controllers/editorSession.controller";
 import {
   EditingFacadeService,
+  GovernanceRuntimePolicyService,
   type EditDomain,
   type EditOperator,
   type ResolvedTarget,
+  ViewerLockedChatPolicyService,
 } from "../../../modules/editing/application";
 import DocumentRevisionStoreService from "../../../services/editing/documentRevisionStore.service";
 import { normalizeEditOperator } from "../../../services/editing/editOperatorAliases.service";
@@ -28,8 +30,6 @@ import type {
   StreamTransport,
 } from "../../../services/llm/types/llmStreaming.types";
 import { logger } from "../../../utils/logger";
-import { ViewerLockedChatPolicyService } from "../../../services/core/policy/viewerLockedChatPolicy.service";
-import { GovernanceRuntimePolicyService } from "../../../services/core/policy/governanceRuntimePolicy.service";
 
 const router = Router();
 const controller = createEditorSessionController();

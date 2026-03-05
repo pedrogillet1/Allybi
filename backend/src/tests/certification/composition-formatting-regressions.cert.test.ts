@@ -9,13 +9,17 @@ const metricKeys = [
   "noForcedAnalyticalForSimple",
   "citationAlignment",
   "citationMinimality",
+  "citationStrictNoSnippet",
   "tableNoDashCorruption",
   "tablePreservation",
+  "structureFamilyCoverage",
   "toneParityEnPt",
   "toneParityEs",
+  "esEvidenceLocalization",
   "notFoundPrecision",
   "brevityControl",
   "followupNonLooping",
+  "followupLocaleCoverage",
 ] as const;
 
 const metrics: Record<(typeof metricKeys)[number], number> = {
@@ -23,13 +27,17 @@ const metrics: Record<(typeof metricKeys)[number], number> = {
   noForcedAnalyticalForSimple: 0,
   citationAlignment: 0,
   citationMinimality: 0,
+  citationStrictNoSnippet: 0,
   tableNoDashCorruption: 0,
   tablePreservation: 0,
+  structureFamilyCoverage: 0,
   toneParityEnPt: 0,
   toneParityEs: 0,
+  esEvidenceLocalization: 0,
   notFoundPrecision: 0,
   brevityControl: 0,
   followupNonLooping: 0,
+  followupLocaleCoverage: 0,
 };
 const qualitySignals: Record<string, number> = {
   openerDistinctCount: 0,
@@ -38,6 +46,11 @@ const qualitySignals: Record<string, number> = {
   claimGuardEvidenceCount: 0,
 };
 const failures: string[] = [];
+const qualityCoverage = {
+  compareFamily: 0,
+  locateFamily: 0,
+  summaryFamily: 0,
+};
 
 function mark(metric: keyof typeof metrics, pass: boolean) {
   metrics[metric] = pass ? 1 : 0;
@@ -95,6 +108,9 @@ function bankById(bankId: string): unknown {
           { id: "a", intent: "extract", language: "en", text: "I found relevant evidence." },
           { id: "b", intent: "compare", language: "en", text: "I compared the selected documents." },
           { id: "c", intent: "extract", language: "pt", text: "Encontrei evidencias relevantes." },
+          { id: "d", intent: "compare", language: "pt", text: "Comparei os documentos selecionados." },
+          { id: "e", intent: "extract", language: "es", text: "Encontre evidencia relevante." },
+          { id: "f", intent: "compare", language: "es", text: "Compare los documentos seleccionados." },
         ],
       };
     case "followup_suggestions":
@@ -105,6 +121,11 @@ function bankById(bankId: string): unknown {
           { id: "f1", intent: "extract", language: "en", text: "check the adjacent section as a cross-check." },
           { id: "f2", intent: "compare", language: "en", text: "compare this metric with another selected document." },
           { id: "f3", intent: "extract", language: "pt", text: "verifique o mesmo valor em outro periodo." },
+          { id: "f4", intent: "compare", language: "pt", text: "compare com outro documento e destaque as diferencas materiais." },
+          { id: "f5", intent: "locate_content", language: "pt", text: "mostre o contexto da secao para validar a leitura." },
+          { id: "f6", intent: "extract", language: "es", text: "verifica este valor en otra seccion del documento." },
+          { id: "f7", intent: "compare", language: "es", text: "compara esta metrica con otro documento relacionado." },
+          { id: "f8", intent: "locate_content", language: "es", text: "muestra el contexto de la seccion para validar la lectura." },
         ],
       };
     case "fallback_messages":
@@ -119,6 +140,37 @@ function bankById(bankId: string): unknown {
             missingEvidence: "Nao consigo responder com base nas evidencias disponiveis.",
             wrongDoc: "Encontrei um documento relacionado, mas nao o selecionado.",
           },
+          es: {
+            missingEvidence: "No puedo responder con base en la evidencia disponible.",
+            wrongDoc: "Encontre un documento relacionado, pero no el que seleccionaste.",
+          },
+        },
+      };
+    case "response_templates":
+      return {
+        config: { enabled: true },
+        templates: [
+          { id: "t-en-extract", intent: "extract", language: "en" },
+          { id: "t-en-compare", intent: "compare", language: "en" },
+          { id: "t-en-locate", intent: "locate_content", language: "en" },
+          { id: "t-en-summary", intent: "summary", language: "en" },
+          { id: "t-pt-extract", intent: "extract", language: "pt" },
+          { id: "t-pt-compare", intent: "compare", language: "pt" },
+          { id: "t-pt-locate", intent: "locate_content", language: "pt" },
+          { id: "t-pt-summary", intent: "summary", language: "pt" },
+          { id: "t-es-extract", intent: "extract", language: "es" },
+          { id: "t-es-compare", intent: "compare", language: "es" },
+          { id: "t-es-locate", intent: "locate_content", language: "es" },
+          { id: "t-es-summary", intent: "summary", language: "es" },
+        ],
+      };
+    case "help_microcopy":
+      return {
+        config: { enabled: true },
+        messages: {
+          en: { clarify: "share period and scope for safer detail." },
+          pt: { clarify: "informe periodo e escopo para resposta mais segura." },
+          es: { clarify: "indica periodo y alcance para una respuesta mas segura." },
         },
       };
     default:
@@ -137,6 +189,8 @@ function makeAnalyticalOutput(params: {
   language?: Lang;
   attachments?: unknown[];
   short?: boolean;
+  queryProfile?: string;
+  intentFamily?: string;
 }): string {
   const enforcer = new ResponseContractEnforcerService();
   const out = enforcer.enforce(
@@ -147,8 +201,9 @@ function makeAnalyticalOutput(params: {
     {
       answerMode: "general_answer",
       language: params.language || "en",
+      intentFamily: params.intentFamily,
       constraints: params.short ? { userRequestedShort: true } : undefined,
-      signals: { queryProfile: "analytical" },
+      signals: { queryProfile: params.queryProfile || "analytical" },
     },
   );
   return String(out.content || "");
@@ -233,6 +288,67 @@ describe("Certification: composition formatting regressions", () => {
     expect(pass).toBe(true);
   });
 
+  test("2b) structured template applies to extract profile family", () => {
+    const enforcer = new ResponseContractEnforcerService();
+    const out = enforcer.enforce(
+      { content: "Revenue increased in Q1.", attachments: sourceButtonsAttachment() as any },
+      {
+        answerMode: "general_answer",
+        language: "en",
+        signals: { queryProfile: "extract" },
+      },
+    );
+    const content = String(out.content || "");
+    expect(content).toContain("Extraction result:");
+    expect(content).toContain("Direct answer:");
+    expect(content).toContain("Key evidence:");
+    expect(content).toContain("Sources used:");
+  });
+
+  test("2c) structured template maps compare profile to compare family heading", () => {
+    const content = makeAnalyticalOutput({
+      content: "Doc A has lower churn than Doc B.",
+      attachments: sourceButtonsAttachment(),
+      queryProfile: "compare",
+      intentFamily: "compare",
+    });
+    expect(content).toContain("Comparison result:");
+    expect(content).toContain("Direct answer:");
+    expect(content).toContain("Sources used:");
+    qualityCoverage.compareFamily = content.includes("Comparison result:") ? 1 : 0;
+  });
+
+  test("2d) structured template maps locate profile to location family heading", () => {
+    const content = makeAnalyticalOutput({
+      content: "The clause appears in page 14.",
+      attachments: sourceButtonsAttachment(),
+      queryProfile: "locate_content",
+      intentFamily: "locate_content",
+    });
+    expect(content).toContain("Location result:");
+    expect(content).toContain("Key evidence:");
+    qualityCoverage.locateFamily = content.includes("Location result:") ? 1 : 0;
+  });
+
+  test("2e) structured template maps summary profile to summary family heading", () => {
+    const content = makeAnalyticalOutput({
+      content: "Q1 improved vs prior quarter due to better collections.",
+      attachments: sourceButtonsAttachment(),
+      queryProfile: "summary",
+      intentFamily: "summary",
+    });
+    expect(content).toContain("Summary:");
+    expect(content).toContain("Direct answer:");
+    qualityCoverage.summaryFamily = content.includes("Summary:") ? 1 : 0;
+    const coverageScore =
+      qualityCoverage.compareFamily +
+      qualityCoverage.locateFamily +
+      qualityCoverage.summaryFamily;
+    const pass = coverageScore === 3;
+    mark("structureFamilyCoverage", pass);
+    expect(pass).toBe(true);
+  });
+
   test("3) citation alignment keeps sources section scoped and removes unsupported claims", () => {
     const content = makeAnalyticalOutput({
       content: "Revenue increased in Q1. EBITDA margin reached 80%.",
@@ -251,6 +367,26 @@ describe("Certification: composition formatting regressions", () => {
       : 0;
     mark("citationAlignment", pass);
     expect(pass).toBe(true);
+  });
+
+  test("3b) citation guard drops unsupported claims when only metadata is available", () => {
+    const content = makeAnalyticalOutput({
+      content: "Revenue increased in Q1. EBITDA margin reached 80%.",
+      attachments: sourceButtonsAttachment(),
+    });
+    expect(content).toContain("Removed 2 claim(s) without direct citation support.");
+    expect(content).toContain("I cannot answer that from current document evidence.");
+    expect(content).not.toContain("Revenue increased in Q1.");
+    expect(content).not.toContain("EBITDA margin reached 80%.");
+    mark("citationStrictNoSnippet", true);
+  });
+
+  test("3c) citation evidence lines include claim-linked support text when snippets exist", () => {
+    const content = makeAnalyticalOutput({
+      content: "Revenue increased in Q1 due to subscriptions.",
+      attachments: sourceButtonsWithSnippets(),
+    });
+    expect(content).toContain('supports: "Revenue increased in Q1 due to subscriptions.');
   });
 
   test("4) citation minimality limits source bullets", () => {
@@ -335,13 +471,17 @@ describe("Certification: composition formatting regressions", () => {
       attachments: sourceButtonsAttachment(),
     });
     const pass =
+      es.includes("Resultado de la extraccion:") &&
       es.includes("Respuesta directa:") &&
       es.includes("Evidencia clave:") &&
       es.includes("Fuentes utilizadas:") &&
+      es.includes("Evidencia referenciada en") &&
       es.includes("En resumen,") &&
       es.includes("Si quieres,") &&
-      !es.includes("Direct answer:");
+      !es.includes("Direct answer:") &&
+      !es.includes("Evidence referenced from");
     mark("toneParityEs", pass);
+    mark("esEvidenceLocalization", pass);
     expect(pass).toBe(true);
   });
 
@@ -382,13 +522,36 @@ describe("Certification: composition formatting regressions", () => {
   test("10) follow-up lines are non-looping across seeds", () => {
     const outputs = [
       makeAnalyticalOutput({ content: "Revenue increased in Q1.", attachments: sourceButtonsAttachment() }),
-      makeAnalyticalOutput({ content: "Revenue decreased in Q2.", attachments: sourceButtonsAttachment() }),
-      makeAnalyticalOutput({ content: "Revenue stabilized in Q3.", attachments: sourceButtonsAttachment() }),
+      makeAnalyticalOutput({
+        content: "Metric differs between the selected files.",
+        attachments: sourceButtonsAttachment(),
+        queryProfile: "compare",
+        intentFamily: "compare",
+      }),
+      makeAnalyticalOutput({
+        content: "Receita estabilizou no terceiro trimestre.",
+        language: "pt",
+        attachments: sourceButtonsAttachment(),
+        queryProfile: "locate_content",
+        intentFamily: "locate_content",
+      }),
+      makeAnalyticalOutput({
+        content: "Los ingresos bajaron en el segundo trimestre.",
+        language: "es",
+        attachments: sourceButtonsAttachment(),
+        queryProfile: "extract",
+        intentFamily: "extract",
+      }),
     ];
     const followups = outputs.map(extractFollowupLine).filter(Boolean);
     qualitySignals.followupDistinctCount = new Set(followups).size;
-    const pass = followups.length >= 2 && new Set(followups).size >= 2;
+    const pass =
+      followups.length >= 4 &&
+      new Set(followups).size >= 2 &&
+      followups.some((line) => line.startsWith("Se quiser,")) &&
+      followups.some((line) => line.startsWith("Si quieres,"));
     mark("followupNonLooping", pass);
+    mark("followupLocaleCoverage", pass);
     expect(pass).toBe(true);
   });
 });
@@ -405,13 +568,17 @@ afterAll(() => {
       noForcedAnalyticalForSimple: 1,
       citationAlignment: 1,
       citationMinimality: 1,
+      citationStrictNoSnippet: 1,
       tableNoDashCorruption: 1,
       tablePreservation: 1,
+      structureFamilyCoverage: 1,
       toneParityEnPt: 1,
       toneParityEs: 1,
+      esEvidenceLocalization: 1,
       notFoundPrecision: 1,
       brevityControl: 1,
       followupNonLooping: 1,
+      followupLocaleCoverage: 1,
     },
     failures,
   });

@@ -6,6 +6,7 @@ import { useIntegrationStatus } from '../../hooks/useIntegrationStatus';
 import gmailSvg from '../../assets/Gmail.svg';
 import outlookSvg from '../../assets/outlook.svg';
 import slackSvg from '../../assets/slack.svg';
+import { INTEGRATION_PROVIDERS } from '../../constants/integrationProviders';
 
 const PROVIDER_META = {
   gmail:   { label: 'Gmail',   icon: gmailSvg },
@@ -274,7 +275,7 @@ export default function IntegrationsCard() {
           <Spinner size={20} />
         </div>
       ) : (
-        ['gmail', 'outlook', 'slack'].map(provider => (
+        INTEGRATION_PROVIDERS.map(provider => (
           <ProviderRow
             key={provider}
             provider={provider}

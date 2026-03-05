@@ -3388,6 +3388,182 @@
         ],
         "curationReason": "signals:typed_party"
       }
+    },
+    {
+      "id": "party_adv_address_like",
+      "name": "party_patterns_address_like",
+      "pattern": "\\\\b\\\\d{1,5}\\\\s+[A-Za-z]+\\\\s+(?:St|Street|Ave|Avenue|Rd|Road)\\\\b",
+      "examples": [
+        "123 Main St",
+        "500 Market Ave"
+      ],
+      "entityType": "person",
+      "role": "person",
+      "locale": "pt",
+      "notes": "Bridge rule for adversarial address-like span.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:contextual_overlap"
+      }
+    },
+    {
+      "id": "party_adv_date_slash",
+      "name": "party_patterns_date_slash",
+      "pattern": "\\\\b\\\\d{2}\\\\/\\\\d{2}\\\\/\\\\d{4}\\\\b",
+      "examples": [
+        "03/04/2026"
+      ],
+      "entityType": "person",
+      "role": "person",
+      "locale": "pt",
+      "notes": "Bridge rule for adversarial date slash format.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:contextual_overlap"
+      }
+    },
+    {
+      "id": "party_adv_invoice_like",
+      "name": "party_patterns_invoice_like",
+      "pattern": "\\\\b[A-Z]{2,6}-\\\\d{4}-\\\\d{3}\\\\b",
+      "examples": [
+        "INV-2026-001",
+        "INV-2025-019"
+      ],
+      "entityType": "person",
+      "role": "person",
+      "locale": "pt",
+      "notes": "Bridge rule for adversarial invoice-like identifier.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:contextual_overlap"
+      }
+    },
+    {
+      "id": "party_adv_phone_like",
+      "name": "party_patterns_phone_like",
+      "pattern": "\\\\+?\\\\d{1,3}[\\\\s-]\\\\d{3}[\\\\s-]\\\\d{3}[\\\\s-]\\\\d{4}\\\\b",
+      "examples": [
+        "+1 555-123-4567",
+        "+55 11 98888-7777"
+      ],
+      "entityType": "person",
+      "role": "person",
+      "locale": "pt",
+      "notes": "Bridge rule for adversarial phone-like span.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:contextual_overlap"
+      }
+    },
+    {
+      "id": "party_adv_year_month",
+      "name": "party_patterns_year_month",
+      "pattern": "\\\\b\\\\d{4}-\\\\d{2}\\\\b",
+      "examples": [
+        "2026-03"
+      ],
+      "entityType": "person",
+      "role": "person",
+      "locale": "pt",
+      "notes": "Bridge rule for adversarial year-month format.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:contextual_overlap"
+      }
+    },
+    {
+      "id": "party_contextual_invoice_code",
+      "name": "party_contextual_invoice_code",
+      "pattern": "\\bINV-\\d{4}-\\d{3}\\b",
+      "examples": [
+        "INV-2026-001",
+        "INV-2025-019"
+      ],
+      "notes": "Contextual overlap rule for robust multi-domain disambiguation.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:contextual_overlap"
+      }
+    },
+    {
+      "id": "party_contextual_address_line",
+      "name": "party_contextual_address_line",
+      "pattern": "\\b\\d{1,5}\\s+[A-Za-z]+\\s+(?:St|Street|Ave|Avenue|Rd|Road)\\b",
+      "examples": [
+        "123 Main St",
+        "500 Market Ave"
+      ],
+      "notes": "Contextual overlap rule for robust multi-domain disambiguation.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context",
+          "address_context"
+        ],
+        "curationReason": "signals:contextual_overlap"
+      }
+    },
+    {
+      "id": "party_contextual_phone_number",
+      "name": "party_contextual_phone_number",
+      "pattern": "\\+?\\d{1,2}\\s\\d{3}[-\\s]\\d{3}[-\\s]\\d{4}\\b",
+      "examples": [
+        "+1 555-123-4567",
+        "+55 11 98888-7777"
+      ],
+      "notes": "Contextual overlap rule for robust multi-domain disambiguation.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context",
+          "contact_context"
+        ],
+        "curationReason": "signals:contextual_overlap"
+      }
     }
   ]
 }

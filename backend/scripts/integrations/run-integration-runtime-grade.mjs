@@ -118,12 +118,42 @@ async function main() {
     "handlers",
     "connectorHandler.service.ts",
   );
+  const frontendOAuthCallbackPath = path.join(
+    backendRoot,
+    "..",
+    "frontend",
+    "src",
+    "components",
+    "auth",
+    "OAuthCallback.jsx",
+  );
+  const frontendIntegrationsHookPath = path.join(
+    backendRoot,
+    "..",
+    "frontend",
+    "src",
+    "hooks",
+    "useIntegrationStatus.js",
+  );
+  const frontendChatPath = path.join(
+    backendRoot,
+    "..",
+    "frontend",
+    "src",
+    "components",
+    "chat",
+    "v2",
+    "ChatInterfaceV2.impl.js",
+  );
 
   const controllerText = readFileSafe(controllerPath);
   const routesText = readFileSafe(routesPath);
   const queueText = readFileSafe(queuePath);
   const workerText = readFileSafe(workerPath);
   const handlerText = readFileSafe(handlerPath);
+  const frontendOAuthCallbackText = readFileSafe(frontendOAuthCallbackPath);
+  const frontendIntegrationsHookText = readFileSafe(frontendIntegrationsHookPath);
+  const frontendChatText = readFileSafe(frontendChatPath);
 
   checks.push({
     id: "no_wildcard_postmessage",
@@ -142,6 +172,48 @@ async function main() {
       !/\berr\?\.message\b/.test(routesText) &&
       !/\be\?\.message\b/.test(controllerText),
     detail: "Integrations routes/controller must not return raw exception messages.",
+  });
+
+  checks.push({
+    id: "oauth_callback_no_localstorage_fallback",
+    severity: "high",
+    weight: 20,
+    pass: !/koda_oauth_complete/.test(controllerText),
+    detail:
+      "OAuth callback page must not use localStorage fallback for completion signaling.",
+  });
+
+  checks.push({
+    id: "frontend_oauth_callback_no_url_token_ingest",
+    severity: "high",
+    weight: 20,
+    pass:
+      !/searchParams\.get\(['"]accessToken['"]\)/.test(frontendOAuthCallbackText) &&
+      !/searchParams\.get\(['"]refreshToken['"]\)/.test(frontendOAuthCallbackText) &&
+      !/localStorage\.setItem\(['"]accessToken['"]/.test(frontendOAuthCallbackText) &&
+      !/localStorage\.setItem\(['"]refreshToken['"]/.test(frontendOAuthCallbackText),
+    detail:
+      "Frontend OAuth callback must not read tokens from URL query or write auth tokens to localStorage.",
+  });
+
+  checks.push({
+    id: "frontend_oauth_completion_no_localstorage_signal",
+    severity: "medium",
+    weight: 10,
+    pass: !/koda_oauth_complete/.test(frontendIntegrationsHookText),
+    detail:
+      "Frontend integrations OAuth completion flow must not rely on localStorage cross-window signaling.",
+  });
+
+  checks.push({
+    id: "frontend_oauth_message_origin_validation",
+    severity: "high",
+    weight: 15,
+    pass:
+      /trustedOrigins\.has\(/.test(frontendIntegrationsHookText) &&
+      /connectorMessageOrigins\.has\(/.test(frontendChatText),
+    detail:
+      "OAuth completion messages must enforce trusted origin checks in integrations and chat surfaces.",
   });
 
   checks.push({

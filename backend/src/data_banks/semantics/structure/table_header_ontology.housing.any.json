@@ -147,6 +147,44 @@
       "scope": "table_header:housing",
       "disambiguationRuleId": "headers_disambiguation_housing_utility_costs",
       "curationReason": "weighted:utility_costs:domain_housing"
+    },
+    {
+      "canonical": "lease_terms",
+      "synonyms": [
+        "lease terms",
+        "Lease Terms field",
+        "campo lease_terms",
+        "lease_terms value",
+        "Lease Terms valor"
+      ],
+      "related": [
+        "mortgage_amortization",
+        "hoa_fees"
+      ],
+      "normalizationNotes": "Map lease_terms to normalized canonical lease_terms.",
+      "priority": 506,
+      "scope": "table_header:housing",
+      "disambiguationRuleId": "headers_disambiguation_housing_lease_terms",
+      "curationReason": "weighted:lease_terms:domain_housing"
+    },
+    {
+      "canonical": "maintenance_history",
+      "synonyms": [
+        "maintenance history",
+        "Maintenance History field",
+        "campo maintenance_history",
+        "maintenance_history value",
+        "Maintenance History valor"
+      ],
+      "related": [
+        "mortgage_amortization",
+        "hoa_fees"
+      ],
+      "normalizationNotes": "Map maintenance_history to normalized canonical maintenance_history.",
+      "priority": 507,
+      "scope": "table_header:housing",
+      "disambiguationRuleId": "headers_disambiguation_housing_maintenance_history",
+      "curationReason": "weighted:maintenance_history:domain_housing"
     }
   ]
 }

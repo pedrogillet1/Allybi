@@ -4,12 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { DEFAULT_AUTH_REDIRECT, ROUTES, STORAGE_KEYS } from '../../constants/routes';
 import { useAuthModal } from '../../context/AuthModalContext';
-const AUTH_LOCALSTORAGE_COMPAT = process.env.REACT_APP_AUTH_LOCALSTORAGE_COMPAT === 'true';
 
 const buildAuthHeader = () => {
-    if (!AUTH_LOCALSTORAGE_COMPAT) return {};
-    const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
-    return token ? { Authorization: `Bearer ${token}` } : {};
+    return {};
 };
 
 const Verification = ({ variant = 'page' }) => {
@@ -415,3 +412,4 @@ const Verification = ({ variant = 'page' }) => {
 };
 
 export default Verification;
+

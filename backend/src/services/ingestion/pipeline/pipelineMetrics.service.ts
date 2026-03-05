@@ -70,6 +70,8 @@ let tableScaleDetectedCount = 0;
 let tableScaleCapturedCount = 0;
 let indexEncryptionCompliantCount = 0;
 let indexEncryptionTotalCount = 0;
+let indexPlaintextSensitiveFieldViolationCount = 0;
+let indexingActiveOperationConflictCount = 0;
 
 // ---------------------------------------------------------------------------
 // Recording functions
@@ -150,6 +152,16 @@ export function recordIndexingQualityMetrics(params: {
   indexEncryptionTotalCount += Math.max(0, Math.trunc(params.encryptionTotal));
 }
 
+export function recordIndexingPlaintextSensitiveFieldViolation(
+  count = 1,
+): void {
+  indexPlaintextSensitiveFieldViolationCount += Math.max(0, Math.trunc(count));
+}
+
+export function recordIndexingActiveOperationConflict(count = 1): void {
+  indexingActiveOperationConflictCount += Math.max(0, Math.trunc(count));
+}
+
 // ---------------------------------------------------------------------------
 // Query functions
 // ---------------------------------------------------------------------------
@@ -204,6 +216,8 @@ export function getMetricsSummary(): {
   indexingMetadataCompleteness: { complete: number; total: number; rate: number };
   tableScaleCapture: { detected: number; captured: number; rate: number };
   indexEncryptionCompliance: { compliant: number; total: number; rate: number };
+  indexPlaintextSensitiveFieldViolations: number;
+  indexingActiveOperationConflicts: number;
 } {
   const rate =
     totalExtractionAttempts > 0
@@ -251,6 +265,9 @@ export function getMetricsSummary(): {
           ? indexEncryptionCompliantCount / indexEncryptionTotalCount
           : 0,
     },
+    indexPlaintextSensitiveFieldViolations:
+      indexPlaintextSensitiveFieldViolationCount,
+    indexingActiveOperationConflicts: indexingActiveOperationConflictCount,
   };
 }
 
@@ -276,4 +293,6 @@ export function resetMetrics(): void {
   tableScaleCapturedCount = 0;
   indexEncryptionCompliantCount = 0;
   indexEncryptionTotalCount = 0;
+  indexPlaintextSensitiveFieldViolationCount = 0;
+  indexingActiveOperationConflictCount = 0;
 }

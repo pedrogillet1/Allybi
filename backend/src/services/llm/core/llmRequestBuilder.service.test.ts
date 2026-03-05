@@ -357,6 +357,83 @@ describe("LlmRequestBuilderService", () => {
     expect(payloadStats?.estimatedPromptTokens).toBeGreaterThan(0);
   });
 
+  test("renders structured table context in evidence block", () => {
+    const builder = new LlmRequestBuilderService(prompts);
+    const req = builder.build(
+      createInput({
+        signals: {
+          ...createInput().signals,
+          answerMode: "doc_grounded_table",
+        },
+        evidencePack: {
+          evidence: [
+            {
+              docId: "doc_fin_1",
+              locationKey: "d:doc_fin_1|p:3|sec:income_statement",
+              evidenceType: "table" as const,
+              location: { page: 3, sectionKey: "income_statement" },
+              table: {
+                header: ["Metric", "Q1", "Q2"],
+                rows: [["Revenue", 1250, 1300]],
+                unitAnnotation: {
+                  unitRaw: "$M",
+                  unitNormalized: "USD_MILLIONS",
+                },
+                scaleFactor: "millions",
+                footnotes: ["(1) Restated"],
+              },
+            },
+          ],
+        },
+      }),
+    );
+
+    const userMessage = req.messages.find((msg) => msg.role === "user");
+    const content = userMessage?.content || "";
+    expect(content).toContain("tableContext=");
+    expect(content).toContain("headers=[Metric | Q1 | Q2]");
+    expect(content).toContain("unit=$M/USD_MILLIONS");
+    expect(content).toContain("scale=millions");
+    expect(content).toContain("footnotes=[(1) Restated]");
+  });
+
+  test("snippet clipping preserves negation and numeric unit boundaries", () => {
+    const builder = new LlmRequestBuilderService(prompts);
+    const req = builder.build(
+      createInput({
+        signals: {
+          ...createInput().signals,
+          answerMode: "doc_grounded_single",
+        },
+        evidencePack: {
+          evidence: [
+            {
+              docId: "doc_1",
+              locationKey: "loc_1",
+              evidenceType: "text" as const,
+              snippet:
+                `${"A".repeat(206)} did not decrease 10 % during the audited period due to offsetting factors.`,
+            },
+          ],
+        },
+      }),
+    );
+
+    const userMessage = req.messages.find((msg) => msg.role === "user");
+    const content = String(userMessage?.content || "");
+    expect(content).toContain("did not decrease");
+    expect(content).toContain("10 %");
+  });
+
+  test("snippet clipping preserves non-currency unit tokens from normalization patterns", () => {
+    const builder = new LlmRequestBuilderService(prompts);
+    const clipped = (builder as any).clipSnippetPreservingSemantics(
+      `${"B".repeat(25)} 3 kg`,
+      28,
+    ) as string;
+    expect(clipped).toContain("3 kg");
+  });
+
   test("resolves max input tokens for pinned OpenAI model versions via family key", () => {
     mockedGetOptionalBank.mockImplementation((bankId: string) => {
       if (bankId === "provider_capabilities") {

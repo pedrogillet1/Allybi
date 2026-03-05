@@ -144,6 +144,24 @@ if (activeManifest) {
       `ACTIVE_MANIFEST_MISSING_REQUIRED_ARTIFACTS:${missingRequiredArtifacts}`,
     );
   }
+  const staleExtraArtifacts = Number(
+    activeManifest?.stats?.staleExtraArtifacts ??
+      summary?.artifactInventory?.staleExtraGateArtifacts ??
+      0,
+  );
+  const maxStaleExtraArtifacts = Number(
+    process.env.CERT_MAX_STALE_EXTRA_GATE_ARTIFACTS ||
+      (strict ? 25 : 100),
+  );
+  if (
+    Number.isFinite(maxStaleExtraArtifacts) &&
+    maxStaleExtraArtifacts >= 0 &&
+    staleExtraArtifacts > maxStaleExtraArtifacts
+  ) {
+    failures.push(
+      `ACTIVE_MANIFEST_STALE_EXTRA_ARTIFACTS_EXCEEDED:${staleExtraArtifacts}>${maxStaleExtraArtifacts}`,
+    );
+  }
 }
 
 const runtimeWiringGate = Array.isArray(summary.gates)

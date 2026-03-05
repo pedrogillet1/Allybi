@@ -12,7 +12,7 @@
       "services/core/banks/dataBankLoader.service.ts"
     ],
     "tests": [
-      "tests/patternWiringProof.test.ts"
+      "src/tests/document-intelligence/docint-eval-pack.test.ts"
     ]
   },
   "config": {
@@ -22,7 +22,14 @@
     "requireUniqueCaseIds": true,
     "requireJsonlParse": true,
     "minimumNegativeRatio": 0.2,
-    "parityTolerancePercent": 25
+    "parityTolerancePercent": 5,
+    "governanceThresholds": {
+      "minQueryFamilies": 4,
+      "minDomains": 15,
+      "minNegativeRatio": 0.2,
+      "maxParityGap": 0.05,
+      "maxUnregisteredFiles": 0
+    }
   },
   "schema": {
     "required": [
@@ -65,6 +72,12 @@
       "path": "document_intelligence/eval/crossdoc.qa.jsonl",
       "maxCases": 190,
       "description": "Cross-document scope lock gate."
+    },
+    {
+      "id": "wrong_doc_traps_ci",
+      "path": "document_intelligence/eval/wrong_doc_traps.qa.jsonl",
+      "maxCases": 50,
+      "description": "Wrong-document trap and lock contamination gate."
     }
   ],
   "nightly_suites": [
@@ -94,6 +107,11 @@
       "description": "Full wrong-scope and cross-doc lock suite."
     },
     {
+      "id": "wrong_doc_traps_full",
+      "path": "document_intelligence/eval/wrong_doc_traps.qa.jsonl",
+      "description": "Wrong-document trap and lock contamination suite."
+    },
+    {
       "id": "finance_core_full",
       "path": "document_intelligence/eval/domain_specific/finance/finance_core.qa.jsonl",
       "description": "Finance document pack coverage suite."
@@ -117,6 +135,62 @@
       "id": "everyday_core_full",
       "path": "document_intelligence/eval/domain_specific/everyday/everyday_core.qa.jsonl",
       "description": "Everyday document pack coverage suite."
+    },
+    {
+      "id": "eval_inventory_full",
+      "path": "document_intelligence/eval/",
+      "inventoryOnly": true,
+      "description": "Inventory registration for non-core eval suites; excluded from coverage metrics."
+    },
+    {
+      "id": "banking_core_full",
+      "path": "document_intelligence/eval/domain_specific/banking/banking_core.qa.jsonl",
+      "description": "Banking document pack coverage suite."
+    },
+    {
+      "id": "billing_core_full",
+      "path": "document_intelligence/eval/domain_specific/billing/billing_core.qa.jsonl",
+      "description": "Billing document pack coverage suite."
+    },
+    {
+      "id": "education_core_full",
+      "path": "document_intelligence/eval/domain_specific/education/education_core.qa.jsonl",
+      "description": "Education document pack coverage suite."
+    },
+    {
+      "id": "housing_core_full",
+      "path": "document_intelligence/eval/domain_specific/housing/housing_core.qa.jsonl",
+      "description": "Housing document pack coverage suite."
+    },
+    {
+      "id": "hr_payroll_core_full",
+      "path": "document_intelligence/eval/domain_specific/hr_payroll/hr_payroll_core.qa.jsonl",
+      "description": "Hr Payroll document pack coverage suite."
+    },
+    {
+      "id": "identity_core_full",
+      "path": "document_intelligence/eval/domain_specific/identity/identity_core.qa.jsonl",
+      "description": "Identity document pack coverage suite."
+    },
+    {
+      "id": "insurance_core_full",
+      "path": "document_intelligence/eval/domain_specific/insurance/insurance_core.qa.jsonl",
+      "description": "Insurance document pack coverage suite."
+    },
+    {
+      "id": "ops_core_full",
+      "path": "document_intelligence/eval/domain_specific/ops/ops_core.qa.jsonl",
+      "description": "Ops document pack coverage suite."
+    },
+    {
+      "id": "tax_core_full",
+      "path": "document_intelligence/eval/domain_specific/tax/tax_core.qa.jsonl",
+      "description": "Tax document pack coverage suite."
+    },
+    {
+      "id": "travel_core_full",
+      "path": "document_intelligence/eval/domain_specific/travel/travel_core.qa.jsonl",
+      "description": "Travel document pack coverage suite."
     }
   ],
   "suites": [
@@ -141,11 +215,21 @@
       "path": "document_intelligence/eval/section_detection.qa.jsonl",
       "minimumCases": 280,
       "domains": [
+        "accounting",
+        "banking",
+        "billing",
+        "education",
+        "everyday",
         "finance",
+        "housing",
+        "hr_payroll",
+        "identity",
+        "insurance",
         "legal",
         "medical",
-        "accounting",
-        "everyday"
+        "ops",
+        "tax",
+        "travel"
       ],
       "requiredLangs": [
         "en",
@@ -194,6 +278,32 @@
         "medical",
         "accounting",
         "everyday"
+      ],
+      "requiredLangs": [
+        "en",
+        "pt"
+      ]
+    },
+    {
+      "id": "wrong_doc_traps_core",
+      "path": "document_intelligence/eval/wrong_doc_traps.qa.jsonl",
+      "minimumCases": 50,
+      "domains": [
+        "accounting",
+        "banking",
+        "billing",
+        "education",
+        "everyday",
+        "finance",
+        "housing",
+        "hr_payroll",
+        "identity",
+        "insurance",
+        "legal",
+        "medical",
+        "ops",
+        "tax",
+        "travel"
       ],
       "requiredLangs": [
         "en",
@@ -259,6 +369,126 @@
         "en",
         "pt"
       ]
+    },
+    {
+      "id": "banking_core_suite",
+      "path": "document_intelligence/eval/domain_specific/banking/banking_core.qa.jsonl",
+      "minimumCases": 30,
+      "domains": [
+        "banking"
+      ],
+      "requiredLangs": [
+        "en",
+        "pt"
+      ]
+    },
+    {
+      "id": "billing_core_suite",
+      "path": "document_intelligence/eval/domain_specific/billing/billing_core.qa.jsonl",
+      "minimumCases": 30,
+      "domains": [
+        "billing"
+      ],
+      "requiredLangs": [
+        "en",
+        "pt"
+      ]
+    },
+    {
+      "id": "education_core_suite",
+      "path": "document_intelligence/eval/domain_specific/education/education_core.qa.jsonl",
+      "minimumCases": 30,
+      "domains": [
+        "education"
+      ],
+      "requiredLangs": [
+        "en",
+        "pt"
+      ]
+    },
+    {
+      "id": "housing_core_suite",
+      "path": "document_intelligence/eval/domain_specific/housing/housing_core.qa.jsonl",
+      "minimumCases": 30,
+      "domains": [
+        "housing"
+      ],
+      "requiredLangs": [
+        "en",
+        "pt"
+      ]
+    },
+    {
+      "id": "hr_payroll_core_suite",
+      "path": "document_intelligence/eval/domain_specific/hr_payroll/hr_payroll_core.qa.jsonl",
+      "minimumCases": 30,
+      "domains": [
+        "hr_payroll"
+      ],
+      "requiredLangs": [
+        "en",
+        "pt"
+      ]
+    },
+    {
+      "id": "identity_core_suite",
+      "path": "document_intelligence/eval/domain_specific/identity/identity_core.qa.jsonl",
+      "minimumCases": 30,
+      "domains": [
+        "identity"
+      ],
+      "requiredLangs": [
+        "en",
+        "pt"
+      ]
+    },
+    {
+      "id": "insurance_core_suite",
+      "path": "document_intelligence/eval/domain_specific/insurance/insurance_core.qa.jsonl",
+      "minimumCases": 30,
+      "domains": [
+        "insurance"
+      ],
+      "requiredLangs": [
+        "en",
+        "pt"
+      ]
+    },
+    {
+      "id": "ops_core_suite",
+      "path": "document_intelligence/eval/domain_specific/ops/ops_core.qa.jsonl",
+      "minimumCases": 120,
+      "domains": [
+        "ops"
+      ],
+      "requiredLangs": [
+        "en",
+        "pt"
+      ]
+    },
+    {
+      "id": "tax_core_suite",
+      "path": "document_intelligence/eval/domain_specific/tax/tax_core.qa.jsonl",
+      "minimumCases": 30,
+      "domains": [
+        "tax"
+      ],
+      "requiredLangs": [
+        "en",
+        "pt"
+      ]
+    },
+    {
+      "id": "travel_core_suite",
+      "path": "document_intelligence/eval/domain_specific/travel/travel_core.qa.jsonl",
+      "minimumCases": 30,
+      "domains": [
+        "travel"
+      ],
+      "requiredLangs": [
+        "en",
+        "pt"
+      ]
     }
   ],
   "suite_stats": {
@@ -267,6 +497,7 @@
     "abbreviation_resolution": 240,
     "answer_format": 240,
     "crossdoc": 190,
+    "wrong_doc_traps": 50,
     "finance_core": 320,
     "legal_core": 320,
     "medical_core": 320,

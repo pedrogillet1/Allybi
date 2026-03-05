@@ -101,13 +101,52 @@ describe("Certification: P0 runtime-wiring gate mapping", () => {
     expect(scriptText).toContain("model-governance-perimeter.json");
   });
 
-  test("routing SLO requires canonical routing-behavioral gate id", () => {
+  test("routing SLO enforces canonical routing + scope gate set", () => {
     const backendRoot = resolveBackendRoot();
     const sloScript = fs.readFileSync(
       path.join(backendRoot, "scripts", "audit", "routing-quality-slo.mjs"),
       "utf8",
     );
     expect(sloScript).toMatch(/getGate\("routing-behavioral"\)/);
-    expect(sloScript).not.toMatch(/getGate\("routing-determinism"\)/);
+    expect(sloScript).toMatch(/getGate\("followup-overlay-integrity"\)/);
+    expect(sloScript).toMatch(/recordSimpleGateCheck\("collision-matrix-exhaustive"\)/);
+    expect(sloScript).toMatch(/recordSimpleGateCheck\("collision-cross-family-tiebreak"\)/);
+    expect(sloScript).toMatch(/recordSimpleGateCheck\("routing-determinism"\)/);
+    expect(sloScript).toMatch(/recordSimpleGateCheck\("routing-determinism-runtime-e2e"\)/);
+    expect(sloScript).toMatch(/recordSimpleGateCheck\("scope-integrity"\)/);
+    expect(sloScript).toMatch(/recordSimpleGateCheck\("scope-boundary-locks"\)/);
+    expect(sloScript).toMatch(/recordSimpleGateCheck\("slot-contracts-wiring"\)/);
+    expect(sloScript).toMatch(/recordSimpleGateCheck\("slot-extraction-e2e"\)/);
+    expect(sloScript).toMatch(/recordSimpleGateCheck\("disambiguation-e2e"\)/);
+    expect(sloScript).toMatch(/recordSimpleGateCheck\("intent-precision"\)/);
+    expect(sloScript).toMatch(/recordSimpleGateCheck\("intent-family-firstclass"\)/);
+    expect(sloScript).toMatch(/recordSimpleGateCheck\("routing-family-alias-consistency"\)/);
+    expect(sloScript).toMatch(/recordSimpleGateCheck\("routing-integration-intents-parity"\)/);
+    expect(sloScript).toMatch(/recordSimpleGateCheck\("nav-intents-locale-parity"\)/);
+    expect(sloScript).toMatch(/recordSimpleGateCheck\("telemetry-completeness"\)/);
+  });
+
+  test("test:cert:wiring includes routing collision/determinism/scope/slot/disambiguation/precision gates", () => {
+    const backendRoot = resolveBackendRoot();
+    const pkg = JSON.parse(
+      fs.readFileSync(path.join(backendRoot, "package.json"), "utf8"),
+    ) as { scripts?: Record<string, string> };
+    const script = String(pkg?.scripts?.["test:cert:wiring"] || "");
+    expect(script).toContain("followup-overlay-integrity.cert.test.ts");
+    expect(script).toContain("collision-matrix-exhaustive.cert.test.ts");
+    expect(script).toContain("collision-cross-family-tiebreak.cert.test.ts");
+    expect(script).toContain("routing-determinism.cert.test.ts");
+    expect(script).toContain("scope-integrity.cert.test.ts");
+    expect(script).toContain("scope-boundary-locks.cert.test.ts");
+    expect(script).toContain("slot-contracts-wiring.cert.test.ts");
+    expect(script).toContain("slot-extraction-e2e.cert.test.ts");
+    expect(script).toContain("disambiguation-e2e.cert.test.ts");
+    expect(script).toContain("intent-precision.cert.test.ts");
+    expect(script).toContain("intent-family-firstclass.cert.test.ts");
+    expect(script).toContain("routing-family-alias-consistency.cert.test.ts");
+    expect(script).toContain("routing-integration-intents-parity.cert.test.ts");
+    expect(script).toContain("nav-intents-locale-parity.cert.test.ts");
+    expect(script).toContain("routing-determinism-runtime-e2e.cert.test.ts");
+    expect(script).toContain("telemetry-completeness.cert.test.ts");
   });
 });

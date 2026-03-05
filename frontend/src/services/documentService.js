@@ -1,10 +1,8 @@
 import api from './api';
 import { calculateFileHash } from '../utils/security/crypto';
-const AUTH_LOCALSTORAGE_COMPAT = process.env.REACT_APP_AUTH_LOCALSTORAGE_COMPAT === 'true';
 
 const getCompatAccessToken = () => {
-  if (!AUTH_LOCALSTORAGE_COMPAT) return null;
-  return localStorage.getItem('accessToken') || localStorage.getItem('token');
+  return null;
 };
 
 /**
@@ -317,3 +315,4 @@ class DocumentService {
 }
 
 export default new DocumentService();
+

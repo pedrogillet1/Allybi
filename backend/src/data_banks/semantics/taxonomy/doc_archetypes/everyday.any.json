@@ -59,20 +59,35 @@
       ],
       "expectedTableFamilies": [
         "Bank Statement line-item table",
-        "Bank Statement summary matrix"
+        "Bank Statement summary matrix",
+        "Bank Statement line items",
+        "Bank Statement itens",
+        "Bank Statement summary",
+        "Bank Statement resumo"
       ],
       "fieldFamilies": [
         "Primary identifiers",
         "Dates and periods",
-        "Amounts and statuses"
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
       ],
       "redFlags": [
         "Missing mandatory section anchors",
-        "Conflicting summary totals"
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
       ],
       "missingQuestions": [
         "Which bank statement variant should be prioritized?",
-        "Should extraction prefer header metadata or detailed section data?"
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Bank Statement variant should be prioritized?",
+        "Qual variante de Bank Statement deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
       ]
     },
     {
@@ -112,20 +127,35 @@
       ],
       "expectedTableFamilies": [
         "Retail Receipt line-item table",
-        "Retail Receipt summary matrix"
+        "Retail Receipt summary matrix",
+        "Retail Receipt line items",
+        "Retail Receipt itens",
+        "Retail Receipt summary",
+        "Retail Receipt resumo"
       ],
       "fieldFamilies": [
         "Primary identifiers",
         "Dates and periods",
-        "Amounts and statuses"
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
       ],
       "redFlags": [
         "Missing mandatory section anchors",
-        "Conflicting summary totals"
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
       ],
       "missingQuestions": [
         "Which retail receipt variant should be prioritized?",
-        "Should extraction prefer header metadata or detailed section data?"
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Retail Receipt variant should be prioritized?",
+        "Qual variante de Retail Receipt deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
       ]
     },
     {
@@ -165,20 +195,1063 @@
       ],
       "expectedTableFamilies": [
         "Tax Notice line-item table",
-        "Tax Notice summary matrix"
+        "Tax Notice summary matrix",
+        "Tax Notice line items",
+        "Tax Notice itens",
+        "Tax Notice summary",
+        "Tax Notice resumo"
       ],
       "fieldFamilies": [
         "Primary identifiers",
         "Dates and periods",
-        "Amounts and statuses"
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
       ],
       "redFlags": [
         "Missing mandatory section anchors",
-        "Conflicting summary totals"
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
       ],
       "missingQuestions": [
         "Which tax notice variant should be prioritized?",
-        "Should extraction prefer header metadata or detailed section data?"
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Tax Notice variant should be prioritized?",
+        "Qual variante de Tax Notice deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "every_electricity_bill",
+      "label": "Electricity Bill",
+      "expectedSections": [
+        "Header",
+        "Cabeçalho",
+        "Account Profile",
+        "Perfil da Conta",
+        "Statement Period",
+        "Período do Extrato",
+        "Opening and Closing",
+        "Saldo Inicial e Final",
+        "Transactions",
+        "Transações",
+        "Charges and Interest",
+        "Tarifas e Juros"
+      ],
+      "headings": [
+        "bank statement",
+        "extrato",
+        "statement",
+        "account",
+        "bank",
+        "agencia",
+        "conta",
+        "period",
+        "from",
+        "to",
+        "de",
+        "a",
+        "opening balance",
+        "closing balance",
+        "saldo inicial",
+        "saldo final"
+      ],
+      "expectedTableFamilies": [
+        "Bank Statement line-item table",
+        "Bank Statement summary matrix",
+        "Electricity Bill line items",
+        "Electricity Bill itens",
+        "Electricity Bill summary",
+        "Electricity Bill resumo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
+      ],
+      "missingQuestions": [
+        "Which bank statement variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Electricity Bill variant should be prioritized?",
+        "Qual variante de Electricity Bill deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "every_identity_document",
+      "label": "Identity Document",
+      "expectedSections": [
+        "Header",
+        "Cabeçalho",
+        "Account Profile",
+        "Perfil da Conta",
+        "Statement Period",
+        "Período do Extrato",
+        "Opening and Closing",
+        "Saldo Inicial e Final",
+        "Transactions",
+        "Transações",
+        "Charges and Interest",
+        "Tarifas e Juros"
+      ],
+      "headings": [
+        "bank statement",
+        "extrato",
+        "statement",
+        "account",
+        "bank",
+        "agencia",
+        "conta",
+        "period",
+        "from",
+        "to",
+        "de",
+        "a",
+        "opening balance",
+        "closing balance",
+        "saldo inicial",
+        "saldo final"
+      ],
+      "expectedTableFamilies": [
+        "Bank Statement line-item table",
+        "Bank Statement summary matrix",
+        "Identity Document line items",
+        "Identity Document itens",
+        "Identity Document summary",
+        "Identity Document resumo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
+      ],
+      "missingQuestions": [
+        "Which bank statement variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Identity Document variant should be prioritized?",
+        "Qual variante de Identity Document deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "every_insurance_claim",
+      "label": "Insurance Claim",
+      "expectedSections": [
+        "Header",
+        "Cabeçalho",
+        "Account Profile",
+        "Perfil da Conta",
+        "Statement Period",
+        "Período do Extrato",
+        "Opening and Closing",
+        "Saldo Inicial e Final",
+        "Transactions",
+        "Transações",
+        "Charges and Interest",
+        "Tarifas e Juros"
+      ],
+      "headings": [
+        "bank statement",
+        "extrato",
+        "statement",
+        "account",
+        "bank",
+        "agencia",
+        "conta",
+        "period",
+        "from",
+        "to",
+        "de",
+        "a",
+        "opening balance",
+        "closing balance",
+        "saldo inicial",
+        "saldo final"
+      ],
+      "expectedTableFamilies": [
+        "Bank Statement line-item table",
+        "Bank Statement summary matrix",
+        "Insurance Claim line items",
+        "Insurance Claim itens",
+        "Insurance Claim summary",
+        "Insurance Claim resumo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
+      ],
+      "missingQuestions": [
+        "Which bank statement variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Insurance Claim variant should be prioritized?",
+        "Qual variante de Insurance Claim deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "every_insurance_policy",
+      "label": "Insurance Policy",
+      "expectedSections": [
+        "Header",
+        "Cabeçalho",
+        "Account Profile",
+        "Perfil da Conta",
+        "Statement Period",
+        "Período do Extrato",
+        "Opening and Closing",
+        "Saldo Inicial e Final",
+        "Transactions",
+        "Transações",
+        "Charges and Interest",
+        "Tarifas e Juros"
+      ],
+      "headings": [
+        "bank statement",
+        "extrato",
+        "statement",
+        "account",
+        "bank",
+        "agencia",
+        "conta",
+        "period",
+        "from",
+        "to",
+        "de",
+        "a",
+        "opening balance",
+        "closing balance",
+        "saldo inicial",
+        "saldo final"
+      ],
+      "expectedTableFamilies": [
+        "Bank Statement line-item table",
+        "Bank Statement summary matrix",
+        "Insurance Policy line items",
+        "Insurance Policy itens",
+        "Insurance Policy summary",
+        "Insurance Policy resumo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
+      ],
+      "missingQuestions": [
+        "Which bank statement variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Insurance Policy variant should be prioritized?",
+        "Qual variante de Insurance Policy deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "every_internet_bill",
+      "label": "Internet Bill",
+      "expectedSections": [
+        "Header",
+        "Cabeçalho",
+        "Account Profile",
+        "Perfil da Conta",
+        "Statement Period",
+        "Período do Extrato",
+        "Opening and Closing",
+        "Saldo Inicial e Final",
+        "Transactions",
+        "Transações",
+        "Charges and Interest",
+        "Tarifas e Juros"
+      ],
+      "headings": [
+        "bank statement",
+        "extrato",
+        "statement",
+        "account",
+        "bank",
+        "agencia",
+        "conta",
+        "period",
+        "from",
+        "to",
+        "de",
+        "a",
+        "opening balance",
+        "closing balance",
+        "saldo inicial",
+        "saldo final"
+      ],
+      "expectedTableFamilies": [
+        "Bank Statement line-item table",
+        "Bank Statement summary matrix",
+        "Internet Bill line items",
+        "Internet Bill itens",
+        "Internet Bill summary",
+        "Internet Bill resumo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
+      ],
+      "missingQuestions": [
+        "Which bank statement variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Internet Bill variant should be prioritized?",
+        "Qual variante de Internet Bill deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "every_invoice",
+      "label": "Invoice",
+      "expectedSections": [
+        "Header",
+        "Cabeçalho",
+        "Account Profile",
+        "Perfil da Conta",
+        "Statement Period",
+        "Período do Extrato",
+        "Opening and Closing",
+        "Saldo Inicial e Final",
+        "Transactions",
+        "Transações",
+        "Charges and Interest",
+        "Tarifas e Juros"
+      ],
+      "headings": [
+        "bank statement",
+        "extrato",
+        "statement",
+        "account",
+        "bank",
+        "agencia",
+        "conta",
+        "period",
+        "from",
+        "to",
+        "de",
+        "a",
+        "opening balance",
+        "closing balance",
+        "saldo inicial",
+        "saldo final"
+      ],
+      "expectedTableFamilies": [
+        "Bank Statement line-item table",
+        "Bank Statement summary matrix",
+        "Invoice line items",
+        "Invoice itens",
+        "Invoice summary",
+        "Invoice resumo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
+      ],
+      "missingQuestions": [
+        "Which bank statement variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Invoice variant should be prioritized?",
+        "Qual variante de Invoice deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "every_phone_bill",
+      "label": "Phone Bill",
+      "expectedSections": [
+        "Header",
+        "Cabeçalho",
+        "Account Profile",
+        "Perfil da Conta",
+        "Statement Period",
+        "Período do Extrato",
+        "Opening and Closing",
+        "Saldo Inicial e Final",
+        "Transactions",
+        "Transações",
+        "Charges and Interest",
+        "Tarifas e Juros"
+      ],
+      "headings": [
+        "bank statement",
+        "extrato",
+        "statement",
+        "account",
+        "bank",
+        "agencia",
+        "conta",
+        "period",
+        "from",
+        "to",
+        "de",
+        "a",
+        "opening balance",
+        "closing balance",
+        "saldo inicial",
+        "saldo final"
+      ],
+      "expectedTableFamilies": [
+        "Bank Statement line-item table",
+        "Bank Statement summary matrix",
+        "Phone Bill line items",
+        "Phone Bill itens",
+        "Phone Bill summary",
+        "Phone Bill resumo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
+      ],
+      "missingQuestions": [
+        "Which bank statement variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Phone Bill variant should be prioritized?",
+        "Qual variante de Phone Bill deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "every_rent_receipt",
+      "label": "Rent Receipt",
+      "expectedSections": [
+        "Header",
+        "Cabeçalho",
+        "Account Profile",
+        "Perfil da Conta",
+        "Statement Period",
+        "Período do Extrato",
+        "Opening and Closing",
+        "Saldo Inicial e Final",
+        "Transactions",
+        "Transações",
+        "Charges and Interest",
+        "Tarifas e Juros"
+      ],
+      "headings": [
+        "bank statement",
+        "extrato",
+        "statement",
+        "account",
+        "bank",
+        "agencia",
+        "conta",
+        "period",
+        "from",
+        "to",
+        "de",
+        "a",
+        "opening balance",
+        "closing balance",
+        "saldo inicial",
+        "saldo final"
+      ],
+      "expectedTableFamilies": [
+        "Bank Statement line-item table",
+        "Bank Statement summary matrix",
+        "Rent Receipt line items",
+        "Rent Receipt itens",
+        "Rent Receipt summary",
+        "Rent Receipt resumo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
+      ],
+      "missingQuestions": [
+        "Which bank statement variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Rent Receipt variant should be prioritized?",
+        "Qual variante de Rent Receipt deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "every_tax_return",
+      "label": "Tax Return",
+      "expectedSections": [
+        "Header",
+        "Cabeçalho",
+        "Account Profile",
+        "Perfil da Conta",
+        "Statement Period",
+        "Período do Extrato",
+        "Opening and Closing",
+        "Saldo Inicial e Final",
+        "Transactions",
+        "Transações",
+        "Charges and Interest",
+        "Tarifas e Juros"
+      ],
+      "headings": [
+        "bank statement",
+        "extrato",
+        "statement",
+        "account",
+        "bank",
+        "agencia",
+        "conta",
+        "period",
+        "from",
+        "to",
+        "de",
+        "a",
+        "opening balance",
+        "closing balance",
+        "saldo inicial",
+        "saldo final"
+      ],
+      "expectedTableFamilies": [
+        "Bank Statement line-item table",
+        "Bank Statement summary matrix",
+        "Tax Return line items",
+        "Tax Return itens",
+        "Tax Return summary",
+        "Tax Return resumo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
+      ],
+      "missingQuestions": [
+        "Which bank statement variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Tax Return variant should be prioritized?",
+        "Qual variante de Tax Return deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "everyday_customer_notice",
+      "label": "Customer Notice",
+      "expectedSections": [
+        "Supplement Everyday 01 Header",
+        "Cabecalho Supplement Everyday 01",
+        "Supplement Everyday 01 Parties",
+        "Partes Supplement Everyday 01",
+        "Supplement Everyday 01 Timeline",
+        "Linha do tempo Supplement Everyday 01"
+      ],
+      "headings": [
+        "supplement everyday 01",
+        "everyday supplement 01",
+        "everyday",
+        "everyday summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Everyday 01 line items",
+        "Supplement Everyday 01 itens",
+        "Supplement Everyday 01 summary",
+        "Supplement Everyday 01 resumo",
+        "Supplement Everyday 01 balance",
+        "Supplement Everyday 01 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Everyday 01 variant should be prioritized?",
+        "Qual variante de Supplement Everyday 01 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "everyday_transaction_note",
+      "label": "Transaction Note",
+      "expectedSections": [
+        "Supplement Everyday 02 Header",
+        "Cabecalho Supplement Everyday 02",
+        "Supplement Everyday 02 Parties",
+        "Partes Supplement Everyday 02",
+        "Supplement Everyday 02 Timeline",
+        "Linha do tempo Supplement Everyday 02"
+      ],
+      "headings": [
+        "supplement everyday 02",
+        "everyday supplement 02",
+        "everyday",
+        "everyday summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Everyday 02 line items",
+        "Supplement Everyday 02 itens",
+        "Supplement Everyday 02 summary",
+        "Supplement Everyday 02 resumo",
+        "Supplement Everyday 02 balance",
+        "Supplement Everyday 02 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Everyday 02 variant should be prioritized?",
+        "Qual variante de Supplement Everyday 02 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "everyday_service_update_notice",
+      "label": "Service Update Notice",
+      "expectedSections": [
+        "Supplement Everyday 03 Header",
+        "Cabecalho Supplement Everyday 03",
+        "Supplement Everyday 03 Parties",
+        "Partes Supplement Everyday 03",
+        "Supplement Everyday 03 Timeline",
+        "Linha do tempo Supplement Everyday 03"
+      ],
+      "headings": [
+        "supplement everyday 03",
+        "everyday supplement 03",
+        "everyday",
+        "everyday summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Everyday 03 line items",
+        "Supplement Everyday 03 itens",
+        "Supplement Everyday 03 summary",
+        "Supplement Everyday 03 resumo",
+        "Supplement Everyday 03 balance",
+        "Supplement Everyday 03 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Everyday 03 variant should be prioritized?",
+        "Qual variante de Supplement Everyday 03 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "everyday_payment_status_note",
+      "label": "Payment Status Note",
+      "expectedSections": [
+        "Supplement Everyday 04 Header",
+        "Cabecalho Supplement Everyday 04",
+        "Supplement Everyday 04 Parties",
+        "Partes Supplement Everyday 04",
+        "Supplement Everyday 04 Timeline",
+        "Linha do tempo Supplement Everyday 04"
+      ],
+      "headings": [
+        "supplement everyday 04",
+        "everyday supplement 04",
+        "everyday",
+        "everyday summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Everyday 04 line items",
+        "Supplement Everyday 04 itens",
+        "Supplement Everyday 04 summary",
+        "Supplement Everyday 04 resumo",
+        "Supplement Everyday 04 balance",
+        "Supplement Everyday 04 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Everyday 04 variant should be prioritized?",
+        "Qual variante de Supplement Everyday 04 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "everyday_document_summary_note",
+      "label": "Document Summary Note",
+      "expectedSections": [
+        "Supplement Everyday 05 Header",
+        "Cabecalho Supplement Everyday 05",
+        "Supplement Everyday 05 Parties",
+        "Partes Supplement Everyday 05",
+        "Supplement Everyday 05 Timeline",
+        "Linha do tempo Supplement Everyday 05"
+      ],
+      "headings": [
+        "supplement everyday 05",
+        "everyday supplement 05",
+        "everyday",
+        "everyday summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Everyday 05 line items",
+        "Supplement Everyday 05 itens",
+        "Supplement Everyday 05 summary",
+        "Supplement Everyday 05 resumo",
+        "Supplement Everyday 05 balance",
+        "Supplement Everyday 05 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Everyday 05 variant should be prioritized?",
+        "Qual variante de Supplement Everyday 05 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "everyday_account_update_notice",
+      "label": "Account Update Notice",
+      "expectedSections": [
+        "Supplement Everyday 06 Header",
+        "Cabecalho Supplement Everyday 06",
+        "Supplement Everyday 06 Parties",
+        "Partes Supplement Everyday 06",
+        "Supplement Everyday 06 Timeline",
+        "Linha do tempo Supplement Everyday 06"
+      ],
+      "headings": [
+        "supplement everyday 06",
+        "everyday supplement 06",
+        "everyday",
+        "everyday summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Everyday 06 line items",
+        "Supplement Everyday 06 itens",
+        "Supplement Everyday 06 summary",
+        "Supplement Everyday 06 resumo",
+        "Supplement Everyday 06 balance",
+        "Supplement Everyday 06 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Everyday 06 variant should be prioritized?",
+        "Qual variante de Supplement Everyday 06 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "everyday_usage_snapshot",
+      "label": "Usage Snapshot",
+      "expectedSections": [
+        "Supplement Everyday 07 Header",
+        "Cabecalho Supplement Everyday 07",
+        "Supplement Everyday 07 Parties",
+        "Partes Supplement Everyday 07",
+        "Supplement Everyday 07 Timeline",
+        "Linha do tempo Supplement Everyday 07"
+      ],
+      "headings": [
+        "supplement everyday 07",
+        "everyday supplement 07",
+        "everyday",
+        "everyday summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Everyday 07 line items",
+        "Supplement Everyday 07 itens",
+        "Supplement Everyday 07 summary",
+        "Supplement Everyday 07 resumo",
+        "Supplement Everyday 07 balance",
+        "Supplement Everyday 07 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Everyday 07 variant should be prioritized?",
+        "Qual variante de Supplement Everyday 07 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "everyday_balance_update_note",
+      "label": "Balance Update Note",
+      "expectedSections": [
+        "Supplement Everyday 08 Header",
+        "Cabecalho Supplement Everyday 08",
+        "Supplement Everyday 08 Parties",
+        "Partes Supplement Everyday 08",
+        "Supplement Everyday 08 Timeline",
+        "Linha do tempo Supplement Everyday 08"
+      ],
+      "headings": [
+        "supplement everyday 08",
+        "everyday supplement 08",
+        "everyday",
+        "everyday summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Everyday 08 line items",
+        "Supplement Everyday 08 itens",
+        "Supplement Everyday 08 summary",
+        "Supplement Everyday 08 resumo",
+        "Supplement Everyday 08 balance",
+        "Supplement Everyday 08 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Everyday 08 variant should be prioritized?",
+        "Qual variante de Supplement Everyday 08 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
       ]
     }
   ]

@@ -7,12 +7,17 @@ import {
   COMPOSE_ANSWER_TEMPLATE_MODES,
   RETRIEVAL_ANSWER_MODES,
 } from "../../../modules/chat/domain/answerModes";
+import {
+  COMPOSE_BANK_USAGE_POLICY,
+  COMPOSE_REQUIRED_BANK_IDS,
+} from "../enforcement/composeMicrocopy.service";
 
 export interface RuntimeWiringIntegrityResult {
   ok: boolean;
   missingBanks: string[];
   missingLlmRoutingPolicyBanks: string[];
   missingRuntimePolicyConsumers: string[];
+  missingRoutingBankConsumers: string[];
   runtimePolicyEnvGaps: string[];
   missingOperatorContracts: string[];
   missingOperatorOutputShapes: string[];
@@ -35,11 +40,21 @@ export interface RuntimeWiringIntegrityResult {
   answerModeContractDrift: string[];
   productHelpRuntimeUsageMissing: string[];
   followupOverlayCoverageGaps: string[];
+  composeMicrocopyBankUsageGaps: string[];
 }
 
 export const RUNTIME_REQUIRED_BANKS = [
   "intent_config",
   "intent_patterns",
+  "viewer_assistant_routing",
+  "connect_intents_en",
+  "connect_intents_pt",
+  "search_intents_en",
+  "search_intents_pt",
+  "send_intents_en",
+  "send_intents_pt",
+  "sync_intents_en",
+  "sync_intents_pt",
   "operator_families",
   "operator_contracts",
   "operator_output_shapes",
@@ -97,6 +112,29 @@ export const RUNTIME_REQUIRED_BANKS = [
   "llm_cost_table",
   "composition_lane_policy",
 ] as const;
+
+const RUNTIME_REQUIRED_ROUTING_BANKS = [
+  "viewer_assistant_routing",
+  "connect_intents_en",
+  "connect_intents_pt",
+  "search_intents_en",
+  "search_intents_pt",
+  "send_intents_en",
+  "send_intents_pt",
+  "sync_intents_en",
+  "sync_intents_pt",
+] as const;
+const RUNTIME_ROUTING_BANK_CONSUMER_MARKERS: Record<string, string[]> = {
+  viewer_assistant_routing: ["viewer_assistant_routing"],
+  connect_intents_en: ["connect_intents_en"],
+  connect_intents_pt: ["connect_intents_pt"],
+  search_intents_en: ["search_intents_en"],
+  search_intents_pt: ["search_intents_pt"],
+  send_intents_en: ["send_intents_en"],
+  send_intents_pt: ["send_intents_pt"],
+  sync_intents_en: ["sync_intents_en"],
+  sync_intents_pt: ["sync_intents_pt"],
+};
 
 export const RUNTIME_REQUIRED_LLM_ROUTING_BANKS = [
   "provider_capabilities",
@@ -839,6 +877,56 @@ function collectFollowupOverlayCoverageGaps(
   return gaps;
 }
 
+function collectComposeMicrocopyBankUsageGaps(): string[] {
+  const candidatePaths = [
+    path.join(
+      process.cwd(),
+      "backend/src/services/core/enforcement/composeMicrocopy.service.ts",
+    ),
+    path.join(process.cwd(), "src/services/core/enforcement/composeMicrocopy.service.ts"),
+  ];
+  const composePath = candidatePaths.find((candidate) => fs.existsSync(candidate));
+  if (!composePath) return [];
+  let source = "";
+  try {
+    source = fs.readFileSync(composePath, "utf8");
+  } catch {
+    return [];
+  }
+
+  const gaps: string[] = [];
+  for (const bankId of COMPOSE_REQUIRED_BANK_IDS) {
+    if (!(bankId in COMPOSE_BANK_USAGE_POLICY)) {
+      gaps.push(`missing_usage_policy:${bankId}`);
+    }
+  }
+
+  const behavioralMarkers: Record<string, string[]> = {
+    openers: ["this.openers", "pickOpener("],
+    followup_suggestions_v1c6269cc: ["this.followups", "pickFollowup("],
+    fallback_messages: ["this.fallbackMessages", "resolveNotFoundLine("],
+    citation_policy: ["this.citationPolicy", "resolveMaxSourceLines("],
+    help_microcopy: ["this.helpMicrocopy", "pickFollowup("],
+    closers: ["this.closers", "pickCloser("],
+  };
+
+  for (const [bankId, mode] of Object.entries(COMPOSE_BANK_USAGE_POLICY)) {
+    if (mode === "behavioral_primary" || mode === "behavioral_fallback") {
+      const markers = behavioralMarkers[bankId] || [];
+      if (markers.length === 0) {
+        gaps.push(`missing_behavioral_marker_config:${bankId}`);
+        continue;
+      }
+      const missing = markers.filter((marker) => !source.includes(marker));
+      if (missing.length > 0) {
+        gaps.push(`missing_behavioral_usage:${bankId}`);
+      }
+    }
+  }
+
+  return gaps;
+}
+
 function listRuntimeSourceFiles(): string[] {
   const roots = [
     path.join(process.cwd(), "backend", "src"),
@@ -895,6 +983,33 @@ function collectMissingRuntimePolicyConsumers(): string[] {
       }
     }
     if (!found) missing.push(policyId);
+  }
+  return missing.sort((a, b) => a.localeCompare(b));
+}
+
+function collectMissingRoutingBankConsumers(): string[] {
+  const files = listRuntimeSourceFiles();
+  if (files.length < 1) return [];
+  const content = new Map<string, string>();
+  for (const filePath of files) {
+    try {
+      content.set(filePath, fs.readFileSync(filePath, "utf8"));
+    } catch {
+      // Ignore unreadable files; they are non-deterministic in this static check.
+    }
+  }
+
+  const missing: string[] = [];
+  for (const bankId of RUNTIME_REQUIRED_ROUTING_BANKS) {
+    const markers = RUNTIME_ROUTING_BANK_CONSUMER_MARKERS[bankId] || [bankId];
+    let found = false;
+    for (const src of content.values()) {
+      if (markers.some((marker) => src.includes(marker))) {
+        found = true;
+        break;
+      }
+    }
+    if (!found) missing.push(bankId);
   }
   return missing.sort((a, b) => a.localeCompare(b));
 }
@@ -977,6 +1092,7 @@ export class RuntimeWiringIntegrityService {
       (id) => !getOptionalBank(id),
     );
     const missingRuntimePolicyConsumers = collectMissingRuntimePolicyConsumers();
+    const missingRoutingBankConsumers = collectMissingRoutingBankConsumers();
     const runtimePolicyEnvGaps = collectRuntimePolicyEnvGaps();
 
     const intentConfig = getOptionalBank<Record<string, unknown>>("intent_config");
@@ -1082,12 +1198,15 @@ export class RuntimeWiringIntegrityService {
       intentPatterns,
       followupIndicators,
     );
+    const composeMicrocopyBankUsageGaps =
+      collectComposeMicrocopyBankUsageGaps();
 
     return {
       ok:
         missingBanks.length === 0 &&
         missingLlmRoutingPolicyBanks.length === 0 &&
         missingRuntimePolicyConsumers.length === 0 &&
+        missingRoutingBankConsumers.length === 0 &&
         runtimePolicyEnvGaps.length === 0 &&
         missingOperatorContracts.length === 0 &&
         missingOperatorOutputShapes.length === 0 &&
@@ -1109,10 +1228,12 @@ export class RuntimeWiringIntegrityService {
         composeAnswerModeTemplateGaps.length === 0 &&
         answerModeContractDrift.length === 0 &&
         productHelpRuntimeUsageMissing.length === 0 &&
-        followupOverlayCoverageGaps.length === 0,
+        followupOverlayCoverageGaps.length === 0 &&
+        composeMicrocopyBankUsageGaps.length === 0,
       missingBanks,
       missingLlmRoutingPolicyBanks,
       missingRuntimePolicyConsumers,
+      missingRoutingBankConsumers,
       runtimePolicyEnvGaps,
       missingOperatorContracts,
       missingOperatorOutputShapes,
@@ -1135,6 +1256,7 @@ export class RuntimeWiringIntegrityService {
       answerModeContractDrift,
       productHelpRuntimeUsageMissing,
       followupOverlayCoverageGaps,
+      composeMicrocopyBankUsageGaps,
     };
   }
 }

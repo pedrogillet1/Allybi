@@ -32,6 +32,7 @@ const BASE_REQUIRED_GATE_IDS = [
   "gateway-json-routing",
   "collision-matrix-exhaustive",
   "telemetry-completeness",
+  "rollout-safety",
   "turn-debug-packet",
   "security-auth",
   "observability-integrity",

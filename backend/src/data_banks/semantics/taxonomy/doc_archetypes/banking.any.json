@@ -59,20 +59,35 @@
       ],
       "expectedTableFamilies": [
         "Bank Statement line-item table",
-        "Bank Statement summary matrix"
+        "Bank Statement summary matrix",
+        "Bank Statement line items",
+        "Bank Statement itens",
+        "Bank Statement summary",
+        "Bank Statement resumo"
       ],
       "fieldFamilies": [
         "Primary identifiers",
         "Dates and periods",
-        "Amounts and statuses"
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
       ],
       "redFlags": [
         "Missing mandatory section anchors",
-        "Conflicting summary totals"
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
       ],
       "missingQuestions": [
         "Which bank statement variant should be prioritized?",
-        "Should extraction prefer header metadata or detailed section data?"
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Bank Statement variant should be prioritized?",
+        "Qual variante de Bank Statement deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
       ]
     },
     {
@@ -110,20 +125,35 @@
       ],
       "expectedTableFamilies": [
         "Brokerage Statement line-item table",
-        "Brokerage Statement summary matrix"
+        "Brokerage Statement summary matrix",
+        "Brokerage Statement line items",
+        "Brokerage Statement itens",
+        "Brokerage Statement summary",
+        "Brokerage Statement resumo"
       ],
       "fieldFamilies": [
         "Primary identifiers",
         "Dates and periods",
-        "Amounts and statuses"
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
       ],
       "redFlags": [
         "Missing mandatory section anchors",
-        "Conflicting summary totals"
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
       ],
       "missingQuestions": [
         "Which brokerage statement variant should be prioritized?",
-        "Should extraction prefer header metadata or detailed section data?"
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Brokerage Statement variant should be prioritized?",
+        "Qual variante de Brokerage Statement deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
       ]
     },
     {
@@ -161,20 +191,999 @@
       ],
       "expectedTableFamilies": [
         "Wire Transfer Confirmation line-item table",
-        "Wire Transfer Confirmation summary matrix"
+        "Wire Transfer Confirmation summary matrix",
+        "Wire Transfer Confirmation line items",
+        "Wire Transfer Confirmation itens",
+        "Wire Transfer Confirmation summary",
+        "Wire Transfer Confirmation resumo"
       ],
       "fieldFamilies": [
         "Primary identifiers",
         "Dates and periods",
-        "Amounts and statuses"
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
       ],
       "redFlags": [
         "Missing mandatory section anchors",
-        "Conflicting summary totals"
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
       ],
       "missingQuestions": [
         "Which wire transfer confirmation variant should be prioritized?",
-        "Should extraction prefer header metadata or detailed section data?"
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Wire Transfer Confirmation variant should be prioritized?",
+        "Qual variante de Wire Transfer Confirmation deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "banking_cd_statement",
+      "label": "Cd Statement",
+      "expectedSections": [
+        "Header",
+        "Cabeçalho",
+        "Issuer and Customer",
+        "Emissor e Cliente",
+        "Period",
+        "Período",
+        "Summary",
+        "Resumo",
+        "Charges and Fees",
+        "Cobrancas e Taxas",
+        "Usage or Activity",
+        "Uso ou Atividade"
+      ],
+      "headings": [
+        "account",
+        "statement",
+        "invoice",
+        "bill",
+        "bank",
+        "deposit",
+        "withdrawal",
+        "balance",
+        "issuer",
+        "provider",
+        "customer",
+        "subscriber",
+        "name",
+        "id",
+        "billing period",
+        "statement period"
+      ],
+      "expectedTableFamilies": [
+        "Bank Statement line-item table",
+        "Bank Statement summary matrix",
+        "Cd Statement line items",
+        "Cd Statement itens",
+        "Cd Statement summary",
+        "Cd Statement resumo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
+      ],
+      "missingQuestions": [
+        "Which bank statement variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Cd Statement variant should be prioritized?",
+        "Qual variante de Cd Statement deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "banking_credit_card_statement",
+      "label": "Credit Card Statement",
+      "expectedSections": [
+        "Header",
+        "Cabeçalho",
+        "Issuer and Customer",
+        "Emissor e Cliente",
+        "Period",
+        "Período",
+        "Summary",
+        "Resumo",
+        "Charges and Fees",
+        "Cobrancas e Taxas",
+        "Usage or Activity",
+        "Uso ou Atividade"
+      ],
+      "headings": [
+        "account",
+        "statement",
+        "invoice",
+        "bill",
+        "bank",
+        "deposit",
+        "withdrawal",
+        "balance",
+        "issuer",
+        "provider",
+        "customer",
+        "subscriber",
+        "name",
+        "id",
+        "billing period",
+        "statement period"
+      ],
+      "expectedTableFamilies": [
+        "Bank Statement line-item table",
+        "Bank Statement summary matrix",
+        "Credit Card Statement line items",
+        "Credit Card Statement itens",
+        "Credit Card Statement summary",
+        "Credit Card Statement resumo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
+      ],
+      "missingQuestions": [
+        "Which bank statement variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Credit Card Statement variant should be prioritized?",
+        "Qual variante de Credit Card Statement deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "banking_investment_account_statement",
+      "label": "Investment Account Statement",
+      "expectedSections": [
+        "Header",
+        "Cabeçalho",
+        "Issuer and Customer",
+        "Emissor e Cliente",
+        "Period",
+        "Período",
+        "Summary",
+        "Resumo",
+        "Charges and Fees",
+        "Cobrancas e Taxas",
+        "Usage or Activity",
+        "Uso ou Atividade"
+      ],
+      "headings": [
+        "account",
+        "statement",
+        "invoice",
+        "bill",
+        "bank",
+        "deposit",
+        "withdrawal",
+        "balance",
+        "issuer",
+        "provider",
+        "customer",
+        "subscriber",
+        "name",
+        "id",
+        "billing period",
+        "statement period"
+      ],
+      "expectedTableFamilies": [
+        "Bank Statement line-item table",
+        "Bank Statement summary matrix",
+        "Investment Account Statement line items",
+        "Investment Account Statement itens",
+        "Investment Account Statement summary",
+        "Investment Account Statement resumo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
+      ],
+      "missingQuestions": [
+        "Which bank statement variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Investment Account Statement variant should be prioritized?",
+        "Qual variante de Investment Account Statement deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "banking_loan_statement",
+      "label": "Loan Statement",
+      "expectedSections": [
+        "Header",
+        "Cabeçalho",
+        "Issuer and Customer",
+        "Emissor e Cliente",
+        "Period",
+        "Período",
+        "Summary",
+        "Resumo",
+        "Charges and Fees",
+        "Cobrancas e Taxas",
+        "Usage or Activity",
+        "Uso ou Atividade"
+      ],
+      "headings": [
+        "account",
+        "statement",
+        "invoice",
+        "bill",
+        "bank",
+        "deposit",
+        "withdrawal",
+        "balance",
+        "issuer",
+        "provider",
+        "customer",
+        "subscriber",
+        "name",
+        "id",
+        "billing period",
+        "statement period"
+      ],
+      "expectedTableFamilies": [
+        "Bank Statement line-item table",
+        "Bank Statement summary matrix",
+        "Loan Statement line items",
+        "Loan Statement itens",
+        "Loan Statement summary",
+        "Loan Statement resumo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
+      ],
+      "missingQuestions": [
+        "Which bank statement variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Loan Statement variant should be prioritized?",
+        "Qual variante de Loan Statement deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "banking_payment_receipt",
+      "label": "Payment Receipt",
+      "expectedSections": [
+        "Header",
+        "Cabeçalho",
+        "Issuer and Customer",
+        "Emissor e Cliente",
+        "Period",
+        "Período",
+        "Summary",
+        "Resumo",
+        "Charges and Fees",
+        "Cobrancas e Taxas",
+        "Usage or Activity",
+        "Uso ou Atividade"
+      ],
+      "headings": [
+        "account",
+        "statement",
+        "invoice",
+        "bill",
+        "bank",
+        "deposit",
+        "withdrawal",
+        "balance",
+        "issuer",
+        "provider",
+        "customer",
+        "subscriber",
+        "name",
+        "id",
+        "billing period",
+        "statement period"
+      ],
+      "expectedTableFamilies": [
+        "Bank Statement line-item table",
+        "Bank Statement summary matrix",
+        "Payment Receipt line items",
+        "Payment Receipt itens",
+        "Payment Receipt summary",
+        "Payment Receipt resumo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Dates and periods",
+        "Amounts and statuses",
+        "Marcadores de data e periodo",
+        "Primary identifiers",
+        "Identificadores primarios"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Conflicting summary totals",
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes"
+      ],
+      "missingQuestions": [
+        "Which bank statement variant should be prioritized?",
+        "Should extraction prefer header metadata or detailed section data?",
+        "Which Payment Receipt variant should be prioritized?",
+        "Qual variante de Payment Receipt deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?"
+      ]
+    },
+    {
+      "id": "banking_fee_schedule_notice",
+      "label": "Fee Schedule Notice",
+      "expectedSections": [
+        "Supplement Banking 01 Header",
+        "Cabecalho Supplement Banking 01",
+        "Supplement Banking 01 Parties",
+        "Partes Supplement Banking 01",
+        "Supplement Banking 01 Timeline",
+        "Linha do tempo Supplement Banking 01"
+      ],
+      "headings": [
+        "supplement banking 01",
+        "banking supplement 01",
+        "banking",
+        "banking summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Banking 01 line items",
+        "Supplement Banking 01 itens",
+        "Supplement Banking 01 summary",
+        "Supplement Banking 01 resumo",
+        "Supplement Banking 01 balance",
+        "Supplement Banking 01 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Banking 01 variant should be prioritized?",
+        "Qual variante de Supplement Banking 01 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "banking_rate_change_notice",
+      "label": "Rate Change Notice",
+      "expectedSections": [
+        "Supplement Banking 02 Header",
+        "Cabecalho Supplement Banking 02",
+        "Supplement Banking 02 Parties",
+        "Partes Supplement Banking 02",
+        "Supplement Banking 02 Timeline",
+        "Linha do tempo Supplement Banking 02"
+      ],
+      "headings": [
+        "supplement banking 02",
+        "banking supplement 02",
+        "banking",
+        "banking summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Banking 02 line items",
+        "Supplement Banking 02 itens",
+        "Supplement Banking 02 summary",
+        "Supplement Banking 02 resumo",
+        "Supplement Banking 02 balance",
+        "Supplement Banking 02 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Banking 02 variant should be prioritized?",
+        "Qual variante de Supplement Banking 02 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "banking_overdraft_policy_notice",
+      "label": "Overdraft Policy Notice",
+      "expectedSections": [
+        "Supplement Banking 03 Header",
+        "Cabecalho Supplement Banking 03",
+        "Supplement Banking 03 Parties",
+        "Partes Supplement Banking 03",
+        "Supplement Banking 03 Timeline",
+        "Linha do tempo Supplement Banking 03"
+      ],
+      "headings": [
+        "supplement banking 03",
+        "banking supplement 03",
+        "banking",
+        "banking summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Banking 03 line items",
+        "Supplement Banking 03 itens",
+        "Supplement Banking 03 summary",
+        "Supplement Banking 03 resumo",
+        "Supplement Banking 03 balance",
+        "Supplement Banking 03 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Banking 03 variant should be prioritized?",
+        "Qual variante de Supplement Banking 03 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "banking_deposit_hold_notice",
+      "label": "Deposit Hold Notice",
+      "expectedSections": [
+        "Supplement Banking 04 Header",
+        "Cabecalho Supplement Banking 04",
+        "Supplement Banking 04 Parties",
+        "Partes Supplement Banking 04",
+        "Supplement Banking 04 Timeline",
+        "Linha do tempo Supplement Banking 04"
+      ],
+      "headings": [
+        "supplement banking 04",
+        "banking supplement 04",
+        "banking",
+        "banking summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Banking 04 line items",
+        "Supplement Banking 04 itens",
+        "Supplement Banking 04 summary",
+        "Supplement Banking 04 resumo",
+        "Supplement Banking 04 balance",
+        "Supplement Banking 04 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Banking 04 variant should be prioritized?",
+        "Qual variante de Supplement Banking 04 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "banking_account_limit_notice",
+      "label": "Account Limit Notice",
+      "expectedSections": [
+        "Supplement Banking 05 Header",
+        "Cabecalho Supplement Banking 05",
+        "Supplement Banking 05 Parties",
+        "Partes Supplement Banking 05",
+        "Supplement Banking 05 Timeline",
+        "Linha do tempo Supplement Banking 05"
+      ],
+      "headings": [
+        "supplement banking 05",
+        "banking supplement 05",
+        "banking",
+        "banking summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Banking 05 line items",
+        "Supplement Banking 05 itens",
+        "Supplement Banking 05 summary",
+        "Supplement Banking 05 resumo",
+        "Supplement Banking 05 balance",
+        "Supplement Banking 05 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Banking 05 variant should be prioritized?",
+        "Qual variante de Supplement Banking 05 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "banking_fraud_alert_notice",
+      "label": "Fraud Alert Notice",
+      "expectedSections": [
+        "Supplement Banking 06 Header",
+        "Cabecalho Supplement Banking 06",
+        "Supplement Banking 06 Parties",
+        "Partes Supplement Banking 06",
+        "Supplement Banking 06 Timeline",
+        "Linha do tempo Supplement Banking 06"
+      ],
+      "headings": [
+        "supplement banking 06",
+        "banking supplement 06",
+        "banking",
+        "banking summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Banking 06 line items",
+        "Supplement Banking 06 itens",
+        "Supplement Banking 06 summary",
+        "Supplement Banking 06 resumo",
+        "Supplement Banking 06 balance",
+        "Supplement Banking 06 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Banking 06 variant should be prioritized?",
+        "Qual variante de Supplement Banking 06 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "banking_wire_fee_notice",
+      "label": "Wire Fee Notice",
+      "expectedSections": [
+        "Supplement Banking 07 Header",
+        "Cabecalho Supplement Banking 07",
+        "Supplement Banking 07 Parties",
+        "Partes Supplement Banking 07",
+        "Supplement Banking 07 Timeline",
+        "Linha do tempo Supplement Banking 07"
+      ],
+      "headings": [
+        "supplement banking 07",
+        "banking supplement 07",
+        "banking",
+        "banking summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Banking 07 line items",
+        "Supplement Banking 07 itens",
+        "Supplement Banking 07 summary",
+        "Supplement Banking 07 resumo",
+        "Supplement Banking 07 balance",
+        "Supplement Banking 07 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Banking 07 variant should be prioritized?",
+        "Qual variante de Supplement Banking 07 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "banking_service_terms_update",
+      "label": "Service Terms Update",
+      "expectedSections": [
+        "Supplement Banking 08 Header",
+        "Cabecalho Supplement Banking 08",
+        "Supplement Banking 08 Parties",
+        "Partes Supplement Banking 08",
+        "Supplement Banking 08 Timeline",
+        "Linha do tempo Supplement Banking 08"
+      ],
+      "headings": [
+        "supplement banking 08",
+        "banking supplement 08",
+        "banking",
+        "banking summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Banking 08 line items",
+        "Supplement Banking 08 itens",
+        "Supplement Banking 08 summary",
+        "Supplement Banking 08 resumo",
+        "Supplement Banking 08 balance",
+        "Supplement Banking 08 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Banking 08 variant should be prioritized?",
+        "Qual variante de Supplement Banking 08 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "banking_branch_compliance_notice",
+      "label": "Branch Compliance Notice",
+      "expectedSections": [
+        "Supplement Banking 09 Header",
+        "Cabecalho Supplement Banking 09",
+        "Supplement Banking 09 Parties",
+        "Partes Supplement Banking 09",
+        "Supplement Banking 09 Timeline",
+        "Linha do tempo Supplement Banking 09"
+      ],
+      "headings": [
+        "supplement banking 09",
+        "banking supplement 09",
+        "banking",
+        "banking summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Banking 09 line items",
+        "Supplement Banking 09 itens",
+        "Supplement Banking 09 summary",
+        "Supplement Banking 09 resumo",
+        "Supplement Banking 09 balance",
+        "Supplement Banking 09 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Banking 09 variant should be prioritized?",
+        "Qual variante de Supplement Banking 09 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "banking_payment_reversal_notice",
+      "label": "Payment Reversal Notice",
+      "expectedSections": [
+        "Supplement Banking 10 Header",
+        "Cabecalho Supplement Banking 10",
+        "Supplement Banking 10 Parties",
+        "Partes Supplement Banking 10",
+        "Supplement Banking 10 Timeline",
+        "Linha do tempo Supplement Banking 10"
+      ],
+      "headings": [
+        "supplement banking 10",
+        "banking supplement 10",
+        "banking",
+        "banking summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Banking 10 line items",
+        "Supplement Banking 10 itens",
+        "Supplement Banking 10 summary",
+        "Supplement Banking 10 resumo",
+        "Supplement Banking 10 balance",
+        "Supplement Banking 10 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Banking 10 variant should be prioritized?",
+        "Qual variante de Supplement Banking 10 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "banking_account_reconciliation_note",
+      "label": "Account Reconciliation Note",
+      "expectedSections": [
+        "Supplement Banking 11 Header",
+        "Cabecalho Supplement Banking 11",
+        "Supplement Banking 11 Parties",
+        "Partes Supplement Banking 11",
+        "Supplement Banking 11 Timeline",
+        "Linha do tempo Supplement Banking 11"
+      ],
+      "headings": [
+        "supplement banking 11",
+        "banking supplement 11",
+        "banking",
+        "banking summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Banking 11 line items",
+        "Supplement Banking 11 itens",
+        "Supplement Banking 11 summary",
+        "Supplement Banking 11 resumo",
+        "Supplement Banking 11 balance",
+        "Supplement Banking 11 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Banking 11 variant should be prioritized?",
+        "Qual variante de Supplement Banking 11 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
+      ]
+    },
+    {
+      "id": "banking_statement_addendum",
+      "label": "Statement Addendum",
+      "expectedSections": [
+        "Supplement Banking 12 Header",
+        "Cabecalho Supplement Banking 12",
+        "Supplement Banking 12 Parties",
+        "Partes Supplement Banking 12",
+        "Supplement Banking 12 Timeline",
+        "Linha do tempo Supplement Banking 12"
+      ],
+      "headings": [
+        "supplement banking 12",
+        "banking supplement 12",
+        "banking",
+        "banking summary",
+        "document id",
+        "identificacao"
+      ],
+      "expectedTableFamilies": [
+        "Supplement Banking 12 line items",
+        "Supplement Banking 12 itens",
+        "Supplement Banking 12 summary",
+        "Supplement Banking 12 resumo",
+        "Supplement Banking 12 balance",
+        "Supplement Banking 12 saldo"
+      ],
+      "fieldFamilies": [
+        "Primary identifiers",
+        "Identificadores primarios",
+        "Date and period markers",
+        "Marcadores de data e periodo",
+        "Amounts and status",
+        "Valores e status"
+      ],
+      "redFlags": [
+        "Missing mandatory section anchors",
+        "Faltam ancoras obrigatorias de secao",
+        "Conflicting summary totals",
+        "Totais de resumo conflitantes",
+        "Unparsable critical identifiers",
+        "Identificadores criticos nao interpretaveis"
+      ],
+      "missingQuestions": [
+        "Which Supplement Banking 12 variant should be prioritized?",
+        "Qual variante de Supplement Banking 12 deve ser priorizada?",
+        "Should extraction prefer header metadata or detailed rows?",
+        "A extracao deve priorizar metadados do cabecalho ou linhas detalhadas?",
+        "Do we need clarification about version or amendment?",
+        "Precisamos de esclarecimento sobre versao ou aditivo?"
       ]
     }
   ]

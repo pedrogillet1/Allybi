@@ -28,7 +28,11 @@ import embeddingService from "./embedding.service";
 import { parseBooleanFlag, resolveIndexingPolicySnapshot } from "./indexingPolicy.service";
 import pineconeService from "./pinecone.service";
 import type { InputChunk as PipelineInputChunk } from "../ingestion/pipeline/pipelineTypes";
-import { recordIndexingQualityMetrics } from "../ingestion/pipeline/pipelineMetrics.service";
+import {
+  recordIndexingActiveOperationConflict,
+  recordIndexingPlaintextSensitiveFieldViolation,
+  recordIndexingQualityMetrics,
+} from "../ingestion/pipeline/pipelineMetrics.service";
 
 type JsonPrimitive = string | number | boolean | null;
 type PineconeMetaValue = JsonPrimitive | string[];
@@ -72,6 +76,10 @@ const SAFE_STRUCTURAL_METADATA_KEYS = new Set<string>([
   "rowIndex",
   "columnIndex",
   "cellRef",
+  "periodYear",
+  "periodMonth",
+  "periodQuarter",
+  "periodTokens",
   "scaleRaw",
   "scaleMultiplier",
   "startChar",
@@ -189,6 +197,21 @@ function sanitizeStoredChunkMetadata(
     out[key] = value;
   }
   return out;
+}
+
+function hasSensitivePlaintextMetadata(metadata: Record<string, any>): boolean {
+  const candidateValues = [
+    metadata.rowLabel,
+    metadata.colHeader,
+    metadata.valueRaw,
+    metadata.unitRaw,
+  ];
+  for (const value of candidateValues) {
+    if (typeof value === "string" && value.trim().length > 0) {
+      return true;
+    }
+  }
+  return false;
 }
 
 function toPrismaJsonValue(value: unknown): Prisma.InputJsonValue {
@@ -448,14 +471,24 @@ export async function storeDocumentEmbeddings(
     isLatestVersion,
   };
 
-  await prisma.document.update({
-    where: { id: documentId },
+  const previousOperationId = document.indexingOperationId ?? null;
+  const claim = await prisma.document.updateMany({
+    where: {
+      id: documentId,
+      indexingOperationId: previousOperationId,
+    } as any,
     data: {
       indexingOperationId: operationId,
       indexingError: null,
       indexingUpdatedAt: new Date(indexedAtMs),
     },
   });
+  if ((claim as any)?.count !== 1) {
+    recordIndexingActiveOperationConflict();
+    throw new Error(
+      `Concurrent indexing operation detected for document ${documentId}. Expected previous operation ${previousOperationId ?? "null"}.`,
+    );
+  }
 
   if (needsEmbedding.length > 0) {
     logger.info("[vectorEmbedding] Generating embeddings", {
@@ -563,6 +596,18 @@ export async function storeDocumentEmbeddings(
               documentId,
             )
           : null;
+      const stripSensitivePlaintext = encryptionMode === "encrypted_only";
+      const sensitivePlaintextViolationCount = stripSensitivePlaintext
+        ? usableChunks.reduce((count, chunk) => {
+            return count +
+              (hasSensitivePlaintextMetadata(chunk.metadata || {}) ? 1 : 0);
+          }, 0)
+        : 0;
+      if (sensitivePlaintextViolationCount > 0) {
+        recordIndexingPlaintextSensitiveFieldViolation(
+          sensitivePlaintextViolationCount,
+        );
+      }
       const chunkRecords = usableChunks.map((c) => {
         const id = randomUUID();
         const plaintext = c.content;
@@ -614,18 +659,18 @@ export async function storeDocumentEmbeddings(
             typeof metadata.columnIndex === "number"
               ? metadata.columnIndex
               : null,
-          rowLabel: metadata.rowLabel || null,
-          colHeader: metadata.colHeader || null,
+          rowLabel: stripSensitivePlaintext ? null : metadata.rowLabel || null,
+          colHeader: stripSensitivePlaintext ? null : metadata.colHeader || null,
           valueRaw:
-            encryptionMode === "encrypted_only" ? null : metadata.valueRaw || null,
+            stripSensitivePlaintext ? null : metadata.valueRaw || null,
           unitRaw:
-            encryptionMode === "encrypted_only" ? null : metadata.unitRaw || null,
+            stripSensitivePlaintext ? null : metadata.unitRaw || null,
           unitNormalized:
-            encryptionMode === "encrypted_only"
+            stripSensitivePlaintext
               ? null
               : metadata.unitNormalized || null,
           numericValue:
-            encryptionMode === "encrypted_only"
+            stripSensitivePlaintext
               ? null
               : typeof metadata.numericValue === "number"
                 ? metadata.numericValue

@@ -6,14 +6,12 @@
  */
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || '';
-const AUTH_LOCALSTORAGE_COMPAT = process.env.REACT_APP_AUTH_LOCALSTORAGE_COMPAT === 'true';
 
 /**
  * Get token from localStorage (same pattern as other services)
  */
 const getAuthToken = () => {
-  if (!AUTH_LOCALSTORAGE_COMPAT) return null;
-  return localStorage.getItem('accessToken') || localStorage.getItem('token');
+  return null;
 };
 
 /**
@@ -254,3 +252,4 @@ export default {
   canExportAsPdf,
   isOfficeDocument
 };
+

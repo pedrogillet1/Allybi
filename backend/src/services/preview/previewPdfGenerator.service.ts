@@ -22,16 +22,12 @@ import {
   PreviewProvider,
 } from "./previewProviderRouter";
 import * as pptxSlideImageGenerator from "./pptxSlideImageGenerator.service";
-
-// MIME types that need PDF conversion for preview
-const OFFICE_MIME_TYPES = [
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
-  "application/msword", // .doc
-  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
-  "application/vnd.ms-excel", // .xls
-  "application/vnd.openxmlformats-officedocument.presentationml.presentation", // .pptx
-  "application/vnd.ms-powerpoint", // .ppt
-];
+import {
+  getPreferredExtensionForMime,
+  needsPreviewPdfGenerationForMime,
+  PREVIEW_CONVERTIBLE_OFFICE_MIMES,
+  isPptxMime,
+} from "../ingestion/extraction/ingestionMimeRegistry.service";
 
 // Configuration for retry mechanism
 const MAX_RETRY_ATTEMPTS = 3;
@@ -50,7 +46,7 @@ export interface PreviewGenerationResult {
  * Check if a document's MIME type requires PDF preview generation
  */
 export function needsPreviewPdfGeneration(mimeType: string): boolean {
-  return OFFICE_MIME_TYPES.includes(mimeType);
+  return needsPreviewPdfGenerationForMime(mimeType);
 }
 
 /**
@@ -177,18 +173,7 @@ export async function generatePreviewPdf(
     }
     if (!fname) fname = "document";
     if (!fname.includes(".")) {
-      const extMap: Record<string, string> = {
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-          ".docx",
-        "application/msword": ".doc",
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
-          ".xlsx",
-        "application/vnd.ms-excel": ".xls",
-        "application/vnd.openxmlformats-officedocument.presentationml.presentation":
-          ".pptx",
-        "application/vnd.ms-powerpoint": ".ppt",
-      };
-      fname += extMap[document.mimeType] || "";
+      fname += getPreferredExtensionForMime(document.mimeType);
     }
 
     // 9. Convert to PDF — route to best provider (Google Slides for PPTX when available, else CloudConvert)
@@ -273,11 +258,7 @@ export async function generatePreviewPdf(
     );
 
     // 12. For PPTX files, generate slide images from the PDF (async, don't block)
-    const isPptx =
-      document.mimeType ===
-        "application/vnd.openxmlformats-officedocument.presentationml.presentation" ||
-      document.mimeType?.includes("presentation") ||
-      document.mimeType?.includes("powerpoint");
+    const isPptx = isPptxMime(document.mimeType);
 
     if (isPptx && conversion.pdfBuffer) {
       console.log(`[PreviewPDF] Triggering slide image generation for PPTX...`);
@@ -481,7 +462,7 @@ export async function findDocumentsNeedingPreviewRetry(): Promise<
 
   const staleDocuments = await prisma.document.findMany({
     where: {
-      mimeType: { in: OFFICE_MIME_TYPES },
+      mimeType: { in: PREVIEW_CONVERTIBLE_OFFICE_MIMES as string[] },
       status: { in: ["ready", "indexed", "enriching", "available"] },
       OR: [
         {

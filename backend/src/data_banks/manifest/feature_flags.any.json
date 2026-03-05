@@ -12,7 +12,10 @@
       "services/core/banks/dataBankLoader.service.ts"
     ],
     "tests": [
-      "tests/patternWiringProof.test.ts"
+      "src/services/core/banks/bankRollout.service.test.ts",
+      "src/services/core/banks/featureFlagResolver.service.test.ts",
+      "src/services/core/banks/canaryHealthCheck.service.test.ts",
+      "src/tests/certification/rollout-safety.cert.test.ts"
     ]
   },
   "config": {
@@ -42,6 +45,15 @@
         "ff.viewer_source_navigation_animation",
         "ff.viewer_cross_document_source_jump"
       ]
+    },
+    "rolloutSafety": {
+      "enabled": true,
+      "thresholds": {
+        "minSampleSize": 20,
+        "maxErrorRate": 0.02,
+        "maxP95LatencyMs": 12000,
+        "maxWeakEvidenceRate": 0.15
+      }
     }
   },
   "flags": [
@@ -77,7 +89,16 @@
         "provider_fallbacks",
         "llm_gateway"
       ],
-      "riskLevel": "high"
+      "riskLevel": "high",
+      "rollout": {
+        "requiresCanary": true,
+        "maxPercentByEnv": {
+          "production": 10,
+          "staging": 25,
+          "dev": 100,
+          "local": 100
+        }
+      }
     },
     {
       "id": "ff.adaptive_failure_fallbacks",
@@ -160,7 +181,16 @@
         "retrieval_ranker",
         "intent_patterns"
       ],
-      "riskLevel": "high"
+      "riskLevel": "high",
+      "rollout": {
+        "requiresCanary": true,
+        "maxPercentByEnv": {
+          "production": 10,
+          "staging": 25,
+          "dev": 100,
+          "local": 100
+        }
+      }
     },
     {
       "id": "ff.strict_provenance_v2",
@@ -176,7 +206,16 @@
         "provenance",
         "response_contract_enforcer"
       ],
-      "riskLevel": "high"
+      "riskLevel": "high",
+      "rollout": {
+        "requiresCanary": true,
+        "maxPercentByEnv": {
+          "production": 10,
+          "staging": 25,
+          "dev": 100,
+          "local": 100
+        }
+      }
     },
     {
       "id": "ff.provenance_user_failopen_with_evidence",
@@ -193,7 +232,16 @@
         "answer_finalization",
         "telemetry"
       ],
-      "riskLevel": "high"
+      "riskLevel": "high",
+      "rollout": {
+        "requiresCanary": true,
+        "maxPercentByEnv": {
+          "production": 10,
+          "staging": 25,
+          "dev": 100,
+          "local": 100
+        }
+      }
     },
     {
       "id": "ff.provenance_thresholds_v3",
@@ -242,7 +290,16 @@
         "quality_gates",
         "answer_finalization"
       ],
-      "riskLevel": "high"
+      "riskLevel": "high",
+      "rollout": {
+        "requiresCanary": true,
+        "maxPercentByEnv": {
+          "production": 10,
+          "staging": 25,
+          "dev": 100,
+          "local": 100
+        }
+      }
     },
     {
       "id": "ff.language_contract_v2",
@@ -290,7 +347,16 @@
         "prompt_registry",
         "answer_composition"
       ],
-      "riskLevel": "high"
+      "riskLevel": "high",
+      "rollout": {
+        "requiresCanary": true,
+        "maxPercentByEnv": {
+          "production": 10,
+          "staging": 25,
+          "dev": 100,
+          "local": 100
+        }
+      }
     },
     {
       "id": "ff.emit_gate_trace",
@@ -321,7 +387,16 @@
         "prompt_registry",
         "orchestrator"
       ],
-      "riskLevel": "high"
+      "riskLevel": "high",
+      "rollout": {
+        "requiresCanary": true,
+        "maxPercentByEnv": {
+          "production": 10,
+          "staging": 25,
+          "dev": 100,
+          "local": 100
+        }
+      }
     },
     {
       "id": "ff.viewer_qa_locked_default",

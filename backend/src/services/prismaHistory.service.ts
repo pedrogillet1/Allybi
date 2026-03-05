@@ -11,6 +11,33 @@ import type {
   ListConversationsResult,
 } from "../controllers/history.controller";
 
+type ConversationCursor = { id: string; updatedAt: Date };
+
+function encodeConversationCursor(row: {
+  id: string;
+  updatedAt: Date | string;
+}): string {
+  const payload = JSON.stringify({
+    id: row.id,
+    updatedAt: new Date(row.updatedAt).toISOString(),
+  });
+  return Buffer.from(payload, "utf8").toString("base64url");
+}
+
+function decodeConversationCursor(raw: string): ConversationCursor | null {
+  try {
+    const json = Buffer.from(raw, "base64url").toString("utf8");
+    const parsed = JSON.parse(json) as { id?: unknown; updatedAt?: unknown };
+    if (typeof parsed?.id !== "string") return null;
+    if (typeof parsed?.updatedAt !== "string") return null;
+    const updatedAt = new Date(parsed.updatedAt);
+    if (Number.isNaN(updatedAt.getTime())) return null;
+    return { id: parsed.id, updatedAt };
+  } catch {
+    return null;
+  }
+}
+
 export class PrismaHistoryService implements ChatHistoryService {
   async listConversations(args: {
     userId: string;
@@ -21,18 +48,46 @@ export class PrismaHistoryService implements ChatHistoryService {
     q?: string;
   }): Promise<ListConversationsResult> {
     const limit = Math.min(args.limit, 50);
-    const where: any = { userId: args.userId, isDeleted: false };
+    const filters: any[] = [{ userId: args.userId }];
 
-    if (args.pinnedOnly) where.isPinned = true;
+    if (!args.includeArchived) filters.push({ isDeleted: false });
+    if (args.pinnedOnly) filters.push({ isPinned: true });
     if (args.q) {
-      where.title = { contains: args.q, mode: "insensitive" };
+      filters.push({ title: { contains: args.q, mode: "insensitive" } });
+    }
+
+    let decodedCursor = args.cursor
+      ? decodeConversationCursor(args.cursor)
+      : null;
+    if (args.cursor && !decodedCursor) {
+      const anchor = await prisma.conversation.findFirst({
+        where: {
+          userId: args.userId,
+          id: args.cursor,
+          ...(args.includeArchived ? {} : { isDeleted: false }),
+        },
+        select: { id: true, updatedAt: true },
+      });
+      if (anchor) decodedCursor = { id: anchor.id, updatedAt: anchor.updatedAt };
+    }
+    if (decodedCursor) {
+      filters.push({
+        OR: [
+          { updatedAt: { lt: decodedCursor.updatedAt } },
+          {
+            AND: [
+              { updatedAt: decodedCursor.updatedAt },
+              { id: { lt: decodedCursor.id } },
+            ],
+          },
+        ],
+      });
     }
 
     const conversations = await prisma.conversation.findMany({
-      where,
+      where: { AND: filters },
       take: limit + 1,
-      ...(args.cursor ? { cursor: { id: args.cursor }, skip: 1 } : {}),
-      orderBy: { updatedAt: "desc" },
+      orderBy: [{ updatedAt: "desc" }, { id: "desc" }],
       include: {
         _count: { select: { messages: true } },
         messages: {
@@ -44,9 +99,8 @@ export class PrismaHistoryService implements ChatHistoryService {
     });
 
     const hasMore = conversations.length > limit;
-    const items: ConversationSummary[] = (
-      hasMore ? conversations.slice(0, limit) : conversations
-    ).map((c) => ({
+    const page = hasMore ? conversations.slice(0, limit) : conversations;
+    const items: ConversationSummary[] = page.map((c) => ({
       id: c.id,
       title: c.title ?? "New Chat",
       updatedAt: c.updatedAt.toISOString(),
@@ -60,7 +114,10 @@ export class PrismaHistoryService implements ChatHistoryService {
 
     return {
       items,
-      nextCursor: hasMore ? items[items.length - 1]?.id : undefined,
+      nextCursor:
+        hasMore && page.length > 0
+          ? encodeConversationCursor(page[page.length - 1])
+          : undefined,
     };
   }
 
