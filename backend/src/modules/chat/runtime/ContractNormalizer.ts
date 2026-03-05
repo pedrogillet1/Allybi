@@ -72,7 +72,7 @@ export class ContractNormalizer {
     }
 
     if (status === "success" && evidence.required && !evidence.provided) {
-      status = "partial";
+      status = "failed";
       failureCode = failureCode || "MISSING_EVIDENCE";
     }
 
@@ -86,7 +86,7 @@ export class ContractNormalizer {
       Array.isArray(qualityGates.failed) &&
       qualityGates.failed.some((gate) => gate.severity === "block");
     if (status === "success" && hasBlockingQualityGate) {
-      status = "partial";
+      status = "failed";
       failureCode = failureCode || "quality_gate_blocked";
     }
 

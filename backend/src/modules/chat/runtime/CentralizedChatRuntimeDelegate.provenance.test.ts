@@ -39,6 +39,8 @@ describe("CentralizedChatRuntimeDelegate provenance enforcement", () => {
     | jest.SpiedFunction<QualityGateRunnerService["runGates"]>
     | null = null;
   let priorFailSoftFlag: string | undefined;
+  let priorQualityGatesEnforcingFlag: string | undefined;
+  let priorNodeEnv: string | undefined;
   let priorProvenanceFailOpenFlag: string | undefined;
 
   beforeAll(async () => {
@@ -53,6 +55,8 @@ describe("CentralizedChatRuntimeDelegate provenance enforcement", () => {
 
   beforeEach(() => {
     priorFailSoftFlag = process.env.CHAT_RUNTIME_FAIL_SOFT_WARNINGS;
+    priorQualityGatesEnforcingFlag = process.env.QUALITY_GATES_ENFORCING;
+    priorNodeEnv = process.env.NODE_ENV;
     priorProvenanceFailOpenFlag =
       process.env.PROVENANCE_USER_FAILOPEN_WITH_EVIDENCE;
     restoreEnforcer = jest
@@ -89,6 +93,16 @@ describe("CentralizedChatRuntimeDelegate provenance enforcement", () => {
       delete process.env.CHAT_RUNTIME_FAIL_SOFT_WARNINGS;
     } else {
       process.env.CHAT_RUNTIME_FAIL_SOFT_WARNINGS = priorFailSoftFlag;
+    }
+    if (priorQualityGatesEnforcingFlag === undefined) {
+      delete process.env.QUALITY_GATES_ENFORCING;
+    } else {
+      process.env.QUALITY_GATES_ENFORCING = priorQualityGatesEnforcingFlag;
+    }
+    if (priorNodeEnv === undefined) {
+      delete process.env.NODE_ENV;
+    } else {
+      process.env.NODE_ENV = priorNodeEnv;
     }
     if (priorProvenanceFailOpenFlag === undefined) {
       delete process.env.PROVENANCE_USER_FAILOPEN_WITH_EVIDENCE;
@@ -243,7 +257,7 @@ describe("CentralizedChatRuntimeDelegate provenance enforcement", () => {
     expect(finalized.provenanceTelemetry).toBeNull();
   });
 
-  test("soft-opens quality gate blocks with warnings when fail-soft flag is enabled", async () => {
+  test("fails closed on quality gate blocks even when fail-soft flag is enabled", async () => {
     process.env.CHAT_RUNTIME_FAIL_SOFT_WARNINGS = "true";
     restoreQualityRunner = jest
       .spyOn(QualityGateRunnerService.prototype, "runGates")
@@ -286,8 +300,8 @@ describe("CentralizedChatRuntimeDelegate provenance enforcement", () => {
       telemetry: { model: "unit-test-model" },
     });
 
-    expect(finalized.failureCode).toBeNull();
-    expect(finalized.assistantText).toContain(
+    expect(finalized.failureCode).toBe("quality_gate_blocked");
+    expect(finalized.assistantText).not.toContain(
       "Grounded answer text that should remain visible.",
     );
     expect(finalized.userWarning?.code).toBe("quality_gate_blocked");
@@ -344,5 +358,156 @@ describe("CentralizedChatRuntimeDelegate provenance enforcement", () => {
       "This text should be replaced by fallback.",
     );
     expect(finalized.userWarning?.code).toBe("quality_gate_blocked");
+  });
+
+  test("fails closed when quality gates are disabled by flag in production", async () => {
+    process.env.CHAT_RUNTIME_FAIL_SOFT_WARNINGS = "true";
+    process.env.QUALITY_GATES_ENFORCING = "false";
+    process.env.NODE_ENV = "production";
+    restoreQualityRunner = jest
+      .spyOn(QualityGateRunnerService.prototype, "runGates")
+      .mockResolvedValue({
+        allPassed: false,
+        finalScore: 0,
+        results: [
+          {
+            passed: false,
+            gateName: "privacy_minimal",
+            issues: ["blocked for test"],
+          },
+        ],
+      });
+
+    const engine: ChatEngine = {
+      async generate() {
+        return { text: "unused" };
+      },
+      async stream() {
+        return { text: "unused", chunks: [] };
+      },
+    } as ChatEngine;
+
+    const delegate = new CentralizedChatRuntimeDelegate(engine, {
+      conversationMemory: {} as any,
+    });
+
+    const finalized = await (delegate as any).finalizeChatTurn({
+      assistantText: "This text should be replaced by fallback.",
+      req: {
+        userId: "user-quality-production",
+        message: "summarize this",
+        preferredLanguage: "en",
+      },
+      answerMode: "general_answer",
+      answerClass: "GENERAL",
+      retrievalPack: null,
+      sources: [],
+      telemetry: { model: "unit-test-model" },
+    });
+
+    expect(finalized.failureCode).toBe("quality_gate_blocked");
+    expect(finalized.assistantText).not.toBe(
+      "This text should be replaced by fallback.",
+    );
+  });
+
+  test("fails closed on enforcer runtime errors even with fail-soft enabled", async () => {
+    process.env.CHAT_RUNTIME_FAIL_SOFT_WARNINGS = "true";
+    restoreEnforcer?.mockRestore();
+    restoreEnforcer = jest
+      .spyOn(enforcerModule, "getResponseContractEnforcer")
+      .mockReturnValue({
+        enforce() {
+          throw new Error("forced-enforcer-error");
+        },
+      } as any);
+
+    const engine: ChatEngine = {
+      async generate() {
+        return { text: "unused" };
+      },
+      async stream() {
+        return { text: "unused", chunks: [] };
+      },
+    } as ChatEngine;
+
+    const delegate = new CentralizedChatRuntimeDelegate(engine, {
+      conversationMemory: {} as any,
+    });
+
+    const finalized = await (delegate as any).finalizeChatTurn({
+      assistantText: "This text should be replaced by fallback.",
+      req: {
+        userId: "user-enforcer-error",
+        message: "summarize this",
+        preferredLanguage: "en",
+      },
+      answerMode: "general_answer",
+      answerClass: "GENERAL",
+      retrievalPack: null,
+      sources: [],
+      telemetry: { model: "unit-test-model" },
+    });
+
+    expect(finalized.failureCode).toBe("enforcer_runtime_error");
+    expect(finalized.assistantText).not.toBe(
+      "This text should be replaced by fallback.",
+    );
+    expect(finalized.warnings || []).not.toContainEqual(
+      expect.objectContaining({ code: "ENFORCER_RUNTIME_ERROR_FAIL_OPEN" }),
+    );
+  });
+
+  test("fails closed on nav contract block even when fail-soft is enabled", async () => {
+    process.env.CHAT_RUNTIME_FAIL_SOFT_WARNINGS = "true";
+    restoreEnforcer?.mockRestore();
+    restoreEnforcer = jest
+      .spyOn(enforcerModule, "getResponseContractEnforcer")
+      .mockReturnValue({
+        enforce(payload: { content: string; attachments: unknown[] }) {
+          return {
+            content: payload.content,
+            attachments: payload.attachments,
+            enforcement: {
+              repairs: [],
+              warnings: [],
+              blocked: true,
+              reasonCode: "nav_pills_missing_buttons",
+            },
+          };
+        },
+      } as any);
+
+    const engine: ChatEngine = {
+      async generate() {
+        return { text: "unused" };
+      },
+      async stream() {
+        return { text: "unused", chunks: [] };
+      },
+    } as ChatEngine;
+
+    const delegate = new CentralizedChatRuntimeDelegate(engine, {
+      conversationMemory: {} as any,
+    });
+
+    const finalized = await (delegate as any).finalizeChatTurn({
+      assistantText: "This text should be replaced by fallback.",
+      req: {
+        userId: "user-nav-contract",
+        message: "open section 2",
+        preferredLanguage: "en",
+      },
+      answerMode: "nav_pills",
+      answerClass: "NAVIGATION",
+      retrievalPack: null,
+      sources: [],
+      telemetry: { model: "unit-test-model" },
+    });
+
+    expect(finalized.failureCode).toBe("nav_pills_missing_buttons");
+    expect(finalized.assistantText).not.toBe(
+      "This text should be replaced by fallback.",
+    );
   });
 });

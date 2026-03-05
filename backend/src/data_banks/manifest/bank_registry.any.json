@@ -8284,7 +8284,7 @@
         "dev": false,
         "local": false
       },
-      "checksumSha256": "0ebeacdba2e27bbf30d023f20f28eab9c0dafe84c1a1fb41dc66da120fcac8a5",
+      "checksumSha256": "2915c67ed597c6eb0e178ccb506ebd5110b794982ce600b30e322ec816604291",
       "lastUpdated": "2026-02-27",
       "dependsOn": []
     },
@@ -21588,7 +21588,7 @@
         "dev": false,
         "local": false
       },
-      "checksumSha256": "18dab5cecec6211724113dd1d310ec1040ac104f7540681af7cd0283159a48cc",
+      "checksumSha256": "0adb30b59dc528955a0fc65bc19b342b525ff605609377c48ac3c25d3ad3e24b",
       "lastUpdated": "2026-02-27",
       "dependsOn": []
     },
@@ -21615,7 +21615,7 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "2642ed8e750b1c403fb341faf709b0b5809941b73273d718d3c1323462fad086",
+      "checksumSha256": "ef8ce079834ee36372f8ab685754def08cec7c7259a0125bae7409eb6ab116c0",
       "lastUpdated": "2026-03-01"
     },
     {
@@ -21665,7 +21665,7 @@
         "dev": false,
         "local": false
       },
-      "checksumSha256": "a8773cf330305bcfa2a1ca53407b7b84cd5140d3e09b641d893c324173deab89",
+      "checksumSha256": "2ec5a8fb15ae069c646585a50e351a5e5ab847de1515e5efa81689069e977bb7",
       "lastUpdated": "2026-03-03"
     },
     {

@@ -1848,6 +1848,61 @@ export class QualityGateRunnerService {
       });
     }
 
+    const contradictionPolicyBank =
+      this.documentIntelligenceBanks.getQualityGateBank(
+        "contradiction_policy" as any,
+      ) as DocumentIntelligenceQualityBank | null;
+    if (contradictionPolicyBank?.config?.enabled) {
+      const contradictionPolicy = this.runDocumentIntelligenceRuleBank(
+        "contradiction_policy",
+        contradictionPolicyBank,
+        scope,
+      );
+      results.push(...contradictionPolicy.failures);
+      const contradictionCount =
+        firstFiniteNumber([
+          asRecord(scope.context).contradictions,
+          asRecord(scope.output).contradictions,
+          asRecord(scope.source).contradictions,
+        ]) ?? 0;
+      const hasCriticalContradiction = [
+        asRecord(scope.context).criticalContradiction,
+        asRecord(scope.output).criticalContradiction,
+        asRecord(scope.source).criticalContradiction,
+      ].some((value) => {
+        if (value === true) return true;
+        return String(value || "").trim().toLowerCase() === "true";
+      });
+      const hasPolicySignal =
+        contradictionCount >= 1 || hasCriticalContradiction;
+      const failed =
+        hasPolicySignal ||
+        contradictionPolicy.failures.length > 0 ||
+        contradictionPolicy.errors.length > 0;
+      results.push({
+        gateName: "contradiction_policy_enforcement",
+        passed: !failed,
+        score: failed ? 0 : 1,
+        issues: failed
+          ? [
+              ...(hasPolicySignal
+                ? [
+                    hasCriticalContradiction
+                      ? "Critical contradiction signal detected in policy scope."
+                      : `Contradiction signal count detected (${contradictionCount}).`,
+                  ]
+                : []),
+              ...contradictionPolicy.failures
+                .map((failure) => failure.issues || [])
+                .flat(),
+              ...contradictionPolicy.errors,
+            ]
+          : undefined,
+        sourceBankId:
+          contradictionPolicyBank._meta?.id || "contradiction_policy",
+      });
+    }
+
     const numericIntegrityBank =
       this.documentIntelligenceBanks.getQualityGateBank(
         "numeric_integrity",

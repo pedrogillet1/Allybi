@@ -253,6 +253,45 @@ describe("QualityGateRunnerService", () => {
     ).toBe(false);
   });
 
+  test("enforces contradiction_policy when contradiction signals are present", async () => {
+    process.env.NODE_ENV = "development";
+    mockGetOptionalBank.mockReturnValue(null);
+
+    const { QualityGateRunnerService } =
+      await import("./qualityGateRunner.service");
+    const runner = new QualityGateRunnerService({
+      getQualityGateBank: (type: string) =>
+        type === "contradiction_policy"
+          ? {
+              _meta: { id: "contradiction_policy" },
+              config: { enabled: true },
+              rules: [
+                {
+                  id: "CP_001_cross_statement_conflict",
+                  trigger: "cross statement contradiction",
+                  check: "context.contradictions >= 1 AND context.confidence < 0.8",
+                  failureAction: "BLOCK_AND_ASK_CLARIFY",
+                },
+              ],
+            }
+          : null,
+    } as any);
+
+    const out = await runner.runGates("summary text", {
+      answerMode: "doc_grounded_single",
+      diPolicyContext: { contradictions: 2, confidence: 0.5 },
+    });
+
+    expect(
+      out.results.find((g) => g.gateName === "CP_001_cross_statement_conflict")
+        ?.passed,
+    ).toBe(false);
+    expect(
+      out.results.find((g) => g.gateName === "contradiction_policy_enforcement")
+        ?.passed,
+    ).toBe(false);
+  });
+
   test("evaluates wrong_doc_lock and ambiguity rules from bank checks", async () => {
     process.env.NODE_ENV = "development";
     mockGetOptionalBank.mockReturnValue(null);

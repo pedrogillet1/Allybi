@@ -1147,6 +1147,9 @@ const DEFAULT_BLOCKING_QUALITY_GATES = new Set<string>([
   "redaction_default_pii_identity_tax_banking",
   "medical_safety_boundaries",
   "privacy_minimal",
+  "source_policy_navigation_mode",
+  "contradiction_policy_enforcement",
+  "ambiguity_single_question_policy",
 ]);
 
 type QualityGatesBank = {
@@ -1218,6 +1221,12 @@ const HARD_FAIL_CLOSED_REASON_CODES = new Set<string>([
   "missing_evidence_map",
   "policy_refusal_required",
   "compliance_blocked",
+  "quality_gate_blocked",
+  "quality_gate_runner_error",
+  "enforcer_runtime_error",
+  "missing_provenance",
+  "insufficient_provenance_coverage",
+  "nav_pills_missing_buttons",
 ]);
 
 function normalizeReasonCode(value: unknown): string {
@@ -1245,6 +1254,42 @@ function resolveRuntimeFailureMode(
 ): RuntimeFailureMode {
   if (isHardFailClosedReason(reasonCode)) return "fail_closed";
   return failSoftEnabled ? "fail_soft" : "fail_closed";
+}
+
+function shouldForceStrictGovernanceFailClosed(): boolean {
+  const explicit = String(process.env.CHAT_RUNTIME_STRICT_GOVERNANCE || "")
+    .trim()
+    .toLowerCase();
+  if (explicit === "1" || explicit === "true" || explicit === "yes") {
+    return true;
+  }
+  if (explicit === "0" || explicit === "false" || explicit === "no") {
+    return false;
+  }
+  const nodeEnv = String(process.env.NODE_ENV || "")
+    .trim()
+    .toLowerCase();
+  const runtimeEnv = String(process.env.RUNTIME_ENV || process.env.APP_ENV || "")
+    .trim()
+    .toLowerCase();
+  return (
+    nodeEnv === "production" ||
+    runtimeEnv === "production" ||
+    runtimeEnv === "staging"
+  );
+}
+
+function detectDominantLanguageTag(text: string): "en" | "pt" | "es" | "unknown" {
+  const scores = languageScores(String(text || ""));
+  const ranked = [
+    { lang: "en" as const, score: scores.en },
+    { lang: "pt" as const, score: scores.pt },
+    { lang: "es" as const, score: scores.es },
+  ].sort((a, b) => b.score - a.score);
+  if (!Number.isFinite(ranked[0].score) || ranked[0].score <= 0.5) {
+    return "unknown";
+  }
+  return ranked[0].lang;
 }
 
 function buildWarningMessageForReason(params: {
@@ -1655,6 +1700,61 @@ export class CentralizedChatRuntimeDelegate {
     if (strength === "weak") return 0.35;
     if (strength === "none") return 0.05;
     return null;
+  }
+
+  private emitGovernanceMetric(params: {
+    traceId: string;
+    req: ChatRequest;
+    answerMode: AnswerMode;
+    metricName:
+      | "governance_gate_fail_total"
+      | "language_lock_violation_total"
+      | "source_policy_violation_total";
+    reasonCode?: string | null;
+    gateName?: string | null;
+    failureMode?: RuntimeFailureMode | null;
+    enforced?: boolean | null;
+    requestedLanguage?: string | null;
+    detectedLanguage?: string | null;
+    violationType?: string | null;
+    blocked?: boolean | null;
+  }): void {
+    const traceId = String(params.traceId || "").trim();
+    if (!traceId) return;
+    void this.traceWriter
+      .writeRetrievalEvent({
+        traceId,
+        userId: params.req.userId,
+        conversationId: params.req.conversationId || null,
+        operator: "governance",
+        intent: "governance_metric",
+        domain: "governance",
+        docLockEnabled: (params.req.attachedDocumentIds || []).length > 0,
+        strategy: "governance_metric",
+        navPillsUsed: params.answerMode === "nav_pills",
+        fallbackReasonCode: params.reasonCode || null,
+        at: new Date(),
+        meta: {
+          eventType: `metric.${params.metricName}`,
+          metricName: params.metricName,
+          reasonCode: params.reasonCode || null,
+          gateName: params.gateName || null,
+          failureMode: params.failureMode || null,
+          enforced:
+            typeof params.enforced === "boolean" ? params.enforced : null,
+          requestedLanguage: params.requestedLanguage || null,
+          detectedLanguage: params.detectedLanguage || null,
+          violationType: params.violationType || null,
+          blocked: typeof params.blocked === "boolean" ? params.blocked : null,
+        },
+      })
+      .catch((error) => {
+        appLogger.warn("[governance-metric] write failed", {
+          traceId,
+          metricName: params.metricName,
+          error: error instanceof Error ? error.message : String(error),
+        });
+      });
   }
 
   private async persistTraceArtifacts(params: {
@@ -3894,6 +3994,7 @@ export class CentralizedChatRuntimeDelegate {
     let text = params.assistantText;
     let failureCode: string | null = null;
     let provenanceTelemetry: ProvenanceRuntimeTelemetry | null = null;
+    const traceId = this.resolveTraceId(params.req);
     const preferredLanguage = normalizeChatLanguage(params.req.preferredLanguage);
     const warningPayloadEnabled = isRuntimeFlagEnabled(
       "CHAT_RUNTIME_WARNING_PAYLOAD_ENABLED",
@@ -3996,10 +4097,9 @@ export class CentralizedChatRuntimeDelegate {
     // 2. Run quality gates (format checks, brevity, markdown sanity)
     let qualityGateIssues: string[] = [];
     let qualityGates: ChatQualityGateState = { allPassed: true, failed: [] };
-    const enforceQualityGates = isRuntimeFlagEnabled(
-      "QUALITY_GATES_ENFORCING",
-      true,
-    );
+    const enforceQualityGates = shouldForceStrictGovernanceFailClosed()
+      ? true
+      : isRuntimeFlagEnabled("QUALITY_GATES_ENFORCING", true);
     const qualityGateSeverityByName = resolveQualityGateSeverityMap();
     try {
       const qualityRunner = new QualityGateRunnerService();
@@ -4054,6 +4154,20 @@ export class CentralizedChatRuntimeDelegate {
           issues: qualityGateIssues,
         });
         if (enforceQualityGates && !failureCode) {
+          for (const gate of failedGates) {
+            const gateName = String(gate.gateName || "").trim();
+            if (!gateName.startsWith("source_policy")) continue;
+            this.emitGovernanceMetric({
+              traceId,
+              req: params.req,
+              answerMode: params.answerMode,
+              metricName: "source_policy_violation_total",
+              reasonCode: "source_policy_violation",
+              gateName,
+              violationType: gateName,
+              blocked: gate.severity === "block",
+            });
+          }
           const blockingGate = failedGates.find(
             (gate) => gate.severity === "block",
           );
@@ -4063,6 +4177,17 @@ export class CentralizedChatRuntimeDelegate {
               reasonCode,
               failSoftWarningsEnabled,
             );
+            this.emitGovernanceMetric({
+              traceId,
+              req: params.req,
+              answerMode: params.answerMode,
+              metricName: "governance_gate_fail_total",
+              reasonCode,
+              gateName: blockingGate.gateName,
+              failureMode,
+              enforced: failureMode === "fail_closed",
+              blocked: failureMode === "fail_closed",
+            });
             if (failureMode === "fail_closed") {
               failureCode = reasonCode;
               text = buildEmptyAssistantText({
@@ -4090,6 +4215,17 @@ export class CentralizedChatRuntimeDelegate {
           reasonCode,
           failSoftWarningsEnabled,
         );
+        this.emitGovernanceMetric({
+          traceId,
+          req: params.req,
+          answerMode: params.answerMode,
+          metricName: "governance_gate_fail_total",
+          reasonCode,
+          gateName: reasonCode,
+          failureMode,
+          enforced: failureMode === "fail_closed",
+          blocked: failureMode === "fail_closed",
+        });
         if (failureMode === "fail_closed") {
           failureCode = reasonCode;
           text = buildEmptyAssistantText({
@@ -4220,15 +4356,38 @@ export class CentralizedChatRuntimeDelegate {
           reasonCode,
           failSoftWarningsEnabled,
         );
+        if (
+          String(reasonCode).trim().toLowerCase() === "nav_pills_missing_buttons"
+        ) {
+          this.emitGovernanceMetric({
+            traceId,
+            req: params.req,
+            answerMode: params.answerMode,
+            metricName: "source_policy_violation_total",
+            reasonCode,
+            gateName: "nav_pills_missing_buttons",
+            violationType: "nav_pills_missing_buttons",
+            blocked: failureMode === "fail_closed",
+          });
+        }
+        this.emitGovernanceMetric({
+          traceId,
+          req: params.req,
+          answerMode: params.answerMode,
+          metricName: "governance_gate_fail_total",
+          reasonCode,
+          gateName: reasonCode,
+          failureMode,
+          enforced: failureMode === "fail_closed",
+          blocked: failureMode === "fail_closed",
+        });
         if (failureMode === "fail_closed") {
           failureCode = reasonCode;
-          text =
-            enforced.content ||
-            buildEmptyAssistantText({
-              language: params.req.preferredLanguage,
-              reasonCode,
-              seed: `${params.req.userId}:enforcer:${reasonCode}`,
-            });
+          text = buildEmptyAssistantText({
+            language: params.req.preferredLanguage,
+            reasonCode,
+            seed: `${params.req.userId}:enforcer:${reasonCode}`,
+          });
         } else {
           if (String(enforced.content || "").trim()) {
             text = enforced.content;
@@ -4277,32 +4436,28 @@ export class CentralizedChatRuntimeDelegate {
           : 0,
         error: error instanceof Error ? error.message : String(error),
       });
-      const failureMode = resolveRuntimeFailureMode(
+      const failureMode: RuntimeFailureMode = "fail_closed";
+      this.emitGovernanceMetric({
+        traceId,
+        req: params.req,
+        answerMode: params.answerMode,
+        metricName: "governance_gate_fail_total",
         reasonCode,
-        failSoftWarningsEnabled,
-      );
-      if (failureMode === "fail_closed") {
-        failureCode = reasonCode;
-        text = buildEmptyAssistantText({
-          language: params.req.preferredLanguage,
-          reasonCode,
-          seed: `${params.req.userId}:enforcer:${reasonCode}`,
-        });
-        enforcement = {
-          repairs: [],
-          warnings: ["ENFORCER_RUNTIME_ERROR_FAIL_CLOSED"],
-        };
-      } else {
-        addWarning({
-          code: reasonCode,
-          source: "enforcer",
-          severity: "warning",
-        });
-        enforcement = {
-          repairs: [],
-          warnings: ["ENFORCER_RUNTIME_ERROR_FAIL_OPEN"],
-        };
-      }
+        gateName: reasonCode,
+        failureMode,
+        enforced: failureMode === "fail_closed",
+        blocked: failureMode === "fail_closed",
+      });
+      failureCode = reasonCode;
+      text = buildEmptyAssistantText({
+        language: params.req.preferredLanguage,
+        reasonCode,
+        seed: `${params.req.userId}:enforcer:${reasonCode}`,
+      });
+      enforcement = {
+        repairs: [],
+        warnings: ["ENFORCER_RUNTIME_ERROR_FAIL_CLOSED"],
+      };
     }
 
     if (!failureCode) {
@@ -4343,15 +4498,28 @@ export class CentralizedChatRuntimeDelegate {
       }
     }
 
+    const languageContractInput = text;
     const languageContract = enforceLanguageContract({
-      text,
+      text: languageContractInput,
       preferredLanguage: params.req.preferredLanguage,
     });
     if (languageContract.adjusted) {
       appLogger.warn("[finalizeChatTurn] language_contract_adjusted", {
-        requestId: this.resolveTraceId(params.req),
+        requestId: traceId,
         preferredLanguage: normalizeChatLanguage(params.req.preferredLanguage),
         failClosed: languageContract.failClosed,
+      });
+      this.emitGovernanceMetric({
+        traceId,
+        req: params.req,
+        answerMode: params.answerMode,
+        metricName: "language_lock_violation_total",
+        reasonCode: languageContract.failClosed
+          ? "language_contract_mismatch"
+          : "language_contract_adjusted",
+        requestedLanguage: normalizeChatLanguage(params.req.preferredLanguage),
+        detectedLanguage: detectDominantLanguageTag(languageContractInput),
+        blocked: languageContract.failClosed,
       });
       text = languageContract.text;
       if (languageContract.failClosed && !failureCode) {

@@ -40,7 +40,7 @@ function mkResult(overrides: Partial<ChatResult> = {}): ChatResult {
 }
 
 describe("ContractNormalizer", () => {
-  test("downgrades to partial when required evidence is missing", () => {
+  test("fails closed when required evidence is missing", () => {
     const normalizer = new ContractNormalizer();
     const normalized = normalizer.normalize(
       mkResult({
@@ -48,7 +48,7 @@ describe("ContractNormalizer", () => {
         sources: [],
       }),
     );
-    expect(normalized.status).toBe("partial");
+    expect(normalized.status).toBe("failed");
     expect(normalized.failureCode).toBe("MISSING_EVIDENCE");
   });
 
@@ -93,7 +93,7 @@ describe("ContractNormalizer", () => {
     expect(normalized.failureCode).toBe("EMPTY_ANSWER");
   });
 
-  test("downgrades to partial when blocking quality gates are present", () => {
+  test("fails closed when blocking quality gates are present", () => {
     const normalizer = new ContractNormalizer();
     const normalized = normalizer.normalize(
       mkResult({
@@ -109,7 +109,7 @@ describe("ContractNormalizer", () => {
         },
       }),
     );
-    expect(normalized.status).toBe("partial");
+    expect(normalized.status).toBe("failed");
     expect(normalized.failureCode).toBe("quality_gate_blocked");
   });
 
