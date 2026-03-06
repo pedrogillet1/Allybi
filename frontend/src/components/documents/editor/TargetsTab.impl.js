@@ -123,11 +123,11 @@ export default function TargetsTab({
     const beforeText = String(selectedAnchor.text || "").trim();
     const proposedText = String(slidesDraftText || "").trim();
     if (!proposedText) {
-      setSlidesStatus("Cannot apply empty text.");
+      setSlidesStatus(t("editor.targetsTab.cannotApplyEmpty"));
       return;
     }
     if (proposedText === beforeText) {
-      setSlidesStatus("No changes to apply.");
+      setSlidesStatus(t("editor.targetsTab.noChangesToApply"));
       return;
     }
 
@@ -160,12 +160,12 @@ export default function TargetsTab({
         userConfirmed: true,
       });
 
-      setSlidesStatus("Applied. Refreshing…");
+      setSlidesStatus(t("editor.targetsTab.appliedRefreshing"));
       onSlidesApplied?.();
-      setSlidesStatus("Applied.");
+      setSlidesStatus(t("editor.targetsTab.applied"));
       setTimeout(() => setSlidesStatus(""), 1500);
     } catch (e) {
-      setSlidesStatus(e?.response?.data?.error?.message || e?.response?.data?.error || e?.message || "Apply failed.");
+      setSlidesStatus(e?.response?.data?.error?.message || e?.response?.data?.error || e?.message || t("editor.targetsTab.applyFailed"));
     } finally {
       setSlidesApplying(false);
     }

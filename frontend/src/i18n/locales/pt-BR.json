@@ -2003,7 +2003,12 @@
       "selectedSlide": "Selecionado: Slide {{number}}",
       "targets": "Alvos",
       "targetsUnavailable": "Alvos não estão disponíveis para este tipo de arquivo ainda.",
-      "applyRewrite": "Aplicar reescrita"
+      "applyRewrite": "Aplicar reescrita",
+      "cannotApplyEmpty": "Não é possível aplicar texto vazio.",
+      "noChangesToApply": "Nenhuma alteração para aplicar.",
+      "applyFailed": "Falha ao aplicar.",
+      "appliedRefreshing": "Aplicado. Atualizando\u2026",
+      "applied": "Aplicado."
     }
   }
 }

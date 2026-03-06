@@ -2030,7 +2030,12 @@
       "selectedSlide": "Seleccionado: Diapositiva {{number}}",
       "targets": "Objetivos",
       "targetsUnavailable": "Los objetivos no están disponibles para este tipo de archivo aún.",
-      "applyRewrite": "Aplicar reescritura"
+      "applyRewrite": "Aplicar reescritura",
+      "cannotApplyEmpty": "No se puede aplicar texto vacío.",
+      "noChangesToApply": "No hay cambios para aplicar.",
+      "applyFailed": "Error al aplicar.",
+      "appliedRefreshing": "Aplicado. Actualizando\u2026",
+      "applied": "Aplicado."
     }
   }
 }

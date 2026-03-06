@@ -4,6 +4,7 @@ import {
   canRenderSourcesForMessage,
   isNavigationMode,
   isDocumentGroundedMode,
+  hasSourceButtonsAttachment,
 } from '../messageClassification';
 
 describe('isNavigationMode', () => {
@@ -34,6 +35,37 @@ describe('isDocumentGroundedMode', () => {
   });
   it('returns false for nav_pills', () => {
     expect(isDocumentGroundedMode('nav_pills')).toBe(false);
+  });
+});
+
+describe('hasSourceButtonsAttachment', () => {
+  it('returns false for non-array', () => {
+    expect(hasSourceButtonsAttachment(null)).toBe(false);
+    expect(hasSourceButtonsAttachment(undefined)).toBe(false);
+    expect(hasSourceButtonsAttachment('string')).toBe(false);
+  });
+  it('returns false for empty array', () => {
+    expect(hasSourceButtonsAttachment([])).toBe(false);
+  });
+  it('returns false for attachments without source_buttons type', () => {
+    expect(hasSourceButtonsAttachment([{ type: 'image', buttons: [{ id: '1' }] }])).toBe(false);
+  });
+  it('returns false for source_buttons with empty buttons array', () => {
+    expect(hasSourceButtonsAttachment([{ type: 'source_buttons', buttons: [] }])).toBe(false);
+  });
+  it('returns true for valid source_buttons attachment', () => {
+    expect(hasSourceButtonsAttachment([{ type: 'source_buttons', buttons: [{ id: '1' }] }])).toBe(true);
+  });
+  it('with navOnly=true, returns true only if answerMode is nav', () => {
+    const navAtt = [{ type: 'source_buttons', buttons: [{ id: '1' }], answerMode: 'nav_pills' }];
+    const docAtt = [{ type: 'source_buttons', buttons: [{ id: '1' }], answerMode: 'doc_grounded_single' }];
+    expect(hasSourceButtonsAttachment(navAtt, { navOnly: true })).toBe(true);
+    expect(hasSourceButtonsAttachment(docAtt, { navOnly: true })).toBe(false);
+  });
+  it('with navOnly=false (default), returns true regardless of answerMode', () => {
+    const att = [{ type: 'source_buttons', buttons: [{ id: '1' }], answerMode: 'doc_grounded_single' }];
+    expect(hasSourceButtonsAttachment(att)).toBe(true);
+    expect(hasSourceButtonsAttachment(att, { navOnly: false })).toBe(true);
   });
 });
 

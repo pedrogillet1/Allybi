@@ -545,6 +545,7 @@ export default function AllybiEditingToolbar({
 	                  type="button"
 	                  className="toolbar-btn icon-btn allybi-color-trigger"
 	                  title="Text color"
+	                  aria-expanded={colorMenuOpen}
 	                  onMouseDown={(e) => {
 	                    e.preventDefault();
 	                    setColorMenuOpen((v) => !v);
@@ -669,6 +670,7 @@ export default function AllybiEditingToolbar({
                       type="button"
                       className="toolbar-btn allybi-font-trigger"
                       title="Font"
+                      aria-expanded={xlFontMenuOpen}
                       onMouseDown={(e) => {
                         e.preventDefault();
                         setXlSizeMenuOpen(false);
@@ -714,6 +716,7 @@ export default function AllybiEditingToolbar({
                       type="button"
                       className="toolbar-btn allybi-size-trigger"
                       title="Font size"
+                      aria-expanded={xlSizeMenuOpen}
                       onMouseDown={(e) => {
                         e.preventDefault();
                         setXlFontMenuOpen(false);
@@ -777,6 +780,7 @@ export default function AllybiEditingToolbar({
                       type="button"
                       className="toolbar-btn icon-btn allybi-color-trigger"
                       title="Text color"
+                      aria-expanded={xlColorMenuOpen}
                       onMouseDown={(e) => {
                         e.preventDefault();
                         setXlFontMenuOpen(false);

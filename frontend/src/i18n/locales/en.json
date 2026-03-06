@@ -2036,7 +2036,12 @@
       "selectedSlide": "Selected: Slide {{number}}",
       "targets": "Targets",
       "targetsUnavailable": "Targets are not available for this file type yet.",
-      "applyRewrite": "Apply rewrite"
+      "applyRewrite": "Apply rewrite",
+      "cannotApplyEmpty": "Cannot apply empty text.",
+      "noChangesToApply": "No changes to apply.",
+      "applyFailed": "Apply failed.",
+      "appliedRefreshing": "Applied. Refreshing\u2026",
+      "applied": "Applied."
     }
   }
 }
