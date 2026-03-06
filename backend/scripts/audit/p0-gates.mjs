@@ -431,6 +431,15 @@ function main() {
     failures.push("P0-12_MODEL_GOVERNANCE_CONSISTENCY_FAILED");
   }
 
+  const failedChecks = checks
+    .filter((check) => check?.passed !== true)
+    .map((check) => String(check.gateId || "").trim())
+    .filter(Boolean);
+  for (const gateId of failedChecks) {
+    const code = `P0_GATE_CHECK_FAILED:${gateId}`;
+    if (!failures.includes(code)) failures.push(code);
+  }
+
   const summary = {
     generatedAt: new Date().toISOString(),
     strict,

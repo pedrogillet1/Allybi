@@ -1,0 +1,4580 @@
+{
+  "generatedAt": "2026-03-05T21:49:29.903Z",
+  "inputFile": "C:\\Users\\Pedro\\desktop\\webapp\\frontend\\e2e\\reports\\latest\\per_query.json",
+  "pack": "40",
+  "meta": {
+    "runId": "run_2026-03-05T21-49-29-903Z",
+    "datasetId": "per_query.json:100",
+    "expectedLanguage": "pt",
+    "totalQueries": 100,
+    "allowedDocIdsCount": 0,
+    "allowedDocNamesCount": 0,
+    "scopeKnown": false,
+    "scopeSource": null,
+    "scopePolicyApplied": null,
+    "queryProfile": null,
+    "domainHint": null,
+    "artifactIntegrity": {
+      "rows": 100,
+      "rowsWithSources": 0,
+      "rowsWithSourceButtons": 0,
+      "sourceCount": 0,
+      "richSourceCount": 0,
+      "issues": [],
+      "ok": true
+    }
+  },
+  "summary": {
+    "finalScore": 0,
+    "avgScore": 0,
+    "overallHardFail": true,
+    "hardFailCount": 100,
+    "gateFails": {
+      "A": 0,
+      "B": 0,
+      "C": 0,
+      "D": 0,
+      "E": 100,
+      "F": 0,
+      "G": 0,
+      "H": 0
+    },
+    "gateSkips": {
+      "A": 0,
+      "B": 100,
+      "C": 0,
+      "D": 0,
+      "E": 0,
+      "F": 0,
+      "G": 0,
+      "H": 0
+    },
+    "avgCategories": {
+      "retrieval": 0,
+      "correctness": 0,
+      "reasoning": 0,
+      "writing": 0,
+      "conversation": 0
+    },
+    "verdict": "NO_GO",
+    "topIssues": [
+      {
+        "issue": "GATE_E_LANGUAGE_MISMATCH",
+        "count": 100
+      }
+    ],
+    "modelUsage": [
+      {
+        "providerModel": "unknown::unknown",
+        "count": 100
+      }
+    ],
+    "uniqueKnownModels": 0,
+    "singleModelMonopoly": false,
+    "passCount": 0,
+    "partialCount": 0,
+    "failCount": 100
+  },
+  "rows": [
+    {
+      "index": 1,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 1940,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 2,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2080,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 3,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2220,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 4,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2360,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 5,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2500,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 6,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2640,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 7,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2780,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 8,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2920,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 9,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 3060,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 10,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 3200,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 11,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 3340,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 12,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 1800,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 13,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 1940,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 14,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2080,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 15,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2220,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 16,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2360,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 17,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2500,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 18,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2640,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 19,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2780,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 20,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2920,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 21,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 3060,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 22,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 3200,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 23,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 3340,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 24,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 1800,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 25,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 1940,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 26,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2080,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 27,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2220,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 28,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2360,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 29,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2500,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 30,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2640,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 31,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2780,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 32,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2920,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 33,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 3060,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 34,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 3200,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 35,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 3340,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 36,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 1800,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 37,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 1940,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 38,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2080,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 39,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2220,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 40,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2360,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 41,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2500,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 42,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2640,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 43,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2780,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 44,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2920,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 45,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 3060,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 46,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 3200,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 47,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 3340,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 48,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 1800,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 49,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 1940,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 50,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2080,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 51,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2220,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 52,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2360,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 53,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2500,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 54,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2640,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 55,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2780,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 56,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2920,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 57,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 3060,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 58,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 3200,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 59,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 3340,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 60,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 1800,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 61,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 1940,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 62,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2080,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 63,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2220,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 64,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2360,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 65,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2500,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 66,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2640,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 67,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2780,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 68,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2920,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 69,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 3060,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 70,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 3200,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 71,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 3340,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 72,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 1800,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 73,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 1940,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 74,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2080,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 75,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2220,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 76,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2360,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 77,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2500,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 78,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2640,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 79,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2780,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 80,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2920,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 81,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 3060,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 82,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 3200,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 83,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 3340,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 84,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 1800,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 85,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 1940,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 86,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2080,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 87,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2220,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 88,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2360,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 89,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2500,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 90,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2640,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 91,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2780,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 92,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2920,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 93,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 3060,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 94,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 3200,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 95,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 3340,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 96,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 1800,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 97,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 1940,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 98,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2080,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 99,
+      "query": "",
+      "expectedLanguage": "pt",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2220,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 100,
+      "query": "",
+      "expectedLanguage": "en",
+      "responseText": "",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": null,
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 2360,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    }
+  ]
+}

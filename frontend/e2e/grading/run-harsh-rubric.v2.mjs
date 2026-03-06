@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPORTS_DIR = path.resolve(__dirname, '..', 'reports');
 const LATEST_DIR = path.join(REPORTS_DIR, 'latest');
+const INPUT_ARTIFACT_TYPE_RAW_QUERY_RUN = 'raw_query_run';
 
 const DEFAULT_INPUT_BY_PACK = {
   '25': path.join(REPORTS_DIR, 'query-test-25-api-results.json'),
@@ -60,6 +61,19 @@ function countDatasetRows(dataset) {
   return 0;
 }
 
+function datasetLooksLikePerQueryArtifact(dataset) {
+  return (
+    Array.isArray(dataset) &&
+    dataset.some(
+      (row) =>
+        row &&
+        typeof row === 'object' &&
+        Object.prototype.hasOwnProperty.call(row, 'finalScore') &&
+        Object.prototype.hasOwnProperty.call(row, 'gates'),
+    )
+  );
+}
+
 function expectedRowsForPack(pack) {
   const n = Number(String(pack || '').trim());
   if (!Number.isFinite(n) || n <= 0) return 1;
@@ -80,7 +94,6 @@ function packInputBasenames(pack) {
   names.add(`queries-${pack}-run.json`);
   names.add(`query-test-${pack}-results.json`);
   names.add(`query-test-${pack}-gate-results.json`);
-  names.add("per_query.json");
   return [...names];
 }
 
@@ -115,9 +128,44 @@ function uniquePaths(values) {
   return out;
 }
 
+function normalizeAbsolutePath(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return '';
+  return path.resolve(raw);
+}
+
+function isLatestPerQueryPath(value) {
+  const normalized = normalizeAbsolutePath(value)
+    .replace(/\\/g, '/')
+    .toLowerCase();
+  return normalized.endsWith('/latest/per_query.json');
+}
+
+function pathsEqual(a, b) {
+  const left = normalizeAbsolutePath(a).toLowerCase();
+  const right = normalizeAbsolutePath(b).toLowerCase();
+  return Boolean(left && right && left === right);
+}
+
+function computeFileDigest(filePath) {
+  const buffer = fs.readFileSync(filePath);
+  return {
+    sha256: crypto.createHash('sha256').update(buffer).digest('hex'),
+    bytes: buffer.byteLength,
+  };
+}
+
 function resolveInputDataset(opts) {
   const pack = String(opts.pack || '40');
   const explicitInput = opts.input ? path.resolve(opts.input) : null;
+  if (!explicitInput) {
+    throw new Error(
+      [
+        '[harsh-rubric] explicit --input is required.',
+        `Producer command: ${PRODUCER_COMMAND_BY_PACK[pack] || 'run the corresponding query pack runner'}`,
+      ].join('\n'),
+    );
+  }
   const requiredRows = expectedRowsForPack(pack);
   const defaultInput = path.resolve(
     DEFAULT_INPUT_BY_PACK[pack] || DEFAULT_INPUT_BY_PACK['40'],
@@ -138,9 +186,21 @@ function resolveInputDataset(opts) {
       invalid.push({ file: candidate, reason: 'missing' });
       continue;
     }
+    if (isLatestPerQueryPath(candidate)) {
+      invalid.push({ file: candidate, reason: 'recursive_latest_per_query_forbidden' });
+      continue;
+    }
     const dataset = readJsonFileSafe(candidate);
     if (!dataset) {
       invalid.push({ file: candidate, reason: 'invalid_json' });
+      continue;
+    }
+    if (path.basename(candidate).toLowerCase() === 'per_query.json') {
+      invalid.push({ file: candidate, reason: 'derived_artifact_forbidden' });
+      continue;
+    }
+    if (datasetLooksLikePerQueryArtifact(dataset)) {
+      invalid.push({ file: candidate, reason: 'derived_artifact_forbidden' });
       continue;
     }
     const rowCount = countDatasetRows(dataset);
@@ -151,7 +211,21 @@ function resolveInputDataset(opts) {
       });
       continue;
     }
-    return { inputFile: candidate, dataset, rowCount };
+    let digest = null;
+    try {
+      digest = computeFileDigest(candidate);
+    } catch {
+      invalid.push({ file: candidate, reason: 'unreadable_for_digest' });
+      continue;
+    }
+    return {
+      inputFile: candidate,
+      dataset,
+      rowCount,
+      inputArtifactType: INPUT_ARTIFACT_TYPE_RAW_QUERY_RUN,
+      sourceArtifactSha256: digest.sha256,
+      sourceArtifactBytes: digest.bytes,
+    };
   }
 
   if (explicitInput) {
@@ -173,6 +247,49 @@ function resolveInputDataset(opts) {
       sampledReasons ? `Checked candidates:\n${sampledReasons}` : 'No candidates were discovered.',
     ].join('\n'),
   );
+}
+
+function validateRawDatasetShape(normalized) {
+  const rows = Array.isArray(normalized?.rows) ? normalized.rows : [];
+  const total = rows.length;
+  if (total < 1) {
+    return { ok: false, reason: 'empty_rows', total, nonEmptyQueryCount: 0, nonEmptyResponseCount: 0 };
+  }
+  const nonEmptyQueryCount = rows.filter((row) => String(row?.query || '').trim().length > 0).length;
+  const nonEmptyResponseCount = rows.filter((row) => String(row?.responseText || '').trim().length > 0).length;
+  const queryCoverage = nonEmptyQueryCount / total;
+  const responseCoverage = nonEmptyResponseCount / total;
+  if (queryCoverage < 0.9) {
+    return {
+      ok: false,
+      reason: 'query_coverage_too_low',
+      total,
+      nonEmptyQueryCount,
+      nonEmptyResponseCount,
+      queryCoverage,
+      responseCoverage,
+    };
+  }
+  if (responseCoverage < 0.05) {
+    return {
+      ok: false,
+      reason: 'response_coverage_too_low',
+      total,
+      nonEmptyQueryCount,
+      nonEmptyResponseCount,
+      queryCoverage,
+      responseCoverage,
+    };
+  }
+  return {
+    ok: true,
+    reason: null,
+    total,
+    nonEmptyQueryCount,
+    nonEmptyResponseCount,
+    queryCoverage,
+    responseCoverage,
+  };
 }
 
 function normalizeText(value) {
@@ -1154,6 +1271,10 @@ function validateScorecardLineage(result) {
   const runId = String(result?.meta?.runId || '').trim();
   const datasetId = String(result?.meta?.datasetId || '').trim();
   const totalQueries = Number(result?.meta?.totalQueries || 0);
+  const inputArtifactType = String(result?.meta?.inputArtifactType || '').trim().toLowerCase();
+  const sourceArtifactPath = String(result?.meta?.sourceArtifactPath || '').trim();
+  const sourceArtifactSha256 = String(result?.meta?.sourceArtifactSha256 || '').trim().toLowerCase();
+  const sourceArtifactBytes = Number(result?.meta?.sourceArtifactBytes || 0);
   if (!generatedAt) failures.push('missing_generatedAt');
   if (!pack) failures.push('missing_pack');
   if (!inputFile) failures.push('missing_inputFile');
@@ -1161,6 +1282,23 @@ function validateScorecardLineage(result) {
   if (!datasetId) failures.push('missing_meta_datasetId');
   if (!Number.isFinite(totalQueries) || totalQueries < 1) {
     failures.push('invalid_meta_totalQueries');
+  }
+  if (!inputArtifactType) failures.push('missing_meta_inputArtifactType');
+  if (inputArtifactType !== INPUT_ARTIFACT_TYPE_RAW_QUERY_RUN) {
+    failures.push('invalid_meta_inputArtifactType');
+  }
+  if (!sourceArtifactPath) failures.push('missing_meta_sourceArtifactPath');
+  if (!sourceArtifactSha256 || !/^[a-f0-9]{64}$/i.test(sourceArtifactSha256)) {
+    failures.push('invalid_meta_sourceArtifactSha256');
+  }
+  if (!Number.isFinite(sourceArtifactBytes) || sourceArtifactBytes < 1) {
+    failures.push('invalid_meta_sourceArtifactBytes');
+  }
+  if (sourceArtifactPath && !pathsEqual(sourceArtifactPath, inputFile)) {
+    failures.push('meta_sourceArtifactPath_inputFile_mismatch');
+  }
+  if (isLatestPerQueryPath(inputFile) || isLatestPerQueryPath(sourceArtifactPath)) {
+    failures.push('recursive_latest_per_query_input_forbidden');
   }
   return { ok: failures.length === 0, failures };
 }
@@ -1212,14 +1350,43 @@ function publishLatestAtomically(latestArtifacts) {
   }
 }
 
-function writeLatestAndArchiveArtifacts(result, scoredRows) {
+function writeLatestAndArchiveArtifacts(result, scoredRows, options = {}) {
+  const publishLatest = options.publishLatest !== false;
   const runId = String(result?.meta?.runId || '').trim();
   const datasetId = String(result?.meta?.datasetId || '').trim();
+  const sourceArtifactPath = normalizeAbsolutePath(
+    result?.meta?.sourceArtifactPath || result.inputFile || '',
+  );
+  const inputArtifactType = String(
+    result?.meta?.inputArtifactType || INPUT_ARTIFACT_TYPE_RAW_QUERY_RUN,
+  )
+    .trim()
+    .toLowerCase();
+  const sourceArtifactSha256 = String(result?.meta?.sourceArtifactSha256 || '')
+    .trim()
+    .toLowerCase();
+  const sourceArtifactBytes = Number(result?.meta?.sourceArtifactBytes || 0);
   if (!runId) {
     throw new Error('[harsh-rubric] missing runId for artifact writing');
   }
   if (!datasetId) {
     throw new Error('[harsh-rubric] missing datasetId for artifact writing');
+  }
+  if (inputArtifactType !== INPUT_ARTIFACT_TYPE_RAW_QUERY_RUN) {
+    throw new Error(
+      `[harsh-rubric] invalid input artifact type for lineage: ${inputArtifactType || 'missing'}`,
+    );
+  }
+  if (!sourceArtifactPath || isLatestPerQueryPath(sourceArtifactPath)) {
+    throw new Error(
+      `[harsh-rubric] invalid source artifact path for lineage: ${sourceArtifactPath || 'missing'}`,
+    );
+  }
+  if (!/^[a-f0-9]{64}$/i.test(sourceArtifactSha256)) {
+    throw new Error('[harsh-rubric] invalid source artifact sha256 for lineage');
+  }
+  if (!Number.isFinite(sourceArtifactBytes) || sourceArtifactBytes < 1) {
+    throw new Error('[harsh-rubric] invalid source artifact bytes for lineage');
   }
   const archiveRoot = path.join(REPORTS_DIR, 'archive');
   const runArchiveDir = path.join(archiveRoot, runId);
@@ -1261,6 +1428,11 @@ function writeLatestAndArchiveArtifacts(result, scoredRows) {
     datasetId,
     pack: result.pack,
     inputFile: String(result.inputFile || ''),
+    inputArtifactType,
+    sourceArtifactPath,
+    sourceArtifactSha256,
+    sourceArtifactBytes,
+    sourceArtifactRelPath: toPosixRelative(REPORTS_DIR, sourceArtifactPath),
     totalQueries: Number(result?.meta?.totalQueries || 0),
     source: 'run-harsh-rubric.v2.mjs',
     artifacts: lineageArtifacts,
@@ -1272,8 +1444,10 @@ function writeLatestAndArchiveArtifacts(result, scoredRows) {
   };
   const lineageJson = `${JSON.stringify(lineage, null, 2)}\n`;
   writeAtomic(path.join(runArchiveDir, 'lineage.json'), lineageJson);
-  latestArtifacts.push({ fileName: 'lineage.json', content: lineageJson });
-  publishLatestAtomically(latestArtifacts);
+  if (publishLatest) {
+    latestArtifacts.push({ fileName: 'lineage.json', content: lineageJson });
+    publishLatestAtomically(latestArtifacts);
+  }
 }
 
 function renderAPlusGapDeepDive(result) {
@@ -1381,29 +1555,31 @@ function main() {
   }
 
   const inputFile = resolved.inputFile;
-  const dataset = resolved.dataset;
-  if (!opts.input) {
-    console.log(
-      `[harsh-rubric] using input artifact: ${inputFile} (${resolved.rowCount} rows)`,
-    );
+  if (isLatestPerQueryPath(inputFile)) {
+    console.error('[harsh-rubric] recursive input forbidden: latest/per_query.json cannot be used as source input');
+    process.exit(1);
   }
+  const dataset = resolved.dataset;
+  console.log(
+    `[harsh-rubric] using input artifact: ${inputFile} (${resolved.rowCount} rows)`,
+  );
 
   const normalized = normalizeResults(dataset);
-  const datasetLooksLikePerQueryArtifact =
-    Array.isArray(dataset) &&
-    dataset.some(
-      (row) =>
-        row &&
-        typeof row === 'object' &&
-        Object.prototype.hasOwnProperty.call(row, 'finalScore') &&
-        Object.prototype.hasOwnProperty.call(row, 'gates'),
+  const rawShape = validateRawDatasetShape(normalized);
+  if (!rawShape.ok) {
+    console.error(
+      `[harsh-rubric] input artifact failed raw-shape checks: ${rawShape.reason}`,
     );
+    console.error(
+      `[harsh-rubric] rows=${rawShape.total} nonEmptyQueries=${rawShape.nonEmptyQueryCount} nonEmptyResponses=${rawShape.nonEmptyResponseCount}`,
+    );
+    process.exit(1);
+  }
   const requiresAttachedDocset = ['40', '50', '100'].includes(String(opts.pack));
   if (
     requiresAttachedDocset &&
     normalized.allowedDocIds.size === 0 &&
-    normalized.allowedDocNames.size === 0 &&
-    !datasetLooksLikePerQueryArtifact
+    normalized.allowedDocNames.size === 0
   ) {
     console.error(
       `[harsh-rubric] strict mode requires attached document metadata for pack ${opts.pack}.`,
@@ -1453,7 +1629,16 @@ function main() {
       scopePolicyApplied: normalized.scopePolicyApplied,
       queryProfile: normalized.queryProfile,
       domainHint: normalized.domainHint,
+      inputArtifactType: String(
+        resolved.inputArtifactType || INPUT_ARTIFACT_TYPE_RAW_QUERY_RUN,
+      ).trim().toLowerCase(),
+      sourceArtifactPath: normalizeAbsolutePath(inputFile),
+      sourceArtifactSha256: String(resolved.sourceArtifactSha256 || '')
+        .trim()
+        .toLowerCase(),
+      sourceArtifactBytes: Number(resolved.sourceArtifactBytes || 0),
       artifactIntegrity,
+      rawShape,
     },
     summary,
     rows: scoredRows,
@@ -1466,22 +1651,34 @@ function main() {
     process.exit(1);
   }
 
+  const failsHardGates = summary.overallHardFail;
+  const failsMultiModel =
+    opts.requireMultiModel && summary.uniqueKnownModels < 2;
+  const failsReadinessThreshold = summary.finalScore < 95;
+  const shouldPublishLatest =
+    !failsHardGates && !failsMultiModel && !failsReadinessThreshold;
+
   if (opts.writeLatest) {
-    writeLatestAndArchiveArtifacts(result, scoredRows);
+    writeLatestAndArchiveArtifacts(result, scoredRows, {
+      publishLatest: shouldPublishLatest,
+    });
   }
 
   console.log(`[harsh-rubric] pack=${opts.pack} total=${scoredRows.length} final=${summary.finalScore} verdict=${summary.verdict}`);
-  if (summary.overallHardFail) {
+  if (!shouldPublishLatest && opts.writeLatest) {
+    console.error('[harsh-rubric] latest artifacts were not published because run did not satisfy release policy');
+  }
+  if (failsHardGates) {
     console.error('[harsh-rubric] hard gates failed');
     process.exit(1);
   }
-  if (opts.requireMultiModel && summary.uniqueKnownModels < 2) {
+  if (failsMultiModel) {
     console.error(
       `[harsh-rubric] orchestration failure: expected multi-model usage but observed ${summary.uniqueKnownModels} known model(s)`,
     );
     process.exit(1);
   }
-  if (summary.finalScore < 95) {
+  if (failsReadinessThreshold) {
     console.error(`[harsh-rubric] score below readiness threshold: ${summary.finalScore}`);
     process.exit(1);
   }

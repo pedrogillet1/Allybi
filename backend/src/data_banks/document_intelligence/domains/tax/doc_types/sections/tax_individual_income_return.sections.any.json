@@ -28,7 +28,14 @@
         "pt": "Identificacao do Documento"
       },
       "required": true,
-      "order": 1
+      "order": 1,
+      "headingAnchors": [
+        "document identification",
+        "identificacao do documento",
+        "document id",
+        "identification",
+        "identificacao"
+      ]
     },
     {
       "id": "issuer_information",
@@ -37,7 +44,15 @@
         "pt": "Informações do Emissor de Declaracao de Imposto de Renda Pessoa Fisica"
       },
       "required": true,
-      "order": 2
+      "order": 2,
+      "headingAnchors": [
+        "individual income tax return issuer information",
+        "informações do emissor de declaracao de imposto de renda pessoa fisica",
+        "issuer information",
+        "issuer",
+        "issuing authority",
+        "emissor"
+      ]
     },
     {
       "id": "party_identification",
@@ -46,7 +61,15 @@
         "pt": "Identificacao das Partes"
       },
       "required": true,
-      "order": 3
+      "order": 3,
+      "headingAnchors": [
+        "party identification",
+        "identificacao das partes",
+        "party",
+        "beneficiary",
+        "taxpayer",
+        "partes"
+      ]
     },
     {
       "id": "period_and_jurisdiction",
@@ -55,7 +78,16 @@
         "pt": "Período e Jurisdicao"
       },
       "required": true,
-      "order": 4
+      "order": 4,
+      "headingAnchors": [
+        "period and jurisdiction",
+        "período e jurisdicao",
+        "period",
+        "fiscal period",
+        "jurisdiction",
+        "periodo",
+        "jurisdicao"
+      ]
     },
     {
       "id": "status_and_summary",
@@ -64,7 +96,14 @@
         "pt": "Status e Resumo"
       },
       "required": true,
-      "order": 5
+      "order": 5,
+      "headingAnchors": [
+        "status and summary",
+        "status e resumo",
+        "status",
+        "summary",
+        "resumo"
+      ]
     },
     {
       "id": "line_items",
@@ -73,7 +112,13 @@
         "pt": "Itens de Linha"
       },
       "required": true,
-      "order": 6
+      "order": 6,
+      "headingAnchors": [
+        "line items",
+        "itens de linha",
+        "entries",
+        "itens"
+      ]
     },
     {
       "id": "calculation_basis",
@@ -82,7 +127,12 @@
         "pt": "Base de Calculo"
       },
       "required": false,
-      "order": 7
+      "order": 7,
+      "headingAnchors": [
+        "calculation basis",
+        "base de calculo",
+        "tax basis"
+      ]
     },
     {
       "id": "critical_dates",
@@ -91,7 +141,15 @@
         "pt": "Datas Criticas"
       },
       "required": true,
-      "order": 8
+      "order": 8,
+      "headingAnchors": [
+        "critical dates",
+        "datas criticas",
+        "due date",
+        "effective date",
+        "filing date",
+        "vencimento"
+      ]
     },
     {
       "id": "obligations_and_conditions",
@@ -100,7 +158,16 @@
         "pt": "Obrigacoes e Condições"
       },
       "required": false,
-      "order": 9
+      "order": 9,
+      "headingAnchors": [
+        "obligations and conditions",
+        "obrigacoes e condições",
+        "obligations",
+        "conditions",
+        "terms",
+        "obrigacoes",
+        "condicoes"
+      ]
     },
     {
       "id": "supporting_documents",
@@ -109,7 +176,13 @@
         "pt": "Documentos de Suporte"
       },
       "required": false,
-      "order": 10
+      "order": 10,
+      "headingAnchors": [
+        "supporting documents",
+        "documentos de suporte",
+        "attachments",
+        "evidence"
+      ]
     },
     {
       "id": "annexes_exhibits",
@@ -118,7 +191,16 @@
         "pt": "Anexos e Apensos"
       },
       "required": false,
-      "order": 11
+      "order": 11,
+      "headingAnchors": [
+        "annexes and exhibits",
+        "anexos e apensos",
+        "annexes exhibits",
+        "annexes",
+        "exhibits",
+        "anexos",
+        "apensos"
+      ]
     },
     {
       "id": "footnotes",
@@ -127,7 +209,13 @@
         "pt": "Notas de Rodapé"
       },
       "required": false,
-      "order": 12
+      "order": 12,
+      "headingAnchors": [
+        "footnotes",
+        "notas de rodapé",
+        "notes",
+        "notas de rodape"
+      ]
     },
     {
       "id": "signatures_attestations",
@@ -136,7 +224,16 @@
         "pt": "Assinaturas e Atestacoes"
       },
       "required": false,
-      "order": 13
+      "order": 13,
+      "headingAnchors": [
+        "signatures and attestations",
+        "assinaturas e atestacoes",
+        "signatures attestations",
+        "signatures",
+        "attestations",
+        "assinaturas",
+        "atestacoes"
+      ]
     },
     {
       "id": "contacts_and_instructions",
@@ -145,7 +242,15 @@
         "pt": "Contatos e Instrucoes"
       },
       "required": false,
-      "order": 14
+      "order": 14,
+      "headingAnchors": [
+        "contacts and instructions",
+        "contatos e instrucoes",
+        "contacts",
+        "instructions",
+        "contatos",
+        "instrucoes"
+      ]
     }
   ]
 }

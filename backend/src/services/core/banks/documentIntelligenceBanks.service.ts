@@ -28,6 +28,7 @@ export type DocumentIntelligenceOntologyType =
   | "domain"
   | "entity"
   | "metric"
+  | "table"
   | "section"
   | "unit_and_measurement";
 
@@ -216,6 +217,7 @@ const DI_ONTOLOGY_TYPES: DocumentIntelligenceOntologyType[] = [
   "domain",
   "entity",
   "metric",
+  "table",
   "section",
   "unit_and_measurement",
 ];
@@ -229,6 +231,7 @@ function domainBankPrefix(domain: DocumentIntelligenceDomain): string {
 export class DocumentIntelligenceBanksService {
   private readonly cache = new Map<string, unknown | typeof MISSING>();
   private versionedBankIndex: Map<string, string[]> | null = null;
+  private docTypeCanonicalMap: Map<string, string> | null = null;
 
   constructor(
     private readonly bankLoader: BankLoaderLike = getBankLoaderInstance(),
@@ -237,6 +240,7 @@ export class DocumentIntelligenceBanksService {
   invalidateCache(): void {
     this.cache.clear();
     this.versionedBankIndex = null;
+    this.docTypeCanonicalMap = null;
   }
 
   private getCachedRequired<T = unknown>(bankId: string): T {
@@ -378,21 +382,29 @@ export class DocumentIntelligenceBanksService {
       .trim()
       .toLowerCase();
     if (!normalizedDocType) return [];
-    if (domain !== "legal") return [normalizedDocType];
+    const canonicalDocType = this.canonicalizeDocTypeId(normalizedDocType);
+    if (domain !== "legal") {
+      return uniqueSorted([normalizedDocType, canonicalDocType]);
+    }
 
-    const keys = normalizedDocType.startsWith("legal_")
-      ? [normalizedDocType.slice("legal_".length), normalizedDocType]
-      : [normalizedDocType, `legal_${normalizedDocType}`];
-    const aliasSource = normalizedDocType.startsWith("legal_")
-      ? normalizedDocType.slice("legal_".length)
-      : normalizedDocType;
-    const aliasTargets = LEGAL_DOC_TYPE_LOOKUP_ALIASES[aliasSource] ?? [];
-    for (const target of aliasTargets) {
-      keys.push(target);
-      if (target.startsWith("legal_")) {
-        keys.push(target.slice("legal_".length));
+    const seeds = uniqueSorted([normalizedDocType, canonicalDocType]);
+    const keys: string[] = [];
+    for (const seed of seeds) {
+      const unprefixed = seed.startsWith("legal_")
+        ? seed.slice("legal_".length)
+        : seed;
+      keys.push(unprefixed, `legal_${unprefixed}`, seed);
+      const aliasTargets = LEGAL_DOC_TYPE_LOOKUP_ALIASES[unprefixed] ?? [];
+      for (const target of aliasTargets) {
+        keys.push(target);
+        if (target.startsWith("legal_")) {
+          keys.push(target.slice("legal_".length));
+        } else {
+          keys.push(`legal_${target}`);
+        }
       }
     }
+
     const deduped: string[] = [];
     for (const key of keys) {
       const candidate = String(key || "").trim();
@@ -400,6 +412,119 @@ export class DocumentIntelligenceBanksService {
       deduped.push(candidate);
     }
     return deduped;
+  }
+
+  private getDocTypeCanonicalMap(): Map<string, string> {
+    if (this.docTypeCanonicalMap) return this.docTypeCanonicalMap;
+
+    const map = new Map<string, string>();
+    let taxonomy: Record<string, any> | null = null;
+    try {
+      taxonomy = this.getDocTaxonomy();
+    } catch {
+      taxonomy = null;
+    }
+
+    const typeDefinitions = Array.isArray(taxonomy?.typeDefinitions)
+      ? taxonomy.typeDefinitions
+      : [];
+    for (const entry of typeDefinitions) {
+      const canonical = lower(entry?.id);
+      if (!canonical) continue;
+      map.set(canonical, canonical);
+      const aliases = Array.isArray(entry?.aliases) ? entry.aliases : [];
+      for (const alias of aliases) {
+        const normalizedAlias = lower(alias);
+        if (!normalizedAlias) continue;
+        map.set(normalizedAlias, canonical);
+      }
+    }
+
+    for (const [alias, targets] of Object.entries(LEGAL_DOC_TYPE_LOOKUP_ALIASES)) {
+      const canonical = lower(targets[0]);
+      const normalizedAlias = lower(alias);
+      if (!canonical || !normalizedAlias) continue;
+      map.set(normalizedAlias, canonical);
+      map.set(canonical, canonical);
+    }
+
+    this.docTypeCanonicalMap = map;
+    return map;
+  }
+
+  private canonicalizeDocTypeId(docTypeId: string): string {
+    const normalized = lower(docTypeId);
+    if (!normalized) return "";
+    const map = this.getDocTypeCanonicalMap();
+    return map.get(normalized) ?? normalized;
+  }
+
+  private normalizeDocTypeCatalog(
+    catalog: Record<string, any> | null,
+  ): Record<string, any> | null {
+    if (!catalog) return null;
+    const rows = Array.isArray(catalog.docTypes) ? catalog.docTypes : [];
+    if (!rows.length) return catalog;
+
+    const merged = new Map<string, Record<string, any>>();
+    for (const row of rows) {
+      const rawId = lower(row?.id);
+      if (!rawId) continue;
+      const canonicalId = this.canonicalizeDocTypeId(rawId);
+      const existing = merged.get(canonicalId);
+      const detectionPatterns = uniqueSorted([
+        ...(Array.isArray(existing?.detectionPatterns)
+          ? existing?.detectionPatterns.map((value: unknown) => String(value || "").trim())
+          : []),
+        ...(Array.isArray(row?.detectionPatterns)
+          ? row.detectionPatterns.map((value: unknown) => String(value || "").trim())
+          : []),
+      ]);
+      const commonSections = uniqueSorted([
+        ...(Array.isArray(existing?.commonSections)
+          ? existing?.commonSections.map((value: unknown) => String(value || "").trim())
+          : []),
+        ...(Array.isArray(row?.commonSections)
+          ? row.commonSections.map((value: unknown) => String(value || "").trim())
+          : []),
+      ]);
+      const aliases = uniqueSorted([
+        ...(Array.isArray(existing?.aliases)
+          ? existing?.aliases.map((value: unknown) => String(value || "").trim())
+          : []),
+        ...(Array.isArray(row?.aliases)
+          ? row.aliases.map((value: unknown) => String(value || "").trim())
+          : []),
+        rawId,
+        canonicalId,
+      ]);
+      const extractionPriority = Math.max(
+        asNumber(existing?.extractionPriority) ?? 0,
+        asNumber(row?.extractionPriority) ?? 0,
+      );
+      const priority = Math.max(
+        asNumber(existing?.priority) ?? 0,
+        asNumber(row?.priority) ?? 0,
+      );
+      const riskTier = String(existing?.riskTier || row?.riskTier || "").trim() || undefined;
+      const normalizedRow: Record<string, any> = {
+        ...(existing || row || {}),
+        ...(row || {}),
+        id: canonicalId,
+        detectionPatterns,
+        commonSections,
+        aliases,
+      };
+      if (extractionPriority > 0) normalizedRow.extractionPriority = extractionPriority;
+      if (priority > 0) normalizedRow.priority = priority;
+      if (riskTier) normalizedRow.riskTier = riskTier;
+      merged.set(canonicalId, normalizedRow);
+    }
+
+    return {
+      ...catalog,
+      docTypes: Array.from(merged.values()),
+    };
   }
 
   private getDomainDocTypeBankIds(
@@ -800,12 +925,13 @@ export class DocumentIntelligenceBanksService {
 
   getDocTypeCatalog(domain: DocumentIntelligenceDomain): Record<string, any> | null {
     const normalized = this.normalizeDomainOrThrow(domain, "getDocTypeCatalog");
-    return this.getFirstAvailableBank<Record<string, any>>(
+    const catalog = this.getFirstAvailableBank<Record<string, any>>(
       [
         `${domainBankPrefix(normalized)}_doc_type_catalog`,
         `${domainBankPrefix(normalized)}_doc_type_catalog_v2`,
       ],
     );
+    return this.normalizeDocTypeCatalog(catalog);
   }
 
   getDocTypeSections(
@@ -845,6 +971,11 @@ export class DocumentIntelligenceBanksService {
     return this.getFirstAvailableBank<Record<string, any>>(
       this.getDomainDocTypeBankIds(normalized, docType, "tables"),
     );
+  }
+
+  getDomainEntitySchema(domain: DocumentIntelligenceDomain): Record<string, any> | null {
+    const normalized = this.normalizeDomainOrThrow(domain, "getDomainEntitySchema");
+    return this.getCachedOptional<Record<string, any>>(`entity_schema_${normalized}`);
   }
 
   // ── Document Intelligence Ontology Banks ────────────────────────────
@@ -922,6 +1053,7 @@ export class DocumentIntelligenceBanksService {
       ...DOMAINS.map((domain) => `boost_rules_${domain}`),
       ...DOMAINS.map((domain) => `query_rewrites_${domain}`),
       ...DOMAINS.map((domain) => `section_priority_${domain}`),
+      ...DOMAINS.map((domain) => `entity_schema_${domain}`),
       ...DOMAINS.flatMap((domain) =>
         OPERATORS.map((operator) => `operator_playbook_${operator}_${domain}`),
       ),
@@ -998,6 +1130,9 @@ export class DocumentIntelligenceBanksService {
     documentIntelligenceFamilyCounts["language"] =
       (loadedSet.has("di_normalization_rules") ? 1 : 0) +
       (loadedSet.has("di_abbreviation_global") ? 1 : 0);
+    documentIntelligenceFamilyCounts["entity_schema"] = DOMAINS.filter((domain) =>
+      loadedSet.has(`entity_schema_${domain}`),
+    ).length;
     documentIntelligenceFamilyCounts["manifest"] = [
       "document_intelligence_schema_registry",
       "document_intelligence_orphan_allowlist",

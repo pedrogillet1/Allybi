@@ -2,7 +2,13 @@ import React, { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
-import { DEFAULT_AUTH_REDIRECT, STORAGE_KEYS, buildRoute, AUTH_MODES } from '../../constants/routes';
+import {
+  DEFAULT_AUTH_REDIRECT,
+  STORAGE_KEYS,
+  buildRoute,
+  AUTH_MODES,
+  ROUTES,
+} from '../../constants/routes';
 import { useAuthModal } from '../../context/AuthModalContext';
 import { fetchBootstrapSession } from '../../services/authBootstrap';
 
@@ -17,6 +23,7 @@ const OAuthCallback = ({ variant = 'page' }) => {
   useEffect(() => {
     const handleOAuthCallback = async () => {
       const error = searchParams.get('error');
+      const authStatus = searchParams.get('auth');
 
       // Handle errors
       if (error) {
@@ -33,11 +40,25 @@ const OAuthCallback = ({ variant = 'page' }) => {
           case 'oauth_error':
             errorMessage = 'An error occurred during authentication';
             break;
+          case 'invalid_state':
+            errorMessage = 'Authentication request expired. Please try again.';
+            break;
+          case 'email_not_verified':
+            errorMessage = 'Google account email is not verified';
+            break;
           default:
             errorMessage = 'Authentication failed';
         }
 
         navigate(`${buildRoute.auth(AUTH_MODES.LOGIN)}?error=${errorMessage}`);
+        return;
+      }
+
+      if (authStatus === '2fa_required') {
+        navigate(ROUTES.TWO_FACTOR_LOGIN, {
+          replace: true,
+          state: { source: 'oauth' },
+        });
         return;
       }
 

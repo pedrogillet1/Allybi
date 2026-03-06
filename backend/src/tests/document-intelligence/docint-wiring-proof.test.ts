@@ -203,6 +203,15 @@ describe("DocumentIntelligenceBanksService accessor coverage", () => {
     expect(mockGetBank).toHaveBeenCalledWith("pattern_library");
   });
 
+  test("getDomainEntitySchema(domain) fetches 'entity_schema_{domain}'", () => {
+    for (const domain of DOMAINS) {
+      service.invalidateCache();
+      mockGetBank.mockClear();
+      service.getDomainEntitySchema(domain);
+      expect(mockGetBank).toHaveBeenCalledWith(`entity_schema_${domain}`);
+    }
+  });
+
   test("getDocumentIntelligenceMap fetches 'document_intelligence_bank_map'", () => {
     service.getDocumentIntelligenceMap();
     expect(mockGetBank).toHaveBeenCalledWith("document_intelligence_bank_map");

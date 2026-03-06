@@ -1,0 +1,52 @@
+{
+  "generatedAt": "2026-03-05T22:33:10.673Z",
+  "runId": "run_2026-03-05T22-32-restore-latest",
+  "datasetId": "retrieval-signoff-fallback-input.json:50",
+  "pack": "25",
+  "inputFile": "C:\\Users\\Pedro\\desktop\\webapp\\frontend\\e2e\\reports\\archive\\2026-03-05T16-30-27-110Z\\retrieval-signoff-fallback-input.json",
+  "inputArtifactType": "raw_query_run",
+  "sourceArtifactPath": "C:\\Users\\Pedro\\desktop\\webapp\\frontend\\e2e\\reports\\archive\\2026-03-05T16-30-27-110Z\\retrieval-signoff-fallback-input.json",
+  "sourceArtifactSha256": "7acd6e9034ca0b8ba98d82315cfb32ec66054e59a0017d9d9962481469d27d6f",
+  "sourceArtifactBytes": 15887,
+  "sourceArtifactRelPath": "archive/2026-03-05T16-30-27-110Z/retrieval-signoff-fallback-input.json",
+  "totalQueries": 50,
+  "source": "run-harsh-rubric.v2.mjs",
+  "artifacts": {
+    "scorecard": {
+      "latestPath": "C:\\Users\\Pedro\\desktop\\webapp\\frontend\\e2e\\reports\\latest\\scorecard.json",
+      "archivePath": "C:\\Users\\Pedro\\desktop\\webapp\\frontend\\e2e\\reports\\archive\\run_2026-03-05T22-32-restore-latest\\scorecard.json",
+      "latestRelPath": "latest/scorecard.json",
+      "archiveRelPath": "archive/run_2026-03-05T22-32-restore-latest/scorecard.json",
+      "sha256": "86fcd219bb94771b4ea7cf94693bb6fae78870d7d2057618fd96df2762542788",
+      "bytes": 63399
+    },
+    "grading": {
+      "latestPath": "C:\\Users\\Pedro\\desktop\\webapp\\frontend\\e2e\\reports\\latest\\grading.md",
+      "archivePath": "C:\\Users\\Pedro\\desktop\\webapp\\frontend\\e2e\\reports\\archive\\run_2026-03-05T22-32-restore-latest\\grading.md",
+      "latestRelPath": "latest/grading.md",
+      "archiveRelPath": "archive/run_2026-03-05T22-32-restore-latest/grading.md",
+      "sha256": "0cc1a01dea32c36fb06b0219c56db9ca8beec24973f5dfa064f4ac8fb6912b13",
+      "bytes": 6156
+    },
+    "deepDive": {
+      "latestPath": "C:\\Users\\Pedro\\desktop\\webapp\\frontend\\e2e\\reports\\latest\\a-plus-gap-deep-dive.md",
+      "archivePath": "C:\\Users\\Pedro\\desktop\\webapp\\frontend\\e2e\\reports\\archive\\run_2026-03-05T22-32-restore-latest\\a-plus-gap-deep-dive.md",
+      "latestRelPath": "latest/a-plus-gap-deep-dive.md",
+      "archiveRelPath": "archive/run_2026-03-05T22-32-restore-latest/a-plus-gap-deep-dive.md",
+      "sha256": "e9290de9019c093b4d225f67af1ebd5b1bb5d8dec20d1e37b08f0b8ff04cf3e5",
+      "bytes": 2826
+    },
+    "perQuery": {
+      "latestPath": "C:\\Users\\Pedro\\desktop\\webapp\\frontend\\e2e\\reports\\latest\\per_query.json",
+      "archivePath": "C:\\Users\\Pedro\\desktop\\webapp\\frontend\\e2e\\reports\\archive\\run_2026-03-05T22-32-restore-latest\\per_query.json",
+      "latestRelPath": "latest/per_query.json",
+      "archiveRelPath": "archive/run_2026-03-05T22-32-restore-latest/per_query.json",
+      "sha256": "506181c573d4554e6604876f788b869a14e99c89b8c0823298b46feeaea49661",
+      "bytes": 56160
+    }
+  },
+  "latestPerQueryPath": "C:\\Users\\Pedro\\desktop\\webapp\\frontend\\e2e\\reports\\latest\\per_query.json",
+  "archivePerQueryPath": "C:\\Users\\Pedro\\desktop\\webapp\\frontend\\e2e\\reports\\archive\\run_2026-03-05T22-32-restore-latest\\per_query.json",
+  "scorecardPath": "C:\\Users\\Pedro\\desktop\\webapp\\frontend\\e2e\\reports\\latest\\scorecard.json",
+  "archiveScorecardPath": "C:\\Users\\Pedro\\desktop\\webapp\\frontend\\e2e\\reports\\archive\\run_2026-03-05T22-32-restore-latest\\scorecard.json"
+}

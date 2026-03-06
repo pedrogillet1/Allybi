@@ -30,10 +30,19 @@ const envCandidates = [
 
 for (const envPath of envCandidates) loadEnvFileIfExists(envPath);
 
+// Keep local storage deterministic across launch styles ("cd backend" vs "--prefix backend").
+// In both src/ and dist/, ../../../ resolves to the workspace root.
+const workspaceRoot = path.resolve(__dirname, "../../../");
+const rawLocalStoragePath =
+  process.env.LOCAL_STORAGE_PATH || path.join(workspaceRoot, "storage");
+const resolvedLocalStoragePath = path.isAbsolute(rawLocalStoragePath)
+  ? rawLocalStoragePath
+  : path.resolve(workspaceRoot, rawLocalStoragePath);
+
 export const UPLOAD_CONFIG = {
   // Storage Provider: "gcs" for Google Cloud Storage, "local" for local filesystem (fast dev)
   STORAGE_PROVIDER: (process.env.STORAGE_PROVIDER || "gcs") as "gcs" | "local",
-  LOCAL_STORAGE_PATH: process.env.LOCAL_STORAGE_PATH || "./storage",
+  LOCAL_STORAGE_PATH: resolvedLocalStoragePath,
 
   // ═══════════════════════════════════════════════════════════════════════════
   // FILE SIZE LIMITS (UNIFIED - used by ALL upload paths)

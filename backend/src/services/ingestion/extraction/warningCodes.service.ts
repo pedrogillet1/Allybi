@@ -9,6 +9,16 @@ function slugify(value: string): string {
     .slice(0, 96);
 }
 
+function stableHashToken(value: string): string {
+  // FNV-1a (32-bit) for deterministic, low-collision warning code suffixes.
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < value.length; i += 1) {
+    hash ^= value.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return (hash >>> 0).toString(36).slice(0, 8);
+}
+
 export function deriveWarningCode(warning: string): string {
   const normalized = String(warning || "").trim();
   if (!normalized) return "unknown_warning";
@@ -22,7 +32,14 @@ export function deriveWarningCode(warning: string): string {
   if (!compact) return "unknown_warning";
 
   const parts = compact.split("_").filter(Boolean).slice(0, 6);
-  return parts.length > 0 ? parts.join("_") : "unknown_warning";
+  const tokenized = parts.length > 0 ? parts.join("_") : "";
+  if (!tokenized) return "unknown_warning";
+  if (tokenized === compact) return tokenized;
+
+  const suffix = stableHashToken(compact);
+  const maxBaseLen = Math.max(1, 96 - suffix.length - 1);
+  const base = tokenized.slice(0, maxBaseLen).replace(/_+$/g, "") || "warning";
+  return `${base}_${suffix}`;
 }
 
 export function deriveExtractionWarningCodes(
@@ -40,4 +57,3 @@ export function deriveExtractionWarningCodes(
   }
   return out;
 }
-

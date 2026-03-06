@@ -4,6 +4,12 @@ jest.mock("../queues/connector.queue", () => ({
   addConnectorSyncJob: jest.fn(async () => ({ id: "job-mock-1" })),
 }));
 
+const consumeOAuthCompletionPayloadOnce = jest.fn(async () => true);
+jest.mock("../services/connectors/oauthCompletionReplayGuard.service", () => ({
+  consumeOAuthCompletionPayloadOnce: (...args: any[]) =>
+    consumeOAuthCompletionPayloadOnce(...args),
+}));
+
 import { createIntegrationsController } from "./integrations.controller";
 import { registerConnector } from "../services/connectors/connectorsRegistry";
 import { signEmailSendConfirmationToken } from "../services/connectors/emailSendConfirmation.service";
@@ -35,6 +41,8 @@ describe("IntegrationsController", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     resetEmailSendReplayCacheForTests();
+    consumeOAuthCompletionPayloadOnce.mockReset();
+    consumeOAuthCompletionPayloadOnce.mockResolvedValue(true);
   });
 
   test("sync sanitizes thrown runtime errors and returns a correlation ref", async () => {
@@ -94,6 +102,7 @@ describe("IntegrationsController", () => {
     expect(html).not.toContain("koda_oauth_complete");
     expect(html).not.toContain("localStorage.setItem(");
     expect(html).toContain("\"sig\":");
+    expect(html).toContain("\"n\":");
   });
 
   test("oauth verify endpoint validates signed completion payload", async () => {
@@ -107,6 +116,7 @@ describe("IntegrationsController", () => {
       provider: "gmail",
       ok: true,
       t: 1000,
+      n: "nonce-stub",
       sig: "stub",
     };
     // Generate a real payload via callback HTML so signature generation stays aligned.
@@ -131,10 +141,65 @@ describe("IntegrationsController", () => {
     expect(match).toBeTruthy();
     const completion = JSON.parse(String(match?.[1] || JSON.stringify(validPayload)));
 
-    await controller.oauthVerify({ body: completion } as any, res as any);
+    await controller.oauthVerify(
+      { body: completion, user: { id: "user-1" }, headers: {} } as any,
+      res as any,
+    );
     expect(state.status).toBe(200);
     expect(state.body?.ok).toBe(true);
     expect(state.body?.data?.valid).toBe(true);
+    expect(consumeOAuthCompletionPayloadOnce).toHaveBeenCalledWith(
+      expect.objectContaining({
+        userId: "user-1",
+        provider: "gmail",
+      }),
+    );
+
+    consumeOAuthCompletionPayloadOnce.mockResolvedValueOnce(false);
+    const secondReplayRes = makeJsonRes();
+    await controller.oauthVerify(
+      { body: completion, user: { id: "user-1" }, headers: {} } as any,
+      secondReplayRes.res as any,
+    );
+    expect(secondReplayRes.state.body?.data?.valid).toBe(false);
+  });
+
+  test("oauth verify rejects malformed payload without consuming replay token", async () => {
+    process.env.CONNECTOR_OAUTH_CALLBACK_SECRET = "oauth-callback-test-secret";
+    const controller = createIntegrationsController({
+      execute: jest.fn(),
+    } as any);
+    const { res, state } = makeJsonRes();
+
+    await controller.oauthVerify(
+      {
+        body: { type: "koda_oauth_done", provider: "gmail", ok: true },
+        user: { id: "user-1" },
+        headers: {},
+      } as any,
+      res as any,
+    );
+
+    expect(state.status).toBe(200);
+    expect(state.body?.ok).toBe(true);
+    expect(state.body?.data?.valid).toBe(false);
+    expect(consumeOAuthCompletionPayloadOnce).not.toHaveBeenCalled();
+  });
+
+  test("oauth verify requires authenticated user context", async () => {
+    process.env.CONNECTOR_OAUTH_CALLBACK_SECRET = "oauth-callback-test-secret";
+    const controller = createIntegrationsController({
+      execute: jest.fn(),
+    } as any);
+    const { res, state } = makeJsonRes();
+
+    await controller.oauthVerify(
+      { body: { type: "koda_oauth_done" }, headers: {} } as any,
+      res as any,
+    );
+
+    expect(state.status).toBe(401);
+    expect(state.body?.error?.code).toBe("AUTH_UNAUTHORIZED");
   });
 
   test("send returns normalized receipt payload", async () => {

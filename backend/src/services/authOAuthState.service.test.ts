@@ -4,6 +4,8 @@ import { describe, expect, test } from "@jest/globals";
 import {
   issueGoogleOAuthState,
   verifyGoogleOAuthState,
+  issueAppleOAuthState,
+  verifyAppleOAuthState,
   timingSafeEqualString,
 } from "./authOAuthState.service";
 
@@ -119,5 +121,31 @@ describe("authOAuthState.service", () => {
     expect(timingSafeEqualString("abc", "abc")).toBe(true);
     expect(timingSafeEqualString("abc", "abd")).toBe(false);
     expect(timingSafeEqualString("abc", "ab")).toBe(false);
+  });
+
+  test("issues and verifies Apple OAuth state with provider binding", () => {
+    const nowMs = 1_700_000_000_000;
+    const token = issueAppleOAuthState({
+      secret,
+      nowMs,
+      nonce: "nonce-apple-1",
+    });
+
+    const verification = verifyAppleOAuthState({
+      state: token,
+      secret,
+      nowMs: nowMs + 1_000,
+      ttlMs: 60_000,
+    });
+
+    expect(verification).toEqual({
+      ok: true,
+      payload: {
+        v: 1,
+        provider: "apple_auth",
+        nonce: "nonce-apple-1",
+        iat: Math.floor(nowMs / 1000),
+      },
+    });
   });
 });

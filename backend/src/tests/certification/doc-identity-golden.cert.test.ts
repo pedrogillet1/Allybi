@@ -20,12 +20,12 @@ describe("doc identity golden eval cases", () => {
     expect(fs.existsSync(EVAL_PATH)).toBe(true);
   });
 
-  it("contains exactly 10 cases", () => {
+  it("contains at least 20 cases", () => {
     const lines = fs
       .readFileSync(EVAL_PATH, "utf-8")
       .split(/\r?\n/)
       .filter((line) => line.trim().length > 0);
-    expect(lines).toHaveLength(10);
+    expect(lines.length).toBeGreaterThanOrEqual(20);
   });
 
   it("each case is valid JSON with required fields", () => {

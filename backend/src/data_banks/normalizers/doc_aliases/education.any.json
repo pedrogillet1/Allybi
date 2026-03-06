@@ -1,0 +1,86 @@
+{
+  "_meta": {
+    "id": "doc_aliases_education",
+    "version": "1.0.0",
+    "description": "Education document alias normalization bank with EN/PT coverage.",
+    "languages": ["any"],
+    "lastUpdated": "2026-03-05",
+    "schemaId": "doc_identity_schema",
+    "owner": "data-bank-governance",
+    "usedBy": ["services/core/banks/dataBankLoader.service.ts"],
+    "tests": ["tests/patternWiringProof.test.ts"]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "education",
+    "caseInsensitive": true,
+    "minAliasConfidence": 0.62
+  },
+  "domain": "education",
+  "aliases": [
+    {
+      "phrase": "transcript",
+      "normalized": "student_transcript",
+      "docTypeIds": ["edu_transcript"],
+      "hints": {"periodHint": "academic_term", "entityHint": "student", "formatHint": "record", "languageHint": "en"},
+      "confidence": 0.9,
+      "examples": ["show transcript", "compare transcript"]
+    },
+    {
+      "phrase": "historico escolar",
+      "normalized": "student_transcript",
+      "docTypeIds": ["edu_transcript"],
+      "hints": {"periodHint": "academic_term", "entityHint": "student", "formatHint": "record", "languageHint": "pt"},
+      "confidence": 0.91,
+      "examples": ["mostrar historico escolar", "comparar historico escolar"]
+    },
+    {
+      "phrase": "diploma",
+      "normalized": "diploma_certificate",
+      "docTypeIds": ["edu_diploma_certificate"],
+      "hints": {"periodHint": "completion_date", "entityHint": "student", "formatHint": "certificate", "languageHint": "en"},
+      "confidence": 0.89,
+      "examples": ["show diploma", "open diploma certificate"]
+    },
+    {
+      "phrase": "certificado de diploma",
+      "normalized": "diploma_certificate",
+      "docTypeIds": ["edu_diploma_certificate"],
+      "hints": {"periodHint": "completion_date", "entityHint": "student", "formatHint": "certificate", "languageHint": "pt"},
+      "confidence": 0.88,
+      "examples": ["mostrar certificado de diploma", "abrir diploma"]
+    },
+    {
+      "phrase": "enrollment letter",
+      "normalized": "enrollment_letter",
+      "docTypeIds": ["edu_enrollment_letter"],
+      "hints": {"periodHint": "academic_term", "entityHint": "student", "formatHint": "letter", "languageHint": "en"},
+      "confidence": 0.86,
+      "examples": ["show enrollment letter", "find enrollment confirmation"]
+    },
+    {
+      "phrase": "comprovante de matricula",
+      "normalized": "enrollment_letter",
+      "docTypeIds": ["edu_enrollment_letter"],
+      "hints": {"periodHint": "academic_term", "entityHint": "student", "formatHint": "letter", "languageHint": "pt"},
+      "confidence": 0.9,
+      "examples": ["mostrar comprovante de matricula", "encontrar carta de matricula"]
+    },
+    {
+      "phrase": "course syllabus",
+      "normalized": "course_syllabus",
+      "docTypeIds": ["edu_course_syllabus"],
+      "hints": {"periodHint": "term_schedule", "entityHint": "course", "formatHint": "syllabus", "languageHint": "en"},
+      "confidence": 0.84,
+      "examples": ["show course syllabus", "open syllabus"]
+    },
+    {
+      "phrase": "plano de ensino",
+      "normalized": "course_syllabus",
+      "docTypeIds": ["edu_course_syllabus"],
+      "hints": {"periodHint": "term_schedule", "entityHint": "course", "formatHint": "syllabus", "languageHint": "pt"},
+      "confidence": 0.85,
+      "examples": ["mostrar plano de ensino", "abrir ementa"]
+    }
+  ]
+}

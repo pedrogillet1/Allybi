@@ -30,6 +30,8 @@ export interface IngestionSloEvaluationShared {
   globalFailureRatePct: number;
 }
 
+export function isIngestionFailureStatus(status: unknown): boolean;
+
 export function summarizeIngestionSloEvents(
   events: Array<{
     status?: string | null;

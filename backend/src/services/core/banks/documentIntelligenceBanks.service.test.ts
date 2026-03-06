@@ -126,6 +126,45 @@ describe("DocumentIntelligenceBanksService", () => {
     expect((sections as any).sections[0].id).toBe("governing_law");
   });
 
+  test("normalizes catalog doc types to canonical taxonomy IDs", () => {
+    const svc = new DocumentIntelligenceBanksService(
+      makeLoader({
+        doc_taxonomy: {
+          typeDefinitions: [
+            {
+              id: "legal_nda",
+              aliases: ["legal_nda", "nda"],
+            },
+          ],
+        },
+        legal_doc_type_catalog: {
+          docTypes: [
+            {
+              id: "legal_nda",
+              detectionPatterns: ["\\bnda\\b"],
+              extractionPriority: 100,
+            },
+            {
+              id: "nda",
+              detectionPatterns: ["\\bnon[- ]disclosure\\b"],
+              extractionPriority: 120,
+            },
+          ],
+        },
+      }) as any,
+    );
+
+    const catalog = svc.getDocTypeCatalog("legal");
+    expect(catalog).toBeTruthy();
+    const docTypes = Array.isArray((catalog as any)?.docTypes)
+      ? (catalog as any).docTypes
+      : [];
+    expect(docTypes.length).toBe(1);
+    expect(docTypes[0].id).toBe("legal_nda");
+    expect(docTypes[0].aliases).toContain("nda");
+    expect(docTypes[0].extractionPriority).toBe(120);
+  });
+
   test("returns diagnostics warning when required core bank is missing", () => {
     const svc = new DocumentIntelligenceBanksService(
       makeLoader({
@@ -142,6 +181,20 @@ describe("DocumentIntelligenceBanksService", () => {
         msg.includes("missing_required_bank"),
       ),
       ).toBe(true);
+  });
+
+  test("domain entity schema accessor maps to entity_schema_{domain}", () => {
+    const svc = new DocumentIntelligenceBanksService(
+      makeLoader({
+        entity_schema_finance: {
+          entities: [{ id: "amount", type: "money" }],
+        },
+      }) as any,
+    );
+
+    const schema = svc.getDomainEntitySchema("finance");
+    expect(schema).toBeTruthy();
+    expect((schema as any).entities[0].id).toBe("amount");
   });
 
   test("falls back to _v2 accounting family and legacy doc-type ordering", () => {

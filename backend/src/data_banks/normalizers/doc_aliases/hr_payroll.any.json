@@ -1,0 +1,86 @@
+{
+  "_meta": {
+    "id": "doc_aliases_hr_payroll",
+    "version": "1.0.0",
+    "description": "HR/payroll document alias normalization bank with EN/PT coverage.",
+    "languages": ["any"],
+    "lastUpdated": "2026-03-05",
+    "schemaId": "doc_identity_schema",
+    "owner": "data-bank-governance",
+    "usedBy": ["services/core/banks/dataBankLoader.service.ts"],
+    "tests": ["tests/patternWiringProof.test.ts"]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "hr_payroll",
+    "caseInsensitive": true,
+    "minAliasConfidence": 0.62
+  },
+  "domain": "hr_payroll",
+  "aliases": [
+    {
+      "phrase": "pay stub",
+      "normalized": "pay_stub",
+      "docTypeIds": ["hr_pay_stub"],
+      "hints": {"periodHint": "pay_period", "entityHint": "employee", "formatHint": "statement", "languageHint": "en"},
+      "confidence": 0.92,
+      "examples": ["show pay stub", "open payroll stub"]
+    },
+    {
+      "phrase": "holerite",
+      "normalized": "pay_stub",
+      "docTypeIds": ["hr_pay_stub"],
+      "hints": {"periodHint": "pay_period", "entityHint": "employee", "formatHint": "statement", "languageHint": "pt"},
+      "confidence": 0.93,
+      "examples": ["mostrar holerite", "abrir contracheque"]
+    },
+    {
+      "phrase": "timesheet",
+      "normalized": "timesheet",
+      "docTypeIds": ["hr_timesheet"],
+      "hints": {"periodHint": "work_period", "entityHint": "employee", "formatHint": "table", "languageHint": "en"},
+      "confidence": 0.88,
+      "examples": ["show timesheet", "compare timesheet hours"]
+    },
+    {
+      "phrase": "folha de ponto",
+      "normalized": "timesheet",
+      "docTypeIds": ["hr_timesheet"],
+      "hints": {"periodHint": "work_period", "entityHint": "employee", "formatHint": "table", "languageHint": "pt"},
+      "confidence": 0.89,
+      "examples": ["mostrar folha de ponto", "comparar horas"]
+    },
+    {
+      "phrase": "employment verification",
+      "normalized": "employment_verification_letter",
+      "docTypeIds": ["hr_employment_verification_letter"],
+      "hints": {"periodHint": "employment_term", "entityHint": "employee", "formatHint": "letter", "languageHint": "en"},
+      "confidence": 0.87,
+      "examples": ["show employment verification", "open verification letter"]
+    },
+    {
+      "phrase": "carta de comprovacao de emprego",
+      "normalized": "employment_verification_letter",
+      "docTypeIds": ["hr_employment_verification_letter"],
+      "hints": {"periodHint": "employment_term", "entityHint": "employee", "formatHint": "letter", "languageHint": "pt"},
+      "confidence": 0.87,
+      "examples": ["mostrar carta de comprovacao de emprego", "abrir comprovacao de vinculo"]
+    },
+    {
+      "phrase": "benefits enrollment",
+      "normalized": "benefits_enrollment_summary",
+      "docTypeIds": ["hr_benefits_enrollment_summary"],
+      "hints": {"periodHint": "benefits_period", "entityHint": "employee", "formatHint": "summary", "languageHint": "en"},
+      "confidence": 0.84,
+      "examples": ["show benefits enrollment", "open benefits summary"]
+    },
+    {
+      "phrase": "resumo de beneficios",
+      "normalized": "benefits_enrollment_summary",
+      "docTypeIds": ["hr_benefits_enrollment_summary"],
+      "hints": {"periodHint": "benefits_period", "entityHint": "employee", "formatHint": "summary", "languageHint": "pt"},
+      "confidence": 0.85,
+      "examples": ["mostrar resumo de beneficios", "abrir inscricao de beneficios"]
+    }
+  ]
+}

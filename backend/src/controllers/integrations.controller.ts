@@ -20,10 +20,12 @@ import {
   buildOAuthCompletionPayload,
   clientSafeIntegrationMessage,
   normalizeIntegrationErrorMessage,
+  resolveOAuthCompletionMaxAgeMs,
   resolveOAuthPostMessageOrigin,
   verifyOAuthCompletionPayload,
 } from "../services/connectors/integrationRuntimePolicy.service";
 import { consumeEmailSendConfirmationTokenOnce } from "../services/connectors/emailSendReplayGuard.service";
+import { consumeOAuthCompletionPayloadOnce } from "../services/connectors/oauthCompletionReplayGuard.service";
 
 interface ApiError {
   code: string;
@@ -900,8 +902,28 @@ export class IntegrationsController {
 
   oauthVerify = async (req: Request, res: Response): Promise<Response> => {
     const payload = (req.body || {}) as Record<string, unknown>;
+    const context = contextFromReq(req);
+    if (!context)
+      return sendErr(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
+
+    const verified = verifyOAuthCompletionPayload(payload);
+    if (!verified) return sendOk(res, { valid: false });
+
+    const providerRaw = asString(payload.provider);
+    const nonce = asString(payload.n);
+    if (!providerRaw || !nonce) return sendOk(res, { valid: false });
+    const provider = providerRaw.toLowerCase();
+    const ts = Number(payload.t);
+    const maxAgeMs = resolveOAuthCompletionMaxAgeMs();
+    const expiryMs = Number.isFinite(ts) ? ts + maxAgeMs : Date.now() + maxAgeMs;
+    const consumed = await consumeOAuthCompletionPayloadOnce({
+      userId: context.userId,
+      provider,
+      nonce,
+      expMs: expiryMs,
+    });
     return sendOk(res, {
-      valid: verifyOAuthCompletionPayload(payload),
+      valid: consumed,
     });
   };
 

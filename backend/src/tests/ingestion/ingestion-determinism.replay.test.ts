@@ -84,4 +84,58 @@ describe("ingestion replay determinism", () => {
 
     expect(fingerprint(chunksA)).toBe(fingerprint(chunksB));
   });
+
+  test("semantically identical XLSX cell facts with different arrival order produce same chunk fingerprint", () => {
+    const extractionA = {
+      sourceType: "xlsx" as const,
+      text: "Revenue table",
+      sheetCount: 1,
+      sheets: [{ sheetName: "Sheet1", textContent: "", isFinancial: true }],
+      cellFacts: [
+        {
+          sheet: "Sheet1",
+          cell: "C2",
+          rowLabel: "Revenue",
+          colHeader: "2023",
+          value: "1100",
+          displayValue: "1,100",
+        },
+        {
+          sheet: "Sheet1",
+          cell: "B2",
+          rowLabel: "Revenue",
+          colHeader: "2024",
+          value: "1200",
+          displayValue: "1,200",
+        },
+      ],
+    };
+
+    const extractionB = {
+      ...extractionA,
+      cellFacts: [...extractionA.cellFacts].reverse(),
+    };
+
+    const context = {
+      documentId: "doc-1",
+      versionId: "doc-1",
+      rootDocumentId: "doc-1",
+      isLatestVersion: true,
+    };
+
+    const chunksA = buildInputChunks(
+      extractionA as any,
+      extractionA.text,
+      undefined,
+      context,
+    );
+    const chunksB = buildInputChunks(
+      extractionB as any,
+      extractionB.text,
+      undefined,
+      context,
+    );
+
+    expect(fingerprint(chunksA)).toBe(fingerprint(chunksB));
+  });
 });

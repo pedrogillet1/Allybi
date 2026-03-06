@@ -3,6 +3,7 @@ import {
   buildInputChunks,
   deduplicateChunks,
 } from "../../services/ingestion/pipeline/chunkAssembly.service";
+import { writeCertificationGateReport } from "./reporting";
 
 describe("Indexing & Storage — Chunk + Metadata Invariants", () => {
   // ---------------------------------------------------------------
@@ -67,12 +68,16 @@ describe("Indexing & Storage — Chunk + Metadata Invariants", () => {
       );
       expect(chunks.length).toBeGreaterThan(0);
       for (const chunk of chunks) {
+        const hasSectionId =
+          typeof chunk.metadata?.sectionId === "string" &&
+          chunk.metadata.sectionId.trim().length > 0;
         const hasLocation =
           chunk.pageNumber != null ||
           chunk.metadata?.sheetName != null ||
           chunk.metadata?.sectionName != null ||
           chunk.metadata?.startChar != null ||
           chunk.metadata?.slideTitle != null;
+        expect(hasSectionId).toBe(true);
         expect(hasLocation).toBe(true);
       }
     }
@@ -335,14 +340,40 @@ describe("Indexing & Storage — Chunk + Metadata Invariants", () => {
     ];
 
     for (const { extraction, fullText } of cases) {
-      const chunks = buildInputChunks(extraction, fullText);
+      const chunks = buildInputChunks(extraction, fullText, undefined, {
+        documentId: "doc-cert-1",
+        versionId: "doc-cert-1",
+        rootDocumentId: "doc-cert-1",
+        isLatestVersion: true,
+      });
       expect(chunks.length).toBeGreaterThan(0);
       for (const chunk of chunks) {
-        // Every chunk must have: non-empty content, numeric chunkIndex, sourceType, chunkType
+        // Strict citation contract: content/index + source/chunk types + section scope + version scope.
         expect(chunk.content.length).toBeGreaterThan(0);
         expect(typeof chunk.chunkIndex).toBe("number");
         expect(chunk.metadata.sourceType).toBe(extraction.sourceType);
-        expect(chunk.metadata.chunkType).toBeDefined();
+        expect(typeof chunk.metadata.chunkType).toBe("string");
+        expect(typeof chunk.metadata.sectionId).toBe("string");
+        expect(chunk.metadata.sectionId!.length).toBeGreaterThan(0);
+        expect(chunk.metadata.documentId).toBe("doc-cert-1");
+        expect(chunk.metadata.versionId).toBe("doc-cert-1");
+        expect(chunk.metadata.rootDocumentId).toBe("doc-cert-1");
+        expect(chunk.metadata.isLatestVersion).toBe(true);
+
+        if (extraction.sourceType === "pdf") {
+          expect(chunk.pageNumber).toBeDefined();
+          expect(Number(chunk.pageNumber)).toBeGreaterThanOrEqual(1);
+        }
+        if (extraction.sourceType === "xlsx") {
+          expect(chunk.metadata.tableId || chunk.metadata.sheetName).toBeTruthy();
+          if (chunk.metadata.tableChunkForm === "cell_centric") {
+            expect(chunk.metadata.tableId).toBeTruthy();
+            expect(
+              Number.isFinite(chunk.metadata.rowIndex) ||
+                Number.isFinite(chunk.metadata.columnIndex),
+            ).toBe(true);
+          }
+        }
       }
     }
   });
@@ -641,5 +672,200 @@ describe("Indexing & Storage — Chunk + Metadata Invariants", () => {
       const parsed = String(input || "").trim().toLowerCase() === "true";
       expect(parsed).toBe(expected);
     }
+  });
+
+  test("INV-CERT: emits indexing storage invariants gate report", () => {
+    const failures: string[] = [];
+    const documentContext = {
+      documentId: "cert-doc-001",
+      versionId: "cert-doc-001",
+      rootDocumentId: "cert-root-001",
+      isLatestVersion: true,
+    };
+
+    const pdfExtraction: any = {
+      sourceType: "pdf",
+      text:
+        "Page one text with enough words for chunking.\n\n" +
+        "Page two text continues with additional detail for verification.",
+      pages: [
+        { page: 1, text: "Page one text with enough words for chunking." },
+        {
+          page: 2,
+          text: "Page two text continues with additional detail for verification.",
+        },
+      ],
+    };
+    const pdfChunks = buildInputChunks(
+      pdfExtraction,
+      pdfExtraction.text,
+      { targetChars: 70, overlapChars: 8 },
+      documentContext,
+    );
+
+    const xlsxExtraction: any = {
+      sourceType: "xlsx",
+      sheets: [{ sheetName: "SheetA", textContent: "Revenue table" }],
+      cellFacts: [
+        {
+          sheet: "SheetA",
+          cell: "B2",
+          rowLabel: "Revenue",
+          colHeader: "Q1",
+          value: "$100",
+          displayValue: "$100",
+        },
+        {
+          sheet: "SheetA",
+          cell: "C2",
+          rowLabel: "Revenue",
+          colHeader: "Q2",
+          value: "$200",
+          displayValue: "$200",
+        },
+      ],
+    };
+    const xlsxChunks = buildInputChunks(
+      xlsxExtraction,
+      "",
+      undefined,
+      documentContext,
+    );
+
+    const pdfSequential = pdfChunks.every(
+      (chunk, index) => chunk.chunkIndex === index,
+    );
+    const xlsxSequential = xlsxChunks.every(
+      (chunk, index) => chunk.chunkIndex === index,
+    );
+    const allChunks = [...pdfChunks, ...xlsxChunks];
+    const allHaveCitationContract = allChunks.every(
+      (chunk) => {
+        const sourceType = String(chunk.metadata?.sourceType || "");
+        const chunkType = String(chunk.metadata?.chunkType || "");
+        const hasCore =
+          chunk.content.length > 0 &&
+          typeof chunk.chunkIndex === "number" &&
+          Boolean(sourceType) &&
+          Boolean(chunkType) &&
+          Boolean(chunk.metadata?.sectionId);
+        if (!hasCore) return false;
+        if (sourceType === "pdf") {
+          return Number.isFinite(chunk.pageNumber);
+        }
+        if (sourceType === "xlsx") {
+          const hasTableScope = Boolean(
+            chunk.metadata?.tableId || chunk.metadata?.sheetName,
+          );
+          if (!hasTableScope) return false;
+          if (chunk.metadata?.tableChunkForm === "cell_centric") {
+            return (
+              Number.isFinite(chunk.metadata?.rowIndex) &&
+              Number.isFinite(chunk.metadata?.columnIndex)
+            );
+          }
+        }
+        return true;
+      },
+    );
+    const allHaveLocation = allChunks.every(
+      (chunk) => {
+        const hasSectionId =
+          typeof chunk.metadata?.sectionId === "string" &&
+          chunk.metadata.sectionId.length > 0;
+        const hasLocator =
+          chunk.pageNumber != null ||
+          chunk.metadata?.sheetName != null ||
+          chunk.metadata?.sectionName != null ||
+          chunk.metadata?.startChar != null ||
+          chunk.metadata?.slideTitle != null;
+        return hasSectionId && hasLocator;
+      },
+    );
+    const versionMetadataPresent = allChunks.every(
+      (chunk) =>
+        chunk.metadata?.documentId === "cert-doc-001" &&
+        chunk.metadata?.versionId === "cert-doc-001" &&
+        chunk.metadata?.rootDocumentId === "cert-root-001" &&
+        chunk.metadata?.isLatestVersion === true,
+    );
+    const cellChunks = xlsxChunks.filter(
+      (chunk) => chunk.metadata?.tableChunkForm === "cell_centric",
+    );
+    const cellCoordinatesPresent =
+      cellChunks.length > 0 &&
+      cellChunks.every(
+        (chunk) =>
+          typeof chunk.metadata?.rowIndex === "number" &&
+          typeof chunk.metadata?.columnIndex === "number" &&
+          chunk.metadata?.tableId,
+      );
+
+    const duplicateCandidate =
+      "Quarterly revenue remained stable across the compared periods.";
+    const deduped = deduplicateChunks(
+      [
+        {
+          chunkIndex: 0,
+          content: duplicateCandidate,
+          metadata: { sectionName: "Summary" },
+        },
+        {
+          chunkIndex: 1,
+          content: duplicateCandidate,
+          metadata: { sectionName: "Summary" },
+        },
+        {
+          chunkIndex: 2,
+          content: duplicateCandidate,
+          metadata: { sectionName: "Financials" },
+        },
+      ] as any,
+    );
+    const dedupSectionPreserved =
+      deduped.length === 2 &&
+      deduped.some((chunk) => chunk.metadata?.sectionName === "Summary") &&
+      deduped.some((chunk) => chunk.metadata?.sectionName === "Financials");
+
+    if (pdfChunks.length === 0) failures.push("PDF_CHUNKS_EMPTY");
+    if (xlsxChunks.length === 0) failures.push("XLSX_CHUNKS_EMPTY");
+    if (!pdfSequential) failures.push("PDF_CHUNK_INDEX_NON_SEQUENTIAL");
+    if (!xlsxSequential) failures.push("XLSX_CHUNK_INDEX_NON_SEQUENTIAL");
+    if (!allHaveCitationContract) failures.push("CITATION_CONTRACT_VIOLATION");
+    if (!allHaveLocation) failures.push("PROVENANCE_LOCATION_MISSING");
+    if (!versionMetadataPresent) failures.push("VERSION_METADATA_MISSING");
+    if (!cellCoordinatesPresent) failures.push("CELL_COORDINATES_MISSING");
+    if (!dedupSectionPreserved) failures.push("DEDUP_SECTION_COLLAPSE");
+
+    writeCertificationGateReport("indexing-storage-invariants", {
+      passed: failures.length === 0,
+      metrics: {
+        pdfChunkCount: pdfChunks.length,
+        xlsxChunkCount: xlsxChunks.length,
+        pdfSequential,
+        xlsxSequential,
+        allHaveCitationContract,
+        allHaveLocation,
+        versionMetadataPresent,
+        cellChunks: cellChunks.length,
+        cellCoordinatesPresent,
+        dedupSectionPreserved,
+      },
+      thresholds: {
+        minPdfChunkCount: 1,
+        minXlsxChunkCount: 1,
+        pdfSequential: true,
+        xlsxSequential: true,
+        allHaveCitationContract: true,
+        allHaveLocation: true,
+        versionMetadataPresent: true,
+        minCellChunks: 1,
+        cellCoordinatesPresent: true,
+        dedupSectionPreserved: true,
+      },
+      failures,
+    });
+
+    expect(failures).toEqual([]);
   });
 });

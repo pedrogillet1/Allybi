@@ -10,19 +10,53 @@ the expected write boundaries for HTTP routes.
 1. `npm run prisma:ci:policy:check` blocks forbidden CI commands:
    - `prisma db push`
    - `--accept-data-loss`
+   - `prisma migrate reset`
+   - `prisma migrate dev`
+   - `prisma db execute`
+   - including commands hidden inside workflow-invoked shell scripts (`.sh`/`.ps1`)
 2. `npm run prisma:replay:check` enforces env preflight before migration replay.
 3. `npm run prisma:deps:check` enforces version parity between `prisma` and
    `@prisma/client`.
-4. `npm run prisma:rls:verify` validates RLS posture for the active environment
+4. `npm run prisma:env:check` fails fast when `DATABASE_URL` /
+   `DIRECT_DATABASE_URL` still contain placeholder tokens.
+5. `npm run prisma:hygiene:check` blocks tracked DB artifacts and deprecated
+   Prisma SQLite dependency drift.
+6. `npm run prisma:migrations:lint` blocks new migration folders (post-baseline)
+   that contain sqlite-only tokens or destructive SQL unless explicitly waived.
+7. `npm run prisma:behavioral:cert` executes runtime fail-closed checks against a
+   real Postgres instance (missing table, RLS disabled, strict telemetry ambiguity).
+8. `npm run prisma:replay:cert` is the canonical end-to-end replay certification
+   gate and emits `reports/prisma/replay-cert.json`.
+9. `npm run prisma:rls:verify` validates RLS posture for the active environment
    profile (`PRISMA_RLS_PROFILE`; CI uses `ci`, prod/staging should use `prod`).
-5. `npm run prisma:telemetry:repair:audit` reports remaining ambiguous telemetry
+10. `npm run prisma:telemetry:repair:audit` reports remaining ambiguous telemetry
    cohorts after compensation and can fail with
    `PRISMA_TELEMETRY_AUDIT_FAIL_ON_AMBIGUOUS=1`.
-6. `npm run prisma:rls:seed-service-role` should run before replay in CI/local
+11. `npm run prisma:rls:seed-service-role` should run before replay in CI/local
    environments where RLS migrations depend on role presence.
-7. `.github/workflows/prisma-migration-replay.yml` is the canonical replay gate
-   and runs both soft (`ci`) and strict (`prod`) RLS verification profiles.
-8. CI exports telemetry audit evidence as `prisma-telemetry-audit` artifact.
+12. `.github/workflows/prisma-migration-replay.yml` is the canonical replay gate
+   and now runs on PR/push plus nightly schedule + `workflow_dispatch`.
+13. CI exports replay and telemetry artifacts:
+   - `prisma-replay-cert`
+   - `prisma-telemetry-audit`
+   - `prisma-telemetry-audit-behavioral`
+14. `npm run prisma:governance:gate` is the canonical reusable CI guard script
+   for non-replay workflows that still execute Prisma migrations/deploys:
+   - run `--phase pre-migrate` before `prisma migrate deploy`
+   - run `--phase post-migrate` after migration replay/deploy
+
+## Local Bootstrap
+
+1. `npm run prisma:dev:bootstrap` starts local Postgres via
+   `docker-compose.dev.yml`, provisions `.env.local`, and applies migrations.
+2. `npm run prisma:check` should pass after bootstrap with a real local DB URL.
+
+## Canonical Table Source
+
+1. `scripts/prisma/schema-table-manifest.cjs` is the canonical parser for
+   schema-mapped table names (`model` + optional `@@map`).
+2. `scripts/prisma/verify-rls.mjs` defaults to this manifest (unless
+   `PRISMA_RLS_TABLES` override is explicitly set).
 
 ## Route Write Boundary
 

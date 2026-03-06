@@ -1,14 +1,20 @@
 import { Prisma } from "@prisma/client";
 
 import prisma from "../../../config/database";
+import { logger } from "../../../utils/logger";
 import { DocumentCryptoService } from "../../documents/documentCrypto.service";
 import { DocumentKeyService } from "../../documents/documentKey.service";
 import { EmbeddingsService } from "../../retrieval/embedding.service";
 import { ChunkCryptoService } from "../../retrieval/chunkCrypto.service";
+import { resolveIndexingEncryptionPosture } from "../../retrieval/indexingPolicy.service";
 import pineconeService from "../../retrieval/pinecone.service";
 import { EncryptionService } from "../../security/encryption.service";
 import { EnvelopeService } from "../../security/envelope.service";
 import { TenantKeyService } from "../../security/tenantKey.service";
+import {
+  recordRetrievalEncryptedFallbackBlocked,
+  recordRetrievalRelatedExpansion,
+} from "../../ingestion/pipeline/pipelineMetrics.service";
 import type {
   ChunkLocation,
   DocMeta,
@@ -24,6 +30,20 @@ const READY_DOCUMENT_STATUSES = [
   "available",
   "completed",
 ] as const;
+
+const DEFAULT_RELATED_DOC_RELATIONSHIP_TYPES = [
+  "amends",
+  "supersedes",
+  "restates",
+  "extends",
+  "terminates",
+  "attachment",
+  "attached_to",
+  "references",
+  "related",
+] as const;
+
+const DEFAULT_RELATED_DOC_MAX_DOCS = 64;
 
 type SearchMode = "semantic" | "lexical" | "structural";
 
@@ -173,6 +193,29 @@ function uniq(values: string[]): string[] {
     out.push(normalized);
   }
   return out;
+}
+
+function parseCsvList(rawValue: unknown): string[] {
+  return uniq(
+    String(rawValue || "")
+      .split(",")
+      .map((item) => item.trim().toLowerCase())
+      .filter(Boolean),
+  );
+}
+
+function resolveRelatedDocExpansionRelationshipTypes(): string[] | null {
+  const configured = parseCsvList(
+    process.env.RETRIEVAL_RELATED_DOC_RELATIONSHIP_TYPES,
+  );
+  const values =
+    configured.length > 0
+      ? configured
+      : [...DEFAULT_RELATED_DOC_RELATIONSHIP_TYPES];
+  if (values.some((value) => value === "*" || value === "all" || value === "any")) {
+    return null;
+  }
+  return values;
 }
 
 function rootDocumentIdFor(doc: {
@@ -458,19 +501,37 @@ class PrismaRetrievalUserAdapter
     return isRuntimeFlagEnabled("RETRIEVAL_INCLUDE_RELATED_DOCS_STRICT", false);
   }
 
+  private isEncryptedChunkRuntime(): boolean {
+    return resolveIndexingEncryptionPosture().encryptedChunksOnly;
+  }
+
+  private relatedDocExpansionMaxDocs(): number {
+    return Math.max(
+      1,
+      toSafeInt(
+        process.env.RETRIEVAL_RELATED_DOC_MAX_DOCS,
+        DEFAULT_RELATED_DOC_MAX_DOCS,
+      ),
+    );
+  }
+
   private async expandWithRelatedDocIds(docIds: string[]): Promise<string[]> {
     const seed = uniq(docIds);
     if (!seed.length || !this.isRelatedDocExpansionEnabled()) return seed;
     try {
+      const relationshipTypes = resolveRelatedDocExpansionRelationshipTypes();
+      const linkWhere: Prisma.DocumentLinkWhereInput = {
+        status: "active",
+        OR: [
+          { sourceDocumentId: { in: seed } },
+          { targetDocumentId: { in: seed } },
+        ],
+      };
+      if (relationshipTypes && relationshipTypes.length > 0) {
+        linkWhere.relationshipType = { in: relationshipTypes };
+      }
       const linksRaw = await prisma.documentLink.findMany({
-        where: {
-          status: "active",
-          relationshipType: { in: ["amends", "supersedes", "restates", "extends"] },
-          OR: [
-            { sourceDocumentId: { in: seed } },
-            { targetDocumentId: { in: seed } },
-          ],
-        },
+        where: linkWhere,
         select: {
           sourceDocumentId: true,
           targetDocumentId: true,
@@ -492,14 +553,54 @@ class PrismaRetrievalUserAdapter
         select: { id: true },
       });
       const allowedDocs = Array.isArray(allowedDocsRaw) ? allowedDocsRaw : [];
-      return uniq(allowedDocs.map((doc) => String(doc.id || "").trim()));
+      const allowedIds = uniq(
+        allowedDocs
+          .map((doc) => String(doc.id || "").trim())
+          .filter(Boolean)
+          .sort((a, b) => a.localeCompare(b)),
+      );
+      const allowedSet = new Set(allowedIds);
+      const orderedSeed = seed.filter((docId) => allowedSet.has(docId));
+      const extras = allowedIds.filter((docId) => !seed.includes(docId));
+      const merged = [...orderedSeed, ...extras];
+      const maxDocs = this.relatedDocExpansionMaxDocs();
+      const bounded = merged.slice(0, maxDocs);
+      const truncatedCount = Math.max(0, merged.length - bounded.length);
+      if (truncatedCount > 0) {
+        logger.warn("[retrieval] related-doc expansion truncated", {
+          userId: this.userId,
+          seedCount: seed.length,
+          expandedCount: merged.length,
+          returnedCount: bounded.length,
+          truncatedCount,
+          maxDocs,
+        });
+      }
+      recordRetrievalRelatedExpansion({
+        seedCount: seed.length,
+        expandedCount: merged.length,
+        returnedCount: bounded.length,
+        truncatedCount,
+      });
+      return bounded;
     } catch (error: any) {
+      recordRetrievalRelatedExpansion({
+        seedCount: seed.length,
+        expandedCount: seed.length,
+        returnedCount: seed.length,
+        failed: true,
+      });
       if (this.isRelatedDocExpansionStrictEnabled()) {
         const message = String(error?.message || error || "unknown_error");
         throw new Error(
           `[retrieval] related document expansion failed: ${message}`,
         );
       }
+      logger.warn("[retrieval] related-doc expansion degraded to seed set", {
+        userId: this.userId,
+        seedCount: seed.length,
+        error: String(error?.message || error || "unknown_error"),
+      });
       return seed;
     }
   }
@@ -901,7 +1002,10 @@ class PrismaRetrievalUserAdapter
         sourceRow,
         metadataByChunkId.get(sourceRow.id),
       ) as ChunkWithDocument;
-      const snippet = toSnippet(plaintextByChunkId.get(row.id) ?? row.text);
+      const snippet = toSnippet(
+        plaintextByChunkId.get(row.id) ??
+          (this.isEncryptedChunkRuntime() ? null : row.text),
+      );
       if (!snippet) continue;
 
       const score = scoreChunkText(snippet, query, tokens, input.mode);
@@ -1008,7 +1112,8 @@ class PrismaRetrievalUserAdapter
           const count = backfillPerDoc.get(row.documentId) ?? 0;
           if (count >= perDocLimit) continue;
           const snippet = toSnippet(
-            fallbackPlaintextByChunkId.get(row.id) ?? row.text,
+            fallbackPlaintextByChunkId.get(row.id) ??
+              (this.isEncryptedChunkRuntime() ? null : row.text),
           );
           if (!snippet) continue;
           backfillPerDoc.set(row.documentId, count + 1);
@@ -1157,7 +1262,10 @@ class PrismaRetrievalUserAdapter
         sourceRow,
         metadataByChunkId.get(sourceRow.id),
       ) as ChunkWithDocument;
-      const snippet = toSnippet(plaintextByChunkId.get(row.id) ?? row.text);
+      const snippet = toSnippet(
+        plaintextByChunkId.get(row.id) ??
+          (this.isEncryptedChunkRuntime() ? null : row.text),
+      );
       if (!snippet) continue;
       const score = scoreChunkText(snippet, query, tokens, input.mode);
       if (score <= 0) continue;
@@ -1485,77 +1593,95 @@ class PrismaRetrievalUserAdapter
     row: ChunkRow,
     metadata: Record<string, unknown> | undefined,
   ): ChunkRow {
-    if (!metadata || Object.keys(metadata).length === 0) return row;
+    const baseRow = this.isEncryptedChunkRuntime()
+      ? this.redactSensitiveTableColumns(row)
+      : row;
+    if (!metadata || Object.keys(metadata).length === 0) return baseRow;
     const mergedMetadata = {
-      ...(row.metadata && typeof row.metadata === "object" ? row.metadata : {}),
+      ...(baseRow.metadata && typeof baseRow.metadata === "object"
+        ? baseRow.metadata
+        : {}),
       ...metadata,
     };
     return {
-      ...row,
+      ...baseRow,
       metadata: mergedMetadata,
       page:
-        row.page ??
+        baseRow.page ??
         parseNullableInt((mergedMetadata as Record<string, unknown>).pageNumber),
       sectionId:
-        row.sectionId ??
+        baseRow.sectionId ??
         parseNullableString(
           (mergedMetadata as Record<string, unknown>).sectionId,
         ),
       sectionName:
-        row.sectionName ??
+        baseRow.sectionName ??
         parseNullableString(
           (mergedMetadata as Record<string, unknown>).sectionName,
         ),
       sheetName:
-        row.sheetName ??
+        baseRow.sheetName ??
         parseNullableString(
           (mergedMetadata as Record<string, unknown>).sheetName,
         ),
       tableChunkForm:
-        row.tableChunkForm ??
+        baseRow.tableChunkForm ??
         parseNullableString(
           (mergedMetadata as Record<string, unknown>).tableChunkForm,
         ),
       tableId:
-        row.tableId ??
+        baseRow.tableId ??
         parseNullableString((mergedMetadata as Record<string, unknown>).tableId),
       rowLabel:
-        row.rowLabel ??
+        baseRow.rowLabel ??
         parseNullableString(
           (mergedMetadata as Record<string, unknown>).rowLabel,
         ),
       colHeader:
-        row.colHeader ??
+        baseRow.colHeader ??
         parseNullableString(
           (mergedMetadata as Record<string, unknown>).colHeader,
         ),
       valueRaw:
-        row.valueRaw ??
+        baseRow.valueRaw ??
         parseNullableString(
           (mergedMetadata as Record<string, unknown>).valueRaw,
         ),
       unitRaw:
-        row.unitRaw ??
+        baseRow.unitRaw ??
         parseNullableString((mergedMetadata as Record<string, unknown>).unitRaw),
       unitNormalized:
-        row.unitNormalized ??
+        baseRow.unitNormalized ??
         parseNullableString(
           (mergedMetadata as Record<string, unknown>).unitNormalized,
         ),
       numericValue:
-        row.numericValue ??
+        baseRow.numericValue ??
         parseNullableNumber(
           (mergedMetadata as Record<string, unknown>).numericValue,
         ),
       scaleRaw:
-        row.scaleRaw ??
+        baseRow.scaleRaw ??
         parseNullableString((mergedMetadata as Record<string, unknown>).scaleRaw),
       scaleMultiplier:
-        row.scaleMultiplier ??
+        baseRow.scaleMultiplier ??
         parseNullableNumber(
           (mergedMetadata as Record<string, unknown>).scaleMultiplier,
         ),
     };
+  }
+
+  private redactSensitiveTableColumns<T extends ChunkRow>(row: T): T {
+    if (!row) return row;
+    return {
+      ...row,
+      rowLabel: null,
+      colHeader: null,
+      valueRaw: null,
+      unitRaw: null,
+      unitNormalized: null,
+      numericValue: null,
+    } as T;
   }
 
   private buildTablePayloadFromChunkRow(
@@ -1585,19 +1711,27 @@ class PrismaRetrievalUserAdapter
   ): Promise<Map<string, string>> {
     const out = new Map<string, string>();
     if (!rows.length) return out;
+    const encryptedRuntime = this.isEncryptedChunkRuntime();
+    let blockedPlaintextFallbacks = 0;
 
     const toDecryptByDoc = new Map<string, string[]>();
     for (const row of rows) {
-      const plain = String(row.text || "").trim();
-      if (plain) {
-        out.set(row.id, plain);
+      const encrypted = String(row.textEncrypted || "").trim();
+      if (encrypted) {
+        const list = toDecryptByDoc.get(row.documentId) || [];
+        list.push(row.id);
+        toDecryptByDoc.set(row.documentId, list);
         continue;
       }
-      const encrypted = String(row.textEncrypted || "").trim();
-      if (!encrypted) continue;
-      const list = toDecryptByDoc.get(row.documentId) || [];
-      list.push(row.id);
-      toDecryptByDoc.set(row.documentId, list);
+      const plain = String(row.text || "").trim();
+      if (encryptedRuntime) {
+        if (plain) blockedPlaintextFallbacks += 1;
+        continue;
+      }
+      if (plain) out.set(row.id, plain);
+    }
+    if (blockedPlaintextFallbacks > 0) {
+      recordRetrievalEncryptedFallbackBlocked(blockedPlaintextFallbacks);
     }
     if (toDecryptByDoc.size === 0) return out;
 
@@ -1632,13 +1766,22 @@ class PrismaRetrievalUserAdapter
   ): Promise<Map<string, Record<string, unknown>>> {
     const out = new Map<string, Record<string, unknown>>();
     if (!rows.length) return out;
+    const encryptedRuntime = this.isEncryptedChunkRuntime();
 
     const toDecryptByDoc = new Map<string, string[]>();
     for (const row of rows) {
-      if (row.metadata && typeof row.metadata === "object" && !Array.isArray(row.metadata)) {
-        out.set(row.id, row.metadata);
-      }
       const encrypted = String(row.metadataEncrypted || "").trim();
+      const rowMetadata =
+        row.metadata &&
+        typeof row.metadata === "object" &&
+        !Array.isArray(row.metadata)
+          ? (row.metadata as Record<string, unknown>)
+          : null;
+      if (rowMetadata) {
+        if (!encryptedRuntime) {
+          out.set(row.id, rowMetadata);
+        }
+      }
       if (!encrypted) continue;
       const list = toDecryptByDoc.get(row.documentId) || [];
       list.push(row.id);
@@ -1739,7 +1882,10 @@ class PrismaRetrievalUserAdapter
       { chunkId: string; text: string; page: number | null }
     >();
     for (const row of rows) {
-      const snippet = toSnippet(plaintextByChunkId.get(row.id) ?? row.text);
+      const snippet = toSnippet(
+        plaintextByChunkId.get(row.id) ??
+          (this.isEncryptedChunkRuntime() ? null : row.text),
+      );
       if (!snippet) continue;
       const key = `${row.documentId}:${row.chunkIndex}`;
       if (!out.has(key)) {

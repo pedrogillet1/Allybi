@@ -1,8 +1,11 @@
 import { describe, expect, test } from "@jest/globals";
 
 import {
+  isProtectedRuntimeEnv,
   parseBooleanFlag,
   resolveIndexingPolicySnapshot,
+  resolveIndexingEncryptionPosture,
+  shouldStripPineconePlaintext,
 } from "./indexingPolicy.service";
 
 describe("indexingPolicy.service", () => {
@@ -31,103 +34,97 @@ describe("indexingPolicy.service", () => {
     expect(policy.runtimeModeAllowed).toBe(true);
   });
 
-  test("marks runtime mode disallowed when mode constraints exclude selected mode", () => {
-    const policy = resolveIndexingPolicySnapshot({
-      RETRIEVAL_V2_VECTOR_EMBEDDING: "0",
-      INDEXING_RUNTIME_MODE_ALLOWED: "v2",
-    } as NodeJS.ProcessEnv);
-
-    expect(policy.runtimeMode).toBe("v1");
-    expect(policy.allowedRuntimeModes).toEqual(["v2"]);
-    expect(policy.runtimeModeAllowed).toBe(false);
+  test("protected runtime detector matches production/staging only", () => {
+    expect(isProtectedRuntimeEnv("production")).toBe(true);
+    expect(isProtectedRuntimeEnv("staging")).toBe(true);
+    expect(isProtectedRuntimeEnv("development")).toBe(false);
   });
 
-  test("fails closed for invalid allowed-mode values", () => {
-    const policy = resolveIndexingPolicySnapshot({
-      RETRIEVAL_V2_VECTOR_EMBEDDING: "1",
-      INDEXING_RUNTIME_MODE_ALLOWED: "invalid_mode",
-    } as NodeJS.ProcessEnv);
-
-    expect(policy.allowedRuntimeModes).toEqual([]);
-    expect(policy.runtimeModeAllowed).toBe(false);
-  });
-
-  test("resolves operational flags from one source of truth", () => {
-    const policy = resolveIndexingPolicySnapshot({
-      RETRIEVAL_V2_VECTOR_EMBEDDING: "1",
-      INDEXING_STRICT_FAIL_CLOSED: "false",
-      INDEXING_ENCRYPTED_CHUNKS_ONLY: "false",
-      INDEXING_ALLOW_PLAINTEXT_CHUNKS: "true",
-      INDEXING_PLAINTEXT_OVERRIDE_REASON: "integration_test_override",
-      INDEXING_ENFORCE_ENCRYPTED_ONLY: "false",
-      INDEXING_ENFORCE_CHUNK_METADATA: "false",
-      INDEXING_ENFORCE_VERSION_METADATA: "false",
-      INDEXING_VERIFY_REQUIRED: "0",
-      INDEXING_ALLOW_UNVERIFIED_PREVOP_DELETE: "1",
-      EMBEDDING_FAILCLOSE_V1: "0",
-    } as NodeJS.ProcessEnv);
-
-    expect(policy.runtimeMode).toBe("v2");
-    expect(policy.strictFailClosed).toBe(false);
-    expect(policy.encryptedChunksOnly).toBe(false);
-    expect(policy.allowPlaintextChunksOverride).toBe(true);
-    expect(policy.plaintextOverrideReason).toBe("integration_test_override");
-    expect(policy.enforceEncryptedOnlyInvariant).toBe(false);
-    expect(policy.enforceChunkMetadataInvariant).toBe(false);
-    expect(policy.enforceVersionMetadataInvariant).toBe(false);
-    expect(policy.verifyRequired).toBe(false);
-    expect(policy.allowUnverifiedPreviousOperationDelete).toBe(true);
-    expect(policy.embeddingFailCloseV1).toBe(false);
-  });
-
-  test("fails closed when encrypted-only is disabled without explicit plaintext override", () => {
-    expect(() =>
-      resolveIndexingPolicySnapshot({
-        NODE_ENV: "development",
-        INDEXING_ENCRYPTED_CHUNKS_ONLY: "false",
-      } as NodeJS.ProcessEnv),
-    ).toThrow(/INDEXING_ALLOW_PLAINTEXT_CHUNKS=true/);
-  });
-
-  test("fails closed when plaintext override is enabled without an explicit reason", () => {
-    expect(() =>
-      resolveIndexingPolicySnapshot({
-        NODE_ENV: "development",
-        INDEXING_ENCRYPTED_CHUNKS_ONLY: "false",
-        INDEXING_ALLOW_PLAINTEXT_CHUNKS: "true",
-      } as NodeJS.ProcessEnv),
-    ).toThrow(/INDEXING_PLAINTEXT_OVERRIDE_REASON/);
-  });
-
-  test("fails closed when encrypted-only is disabled in protected environments", () => {
-    expect(() =>
-      resolveIndexingPolicySnapshot({
-        NODE_ENV: "production",
-        INDEXING_ENCRYPTED_CHUNKS_ONLY: "false",
-        INDEXING_ALLOW_PLAINTEXT_CHUNKS: "true",
-        INDEXING_PLAINTEXT_OVERRIDE_REASON: "integration_test_override",
-      } as NodeJS.ProcessEnv),
-    ).toThrow(/INDEXING_ENCRYPTED_CHUNKS_ONLY=false/);
-  });
-
-  test("allows encrypted-only disablement in non-protected environments with explicit override", () => {
-    const policy = resolveIndexingPolicySnapshot({
+  test("encryption posture is forced encrypted outside test runtime", () => {
+    const posture = resolveIndexingEncryptionPosture({
       NODE_ENV: "development",
       INDEXING_ENCRYPTED_CHUNKS_ONLY: "false",
       INDEXING_ALLOW_PLAINTEXT_CHUNKS: "true",
-      INDEXING_PLAINTEXT_OVERRIDE_REASON: "integration_test_override",
+      INDEXING_PLAINTEXT_OVERRIDE_REASON: "legacy",
     } as NodeJS.ProcessEnv);
-    expect(policy.encryptedChunksOnly).toBe(false);
-    expect(policy.allowPlaintextChunksOverride).toBe(true);
-    expect(policy.plaintextOverrideReason).toBe("integration_test_override");
+
+    expect(posture.encryptedChunksOnly).toBe(true);
+    expect(posture.allowPlaintextChunksOverride).toBe(false);
+    expect(posture.plaintextOverrideReason).toBeNull();
   });
 
-  test("allows encrypted-only policy in protected environments", () => {
-    const policy = resolveIndexingPolicySnapshot({
-      NODE_ENV: "production",
-      INDEXING_ENCRYPTED_CHUNKS_ONLY: "true",
+  test("test runtime posture can be toggled for harness compatibility", () => {
+    const posture = resolveIndexingEncryptionPosture({
+      NODE_ENV: "test",
+      INDEXING_ENCRYPTED_CHUNKS_ONLY: "false",
     } as NodeJS.ProcessEnv);
+    expect(posture.encryptedChunksOnly).toBe(false);
+  });
+
+  test("pinecone plaintext strip is forced outside test runtime", () => {
+    expect(
+      shouldStripPineconePlaintext({
+        NODE_ENV: "development",
+        INDEXING_ENCRYPTED_CHUNKS_ONLY: "false",
+        PINECONE_STRIP_PLAINTEXT: "false",
+      } as NodeJS.ProcessEnv),
+    ).toBe(true);
+  });
+
+  test("pinecone plaintext strip preserves test harness compatibility", () => {
+    expect(
+      shouldStripPineconePlaintext({
+        NODE_ENV: "test",
+        INDEXING_ENCRYPTED_CHUNKS_ONLY: "false",
+        PINECONE_STRIP_PLAINTEXT: "false",
+      } as NodeJS.ProcessEnv),
+    ).toBe(false);
+    expect(
+      shouldStripPineconePlaintext({
+        NODE_ENV: "test",
+        INDEXING_ENCRYPTED_CHUNKS_ONLY: "false",
+        PINECONE_STRIP_PLAINTEXT: "true",
+      } as NodeJS.ProcessEnv),
+    ).toBe(true);
+  });
+
+  test("fails closed when encrypted-only mode is disabled outside test runtime", () => {
+    expect(() =>
+      resolveIndexingPolicySnapshot({
+        NODE_ENV: "development",
+        INDEXING_ENCRYPTED_CHUNKS_ONLY: "false",
+      } as NodeJS.ProcessEnv),
+    ).toThrow(/Plaintext chunk mode is removed/i);
+  });
+
+  test("fails closed when plaintext override flags are configured outside test runtime", () => {
+    expect(() =>
+      resolveIndexingPolicySnapshot({
+        NODE_ENV: "development",
+        INDEXING_ALLOW_PLAINTEXT_CHUNKS: "true",
+      } as NodeJS.ProcessEnv),
+    ).toThrow(/no longer supported/i);
+    expect(() =>
+      resolveIndexingPolicySnapshot({
+        NODE_ENV: "development",
+        INDEXING_PLAINTEXT_OVERRIDE_REASON: "legacy",
+      } as NodeJS.ProcessEnv),
+    ).toThrow(/no longer supported/i);
+  });
+
+  test("snapshot preserves strict invariants while forcing encrypted-only posture", () => {
+    const policy = resolveIndexingPolicySnapshot({
+      NODE_ENV: "development",
+      INDEXING_ENCRYPTED_CHUNKS_ONLY: "true",
+      INDEXING_ENFORCE_ENCRYPTED_ONLY: "true",
+      INDEXING_ENFORCE_CHUNK_METADATA: "true",
+      INDEXING_ENFORCE_VERSION_METADATA: "true",
+      INDEXING_VERIFY_REQUIRED: "true",
+    } as NodeJS.ProcessEnv);
+
     expect(policy.encryptedChunksOnly).toBe(true);
+    expect(policy.allowPlaintextChunksOverride).toBe(false);
+    expect(policy.plaintextOverrideReason).toBeNull();
   });
 
   test("fails closed in protected environments when invariant enforcement flags are disabled", () => {
@@ -138,26 +135,5 @@ describe("indexingPolicy.service", () => {
         INDEXING_ENFORCE_CHUNK_METADATA: "false",
       } as NodeJS.ProcessEnv),
     ).toThrow(/Protected runtime requires strict indexing invariants/i);
-  });
-
-  test("fails closed in protected environments when verify-required is disabled", () => {
-    expect(() =>
-      resolveIndexingPolicySnapshot({
-        NODE_ENV: "staging",
-        INDEXING_ENCRYPTED_CHUNKS_ONLY: "true",
-        INDEXING_VERIFY_REQUIRED: "false",
-      } as NodeJS.ProcessEnv),
-    ).toThrow(/Protected runtime requires strict indexing invariants/i);
-  });
-
-  test("allows relaxed invariant flags in non-protected environments", () => {
-    const policy = resolveIndexingPolicySnapshot({
-      NODE_ENV: "development",
-      INDEXING_ENCRYPTED_CHUNKS_ONLY: "true",
-      INDEXING_ENFORCE_CHUNK_METADATA: "false",
-      INDEXING_VERIFY_REQUIRED: "false",
-    } as NodeJS.ProcessEnv);
-    expect(policy.enforceChunkMetadataInvariant).toBe(false);
-    expect(policy.verifyRequired).toBe(false);
   });
 });

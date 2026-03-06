@@ -1,5 +1,7 @@
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const schemaTableManifest = require("../../scripts/prisma/schema-table-manifest.cjs");
 
 describe("Prisma migration integrity guards", () => {
   const root = process.cwd();
@@ -121,8 +123,12 @@ describe("Prisma migration integrity guards", () => {
     expect(script).toContain("policy-core.cjs");
     expect(policyCore).toContain("forbiddenPatterns");
     expect(policyCore).toContain("runScriptPatterns");
+    expect(policyCore).toContain("shellScriptRunPatterns");
     expect(policyCore).toContain("prisma db push");
     expect(policyCore).toContain("--accept-data-loss");
+    expect(policyCore).toContain("prisma migrate reset");
+    expect(policyCore).toContain("prisma migrate dev");
+    expect(policyCore).toContain("prisma db execute");
   });
 
   test("replay check fails fast on placeholder database URLs", () => {
@@ -301,14 +307,37 @@ describe("Prisma migration integrity guards", () => {
     expect(runbook).toContain("auth.routes.ts");
     expect(runbook).toContain("admin-analytics.routes.ts");
     expect(runbook).toContain("PRISMA_RLS_PROFILE");
+    expect(runbook).toContain("prisma:governance:gate");
   });
 
   test("package scripts include prisma dependency parity + rls verification checks", () => {
     const pkg = readFileSync(join(root, "package.json"), "utf8");
+    const governanceGate = readFileSync(
+      join(root, "scripts", "prisma", "run-governance-gate.mjs"),
+      "utf8",
+    );
+    const envCheck = readFileSync(
+      join(root, "scripts", "prisma", "check-local-db-env.mjs"),
+      "utf8",
+    );
     expect(pkg).toContain('"prisma:deps:check"');
+    expect(pkg).toContain('"prisma:env:check"');
+    expect(pkg).toContain('"prisma:governance:gate"');
+    expect(pkg).toContain('"prisma:hygiene:check"');
+    expect(pkg).toContain('"prisma:migrations:lint"');
+    expect(pkg).toContain('"prisma:behavioral:cert"');
+    expect(pkg).toContain('"prisma:replay:cert"');
+    expect(pkg).toContain('"prisma:dev:bootstrap"');
     expect(pkg).toContain('"prisma:rls:verify"');
     expect(pkg).toContain('"prisma:rls:seed-service-role"');
     expect(pkg).toContain('"prisma:telemetry:repair:audit"');
+    expect(envCheck).toContain("isPlaceholderDatabaseUrl");
+    expect(envCheck).toContain("[prisma:env:check]");
+    expect(governanceGate).toContain("--skip-hygiene");
+    expect(governanceGate).toContain("--skip-migration-lint");
+    expect(governanceGate).toContain("--phase");
+    expect(governanceGate).toContain("pre-migrate");
+    expect(governanceGate).toContain("post-migrate");
   });
 
   test("rls verification core supports profile + override enforcement", () => {
@@ -337,18 +366,71 @@ describe("Prisma migration integrity guards", () => {
       join(root, "..", ".github", "workflows", "prisma-migration-replay.yml"),
       "utf8",
     );
-    expect(workflow).toContain('PRISMA_RLS_PROFILE: "ci"');
-    expect(workflow).toContain('PRISMA_RLS_PROFILE: "prod"');
-    expect(workflow).toContain("prisma:rls:seed-service-role");
-    expect(workflow).toContain("PRISMA_TELEMETRY_AUDIT_FAIL_ON_AMBIGUOUS: \"1\"");
+    expect(workflow).toContain("workflow_dispatch:");
+    expect(workflow).toContain("schedule:");
+    expect(workflow).toContain("prisma:replay:cert");
+    expect(workflow).toContain("PRISMA_REPLAY_CERT_OUT:");
     expect(workflow).toContain("PRISMA_TELEMETRY_AUDIT_OUT:");
     expect(workflow).toContain("actions/upload-artifact@v4");
+    expect(workflow).toContain("prisma-replay-cert");
+    expect(workflow).toContain("prisma-telemetry-audit-behavioral");
+  });
 
-    const replayIndex = workflow.indexOf("npm run prisma:replay:check");
-    const seedIndex = workflow.indexOf("npm run prisma:rls:seed-service-role");
-    expect(replayIndex).toBeGreaterThan(-1);
-    expect(seedIndex).toBeGreaterThan(-1);
-    expect(seedIndex).toBeLessThan(replayIndex);
+  test("replay certification script persists report and runs behavioral gate", () => {
+    const script = readFileSync(
+      join(root, "scripts", "prisma", "run-replay-certification.mjs"),
+      "utf8",
+    );
+    expect(script).toContain("reports/prisma/replay-cert.json");
+    expect(script).toContain("prisma:behavioral:cert");
+    expect(script).toContain("prisma:migrations:lint");
+    expect(script).toContain('COUNT(*)::int AS total FROM "_prisma_migrations"');
+  });
+
+  test("behavioral gate script asserts fail-closed and telemetry ambiguity", () => {
+    const script = readFileSync(
+      join(root, "scripts", "prisma", "run-behavioral-gates.mjs"),
+      "utf8",
+    );
+    expect(script).toContain("required tables are missing");
+    expect(script).toContain("rls_not_enabled");
+    expect(script).toContain("PRISMA_TELEMETRY_AUDIT_FAIL_ON_AMBIGUOUS");
+    expect(script).toContain('INSERT INTO "query_telemetry"');
+  });
+
+  test("migration safety lint configuration exists with explicit baseline", () => {
+    const script = readFileSync(
+      join(root, "scripts", "prisma", "lint-migration-safety.mjs"),
+      "utf8",
+    );
+    const waivers = readFileSync(
+      join(root, "scripts", "prisma", "migration-safety-waivers.json"),
+      "utf8",
+    );
+    expect(script).toContain("migration-safety-waivers.json");
+    expect(script).toContain("[prisma:migrations:lint]");
+    expect(waivers).toContain("baselineMigrationTimestamp");
+    expect(waivers).toContain("allowDestructiveMigrations");
+    expect(waivers).toContain("allowSqliteTokenMigrations");
+  });
+
+  test("upload visibility workflow runs pre+post prisma governance gate around migration deploy", () => {
+    const workflow = readFileSync(
+      join(root, "..", ".github", "workflows", "upload-visibility-guard.yml"),
+      "utf8",
+    );
+    expect(workflow).toContain("--phase pre-migrate");
+    expect(workflow).toContain("--phase post-migrate");
+    expect(workflow).toContain("prisma-telemetry-audit-upload-visibility");
+
+    const migrateIndex = workflow.indexOf("npx prisma migrate deploy");
+    const preGateIndex = workflow.indexOf("--phase pre-migrate");
+    const postGateIndex = workflow.indexOf("--phase post-migrate");
+    expect(migrateIndex).toBeGreaterThan(-1);
+    expect(preGateIndex).toBeGreaterThan(-1);
+    expect(postGateIndex).toBeGreaterThan(-1);
+    expect(preGateIndex).toBeLessThan(migrateIndex);
+    expect(postGateIndex).toBeGreaterThan(migrateIndex);
   });
 
   test("post-baseline migrations do not include sqlite-only tokens", () => {
@@ -391,6 +473,40 @@ describe("Prisma migration integrity guards", () => {
       ]),
     );
     expect(offenders).toEqual([]);
+  });
+
+  test("every schema-mapped table has migration coverage", () => {
+    const schemaTables = new Set<string>(
+      schemaTableManifest.loadSchemaMappedTables(
+        join(root, "prisma", "schema.prisma"),
+      ),
+    );
+
+    const migrationsRoot = join(root, "prisma", "migrations");
+    const sqlChunks: string[] = [];
+    for (const entry of readdirSync(migrationsRoot)) {
+      const migrationPath = join(migrationsRoot, entry, "migration.sql");
+      try {
+        sqlChunks.push(readFileSync(migrationPath, "utf8"));
+      } catch {
+        // Ignore folders without migration.sql
+      }
+    }
+    const corpus = sqlChunks.join("\n");
+    const missing: string[] = [];
+    for (const table of schemaTables) {
+      const escaped = table.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const mentionRegex = new RegExp(`["']${escaped}["']|\\b${escaped}\\b`);
+      if (!mentionRegex.test(corpus)) missing.push(table);
+    }
+
+    expect(missing).toEqual([]);
+  });
+
+  test("verify-rls default target source is schema table manifest", () => {
+    const verifyRls = readFileSync(join(root, "scripts", "prisma", "verify-rls.mjs"), "utf8");
+    expect(verifyRls).toContain("schema-table-manifest.cjs");
+    expect(verifyRls).toContain("loadSchemaMappedTables");
   });
 
   test("route files do not import config/database directly", () => {

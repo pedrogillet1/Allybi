@@ -104,12 +104,22 @@ const authService = {
     try {
       const response = await api.post('/api/auth/login', credentials);
 
-      // If 2FA is required, return that status
-      if (response.data.requires2FA) {
+      // Canonical backend shape: requiresTwoFactor + challengeToken.
+      // Keep legacy alias support for backward compatibility during migration.
+      const requiresTwoFactor = Boolean(
+        response.data.requiresTwoFactor || response.data.requires2FA
+      );
+      if (requiresTwoFactor) {
+        const challengeToken =
+          response.data.challengeToken || response.data.tempToken || null;
+        const user = response.data.user || null;
         return {
+          requiresTwoFactor: true,
           requires2FA: true,
-          userId: response.data.userId,
-          tempToken: response.data.tempToken,
+          userId: user?.id || response.data.userId || null,
+          challengeToken,
+          tempToken: challengeToken,
+          user,
         };
       }
 
@@ -127,12 +137,16 @@ const authService = {
 
   /**
    * Verify 2FA code during login
-   * @param {Object} data - { userId, token, tempToken }
+   * @param {Object} data - { token, challengeToken }
    * @returns {Promise<Object>} - User data with tokens
    */
   async verify2FALogin(data) {
     try {
-      const response = await api.post('/api/auth/2fa/verify-login', data);
+      const payload = {
+        ...data,
+        challengeToken: data?.challengeToken || data?.tempToken,
+      };
+      const response = await api.post('/api/auth/2fa/verify-login', payload);
 
       if (response.data.accessToken) {
         localStorage.setItem('user', JSON.stringify(response.data.user));

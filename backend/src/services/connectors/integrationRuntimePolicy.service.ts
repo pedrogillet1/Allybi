@@ -1,10 +1,11 @@
-import { createHash, createHmac, timingSafeEqual } from "crypto";
+import { createHash, createHmac, randomBytes, timingSafeEqual } from "crypto";
 
 export interface OAuthCompletionPayload {
   type: "koda_oauth_done";
   provider: string;
   ok: boolean;
   t: number;
+  n: string;
   sig: string | null;
 }
 
@@ -13,6 +14,7 @@ interface OAuthCompletionPayloadLike {
   provider?: unknown;
   ok?: unknown;
   t?: unknown;
+  n?: unknown;
   sig?: unknown;
 }
 
@@ -55,13 +57,30 @@ export function resolveOAuthPostMessageOrigin(): string | null {
 }
 
 function resolveOAuthSigningSecret(): string | null {
+  const callbackSecret = String(
+    process.env.CONNECTOR_OAUTH_CALLBACK_SECRET || "",
+  ).trim();
+  const strictRaw = String(
+    process.env.CONNECTOR_OAUTH_CALLBACK_STRICT_KEY || "",
+  ).trim().toLowerCase();
+  const strictMode =
+    strictRaw === "1" ||
+    strictRaw === "true" ||
+    strictRaw === "yes" ||
+    process.env.NODE_ENV === "production";
+  if (strictMode) return callbackSecret || null;
+
   const secret = String(
-    process.env.CONNECTOR_OAUTH_CALLBACK_SECRET ||
+    callbackSecret ||
       process.env.CONNECTOR_OAUTH_STATE_SECRET ||
       process.env.ENCRYPTION_KEY ||
       "",
   ).trim();
   return secret || null;
+}
+
+function buildCompletionNonce(): string {
+  return randomBytes(12).toString("base64url");
 }
 
 export function buildOAuthCompletionPayload(
@@ -75,12 +94,13 @@ export function buildOAuthCompletionPayload(
     provider: safeProvider,
     ok: Boolean(ok),
     t: nowMs,
+    n: buildCompletionNonce(),
     sig: null,
   };
   const secret = resolveOAuthSigningSecret();
   if (!secret) return payload;
 
-  const data = `${safeProvider}:${payload.ok ? "1" : "0"}:${nowMs}`;
+  const data = `${safeProvider}:${payload.ok ? "1" : "0"}:${nowMs}:${payload.n}`;
   payload.sig = createHmac("sha256", secret).update(data).digest("base64url");
   return payload;
 }
@@ -107,26 +127,30 @@ export function verifyOAuthCompletionPayload(
   const provider = String(record.provider || "").trim().toLowerCase();
   const ok = record.ok;
   const ts = Number(record.t);
+  const nonce = String(record.n || "").trim();
   const sig = String(record.sig || "").trim();
-  if (!provider || !Number.isFinite(ts) || !sig) return false;
+  if (!provider || !Number.isFinite(ts) || !nonce || !sig) return false;
   if (ok !== true && ok !== false) return false;
 
   const secret = resolveOAuthSigningSecret();
   // Fail closed: if signing secret is absent, callback payload authenticity cannot be verified.
   if (!secret) return false;
 
-  const maxAgeMsRaw = Number(process.env.CONNECTOR_OAUTH_CALLBACK_MAX_AGE_MS);
-  const maxAgeMs =
-    Number.isFinite(maxAgeMsRaw) && maxAgeMsRaw > 0
-      ? Math.min(Math.floor(maxAgeMsRaw), 15 * 60 * 1000)
-      : 5 * 60 * 1000;
+  const maxAgeMs = resolveOAuthCompletionMaxAgeMs();
   // Allow small positive clock skew while rejecting stale/implausible timestamps.
   if (ts > nowMs + 60_000) return false;
   if (nowMs - ts > maxAgeMs) return false;
 
-  const data = `${provider}:${ok ? "1" : "0"}:${ts}`;
+  const data = `${provider}:${ok ? "1" : "0"}:${ts}:${nonce}`;
   const expected = createHmac("sha256", secret).update(data).digest("base64url");
   return safeSignatureEqual(expected, sig);
+}
+
+export function resolveOAuthCompletionMaxAgeMs(): number {
+  const maxAgeMsRaw = Number(process.env.CONNECTOR_OAUTH_CALLBACK_MAX_AGE_MS);
+  return Number.isFinite(maxAgeMsRaw) && maxAgeMsRaw > 0
+    ? Math.min(Math.floor(maxAgeMsRaw), 15 * 60 * 1000)
+    : 5 * 60 * 1000;
 }
 
 export function normalizeIntegrationErrorMessage(error: unknown): string {

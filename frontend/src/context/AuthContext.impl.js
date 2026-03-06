@@ -167,7 +167,7 @@ export const AuthProvider = ({ children }) => {
       const response = await authService.login(credentials);
 
       // If 2FA is required, don't set user yet
-      if (response.requires2FA) {
+      if (response.requiresTwoFactor || response.requires2FA) {
         return response;
       }
 

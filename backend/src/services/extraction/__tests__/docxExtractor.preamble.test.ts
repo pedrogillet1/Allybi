@@ -307,4 +307,26 @@ describe("DOCX preamble text handling (pre-heading text)", () => {
     expect(preamble.heading).toBeUndefined();
     expect(preamble.content).toBe("Real preamble.");
   });
+
+  it("detects localized Portuguese heading style names", async () => {
+    const body = [makeP("Resumo Executivo", "Título1"), makeP("Conteúdo.")].join(
+      "\n",
+    );
+
+    const buf = buildDocx(body);
+    const result = await extractDocxWithAnchors(buf);
+
+    expect(result.headings.length).toBeGreaterThanOrEqual(1);
+    expect(result.headings[0].text).toBe("Resumo Executivo");
+    expect(result.headings[0].level).toBe(1);
+  });
+
+  it("detects Portuguese TOC heading keyword", async () => {
+    const body = [makeP("Sumário", "Heading1"), makeP("Item 1 ... 3")].join("\n");
+
+    const buf = buildDocx(body);
+    const result = await extractDocxWithAnchors(buf);
+
+    expect(result.hasToc).toBe(true);
+  });
 });

@@ -1,12 +1,12 @@
 {
   "_meta": {
     "id": "doc_type_confusion_matrix",
-    "version": "1.0.0",
+    "version": "1.2.0",
     "description": "Disambiguation rules for doc types that frequently confuse with each other across domains.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-03-04",
+    "lastUpdated": "2026-03-05",
     "owner": "data-bank-governance",
     "usedBy": [
       "services/core/banks/bankSelectionPlanner.service.ts"
@@ -83,6 +83,94 @@
       "winner": "ins_policy_document",
       "structureCue": "Contains coverage limits, exclusions, endorsements, and declarations page",
       "reason": "Insurance policy documents require specialized clause-level extraction."
+    },
+    {
+      "id": "CTM_009",
+      "docTypeA": "every_invoice",
+      "docTypeB": "billing_invoice_business",
+      "winner": "billing_invoice_business",
+      "structureCue": "Contains invoice number, payment terms, and business line-item tax breakdown",
+      "reason": "Billing invoice packs include stronger AP/AR extraction fields than generic everyday invoices."
+    },
+    {
+      "id": "CTM_010",
+      "docTypeA": "every_tax_return",
+      "docTypeB": "tax_individual_income_return",
+      "winner": "tax_individual_income_return",
+      "structureCue": "Contains taxpayer identifiers, filing period, and tax owed/refund summary",
+      "reason": "Tax-return schemas encode filing-specific sections and controlled numeric integrity rules."
+    },
+    {
+      "id": "CTM_011",
+      "docTypeA": "every_tax_notice",
+      "docTypeB": "tax_assessment_notice",
+      "winner": "tax_assessment_notice",
+      "structureCue": "Contains assessment reference, assessed amount, due date, and appeal instructions",
+      "reason": "Tax assessment notices require tax-domain-specific compliance and date resolution behavior."
+    },
+    {
+      "id": "CTM_012",
+      "docTypeA": "every_rent_receipt",
+      "docTypeB": "housing_rent_receipt",
+      "winner": "housing_rent_receipt",
+      "structureCue": "Contains rental period, unit/property address, and landlord/tenant payment ledger",
+      "reason": "Housing rent receipts provide tenancy-aware field extraction and section anchors."
+    },
+    {
+      "id": "CTM_013",
+      "docTypeA": "every_identity_document",
+      "docTypeB": "id_passport",
+      "winner": "id_passport",
+      "structureCue": "Contains passport number, issuing country, expiration, and MRZ-style identity fields",
+      "reason": "Identity passport schemas enforce identity-doc safety and field-level precision."
+    },
+    {
+      "id": "CTM_014",
+      "docTypeA": "every_identity_document",
+      "docTypeB": "id_driver_license",
+      "winner": "id_driver_license",
+      "structureCue": "Contains driver license number, issuing authority, class, and validity period",
+      "reason": "Driver-license specific structure should win over generic everyday identity cues when present."
+    },
+    {
+      "id": "CTM_015",
+      "docTypeA": "banking_bank_statement",
+      "docTypeB": "fin_bank_statement",
+      "winner": "banking_bank_statement",
+      "structureCue": "Contains routing number, account number mask, or debit/credit transaction ledger rows",
+      "reason": "Banking statements have account-ledger structure that should override finance portfolio-style statements."
+    },
+    {
+      "id": "CTM_016",
+      "docTypeA": "housing_property_tax_bill",
+      "docTypeB": "tax_property_tax_bill",
+      "winner": "tax_property_tax_bill",
+      "structureCue": "Contains tax authority assessment reference, levy code, or appeal/payment slip details",
+      "reason": "Tax-domain property tax bills provide stronger compliance-grade tax section semantics."
+    },
+    {
+      "id": "CTM_017",
+      "docTypeA": "every_insurance_claim",
+      "docTypeB": "legal_complaint",
+      "winner": "every_insurance_claim",
+      "structureCue": "Contains claim number, policy number, insurer adjuster fields, or adjudication status blocks",
+      "reason": "Insurance claim forms should win when claims workflow fields are present."
+    },
+    {
+      "id": "CTM_018",
+      "docTypeA": "acct_forecast_pack",
+      "docTypeB": "fin_forecast",
+      "winner": "fin_forecast",
+      "structureCue": "Contains guidance/forecast narrative with KPI outlook sections and investor-style summary tables",
+      "reason": "Finance forecast doc types should win when forward-looking KPI narrative is explicit."
+    },
+    {
+      "id": "CTM_019",
+      "docTypeA": "acct_variance_pack",
+      "docTypeB": "fin_variance",
+      "winner": "fin_variance",
+      "structureCue": "Contains variance commentary with KPI bridge, outlook, or management action narrative",
+      "reason": "Finance variance packs should win over accounting variance workpapers when narrative KPI framing exists."
     }
   ]
 }

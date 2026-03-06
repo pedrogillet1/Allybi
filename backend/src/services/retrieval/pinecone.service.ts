@@ -14,6 +14,7 @@ import {
   sanitizePineconeMetadata,
   toIsoString,
 } from "./pinecone/pinecone.metadata";
+import { shouldStripPineconePlaintext } from "./indexingPolicy.service";
 import { mapPineconeMatchesToHits } from "./pinecone/pinecone.mappers";
 import type {
   PineconeIndexClient,
@@ -197,8 +198,7 @@ export class PineconeService {
     // When PINECONE_STRIP_PLAINTEXT=true OR INDEXING_ENCRYPTED_CHUNKS_ONLY=true,
     // replace content with SHA-256 hash to avoid storing plaintext in Pinecone.
     // The retrieval layer hydrates from Postgres when content is missing.
-    const encryptedOnly = String(process.env.INDEXING_ENCRYPTED_CHUNKS_ONLY || "").trim().toLowerCase() === "true";
-    const stripPlaintext = encryptedOnly || String(process.env.PINECONE_STRIP_PLAINTEXT || "").trim().toLowerCase() === "true";
+    const stripPlaintext = shouldStripPineconePlaintext();
 
     for (const c of chunks) {
       if (!c.embedding || !this.hasNonZero(c.embedding)) {

@@ -360,9 +360,10 @@ function processTableLines(
   const rows: string[][] = lines.map((line) =>
     splitRowIntoCells(line, columnPositions),
   );
+  let workingRows = rows;
 
   // Validate: all rows should have similar column count
-  const columnCounts = rows.map((r) => r.length);
+  let columnCounts = workingRows.map((r) => r.length);
   const maxColumns = Math.max(...columnCounts);
   const minColumns = Math.min(...columnCounts);
 
@@ -380,10 +381,12 @@ function processTableLines(
           return b[0] - a[0];
         })[0]?.[0] || maxColumns;
 
-    const filteredRows = rows.filter((r) => Math.abs(r.length - mode) <= 1);
+    const filteredRows = workingRows.filter((r) => Math.abs(r.length - mode) <= 1);
     if (filteredRows.length < 2) {
       return null;
     }
+    workingRows = filteredRows;
+    columnCounts = workingRows.map((r) => r.length);
   }
 
   // Calculate confidence based on consistency
@@ -395,10 +398,10 @@ function processTableLines(
   const confidence = Math.max(0.5, 1 - columnVariance / avgColumns);
 
   // Generate markdown
-  const markdown = formatAsMarkdownTable(rows);
+  const markdown = formatAsMarkdownTable(workingRows);
 
   // Build structured rows with positional metadata
-  const structuredRows: StructuredRow[] = rows.map((row, rIdx) => ({
+  const structuredRows: StructuredRow[] = workingRows.map((row, rIdx) => ({
     rowIndex: rIdx,
     cells: row.map((text, cIdx) => ({ text, colIndex: cIdx })),
     isHeader: rIdx === 0,
@@ -407,7 +410,7 @@ function processTableLines(
   return {
     startLine,
     endLine,
-    rows,
+    rows: workingRows,
     structuredRows,
     markdown,
     confidence,

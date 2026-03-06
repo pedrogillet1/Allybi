@@ -28,6 +28,9 @@ interface BasePipelineTimings {
   embeddingMs: number;
   pageCount: number | null;
   peakRssMb?: number | null;
+  rssStartMb?: number | null;
+  rssEndMb?: number | null;
+  rssDeltaMb?: number | null;
   /** SHA256 of the raw file buffer, computed after download */
   fileHash?: string;
 }
@@ -71,6 +74,8 @@ export interface InputChunkMetadata {
     | "cell_centric";
   tableId?: string;
   tableMethod?: string;
+  tableConfidence?: number;
+  tableFallbackReason?: string;
   rowIndex?: number;
   columnIndex?: number;
   rowSpan?: number;

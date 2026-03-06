@@ -1,6 +1,7 @@
 import type { PrismaClient } from "@prisma/client";
 import { DocumentKeyService } from "../documents/documentKey.service";
 import { DocumentCryptoService } from "../documents/documentCrypto.service";
+import { resolveIndexingEncryptionPosture } from "./indexingPolicy.service";
 
 /**
  * Given a chunk row (with textEncrypted), return plaintext text for LLM context.
@@ -75,6 +76,8 @@ export class ChunkCryptoService {
     documentId: string,
     chunkIds: string[],
   ): Promise<Map<string, Record<string, unknown>>> {
+    const encryptedRuntime =
+      resolveIndexingEncryptionPosture().encryptedChunksOnly;
     const dk = await this.docKeys.getDocumentKey(userId, documentId);
     const chunks = await this.prisma.documentChunk.findMany({
       where: { id: { in: chunkIds }, documentId },
@@ -98,10 +101,20 @@ export class ChunkCryptoService {
             continue;
           }
         } catch {
-          // best effort decrypt; fallback to plaintext JSON below
+          if (encryptedRuntime) {
+            // In encrypted-only runtime, do not silently fall back to plaintext metadata.
+            continue;
+          }
         }
       }
-      if (chunk.metadata && typeof chunk.metadata === "object" && !Array.isArray(chunk.metadata)) {
+      if (
+        chunk.metadata &&
+        typeof chunk.metadata === "object" &&
+        !Array.isArray(chunk.metadata)
+      ) {
+        if (encryptedRuntime && chunk.metadataEncrypted) {
+          continue;
+        }
         result.set(chunk.id, chunk.metadata as Record<string, unknown>);
       }
     }

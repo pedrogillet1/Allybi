@@ -30,6 +30,13 @@ import { logger } from "../../utils/logger";
 
 /** Timeout (ms) for Document AI table extraction */
 const DOCUMENT_AI_TIMEOUT_MS = 5000;
+const DEFAULT_DOCUMENT_AI_TABLE_MIN_CONFIDENCE = 0.75;
+
+function resolveDocumentAiTableMinConfidence(): number {
+  const raw = Number(process.env.DOCUMENT_AI_TABLE_MIN_CONFIDENCE);
+  if (!Number.isFinite(raw)) return DEFAULT_DOCUMENT_AI_TABLE_MIN_CONFIDENCE;
+  return Math.max(0, Math.min(1, raw));
+}
 
 // ============================================================================
 // Constants
@@ -739,8 +746,9 @@ async function enhancePdfPagesWithTables(
 }> {
   const docAiTablesByPage = new Map<
     number,
-    { markdown: string[]; structured: StructuredTable[] }
+    { markdown: string[]; structured: StructuredTable[]; confidences: number[] }
   >();
+  const minDocAiTableConfidence = resolveDocumentAiTableMinConfidence();
   const warnings: string[] = [];
   if (process.env.DOCUMENT_AI_ENABLED === "true") {
     try {
@@ -752,10 +760,32 @@ async function enhancePdfPagesWithTables(
       ]);
 
       if (docAiResult && docAiResult.tableCount > 0) {
+        const confidenceByPage = new Map<number, Map<number, number>>();
+        for (const entry of docAiResult.tableConfidences || []) {
+          if (!confidenceByPage.has(entry.page)) {
+            confidenceByPage.set(entry.page, new Map());
+          }
+          confidenceByPage.get(entry.page)!.set(
+            entry.tableIndex,
+            Number(entry.confidence || 0),
+          );
+        }
+
         for (const entry of docAiResult.pages) {
+          const pageConfidenceMap = confidenceByPage.get(entry.page);
+          const tableCount = Math.max(
+            entry.tables?.length || 0,
+            entry.structuredTables?.length || 0,
+          );
+          const confidences: number[] = [];
+          for (let i = 0; i < tableCount; i += 1) {
+            const confidence = Number(pageConfidenceMap?.get(i) ?? 1);
+            confidences.push(confidence);
+          }
           docAiTablesByPage.set(entry.page, {
             markdown: entry.tables || [],
             structured: entry.structuredTables || [],
+            confidences,
           });
         }
 
@@ -780,44 +810,12 @@ async function enhancePdfPagesWithTables(
 
   const allExtractedTables: ExtractedTable[] = [];
   const tableIndexByPage = new Map<number, number>();
-  const enhancedPages = pages.map((page) => {
-    const pageNum = page.page ?? (page as any).pageNumber ?? 0;
-    const aiTables = docAiTablesByPage.get(pageNum);
-    const nextTableIndex = () => {
-      const current = tableIndexByPage.get(pageNum) || 0;
-      tableIndexByPage.set(pageNum, current + 1);
-      return current;
-    };
-
-    if (aiTables && aiTables.markdown.length > 0) {
-      for (const structuredTable of aiTables.structured) {
-        const rows = normalizeStructuredTableRows(structuredTable);
-        if (rows.length === 0) continue;
-        allExtractedTables.push({
-          tableId: `pdf:p${pageNum}:t${nextTableIndex()}`,
-          pageOrSlide: pageNum,
-          tableMethod: "document_ai",
-          markdown: structuredTable.markdown || "",
-          rows,
-        });
-      }
-
-      // Check if heuristic would also find tables (for duplication tracking)
-      try {
-        const heuristicCheck = extractTablesFromText(page.text);
-        if (heuristicCheck.tableCount > 0) {
-          recordTableDuplication();
-        }
-      } catch {
-        // best-effort duplication check
-      }
-
-      return {
-        ...page,
-        text: page.text + "\n\n" + aiTables.markdown.join("\n\n"),
-      };
-    }
-
+  const processHeuristicTables = (
+    page: PdfExtractedPage,
+    pageNum: number,
+    nextTableIndex: () => number,
+    fallbackReason?: string,
+  ): PdfExtractedPage => {
     try {
       const tableResult = extractTablesFromText(page.text);
       for (let tIdx = 0; tIdx < tableResult.tables.length; tIdx++) {
@@ -827,6 +825,7 @@ async function enhancePdfPagesWithTables(
             tableId: `pdf:p${pageNum}:t${nextTableIndex()}`,
             pageOrSlide: pageNum,
             tableMethod: "heuristic",
+            ...(fallbackReason ? { fallbackReason } : {}),
             markdown: t.markdown,
             rows: t.structuredRows,
           });
@@ -842,6 +841,84 @@ async function enhancePdfPagesWithTables(
       );
       return page;
     }
+  };
+
+  const enhancedPages = pages.map((page) => {
+    const pageNum = page.page ?? (page as any).pageNumber ?? 0;
+    const aiTables = docAiTablesByPage.get(pageNum);
+    const nextTableIndex = () => {
+      const current = tableIndexByPage.get(pageNum) || 0;
+      tableIndexByPage.set(pageNum, current + 1);
+      return current;
+    };
+
+    if (aiTables && (aiTables.markdown.length > 0 || aiTables.structured.length > 0)) {
+      const acceptedMarkdown: string[] = [];
+      let lowConfidenceRejected = 0;
+      let acceptedStructuredCount = 0;
+
+      for (let idx = 0; idx < aiTables.markdown.length; idx += 1) {
+        const confidence = Number(aiTables.confidences[idx] ?? 1);
+        if (confidence < minDocAiTableConfidence) {
+          lowConfidenceRejected += 1;
+          warnings.push(
+            `document_ai_table_low_confidence_page_${pageNum}_table_${idx}: ${confidence.toFixed(3)} < ${minDocAiTableConfidence.toFixed(3)}`,
+          );
+          continue;
+        }
+        acceptedMarkdown.push(aiTables.markdown[idx]);
+      }
+
+      for (let idx = 0; idx < aiTables.structured.length; idx += 1) {
+        const structuredTable = aiTables.structured[idx];
+        const confidence = Number(aiTables.confidences[idx] ?? 1);
+        if (confidence < minDocAiTableConfidence) continue;
+        const rows = normalizeStructuredTableRows(structuredTable);
+        if (rows.length === 0) continue;
+        allExtractedTables.push({
+          tableId: `pdf:p${pageNum}:t${nextTableIndex()}`,
+          pageOrSlide: pageNum,
+          tableMethod: "document_ai",
+          tableConfidence: confidence,
+          markdown: structuredTable.markdown || "",
+          rows,
+        });
+        acceptedStructuredCount += 1;
+      }
+
+      if (acceptedMarkdown.length === 0 && acceptedStructuredCount === 0) {
+        if (lowConfidenceRejected > 0) {
+          warnings.push(
+            `document_ai_page_${pageNum}_fallback_to_heuristic: all_${lowConfidenceRejected}_tables_below_confidence_threshold`,
+          );
+        }
+        return processHeuristicTables(
+          page,
+          pageNum,
+          nextTableIndex,
+          lowConfidenceRejected > 0
+            ? "document_ai_low_confidence"
+            : "document_ai_no_accepted_tables",
+        );
+      }
+
+      // Check if heuristic would also find tables (for duplication tracking)
+      try {
+        const heuristicCheck = extractTablesFromText(page.text);
+        if (heuristicCheck.tableCount > 0) {
+          recordTableDuplication();
+        }
+      } catch {
+        // best-effort duplication check
+      }
+
+      return {
+        ...page,
+        text: page.text + "\n\n" + acceptedMarkdown.join("\n\n"),
+      };
+    }
+
+    return processHeuristicTables(page, pageNum, nextTableIndex);
   });
 
   return {

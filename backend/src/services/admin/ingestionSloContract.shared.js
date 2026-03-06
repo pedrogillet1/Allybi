@@ -23,13 +23,22 @@ function toPositiveNumber(value) {
   return value;
 }
 
+function normalizeStatus(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function isIngestionFailureStatus(status) {
+  const normalized = normalizeStatus(status);
+  return normalized === "fail" || normalized === "queue_fail" || normalized.endsWith("_fail");
+}
+
 function summarizeIngestionSloEvents(events) {
   const durations = [];
   const rssSeries = [];
   const bucketMap = new Map();
 
   for (const event of events || []) {
-    const status = String(event?.status || "").trim().toLowerCase();
+    const status = normalizeStatus(event?.status);
     const mimeType = String(event?.mimeType || "unknown").trim().toLowerCase();
     const meta = asRecord(event?.meta);
     const sizeBucket =
@@ -46,7 +55,7 @@ function summarizeIngestionSloEvents(events) {
     }
     const bucket = bucketMap.get(key);
     bucket.count += 1;
-    if (status === "fail") bucket.failures += 1;
+    if (isIngestionFailureStatus(status)) bucket.failures += 1;
 
     if (typeof event?.durationMs === "number" && event.durationMs > 0) {
       bucket.latencies.push(event.durationMs);
@@ -191,6 +200,7 @@ function evaluateIngestionSloMetrics(metrics, thresholds) {
 }
 
 module.exports = {
+  isIngestionFailureStatus,
   summarizeIngestionSloEvents,
   evaluateIngestionSloMetrics,
 };

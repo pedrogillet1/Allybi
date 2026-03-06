@@ -18,6 +18,7 @@ export const ROUTES = {
   PHONE_NUMBER: '/a/n8q4w3',
   PHONE_NUMBER_PENDING: '/a/d6f9k1',
   VERIFICATION_PENDING: '/v/g4j7n5',
+  TWO_FACTOR_LOGIN: '/a/m2f7x9',
   VERIFY_RECOVERY_EMAIL: '/v/b8m3q6',
   VERIFY_RECOVERY_PHONE: '/v/w2k7f4',
 

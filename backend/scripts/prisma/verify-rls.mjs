@@ -2,29 +2,20 @@
 
 import { Client } from "pg";
 import verifyRlsCore from "./verify-rls-core.cjs";
-
-const DEFAULT_TABLES = [
-  "users",
-  "documents",
-  "document_chunks",
-  "document_metadata",
-  "conversations",
-  "messages",
-  "query_telemetry",
-  "retrieval_events",
-  "token_usage",
-  "ingestion_events",
-];
+import schemaTableManifest from "./schema-table-manifest.cjs";
 
 const { resolveProfile, resolveRequireServiceRole } = verifyRlsCore;
+const { loadSchemaMappedTables } = schemaTableManifest;
 
 function resolveTargetTables() {
   const raw = String(process.env.PRISMA_RLS_TABLES || "").trim();
-  if (!raw) return [...DEFAULT_TABLES];
-  return raw
-    .split(",")
-    .map((token) => token.trim())
-    .filter(Boolean);
+  const source = !raw
+    ? loadSchemaMappedTables()
+    : raw
+        .split(",")
+        .map((token) => token.trim())
+        .filter(Boolean);
+  return [...new Set(source)];
 }
 
 async function main() {
@@ -63,13 +54,19 @@ async function main() {
     const existing = new Set(
       (tablesRes.rows || []).map((row) => String(row.tablename || "")),
     );
-    const targets = requestedTables.filter((table) => existing.has(table));
-    if (!targets.length) {
-      console.log(
-        "[prisma:rls:verify] none of the configured target tables exist; nothing to verify.",
+
+    if (!requestedTables.length) {
+      throw new Error(
+        "[prisma:rls:verify] no target tables resolved. Configure PRISMA_RLS_TABLES or ensure prisma/schema.prisma defines mapped models.",
       );
-      return;
     }
+    const missingTables = requestedTables.filter((table) => !existing.has(table));
+    if (missingTables.length > 0) {
+      throw new Error(
+        `[prisma:rls:verify] required tables are missing from public schema:\n - ${missingTables.join("\n - ")}`,
+      );
+    }
+    const targets = requestedTables;
 
     const tableRes = await client.query(
       `

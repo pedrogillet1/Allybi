@@ -2616,32 +2616,15 @@ export class ResponseContractEnforcerService {
     this.reloadBanks();
   }
 
-  private buildFallbackUiContracts(): UIContractsBank {
-    return {
-      _meta: {
-        id: "ui_contracts_fallback",
-        version: "0.0.0-fallback",
-      },
-      config: {
-        enabled: false,
-        contracts: {},
-      },
-      rules: [],
-    };
-  }
-
   private shouldFailClosedUiContracts(): boolean {
     const override = String(process.env.UI_CONTRACTS_FAIL_CLOSED || "").trim();
-    if (override) return parseBoolish(override);
-    const profile = String(process.env.CERT_PROFILE || "").trim().toLowerCase();
-    const nodeEnv = String(process.env.NODE_ENV || "").trim().toLowerCase();
-    return (
-      profile === "release" ||
-      profile === "ci" ||
-      profile === "retrieval_signoff" ||
-      profile === "local_hard" ||
-      nodeEnv === "production"
-    );
+    if (override) {
+      // Compatibility: retain env var but ignore value to prevent fail-open bypass.
+      this.uiContractsLoadWarnings.push(
+        "UI_CONTRACTS_FAIL_CLOSED_OVERRIDE_IGNORED_ENFORCED_STRICT",
+      );
+    }
+    return true;
   }
 
   private shouldAllowLegacyUiContracts(): boolean {
@@ -2693,9 +2676,6 @@ export class ResponseContractEnforcerService {
     this.renderPolicy = getBank<RenderPolicyBank>("render_policy");
     this.uiContractsLoadWarnings = [];
     const strictUiContracts = this.shouldFailClosedUiContracts();
-    if (!strictUiContracts) {
-      this.uiContractsLoadWarnings.push("UI_CONTRACTS_FAIL_OPEN_OVERRIDE_ENABLED");
-    }
     try {
       let rawUiContracts: unknown;
       try {
@@ -2714,15 +2694,9 @@ export class ResponseContractEnforcerService {
         ),
       );
     } catch (error) {
-      if (strictUiContracts) {
-        const reason =
-          error instanceof Error ? error.message : "unknown ui_contracts load failure";
-        throw new Error(`ui_contracts load failed in strict mode: ${reason}`);
-      }
-      this.uiContracts = this.buildFallbackUiContracts();
-      this.uiContractsLoadWarnings.push(
-        "UI_CONTRACTS_PARSE_FAILED_FAIL_OPEN_FALLBACK",
-      );
+      const reason =
+        error instanceof Error ? error.message : "unknown ui_contracts load failure";
+      throw new Error(`ui_contracts load failed in strict mode: ${reason}`);
     }
     const uiReceiptRaw = getOptionalBank<unknown>("ui_receipt_shapes");
     if (!uiReceiptRaw) {

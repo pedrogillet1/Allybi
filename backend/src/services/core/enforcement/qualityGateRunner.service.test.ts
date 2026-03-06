@@ -64,7 +64,7 @@ describe("QualityGateRunnerService", () => {
     ).rejects.toThrow(/Required quality integration hook bank missing/i);
   });
 
-  test("warns in non-strict env when required quality hook bank is missing", async () => {
+  test("fails closed in non-strict env when required quality hook bank is missing", async () => {
     process.env.NODE_ENV = "development";
     mockGetOptionalBank.mockImplementation((bankId: string) => {
       if (bankId === "quality_gates") {
@@ -92,17 +92,12 @@ describe("QualityGateRunnerService", () => {
       getQualityGateBank: () => null,
     } as any);
 
-    const out = await runner.runGates("hello", {
-      answerMode: "doc_grounded_single",
-      evidenceItems: [],
-    });
-
-    expect(
-      out.results.some(
-        (g) => g.gateName === "quality_integration_hook_presence",
-      ),
-    ).toBe(true);
-    expect(out.allPassed).toBe(false);
+    await expect(
+      runner.runGates("hello", {
+        answerMode: "doc_grounded_single",
+        evidenceItems: [],
+      }),
+    ).rejects.toThrow(/Required quality integration hook bank missing/i);
   });
 
   test("forces strict fail-closed when CERT_PROFILE is ci", async () => {

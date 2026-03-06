@@ -1,6 +1,6 @@
 # Integration Runtime Grade
 
-- Generated: 2026-03-05T21:36:34.044Z
+- Generated: 2026-03-05T23:17:54.358Z
 - Final score: **100**
 - Final grade: **A+**
 - Verdict: **ready**
@@ -16,6 +16,9 @@
 | frontend_oauth_completion_no_localstorage_signal | medium | 10 | yes | Frontend integrations OAuth completion flow must not rely on localStorage cross-window signaling. |
 | frontend_oauth_message_origin_validation | high | 15 | yes | OAuth completion messages must enforce trusted origin checks in integrations and chat surfaces. |
 | oauth_completion_signature_verification_wired | high | 25 | yes | OAuth completion payload authenticity must be server-verified before frontend applies connection state. |
+| frontend_oauth_verify_contract_reads_data_valid | high | 20 | yes | Frontend OAuth verification must read the unwrapped Axios response payload (response.data.valid). |
+| oauth_completion_replay_guard_wired | high | 25 | yes | OAuth completion payloads must include a nonce and be consumed once to reject replay. |
+| gmail_oauth_fallback_is_guarded | high | 20 | yes | Gmail connector OAuth must enforce dedicated callback separation and guard any legacy GOOGLE_CLIENT_* fallback behind explicit flags. |
 | chat_oauth_popup_source_validation | high | 20 | yes | OAuth completion handlers must bind postMessage events to the initiating popup window source. |
 | security_cert_scans_dashboard_client | high | 20 | yes | Security certification must include dashboard client source scanning (not only frontend). |
 | editor_mode_blocks_connector_routing | high | 20 | yes | Editor mode must not execute connector actions; routing must stay in KNOWLEDGE/editor lane. |

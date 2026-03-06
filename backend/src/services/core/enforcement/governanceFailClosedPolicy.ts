@@ -19,18 +19,6 @@ function normalizeString(value: unknown): string {
     .toLowerCase();
 }
 
-function parseBooleanString(value: unknown): boolean | null {
-  const normalized = normalizeString(value);
-  if (!normalized) return null;
-  if (normalized === "1" || normalized === "true" || normalized === "yes") {
-    return true;
-  }
-  if (normalized === "0" || normalized === "false" || normalized === "no") {
-    return false;
-  }
-  return null;
-}
-
 function isStrictCertificationProfile(profile: string): boolean {
   return (
     profile === "ci" ||
@@ -71,31 +59,9 @@ export function resolveGovernanceFailClosed(
     runtimeEnv === "production" ||
     runtimeEnv === "staging" ||
     strictCertProfile;
-  const explicit = parseBooleanString(input.strictGovernanceFlag);
-
-  if (explicit === true) {
-    return {
-      failClosed: true,
-      runtimeEnv,
-      protectedEnv,
-      strictCertProfile,
-    };
-  }
-  if (explicit === false) {
-    return {
-      failClosed: protectedEnv,
-      runtimeEnv,
-      protectedEnv,
-      strictCertProfile,
-    };
-  }
-
-  const configured =
-    typeof input.configuredFailClosed === "boolean"
-      ? input.configuredFailClosed
-      : protectedEnv;
+  // Governance hardening policy: fail-closed is mandatory in every environment.
   return {
-    failClosed: protectedEnv ? true : configured,
+    failClosed: true,
     runtimeEnv,
     protectedEnv,
     strictCertProfile,
@@ -113,26 +79,12 @@ export function resolveGovernanceQualityGateEnforcement(
   reasonCode?: string;
 } {
   const failClosed = resolveGovernanceFailClosed(input);
-  if (failClosed.failClosed) {
-    return {
-      enforceQualityGates: true,
-      failClosed: true,
-      runtimeEnv: failClosed.runtimeEnv,
-      protectedEnv: failClosed.protectedEnv,
-      strictCertProfile: failClosed.strictCertProfile,
-      reasonCode: "strict_fail_closed",
-    };
-  }
-  const explicit = parseBooleanString(input.qualityGatesEnforcingFlag);
-  const enforceQualityGates = explicit !== false;
   return {
-    enforceQualityGates,
-    failClosed: false,
+    enforceQualityGates: true,
+    failClosed: true,
     runtimeEnv: failClosed.runtimeEnv,
     protectedEnv: failClosed.protectedEnv,
     strictCertProfile: failClosed.strictCertProfile,
-    reasonCode: enforceQualityGates
-      ? "quality_gates_enforcing_enabled"
-      : "quality_gates_enforcing_disabled",
+    reasonCode: "strict_fail_closed",
   };
 }

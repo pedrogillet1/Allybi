@@ -36,6 +36,8 @@ export interface ExtractedTable {
   tableId: string;
   pageOrSlide?: number;
   tableMethod?: string;
+  tableConfidence?: number;
+  fallbackReason?: string;
   markdown: string;
   rows: Array<{
     rowIndex: number;

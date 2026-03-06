@@ -312,6 +312,21 @@
       "optional": true
     },
     {
+      "id": "board_resolution_extraction_hints_v50c4150f",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "board_resolution_sections_v0d54900e",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "board_resolution_tables_v07fdadde",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "bolding_rules",
       "dependsOn": [],
       "optional": true
@@ -5087,6 +5102,11 @@
       "optional": true
     },
     {
+      "id": "doc_aliases_education",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "doc_aliases_everyday",
       "dependsOn": [],
       "optional": true
@@ -5099,6 +5119,11 @@
     },
     {
       "id": "doc_aliases_housing",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "doc_aliases_hr_payroll",
       "dependsOn": [],
       "optional": true
     },
@@ -5132,6 +5157,11 @@
     },
     {
       "id": "doc_aliases_tax",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "doc_aliases_travel",
       "dependsOn": [],
       "optional": true
     },
@@ -5368,6 +5398,21 @@
       "optional": true
     },
     {
+      "id": "dpa_extraction_hints_vc1cbb882",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "dpa_sections_v59ba1526",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "dpa_tables_v679bed8b",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "edit_error_catalog",
       "dependsOn": []
     },
@@ -5416,7 +5461,97 @@
       "optional": true
     },
     {
+      "id": "employment_agreement_extraction_hints_v1ed74ca8",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "employment_agreement_sections_v9f1eb8d7",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "employment_agreement_tables_v1a28d070",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "entity_role_ontology",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "entity_schema_accounting",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "entity_schema_banking",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "entity_schema_billing",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "entity_schema_education",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "entity_schema_everyday",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "entity_schema_finance",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "entity_schema_housing",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "entity_schema_hr_payroll",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "entity_schema_identity",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "entity_schema_insurance",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "entity_schema_legal",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "entity_schema_medical",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "entity_schema_ops",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "entity_schema_tax",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "entity_schema_travel",
       "dependsOn": [],
       "optional": true
     },
@@ -5704,6 +5839,11 @@
       "optional": true
     },
     {
+      "id": "ingestion_slo_baseline_summary",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "intent_config",
       "dependsOn": [
         "bank_schema"
@@ -5804,6 +5944,11 @@
     },
     {
       "id": "layout_cues_v61e6793a",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_doc_type_aliases",
       "dependsOn": [],
       "optional": true
     },
@@ -6201,6 +6346,21 @@
       "optional": true
     },
     {
+      "id": "legal_lease_extraction_hints",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legal_lease_sections",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legal_lease_tables",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "legal_legal_lease_agreement_extraction_hints",
       "dependsOn": [
         "legal_doc_type_catalog"
@@ -6285,6 +6445,21 @@
       "dependsOn": [
         "legal_doc_type_catalog"
       ],
+      "optional": true
+    },
+    {
+      "id": "legal_litigation_memo_extraction_hints",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legal_litigation_memo_sections",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legal_litigation_memo_tables",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -7338,6 +7513,21 @@
       "optional": true
     },
     {
+      "id": "msa_extraction_hints_v41111395",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "msa_sections_v24b4aa70",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "msa_tables_vdb79e19e",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "nav_failure_recovery",
       "dependsOn": [],
       "optional": true
@@ -7354,6 +7544,21 @@
     },
     {
       "id": "nav_intents_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "nda_extraction_hints_v94b17eb1",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "nda_sections_v215acb2d",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "nda_tables_v3a19a550",
       "dependsOn": [],
       "optional": true
     },
@@ -8207,6 +8412,21 @@
       "optional": true
     },
     {
+      "id": "privacy_policy_extraction_hints_v3525de6b",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "privacy_policy_sections_v5a2b8d13",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "privacy_policy_tables_v113ccc0c",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "processing_messages",
       "dependsOn": []
     },
@@ -8633,6 +8853,21 @@
       ]
     },
     {
+      "id": "sow_extraction_hints_vfb984862",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "sow_sections_v24240fd6",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "sow_tables_v23424409",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "spreadsheet_semantics",
       "dependsOn": [],
       "optional": true
@@ -8778,6 +9013,21 @@
     },
     {
       "id": "task_plan_generation",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "terms_extraction_hints",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "terms_sections",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "terms_tables",
       "dependsOn": [],
       "optional": true
     },

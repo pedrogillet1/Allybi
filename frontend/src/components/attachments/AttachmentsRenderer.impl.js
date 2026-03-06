@@ -351,40 +351,49 @@ export default function AttachmentsRenderer({
           }
 
           if (a.kind === "source") {
+            const sourcePayload =
+              a.meta && typeof a.meta === "object"
+                ? { ...a.meta, ...a, docId: a.meta.docId || a.meta.documentId || a.id, documentId: a.meta.documentId || a.meta.docId || a.id }
+                : a;
             return (
               <SourcePill
                 key={`${a.id || "src"}-${a.locationKey || idx}`}
                 source={a}
                 variant={variant}
                 onOpen={() => {
-                  // Prefer URL if present, otherwise call onFileClick
-                  if (a.url) window.open(a.url, "_blank", "noopener,noreferrer");
-                  else onFileClick?.(a);
+                  onFileClick?.(sourcePayload);
                 }}
               />
             );
           }
 
           if (a.kind === "folder") {
+            const folderPayload =
+              a.meta && typeof a.meta === "object"
+                ? { ...a.meta, ...a, kind: "folder", type: "folder", folderId: a.meta.folderId || a.id || a.meta.id }
+                : { ...a, kind: "folder", type: "folder", folderId: a.id };
             return (
               <FolderPill
                 key={`${a.id || "folder"}-${idx}`}
                 folder={a}
                 variant={variant}
-                onOpen={() => onFolderClick?.(a)}
+                onOpen={() => onFolderClick?.(folderPayload)}
               />
             );
           }
 
           if (a.kind === "file") {
+            const filePayload =
+              a.meta && typeof a.meta === "object"
+                ? { ...a.meta, ...a, id: a.id || a.meta.id, filename: a.filename || a.title || a.meta.filename || a.meta.title }
+                : a;
             return (
               <FilePill
                 key={`${a.id || "file"}-${idx}`}
                 file={a}
                 variant={variant}
                 onOpen={() => {
-                  if (a.url) window.open(a.url, "_blank", "noopener,noreferrer");
-                  else onFileClick?.(a);
+                  onFileClick?.(filePayload);
                 }}
               />
             );

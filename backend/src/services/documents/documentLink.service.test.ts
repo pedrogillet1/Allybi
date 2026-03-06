@@ -5,12 +5,19 @@ const mockCreate = jest.fn();
 const mockUpdate = jest.fn();
 const mockUpsert = jest.fn();
 const mockDocumentFindMany = jest.fn();
+const mockDocumentFindUnique = jest.fn();
+const getOptionalBankMock = jest.fn();
+
+jest.mock("../core/banks/bankLoader.service", () => ({
+  getOptionalBank: (...args: any[]) => getOptionalBankMock(...args),
+}));
 
 jest.mock("../../config/database", () => ({
   __esModule: true,
   default: {
     document: {
       findMany: (...args: any[]) => mockDocumentFindMany(...args),
+      findUnique: (...args: any[]) => mockDocumentFindUnique(...args),
     },
     documentLink: {
       findMany: (...args: any[]) => mockLinkFindMany(...args),
@@ -88,6 +95,32 @@ describe("detectAmendmentConflict", () => {
 describe("DocumentLinkService persistence and reconciliation", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    getOptionalBankMock.mockImplementation((bankId: string) => {
+      if (bankId !== "amendment_chain_schema") return null;
+      return {
+        config: { enabled: true },
+        relationshipTypes: [
+          { type: "amends" },
+          { type: "supersedes" },
+          { type: "restates" },
+          { type: "extends" },
+          { type: "terminates" },
+          { type: "attachment" },
+          { type: "attached_to" },
+          { type: "references" },
+          { type: "related" },
+        ],
+        conflictDetection: {
+          enabled: true,
+          rules: [
+            { id: "VCR_001", action: "flag_conflict", severity: "warning" },
+            { id: "VCR_002", action: "require_resolution", severity: "error" },
+            { id: "VCR_003", action: "flag_missing_parent", severity: "info" },
+          ],
+        },
+      };
+    });
+    mockDocumentFindUnique.mockResolvedValue({ id: "doc-b" });
   });
 
   test("createDocumentLink persists to database and returns record", async () => {
@@ -116,6 +149,58 @@ describe("DocumentLinkService persistence and reconciliation", () => {
       }),
     });
     expect(result.id).toBe("link-1");
+  });
+
+  test("validateDocumentLink accepts attachment relationships from schema", () => {
+    expect(() =>
+      validateDocumentLink({
+        sourceDocumentId: "doc-a",
+        targetDocumentId: "doc-b",
+        relationshipType: "attachment" as any,
+      }),
+    ).not.toThrow();
+  });
+
+  test("validateDocumentLink follows amendment_chain_schema relationship types", () => {
+    getOptionalBankMock.mockImplementation((bankId: string) => {
+      if (bankId !== "amendment_chain_schema") return null;
+      return {
+        config: { enabled: true },
+        relationshipTypes: [{ type: "amends" }],
+        conflictDetection: { enabled: false, rules: [] },
+      };
+    });
+
+    expect(() =>
+      validateDocumentLink({
+        sourceDocumentId: "doc-a",
+        targetDocumentId: "doc-b",
+        relationshipType: "extends" as any,
+      }),
+    ).toThrow("Invalid relationship type");
+  });
+
+  test("createDocumentLink blocks when VCR_003 requires resolution and parent is missing", async () => {
+    getOptionalBankMock.mockImplementation((bankId: string) => {
+      if (bankId !== "amendment_chain_schema") return null;
+      return {
+        config: { enabled: true },
+        relationshipTypes: [{ type: "amends" }, { type: "supersedes" }],
+        conflictDetection: {
+          enabled: true,
+          rules: [{ id: "VCR_003", action: "require_resolution", severity: "error" }],
+        },
+      };
+    });
+    mockDocumentFindUnique.mockResolvedValue(null);
+
+    await expect(
+      createDocumentLink({
+        sourceDocumentId: "doc-a",
+        targetDocumentId: "missing-parent",
+        relationshipType: "amends",
+      }),
+    ).rejects.toThrow("LINK_CONFLICT [VCR_003]");
   });
 
   test("listDocumentLinks queries both source and target", async () => {

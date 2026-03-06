@@ -1186,14 +1186,16 @@ function resolveQualityGateSeverity(
 ): "warn" | "block" {
   const normalized = String(gateName || "").trim();
   if (!normalized) return "warn";
+  const immutableBlock =
+    DEFAULT_BLOCKING_QUALITY_GATES.has(normalized) ||
+    normalized === "doc_grounding_minimums" ||
+    normalized === "hallucination_risk" ||
+    normalized.startsWith("numeric_integrity") ||
+    normalized.startsWith("redaction_") ||
+    normalized.startsWith("medical_") ||
+    normalized.startsWith("domain_safety_rule_violation:");
+  if (immutableBlock) return "block";
   if (severityByName[normalized]) return severityByName[normalized];
-  if (DEFAULT_BLOCKING_QUALITY_GATES.has(normalized)) return "block";
-  if (normalized === "doc_grounding_minimums") return "block";
-  if (normalized === "hallucination_risk") return "block";
-  if (normalized.startsWith("numeric_integrity")) return "block";
-  if (normalized.startsWith("redaction_")) return "block";
-  if (normalized.startsWith("medical_")) return "block";
-  if (normalized.startsWith("domain_safety_rule_violation:")) return "block";
   return "warn";
 }
 
@@ -2301,6 +2303,7 @@ export class CentralizedChatRuntimeDelegate {
         {
           attachedDocumentIds: req.attachedDocumentIds,
           evidenceCount: retrievalPack?.evidence.length ?? 0,
+          answerMode,
         },
       );
       if (bypass) {
@@ -2941,6 +2944,7 @@ export class CentralizedChatRuntimeDelegate {
         {
           attachedDocumentIds: req.attachedDocumentIds,
           evidenceCount: retrievalPack?.evidence.length ?? 0,
+          answerMode,
         },
       );
       if (bypass) {
@@ -6262,6 +6266,7 @@ export class CentralizedChatRuntimeDelegate {
     opts?: {
       attachedDocumentIds?: string[];
       evidenceCount?: number;
+      answerMode?: AnswerMode;
     },
   ): { text: string; failureCode: string } | null {
     if (!decision) return null;
@@ -6272,9 +6277,12 @@ export class CentralizedChatRuntimeDelegate {
     // the documents; asking them to "confirm" is a false refusal.
     const hasAttachedDocs = (opts?.attachedDocumentIds || []).length > 0;
     const hasEvidence = (opts?.evidenceCount ?? 0) > 0;
+    const isDocGrounded = isDocGroundedAnswerMode(
+      (opts?.answerMode || "general_answer") as AnswerMode,
+    );
 
     if (decision.suggestedAction === "clarify") {
-      if (hasAttachedDocs && hasEvidence) {
+      if (!isDocGrounded && hasAttachedDocs && hasEvidence) {
         // Don't bypass — let the LLM attempt an answer with the evidence.
         // The hedge mechanism will add uncertainty prefix if needed.
         return null;
@@ -6306,7 +6314,7 @@ export class CentralizedChatRuntimeDelegate {
       // RC8 fix: When documents ARE attached and retrieval returned evidence,
       // do not block entirely — let the LLM hedge instead of refusing.
       // The user already provided documents; a full refusal is a false negative.
-      if (hasAttachedDocs && hasEvidence) {
+      if (!isDocGrounded && hasAttachedDocs && hasEvidence) {
         return null;
       }
       const text =

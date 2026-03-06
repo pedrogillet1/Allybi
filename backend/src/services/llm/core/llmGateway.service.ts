@@ -127,6 +127,32 @@ function mapProviderForRequest(provider: LLMProvider): LLMProvider {
   return canonicalizeToLlmProvider(provider);
 }
 
+const STRICT_PROVIDER_CONSISTENCY_CERT_PROFILES = new Set([
+  "ci",
+  "release",
+  "retrieval_signoff",
+  "local_hard",
+]);
+
+function normalizeProviderForConsistency(provider: LLMProvider): "openai" | "gemini" | "unknown" {
+  const canonical = mapProviderForRequest(provider);
+  if (canonical === "openai") return "openai";
+  if (canonical === "google" || canonical === "gemini") return "gemini";
+  return "unknown";
+}
+
+function isAllowedProviderConsistencyModel(
+  provider: LLMProvider,
+  model: string,
+): boolean {
+  const providerFamily = normalizeProviderForConsistency(provider);
+  const family = toCostFamilyModel(String(model)) ?? String(model || "").trim().toLowerCase();
+  return (
+    (providerFamily === "gemini" && family === "gemini-2.5-flash") ||
+    (providerFamily === "openai" && family === "gpt-5.2")
+  );
+}
+
 function mapPurpose(promptType: string): LLMRequest["purpose"] {
   if (promptType === "retrieval") return "retrieval_planning";
   if (promptType === "disambiguation") return "intent_routing";
@@ -379,6 +405,29 @@ export class LlmGatewayService {
     return { provider, model };
   }
 
+  private isProviderConsistencyStrictMode(): boolean {
+    if (this.cfg.env === "production" || this.cfg.env === "staging") return true;
+    const certProfile = String(process.env.CERT_PROFILE || "").trim().toLowerCase();
+    return STRICT_PROVIDER_CONSISTENCY_CERT_PROFILES.has(certProfile);
+  }
+
+  private createProviderConsistencyError(params: {
+    stage: "route" | "execution";
+    provider: LLMProvider;
+    model: string;
+  }): Error {
+    const message =
+      params.stage === "execution"
+        ? `Provider consistency blocked provider-executed model: ${params.provider}:${params.model}`
+        : `Provider consistency blocked routed model: ${params.provider}:${params.model}`;
+    const error = new Error(message) as Error & { code?: string };
+    error.code =
+      params.stage === "execution"
+        ? "PROVIDER_CONSISTENCY_EXECUTION_BLOCKED"
+        : "PROVIDER_CONSISTENCY_ROUTE_BLOCKED";
+    return error;
+  }
+
   async generate(params: LlmGatewayRequest): Promise<{
     text: string;
     telemetry?: Record<string, unknown>;
@@ -387,11 +436,20 @@ export class LlmGatewayService {
     const prepared = this.prepareProviderRequest(params, false);
     const routedProvider = prepared.request.model.provider;
     const routedModel = prepared.request.model.model;
+    const strictProviderConsistency = this.isProviderConsistencyStrictMode();
+    const routeAllowedForConsistency =
+      !strictProviderConsistency ||
+      isAllowedProviderConsistencyModel(
+        routedProvider as LLMProvider,
+        routedModel,
+      );
     const composeCacheEnabled =
       process.env.BANK_MULTI_LEVEL_CACHE_ENABLED === "true" &&
       process.env.BANK_COMPOSE_CACHE_ENABLED !== "false";
     const composeCacheKey =
-      composeCacheEnabled && prepared.promptMode === "compose"
+      composeCacheEnabled &&
+      prepared.promptMode === "compose" &&
+      routeAllowedForConsistency
         ? this.buildComposeCacheKey(params, prepared)
         : null;
     if (composeCacheKey) {
@@ -423,6 +481,11 @@ export class LlmGatewayService {
             requestedMaxOutputTokens:
               prepared.request.sampling?.maxOutputTokens ?? null,
             cacheHit: true,
+            providerConsistency: {
+              strict: strictProviderConsistency,
+              passed: true,
+              reasonCode: null,
+            },
             ...cached.promptTrace,
           },
           promptTrace: cached.promptTrace,
@@ -513,6 +576,11 @@ export class LlmGatewayService {
       requestedMaxOutputTokens:
         prepared.request.sampling?.maxOutputTokens ?? null,
       cacheHit: false,
+      providerConsistency: {
+        strict: strictProviderConsistency,
+        passed: true,
+        reasonCode: null,
+      },
       ...prepared.promptTrace,
     };
     if (composeCacheKey && !execution.fallbackUsed) {
@@ -548,6 +616,7 @@ export class LlmGatewayService {
       prepared.route,
       prepared.request,
     );
+    const strictProviderConsistency = this.isProviderConsistencyStrictMode();
     const response = execution.response;
     const modelFamily =
       toCostFamilyModel(String(execution.executed.model)) ||
@@ -581,6 +650,11 @@ export class LlmGatewayService {
         promptType: prepared.promptType,
         requestedMaxOutputTokens:
           prepared.request.sampling?.maxOutputTokens ?? null,
+        providerConsistency: {
+          strict: strictProviderConsistency,
+          passed: true,
+          reasonCode: null,
+        },
         ...prepared.promptTrace,
       },
       promptTrace: prepared.promptTrace,
@@ -604,6 +678,7 @@ export class LlmGatewayService {
       params.sink,
       params.streamingConfig,
     );
+    const strictProviderConsistency = this.isProviderConsistencyStrictMode();
     const result = execution.response;
     const modelFamily =
       toCostFamilyModel(String(execution.executed.model)) ||
@@ -637,6 +712,11 @@ export class LlmGatewayService {
         promptType: prepared.promptType,
         requestedMaxOutputTokens:
           prepared.request.sampling?.maxOutputTokens ?? null,
+        providerConsistency: {
+          strict: strictProviderConsistency,
+          passed: true,
+          reasonCode: null,
+        },
         ...prepared.promptTrace,
       },
       promptTrace: prepared.promptTrace,
@@ -732,9 +812,28 @@ export class LlmGatewayService {
     const attempts: GatewayExecutionAttempt[] = [];
     const order = this.buildAttemptOrder(route);
     let lastError: unknown = null;
+    const strictProviderConsistency = this.isProviderConsistencyStrictMode();
 
     for (let idx = 0; idx < order.length; idx++) {
       const candidate = order[idx] as { provider: LLMProvider; model: string };
+      if (
+        strictProviderConsistency &&
+        !isAllowedProviderConsistencyModel(candidate.provider, candidate.model)
+      ) {
+        lastError = this.createProviderConsistencyError({
+          stage: "route",
+          provider: candidate.provider,
+          model: candidate.model,
+        });
+        attempts.push({
+          provider: candidate.provider,
+          model: candidate.model,
+          status: "fail",
+          durationMs: 0,
+          errorCode: LlmGatewayService.toErrorCode(lastError),
+        });
+        continue;
+      }
       const client = this.resolveClient(candidate.provider);
       if (!client) {
         attempts.push({
@@ -783,6 +882,24 @@ export class LlmGatewayService {
           candidate,
           response,
         );
+        if (
+          strictProviderConsistency &&
+          !isAllowedProviderConsistencyModel(executed.provider, executed.model)
+        ) {
+          lastError = this.createProviderConsistencyError({
+            stage: "execution",
+            provider: executed.provider,
+            model: executed.model,
+          });
+          attempts.push({
+            provider: executed.provider,
+            model: executed.model,
+            status: "fail",
+            durationMs: Date.now() - startedAtMs,
+            errorCode: LlmGatewayService.toErrorCode(lastError),
+          });
+          continue;
+        }
         attempts.push({
           provider: executed.provider,
           model: executed.model,
@@ -832,9 +949,28 @@ export class LlmGatewayService {
     const attempts: GatewayExecutionAttempt[] = [];
     const order = this.buildAttemptOrder(route);
     let lastError: unknown = null;
+    const strictProviderConsistency = this.isProviderConsistencyStrictMode();
 
     for (let idx = 0; idx < order.length; idx++) {
       const candidate = order[idx] as { provider: LLMProvider; model: string };
+      if (
+        strictProviderConsistency &&
+        !isAllowedProviderConsistencyModel(candidate.provider, candidate.model)
+      ) {
+        lastError = this.createProviderConsistencyError({
+          stage: "route",
+          provider: candidate.provider,
+          model: candidate.model,
+        });
+        attempts.push({
+          provider: candidate.provider,
+          model: candidate.model,
+          status: "fail",
+          durationMs: 0,
+          errorCode: LlmGatewayService.toErrorCode(lastError),
+        });
+        continue;
+      }
       const client = this.resolveClient(candidate.provider);
       if (!client) {
         attempts.push({
@@ -914,6 +1050,17 @@ export class LlmGatewayService {
           candidate,
           response,
         );
+        if (
+          strictProviderConsistency &&
+          !isAllowedProviderConsistencyModel(executed.provider, executed.model)
+        ) {
+          lastError = this.createProviderConsistencyError({
+            stage: "execution",
+            provider: executed.provider,
+            model: executed.model,
+          });
+          throw lastError;
+        }
         attempts.push({
           provider: executed.provider,
           model: executed.model,

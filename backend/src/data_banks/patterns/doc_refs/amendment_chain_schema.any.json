@@ -44,6 +44,30 @@
       "label": { "en": "terminates", "pt": "rescinde" },
       "description": "This document terminates a parent document.",
       "precedence": "parent_no_longer_in_force"
+    },
+    {
+      "type": "attachment",
+      "label": { "en": "attachment", "pt": "anexo" },
+      "description": "This document is an attachment supporting a parent document.",
+      "precedence": "supporting_context"
+    },
+    {
+      "type": "attached_to",
+      "label": { "en": "attached to", "pt": "anexado a" },
+      "description": "This document is attached to the target document and should be searched together.",
+      "precedence": "supporting_context"
+    },
+    {
+      "type": "references",
+      "label": { "en": "references", "pt": "referencia" },
+      "description": "This document references related source material.",
+      "precedence": "related_context"
+    },
+    {
+      "type": "related",
+      "label": { "en": "related", "pt": "relacionado" },
+      "description": "This document is related and should be considered for cross-document retrieval.",
+      "precedence": "related_context"
     }
   ],
   "versionStatuses": [
@@ -60,7 +84,11 @@
     "supersedes": ["\\bsupersed(?:es|ed|ing)\\b", "\\breplac(?:es|ed|ing)\\b", "\\bsubstitui(?:r|do|ção)\\b"],
     "restates": ["\\brestat(?:es|ed|ement)\\b", "\\bamended and restated\\b", "\\bconsolidad[oa]\\b"],
     "extends": ["\\bextend(?:s|ed|ing)\\b", "\\brenewal\\b", "\\bprorrog(?:ar|ação|ado)\\b"],
-    "terminates": ["\\bterminat(?:es|ed|ion)\\b", "\\brescis(?:ão|dir)\\b"]
+    "terminates": ["\\bterminat(?:es|ed|ion)\\b", "\\brescis(?:ão|dir)\\b"],
+    "attachment": ["\\battachment\\b", "\\bannex\\b", "\\banexo\\b"],
+    "attached_to": ["\\battached to\\b", "\\banexado a\\b"],
+    "references": ["\\breferences?\\b", "\\brefers to\\b", "\\breferencia\\b"],
+    "related": ["\\brelated\\b", "\\brelated file\\b", "\\brelacionad[oa]\\b"]
   },
   "conflictDetection": {
     "enabled": true,

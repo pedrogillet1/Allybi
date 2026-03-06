@@ -6,7 +6,6 @@ import { UPLOAD_CONFIG } from "../config/upload.config";
 import { createNanoBananaClientFromEnv } from "../services/creative/nanoBananaFactory";
 import RevisionService from "../services/documents/revision.service";
 import { documentUploadWriteService } from "../services/documents/documentUploadWrite.service";
-import DocumentRevisionStoreService from "../services/editing/documentRevisionStore.service";
 import * as crypto from "crypto";
 
 type SlidesStudioContext = {
@@ -22,31 +21,6 @@ function sleep(ms: number): Promise<void> {
 
 function asString(v: unknown): string | undefined {
   return typeof v === "string" && v.trim() ? v.trim() : undefined;
-}
-
-function isProtectedRuntimeEnv(
-  nodeEnv: string | undefined = process.env.NODE_ENV,
-): boolean {
-  const normalized = String(nodeEnv || "")
-    .trim()
-    .toLowerCase();
-  return normalized === "production" || normalized === "staging";
-}
-
-function allowOverwriteInProtectedEnv(
-  rawValue: string | undefined = process.env.KODA_EDITING_ALLOW_OVERWRITE_PROTECTED,
-): boolean {
-  return String(rawValue || "")
-    .trim()
-    .toLowerCase() === "true";
-}
-
-function isOverwriteGloballyEnabled(
-  rawValue: string | undefined = process.env.KODA_EDITING_ENABLE_OVERWRITE,
-): boolean {
-  return String(rawValue || "")
-    .trim()
-    .toLowerCase() === "true";
 }
 
 function safeJsonParseObject(value: unknown): Record<string, any> {
@@ -1200,7 +1174,7 @@ router.post(
 
 /**
  * POST /api/documents/:id/studio/slides/export
- * Export current Slides presentation back to PPTX and store as revision or overwrite.
+ * Export current Slides presentation back to PPTX and store as revision.
  */
 router.post("/export", async (req: any, res: Response): Promise<void> => {
   const ctx = ctxFromReq(req);
@@ -1222,21 +1196,9 @@ router.post("/export", async (req: any, res: Response): Promise<void> => {
     const mode = String(req.body?.mode || "revision")
       .trim()
       .toLowerCase();
-    if (mode === "overwrite" && !isOverwriteGloballyEnabled()) {
-      res.status(403).json({
-        error:
-          "Overwrite export is disabled. Set KODA_EDITING_ENABLE_OVERWRITE=true or use revision mode.",
-      });
-      return;
-    }
-    if (
-      mode === "overwrite" &&
-      isProtectedRuntimeEnv() &&
-      !allowOverwriteInProtectedEnv()
-    ) {
-      res.status(403).json({
-        error:
-          "Overwrite export is disabled in protected environments. Use revision mode or explicitly set KODA_EDITING_ALLOW_OVERWRITE_PROTECTED=true.",
+    if (mode !== "revision") {
+      res.status(400).json({
+        error: "Only revision mode is supported for Slides export.",
       });
       return;
     }
@@ -1263,51 +1225,34 @@ router.post("/export", async (req: any, res: Response): Promise<void> => {
       "application/vnd.openxmlformats-officedocument.presentationml.presentation";
     const revisionService = new RevisionService();
 
-    if (mode !== "overwrite") {
-      const created = await revisionService.createRevision(
-        {
-          userId,
-          sourceDocumentId: sourceDoc.id,
-          contentBuffer: pptxBytes,
-          mimeType,
-          filename: sourceDoc.filename || "deck.pptx",
-          metadata: {
-            source: "pptx_studio",
-            slidesPresentationId: presentationId,
-          },
-          enqueueReindex: true,
-          reason: "PPTX Studio export",
+    const created = await revisionService.createRevision(
+      {
+        userId,
+        sourceDocumentId: sourceDoc.id,
+        contentBuffer: pptxBytes,
+        mimeType,
+        filename: sourceDoc.filename || "deck.pptx",
+        metadata: {
+          source: "pptx_studio",
+          slidesPresentationId: presentationId,
         },
-        {
-          correlationId: ctx.correlationId,
-          userId,
-          conversationId: ctx.conversationId,
-          clientMessageId: ctx.clientMessageId,
-        },
-      );
+        enqueueReindex: true,
+        reason: "PPTX Studio export",
+      },
+      {
+        correlationId: ctx.correlationId,
+        userId,
+        conversationId: ctx.conversationId,
+        clientMessageId: ctx.clientMessageId,
+      },
+    );
 
-      res.json({
-        ok: true,
-        mode: "revision",
-        documentId: created.id,
-        filename: created.filename,
-      });
-      return;
-    }
-
-    const store = new DocumentRevisionStoreService();
-    await store.storeEditedBuffer({
-      documentId: sourceDoc.id,
-      userId,
-      editedBuffer: pptxBytes,
-      operator: "EXPORT_SLIDES",
-      correlationId: ctx.correlationId,
-      conversationId: ctx.conversationId,
-      clientMessageId: ctx.clientMessageId,
-      metadata: { source: "pptx_studio", slidesPresentationId: presentationId },
+    res.json({
+      ok: true,
+      mode: "revision",
+      documentId: created.id,
+      filename: created.filename,
     });
-
-    res.json({ ok: true, mode: "overwrite", documentId: sourceDoc.id });
   } catch (e: any) {
     console.error("POST /documents/:id/studio/slides/export error:", e);
     res.status(500).json({ error: e?.message || "Failed to export PPTX" });

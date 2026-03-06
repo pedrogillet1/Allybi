@@ -13,7 +13,7 @@ import vectorEmbeddingRuntimeService from "../../retrieval/vectorEmbedding.runti
 import { extractText, PDF_MIMES, DOCX_MIMES, XLSX_MIMES, PPTX_MIMES } from "../extraction/extractionDispatch.service";
 import { normalizeMimeType } from "../extraction/ingestionMimeRegistry.service";
 import { isSkipped, hasPagesArray, hasSlidesArray } from "../extraction/extractionResult.types";
-import type { DispatchedExtractionResult, ImageSkippedResult } from "../extraction/extractionResult.types";
+import type { DispatchedExtractionResult } from "../extraction/extractionResult.types";
 import { buildInputChunks, deduplicateChunks } from "./chunkAssembly.service";
 import { deriveTextQuality } from "./textQuality.service";
 import { runEncryptionStep } from "./encryptionStep.service";
@@ -22,6 +22,7 @@ import type { PipelineTimings, InputChunk } from "./pipelineTypes";
 import { recordIngestionTiming, recordExtractionAttempt } from "./pipelineMetrics.service";
 import { deriveOcrSignals } from "../../extraction/ocrSignals.service";
 import { toSkipCode } from "./skipCodes";
+import type { SkipCode } from "./skipCodes";
 import { deriveExtractionWarningCodes } from "../extraction/warningCodes.service";
 
 // Storage download concurrency limiter
@@ -82,6 +83,64 @@ export function resolveStrictPdfOcrRequired(
   return strictEnabled;
 }
 
+function resolveEmptyExtractionFailure(
+  extraction: DispatchedExtractionResult,
+): { skipReason: string; skipCode: SkipCode } {
+  if (extraction.sourceType === "image") {
+    if (isSkipped(extraction)) {
+      return {
+        skipReason: extraction.skipReason,
+        skipCode: "IMAGE_VISUAL_ONLY",
+      };
+    }
+    return {
+      skipReason:
+        "Unable to extract text from image OCR output (image remained visual-only)",
+      skipCode: "IMAGE_OCR_EMPTY",
+    };
+  }
+
+  if (extraction.sourceType === "pdf") {
+    return {
+      skipReason:
+        "Unable to extract text from PDF (empty or insufficient extraction output)",
+      skipCode: "PDF_TEXT_EMPTY",
+    };
+  }
+  if (extraction.sourceType === "docx") {
+    return {
+      skipReason:
+        "Unable to extract text from DOCX (empty or insufficient extraction output)",
+      skipCode: "DOCX_TEXT_EMPTY",
+    };
+  }
+  if (extraction.sourceType === "xlsx") {
+    return {
+      skipReason:
+        "Unable to extract text from XLSX (empty or insufficient extraction output)",
+      skipCode: "XLSX_TEXT_EMPTY",
+    };
+  }
+  if (extraction.sourceType === "pptx") {
+    return {
+      skipReason:
+        "Unable to extract text from PPTX (empty or insufficient extraction output)",
+      skipCode: "PPTX_TEXT_EMPTY",
+    };
+  }
+  if (extraction.sourceType === "text") {
+    return {
+      skipReason: "Text file is empty or contains no indexable content",
+      skipCode: "TEXT_FILE_EMPTY",
+    };
+  }
+
+  return {
+    skipReason: "No extractable text content",
+    skipCode: "NO_TEXT_CONTENT",
+  };
+}
+
 /**
  * Run the full document processing pipeline.
  */
@@ -98,12 +157,18 @@ export async function processDocumentAsync(
       `No storage key (encryptedFilename) for document ${documentId}`,
     );
   }
+  const rssStartBytes = process.memoryUsage().rss;
   let peakRssBytes = process.memoryUsage().rss;
   const updatePeakRss = () => {
     const current = process.memoryUsage().rss;
     if (current > peakRssBytes) peakRssBytes = current;
   };
-  const readPeakRssMb = () => Number((peakRssBytes / (1024 * 1024)).toFixed(1));
+  const toMb = (bytes: number) => Number((bytes / (1024 * 1024)).toFixed(1));
+  const readPeakRssMb = () => toMb(peakRssBytes);
+  const readRssStartMb = () => toMb(rssStartBytes);
+  const readRssEndMb = () => toMb(process.memoryUsage().rss);
+  const readRssDeltaMb = () =>
+    Number(((process.memoryUsage().rss - rssStartBytes) / (1024 * 1024)).toFixed(1));
   const normalizedMimeType = normalizeMimeType(mimeType);
 
   // 1) Download from storage (with memory backpressure)
@@ -177,6 +242,9 @@ export async function processDocumentAsync(
       embeddingMs: 0,
       pageCount: null,
       peakRssMb: readPeakRssMb(),
+      rssStartMb: readRssStartMb(),
+      rssEndMb: readRssEndMb(),
+      rssDeltaMb: readRssDeltaMb(),
       fileHash,
       skipped: true,
       skipReason: `${headerCheck.errorCode}: ${headerCheck.error}`,
@@ -203,7 +271,6 @@ export async function processDocumentAsync(
   });
 
   const fullText = extraction.text || "";
-  const wasSkipped = extraction.sourceType === "image" && isSkipped(extraction);
   const ocrSignals = deriveOcrSignals({
     mimeType,
     extraction: extraction as unknown as Record<string, unknown>,
@@ -293,6 +360,9 @@ export async function processDocumentAsync(
       embeddingMs: 0,
       pageCount: hasPagesArray(extraction) ? extraction.pageCount : null,
       peakRssMb: readPeakRssMb(),
+      rssStartMb: readRssStartMb(),
+      rssEndMb: readRssEndMb(),
+      rssDeltaMb: readRssDeltaMb(),
       fileHash,
       skipped: true,
       skipReason,
@@ -303,9 +373,9 @@ export async function processDocumentAsync(
   if (!fullText || fullText.trim().length < 10) {
     recordExtractionAttempt(false);
 
-    const skipReason = wasSkipped
-      ? (extraction as ImageSkippedResult).skipReason
-      : "No extractable text content";
+    const emptyFailure = resolveEmptyExtractionFailure(extraction);
+    const skipReason = emptyFailure.skipReason;
+    const skipCode = emptyFailure.skipCode;
 
     logger.info("[Pipeline] File skipped, no usable content", {
       documentId,
@@ -334,10 +404,13 @@ export async function processDocumentAsync(
       embeddingMs: 0,
       pageCount: null,
       peakRssMb: readPeakRssMb(),
+      rssStartMb: readRssStartMb(),
+      rssEndMb: readRssEndMb(),
+      rssDeltaMb: readRssDeltaMb(),
       fileHash,
       skipped: true,
       skipReason,
-      skipCode: wasSkipped ? "IMAGE_VISUAL_ONLY" : "NO_TEXT_CONTENT",
+      skipCode,
     };
   }
 
@@ -436,6 +509,9 @@ export async function processDocumentAsync(
       hasPagesArray(extraction) ? extraction.pageCount :
       hasSlidesArray(extraction) ? extraction.slideCount : null,
     peakRssMb: readPeakRssMb(),
+    rssStartMb: readRssStartMb(),
+    rssEndMb: readRssEndMb(),
+    rssDeltaMb: readRssDeltaMb(),
     fileHash,
   };
 }

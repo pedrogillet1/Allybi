@@ -49,6 +49,7 @@
     "reports:hygiene:prepare:force-reset": "node e2e/grading/report-hygiene.mjs --prepare --reset-latest --force-reset-latest",
     "reports:hygiene:check": "node e2e/grading/report-hygiene.mjs --check",
     "reports:lineage:bootstrap": "node e2e/grading/bootstrap-report-lineage.mjs",
+    "reports:lineage:bootstrap:strict": "node e2e/grading/bootstrap-report-lineage.mjs --strict",
     "reports:lineage:check": "node e2e/grading/validate-report-lineage.mjs",
     "audit:a11y:semantic-click": "node e2e/grading/a11y-semantic-click-audit.mjs --max-violations 225",
     "grade:harsh": "node e2e/grading/run-harsh-rubric.mjs",

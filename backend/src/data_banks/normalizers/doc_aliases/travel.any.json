@@ -1,0 +1,86 @@
+{
+  "_meta": {
+    "id": "doc_aliases_travel",
+    "version": "1.0.0",
+    "description": "Travel document alias normalization bank with EN/PT coverage.",
+    "languages": ["any"],
+    "lastUpdated": "2026-03-05",
+    "schemaId": "doc_identity_schema",
+    "owner": "data-bank-governance",
+    "usedBy": ["services/core/banks/dataBankLoader.service.ts"],
+    "tests": ["tests/patternWiringProof.test.ts"]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "travel",
+    "caseInsensitive": true,
+    "minAliasConfidence": 0.62
+  },
+  "domain": "travel",
+  "aliases": [
+    {
+      "phrase": "boarding pass",
+      "normalized": "boarding_pass",
+      "docTypeIds": ["travel_boarding_pass"],
+      "hints": {"periodHint": "travel_date", "entityHint": "traveler", "formatHint": "ticket", "languageHint": "en"},
+      "confidence": 0.92,
+      "examples": ["show boarding pass", "open flight boarding pass"]
+    },
+    {
+      "phrase": "cartao de embarque",
+      "normalized": "boarding_pass",
+      "docTypeIds": ["travel_boarding_pass"],
+      "hints": {"periodHint": "travel_date", "entityHint": "traveler", "formatHint": "ticket", "languageHint": "pt"},
+      "confidence": 0.92,
+      "examples": ["mostrar cartao de embarque", "abrir bilhete de embarque"]
+    },
+    {
+      "phrase": "itinerary",
+      "normalized": "travel_itinerary",
+      "docTypeIds": ["travel_itinerary"],
+      "hints": {"periodHint": "travel_period", "entityHint": "traveler", "formatHint": "summary", "languageHint": "en"},
+      "confidence": 0.88,
+      "examples": ["show itinerary", "compare itinerary changes"]
+    },
+    {
+      "phrase": "roteiro de viagem",
+      "normalized": "travel_itinerary",
+      "docTypeIds": ["travel_itinerary"],
+      "hints": {"periodHint": "travel_period", "entityHint": "traveler", "formatHint": "summary", "languageHint": "pt"},
+      "confidence": 0.89,
+      "examples": ["mostrar roteiro de viagem", "comparar itinerario"]
+    },
+    {
+      "phrase": "hotel booking confirmation",
+      "normalized": "hotel_booking_confirmation",
+      "docTypeIds": ["travel_hotel_booking_confirmation"],
+      "hints": {"periodHint": "stay_period", "entityHint": "traveler", "formatHint": "confirmation", "languageHint": "en"},
+      "confidence": 0.9,
+      "examples": ["show hotel booking confirmation", "open hotel reservation"]
+    },
+    {
+      "phrase": "confirmacao de reserva de hotel",
+      "normalized": "hotel_booking_confirmation",
+      "docTypeIds": ["travel_hotel_booking_confirmation"],
+      "hints": {"periodHint": "stay_period", "entityHint": "traveler", "formatHint": "confirmation", "languageHint": "pt"},
+      "confidence": 0.9,
+      "examples": ["mostrar confirmacao de reserva de hotel", "abrir reserva do hotel"]
+    },
+    {
+      "phrase": "car rental agreement",
+      "normalized": "car_rental_agreement",
+      "docTypeIds": ["travel_car_rental_agreement"],
+      "hints": {"periodHint": "rental_period", "entityHint": "traveler", "formatHint": "agreement", "languageHint": "en"},
+      "confidence": 0.87,
+      "examples": ["show car rental agreement", "open rental contract"]
+    },
+    {
+      "phrase": "apolice de seguro viagem",
+      "normalized": "travel_insurance_policy",
+      "docTypeIds": ["travel_travel_insurance_policy"],
+      "hints": {"periodHint": "coverage_period", "entityHint": "insured_traveler", "formatHint": "policy", "languageHint": "pt"},
+      "confidence": 0.85,
+      "examples": ["mostrar apolice de seguro viagem", "abrir seguro viagem"]
+    }
+  ]
+}

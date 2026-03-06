@@ -88,6 +88,16 @@ function allowOverwriteInProtectedEnv(
     .toLowerCase() === "true";
 }
 
+function hardBlockOverwriteInProtectedEnv(
+  rawValue: string | undefined = process.env.KODA_EDITING_DISABLE_OVERWRITE_IN_PROTECTED,
+): boolean {
+  const normalized = String(rawValue || "")
+    .trim()
+    .toLowerCase();
+  if (!normalized) return true;
+  return normalized !== "false";
+}
+
 function isOverwriteGloballyEnabled(
   rawValue: string | undefined = process.env.KODA_EDITING_ENABLE_OVERWRITE,
 ): boolean {
@@ -100,25 +110,14 @@ function editingSaveMode(): EditingSaveMode {
   const raw = String(process.env.KODA_EDITING_SAVE_MODE || "revision")
     .trim()
     .toLowerCase();
-  if (raw === "overwrite" && !isOverwriteGloballyEnabled()) {
+  if (raw === "overwrite") {
     logger.error(
-      "[RevisionStore] KODA_EDITING_SAVE_MODE=overwrite is blocked unless KODA_EDITING_ENABLE_OVERWRITE=true; forcing revision mode",
+      "[RevisionStore] KODA_EDITING_SAVE_MODE=overwrite is no longer supported; forcing revision mode",
       { nodeEnv: process.env.NODE_ENV || null },
     );
     return "revision";
   }
-  if (
-    raw === "overwrite" &&
-    isProtectedRuntimeEnv() &&
-    !allowOverwriteInProtectedEnv()
-  ) {
-    logger.error(
-      "[RevisionStore] KODA_EDITING_SAVE_MODE=overwrite is blocked in protected environments without KODA_EDITING_ALLOW_OVERWRITE_PROTECTED=true; forcing revision mode",
-      { nodeEnv: process.env.NODE_ENV || null },
-    );
-    return "revision";
-  }
-  return raw === "overwrite" ? "overwrite" : "revision";
+  return "revision";
 }
 
 function keepUndoHistory(): boolean {
@@ -2170,16 +2169,9 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
     fileHashBefore: string;
     fileHashAfter: string;
   }> {
-    if (!isOverwriteGloballyEnabled()) {
-      throw new Error(
-        "OVERWRITE_DISABLED: storeEditedBuffer requires KODA_EDITING_ENABLE_OVERWRITE=true.",
-      );
-    }
-    if (isProtectedRuntimeEnv() && !allowOverwriteInProtectedEnv()) {
-      throw new Error(
-        "OVERWRITE_DISABLED_IN_PROTECTED_ENV: storeEditedBuffer requires KODA_EDITING_ALLOW_OVERWRITE_PROTECTED=true.",
-      );
-    }
+    throw new Error(
+      "OVERWRITE_DISABLED: storeEditedBuffer is no longer supported. Use revision mode.",
+    );
 
     const docId = input.documentId.trim();
     const userId = input.userId.trim();

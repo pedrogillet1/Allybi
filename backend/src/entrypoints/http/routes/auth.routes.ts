@@ -23,6 +23,7 @@ import {
 import {
   AuthController,
   createAuthController,
+  mapServiceError,
 } from "../../../controllers/auth.controller";
 import { validate } from "../../../middleware/validate.middleware";
 import {
@@ -34,16 +35,31 @@ import {
 import prisma from "../../../platform/db/prismaClient";
 import { config } from "../../../config/env";
 import { generateAccessToken, generateRefreshToken } from "../../../utils/jwt";
-import { setAuthCookies } from "../../../utils/authCookies";
+import {
+  setAuthCookies,
+  clearAuthCookies,
+  setTwoFactorChallengeCookie,
+  clearTwoFactorChallengeCookie,
+  TWO_FACTOR_CHALLENGE_COOKIE,
+} from "../../../utils/authCookies";
 import { logger } from "../../../utils/logger";
 import {
   issueGoogleOAuthState,
   verifyGoogleOAuthState,
+  issueAppleOAuthState,
+  verifyAppleOAuthState,
   timingSafeEqualString,
 } from "../../../services/authOAuthState.service";
+import { verifyAppleIdToken } from "../../../services/appleOidc.service";
+import {
+  consumeTwoFactorLoginChallenge,
+  issueTwoFactorLoginChallenge,
+  verifyTwoFactorLoginChallenge,
+} from "../../../services/authLoginChallenge.service";
 
 import * as authService from "../../../services/auth.service";
 import * as twoFactorController from "../../../controllers/twoFactor.controller";
+import * as twoFactorService from "../../../services/twoFactor.service";
 
 const router = Router();
 
@@ -54,7 +70,9 @@ const router = Router();
 const REFRESH_TOKEN_PEPPER =
   process.env.KODA_REFRESH_PEPPER || process.env.JWT_REFRESH_SECRET || "";
 const GOOGLE_OAUTH_STATE_COOKIE = "koda_google_oauth_state";
+const APPLE_OAUTH_STATE_COOKIE = "koda_apple_oauth_state";
 const GOOGLE_OAUTH_STATE_TTL_MS = 10 * 60 * 1000;
+const APPLE_OAUTH_STATE_TTL_MS = 10 * 60 * 1000;
 const isProduction = process.env.NODE_ENV === "production";
 
 function hmacSha256(input: string): string {
@@ -92,11 +110,103 @@ function clearGoogleOAuthStateCookie(res: Response): void {
   res.clearCookie(GOOGLE_OAUTH_STATE_COOKIE, { path: "/" });
 }
 
+function setAppleOAuthStateCookie(res: Response, stateToken: string): void {
+  res.cookie(APPLE_OAUTH_STATE_COOKIE, stateToken, {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: "lax",
+    path: "/",
+    maxAge: APPLE_OAUTH_STATE_TTL_MS,
+  });
+}
+
+function clearAppleOAuthStateCookie(res: Response): void {
+  res.clearCookie(APPLE_OAUTH_STATE_COOKIE, { path: "/" });
+}
+
 function getGoogleOAuthStateFromQuery(req: Request): string {
   const raw = req.query?.state;
   if (typeof raw === "string") return raw.trim();
   if (Array.isArray(raw) && typeof raw[0] === "string") return raw[0].trim();
   return "";
+}
+
+function getAppleOAuthState(req: Request): string {
+  const queryRaw = req.query?.state;
+  if (typeof queryRaw === "string" && queryRaw.trim()) return queryRaw.trim();
+  if (Array.isArray(queryRaw) && typeof queryRaw[0] === "string") {
+    return queryRaw[0].trim();
+  }
+  const bodyRaw = (req.body as any)?.state;
+  if (typeof bodyRaw === "string" && bodyRaw.trim()) return bodyRaw.trim();
+  return "";
+}
+
+function routeErr(
+  res: Response,
+  code: string,
+  message: string,
+  status = 400,
+): Response {
+  return res.status(status).json({
+    ok: false,
+    error: { code, message },
+  });
+}
+
+async function issueSessionTokensForUser(userId: string, email: string) {
+  const refreshToken = generateRefreshToken({
+    userId,
+    email,
+  });
+  const session = await prisma.session.create({
+    data: {
+      userId,
+      refreshTokenHash: hmacSha256(refreshToken),
+      tokenVersion: 1,
+      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      isActive: true,
+    },
+  });
+  const accessToken = generateAccessToken({
+    userId,
+    email,
+    sid: session.id,
+    sv: session.tokenVersion,
+  });
+  return { accessToken, refreshToken };
+}
+
+function toPublicUser(
+  user: {
+    id: string;
+    email: string;
+    firstName: string | null;
+    lastName: string | null;
+    phoneNumber: string | null;
+    profileImage: string | null;
+    isEmailVerified: boolean;
+    isPhoneVerified: boolean;
+    googleId: string | null;
+    appleId: string | null;
+    subscriptionTier: string | null;
+    createdAt: Date;
+  },
+) {
+  return {
+    id: user.id,
+    email: user.email,
+    name: [user.firstName, user.lastName].filter(Boolean).join(" ") || null,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    phoneNumber: user.phoneNumber,
+    profileImage: user.profileImage,
+    isEmailVerified: user.isEmailVerified,
+    isPhoneVerified: user.isPhoneVerified,
+    isOAuth: !!(user.googleId || user.appleId),
+    subscriptionTier: user.subscriptionTier,
+    createdAt: user.createdAt.toISOString(),
+  };
 }
 
 export function startGoogleOAuth(
@@ -177,6 +287,7 @@ async function handleOAuthUser(
     googleId?: string;
     appleId?: string;
     email: string;
+    emailVerified?: boolean | null;
     displayName?: string;
   },
 ) {
@@ -223,28 +334,28 @@ async function handleOAuthUser(
       });
     }
 
-    // Issue session + tokens (same pattern as authBridge.ts)
-    const refreshToken = generateRefreshToken({
-      userId: user.id,
-      email: user.email,
-    });
-    const session = await prisma.session.create({
-      data: {
-        userId: user.id,
-        refreshTokenHash: hmacSha256(refreshToken),
-        tokenVersion: 1,
-        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-        isActive: true,
-      },
-    });
-    const accessToken = generateAccessToken({
-      userId: user.id,
-      email: user.email,
-      sid: session.id,
-      sv: session.tokenVersion,
+    const twoFactorState = await prisma.twoFactorAuth.findUnique({
+      where: { userId: user.id },
+      select: { isEnabled: true },
     });
 
+    if (twoFactorState?.isEnabled) {
+      const challengeToken = await issueTwoFactorLoginChallenge({
+        userId: user.id,
+        email: user.email,
+      });
+      clearAuthCookies(res);
+      setTwoFactorChallengeCookie(res, challengeToken);
+      return res.redirect(`${config.FRONTEND_URL}/a/x7k2m9/c3b?auth=2fa_required`);
+    }
+
+    const { accessToken, refreshToken } = await issueSessionTokensForUser(
+      user.id,
+      user.email,
+    );
+
     // Set HTTP-only cookies (Safari-resilient)
+    clearTwoFactorChallengeCookie(res);
     setAuthCookies(res, accessToken, refreshToken);
     return res.redirect(`${config.FRONTEND_URL}/a/x7k2m9/c3b?auth=ok`);
   } catch (e: any) {
@@ -301,7 +412,12 @@ router.post(
     try {
       const { email, code } = req.body;
       if (!email || !code)
-        return res.status(400).json({ error: "Email and code are required" });
+        return routeErr(
+          res,
+          "VALIDATION_EMAIL_CODE_REQUIRED",
+          "Email and code are required.",
+          400,
+        );
       const result = await authService.verifyPendingUserEmail(email, code);
       // Set auth cookies if tokens were returned (registration complete)
       if (result.tokens?.accessToken && result.tokens?.refreshToken) {
@@ -312,8 +428,8 @@ router.post(
         );
       }
       return res.status(200).json(result);
-    } catch (e: any) {
-      return res.status(400).json({ error: e.message });
+    } catch (e) {
+      return mapServiceError(res, e);
     }
   },
 );
@@ -324,11 +440,17 @@ router.post(
   async (req: Request, res: Response) => {
     try {
       const { email } = req.body;
-      if (!email) return res.status(400).json({ error: "Email is required" });
+      if (!email)
+        return routeErr(
+          res,
+          "VALIDATION_EMAIL_REQUIRED",
+          "Email is required.",
+          400,
+        );
       const result = await authService.resendPendingUserEmail(email);
       return res.status(200).json(result);
-    } catch (e: any) {
-      return res.status(400).json({ error: e.message });
+    } catch (e) {
+      return mapServiceError(res, e);
     }
   },
 );
@@ -340,16 +462,19 @@ router.post(
     try {
       const { email, phoneNumber } = req.body;
       if (!email || !phoneNumber)
-        return res
-          .status(400)
-          .json({ error: "Email and phone number are required" });
+        return routeErr(
+          res,
+          "VALIDATION_EMAIL_PHONE_REQUIRED",
+          "Email and phone number are required.",
+          400,
+        );
       const result = await authService.addPhoneToPendingUser(
         email,
         phoneNumber,
       );
       return res.status(200).json(result);
-    } catch (e: any) {
-      return res.status(400).json({ error: e.message });
+    } catch (e) {
+      return mapServiceError(res, e);
     }
   },
 );
@@ -361,7 +486,12 @@ router.post(
     try {
       const { email, code } = req.body;
       if (!email || !code)
-        return res.status(400).json({ error: "Email and code are required" });
+        return routeErr(
+          res,
+          "VALIDATION_EMAIL_CODE_REQUIRED",
+          "Email and code are required.",
+          400,
+        );
       const result = await authService.verifyPendingUserPhone(email, code);
       // Set auth cookies if tokens were returned (registration complete)
       if (result.tokens?.accessToken && result.tokens?.refreshToken) {
@@ -372,8 +502,8 @@ router.post(
         );
       }
       return res.status(200).json(result);
-    } catch (e: any) {
-      return res.status(400).json({ error: e.message });
+    } catch (e) {
+      return mapServiceError(res, e);
     }
   },
 );
@@ -387,11 +517,12 @@ router.post(
   async (req: Request, res: Response) => {
     try {
       const userId = (req as any).user?.id;
-      if (!userId) return res.status(401).json({ error: "Unauthorized" });
+      if (!userId)
+        return routeErr(res, "AUTH_UNAUTHORIZED", "Unauthorized.", 401);
       const result = await authService.sendEmailVerificationCode(userId);
       return res.status(200).json(result);
-    } catch (e: any) {
-      return res.status(400).json({ error: e.message });
+    } catch (e) {
+      return mapServiceError(res, e);
     }
   },
 );
@@ -403,12 +534,19 @@ router.post(
     try {
       const userId = (req as any).user?.id;
       const { code } = req.body;
-      if (!userId) return res.status(401).json({ error: "Unauthorized" });
-      if (!code) return res.status(400).json({ error: "Code is required" });
+      if (!userId)
+        return routeErr(res, "AUTH_UNAUTHORIZED", "Unauthorized.", 401);
+      if (!code)
+        return routeErr(
+          res,
+          "VALIDATION_CODE_REQUIRED",
+          "Code is required.",
+          400,
+        );
       const result = await authService.verifyEmailCode(userId, code);
       return res.status(200).json(result);
-    } catch (e: any) {
-      return res.status(400).json({ error: e.message });
+    } catch (e) {
+      return mapServiceError(res, e);
     }
   },
 );
@@ -420,16 +558,22 @@ router.post(
     try {
       const userId = (req as any).user?.id;
       const { phoneNumber } = req.body;
-      if (!userId) return res.status(401).json({ error: "Unauthorized" });
+      if (!userId)
+        return routeErr(res, "AUTH_UNAUTHORIZED", "Unauthorized.", 401);
       if (!phoneNumber)
-        return res.status(400).json({ error: "Phone number is required" });
+        return routeErr(
+          res,
+          "VALIDATION_PHONE_REQUIRED",
+          "Phone number is required.",
+          400,
+        );
       const result = await authService.sendPhoneVerificationCode(
         userId,
         phoneNumber,
       );
       return res.status(200).json(result);
-    } catch (e: any) {
-      return res.status(400).json({ error: e.message });
+    } catch (e) {
+      return mapServiceError(res, e);
     }
   },
 );
@@ -441,12 +585,19 @@ router.post(
     try {
       const userId = (req as any).user?.id;
       const { code } = req.body;
-      if (!userId) return res.status(401).json({ error: "Unauthorized" });
-      if (!code) return res.status(400).json({ error: "Code is required" });
+      if (!userId)
+        return routeErr(res, "AUTH_UNAUTHORIZED", "Unauthorized.", 401);
+      if (!code)
+        return routeErr(
+          res,
+          "VALIDATION_CODE_REQUIRED",
+          "Code is required.",
+          400,
+        );
       const result = await authService.verifyPhoneCode(userId, code);
       return res.status(200).json(result);
-    } catch (e: any) {
-      return res.status(400).json({ error: e.message });
+    } catch (e) {
+      return mapServiceError(res, e);
     }
   },
 );
@@ -459,7 +610,81 @@ router.post("/2fa/verify", authenticateToken, twoFactorController.verify2FA);
 router.post(
   "/2fa/verify-login",
   twoFactorLimiter,
-  twoFactorController.verify2FALogin,
+  async (req: Request, res: Response) => {
+    try {
+      const twoFactorToken = String((req.body as any)?.token || "").trim();
+      const challengeToken = String(
+        (req.body as any)?.challengeToken ||
+          req.cookies?.koda_2fa_challenge ||
+          req.cookies?.[TWO_FACTOR_CHALLENGE_COOKIE] ||
+          "",
+      ).trim();
+
+      if (!twoFactorToken) {
+        return routeErr(
+          res,
+          "VALIDATION_2FA_TOKEN_REQUIRED",
+          "2FA token is required.",
+          400,
+        );
+      }
+      if (!challengeToken) {
+        return routeErr(
+          res,
+          "AUTH_2FA_CHALLENGE_REQUIRED",
+          "Two-factor challenge is required.",
+          401,
+        );
+      }
+
+      const challenge = await verifyTwoFactorLoginChallenge(challengeToken);
+      const verification = await twoFactorService.verify2FALogin(
+        challenge.userId,
+        twoFactorToken,
+      );
+      await consumeTwoFactorLoginChallenge(challengeToken);
+
+      const user = await prisma.user.findUnique({
+        where: { id: challenge.userId },
+        select: {
+          id: true,
+          email: true,
+          firstName: true,
+          lastName: true,
+          phoneNumber: true,
+          profileImage: true,
+          isEmailVerified: true,
+          isPhoneVerified: true,
+          googleId: true,
+          appleId: true,
+          subscriptionTier: true,
+          createdAt: true,
+        },
+      });
+
+      if (!user) {
+        throw new Error("User not found");
+      }
+
+      const tokens = await issueSessionTokensForUser(user.id, user.email);
+      clearTwoFactorChallengeCookie(res);
+      setAuthCookies(res, tokens.accessToken, tokens.refreshToken);
+
+      return res.status(200).json({
+        user: toPublicUser(user),
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
+        usedBackupCode: Boolean((verification as any)?.usedBackupCode),
+      });
+    } catch (e) {
+      const message =
+        e instanceof Error ? e.message.toLowerCase() : String(e).toLowerCase();
+      if (message.includes("2fa challenge") || message.includes("challenge")) {
+        clearTwoFactorChallengeCookie(res);
+      }
+      return mapServiceError(res, e);
+    }
+  },
 );
 router.post("/2fa/disable", authenticateToken, twoFactorController.disable2FA);
 router.get(
@@ -478,16 +703,19 @@ router.post(
     try {
       const { email, phoneNumber } = req.body;
       if (!email && !phoneNumber)
-        return res
-          .status(400)
-          .json({ error: "Email or phone number is required" });
+        return routeErr(
+          res,
+          "VALIDATION_EMAIL_OR_PHONE_REQUIRED",
+          "Email or phone number is required.",
+          400,
+        );
       const result = await authService.requestPasswordReset({
         email,
         phoneNumber,
       });
       return res.status(200).json(result);
-    } catch (e: any) {
-      return res.status(400).json({ error: e.message });
+    } catch (e) {
+      return mapServiceError(res, e);
     }
   },
 );
@@ -498,15 +726,21 @@ router.post(
   async (req: Request, res: Response) => {
     try {
       const { email, phoneNumber, code } = req.body;
-      if (!code) return res.status(400).json({ error: "Code is required" });
+      if (!code)
+        return routeErr(
+          res,
+          "VALIDATION_CODE_REQUIRED",
+          "Code is required.",
+          400,
+        );
       const result = await authService.verifyPasswordResetCode({
         email,
         phoneNumber,
         code,
       });
       return res.status(200).json(result);
-    } catch (e: any) {
-      return res.status(400).json({ error: e.message });
+    } catch (e) {
+      return mapServiceError(res, e);
     }
   },
 );
@@ -518,9 +752,12 @@ router.post(
     try {
       const { email, phoneNumber, code, newPassword } = req.body;
       if (!code || !newPassword)
-        return res
-          .status(400)
-          .json({ error: "Code and new password are required" });
+        return routeErr(
+          res,
+          "VALIDATION_RESET_INPUT_REQUIRED",
+          "Code and new password are required.",
+          400,
+        );
       const result = await authService.resetPassword({
         email,
         phoneNumber,
@@ -528,8 +765,8 @@ router.post(
         newPassword,
       });
       return res.status(200).json(result);
-    } catch (e: any) {
-      return res.status(400).json({ error: e.message });
+    } catch (e) {
+      return mapServiceError(res, e);
     }
   },
 );
@@ -543,11 +780,17 @@ router.post(
   async (req: Request, res: Response) => {
     try {
       const { email } = req.body;
-      if (!email) return res.status(400).json({ error: "Email is required" });
+      if (!email)
+        return routeErr(
+          res,
+          "VALIDATION_EMAIL_REQUIRED",
+          "Email is required.",
+          400,
+        );
       const result = await authService.initiateForgotPassword(email);
       return res.status(200).json(result);
-    } catch (e: any) {
-      return res.status(400).json({ error: e.message });
+    } catch (e) {
+      return mapServiceError(res, e);
     }
   },
 );
@@ -559,13 +802,16 @@ router.post(
     try {
       const { sessionToken, method } = req.body;
       if (!sessionToken || !method)
-        return res
-          .status(400)
-          .json({ error: "Session token and method are required" });
+        return routeErr(
+          res,
+          "VALIDATION_RESET_METHOD_REQUIRED",
+          "Session token and method are required.",
+          400,
+        );
       const result = await authService.sendResetLink(sessionToken, method);
       return res.status(200).json(result);
-    } catch (e: any) {
-      return res.status(400).json({ error: e.message });
+    } catch (e) {
+      return mapServiceError(res, e);
     }
   },
 );
@@ -577,16 +823,19 @@ router.post(
     try {
       const { token, newPassword } = req.body;
       if (!token || !newPassword)
-        return res
-          .status(400)
-          .json({ error: "Token and new password are required" });
+        return routeErr(
+          res,
+          "VALIDATION_RESET_TOKEN_REQUIRED",
+          "Token and new password are required.",
+          400,
+        );
       const result = await authService.resetPasswordWithToken(
         token,
         newPassword,
       );
       return res.status(200).json(result);
-    } catch (e: any) {
-      return res.status(400).json({ error: e.message });
+    } catch (e) {
+      return mapServiceError(res, e);
     }
   },
 );
@@ -618,14 +867,25 @@ router.get(
   }),
   (req: Request, res: Response) => {
     const profile = req.user as
-      | { id: string; email: string; displayName?: string }
+      | {
+          id: string;
+          email: string;
+          emailVerified?: boolean | null;
+          displayName?: string;
+        }
       | undefined;
     if (!profile?.email) {
       return res.redirect(`${config.FRONTEND_URL}/a/x7k2m9/c3b?error=no_email`);
     }
+    if (profile.emailVerified === false) {
+      return res.redirect(
+        `${config.FRONTEND_URL}/a/x7k2m9/c3b?error=email_not_verified`,
+      );
+    }
     return handleOAuthUser(res, {
       googleId: profile.id,
       email: profile.email,
+      emailVerified: profile.emailVerified,
       displayName: profile.displayName,
     });
   },
@@ -633,15 +893,28 @@ router.get(
 
 /**
  * Apple OAuth
- * Apple sends a POST to the callback URL (not GET).
- * Uses the `id_token` from Apple's response to extract user info.
+ * Apple sends a POST to the callback URL (response_mode=form_post).
  */
 router.get("/apple", authLimiter, (_req: Request, res: Response) => {
-  if (!config.APPLE_CLIENT_ID) {
+  if (!config.APPLE_CLIENT_ID || !config.APPLE_CALLBACK_URL) {
     return res.redirect(
       `${config.FRONTEND_URL}/a/x7k2m9/c3b?error=apple_not_configured`,
     );
   }
+
+  const stateSecret = resolveGoogleOAuthStateSecret();
+  if (!stateSecret) {
+    logger.error("[Apple OAuth] State secret is missing.");
+    clearAppleOAuthStateCookie(res);
+    return res.redirect(`${config.FRONTEND_URL}/a/x7k2m9/c3b?error=oauth_failed`);
+  }
+
+  const nonce = crypto.randomUUID();
+  const stateToken = issueAppleOAuthState({
+    secret: stateSecret,
+    nonce,
+  });
+  setAppleOAuthStateCookie(res, stateToken);
 
   const params = new URLSearchParams({
     client_id: config.APPLE_CLIENT_ID,
@@ -649,6 +922,8 @@ router.get("/apple", authLimiter, (_req: Request, res: Response) => {
     response_type: "code id_token",
     scope: "name email",
     response_mode: "form_post",
+    state: stateToken,
+    nonce: nonce,
   });
 
   return res.redirect(
@@ -666,6 +941,11 @@ router.post(
         user?: string;
         code?: string;
       };
+      const stateFromRequest = getAppleOAuthState(req);
+      const stateFromCookie = String(
+        req.cookies?.[APPLE_OAUTH_STATE_COOKIE] || "",
+      ).trim();
+      clearAppleOAuthStateCookie(res);
 
       if (!id_token) {
         return res.redirect(
@@ -673,18 +953,40 @@ router.post(
         );
       }
 
-      // Decode the id_token (Apple signs it, payload is base64url-encoded JSON)
-      const payloadB64 = id_token.split(".")[1];
-      if (!payloadB64) {
+      if (
+        !stateFromRequest ||
+        !stateFromCookie ||
+        !timingSafeEqualString(stateFromRequest, stateFromCookie)
+      ) {
+        logger.warn("[Apple OAuth] Callback state mismatch.");
         return res.redirect(
-          `${config.FRONTEND_URL}/a/x7k2m9/c3b?error=oauth_failed`,
+          `${config.FRONTEND_URL}/a/x7k2m9/c3b?error=invalid_state`,
         );
       }
-      const payload = JSON.parse(
-        Buffer.from(payloadB64, "base64url").toString("utf8"),
-      );
-      const appleId = payload.sub as string;
-      const email = (payload.email as string) || "";
+
+      const stateSecret = resolveGoogleOAuthStateSecret();
+      const stateVerification = verifyAppleOAuthState({
+        state: stateFromRequest,
+        secret: stateSecret,
+        ttlMs: APPLE_OAUTH_STATE_TTL_MS,
+      });
+      if (!stateVerification.ok) {
+        logger.warn("[Apple OAuth] Callback state verification failed.", {
+          reason: stateVerification.reason,
+        });
+        return res.redirect(
+          `${config.FRONTEND_URL}/a/x7k2m9/c3b?error=invalid_state`,
+        );
+      }
+
+      const claims = await verifyAppleIdToken({
+        idToken: id_token,
+        clientId: config.APPLE_CLIENT_ID,
+        expectedNonce: stateVerification.payload.nonce,
+      });
+
+      const appleId = claims.sub;
+      const email = String(claims.email || "").trim().toLowerCase();
 
       if (!email) {
         return res.redirect(

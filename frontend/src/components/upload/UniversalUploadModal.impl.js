@@ -979,14 +979,9 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
             }
 
             // ═══════════════════════════════════════════════════════════════════════════
-            // HARDENING: Update global progress during upload phase (capped at 94%)
-            // This ensures the progress bar always moves forward during uploads
+            // HARDENING: Update global progress during upload phase (aggregate of all items)
             // ═══════════════════════════════════════════════════════════════════════════
-            if (progress.percentage !== undefined) {
-              // Cap at 94% during upload - 95-100 reserved for finalize phase
-              const cappedProgress = Math.min(94, progress.percentage);
-              setGlobalProgress(prev => Math.max(prev, cappedProgress));
-            }
+            updateAggregateProgress();
 
             // ═══════════════════════════════════════════════════════════════════════════
             // FIX #1: Update accepted files count when service reports actual count
@@ -1068,6 +1063,19 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
       }
     }
 
+    // Helper: recompute aggregate globalProgress from all items (capped at 94%)
+    const updateAggregateProgress = () => {
+      setUploadingFiles(prev => {
+        const uploadItems = prev.filter(f => f.status === 'uploading' || f.status === 'completed' || f.status === 'failed');
+        if (uploadItems.length > 0) {
+          const avg = uploadItems.reduce((sum, f) => sum + (f.progress || 0), 0) / uploadItems.length;
+          const capped = Math.min(94, Math.round(avg));
+          setGlobalProgress(p => Math.max(p, capped));
+        }
+        return prev; // no mutation
+      });
+    };
+
     // ✅ Process file uploads using unified service with MONOTONIC PROGRESS ENFORCEMENT
     const processFile = async (fileEntry) => {
       const makeProgressHandler = () => (progress) => {
@@ -1094,6 +1102,9 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
             } : f
           );
         });
+
+        // Update aggregate global progress bar
+        updateAggregateProgress();
       };
 
       try {

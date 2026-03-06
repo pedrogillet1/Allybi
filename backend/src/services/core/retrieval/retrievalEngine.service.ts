@@ -398,6 +398,8 @@ export interface RetrievalRuleTelemetryEvent {
 interface DocumentClassificationResult {
   domain: DocumentIntelligenceDomain | null;
   docTypeId: string | null;
+  docTypeAlternatives?: string[];
+  docTypeAmbiguous?: boolean;
   confidence: number;
   reasons: string[];
   matchedDomainRuleIds: string[];
@@ -409,6 +411,30 @@ interface DocTypeBoostPlan {
   sectionAnchors: string[];
   tableAnchors: string[];
   reasons: string[];
+}
+
+interface DocTypeClassificationCandidate {
+  domain: DocumentIntelligenceDomain;
+  docTypeId: string;
+  score: number;
+  reasons: string[];
+}
+
+interface DocTypeClassificationResult {
+  docTypeId: string;
+  score: number;
+  reasons: string[];
+  alternatives: string[];
+  ambiguous: boolean;
+}
+
+interface DocTypeConfusionMatrixRule {
+  id?: string;
+  docTypeA?: string;
+  docTypeB?: string;
+  winner?: string;
+  structureCue?: string;
+  confidenceBoost?: number;
 }
 
 interface RetrievalPhaseCounts {
@@ -596,7 +622,10 @@ export class RetrievalEngineService {
       Partial<
         Pick<
           DocumentIntelligenceBanksService,
-          "getDocTypeExtractionHints" | "getCrossDocAlignmentRules"
+          | "getDocTypeExtractionHints"
+          | "getCrossDocAlignmentRules"
+          | "getDomainEntitySchema"
+          | "getDiOntology"
         >
       > = getDocumentIntelligenceBanksInstance(),
   ) {}
@@ -620,6 +649,9 @@ export class RetrievalEngineService {
     const boostsTitle = this.safeGetBank<Record<string, any>>("doc_title_boost_rules");
     const boostsType = this.safeGetBank<Record<string, any>>("doc_type_boost_rules");
     const boostsRecency = this.safeGetBank<Record<string, any>>("recency_boost_rules");
+    const amendmentChainSchema = this.safeGetBank<Record<string, any>>(
+      "amendment_chain_schema",
+    );
     const routingPriority = this.safeGetBank<Record<string, any>>("routing_priority");
     const diversification = this.getRequiredBank<any>("diversification_rules");
     const negatives = this.getRequiredBank<any>("retrieval_negatives");
@@ -1053,6 +1085,7 @@ export class RetrievalEngineService {
         boostsTitle,
         boostsType,
         boostsRecency,
+        amendmentChainSchema,
       },
       docMetaById,
     );
@@ -1708,6 +1741,11 @@ export class RetrievalEngineService {
     return normalized || null;
   }
 
+  private asObject(value: unknown): Record<string, any> {
+    if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+    return value as Record<string, any>;
+  }
+
   private listClassificationDomains(): DocumentIntelligenceDomain[] {
     const fallback: DocumentIntelligenceDomain[] = [
       "accounting",
@@ -1745,14 +1783,169 @@ export class RetrievalEngineService {
     }
   }
 
+  private normalizeDetectionPattern(pattern: string): string {
+    const raw = String(pattern || "").trim();
+    if (!raw) return "";
+    // Repair malformed generated sequences like "\\s\\+" -> "\\s+"
+    return raw
+      .replace(/\\\\s\\\+/g, "\\s+")
+      .replace(/\\s\\\+/g, "\\s+");
+  }
+
+  private patternMatches(input: string, pattern: string): boolean {
+    const normalized = this.normalizeDetectionPattern(pattern);
+    if (!normalized) return false;
+    return this.regexMatches(input, normalized);
+  }
+
+  private escapeRegexToken(value: string): string {
+    return String(value || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+
+  private scoreStructureCueMatch(query: string, structureCue: string): number {
+    const cue = String(structureCue || "")
+      .trim()
+      .toLowerCase();
+    if (!cue) return 0;
+    const queryTokens = this.simpleTokens(query);
+    const cueTokens = cue
+      .split(/[^a-z0-9]+/)
+      .map((token) => token.trim())
+      .filter((token) => token.length >= 3);
+    if (!queryTokens.length || !cueTokens.length) return 0;
+    const querySet = new Set(queryTokens);
+    let hits = 0;
+    for (const token of cueTokens) {
+      if (querySet.has(token)) hits += 1;
+    }
+    return hits / cueTokens.length;
+  }
+
+  private buildDocTypeFallbackPatterns(
+    docType: Record<string, any>,
+    domain: DocumentIntelligenceDomain,
+  ): string[] {
+    const patterns: string[] = [];
+    const id = this.normalizeDocType(docType?.id) || "";
+    const idParts = id.split("_").filter(Boolean);
+    let tokenParts = [...idParts];
+    if (tokenParts[0] === domain) {
+      tokenParts = tokenParts.slice(1);
+    }
+    if (tokenParts.length >= 2) {
+      patterns.push(`\\b${tokenParts.map((part) => this.escapeRegexToken(part)).join("\\s+")}\\b`);
+      patterns.push(`\\b${tokenParts.slice(0, 2).map((part) => this.escapeRegexToken(part)).join("\\s+")}\\b`);
+    }
+    const name = docType?.name as Record<string, any> | undefined;
+    const names = [String(name?.en || ""), String(name?.pt || "")]
+      .map((value) => value.trim())
+      .filter(Boolean);
+    for (const label of names) {
+      const parts = label
+        .toLowerCase()
+        .split(/[^a-z0-9]+/)
+        .map((part) => part.trim())
+        .filter((part) => part.length >= 2);
+      if (parts.length >= 2) {
+        patterns.push(`\\b${parts.map((part) => this.escapeRegexToken(part)).join("\\s+")}\\b`);
+      }
+    }
+    return Array.from(new Set(patterns.map((pattern) => this.normalizeDetectionPattern(pattern)).filter(Boolean)));
+  }
+
+  private inferDomainFromDocTypeId(
+    docTypeId: string,
+    domains: DocumentIntelligenceDomain[],
+  ): DocumentIntelligenceDomain | null {
+    const normalizedDocType = this.normalizeDocType(docTypeId);
+    if (!normalizedDocType) return null;
+    for (const domain of domains) {
+      const provider = this.documentIntelligenceBanks as Record<string, any>;
+      const catalog =
+        typeof provider.getDocTypeCatalog === "function"
+          ? provider.getDocTypeCatalog(domain)
+          : null;
+      const docTypes = Array.isArray(catalog?.docTypes) ? catalog.docTypes : [];
+      const hasDocType = docTypes.some(
+        (entry: unknown) =>
+          this.normalizeDocType((entry as Record<string, any>)?.id) ===
+          normalizedDocType,
+      );
+      if (hasDocType) return domain;
+    }
+    return null;
+  }
+
+  private applyDocTypeConfusionMatrix(
+    query: string,
+    domains: DocumentIntelligenceDomain[],
+    candidates: DocTypeClassificationCandidate[],
+  ): DocTypeClassificationCandidate[] {
+    if (candidates.length < 2) return candidates;
+    const confusionBank =
+      this.safeGetBank<Record<string, any>>("doc_type_confusion_matrix");
+    if (!confusionBank || confusionBank?.config?.enabled === false) {
+      return candidates;
+    }
+    const rules = Array.isArray(confusionBank?.rules)
+      ? (confusionBank.rules as DocTypeConfusionMatrixRule[])
+      : [];
+    if (!rules.length) return candidates;
+
+    const updated = candidates.map((candidate) => ({
+      ...candidate,
+      reasons: [...candidate.reasons],
+    }));
+    const byDocType = new Map<string, number>();
+    for (let i = 0; i < updated.length; i += 1) {
+      byDocType.set(updated[i].docTypeId, i);
+    }
+
+    for (const rule of rules) {
+      const typeA = this.normalizeDocType(rule?.docTypeA);
+      const typeB = this.normalizeDocType(rule?.docTypeB);
+      const winner = this.normalizeDocType(rule?.winner);
+      if (!typeA || !typeB || !winner) continue;
+      const winnerDomain = this.inferDomainFromDocTypeId(winner, domains);
+      if (!winnerDomain) continue;
+
+      const winnerIndex = byDocType.get(winner);
+      if (winnerIndex == null) continue;
+      const loserType = winner === typeA ? typeB : typeA;
+      const loserIndex = byDocType.get(loserType);
+      if (loserIndex == null) continue;
+
+      const cue = String(rule?.structureCue || "").trim();
+      const cueScore = cue ? this.scoreStructureCueMatch(query, cue) : 0;
+      let boost = Number.isFinite(Number(rule?.confidenceBoost))
+        ? Number(rule?.confidenceBoost)
+        : 0.22;
+      if (cue) {
+        if (cueScore <= 0) {
+          boost *= 0.35;
+        } else {
+          boost += Math.min(0.16, cueScore * 0.2);
+        }
+      }
+      if (boost <= 0) continue;
+
+      updated[winnerIndex].score += boost;
+      updated[winnerIndex].reasons.push(
+        `doc_type_confusion_rule:${String(rule?.id || "rule")}:${winnerDomain}`,
+      );
+    }
+
+    updated.sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score;
+      return a.docTypeId.localeCompare(b.docTypeId);
+    });
+    return updated;
+  }
+
   private classifyDocTypeForDomain(
     domain: DocumentIntelligenceDomain,
     normalizedQuery: string,
-  ): {
-    docTypeId: string;
-    score: number;
-    reasons: string[];
-  } | null {
+  ): DocTypeClassificationResult | null {
     const provider = this.documentIntelligenceBanks as Record<string, any>;
     const catalog =
       typeof provider.getDocTypeCatalog === "function"
@@ -1773,29 +1966,83 @@ export class RetrievalEngineService {
             .map((value: unknown) => String(value || "").trim())
             .filter(Boolean)
         : [];
+      const negativePatterns = Array.isArray(docType?.negativeDetectionPatterns)
+        ? docType.negativeDetectionPatterns
+            .map((value: unknown) => String(value || "").trim())
+            .filter(Boolean)
+        : [];
+      const fallbackPatterns =
+        patterns.length >= 3
+          ? []
+          : this.buildDocTypeFallbackPatterns(docType as Record<string, any>, domain);
+      const effectivePatterns = Array.from(
+        new Set(
+          [...patterns, ...fallbackPatterns]
+            .map((value) => this.normalizeDetectionPattern(value))
+            .filter(Boolean),
+        ),
+      );
       let hitCount = 0;
+      let negativeHitCount = 0;
       const reasons: string[] = [];
-      for (const pattern of patterns) {
-        if (!this.regexMatches(normalizedQuery, pattern)) continue;
+      for (const pattern of effectivePatterns) {
+        if (!this.patternMatches(normalizedQuery, pattern)) continue;
         hitCount += 1;
         reasons.push(`doc_type_pattern:${pattern}`);
       }
+      for (const pattern of negativePatterns) {
+        const normalizedPattern = this.normalizeDetectionPattern(pattern);
+        if (!normalizedPattern) continue;
+        if (!this.patternMatches(normalizedQuery, normalizedPattern)) continue;
+        negativeHitCount += 1;
+        reasons.push(`doc_type_negative_pattern:${normalizedPattern}`);
+      }
       if (!hitCount) continue;
       const priority = safeNumber(docType?.priority, 0);
-      const score = hitCount + Math.max(0, priority) / 100;
+      const score = hitCount + Math.max(0, priority) / 100 - negativeHitCount * 0.75;
+      if (score <= 0) continue;
       matches.push({
         docTypeId,
         score,
-        reasons: reasons.slice(0, 6),
+        reasons: reasons.slice(0, 10),
       });
     }
 
     if (!matches.length) return null;
-    matches.sort((a, b) => {
+    const boosted = this.applyDocTypeConfusionMatrix(
+      normalizedQuery,
+      this.listClassificationDomains(),
+      matches.map((row) => ({
+        domain,
+        docTypeId: row.docTypeId,
+        score: row.score,
+        reasons: [...row.reasons],
+      })),
+    ).map((row) => ({
+      docTypeId: row.docTypeId,
+      score: row.score,
+      reasons: row.reasons,
+    }));
+    boosted.sort((a, b) => {
       if (b.score !== a.score) return b.score - a.score;
       return a.docTypeId.localeCompare(b.docTypeId);
     });
-    return matches[0];
+    const top = boosted[0];
+    const second = boosted[1];
+    const gap = second ? top.score - second.score : Number.POSITIVE_INFINITY;
+    const ambiguous = Boolean(
+      second &&
+        second.score > 0 &&
+        gap < 0.35 &&
+        top.score < 3.2,
+    );
+    return {
+      docTypeId: top.docTypeId,
+      score: top.score,
+      reasons: top.reasons.slice(0, 12),
+      alternatives: boosted.slice(1, 4).map((row) => row.docTypeId),
+      ambiguous,
+    };
   }
 
   private classifyDocumentContext(params: {
@@ -1807,6 +2054,8 @@ export class RetrievalEngineService {
   }): DocumentClassificationResult {
     const reasons: string[] = [];
     const matchedDomainRuleIds: string[] = [];
+    let docTypeAlternatives: string[] = [];
+    let docTypeAmbiguous = false;
     const domains = this.listClassificationDomains();
 
     let domain = params.hintedDomain;
@@ -1904,30 +2153,44 @@ export class RetrievalEngineService {
         params.normalizedQuery,
       );
       if (docTypeMatch) {
-        docTypeId = docTypeMatch.docTypeId;
-        reasons.push(...docTypeMatch.reasons.slice(0, 6));
+        if (docTypeMatch.ambiguous && !params.explicitDocTypes.length) {
+          docTypeAlternatives = [
+            docTypeMatch.docTypeId,
+            ...docTypeMatch.alternatives,
+          ]
+            .filter(Boolean)
+            .slice(0, 3);
+          docTypeAmbiguous = true;
+          reasons.push(
+            `doc_type_ambiguous:${docTypeAlternatives.join("|")}`,
+          );
+          reasons.push(...docTypeMatch.reasons.slice(0, 4));
+        } else {
+          docTypeId = docTypeMatch.docTypeId;
+          docTypeAlternatives = docTypeMatch.alternatives.slice(0, 3);
+          reasons.push(...docTypeMatch.reasons.slice(0, 6));
+        }
+      }
+    }
+
+    if (!docTypeId && domain) {
+      const fallbackDocTypeMatch = this.classifyDocTypeForDomain(
+        domain,
+        params.normalizedQuery,
+      );
+      if (fallbackDocTypeMatch && fallbackDocTypeMatch.score >= 2.4) {
+        docTypeId = fallbackDocTypeMatch.docTypeId;
+        docTypeAlternatives = fallbackDocTypeMatch.alternatives.slice(0, 3);
+        reasons.push(...fallbackDocTypeMatch.reasons.slice(0, 6));
       }
     }
 
     // Fallback: infer domain from doc type if domain score was inconclusive.
     if (!domain && docTypeId) {
-      for (const candidateDomain of domains) {
-        const provider = this.documentIntelligenceBanks as Record<string, any>;
-        const catalog =
-          typeof provider.getDocTypeCatalog === "function"
-            ? provider.getDocTypeCatalog(candidateDomain)
-            : null;
-        const docTypes = Array.isArray(catalog?.docTypes)
-          ? catalog.docTypes
-          : [];
-        const hasDocType = docTypes.some(
-          (entry: unknown) => this.normalizeDocType((entry as Record<string, any>)?.id) === docTypeId,
-        );
-        if (hasDocType) {
-          domain = candidateDomain;
-          reasons.push(`doc_type_implied_domain:${candidateDomain}`);
-          break;
-        }
+      const impliedDomain = this.inferDomainFromDocTypeId(docTypeId, domains);
+      if (impliedDomain) {
+        domain = impliedDomain;
+        reasons.push(`doc_type_implied_domain:${impliedDomain}`);
       }
     }
 
@@ -1940,6 +2203,10 @@ export class RetrievalEngineService {
     return {
       domain: domain || null,
       docTypeId: docTypeId || null,
+      docTypeAlternatives,
+      docTypeAmbiguous:
+        docTypeAmbiguous ||
+        reasons.some((reason) => reason.startsWith("doc_type_ambiguous:")),
       confidence,
       reasons: Array.from(new Set(reasons)).slice(0, 12),
       matchedDomainRuleIds: Array.from(new Set(matchedDomainRuleIds)).slice(
@@ -1978,6 +2245,10 @@ export class RetrievalEngineService {
       typeof provider.getTableHeaderOntology === "function"
         ? provider.getTableHeaderOntology(domain)
         : null;
+    const tableOntology =
+      typeof provider.getDiOntology === "function"
+        ? provider.getDiOntology("table")
+        : null;
     const sections = Array.isArray(sectionsBank?.sections)
       ? sectionsBank.sections
       : [];
@@ -1990,6 +2261,9 @@ export class RetrievalEngineService {
       : [];
     const domainHeaders = Array.isArray(tableHeaderOntology?.headers)
       ? tableHeaderOntology.headers
+      : [];
+    const tableFamilies = Array.isArray(tableOntology?.tableFamilies)
+      ? tableOntology.tableFamilies
       : [];
 
     const sectionAnchors: string[] = sections
@@ -2061,6 +2335,25 @@ export class RetrievalEngineService {
                 .toLowerCase(),
             )
           : []),
+        ...(Array.isArray(table?.requiredHeaders)
+          ? table.requiredHeaders.map((value: unknown) =>
+              String(value || "")
+                .trim()
+                .toLowerCase(),
+            )
+          : []),
+      ]),
+      ...Object.entries(
+        this.asObject((tablesBank as Record<string, any> | null)?.tableHeaderSynonyms),
+      ).flatMap(([canonical, synonyms]) => [
+        canonical,
+        ...(Array.isArray(synonyms)
+          ? synonyms.map((value: unknown) =>
+              String(value || "")
+                .trim()
+                .toLowerCase(),
+            )
+          : []),
       ]),
       ...domainHeaders.flatMap((header: unknown) => {
         const row = header as Record<string, any>;
@@ -2078,14 +2371,68 @@ export class RetrievalEngineService {
           : [];
         return [canonical, ...synonyms].filter(Boolean);
       }),
+      ...tableFamilies
+        .filter((family: unknown) => {
+          const row = family as Record<string, any>;
+          const domains = Array.isArray(row?.domains) ? row.domains : [];
+          return domains
+            .map((value: unknown) => String(value || "").trim().toLowerCase())
+            .some(
+              (value: string) =>
+                value === domain || (domain === "ops" && value === "operations"),
+            );
+        })
+        .flatMap((family: unknown) => {
+          const row = family as Record<string, any>;
+          const headerFamilies = this.asObject(row?.headerFamilies);
+          const en = Array.isArray(headerFamilies.en) ? headerFamilies.en : [];
+          const pt = Array.isArray(headerFamilies.pt) ? headerFamilies.pt : [];
+          const columnArchetypes = Array.isArray(row?.columnArchetypes)
+            ? row.columnArchetypes
+            : [];
+          return [
+            String(row?.familyCategory || "")
+              .trim()
+              .toLowerCase(),
+            String(row?.label || "")
+              .trim()
+              .toLowerCase(),
+            String(row?.labelPt || "")
+              .trim()
+              .toLowerCase(),
+            ...en.map((value: unknown) =>
+              String(value || "")
+                .trim()
+                .toLowerCase(),
+            ),
+            ...pt.map((value: unknown) =>
+              String(value || "")
+                .trim()
+                .toLowerCase(),
+            ),
+            ...columnArchetypes.map((value: unknown) =>
+              String(value || "")
+                .trim()
+                .toLowerCase(),
+            ),
+          ].filter(Boolean);
+        }),
     ].filter((value): value is string => Boolean(value));
 
+    const maxSectionAnchors = Math.max(
+      16,
+      Math.floor(safeNumber(process.env.RETRIEVAL_DOC_TYPE_SECTION_ANCHOR_CAP, 32)),
+    );
+    const maxTableAnchors = Math.max(
+      24,
+      Math.floor(safeNumber(process.env.RETRIEVAL_DOC_TYPE_TABLE_ANCHOR_CAP, 64)),
+    );
     const normalizedSectionAnchors = Array.from(
       new Set([...sectionAnchors, ...archetypeSectionAnchors]),
-    ).slice(0, 16);
+    ).slice(0, maxSectionAnchors);
     const normalizedTableAnchors = Array.from(new Set(tableAnchors)).slice(
       0,
-      16,
+      maxTableAnchors,
     );
 
     return {
@@ -2098,6 +2445,7 @@ export class RetrievalEngineService {
         `doc_type_tables:${normalizedTableAnchors.length}`,
         `doc_archetypes:${archetypes.length}`,
         `table_header_ontology:${domainHeaders.length}`,
+        `table_ontology_families:${tableFamilies.length}`,
       ],
     };
   }
@@ -3001,6 +3349,7 @@ export class RetrievalEngineService {
       boostsTitle: Record<string, any> | null;
       boostsType: Record<string, any> | null;
       boostsRecency: Record<string, any> | null;
+      amendmentChainSchema: Record<string, any> | null;
     },
     docMetaById?: Map<string, DocMeta>,
   ): CandidateChunk[] {
@@ -3097,6 +3446,21 @@ export class RetrievalEngineService {
             ),
           )
         : 1;
+    const versionIntent = this.resolveVersionIntentFromQuery(query);
+    const versionSignals = versionIntent.enabled
+      ? this.buildVersionSignalsForCandidates(
+          candidates,
+          banks.amendmentChainSchema,
+        )
+      : new Map<string, { status: string | null; version: number | null }>();
+    const maxVersion = versionIntent.enabled
+      ? Math.max(
+          -1,
+          ...Array.from(versionSignals.values()).map((entry) =>
+            Number.isFinite(entry.version) ? Number(entry.version) : -1,
+          ),
+        )
+      : -1;
 
     for (const c of candidates) {
       // Keyword boost (approximation): if query tokens appear in snippet, treat as body_text match.
@@ -3160,6 +3524,23 @@ export class RetrievalEngineService {
             overlap.overlapRatio >= titleMinOverlapRatio
           ) {
             b += safeNumber(titleWeights.partial, 0.07);
+          }
+        }
+        if (versionIntent.enabled) {
+          const versionSignal = versionSignals.get(c.chunkId) ?? {
+            status: null,
+            version: null,
+          };
+          const versionBoost = this.computeVersionIntentBoost({
+            intent: versionIntent,
+            signal: versionSignal,
+            maxVersion,
+          });
+          b += versionBoost.boost;
+          if (versionBoost.penalty > 0) {
+            c.scores.penalties = clamp01(
+              (c.scores.penalties ?? 0) + versionBoost.penalty,
+            );
           }
         }
         c.scores.titleBoost = clamp01(Math.min(titleCap, b));
@@ -3911,12 +4292,193 @@ export class RetrievalEngineService {
         : Array.isArray(hints.hints)
           ? hints.hints
           : [];
-      return fields.slice(0, 5).map((f: unknown) =>
+      const normalizedHints = fields.slice(0, 5).map((f: unknown) =>
         f && typeof f === "object" ? (f as Record<string, any>) : { hint: String(f) },
       );
+      const entitySchema =
+        typeof this.documentIntelligenceBanks.getDomainEntitySchema === "function"
+          ? this.documentIntelligenceBanks.getDomainEntitySchema(
+              domain as Parameters<
+                NonNullable<
+                  typeof this.documentIntelligenceBanks.getDomainEntitySchema
+                >
+              >[0],
+            )
+          : null;
+      const entityHints = Array.isArray(entitySchema?.entities)
+        ? (entitySchema.entities as unknown[])
+            .slice(0, 5)
+            .map((entity) => {
+              const row = entity as Record<string, any>;
+              return {
+                id: String(row?.id || "").trim() || "entity",
+                hint:
+                  String(row?.description || "").trim() ||
+                  String(row?.id || "").trim(),
+                required: row?.required === true,
+                source: "entity_schema",
+              };
+            })
+            .filter((row) => String(row.id || "").trim().length > 0)
+        : [];
+      const merged = [...normalizedHints, ...entityHints];
+      if (!merged.length) return [];
+      return merged.slice(0, 7);
     } catch {
       return [];
     }
+  }
+
+  private resolveVersionIntentFromQuery(query: string): {
+    enabled: boolean;
+    wantsLatest: boolean;
+    wantsSigned: boolean;
+    wantsDraft: boolean;
+    wantsAmendment: boolean;
+    explicitVersion: number | null;
+  } {
+    const q = String(query || "").toLowerCase();
+    if (!q) {
+      return {
+        enabled: false,
+        wantsLatest: false,
+        wantsSigned: false,
+        wantsDraft: false,
+        wantsAmendment: false,
+        explicitVersion: null,
+      };
+    }
+    const explicitVersionMatch = q.match(/\bv(?:ersion)?\s*([0-9]{1,3})\b/i);
+    const explicitVersion = explicitVersionMatch
+      ? Number(explicitVersionMatch[1])
+      : null;
+    const wantsLatest =
+      /\b(latest|newest|recent|current|most recent|ultimo|último|vigente)\b/i.test(
+        q,
+      );
+    const wantsSigned =
+      /\b(signed|executed|effective|assinado|executado|vigente|final)\b/i.test(
+        q,
+      );
+    const wantsDraft = /\b(draft|rascunho|minuta)\b/i.test(q);
+    const wantsAmendment =
+      /\b(amendment|amended|amends|aditivo|alteracao|alteração|restated)\b/i.test(
+        q,
+      );
+    return {
+      enabled:
+        wantsLatest ||
+        wantsSigned ||
+        wantsDraft ||
+        wantsAmendment ||
+        Number.isFinite(explicitVersion),
+      wantsLatest,
+      wantsSigned,
+      wantsDraft,
+      wantsAmendment,
+      explicitVersion:
+        Number.isFinite(explicitVersion) && explicitVersion != null
+          ? explicitVersion
+          : null,
+    };
+  }
+
+  private buildVersionSignalsForCandidates(
+    candidates: CandidateChunk[],
+    amendmentChainSchema: Record<string, any> | null,
+  ): Map<string, { status: string | null; version: number | null }> {
+    const patterns = (amendmentChainSchema?.detectionPatterns || {}) as Record<
+      string,
+      unknown
+    >;
+    const signals = new Map<string, { status: string | null; version: number | null }>();
+    for (const candidate of candidates) {
+      const raw = `${String(candidate.filename || "")} ${String(candidate.title || "")}`.toLowerCase();
+      const versionMatch = raw.match(/\bv(?:ersion)?[_\-\s]?([0-9]{1,3})\b/i);
+      const version = versionMatch ? Number(versionMatch[1]) : null;
+      let status: string | null = null;
+      if (/\b(draft|rascunho|minuta)\b/i.test(raw)) {
+        status = "draft";
+      } else if (/\b(signed|executed|effective|assinado|executado|vigente|final)\b/i.test(raw)) {
+        status = "executed";
+      } else if (
+        this.matchesAnyRegex(raw, patterns.supersedes) ||
+        /\bsuperseded\b/i.test(raw)
+      ) {
+        status = "superseded";
+      } else if (this.matchesAnyRegex(raw, patterns.amends)) {
+        status = "amended";
+      }
+      signals.set(candidate.chunkId, { status, version });
+    }
+    return signals;
+  }
+
+  private matchesAnyRegex(input: string, patterns: unknown): boolean {
+    if (!Array.isArray(patterns)) return false;
+    for (const pattern of patterns) {
+      const source = String(pattern || "").trim();
+      if (!source) continue;
+      if (this.regexMatches(input, source)) return true;
+    }
+    return false;
+  }
+
+  private computeVersionIntentBoost(input: {
+    intent: {
+      wantsLatest: boolean;
+      wantsSigned: boolean;
+      wantsDraft: boolean;
+      wantsAmendment: boolean;
+      explicitVersion: number | null;
+    };
+    signal: {
+      status: string | null;
+      version: number | null;
+    };
+    maxVersion: number;
+  }): { boost: number; penalty: number } {
+    let boost = 0;
+    let penalty = 0;
+    const status = input.signal.status;
+    const version = input.signal.version;
+
+    if (
+      input.intent.explicitVersion != null &&
+      version != null &&
+      version === input.intent.explicitVersion
+    ) {
+      boost += 0.09;
+    } else if (
+      input.intent.explicitVersion != null &&
+      version != null &&
+      version !== input.intent.explicitVersion
+    ) {
+      penalty += 0.05;
+    }
+    if (input.intent.wantsDraft) {
+      if (status === "draft") boost += 0.08;
+      else if (status === "executed") penalty += 0.04;
+    }
+    if (input.intent.wantsSigned) {
+      if (status === "executed" || status === "effective") boost += 0.08;
+      else if (status === "draft") penalty += 0.05;
+    }
+    if (input.intent.wantsAmendment) {
+      if (status === "amended") boost += 0.06;
+    }
+    if (
+      input.intent.wantsLatest &&
+      version != null &&
+      input.maxVersion >= 0 &&
+      version === input.maxVersion
+    ) {
+      boost += status === "draft" ? 0.02 : 0.06;
+    }
+    return {
+      boost: clamp01(boost),
+      penalty: clamp01(penalty),
+    };
   }
 
   // -----------------------------

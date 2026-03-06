@@ -150,4 +150,22 @@ describe("pdfTableExtractor", () => {
       expect(result.text).toContain("Narrative line");
     });
   });
+
+  describe("table salvage", () => {
+    it("filters out outlier rows with inconsistent column counts", () => {
+      const text = [
+        "Metric\t2024\t2023",
+        "Revenue\t120\t100",
+        "Corrupted\trow\twith\ttoo\tmany\tcells\t999",
+        "Margin\t22%\t19%",
+      ].join("\n");
+
+      const result = extractTablesFromText(text);
+      expect(result.tableCount).toBe(1);
+      expect(result.tables[0].rows.length).toBe(3);
+      expect(result.text).not.toContain("Corrupted");
+      expect(result.text).toContain("| Revenue");
+      expect(result.text).toContain("| Margin");
+    });
+  });
 });

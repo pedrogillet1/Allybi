@@ -543,7 +543,7 @@ function buildSectionTree(paragraphs: ParsedParagraph[]): {
       }
       currentSection.paragraphEnd = para.index;
     } else {
-      // No heading seen yet — accumulate preamble text
+      // No heading seen yet - accumulate preamble text
       if (preambleText) {
         preambleText += "\n\n" + text;
       } else {
@@ -647,7 +647,7 @@ export async function extractDocxWithAnchors(
     // Build full text (preserving structure)
     let fullText = "";
     const appendSection = (section: DocxSection, depth: number = 0): void => {
-      // Preamble sections have no heading — skip the markdown heading line
+      // Preamble sections have no heading - skip the markdown heading line
       if (section.heading) {
         const prefix = "#".repeat(section.level ?? 1) + " ";
         fullText += prefix + section.heading + "\n\n";
@@ -806,4 +806,3 @@ export default {
   getHeadingAnchors,
   findSectionByHeading,
 };
-

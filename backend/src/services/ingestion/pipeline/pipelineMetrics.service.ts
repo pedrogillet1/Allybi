@@ -73,6 +73,11 @@ let indexEncryptionTotalCount = 0;
 let indexPlaintextSensitiveFieldViolationCount = 0;
 let indexPlaintextOverrideActivationCount = 0;
 let indexingActiveOperationConflictCount = 0;
+let retrievalRelatedExpansionAttempts = 0;
+let retrievalRelatedExpansionFailures = 0;
+let retrievalRelatedExpansionTruncated = 0;
+let retrievalRelatedExpansionAddedDocs = 0;
+let retrievalEncryptedFallbackBlockedCount = 0;
 
 // ---------------------------------------------------------------------------
 // Recording functions
@@ -182,6 +187,29 @@ export function recordIndexingActiveOperationConflict(count = 1): void {
   indexingActiveOperationConflictCount += Math.max(0, Math.trunc(count));
 }
 
+export function recordRetrievalRelatedExpansion(params: {
+  seedCount: number;
+  expandedCount: number;
+  returnedCount: number;
+  truncatedCount?: number;
+  failed?: boolean;
+}): void {
+  retrievalRelatedExpansionAttempts += 1;
+  if (params.failed) retrievalRelatedExpansionFailures += 1;
+  retrievalRelatedExpansionAddedDocs += Math.max(
+    0,
+    Math.trunc(params.expandedCount) - Math.trunc(params.seedCount),
+  );
+  retrievalRelatedExpansionTruncated += Math.max(
+    0,
+    Math.trunc(params.truncatedCount ?? 0),
+  );
+}
+
+export function recordRetrievalEncryptedFallbackBlocked(count = 1): void {
+  retrievalEncryptedFallbackBlockedCount += Math.max(0, Math.trunc(count));
+}
+
 // ---------------------------------------------------------------------------
 // Query functions
 // ---------------------------------------------------------------------------
@@ -239,6 +267,13 @@ export function getMetricsSummary(): {
   indexPlaintextSensitiveFieldViolations: number;
   indexPlaintextOverrideActivations: number;
   indexingActiveOperationConflicts: number;
+  retrievalRelatedExpansion: {
+    attempts: number;
+    failures: number;
+    truncatedDocs: number;
+    addedDocs: number;
+  };
+  retrievalEncryptedFallbackBlocked: number;
   xlsxRowsTruncatedTotal: number;
   tableExtractionMethodCounts: Record<string, number>;
 } {
@@ -292,6 +327,13 @@ export function getMetricsSummary(): {
       indexPlaintextSensitiveFieldViolationCount,
     indexPlaintextOverrideActivations: indexPlaintextOverrideActivationCount,
     indexingActiveOperationConflicts: indexingActiveOperationConflictCount,
+    retrievalRelatedExpansion: {
+      attempts: retrievalRelatedExpansionAttempts,
+      failures: retrievalRelatedExpansionFailures,
+      truncatedDocs: retrievalRelatedExpansionTruncated,
+      addedDocs: retrievalRelatedExpansionAddedDocs,
+    },
+    retrievalEncryptedFallbackBlocked: retrievalEncryptedFallbackBlockedCount,
     xlsxRowsTruncatedTotal,
     tableExtractionMethodCounts: Object.fromEntries(tableExtractionMethodCounts),
   };
@@ -322,6 +364,11 @@ export function resetMetrics(): void {
   indexPlaintextSensitiveFieldViolationCount = 0;
   indexPlaintextOverrideActivationCount = 0;
   indexingActiveOperationConflictCount = 0;
+  retrievalRelatedExpansionAttempts = 0;
+  retrievalRelatedExpansionFailures = 0;
+  retrievalRelatedExpansionTruncated = 0;
+  retrievalRelatedExpansionAddedDocs = 0;
+  retrievalEncryptedFallbackBlockedCount = 0;
   xlsxRowsTruncatedTotal = 0;
   tableExtractionMethodCounts.clear();
 }

@@ -20,6 +20,7 @@ import {
 } from "../../config/storage";
 import prisma from "../../config/database";
 import { isPptxMime } from "../ingestion/extraction/ingestionMimeRegistry.service";
+import { performanceConsole as previewLog } from "../../utils/logger";
 
 export interface SlideImageData {
   slideNumber: number;
@@ -60,7 +61,7 @@ export async function generateSlideImages(
   const startTime = Date.now();
   const { dpi = 150, signedUrlExpiration = 604800 } = options;
 
-  console.log(
+  previewLog.log(
     `[SlideImageGen] Starting slide image generation for ${documentId.substring(0, 8)}...`,
   );
 
@@ -71,7 +72,7 @@ export async function generateSlideImages(
     );
 
     // 1. Convert PDF pages to PNG images
-    console.log(
+    previewLog.log(
       `[SlideImageGen] Converting PDF to PNG images (DPI: ${dpi})...`,
     );
 
@@ -81,7 +82,7 @@ export async function generateSlideImages(
       viewportScale: dpi / 72,
     });
 
-    console.log(`[SlideImageGen] Converted ${pngPages.length} pages to PNG`);
+    previewLog.log(`[SlideImageGen] Converted ${pngPages.length} pages to PNG`);
 
     if (pngPages.length === 0) {
       return {
@@ -116,11 +117,11 @@ export async function generateSlideImages(
           imageUrl,
         });
 
-        console.log(
+        previewLog.log(
           `   Uploaded slide ${slideNumber}/${pngPages.length}: ${storagePath}`,
         );
       } catch (uploadError: any) {
-        console.error(
+        previewLog.error(
           `   Failed to upload slide ${slideNumber}:`,
           uploadError.message,
         );
@@ -134,7 +135,7 @@ export async function generateSlideImages(
     }
 
     const duration = Date.now() - startTime;
-    console.log(
+    previewLog.log(
       `[SlideImageGen] Generated ${uploadedCount}/${pngPages.length} slide images in ${duration}ms`,
     );
 
@@ -146,7 +147,7 @@ export async function generateSlideImages(
     };
   } catch (error: any) {
     const duration = Date.now() - startTime;
-    console.error(`[SlideImageGen] Error:`, error.message);
+    previewLog.error(`[SlideImageGen] Error:`, error.message);
 
     return {
       success: false,
@@ -163,7 +164,7 @@ export async function generateSlideImagesForDocument(
   documentId: string,
   userId: string,
 ): Promise<SlideGenerationResult> {
-  console.log(
+  previewLog.log(
     `[SlideImageGen] Processing document ${documentId.substring(0, 8)}...`,
   );
 
@@ -205,10 +206,10 @@ export async function generateSlideImagesForDocument(
       );
       if (slidesWithImages.length > 0) {
         // Verify files actually exist in the current storage provider before skipping.
-        // After a migration (e.g. S3 → GCS) the metadata may be stale.
+        // After a migration (e.g. S3 -> GCS) the metadata may be stale.
         const probeExists = await fileExists(slidesWithImages[0].storagePath);
         if (probeExists) {
-          console.log(
+          previewLog.log(
             `[SlideImageGen] Document already has ${slidesWithImages.length} slide images, skipping`,
           );
           return {
@@ -217,7 +218,7 @@ export async function generateSlideImagesForDocument(
             totalSlides: parsedSlides.length,
           };
         }
-        console.log(
+        previewLog.log(
           `[SlideImageGen] Slide files not found in current storage, regenerating...`,
         );
       }
@@ -233,7 +234,7 @@ export async function generateSlideImagesForDocument(
 
     const pdfExists = await fileExists(previewPdfKey);
     if (!pdfExists) {
-      console.warn(`[SlideImageGen] Preview PDF not found: ${previewPdfKey}`);
+      previewLog.warn(`[SlideImageGen] Preview PDF not found: ${previewPdfKey}`);
       await updateSlideGenerationStatus(
         documentId,
         "failed",
@@ -247,7 +248,7 @@ export async function generateSlideImagesForDocument(
     }
 
     // 6. Download the PDF
-    console.log(`[SlideImageGen] Downloading PDF: ${previewPdfKey}`);
+    previewLog.log(`[SlideImageGen] Downloading PDF: ${previewPdfKey}`);
     const pdfBuffer = await downloadFile(previewPdfKey);
 
     // 7. Generate slide images
@@ -273,13 +274,13 @@ export async function generateSlideImagesForDocument(
       },
     });
 
-    console.log(
+    previewLog.log(
       `[SlideImageGen] Updated metadata with ${result.slidesData?.length} slides`,
     );
 
     return result;
   } catch (error: any) {
-    console.error(`[SlideImageGen] Error processing document:`, error.message);
+    previewLog.error(`[SlideImageGen] Error processing document:`, error.message);
     await updateSlideGenerationStatus(documentId, "failed", error.message);
     return { success: false, error: error.message };
   }

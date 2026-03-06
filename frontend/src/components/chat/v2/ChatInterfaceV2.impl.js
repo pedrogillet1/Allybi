@@ -575,6 +575,52 @@ function isDocumentGroundedMode(mode) {
   return value.startsWith("doc_grounded");
 }
 
+function isNavigationMode(mode) {
+  const value = String(mode || "").trim().toLowerCase();
+  return value === "nav_pills" || value === "nav_pill" || value === "rank_disambiguate";
+}
+
+function hasSourceButtonsAttachment(attachments, { navOnly = false } = {}) {
+  if (!Array.isArray(attachments)) return false;
+  return attachments.some((att) => {
+    if (!att || att.type !== "source_buttons" || !Array.isArray(att.buttons) || att.buttons.length === 0) {
+      return false;
+    }
+    if (!navOnly) return true;
+    return isNavigationMode(att.answerMode);
+  });
+}
+
+function isNavigationAnswerMessage(message) {
+  const answerMode = String(message?.answerMode || "").trim();
+  const answerClass = String(message?.answerClass || "").trim().toUpperCase();
+  const navType = String(message?.navType || "").trim();
+  const hasListing = Array.isArray(message?.listing) && message.listing.length > 0;
+  const hasNavSourceButtons = hasSourceButtonsAttachment(message?.attachments, { navOnly: true });
+  return (
+    isNavigationMode(answerMode) ||
+    answerClass === "NAVIGATION" ||
+    Boolean(navType) ||
+    hasListing ||
+    hasNavSourceButtons
+  );
+}
+
+function isDocumentContextAnswerMessage(message) {
+  if (isNavigationAnswerMessage(message)) return false;
+  const answerClass = String(message?.answerClass || "").trim().toUpperCase();
+  const answerMode = String(message?.answerMode || "").trim();
+  if (answerClass === "DOCUMENT" || isDocumentGroundedMode(answerMode)) return true;
+  const hasAnySources =
+    (Array.isArray(message?.sources) && message.sources.length > 0) ||
+    hasSourceButtonsAttachment(message?.attachments);
+  return hasAnySources;
+}
+
+function canRenderSourcesForMessage(message) {
+  return isDocumentContextAnswerMessage(message) && !isNavigationAnswerMessage(message);
+}
+
 function shouldRenderFollowupsForMessage(message) {
   const answerClass = String(message?.answerClass || "")
     .trim()
@@ -4245,12 +4291,26 @@ export default function ChatInterface({
   }, [folders, documents, fetchFolders, docTotalByFolderId]);
 
   const openPreviewFromSource = useCallback((src) => {
-    if (src?.type === 'folder' && src?.folderId) {
-      openFolderPreview(src.folderId);
+    const sourceKind = String(src?.kind || src?.type || "").trim().toLowerCase();
+    const folderId = src?.folderId || src?.id || src?.meta?.folderId || src?.meta?.id;
+    if (sourceKind === "folder" && folderId) {
+      openFolderPreview(folderId);
       return;
     }
-    const filename = src?.title || src?.filename || "Document";
-    let docId = src?.docId || src?.documentId || src?.id;
+    const filename =
+      src?.title ||
+      src?.filename ||
+      src?.name ||
+      src?.meta?.filename ||
+      src?.meta?.title ||
+      "Document";
+    let docId =
+      src?.docId ||
+      src?.documentId ||
+      src?.id ||
+      src?.meta?.docId ||
+      src?.meta?.documentId ||
+      src?.meta?.id;
 
     // If no ID, try to find the document by filename match
     if (!docId && filename) {
@@ -4272,15 +4332,15 @@ export default function ChatInterface({
       documentId: docId || null,
       docId: docId || null,
       filename,
-      mimeType: src?.mimeType || "application/octet-stream",
-      page: Number.isFinite(Number(src?.page)) ? Number(src.page) : null,
-      slide: Number.isFinite(Number(src?.slide)) ? Number(src.slide) : null,
-      sheet: src?.sheet != null ? String(src.sheet) : null,
-      cell: src?.cell != null ? String(src.cell) : null,
-      section: src?.section != null ? String(src.section) : null,
-      locationKey: src?.locationKey ? String(src.locationKey) : null,
-      locationLabel: src?.locationLabel ? String(src.locationLabel) : null,
-      snippet: src?.snippet ? String(src.snippet) : null,
+      mimeType: src?.mimeType || src?.meta?.mimeType || "application/octet-stream",
+      page: Number.isFinite(Number(src?.page ?? src?.meta?.page)) ? Number(src?.page ?? src?.meta?.page) : null,
+      slide: Number.isFinite(Number(src?.slide ?? src?.meta?.slide)) ? Number(src?.slide ?? src?.meta?.slide) : null,
+      sheet: (src?.sheet ?? src?.meta?.sheet) != null ? String(src?.sheet ?? src?.meta?.sheet) : null,
+      cell: (src?.cell ?? src?.meta?.cell) != null ? String(src?.cell ?? src?.meta?.cell) : null,
+      section: (src?.section ?? src?.meta?.section) != null ? String(src?.section ?? src?.meta?.section) : null,
+      locationKey: (src?.locationKey ?? src?.meta?.locationKey) ? String(src?.locationKey ?? src?.meta?.locationKey) : null,
+      locationLabel: (src?.locationLabel ?? src?.meta?.locationLabel) ? String(src?.locationLabel ?? src?.meta?.locationLabel) : null,
+      snippet: (src?.snippet ?? src?.meta?.snippet) ? String(src?.snippet ?? src?.meta?.snippet) : null,
     };
     const activeViewerDocId = String(viewerContext?.activeDocumentId || "").trim();
     const sourceDocId = String(sourcePayload.documentId || "").trim();
@@ -4309,7 +4369,9 @@ export default function ChatInterface({
     });
   }, [openFolderPreview, documents, isViewerVariant, onViewerSourceNavigate, viewerContext?.activeDocumentId, navigate]);
 
-  const renderSources = (m) => {
+  const renderSources = (m, opts = {}) => {
+    const forNavigation = opts?.forNavigation === true;
+    if (!forNavigation && !canRenderSourcesForMessage(m)) return null;
     const mapSourceButtonsToSources = (attachments) => {
       if (!Array.isArray(attachments)) return [];
       const sourceAttachment = attachments.find(
@@ -4385,11 +4447,11 @@ export default function ChatInterface({
     // For action_receipt mode, show all action sources as pills
     // For other modes, show top 3 sources
     const isActionReceipt = m.answerMode === 'action_receipt' || m.answerMode === 'action_confirmation';
-    const displaySources = isActionReceipt ? unique : unique.slice(0, 3);
+    const isNav = forNavigation || isNavigationAnswerMessage(m);
+    const displaySources = (isActionReceipt || isNav) ? unique : unique.slice(0, 3);
     if (!displaySources.length) return null;
 
-    const isNav = m.answerMode === "nav_pills" || !!m.navType;
-    const navType = m.navType || (m.answerMode === "nav_pills" ? "discover" : null);
+    const navType = m.navType || (isNavigationMode(m.answerMode) ? "discover" : null);
 
     return (
       <SourcesList
@@ -5797,14 +5859,17 @@ export default function ChatInterface({
                           ) : (
                             /* Content + pills rendering */
                             (() => {
-                              const isNavPills = m.answerMode === 'nav_pills';
-                              const hasPills = m.listing && m.listing.length > 0;
+                              const isNavigationAnswer = isNavigationAnswerMessage(m);
+                              const hasListingPills = Array.isArray(m.listing) && m.listing.length > 0;
 
-                              if (isNavPills && hasPills) {
+                              if (isNavigationAnswer) {
                                 // NAV_PILLS MODE: intro sentence + pills as primary UI
                                 const intro = isStreamingMsg
                                   ? (m.content || "")
                                   : extractIntroSentence(fixCurrencyArtifacts(stripSourcesLabels(m.content || "")));
+                                const navPills = hasListingPills
+                                  ? renderFileListing(m)
+                                  : renderSources(m, { forNavigation: true });
 
                                 return (
                                   <>
@@ -5816,7 +5881,7 @@ export default function ChatInterface({
                                         {intro}
                                       </div>
                                     )}
-                                    {renderFileListing(m)}
+                                    {navPills}
                                   </>
                                 );
                               }
@@ -5934,7 +5999,7 @@ export default function ChatInterface({
                           ) : null}
 
                           {/* Action icons (Copy/Regenerate) + Source pill */}
-                          {!isStreamingMsg && !isError && m.answerMode !== 'nav_pills' ? (
+                          {!isStreamingMsg && !isError && !isNavigationAnswerMessage(m) ? (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: suppressPlainFileMatch ? -2 : (String(assistantCleanText || "").trim() ? 10 : 0), width: '100%' }}>
                               <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                                 <MessageActions
@@ -5988,7 +6053,7 @@ export default function ChatInterface({
                                     </span>
                                   );
                                 })()}
-                                {(m.answerClass === 'DOCUMENT' || (!m.answerClass && m.answerMode?.startsWith('doc_grounded')) || m.answerMode === 'action_receipt') ? renderSources(m) : null}
+                                {canRenderSourcesForMessage(m) ? renderSources(m) : null}
                               </div>
                               {(() => {
                                 const renderableFollowups = deriveRenderableFollowups(m);

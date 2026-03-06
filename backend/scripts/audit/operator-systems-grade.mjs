@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { generateRoutingAlignmentReport } from "./routing-alignment-core.mjs";
 
 const strict = process.argv.includes("--strict");
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
@@ -88,23 +89,16 @@ function gradeFromScore(score) {
 }
 
 function runRoutingJson() {
-  const result = spawnSync(
-    "npx",
-    [
-      "ts-node",
-      "--transpile-only",
-      "scripts/audit-routing-alignment.ts",
-      "--json",
-    ],
-    { cwd: ROOT, encoding: "utf8" },
-  );
-  if (result.status !== 0) {
-    return { ok: false, error: String(result.stderr || result.stdout || "routing command failed") };
-  }
   try {
-    return JSON.parse(String(result.stdout || "{}").trim());
-  } catch {
-    return { ok: false, error: "invalid routing json output" };
+    return generateRoutingAlignmentReport(ROOT);
+  } catch (error) {
+    return {
+      ok: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : String(error || "routing alignment runtime failure"),
+    };
   }
 }
 
@@ -229,6 +223,7 @@ function main() {
   }
 
   const p0 = safeReadJson("reports/cert/p0-gates-summary.json");
+  let p0StrictVerifyArtifact = false;
   if (!p0) {
     addFinding("high", "p0_summary_missing", "Missing p0 gates summary artifact.", 30);
   } else {
@@ -246,6 +241,20 @@ function main() {
         "high",
         "p0_failed",
         `P0 strict gates failed: ${(p0.failures || []).join(", ") || "unknown"}`,
+        35,
+      );
+    }
+    const mode = String(p0?.mode || "").trim().toLowerCase();
+    const profile = String(p0?.profile || "").trim().toLowerCase();
+    const verifyOnly = p0?.verifyOnly === true;
+    const strictP0 = p0?.strict === true;
+    p0StrictVerifyArtifact =
+      strictP0 && verifyOnly && mode === "verify" && profile === "ci";
+    if (!p0StrictVerifyArtifact) {
+      addFinding(
+        "high",
+        "p0_not_strict_verify_artifact",
+        `P0 summary is not from strict verify (strict=${strictP0} verifyOnly=${verifyOnly} mode=${mode || "missing"} profile=${profile || "missing"}).`,
         35,
       );
     }
@@ -333,7 +342,7 @@ function main() {
 
   const subscores = {
     integration: integration ? Number(integration.finalScore || 0) : 0,
-    p0: p0?.passed === true ? 100 : 0,
+    p0: p0?.passed === true && p0StrictVerifyArtifact ? 100 : 0,
     routing: routing?.ok === true ? 100 : 0,
     completeness: completeness.ok ? 100 : 0,
     python:

@@ -17,7 +17,7 @@ describe("doc_type_confusion_matrix", () => {
     expect(raw?._meta?.id).toBe("doc_type_confusion_matrix");
   });
 
-  it("covers 8 high-risk confusion pairs", () => {
+  it("covers high-risk confusion pairs across everyday and specialized domains", () => {
     const raw = JSON.parse(fs.readFileSync(BANK_PATH, "utf-8"));
     const rules = raw?.rules ?? [];
 
@@ -30,6 +30,11 @@ describe("doc_type_confusion_matrix", () => {
       ["every_retail_receipt", "billing_retail_receipt"],
       ["every_insurance_claim", "ins_claim_submission"],
       ["every_insurance_policy", "ins_policy_document"],
+      ["banking_bank_statement", "fin_bank_statement"],
+      ["housing_property_tax_bill", "tax_property_tax_bill"],
+      ["every_insurance_claim", "legal_complaint"],
+      ["acct_forecast_pack", "fin_forecast"],
+      ["acct_variance_pack", "fin_variance"],
     ];
 
     for (const [typeA, typeB] of requiredPairs) {

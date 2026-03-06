@@ -205,7 +205,7 @@
       "category": "dictionaries"
     },
     "document_intelligence/__implementation_report.any.json": {
-      "sha256": "2ec5a8fb15ae069c646585a50e351a5e5ab847de1515e5efa81689069e977bb7",
+      "sha256": "590248e43f407192d124e8cbf5ee86578080e3c3a5e6cb9e8a19b931c1b18ef9",
       "required": false,
       "category": "semantics"
     },
@@ -3330,7 +3330,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/insurance/doc_types/sections/ins_claim_submission.sections.any.json": {
-      "sha256": "58f587824d712db4ab885cf92b801355774e74e076e9d36986b81154346167c9",
+      "sha256": "75b2433c1c4bb11db7f2300f1361e280a28009e4b05be1600ff4a1b4963161a8",
       "required": false,
       "category": "semantics"
     },
@@ -3345,17 +3345,17 @@
       "category": "semantics"
     },
     "document_intelligence/domains/insurance/doc_types/sections/ins_explanation_of_benefits.sections.any.json": {
-      "sha256": "619c7a5fb496b8b89a5c84597e69a555a5f37ba9cb773eb5976a6593a540860b",
+      "sha256": "ce1fbd8666ecb6ea32b9e4acc62e037137284a0160132077447921cd7d300c07",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/insurance/doc_types/sections/ins_policy_document.sections.any.json": {
-      "sha256": "572bcfd38110ede9c5206b891bce5ca5906328f021e91e60608f82214b7e0f3d",
+      "sha256": "717c01d87bacb23399ee1635a4c817460f73bcc18b1646d242c2e9c5f41781ad",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/insurance/doc_types/sections/ins_premium_invoice.sections.any.json": {
-      "sha256": "d41a0f463480efeb89f7f7a5252ae10edefee44268dc6991b3a0826d9e4e15e4",
+      "sha256": "dd984bad25b99b50301a875eb4d38f0251f6ccbda3b01402f346b1b3f4f92f6b",
       "required": false,
       "category": "semantics"
     },
@@ -4680,22 +4680,22 @@
       "category": "semantics"
     },
     "document_intelligence/domains/tax/doc_types/sections/tax_assessment_notice.sections.any.json": {
-      "sha256": "df4ce0ae2d0fec1d0b679e5bc6212503a29eb27eb69948549531ea85c8d0995b",
+      "sha256": "161704ae9941086c9c4b5c529217a22b8fcd177724af463f4735f07e723dff73",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/tax/doc_types/sections/tax_individual_income_return.sections.any.json": {
-      "sha256": "e5a4f5f17ffdafd607986cf601237dc97db8fe3f1b3b716b19a3293e735fddc7",
+      "sha256": "b4b45380cdfc68b5c446aaa311bec91cc37d5d170a87bdad125ad9fba87f71c7",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/tax/doc_types/sections/tax_payment_slip.sections.any.json": {
-      "sha256": "db3c435944905899d47c6015bf024d85b632886246efff67365d057bfb748f00",
+      "sha256": "a8959e514fd5749e9d01dc298781d7c2ff4924f4db66ff70ad1cba6fe9919c49",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/tax/doc_types/sections/tax_property_tax_bill.sections.any.json": {
-      "sha256": "b9687a76b091c997d8ca029624b45f32a067adf4f7262588e1f421536c15067c",
+      "sha256": "eeb4263b5752d78c64fa63a0afc2fbb83d9defb475db026f1edf881b17026f2d",
       "required": false,
       "category": "semantics"
     },
@@ -4975,12 +4975,12 @@
       "category": "manifest"
     },
     "document_intelligence/manifest/runtime_wiring_gates.any.json": {
-      "sha256": "2aa7eb3f5e495168e9e85ec7102f09eadcf50adde7da39a71bc2a899674ed169",
+      "sha256": "e43efc202adbe3c5c306d9e3c72a4aeaa32a826fb57259279b4b856e2cca562b",
       "required": true,
       "category": "manifest"
     },
     "document_intelligence/manifest/usage_manifest.any.json": {
-      "sha256": "943f7f9c218b612f0ce8ca3126dd4380cad6ad68e7f6cf0f14c144160798e1ea",
+      "sha256": "5881f6da78d6d1a589f942672a9e7ec569ac3f4e7807179c7f8b0053b2d8181e",
       "required": true,
       "category": "manifest"
     },
@@ -5189,6 +5189,236 @@
       "required": false,
       "category": "semantics"
     },
+    "document_intelligence\\domains\\accounting\\doc_types\\entities\\entity_schema.any.json": {
+      "sha256": "a5a079e6fe2d5f7e081990b548547ad2c5d71fe0df0f005740b85eaf30efc643",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\banking\\doc_types\\entities\\entity_schema.any.json": {
+      "sha256": "4cb41343b997ff34211a88195f8b4221c640503eff1495f2d8a0974d7ea3686e",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\billing\\doc_types\\entities\\entity_schema.any.json": {
+      "sha256": "ef99e203e917c30b1abc941da7b14d38a5275e8f676e4ad8e5935adcccf15372",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\education\\doc_types\\entities\\entity_schema.any.json": {
+      "sha256": "f077cc2b546cd0f31add8280cb50208ff6fd18cdcbb0c7f2b41939e413217832",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\everyday\\doc_types\\entities\\entity_schema.any.json": {
+      "sha256": "2c776cc4aa439043be42d289cf4a808fd13357cc2c8b4a8bc057e833df1bd4b3",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\finance\\doc_types\\entities\\entity_schema.any.json": {
+      "sha256": "1c62cf74ddf72c510e89f5c880d6e197be9f21b3ccfe12e7ba0e28e5c7a15368",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\housing\\doc_types\\entities\\entity_schema.any.json": {
+      "sha256": "97512474375ba3a940bc5c4ac741b4e8199e03105ed1a59f9327c31a04a24c99",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\hr_payroll\\doc_types\\entities\\entity_schema.any.json": {
+      "sha256": "c75bfe334b01418dd8133f81696c70b19deefcd8762cba1304d330eef1fd5b8b",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\identity\\doc_types\\entities\\entity_schema.any.json": {
+      "sha256": "9457667045956c711c256836cc3569e366b14ba871976f7b259de451e55d4b1a",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\insurance\\doc_types\\entities\\entity_schema.any.json": {
+      "sha256": "97db9e48499b3f11c66dfcc7cdb0a3fa378dbad6aab26211d7bbac614b61d77a",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\legal\\doc_types\\entities\\entity_schema.any.json": {
+      "sha256": "a1f5a9e2a6fe380921cfdebe48f82499e02214627c5a81b65b68eeccd9d4fe96",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\legal\\doc_types\\extraction\\board_resolution.extraction_hints.any.json": {
+      "sha256": "cbed432c6698b67fc64e6889d6e91fd2a0cdf480238381357e298eda8e045fc7",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\legal\\doc_types\\extraction\\dpa.extraction_hints.any.json": {
+      "sha256": "936e5092dab1c6fabe094c2136ce3f33410052cf7de43bdc46572154a0ac5e9f",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\legal\\doc_types\\extraction\\employment_agreement.extraction_hints.any.json": {
+      "sha256": "44ae59539e9f3fa9803e9dc25d87768dd1613f17fdb6990024be80a69f1017b9",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\legal\\doc_types\\extraction\\lease.extraction_hints.any.json": {
+      "sha256": "ae6b997a3aaea3a0c0de4edc62d5244700b73bb6ba44c7c4f6b44717002ad9d5",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\legal\\doc_types\\extraction\\litigation_memo.extraction_hints.any.json": {
+      "sha256": "dfd85856c85af817e4b5722d7377851a9a314a370c073f29aa0df1637d997329",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\legal\\doc_types\\extraction\\msa.extraction_hints.any.json": {
+      "sha256": "cfb17c086b88c96b85d0620b314176641e5bf83f04e602f04d3788aab1f44c9c",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\legal\\doc_types\\extraction\\nda.extraction_hints.any.json": {
+      "sha256": "03b3ff83cde4d288a5ccc44648557182d875d2a6d1f922e57a6b6b526128bc99",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\legal\\doc_types\\extraction\\privacy_policy.extraction_hints.any.json": {
+      "sha256": "1548d40ff572ef9d490905171b03278890c41cc5a2b48f4a9a908536ea846dab",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\legal\\doc_types\\extraction\\sow.extraction_hints.any.json": {
+      "sha256": "46a3ab44414a2d2cc6230e8b0daa1f642bf60970b6be4e486c6131a805a9e6d2",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\legal\\doc_types\\extraction\\terms.extraction_hints.any.json": {
+      "sha256": "5dd0817ef9cd37f265f004cd00468a118954b3c6051019a67b30ce34976baf4e",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\legal\\doc_types\\sections\\board_resolution.sections.any.json": {
+      "sha256": "d93c6cbf71ee3fc1c7672c4cbb69c9ac23131b6376a7329410228f9a55adeb85",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\legal\\doc_types\\sections\\dpa.sections.any.json": {
+      "sha256": "ddc581f2348de2f45eeb29af51553e6e9db7d403bc5e45cbc786e48350422361",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\legal\\doc_types\\sections\\employment_agreement.sections.any.json": {
+      "sha256": "b507154273642684b5c1f9c1d08523c11beea569c7a15254c474664f050d5155",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\legal\\doc_types\\sections\\lease.sections.any.json": {
+      "sha256": "e6241c4825d397861354de7f80afaf988b060bbdd5184296253f880030969718",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\legal\\doc_types\\sections\\litigation_memo.sections.any.json": {
+      "sha256": "03e73b51ebcb2c47155ea40a0a51ca4bd8152f706cfccf4ff3183bcfef441531",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\legal\\doc_types\\sections\\msa.sections.any.json": {
+      "sha256": "0e0089b897e81c54c985f056522d77cdef35476b023d3d619fd1e12e04a76586",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\legal\\doc_types\\sections\\nda.sections.any.json": {
+      "sha256": "5981d26c0454605988192ac46e2d60257b7d02acfa76bd20d5ea05847c6de6ec",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\legal\\doc_types\\sections\\privacy_policy.sections.any.json": {
+      "sha256": "ff0658bf7e5799a3bafffa7d1a8047f16e6c57a88dfdfc79244b999bf745771d",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\legal\\doc_types\\sections\\sow.sections.any.json": {
+      "sha256": "dacca6b48ef6145e9e536e5151d7b3be52cb2664f735fc1948008dcecea03901",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\legal\\doc_types\\sections\\terms.sections.any.json": {
+      "sha256": "94eccfe0595ab2806a33dad1038cc87bbabb2e0e93cea95b5845a8322ab82cb0",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\legal\\doc_types\\tables\\board_resolution.tables.any.json": {
+      "sha256": "97e5fc336c801b5e4dce38346830bd843152fcd177e79c94e420ed6f14226ee6",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\legal\\doc_types\\tables\\dpa.tables.any.json": {
+      "sha256": "7a08020d1a2d65874a6095827340d0f404750ddbfe6ca4fcb77b2d78d591367b",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\legal\\doc_types\\tables\\employment_agreement.tables.any.json": {
+      "sha256": "df607c311cbbcc416eb3a812dbaa3f6e951741da67111d89dec5fbcdd75e49ba",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\legal\\doc_types\\tables\\lease.tables.any.json": {
+      "sha256": "32e1a338c2f9ad368543a2491d7323308186200e0df99e7ed8eba03b20ebe174",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\legal\\doc_types\\tables\\litigation_memo.tables.any.json": {
+      "sha256": "00c3de021d45c57a303f6c7e5420fea5a02572861097932632b8542bd03a65b2",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\legal\\doc_types\\tables\\msa.tables.any.json": {
+      "sha256": "9b0b0d88cf3356af12b37fae77f4a629fa990b2f41f5894a71b12558d0844a91",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\legal\\doc_types\\tables\\nda.tables.any.json": {
+      "sha256": "44849f6f5b87941b4954b3133bc9a9eb00d36485fba1e70fc73dfd1c7049d6b2",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\legal\\doc_types\\tables\\privacy_policy.tables.any.json": {
+      "sha256": "01a7db13d822b04604143003ec650a213ac6d9499e2635e979acb33c6b456d6b",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\legal\\doc_types\\tables\\sow.tables.any.json": {
+      "sha256": "8399f1bc5b5174f6186173ebc4942efad06129cbba2bd9341029bcd0afad59e3",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\legal\\doc_types\\tables\\terms.tables.any.json": {
+      "sha256": "bd84d837f3f273f1b143dbd5b22513a38d3fd9a9b622f55d2f1f9e515425bfb6",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\medical\\doc_types\\entities\\entity_schema.any.json": {
+      "sha256": "d96a31a30cb6927ab67a1acbdde28fb05af2b499ad42e78a073771bc5e3eb587",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\ops\\doc_types\\entities\\entity_schema.any.json": {
+      "sha256": "1ad32c9cc23fc9fb247e53727b6b4fd28fb2d741e688a258b2f2a3c41d3af424",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\tax\\doc_types\\entities\\entity_schema.any.json": {
+      "sha256": "8b68e9bd917ffbac15f79b336132650ed457afe81caeee66c3e65bbe4bd62962",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\domains\\travel\\doc_types\\entities\\entity_schema.any.json": {
+      "sha256": "501ce1d114a349414c135469179f3bbbfe126d228b562e81ac516d34838cd01b",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence\\eval\\suites\\legacy_doc_type_aliases.any.json": {
+      "sha256": "b48f1a7d6153e89ddf21d94ecb11a912b0f51de607a203ffe9b62f5a4c73a908",
+      "required": false,
+      "category": "semantics"
+    },
     "fallbacks/fallback_extraction_recovery.any.json": {
       "sha256": "7fc33e681e89bc7d27570b0941ed33f99e6162f54ed49ea43d0e29cee24288b7",
       "required": false,
@@ -5345,7 +5575,7 @@
       "category": "llm"
     },
     "manifest/bank_aliases.any.json": {
-      "sha256": "c8d0e146efc7f3a21e984f78e1c6eb88dc29fdba5c7baf8ef315f28f8dd34bfa",
+      "sha256": "82419d38bea1ecedaff50f1c20100a8ea8a66776d5c58be840ada7a3faf9501b",
       "required": true,
       "category": "manifest"
     },
@@ -5355,7 +5585,7 @@
       "category": "manifest"
     },
     "manifest/bank_dependencies.any.json": {
-      "sha256": "37905d60cc3cbe34afbf2bc0499c86fa4e166e4fd248fc3e3b22b62bd956ceab",
+      "sha256": "92aeb892888fe18a90e2e171284b67479b0d96d4c45ce7be437eb0c3e1131fce",
       "required": true,
       "category": "manifest"
     },
@@ -5398,6 +5628,11 @@
       "sha256": "f866e9f044f4d7750cde469b621cbb12eb495a7b2610373f9f22afdf4a7e0860",
       "required": true,
       "category": "manifest"
+    },
+    "manifest\\ingestion_slo_baseline_summary.any.json": {
+      "sha256": "460c690c3637022d18340a13e427b81c92f90f4f04e99d0b675c4f1bc3cd612a",
+      "required": false,
+      "category": "semantics"
     },
     "microcopy/allybi_response_style.any.json": {
       "sha256": "4c4dc1015bcc1b4e9d2a95ce3aa629741599dc6344a850efdc78f5c60bd8080b",
@@ -5538,6 +5773,21 @@
       "sha256": "1a2f801dff627b4286a341c37fb18fd59327d1e4bdd9179fe32ee659fbac5995",
       "required": true,
       "category": "normalizers"
+    },
+    "normalizers\\doc_aliases\\education.any.json": {
+      "sha256": "e23dc9c6f71197c9c9693e777a7edd45cdd01ed40173541e36d1f3e70a350b79",
+      "required": false,
+      "category": "semantics"
+    },
+    "normalizers\\doc_aliases\\hr_payroll.any.json": {
+      "sha256": "5398665e25f936afb6571e602cb7f915bc51edffefcd4e5b281437b6331e55dd",
+      "required": false,
+      "category": "semantics"
+    },
+    "normalizers\\doc_aliases\\travel.any.json": {
+      "sha256": "c253c0e9b85988534002772ca618407d7f1530c35149cffb661ae712b84da1bd",
+      "required": false,
+      "category": "semantics"
     },
     "operators/allybi_docx_operators.any.json": {
       "sha256": "0853f634a41af73e2c1cb92ff5badb3a5ebdbadae96d8c9e67b6a04589fce592",
@@ -5905,7 +6155,7 @@
       "category": "semantics"
     },
     "patterns/doc_refs/amendment_chain_schema.any.json": {
-      "sha256": "f2f5c8d5cc4888417857c2e8665f142cd007d3210ef2a286841db270779991ba",
+      "sha256": "b579c699a07761d77c1b17e1745b55d6517761114f92c78c75bde3922ee501d4",
       "required": false,
       "category": "semantics"
     },
@@ -6680,7 +6930,7 @@
       "category": "quality"
     },
     "quality/document_intelligence/doc_type_confusion_matrix.any.json": {
-      "sha256": "6f7060df8ed54844a8b86ed06b8feadadd31a05f278023af54644a593c066fab",
+      "sha256": "5934ee8372c3aa8329582563407ace1988dbfdb46d0f7941fe644c119a10df77",
       "required": true,
       "category": "quality"
     },

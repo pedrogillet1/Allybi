@@ -2,6 +2,7 @@
 /* eslint-disable no-console */
 import fs from "node:fs";
 import path from "node:path";
+import crypto from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { resolveCommitHash } from "./git-commit.mjs";
 import { packageCertificationEvidence } from "./package-evidence-bundle.mjs";
@@ -77,6 +78,20 @@ const gateGenerators = {
   "indexing-storage-invariants":
     "jest:path:src/tests/certification/indexing-storage-invariants.cert.test.ts",
 };
+const strictForcedRegenerationGateIds = new Set([
+  "query-latency",
+  "frontend-retrieval-evidence",
+]);
+const strictRetrievalEvidenceProfiles = new Set([
+  "ci",
+  "release",
+  "retrieval_signoff",
+  "local_hard",
+]);
+const retrievalEvidenceContractPath = path.resolve(
+  ROOT,
+  "scripts/certification/retrieval-evidence-contract.json",
+);
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, "utf8"));
@@ -204,6 +219,255 @@ function safeReadJson(filePath) {
   }
 }
 
+function normalizeAbsolutePath(value) {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+  return path.resolve(raw);
+}
+
+function pathsEqual(a, b) {
+  const left = normalizeAbsolutePath(a);
+  const right = normalizeAbsolutePath(b);
+  if (!left || !right) return false;
+  if (process.platform === "win32") {
+    return left.toLowerCase() === right.toLowerCase();
+  }
+  return left === right;
+}
+
+function computeFileFingerprint(filePath) {
+  const normalized = normalizeAbsolutePath(filePath);
+  if (!normalized || !fs.existsSync(normalized)) return null;
+  const payload = fs.readFileSync(normalized);
+  return {
+    path: normalized,
+    sha256: crypto.createHash("sha256").update(payload).digest("hex"),
+    bytes: payload.byteLength,
+  };
+}
+
+function readRetrievalEvidenceContract() {
+  const fallback = {
+    requiredLatestFiles: [
+      "scorecard.json",
+      "grading.md",
+      "a-plus-gap-deep-dive.md",
+      "per_query.json",
+      "lineage.json",
+    ],
+    forbiddenFallbackDatasetMarkers: ["per_query.json"],
+  };
+  if (!fs.existsSync(retrievalEvidenceContractPath)) return fallback;
+  try {
+    const parsed = readJson(retrievalEvidenceContractPath);
+    const requiredLatestFiles = Array.isArray(parsed?.requiredLatestFiles)
+      ? parsed.requiredLatestFiles
+        .map((value) => String(value || "").trim())
+        .filter(Boolean)
+      : fallback.requiredLatestFiles;
+    const forbiddenFallbackDatasetMarkers = Array.isArray(
+      parsed?.forbiddenFallbackDatasetMarkers,
+    )
+      ? parsed.forbiddenFallbackDatasetMarkers
+        .map((value) => String(value || "").trim().toLowerCase())
+        .filter(Boolean)
+      : fallback.forbiddenFallbackDatasetMarkers;
+    return {
+      requiredLatestFiles: requiredLatestFiles.length > 0
+        ? requiredLatestFiles
+        : fallback.requiredLatestFiles,
+      forbiddenFallbackDatasetMarkers,
+    };
+  } catch {
+    return fallback;
+  }
+}
+
+function resolveFrontendReportsRoot() {
+  const candidates = [
+    path.resolve(ROOT, "../frontend/e2e/reports"),
+    path.resolve(ROOT, "frontend/e2e/reports"),
+  ];
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) return candidate;
+  }
+  return candidates[0];
+}
+
+function isLatestPerQueryPath(value) {
+  const normalized = normalizeAbsolutePath(value).replace(/\\/g, "/").toLowerCase();
+  return normalized.endsWith("/latest/per_query.json");
+}
+
+function resolveForbiddenLineageMarker(lineage, markers) {
+  if (!lineage || typeof lineage !== "object") return null;
+  if (!Array.isArray(markers) || markers.length <= 0) return null;
+  const record = lineage;
+  const fields = [
+    String(record.datasetId || "").trim().toLowerCase(),
+    String(record.inputFile || "").trim().toLowerCase(),
+    String(record.source || "").trim().toLowerCase(),
+    String(record.runId || "").trim().toLowerCase(),
+    String(record.sourceArtifactPath || "").trim().toLowerCase(),
+  ];
+  for (const marker of markers) {
+    const normalized = String(marker || "").trim().toLowerCase();
+    if (!normalized) continue;
+    if (fields.some((field) => field.includes(normalized))) return normalized;
+  }
+  return null;
+}
+
+function validateStrictLatestEvidence(profile) {
+  const failures = [];
+  const metrics = {};
+  const enforce =
+    strict &&
+    (strictRetrievalEvidenceProfiles.has(profile) || String(profile || "").trim().length === 0);
+  if (!enforce) return { failures, metrics };
+
+  const contract = readRetrievalEvidenceContract();
+  const reportsRoot = resolveFrontendReportsRoot();
+  const latestDir = path.join(reportsRoot, "latest");
+  const latestPerQueryPath = path.join(latestDir, "per_query.json");
+  const latestScorecardPath = path.join(latestDir, "scorecard.json");
+  const latestLineagePath = path.join(latestDir, "lineage.json");
+
+  metrics.reportsRoot = reportsRoot;
+  metrics.latestDir = latestDir;
+
+  if (!fs.existsSync(latestDir)) {
+    failures.push("LATEST_DIR_MISSING");
+    return { failures, metrics };
+  }
+
+  const missingLatestFiles = contract.requiredLatestFiles.filter((fileName) =>
+    !fs.existsSync(path.join(latestDir, fileName))
+  );
+  metrics.missingLatestFiles = missingLatestFiles;
+  if (missingLatestFiles.length > 0) {
+    failures.push(`LATEST_FILES_MISSING:${missingLatestFiles.join(",")}`);
+  }
+
+  let perQueryRows = 0;
+  if (!fs.existsSync(latestPerQueryPath)) {
+    failures.push("PER_QUERY_MISSING");
+  } else {
+    try {
+      const parsed = readJson(latestPerQueryPath);
+      if (!Array.isArray(parsed)) {
+        failures.push("PER_QUERY_NOT_ARRAY");
+      } else {
+        perQueryRows = parsed.length;
+      }
+    } catch {
+      failures.push("PER_QUERY_INVALID_JSON");
+    }
+  }
+  metrics.perQueryRows = perQueryRows;
+  if (perQueryRows < 100) {
+    failures.push(`PER_QUERY_ROWS_LT_100:${perQueryRows}`);
+  }
+
+  let scorecardInputFile = "";
+  if (!fs.existsSync(latestScorecardPath)) {
+    failures.push("SCORECARD_MISSING");
+  } else {
+    try {
+      const scorecard = readJson(latestScorecardPath);
+      const pack = String(scorecard?.pack || "").trim();
+      const totalQueries = Number(scorecard?.meta?.totalQueries || 0);
+      const allowedDocs =
+        Number(scorecard?.meta?.allowedDocIdsCount || 0) +
+        Number(scorecard?.meta?.allowedDocNamesCount || 0);
+      scorecardInputFile = String(scorecard?.inputFile || "").trim();
+      metrics.scorecardPack = pack;
+      metrics.scorecardTotalQueries = totalQueries;
+      metrics.scorecardAllowedDocs = allowedDocs;
+      metrics.scorecardInputFile = scorecardInputFile || null;
+      if (pack !== "100") failures.push(`SCORECARD_PACK_NOT_100:${pack || "missing"}`);
+      if (!Number.isFinite(totalQueries) || totalQueries < 100) {
+        failures.push(`SCORECARD_TOTAL_QUERIES_LT_100:${totalQueries || 0}`);
+      }
+      if (!Number.isFinite(allowedDocs) || allowedDocs <= 0) {
+        failures.push("SCORECARD_ALLOWED_DOCS_MISSING");
+      }
+      if (!scorecardInputFile) failures.push("SCORECARD_INPUT_FILE_MISSING");
+      if (isLatestPerQueryPath(scorecardInputFile)) {
+        failures.push("SCORECARD_INPUT_FILE_RECURSIVE_PER_QUERY");
+      }
+    } catch {
+      failures.push("SCORECARD_INVALID_JSON");
+    }
+  }
+
+  if (!fs.existsSync(latestLineagePath)) {
+    failures.push("LINEAGE_MISSING");
+  } else {
+    try {
+      const lineage = readJson(latestLineagePath);
+      const forbiddenMarker = resolveForbiddenLineageMarker(
+        lineage,
+        contract.forbiddenFallbackDatasetMarkers,
+      );
+      const inputArtifactType = String(lineage?.inputArtifactType || "")
+        .trim()
+        .toLowerCase();
+      const sourceArtifactPath = String(lineage?.sourceArtifactPath || "").trim();
+      const sourceArtifactSha256 = String(lineage?.sourceArtifactSha256 || "")
+        .trim()
+        .toLowerCase();
+      const sourceArtifactBytes = Number(lineage?.sourceArtifactBytes || 0);
+      const lineageInputFile = String(lineage?.inputFile || "").trim();
+      metrics.lineageInputArtifactType = inputArtifactType || null;
+      metrics.lineageSourceArtifactPath = sourceArtifactPath || null;
+      metrics.lineageSourceArtifactSha256 = sourceArtifactSha256 || null;
+      metrics.lineageSourceArtifactBytes = sourceArtifactBytes;
+      metrics.lineageInputFile = lineageInputFile || null;
+      if (forbiddenMarker) {
+        failures.push(`LINEAGE_FORBIDDEN_MARKER:${forbiddenMarker}`);
+      }
+      if (inputArtifactType !== "raw_query_run") {
+        failures.push(`LINEAGE_INPUT_ARTIFACT_TYPE_INVALID:${inputArtifactType || "missing"}`);
+      }
+      if (!sourceArtifactPath) {
+        failures.push("LINEAGE_SOURCE_ARTIFACT_PATH_MISSING");
+      } else {
+        if (isLatestPerQueryPath(sourceArtifactPath)) {
+          failures.push("LINEAGE_SOURCE_ARTIFACT_RECURSIVE_PER_QUERY");
+        }
+        if (!fs.existsSync(sourceArtifactPath)) {
+          failures.push("LINEAGE_SOURCE_ARTIFACT_MISSING_FILE");
+        }
+      }
+      if (!/^[a-f0-9]{64}$/i.test(sourceArtifactSha256)) {
+        failures.push("LINEAGE_SOURCE_ARTIFACT_SHA256_INVALID");
+      }
+      if (!Number.isFinite(sourceArtifactBytes) || sourceArtifactBytes < 1) {
+        failures.push("LINEAGE_SOURCE_ARTIFACT_BYTES_INVALID");
+      }
+      if (lineageInputFile && isLatestPerQueryPath(lineageInputFile)) {
+        failures.push("LINEAGE_INPUT_FILE_RECURSIVE_PER_QUERY");
+      }
+      if (lineageInputFile && scorecardInputFile && !pathsEqual(lineageInputFile, scorecardInputFile)) {
+        failures.push("LINEAGE_INPUT_FILE_SCORECARD_INPUT_MISMATCH");
+      }
+      if (sourceArtifactPath && sourceArtifactSha256 && /^[a-f0-9]{64}$/i.test(sourceArtifactSha256)) {
+        const sourceFingerprint = computeFileFingerprint(sourceArtifactPath);
+        if (!sourceFingerprint) {
+          failures.push("LINEAGE_SOURCE_ARTIFACT_FINGERPRINT_UNAVAILABLE");
+        } else if (sourceFingerprint.sha256.toLowerCase() !== sourceArtifactSha256) {
+          failures.push("LINEAGE_SOURCE_ARTIFACT_SHA256_MISMATCH");
+        }
+      }
+    } catch {
+      failures.push("LINEAGE_INVALID_JSON");
+    }
+  }
+
+  return { failures, metrics };
+}
+
 function analyzeFreshness(gate, commitHash) {
   const reasons = [];
   const generatedAt = String(gate?.generatedAt || "").trim();
@@ -297,6 +561,25 @@ function ensureGate(gateId, commitHash, regenerated) {
   const generator = gateGenerators[gateId] || null;
   let gate = getGate(gateId);
   let refreshed = false;
+  let forcedRefreshAttempted = false;
+  let forcedRefreshSucceeded = false;
+  const forceRegenerateInStrict =
+    strict &&
+    autoRefresh &&
+    strictForcedRegenerationGateIds.has(gateId) &&
+    Boolean(generator);
+
+  if (forceRegenerateInStrict) {
+    forcedRefreshAttempted = true;
+    console.log(
+      `[certification] gate '${gateId}' strict mode enforces regeneration; running: npm run ${generator}`,
+    );
+    if (runGateGenerator(generator, commitHash)) {
+      gate = getGate(gateId);
+      refreshed = true;
+      forcedRefreshSucceeded = true;
+    }
+  }
 
   if (gate.missing && autoRefresh && generator) {
     console.log(
@@ -325,7 +608,12 @@ function ensureGate(gateId, commitHash, regenerated) {
     ? { stale: false, reasons: [] }
     : analyzeFreshness(gate, commitHash);
   if (refreshed) regenerated.push(gateId);
-  return { gate, freshness: finalFreshness };
+  return {
+    gate,
+    freshness: finalFreshness,
+    forcedRefreshAttempted,
+    forcedRefreshSucceeded,
+  };
 }
 
 function buildActiveGateManifest({
@@ -506,6 +794,7 @@ function main() {
   });
   const generatedAt = new Date().toISOString();
   const reportPath = resolvePerQueryReportPath();
+  const perQueryFingerprint = computeFileFingerprint(reportPath);
   const lineage = {
     runId: String(
       process.env.CERT_RUN_ID || `cert_${generatedAt.replace(/[:.]/g, "-")}`,
@@ -517,10 +806,17 @@ function main() {
           : "none"),
     ).trim(),
     profile,
+    inputReportPath: perQueryFingerprint?.path || null,
+    inputReportSha256: perQueryFingerprint?.sha256 || null,
+    inputReportBytes: perQueryFingerprint?.bytes || null,
   };
   const gates = [];
   const failures = [];
   const regenerated = [];
+  const strictLatestEvidence = validateStrictLatestEvidence(profile);
+  for (const reason of strictLatestEvidence.failures) {
+    failures.push(`STRICT_LATEST_EVIDENCE:${reason}`);
+  }
 
   const strictLatencyRequired = strict && queryLatencyPolicy.required;
   if (strictLatencyRequired && !hasLatencyInput) {
@@ -529,6 +825,9 @@ function main() {
 
   for (const gateId of requiredGateIds) {
     const state = ensureGate(gateId, commitHash, regenerated);
+    if (state.forcedRefreshAttempted && !state.forcedRefreshSucceeded) {
+      failures.push(`GATE_REGEN_FAILED:${gateId}`);
+    }
     const report = state.gate;
     if (report.missing) {
       failures.push(`MISSING_GATE_REPORT:${gateId}`);
@@ -567,6 +866,42 @@ function main() {
         failures.push(
           `DEGRADED_GATE_EVIDENCE:${gateId}:embedding_runtime_mode_not_allowed`,
         );
+      }
+    }
+    if (strict && gateId === "query-latency") {
+      if (!perQueryFingerprint) {
+        failures.push("DEGRADED_GATE_EVIDENCE:query-latency:input_fingerprint_unavailable");
+      } else {
+        const inputReportPath = normalizeAbsolutePath(
+          report?.metrics?.inputReportPath || report?.metrics?.reportPath || "",
+        );
+        const inputReportSha256 = String(
+          report?.metrics?.inputReportSha256 || "",
+        )
+          .trim()
+          .toLowerCase();
+        const inputReportBytes = Number(report?.metrics?.inputReportBytes || 0);
+        if (!inputReportPath) {
+          failures.push("DEGRADED_GATE_EVIDENCE:query-latency:missing_input_report_path");
+        } else if (!pathsEqual(inputReportPath, perQueryFingerprint.path)) {
+          failures.push(
+            "DEGRADED_GATE_EVIDENCE:query-latency:input_report_path_mismatch",
+          );
+        }
+        if (!/^[a-f0-9]{64}$/i.test(inputReportSha256)) {
+          failures.push("DEGRADED_GATE_EVIDENCE:query-latency:missing_input_report_sha256");
+        } else if (inputReportSha256 !== perQueryFingerprint.sha256) {
+          failures.push(
+            "DEGRADED_GATE_EVIDENCE:query-latency:input_report_sha256_mismatch",
+          );
+        }
+        if (!Number.isFinite(inputReportBytes) || inputReportBytes < 1) {
+          failures.push("DEGRADED_GATE_EVIDENCE:query-latency:missing_input_report_bytes");
+        } else if (inputReportBytes !== perQueryFingerprint.bytes) {
+          failures.push(
+            "DEGRADED_GATE_EVIDENCE:query-latency:input_report_bytes_mismatch",
+          );
+        }
       }
     }
   }
@@ -633,6 +968,7 @@ function main() {
     regenerated,
     policy: {
       queryLatency: queryLatencyPolicy,
+      latestEvidence: strictLatestEvidence.metrics,
       localCertRun: localRunPolicy,
       runtimeGraph: {
         requireLiveMode: requireLiveRuntimeGraphEvidence({ profile, strict }),

@@ -25,6 +25,7 @@
         "di_normalization_rules",
         "doc_aliases_*",
         "doc_archetypes_*",
+        "entity_schema_*",
         "document_intelligence_*",
         "legal_*",
         "medical_*",
@@ -67,6 +68,8 @@
       "path": "src/services/core/retrieval/retrievalEngine.service.ts",
       "uses": [
         "boost_rules_*",
+        "di_table_ontology",
+        "entity_schema_*",
         "query_rewrites_*",
         "section_priority_*"
       ]
@@ -128,6 +131,7 @@
     "document_intelligence_runtime_wiring_gates",
     "document_intelligence_schema_registry",
     "document_intelligence_usage_manifest",
+    "di_table_ontology",
     "fallback_messages",
     "finance_doc_logic",
     "finance_kpi_ontology",
@@ -165,9 +169,11 @@
     "di_finance_",
     "di_metric_",
     "di_section_",
+    "di_table_",
     "di_unit_and_measurement_",
     "doc_aliases_",
     "doc_archetypes_",
+    "entity_schema_",
     "explain_style_",
     "keyword_taxonomy_",
     "legal_",

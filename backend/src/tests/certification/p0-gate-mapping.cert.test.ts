@@ -59,6 +59,16 @@ describe("Certification: P0 runtime-wiring gate mapping", () => {
     expect(gateScript).toMatch(/const autoRefresh = repairMode/);
   });
 
+  test("p0-gates summary fails closed when any required check fails", () => {
+    const backendRoot = resolveBackendRoot();
+    const gateScript = fs.readFileSync(
+      path.join(backendRoot, "scripts", "audit", "p0-gates.mjs"),
+      "utf8",
+    );
+    expect(gateScript).toMatch(/const failedChecks = checks/);
+    expect(gateScript).toMatch(/P0_GATE_CHECK_FAILED:/);
+  });
+
   test("cert strict verify scripts are wired in package scripts", () => {
     const backendRoot = resolveBackendRoot();
     const pkg = JSON.parse(

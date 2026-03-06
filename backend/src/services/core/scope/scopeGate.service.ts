@@ -400,6 +400,9 @@ export class ScopeGateService {
     const sectionDisambiguationPolicy = this.safeGetBank<Record<string, unknown>>(
       "section_disambiguation_policy",
     );
+    const amendmentChainSchema = this.safeGetBank<Record<string, unknown>>(
+      "amendment_chain_schema",
+    );
 
     // Quality trigger banks (post-retrieval quality gates, loaded on-demand).
     const qualityTriggers = {
@@ -746,6 +749,24 @@ export class ScopeGateService {
         stopwordsDocnames,
         rankFeatures,
       );
+      const versionResolution = this.resolveVersionAwareDocChoice({
+        query: qNorm,
+        docs,
+        rankedCandidates: disambiguationOptions,
+        amendmentChainSchema,
+      });
+      if (versionResolution.docId) {
+        debug.appliedRules.push(
+          `version_resolution_autopick:${versionResolution.reason}`,
+        );
+        activeDocId = versionResolution.docId;
+        hardDocLock = true;
+        candidateDocIds = [versionResolution.docId];
+        needsDocChoice = false;
+        disambiguationOptions = [];
+      } else if (versionResolution.ambiguous) {
+        debug.appliedRules.push("version_resolution_requires_clarification");
+      }
 
       // Apply policy thresholds (autopick vs disambiguate)
       const topScore = disambiguationOptions[0]?.score ?? 0;
@@ -758,7 +779,12 @@ export class ScopeGateService {
       const autopickGap = Number(ambiguityThresholds.autopickGap ?? 0.25);
 
       const topDoc = disambiguationOptions[0]?.docId ?? null;
-      if (topDoc && topScore >= autopickTop && gap >= autopickGap) {
+      if (
+        topDoc &&
+        !versionResolution.ambiguous &&
+        topScore >= autopickTop &&
+        gap >= autopickGap
+      ) {
         debug.appliedRules.push("autopick_safe_doc_choice");
         activeDocId = topDoc;
         hardDocLock = true;
@@ -1051,15 +1077,21 @@ export class ScopeGateService {
       return { docId: null, confidence: 0, method: "none" };
 
     // Use token overlap on doc title + filename tokens as deterministic fallback
-    const qTokens = this.docnameTokens(args.qNorm, args.stopwordsDocnames);
+    const preserveVersionTerms = this.hasVersionIntent(args.qNorm);
+    const qTokens = this.docnameTokens(args.qNorm, args.stopwordsDocnames, {
+      preserveVersionTerms,
+    });
     if (!qTokens.length) return { docId: null, confidence: 0, method: "none" };
 
     let best: { docId: string; score: number } | null = null;
     for (const d of args.docs) {
-      const tTokens = this.docnameTokens(d.title ?? "", args.stopwordsDocnames);
+      const tTokens = this.docnameTokens(d.title ?? "", args.stopwordsDocnames, {
+        preserveVersionTerms,
+      });
       const fTokens = this.docnameTokens(
         d.filename ?? "",
         args.stopwordsDocnames,
+        { preserveVersionTerms },
       );
       const score = Math.max(
         tokenOverlap(qTokens, tTokens),
@@ -1080,7 +1112,243 @@ export class ScopeGateService {
     return { docId: null, confidence: 0, method: "none" };
   }
 
-  private docnameTokens(s: string, stopwordsDocnames: Record<string, unknown> | null): string[] {
+  private hasVersionIntent(query: string): boolean {
+    const q = foldDiacritics(lower(query));
+    if (!q) return false;
+    return /\b(latest|newest|recent|current|signed|executed|effective|draft|final|version|revision|rev|amendment|amends|addendum|v\d+|versao|vigente|assinado|rascunho|aditivo|alteracao)\b/i.test(
+      q,
+    );
+  }
+
+  private resolveVersionAwareDocChoice(args: {
+    query: string;
+    docs: DocMeta[];
+    rankedCandidates: ScopeCandidate[];
+    amendmentChainSchema: Record<string, unknown> | null;
+  }): {
+    docId: string | null;
+    confidence: number;
+    reason: string | null;
+    ambiguous: boolean;
+  } {
+    if (!this.hasVersionIntent(args.query)) {
+      return { docId: null, confidence: 0, reason: null, ambiguous: false };
+    }
+    const query = foldDiacritics(lower(args.query));
+    const explicitVersionMatch = query.match(/\bv(?:ersion)?\s*([0-9]{1,3})\b/i);
+    const explicitVersion = explicitVersionMatch ? Number(explicitVersionMatch[1]) : null;
+    const wantsLatest = /\b(latest|newest|recent|current|ultimo|último|vigente)\b/i.test(
+      query,
+    );
+    const wantsSigned = /\b(signed|executed|effective|assinado|executado|vigente|final)\b/i.test(
+      query,
+    );
+    const wantsDraft = /\b(draft|rascunho|minuta)\b/i.test(query);
+    const wantsAmendment =
+      /\b(amendment|amends|aditivo|alteracao|alteração|restated)\b/i.test(query);
+
+    const rankedByDocId = new Map(
+      args.rankedCandidates.map((candidate, index) => [
+        candidate.docId,
+        { score: candidate.score, index },
+      ]),
+    );
+    const candidates = args.docs.map((doc, index) => {
+      const raw = foldDiacritics(
+        `${String(doc.title || "")} ${String(doc.filename || "")}`,
+      );
+      const versionMatch = raw.match(/\bv(?:ersion)?[_\-\s]?([0-9]{1,3})\b/i);
+      const parsedVersion = versionMatch ? Number(versionMatch[1]) : null;
+      const status = this.resolveDocVersionStatus(raw, args.amendmentChainSchema);
+      const rank = rankedByDocId.get(doc.docId);
+      return {
+        docId: doc.docId,
+        rankScore: rank?.score ?? 0,
+        rankIndex: rank?.index ?? index,
+        version: Number.isFinite(parsedVersion) ? parsedVersion : null,
+        status,
+      };
+    });
+    if (!candidates.length) {
+      return { docId: null, confidence: 0, reason: null, ambiguous: true };
+    }
+
+    const sortByRank = (rows: Array<(typeof candidates)[number]>) =>
+      [...rows].sort((a, b) => {
+        if (b.rankScore !== a.rankScore) return b.rankScore - a.rankScore;
+        return a.rankIndex - b.rankIndex;
+      });
+    const byVersionDesc = (rows: Array<(typeof candidates)[number]>) =>
+      [...rows].sort((a, b) => {
+        const aVersion = a.version ?? -1;
+        const bVersion = b.version ?? -1;
+        if (bVersion !== aVersion) return bVersion - aVersion;
+        if (b.rankScore !== a.rankScore) return b.rankScore - a.rankScore;
+        return a.rankIndex - b.rankIndex;
+      });
+
+    if (explicitVersion != null && Number.isFinite(explicitVersion)) {
+      const versionMatches = sortByRank(
+        candidates.filter((candidate) => candidate.version === explicitVersion),
+      );
+      if (versionMatches.length === 1) {
+        return {
+          docId: versionMatches[0].docId,
+          confidence: 0.93,
+          reason: "explicit_version",
+          ambiguous: false,
+        };
+      }
+      if (versionMatches.length > 1) {
+        return { docId: null, confidence: 0, reason: "explicit_version", ambiguous: true };
+      }
+    }
+
+    if (wantsDraft) {
+      const drafts = byVersionDesc(
+        candidates.filter((candidate) => candidate.status === "draft"),
+      );
+      if (drafts.length === 1) {
+        return {
+          docId: drafts[0].docId,
+          confidence: 0.91,
+          reason: "draft_status",
+          ambiguous: false,
+        };
+      }
+      if (drafts.length > 1 && drafts[0].rankScore > (drafts[1]?.rankScore ?? 0) + 0.2) {
+        return {
+          docId: drafts[0].docId,
+          confidence: 0.86,
+          reason: "draft_status_ranked",
+          ambiguous: false,
+        };
+      }
+      if (drafts.length > 0) {
+        return { docId: null, confidence: 0, reason: "draft_status", ambiguous: true };
+      }
+    }
+
+    if (wantsSigned) {
+      const signedRows = byVersionDesc(
+        candidates.filter(
+          (candidate) =>
+            candidate.status === "executed" || candidate.status === "effective",
+        ),
+      );
+      if (signedRows.length === 1) {
+        return {
+          docId: signedRows[0].docId,
+          confidence: 0.91,
+          reason: "signed_status",
+          ambiguous: false,
+        };
+      }
+      if (
+        signedRows.length > 1 &&
+        (signedRows[0].version ?? -1) > (signedRows[1].version ?? -1)
+      ) {
+        return {
+          docId: signedRows[0].docId,
+          confidence: 0.86,
+          reason: "signed_latest_version",
+          ambiguous: false,
+        };
+      }
+      if (signedRows.length > 0) {
+        return { docId: null, confidence: 0, reason: "signed_status", ambiguous: true };
+      }
+    }
+
+    if (wantsAmendment) {
+      const amendments = byVersionDesc(
+        candidates.filter((candidate) => candidate.status === "amended"),
+      );
+      if (amendments.length === 1) {
+        return {
+          docId: amendments[0].docId,
+          confidence: 0.88,
+          reason: "amendment_status",
+          ambiguous: false,
+        };
+      }
+      if (amendments.length > 1) {
+        return { docId: null, confidence: 0, reason: "amendment_status", ambiguous: true };
+      }
+    }
+
+    if (wantsLatest) {
+      const sorted = byVersionDesc(candidates);
+      const top = sorted[0];
+      const runner = sorted[1] ?? null;
+      if (!top) return { docId: null, confidence: 0, reason: "latest", ambiguous: true };
+      if (
+        runner &&
+        (top.version ?? -1) === (runner.version ?? -1) &&
+        top.rankScore <= runner.rankScore + 0.15
+      ) {
+        return { docId: null, confidence: 0, reason: "latest", ambiguous: true };
+      }
+      const hasSigned = candidates.some(
+        (candidate) =>
+          candidate.status === "executed" || candidate.status === "effective",
+      );
+      if (top.status === "draft" && hasSigned) {
+        return { docId: null, confidence: 0, reason: "latest", ambiguous: true };
+      }
+      return {
+        docId: top.docId,
+        confidence: 0.84,
+        reason: "latest_version",
+        ambiguous: false,
+      };
+    }
+
+    return { docId: null, confidence: 0, reason: null, ambiguous: false };
+  }
+
+  private resolveDocVersionStatus(
+    normalizedDocLabel: string,
+    amendmentChainSchema: Record<string, unknown> | null,
+  ): "draft" | "executed" | "effective" | "superseded" | "amended" | "unknown" {
+    const raw = foldDiacritics(lower(normalizedDocLabel));
+    if (!raw) return "unknown";
+    if (/\b(draft|rascunho|minuta)\b/i.test(raw)) return "draft";
+    if (
+      /\b(signed|executed|assinado|executado|final)\b/i.test(raw)
+    )
+      return "executed";
+    if (/\b(effective|vigente)\b/i.test(raw)) return "effective";
+    if (/\b(superseded|substituido|substituído)\b/i.test(raw)) return "superseded";
+
+    const patterns = (amendmentChainSchema?.detectionPatterns || {}) as Record<
+      string,
+      unknown
+    >;
+    if (this.matchesAnyRegexPattern(raw, patterns.supersedes)) return "superseded";
+    if (this.matchesAnyRegexPattern(raw, patterns.amends)) return "amended";
+    return "unknown";
+  }
+
+  private matchesAnyRegexPattern(input: string, patterns: unknown): boolean {
+    if (!Array.isArray(patterns)) return false;
+    for (const pattern of patterns) {
+      const source = String(pattern || "").trim();
+      if (!source) continue;
+      try {
+        if (new RegExp(source, "i").test(input)) return true;
+      } catch {
+        continue;
+      }
+    }
+    return false;
+  }
+
+  private docnameTokens(
+    s: string,
+    stopwordsDocnames: Record<string, unknown> | null,
+    options?: { preserveVersionTerms?: boolean },
+  ): string[] {
     // If stopwords_docnames bank exists, we still keep it deterministic and conservative:
     // remove only generic doc terms and status adjectives (as in your bank).
     const toks = simpleTokens(s);
@@ -1138,7 +1406,12 @@ export class ScopeGateService {
       "version",
     ]);
 
-    const filtered = toks.filter((t) => !generic.has(t) && !status.has(t));
+    const preserveVersionTerms = options?.preserveVersionTerms === true;
+    const filtered = toks.filter((t) => {
+      if (generic.has(t)) return false;
+      if (!preserveVersionTerms && status.has(t)) return false;
+      return true;
+    });
     return filtered;
   }
 
@@ -1183,14 +1456,20 @@ export class ScopeGateService {
     stopwordsDocnames: Record<string, unknown> | null,
     rankFeatures: Record<string, unknown> | null,
   ): ScopeCandidate[] {
-    const qTokens = this.docnameTokens(query, stopwordsDocnames);
+    const preserveVersionTerms = this.hasVersionIntent(query);
+    const qTokens = this.docnameTokens(query, stopwordsDocnames, {
+      preserveVersionTerms,
+    });
     const out: ScopeCandidate[] = [];
 
     for (const d of docs) {
-      const titleTokens = this.docnameTokens(d.title ?? "", stopwordsDocnames);
+      const titleTokens = this.docnameTokens(d.title ?? "", stopwordsDocnames, {
+        preserveVersionTerms,
+      });
       const fileTokens = this.docnameTokens(
         d.filename ?? "",
         stopwordsDocnames,
+        { preserveVersionTerms },
       );
 
       const titleOverlap = tokenOverlap(qTokens, titleTokens);
@@ -1347,6 +1626,7 @@ export class ScopeGateService {
       ? (diSectionOntologyBank.sections as Array<Record<string, unknown>>)
       : [];
     for (const section of ontologySections) {
+      if (this.isSyntheticSectionOntologyEntry(section)) continue;
       appendPhrase(section?.label, 0.95);
       appendPhrase(section?.labelPt, 0.95);
       appendPhrase(section?.category, 0.85);
@@ -1435,6 +1715,34 @@ export class ScopeGateService {
       return a.label.localeCompare(b.label);
     });
     return { candidates: semanticCandidates.slice(0, 4) };
+  }
+
+  private isSyntheticSectionOntologyEntry(
+    section: Record<string, unknown>,
+  ): boolean {
+    const id = String(section?.id || "")
+      .trim()
+      .toLowerCase();
+    const label = String(section?.label || "")
+      .trim()
+      .toLowerCase();
+    const labelPt = String(section?.labelPt || "")
+      .trim()
+      .toLowerCase();
+    const families = Array.isArray(section?.families)
+      ? section.families.map((value) => String(value || "").toLowerCase())
+      : [];
+    const isSyntheticId = /^sec_[0-9]{3,}$/.test(id);
+    const syntheticLabel =
+      /^(overview|financial|legal|clinical|operations|method|risk|compliance|appendix|table)\s+\d+$/i.test(
+        label,
+      ) ||
+      /^(visao geral|financeiro|juridico|clinico|operacoes|metodologia|risco|conformidade|apendice|tabela)\s+\d+$/i.test(
+        foldDiacritics(labelPt),
+      );
+    const genericFamilyBundle =
+      families.includes("cross_domain") && families.includes("structural");
+    return isSyntheticId && syntheticLabel && genericFamilyBundle;
   }
 
   // -----------------------------

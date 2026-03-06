@@ -1,0 +1,50 @@
+{
+    "_meta":  {
+                  "id":  "entity_schema_housing",
+                  "version":  "1.0.0",
+                  "description":  "Domain-level entity schema registry for housing document types.",
+                  "languages":  [
+                                    "any"
+                                ],
+                  "lastUpdated":  "2026-03-05",
+                  "owner":  "data-bank-governance",
+                  "usedBy":  [
+                                 "services/core/retrieval/document_intelligence/ruleInterpreter.ts"
+                             ],
+                  "tests":  [
+                                "tests/document-intelligence/docint-bank-integrity.test.ts"
+                            ]
+              },
+    "config":  {
+                   "enabled":  true,
+                   "domain":  "housing",
+                   "strict":  true
+               },
+    "domain":  "housing",
+    "entities":  [
+                     {
+                         "id":  "document_id",
+                         "type":  "string",
+                         "required":  false,
+                         "description":  "Stable source identifier when available."
+                     },
+                     {
+                         "id":  "effective_date",
+                         "type":  "date",
+                         "required":  false,
+                         "description":  "Effective date captured from the document."
+                     },
+                     {
+                         "id":  "counterparty",
+                         "type":  "string",
+                         "required":  false,
+                         "description":  "Primary party/person/entity referenced."
+                     },
+                     {
+                         "id":  "amount",
+                         "type":  "money",
+                         "required":  false,
+                         "description":  "Primary monetary amount when present."
+                     }
+                 ]
+}

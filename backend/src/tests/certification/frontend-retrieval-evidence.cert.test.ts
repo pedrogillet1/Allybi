@@ -46,6 +46,13 @@ function resolveCertProfile(): string {
     .toLowerCase();
 }
 
+function resolveStrictFlag(): boolean {
+  const raw = String(process.env.CERT_STRICT || "")
+    .trim()
+    .toLowerCase();
+  return raw === "1" || raw === "true";
+}
+
 function isStrictRetrievalProfile(profile: string): boolean {
   return profile === "ci" || profile === "release" ||
     profile === "retrieval_signoff" || profile === "local_hard";
@@ -79,6 +86,14 @@ function resolveLineageMarkerViolation(
   return null;
 }
 
+function isRecursivePerQueryInput(value: unknown): boolean {
+  const normalized = String(value || "")
+    .trim()
+    .replace(/\\/g, "/")
+    .toLowerCase();
+  return normalized.endsWith("/latest/per_query.json");
+}
+
 describe("Certification: frontend retrieval evidence completeness", () => {
   test("latest grading artifacts and playwright results are complete and non-skipped", () => {
     const repoRoot = resolveRepoRoot();
@@ -90,7 +105,8 @@ describe("Certification: frontend retrieval evidence completeness", () => {
     const lineagePath = path.join(latestDir, "lineage.json");
     const failures: string[] = [];
     const certProfile = resolveCertProfile();
-    const strictRetrievalProfile = isStrictRetrievalProfile(certProfile);
+    const strictRetrievalProfile =
+      isStrictRetrievalProfile(certProfile) || resolveStrictFlag();
 
     if (!fs.existsSync(latestDir)) {
       failures.push("LATEST_REPORT_DIR_MISSING");
@@ -135,6 +151,7 @@ describe("Certification: frontend retrieval evidence completeness", () => {
     let scorecardPack: string | null = null;
     let scorecardTotalQueries = 0;
     let scorecardAllowedDocs = 0;
+    let scorecardInputFile: string | null = null;
     if (!fs.existsSync(scorecardPath)) {
       failures.push("SCORECARD_MISSING");
     } else {
@@ -143,6 +160,7 @@ describe("Certification: frontend retrieval evidence completeness", () => {
           fs.readFileSync(scorecardPath, "utf8"),
         ) as Record<string, unknown>;
         scorecardPack = String(scorecard.pack || "").trim() || null;
+        scorecardInputFile = String(scorecard.inputFile || "").trim() || null;
         const meta = scorecard.meta &&
             typeof scorecard.meta === "object"
           ? (scorecard.meta as Record<string, unknown>)
@@ -157,17 +175,36 @@ describe("Certification: frontend retrieval evidence completeness", () => {
     }
 
     let lineageViolation: string | null = null;
+    let lineageInputFile: string | null = null;
+    let lineageSourceArtifactPath: string | null = null;
+    let lineageSourceArtifactSha256: string | null = null;
+    let lineageInputArtifactType: string | null = null;
     if (!fs.existsSync(lineagePath)) {
       failures.push("LINEAGE_MISSING");
     } else {
       try {
-        const lineage = JSON.parse(fs.readFileSync(lineagePath, "utf8"));
+        const lineage = JSON.parse(
+          fs.readFileSync(lineagePath, "utf8"),
+        ) as Record<string, unknown>;
+        lineageInputFile = String(lineage.inputFile || "").trim() || null;
+        lineageSourceArtifactPath =
+          String(lineage.sourceArtifactPath || "").trim() || null;
+        lineageSourceArtifactSha256 =
+          String(lineage.sourceArtifactSha256 || "").trim().toLowerCase() || null;
+        lineageInputArtifactType =
+          String(lineage.inputArtifactType || "").trim().toLowerCase() || null;
         lineageViolation = resolveLineageMarkerViolation(
           lineage,
           contract.forbiddenFallbackDatasetMarkers,
         );
         if (lineageViolation) {
           failures.push(`LINEAGE_FORBIDDEN_MARKER:${lineageViolation}`);
+        }
+        if (isRecursivePerQueryInput(lineageInputFile)) {
+          failures.push("LINEAGE_INPUTFILE_RECURSIVE_PER_QUERY");
+        }
+        if (isRecursivePerQueryInput(lineageSourceArtifactPath)) {
+          failures.push("LINEAGE_SOURCE_ARTIFACT_RECURSIVE_PER_QUERY");
         }
       } catch {
         failures.push("LINEAGE_INVALID_JSON");
@@ -198,9 +235,21 @@ describe("Certification: frontend retrieval evidence completeness", () => {
       if (scorecardPack !== "100") failures.push("STRICT_SCORECARD_PACK_NOT_100");
       if (scorecardAllowedDocs <= 0) failures.push("STRICT_SCORECARD_DOC_SCOPE_MISSING");
       if (scorecardTotalQueries < 100) failures.push("STRICT_SCORECARD_TOTAL_QUERIES_TOO_LOW");
+      if (isRecursivePerQueryInput(scorecardInputFile)) {
+        failures.push("STRICT_SCORECARD_INPUT_RECURSIVE_PER_QUERY");
+      }
       if (queryCoverage < 0.98) failures.push("STRICT_PER_QUERY_QUERY_COVERAGE_TOO_LOW");
       if (responseFieldCoverage < 0.98) {
         failures.push("STRICT_PER_QUERY_RESPONSE_FIELD_COVERAGE_TOO_LOW");
+      }
+      if (!lineageInputArtifactType || lineageInputArtifactType !== "raw_query_run") {
+        failures.push("STRICT_LINEAGE_INPUT_ARTIFACT_TYPE_INVALID");
+      }
+      if (!lineageSourceArtifactPath) {
+        failures.push("STRICT_LINEAGE_SOURCE_ARTIFACT_PATH_MISSING");
+      }
+      if (!lineageSourceArtifactSha256 || !/^[a-f0-9]{64}$/i.test(lineageSourceArtifactSha256)) {
+        failures.push("STRICT_LINEAGE_SOURCE_ARTIFACT_SHA256_INVALID");
       }
     }
 
@@ -217,9 +266,14 @@ describe("Certification: frontend retrieval evidence completeness", () => {
         scorecardPack,
         scorecardTotalQueries,
         scorecardAllowedDocs,
+        scorecardInputFile,
         certProfile,
         strictRetrievalProfile,
         lineageViolation,
+        lineageInputFile,
+        lineageSourceArtifactPath,
+        lineageSourceArtifactSha256,
+        lineageInputArtifactType,
         playwrightExpected,
         playwrightSkipped,
       },
@@ -230,6 +284,8 @@ describe("Certification: frontend retrieval evidence completeness", () => {
         strictPack: "100",
         strictMinQueryCoverage: 0.98,
         strictMinResponseFieldCoverage: 0.98,
+        strictInputArtifactType: "raw_query_run",
+        strictSourceArtifactSha256Regex: "^[a-f0-9]{64}$",
         minPlaywrightExpected: 1,
         maxPlaywrightSkipped: 0,
       },

@@ -29,15 +29,15 @@ export const UNIT_PATTERNS: UnitPattern[] = [
   },
   {
     normalized: "currency_eur",
-    patterns: [/\beur\b/i, /€/],
+    patterns: [/\beur\b/i, /€/u, /â‚¬/],
   },
   {
     normalized: "currency_gbp",
-    patterns: [/\bgbp\b/i, /£/],
+    patterns: [/\bgbp\b/i, /£/u, /Â£/],
   },
   {
     normalized: "currency_jpy",
-    patterns: [/\bjpy\b/i, /¥/],
+    patterns: [/\bjpy\b/i, /¥/u, /Â¥/],
   },
   {
     normalized: "percent",
@@ -116,7 +116,7 @@ function parseLocaleNumber(raw: string): number | null {
   let value = clean(raw);
   if (!value) return null;
 
-  // Accounting negative: (1,500) → -1500
+  // Accounting negative: (1,500) -> -1500
   const parenMatch = value.match(/^\((.+)\)$/);
   if (parenMatch) {
     value = "-" + parenMatch[1];
@@ -165,9 +165,9 @@ function detectUnitRaw(
         if (entry.normalized.startsWith("currency_")) {
           if (raw.includes("r$")) raw = "R$";
           else if (raw.includes("$")) raw = "$";
-          else if (raw.includes("€")) raw = "€";
-          else if (raw.includes("£")) raw = "£";
-          else if (raw.includes("¥")) raw = "¥";
+          else if (raw.includes("€") || raw.includes("â‚¬")) raw = "€";
+          else if (raw.includes("£") || raw.includes("Â£")) raw = "£";
+          else if (raw.includes("¥") || raw.includes("Â¥")) raw = "¥";
         }
         return { raw, normalized: entry.normalized };
       }

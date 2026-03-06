@@ -1,5 +1,10 @@
 import type { Request, Response } from "express";
-import { setAuthCookies, clearAuthCookies } from "../utils/authCookies";
+import {
+  setAuthCookies,
+  clearAuthCookies,
+  setTwoFactorChallengeCookie,
+  clearTwoFactorChallengeCookie,
+} from "../utils/authCookies";
 import prisma from "../config/database";
 import { Prisma } from "@prisma/client";
 
@@ -70,7 +75,12 @@ export interface AuthService {
     email: string;
     password: string;
     language?: AuthLanguage;
-  }): Promise<{ user: PublicUser; tokens: AuthTokens }>;
+  }): Promise<{
+    user: PublicUser;
+    tokens?: AuthTokens;
+    requiresTwoFactor?: boolean;
+    twoFactorChallengeToken?: string;
+  }>;
 
   refresh(input: { refreshToken: string }): Promise<{ tokens: AuthTokens }>;
 
@@ -110,7 +120,7 @@ function getUserIdFromReq(req: Request): string | null {
   return typeof userId === "string" && userId.trim() ? userId.trim() : null;
 }
 
-function mapServiceError(res: Response, e: unknown) {
+export function mapServiceError(res: Response, e: unknown) {
   const msg = e instanceof Error ? e.message : "Unknown error";
   const m = msg.toLowerCase();
 
@@ -158,6 +168,31 @@ function mapServiceError(res: Response, e: unknown) {
       res,
       "AUTH_REFRESH_INVALID",
       "Session expired. Please log in again.",
+      401,
+    );
+  }
+
+  if (
+    (m.includes("2fa") || m.includes("two-factor")) &&
+    m.includes("required")
+  ) {
+    return err(
+      res,
+      "AUTH_2FA_REQUIRED",
+      "Two-factor authentication is required.",
+      401,
+    );
+  }
+
+  if (
+    m.includes("2fa challenge") ||
+    (m.includes("challenge") &&
+      (m.includes("expired") || m.includes("invalid")))
+  ) {
+    return err(
+      res,
+      "AUTH_2FA_CHALLENGE_INVALID",
+      "Two-factor challenge is invalid or expired.",
       401,
     );
   }
@@ -263,7 +298,36 @@ export class AuthController {
         ip,
         userAgent,
       });
+      if (result.requiresTwoFactor) {
+        if (!result.twoFactorChallengeToken) {
+          return err(
+            res,
+            "AUTH_2FA_CHALLENGE_MISSING",
+            "Two-factor challenge could not be created.",
+            500,
+          );
+        }
+
+        clearAuthCookies(res);
+        setTwoFactorChallengeCookie(res, result.twoFactorChallengeToken);
+        return res.status(200).json({
+          requiresTwoFactor: true,
+          challengeToken: result.twoFactorChallengeToken,
+          user: result.user,
+        });
+      }
+
+      if (!result.tokens?.accessToken || !result.tokens?.refreshToken) {
+        return err(
+          res,
+          "AUTH_LOGIN_RESULT_INVALID",
+          "Authentication result is invalid.",
+          500,
+        );
+      }
+
       // Flatten: frontend expects { accessToken, refreshToken, user }
+      clearTwoFactorChallengeCookie(res);
       setAuthCookies(
         res,
         result.tokens.accessToken,
@@ -329,6 +393,7 @@ export class AuthController {
     try {
       await this.auth.logout({ refreshToken, userId });
       clearAuthCookies(res);
+      clearTwoFactorChallengeCookie(res);
       return res.status(200).json({ success: true });
     } catch (e) {
       return mapServiceError(res, e);

@@ -3,6 +3,15 @@ import crypto from "crypto";
 const DEFAULT_TTL_MS = 10 * 60 * 1000;
 const MAX_STATE_LENGTH = 4096;
 
+type OAuthStateProvider = "google_auth" | "apple_auth";
+
+interface OAuthStatePayloadBase {
+  v: 1;
+  provider: OAuthStateProvider;
+  nonce: string;
+  iat: number;
+}
+
 export interface GoogleOAuthStatePayload {
   v: 1;
   provider: "google_auth";
@@ -14,15 +23,28 @@ export type GoogleOAuthStateVerification =
   | { ok: true; payload: GoogleOAuthStatePayload }
   | { ok: false; reason: string };
 
-interface IssueGoogleOAuthStateInput {
+export interface AppleOAuthStatePayload {
+  v: 1;
+  provider: "apple_auth";
+  nonce: string;
+  iat: number;
+}
+
+export type AppleOAuthStateVerification =
+  | { ok: true; payload: AppleOAuthStatePayload }
+  | { ok: false; reason: string };
+
+interface IssueOAuthStateInput {
   secret: string;
+  provider: OAuthStateProvider;
   nowMs?: number;
   nonce?: string;
 }
 
-interface VerifyGoogleOAuthStateInput {
+interface VerifyOAuthStateInput {
   state: string;
   secret: string;
+  provider: OAuthStateProvider;
   nowMs?: number;
   ttlMs?: number;
 }
@@ -49,9 +71,7 @@ export function timingSafeEqualString(a: string, b: string): boolean {
   return crypto.timingSafeEqual(aBuf, bBuf);
 }
 
-export function issueGoogleOAuthState(
-  input: IssueGoogleOAuthStateInput,
-): string {
+function issueOAuthState(input: IssueOAuthStateInput): string {
   const secret = String(input.secret || "").trim();
   if (!secret) throw new Error("OAuth state secret is required.");
 
@@ -59,9 +79,9 @@ export function issueGoogleOAuthState(
   const nonce = String(input.nonce || crypto.randomUUID()).trim();
   if (!nonce) throw new Error("OAuth state nonce is required.");
 
-  const payload: GoogleOAuthStatePayload = {
+  const payload: OAuthStatePayloadBase = {
     v: 1,
-    provider: "google_auth",
+    provider: input.provider,
     nonce,
     iat: Math.floor(nowMs / 1000),
   };
@@ -71,9 +91,9 @@ export function issueGoogleOAuthState(
   return `${encodedPayload}.${signature}`;
 }
 
-export function verifyGoogleOAuthState(
-  input: VerifyGoogleOAuthStateInput,
-): GoogleOAuthStateVerification {
+function verifyOAuthState(
+  input: VerifyOAuthStateInput,
+): { ok: true; payload: OAuthStatePayloadBase } | { ok: false; reason: string } {
   const secret = String(input.secret || "").trim();
   if (!secret) return { ok: false, reason: "STATE_SECRET_MISSING" };
 
@@ -100,10 +120,10 @@ export function verifyGoogleOAuthState(
     return { ok: false, reason: "STATE_INVALID_PAYLOAD" };
   }
 
-  const payload = parsed as Partial<GoogleOAuthStatePayload>;
+  const payload = parsed as Partial<OAuthStatePayloadBase>;
   if (
     payload.v !== 1 ||
-    payload.provider !== "google_auth" ||
+    payload.provider !== input.provider ||
     typeof payload.nonce !== "string" ||
     !payload.nonce.trim() ||
     !Number.isFinite(payload.iat)
@@ -122,5 +142,51 @@ export function verifyGoogleOAuthState(
     return { ok: false, reason: "STATE_EXPIRED" };
   }
 
-  return { ok: true, payload: payload as GoogleOAuthStatePayload };
+  return { ok: true, payload: payload as OAuthStatePayloadBase };
+}
+
+export function issueGoogleOAuthState(
+  input: Omit<IssueOAuthStateInput, "provider">,
+): string {
+  return issueOAuthState({
+    ...input,
+    provider: "google_auth",
+  });
+}
+
+export function verifyGoogleOAuthState(
+  input: Omit<VerifyOAuthStateInput, "provider">,
+): GoogleOAuthStateVerification {
+  const verification = verifyOAuthState({
+    ...input,
+    provider: "google_auth",
+  });
+  if (!verification.ok) return verification;
+  return {
+    ok: true,
+    payload: verification.payload as GoogleOAuthStatePayload,
+  };
+}
+
+export function issueAppleOAuthState(
+  input: Omit<IssueOAuthStateInput, "provider">,
+): string {
+  return issueOAuthState({
+    ...input,
+    provider: "apple_auth",
+  });
+}
+
+export function verifyAppleOAuthState(
+  input: Omit<VerifyOAuthStateInput, "provider">,
+): AppleOAuthStateVerification {
+  const verification = verifyOAuthState({
+    ...input,
+    provider: "apple_auth",
+  });
+  if (!verification.ok) return verification;
+  return {
+    ok: true,
+    payload: verification.payload as AppleOAuthStatePayload,
+  };
 }

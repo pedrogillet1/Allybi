@@ -7,6 +7,7 @@ import policyCore from "./policy-core.cjs";
 export const {
   forbiddenPatterns,
   runScriptPatterns,
+  shellScriptRunPatterns,
   findForbiddenCiPrismaPatterns,
   assertNoCiDbPush,
 } = policyCore;

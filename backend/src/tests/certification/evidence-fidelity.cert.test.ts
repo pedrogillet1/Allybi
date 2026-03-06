@@ -5,6 +5,75 @@ import { writeCertificationGateReport } from "./reporting";
 const mockGetBank = jest.fn();
 const mockGetOptionalBank = jest.fn();
 
+const uiContractsFixture = {
+  _meta: {
+    id: "ui_contracts",
+    version: "1.0.0",
+  },
+  config: {
+    enabled: true,
+    contracts: {
+      conversation: {
+        allowedOutputShapes: ["paragraph"],
+      },
+    },
+  },
+  rules: [],
+};
+
+const genericEnabledBank = {
+  config: { enabled: true },
+};
+
+function requiredBankFixture(bankId: string): unknown {
+  switch (bankId) {
+    case "render_policy":
+      return {
+        config: {
+          markdown: { allowCodeBlocks: false, maxConsecutiveNewlines: 2 },
+          noJsonOutput: { enabled: true, detectJsonLike: true },
+        },
+        enforcementRules: { rules: [] },
+      };
+    case "ui_contracts":
+      return uiContractsFixture;
+    case "banned_phrases":
+      return {
+        config: { enabled: true, actionOnMatch: "strip_or_replace" },
+        categories: {},
+        patterns: [],
+        sourceLeakage: { patterns: [] },
+        robotic: { en: [], pt: [], es: [] },
+      };
+    case "truncation_and_limits":
+      return {
+        globalLimits: {
+          maxResponseCharsHard: 12000,
+          maxResponseTokensHard: 3500,
+        },
+      };
+    case "answer_style_policy":
+      return {
+        config: {
+          enabled: true,
+          globalRules: { maxQuestionsPerAnswer: 1 },
+        },
+        profiles: {},
+      };
+    default:
+      return genericEnabledBank;
+  }
+}
+
+function optionalBankFixture(bankId: string): unknown {
+  switch (bankId) {
+    case "ui_contracts":
+      return uiContractsFixture;
+    default:
+      return genericEnabledBank;
+  }
+}
+
 jest.mock("../../services/core/banks/bankLoader.service", () => ({
   __esModule: true,
   getBank: (...args: unknown[]) => mockGetBank(...args),
@@ -15,8 +84,12 @@ describe("Certification: evidence fidelity", () => {
   beforeEach(() => {
     mockGetBank.mockReset();
     mockGetOptionalBank.mockReset();
-    mockGetBank.mockReturnValue(null);
-    mockGetOptionalBank.mockReturnValue(null);
+    mockGetBank.mockImplementation((bankId: unknown) =>
+      requiredBankFixture(String(bankId || "")),
+    );
+    mockGetOptionalBank.mockImplementation((bankId: unknown) =>
+      optionalBankFixture(String(bankId || "")),
+    );
   });
 
   test("doc-grounded output enforces structured provenance map integrity", async () => {

@@ -1,16 +1,23 @@
 import type { Prisma } from "@prisma/client";
 import prisma from "../../config/database";
+import { getOptionalBank } from "../core/banks/bankLoader.service";
 import { logger } from "../../utils/logger";
 
-const VALID_RELATIONSHIP_TYPES = [
+const DEFAULT_RELATIONSHIP_TYPES = [
   "amends",
   "supersedes",
   "restates",
   "extends",
   "terminates",
+  "attachment",
+  "attached_to",
+  "references",
+  "related",
 ] as const;
 
-export type RelationshipType = (typeof VALID_RELATIONSHIP_TYPES)[number];
+const VALID_RELATIONSHIP_TYPES = [...DEFAULT_RELATIONSHIP_TYPES];
+
+export type RelationshipType = (typeof DEFAULT_RELATIONSHIP_TYPES)[number];
 
 export interface CreateDocumentLinkInput {
   sourceDocumentId: string;
@@ -39,6 +46,62 @@ export interface ReconcileRevisionAmendsLinksResult {
   repaired: number;
   failed: number;
   sampleFailures: Array<{ revisionDocumentId: string; error: string }>;
+}
+
+interface AmendmentChainConflictRule {
+  id?: string;
+  action?: string;
+  severity?: string;
+}
+
+interface AmendmentChainSchemaBank {
+  _meta?: { id?: string; version?: string };
+  config?: { enabled?: boolean };
+  relationshipTypes?: Array<{ type?: string }>;
+  conflictDetection?: {
+    enabled?: boolean;
+    rules?: AmendmentChainConflictRule[];
+  };
+}
+
+function getAmendmentChainSchemaBank(): AmendmentChainSchemaBank | null {
+  return getOptionalBank<AmendmentChainSchemaBank>("amendment_chain_schema");
+}
+
+function getEffectiveRelationshipTypes(): string[] {
+  const schema = getAmendmentChainSchemaBank();
+  if (schema?.config?.enabled === false) {
+    return [...VALID_RELATIONSHIP_TYPES];
+  }
+  const fromSchema = Array.isArray(schema?.relationshipTypes)
+    ? schema.relationshipTypes
+        .map((entry) => String(entry?.type || "").trim().toLowerCase())
+        .filter(Boolean)
+    : [];
+  return fromSchema.length > 0 ? Array.from(new Set(fromSchema)) : [...VALID_RELATIONSHIP_TYPES];
+}
+
+function getConflictRule(
+  ruleId: string,
+): { enabled: boolean; action: string; severity: string } {
+  const schema = getAmendmentChainSchemaBank();
+  if (schema?.config?.enabled === false) {
+    return { enabled: false, action: "ignore", severity: "info" };
+  }
+  const detectionEnabled = schema?.conflictDetection?.enabled !== false;
+  if (!detectionEnabled) {
+    return { enabled: false, action: "ignore", severity: "info" };
+  }
+
+  const rules = Array.isArray(schema?.conflictDetection?.rules)
+    ? schema.conflictDetection.rules
+    : [];
+  const match = rules.find(
+    (rule) => String(rule?.id || "").trim().toUpperCase() === ruleId.toUpperCase(),
+  );
+  const action = String(match?.action || "require_resolution").trim().toLowerCase();
+  const severity = String(match?.severity || "error").trim().toLowerCase();
+  return { enabled: true, action, severity };
 }
 
 async function computeMissingRevisionAmendsLinks(params?: {
@@ -108,9 +171,10 @@ async function computeMissingRevisionAmendsLinks(params?: {
  * Throws on invalid relationship type or self-link.
  */
 export function validateDocumentLink(input: CreateDocumentLinkInput): void {
-  if (!(VALID_RELATIONSHIP_TYPES as readonly string[]).includes(input.relationshipType)) {
+  const validRelationshipTypes = getEffectiveRelationshipTypes();
+  if (!validRelationshipTypes.includes(String(input.relationshipType || "").toLowerCase())) {
     throw new Error(
-      `Invalid relationship type: ${input.relationshipType}. Must be one of: ${VALID_RELATIONSHIP_TYPES.join(", ")}`,
+      `Invalid relationship type: ${input.relationshipType}. Must be one of: ${validRelationshipTypes.join(", ")}`,
     );
   }
 
@@ -133,8 +197,11 @@ export function detectAmendmentConflict(
   existingLinks: Array<{ relationshipType: string; targetDocumentId: string; status: string }>,
   newLink: CreateDocumentLinkInput,
 ): { conflict: boolean; rule?: string; message?: string } {
+  const vcr2Rule = getConflictRule("VCR_002");
+  const vcr1Rule = getConflictRule("VCR_001");
+
   // VCR_002: target already superseded
-  if (newLink.relationshipType === "supersedes") {
+  if (vcr2Rule.enabled && newLink.relationshipType === "supersedes") {
     const alreadySuperseded = existingLinks.find(
       (l) =>
         l.targetDocumentId === newLink.targetDocumentId &&
@@ -142,16 +209,25 @@ export function detectAmendmentConflict(
         l.status === "active",
     );
     if (alreadySuperseded) {
-      return {
-        conflict: true,
-        rule: "VCR_002",
-        message: `Target document ${newLink.targetDocumentId} is already superseded by another document`,
-      };
+      const message = `Target document ${newLink.targetDocumentId} is already superseded by another document`;
+      if (vcr2Rule.action === "require_resolution") {
+        return {
+          conflict: true,
+          rule: "VCR_002",
+          message,
+        };
+      }
+      logger.warn("[DocumentLink] VCR_002 detected but not blocking per schema action", {
+        targetDocumentId: newLink.targetDocumentId,
+        action: vcr2Rule.action,
+        severity: vcr2Rule.severity,
+      });
+      return { conflict: false };
     }
   }
 
   // VCR_001: same parent amended by multiple children on same clause
-  if (newLink.relationshipType === "amends") {
+  if (vcr1Rule.enabled && newLink.relationshipType === "amends") {
     const otherAmendments = existingLinks.filter(
       (l) =>
         l.targetDocumentId === newLink.targetDocumentId &&
@@ -162,8 +238,10 @@ export function detectAmendmentConflict(
       logger.warn("[DocumentLink] VCR_001: Multiple amendments to same target", {
         targetDocumentId: newLink.targetDocumentId,
         existingCount: otherAmendments.length,
+        action: vcr1Rule.action,
+        severity: vcr1Rule.severity,
       });
-      // Not a hard conflict — just a warning
+      // Not a hard conflict in default schema (flag_conflict action).
     }
   }
 
@@ -178,6 +256,27 @@ export async function createDocumentLink(
   input: CreateDocumentLinkInput,
 ): Promise<DocumentLinkRecord> {
   validateDocumentLink(input);
+
+  const vcr3Rule = getConflictRule("VCR_003");
+  if (vcr3Rule.enabled) {
+    const targetDoc = await prisma.document.findUnique({
+      where: { id: input.targetDocumentId },
+      select: { id: true },
+    });
+    if (!targetDoc) {
+      logger.warn("[DocumentLink] VCR_003: amendment parent missing from corpus", {
+        targetDocumentId: input.targetDocumentId,
+        sourceDocumentId: input.sourceDocumentId,
+        action: vcr3Rule.action,
+        severity: vcr3Rule.severity,
+      });
+      if (vcr3Rule.action === "require_resolution") {
+        throw new Error(
+          `LINK_CONFLICT [VCR_003]: Target parent document ${input.targetDocumentId} not found in corpus`,
+        );
+      }
+    }
+  }
 
   // Check for conflicts against existing links
   const existingLinks = await prisma.documentLink.findMany({
@@ -306,3 +405,4 @@ export async function reconcileRevisionAmendsLinks(params?: {
 }
 
 export const RELATIONSHIP_TYPES = VALID_RELATIONSHIP_TYPES;
+

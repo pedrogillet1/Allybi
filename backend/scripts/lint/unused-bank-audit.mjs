@@ -15,6 +15,15 @@ const ALLOWED_PREFIXES = [
   "document_intelligence/__",
 ];
 const ALLOWED_SUFFIXES = [".entities.schema.json"];
+const NON_REGISTRY_PATHS = new Set([
+  "document_intelligence/eval/suites/legacy_doc_type_aliases.any.json",
+]);
+
+function isLegacyLegalDocTypeAliasPath(relPath) {
+  return /^document_intelligence\/domains\/legal\/doc_types\/(extraction|sections|tables)\/(?!legal_)[^/]+\.(extraction_hints|sections|tables)\.any\.json$/.test(
+    relPath,
+  );
+}
 
 function toPosix(value) {
   return String(value || "").replace(/\\/g, "/").replace(/^\/+/, "");
@@ -42,6 +51,8 @@ function walkJson(rootDir) {
 
 function isAllowed(relPath) {
   return (
+    NON_REGISTRY_PATHS.has(relPath) ||
+    isLegacyLegalDocTypeAliasPath(relPath) ||
     ALLOWED_PREFIXES.some((prefix) => relPath.startsWith(prefix)) ||
     ALLOWED_SUFFIXES.some((suffix) => relPath.endsWith(suffix))
   );

@@ -76,6 +76,8 @@ function emitCellFactChunks(
             tableChunkForm: "cell_centric",
             tableId: table.tableId,
             tableMethod: table.tableMethod,
+            tableConfidence: table.tableConfidence,
+            tableFallbackReason: table.fallbackReason,
             rowIndex: row.rowIndex,
             columnIndex: cell.colIndex,
             rowSpan: cell.rowSpan,
@@ -139,6 +141,11 @@ function parseCellRef(cellRef: string): {
     rowIndex,
     columnIndex: columnIndex > 0 ? columnIndex : null,
   };
+}
+
+function compareTokens(a: string, b: string): number {
+  if (a === b) return 0;
+  return a < b ? -1 : 1;
 }
 
 function toHeaderPath(
@@ -452,7 +459,13 @@ export function buildInputChunks(
     const out: InputChunk[] = [];
     let idx = 0;
 
-    for (const sheet of extraction.sheets) {
+    const orderedSheets = [...extraction.sheets].sort((a, b) => {
+      const aName = String(a.sheetName || a.name || "Sheet").trim().toLowerCase();
+      const bName = String(b.sheetName || b.name || "Sheet").trim().toLowerCase();
+      return compareTokens(aName, bName);
+    });
+
+    for (const sheet of orderedSheets) {
       const sheetName = sheet.sheetName || sheet.name || "Sheet";
       const isFinancial = sheet.isFinancial ?? extraction.isFinancial ?? false;
       const tableId = `sheet:${sheetName}`;
@@ -487,13 +500,43 @@ export function buildInputChunks(
     if (extraction.cellFacts && extraction.cellFacts.length > 0) {
       // Build per-sheet isFinancial lookup
       const sheetFinancialMap = new Map<string, boolean>();
-      for (const sheet of extraction.sheets) {
+      for (const sheet of orderedSheets) {
         const name = sheet.sheetName || sheet.name || "Sheet";
         sheetFinancialMap.set(name, sheet.isFinancial ?? extraction.isFinancial ?? false);
       }
 
+      const orderedFacts = [...extraction.cellFacts].sort((a, b) => {
+        const aSheet = String(a.sheet || "Sheet").trim().toLowerCase();
+        const bSheet = String(b.sheet || "Sheet").trim().toLowerCase();
+        const bySheet = compareTokens(aSheet, bSheet);
+        if (bySheet !== 0) return bySheet;
+
+        const aRowLabel = String(a.rowLabel || "").trim().toLowerCase();
+        const bRowLabel = String(b.rowLabel || "").trim().toLowerCase();
+        const byRow = compareTokens(aRowLabel, bRowLabel);
+        if (byRow !== 0) return byRow;
+
+        const aRef = parseCellRef(String(a.cell || ""));
+        const bRef = parseCellRef(String(b.cell || ""));
+        const aRowIndex = aRef.rowIndex ?? Number.MAX_SAFE_INTEGER;
+        const bRowIndex = bRef.rowIndex ?? Number.MAX_SAFE_INTEGER;
+        if (aRowIndex !== bRowIndex) return aRowIndex - bRowIndex;
+        const aColIndex = aRef.columnIndex ?? Number.MAX_SAFE_INTEGER;
+        const bColIndex = bRef.columnIndex ?? Number.MAX_SAFE_INTEGER;
+        if (aColIndex !== bColIndex) return aColIndex - bColIndex;
+
+        const aHeader = String(a.colHeader || "").trim().toLowerCase();
+        const bHeader = String(b.colHeader || "").trim().toLowerCase();
+        const byHeader = compareTokens(aHeader, bHeader);
+        if (byHeader !== 0) return byHeader;
+
+        const aValue = String(a.displayValue || a.value || "").trim().toLowerCase();
+        const bValue = String(b.displayValue || b.value || "").trim().toLowerCase();
+        return compareTokens(aValue, bValue);
+      });
+
       const bySheetRow = new Map<string, typeof extraction.cellFacts>();
-      for (const fact of extraction.cellFacts) {
+      for (const fact of orderedFacts) {
         const key = `${fact.sheet}||${fact.rowLabel}`;
         const group = bySheetRow.get(key) || [];
         group.push(fact);

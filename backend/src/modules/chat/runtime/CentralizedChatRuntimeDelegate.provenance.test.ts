@@ -553,7 +553,7 @@ describe("CentralizedChatRuntimeDelegate provenance enforcement", () => {
     );
   });
 
-  test("stays fail-soft on bank loader health issues in non-protected env", async () => {
+  test("fails closed on bank loader health issues in non-protected env", async () => {
     process.env.NODE_ENV = "development";
     process.env.CHAT_RUNTIME_STRICT_GOVERNANCE = "false";
     restoreBankHealth?.mockReturnValue({
@@ -600,11 +600,9 @@ describe("CentralizedChatRuntimeDelegate provenance enforcement", () => {
       telemetry: { model: "unit-test-model" },
     });
 
-    expect(finalized.failureCode).toBeNull();
-    expect(finalized.warnings || []).toContainEqual(
-      expect.objectContaining({
-        code: "bank_loader_unhealthy",
-      }),
+    expect(finalized.failureCode).toBe("bank_loader_unhealthy");
+    expect(finalized.assistantText).not.toBe(
+      "This text should stay eligible for normal flow.",
     );
   });
 
@@ -763,6 +761,18 @@ describe("CentralizedChatRuntimeDelegate provenance enforcement", () => {
         evidenceCount: 2,
       },
     );
+    const docGroundedClarifyWithEvidence = (delegate as any).resolveEvidenceGateBypass(
+      {
+        suggestedAction: "clarify",
+        clarifyQuestion: "Which exact period should I use?",
+      },
+      "en",
+      {
+        attachedDocumentIds: ["doc-1"],
+        evidenceCount: 2,
+        answerMode: "doc_grounded_single",
+      },
+    );
 
     const apologizeWithoutEvidence = (delegate as any).resolveEvidenceGateBypass(
       {
@@ -774,6 +784,17 @@ describe("CentralizedChatRuntimeDelegate provenance enforcement", () => {
         evidenceCount: 0,
       },
     );
+    const docGroundedApologizeWithEvidence = (delegate as any).resolveEvidenceGateBypass(
+      {
+        suggestedAction: "apologize",
+      },
+      "en",
+      {
+        attachedDocumentIds: ["doc-1"],
+        evidenceCount: 2,
+        answerMode: "doc_grounded_single",
+      },
+    );
 
     expect(clarifyWithoutEvidence?.failureCode).toBe(
       "EVIDENCE_NEEDS_CLARIFICATION",
@@ -782,7 +803,13 @@ describe("CentralizedChatRuntimeDelegate provenance enforcement", () => {
       "Which exact period should I use?",
     );
     expect(clarifyWithEvidence).toBeNull();
+    expect(docGroundedClarifyWithEvidence?.failureCode).toBe(
+      "EVIDENCE_NEEDS_CLARIFICATION",
+    );
     expect(apologizeWithoutEvidence?.failureCode).toBe("EVIDENCE_INSUFFICIENT");
+    expect(docGroundedApologizeWithEvidence?.failureCode).toBe(
+      "EVIDENCE_INSUFFICIENT",
+    );
   });
 
   test("fails closed on enforcer runtime errors even with fail-soft enabled", async () => {
@@ -1148,6 +1175,29 @@ describe("CentralizedChatRuntimeDelegate provenance enforcement", () => {
         evidenceCount: 2,
       },
     );
+    const docGroundedClarifyWithEvidence = (delegate as any).resolveEvidenceGateBypass(
+      {
+        suggestedAction: "clarify",
+        clarifyQuestion: "Which exact period should I use?",
+      },
+      "en",
+      {
+        attachedDocumentIds: ["doc-1"],
+        evidenceCount: 2,
+        answerMode: "doc_grounded_single",
+      },
+    );
+    const docGroundedApologizeWithEvidence = (delegate as any).resolveEvidenceGateBypass(
+      {
+        suggestedAction: "apologize",
+      },
+      "en",
+      {
+        attachedDocumentIds: ["doc-1"],
+        evidenceCount: 2,
+        answerMode: "doc_grounded_single",
+      },
+    );
 
     expect(clarifyWithoutEvidence?.failureCode).toBe(
       "EVIDENCE_NEEDS_CLARIFICATION",
@@ -1156,5 +1206,11 @@ describe("CentralizedChatRuntimeDelegate provenance enforcement", () => {
       "Which exact period should I use?",
     );
     expect(clarifyWithEvidence).toBeNull();
+    expect(docGroundedClarifyWithEvidence?.failureCode).toBe(
+      "EVIDENCE_NEEDS_CLARIFICATION",
+    );
+    expect(docGroundedApologizeWithEvidence?.failureCode).toBe(
+      "EVIDENCE_INSUFFICIENT",
+    );
   });
 });

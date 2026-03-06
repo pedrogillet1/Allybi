@@ -18,6 +18,13 @@ export interface IndexingPolicySnapshot {
   embeddingFailCloseV1: boolean;
 }
 
+export interface IndexingEncryptionPosture {
+  encryptedChunksOnly: boolean;
+  allowPlaintextChunksOverride: boolean;
+  plaintextOverrideReason: string | null;
+  protectedRuntimeEnv: boolean;
+}
+
 const TRUE_VALUES = new Set(["1", "true", "yes", "on"]);
 const FALSE_VALUES = new Set(["0", "false", "no", "off"]);
 
@@ -59,9 +66,42 @@ function resolveRuntimeMode(env: NodeJS.ProcessEnv): IndexingRuntimeMode {
   return enabled ? "v2" : "v1";
 }
 
-function isProtectedRuntimeEnv(nodeEnv: unknown): boolean {
+export function isProtectedRuntimeEnv(nodeEnv: unknown): boolean {
   const normalized = normalize(nodeEnv);
   return normalized === "production" || normalized === "staging";
+}
+
+function isTestRuntimeEnv(nodeEnv: unknown): boolean {
+  return normalize(nodeEnv) === "test";
+}
+
+export function resolveIndexingEncryptionPosture(
+  env: NodeJS.ProcessEnv = process.env,
+): IndexingEncryptionPosture {
+  const configuredEncryptedChunksOnly = parseBooleanFlag(
+    env.INDEXING_ENCRYPTED_CHUNKS_ONLY,
+    true,
+  );
+  const testEnv = isTestRuntimeEnv(env.NODE_ENV);
+  const encryptedChunksOnly = testEnv ? configuredEncryptedChunksOnly : true;
+  return {
+    encryptedChunksOnly,
+    allowPlaintextChunksOverride: false,
+    plaintextOverrideReason: null,
+    protectedRuntimeEnv: isProtectedRuntimeEnv(env.NODE_ENV),
+  };
+}
+
+export function shouldStripPineconePlaintext(
+  env: NodeJS.ProcessEnv = process.env,
+): boolean {
+  if (!isTestRuntimeEnv(env.NODE_ENV)) return true;
+  const explicitEncryptedFlag = normalize(env.INDEXING_ENCRYPTED_CHUNKS_ONLY);
+  if (explicitEncryptedFlag) {
+    const posture = resolveIndexingEncryptionPosture(env);
+    if (posture.encryptedChunksOnly) return true;
+  }
+  return parseBooleanFlag(env.PINECONE_STRIP_PLAINTEXT, false);
 }
 
 function assertProtectedRuntimeInvariants(params: {
@@ -98,17 +138,21 @@ export function resolveIndexingPolicySnapshot(
   const allowedRuntimeModes = parseRuntimeModeAllowed(
     env[INDEXING_RUNTIME_MODE_ALLOWED_ENV],
   );
-  const encryptedChunksOnly = parseBooleanFlag(
+  const configuredEncryptedChunksOnly = parseBooleanFlag(
     env.INDEXING_ENCRYPTED_CHUNKS_ONLY,
     true,
   );
-  const allowPlaintextChunksOverride = parseBooleanFlag(
+  const configuredAllowPlaintextChunksOverride = parseBooleanFlag(
     env.INDEXING_ALLOW_PLAINTEXT_CHUNKS,
     false,
   );
-  const plaintextOverrideReason = String(
+  const configuredPlaintextOverrideReason = String(
     env.INDEXING_PLAINTEXT_OVERRIDE_REASON || "",
   ).trim();
+  const testEnv = isTestRuntimeEnv(env.NODE_ENV);
+  const encryptedChunksOnly = testEnv ? configuredEncryptedChunksOnly : true;
+  const allowPlaintextChunksOverride = false;
+  const plaintextOverrideReason = "";
   const enforceEncryptedOnlyInvariant = parseBooleanFlag(
     env.INDEXING_ENFORCE_ENCRYPTED_ONLY,
     true,
@@ -123,23 +167,19 @@ export function resolveIndexingPolicySnapshot(
   );
   const verifyRequired = parseBooleanFlag(env.INDEXING_VERIFY_REQUIRED, true);
 
-  if (!encryptedChunksOnly && isProtectedRuntimeEnv(env.NODE_ENV)) {
+  if (!testEnv && !configuredEncryptedChunksOnly) {
     throw new Error(
-      "[indexing] INDEXING_ENCRYPTED_CHUNKS_ONLY=false is not allowed in production/staging.",
+      "[indexing] Plaintext chunk mode is removed. INDEXING_ENCRYPTED_CHUNKS_ONLY must remain enabled.",
     );
   }
-  if (!encryptedChunksOnly && !allowPlaintextChunksOverride) {
+  if (!testEnv && configuredAllowPlaintextChunksOverride) {
     throw new Error(
-      "[indexing] INDEXING_ENCRYPTED_CHUNKS_ONLY=false requires INDEXING_ALLOW_PLAINTEXT_CHUNKS=true.",
+      "[indexing] INDEXING_ALLOW_PLAINTEXT_CHUNKS is no longer supported.",
     );
   }
-  if (
-    !encryptedChunksOnly &&
-    allowPlaintextChunksOverride &&
-    !plaintextOverrideReason
-  ) {
+  if (!testEnv && configuredPlaintextOverrideReason) {
     throw new Error(
-      "[indexing] INDEXING_ALLOW_PLAINTEXT_CHUNKS=true requires INDEXING_PLAINTEXT_OVERRIDE_REASON to be set.",
+      "[indexing] INDEXING_PLAINTEXT_OVERRIDE_REASON is no longer supported.",
     );
   }
   assertProtectedRuntimeInvariants({
@@ -159,7 +199,7 @@ export function resolveIndexingPolicySnapshot(
     strictFailClosed: parseBooleanFlag(env.INDEXING_STRICT_FAIL_CLOSED, true),
     encryptedChunksOnly,
     allowPlaintextChunksOverride,
-    plaintextOverrideReason: plaintextOverrideReason || null,
+    plaintextOverrideReason: null,
     enforceEncryptedOnlyInvariant,
     enforceChunkMetadataInvariant,
     enforceVersionMetadataInvariant,

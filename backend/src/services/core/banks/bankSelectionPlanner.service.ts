@@ -212,6 +212,44 @@ interface DocTypeConfusionMatrixBank {
   rules?: DocTypeConfusionRule[];
 }
 
+const STRUCTURE_CUE_STOPWORDS = new Set([
+  "has",
+  "have",
+  "contains",
+  "contain",
+  "with",
+  "and",
+  "or",
+  "the",
+  "a",
+  "an",
+  "of",
+  "to",
+  "for",
+  "in",
+  "on",
+  "by",
+]);
+
+function cueTokens(input: string): string[] {
+  return lower(input)
+    .split(/[^a-z0-9]+/)
+    .map((token) => token.trim())
+    .filter((token) => token.length >= 3 && !STRUCTURE_CUE_STOPWORDS.has(token));
+}
+
+function scoreStructureCueMatch(query: string, cue: string): number {
+  const cueSet = new Set(cueTokens(cue));
+  if (cueSet.size === 0) return 0;
+  const querySet = new Set(cueTokens(query));
+  if (querySet.size === 0) return 0;
+  let hits = 0;
+  for (const token of cueSet) {
+    if (querySet.has(token)) hits += 1;
+  }
+  return hits / cueSet.size;
+}
+
 function resolveDomainFromDocTypeId(
   docTypeId: string,
 ): DocumentIntelligenceDomain | null {
@@ -251,6 +289,7 @@ function resolveDomainFromDocTypeId(
  */
 function applyDocTypeConfusionMatrix(
   candidates: DomainScore[],
+  query: string,
   docTypeId: string,
   reasons: string[],
 ): DomainScore[] {
@@ -294,9 +333,24 @@ function applyDocTypeConfusionMatrix(
       if (loserIdx < 0) continue;
     }
 
-    const boost = Number.isFinite(rule.confidenceBoost)
+    const baseBoost = Number.isFinite(rule.confidenceBoost)
       ? Number(rule.confidenceBoost)
       : DOC_TYPE_CONFUSION_BOOST_DEFAULT;
+    if (baseBoost <= 0) continue;
+
+    let boost = baseBoost;
+    const structureCue = String(rule.structureCue || "").trim();
+    if (structureCue) {
+      const cueScore = scoreStructureCueMatch(query, structureCue);
+      if (cueScore > 0) {
+        boost += Math.min(0.2, cueScore * 0.25);
+        reasons.push(`doc_type_confusion_structure_cue:${rule.id}:${cueScore.toFixed(2)}`);
+      } else {
+        // Keep rule usable but reduce force when query has no structural corroboration.
+        boost *= 0.4;
+        reasons.push(`doc_type_confusion_structure_cue_miss:${rule.id}`);
+      }
+    }
     if (boost <= 0) continue;
 
     updated[winnerIdx] = {
@@ -543,6 +597,7 @@ export class BankSelectionPlannerService {
       const candidates = scoreDomainCandidates(input.query);
       const confusionResolved = applyDocTypeConfusionMatrix(
         candidates,
+        input.query,
         normalizedDocType,
         reasons,
       );

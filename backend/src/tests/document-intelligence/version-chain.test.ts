@@ -21,6 +21,10 @@ describe("amendment_chain_schema", () => {
     expect(types).toContain("restates");
     expect(types).toContain("extends");
     expect(types).toContain("terminates");
+    expect(types).toContain("attachment");
+    expect(types).toContain("attached_to");
+    expect(types).toContain("references");
+    expect(types).toContain("related");
   });
 
   it("defines version status taxonomy", () => {

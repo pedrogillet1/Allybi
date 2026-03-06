@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { createContext, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import SourcePill from '../../attachments/pills/SourcePill';
@@ -87,17 +87,25 @@ const cursorStyles = `
   }
 `;
 
+const TableCellContext = createContext(false);
+
+function balanceMarkdownDelimiters(text, isStreaming) {
+  if (!isStreaming) return text;
+  let t = String(text || '');
+
+  // Keep fenced code blocks stable while the assistant is still streaming.
+  const fenceCount = (t.match(/```/g) || []).length;
+  if (fenceCount % 2 === 1) t += '\n```';
+
+  // Balance stray inline backticks to avoid malformed markdown while partial tokens arrive.
+  const inlineBackticks = (t.replace(/```/g, '').match(/`/g) || []).length;
+  if (inlineBackticks % 2 === 1) t += '`';
+
+  return t;
+}
+
 function sanitizeAndBalanceMarkdownForRender(text, isStreaming) {
   let t = String(text ?? '');
-
-  // Allybi is a document-intelligence product, not a coding assistant.
-  // Strip all code fences and inline backticks so they render as plain text.
-  // 1. Remove fenced code blocks (``` ... ```) — keep inner content as plain text
-  t = t.replace(/```[\w-]*\n?([\s\S]*?)```/g, '$1');
-  // 2. Handle unclosed code fences (streaming edge case) — remove the opening fence
-  t = t.replace(/```[\w-]*\n?/g, '');
-  // 3. Remove inline backticks — keep inner text
-  t = t.replace(/`([^`]+)`/g, '$1');
 
   // Preserve model table columns by default; legacy behavior can be re-enabled by flag.
   if (!PRESERVE_TABLE_SOURCE_COLUMNS) {
@@ -105,6 +113,7 @@ function sanitizeAndBalanceMarkdownForRender(text, isStreaming) {
   }
   // Remove leaked inline retrieval markers from model text.
   t = stripInlineCitationArtifacts(t);
+  t = balanceMarkdownDelimiters(t, isStreaming);
 
   return t;
 }
@@ -274,54 +283,106 @@ export default function StreamingMarkdown({ content, isStreaming, className, onS
       ),
 
       // Links: koda://source → SourcePill, otherwise normal link
-      a: ({ href, children }) => {
-        const src = parseKodaSourceHref(href);
-        if (src?.docId && src?.filename) {
+      a: ({ href, children }) => (
+        <TableCellContext.Consumer>
+          {(isInsideTableCell) => {
+            const src = parseKodaSourceHref(href);
+            if (src?.docId && src?.filename) {
+              if (isInsideTableCell) {
+                const label =
+                  React.Children.toArray(children)
+                    .map((child) => (typeof child === 'string' ? child : ''))
+                    .join('')
+                    .trim() || src.filename;
+                return <span>{label}</span>;
+              }
+              return (
+                <SourcePill
+                  source={{
+                    docId: src.docId,
+                    documentId: src.documentId,
+                    filename: src.filename,
+                    mimeType: src.mimeType,
+                    page: src.page,
+                    slide: Number.isFinite(Number(src.slide)) ? Number(src.slide) : undefined,
+                    sheet: src.sheet,
+                    cell: src.cell,
+                    section: src.section,
+                    locationKey: src.locationKey,
+                    locationLabel: src.locationLabel,
+                    snippet: src.snippet,
+                  }}
+                  onOpen={onSourceClick}
+                  style={{ display: 'inline-flex', verticalAlign: 'middle' }}
+                />
+              );
+            }
+            return (
+              <a
+                href={href}
+                target="_blank"
+                rel="noreferrer"
+                style={{
+                  color: '#18181B',
+                  textDecoration: 'underline',
+                  textDecorationColor: '#D4D4D8',
+                  textUnderlineOffset: 3,
+                  fontWeight: 600,
+                  transition: 'text-decoration-color 0.15s',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.textDecorationColor = '#18181B'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.textDecorationColor = '#D4D4D8'; }}
+              >
+                {children}
+              </a>
+            );
+          }}
+        </TableCellContext.Consumer>
+      ),
+      // Preserve markdown code formatting (inline + fenced) with safe styling.
+      code: ({ inline, className: codeClassName, children }) => {
+        if (inline) {
           return (
-            <SourcePill
-              source={{
-                docId: src.docId,
-                documentId: src.documentId,
-                filename: src.filename,
-                mimeType: src.mimeType,
-                page: src.page,
-                slide: Number.isFinite(Number(src.slide)) ? Number(src.slide) : undefined,
-                sheet: src.sheet,
-                cell: src.cell,
-                section: src.section,
-                locationKey: src.locationKey,
-                locationLabel: src.locationLabel,
-                snippet: src.snippet,
+            <code
+              style={{
+                background: '#F3F4F6',
+                borderRadius: 6,
+                padding: '1px 5px',
+                fontSize: 13,
+                fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
               }}
-              onOpen={onSourceClick}
-              style={{ display: 'inline-flex', verticalAlign: 'middle' }}
-            />
+            >
+              {children}
+            </code>
           );
         }
         return (
-          <a
-            href={href}
-            target="_blank"
-            rel="noreferrer"
+          <code
+            className={codeClassName}
             style={{
-              color: '#18181B',
-              textDecoration: 'underline',
-              textDecorationColor: '#D4D4D8',
-              textUnderlineOffset: 3,
-              fontWeight: 600,
-              transition: 'text-decoration-color 0.15s',
+              fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+              fontSize: 13,
+              lineHeight: 1.6,
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.textDecorationColor = '#18181B'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.textDecorationColor = '#D4D4D8'; }}
           >
             {children}
-          </a>
+          </code>
         );
       },
-
-      // Allybi is NOT a coding assistant — render all code as plain text
-      code: ({ children }) => <span>{children}</span>,
-      pre: ({ children }) => <span>{children}</span>,
+      pre: ({ children }) => (
+        <pre
+          style={{
+            margin: '12px 0',
+            padding: '12px 14px',
+            borderRadius: 10,
+            background: '#111827',
+            color: '#E5E7EB',
+            overflowX: 'auto',
+          }}
+        >
+          {children}
+        </pre>
+      ),
 
       // Tables (GFM)
       table: ({ children }) => (
@@ -361,7 +422,7 @@ export default function StreamingMarkdown({ content, isStreaming, className, onS
             wordBreak: 'break-word',
           }}
         >
-          {children}
+          <TableCellContext.Provider value={true}>{children}</TableCellContext.Provider>
         </th>
       ),
       td: ({ children }) => (
@@ -375,7 +436,7 @@ export default function StreamingMarkdown({ content, isStreaming, className, onS
             wordBreak: 'break-word',
           }}
         >
-          {children}
+          <TableCellContext.Provider value={true}>{children}</TableCellContext.Provider>
         </td>
       ),
       tr: ({ children }) => <tr>{children}</tr>,
@@ -432,3 +493,4 @@ export default function StreamingMarkdown({ content, isStreaming, className, onS
     </>
   );
 }
+

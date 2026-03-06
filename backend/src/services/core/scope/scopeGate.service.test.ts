@@ -408,4 +408,104 @@ describe("ScopeGateService", () => {
       expect(decision.signals.timeConstraintsPresent).toBe(false);
     });
   });
+
+  describe("version-intent doc matching", () => {
+    it("preserves status/version tokens when ranking doc names for version queries", () => {
+      const docs: DocMeta[] = [
+        { docId: "msa-v1", filename: "MSA_v1_signed.pdf", title: "Master Services Agreement v1 signed" },
+        { docId: "msa-v2", filename: "MSA_v2_draft.pdf", title: "Master Services Agreement v2 draft" },
+      ];
+      const service = new ScopeGateService(
+        { getBank: () => ({}) } as any,
+        {
+          listDocs: async () => docs,
+          getDocMeta: async () => null,
+        } as any,
+        {
+          getMergedDocAliasesBank: () => ({ config: { minAliasConfidence: 0.75 } }),
+          getDocAliasPhrases: () => [],
+          getDocTaxonomy: () => ({ typeDefinitions: [] }),
+        } as any,
+      );
+
+      const ranked = (service as any).rankDocCandidatesByName(
+        docs,
+        "open the draft version of the MSA",
+        null,
+        null,
+      );
+      expect(ranked[0]?.docId).toBe("msa-v2");
+    });
+
+    it("auto-resolves signed version intent when exactly one signed candidate exists", async () => {
+      const docs: DocMeta[] = [
+        { docId: "msa-v1", filename: "MSA_v1_signed.pdf", title: "Master Services Agreement v1 signed" },
+        { docId: "msa-v2", filename: "MSA_v2_draft.pdf", title: "Master Services Agreement v2 draft" },
+      ];
+      const service = new ScopeGateService(
+        { getBank: () => ({}) } as any,
+        {
+          listDocs: async () => docs,
+          getDocMeta: async () => null,
+        } as any,
+        {
+          getMergedDocAliasesBank: () => ({ config: { minAliasConfidence: 0.75 } }),
+          getDocAliasPhrases: () => ["agreement", "msa"],
+          getDocTaxonomy: () => ({
+            typeDefinitions: [
+              {
+                id: "legal_msa",
+                aliases: ["msa", "agreement", "master services agreement"],
+              },
+            ],
+          }),
+          getDiOntology: () => null,
+        } as any,
+      );
+
+      const decision = await service.evaluate(buildState(), {
+        query: "open the signed version of the agreement",
+        env: "dev",
+        signals: {},
+      });
+      expect(decision.signals.activeDocId).toBe("msa-v1");
+      expect(decision.reasonCodes).not.toContain("needs_doc_choice");
+    });
+
+    it("keeps latest version intent ambiguous when draft outruns signed", async () => {
+      const docs: DocMeta[] = [
+        { docId: "msa-v1", filename: "MSA_v1_signed.pdf", title: "Master Services Agreement v1 signed" },
+        { docId: "msa-v2", filename: "MSA_v2_draft.pdf", title: "Master Services Agreement v2 draft" },
+        { docId: "msa-am1", filename: "MSA_amendment_1.pdf", title: "MSA amendment 1" },
+      ];
+      const service = new ScopeGateService(
+        { getBank: () => ({}) } as any,
+        {
+          listDocs: async () => docs,
+          getDocMeta: async () => null,
+        } as any,
+        {
+          getMergedDocAliasesBank: () => ({ config: { minAliasConfidence: 0.75 } }),
+          getDocAliasPhrases: () => ["agreement", "msa"],
+          getDocTaxonomy: () => ({
+            typeDefinitions: [
+              {
+                id: "legal_msa",
+                aliases: ["msa", "agreement", "master services agreement"],
+              },
+            ],
+          }),
+          getDiOntology: () => null,
+        } as any,
+      );
+
+      const decision = await service.evaluate(buildState(), {
+        query: "show me the latest version of the agreement",
+        env: "dev",
+        signals: {},
+      });
+      expect(decision.reasonCodes).toContain("needs_doc_choice");
+      expect(decision.disambiguation?.maxQuestions).toBe(1);
+    });
+  });
 });

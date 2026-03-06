@@ -10,6 +10,7 @@ on:
       - 'backend/src/services/connectors/**'
       - 'backend/src/services/documents/documentStateManager.service.ts'
       - 'backend/src/services/ingestion/**'
+      - 'backend/src/services/preview/**'
       - 'backend/src/services/retrieval/vectorEmbedding.runtime.service.ts'
       - 'backend/scripts/lint/ocr-degrade-audit.mjs'
       - 'backend/scripts/audit/ingestion-slo-cert-gate.mjs'
@@ -24,6 +25,7 @@ on:
       - 'backend/src/services/connectors/**'
       - 'backend/src/services/documents/documentStateManager.service.ts'
       - 'backend/src/services/ingestion/**'
+      - 'backend/src/services/preview/**'
       - 'backend/src/services/retrieval/vectorEmbedding.runtime.service.ts'
       - 'backend/scripts/lint/ocr-degrade-audit.mjs'
       - 'backend/scripts/audit/ingestion-slo-cert-gate.mjs'
@@ -97,6 +99,8 @@ jobs:
             src/services/connectors/gmail/gmailSync.service.ts \
             src/services/connectors/outlook/outlookSync.service.ts \
             src/services/connectors/slack/slackSync.service.ts \
+            src/services/preview/googleSlidesPreview.service.ts \
+            src/services/preview/pptxSlideImageGenerator.service.ts \
             src/services/preview/previewPdfGenerator.service.ts \
             src/queues/workers/documentIngestionPipeline.service.ts \
             src/queues/workers/stuckDocSweeper.service.ts; then

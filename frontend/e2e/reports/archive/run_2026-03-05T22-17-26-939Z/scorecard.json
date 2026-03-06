@@ -1,0 +1,2589 @@
+{
+  "generatedAt": "2026-03-05T22:17:26.939Z",
+  "inputFile": "C:\\Users\\Pedro\\desktop\\webapp\\frontend\\e2e\\reports\\archive\\2026-03-05T16-30-27-110Z\\retrieval-signoff-fallback-input.json",
+  "pack": "25",
+  "meta": {
+    "runId": "run_2026-03-05T22-17-26-939Z",
+    "datasetId": "retrieval-signoff-fallback-input.json:50",
+    "expectedLanguage": "pt",
+    "totalQueries": 50,
+    "allowedDocIdsCount": 0,
+    "allowedDocNamesCount": 0,
+    "scopeKnown": false,
+    "scopeSource": null,
+    "scopePolicyApplied": null,
+    "queryProfile": null,
+    "domainHint": null,
+    "artifactIntegrity": {
+      "rows": 50,
+      "rowsWithSources": 0,
+      "rowsWithSourceButtons": 0,
+      "sourceCount": 0,
+      "richSourceCount": 0,
+      "issues": [],
+      "ok": true
+    },
+    "rawShape": {
+      "ok": true,
+      "reason": null,
+      "total": 50,
+      "nonEmptyQueryCount": 50,
+      "nonEmptyResponseCount": 50,
+      "queryCoverage": 1,
+      "responseCoverage": 1
+    }
+  },
+  "summary": {
+    "finalScore": 0,
+    "avgScore": 0,
+    "overallHardFail": true,
+    "hardFailCount": 50,
+    "gateFails": {
+      "A": 0,
+      "B": 0,
+      "C": 0,
+      "D": 0,
+      "E": 50,
+      "F": 0,
+      "G": 0,
+      "H": 0
+    },
+    "gateSkips": {
+      "A": 0,
+      "B": 50,
+      "C": 0,
+      "D": 0,
+      "E": 0,
+      "F": 0,
+      "G": 0,
+      "H": 0
+    },
+    "avgCategories": {
+      "retrieval": 0,
+      "correctness": 0,
+      "reasoning": 0,
+      "writing": 0,
+      "conversation": 0
+    },
+    "verdict": "NO_GO",
+    "topIssues": [
+      {
+        "issue": "GATE_E_LANGUAGE_MISMATCH",
+        "count": 50
+      }
+    ],
+    "modelUsage": [
+      {
+        "providerModel": "unknown::unknown",
+        "count": 50
+      }
+    ],
+    "uniqueKnownModels": 0,
+    "singleModelMonopoly": false,
+    "passCount": 0,
+    "partialCount": 0,
+    "failCount": 50
+  },
+  "rows": [
+    {
+      "index": 1,
+      "query": "q001",
+      "expectedLanguage": null,
+      "responseText": "Stub response: 'The table was cut before completion. I can resend ...' — no usable content delivered; Sources: RF2_Gillet_Neto_Paulo.pdf, Breguet.pdf, Pedro-Gillet.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_table",
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 22223,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 2,
+      "query": "q002",
+      "expectedLanguage": null,
+      "responseText": "Response indicates retrieval could not find relevant content",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "help_steps",
+      "failureCode": "EVIDENCE_INSUFFICIENT",
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 18860,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 3,
+      "query": "q003",
+      "expectedLanguage": null,
+      "responseText": "Response indicates retrieval could not find relevant content; Sources: Breguet.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_quote",
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 18015,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 4,
+      "query": "q004",
+      "expectedLanguage": null,
+      "responseText": "Stub response: 'Let me try a different approach....' — no usable content delivered; Quality gate suppressed LLM output; Sources: SEVIS_RTI.pdf, RF2_Gillet_Neto_Paulo.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_multi",
+      "failureCode": "quality_gate_blocked",
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 6979,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 5,
+      "query": "q005",
+      "expectedLanguage": null,
+      "responseText": "Stub response: 'Let me try a different approach....' — no usable content delivered; Quality gate suppressed LLM output; Sources: Mayfair Group_Investor Deck 2025.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_multi",
+      "failureCode": "quality_gate_blocked",
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 23562,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 6,
+      "query": "q006",
+      "expectedLanguage": null,
+      "responseText": "Response in Portuguese despite English query; Response truncated (finishReason=stop); Sources: RF2_Gillet_Neto_Paulo.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_quote",
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 8044,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 7,
+      "query": "q007",
+      "expectedLanguage": null,
+      "responseText": "Stub response: 'I will re-check with a safer strategy....' — no usable content delivered; Sources: 214 Move Out Statement (2).pdf, Breguet.pdf, RF2_Gillet_Neto_Paulo.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "nav_pills",
+      "failureCode": "nav_pills_missing_buttons",
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 3535,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 8,
+      "query": "q008",
+      "expectedLanguage": null,
+      "responseText": "Response in Portuguese despite English query; Response truncated (finishReason=stop); Sources: RF2_Gillet_Neto_Paulo.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_multi",
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 5975,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 9,
+      "query": "q009",
+      "expectedLanguage": null,
+      "responseText": "Stub response: 'I will re-check with a safer strategy....' — no usable content delivered; Sources: 214 Move Out Statement (2).pdf, Breguet.pdf, SEVIS_RTI.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "nav_pills",
+      "failureCode": "nav_pills_missing_buttons",
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 6113,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 10,
+      "query": "q010",
+      "expectedLanguage": null,
+      "responseText": "Response in Portuguese despite English query; Response truncated (finishReason=length); Sources: ARM Montana & Arizona Summary_3.12.25.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_multi",
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 21723,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 11,
+      "query": "q011",
+      "expectedLanguage": null,
+      "responseText": "Response in Portuguese despite English query; Response truncated (finishReason=stop); Sources: Breguet.pdf, RF2_Gillet_Neto_Paulo.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_table",
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 9745,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 12,
+      "query": "q012",
+      "expectedLanguage": null,
+      "responseText": "Response indicates retrieval could not find relevant content; Sources: RF2_Gillet_Neto_Paulo.pdf, Pedro-Gillet.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_multi",
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 8685,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 13,
+      "query": "q013",
+      "expectedLanguage": null,
+      "responseText": "Response in Portuguese despite English query; Response truncated (finishReason=stop); Sources: Breguet.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_multi",
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 15020,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 14,
+      "query": "q014",
+      "expectedLanguage": null,
+      "responseText": "Response indicates retrieval could not find relevant content; Sources: Breguet.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_multi",
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 5127,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 15,
+      "query": "q015",
+      "expectedLanguage": null,
+      "responseText": "Response in Portuguese despite English query; Response truncated (finishReason=length); Sources: 214 Move Out Statement (2).pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_multi",
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 27123,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 16,
+      "query": "q016",
+      "expectedLanguage": null,
+      "responseText": "Response in Portuguese despite English query; Response truncated (finishReason=length); Sources: 214 Move Out Statement (2).pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_quote",
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 15785,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 17,
+      "query": "q017",
+      "expectedLanguage": null,
+      "responseText": "Response in Portuguese despite English query; Response truncated (finishReason=stop); Sources: Breguet.pdf, Pedro-Gillet.pdf, RF2_Gillet_Neto_Paulo.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_quote",
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 6087,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 18,
+      "query": "q018",
+      "expectedLanguage": null,
+      "responseText": "Response in Portuguese despite English query; Response truncated (finishReason=stop); Sources: 214 Move Out Statement (2).pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_multi",
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 19135,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 19,
+      "query": "q019",
+      "expectedLanguage": null,
+      "responseText": "Stub response: 'The response was interrupted before completion. I ...' — no usable content delivered; Sources: 214 Move Out Statement (2).pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_multi",
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 23897,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 20,
+      "query": "q020",
+      "expectedLanguage": null,
+      "responseText": "Stub response: 'Trying another method now....' — no usable content delivered; Quality gate suppressed LLM output; Sources: Breguet.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_multi",
+      "failureCode": "quality_gate_blocked",
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 13618,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 21,
+      "query": "q021",
+      "expectedLanguage": null,
+      "responseText": "Response in Portuguese despite English query; Response truncated (finishReason=stop); Sources: Breguet.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_multi",
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 17544,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 22,
+      "query": "q022",
+      "expectedLanguage": null,
+      "responseText": "Sources: Breguet.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_quote",
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 14334,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 23,
+      "query": "q023",
+      "expectedLanguage": null,
+      "responseText": "Sources: Breguet.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_multi",
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 14030,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 24,
+      "query": "q024",
+      "expectedLanguage": null,
+      "responseText": "Stub response: 'I will re-check with a safer strategy....' — no usable content delivered; Sources: Breguet.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_table",
+      "failureCode": "table_contract_violation",
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 23835,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 25,
+      "query": "q025",
+      "expectedLanguage": null,
+      "responseText": "Response in Portuguese despite English query; Response truncated (finishReason=stop); Provenance coverage flagged as insufficient despite grounded content",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_multi",
+      "failureCode": "insufficient_provenance_coverage",
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 11536,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 26,
+      "query": "q026",
+      "expectedLanguage": null,
+      "responseText": "Response in Portuguese despite English query; Response truncated (finishReason=stop); Sources: Breguet.pdf, RF2_Gillet_Neto_Paulo.pdf, Pedro-Gillet.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_multi",
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 27421,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 27,
+      "query": "q027",
+      "expectedLanguage": null,
+      "responseText": "Response indicates retrieval could not find relevant content; Sources: Breguet.pdf, RF2_Gillet_Neto_Paulo.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_quote",
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 6259,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 28,
+      "query": "q028",
+      "expectedLanguage": null,
+      "responseText": "Response indicates retrieval could not find relevant content; Sources: Breguet.pdf, RF2_Gillet_Neto_Paulo.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_quote",
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 23546,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 29,
+      "query": "q029",
+      "expectedLanguage": null,
+      "responseText": "Sources: ATTBill_4977_Dec2023.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_single",
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 10563,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 30,
+      "query": "q030",
+      "expectedLanguage": null,
+      "responseText": "Response in Portuguese despite English query; Response truncated (finishReason=stop); Sources: Pedro-Gillet.pdf, RF2_Gillet_Neto_Paulo.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_quote",
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 13763,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 31,
+      "query": "q031",
+      "expectedLanguage": null,
+      "responseText": "Response in Portuguese despite English query; Response truncated (finishReason=stop); Sources: Breguet.pdf, RF2_Gillet_Neto_Paulo.pdf, Pedro-Gillet.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_multi",
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 19508,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 32,
+      "query": "q032",
+      "expectedLanguage": null,
+      "responseText": "Response indicates retrieval could not find relevant content; Sources: 214 Move Out Statement (2).pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_multi",
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 6817,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 33,
+      "query": "q033",
+      "expectedLanguage": null,
+      "responseText": "Response indicates retrieval could not find relevant content; Sources: Breguet.pdf, Pedro-Gillet.pdf, RF2_Gillet_Neto_Paulo.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_quote",
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 21202,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 34,
+      "query": "q034",
+      "expectedLanguage": null,
+      "responseText": "Response truncated (finishReason=stop); Sources: AÉREO ALVARO + 2.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_multi",
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 11062,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 35,
+      "query": "q035",
+      "expectedLanguage": null,
+      "responseText": "Response in Portuguese despite English query; Response truncated (finishReason=stop); Sources: RF2_Gillet_Neto_Paulo.pdf, Breguet.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_quote",
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 10365,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 36,
+      "query": "q036",
+      "expectedLanguage": null,
+      "responseText": "Response truncated (finishReason=stop); Sources: Breguet.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_single",
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 16638,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 37,
+      "query": "q037",
+      "expectedLanguage": null,
+      "responseText": "Stub response: 'Let me try a different approach....' — no usable content delivered; Quality gate suppressed LLM output; Sources: Pedro-Gillet.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_multi",
+      "failureCode": "quality_gate_blocked",
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 5700,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 38,
+      "query": "q038",
+      "expectedLanguage": null,
+      "responseText": "Stub response: 'The response was interrupted before completion. I ...' — no usable content delivered; Sources: Pedro-Gillet.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_multi",
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 15663,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 39,
+      "query": "q039",
+      "expectedLanguage": null,
+      "responseText": "Stub response: 'Trying another method now....' — no usable content delivered; Quality gate suppressed LLM output; Sources: Pedro-Gillet.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_quote",
+      "failureCode": "quality_gate_blocked",
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 21090,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 40,
+      "query": "q040",
+      "expectedLanguage": null,
+      "responseText": "Response truncated (finishReason=stop); Sources: Certidao de nascimento Pedro.pdf, Pedro-Gillet.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_multi",
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 6405,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 41,
+      "query": "q041",
+      "expectedLanguage": null,
+      "responseText": "Sources: Breguet.pdf, Pedro-Gillet.pdf, RF2_Gillet_Neto_Paulo.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_quote",
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 7069,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 42,
+      "query": "q042",
+      "expectedLanguage": null,
+      "responseText": "Response in Portuguese despite English query; Response truncated (finishReason=stop); Sources: Certidao de nascimento Pedro.pdf, Pedro-Gillet.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_quote",
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 16469,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 43,
+      "query": "q043",
+      "expectedLanguage": null,
+      "responseText": "Response in Portuguese despite English query; Response truncated (finishReason=stop); Sources: SEVIS_RTI.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_multi",
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 21119,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 44,
+      "query": "q044",
+      "expectedLanguage": null,
+      "responseText": "Sources: SEVIS_RTI.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_multi",
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 17320,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 45,
+      "query": "q045",
+      "expectedLanguage": null,
+      "responseText": "Response in Portuguese despite English query; Response truncated (finishReason=stop); Sources: SEVIS_RTI.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_multi",
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 17172,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 46,
+      "query": "q046",
+      "expectedLanguage": null,
+      "responseText": "Stub response: 'The response was interrupted before completion. I ...' — no usable content delivered; Sources: Pedro-Gillet.pdf, RF2_Gillet_Neto_Paulo.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_quote",
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 17992,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 47,
+      "query": "q047",
+      "expectedLanguage": null,
+      "responseText": "Stub response: 'I will re-check with a safer strategy....' — no usable content delivered; Sources: RF2_Gillet_Neto_Paulo.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_table",
+      "failureCode": "table_contract_violation",
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 24481,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 48,
+      "query": "q048",
+      "expectedLanguage": null,
+      "responseText": "Response in Portuguese despite English query; Response truncated (finishReason=stop); Sources: SEVIS_RTI.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_multi",
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 22198,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 49,
+      "query": "q049",
+      "expectedLanguage": null,
+      "responseText": "Response in Portuguese despite English query; Response truncated (finishReason=stop); Sources: RF2_Gillet_Neto_Paulo.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_multi",
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 12521,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    },
+    {
+      "index": 50,
+      "query": "q050",
+      "expectedLanguage": null,
+      "responseText": "Response in Portuguese despite English query; Response truncated (finishReason=stop); Sources: Breguet.pdf",
+      "rawSources": [],
+      "rawAttachments": [],
+      "sourceDocIds": [],
+      "sourceNames": [],
+      "answerMode": "doc_grounded_quote",
+      "failureCode": null,
+      "status": "FAIL",
+      "errorDetail": null,
+      "transportHttpStatus": null,
+      "truncated": false,
+      "truncation": null,
+      "latencyMs": 17758,
+      "assistantTelemetry": null,
+      "hardFail": true,
+      "gates": {
+        "A": true,
+        "B": true,
+        "C": true,
+        "D": true,
+        "E": false,
+        "F": true,
+        "G": true,
+        "H": true
+      },
+      "gateSkips": {
+        "B": "scope_unknown"
+      },
+      "issues": [
+        "GATE_E_LANGUAGE_MISMATCH"
+      ],
+      "deductions": [
+        {
+          "code": "UNGROUNDED_FACTUAL_CLAIM",
+          "value": 20
+        }
+      ],
+      "categoryScores": {
+        "retrieval": 0,
+        "correctness": 0,
+        "reasoning": 0,
+        "writing": 0,
+        "conversation": 0
+      },
+      "finalScore": 0
+    }
+  ]
+}

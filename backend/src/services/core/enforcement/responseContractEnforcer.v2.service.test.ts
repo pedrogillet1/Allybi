@@ -106,6 +106,7 @@ function bankById(bankId: string): unknown {
 
 describe("ResponseContractEnforcerService v2", () => {
   beforeEach(() => {
+    jest.resetModules();
     mockGetBank.mockReset();
     mockGetOptionalBank.mockReset();
     delete process.env.UI_CONTRACTS_FAIL_CLOSED;
@@ -224,7 +225,7 @@ describe("ResponseContractEnforcerService v2", () => {
     );
   });
 
-  test("falls back in non-strict mode when ui_contracts is invalid and emits warning", async () => {
+  test("ignores UI_CONTRACTS_FAIL_CLOSED override and still fails closed on invalid ui_contracts", async () => {
     process.env.UI_CONTRACTS_FAIL_CLOSED = "false";
     mockGetBank.mockImplementation((bankId: string) => {
       if (bankId === "ui_contracts") return { malformed: true };
@@ -234,17 +235,8 @@ describe("ResponseContractEnforcerService v2", () => {
     const { ResponseContractEnforcerService } = await import(
       "./responseContractEnforcer.v2.service"
     );
-    const enforcer = new ResponseContractEnforcerService();
-    const out = enforcer.enforce(
-      { content: "Hello", attachments: [] },
-      { answerMode: "general_answer", language: "en" },
-    );
-    expect(out.enforcement.blocked).toBe(false);
-    expect(out.enforcement.warnings).toContain(
-      "UI_CONTRACTS_FAIL_OPEN_OVERRIDE_ENABLED",
-    );
-    expect(out.enforcement.warnings).toContain(
-      "UI_CONTRACTS_PARSE_FAILED_FAIL_OPEN_FALLBACK",
+    expect(() => new ResponseContractEnforcerService()).toThrow(
+      /ui_contracts load failed in strict mode/i,
     );
   });
 

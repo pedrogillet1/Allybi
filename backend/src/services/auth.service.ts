@@ -729,7 +729,6 @@ import {
   maskEmail,
   maskPhone,
 } from "../utils/maskingUtils";
-import bcrypt from "bcrypt";
 
 // In-memory fallback when Redis is not available
 const memoryStore = new Map<string, { value: string; expiresAt: number }>();
@@ -973,12 +972,17 @@ export async function resetPasswordWithToken(
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
   if (!passwordRegex.test(newPassword)) throw new Error("WEAK_PASSWORD");
 
-  const salt = await bcrypt.genSalt(12);
-  const passwordHash = await bcrypt.hash(newPassword, salt);
+  const { hash: passwordHash, salt } = await hashPassword(newPassword);
 
   await prisma.user.update({
     where: { id: userId },
     data: { passwordHash, salt },
+  });
+
+  // Revoke all active sessions after a successful password reset.
+  await prisma.session.updateMany({
+    where: { userId },
+    data: { isActive: false, revokedAt: new Date() },
   });
 
   await deleteResetToken(token);

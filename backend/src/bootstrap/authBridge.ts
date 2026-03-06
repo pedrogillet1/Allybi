@@ -13,7 +13,6 @@
  *   sessions for that user are revoked (theft assumption)
  */
 
-import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import prisma from "../config/database";
 import {
@@ -22,8 +21,8 @@ import {
   verifyRefreshToken,
 } from "../utils/jwt";
 import type { AuthService } from "../controllers/auth.controller";
-
-const BCRYPT_ROUNDS = 12;
+import { hashPassword, verifyPassword } from "../utils/password";
+import { issueTwoFactorLoginChallenge } from "../services/authLoginChallenge.service";
 
 /**
  * HMAC-SHA256 with a server-side pepper.
@@ -56,9 +55,8 @@ export function createAuthService(): AuthService {
         throw new Error("Email already exists");
       }
 
-      // Hash password
-      const salt = await bcrypt.genSalt(BCRYPT_ROUNDS);
-      const passwordHash = await bcrypt.hash(input.password, salt);
+      // Hash password (canonical salted format used across auth flows)
+      const { hash: passwordHash, salt } = await hashPassword(input.password);
 
       // Parse name into firstName/lastName
       let firstName: string | null = null;
@@ -125,9 +123,60 @@ export function createAuthService(): AuthService {
         throw new Error("Invalid credentials");
       }
 
-      const valid = await bcrypt.compare(input.password, user.passwordHash);
+      let valid = false;
+
+      // Canonical salted hash path.
+      if (user.salt) {
+        valid = await verifyPassword(input.password, user.passwordHash, user.salt);
+      }
+
+      // Backward-compatible legacy path (bcrypt(password)) followed by migration.
+      if (!valid) {
+        const bcrypt = await import("bcryptjs");
+        valid = await bcrypt.compare(input.password, user.passwordHash);
+        if (valid) {
+          const migrated = await hashPassword(input.password);
+          await prisma.user.update({
+            where: { id: user.id },
+            data: { passwordHash: migrated.hash, salt: migrated.salt },
+          });
+        }
+      }
+
       if (!valid) {
         throw new Error("Invalid credentials");
+      }
+
+      const twoFactorState = await prisma.twoFactorAuth.findUnique({
+        where: { userId: user.id },
+        select: { isEnabled: true },
+      });
+
+      if (twoFactorState?.isEnabled) {
+        const twoFactorChallengeToken = await issueTwoFactorLoginChallenge({
+          userId: user.id,
+          email: user.email,
+        });
+
+        return {
+          user: {
+            id: user.id,
+            email: user.email,
+            name:
+              [user.firstName, user.lastName].filter(Boolean).join(" ") || null,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            phoneNumber: user.phoneNumber,
+            profileImage: user.profileImage,
+            isEmailVerified: user.isEmailVerified,
+            isPhoneVerified: user.isPhoneVerified,
+            isOAuth: !!(user.googleId || user.appleId),
+            subscriptionTier: user.subscriptionTier,
+            createdAt: user.createdAt.toISOString(),
+          },
+          requiresTwoFactor: true,
+          twoFactorChallengeToken,
+        };
       }
 
       // Generate tokens

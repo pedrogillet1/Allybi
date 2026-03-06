@@ -42,30 +42,6 @@
   transform: scale(0.99);
 }
 
-/* Compact variant for pills rendered inside table cells */
-td .koda-source-pill {
-  height: 30px;
-  padding: 0 10px;
-  gap: 6px;
-  max-width: 280px;
-  border-width: 1px;
-}
-
-td .koda-source-pill__text {
-  font-size: 13px;
-}
-
-td .koda-source-pill__icon {
-  width: 18px;
-  height: 18px;
-}
-
-td .koda-source-pill__icon svg,
-td .koda-source-pill__icon img {
-  width: 18px;
-  height: 18px;
-}
-
 .koda-source-pill:focus-visible {
   outline: none;
   box-shadow: 0 0 0 3px rgba(50, 48, 44, 0.12);

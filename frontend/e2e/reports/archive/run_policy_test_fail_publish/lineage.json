@@ -1,0 +1,52 @@
+{
+  "generatedAt": "2026-03-05T22:42:52.090Z",
+  "runId": "run_policy_test_fail_publish",
+  "datasetId": "retrieval-signoff-fallback-input.json:50",
+  "pack": "25",
+  "inputFile": "C:\\Users\\Pedro\\desktop\\webapp\\frontend\\e2e\\reports\\archive\\2026-03-05T16-30-27-110Z\\retrieval-signoff-fallback-input.json",
+  "inputArtifactType": "raw_query_run",
+  "sourceArtifactPath": "C:\\Users\\Pedro\\desktop\\webapp\\frontend\\e2e\\reports\\archive\\2026-03-05T16-30-27-110Z\\retrieval-signoff-fallback-input.json",
+  "sourceArtifactSha256": "7acd6e9034ca0b8ba98d82315cfb32ec66054e59a0017d9d9962481469d27d6f",
+  "sourceArtifactBytes": 15887,
+  "sourceArtifactRelPath": "archive/2026-03-05T16-30-27-110Z/retrieval-signoff-fallback-input.json",
+  "totalQueries": 50,
+  "source": "run-harsh-rubric.v2.mjs",
+  "artifacts": {
+    "scorecard": {
+      "latestPath": "C:\\Users\\Pedro\\desktop\\webapp\\frontend\\e2e\\reports\\latest\\scorecard.json",
+      "archivePath": "C:\\Users\\Pedro\\desktop\\webapp\\frontend\\e2e\\reports\\archive\\run_policy_test_fail_publish\\scorecard.json",
+      "latestRelPath": "latest/scorecard.json",
+      "archiveRelPath": "archive/run_policy_test_fail_publish/scorecard.json",
+      "sha256": "07e598777a7aa10f513ac5567889c86cc81539ab37a617bcedbf0c8d7ca9fc6f",
+      "bytes": 63392
+    },
+    "grading": {
+      "latestPath": "C:\\Users\\Pedro\\desktop\\webapp\\frontend\\e2e\\reports\\latest\\grading.md",
+      "archivePath": "C:\\Users\\Pedro\\desktop\\webapp\\frontend\\e2e\\reports\\archive\\run_policy_test_fail_publish\\grading.md",
+      "latestRelPath": "latest/grading.md",
+      "archiveRelPath": "archive/run_policy_test_fail_publish/grading.md",
+      "sha256": "e4cee2ff434a2a557fe8aa90ee7bfe589f5cc6325358a98964c8b71377eb4223",
+      "bytes": 6149
+    },
+    "deepDive": {
+      "latestPath": "C:\\Users\\Pedro\\desktop\\webapp\\frontend\\e2e\\reports\\latest\\a-plus-gap-deep-dive.md",
+      "archivePath": "C:\\Users\\Pedro\\desktop\\webapp\\frontend\\e2e\\reports\\archive\\run_policy_test_fail_publish\\a-plus-gap-deep-dive.md",
+      "latestRelPath": "latest/a-plus-gap-deep-dive.md",
+      "archiveRelPath": "archive/run_policy_test_fail_publish/a-plus-gap-deep-dive.md",
+      "sha256": "b1103160b00da8e4560295a99e880c7a0f0af20ce8ba5a6cc13cf46c52760eeb",
+      "bytes": 2819
+    },
+    "perQuery": {
+      "latestPath": "C:\\Users\\Pedro\\desktop\\webapp\\frontend\\e2e\\reports\\latest\\per_query.json",
+      "archivePath": "C:\\Users\\Pedro\\desktop\\webapp\\frontend\\e2e\\reports\\archive\\run_policy_test_fail_publish\\per_query.json",
+      "latestRelPath": "latest/per_query.json",
+      "archiveRelPath": "archive/run_policy_test_fail_publish/per_query.json",
+      "sha256": "506181c573d4554e6604876f788b869a14e99c89b8c0823298b46feeaea49661",
+      "bytes": 56160
+    }
+  },
+  "latestPerQueryPath": "C:\\Users\\Pedro\\desktop\\webapp\\frontend\\e2e\\reports\\latest\\per_query.json",
+  "archivePerQueryPath": "C:\\Users\\Pedro\\desktop\\webapp\\frontend\\e2e\\reports\\archive\\run_policy_test_fail_publish\\per_query.json",
+  "scorecardPath": "C:\\Users\\Pedro\\desktop\\webapp\\frontend\\e2e\\reports\\latest\\scorecard.json",
+  "archiveScorecardPath": "C:\\Users\\Pedro\\desktop\\webapp\\frontend\\e2e\\reports\\archive\\run_policy_test_fail_publish\\scorecard.json"
+}

@@ -14,6 +14,7 @@ const gradingPath = path.join(LATEST_DIR, 'grading.md');
 const deepDivePath = path.join(LATEST_DIR, 'a-plus-gap-deep-dive.md');
 const perQueryPath = path.join(LATEST_DIR, 'per_query.json');
 const lineagePath = path.join(LATEST_DIR, 'lineage.json');
+const REQUIRED_INPUT_ARTIFACT_TYPE = 'raw_query_run';
 
 const failures = [];
 
@@ -30,6 +31,16 @@ function normalizePath(value) {
   const raw = String(value || '').trim();
   if (!raw) return '';
   return path.resolve(raw);
+}
+
+function pathEquals(a, b) {
+  if (!a || !b) return false;
+  return normalizePath(a).toLowerCase() === normalizePath(b).toLowerCase();
+}
+
+function isRecursivePerQueryInput(value) {
+  const normalized = normalizePath(value).replace(/\\/g, '/').toLowerCase();
+  return normalized.endsWith('/latest/per_query.json');
 }
 
 function assertManifestArtifact(lineage, key, expectedLatestPath) {
@@ -87,6 +98,14 @@ const pack = String(scorecard?.pack || '').trim();
 const inputFile = String(scorecard?.inputFile || '').trim();
 const totalQueries = Number(scorecard?.meta?.totalQueries || 0);
 const rowsCount = Array.isArray(scorecard?.rows) ? scorecard.rows.length : 0;
+const scorecardInputArtifactType = String(scorecard?.meta?.inputArtifactType || '')
+  .trim()
+  .toLowerCase();
+const scorecardSourceArtifactPath = String(scorecard?.meta?.sourceArtifactPath || '').trim();
+const scorecardSourceArtifactSha256 = String(scorecard?.meta?.sourceArtifactSha256 || '')
+  .trim()
+  .toLowerCase();
+const scorecardSourceArtifactBytes = Number(scorecard?.meta?.sourceArtifactBytes || 0);
 
 if (!generatedAt) failures.push('scorecard_missing_generatedAt');
 if (!runId) failures.push('scorecard_missing_meta_runId');
@@ -98,22 +117,102 @@ if (!Number.isFinite(totalQueries) || totalQueries < 1) {
 if (rowsCount !== totalQueries) {
   failures.push('scorecard_rows_total_mismatch');
 }
+if (!scorecardInputArtifactType) failures.push('scorecard_missing_meta_inputArtifactType');
+if (scorecardInputArtifactType !== REQUIRED_INPUT_ARTIFACT_TYPE) {
+  failures.push('scorecard_invalid_meta_inputArtifactType');
+}
+if (!scorecardSourceArtifactPath) failures.push('scorecard_missing_meta_sourceArtifactPath');
+if (!scorecardSourceArtifactSha256 || !/^[a-f0-9]{64}$/i.test(scorecardSourceArtifactSha256)) {
+  failures.push('scorecard_invalid_meta_sourceArtifactSha256');
+}
+if (!Number.isFinite(scorecardSourceArtifactBytes) || scorecardSourceArtifactBytes < 1) {
+  failures.push('scorecard_invalid_meta_sourceArtifactBytes');
+}
 
 const lineageRunId = String(lineage?.runId || '').trim();
 const lineagePack = String(lineage?.pack || '').trim();
 const lineageInputFile = String(lineage?.inputFile || '').trim();
 const lineageTotalQueries = Number(lineage?.totalQueries || 0);
+const lineageInputArtifactType = String(lineage?.inputArtifactType || '').trim().toLowerCase();
+const lineageSourceArtifactPath = String(lineage?.sourceArtifactPath || '').trim();
+const lineageSourceArtifactSha256 = String(lineage?.sourceArtifactSha256 || '')
+  .trim()
+  .toLowerCase();
+const lineageSourceArtifactBytes = Number(lineage?.sourceArtifactBytes || 0);
 if (!lineageRunId) failures.push('lineage_missing_runId');
 if (!lineagePack) failures.push('lineage_missing_pack');
 if (!lineageInputFile) failures.push('lineage_missing_inputFile');
 if (!Number.isFinite(lineageTotalQueries) || lineageTotalQueries < 1) {
   failures.push('lineage_invalid_totalQueries');
 }
+if (!lineageInputArtifactType) failures.push('lineage_missing_inputArtifactType');
+if (lineageInputArtifactType !== REQUIRED_INPUT_ARTIFACT_TYPE) {
+  failures.push('lineage_invalid_inputArtifactType');
+}
+if (!lineageSourceArtifactPath) failures.push('lineage_missing_sourceArtifactPath');
+if (!lineageSourceArtifactSha256 || !/^[a-f0-9]{64}$/i.test(lineageSourceArtifactSha256)) {
+  failures.push('lineage_invalid_sourceArtifactSha256');
+}
+if (!Number.isFinite(lineageSourceArtifactBytes) || lineageSourceArtifactBytes < 1) {
+  failures.push('lineage_invalid_sourceArtifactBytes');
+}
 if (lineageRunId && lineageRunId !== runId) failures.push('lineage_runId_mismatch');
 if (lineagePack && lineagePack !== pack) failures.push('lineage_pack_mismatch');
 if (lineageInputFile && lineageInputFile !== inputFile) failures.push('lineage_inputFile_mismatch');
 if (Number.isFinite(lineageTotalQueries) && lineageTotalQueries !== totalQueries) {
   failures.push('lineage_totalQueries_mismatch');
+}
+if (
+  lineageSourceArtifactPath &&
+  lineageInputFile &&
+  !pathEquals(lineageSourceArtifactPath, lineageInputFile)
+) {
+  failures.push('lineage_sourceArtifactPath_inputFile_mismatch');
+}
+if (
+  scorecardSourceArtifactPath &&
+  lineageSourceArtifactPath &&
+  !pathEquals(scorecardSourceArtifactPath, lineageSourceArtifactPath)
+) {
+  failures.push('scorecard_lineage_sourceArtifactPath_mismatch');
+}
+if (
+  scorecardSourceArtifactSha256 &&
+  lineageSourceArtifactSha256 &&
+  scorecardSourceArtifactSha256 !== lineageSourceArtifactSha256
+) {
+  failures.push('scorecard_lineage_sourceArtifactSha256_mismatch');
+}
+if (
+  Number.isFinite(scorecardSourceArtifactBytes) &&
+  scorecardSourceArtifactBytes > 0 &&
+  Number.isFinite(lineageSourceArtifactBytes) &&
+  lineageSourceArtifactBytes > 0 &&
+  scorecardSourceArtifactBytes !== lineageSourceArtifactBytes
+) {
+  failures.push('scorecard_lineage_sourceArtifactBytes_mismatch');
+}
+
+if (isRecursivePerQueryInput(inputFile) || pathEquals(inputFile, perQueryPath)) {
+  failures.push('scorecard_inputfile_recursive_per_query_forbidden');
+}
+if (isRecursivePerQueryInput(lineageInputFile) || pathEquals(lineageInputFile, perQueryPath)) {
+  failures.push('lineage_inputfile_recursive_per_query_forbidden');
+}
+if (isRecursivePerQueryInput(lineageSourceArtifactPath)) {
+  failures.push('lineage_sourceArtifactPath_recursive_per_query_forbidden');
+}
+if (isRecursivePerQueryInput(scorecardSourceArtifactPath)) {
+  failures.push('scorecard_sourceArtifactPath_recursive_per_query_forbidden');
+}
+if (lineageSourceArtifactPath && !fs.existsSync(lineageSourceArtifactPath)) {
+  failures.push('lineage_sourceArtifactPath_missing_file');
+}
+if (lineageSourceArtifactPath && fs.existsSync(lineageSourceArtifactPath)) {
+  const actualSha256 = sha256File(lineageSourceArtifactPath).toLowerCase();
+  if (lineageSourceArtifactSha256 && actualSha256 !== lineageSourceArtifactSha256) {
+    failures.push('lineage_sourceArtifactSha256_mismatch');
+  }
 }
 
 assertManifestArtifact(lineage, 'scorecard', scorecardPath);

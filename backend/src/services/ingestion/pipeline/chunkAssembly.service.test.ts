@@ -863,6 +863,7 @@ describe("chunkAssembly.service — buildInputChunks", () => {
           tableId: "pdf:p1:t0",
           pageOrSlide: 1,
           tableMethod: "heuristic",
+          fallbackReason: "document_ai_low_confidence",
           markdown: "| Name | Value |",
           rows: [
             {
@@ -893,6 +894,9 @@ describe("chunkAssembly.service — buildInputChunks", () => {
 
     expect(cellFact).toBeDefined();
     expect(cellFact!.metadata?.tableMethod).toBe("heuristic");
+    expect(cellFact!.metadata?.tableFallbackReason).toBe(
+      "document_ai_low_confidence",
+    );
   });
 
   test("cell_fact chunks for document_ai tables have correct tableMethod", () => {
@@ -905,6 +909,7 @@ describe("chunkAssembly.service — buildInputChunks", () => {
           tableId: "pdf:p1:t0",
           pageOrSlide: 1,
           tableMethod: "document_ai",
+          tableConfidence: 0.93,
           markdown: "| Metric | Amount |",
           rows: [
             {
@@ -935,5 +940,6 @@ describe("chunkAssembly.service — buildInputChunks", () => {
 
     expect(cellFact).toBeDefined();
     expect(cellFact!.metadata?.tableMethod).toBe("document_ai");
+    expect(cellFact!.metadata?.tableConfidence).toBeCloseTo(0.93, 2);
   });
 });

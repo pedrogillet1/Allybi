@@ -10,8 +10,8 @@
  *   3. Shared Drive folder for temporary uploads
  *
  * Env vars:
- *   GOOGLE_APPLICATION_CREDENTIALS — path to service account JSON key
- *   GOOGLE_SLIDES_FOLDER_ID        — Drive folder ID for temp uploads
+ *   GOOGLE_APPLICATION_CREDENTIALS - path to service account JSON key
+ *   GOOGLE_SLIDES_FOLDER_ID        - Drive folder ID for temp uploads
  *
  * Pipeline:
  *   1. Upload PPTX to Google Drive (converts to Google Slides)
@@ -22,6 +22,7 @@
 
 import { google } from "googleapis";
 import { Readable } from "stream";
+import { performanceConsole as previewLog } from "../../utils/logger";
 
 export interface GoogleSlidesResult {
   success: boolean;
@@ -72,9 +73,9 @@ export async function convertPptxViaSlidesApi(
     const auth = getAuth();
     const drive = google.drive({ version: "v3", auth });
 
-    console.log(`[GoogleSlides] Uploading "${filename}" to Google Drive...`);
+    previewLog.log(`[GoogleSlides] Uploading "${filename}" to Google Drive...`);
 
-    // 1. Upload PPTX to Drive — auto-converts to Google Slides format
+    // 1. Upload PPTX to Drive - auto-converts to Google Slides format
     const uploaded = await drive.files.create({
       requestBody: {
         name: `preview-${Date.now()}-${filename}`,
@@ -90,10 +91,10 @@ export async function convertPptxViaSlidesApi(
     });
 
     uploadedFileId = uploaded.data.id!;
-    console.log(`[GoogleSlides] Uploaded as Google Slides: ${uploadedFileId}`);
+    previewLog.log(`[GoogleSlides] Uploaded as Google Slides: ${uploadedFileId}`);
 
     // 2. Export as PDF
-    console.log(`[GoogleSlides] Exporting as PDF...`);
+    previewLog.log(`[GoogleSlides] Exporting as PDF...`);
     const pdfResponse = await drive.files.export(
       { fileId: uploadedFileId, mimeType: "application/pdf" },
       { responseType: "arraybuffer" },
@@ -102,8 +103,8 @@ export async function convertPptxViaSlidesApi(
     const pdfBuffer = Buffer.from(pdfResponse.data as ArrayBuffer);
     const duration = Date.now() - startTime;
 
-    console.log(
-      `[GoogleSlides] Conversion complete: "${filename}" → PDF ` +
+    previewLog.log(
+      `[GoogleSlides] Conversion complete: "${filename}" -> PDF ` +
         `(${(pdfBuffer.length / 1024).toFixed(1)} KB) in ${duration}ms`,
     );
 
@@ -111,18 +112,18 @@ export async function convertPptxViaSlidesApi(
   } catch (err: any) {
     const duration = Date.now() - startTime;
     const error = err.message || "Google Slides conversion failed";
-    console.error(`[GoogleSlides] Failed after ${duration}ms: ${error}`);
+    previewLog.error(`[GoogleSlides] Failed after ${duration}ms: ${error}`);
     return { success: false, error };
   } finally {
-    // 3. Clean up — delete temp file from Drive
+    // 3. Clean up - delete temp file from Drive
     if (uploadedFileId) {
       try {
         const auth = getAuth();
         const drive = google.drive({ version: "v3", auth });
         await drive.files.delete({ fileId: uploadedFileId });
-        console.log(`[GoogleSlides] Cleaned up temp file: ${uploadedFileId}`);
+        previewLog.log(`[GoogleSlides] Cleaned up temp file: ${uploadedFileId}`);
       } catch (cleanupErr: any) {
-        console.warn(
+        previewLog.warn(
           `[GoogleSlides] Cleanup failed (non-fatal): ${cleanupErr.message}`,
         );
       }

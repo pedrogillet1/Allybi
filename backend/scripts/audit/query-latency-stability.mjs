@@ -130,10 +130,14 @@ function main() {
   const requiredByProfile =
     profile === "ci" || profile === "release" || profile === "retrieval_signoff";
   const requireInput = forceRequired || (strict && requiredByProfile);
-  const defaultQualityFailPolicy =
-    profile === "release" || profile === "retrieval_signoff"
-      ? "blocking"
-      : "advisory";
+  const strictHardFailProfiles = new Set([
+    "ci",
+    "release",
+    "retrieval_signoff",
+    "local_hard",
+  ]);
+  const strictHardFail = strict || strictHardFailProfiles.has(profile);
+  const defaultQualityFailPolicy = strictHardFail ? "blocking" : "advisory";
   const qualityFailPolicyRaw = String(
     arg(
       "--quality-fail-policy",

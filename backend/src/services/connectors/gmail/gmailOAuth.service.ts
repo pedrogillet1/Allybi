@@ -136,37 +136,68 @@ function pickDefaultAllowedGmailCallbackUrl(): string | null {
   return null;
 }
 
+function isTruthy(value: string): boolean {
+  return ["1", "true", "yes", "on"].includes(value);
+}
+
+function isFalsy(value: string): boolean {
+  return ["0", "false", "no", "off"].includes(value);
+}
+
+function isStrictGmailOAuthConfigMode(): boolean {
+  const raw = String(process.env.CONNECTOR_GMAIL_STRICT_OAUTH_CONFIG || "")
+    .trim()
+    .toLowerCase();
+  if (raw && (isTruthy(raw) || isFalsy(raw))) return isTruthy(raw);
+
+  const env = String(process.env.NODE_ENV || "").trim().toLowerCase();
+  return env === "production" || env === "staging";
+}
+
+function allowLegacyGoogleAuthFallbackForGmail(): boolean {
+  const raw = String(process.env.CONNECTOR_GMAIL_ALLOW_GOOGLE_AUTH_FALLBACK || "")
+    .trim()
+    .toLowerCase();
+  if (raw && (isTruthy(raw) || isFalsy(raw))) return isTruthy(raw);
+  return !isStrictGmailOAuthConfigMode();
+}
+
 function resolveOAuthConfig(): {
   clientId: string;
   clientSecret: string;
   callbackUrl: string;
 } {
-  // Prefer dedicated Gmail connector creds if provided (recommended, due to sensitive Gmail scopes).
-  const clientId = (
-    process.env.GOOGLE_GMAIL_CLIENT_ID ||
-    process.env.GOOGLE_CLIENT_ID ||
-    ""
-  ).trim();
-  const clientSecret = (
-    process.env.GOOGLE_GMAIL_CLIENT_SECRET ||
-    process.env.GOOGLE_CLIENT_SECRET ||
-    ""
-  ).trim();
-  const callbackUrlRaw = (
-    process.env.GOOGLE_GMAIL_CALLBACK_URL ||
-    process.env.GOOGLE_CALLBACK_URL ||
-    ""
-  ).trim();
+  const strict = isStrictGmailOAuthConfigMode();
+  const allowLegacyFallback = allowLegacyGoogleAuthFallbackForGmail();
+  let clientId = String(process.env.GOOGLE_GMAIL_CLIENT_ID || "").trim();
+  let clientSecret = String(process.env.GOOGLE_GMAIL_CLIENT_SECRET || "").trim();
+  let callbackUrlRaw = String(process.env.GOOGLE_GMAIL_CALLBACK_URL || "").trim();
+  const dedicatedCallbackExplicit = callbackUrlRaw.length > 0;
+
+  if ((!clientId || !clientSecret || !callbackUrlRaw) && allowLegacyFallback) {
+    clientId ||= String(process.env.GOOGLE_CLIENT_ID || "").trim();
+    clientSecret ||= String(process.env.GOOGLE_CLIENT_SECRET || "").trim();
+    callbackUrlRaw ||= String(process.env.GOOGLE_CALLBACK_URL || "").trim();
+  }
 
   if (!clientId || !clientSecret || !callbackUrlRaw) {
     throw new GmailOAuthError(
-      "Missing GOOGLE_GMAIL_CLIENT_ID/SECRET/CALLBACK_URL (or GOOGLE_CLIENT_ID/SECRET/CALLBACK_URL) for Gmail OAuth.",
+      strict
+        ? "Missing GOOGLE_GMAIL_CLIENT_ID/SECRET/CALLBACK_URL for Gmail OAuth. Generic GOOGLE_CLIENT_* fallback is disabled in strict mode."
+        : "Missing GOOGLE_GMAIL_CLIENT_ID/SECRET/CALLBACK_URL for Gmail OAuth.",
       "GMAIL_OAUTH_ENV_MISSING",
     );
   }
 
   if (isAllowedGmailCallbackUrl(callbackUrlRaw)) {
     return { clientId, clientSecret, callbackUrl: callbackUrlRaw };
+  }
+
+  if (strict && dedicatedCallbackExplicit) {
+    throw new GmailOAuthError(
+      "Invalid Gmail callback URL. Set GOOGLE_GMAIL_CALLBACK_URL (or *_URLS) to /api/integrations/gmail/callback.",
+      "GMAIL_OAUTH_CALLBACK_INVALID",
+    );
   }
 
   const fallback = pickDefaultAllowedGmailCallbackUrl();

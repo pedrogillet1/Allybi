@@ -108,7 +108,7 @@ async function sync(provider, opts = {}) {
 
 async function verifyOAuthCompletion(payload) {
   const response = await api.post("/api/integrations/oauth/verify", payload || {});
-  return Boolean(response?.valid);
+  return Boolean(response?.data?.valid ?? response?.valid);
 }
 
 export {

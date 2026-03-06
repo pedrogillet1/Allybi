@@ -2,6 +2,8 @@ import type { Response } from "express";
 import crypto from "crypto";
 
 const isProduction = process.env.NODE_ENV === "production";
+export const TWO_FACTOR_CHALLENGE_COOKIE = "koda_2fa_challenge";
+const TWO_FACTOR_CHALLENGE_MAX_AGE_MS = 5 * 60 * 1000;
 
 /**
  * Set HTTP-only auth cookies alongside JSON token responses.
@@ -45,4 +47,21 @@ export function clearAuthCookies(res: Response) {
   res.clearCookie("koda_at", { path: "/" });
   res.clearCookie("koda_rt", { path: "/" });
   res.clearCookie("koda_csrf", { path: "/" });
+}
+
+export function setTwoFactorChallengeCookie(
+  res: Response,
+  challengeToken: string,
+) {
+  res.cookie(TWO_FACTOR_CHALLENGE_COOKIE, challengeToken, {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: "lax",
+    path: "/",
+    maxAge: TWO_FACTOR_CHALLENGE_MAX_AGE_MS,
+  });
+}
+
+export function clearTwoFactorChallengeCookie(res: Response) {
+  res.clearCookie(TWO_FACTOR_CHALLENGE_COOKIE, { path: "/" });
 }

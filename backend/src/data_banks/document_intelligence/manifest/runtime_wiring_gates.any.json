@@ -106,15 +106,19 @@
             "date_patterns",
             "party_patterns",
             "identifier_patterns",
-            "di_doc_type_ontology"
+            "di_doc_type_ontology",
+            "di_table_ontology",
+            "entity_schema_finance"
           ],
           "bankIdPrefixes": [
             "di_doc_type_",
             "di_domain_",
             "di_entity_",
             "di_metric_",
+            "di_table_",
             "di_section_",
-            "di_unit_and_measurement_"
+            "di_unit_and_measurement_",
+            "entity_schema_"
           ],
           "bankIdPatterns": [
             "^(finance_kpi_ontology|accounting_rules|finance_doc_logic|legal_clause_ontology|legal_risk_heuristics|legal_reference_rules|medical_report_ontology|medical_safety_boundaries|medical_explanation_templates|ops_kpi_ontology|ops_doc_logic)$",

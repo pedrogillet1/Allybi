@@ -10,6 +10,8 @@ import {
   recordIndexingPlaintextOverrideActivation,
   recordIndexingPlaintextSensitiveFieldViolation,
   recordIndexingQualityMetrics,
+  recordRetrievalEncryptedFallbackBlocked,
+  recordRetrievalRelatedExpansion,
   recordXlsxRowsTruncated,
   recordTableExtractionMethod,
   getIngestionPercentiles,
@@ -182,6 +184,13 @@ describe("pipelineMetrics", () => {
       expect(summary.indexPlaintextSensitiveFieldViolations).toBe(0);
       expect(summary.indexPlaintextOverrideActivations).toBe(0);
       expect(summary.indexingActiveOperationConflicts).toBe(0);
+      expect(summary.retrievalRelatedExpansion).toEqual({
+        attempts: 0,
+        failures: 0,
+        truncatedDocs: 0,
+        addedDocs: 0,
+      });
+      expect(summary.retrievalEncryptedFallbackBlocked).toBe(0);
     });
   });
 
@@ -269,6 +278,37 @@ describe("pipelineMetrics", () => {
       recordIndexingPlaintextOverrideActivation();
       const summary = getMetricsSummary();
       expect(summary.indexPlaintextOverrideActivations).toBe(3);
+    });
+  });
+
+  describe("retrieval expansion/encryption counters", () => {
+    it("tracks related-doc expansion attempts/failures and truncation", () => {
+      recordRetrievalRelatedExpansion({
+        seedCount: 1,
+        expandedCount: 4,
+        returnedCount: 2,
+        truncatedCount: 2,
+      });
+      recordRetrievalRelatedExpansion({
+        seedCount: 1,
+        expandedCount: 1,
+        returnedCount: 1,
+        failed: true,
+      });
+      const summary = getMetricsSummary();
+      expect(summary.retrievalRelatedExpansion).toEqual({
+        attempts: 2,
+        failures: 1,
+        truncatedDocs: 2,
+        addedDocs: 3,
+      });
+    });
+
+    it("tracks encrypted fallback blocks", () => {
+      recordRetrievalEncryptedFallbackBlocked(2);
+      recordRetrievalEncryptedFallbackBlocked();
+      const summary = getMetricsSummary();
+      expect(summary.retrievalEncryptedFallbackBlocked).toBe(3);
     });
   });
 });

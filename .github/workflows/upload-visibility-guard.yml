@@ -96,12 +96,35 @@ jobs:
         working-directory: backend
         run: npm ci
 
+      - name: Run Prisma governance gate (pre-migration)
+        working-directory: backend
+        run: npm run prisma:governance:gate -- --phase pre-migrate
+        env:
+          DATABASE_URL: postgresql://koda:koda_password@localhost:5432/koda_db
+          DIRECT_DATABASE_URL: postgresql://koda:koda_password@localhost:5432/koda_db
+
       - name: Apply Prisma migrations
         working-directory: backend
         run: npx prisma migrate deploy
         env:
           DATABASE_URL: postgresql://koda:koda_password@localhost:5432/koda_db
           DIRECT_DATABASE_URL: postgresql://koda:koda_password@localhost:5432/koda_db
+
+      - name: Run Prisma governance gate (post-migration)
+        working-directory: backend
+        run: npm run prisma:governance:gate -- --phase post-migrate
+        env:
+          DATABASE_URL: postgresql://koda:koda_password@localhost:5432/koda_db
+          DIRECT_DATABASE_URL: postgresql://koda:koda_password@localhost:5432/koda_db
+          PRISMA_TELEMETRY_AUDIT_OUT: reports/prisma/telemetry-audit-upload-visibility.json
+
+      - name: Upload Prisma telemetry audit artifact
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: prisma-telemetry-audit-upload-visibility
+          path: backend/reports/prisma/telemetry-audit-upload-visibility.json
+          if-no-files-found: warn
 
       - name: Generate Prisma client
         working-directory: backend

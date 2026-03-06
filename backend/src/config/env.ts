@@ -73,8 +73,8 @@ interface EnvConfig {
   JWT_ALLOWED_ALGORITHMS: string;
   GOOGLE_CLIENT_ID: string;
   GOOGLE_CLIENT_SECRET: string;
-  GOOGLE_CALLBACK_URL: string;
-  GOOGLE_AUTH_CALLBACK_URL?: string;
+  GOOGLE_CALLBACK_URL?: string;
+  GOOGLE_AUTH_CALLBACK_URL: string;
   GOOGLE_GMAIL_CALLBACK_URL?: string;
   APPLE_CLIENT_ID: string;
   APPLE_TEAM_ID: string;
@@ -170,6 +170,33 @@ const getEnvVar = (key: string, required: boolean = true): string => {
   return value || "";
 };
 
+function resolveGoogleAuthCallbackUrl(): string {
+  const googleAuthCallback = String(
+    process.env.GOOGLE_AUTH_CALLBACK_URL || process.env.GOOGLE_CALLBACK_URL || "",
+  ).trim();
+
+  if (!googleAuthCallback) {
+    if (process.env.NODE_ENV === "test") return "";
+    throw new Error(
+      "Missing environment variable: GOOGLE_AUTH_CALLBACK_URL (or legacy GOOGLE_CALLBACK_URL)",
+    );
+  }
+
+  try {
+    // Enforce absolute callback URLs in non-test runtime.
+    // eslint-disable-next-line no-new
+    new URL(googleAuthCallback);
+  } catch {
+    if (process.env.NODE_ENV !== "test") {
+      throw new Error(
+        "Invalid GOOGLE_AUTH_CALLBACK_URL (or GOOGLE_CALLBACK_URL): expected absolute URL",
+      );
+    }
+  }
+
+  return googleAuthCallback;
+}
+
 export const config: EnvConfig = {
   PORT: parseInt(process.env.PORT || "5000", 10),
   NODE_ENV: process.env.NODE_ENV || "development",
@@ -184,9 +211,8 @@ export const config: EnvConfig = {
   JWT_ALLOWED_ALGORITHMS: process.env.JWT_ALLOWED_ALGORITHMS || "HS256",
   GOOGLE_CLIENT_ID: getEnvVar("GOOGLE_CLIENT_ID"),
   GOOGLE_CLIENT_SECRET: getEnvVar("GOOGLE_CLIENT_SECRET"),
-  GOOGLE_CALLBACK_URL: getEnvVar("GOOGLE_CALLBACK_URL"),
-  GOOGLE_AUTH_CALLBACK_URL:
-    process.env.GOOGLE_AUTH_CALLBACK_URL || process.env.GOOGLE_CALLBACK_URL,
+  GOOGLE_CALLBACK_URL: getEnvVar("GOOGLE_CALLBACK_URL", false),
+  GOOGLE_AUTH_CALLBACK_URL: resolveGoogleAuthCallbackUrl(),
   GOOGLE_GMAIL_CALLBACK_URL:
     process.env.GOOGLE_GMAIL_CALLBACK_URL || process.env.GOOGLE_CALLBACK_URL,
   APPLE_CLIENT_ID: getEnvVar("APPLE_CLIENT_ID", false),

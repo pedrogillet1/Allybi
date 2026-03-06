@@ -21,6 +21,7 @@ import {
 import {
   isMimeTypeSupportedForExtraction,
 } from "../../services/ingestion/extraction/extractionDispatch.service";
+import { isImageMime } from "../../services/ingestion/extraction/ingestionMimeRegistry.service";
 import { isPipelineSkipped } from "../../services/ingestion/pipeline/pipelineTypes";
 import {
   generatePreviewPdf,
@@ -328,19 +329,45 @@ export async function runDocumentIngestionPipeline(
     const skipReason = wasSkipped ? timings.skipReason : undefined;
     const skipCode = wasSkipped ? timings.skipCode : undefined;
     const sizeBucket = toSizeBucket(document.fileSize || null);
+    const keepVisibleWithoutText =
+      (skipCode === "IMAGE_VISUAL_ONLY" || skipCode === "NO_TEXT_CONTENT") &&
+      isImageMime(effectiveMimeType);
 
     if (wasSkipped || timings.chunkCount === 0) {
       const reason = skipReason || "No extractable text content";
-      const transitionResult = await documentStateManager.markSkipped(
-        documentId,
-        reason,
-      );
-      ensureTransitionSucceeded(transitionResult, "markSkipped");
-      emitToUser(userId, "document-skipped", {
-        documentId,
-        filename,
-        reason,
-      });
+      if (keepVisibleWithoutText) {
+        const readyWithoutContentResult =
+          await documentStateManager.markReadyWithoutContent(documentId);
+        if (readyWithoutContentResult.success) {
+          emitToUser(userId, "document-ready", {
+            documentId,
+            filename,
+            hasPreview: false,
+          });
+        } else {
+          const transitionResult = await documentStateManager.markSkipped(
+            documentId,
+            reason,
+          );
+          ensureTransitionSucceeded(transitionResult, "markSkipped");
+          emitToUser(userId, "document-skipped", {
+            documentId,
+            filename,
+            reason,
+          });
+        }
+      } else {
+        const transitionResult = await documentStateManager.markSkipped(
+          documentId,
+          reason,
+        );
+        ensureTransitionSucceeded(transitionResult, "markSkipped");
+        emitToUser(userId, "document-skipped", {
+          documentId,
+          filename,
+          reason,
+        });
+      }
 
       const totalTime = Date.now() - startTime;
       logger.info("[IngestionPipeline] Document skipped", {
@@ -380,6 +407,9 @@ export async function runDocumentIngestionPipeline(
                 ? timings.extractionWarningCodes.slice(0, 20)
                 : [],
               peakRssMb: timings.peakRssMb ?? null,
+              rssStartMb: timings.rssStartMb ?? null,
+              rssEndMb: timings.rssEndMb ?? null,
+              rssDeltaMb: timings.rssDeltaMb ?? null,
               sizeBucket,
             },
           },
@@ -469,6 +499,9 @@ export async function runDocumentIngestionPipeline(
             extractorDurationMs: (timings as any).extractorDurationMs ?? null,
             fileHash: timings.fileHash ?? null,
             peakRssMb: timings.peakRssMb ?? null,
+            rssStartMb: timings.rssStartMb ?? null,
+            rssEndMb: timings.rssEndMb ?? null,
+            rssDeltaMb: timings.rssDeltaMb ?? null,
             sizeBucket,
           },
         },

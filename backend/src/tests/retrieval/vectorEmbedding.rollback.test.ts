@@ -65,9 +65,9 @@ import { storeDocumentEmbeddings } from "../../services/retrieval/vectorEmbeddin
 
 describe("vectorEmbedding rollback", () => {
   beforeEach(() => {
-    process.env.INDEXING_ENCRYPTED_CHUNKS_ONLY = "false";
-    process.env.INDEXING_ALLOW_PLAINTEXT_CHUNKS = "true";
-    process.env.INDEXING_PLAINTEXT_OVERRIDE_REASON = "integration_test_override";
+    process.env.INDEXING_ENCRYPTED_CHUNKS_ONLY = "true";
+    delete process.env.INDEXING_ALLOW_PLAINTEXT_CHUNKS;
+    delete process.env.INDEXING_PLAINTEXT_OVERRIDE_REASON;
     delete process.env.INDEXING_ENFORCE_CHUNK_METADATA;
     delete process.env.INDEXING_ENFORCE_ENCRYPTED_ONLY;
     mockFindDocument.mockReset();
@@ -132,7 +132,7 @@ describe("vectorEmbedding rollback", () => {
           embedding: [0.11],
           metadata: { chunkType: "text", sourceType: "text", sectionId: "sec:rev" },
         }],
-        { maxRetries: 1, strictVerify: true, encryptionMode: "plaintext" },
+        { maxRetries: 1, strictVerify: true, encryptionMode: "encrypted_only" },
       ),
     ).rejects.toThrow("Failed to store embeddings for document doc-1");
 

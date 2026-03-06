@@ -5,6 +5,7 @@ import {
   buildOAuthCompletionPayload,
   clientSafeIntegrationMessage,
   resolveAllowedFrontendOrigins,
+  resolveOAuthCompletionMaxAgeMs,
   resolveOAuthPostMessageOrigin,
   verifyOAuthCompletionPayload,
 } from "./integrationRuntimePolicy.service";
@@ -13,8 +14,10 @@ const ENV_KEYS = [
   "FRONTEND_URL",
   "FRONTEND_URLS",
   "CONNECTOR_OAUTH_CALLBACK_SECRET",
+  "CONNECTOR_OAUTH_CALLBACK_STRICT_KEY",
   "CONNECTOR_OAUTH_STATE_SECRET",
   "ENCRYPTION_KEY",
+  "CONNECTOR_OAUTH_CALLBACK_MAX_AGE_MS",
 ] as const;
 
 const originalEnv = new Map<string, string | undefined>(
@@ -53,6 +56,8 @@ describe("integrationRuntimePolicy.service", () => {
     expect(payload.provider).toBe("gmail");
     expect(payload.ok).toBe(true);
     expect(payload.t).toBe(12345);
+    expect(typeof payload.n).toBe("string");
+    expect(payload.n.length).toBeGreaterThan(0);
     expect(typeof payload.sig).toBe("string");
     expect(payload.sig).not.toBeNull();
   });
@@ -63,6 +68,15 @@ describe("integrationRuntimePolicy.service", () => {
     const payload = buildOAuthCompletionPayload("gmail", true, now);
     expect(verifyOAuthCompletionPayload(payload, now + 30_000)).toBe(true);
     expect(verifyOAuthCompletionPayload(payload, now + 6 * 60_000)).toBe(false);
+  });
+
+  test("enforces max callback age cap and default", () => {
+    delete process.env.CONNECTOR_OAUTH_CALLBACK_MAX_AGE_MS;
+    expect(resolveOAuthCompletionMaxAgeMs()).toBe(5 * 60 * 1000);
+    process.env.CONNECTOR_OAUTH_CALLBACK_MAX_AGE_MS = String(20 * 60 * 1000);
+    expect(resolveOAuthCompletionMaxAgeMs()).toBe(15 * 60 * 1000);
+    process.env.CONNECTOR_OAUTH_CALLBACK_MAX_AGE_MS = "60000";
+    expect(resolveOAuthCompletionMaxAgeMs()).toBe(60_000);
   });
 
   test("fails closed when signature is missing, malformed, or secret absent", () => {
@@ -79,6 +93,15 @@ describe("integrationRuntimePolicy.service", () => {
     delete process.env.CONNECTOR_OAUTH_STATE_SECRET;
     delete process.env.ENCRYPTION_KEY;
     expect(verifyOAuthCompletionPayload(payload, 55_500)).toBe(false);
+  });
+
+  test("strict key mode requires dedicated callback secret", () => {
+    process.env.CONNECTOR_OAUTH_CALLBACK_STRICT_KEY = "true";
+    process.env.CONNECTOR_OAUTH_CALLBACK_SECRET = "";
+    process.env.CONNECTOR_OAUTH_STATE_SECRET = "legacy-state-secret";
+    process.env.ENCRYPTION_KEY = "legacy-encryption-secret";
+    const payload = buildOAuthCompletionPayload("gmail", true, 42_000);
+    expect(payload.sig).toBeNull();
   });
 
   test("returns fallback for server errors and keeps detail for client errors", () => {

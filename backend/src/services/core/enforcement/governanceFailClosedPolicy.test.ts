@@ -33,11 +33,11 @@ describe("governanceFailClosedPolicy", () => {
     expect(out.protectedEnv).toBe(true);
   });
 
-  test("uses configured failClosed in non-protected env", () => {
+  test("enforces fail-closed in non-protected env", () => {
     const out = resolveGovernanceFailClosed({
       nodeEnv: "development",
       runtimeEnv: "dev",
-      configuredFailClosed: true,
+      configuredFailClosed: false,
     });
     expect(out.failClosed).toBe(true);
     expect(out.protectedEnv).toBe(false);
@@ -53,14 +53,14 @@ describe("governanceFailClosedPolicy", () => {
     expect(out.failClosed).toBe(true);
   });
 
-  test("explicit opt-out only works in non-protected env", () => {
+  test("explicit opt-out is ignored in all environments", () => {
     const nonProtected = resolveGovernanceFailClosed({
       nodeEnv: "development",
       runtimeEnv: "dev",
       configuredFailClosed: true,
       strictGovernanceFlag: "false",
     });
-    expect(nonProtected.failClosed).toBe(false);
+    expect(nonProtected.failClosed).toBe(true);
 
     const protectedOut = resolveGovernanceFailClosed({
       nodeEnv: "production",
@@ -94,16 +94,16 @@ describe("governanceFailClosedPolicy", () => {
     expect(out.reasonCode).toBe("strict_fail_closed");
   });
 
-  test("allows quality gate opt-out in non-protected env only", () => {
+  test("ignores quality gate opt-out in non-protected env", () => {
     const out = resolveGovernanceQualityGateEnforcement({
       nodeEnv: "development",
       runtimeEnv: "dev",
       qualityGatesEnforcingFlag: "false",
       configuredFailClosed: false,
     });
-    expect(out.failClosed).toBe(false);
-    expect(out.enforceQualityGates).toBe(false);
-    expect(out.reasonCode).toBe("quality_gates_enforcing_disabled");
+    expect(out.failClosed).toBe(true);
+    expect(out.enforceQualityGates).toBe(true);
+    expect(out.reasonCode).toBe("strict_fail_closed");
   });
 
   test("forces quality gates when strict governance flag is true", () => {
@@ -123,7 +123,7 @@ describe("governanceFailClosedPolicy", () => {
       {
         id: "local-default",
         input: { nodeEnv: "development", runtimeEnv: "dev" },
-        expected: { failClosed: false, enforceQualityGates: true },
+        expected: { failClosed: true, enforceQualityGates: true },
       },
       {
         id: "local-optout",
@@ -132,7 +132,7 @@ describe("governanceFailClosedPolicy", () => {
           runtimeEnv: "dev",
           qualityGatesEnforcingFlag: "false",
         },
-        expected: { failClosed: false, enforceQualityGates: false },
+        expected: { failClosed: true, enforceQualityGates: true },
       },
       {
         id: "ci-profile-forces-strict",

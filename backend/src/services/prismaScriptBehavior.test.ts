@@ -10,6 +10,10 @@ const replayCore = require("../../scripts/prisma/replay-core.cjs");
 const verifyRlsCore = require("../../scripts/prisma/verify-rls-core.cjs");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const telemetryAuditCore = require("../../scripts/prisma/telemetry-audit-core.cjs");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const schemaTableManifest = require("../../scripts/prisma/schema-table-manifest.cjs");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const migrationSafetyCore = require("../../scripts/prisma/migration-safety-core.cjs");
 
 function withTempDir(testBody: (root: string) => void): void {
   const root = mkdtempSync(join(tmpdir(), "prisma-policy-"));
@@ -39,6 +43,27 @@ jobs:
       expect(() =>
         policyCore.assertNoCiDbPush(workflowsDir, join(root, "package.json")),
       ).toThrow("Forbidden Prisma CI patterns");
+    });
+  });
+
+  test("policy check fails when workflow directly uses prisma migrate reset", () => {
+    withTempDir((root) => {
+      const workflowsDir = join(root, ".github", "workflows");
+      mkdirSync(workflowsDir, { recursive: true });
+      writeFileSync(
+        join(workflowsDir, "ci.yml"),
+        `name: CI
+jobs:
+  test:
+    steps:
+      - run: npx prisma migrate reset --force
+`,
+      );
+      writeFileSync(join(root, "package.json"), '{"scripts":{}}');
+
+      expect(() =>
+        policyCore.assertNoCiDbPush(workflowsDir, join(root, "package.json")),
+      ).toThrow("prisma migrate reset");
     });
   });
 
@@ -138,6 +163,38 @@ jobs:
     });
   });
 
+  test("policy check fails when referenced script runs prisma migrate dev", () => {
+    withTempDir((root) => {
+      const workflowsDir = join(root, ".github", "workflows");
+      mkdirSync(workflowsDir, { recursive: true });
+      writeFileSync(
+        join(workflowsDir, "ci.yml"),
+        `name: CI
+jobs:
+  replay:
+    steps:
+      - run: npm run danger:migrate-dev
+`,
+      );
+      writeFileSync(
+        join(root, "package.json"),
+        JSON.stringify(
+          {
+            scripts: {
+              "danger:migrate-dev": "npx prisma migrate dev --name ci_drift",
+            },
+          },
+          null,
+          2,
+        ),
+      );
+
+      expect(() =>
+        policyCore.assertNoCiDbPush(workflowsDir, join(root, "package.json")),
+      ).toThrow("prisma migrate dev");
+    });
+  });
+
   test("policy check allows forbidden command in non-referenced script", () => {
     withTempDir((root) => {
       const workflowsDir = join(root, ".github", "workflows");
@@ -168,6 +225,76 @@ jobs:
       expect(() =>
         policyCore.assertNoCiDbPush(workflowsDir, join(root, "package.json")),
       ).not.toThrow();
+    });
+  });
+
+  test("policy check fails when workflow calls forbidden shell script", () => {
+    withTempDir((root) => {
+      const workflowsDir = join(root, ".github", "workflows");
+      const scriptsDir = join(root, "scripts");
+      mkdirSync(workflowsDir, { recursive: true });
+      mkdirSync(scriptsDir, { recursive: true });
+      writeFileSync(
+        join(workflowsDir, "ci.yml"),
+        `name: CI
+jobs:
+  replay:
+    steps:
+      - run: bash scripts/danger.sh
+`,
+      );
+      writeFileSync(
+        join(scriptsDir, "danger.sh"),
+        "npx prisma db execute --stdin < migration.sql\n",
+      );
+      writeFileSync(join(root, "package.json"), '{"scripts":{}}');
+
+      expect(() =>
+        policyCore.assertNoCiDbPush(workflowsDir, join(root, "package.json")),
+      ).toThrow("scripts/danger.sh");
+    });
+  });
+
+  test("policy check fails when referenced npm script calls forbidden shell script", () => {
+    withTempDir((root) => {
+      const workflowsDir = join(root, ".github", "workflows");
+      const backendDir = join(root, "backend");
+      const scriptsDir = join(root, "backend", "scripts");
+      mkdirSync(workflowsDir, { recursive: true });
+      mkdirSync(backendDir, { recursive: true });
+      mkdirSync(scriptsDir, { recursive: true });
+      writeFileSync(
+        join(workflowsDir, "ci.yml"),
+        `name: CI
+jobs:
+  replay:
+    steps:
+      - run: npm run danger:shell
+`,
+      );
+      writeFileSync(
+        join(scriptsDir, "danger.sh"),
+        "npx prisma migrate dev --name bad_idea\n",
+      );
+      writeFileSync(
+        join(root, "backend", "package.json"),
+        JSON.stringify(
+          {
+            scripts: {
+              "danger:shell": "bash scripts/danger.sh",
+            },
+          },
+          null,
+          2,
+        ),
+      );
+
+      expect(() =>
+        policyCore.assertNoCiDbPush(
+          workflowsDir,
+          join(root, "backend", "package.json"),
+        ),
+      ).toThrow("scripts/danger.sh");
     });
   });
 
@@ -251,5 +378,87 @@ jobs:
     expect(telemetryAuditCore.allRepairMigrationsApplied(required, history)).toBe(
       true,
     );
+  });
+
+  test("schema table manifest parser respects @@map and model defaults", () => {
+    const parsed = schemaTableManifest.parseSchemaMappedTables(`
+model User {
+  id String @id
+  @@map("users")
+}
+
+model Session {
+  id String @id
+}
+`);
+    expect(parsed).toEqual(["Session", "users"]);
+  });
+
+  test("migration safety parser normalizes migration timestamps", () => {
+    expect(migrationSafetyCore.parseMigrationTimestamp("20260307001000_name")).toBe(
+      "20260307001000",
+    );
+    expect(migrationSafetyCore.parseMigrationTimestamp("20260307_name")).toBe(
+      "20260307000000",
+    );
+    expect(migrationSafetyCore.parseMigrationTimestamp("invalid_name")).toBeNull();
+  });
+
+  test("migration safety scan flags sqlite and destructive SQL beyond baseline", () => {
+    withTempDir((root) => {
+      const migrationsDir = join(root, "prisma", "migrations");
+      const scriptsDir = join(root, "scripts", "prisma");
+      mkdirSync(join(migrationsDir, "20260307001000_safe"), { recursive: true });
+      mkdirSync(join(migrationsDir, "20260308000000_bad_sqlite"), {
+        recursive: true,
+      });
+      mkdirSync(join(migrationsDir, "20260309000000_bad_destructive"), {
+        recursive: true,
+      });
+      mkdirSync(scriptsDir, { recursive: true });
+
+      writeFileSync(
+        join(migrationsDir, "20260307001000_safe", "migration.sql"),
+        `CREATE TABLE "safe_table" ("id" TEXT PRIMARY KEY);`,
+      );
+      writeFileSync(
+        join(migrationsDir, "20260308000000_bad_sqlite", "migration.sql"),
+        `PRAGMA foreign_keys=OFF;`,
+      );
+      writeFileSync(
+        join(migrationsDir, "20260309000000_bad_destructive", "migration.sql"),
+        `DROP TABLE "users";`,
+      );
+      writeFileSync(
+        join(scriptsDir, "migration-safety-waivers.json"),
+        JSON.stringify(
+          {
+            baselineMigrationTimestamp: "20260307001000",
+            allowDestructiveMigrations: [],
+            allowSqliteTokenMigrations: [],
+          },
+          null,
+          2,
+        ),
+      );
+
+      const report = migrationSafetyCore.scanMigrationSafety({
+        migrationsDir,
+        waiverConfigPath: join(scriptsDir, "migration-safety-waivers.json"),
+      });
+
+      expect(report.issues).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            migration: "20260308000000_bad_sqlite",
+            type: "sqlite_tokens",
+          }),
+          expect.objectContaining({
+            migration: "20260309000000_bad_destructive",
+            type: "destructive_sql",
+          }),
+        ]),
+      );
+    });
   });
 });

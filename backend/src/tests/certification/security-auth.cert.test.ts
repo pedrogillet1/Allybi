@@ -259,7 +259,17 @@ describe("Certification: security auth hardening", () => {
       process.cwd(),
       "src/entrypoints/http/routes/auth.routes.ts",
     );
+    const gmailOAuthPath = path.resolve(
+      process.cwd(),
+      "src/services/connectors/gmail/gmailOAuth.service.ts",
+    );
+    const passportConfigPath = path.resolve(
+      process.cwd(),
+      "src/config/passport.ts",
+    );
     const authRoutesSource = fs.readFileSync(authRoutesPath, "utf8");
+    const gmailOAuthSource = fs.readFileSync(gmailOAuthPath, "utf8");
+    const passportConfigSource = fs.readFileSync(passportConfigPath, "utf8");
     const hasUrlTokenCompatFlag = /AUTH_URL_TOKEN_COMPAT/.test(authRoutesSource);
     const hasTokenQueryRedirect =
       /URLSearchParams\s*\(\s*\{[\s\S]*accessToken[\s\S]*refreshToken[\s\S]*\}\s*\)/.test(
@@ -278,6 +288,46 @@ describe("Certification: security auth hardening", () => {
     const hasGooglePassportStateOption = /state:\s*stateToken/.test(
       authRoutesSource,
     );
+    const hasGoogleAuthCallbackEnvUsage =
+      /GOOGLE_AUTH_CALLBACK_URL/.test(passportConfigSource) &&
+      /callbackURL:\s*googleCallbackUrl/.test(passportConfigSource);
+    const hasGoogleEmailVerifiedGuard = /email_not_verified/.test(
+      authRoutesSource,
+    );
+    const hasAppleStateIssue = /issueAppleOAuthState\s*\(/.test(authRoutesSource);
+    const hasAppleStateVerify = /verifyAppleOAuthState\s*\(/.test(authRoutesSource);
+    const hasAppleStateCookie = /koda_apple_oauth_state/.test(authRoutesSource);
+    const hasAppleNonceParam = /nonce:\s*nonce/.test(authRoutesSource);
+    const hasAppleIdTokenVerifier = /verifyAppleIdToken\s*\(/.test(
+      authRoutesSource,
+    );
+    const hasTwoFactorChallengeIssue = /issueTwoFactorLoginChallenge\s*\(/.test(
+      authRoutesSource,
+    );
+    const hasTwoFactorChallengeVerify =
+      /verifyTwoFactorLoginChallenge\s*\(/.test(authRoutesSource) &&
+      /consumeTwoFactorLoginChallenge\s*\(/.test(authRoutesSource);
+    const hasTwoFactorChallengeCookie = /koda_2fa_challenge/.test(
+      authRoutesSource,
+    );
+    const hasOAuthTwoFactorAuthCookieClear =
+      /clearAuthCookies\(res\)\s*;\s*setTwoFactorChallengeCookie\(res,\s*challengeToken\)/.test(
+        authRoutesSource,
+      );
+    const hasGmailConnectorCallbackPath =
+      /\/api\/integrations\/gmail\/callback/.test(gmailOAuthSource);
+    const hasGoogleLoginCallbackPath =
+      /\/google\/callback/.test(authRoutesSource);
+    const usesGenericGoogleFallbackInGmailOauth =
+      /process\.env\.GOOGLE_CLIENT_ID/.test(gmailOAuthSource) ||
+      /process\.env\.GOOGLE_CLIENT_SECRET/.test(gmailOAuthSource) ||
+      /process\.env\.GOOGLE_CALLBACK_URL/.test(gmailOAuthSource);
+    const hasGmailLegacyFallbackGuardFlag =
+      /CONNECTOR_GMAIL_ALLOW_GOOGLE_AUTH_FALLBACK/.test(gmailOAuthSource) &&
+      /CONNECTOR_GMAIL_STRICT_OAUTH_CONFIG/.test(gmailOAuthSource);
+    const unguardedGmailGenericFallback =
+      usesGenericGoogleFallbackInGmailOauth &&
+      !hasGmailLegacyFallbackGuardFlag;
     if (hasUrlTokenCompatFlag) failures.push("AUTH_URL_TOKEN_COMPAT_PRESENT");
     if (hasTokenQueryRedirect) failures.push("AUTH_TOKEN_QUERY_REDIRECT_PRESENT");
     if (!hasGoogleStateIssue) failures.push("GOOGLE_OAUTH_STATE_ISSUE_MISSING");
@@ -287,6 +337,31 @@ describe("Certification: security auth hardening", () => {
       failures.push("GOOGLE_OAUTH_STATE_VALIDATOR_NOT_WIRED");
     if (!hasGooglePassportStateOption)
       failures.push("GOOGLE_OAUTH_PASSPORT_STATE_OPTION_MISSING");
+    if (!hasGoogleAuthCallbackEnvUsage)
+      failures.push("GOOGLE_OAUTH_CALLBACK_ENV_USAGE_MISSING");
+    if (!hasGoogleEmailVerifiedGuard)
+      failures.push("GOOGLE_OAUTH_EMAIL_VERIFIED_GUARD_MISSING");
+    if (!hasAppleStateIssue) failures.push("APPLE_OAUTH_STATE_ISSUE_MISSING");
+    if (!hasAppleStateVerify) failures.push("APPLE_OAUTH_STATE_VERIFY_MISSING");
+    if (!hasAppleStateCookie) failures.push("APPLE_OAUTH_STATE_COOKIE_MISSING");
+    if (!hasAppleNonceParam) failures.push("APPLE_OAUTH_NONCE_PARAM_MISSING");
+    if (!hasAppleIdTokenVerifier)
+      failures.push("APPLE_OAUTH_IDTOKEN_VERIFY_MISSING");
+    if (!hasTwoFactorChallengeIssue)
+      failures.push("AUTH_2FA_CHALLENGE_ISSUE_MISSING");
+    if (!hasTwoFactorChallengeVerify)
+      failures.push("AUTH_2FA_CHALLENGE_VERIFY_MISSING");
+    if (!hasTwoFactorChallengeCookie)
+      failures.push("AUTH_2FA_CHALLENGE_COOKIE_MISSING");
+    if (!hasOAuthTwoFactorAuthCookieClear)
+      failures.push("AUTH_OAUTH_2FA_COOKIE_CLEAR_MISSING");
+    if (!hasGmailConnectorCallbackPath)
+      failures.push("GMAIL_CONNECTOR_CALLBACK_PATH_MISSING");
+    if (!hasGoogleLoginCallbackPath)
+      failures.push("GOOGLE_LOGIN_CALLBACK_PATH_MISSING");
+    if (unguardedGmailGenericFallback) {
+      failures.push("GMAIL_OAUTH_GENERIC_FALLBACK_UNGUARDED");
+    }
 
     // -- Static analysis: browser clients must not read auth tokens from localStorage
     // and dashboard code must not keep API keys in JS runtime state. --
@@ -322,7 +397,14 @@ describe("Certification: security auth hardening", () => {
         }
         if (
           /localStorage\.getItem\(["']token["']\)/.test(src) ||
-          /localStorage\.getItem\(["']accessToken["']\)/.test(src)
+          /localStorage\.getItem\(["']accessToken["']\)/.test(src) ||
+          /localStorage\.getItem\(["']refreshToken["']\)/.test(src) ||
+          /localStorage\.setItem\(["']token["']/.test(src) ||
+          /localStorage\.setItem\(["']accessToken["']/.test(src) ||
+          /localStorage\.setItem\(["']refreshToken["']/.test(src) ||
+          /sessionStorage\.setItem\(["']token["']/.test(src) ||
+          /sessionStorage\.setItem\(["']accessToken["']/.test(src) ||
+          /sessionStorage\.setItem\(["']refreshToken["']/.test(src)
         ) {
           frontendTokenReadPatterns++;
         }
@@ -432,6 +514,14 @@ describe("Certification: security auth hardening", () => {
         hasGoogleStateCookie,
         hasGoogleStateValidatorMiddleware,
         hasGooglePassportStateOption,
+        hasGoogleAuthCallbackEnvUsage,
+        hasGoogleEmailVerifiedGuard,
+        hasGmailConnectorCallbackPath,
+        hasGoogleLoginCallbackPath,
+        hasOAuthTwoFactorAuthCookieClear,
+        usesGenericGoogleFallbackInGmailOauth,
+        hasGmailLegacyFallbackGuardFlag,
+        unguardedGmailGenericFallback,
         frontendCompatFlagPatterns,
         frontendTokenReadPatterns,
         dashboardApiKeyPatterns,
@@ -456,6 +546,12 @@ describe("Certification: security auth hardening", () => {
         hasGoogleStateCookie: true,
         hasGoogleStateValidatorMiddleware: true,
         hasGooglePassportStateOption: true,
+        hasGoogleAuthCallbackEnvUsage: true,
+        hasGoogleEmailVerifiedGuard: true,
+        hasGmailConnectorCallbackPath: true,
+        hasGoogleLoginCallbackPath: true,
+        hasOAuthTwoFactorAuthCookieClear: true,
+        unguardedGmailGenericFallback: false,
         maxFrontendCompatFlagPatterns: 0,
         maxFrontendTokenReadPatterns: 0,
         maxDashboardApiKeyPatterns: 0,

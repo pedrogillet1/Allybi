@@ -93,12 +93,31 @@ export async function storeDocumentEmbeddings(
   let verificationPassed = false;
 
   if (shouldVerify) {
+    // Pinecone serverless indexes have eventual consistency — vectors may not
+    // be queryable immediately after upsert.  Retry verification with backoff
+    // to tolerate propagation delay (typically < 2s).
+    const VERIFY_MAX_RETRIES = 3;
+    const VERIFY_BASE_DELAY_MS = 2000;
+
     try {
-      await verifyIndexedVectorCount({
-        documentId,
-        userId,
-        operationId: currentOperationId || undefined,
-      });
+      let lastError: Error | null = null;
+      for (let attempt = 0; attempt <= VERIFY_MAX_RETRIES; attempt++) {
+        if (attempt > 0) {
+          await new Promise((r) => setTimeout(r, VERIFY_BASE_DELAY_MS * attempt));
+        }
+        try {
+          await verifyIndexedVectorCount({
+            documentId,
+            userId,
+            operationId: currentOperationId || undefined,
+          });
+          lastError = null;
+          break;
+        } catch (err: any) {
+          lastError = err instanceof Error ? err : new Error(String(err));
+        }
+      }
+      if (lastError) throw lastError;
       verificationPassed = true;
     } catch (error: any) {
       const message = String(error?.message || error || "unknown_error");

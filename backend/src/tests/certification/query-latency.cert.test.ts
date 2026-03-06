@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import crypto from "node:crypto";
 import { describe, expect, test } from "@jest/globals";
 
 import { writeCertificationGateReport } from "./reporting";
@@ -109,6 +110,30 @@ function isRuntimeFailureCode(value: unknown): boolean {
   return runtimeSignals.some((token) => code.includes(token));
 }
 
+function parseBooleanFlag(value: string | undefined): boolean {
+  const raw = String(value || "").trim().toLowerCase();
+  return raw === "1" || raw === "true";
+}
+
+function computeFileFingerprint(filePath: string): {
+  path: string;
+  sha256: string;
+  bytes: number;
+} | null {
+  const normalized = normalizePath(filePath);
+  if (!normalized || !fs.existsSync(normalized)) return null;
+  try {
+    const payload = fs.readFileSync(normalized);
+    return {
+      path: normalized,
+      sha256: crypto.createHash("sha256").update(payload).digest("hex"),
+      bytes: payload.byteLength,
+    };
+  } catch {
+    return null;
+  }
+}
+
 describe("Certification: query latency gate", () => {
   test("records p95 query latency and pass/fail thresholds", () => {
     const failures: string[] = [];
@@ -160,19 +185,44 @@ describe("Certification: query latency gate", () => {
     const errorRate = total > 0 ? runtimeErrorCount / total : 1;
     const timeoutRate = total > 0 ? timeoutCount / total : 1;
     const qualityFailRate = total > 0 ? qualityFailCount / total : 1;
+    const strictProfiles = new Set([
+      "ci",
+      "release",
+      "retrieval_signoff",
+      "local_hard",
+    ]);
+    const certProfile = String(process.env.CERT_PROFILE || "")
+      .trim()
+      .toLowerCase();
+    const strictMode = parseBooleanFlag(process.env.CERT_STRICT);
+    const qualityFailPolicy =
+      strictMode && (strictProfiles.has(certProfile) || certProfile.length === 0)
+        ? "blocking"
+        : "advisory";
+    const maxQualityFailRate = Number(
+      process.env.CERT_QUERY_MAX_QUALITY_FAIL_RATE || "0.25",
+    );
+    const inputFingerprint = computeFileFingerprint(reportPath);
 
     if (total <= 0) failures.push("EMPTY_PER_QUERY_REPORT");
     if (p95LatencyMs == null) failures.push("MISSING_LATENCY_VALUES");
+    if (!inputFingerprint) failures.push("INPUT_REPORT_FINGERPRINT_UNAVAILABLE");
     if (p95LatencyMs != null && p95LatencyMs > 12000) {
       failures.push("P95_LATENCY_EXCEEDED");
     }
     if (errorRate > 0.02) failures.push("ERROR_RATE_EXCEEDED");
     if (timeoutRate > 0.01) failures.push("TIMEOUT_RATE_EXCEEDED");
+    if (qualityFailRate > maxQualityFailRate && qualityFailPolicy === "blocking") {
+      failures.push("QUALITY_FAIL_RATE_EXCEEDED");
+    }
 
     writeCertificationGateReport("query-latency", {
       passed: failures.length === 0,
       metrics: {
         reportPath,
+        inputReportPath: inputFingerprint?.path || null,
+        inputReportSha256: inputFingerprint?.sha256 || null,
+        inputReportBytes: inputFingerprint?.bytes || null,
         totalQueries: total,
         p95LatencyMs: p95LatencyMs == null ? null : Math.round(p95LatencyMs),
         runtimeErrorCount,
@@ -180,11 +230,13 @@ describe("Certification: query latency gate", () => {
         errorRate,
         timeoutRate,
         qualityFailRate,
+        qualityFailPolicy,
       },
       thresholds: {
         p95LatencyMsMax: 12000,
         errorRateMax: 0.02,
         timeoutRateMax: 0.01,
+        maxQualityFailRate,
       },
       failures,
     });

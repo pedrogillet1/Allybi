@@ -71,8 +71,12 @@ describe("PrismaRetrievalAdapterFactory encrypted chunk hydration", () => {
     mockGenerateQueryEmbedding.mockReset();
     delete process.env.RETRIEVAL_INCLUDE_RELATED_DOCS;
     delete process.env.RETRIEVAL_INCLUDE_RELATED_DOCS_STRICT;
+    delete process.env.RETRIEVAL_RELATED_DOC_RELATIONSHIP_TYPES;
+    delete process.env.RETRIEVAL_RELATED_DOC_MAX_DOCS;
     mockDocumentFindMany.mockResolvedValue([]);
     mockDocumentLinkFindMany.mockResolvedValue([]);
+    mockChunkFindMany.mockResolvedValue([]);
+    mockDecryptChunksBatch.mockResolvedValue(new Map());
     mockDecryptChunkMetadataBatch.mockResolvedValue(new Map());
   });
 
@@ -289,8 +293,8 @@ describe("PrismaRetrievalAdapterFactory encrypted chunk hydration", () => {
         id: "chunk-enc-table-1",
         documentId: "doc-enc-1",
         chunkIndex: 9,
-        text: "Revenue / Q1 = $900",
-        textEncrypted: null,
+        text: null,
+        textEncrypted: '{"v":1}',
         metadataEncrypted: '{"v":1}',
         page: null,
         tableChunkForm: null,
@@ -333,6 +337,9 @@ describe("PrismaRetrievalAdapterFactory encrypted chunk hydration", () => {
           },
         ],
       ]),
+    );
+    mockDecryptChunksBatch.mockResolvedValue(
+      new Map([["chunk-enc-table-1", "Revenue / Q1 = $900"]]),
     );
 
     const deps = new PrismaRetrievalAdapterFactory().createForUser("user-1");
@@ -578,6 +585,233 @@ describe("PrismaRetrievalAdapterFactory encrypted chunk hydration", () => {
 
     expect(hits).toHaveLength(1);
     expect(hits[0].docId).toBe("doc-root");
+  });
+
+  test("related-doc expansion includes attachment/reference relationships by default", async () => {
+    process.env.RETRIEVAL_INCLUDE_RELATED_DOCS = "true";
+    mockPineconeAvailable.mockReturnValue(true);
+    mockGenerateQueryEmbedding.mockResolvedValue({
+      embedding: [0.11, 0.22],
+      model: "text-embedding-3-small",
+      tokens: 8,
+    });
+    mockDocumentFindMany
+      .mockResolvedValueOnce([{ id: "doc-root", parentVersionId: null }])
+      .mockResolvedValueOnce([
+        {
+          id: "doc-root",
+          parentVersionId: null,
+          createdAt: new Date("2026-01-01T00:00:00.000Z"),
+          updatedAt: new Date("2026-01-01T00:00:00.000Z"),
+        },
+      ])
+      .mockResolvedValueOnce([{ id: "doc-root" }]);
+    mockDocumentLinkFindMany.mockResolvedValue([]);
+    mockSearchSimilarChunks.mockResolvedValue([]);
+
+    const deps = new PrismaRetrievalAdapterFactory().createForUser("user-1");
+    await deps.semanticIndex.search({
+      query: "show related attachments",
+      docIds: ["doc-root"],
+      k: 2,
+    });
+
+    const firstCall = mockDocumentLinkFindMany.mock.calls[0]?.[0] || {};
+    const relationshipTypes = firstCall?.where?.relationshipType?.in ?? [];
+    expect(relationshipTypes).toEqual(
+      expect.arrayContaining(["amends", "attachment", "references", "related"]),
+    );
+  });
+
+  test("related-doc expansion honors RETRIEVAL_RELATED_DOC_RELATIONSHIP_TYPES override", async () => {
+    process.env.RETRIEVAL_INCLUDE_RELATED_DOCS = "true";
+    process.env.RETRIEVAL_RELATED_DOC_RELATIONSHIP_TYPES = "attachment,related";
+    mockPineconeAvailable.mockReturnValue(true);
+    mockGenerateQueryEmbedding.mockResolvedValue({
+      embedding: [0.11, 0.22],
+      model: "text-embedding-3-small",
+      tokens: 8,
+    });
+    mockDocumentFindMany
+      .mockResolvedValueOnce([{ id: "doc-root", parentVersionId: null }])
+      .mockResolvedValueOnce([
+        {
+          id: "doc-root",
+          parentVersionId: null,
+          createdAt: new Date("2026-01-01T00:00:00.000Z"),
+          updatedAt: new Date("2026-01-01T00:00:00.000Z"),
+        },
+      ])
+      .mockResolvedValueOnce([{ id: "doc-root" }]);
+    mockDocumentLinkFindMany.mockResolvedValue([]);
+    mockSearchSimilarChunks.mockResolvedValue([]);
+
+    const deps = new PrismaRetrievalAdapterFactory().createForUser("user-1");
+    await deps.semanticIndex.search({
+      query: "show related attachments",
+      docIds: ["doc-root"],
+      k: 2,
+    });
+
+    const firstCall = mockDocumentLinkFindMany.mock.calls[0]?.[0] || {};
+    expect(firstCall?.where?.relationshipType?.in).toEqual([
+      "attachment",
+      "related",
+    ]);
+  });
+
+  test("related-doc expansion is bounded by RETRIEVAL_RELATED_DOC_MAX_DOCS", async () => {
+    process.env.RETRIEVAL_INCLUDE_RELATED_DOCS = "true";
+    process.env.RETRIEVAL_RELATED_DOC_MAX_DOCS = "2";
+    mockPineconeAvailable.mockReturnValue(true);
+    mockGenerateQueryEmbedding.mockResolvedValue({
+      embedding: [0.11, 0.22],
+      model: "text-embedding-3-small",
+      tokens: 8,
+    });
+    mockDocumentFindMany
+      .mockResolvedValueOnce([{ id: "doc-root", parentVersionId: null }])
+      .mockResolvedValueOnce([
+        {
+          id: "doc-root",
+          parentVersionId: null,
+          createdAt: new Date("2026-01-01T00:00:00.000Z"),
+          updatedAt: new Date("2026-01-01T00:00:00.000Z"),
+        },
+        {
+          id: "doc-att-1",
+          parentVersionId: null,
+          createdAt: new Date("2026-01-01T00:00:00.000Z"),
+          updatedAt: new Date("2026-01-01T00:00:00.000Z"),
+        },
+        {
+          id: "doc-att-2",
+          parentVersionId: null,
+          createdAt: new Date("2026-01-01T00:00:00.000Z"),
+          updatedAt: new Date("2026-01-01T00:00:00.000Z"),
+        },
+      ])
+      .mockResolvedValueOnce([
+        { id: "doc-root" },
+        { id: "doc-att-1" },
+        { id: "doc-att-2" },
+      ]);
+    mockDocumentLinkFindMany.mockResolvedValue([
+      { sourceDocumentId: "doc-root", targetDocumentId: "doc-att-1" },
+      { sourceDocumentId: "doc-root", targetDocumentId: "doc-att-2" },
+    ]);
+    mockSearchSimilarChunks.mockResolvedValue([]);
+
+    const deps = new PrismaRetrievalAdapterFactory().createForUser("user-1");
+    await deps.semanticIndex.search({
+      query: "show related attachments",
+      docIds: ["doc-root"],
+      k: 2,
+    });
+
+    // semantic search called once per expanded scoped doc id; cap should keep it to 2 docs.
+    expect(mockSearchSimilarChunks).toHaveBeenCalledTimes(2);
+    delete process.env.RETRIEVAL_RELATED_DOC_MAX_DOCS;
+  });
+
+  test("encrypted runtime does not use plaintext chunk fallback when encrypted text is absent", async () => {
+    process.env.INDEXING_ENCRYPTED_CHUNKS_ONLY = "true";
+    process.env.RETRIEVAL_LEXICAL_FROM_EMBEDDINGS = "true";
+    mockChunkFindMany.mockResolvedValue([
+      {
+        id: "chunk-plaintext-only",
+        documentId: "doc-secure-1",
+        chunkIndex: 0,
+        text: "Revenue Q1 is $999.",
+        textEncrypted: null,
+        metadataEncrypted: null,
+        page: null,
+        tableChunkForm: null,
+        tableId: null,
+        rowLabel: null,
+        colHeader: null,
+        valueRaw: null,
+        unitRaw: null,
+        unitNormalized: null,
+        metadata: { sourceType: "xlsx", chunkType: "text" },
+        document: {
+          id: "doc-secure-1",
+          parentVersionId: null,
+          filename: "secure.xlsx",
+          displayTitle: "Secure",
+          encryptedFilename: "users/u-1/secure.xlsx",
+          mimeType:
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          createdAt: new Date("2026-01-01T00:00:00.000Z"),
+          updatedAt: new Date("2026-01-01T00:00:00.000Z"),
+        },
+      },
+    ]);
+    mockDecryptChunksBatch.mockResolvedValue(new Map());
+
+    const deps = new PrismaRetrievalAdapterFactory().createForUser("user-1");
+    const hits = await deps.lexicalIndex.search({
+      query: "revenue q1",
+      k: 2,
+    });
+
+    expect(hits).toHaveLength(0);
+    process.env.INDEXING_ENCRYPTED_CHUNKS_ONLY = "false";
+    process.env.RETRIEVAL_LEXICAL_FROM_EMBEDDINGS = "false";
+  });
+
+  test("encrypted runtime redacts plaintext table columns when metadata decrypt is unavailable", async () => {
+    process.env.INDEXING_ENCRYPTED_CHUNKS_ONLY = "true";
+    process.env.RETRIEVAL_LEXICAL_FROM_EMBEDDINGS = "true";
+    mockChunkFindMany.mockResolvedValue([
+      {
+        id: "chunk-redact-1",
+        documentId: "doc-secure-2",
+        chunkIndex: 4,
+        text: null,
+        textEncrypted: '{"v":1}',
+        metadataEncrypted: '{"v":1}',
+        page: null,
+        tableChunkForm: "cell_centric",
+        tableId: "sheet:Financials",
+        rowLabel: "Revenue",
+        colHeader: "Q1",
+        valueRaw: "$900",
+        unitRaw: "$",
+        unitNormalized: "currency_usd",
+        metadata: {
+          sourceType: "xlsx",
+          chunkType: "cell_fact",
+        },
+        document: {
+          id: "doc-secure-2",
+          parentVersionId: null,
+          filename: "secure-financials.xlsx",
+          displayTitle: "Secure Financials",
+          encryptedFilename: "users/u-1/secure-financials.xlsx",
+          mimeType:
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          createdAt: new Date("2026-01-01T00:00:00.000Z"),
+          updatedAt: new Date("2026-01-01T00:00:00.000Z"),
+        },
+      },
+    ]);
+    mockDecryptChunksBatch.mockResolvedValue(
+      new Map([["chunk-redact-1", "Revenue / Q1 = $900"]]),
+    );
+    mockDecryptChunkMetadataBatch.mockResolvedValue(new Map());
+
+    const deps = new PrismaRetrievalAdapterFactory().createForUser("user-1");
+    const hits = await deps.lexicalIndex.search({
+      query: "revenue q1",
+      k: 2,
+    });
+
+    expect(hits).toHaveLength(1);
+    expect(hits[0].table?.header).toBeUndefined();
+    expect(hits[0].table?.rows?.[0]?.[0]).toBe("Revenue / Q1 = $900");
+    process.env.INDEXING_ENCRYPTED_CHUNKS_ONLY = "false";
+    process.env.RETRIEVAL_LEXICAL_FROM_EMBEDDINGS = "false";
   });
 
   test("strict related-doc expansion mode throws when link lookup fails", async () => {

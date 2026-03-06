@@ -1256,4 +1256,182 @@ describe("LlmGatewayService retrieval-plan producer", () => {
     );
     expect(errorEvent).toBeDefined();
   });
+
+  test("strict provider consistency skips disallowed routed model and executes allowed fallback", async () => {
+    const openaiClient: LLMClient = {
+      provider: "openai",
+      complete: jest.fn(async () => ({
+        traceId: "trace-consistency-1",
+        turnId: "turn-consistency-1",
+        model: { provider: "openai", model: "model-not-allowlisted" },
+        content: "should-not-run",
+      })),
+      stream: jest.fn(async () => ({
+        traceId: "trace-consistency-1",
+        turnId: "turn-consistency-1",
+        model: { provider: "openai", model: "model-not-allowlisted" },
+        finalText: "",
+      })),
+    };
+    const googleClient: LLMClient = {
+      provider: "google",
+      complete: jest.fn(async () => ({
+        traceId: "trace-consistency-1",
+        turnId: "turn-consistency-1",
+        model: { provider: "google", model: "gemini-2.5-flash" },
+        content: "fallback-ok",
+      })),
+      stream: jest.fn(async () => ({
+        traceId: "trace-consistency-1",
+        turnId: "turn-consistency-1",
+        model: { provider: "google", model: "gemini-2.5-flash" },
+        finalText: "",
+      })),
+    };
+    const router: any = {
+      route: jest.fn(() => ({
+        provider: "openai",
+        model: "model-not-allowlisted",
+        reason: "quality_finish",
+        stage: "final",
+        constraints: {},
+      })),
+      listFallbackTargets: jest.fn(() => [
+        { provider: "gemini", model: "gemini-2.5-flash" },
+      ]),
+    };
+    const builder: any = {
+      build: jest.fn((input: any) => ({
+        route: input.route,
+        messages: [{ role: "system", content: "compose" }],
+        options: { stream: false, maxOutputTokens: 256 },
+        kodaMeta: {
+          promptType: "compose_answer",
+          promptTrace: {
+            orderedPrompts: [
+              {
+                bankId: "compose_prompt",
+                version: "1.0.0",
+                templateId: "compose_prompt:templates.en",
+                hash: "h",
+              },
+            ],
+          },
+        },
+      })),
+    };
+
+    const gateway = new LlmGatewayService(
+      openaiClient,
+      router,
+      builder,
+      {
+        env: "production",
+        provider: "openai",
+        modelId: "gpt-5.2",
+      },
+      {
+        resolve(provider) {
+          if (provider === "google") return googleClient;
+          return null;
+        },
+      },
+    );
+
+    const out = await gateway.generate({
+      traceId: "trace-consistency-1",
+      userId: "u1",
+      conversationId: "c1",
+      messages: [{ role: "user", content: "hello" }],
+    });
+
+    expect((openaiClient.complete as jest.Mock).mock.calls).toHaveLength(0);
+    expect((googleClient.complete as jest.Mock).mock.calls).toHaveLength(1);
+    expect(out.text).toBe("fallback-ok");
+    expect(out.telemetry?.attemptCount).toBe(2);
+    const attempts = out.telemetry?.attempts as Array<{ errorCode?: string }> | undefined;
+    expect(attempts?.[0]?.errorCode).toBe("PROVIDER_CONSISTENCY_ROUTE_BLOCKED");
+  });
+
+  test("strict provider consistency blocks provider-executed disallowed model", async () => {
+    const openaiClient: LLMClient = {
+      provider: "openai",
+      complete: jest.fn(async () => ({
+        traceId: "trace-consistency-2",
+        turnId: "turn-consistency-2",
+        model: { provider: "openai", model: "gpt-5.2" },
+        executedModel: { provider: "openai", model: "model-not-allowlisted" },
+        content: "bad-executed-model",
+      })),
+      stream: jest.fn(async () => ({
+        traceId: "trace-consistency-2",
+        turnId: "turn-consistency-2",
+        model: { provider: "openai", model: "gpt-5.2" },
+        finalText: "",
+      })),
+    };
+    const router: any = {
+      route: jest.fn(() => ({
+        provider: "openai",
+        model: "gpt-5.2",
+        reason: "quality_finish",
+        stage: "final",
+        constraints: {},
+      })),
+      listFallbackTargets: jest.fn(() => []),
+    };
+    const builder: any = {
+      build: jest.fn((input: any) => ({
+        route: input.route,
+        messages: [{ role: "system", content: "compose" }],
+        options: { stream: false, maxOutputTokens: 256 },
+        kodaMeta: {
+          promptType: "compose_answer",
+          promptTrace: {
+            orderedPrompts: [
+              {
+                bankId: "compose_prompt",
+                version: "1.0.0",
+                templateId: "compose_prompt:templates.en",
+                hash: "h",
+              },
+            ],
+          },
+        },
+      })),
+    };
+
+    const gateway = new LlmGatewayService(
+      openaiClient,
+      router,
+      builder,
+      {
+        env: "production",
+        provider: "openai",
+        modelId: "gpt-5.2",
+      },
+      {
+        resolve() {
+          return null;
+        },
+      },
+    );
+
+    try {
+      await gateway.generate({
+        traceId: "trace-consistency-2",
+        userId: "u1",
+        conversationId: "c1",
+        messages: [{ role: "user", content: "hello" }],
+      });
+      throw new Error("should have thrown");
+    } catch (err) {
+      expect(err).toBeInstanceOf(FallbackExhaustedError);
+      const exhausted = err as FallbackExhaustedError;
+      expect(exhausted.attempts).toHaveLength(1);
+      expect(exhausted.attempts[0]?.errorCode).toBe(
+        "PROVIDER_CONSISTENCY_EXECUTION_BLOCKED",
+      );
+    }
+  });
 });

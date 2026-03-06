@@ -25,6 +25,7 @@ import PhoneNumberPending from './components/auth/PhoneNumberPending';
 import VerificationPending from './components/auth/VerificationPending';
 import VerifyRecoveryEmail from './components/auth/VerifyRecoveryEmail';
 import VerifyRecoveryPhone from './components/auth/VerifyRecoveryPhone';
+import TwoFactorLogin from './components/auth/TwoFactorLogin';
 import Upload from './components/upload/Upload';
 import RecoverAccess from './components/auth/RecoverAccess';
 import ForgotPassword from './components/auth/ForgotPassword';
@@ -154,6 +155,7 @@ function AppContent() {
               <Route path={ROUTES.VERIFY_EMAIL} element={<VerifyEmail variant="page" />} />
               <Route path={ROUTES.PHONE_NUMBER_PENDING} element={<PhoneNumberPending variant="page" />} />
               <Route path={ROUTES.VERIFICATION_PENDING} element={<VerificationPending variant="page" />} />
+              <Route path={ROUTES.TWO_FACTOR_LOGIN} element={<TwoFactorLogin variant="page" />} />
               <Route path={ROUTES.AUTH_CALLBACK} element={<OAuthCallback variant="page" />} />
               <Route path={ROUTES.PHONE_NUMBER} element={<PhoneNumber variant="page" />} />
               <Route path={ROUTES.VERIFY_PHONE} element={<Verification variant="page" />} />

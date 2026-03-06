@@ -42,12 +42,11 @@ const Login = () => {
     try {
       const response = await login({ email, password, rememberMe });
 
-      // If 2FA is required, navigate to 2FA verification page
-      if (response.requires2FA) {
-        navigate(ROUTES.AUTH, {
+      // If 2FA is required, navigate to 2FA login verification.
+      if (response.requiresTwoFactor || response.requires2FA) {
+        navigate(ROUTES.TWO_FACTOR_LOGIN, {
           state: {
-            userId: response.userId,
-            tempToken: response.tempToken,
+            challengeToken: response.challengeToken || response.tempToken,
             email: email
           }
         });

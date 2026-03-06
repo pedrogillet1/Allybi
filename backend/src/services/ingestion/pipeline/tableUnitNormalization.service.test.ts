@@ -34,6 +34,24 @@ describe("normalizeCellUnit", () => {
     expect(r.unitNormalized).toBe("currency_brl");
   });
 
+  test("detects EUR from euro symbol", () => {
+    const r = normalizeCellUnit({ value: "€ 42.50" });
+    expect(r.unitNormalized).toBe("currency_eur");
+    expect(r.unitRaw).toBe("€");
+  });
+
+  test("detects GBP from pound symbol", () => {
+    const r = normalizeCellUnit({ value: "£1,250" });
+    expect(r.unitNormalized).toBe("currency_gbp");
+    expect(r.unitRaw).toBe("£");
+  });
+
+  test("detects JPY from yen symbol", () => {
+    const r = normalizeCellUnit({ value: "¥8000" });
+    expect(r.unitNormalized).toBe("currency_jpy");
+    expect(r.unitRaw).toBe("¥");
+  });
+
   // Scale/magnitude detection
   test("detects millions multiplier from header", () => {
     const r = normalizeCellUnit({

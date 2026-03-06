@@ -15,7 +15,6 @@
  */
 
 import { randomUUID, createHash } from "crypto";
-import type { Prisma } from "@prisma/client";
 
 import prisma from "../../config/database";
 import { logger } from "../../utils/logger";
@@ -50,7 +49,7 @@ export interface StoreEmbeddingsOptions {
   minContentChars?: number; // default: 8 (skip useless chunks)
   strictVerify?: boolean; // default: true
   preDeleteVectors?: boolean; // default: true
-  encryptionMode?: "encrypted_only" | "plaintext";
+  encryptionMode?: "encrypted_only";
 }
 
 interface ChunkEncryptionServices {
@@ -214,10 +213,6 @@ function hasSensitivePlaintextMetadata(metadata: Record<string, any>): boolean {
   return false;
 }
 
-function toPrismaJsonValue(value: unknown): Prisma.InputJsonValue {
-  return JSON.parse(JSON.stringify(value ?? {})) as Prisma.InputJsonValue;
-}
-
 function serializeMetadata(value: unknown): string {
   try {
     return JSON.stringify(value ?? {});
@@ -245,12 +240,14 @@ function hasRequiredChunkMetadata(chunk: {
   metadata?: Record<string, any>;
 }): boolean {
   const metadata = chunk.metadata || {};
+  const hasSectionId =
+    typeof metadata.sectionId === "string" && metadata.sectionId.trim().length > 0;
   const hasBase =
     typeof metadata.chunkType === "string" &&
     metadata.chunkType.trim().length > 0 &&
     typeof metadata.sourceType === "string" &&
     metadata.sourceType.trim().length > 0;
-  if (!hasBase) return false;
+  if (!hasBase || !hasSectionId) return false;
   const sourceType = String(metadata.sourceType || "")
     .trim()
     .toLowerCase();
@@ -262,7 +259,11 @@ function hasRequiredChunkMetadata(chunk: {
   const hasCellCoordinates =
     Number.isFinite(metadata.rowIndex) && Number.isFinite(metadata.columnIndex);
   const hasCellLabels = Boolean(metadata.rowLabel && metadata.colHeader);
+  const isRowAggregate = String(metadata.tableChunkForm || "").trim().toLowerCase() === "row_aggregate";
   if (chunkType === "cell_fact") {
+    if (isRowAggregate) {
+      return Boolean(metadata.tableId) && Boolean(metadata.rowLabel);
+    }
     return Boolean(metadata.tableId) && (Boolean(metadata.cellRef) || hasCellCoordinates || hasCellLabels);
   }
 
@@ -415,13 +416,9 @@ export async function storeDocumentEmbeddings(
     minContentChars = 8,
     strictVerify = indexingPolicy.strictFailClosed,
     preDeleteVectors = true,
-    encryptionMode = indexingPolicy.encryptedChunksOnly
-      ? "encrypted_only"
-      : "plaintext",
+    encryptionMode = "encrypted_only",
   } = options;
   const strictFailClosed = indexingPolicy.strictFailClosed;
-  const enforceEncryptedOnlyInvariant =
-    indexingPolicy.enforceEncryptedOnlyInvariant;
   const enforceChunkMetadataInvariant =
     indexingPolicy.enforceChunkMetadataInvariant;
   const enforceVersionMetadataInvariant =
@@ -431,13 +428,9 @@ export async function storeDocumentEmbeddings(
   if (!chunks || chunks.length === 0) {
     throw new Error(`CRITICAL: No chunks provided for document ${documentId}`);
   }
-  if (
-    enforceEncryptedOnlyInvariant &&
-    indexingPolicy.encryptedChunksOnly &&
-    encryptionMode !== "encrypted_only"
-  ) {
+  if (encryptionMode !== "encrypted_only") {
     throw new Error(
-      "INDEXING_ENCRYPTED_CHUNKS_ONLY is enabled; plaintext embedding mode is not allowed.",
+      "Plaintext embedding mode is no longer supported. Use encrypted_only.",
     );
   }
 
@@ -511,13 +504,9 @@ export async function storeDocumentEmbeddings(
       Number.isFinite(metadata.scaleMultiplier)
     );
   }).length;
-  const encryptionExpected = indexingPolicy.encryptedChunksOnly;
+  const encryptionExpected = true;
   const encryptionTotal = usableChunks.length;
-  const encryptionCompliant = encryptionExpected
-    ? encryptionMode === "encrypted_only"
-      ? encryptionTotal
-      : 0
-    : encryptionTotal;
+  const encryptionCompliant = encryptionTotal;
   recordIndexingQualityMetrics({
     metadataComplete,
     metadataTotal,
@@ -632,16 +621,12 @@ export async function storeDocumentEmbeddings(
 
       const pineconeChunks = usableChunks.map((c) => ({
         chunkIndex: c.chunkIndex,
-        content: encryptionMode === "encrypted_only" ? "" : c.content,
+        content: "",
         embedding: c.embedding || [],
         metadata: {
-          ...(encryptionMode === "encrypted_only"
-            ? sanitizeStoredChunkMetadata(c.metadata || {})
-            : (c.metadata || {})),
+          ...sanitizeStoredChunkMetadata(c.metadata || {}),
           ...sharedIndexingMetadata,
-          ...(encryptionMode === "encrypted_only"
-            ? { contentHash: createHash("sha256").update(c.content).digest("hex") }
-            : {}),
+          contentHash: createHash("sha256").update(c.content).digest("hex"),
         },
       }));
 
@@ -656,23 +641,17 @@ export async function storeDocumentEmbeddings(
         });
       }
 
-      const chunkEncryptors =
-        encryptionMode === "encrypted_only"
-          ? getChunkEncryptionServicesSafe()
-          : null;
-      if (encryptionMode === "encrypted_only" && !chunkEncryptors) {
+      const chunkEncryptors = getChunkEncryptionServicesSafe();
+      if (!chunkEncryptors) {
         throw new Error(
           "Chunk encryption services unavailable while INDEXING_ENCRYPTED_CHUNKS_ONLY is enabled.",
         );
       }
-      const documentKey =
-        encryptionMode === "encrypted_only"
-          ? await chunkEncryptors!.docKeys.getDocumentKey(
-              document.userId,
-              documentId,
-            )
-          : null;
-      const stripSensitivePlaintext = encryptionMode === "encrypted_only";
+      const documentKey = await chunkEncryptors.docKeys.getDocumentKey(
+        document.userId,
+        documentId,
+      );
+      const stripSensitivePlaintext = true;
       const sensitivePlaintextViolationCount = stripSensitivePlaintext
         ? usableChunks.reduce((count, chunk) => {
             return count +
@@ -688,38 +667,27 @@ export async function storeDocumentEmbeddings(
         const id = randomUUID();
         const plaintext = c.content;
         const metadata = c.metadata || {};
-        const storedMetadata =
-          encryptionMode === "encrypted_only"
-            ? sanitizeStoredChunkMetadata(metadata)
-            : metadata;
-        const metadataJson = toPrismaJsonValue(storedMetadata);
-        const metadataEncrypted =
-          encryptionMode === "encrypted_only"
-            ? chunkEncryptors!.docCrypto.encryptChunkText(
-                document.userId,
-                documentId,
-                `${id}:meta`,
-                serializeMetadata(metadata),
-                documentKey!,
-              )
-            : null;
-        const textEncrypted =
-          encryptionMode === "encrypted_only"
-            ? chunkEncryptors!.docCrypto.encryptChunkText(
-                document.userId,
-                documentId,
-                id,
-                plaintext,
-                documentKey!,
-              )
-            : null;
+        const metadataEncrypted = chunkEncryptors.docCrypto.encryptChunkText(
+          document.userId,
+          documentId,
+          `${id}:meta`,
+          serializeMetadata(metadata),
+          documentKey,
+        );
+        const textEncrypted = chunkEncryptors.docCrypto.encryptChunkText(
+          document.userId,
+          documentId,
+          id,
+          plaintext,
+          documentKey,
+        );
         return {
           id,
           documentId,
           indexingOperationId: operationId,
           isActive: true,
           chunkIndex: c.chunkIndex,
-          text: encryptionMode === "encrypted_only" ? null : plaintext,
+          text: null,
           textEncrypted,
           page: c.pageNumber ?? c.metadata?.pageNumber ?? null,
           sectionId: metadata.sectionId || null,
@@ -766,7 +734,7 @@ export async function storeDocumentEmbeddings(
             typeof metadata.ocrConfidence === "number"
               ? metadata.ocrConfidence
               : null,
-          metadata: metadataJson,
+          metadata: null,
           metadataEncrypted,
         };
       });

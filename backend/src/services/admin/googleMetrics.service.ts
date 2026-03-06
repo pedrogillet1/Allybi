@@ -2,6 +2,7 @@ import type { PrismaClient } from "@prisma/client";
 import type { OcrOutcome } from "../extraction/ocrSignals.service";
 import {
   evaluateIngestionSloMetrics,
+  isIngestionFailureStatus,
   summarizeIngestionSloEvents,
 } from "./ingestionSloContract.shared.js";
 
@@ -105,6 +106,15 @@ interface WindowParams {
   to: Date;
 }
 
+interface PaginatedIngestionWindow<T extends Record<string, unknown>> {
+  rows: T[];
+  pagesFetched: number;
+}
+
+interface IngestionWindowOptions {
+  pageSize?: number;
+}
+
 function p95(values: number[]): number {
   if (!values.length) return 0;
   const sorted = [...values].sort((a, b) => a - b);
@@ -182,6 +192,60 @@ function toRate(numerator: number, denominator: number): number {
   return round2((numerator / denominator) * 100);
 }
 
+async function fetchIngestionEventsPaginated<T extends Record<string, unknown>>(
+  prisma: PrismaClient,
+  window: WindowParams,
+  select: Record<string, boolean>,
+  options?: IngestionWindowOptions,
+): Promise<PaginatedIngestionWindow<T>> {
+  const pageSize =
+    typeof options?.pageSize === "number" && Number.isFinite(options.pageSize)
+      ? Math.max(1, Math.trunc(options.pageSize))
+      : 5000;
+  let cursorAt: Date | null = null;
+  let cursorId: number | string | null = null;
+  let pagesFetched = 0;
+  const rows: T[] = [];
+
+  while (true) {
+    const where: Record<string, unknown> = {
+      at: { gte: window.from, lt: window.to },
+    };
+    if (cursorAt !== null && cursorId !== null) {
+      where.OR = [
+        { at: { gt: cursorAt } },
+        { at: cursorAt, id: { gt: cursorId } },
+      ];
+    }
+
+    const page = (await prisma.ingestionEvent.findMany({
+      where,
+      select: {
+        id: true,
+        at: true,
+        ...select,
+      },
+      orderBy: [{ at: "asc" }, { id: "asc" }],
+      take: pageSize,
+    })) as Array<T & { id: number | string; at: Date }>;
+
+    if (page.length === 0) break;
+    pagesFetched += 1;
+
+    for (const item of page) {
+      const { id: _id, at: _at, ...rest } = item;
+      rows.push(rest as T);
+    }
+
+    const last = page[page.length - 1];
+    cursorAt = last.at;
+    cursorId = last.id;
+    if (page.length < pageSize) break;
+  }
+
+  return { rows, pagesFetched };
+}
+
 export function summarizeOcrEvents(events: OcrEventLike[]): GoogleOcrMetrics {
   let docsProcessed = 0;
   let ocrAttempted = 0;
@@ -198,7 +262,7 @@ export function summarizeOcrEvents(events: OcrEventLike[]): GoogleOcrMetrics {
     if (used) ocrUsed += 1;
 
     const status = String(event.status || "").toLowerCase();
-    if (status === "fail") failures += 1;
+    if (isIngestionFailureStatus(status)) failures += 1;
 
     const meta = asRecord(event.meta);
     const attemptedFromMeta = readBoolean(meta?.ocrAttempted);
@@ -219,7 +283,9 @@ export function summarizeOcrEvents(events: OcrEventLike[]): GoogleOcrMetrics {
       if (hasCanonicalSignals && attemptedFromMeta === false) {
         outcome = "not_attempted";
       } else if (used) outcome = "applied";
-      else if (attempted && status === "fail") outcome = "runtime_error";
+      else if (attempted && isIngestionFailureStatus(status)) {
+        outcome = "runtime_error";
+      }
       else if (attempted) outcome = "no_text";
     }
 
@@ -484,23 +550,42 @@ async function getOcrMetrics(
   window: WindowParams,
 ): Promise<GoogleOcrMetrics> {
   try {
-    const events = await prisma.ingestionEvent.findMany({
-      where: {
-        at: { gte: window.from, lt: window.to },
-      },
-      select: {
-        status: true,
-        ocrUsed: true,
-        ocrConfidence: true,
-        meta: true,
-      },
-      take: 100000,
+    const { rows } = await fetchIngestionEventsPaginated<OcrEventLike>(prisma, window, {
+      status: true,
+      ocrUsed: true,
+      ocrConfidence: true,
+      meta: true,
     });
 
-    return summarizeOcrEvents(events);
+    return summarizeOcrEvents(rows);
   } catch {
     return summarizeOcrEvents([]);
   }
+}
+
+export async function getIngestionSloMetricsForWindow(
+  prisma: PrismaClient,
+  window: WindowParams,
+  options?: IngestionWindowOptions,
+): Promise<{
+  metrics: GoogleIngestionSloMetrics;
+  pagesFetched: number;
+}> {
+  const { rows, pagesFetched } = await fetchIngestionEventsPaginated<IngestionEventLike>(
+    prisma,
+    window,
+    {
+      status: true,
+      mimeType: true,
+      durationMs: true,
+      meta: true,
+    },
+    options,
+  );
+  return {
+    metrics: summarizeIngestionLatencyByMimeSize(rows),
+    pagesFetched,
+  };
 }
 
 async function getIngestionSloMetrics(
@@ -508,20 +593,8 @@ async function getIngestionSloMetrics(
   window: WindowParams,
 ): Promise<GoogleIngestionSloMetrics> {
   try {
-    const events = await prisma.ingestionEvent.findMany({
-      where: {
-        at: { gte: window.from, lt: window.to },
-      },
-      select: {
-        status: true,
-        mimeType: true,
-        durationMs: true,
-        meta: true,
-      },
-      take: 100000,
-    });
-
-    return summarizeIngestionLatencyByMimeSize(events);
+    const { metrics } = await getIngestionSloMetricsForWindow(prisma, window);
+    return metrics;
   } catch {
     return summarizeIngestionLatencyByMimeSize([]);
   }

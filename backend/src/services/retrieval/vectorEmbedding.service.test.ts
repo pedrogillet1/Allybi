@@ -217,9 +217,9 @@ describe("vectorEmbedding.service", () => {
 
     // Env defaults for test isolation
     delete process.env.INDEXING_STRICT_FAIL_CLOSED;
-    process.env.INDEXING_ENCRYPTED_CHUNKS_ONLY = "false";
-    process.env.INDEXING_ALLOW_PLAINTEXT_CHUNKS = "true";
-    process.env.INDEXING_PLAINTEXT_OVERRIDE_REASON = "integration_test_override";
+    process.env.INDEXING_ENCRYPTED_CHUNKS_ONLY = "true";
+    delete process.env.INDEXING_ALLOW_PLAINTEXT_CHUNKS;
+    delete process.env.INDEXING_PLAINTEXT_OVERRIDE_REASON;
     delete process.env.EMBEDDING_FAILCLOSE_V1;
     delete process.env.INDEXING_ENFORCE_ENCRYPTED_ONLY;
     delete process.env.INDEXING_ENFORCE_CHUNK_METADATA;
@@ -265,7 +265,7 @@ describe("vectorEmbedding.service", () => {
     await storeDocumentEmbeddings(DOC_ID, chunks, {
       maxRetries: 1,
       strictVerify: false,
-      encryptionMode: "plaintext",
+      encryptionMode: "encrypted_only",
     });
 
     // Only 1 chunk should have been processed (the valid one)
@@ -305,7 +305,7 @@ describe("vectorEmbedding.service", () => {
     await storeDocumentEmbeddings(DOC_ID, chunks, {
       maxRetries: 1,
       strictVerify: false,
-      encryptionMode: "plaintext",
+      encryptionMode: "encrypted_only",
     });
 
     // Should dedupe to 2 chunks (first occurrence of chunkIndex 0 + chunkIndex 1)
@@ -325,7 +325,7 @@ describe("vectorEmbedding.service", () => {
     await storeDocumentEmbeddings(DOC_ID, chunks, {
       maxRetries: 1,
       strictVerify: false,
-      encryptionMode: "plaintext",
+      encryptionMode: "encrypted_only",
     });
 
     expect(mockGenerateBatchEmbeddings).toHaveBeenCalledTimes(1);
@@ -344,7 +344,7 @@ describe("vectorEmbedding.service", () => {
     await storeDocumentEmbeddings(DOC_ID, chunks, {
       maxRetries: 1,
       strictVerify: false,
-      encryptionMode: "plaintext",
+      encryptionMode: "encrypted_only",
     });
 
     // Last document.update call should update counters only.
@@ -367,7 +367,7 @@ describe("vectorEmbedding.service", () => {
       maxRetries: 1,
       preDeleteVectors: true,
       strictVerify: false,
-      encryptionMode: "plaintext",
+      encryptionMode: "encrypted_only",
     });
 
     // Pre-delete should happen before upsert
@@ -395,7 +395,7 @@ describe("vectorEmbedding.service", () => {
     await storeDocumentEmbeddings(DOC_ID, chunks, {
       maxRetries: 1,
       strictVerify: false,
-      encryptionMode: "plaintext",
+      encryptionMode: "encrypted_only",
     });
 
     expect(mockTransaction).toHaveBeenCalledTimes(1);
@@ -434,21 +434,23 @@ describe("vectorEmbedding.service", () => {
     await storeDocumentEmbeddings(DOC_ID, chunks as any, {
       maxRetries: 1,
       strictVerify: false,
-      encryptionMode: "plaintext",
+      encryptionMode: "encrypted_only",
     });
 
     const chunkCreatePayload = mockChunkCreateMany.mock.calls[0][0].data[0];
     expect(chunkCreatePayload.tableChunkForm).toBe("cell_centric");
     expect(chunkCreatePayload.tableId).toBe("sheet:Sheet1");
     expect(chunkCreatePayload.sheetName).toBe("Sheet1");
-    expect(chunkCreatePayload.rowLabel).toBe("Revenue");
-    expect(chunkCreatePayload.colHeader).toBe("Jan");
+    expect(chunkCreatePayload.rowLabel).toBeNull();
+    expect(chunkCreatePayload.colHeader).toBeNull();
     expect(chunkCreatePayload.rowIndex).toBe(2);
     expect(chunkCreatePayload.columnIndex).toBe(3);
-    expect(chunkCreatePayload.unitNormalized).toBe("currency_usd");
-    expect(chunkCreatePayload.numericValue).toBe(125);
+    expect(chunkCreatePayload.unitNormalized).toBeNull();
+    expect(chunkCreatePayload.numericValue).toBeNull();
     expect(chunkCreatePayload.scaleRaw).toBe("thousands");
     expect(chunkCreatePayload.scaleMultiplier).toBe(1000);
+    expect(chunkCreatePayload.metadata).toBeNull();
+    expect(chunkCreatePayload.metadataEncrypted).toBe("encrypted-payload");
   });
 
   test("marks metadata isLatestVersion false when a newer revision exists", async () => {
@@ -474,7 +476,7 @@ describe("vectorEmbedding.service", () => {
       {
         maxRetries: 1,
         strictVerify: false,
-        encryptionMode: "plaintext",
+        encryptionMode: "encrypted_only",
       },
     );
 
@@ -525,7 +527,7 @@ describe("vectorEmbedding.service", () => {
       storeDocumentEmbeddings(DOC_ID, makeChunks(1), {
         maxRetries: 1,
         strictVerify: false,
-        encryptionMode: "plaintext",
+        encryptionMode: "encrypted_only",
       }),
     ).rejects.toThrow(/Concurrent indexing operation detected/i);
     expect(mockChunkCreateMany).not.toHaveBeenCalled();
@@ -557,7 +559,7 @@ describe("vectorEmbedding.service", () => {
     await storeDocumentEmbeddings(DOC_ID, chunks, {
       maxRetries: 2,
       strictVerify: false,
-      encryptionMode: "plaintext",
+      encryptionMode: "encrypted_only",
     });
 
     expect(callCount).toBe(2);
@@ -575,7 +577,7 @@ describe("vectorEmbedding.service", () => {
       storeDocumentEmbeddings(DOC_ID, chunks, {
         maxRetries: 1,
         strictVerify: false,
-        encryptionMode: "plaintext",
+        encryptionMode: "encrypted_only",
       }),
     ).rejects.toThrow(/Failed to store embeddings/);
 
@@ -601,7 +603,7 @@ describe("vectorEmbedding.service", () => {
       storeDocumentEmbeddings(DOC_ID, chunks, {
         maxRetries: 1,
         strictVerify: false,
-        encryptionMode: "plaintext",
+        encryptionMode: "encrypted_only",
       }),
     ).rejects.toThrow();
 
@@ -662,7 +664,7 @@ describe("vectorEmbedding.service", () => {
     await storeDocumentEmbeddings(DOC_ID, chunks, {
       maxRetries: 1,
       strictVerify: false,
-      encryptionMode: "plaintext",
+      encryptionMode: "encrypted_only",
     });
 
     // Pinecone upsert should be skipped
@@ -685,7 +687,7 @@ describe("vectorEmbedding.service", () => {
       maxRetries: 1,
       verifyAfterStore: true,
       strictVerify: false,
-      encryptionMode: "plaintext",
+      encryptionMode: "encrypted_only",
     });
 
     expect(mockChunkCount).toHaveBeenCalledWith({
@@ -705,9 +707,9 @@ describe("vectorEmbedding.service", () => {
       storeDocumentEmbeddings(DOC_ID, makeChunks(1), {
         maxRetries: 1,
         strictVerify: false,
-        encryptionMode: "plaintext",
-      }),
-    ).rejects.toThrow(/plaintext embedding mode is not allowed/i);
+        encryptionMode: "plaintext" as any,
+      } as any),
+    ).rejects.toThrow(/Plaintext embedding mode is no longer supported/i);
   });
 
   test("fails when required chunk metadata is missing", async () => {
@@ -723,7 +725,7 @@ describe("vectorEmbedding.service", () => {
       storeDocumentEmbeddings(DOC_ID, chunks as any, {
         maxRetries: 1,
         strictVerify: false,
-        encryptionMode: "plaintext",
+        encryptionMode: "encrypted_only",
       }),
     ).rejects.toThrow(/Chunk metadata invariant failed/i);
   });
@@ -747,7 +749,7 @@ describe("vectorEmbedding.service", () => {
       storeDocumentEmbeddings(DOC_ID, chunks as any, {
         maxRetries: 1,
         strictVerify: false,
-        encryptionMode: "plaintext",
+        encryptionMode: "encrypted_only",
       }),
     ).rejects.toThrow(/Chunk metadata invariant failed/i);
   });
@@ -773,7 +775,7 @@ describe("vectorEmbedding.service", () => {
       storeDocumentEmbeddings(DOC_ID, chunks as any, {
         maxRetries: 1,
         strictVerify: false,
-        encryptionMode: "plaintext",
+        encryptionMode: "encrypted_only",
       }),
     ).rejects.toThrow(/Chunk metadata invariant failed/i);
   });
@@ -786,16 +788,19 @@ describe("vectorEmbedding.service", () => {
     await storeDocumentEmbeddings(DOC_ID, chunks, {
       maxRetries: 1,
       strictVerify: false,
-      encryptionMode: "plaintext",
+      encryptionMode: "encrypted_only",
     });
 
     expect(mockChunkCreateMany).toHaveBeenCalledTimes(1);
     const createManyArgs = mockChunkCreateMany.mock.calls[0]?.[0] || {};
     const firstRow = createManyArgs?.data?.[0] || {};
-    expect(firstRow.metadata?.documentId).toBe(DOC_ID);
-    expect(firstRow.metadata?.versionId).toBe(DOC_ID);
-    expect(firstRow.metadata?.rootDocumentId).toBe(DOC_ID);
-    expect(typeof firstRow.metadata?.isLatestVersion).toBe("boolean");
+    expect(firstRow.metadata).toBeNull();
+    expect(firstRow.metadataEncrypted).toBe("encrypted-payload");
+    const pineconeChunk = mockUpsertDocumentEmbeddings.mock.calls[0]?.[3]?.[0];
+    expect(pineconeChunk.metadata.documentId).toBe(DOC_ID);
+    expect(pineconeChunk.metadata.versionId).toBe(DOC_ID);
+    expect(pineconeChunk.metadata.rootDocumentId).toBe(DOC_ID);
+    expect(typeof pineconeChunk.metadata.isLatestVersion).toBe("boolean");
   });
 
   /* ================================================================ */
@@ -822,3 +827,4 @@ describe("vectorEmbedding.service", () => {
     }
   });
 });
+

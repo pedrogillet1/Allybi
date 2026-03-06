@@ -1,6 +1,9 @@
 name: Prisma Migration Replay
 
 on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 3 * * *"
   pull_request:
     paths:
       - "backend/prisma/**"
@@ -56,24 +59,10 @@ jobs:
       - name: Install backend dependencies
         run: npm ci
 
-      - name: Generate Prisma client
-        run: npm run prisma:generate
-
-      - name: Seed service_role before migration replay
-        run: npm run prisma:rls:seed-service-role
-
-      - name: Validate + replay migrations
-        run: npm run prisma:replay:check
-
-      - name: Verify RLS profile (CI soft profile)
-        run: npm run prisma:rls:verify
+      - name: Run replay certification gate
+        run: npm run prisma:replay:cert
         env:
-          PRISMA_RLS_PROFILE: "ci"
-
-      - name: Audit telemetry ambiguity (fail on ambiguous rows)
-        run: npm run prisma:telemetry:repair:audit
-        env:
-          PRISMA_TELEMETRY_AUDIT_FAIL_ON_AMBIGUOUS: "1"
+          PRISMA_REPLAY_CERT_OUT: "reports/prisma/replay-cert.json"
           PRISMA_TELEMETRY_AUDIT_OUT: "reports/prisma/telemetry-audit-ci.json"
 
       - name: Upload telemetry audit artifact
@@ -84,10 +73,18 @@ jobs:
           path: backend/reports/prisma/telemetry-audit-ci.json
           if-no-files-found: warn
 
-      - name: Verify RLS profile (strict prod profile)
-        run: npm run prisma:rls:verify
-        env:
-          PRISMA_RLS_PROFILE: "prod"
+      - name: Upload replay certification artifact
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: prisma-replay-cert
+          path: backend/reports/prisma/replay-cert.json
+          if-no-files-found: warn
 
-      - name: Run Prisma invariant tests
-        run: npm run test:prisma:invariants
+      - name: Upload behavioral telemetry artifact
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: prisma-telemetry-audit-behavioral
+          path: backend/reports/prisma/telemetry-audit-behavioral.json
+          if-no-files-found: warn

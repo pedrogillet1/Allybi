@@ -1,0 +1,175 @@
+﻿{
+  "_meta": {
+    "id": "di_identity_entities_id_marriage_license",
+    "version": "2.0.0",
+    "description": "Entity extraction schema for id_marriage_license.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-28"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "identity",
+    "docType": "id_marriage_license"
+  },
+  "entities": [
+    {
+      "id": "document_id",
+      "type": "string",
+      "required": true,
+      "description": "Unique document identifier"
+    },
+    {
+      "id": "issuer_name",
+      "type": "string",
+      "required": true,
+      "description": "Document issuer or authority"
+    },
+    {
+      "id": "subject_name",
+      "type": "string",
+      "required": true,
+      "description": "Primary subject referenced by the document"
+    },
+    {
+      "id": "document_number",
+      "type": "string",
+      "required": false,
+      "description": "Official document number"
+    },
+    {
+      "id": "issue_date",
+      "type": "date",
+      "required": true,
+      "description": "Document issue date"
+    },
+    {
+      "id": "effective_date",
+      "type": "date",
+      "required": false,
+      "description": "Document effective date"
+    },
+    {
+      "id": "period_start",
+      "type": "date",
+      "required": false,
+      "description": "Period start date"
+    },
+    {
+      "id": "period_end",
+      "type": "date",
+      "required": false,
+      "description": "Period end date"
+    },
+    {
+      "id": "jurisdiction",
+      "type": "string",
+      "required": true,
+      "description": "Jurisdiction or governing authority"
+    },
+    {
+      "id": "status",
+      "type": "string",
+      "required": true,
+      "description": "Current processing or legal status"
+    },
+    {
+      "id": "currency",
+      "type": "string",
+      "required": false,
+      "description": "Currency code when monetary values are present"
+    },
+    {
+      "id": "total_amount",
+      "type": "currency",
+      "required": false,
+      "description": "Total document amount when applicable"
+    },
+    {
+      "id": "due_date",
+      "type": "date",
+      "required": false,
+      "description": "Due date for payment or action"
+    },
+    {
+      "id": "reference_id",
+      "type": "string",
+      "required": false,
+      "description": "External reference id"
+    },
+    {
+      "id": "source_table_ref",
+      "type": "string",
+      "required": true,
+      "description": "Source table identifier"
+    },
+    {
+      "id": "holder_name",
+      "type": "string",
+      "required": true,
+      "description": "License holder name"
+    },
+    {
+      "id": "document_number",
+      "type": "string",
+      "required": true,
+      "description": "License number"
+    },
+    {
+      "id": "birth_date",
+      "type": "date",
+      "required": true,
+      "description": "Date of birth"
+    },
+    {
+      "id": "issuing_authority",
+      "type": "string",
+      "required": true,
+      "description": "Issuing authority"
+    },
+    {
+      "id": "issuing_state",
+      "type": "string",
+      "required": false,
+      "description": "Issuing state/jurisdiction"
+    },
+    {
+      "id": "issue_date",
+      "type": "date",
+      "required": true,
+      "description": "Issue date"
+    },
+    {
+      "id": "expiry_date",
+      "type": "date",
+      "required": true,
+      "description": "Expiry date"
+    },
+    {
+      "id": "license_class",
+      "type": "string",
+      "required": false,
+      "description": "Driving class"
+    },
+    {
+      "id": "restrictions",
+      "type": "string",
+      "required": false,
+      "description": "Restrictions/endorsements"
+    },
+    {
+      "id": "barcode_present",
+      "type": "boolean",
+      "required": false,
+      "description": "Barcode presence flag"
+    },
+    {
+      "id": "identity_doc_type",
+      "type": "string",
+      "required": true,
+      "description": "Resolved doc type: id_marriage_license"
+    }
+  ]
+}
+

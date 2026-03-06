@@ -23,7 +23,7 @@ function resolveRequiredArtifacts() {
     "per_query.json",
     "lineage.json",
   ];
-  const fallbackForbidden = [];
+  const fallbackForbidden = ["per_query.json"];
   if (!fs.existsSync(EVIDENCE_CONTRACT_PATH)) {
     return {
       requiredLatestFiles: fallbackRequired,
@@ -37,11 +37,14 @@ function resolveRequiredArtifacts() {
         .map((value) => String(value || "").trim())
         .filter(Boolean)
       : fallbackRequired;
-    const forbidden = Array.isArray(parsed?.forbiddenFallbackDatasetMarkers)
+    const forbiddenFromContract = Array.isArray(parsed?.forbiddenFallbackDatasetMarkers)
       ? parsed.forbiddenFallbackDatasetMarkers
         .map((value) => String(value || "").trim().toLowerCase())
         .filter(Boolean)
-      : fallbackForbidden;
+      : [];
+    const forbidden = Array.from(
+      new Set([...fallbackForbidden, ...forbiddenFromContract]),
+    );
     return {
       requiredLatestFiles: required.length > 0 ? required : fallbackRequired,
       forbiddenFallbackDatasetMarkers: forbidden,

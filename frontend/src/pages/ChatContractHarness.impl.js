@@ -104,6 +104,50 @@ const FIXTURES = [
     },
   },
   {
+    label: 'streaming markdown contract — preserve code fences + never render source pills inside table cells',
+    message: {
+      id: 'fix_stream_contract',
+      role: 'assistant',
+      status: 'done',
+      content:
+        '```json\n{ "contract": "streaming", "status": "ok" }\n```\n\n| Metric | Evidence |\n|---|---|\n| Revenue | [Q4_report.pdf](koda://source?docId=d4&filename=Q4_report.pdf&page=3) |',
+      answerMode: 'doc_grounded_table',
+      meta: { answerMode: 'doc_grounded_table', isNavPills: false, hideActions: false },
+      attachments: [
+        {
+          type: 'source_buttons',
+          buttons: [
+            {
+              documentId: 'd4',
+              title: 'Q4_report.pdf',
+              mimeType: 'application/pdf',
+              location: { type: 'page', value: 3, label: 'Page 3' },
+            },
+          ],
+        },
+      ],
+      sources: [
+        {
+          documentId: 'd4',
+          documentName: 'Q4_report.pdf',
+          filename: 'Q4_report.pdf',
+          mimeType: 'application/pdf',
+          page: 3,
+        },
+      ],
+      sourceButtons: {
+        buttons: [
+          {
+            documentId: 'd4',
+            title: 'Q4_report.pdf',
+            mimeType: 'application/pdf',
+            location: { type: 'page', value: 3, label: 'Page 3' },
+          },
+        ],
+      },
+    },
+  },
+  {
     label: 'scoped_not_found — fallback when no documents match',
     message: {
       id: 'fix_scoped_not_found',
@@ -200,6 +244,7 @@ const ChatContractHarness = () => {
           return (
             <div
               key={msg.id}
+              data-testid={`fixture-${msg.id}`}
               style={{
                 marginBottom: 24,
                 border: '1px solid #333',
@@ -326,3 +371,4 @@ const Badge = ({ label, value, ok }) => (
 );
 
 export default ChatContractHarness;
+

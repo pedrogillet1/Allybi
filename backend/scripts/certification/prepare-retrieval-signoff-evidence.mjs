@@ -2,6 +2,7 @@
 /* eslint-disable no-console */
 import fs from "node:fs";
 import path from "node:path";
+import crypto from "node:crypto";
 import { spawnSync } from "node:child_process";
 
 const ROOT = process.cwd();
@@ -49,20 +50,14 @@ const EVIDENCE_CONTRACT = readEvidenceContract();
 const REQUIRED_LATEST_FILES = EVIDENCE_CONTRACT.requiredLatestFiles;
 const FORBIDDEN_FALLBACK_DATASET_MARKERS =
   EVIDENCE_CONTRACT.forbiddenFallbackDatasetMarkers;
+const REQUIRED_INPUT_ARTIFACT_TYPE = "raw_query_run";
 
 function ensureDir(dirPath) {
   fs.mkdirSync(dirPath, { recursive: true });
 }
 
-function clearDirectory(dirPath) {
-  if (!fs.existsSync(dirPath)) return;
-  for (const entry of fs.readdirSync(dirPath)) {
-    const fullPath = path.join(dirPath, entry);
-    fs.rmSync(fullPath, { recursive: true, force: true });
-  }
-}
-
-function runFrontendCommand(command) {
+function runFrontendCommand(command, options = {}) {
+  const allowFailure = options.allowFailure === true;
   const result = process.platform === "win32"
     ? spawnSync("cmd.exe", ["/d", "/s", "/c", command], {
       cwd: FRONTEND_ROOT,
@@ -75,9 +70,11 @@ function runFrontendCommand(command) {
       env: process.env,
     });
   if (result.error) {
+    if (allowFailure) return false;
     throw new Error(`[prepare-retrieval-signoff] command failed: ${result.error.message}`);
   }
   if (result.status !== 0) {
+    if (allowFailure) return false;
     throw new Error(
       `[prepare-retrieval-signoff] command exited with status ${result.status}: ${command}`,
     );
@@ -87,6 +84,27 @@ function runFrontendCommand(command) {
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, "utf8"));
+}
+
+function normalizePath(value) {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+  return path.resolve(raw);
+}
+
+function pathEquals(a, b) {
+  if (!a || !b) return false;
+  return normalizePath(a).toLowerCase() === normalizePath(b).toLowerCase();
+}
+
+function isRecursivePerQueryInput(value) {
+  const normalized = normalizePath(value).replace(/\\/g, "/").toLowerCase();
+  return normalized.endsWith("/latest/per_query.json");
+}
+
+function sha256File(filePath) {
+  const content = fs.readFileSync(filePath);
+  return crypto.createHash("sha256").update(content).digest("hex");
 }
 
 function listArchiveDirs() {
@@ -116,6 +134,82 @@ function resolvePerQueryRows() {
   } catch {
     return 0;
   }
+}
+
+function validatePerQueryCoverageContract() {
+  const perQueryPath = path.join(FRONTEND_REPORTS_LATEST, "per_query.json");
+  if (!fs.existsSync(perQueryPath)) {
+    return {
+      ok: false,
+      reason: "PER_QUERY_MISSING",
+      rows: 0,
+      queryCoverage: 0,
+      responseFieldCoverage: 0,
+    };
+  }
+  let rows = [];
+  try {
+    const parsed = readJson(perQueryPath);
+    rows = Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return {
+      ok: false,
+      reason: "PER_QUERY_INVALID_JSON",
+      rows: 0,
+      queryCoverage: 0,
+      responseFieldCoverage: 0,
+    };
+  }
+  if (rows.length <= 0) {
+    return {
+      ok: false,
+      reason: "PER_QUERY_EMPTY",
+      rows: 0,
+      queryCoverage: 0,
+      responseFieldCoverage: 0,
+    };
+  }
+  let rowsWithQuery = 0;
+  let rowsWithResponseField = 0;
+  for (const row of rows) {
+    const record = row && typeof row === "object" ? row : {};
+    const query = String(record.query || "").trim();
+    if (query.length > 0) rowsWithQuery += 1;
+    if (
+      typeof record.responseText === "string" ||
+      typeof record.assistantText === "string" ||
+      typeof record.response === "string"
+    ) {
+      rowsWithResponseField += 1;
+    }
+  }
+  const queryCoverage = rowsWithQuery / rows.length;
+  const responseFieldCoverage = rowsWithResponseField / rows.length;
+  if (queryCoverage < 0.98) {
+    return {
+      ok: false,
+      reason: "PER_QUERY_QUERY_COVERAGE_TOO_LOW",
+      rows: rows.length,
+      queryCoverage,
+      responseFieldCoverage,
+    };
+  }
+  if (responseFieldCoverage < 0.98) {
+    return {
+      ok: false,
+      reason: "PER_QUERY_RESPONSE_FIELD_COVERAGE_TOO_LOW",
+      rows: rows.length,
+      queryCoverage,
+      responseFieldCoverage,
+    };
+  }
+  return {
+    ok: true,
+    reason: "ok",
+    rows: rows.length,
+    queryCoverage,
+    responseFieldCoverage,
+  };
 }
 
 function readPlaywrightStats(filePath) {
@@ -213,12 +307,55 @@ function validateLatestScorecardContract() {
   if (!Number.isFinite(allowedDocs) || allowedDocs <= 0) {
     return { ok: false, reason: "SCORECARD_DOC_SCOPE_MISSING" };
   }
+  const inputFile = String(scorecard?.inputFile || "").trim();
+  if (!inputFile) {
+    return { ok: false, reason: "SCORECARD_INPUT_FILE_MISSING" };
+  }
+  if (isRecursivePerQueryInput(inputFile)) {
+    return { ok: false, reason: "SCORECARD_INPUT_FILE_RECURSIVE_PER_QUERY" };
+  }
+  const inputArtifactType = String(scorecard?.meta?.inputArtifactType || "")
+    .trim()
+    .toLowerCase();
+  if (inputArtifactType !== REQUIRED_INPUT_ARTIFACT_TYPE) {
+    return {
+      ok: false,
+      reason: `SCORECARD_INPUT_ARTIFACT_TYPE_INVALID:${inputArtifactType || "missing"}`,
+    };
+  }
+  const sourceArtifactPath = String(scorecard?.meta?.sourceArtifactPath || "").trim();
+  if (!sourceArtifactPath) {
+    return { ok: false, reason: "SCORECARD_SOURCE_ARTIFACT_PATH_MISSING" };
+  }
+  if (isRecursivePerQueryInput(sourceArtifactPath)) {
+    return { ok: false, reason: "SCORECARD_SOURCE_ARTIFACT_RECURSIVE_PER_QUERY" };
+  }
+  if (!pathEquals(sourceArtifactPath, inputFile)) {
+    return { ok: false, reason: "SCORECARD_SOURCE_ARTIFACT_PATH_INPUT_MISMATCH" };
+  }
+  const sourceArtifactSha256 = String(scorecard?.meta?.sourceArtifactSha256 || "")
+    .trim()
+    .toLowerCase();
+  if (!/^[a-f0-9]{64}$/i.test(sourceArtifactSha256)) {
+    return { ok: false, reason: "SCORECARD_SOURCE_ARTIFACT_SHA256_INVALID" };
+  }
+  const sourceArtifactBytes = Number(scorecard?.meta?.sourceArtifactBytes || 0);
+  if (!Number.isFinite(sourceArtifactBytes) || sourceArtifactBytes < 1) {
+    return { ok: false, reason: "SCORECARD_SOURCE_ARTIFACT_BYTES_INVALID" };
+  }
   return { ok: true, reason: "ok" };
 }
 
 function ensureLatestArtifacts() {
+  const bootstrapCmd = "node e2e/grading/bootstrap-report-lineage.mjs --strict";
   ensureDir(FRONTEND_REPORTS_LATEST);
-  runFrontendCommand("node e2e/grading/bootstrap-report-lineage.mjs --strict");
+  // Strict bootstrap must fail when no valid archive candidate exists.
+  const bootstrapRecovered = runFrontendCommand(bootstrapCmd, { allowFailure: true });
+  if (!bootstrapRecovered) {
+    console.warn(
+      "[prepare-retrieval-signoff] strict lineage bootstrap did not recover latest; proceeding with strict regeneration.",
+    );
+  }
 
   const lineageAfterBootstrap = validateLatestLineageProvenance();
   if (
@@ -227,16 +364,17 @@ function ensureLatestArtifacts() {
       "FALLBACK_DATASET_PROVENANCE_FORBIDDEN:",
     )
   ) {
-    clearDirectory(FRONTEND_REPORTS_LATEST);
-    runFrontendCommand("node e2e/grading/bootstrap-report-lineage.mjs --strict");
+    // Keep existing latest artifacts until a valid replacement is available.
+    runFrontendCommand(bootstrapCmd, { allowFailure: true });
   }
 
   const missingAfterBootstrap = resolveLatestMissingFiles();
   const lineageAfterRecovery = validateLatestLineageProvenance();
   const scorecardAfterRecovery = validateLatestScorecardContract();
+  const perQueryAfterRecovery = validatePerQueryCoverageContract();
   if (
     missingAfterBootstrap.length === 0 &&
-    resolvePerQueryRows() > 0 &&
+    perQueryAfterRecovery.ok &&
     lineageAfterRecovery.ok &&
     scorecardAfterRecovery.ok
   ) {
@@ -302,6 +440,53 @@ function validateLatestLineageProvenance() {
       reason: `FALLBACK_DATASET_PROVENANCE_FORBIDDEN:${violatedMarker}`,
     };
   }
+  const inputFile = String(lineage?.inputFile || "").trim();
+  if (!inputFile) {
+    return { ok: false, reason: "LINEAGE_INPUT_FILE_MISSING" };
+  }
+  if (isRecursivePerQueryInput(inputFile)) {
+    return { ok: false, reason: "LINEAGE_INPUT_FILE_RECURSIVE_PER_QUERY" };
+  }
+  const inputArtifactType = String(lineage?.inputArtifactType || "")
+    .trim()
+    .toLowerCase();
+  if (inputArtifactType !== REQUIRED_INPUT_ARTIFACT_TYPE) {
+    return {
+      ok: false,
+      reason: `LINEAGE_INPUT_ARTIFACT_TYPE_INVALID:${inputArtifactType || "missing"}`,
+    };
+  }
+  const sourceArtifactPath = String(lineage?.sourceArtifactPath || "").trim();
+  if (!sourceArtifactPath) {
+    return { ok: false, reason: "LINEAGE_SOURCE_ARTIFACT_PATH_MISSING" };
+  }
+  if (isRecursivePerQueryInput(sourceArtifactPath)) {
+    return { ok: false, reason: "LINEAGE_SOURCE_ARTIFACT_RECURSIVE_PER_QUERY" };
+  }
+  if (!pathEquals(sourceArtifactPath, inputFile)) {
+    return { ok: false, reason: "LINEAGE_SOURCE_ARTIFACT_PATH_INPUT_MISMATCH" };
+  }
+  const sourceArtifactSha256 = String(lineage?.sourceArtifactSha256 || "")
+    .trim()
+    .toLowerCase();
+  if (!/^[a-f0-9]{64}$/i.test(sourceArtifactSha256)) {
+    return { ok: false, reason: "LINEAGE_SOURCE_ARTIFACT_SHA256_INVALID" };
+  }
+  const sourceArtifactBytes = Number(lineage?.sourceArtifactBytes || 0);
+  if (!Number.isFinite(sourceArtifactBytes) || sourceArtifactBytes < 1) {
+    return { ok: false, reason: "LINEAGE_SOURCE_ARTIFACT_BYTES_INVALID" };
+  }
+  if (!fs.existsSync(sourceArtifactPath)) {
+    return { ok: false, reason: "LINEAGE_SOURCE_ARTIFACT_MISSING_FILE" };
+  }
+  try {
+    const actualSha256 = sha256File(sourceArtifactPath).toLowerCase();
+    if (actualSha256 !== sourceArtifactSha256) {
+      return { ok: false, reason: "LINEAGE_SOURCE_ARTIFACT_SHA256_MISMATCH" };
+    }
+  } catch {
+    return { ok: false, reason: "LINEAGE_SOURCE_ARTIFACT_UNREADABLE" };
+  }
   return { ok: true, reason: "ok" };
 }
 
@@ -311,6 +496,7 @@ function main() {
 
   const missingLatestFiles = resolveLatestMissingFiles();
   const perQueryRows = resolvePerQueryRows();
+  const perQueryCoverage = validatePerQueryCoverageContract();
   const playwrightStats = readPlaywrightStats(FRONTEND_RESULTS_JSON);
   const failures = [];
   if (missingLatestFiles.length > 0) {
@@ -319,6 +505,7 @@ function main() {
   if (perQueryRows <= 0) {
     failures.push("PER_QUERY_EMPTY_OR_MISSING");
   }
+  if (!perQueryCoverage.ok) failures.push(perQueryCoverage.reason);
   if (!playwrightStats) {
     failures.push("PLAYWRIGHT_RESULTS_MISSING");
   } else {

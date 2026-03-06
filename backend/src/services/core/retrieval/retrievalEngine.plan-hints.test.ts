@@ -236,4 +236,188 @@ describe("RetrievalEngineService retrieval-plan integration", () => {
     expect(pack.evidence.length).toBeGreaterThan(0);
     expect(pack.evidence[0]?.docId).toBe("doc-good");
   });
+
+  test("merges extraction hints with domain entity schema hints", () => {
+    const engine = new RetrievalEngineService(
+      buildBanks() as any,
+      {
+        async listDocs() {
+          return [];
+        },
+        async getDocMeta() {
+          return null;
+        },
+      } as any,
+      { async search() { return []; } } as any,
+      { async search() { return []; } } as any,
+      { async search() { return []; } } as any,
+      undefined,
+      {
+        ...buildDocumentIntelligenceBanks(),
+        getDocTypeExtractionHints() {
+          return {
+            hints: [{ id: "policy_number", hint: "Policy number field" }],
+          };
+        },
+        getDomainEntitySchema() {
+          return {
+            entities: [
+              {
+                id: "deductible_amount",
+                description: "Deductible amount",
+                required: false,
+              },
+            ],
+          };
+        },
+      } as any,
+    );
+
+    const hints = (engine as any).lookupExtractionHints(
+      "insurance",
+      "ins_policy_document",
+    );
+    expect(Array.isArray(hints)).toBe(true);
+    expect(hints.some((hint: any) => String(hint.id) === "policy_number")).toBe(
+      true,
+    );
+    expect(
+      hints.some(
+        (hint: any) =>
+          String(hint.id) === "deductible_amount" &&
+          String(hint.source) === "entity_schema",
+      ),
+    ).toBe(true);
+  });
+
+  test("normalizes malformed detection patterns in doc type classification", () => {
+    const engine = new RetrievalEngineService(
+      buildBanks() as any,
+      {
+        async listDocs() {
+          return [];
+        },
+        async getDocMeta() {
+          return null;
+        },
+      } as any,
+      { async search() { return []; } } as any,
+      { async search() { return []; } } as any,
+      { async search() { return []; } } as any,
+      undefined,
+      {
+        ...buildDocumentIntelligenceBanks(),
+        getDocTypeCatalog(domain: string) {
+          if (domain !== "banking") return { docTypes: [] };
+          return {
+            docTypes: [
+              {
+                id: "banking_wire_transfer_confirmation",
+                detectionPatterns: [
+                  "\\bwire\\\\s\\+transfer\\\\s\\+confirmation\\b",
+                  "\\btransfer\\\\s\\+confirmation\\b",
+                ],
+                priority: 95,
+              },
+            ],
+          };
+        },
+      } as any,
+    );
+
+    const result = (engine as any).classifyDocTypeForDomain(
+      "banking",
+      "show wire transfer confirmation details",
+    );
+    expect(result?.docTypeId).toBe("banking_wire_transfer_confirmation");
+  });
+
+  test("buildDocTypeBoostPlan uses requiredHeaders, tableHeaderSynonyms and table ontology anchors", () => {
+    const engine = new RetrievalEngineService(
+      buildBanks() as any,
+      {
+        async listDocs() {
+          return [];
+        },
+        async getDocMeta() {
+          return null;
+        },
+      } as any,
+      { async search() { return []; } } as any,
+      { async search() { return []; } } as any,
+      { async search() { return []; } } as any,
+      undefined,
+      {
+        ...buildDocumentIntelligenceBanks(),
+        getDocTypeSections() {
+          return {
+            sections: [
+              {
+                id: "summary",
+                order: 1,
+                name: { en: "Summary", pt: "Resumo" },
+              },
+            ],
+          };
+        },
+        getDocTypeTables() {
+          return {
+            tableHeaderSynonyms: {
+              amount: ["amount", "valor"],
+            },
+            tables: [
+              {
+                id: "income_table",
+                name: { en: "Income Statement", pt: "Demonstracao de Resultado" },
+                requiredHeaders: ["amount", "gross_margin", "period"],
+              },
+            ],
+          };
+        },
+        getTableHeaderOntology() {
+          return {
+            headers: [
+              {
+                canonical: "account_amount",
+                synonyms: ["account amount", "valor da conta"],
+              },
+              {
+                canonical: "net_income",
+                synonyms: ["net income", "lucro liquido"],
+              },
+            ],
+          };
+        },
+        getDiOntology(type: string) {
+          if (type !== "table") return null;
+          return {
+            tableFamilies: [
+              {
+                familyCategory: "statement",
+                domains: ["finance"],
+                label: "Statement",
+                labelPt: "Demonstrativo",
+                headerFamilies: {
+                  en: ["statement table"],
+                  pt: ["tabela de demonstrativo"],
+                },
+                columnArchetypes: ["period", "amount"],
+              },
+            ],
+          };
+        },
+      } as any,
+    );
+
+    const plan = (engine as any).buildDocTypeBoostPlan(
+      "finance",
+      "fin_income_statement",
+    );
+
+    expect(plan).toBeTruthy();
+    expect(plan.tableAnchors).toContain("amount");
+    expect(plan.tableAnchors).toContain("gross_margin");
+    expect(plan.tableAnchors).toContain("statement");
+    expect(plan.tableAnchors.length).toBeGreaterThan(16);
+  });
 });

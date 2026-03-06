@@ -142,5 +142,82 @@ describe("BankSelectionPlannerService", () => {
     expect(result.domainId).toBeNull();
     expect(result.reasons).toContain("domain:rejected_by_di_ontology:billing");
   });
-});
 
+  test("applies extra confusion weight when structure cue terms appear in query", () => {
+    getOptionalBankMock.mockImplementation((bankId: string) => {
+      if (bankId === "document_intelligence_bank_map") {
+        return { requiredCoreBankIds: [], optionalBankIds: [] };
+      }
+      if (bankId === "doc_type_confusion_matrix") {
+        return {
+          config: { enabled: true },
+          rules: [
+            {
+              id: "CTM_003",
+              docTypeA: "every_electricity_bill",
+              docTypeB: "billing_electricity_bill",
+              winner: "billing_electricity_bill",
+              confidenceBoost: 0.3,
+              structureCue: "Contains meter readings, kWh usage lines, and tariff blocks",
+            },
+          ],
+        };
+      }
+      if (bankId === "cross_domain_tiebreak_policy") {
+        return { config: { enabled: false }, rules: [] };
+      }
+      return null;
+    });
+
+    const service = new BankSelectionPlannerService();
+    const result = service.plan({
+      query: "household electricity bill with kwh usage and meter readings",
+      docTypeId: "every_electricity_bill",
+      locale: "en",
+    });
+
+    expect(result.domainId).toBe("billing");
+    expect(
+      result.reasons.some((reason) =>
+        reason.startsWith("doc_type_confusion_structure_cue:CTM_003:"),
+      ),
+    ).toBe(true);
+  });
+
+  test("dampens confusion flip when structure cue does not match query terms", () => {
+    getOptionalBankMock.mockImplementation((bankId: string) => {
+      if (bankId === "document_intelligence_bank_map") {
+        return { requiredCoreBankIds: [], optionalBankIds: [] };
+      }
+      if (bankId === "doc_type_confusion_matrix") {
+        return {
+          config: { enabled: true },
+          rules: [
+            {
+              id: "CTM_003",
+              docTypeA: "every_electricity_bill",
+              docTypeB: "billing_electricity_bill",
+              winner: "billing_electricity_bill",
+              confidenceBoost: 0.3,
+              structureCue: "Contains meter readings, kWh usage lines, and tariff blocks",
+            },
+          ],
+        };
+      }
+      if (bankId === "cross_domain_tiebreak_policy") {
+        return { config: { enabled: false }, rules: [] };
+      }
+      return null;
+    });
+
+    const service = new BankSelectionPlannerService();
+    const result = service.plan({
+      query: "everyday household bill",
+      docTypeId: "every_electricity_bill",
+      locale: "en",
+    });
+
+    expect(result.domainId).toBe("everyday");
+    expect(result.reasons).toContain("doc_type_confusion_structure_cue_miss:CTM_003");
+  });
+});

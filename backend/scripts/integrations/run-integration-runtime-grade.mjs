@@ -118,6 +118,21 @@ async function main() {
     "handlers",
     "connectorHandler.service.ts",
   );
+  const runtimePolicyPath = path.join(
+    backendRoot,
+    "src",
+    "services",
+    "connectors",
+    "integrationRuntimePolicy.service.ts",
+  );
+  const gmailOAuthServicePath = path.join(
+    backendRoot,
+    "src",
+    "services",
+    "connectors",
+    "gmail",
+    "gmailOAuth.service.ts",
+  );
   const turnRouterPath = path.join(
     backendRoot,
     "src",
@@ -158,6 +173,14 @@ async function main() {
     "hooks",
     "useIntegrationStatus.js",
   );
+  const frontendIntegrationsServicePath = path.join(
+    backendRoot,
+    "..",
+    "frontend",
+    "src",
+    "services",
+    "integrationsService.js",
+  );
   const frontendChatPath = path.join(
     backendRoot,
     "..",
@@ -181,11 +204,16 @@ async function main() {
   const queueText = readFileSafe(queuePath);
   const workerText = readFileSafe(workerPath);
   const handlerText = readFileSafe(handlerPath);
+  const runtimePolicyText = readFileSafe(runtimePolicyPath);
+  const gmailOAuthServiceText = readFileSafe(gmailOAuthServicePath);
   const turnRouterText = readFileSafe(turnRouterPath);
   const mimeRegistryText = readFileSafe(mimeRegistryPath);
   const extractionDispatchText = readFileSafe(extractionDispatchPath);
   const frontendOAuthCallbackText = readFileSafe(frontendOAuthCallbackPath);
   const frontendIntegrationsHookText = readFileSafe(frontendIntegrationsHookPath);
+  const frontendIntegrationsServiceText = readFileSafe(
+    frontendIntegrationsServicePath,
+  );
   const frontendChatText = readFileSafe(frontendChatPath);
   const securityAuthCertText = readFileSafe(securityAuthCertPath);
 
@@ -264,6 +292,38 @@ async function main() {
   });
 
   checks.push({
+    id: "frontend_oauth_verify_contract_reads_data_valid",
+    severity: "high",
+    weight: 20,
+    pass: /response\?\.data\?\.valid/.test(frontendIntegrationsServiceText),
+    detail:
+      "Frontend OAuth verification must read the unwrapped Axios response payload (response.data.valid).",
+  });
+
+  checks.push({
+    id: "oauth_completion_replay_guard_wired",
+    severity: "high",
+    weight: 25,
+    pass:
+      /consumeOAuthCompletionPayloadOnce/.test(controllerText) &&
+      /n:\s*buildCompletionNonce\(/.test(runtimePolicyText),
+    detail:
+      "OAuth completion payloads must include a nonce and be consumed once to reject replay.",
+  });
+
+  checks.push({
+    id: "gmail_oauth_fallback_is_guarded",
+    severity: "high",
+    weight: 20,
+    pass:
+      /CONNECTOR_GMAIL_ALLOW_GOOGLE_AUTH_FALLBACK/.test(gmailOAuthServiceText) &&
+      /CONNECTOR_GMAIL_STRICT_OAUTH_CONFIG/.test(gmailOAuthServiceText) &&
+      /\/api\/integrations\/gmail\/callback/.test(gmailOAuthServiceText),
+    detail:
+      "Gmail connector OAuth must enforce dedicated callback separation and guard any legacy GOOGLE_CLIENT_* fallback behind explicit flags.",
+  });
+
+  checks.push({
     id: "chat_oauth_popup_source_validation",
     severity: "high",
     weight: 20,
@@ -333,6 +393,46 @@ async function main() {
       "connectors",
       "integrationRuntimePolicy.service.test.ts",
     ),
+    path.join(
+      backendRoot,
+      "src",
+      "services",
+      "connectors",
+      "oauthCompletionReplayGuard.service.test.ts",
+    ),
+    path.join(
+      backendRoot,
+      "src",
+      "services",
+      "connectors",
+      "gmail",
+      "gmailOAuth.service.test.ts",
+    ),
+    path.join(
+      backendRoot,
+      "src",
+      "services",
+      "connectors",
+      "gmail",
+      "gmailClient.service.test.ts",
+    ),
+    path.join(
+      backendRoot,
+      "src",
+      "services",
+      "connectors",
+      "outlook",
+      "graphClient.service.test.ts",
+    ),
+    path.join(
+      backendRoot,
+      "src",
+      "services",
+      "connectors",
+      "slack",
+      "slackClient.service.test.ts",
+    ),
+    path.join(backendRoot, "src", "queues", "connector.queue.test.ts"),
     path.join(backendRoot, "src", "services", "chat", "turnRouter.service.test.ts"),
     path.join(
       backendRoot,
@@ -379,6 +479,12 @@ async function main() {
       "--runTestsByPath",
       "src/controllers/integrations.controller.test.ts",
       "src/services/connectors/integrationRuntimePolicy.service.test.ts",
+      "src/services/connectors/oauthCompletionReplayGuard.service.test.ts",
+      "src/services/connectors/gmail/gmailOAuth.service.test.ts",
+      "src/services/connectors/gmail/gmailClient.service.test.ts",
+      "src/services/connectors/outlook/graphClient.service.test.ts",
+      "src/services/connectors/slack/slackClient.service.test.ts",
+      "src/queues/connector.queue.test.ts",
       "src/services/chat/handlers/connectorTurn.handler.test.ts",
       "src/services/core/handlers/connectorHandler.service.test.ts",
       "src/services/connectors/slack/slackEvents.controller.test.ts",
