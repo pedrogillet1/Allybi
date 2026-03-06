@@ -622,7 +622,8 @@
       "smsFailed": "Failed to send verification SMS",
       "phoneAdded": "Phone number added! Verification SMS sent.",
       "phoneFailed": "Failed to add phone number"
-    }
+    },
+    "connectionRestored": "Connection restored"
   },
   "errors": {
     "generic": "An error occurred. Please try again.",
@@ -1961,6 +1962,81 @@
         "label": "Slack",
         "description": "Connect Slack to search messages and share documents with your team."
       }
+    }
+  },
+  "editor": {
+    "toolbar": {
+      "selection": "Selection",
+      "undo": "Undo",
+      "undoShortcut": "Undo (Ctrl/Cmd+Z)",
+      "redo": "Redo",
+      "redoShortcut": "Redo (Ctrl/Cmd+Shift+Z)",
+      "font": "Font",
+      "fontSize": "Font size",
+      "bold": "Bold",
+      "boldShortcut": "Bold (Ctrl/Cmd+B)",
+      "italic": "Italic",
+      "italicShortcut": "Italic (Ctrl/Cmd+I)",
+      "underline": "Underline",
+      "underlineShortcut": "Underline (Ctrl/Cmd+U)",
+      "textColor": "Text color",
+      "applyStyle": "Apply style",
+      "applyStyleTooltip": "Apply font/size/color to selection",
+      "clearFormatting": "Clear formatting",
+      "clear": "Clear",
+      "alignLeft": "Align left",
+      "alignCenter": "Align center",
+      "alignRight": "Align right",
+      "justify": "Justify",
+      "bulletedList": "Bulleted list",
+      "bullets": "Bullets",
+      "numberedList": "Numbered list",
+      "numbers": "Numbers",
+      "outdent": "Outdent",
+      "indent": "Indent",
+      "askAllybi": "Ask Allybi",
+      "openStudio": "Open Studio editor",
+      "applyRewrite": "Apply rewrite",
+      "newSlideLayout": "New slide layout",
+      "editPdfText": "Edit PDF text",
+      "editPdfTextTooltip": "Edit PDF text (creates an editable working copy)",
+      "applying": "Applying\u2026",
+      "findNext": "Find next",
+      "replace": "Replace",
+      "findPlaceholder": "Find text\u2026",
+      "replacePlaceholder": "Replace with\u2026"
+    },
+    "rightPanel": {
+      "ask": "Ask",
+      "targets": "Targets",
+      "changes": "Changes",
+      "close": "Close"
+    },
+    "changesTab": {
+      "noChanges": "No changes yet",
+      "noChangesHint": "Ask Allybi to edit this document. Applied edits and undo will show up here.",
+      "edit": "Edit",
+      "locate": "Locate",
+      "retry": "Retry",
+      "undo": "Undo",
+      "open": "Open"
+    },
+    "targetsTab": {
+      "docxTargets": "DOCX targets",
+      "findTarget": "Find target\u2026",
+      "slideTargets": "Slide text targets",
+      "noTargets": "No text targets found.",
+      "noParagraphs": "No paragraphs loaded yet.",
+      "noMatches": "No matches.",
+      "rewriteSelected": "Rewrite selected",
+      "spreadsheetTargets": "Spreadsheet targets",
+      "spreadsheetHint": "Click a cell in the grid to set the target, then edit in the toolbar input.",
+      "selection": "Selection",
+      "slide": "Slide {{number}}",
+      "selectedSlide": "Selected: Slide {{number}}",
+      "targets": "Targets",
+      "targetsUnavailable": "Targets are not available for this file type yet.",
+      "applyRewrite": "Apply rewrite"
     }
   }
 }

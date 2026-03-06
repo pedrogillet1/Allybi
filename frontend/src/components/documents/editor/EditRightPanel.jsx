@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import closeIcon from "../../../assets/x-close.svg";
 
 function TabButton({ label, active, onClick }) {
@@ -43,6 +44,7 @@ export default function EditRightPanel({
     return availableTabs[0] || "targets";
   }, [availableTabs, defaultTab]);
 
+  const { t } = useTranslation();
   const [tab, setTab] = useState(initialTab);
 
   const content = useMemo(() => {
@@ -66,13 +68,13 @@ export default function EditRightPanel({
         >
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", flex: 1, minWidth: 0 }}>
             {availableTabs.includes("ask") ? (
-              <TabButton label="Ask" active={tab === "ask"} onClick={() => setTab("ask")} />
+              <TabButton label={t("editor.rightPanel.ask")} active={tab === "ask"} onClick={() => setTab("ask")} />
             ) : null}
             {availableTabs.includes("targets") ? (
-              <TabButton label="Targets" active={tab === "targets"} onClick={() => setTab("targets")} />
+              <TabButton label={t("editor.rightPanel.targets")} active={tab === "targets"} onClick={() => setTab("targets")} />
             ) : null}
             {availableTabs.includes("changes") ? (
-              <TabButton label="Changes" active={tab === "changes"} onClick={() => setTab("changes")} />
+              <TabButton label={t("editor.rightPanel.changes")} active={tab === "changes"} onClick={() => setTab("changes")} />
             ) : null}
           </div>
 
@@ -91,8 +93,8 @@ export default function EditRightPanel({
                 justifyContent: "center",
                 flexShrink: 0,
               }}
-              title="Close"
-              aria-label="Close"
+              title={t("editor.rightPanel.close")}
+              aria-label={t("editor.rightPanel.close")}
             >
               <img
                 src={closeIcon}

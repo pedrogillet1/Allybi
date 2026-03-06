@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 function ToolbarButton({ children, onClick, disabled, active, title, variant = 'ghost', style }) {
   const base = {
@@ -88,6 +89,8 @@ export default function EditorToolbar({
   onUnderline,
   onUndo,
   onRedo,
+  canUndo = true,
+  canRedo = true,
   onAlignLeft,
   onAlignCenter,
   onAlignRight,
@@ -108,6 +111,7 @@ export default function EditorToolbar({
   extraActions = [], // [{label,onClick,disabled,variant,title}]
   centerSlot = null,
 }) {
+  const { t } = useTranslation();
   const showTextControls = canFormatText && format === 'docx';
 
   return (
@@ -206,16 +210,16 @@ export default function EditorToolbar({
           }}
           title={scopeLabel || ''}
         >
-          {scopeLabel || 'Selection'}
+          {scopeLabel || t('editor.toolbar.selection')}
         </div>
 
         {showTextControls ? (
           <>
-            <ToolbarButton onClick={onUndo} disabled={false} title="Undo (Ctrl/Cmd+Z)">
-              Undo
+            <ToolbarButton onClick={onUndo} disabled={!canUndo} title={t('editor.toolbar.undoShortcut')} aria-label={t('editor.toolbar.undo')}>
+              {t('editor.toolbar.undo')}
             </ToolbarButton>
-            <ToolbarButton onClick={onRedo} disabled={false} title="Redo (Ctrl/Cmd+Shift+Z)">
-              Redo
+            <ToolbarButton onClick={onRedo} disabled={!canRedo} title={t('editor.toolbar.redoShortcut')} aria-label={t('editor.toolbar.redo')}>
+              {t('editor.toolbar.redo')}
             </ToolbarButton>
 
             <ToolbarDivider />
@@ -224,7 +228,7 @@ export default function EditorToolbar({
               value={fontFamily || 'Calibri'}
               onChange={(e) => onFontFamilyChange?.(e.target.value)}
               disabled={false}
-              title="Font"
+              title={t('editor.toolbar.font')}
             >
               <option value="Calibri">Calibri</option>
               <option value="Times New Roman">Times New Roman</option>
@@ -236,7 +240,7 @@ export default function EditorToolbar({
               value={fontSizePx || '16px'}
               onChange={(e) => onFontSizeChange?.(e.target.value)}
               disabled={false}
-              title="Font size"
+              title={t('editor.toolbar.fontSize')}
             >
               {['11px', '12px', '14px', '16px', '18px', '20px', '24px', '28px', '32px'].map((s) => (
                 <option key={s} value={s}>
@@ -245,13 +249,13 @@ export default function EditorToolbar({
               ))}
             </ToolbarSelect>
 
-            <ToolbarButton onClick={onBold} disabled={false} title="Bold (Ctrl/Cmd+B)">
+            <ToolbarButton onClick={onBold} disabled={false} title={t('editor.toolbar.boldShortcut')}>
               B
             </ToolbarButton>
             <ToolbarButton
               onClick={onItalic}
               disabled={false}
-              title="Italic (Ctrl/Cmd+I)"
+              title={t('editor.toolbar.italicShortcut')}
               style={{ fontStyle: 'italic' }}
             >
               I
@@ -259,7 +263,7 @@ export default function EditorToolbar({
             <ToolbarButton
               onClick={onUnderline}
               disabled={false}
-              title="Underline (Ctrl/Cmd+U)"
+              title={t('editor.toolbar.underlineShortcut')}
               style={{ textDecoration: 'underline' }}
             >
               U
@@ -270,7 +274,8 @@ export default function EditorToolbar({
               value={colorHex || '#111827'}
               onChange={(e) => onColorChange?.(e.target.value)}
               disabled={false}
-              title="Text color"
+              title={t('editor.toolbar.textColor')}
+              aria-label={t('editor.toolbar.textColor')}
               style={{
                 width: 34,
                 height: 34,
@@ -282,42 +287,42 @@ export default function EditorToolbar({
               }}
             />
 
-            <ToolbarButton onClick={onApplyTextStyle} disabled={false} title="Apply font/size/color to selection">
-              Apply style
+            <ToolbarButton onClick={onApplyTextStyle} disabled={false} title={t('editor.toolbar.applyStyleTooltip')}>
+              {t('editor.toolbar.applyStyle')}
             </ToolbarButton>
 
-            <ToolbarButton onClick={onClearFormatting} disabled={false} title="Clear formatting">
-              Clear
-            </ToolbarButton>
-
-            <ToolbarDivider />
-
-            <ToolbarButton onClick={onAlignLeft} disabled={false} title="Align left">
-              Left
-            </ToolbarButton>
-            <ToolbarButton onClick={onAlignCenter} disabled={false} title="Align center">
-              Center
-            </ToolbarButton>
-            <ToolbarButton onClick={onAlignRight} disabled={false} title="Align right">
-              Right
-            </ToolbarButton>
-            <ToolbarButton onClick={onAlignJustify} disabled={false} title="Justify">
-              Justify
+            <ToolbarButton onClick={onClearFormatting} disabled={false} title={t('editor.toolbar.clearFormatting')}>
+              {t('editor.toolbar.clear')}
             </ToolbarButton>
 
             <ToolbarDivider />
 
-            <ToolbarButton onClick={onBullets} disabled={false} title="Bulleted list">
-              Bullets
+            <ToolbarButton onClick={onAlignLeft} disabled={false} title={t('editor.toolbar.alignLeft')} aria-label={t('editor.toolbar.alignLeft')}>
+              {t('editor.toolbar.alignLeft')}
             </ToolbarButton>
-            <ToolbarButton onClick={onNumbers} disabled={false} title="Numbered list">
-              Numbers
+            <ToolbarButton onClick={onAlignCenter} disabled={false} title={t('editor.toolbar.alignCenter')} aria-label={t('editor.toolbar.alignCenter')}>
+              {t('editor.toolbar.alignCenter')}
             </ToolbarButton>
-            <ToolbarButton onClick={onOutdent} disabled={false} title="Outdent">
-              Outdent
+            <ToolbarButton onClick={onAlignRight} disabled={false} title={t('editor.toolbar.alignRight')} aria-label={t('editor.toolbar.alignRight')}>
+              {t('editor.toolbar.alignRight')}
             </ToolbarButton>
-            <ToolbarButton onClick={onIndent} disabled={false} title="Indent">
-              Indent
+            <ToolbarButton onClick={onAlignJustify} disabled={false} title={t('editor.toolbar.justify')} aria-label={t('editor.toolbar.justify')}>
+              {t('editor.toolbar.justify')}
+            </ToolbarButton>
+
+            <ToolbarDivider />
+
+            <ToolbarButton onClick={onBullets} disabled={false} title={t('editor.toolbar.bulletedList')}>
+              {t('editor.toolbar.bullets')}
+            </ToolbarButton>
+            <ToolbarButton onClick={onNumbers} disabled={false} title={t('editor.toolbar.numberedList')}>
+              {t('editor.toolbar.numbers')}
+            </ToolbarButton>
+            <ToolbarButton onClick={onOutdent} disabled={false} title={t('editor.toolbar.outdent')}>
+              {t('editor.toolbar.outdent')}
+            </ToolbarButton>
+            <ToolbarButton onClick={onIndent} disabled={false} title={t('editor.toolbar.indent')}>
+              {t('editor.toolbar.indent')}
             </ToolbarButton>
           </>
         ) : null}

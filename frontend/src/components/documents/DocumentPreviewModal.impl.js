@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo, Suspense, lazy } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import FocusTrap from 'focus-trap-react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import api from '../../services/api';
 import { previewCache } from '../../services/previewCache';
@@ -350,7 +351,8 @@ const DocumentPreviewModal = ({ isOpen, onClose, document, attachOnClose = false
   if (!isOpen || !document) return null;
 
   return (
-    <>
+    <FocusTrap focusTrapOptions={{ returnFocusOnDeactivate: true, allowOutsideClick: true }}>
+    <div>
       {/* Overlay */}
       <div
         onClick={handleClose}
@@ -1132,7 +1134,8 @@ const DocumentPreviewModal = ({ isOpen, onClose, document, attachOnClose = false
           }
         }
       `}} />
-    </>
+    </div>
+    </FocusTrap>
   );
 };
 

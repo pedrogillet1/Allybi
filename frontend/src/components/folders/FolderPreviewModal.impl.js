@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import FocusTrap from 'focus-trap-react';
 import folderIcon from '../../assets/folder_icon.svg';
 import { ReactComponent as SearchIcon } from '../../assets/Search.svg';
 import cleanDocumentName from '../../utils/cleanDocumentName';
@@ -728,6 +729,7 @@ function FolderPreviewModal({
   if (embedded) return inner;
 
   return (
+    <FocusTrap focusTrapOptions={{ returnFocusOnDeactivate: true, allowOutsideClick: true }}>
     <div
       style={{
         position: 'fixed',
@@ -749,6 +751,7 @@ function FolderPreviewModal({
     >
       {inner}
     </div>
+    </FocusTrap>
   );
 }
 

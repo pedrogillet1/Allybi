@@ -69,14 +69,11 @@ const OAuthCallback = ({ variant = 'page' }) => {
           const userData = { user: bootstrap.user };
 
           // Cache non-sensitive profile locally for quick boot.
-          localStorage.setItem('user', JSON.stringify(userData.user));
+          const safeUser = { id: userData.user.id, name: userData.user.name, avatar: userData.user.avatar, locale: userData.user.locale };
+          localStorage.setItem('user', JSON.stringify(safeUser));
 
-          // Update AuthContext state
+          // Update AuthContext state (full user object in React state only)
           setAuthState(userData.user);
-
-          // Small delay to ensure localStorage writes are flushed before navigation
-          // This prevents race condition where ProtectedRoute checks auth before storage is ready
-          await new Promise(resolve => setTimeout(resolve, 50));
 
           // Set flag so new OAuth users go to first-upload onboarding
           if (!localStorage.getItem(STORAGE_KEYS.FIRST_UPLOAD_DONE)) {

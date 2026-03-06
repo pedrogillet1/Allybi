@@ -6,9 +6,8 @@ import {
   resolveScopedDocsForRequest,
 } from "./support/attachment-scope";
 import { captureAssistantMessage } from "./support/response-capture";
-
-const TEST_EMAIL = process.env.E2E_TEST_EMAIL || "test@koda.com";
-const TEST_PASSWORD = process.env.E2E_TEST_PASSWORD || "test123";
+import { login } from "./support/auth";
+import { navigateToNewChat, waitForStreamComplete, ensureChatComposerVisible } from "./support/chat-helpers";
 
 /* ─────────────────────────────────────────────────────────────────────────────
  * 50-Query Gate Test
@@ -149,119 +148,6 @@ function setupStreamInterceptor(page: Page): StreamInterceptState {
   return state;
 }
 
-async function login(page: Page) {
-  await page.goto("/a/r9p3q1?mode=login");
-  await page.waitForTimeout(2000);
-  const chatInput = page.locator("textarea.chat-v3-textarea");
-  if (await chatInput.isVisible({ timeout: 2000 }).catch(() => false)) return;
-  const emailInput = page.locator('input[type="email"]');
-  await emailInput.waitFor({ state: "visible", timeout: 10_000 });
-  await emailInput.fill(TEST_EMAIL);
-  await page.locator('input[type="password"]').fill(TEST_PASSWORD);
-  await page.locator('button[type="submit"]').click();
-  try {
-    await page.waitForURL((url) => !url.pathname.startsWith("/a/"), { timeout: 30_000 });
-  } catch {
-    await page.screenshot({ path: path.join(REPORT_DIR, "login-failed-50.png") });
-    throw new Error(`Login did not redirect. Current URL: ${page.url()}`);
-  }
-  await page.waitForTimeout(3000);
-  await suppressTours(page);
-}
-
-async function navigateToNewChat(page: Page) {
-  await page.goto("/c/k4r8f5");
-  await page
-    .waitForURL((url) => url.pathname.startsWith("/c/"), { timeout: 12_000 })
-    .catch(() => {});
-  await ensureChatComposerVisible(page);
-  await page.waitForTimeout(1000);
-}
-
-async function suppressTours(page: Page) {
-  await page.evaluate(() => {
-    try {
-      localStorage.setItem("koda_onboarding_completed", "true");
-      sessionStorage.removeItem("koda_sidebar_tour_active");
-      const userRaw = localStorage.getItem("user");
-      const user = userRaw ? JSON.parse(userRaw) : null;
-      const userId = user && user.id ? String(user.id) : "";
-      if (userId) {
-        localStorage.setItem(`allybi:hasSeenSidebarLinkedHomeTour:${userId}`, "true");
-        localStorage.setItem(`allybi:hasSeenHomeTour:${userId}`, "true");
-        localStorage.setItem(`allybi:hasSeenChatTour:${userId}`, "true");
-        localStorage.setItem(`allybi:hasSeenUploadTour:${userId}`, "true");
-      }
-    } catch {
-      // best effort
-    }
-  });
-}
-
-async function dismissOnboardingOverlays(page: Page) {
-  const skipIntro = page.getByRole("button", { name: /Skip introduction/i });
-  if (await skipIntro.isVisible({ timeout: 500 }).catch(() => false)) {
-    await skipIntro.click();
-  }
-  const dialog = page.getByRole("dialog", { name: /onboarding tour/i });
-  if (await dialog.isVisible({ timeout: 500 }).catch(() => false)) {
-    const doneBtn = dialog.getByRole("button", { name: /^Done$/i });
-    if (await doneBtn.isVisible({ timeout: 500 }).catch(() => false)) {
-      await doneBtn.click();
-      return;
-    }
-    const skipBtn = dialog.getByRole("button", { name: /^Skip$/i });
-    if (await skipBtn.isVisible({ timeout: 500 }).catch(() => false)) {
-      await skipBtn.click();
-    }
-  }
-}
-
-async function ensureChatComposerVisible(page: Page) {
-  const chatInput = page.locator("textarea.chat-v3-textarea");
-  const inChatRoute = () => {
-    try {
-      return new URL(page.url()).pathname.startsWith("/c/");
-    } catch {
-      return false;
-    }
-  };
-  if (
-    inChatRoute() &&
-    (await chatInput.isVisible({ timeout: 1200 }).catch(() => false))
-  ) {
-    return;
-  }
-
-  await dismissOnboardingOverlays(page);
-  if (
-    inChatRoute() &&
-    (await chatInput.isVisible({ timeout: 1200 }).catch(() => false))
-  ) {
-    return;
-  }
-
-  const chatNavBtn = page.getByRole("button", { name: /^Chat$/i });
-  if (await chatNavBtn.isVisible({ timeout: 1200 }).catch(() => false)) {
-    await chatNavBtn.click();
-    await page
-      .waitForURL((url) => url.pathname.startsWith("/c/"), { timeout: 5000 })
-      .catch(() => {});
-    if (
-      inChatRoute() &&
-      (await chatInput.isVisible({ timeout: 3000 }).catch(() => false))
-    ) {
-      return;
-    }
-  }
-
-  await page.goto("/c/k4r8f5");
-  await page
-    .waitForURL((url) => url.pathname.startsWith("/c/"), { timeout: 12_000 })
-    .catch(() => {});
-  await dismissOnboardingOverlays(page);
-  await chatInput.waitFor({ state: "visible", timeout: 15_000 });
-}
 
 async function setupDocumentAttachmentInjector(page: Page) {
   const scopedState = { fallbackTurn: 0 };
@@ -306,12 +192,10 @@ async function sendQueryAndCapture(
     await ensureChatComposerVisible(page);
     const chatInput = page.locator("textarea.chat-v3-textarea");
     await chatInput.fill(query);
-    await page.waitForTimeout(300);
     await chatInput.press("Enter");
     await expect(assistantMsgs).toHaveCount(beforeCount + 1, { timeout: 45_000 });
     const lastMsg = assistantMsgs.nth(beforeCount);
-    await page.locator('button[aria-label="Send"]').waitFor({ state: "visible", timeout: MAX_RESPONSE_WAIT_MS });
-    await page.waitForTimeout(1500);
+    await waitForStreamComplete(page, MAX_RESPONSE_WAIT_MS);
 
     const captured = await captureAssistantMessage(lastMsg);
     const responseText = captured.responseText;
@@ -376,7 +260,6 @@ test.describe("50-Query Gate Test", () => {
 
     console.log("[GATE-50] Opening new chat...");
     await navigateToNewChat(page);
-    await page.waitForTimeout(2000);
 
     const results: QueryResult[] = [];
 
@@ -396,7 +279,6 @@ test.describe("50-Query Gate Test", () => {
 
       results.push(result);
       fs.writeFileSync(REPORT_FILE, JSON.stringify(buildReportPayload(results), null, 2));
-      await page.waitForTimeout(1000);
     }
 
     // ── Summary ──

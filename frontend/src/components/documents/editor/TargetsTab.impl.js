@@ -1,6 +1,8 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import cleanDocumentName from "../../../utils/cleanDocumentName";
 import { applyEdit } from "../../../services/editingService";
+import api from "../../../services/api";
 
 function SectionTitle({ children }) {
   return (
@@ -48,6 +50,7 @@ export default function TargetsTab({
   onSelectSlidesAnchorId,
   onSlidesApplied,
 }) {
+  const { t } = useTranslation();
   const filename = cleanDocumentName(document?.filename || "Document");
   const docId = document?.id;
 
@@ -56,6 +59,8 @@ export default function TargetsTab({
   const [slidesDraftText, setSlidesDraftText] = useState("");
   const [slidesStatus, setSlidesStatus] = useState("");
   const [slidesApplying, setSlidesApplying] = useState(false);
+  const slideThumbnailCache = useRef(new Map());
+  const [slideThumbnails, setSlideThumbnails] = useState({});
 
   const slidesAnchorsArr = useMemo(() => (Array.isArray(slidesAnchors) ? slidesAnchors : []), [slidesAnchors]);
   const slidesGrouped = useMemo(() => {
@@ -74,6 +79,37 @@ export default function TargetsTab({
     if (!id) return null;
     return slidesAnchorsArr.find((a) => a?.objectId === id) || null;
   }, [slidesAnchorsArr, slidesSelectedAnchorId]);
+
+  // Fetch slide thumbnails for visible slide groups
+  useEffect(() => {
+    if (fileType !== "powerpoint" || !docId || slidesGrouped.length === 0) return;
+    let cancelled = false;
+    const slideNumbers = slidesGrouped.map(([n]) => n);
+    const missing = slideNumbers.filter((n) => !slideThumbnailCache.current.has(n));
+    if (missing.length === 0) return;
+
+    (async () => {
+      try {
+        const maxSlide = Math.max(...slideNumbers);
+        const res = await api.get(`/api/documents/${docId}/slides`, { params: { page: 1, pageSize: maxSlide } });
+        const slides = res?.data?.slides || [];
+        const newThumbs = {};
+        for (const s of slides) {
+          if (s.hasImage && s.imageUrl) {
+            slideThumbnailCache.current.set(s.slideNumber, s.imageUrl);
+            newThumbs[s.slideNumber] = s.imageUrl;
+          }
+        }
+        if (!cancelled) {
+          setSlideThumbnails((prev) => ({ ...prev, ...newThumbs }));
+        }
+      } catch {
+        // Thumbnails are non-critical — silently ignore
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, [fileType, docId, slidesGrouped]);
 
   // Keep draft text synced to selected anchor (only when empty or equal to previous anchor text).
   useEffect(() => {
@@ -148,7 +184,7 @@ export default function TargetsTab({
 
     return (
       <div style={{ padding: 14 }}>
-        <SectionTitle>DOCX targets</SectionTitle>
+        <SectionTitle>{t("editor.targetsTab.docxTargets")}</SectionTitle>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12, alignItems: "center" }}>
           <Pill>{filename}</Pill>
         </div>
@@ -156,7 +192,7 @@ export default function TargetsTab({
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Find target…"
+          placeholder={t("editor.targetsTab.findTarget")}
           style={{
             width: "100%",
             height: 36,
@@ -175,7 +211,7 @@ export default function TargetsTab({
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {filtered.length === 0 ? (
             <div style={{ fontFamily: "Plus Jakarta Sans", fontWeight: 650, fontSize: 12, color: "#6B7280" }}>
-              {blocks.length === 0 ? "No paragraphs loaded yet." : "No matches."}
+              {blocks.length === 0 ? t("editor.targetsTab.noParagraphs") : t("editor.targetsTab.noMatches")}
             </div>
           ) : filtered.map((b) => {
             const id = b?.paragraphId;
@@ -216,10 +252,10 @@ export default function TargetsTab({
     return (
       <div style={{ padding: 14, display: "flex", flexDirection: "column", gap: 12 }}>
         <div>
-          <SectionTitle>Slide text targets</SectionTitle>
+          <SectionTitle>{t("editor.targetsTab.slideTargets")}</SectionTitle>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             <Pill>{filename}</Pill>
-            {selectedAnchor ? <Pill>Selected: Slide {selectedAnchor.slideNumber}</Pill> : null}
+            {selectedAnchor ? <Pill>{t("editor.targetsTab.selectedSlide", { number: selectedAnchor.slideNumber })}</Pill> : null}
           </div>
         </div>
 
@@ -232,7 +268,7 @@ export default function TargetsTab({
         }}>
           {slidesGrouped.length === 0 ? (
             <div style={{ padding: 12, fontFamily: "Plus Jakarta Sans", fontWeight: 650, fontSize: 12, color: "#6B7280" }}>
-              No text targets found.
+              {t("editor.targetsTab.noTargets")}
             </div>
           ) : slidesGrouped.map(([slideNumber, items]) => (
             <div key={slideNumber} style={{ borderTop: "1px solid #F3F4F6" }}>
@@ -243,8 +279,25 @@ export default function TargetsTab({
                 fontSize: 12,
                 color: "#111827",
                 background: "rgba(17,24,39,0.03)",
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
               }}>
-                Slide {slideNumber}
+                {slideThumbnails[slideNumber] ? (
+                  <img
+                    src={slideThumbnails[slideNumber]}
+                    alt={t("editor.targetsTab.slide", { number: slideNumber })}
+                    loading="lazy"
+                    style={{
+                      width: 120,
+                      height: "auto",
+                      borderRadius: 6,
+                      border: "1px solid #E5E7EB",
+                      flexShrink: 0,
+                    }}
+                  />
+                ) : null}
+                <span>{t("editor.targetsTab.slide", { number: slideNumber })}</span>
               </div>
               {items.map((a) => {
                 const selected = slidesSelectedAnchorId === a.objectId;
@@ -287,7 +340,7 @@ export default function TargetsTab({
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          <SectionTitle>Rewrite selected</SectionTitle>
+          <SectionTitle>{t("editor.targetsTab.rewriteSelected")}</SectionTitle>
           <textarea
             value={slidesDraftText}
             onChange={(e) => setSlidesDraftText(e.target.value)}
@@ -334,9 +387,9 @@ export default function TargetsTab({
               cursor: (!selectedAnchor || slidesApplying) ? "not-allowed" : "pointer",
               opacity: (!selectedAnchor || slidesApplying) ? 0.75 : 1,
             }}
-            title="Apply rewrite"
+            title={t("editor.targetsTab.applyRewrite")}
           >
-            {slidesApplying ? "Applying…" : "Apply rewrite"}
+            {slidesApplying ? t("editor.toolbar.applying") : t("editor.targetsTab.applyRewrite")}
           </button>
         </div>
       </div>
@@ -346,9 +399,9 @@ export default function TargetsTab({
   if (fileType === "excel") {
     return (
       <div style={{ padding: 14 }}>
-        <SectionTitle>Spreadsheet targets</SectionTitle>
+        <SectionTitle>{t("editor.targetsTab.spreadsheetTargets")}</SectionTitle>
         <div style={{ fontFamily: "Plus Jakarta Sans", fontWeight: 650, fontSize: 12, color: "#6B7280" }}>
-          Click a cell in the grid to set the target, then edit in the toolbar input.
+          {t("editor.targetsTab.spreadsheetHint")}
         </div>
       </div>
     );
@@ -356,9 +409,9 @@ export default function TargetsTab({
 
   return (
     <div style={{ padding: 14 }}>
-      <SectionTitle>Targets</SectionTitle>
+      <SectionTitle>{t("editor.targetsTab.targets")}</SectionTitle>
       <div style={{ fontFamily: "Plus Jakarta Sans", fontWeight: 650, fontSize: 12, color: "#6B7280" }}>
-        Targets are not available for this file type yet.
+        {t("editor.targetsTab.targetsUnavailable")}
       </div>
     </div>
   );

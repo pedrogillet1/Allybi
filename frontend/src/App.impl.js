@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { DocumentsProvider } from './context/DocumentsContext';
 import { FileProvider } from './context/FileContext';
@@ -41,8 +42,6 @@ import Documents from './components/documents/Documents';
 import DocumentsPage from './components/documents/DocumentsPage';
 import Dashboard from './components/app-shell/Dashboard';
 import CategoryDetail from './components/library/CategoryDetail';
-import DocumentViewer from './components/documents/DocumentViewer';
-import PptxStudio from './components/documents/studio/PptxStudio';
 import UploadHub from './components/upload/UploadHub';
 import Settings from './components/app-shell/Settings';
 import FileTypeDetail from './components/shared/FileTypeDetail';
@@ -56,6 +55,7 @@ import GmailDetailPage from './components/integrations/GmailDetailPage';
 import LegalPage from './components/legal/LegalPage';
 import FirstDocumentUpload from './components/onboarding/FirstDocumentUpload';
 import SidebarLinkedTour from './components/onboarding/SidebarLinkedTour';
+import OfflineBanner from './components/shared/OfflineBanner';
 
 // Dev-only Chat Contract Harness
 import ChatContractHarness from './pages/ChatContractHarness';
@@ -77,6 +77,9 @@ import {
 } from './components/admin';
 import { AdminAuthProvider } from './context/AdminAuthContext';
 
+const DocumentViewer = lazy(() => import('./components/documents/DocumentViewer'));
+const PptxStudio = lazy(() => import('./components/documents/studio/PptxStudio'));
+
 // Root route: unauthenticated users see signup/login, authenticated users see chat
 // Defined at module level so React keeps a stable component reference across renders.
 function RootRoute() {
@@ -91,7 +94,8 @@ function RootRoute() {
 // Inner component that uses NotificationsStore hook
 function AppContent() {
   const isMobile = useIsMobile();
-  const { activeToasts, removeToast, showWarning } = useNotifications();
+  const { t } = useTranslation();
+  const { activeToasts, removeToast, showWarning, showSuccess } = useNotifications();
 
   // Initialize viewport CSS variables for mobile
   useVisualViewportVars({ enabled: isMobile });
@@ -120,6 +124,17 @@ function AppContent() {
     window.addEventListener('koda:document-skipped', handleDocumentSkipped);
     return () => window.removeEventListener('koda:document-skipped', handleDocumentSkipped);
   }, [showWarning]);
+
+  useEffect(() => {
+    const handleReconnected = () => {
+      showSuccess(t('notifications.connectionRestored'), {
+        duration: 3000,
+        meta: { dedupeKey: 'socket-reconnected' },
+      });
+    };
+    window.addEventListener('koda:socket:reconnected', handleReconnected);
+    return () => window.removeEventListener('koda:socket:reconnected', handleReconnected);
+  }, [showSuccess, t]);
 
   function RouterLayer() {
     const location = useLocation();
@@ -185,8 +200,8 @@ function AppContent() {
               <Route path={ROUTES.DOCUMENTS} element={<ProtectedRoute><DocumentsPage /></ProtectedRoute>} />
               <Route path={ROUTES.CATEGORY} element={<ProtectedRoute><CategoryDetail /></ProtectedRoute>} />
               <Route path={ROUTES.FOLDER} element={<ProtectedRoute><CategoryDetail /></ProtectedRoute>} />
-              <Route path={ROUTES.DOCUMENT_STUDIO} element={<ProtectedRoute><PptxStudio /></ProtectedRoute>} />
-              <Route path={ROUTES.DOCUMENT} element={<ProtectedRoute><DocumentViewer /></ProtectedRoute>} />
+              <Route path={ROUTES.DOCUMENT_STUDIO} element={<ProtectedRoute><Suspense fallback={<div style={{ width: '100%', height: '100vh', background: 'white' }} />}><PptxStudio /></Suspense></ProtectedRoute>} />
+              <Route path={ROUTES.DOCUMENT} element={<ProtectedRoute><Suspense fallback={<div style={{ width: '100%', height: '100vh', background: 'white' }} />}><DocumentViewer /></Suspense></ProtectedRoute>} />
               <Route path={ROUTES.DASHBOARD} element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path={ROUTES.SETTINGS} element={<ProtectedRoute><Settings /></ProtectedRoute>} />
               <Route path={ROUTES.FILE_TYPE} element={<ProtectedRoute><FileTypeDetail /></ProtectedRoute>} />
@@ -239,6 +254,7 @@ function AppContent() {
 
   return (
     <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <OfflineBanner />
       <AuthModalProvider>
         <div style={{
           width: '100%',

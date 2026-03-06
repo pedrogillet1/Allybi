@@ -1,3 +1,5 @@
+import { Page, expect } from "@playwright/test";
+
 export interface TargetDocument {
   id: string;
   name: string;
@@ -70,6 +72,47 @@ function dedupeDocsById(docs: TargetDocument[]): TargetDocument[] {
     if (!byId.has(id)) byId.set(id, doc);
   }
   return Array.from(byId.values());
+}
+
+/**
+ * Poll /api/documents/{id} until all documents report "ready" or "indexed" status.
+ */
+export async function waitForDocumentsIndexed(
+  page: Page,
+  docIds: string[],
+  timeout = 60_000,
+): Promise<void> {
+  const deadline = Date.now() + timeout;
+
+  for (const docId of docIds) {
+    let status = "";
+    let filename = docId;
+
+    while (Date.now() < deadline) {
+      const res = await page.request.get(`/api/documents/${docId}`);
+      expect(
+        res.ok(),
+        `Document ${docId} not found or not accessible (HTTP ${res.status()})`,
+      ).toBe(true);
+
+      const doc = await res.json();
+      status = doc.status || doc.document?.status || doc.data?.status || "";
+      filename = doc.filename || doc.document?.filename || doc.data?.filename || docId;
+
+      if (["ready", "indexed"].includes(status)) {
+        console.log(`[PREFLIGHT] \u2713 ${filename} \u2014 status: ${status}`);
+        break;
+      }
+
+      // Wait 2s before polling again
+      await page.waitForTimeout(2000);
+    }
+
+    expect(
+      ["ready", "indexed"].includes(status),
+      `Document "${filename}" has status "${status}" after ${timeout}ms \u2014 must be "ready" or "indexed"`,
+    ).toBe(true);
+  }
 }
 
 export function resolveScopedDocsForQueryIndex(queryIndex: number): TargetDocument[] {

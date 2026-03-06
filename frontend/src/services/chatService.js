@@ -263,8 +263,7 @@ export const initializeSocket = (token) => {
     // Notify user if this was a reconnection
     if (wasReconnect) {
       console.log('🎉 [WEBSOCKET] Reconnected after network interruption');
-      // Note: Notification will be handled by NotificationsStore if needed
-      // Removed window.showNotification (deprecated pattern)
+      window.dispatchEvent(new CustomEvent('koda:socket:reconnected'));
     }
   });
 
@@ -589,7 +588,8 @@ export const sendAdaptiveMessageStreaming = async (
   onComplete,
   attachedDocumentId = null,
   onAction = null,  // Callback for action events (show_file_modal, etc.)
-  onIntent = null   // Callback for intent events (debug overlay)
+  onIntent = null,  // Callback for intent events (debug overlay)
+  onStage = null    // Callback for stage events (status indicators)
 ) => {
   const token = getCompatAccessToken();
   const headers = {
@@ -642,13 +642,11 @@ export const sendAdaptiveMessageStreaming = async (
     }
 
     if (done) {
-      console.log('🏁 Stream finished (done=true)');
       break;
     }
 
     // Decode the chunk and add to buffer
     const decodedChunk = decoder.decode(value, { stream: true });
-    console.log('📦 RAW CHUNK:', decodedChunk);
     buffer += decodedChunk;
 
     // SSE format uses \n\n (double newline) as delimiter
@@ -657,40 +655,30 @@ export const sendAdaptiveMessageStreaming = async (
     // Keep the last incomplete message in the buffer
     buffer = messages.pop() || '';
 
-    console.log(`📝 Processing ${messages.length} SSE messages`);
     for (const message of messages) {
       // Each SSE message should have "data: " prefix
       const lines = message.split('\n');
       for (const line of lines) {
-        console.log('📄 LINE:', line);
         if (line.startsWith('data: ')) {
           try {
             const data = JSON.parse(line.slice(6));
-            console.log('✅ PARSED DATA:', data);
 
             if (data.type === 'connected') {
-              console.log('🔗 Connected to conversation:', data.conversationId);
+              // Connection established
             } else if (data.type === 'meta') {
-              // Meta event with answerMode and navType
-              console.log('📋 META:', data.answerMode, 'navType:', data.navType);
               // Store meta for done/final event
               if (onComplete) {
                 onComplete.__meta = { answerMode: data.answerMode, navType: data.navType };
               }
             } else if (data.type === 'sources') {
-              // Sources event with structured source pills
-              console.log('📚 SOURCES:', data.sources?.length, 'items');
               if (onComplete) {
                 onComplete.__sources = data.sources || [];
               }
             } else if (data.type === 'attachments') {
-              // Optional attachments event (not always emitted). Keep for parity.
               if (onComplete) {
                 onComplete.__attachments = Array.isArray(data.attachments) ? data.attachments : (Array.isArray(data.items) ? data.items : []);
               }
             } else if (data.type === 'intent') {
-              // Intent event for debug overlay
-              console.log('🎯 INTENT:', data.intent, 'confidence:', data.confidence, 'domain:', data.domain, 'depth:', data.depth);
               if (onIntent) {
                 onIntent({
                   intent: data.intent,
@@ -703,20 +691,20 @@ export const sendAdaptiveMessageStreaming = async (
                   multiIntent: data.multiIntent
                 });
               }
+            } else if (data.type === 'stage') {
+              if (onStage) {
+                onStage({ key: data.key, params: data.params });
+              }
             } else if (data.type === 'content' || data.type === 'delta') {
               const text = data.content || data.text || '';
               if (text) {
-                console.log('🌊 CONTENT CHUNK:', text);
                 onChunk(text);
               }
             } else if (data.type === 'action') {
-              // Handle action events (show_file_modal, etc.)
-              console.log('🎬 ACTION event:', data.actionType, data);
               if (onAction) {
                 onAction(data);
               }
             } else if (data.type === 'done' || data.type === 'final') {
-              console.log('✅ DONE signal received');
               // Merge meta/sources collected during streaming into the done event
               const enriched = {
                 ...data,
@@ -729,10 +717,7 @@ export const sendAdaptiveMessageStreaming = async (
               };
               onComplete(enriched);
             } else if (data.type === 'error') {
-              // ✅ FIX #10: Better Error Messages
-              console.error('❌ Streaming error:', data.error);
-              console.error('💡 Suggestion:', data.suggestion);
-              console.error('🔄 Retryable:', data.retryable);
+              console.error('Streaming error:', data.error);
 
               // Create enhanced error object with additional fields
               const enhancedError = new Error(data.error);
@@ -742,7 +727,8 @@ export const sendAdaptiveMessageStreaming = async (
               throw enhancedError;
             }
           } catch (error) {
-            console.error('Error parsing SSE data:', error, 'Line:', line);
+            if (error?.code) throw error; // Re-throw enhanced errors
+            console.error('Error parsing SSE data:', error);
           }
         }
       }

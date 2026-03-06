@@ -578,7 +578,8 @@
       "smsFailed": "Falha ao enviar SMS de verificação",
       "phoneAdded": "Número de telefone adicionado! SMS de verificação enviado.",
       "phoneFailed": "Falha ao adicionar número de telefone"
-    }
+    },
+    "connectionRestored": "Conexão restaurada"
   },
   "upload": {
     "fileTypeDetected": {
@@ -1928,6 +1929,81 @@
         "label": "Slack",
         "description": "Conecte o Slack para pesquisar mensagens e compartilhar documentos com sua equipe."
       }
+    }
+  },
+  "editor": {
+    "toolbar": {
+      "selection": "Seleção",
+      "undo": "Desfazer",
+      "undoShortcut": "Desfazer (Ctrl/Cmd+Z)",
+      "redo": "Refazer",
+      "redoShortcut": "Refazer (Ctrl/Cmd+Shift+Z)",
+      "font": "Fonte",
+      "fontSize": "Tamanho da fonte",
+      "bold": "Negrito",
+      "boldShortcut": "Negrito (Ctrl/Cmd+B)",
+      "italic": "Itálico",
+      "italicShortcut": "Itálico (Ctrl/Cmd+I)",
+      "underline": "Sublinhado",
+      "underlineShortcut": "Sublinhado (Ctrl/Cmd+U)",
+      "textColor": "Cor do texto",
+      "applyStyle": "Aplicar estilo",
+      "applyStyleTooltip": "Aplicar fonte/tamanho/cor à seleção",
+      "clearFormatting": "Limpar formatação",
+      "clear": "Limpar",
+      "alignLeft": "Alinhar à esquerda",
+      "alignCenter": "Centralizar",
+      "alignRight": "Alinhar à direita",
+      "justify": "Justificar",
+      "bulletedList": "Lista com marcadores",
+      "bullets": "Marcadores",
+      "numberedList": "Lista numerada",
+      "numbers": "Números",
+      "outdent": "Diminuir recuo",
+      "indent": "Aumentar recuo",
+      "askAllybi": "Perguntar ao Allybi",
+      "openStudio": "Abrir editor Studio",
+      "applyRewrite": "Aplicar reescrita",
+      "newSlideLayout": "Novo layout de slide",
+      "editPdfText": "Editar texto do PDF",
+      "editPdfTextTooltip": "Editar texto do PDF (cria uma cópia editável)",
+      "applying": "Aplicando\u2026",
+      "findNext": "Próximo",
+      "replace": "Substituir",
+      "findPlaceholder": "Buscar texto\u2026",
+      "replacePlaceholder": "Substituir por\u2026"
+    },
+    "rightPanel": {
+      "ask": "Perguntar",
+      "targets": "Alvos",
+      "changes": "Alterações",
+      "close": "Fechar"
+    },
+    "changesTab": {
+      "noChanges": "Nenhuma alteração ainda",
+      "noChangesHint": "Peça ao Allybi para editar este documento. Edições aplicadas e desfazer aparecerão aqui.",
+      "edit": "Editar",
+      "locate": "Localizar",
+      "retry": "Tentar novamente",
+      "undo": "Desfazer",
+      "open": "Abrir"
+    },
+    "targetsTab": {
+      "docxTargets": "Alvos DOCX",
+      "findTarget": "Buscar alvo\u2026",
+      "slideTargets": "Alvos de texto dos slides",
+      "noTargets": "Nenhum alvo de texto encontrado.",
+      "noParagraphs": "Nenhum parágrafo carregado ainda.",
+      "noMatches": "Sem resultados.",
+      "rewriteSelected": "Reescrever selecionado",
+      "spreadsheetTargets": "Alvos da planilha",
+      "spreadsheetHint": "Clique em uma célula na grade para definir o alvo, depois edite na barra de ferramentas.",
+      "selection": "Seleção",
+      "slide": "Slide {{number}}",
+      "selectedSlide": "Selecionado: Slide {{number}}",
+      "targets": "Alvos",
+      "targetsUnavailable": "Alvos não estão disponíveis para este tipo de arquivo ainda.",
+      "applyRewrite": "Aplicar reescrita"
     }
   }
 }

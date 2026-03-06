@@ -568,7 +568,8 @@
       "smsFailed": "Error al enviar SMS de verificación",
       "phoneAdded": "¡Número de teléfono agregado! SMS de verificación enviado.",
       "phoneFailed": "Error al agregar número de teléfono"
-    }
+    },
+    "connectionRestored": "Conexión restaurada"
   },
   "upload": {
     "fileTypeDetected": {
@@ -1955,6 +1956,81 @@
         "label": "Slack",
         "description": "Conecta Slack para buscar mensajes y compartir documentos con tu equipo."
       }
+    }
+  },
+  "editor": {
+    "toolbar": {
+      "selection": "Selección",
+      "undo": "Deshacer",
+      "undoShortcut": "Deshacer (Ctrl/Cmd+Z)",
+      "redo": "Rehacer",
+      "redoShortcut": "Rehacer (Ctrl/Cmd+Shift+Z)",
+      "font": "Fuente",
+      "fontSize": "Tamaño de fuente",
+      "bold": "Negrita",
+      "boldShortcut": "Negrita (Ctrl/Cmd+B)",
+      "italic": "Cursiva",
+      "italicShortcut": "Cursiva (Ctrl/Cmd+I)",
+      "underline": "Subrayado",
+      "underlineShortcut": "Subrayado (Ctrl/Cmd+U)",
+      "textColor": "Color del texto",
+      "applyStyle": "Aplicar estilo",
+      "applyStyleTooltip": "Aplicar fuente/tamaño/color a la selección",
+      "clearFormatting": "Limpiar formato",
+      "clear": "Limpiar",
+      "alignLeft": "Alinear a la izquierda",
+      "alignCenter": "Centrar",
+      "alignRight": "Alinear a la derecha",
+      "justify": "Justificar",
+      "bulletedList": "Lista con viñetas",
+      "bullets": "Viñetas",
+      "numberedList": "Lista numerada",
+      "numbers": "Números",
+      "outdent": "Disminuir sangría",
+      "indent": "Aumentar sangría",
+      "askAllybi": "Preguntar a Allybi",
+      "openStudio": "Abrir editor Studio",
+      "applyRewrite": "Aplicar reescritura",
+      "newSlideLayout": "Nuevo diseño de diapositiva",
+      "editPdfText": "Editar texto del PDF",
+      "editPdfTextTooltip": "Editar texto del PDF (crea una copia editable)",
+      "applying": "Aplicando\u2026",
+      "findNext": "Siguiente",
+      "replace": "Reemplazar",
+      "findPlaceholder": "Buscar texto\u2026",
+      "replacePlaceholder": "Reemplazar con\u2026"
+    },
+    "rightPanel": {
+      "ask": "Preguntar",
+      "targets": "Objetivos",
+      "changes": "Cambios",
+      "close": "Cerrar"
+    },
+    "changesTab": {
+      "noChanges": "Sin cambios aún",
+      "noChangesHint": "Pide a Allybi que edite este documento. Las ediciones aplicadas y deshacer aparecerán aquí.",
+      "edit": "Editar",
+      "locate": "Localizar",
+      "retry": "Reintentar",
+      "undo": "Deshacer",
+      "open": "Abrir"
+    },
+    "targetsTab": {
+      "docxTargets": "Objetivos DOCX",
+      "findTarget": "Buscar objetivo\u2026",
+      "slideTargets": "Objetivos de texto de diapositivas",
+      "noTargets": "No se encontraron objetivos de texto.",
+      "noParagraphs": "Aún no se cargaron párrafos.",
+      "noMatches": "Sin resultados.",
+      "rewriteSelected": "Reescribir seleccionado",
+      "spreadsheetTargets": "Objetivos de la hoja de cálculo",
+      "spreadsheetHint": "Haz clic en una celda de la cuadrícula para definir el objetivo, luego edita en la barra de herramientas.",
+      "selection": "Selección",
+      "slide": "Diapositiva {{number}}",
+      "selectedSlide": "Seleccionado: Diapositiva {{number}}",
+      "targets": "Objetivos",
+      "targetsUnavailable": "Los objetivos no están disponibles para este tipo de archivo aún.",
+      "applyRewrite": "Aplicar reescritura"
     }
   }
 }

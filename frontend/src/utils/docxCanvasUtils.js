@@ -2,6 +2,7 @@
  * Shared utility functions for the DOCX edit canvas.
  * Extracted from DocxEditCanvas.jsx for reusability and testability.
  */
+import DOMPurify from 'dompurify';
 
 export function escapeHtml(text) {
   return String(text || '')
@@ -17,8 +18,14 @@ export function toHtmlFromPlain(text) {
 }
 
 export function sanitizeDocxRichHtml(html) {
+  // First pass: DOMPurify removes script injection, event handlers, etc.
+  const purified = DOMPurify.sanitize(String(html || ''), {
+    ALLOWED_TAGS: ['p', 'br', 'b', 'strong', 'i', 'em', 'u', 's', 'strike', 'span', 'div', 'table', 'tr', 'td', 'th', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4'],
+    ALLOWED_ATTR: ['style', 'class'],
+  });
+  // Second pass: custom style-level sanitizer
   const parser = new DOMParser();
-  const doc = parser.parseFromString(`<div>${String(html || '')}</div>`, 'text/html');
+  const doc = parser.parseFromString(`<div>${purified}</div>`, 'text/html');
   const root = doc.body.firstChild;
   if (!root) return '';
 

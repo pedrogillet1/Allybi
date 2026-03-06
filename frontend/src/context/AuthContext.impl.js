@@ -26,8 +26,10 @@ export const AuthProvider = ({ children }) => {
       try {
         const sessionData = await fetchBootstrapSession();
         if (sessionData?.ok && sessionData?.user) {
-          localStorage.setItem('user', JSON.stringify(sessionData.user));
-          setUser(sessionData.user);
+          const u = sessionData.user;
+          const safeUser = { id: u.id, name: u.name, avatar: u.avatar, locale: u.locale };
+          localStorage.setItem('user', JSON.stringify(safeUser));
+          setUser(u);
           setIsAuthenticated(true);
           setLoading(false);
           return;
@@ -301,10 +303,12 @@ export const AuthProvider = ({ children }) => {
       ...userData,
     }));
 
-    // Also update localStorage
+    // Also update localStorage with non-sensitive fields only
     const currentUser = authService.getCurrentUser();
     if (currentUser) {
-      localStorage.setItem('user', JSON.stringify({ ...currentUser, ...userData }));
+      const merged = { ...currentUser, ...userData };
+      const safeUser = { id: merged.id, name: merged.name, avatar: merged.avatar, locale: merged.locale };
+      localStorage.setItem('user', JSON.stringify(safeUser));
     }
   };
 
@@ -317,7 +321,8 @@ export const AuthProvider = ({ children }) => {
     // This ensures authService.isAuthenticated() returns true even if React state
     // hasn't propagated yet (e.g., during OAuth redirect to chat)
     if (userData) {
-      localStorage.setItem('user', JSON.stringify(userData));
+      const safeUser = { id: userData.id, name: userData.name, avatar: userData.avatar, locale: userData.locale };
+      localStorage.setItem('user', JSON.stringify(safeUser));
     }
     setUser(userData);
     setIsAuthenticated(true);

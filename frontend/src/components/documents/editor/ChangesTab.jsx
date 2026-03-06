@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 
 function clip(s, n = 120) {
   const t = String(s || "").trim().replace(/\s+/g, " ");
@@ -89,16 +90,17 @@ export default function ChangesTab({
   onOpenDoc,
   onGoToTarget,
 }) {
+  const { t } = useTranslation();
   const list = useMemo(() => (Array.isArray(entries) ? entries : []), [entries]);
 
   if (list.length === 0) {
     return (
       <div style={{ padding: 14 }}>
         <div style={{ fontFamily: "Plus Jakarta Sans", fontWeight: 950, fontSize: 13, color: "#111827" }}>
-          No changes yet
+          {t("editor.changesTab.noChanges")}
         </div>
         <div style={{ fontFamily: "Plus Jakarta Sans", fontWeight: 650, fontSize: 12, color: "#6B7280", marginTop: 4 }}>
-          Ask Allybi to edit this document. Applied edits and undo will show up here.
+          {t("editor.changesTab.noChangesHint")}
         </div>
       </div>
     );
@@ -109,7 +111,7 @@ export default function ChangesTab({
       {list.map((e) => {
         const session = e?.session || {};
         const status = statusLabel(e?.status);
-        const location = session?.locationLabel || session?.target?.label || "Edit";
+        const location = session?.locationLabel || session?.target?.label || t("editor.changesTab.edit");
         const instruction = session?.instruction || "";
         const revisionId = e?.revisionId || e?.appliedRevisionId || null;
         const canUndo = e?.status === "applied" && Boolean(revisionId || session?.documentId);
@@ -173,22 +175,22 @@ export default function ChangesTab({
               <div style={{ flex: 1 }} />
 
               <Btn
-                label="Locate"
+                label={t("editor.changesTab.locate")}
                 disabled={!canLocate}
                 onClick={() => onGoToTarget?.(e)}
               />
               <Btn
-                label="Retry"
+                label={t("editor.changesTab.retry")}
                 disabled={!canRetry}
                 onClick={() => onRetry?.(e)}
               />
               <Btn
-                label="Undo"
+                label={t("editor.changesTab.undo")}
                 disabled={!canUndo}
                 onClick={() => onUndo?.(e)}
               />
               <Btn
-                label="Open"
+                label={t("editor.changesTab.open")}
                 disabled={!revisionId}
                 onClick={() => onOpenDoc?.(revisionId)}
                 kind="primary"

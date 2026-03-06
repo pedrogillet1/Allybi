@@ -1,18 +1,9 @@
 import { test, expect, Page } from "@playwright/test";
 import * as fs from "fs";
 import * as path from "path";
-
-const TEST_EMAIL = process.env.E2E_TEST_EMAIL || "test@koda.com";
-const TEST_PASSWORD = process.env.E2E_TEST_PASSWORD || "test123";
-
-const TARGET_DOCUMENTS = [
-  { id: "7d55ead0-4840-4537-94ee-913e2feb5bce", name: "Anotações_Aula_2__1_.pdf", type: "application/pdf" },
-  { id: "8938fa6a-730f-4d12-8d6a-4416ea9a6438", name: "Capítulo_8__Framework_Scrum_.pdf", type: "application/pdf" },
-  { id: "ee91764d-304d-4162-8c0b-826662ee70a3", name: "Trabalho_projeto_.pdf", type: "application/pdf" },
-  { id: "5471856b-b93f-4aae-b450-35b121cad140", name: "OBA_marketing_servicos__1_.pdf", type: "application/pdf" },
-  { id: "5708e5f5-42d4-45e7-803b-ae490c45a766", name: "TRABALHO_FINAL__1_.PNG", type: "image/png" },
-  { id: "ce276bc4-bed3-41c2-b965-05ceb9ea0913", name: "guarda_bens_self_storage.pptx", type: "application/vnd.openxmlformats-officedocument.presentationml.presentation" },
-];
+import { login } from "./support/auth";
+import { navigateToNewChat, waitForStreamComplete } from "./support/chat-helpers";
+import { TARGET_DOCUMENTS } from "./support/target-documents";
 
 const QUERIES = [
   "No documento Capítulo 8 (Framework Scrum).pdf, qual é a definição de Scrum?",
@@ -22,31 +13,6 @@ const QUERIES = [
 
 const REPORT_DIR = path.resolve(__dirname, "reports");
 const MAX_WAIT = 120_000;
-
-async function login(page: Page) {
-  await page.goto("/a/r9p3q1?mode=login");
-  await page.waitForTimeout(2000);
-  const chatInput = page.locator("textarea.chat-v3-textarea");
-  if (await chatInput.isVisible({ timeout: 2000 }).catch(() => false)) return;
-  const emailInput = page.locator('input[type="email"]');
-  await emailInput.waitFor({ state: "visible", timeout: 10_000 });
-  await emailInput.fill(TEST_EMAIL);
-  await page.locator('input[type="password"]').fill(TEST_PASSWORD);
-  await page.locator('button[type="submit"]').click();
-  try {
-    await page.waitForURL((url) => !url.pathname.startsWith("/a/"), { timeout: 30_000 });
-  } catch {
-    throw new Error(`Login failed. URL: ${page.url()}`);
-  }
-  await page.waitForTimeout(3000);
-}
-
-async function navigateToNewChat(page: Page) {
-  await page.goto("/c/k4r8f5");
-  const chatInput = page.locator("textarea.chat-v3-textarea");
-  await chatInput.waitFor({ state: "visible", timeout: 15_000 });
-  await page.waitForTimeout(1000);
-}
 
 async function setupDocInjector(page: Page) {
   await page.route("**/api/chat/stream", async (route) => {
@@ -88,7 +54,6 @@ test.describe("Quick 3-Query Test", () => {
 
     console.log("[QUICK] Opening chat...");
     await navigateToNewChat(page);
-    await page.waitForTimeout(2000);
 
     for (let i = 0; i < QUERIES.length; i++) {
       const q = QUERIES[i];
@@ -100,14 +65,12 @@ test.describe("Quick 3-Query Test", () => {
       const chatInput = page.locator("textarea.chat-v3-textarea");
       await chatInput.waitFor({ state: "visible", timeout: 10_000 });
       await chatInput.fill(q);
-      await page.waitForTimeout(300);
       await chatInput.press("Enter");
 
       try {
         await expect(assistantMsgs).toHaveCount(beforeCount + 1, { timeout: 30_000 });
         const lastMsg = assistantMsgs.nth(beforeCount);
-        await page.locator('button[aria-label="Send"]').waitFor({ state: "visible", timeout: MAX_WAIT });
-        await page.waitForTimeout(2000);
+        await waitForStreamComplete(page, MAX_WAIT);
 
         const text = await lastMsg.evaluate((el) => el.innerText);
         console.log(`[QUICK] Response (${text.length} chars): ${text.substring(0, 200)}...`);
@@ -119,7 +82,6 @@ test.describe("Quick 3-Query Test", () => {
         console.log(`[QUICK] ERROR: ${err.message}`);
       }
 
-      await page.waitForTimeout(1000);
     }
 
     console.log("\n[QUICK] Done.");

@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useIsMobile } from '../../../../hooks/useIsMobile';
 import './AllybiEditingToolbar.css';
 
@@ -137,6 +138,7 @@ export default function AllybiEditingToolbar({
   pdfIsEditingText,
   pdfCanEditText = true,
   onPdfToggleEditText,
+  onPdfFindReplace,
   onPdfSave,
   onPdfRevert,
 
@@ -147,8 +149,11 @@ export default function AllybiEditingToolbar({
   // Called when user clicks on a non-interactive (empty) area of the toolbar.
   onBackgroundClick,
 }) {
+  const { t } = useTranslation();
   const isMobile = useIsMobile();
   const showWordControls = fileType === 'word' || (fileType === 'pdf' && pdfIsEditingText);
+  const [pdfFindText, setPdfFindText] = useState('');
+  const [pdfReplaceText, setPdfReplaceText] = useState('');
   const [colorMenuOpen, setColorMenuOpen] = useState(false);
   const [fontMenuOpen, setFontMenuOpen] = useState(false);
   const [sizeMenuOpen, setSizeMenuOpen] = useState(false);
@@ -431,6 +436,7 @@ export default function AllybiEditingToolbar({
                   type="button"
                   className="toolbar-btn allybi-font-trigger"
                   title="Font"
+                  aria-expanded={fontMenuOpen}
                   onMouseDown={(e) => {
                     e.preventDefault();
                     setSizeMenuOpen(false);
@@ -476,6 +482,7 @@ export default function AllybiEditingToolbar({
                   type="button"
                   className="toolbar-btn allybi-size-trigger"
                   title="Font size"
+                  aria-expanded={sizeMenuOpen}
                   onMouseDown={(e) => {
                     e.preventDefault();
                     setFontMenuOpen(false);
@@ -919,14 +926,66 @@ export default function AllybiEditingToolbar({
         ) : null}
 
         {fileType === 'pdf' && pdfControlsEnabled ? (
-          <div className="toolbar-section">
-            {textBtn(
-              'Edit PDF text (creates an editable working copy)',
-              'Edit text',
-              () => onPdfToggleEditText?.(),
-              { disabled: !pdfCanEditText }
-            )}
-          </div>
+          <>
+            <div className="toolbar-section">
+              {textBtn(
+                t('editor.toolbar.editPdfTextTooltip'),
+                t('editor.toolbar.editPdfText'),
+                () => onPdfToggleEditText?.(),
+                { disabled: !pdfCanEditText }
+              )}
+            </div>
+            {pdfIsEditingText && onPdfFindReplace ? (
+              <div className="toolbar-section" style={{ gap: 4, alignItems: 'center' }}>
+                <input
+                  type="text"
+                  value={pdfFindText}
+                  onChange={(e) => setPdfFindText(e.target.value)}
+                  placeholder={t('editor.toolbar.findPlaceholder')}
+                  style={{
+                    width: 120,
+                    height: 28,
+                    borderRadius: 6,
+                    border: '1px solid #E5E7EB',
+                    padding: '0 8px',
+                    fontFamily: 'Plus Jakarta Sans',
+                    fontWeight: 600,
+                    fontSize: 12,
+                    outline: 'none',
+                  }}
+                />
+                <input
+                  type="text"
+                  value={pdfReplaceText}
+                  onChange={(e) => setPdfReplaceText(e.target.value)}
+                  placeholder={t('editor.toolbar.replacePlaceholder')}
+                  style={{
+                    width: 120,
+                    height: 28,
+                    borderRadius: 6,
+                    border: '1px solid #E5E7EB',
+                    padding: '0 8px',
+                    fontFamily: 'Plus Jakarta Sans',
+                    fontWeight: 600,
+                    fontSize: 12,
+                    outline: 'none',
+                  }}
+                />
+                {textBtn(
+                  t('editor.toolbar.findNext'),
+                  t('editor.toolbar.findNext'),
+                  () => onPdfFindReplace?.({ find: pdfFindText, mode: 'find' }),
+                  { disabled: !pdfFindText.trim() }
+                )}
+                {textBtn(
+                  t('editor.toolbar.replace'),
+                  t('editor.toolbar.replace'),
+                  () => onPdfFindReplace?.({ find: pdfFindText, replace: pdfReplaceText, mode: 'replace' }),
+                  { disabled: !pdfFindText.trim() }
+                )}
+              </div>
+            ) : null}
+          </>
         ) : null}
       </div>
 

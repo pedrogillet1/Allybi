@@ -65,6 +65,9 @@ import InlineNavPill from "../../attachments/pills/InlineNavPill";
 import AttachmentsRenderer from "../../attachments/AttachmentsRenderer";
 import { useDocuments } from "../../../context/DocumentsContext";
 
+import { extractIntroSentence } from '../../../utils/chat/extractIntroSentence';
+import { isDocumentGroundedMode, isNavigationMode, hasSourceButtonsAttachment, isNavigationAnswerMessage, isDocumentContextAnswerMessage, canRenderSourcesForMessage } from '../../../utils/chat/messageClassification';
+
 import "../streaming/MarkdownStyles.css";
 import "../streaming/StreamingAnimation.css";
 import "../streaming/SpacingUtilities.css";
@@ -307,6 +310,30 @@ function pickRotatingViewerPrompts(params) {
 // Session cache keys
 const cacheKeyFor = (conversationId) => `koda_chat_messages_${conversationId}`;
 const cacheTsKeyFor = (conversationId) => `${cacheKeyFor(conversationId)}_timestamp`;
+const CACHE_PREFIX = 'koda_chat_messages_';
+const SESSION_CACHE_MAX_BYTES = 4 * 1024 * 1024; // 4MB
+
+function safeSessionSet(key, value) {
+  try {
+    const chatKeys = Object.keys(sessionStorage).filter((k) => k.startsWith(CACHE_PREFIX));
+    const usage = chatKeys.reduce((sum, k) => sum + (sessionStorage.getItem(k)?.length || 0), 0);
+    if (usage > SESSION_CACHE_MAX_BYTES) {
+      const oldest = chatKeys.sort()[0];
+      if (oldest) {
+        sessionStorage.removeItem(oldest);
+        const tsKey = `${oldest}_timestamp`;
+        sessionStorage.removeItem(tsKey);
+      }
+    }
+    sessionStorage.setItem(key, value);
+  } catch {
+    // QuotaExceededError — evict all chat caches
+    Object.keys(sessionStorage)
+      .filter((k) => k.startsWith(CACHE_PREFIX))
+      .forEach((k) => sessionStorage.removeItem(k));
+  }
+}
+
 const DRAFT_KEY = (conversationId) => `koda_draft_${conversationId || "new"}`;
 const PLACEHOLDER_CHAT_TITLES = new Set(["", "new chat", "untitled"]);
 
@@ -547,17 +574,6 @@ function isConnectorEmailArtifactName(name) {
 }
 
 
-/** Extract first intro sentence from text for nav_pills mode */
-function extractIntroSentence(text) {
-  if (!text) return "";
-  // Strip markdown list lines and bold markers
-  let cleaned = text.replace(/^\s*[-*]\s+.+$/gm, '').replace(/^\s*\d+\.\s+.+$/gm, '').trim();
-  cleaned = cleaned.replace(/\*{1,2}([^*]+)\*{1,2}/g, '$1');
-  if (!cleaned) return "";
-  // Take first sentence (up to first period, ?, !, or colon followed by whitespace)
-  const match = cleaned.match(/^[^]*?[.!?:](?:\s|$)/);
-  return match ? match[0].trim() : cleaned.slice(0, 200).trim();
-}
 
 /** Fix LaTeX-style currency artifacts: $(383,893.23)$ → ($383,893.23) */
 function fixCurrencyArtifacts(text) {
@@ -568,57 +584,6 @@ function fixCurrencyArtifacts(text) {
   // $24,972,043.79$ → $24,972,043.79 (strip trailing $)
   t = t.replace(/\$(\d[\d,]*(?:\.\d{1,2})?)\$/g, "$$1");
   return t;
-}
-
-function isDocumentGroundedMode(mode) {
-  const value = String(mode || "").trim();
-  return value.startsWith("doc_grounded");
-}
-
-function isNavigationMode(mode) {
-  const value = String(mode || "").trim().toLowerCase();
-  return value === "nav_pills" || value === "nav_pill" || value === "rank_disambiguate";
-}
-
-function hasSourceButtonsAttachment(attachments, { navOnly = false } = {}) {
-  if (!Array.isArray(attachments)) return false;
-  return attachments.some((att) => {
-    if (!att || att.type !== "source_buttons" || !Array.isArray(att.buttons) || att.buttons.length === 0) {
-      return false;
-    }
-    if (!navOnly) return true;
-    return isNavigationMode(att.answerMode);
-  });
-}
-
-function isNavigationAnswerMessage(message) {
-  const answerMode = String(message?.answerMode || "").trim();
-  const answerClass = String(message?.answerClass || "").trim().toUpperCase();
-  const navType = String(message?.navType || "").trim();
-  const hasListing = Array.isArray(message?.listing) && message.listing.length > 0;
-  const hasNavSourceButtons = hasSourceButtonsAttachment(message?.attachments, { navOnly: true });
-  return (
-    isNavigationMode(answerMode) ||
-    answerClass === "NAVIGATION" ||
-    Boolean(navType) ||
-    hasListing ||
-    hasNavSourceButtons
-  );
-}
-
-function isDocumentContextAnswerMessage(message) {
-  if (isNavigationAnswerMessage(message)) return false;
-  const answerClass = String(message?.answerClass || "").trim().toUpperCase();
-  const answerMode = String(message?.answerMode || "").trim();
-  if (answerClass === "DOCUMENT" || isDocumentGroundedMode(answerMode)) return true;
-  const hasAnySources =
-    (Array.isArray(message?.sources) && message.sources.length > 0) ||
-    hasSourceButtonsAttachment(message?.attachments);
-  return hasAnySources;
-}
-
-function canRenderSourcesForMessage(message) {
-  return isDocumentContextAnswerMessage(message) && !isNavigationAnswerMessage(message);
 }
 
 function shouldRenderFollowupsForMessage(message) {
@@ -1826,6 +1791,7 @@ export default function ChatInterface({
   // UX: long user prompts should not dominate the viewport.
   // Store per-message expansion state so "Show more" is sticky while scrolling.
   const [expandedUserMessages, setExpandedUserMessages] = useState({});
+  const [expandedSources, setExpandedSources] = useState(new Set());
 
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamError, setStreamError] = useState(null);
@@ -2566,8 +2532,8 @@ export default function ChatInterface({
         if (!scrollLockRef.current) {
           setMessages(normalized);
         }
-        sessionStorage.setItem(cacheKeyFor(curId), JSON.stringify(normalized));
-        sessionStorage.setItem(cacheTsKeyFor(curId), Date.now().toString());
+        safeSessionSet(cacheKeyFor(curId), JSON.stringify(normalized));
+        safeSessionSet(cacheTsKeyFor(curId), Date.now().toString());
         lsCacheWrite(curId, normalized);
 
         // Preserve scroll position if the user is reading above.
@@ -2682,8 +2648,8 @@ export default function ChatInterface({
     if (!isEphemeral && !isViewerVariant) {
       try {
         const serialized = JSON.stringify(messages);
-        sessionStorage.setItem(cacheKeyFor(conversationId), serialized);
-        sessionStorage.setItem(cacheTsKeyFor(conversationId), Date.now().toString());
+        safeSessionSet(cacheKeyFor(conversationId), serialized);
+        safeSessionSet(cacheTsKeyFor(conversationId), Date.now().toString());
       } catch {}
       lsCacheWrite(conversationId, messages);
     }
@@ -4445,40 +4411,63 @@ export default function ChatInterface({
     }
 
     // For action_receipt mode, show all action sources as pills
-    // For other modes, show top 3 sources
+    // For other modes, show 3 initially with "Show N more" button
     const isActionReceipt = m.answerMode === 'action_receipt' || m.answerMode === 'action_confirmation';
     const isNav = forNavigation || isNavigationAnswerMessage(m);
-    const displaySources = (isActionReceipt || isNav) ? unique : unique.slice(0, 3);
+    const showAll = isActionReceipt || isNav || expandedSources.has(m.id);
+    const displaySources = showAll ? unique : unique.slice(0, 3);
+    const hiddenCount = unique.length - displaySources.length;
     if (!displaySources.length) return null;
 
     const navType = m.navType || (isNavigationMode(m.answerMode) ? "discover" : null);
 
     return (
-      <SourcesList
-        sources={displaySources.map((s) => ({
-          type: s.type,
-          folderId: s.folderId,
-          docId: s.docId || s.documentId || s.id,
-          title: resolveSourceDisplayName(s),
-          filename: resolveSourceDisplayName(s),
-          mimeType: s.mimeType,
-          url: s.url,
-          page: s.page,
-          slide: s.slide,
-          sheet: s.sheet,
-          cell: s.cell,
-          section: s.section,
-          locationKey: s.locationKey,
-          locationLabel: s.locationLabel,
-          snippet: s.snippet,
-        }))}
-        variant={isNav ? "pills" : "inline"}
-        navType={isNav ? navType : null}
-        introText=""
-        onSelect={(src) => {
-          openPreviewFromSource(src);
-        }}
-      />
+      <>
+        <SourcesList
+          sources={displaySources.map((s) => ({
+            type: s.type,
+            folderId: s.folderId,
+            docId: s.docId || s.documentId || s.id,
+            title: resolveSourceDisplayName(s),
+            filename: resolveSourceDisplayName(s),
+            mimeType: s.mimeType,
+            url: s.url,
+            page: s.page,
+            slide: s.slide,
+            sheet: s.sheet,
+            cell: s.cell,
+            section: s.section,
+            locationKey: s.locationKey,
+            locationLabel: s.locationLabel,
+            snippet: s.snippet,
+          }))}
+          variant={isNav ? "pills" : "inline"}
+          navType={isNav ? navType : null}
+          introText=""
+          onSelect={(src) => {
+            openPreviewFromSource(src);
+          }}
+        />
+        {hiddenCount > 0 ? (
+          <button
+            onClick={() => setExpandedSources((prev) => new Set(prev).add(m.id))}
+            style={{
+              background: 'none',
+              border: '1px solid #E5E7EB',
+              borderRadius: 999,
+              padding: '4px 12px',
+              cursor: 'pointer',
+              fontFamily: 'Plus Jakarta Sans',
+              fontWeight: 800,
+              fontSize: 12,
+              color: '#6B7280',
+              marginTop: 4,
+            }}
+          >
+            Show {hiddenCount} more
+          </button>
+        ) : null}
+      </>
     );
   };
 

@@ -2,6 +2,7 @@
 import React, { useMemo, useState, useCallback } from "react";
 import copyDuplicateIcon from "../../../assets/copy-duplicate.svg";
 import refreshSyncIcon from "../../../assets/refresh-sync.svg";
+import { stripInlineCitationArtifacts } from "../../../utils/chat/markdownHelpers";
 
 /**
  * MessageActions.jsx (ChatGPT-parity)
@@ -82,7 +83,21 @@ function CopyAction({ message, onCopy }) {
       return;
     }
 
-    const ok = await copyToClipboard(message?.content);
+    // Clean koda:// source URLs and citation artifacts before copying
+    const raw = String(message?.content || "");
+    const cleanText = stripInlineCitationArtifacts(
+      raw.replace(/koda:\/\/source\?[^\s)]+/g, (url) => {
+        try {
+          const params = new URLSearchParams(url.split('?')[1]);
+          const filename = params.get('filename') || 'document';
+          const page = params.get('page');
+          return page ? `[${filename}, p.${page}]` : `[${filename}]`;
+        } catch {
+          return '[document]';
+        }
+      })
+    );
+    const ok = await copyToClipboard(cleanText);
     if (ok) {
       setCopied(true);
       window.setTimeout(() => setCopied(false), 1200);
