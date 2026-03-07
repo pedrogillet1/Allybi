@@ -5194,6 +5194,17 @@ export class RetrievalEngineService {
       if (evidence.length >= maxEvidenceHard) break;
     }
 
+    const droppedByEvidenceCap = candidates.filter((c) => c.provenanceOk).length - evidence.length;
+    if (droppedByEvidenceCap > 0) {
+      logger.debug("[Retrieval] evidence packaging drops", {
+        totalCandidates: candidates.length,
+        evidenceKept: evidence.length,
+        droppedByPackaging: droppedByEvidenceCap,
+        maxEvidenceHard,
+        maxPerDocHard,
+      });
+    }
+
     // PACK_004 — Preserve ranking priority; stabilize ties for coherent reading order
     evidence.sort((a, b) => {
       const scoreDelta = (b.score?.finalScore ?? 0) - (a.score?.finalScore ?? 0);

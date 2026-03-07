@@ -1903,7 +1903,9 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
       // Invalidate any cached document buffer so subsequent reads fetch the fresh file.
       try {
         await cacheService.del(`document_buffer:${docId}`);
-      } catch {}
+      } catch (err) {
+        logger.warn("[RevisionStore] cache invalidation failed", { error: (err as Error)?.message });
+      }
 
       // Clear derived artifacts so re-indexing doesn't mix old and new chunks.
       const isSlidesEdit =
@@ -2228,7 +2230,9 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
     );
     try {
       await cacheService.del(`document_buffer:${docId}`);
-    } catch {}
+    } catch (err) {
+      logger.warn("[RevisionStore] cache invalidation failed", { error: (err as Error)?.message });
+    }
 
     const isSlidesEdit = op.includes("SLIDE") || op === "EXPORT_SLIDES";
     const isSheetsEdit =
@@ -3285,7 +3289,9 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
           where: { id: input.documentId },
           data: { status: "ready" },
         });
-      } catch {}
+      } catch (err) {
+        logger.warn("[RevisionStore] status reset failed", { error: (err as Error)?.message });
+      }
       throw new Error("EDIT_NOOP_NO_CHANGES");
     }
 

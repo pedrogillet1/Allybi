@@ -71,6 +71,8 @@ const driveStorage = {
 process.on("uncaughtException", (error: Error) => {
   console.error("UNCAUGHT EXCEPTION:", error.message);
   console.error(error.stack);
+  // Node.js docs: "It is not safe to resume normal operation after uncaughtException."
+  setTimeout(() => process.exit(1), 1000).unref();
 });
 
 process.on("unhandledRejection", (reason: any) => {
@@ -308,6 +310,10 @@ async function startServer() {
     io.on("connection", (socket) => {
       console.log("[Socket.IO] connected:", socket.id);
 
+      socket.on("error", (err) => {
+        console.warn("[Socket.IO] socket error", { socketId: socket.id, error: err?.message });
+      });
+
       socket.on("join-user-room", (rawUserId: unknown) => {
         const userId = String(rawUserId || "").trim();
         if (!userId) return;
@@ -357,11 +363,11 @@ async function startServer() {
             process.exit(0);
           });
       });
-      // Force exit after 10s if connections don't drain
+      // Force exit after 30s if connections don't drain (matches K8s terminationGracePeriodSeconds)
       setTimeout(() => {
-        console.warn("[Server] Forced shutdown after 10s timeout.");
+        console.warn("[Server] Forced shutdown after 30s timeout.");
         process.exit(1);
-      }, 10_000).unref();
+      }, 30_000).unref();
     };
     process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
     process.on("SIGINT", () => gracefulShutdown("SIGINT"));

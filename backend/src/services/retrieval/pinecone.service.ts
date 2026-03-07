@@ -1,6 +1,7 @@
 // src/services/retrieval/pinecone.service.ts
 import { createHash } from "crypto";
 import { Pinecone } from "@pinecone-database/pinecone";
+import { logger } from "../../utils/logger";
 import {
   buildDocumentDeleteFilter,
   buildOperationDeleteFilter,
@@ -209,7 +210,15 @@ export class PineconeService {
       this.assertVectorDim(c.embedding, `chunk ${c.chunkIndex}`);
 
       // Keep content in metadata (for fast retrieval), but cap size.
-      const rawContent = (c.content || "").slice(0, 5000);
+      const fullContent = c.content || "";
+      if (fullContent.length > 5000) {
+        logger.warn("[Pinecone] content truncated at upsert", {
+          documentId,
+          chunkIndex: c.chunkIndex,
+          originalLength: fullContent.length,
+        });
+      }
+      const rawContent = fullContent.slice(0, 5000);
       const content = stripPlaintext ? undefined : rawContent;
       const contentHash = stripPlaintext
         ? createHash("sha256").update(rawContent).digest("hex")

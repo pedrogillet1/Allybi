@@ -6,6 +6,7 @@ import {
   adminLimiter,
 } from "../../../middleware/rateLimit.middleware";
 import prisma from "../../../platform/db/prismaClient";
+import { logger } from "../../../utils/logger";
 import {
   setAdminAuthCookies,
   clearAdminAuthCookies,
@@ -30,7 +31,7 @@ function logAdminSecurityEvent(
         createdAt: new Date(),
       },
     })
-    .catch(() => {});
+    .catch((err) => logger.warn("[AdminAuth] audit log write failed", { error: err?.message }));
 }
 
 let _svc: AdminAuthService | null = null;

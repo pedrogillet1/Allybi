@@ -1,4 +1,5 @@
 import { randomUUID } from "crypto";
+import { logger } from "../../../utils/logger";
 
 import type {
   LLMStreamingConfig,
@@ -418,7 +419,7 @@ export class ConnectorTurnHandler {
         failureCode: "CONNECTOR_RUNTIME_FAILED",
       });
     }
-    await this.persistAssistantOverride(base, result).catch(() => {});
+    await this.persistAssistantOverride(base, result).catch((err) => logger.warn("[ConnectorTurn] assistant override persist failed", { error: err?.message }));
     return result;
   }
 

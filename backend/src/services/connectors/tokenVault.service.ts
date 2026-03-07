@@ -3,6 +3,7 @@ import { promises as fs } from "fs";
 import path from "path";
 
 import prisma from "../../config/database";
+import { logger } from "../../utils/logger";
 import { EncryptionService } from "../security/encryption.service";
 import { EnvelopeService } from "../security/envelope.service";
 import type { ConnectorProvider } from "./connectorsRegistry";
@@ -327,7 +328,7 @@ export class TokenVaultService {
         lower.includes("reconnect") ||
         lower.includes("no token")
       ) {
-        await this.deleteToken(userId, provider).catch(() => {});
+        await this.deleteToken(userId, provider).catch((err) => logger.warn("[TokenVault] token deletion failed", { error: err?.message }));
         return { connected: false, accessToken: null, reason: "not_connected" };
       }
       if (

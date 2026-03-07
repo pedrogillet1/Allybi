@@ -14,6 +14,7 @@ import { Request, Response, NextFunction } from "express";
 import crypto from "crypto";
 import { verifyAdminAccessToken, AdminJWTPayload } from "../../utils/adminJwt";
 import prisma from "../../config/database";
+import { logger } from "../../utils/logger";
 
 /**
  * Log security event for admin access control (fire-and-forget).
@@ -35,7 +36,7 @@ function logAdminAccessEvent(action: string, req: Request): void {
         createdAt: new Date(),
       },
     })
-    .catch(() => {}); // fire-and-forget
+    .catch((err) => logger.warn("[AdminGuard] audit log write failed", { error: err?.message }));
 }
 
 // Environment configuration

@@ -1,11 +1,18 @@
 import { getApiBaseUrl } from './runtimeConfig';
 
+const BOOTSTRAP_TIMEOUT_MS = 10_000;
+
 export async function fetchBootstrapSession() {
   const apiBase = getApiBaseUrl();
-  const opts = { credentials: 'include' };
 
   try {
-    const bootstrapRes = await fetch(`${apiBase}/api/auth/session/bootstrap`, opts);
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), BOOTSTRAP_TIMEOUT_MS);
+    const bootstrapRes = await fetch(`${apiBase}/api/auth/session/bootstrap`, {
+      credentials: 'include',
+      signal: controller.signal,
+    });
+    clearTimeout(timer);
     if (bootstrapRes.ok) {
       const data = await bootstrapRes.json();
       return data?.user ? { ok: true, user: data.user, source: 'bootstrap' } : { ok: false };
@@ -16,7 +23,13 @@ export async function fetchBootstrapSession() {
   }
 
   try {
-    const meRes = await fetch(`${apiBase}/api/auth/me`, opts);
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), BOOTSTRAP_TIMEOUT_MS);
+    const meRes = await fetch(`${apiBase}/api/auth/me`, {
+      credentials: 'include',
+      signal: controller.signal,
+    });
+    clearTimeout(timer);
     if (!meRes.ok) return { ok: false, status: meRes.status };
     const data = await meRes.json();
     return data?.user ? { ok: true, user: data.user, source: 'me' } : { ok: false };

@@ -20,7 +20,7 @@ import {
 } from "../../config/storage";
 import prisma from "../../config/database";
 import { isPptxMime } from "../ingestion/extraction/ingestionMimeRegistry.service";
-import { performanceConsole as previewLog } from "../../utils/logger";
+import { logger, performanceConsole as previewLog } from "../../utils/logger";
 
 export interface SlideImageData {
   slideNumber: number;
@@ -199,7 +199,9 @@ export async function generateSlideImagesForDocument(
           typeof existingSlidesData === "string"
             ? JSON.parse(existingSlidesData)
             : existingSlidesData;
-      } catch (e) {}
+      } catch (e) {
+        logger.warn("[SlideImageGen] failed to parse existing slides data", { error: (e as Error)?.message });
+      }
 
       const slidesWithImages = parsedSlides.filter(
         (s: any) => s.hasImage && s.storagePath,
@@ -328,7 +330,9 @@ export function needsSlideImageGeneration(
     try {
       parsedSlides =
         typeof slidesData === "string" ? JSON.parse(slidesData) : slidesData;
-    } catch (e) {}
+    } catch (e) {
+      logger.warn("[SlideImageGen] failed to parse slides data", { error: (e as Error)?.message });
+    }
 
     if (Array.isArray(parsedSlides) && parsedSlides.length > 0) {
       const slidesWithImages = parsedSlides.filter(

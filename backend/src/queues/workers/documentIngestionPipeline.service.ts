@@ -199,7 +199,7 @@ export async function runDocumentIngestionPipeline(
     } catch {}
     documentProgressService
       .emitCustomProgress(pct, msg, progressOptions)
-      .catch(() => {});
+      .catch((err) => logger.warn("[IngestionPipeline] progress emit failed", { error: err?.message }));
   };
 
   try {

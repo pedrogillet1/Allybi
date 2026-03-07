@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import prisma from "../config/database";
+import { logger } from "../utils/logger";
 import {
   hashPassword,
   verifyPassword,
@@ -775,7 +776,9 @@ async function deleteFromCache(key: string): Promise<void> {
   if (redisConnection) {
     try {
       await redisConnection.del(key);
-    } catch {}
+    } catch (err) {
+      logger.warn("[Auth] cache deletion failed", { error: (err as Error)?.message });
+    }
   }
   memoryStore.delete(key);
 }

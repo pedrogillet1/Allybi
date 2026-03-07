@@ -1451,9 +1451,19 @@ class PrismaRetrievalUserAdapter
         const title = String(md.title || "").trim() || null;
         const filename =
           String(hit.document?.filename || md.filename || "").trim() || null;
-        const snippet = toSnippet(
-          hit.content || String(md.content || "") || hydrated?.text || "",
-        );
+        const rawContent = hit.content || String(md.content || "") || hydrated?.text || "";
+        const contentSource: "pinecone" | "metadata" | "hydrated_chunk" | "empty" =
+          hit.content ? "pinecone"
+          : md.content ? "metadata"
+          : hydrated?.text ? "hydrated_chunk"
+          : "empty";
+        if (contentSource === "empty") {
+          logger.debug("[Retrieval] empty snippet after fallback chain", {
+            documentId: hit.documentId,
+            chunkIndex,
+          });
+        }
+        const snippet = toSnippet(rawContent);
         const versionId =
           typeof md.versionId === "string" && String(md.versionId).trim()
             ? String(md.versionId).trim()
@@ -1896,6 +1906,16 @@ class PrismaRetrievalUserAdapter
         });
       }
     }
+
+    const requestedCount = [...needsHydration.values()].reduce((s, arr) => s + arr.length, 0);
+    if (out.size < requestedCount) {
+      logger.debug("[Retrieval] hydration miss — chunks disappeared between Pinecone and Postgres", {
+        requested: requestedCount,
+        hydrated: out.size,
+        missing: requestedCount - out.size,
+      });
+    }
+
     return out;
   }
 }

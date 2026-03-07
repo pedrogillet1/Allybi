@@ -7,6 +7,7 @@ import {
 } from "../utils/authCookies";
 import prisma from "../config/database";
 import { Prisma } from "@prisma/client";
+import { logger } from "../utils/logger";
 
 /**
  * Clean, DI-friendly Auth Controller.
@@ -35,7 +36,7 @@ function logSecurityEvent(
         createdAt: new Date(),
       },
     })
-    .catch(() => {}); // fire-and-forget
+    .catch((err) => logger.warn("[AuditLog] fire-and-forget write failed", { error: err?.message }));
 }
 
 export type AuthLanguage = "en" | "pt" | "es";

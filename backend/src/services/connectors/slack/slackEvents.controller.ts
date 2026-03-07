@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { createHmac } from "crypto";
 
+import { logger } from "../../../utils/logger";
 import ConnectorIdentityMapService from "../connectorIdentityMap.service";
 import { ConnectorsIngestionService } from "../connectorsIngestion.service";
 
@@ -137,7 +138,7 @@ export class SlackEventsController {
               },
             ],
           )
-          .catch(() => {}),
+          .catch((err) => logger.warn("[SlackEvents] ingestion failed", { error: err?.message })),
       ),
     );
 

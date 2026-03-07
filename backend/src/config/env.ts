@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 import path from "path";
 import fs from "fs";
 import * as os from "os";
+import { safeParseInt } from "../utils/safeParseInt";
 
 function loadEnvFile(p: string) {
   try {
@@ -198,7 +199,7 @@ function resolveGoogleAuthCallbackUrl(): string {
 }
 
 export const config: EnvConfig = {
-  PORT: parseInt(process.env.PORT || "5000", 10),
+  PORT: safeParseInt(process.env.PORT, 5000),
   NODE_ENV: process.env.NODE_ENV || "development",
   DATABASE_URL: getEnvVar("DATABASE_URL"),
   DIRECT_DATABASE_URL: process.env.DIRECT_DATABASE_URL,
@@ -241,15 +242,15 @@ export const config: EnvConfig = {
   ),
   // Redis
   REDIS_HOST: process.env.REDIS_HOST || "localhost",
-  REDIS_PORT: parseInt(process.env.REDIS_PORT || "6379", 10),
+  REDIS_PORT: safeParseInt(process.env.REDIS_PORT, 6379),
   REDIS_PASSWORD: getEnvVar("REDIS_PASSWORD", false),
   REDIS_URL: getEnvVar("REDIS_URL", false),
   UPSTASH_REDIS_REST_URL: getEnvVar("UPSTASH_REDIS_REST_URL", false),
   UPSTASH_REDIS_REST_TOKEN: getEnvVar("UPSTASH_REDIS_REST_TOKEN", false),
   // Workers - default to 8 for better throughput (VPS can handle higher concurrency)
-  WORKER_CONCURRENCY: parseInt(
-    process.env.WORKER_CONCURRENCY || String(Math.max(8, os.cpus().length * 2)),
-    10,
+  WORKER_CONCURRENCY: safeParseInt(
+    process.env.WORKER_CONCURRENCY,
+    Math.max(8, os.cpus().length * 2),
   ),
   // Email & SMS (Infobip)
   INFOBIP_API_KEY: getEnvVar("INFOBIP_API_KEY", false),

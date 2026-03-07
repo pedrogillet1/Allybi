@@ -99,6 +99,7 @@ function markAuthDead(reason) {
   if (_authDead) return;       // already handled
   _authDead = true;
   clearAuthStorage();
+  try { localStorage.setItem('auth_dead', 'true'); } catch {}
   console.log('🔒 Session expired. Please log in again.');
   emitAuthModalOpen({
     mode: 'login',
@@ -112,6 +113,16 @@ function markAuthDead(reason) {
 export function resetAuthDead() {
   _authDead = false;
   _refreshPromise = null;
+  try { localStorage.removeItem('auth_dead'); } catch {}
+}
+
+// Cross-tab auth death sync: if another tab marks auth dead, stop futile retries here too
+if (typeof window !== 'undefined') {
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'auth_dead' && e.newValue === 'true') {
+      markAuthDead('cross_tab_expired');
+    }
+  });
 }
 
 // Response interceptor - unwrap { ok, data } envelope + handle token refresh

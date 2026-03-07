@@ -17,13 +17,14 @@ import {
 import { documentStateManager } from "../../services/documents/documentStateManager.service";
 import { connection, QUEUE_PREFIX, documentQueue, stuckDocSweepQueue } from "../queueConfig";
 import { addDocumentJob } from "./jobHelpers.service";
+import { safeParseInt } from "../../utils/safeParseInt";
 
 let stuckDocSweepWorker: Worker | null = null;
 
-const SWEEP_INTERVAL_MS = parseInt(process.env.SWEEP_INTERVAL_MS || "60000", 10);
-const UPLOADED_STUCK_THRESHOLD_MS = parseInt(process.env.UPLOADED_STUCK_THRESHOLD_MS || "120000", 10);
-const ENRICHING_STUCK_THRESHOLD_MS = parseInt(process.env.ENRICHING_STUCK_THRESHOLD_MS || "480000", 10);
-const SWEEP_BATCH_LIMIT = parseInt(process.env.SWEEP_BATCH_LIMIT || "50", 10);
+const SWEEP_INTERVAL_MS = safeParseInt(process.env.SWEEP_INTERVAL_MS, 60000);
+const UPLOADED_STUCK_THRESHOLD_MS = safeParseInt(process.env.UPLOADED_STUCK_THRESHOLD_MS, 120000);
+const ENRICHING_STUCK_THRESHOLD_MS = safeParseInt(process.env.ENRICHING_STUCK_THRESHOLD_MS, 480000);
+const SWEEP_BATCH_LIMIT = safeParseInt(process.env.SWEEP_BATCH_LIMIT, 50);
 
 export async function startStuckDocSweeper() {
   if (stuckDocSweepWorker) {

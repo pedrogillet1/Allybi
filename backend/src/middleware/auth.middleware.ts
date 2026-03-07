@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { verifyAccessToken } from "../utils/jwt";
 import prisma from "../config/database";
+import { logger } from "../utils/logger";
 
 /**
  * Extended Request type with authenticated user
@@ -178,7 +179,16 @@ export const optionalAuth = async (
     next();
     return;
   } catch (error) {
-    // Continue without authentication
+    // Auth errors (invalid/expired JWT) are expected — skip silently.
+    // Infrastructure errors (DB outage, network) should be logged so they aren't masked.
+    const name = (error as any)?.name || "";
+    const isAuthError =
+      name === "JsonWebTokenError" ||
+      name === "TokenExpiredError" ||
+      name === "NotBeforeError";
+    if (!isAuthError) {
+      logger.warn("[optionalAuth] non-auth error suppressed", { error: (error as Error)?.message });
+    }
     next();
   }
 };
