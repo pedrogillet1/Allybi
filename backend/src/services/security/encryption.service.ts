@@ -12,7 +12,7 @@ export class EncryptionService {
     return crypto.randomBytes(32);
   }
 
-  encryptStringToJson(plaintext: string, key: Buffer, aad?: string): string {
+  encryptStringToJson(plaintext: string, key: Buffer, aad: string): string {
     const payload = this.encryptBuffer(
       Buffer.from(plaintext, "utf8"),
       key,
@@ -24,18 +24,18 @@ export class EncryptionService {
   decryptStringFromJson(
     payloadJson: string,
     key: Buffer,
-    aad?: string,
+    aad: string,
   ): string {
     const payload = JSON.parse(payloadJson) as EncryptedPayload;
     const pt = this.decryptBuffer(payload, key, aad);
     return pt.toString("utf8");
   }
 
-  encryptJsonToJson(obj: unknown, key: Buffer, aad?: string): string {
+  encryptJsonToJson(obj: unknown, key: Buffer, aad: string): string {
     return this.encryptStringToJson(JSON.stringify(obj), key, aad);
   }
 
-  decryptJsonFromJson<T>(payloadJson: string, key: Buffer, aad?: string): T {
+  decryptJsonFromJson<T>(payloadJson: string, key: Buffer, aad: string): T {
     const s = this.decryptStringFromJson(payloadJson, key, aad);
     return JSON.parse(s) as T;
   }
@@ -43,14 +43,14 @@ export class EncryptionService {
   encryptBuffer(
     plaintext: Buffer,
     key: Buffer,
-    aad?: string,
+    aad: string,
   ): EncryptedPayload {
     if (key.length !== 32) throw new Error("AES-256-GCM key must be 32 bytes");
     const iv = crypto.randomBytes(IV_LEN);
     const cipher = crypto.createCipheriv(ALG, key, iv);
 
-    const aadBuf = aad ? Buffer.from(aad, "utf8") : undefined;
-    if (aadBuf) cipher.setAAD(aadBuf);
+    const aadBuf = Buffer.from(aad, "utf8");
+    cipher.setAAD(aadBuf);
 
     const ct = Buffer.concat([cipher.update(plaintext), cipher.final()]);
     const tag = cipher.getAuthTag();
@@ -61,11 +61,11 @@ export class EncryptionService {
       ivB64: b64(iv),
       tagB64: b64(tag),
       ctB64: b64(ct),
-      ...(aadBuf ? { aadB64: b64(aadBuf) } : {}),
+      aadB64: b64(aadBuf),
     };
   }
 
-  decryptBuffer(payload: EncryptedPayload, key: Buffer, aad?: string): Buffer {
+  decryptBuffer(payload: EncryptedPayload, key: Buffer, aad: string): Buffer {
     if (key.length !== 32) throw new Error("AES-256-GCM key must be 32 bytes");
     if (payload.v !== 1 || payload.alg !== "AES-256-GCM")
       throw new Error("Unsupported payload");
@@ -75,8 +75,8 @@ export class EncryptionService {
     const ct = unb64(payload.ctB64);
 
     const decipher = crypto.createDecipheriv(ALG, key, iv);
-    const aadBuf = aad ? Buffer.from(aad, "utf8") : undefined;
-    if (aadBuf) decipher.setAAD(aadBuf);
+    const aadBuf = Buffer.from(aad, "utf8");
+    decipher.setAAD(aadBuf);
 
     decipher.setAuthTag(tag);
     return Buffer.concat([decipher.update(ct), decipher.final()]);

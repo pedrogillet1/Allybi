@@ -46,7 +46,6 @@ jobs:
 
       - name: Scan for Plaintext Writes
         run: npx ts-node scripts/security/scan-plaintext.ts
-        continue-on-error: true  # Warn but don't fail (migration in progress)
 
       - name: Security Summary
         if: always()
