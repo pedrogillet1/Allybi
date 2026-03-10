@@ -1,5 +1,7 @@
 import { EncryptionService } from "./encryption.service";
 import { KeyProvider, TenantKeyEnvelope } from "./crypto.types";
+import { getSecret } from "./secretManager.service";
+import { logger } from "../../utils/logger";
 
 export interface IKeyManager {
   provider: KeyProvider;
@@ -21,6 +23,26 @@ export class LocalKeyManager implements IKeyManager {
     this.masterKey = Buffer.from(mkB64, "base64");
     if (this.masterKey.length !== 32) {
       throw new Error("KODA_MASTER_KEY_BASE64 must be a 32-byte base64 value");
+    }
+  }
+
+  /**
+   * Initialize the master key from GCP Secret Manager in production.
+   * No-op in development (uses .env values directly).
+   */
+  async initializeFromSecretManager(): Promise<void> {
+    if (process.env.NODE_ENV !== "production") return;
+
+    const masterKey = await getSecret("KODA_MASTER_KEY_BASE64");
+    if (masterKey) {
+      process.env.KODA_MASTER_KEY_BASE64 = masterKey;
+      this.masterKey = Buffer.from(masterKey, "base64");
+      if (this.masterKey.length !== 32) {
+        throw new Error(
+          "KODA_MASTER_KEY_BASE64 from Secret Manager must be a 32-byte base64 value",
+        );
+      }
+      logger.info("[KeyManager] Master key loaded from Secret Manager");
     }
   }
 

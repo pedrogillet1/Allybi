@@ -62,6 +62,7 @@ export class EncryptionService {
       tagB64: b64(tag),
       ctB64: b64(ct),
       aadB64: b64(aadBuf),
+      kv: 1,
     };
   }
 
@@ -80,5 +81,9 @@ export class EncryptionService {
 
     decipher.setAuthTag(tag);
     return Buffer.concat([decipher.update(ct), decipher.final()]);
+  }
+
+  getKeyVersion(payload: EncryptedPayload): number {
+    return payload.kv ?? 0;
   }
 }

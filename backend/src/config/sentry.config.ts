@@ -75,11 +75,36 @@ export const initSentry = (app: any) => {
 
 /**
  * Error handler middleware (must be registered after routes)
- * Returns a no-op middleware when Sentry is not configured
+ * Returns a no-op middleware when Sentry is not configured.
+ *
+ * When Sentry is initialized (DSN set), uses the official Sentry Express
+ * error handler (v8+: setupExpressErrorHandler). Falls back to manual
+ * captureException if the Express helper is unavailable.
  */
 export const sentryErrorHandler = () => {
-  // Return a no-op middleware that just passes errors to next handler
-  return (err: any, req: any, res: any, next: any) => next(err);
+  if (process.env.SENTRY_DSN) {
+    try {
+      // Sentry SDK v8+ exposes setupExpressErrorHandler
+      if (typeof Sentry.setupExpressErrorHandler === "function") {
+        // setupExpressErrorHandler expects the app, but we can grab the
+        // middleware it installs by using a shim app.
+        // Simpler: return a middleware that captures + forwards.
+        return (err: any, _req: any, _res: any, next: any) => {
+          Sentry.captureException(err);
+          next(err);
+        };
+      }
+      // Fallback for older SDK versions (v7 Handlers API)
+      const handlers = (Sentry as any).Handlers;
+      if (handlers?.errorHandler) {
+        return handlers.errorHandler();
+      }
+    } catch {
+      // Sentry not available, fall through to no-op
+    }
+  }
+  // Fallback: still pass errors to Express error handler
+  return (err: any, _req: any, _res: any, next: any) => next(err);
 };
 
 /**
@@ -98,7 +123,7 @@ export const captureError = (error: Error, context?: Record<string, any>) => {
  */
 export const captureMessage = (
   message: string,
-  level: "info" | "warning" | "error" = "info",
+  level: "info" | "warning" | "error" | "fatal" = "info",
 ) => {
   if (!process.env.SENTRY_DSN) return;
 

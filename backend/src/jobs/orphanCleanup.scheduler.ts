@@ -4,6 +4,7 @@ import { Pinecone } from "@pinecone-database/pinecone";
 import { UPLOAD_CONFIG } from "../config/upload.config";
 import { logger } from "../utils/logger";
 import { GcsStorageService } from "../services/retrieval/gcsStorage.service";
+import { cleanupExpiredSessions } from "../queues/workers/sessionCleanup.worker";
 
 /**
  * Orphan Cleanup Scheduler
@@ -518,9 +519,18 @@ export function startOrphanCleanupScheduler() {
     await runStaleUploadCleanup();
   });
 
+  // Session cleanup daily at 2:00 AM
+  cron.schedule("0 2 * * *", async () => {
+    logger.info("[SessionCleanup] Running scheduled session cleanup");
+    await cleanupExpiredSessions().catch((err) =>
+      logger.error("[SessionCleanup] Failed", { error: err instanceof Error ? err.message : String(err) })
+    );
+  });
+
   logger.info("[OrphanCleanup] Scheduler started", {
     fullCleanup: "Daily at 3:00 AM",
     staleUploads: "Daily at 4:00 AM",
+    sessionCleanup: "Daily at 2:00 AM",
   });
 }
 

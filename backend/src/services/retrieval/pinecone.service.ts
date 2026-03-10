@@ -201,17 +201,25 @@ export class PineconeService {
 
       this.assertVectorDim(c.embedding, `chunk ${c.chunkIndex}`);
 
+      // D-3: When field encryption is enabled, strip sensitive content from
+      // Pinecone metadata — these live only in the encrypted DB columns.
+      const stripSensitive = process.env.KODA_ENCRYPT_FIELDS === "true";
+
       // Keep content in metadata (for fast retrieval), but cap size
-      const content = (c.content || "").slice(0, 5000);
+      const content = stripSensitive ? "" : (c.content || "").slice(0, 5000);
 
       const meta = this.sanitizeMetadata({
         // scoping
         userId,
         documentId,
 
-        // doc metadata
-        filename: document.filename,
-        originalName: document.originalName,
+        // doc metadata — omit filename/originalName when encrypting
+        ...(stripSensitive
+          ? {}
+          : {
+              filename: document.filename,
+              originalName: document.originalName,
+            }),
         title: document.title,
         mimeType: document.mimeType,
         status: document.status,
@@ -228,7 +236,7 @@ export class PineconeService {
 
         // chunk metadata
         chunkIndex: c.chunkIndex,
-        content,
+        ...(stripSensitive ? {} : { content }),
 
         // embedding model tracking (for consistency verification)
         embeddingModel:

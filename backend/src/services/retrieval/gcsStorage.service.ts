@@ -10,6 +10,8 @@
 
 import { Storage, type GetSignedUrlConfig } from "@google-cloud/storage";
 import { Readable } from "stream";
+import { logger } from "../../utils/logger";
+import { EncryptionService } from "../security/encryption.service";
 
 export type GcsStorageConfig = {
   projectId?: string;
@@ -113,9 +115,23 @@ export class GcsStorageService {
   }): Promise<{ key: string }> {
     try {
       const file = this.bucket().file(params.key);
-      await file.save(params.buffer, {
+      let uploadBuffer = params.buffer;
+      const customMeta: Record<string, string> = {};
+
+      // D-5: Client-side encrypt before saving to GCS
+      if (process.env.KODA_ENCRYPT_GCS === "true" && process.env.KODA_MASTER_KEY_BASE64) {
+        const enc = new EncryptionService();
+        const masterKey = Buffer.from(process.env.KODA_MASTER_KEY_BASE64, "base64");
+        const aad = `gcs:${params.key}`;
+        const payload = enc.encryptBuffer(uploadBuffer, masterKey, aad);
+        uploadBuffer = Buffer.from(JSON.stringify(payload));
+        customMeta.clientEncrypted = "true";
+      }
+
+      await file.save(uploadBuffer, {
         contentType: params.mimeType || "application/octet-stream",
         resumable: false, // this codepath is used for backend-to-GCS uploads
+        metadata: Object.keys(customMeta).length > 0 ? { metadata: customMeta } : undefined,
       });
       return { key: params.key };
     } catch (err) {
@@ -135,7 +151,28 @@ export class GcsStorageService {
       const [meta] = await file.getMetadata();
       const mimeType =
         (meta.contentType as string) || "application/octet-stream";
-      const [buf] = await file.download();
+      let [buf] = await file.download();
+
+      // D-5: Decrypt if the file was client-side encrypted on upload
+      const customMeta = (meta.metadata || {}) as Record<string, string>;
+      if (
+        customMeta.clientEncrypted === "true" &&
+        process.env.KODA_MASTER_KEY_BASE64
+      ) {
+        try {
+          const enc = new EncryptionService();
+          const masterKey = Buffer.from(process.env.KODA_MASTER_KEY_BASE64, "base64");
+          const aad = `gcs:${params.key}`;
+          const payload = JSON.parse(buf.toString());
+          buf = enc.decryptBuffer(payload, masterKey, aad);
+        } catch (decryptErr) {
+          logger.warn("[GCS] Failed to decrypt client-encrypted file, returning raw", {
+            key: params.key,
+            error: (decryptErr as Error).message,
+          });
+        }
+      }
+
       return { buffer: buf, mimeType };
     } catch (err) {
       throw new GcsStorageError(
@@ -178,6 +215,8 @@ export class GcsStorageService {
     mimeType?: string;
     lastModified?: Date;
     etag?: string;
+    md5Hash?: string;
+    crc32c?: string;
   } | null> {
     try {
       const file = this.bucket().file(params.key);
@@ -187,6 +226,8 @@ export class GcsStorageService {
         mimeType: (meta.contentType as string) || undefined,
         lastModified: meta.updated ? new Date(meta.updated) : undefined,
         etag: (meta.etag as string) || undefined,
+        md5Hash: (meta.md5Hash as string) || undefined,
+        crc32c: (meta.crc32c as string) || undefined,
       };
     } catch {
       return null;
@@ -322,13 +363,12 @@ export class GcsStorageService {
           maxAgeSeconds: 3600,
         },
       ]);
-      console.log(`✅ GCS bucket CORS configured for: ${unique.join(", ")}`);
+      logger.info("[GCS] Bucket CORS configured", { origins: unique });
     } catch (err) {
       // Non-fatal — bucket may already have CORS or service account lacks storage.buckets.update.
-      console.warn(
-        "⚠️  Failed to set GCS bucket CORS (uploads may fail from browser):",
-        (err as Error).message,
-      );
+      logger.warn("[GCS] Failed to set bucket CORS (uploads may fail from browser)", {
+        error: (err as Error).message,
+      });
     }
   }
 

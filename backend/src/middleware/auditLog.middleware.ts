@@ -1,5 +1,15 @@
 import { Request, Response, NextFunction } from "express";
+import crypto from "crypto";
 import prisma from "../config/database";
+import { logger } from "../utils/logger";
+import { auditStore } from "../services/security/auditStore.service";
+import { securityAlerting } from "../services/security/alerting.service";
+
+function hashIp(ip: string | null | undefined): string {
+  if (!ip) return "unknown";
+  const salt = process.env.KODA_AUDIT_SALT || "audit-ip-salt";
+  return crypto.createHmac("sha256", salt).update(ip).digest("hex").slice(0, 16);
+}
 
 /**
  * Security Audit Logging Middleware
@@ -50,7 +60,9 @@ export const auditLog = async (
       req.path.includes("/documents") ||
       req.path.includes("/folders") ||
       req.path.includes("/chat") ||
-      req.path.includes("/users");
+      req.path.includes("/users") ||
+      req.path.includes("/presigned-urls") ||
+      req.path.includes("/multipart-upload");
 
     if (isSensitiveOperation) {
       // Extract resource ID from path or body
@@ -63,6 +75,35 @@ export const auditLog = async (
         resourceId = lastSegment;
       }
 
+      // Build audit details — always include responseStatus and duration
+      const isUploadPath =
+        req.path.includes("/presigned-urls/") ||
+        req.path.includes("/multipart-upload/");
+
+      const detailsObj: Record<string, unknown> = {
+        responseStatus: res.statusCode,
+        duration,
+      };
+
+      if (res.statusCode >= 400) {
+        detailsObj.statusCode = res.statusCode;
+      }
+
+      // For upload-related endpoints, capture key metadata (never full body)
+      if (isUploadPath && body) {
+        if (Array.isArray(body?.documentIds)) {
+          detailsObj.documentIdsCount = body.documentIds.length;
+        } else if (Array.isArray(body?.data?.documentIds)) {
+          detailsObj.documentIdsCount = body.data.documentIds.length;
+        }
+        if (body?.error) {
+          detailsObj.responseError = String(body.error).slice(0, 200);
+        }
+        if (body?.data?.error) {
+          detailsObj.responseError = String(body.data.error).slice(0, 200);
+        }
+      }
+
       // Log to audit_log table — NEVER include response body
       prisma.auditLog
         .create({
@@ -70,31 +111,56 @@ export const auditLog = async (
             userId,
             action,
             resource: resourceId,
-            ipAddress,
+            ipAddress: hashIp(ipAddress),
             userAgent,
             status: res.statusCode < 400 ? "success" : "failure",
-            // Store only status code metadata, never response bodies
-            details:
-              res.statusCode >= 400
-                ? JSON.stringify({ statusCode: res.statusCode, duration })
-                : null,
+            // Store only safe metadata, never response bodies
+            details: JSON.stringify(detailsObj),
           },
         })
         .catch((err) => {
-          console.error("Failed to write audit log:", err.message);
+          logger.error("[AuditLog] write failed", {
+            err: err.message,
+            action,
+            userId,
+          });
         });
+
+      // Append-only audit store (non-blocking)
+      auditStore.writeAuditEntry({
+        timestamp: new Date().toISOString(),
+        userId: userId || "anonymous",
+        action,
+        resource: resourceId || "",
+        ipHash: hashIp(ipAddress),
+        status: res.statusCode < 400 ? "success" : "failure",
+        details: detailsObj,
+      }).catch(() => {}); // Non-blocking
 
       // Security violation detection — log only metadata, no body
       if (res.statusCode === 401 || res.statusCode === 403) {
-        console.warn(
-          `[SECURITY] status=${res.statusCode} action="${action}" user=${userId || "anonymous"} ip=${ipAddress}`,
-        );
+        const hashedIp = hashIp(ipAddress);
+        logger.warn("[AuditLog] security violation detected", {
+          status: res.statusCode,
+          action,
+          userId: userId || "anonymous",
+          ipAddress: hashedIp,
+        });
+        securityAlerting.trackAuthFailure(hashedIp, {
+          path: req.path,
+          method: req.method,
+          statusCode: res.statusCode,
+        });
       }
     }
 
     // Log slow operations
     if (duration > 5000) {
-      console.warn(`[SLOW] ${duration}ms action="${action}" user=${userId}`);
+      logger.warn("[AuditLog] slow operation", {
+        duration,
+        action,
+        userId,
+      });
     }
 
     return originalJson(body);

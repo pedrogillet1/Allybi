@@ -16,6 +16,7 @@ import type {
   CacheStatsResult,
 } from "./cache/cache.types";
 import { logger } from "../utils/logger";
+import { getFieldEncryption } from "./security/fieldEncryption.service";
 
 export class CacheService {
   private cache: NodeCache;
@@ -60,6 +61,35 @@ export class CacheService {
     } catch (error) {
       logger.error(errorLabel, { error });
       return null;
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // D-4: Cache value encryption helpers
+  // ---------------------------------------------------------------------------
+
+  private get encryptionEnabled(): boolean {
+    return process.env.KODA_ENCRYPT_FIELDS === "true";
+  }
+
+  private encryptCacheValue(value: string, key: string): string {
+    if (!this.encryptionEnabled) return value;
+    try {
+      const fe = getFieldEncryption();
+      return fe.encryptField(value, { userId: "cache", entityId: key, field: "value" });
+    } catch {
+      return value;
+    }
+  }
+
+  private decryptCacheValue(value: string, key: string): string {
+    if (!this.encryptionEnabled) return value;
+    try {
+      const fe = getFieldEncryption();
+      return fe.decryptField(value, { userId: "cache", entityId: key, field: "value" });
+    } catch {
+      // Legacy unencrypted cache entry — return as-is
+      return value;
     }
   }
 
@@ -117,7 +147,8 @@ export class CacheService {
   async cacheAnswer(userId: string, query: string, answer: any): Promise<void> {
     await this.safeWrite(() => {
       const key = this.generateKey("answer", userId, query);
-      this.cache.set(key, answer, this.ANSWER_TTL);
+      const value = this.encryptCacheValue(JSON.stringify(answer), key);
+      this.cache.set(key, value, this.ANSWER_TTL);
       logger.debug("[Cache] Cached answer", { query: this.preview(query) });
     }, "[Cache] Error caching answer");
   }
@@ -125,10 +156,15 @@ export class CacheService {
   async getCachedAnswer(userId: string, query: string): Promise<any | null> {
     return this.safeRead(() => {
       const key = this.generateKey("answer", userId, query);
-      const cached = this.cache.get<any>(key);
+      const cached = this.cache.get<string>(key);
       if (cached) {
         logger.debug("[Cache] HIT for answer", { query: this.preview(query) });
-        return cached;
+        const decrypted = this.decryptCacheValue(cached, key);
+        try {
+          return JSON.parse(decrypted);
+        } catch {
+          return cached; // Legacy non-string cache entry
+        }
       }
       return null;
     }, "[Cache] Error getting cached answer");
@@ -330,7 +366,8 @@ export class CacheService {
         mode,
         timestamp: Date.now(),
       };
-      this.cache.set(key, cachedData, ttl);
+      const value = this.encryptCacheValue(JSON.stringify(cachedData), key);
+      this.cache.set(key, value, ttl);
       logger.debug("[Cache] Cached query response", { mode, ttl });
     }, "[Cache] Error caching query response");
   }
@@ -342,11 +379,18 @@ export class CacheService {
   ): Promise<CachedQueryResponse | null> {
     return this.safeRead(() => {
       const key = buildQueryResponseKey(userId, mode, query);
-      const cached = this.cache.get<CachedQueryResponse>(key);
+      const cached = this.cache.get<string>(key);
       if (cached) {
-        const age = (Date.now() - cached.timestamp) / 1000;
-        logger.debug("[Cache] HIT for query response", { mode, ageSec: +age.toFixed(1) });
-        return cached;
+        const decrypted = this.decryptCacheValue(cached, key);
+        try {
+          const parsed = JSON.parse(decrypted) as CachedQueryResponse;
+          const age = (Date.now() - parsed.timestamp) / 1000;
+          logger.debug("[Cache] HIT for query response", { mode, ageSec: +age.toFixed(1) });
+          return parsed;
+        } catch {
+          // Legacy non-encrypted entry
+          return cached as unknown as CachedQueryResponse;
+        }
       }
       logger.debug("[Cache] MISS for query response", { mode });
       return null;

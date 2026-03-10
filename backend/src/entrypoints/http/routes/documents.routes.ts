@@ -27,6 +27,7 @@ import {
   fileExists,
 } from "../../../config/storage";
 import cacheService from "../../../services/cache.service";
+import { hkdf32 } from "../../../services/security/hkdf.service";
 import { generateExcelHtmlPreview } from "../../../services/ingestion/excelHtmlPreview.service";
 import * as XLSX from "xlsx";
 import { ensurePreview } from "../../../services/preview/previewOrchestrator.service";
@@ -1993,7 +1994,8 @@ router.get(
       if (doc.isEncrypted && doc.encryptionIV && doc.encryptionAuthTag) {
         try {
           const crypto = await import("crypto");
-          const key = crypto.scryptSync(`document-${userId}`, "salt", 32);
+          const masterKey = Buffer.from(process.env.KODA_MASTER_KEY_BASE64!, "base64");
+          const key = hkdf32(masterKey, `download:${userId}:${documentId}`);
           const iv = Buffer.from(doc.encryptionIV, "base64");
           const authTag = Buffer.from(doc.encryptionAuthTag, "base64");
           const decipher = crypto.createDecipheriv("aes-256-gcm", key, iv);
@@ -2802,7 +2804,8 @@ router.post(
           if (doc.isEncrypted && doc.encryptionIV && doc.encryptionAuthTag) {
             try {
               const crypto = await import("crypto");
-              const key = crypto.scryptSync(`document-${userId}`, "salt", 32);
+              const masterKey = Buffer.from(process.env.KODA_MASTER_KEY_BASE64!, "base64");
+              const key = hkdf32(masterKey, `download:${userId}:${doc.id}`);
               const iv = Buffer.from(doc.encryptionIV, "base64");
               const authTag = Buffer.from(doc.encryptionAuthTag, "base64");
               const decipher = crypto.createDecipheriv("aes-256-gcm", key, iv);

@@ -38,7 +38,7 @@ const LOGIN_PASSWORD = String(
 ).trim();
 
 const isHttps = BASE.startsWith('https://');
-const httpsAgent = new https.Agent({ rejectUnauthorized: false });
+const httpsAgent = new https.Agent();
 const httpAgent = new http.Agent();
 
 // ── Document-specific query sets ──────────────────────────────────

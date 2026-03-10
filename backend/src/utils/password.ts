@@ -1,35 +1,32 @@
 import bcrypt from "bcrypt";
-import crypto from "crypto";
 
 const SALT_ROUNDS = 12;
 
 /**
- * Generate a random salt
- */
-export const generateSalt = (): string => {
-  return crypto.randomBytes(16).toString("hex");
-};
-
-/**
- * Hash a password with a salt
+ * Hash a password using bcrypt-12 with built-in salt.
+ * The returned `salt` field is always empty — kept for DB schema compatibility.
  */
 export const hashPassword = async (
   password: string,
 ): Promise<{ hash: string; salt: string }> => {
-  const salt = generateSalt();
-  const hash = await bcrypt.hash(password + salt, SALT_ROUNDS);
-  return { hash, salt };
+  const hash = await bcrypt.hash(password, SALT_ROUNDS);
+  return { hash, salt: "" }; // salt embedded in bcrypt hash; field kept for schema compat
 };
 
 /**
- * Verify a password against a hash
+ * Verify a password against a hash.
+ * Migration path: if salt is non-empty, this is a legacy hash (password+salt was hashed).
  */
 export const verifyPassword = async (
   password: string,
   hash: string,
   salt: string,
 ): Promise<boolean> => {
-  return bcrypt.compare(password + salt, hash);
+  // Migration path: if salt is non-empty, this is a legacy hash (password+salt was hashed)
+  if (salt && salt.length > 0) {
+    return bcrypt.compare(password + salt, hash);
+  }
+  return bcrypt.compare(password, hash);
 };
 
 /**

@@ -141,6 +141,8 @@ export interface ProcessDocumentJobData {
   thumbnailUrl?: string | null;
   priority?: "high" | "normal" | "low";
   plaintextForEmbeddings?: string;
+  /** D-7: Encrypted counterpart of plaintextForEmbeddings (set when KODA_ENCRYPT_FIELDS=true) */
+  plaintextForEmbeddingsEncrypted?: string;
 }
 
 export interface PreviewGenerationJobData {

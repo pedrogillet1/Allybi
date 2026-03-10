@@ -18,6 +18,7 @@ import prisma from "../../../platform/db/prismaClient";
 import { logger } from "../../../utils/logger";
 import AdmZip from "adm-zip";
 import { downloadFile } from "../../../config/storage";
+import { hkdf32 } from "../../../services/security/hkdf.service";
 
 const router = Router();
 
@@ -363,7 +364,8 @@ router.get(
         if (doc.isEncrypted && doc.encryptionIV && doc.encryptionAuthTag) {
           try {
             const crypto = await import("crypto");
-            const key = crypto.scryptSync(`document-${userId}`, "salt", 32);
+            const masterKey = Buffer.from(process.env.KODA_MASTER_KEY_BASE64!, "base64");
+            const key = hkdf32(masterKey, `download:${userId}:${doc.id}`);
             const iv = Buffer.from(doc.encryptionIV, "base64");
             const authTag = Buffer.from(doc.encryptionAuthTag, "base64");
             const decipher = crypto.createDecipheriv("aes-256-gcm", key, iv);

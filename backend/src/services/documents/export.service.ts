@@ -1,6 +1,7 @@
 import * as crypto from "crypto";
 import prisma from "../../config/database";
 import { downloadFile } from "../../config/storage";
+import { hkdf32 } from "../security/hkdf.service";
 import {
   convertToDocx,
   isCloudConvertAvailable,
@@ -82,7 +83,8 @@ function decryptDocumentBytesIfNeeded(
     return fileBuffer;
   }
 
-  const key = crypto.scryptSync(`document-${userId}`, "salt", 32);
+  const masterKey = Buffer.from(process.env.KODA_MASTER_KEY_BASE64!, "base64");
+  const key = hkdf32(masterKey, `download:${userId}:${doc.id}`);
   const iv = Buffer.from(doc.encryptionIV, "base64");
   const authTag = Buffer.from(doc.encryptionAuthTag, "base64");
   const decipher = crypto.createDecipheriv("aes-256-gcm", key, iv);

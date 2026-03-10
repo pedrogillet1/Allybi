@@ -32,7 +32,7 @@ app.set("trust proxy", 1);
 /** -----------------------------
  * CORS (must come first)
  * ----------------------------- */
-const allowedOrigins = [
+const allowedOrigins: string[] = [
   "https://allybi.co",
   "https://www.allybi.co",
   "https://app.allybi.co",
@@ -40,20 +40,26 @@ const allowedOrigins = [
   // OAuth provider origins (Apple sends POST with Origin header)
   "https://appleid.apple.com",
   "https://accounts.google.com",
-  "http://localhost:3000",
-  "http://localhost:3001",
-  "http://localhost:3002",
-  "http://localhost:3003",
-  "http://localhost:5173",
-  "http://127.0.0.1:3000",
-  "http://127.0.0.1:3001",
-  "http://127.0.0.1:3002",
-  "http://127.0.0.1:3003",
-  // Local network for mobile testing
-  "http://192.168.15.63:3000",
-  "http://192.168.15.63:3002",
   config.FRONTEND_URL,
 ].filter(Boolean) as string[];
+
+// Only allow localhost and local-network origins in non-production
+if (process.env.NODE_ENV !== "production") {
+  allowedOrigins.push(
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://localhost:3002",
+    "http://localhost:3003",
+    "http://localhost:5173",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:3001",
+    "http://127.0.0.1:3002",
+    "http://127.0.0.1:3003",
+    // Local network for mobile testing
+    "http://192.168.15.63:3000",
+    "http://192.168.15.63:3002",
+  );
+}
 
 const isLocalNetworkOrigin = (origin: string): boolean => {
   try {
@@ -69,7 +75,10 @@ const corsOptions: cors.CorsOptions = {
     // Allow same-origin / server-to-server (no Origin header)
     if (!origin) return callback(null, true);
 
-    if (allowedOrigins.includes(origin) || isLocalNetworkOrigin(origin)) {
+    if (
+      allowedOrigins.includes(origin) ||
+      (process.env.NODE_ENV !== "production" && isLocalNetworkOrigin(origin))
+    ) {
       // Echo origin for proper ACAO behavior with credentials
       return callback(null, origin);
     }
@@ -167,7 +176,6 @@ app.use((req: Request, res: Response, next: NextFunction) => {
       "Strict-Transport-Security",
       "max-age=63072000; includeSubDomains; preload",
     );
-    res.setHeader("Expect-CT", "max-age=86400, enforce");
   } else {
     res.setHeader("X-Frame-Options", "SAMEORIGIN");
   }

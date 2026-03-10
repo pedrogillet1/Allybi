@@ -66,6 +66,22 @@ export async function runEncryptionStep(params: {
         : Promise.resolve(),
     ]);
 
+    // D-6: Null out plaintext now that the encrypted counterpart exists.
+    // This prevents plaintext from persisting after encryption.
+    if (fullText) {
+      // Null plaintext on Document (rawText, previewText)
+      await prisma.document.update({
+        where: { id: documentId },
+        data: { rawText: null, previewText: null },
+      });
+      // Null plaintext on DocumentMetadata (extractedText)
+      await prisma.documentMetadata.updateMany({
+        where: { documentId },
+        data: { extractedText: null },
+      });
+      logger.info("[Pipeline] Nulled plaintext fields after encryption", { documentId });
+    }
+
     logger.info("[Pipeline] Encrypted extracted text stored", { documentId });
   } catch (encErr: any) {
     if (encryptedOnly) {

@@ -15,6 +15,7 @@
 
 import prisma from "../../config/database";
 import { downloadFile, uploadFile, fileExists } from "../../config/storage";
+import { hkdf32 } from "../security/hkdf.service";
 import * as cloudConvert from "../conversion/cloudConvertPptx.service";
 import * as googleSlides from "./googleSlidesPreview.service";
 import {
@@ -154,7 +155,8 @@ export async function generatePreviewPdf(
       console.log(`[PreviewPDF] Decrypting file...`);
       try {
         const crypto = await import("crypto");
-        const key = crypto.scryptSync(`document-${userId}`, "salt", 32);
+        const masterKey = Buffer.from(process.env.KODA_MASTER_KEY_BASE64!, "base64");
+        const key = hkdf32(masterKey, `download:${userId}:${documentId}`);
         const iv = Buffer.from(document.encryptionIV, "base64");
         const authTag = Buffer.from(document.encryptionAuthTag, "base64");
         const decipher = crypto.createDecipheriv("aes-256-gcm", key, iv);

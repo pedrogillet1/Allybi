@@ -5,6 +5,7 @@ export type AesGcmEncryptedPayloadV1 = {
   tagB64: string;
   ctB64: string;
   aadB64?: string;
+  kv?: number;
 };
 
 export type EncryptedPayload = AesGcmEncryptedPayloadV1;

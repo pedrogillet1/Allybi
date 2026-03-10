@@ -13,7 +13,7 @@
  *   sessions for that user are revoked (theft assumption)
  */
 
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
 import crypto from "crypto";
 import prisma from "../config/database";
 import {
@@ -56,9 +56,8 @@ export function createAuthService(): AuthService {
         throw new Error("Email already exists");
       }
 
-      // Hash password
-      const salt = await bcrypt.genSalt(BCRYPT_ROUNDS);
-      const passwordHash = await bcrypt.hash(input.password, salt);
+      // Hash password (bcrypt-12 with built-in salt)
+      const passwordHash = await bcrypt.hash(input.password, BCRYPT_ROUNDS);
 
       // Parse name into firstName/lastName
       let firstName: string | null = null;
@@ -83,7 +82,7 @@ export function createAuthService(): AuthService {
         data: {
           email,
           passwordHash,
-          salt,
+          salt: "", // salt embedded in bcrypt hash; field kept for schema compat
           firstName,
           lastName,
           emailCode,
@@ -125,9 +124,29 @@ export function createAuthService(): AuthService {
         throw new Error("Invalid credentials");
       }
 
-      const valid = await bcrypt.compare(input.password, user.passwordHash);
+      let valid = await bcrypt.compare(input.password, user.passwordHash);
+      if (!valid && user.salt) {
+        // Legacy fallback: old hashes used password+salt
+        valid = await bcrypt.compare(input.password + user.salt, user.passwordHash);
+      }
       if (!valid) {
         throw new Error("Invalid credentials");
+      }
+
+      // Enforce max 10 active sessions per user
+      const activeSessions = await prisma.session.findMany({
+        where: { userId: user.id, isActive: true },
+        orderBy: { createdAt: "asc" },
+        select: { id: true },
+      });
+
+      if (activeSessions.length >= 10) {
+        // Revoke oldest sessions to stay under limit
+        const toRevoke = activeSessions.slice(0, activeSessions.length - 9);
+        await prisma.session.updateMany({
+          where: { id: { in: toRevoke.map((s) => s.id) } },
+          data: { isActive: false, revokedAt: new Date() },
+        });
       }
 
       // Generate tokens

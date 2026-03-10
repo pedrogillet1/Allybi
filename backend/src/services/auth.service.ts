@@ -29,6 +29,22 @@ function hashVerificationCode(code: string): string {
 // Helper: create session with HMAC-hashed refresh token + session-bound access token
 // ---------------------------------------------------------------------------
 async function createSessionTokens(userId: string, email: string) {
+  // Enforce max 10 active sessions per user
+  const activeSessions = await prisma.session.findMany({
+    where: { userId, isActive: true },
+    orderBy: { createdAt: "asc" },
+    select: { id: true },
+  });
+
+  if (activeSessions.length >= 10) {
+    // Revoke oldest sessions to stay under limit
+    const toRevoke = activeSessions.slice(0, activeSessions.length - 9);
+    await prisma.session.updateMany({
+      where: { id: { in: toRevoke.map((s) => s.id) } },
+      data: { isActive: false, revokedAt: new Date() },
+    });
+  }
+
   const refreshToken = generateRefreshToken({ userId, email });
 
   const session = await prisma.session.create({
@@ -978,12 +994,11 @@ export async function resetPasswordWithToken(
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
   if (!passwordRegex.test(newPassword)) throw new Error("WEAK_PASSWORD");
 
-  const salt = await bcrypt.genSalt(12);
-  const passwordHash = await bcrypt.hash(newPassword, salt);
+  const passwordHash = await bcrypt.hash(newPassword, 12);
 
   await prisma.user.update({
     where: { id: userId },
-    data: { passwordHash, salt },
+    data: { passwordHash, salt: "" }, // salt embedded in bcrypt hash; field kept for schema compat
   });
 
   await deleteResetToken(token);
