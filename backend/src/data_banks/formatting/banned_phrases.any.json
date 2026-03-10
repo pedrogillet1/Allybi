@@ -415,6 +415,42 @@
       "languages": [
         "en"
       ]
+    },
+    {
+      "id": "BAN_040_pt_nao_aparece",
+      "category": "excessive_hedging",
+      "regex": "(?i)\\bn[aã]o (?:aparece|traz|consta|contem|h[aá])\\b.{0,30}\\b(?:defini[cç][aã]o|conceito|termo|informa[cç][aã]o|dado|men[cç][aã]o|explica[cç][aã]o)",
+      "action": "strip",
+      "languages": [
+        "pt"
+      ]
+    },
+    {
+      "id": "BAN_041_pt_nao_da_para",
+      "category": "excessive_hedging",
+      "regex": "(?i)\\bn[aã]o d[aá] para (?:listar|afirmar|confirmar|determinar|verificar|identificar)",
+      "action": "strip",
+      "languages": [
+        "pt"
+      ]
+    },
+    {
+      "id": "BAN_042_pt_pelos_trechos",
+      "category": "filler_phrases",
+      "regex": "(?i)^\\s*(?:pelos? trechos? (?:encontrados?|dispon[ií]veis?|recuperados?)|de acordo com os documentos? dispon[ií]veis?|com base nos? trechos?)[,.]?\\s*",
+      "action": "strip",
+      "languages": [
+        "pt"
+      ]
+    },
+    {
+      "id": "BAN_043_es_con_base_en",
+      "category": "filler_phrases",
+      "regex": "(?i)^\\s*con base en la informaci[oó]n limitada disponible[,.]?\\s*",
+      "action": "strip",
+      "languages": [
+        "es"
+      ]
     }
   ],
   "postProcessing": {

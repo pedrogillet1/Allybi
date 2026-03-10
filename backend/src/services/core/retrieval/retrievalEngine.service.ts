@@ -4172,7 +4172,7 @@ export class RetrievalEngineService {
       .trim()
       .toLowerCase();
     if (
-      /\b(list|all|which (docs|files)|where else|across (docs|files)|documents? mentioning|files? mentioning)\b/i.test(
+      /\b(list|all|which (docs|files)|where else|across (docs|files)|documents? mentioning|files? mentioning|todos|visa[oã]o geral|compara|entre .+ e .+|quais (docs|documentos|arquivos)|dos (docs|documentos) anexa)/i.test(
         query,
       )
     ) {

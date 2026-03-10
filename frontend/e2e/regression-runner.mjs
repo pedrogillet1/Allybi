@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * 40-Query Conversational Regression Runner
+ * 30-Query Conversational Regression Runner
  * Executes queries sequentially against the chat API, captures responses, and grades them.
  */
 import https from 'https';
@@ -50,18 +50,9 @@ const QUERIES = [
   'Resume tudo em 3 frases para WhatsApp.',
   'Quais docs estão mais completos e quais parecem rasos?',
   'Se eu tiver 15 minutos, qual ordem de leitura você recomenda?',
-  'Começa pelo capítulo de scrum.',
-  'No capítulo de scrum, qual a definição central de Scrum?',
-  'Quais papéis aparecem e qual responsabilidade de cada um?',
-  'Explica os eventos do Scrum na ordem correta, simples.',
-  'Diferença prática entre Product Backlog e Sprint Backlog.',
-  'O que o texto fala sobre Definition of Done?',
-  'Me dá 3 trechos curtos que provam os pontos principais.',
-  'Agora transforma isso em tabela: conceito | definição | evidência.',
-  'Cria 10 flashcards com base nesse capítulo.',
-  'Agora conecta com as anotações da aula.',
-  'Quais temas das anotações batem com o capítulo?',
-  'Quais pontos das anotações contradizem ou ampliam o capítulo?',
+  'Resume as anotações da aula e destaca os conceitos principais.',
+  'Quais temas das anotações se conectam com gestão de projetos?',
+  'Quais pontos das anotações são mais aplicáveis a projetos reais?',
   'Resume as anotações por tema em tópicos.',
   'Me dá os 10 termos mais importantes das anotações com explicação curta.',
   'Agora vamos para o trabalho do projeto.',
@@ -76,7 +67,6 @@ const QUERIES = [
   'Resume esse trabalho em um pitch de 60 segundos.',
   'Agora versão técnica para time de execução.',
   'Faz uma SWOT baseada só nesse trabalho.',
-  'Compara o trabalho com o capítulo de scrum (convergências e lacunas).',
   'Agora usa o one-pager de marketing e o deck de self storage para comparar posicionamento.',
   'Quais mensagens comerciais se repetem entre o one-pager e o deck?',
   'Onde há inconsistência entre promessa comercial e execução do projeto?',
@@ -451,7 +441,7 @@ function gradeResult(idx, query, result, options = {}) {
 
 // ── Main ──────────────────────────────────────────────────────────────
 async function main() {
-  console.log('=== 40-Query Regression Runner ===\n');
+  console.log(`=== ${QUERIES.length}-Query Regression Runner ===\n`);
   console.log(`  API base: ${BASE}`);
   console.log(`  Strict docset lock: ${STRICT_DOCSET_LOCK ? 'ON' : 'OFF'}`);
   console.log(`  TLS verify: ${isHttps ? 'disabled (self-signed allowed)' : 'n/a (http)'}`);
@@ -472,7 +462,7 @@ async function main() {
   const allDocs = docsRes.data.items.filter(d => d.status === 'ready');
 
   // Select the relevant documents for this test set (from stress test/pdf + relevant ones)
-  // Based on queries: Scrum chapter, class notes, project work, marketing one-pager,
+  // Based on queries: class notes, project work, marketing one-pager,
   // self-storage deck, final project image
   const docMap = {};
   for (const d of allDocs) {
@@ -481,6 +471,7 @@ async function main() {
   }
 
   // Pick one copy of each relevant doc (prefer stress test folder)
+  // Note: Scrum chapter removed — not in test account docset
   const targetDocs = [];
   const findDoc = (substring) => {
     const found = allDocs.find(d => d.filename.toLowerCase().includes(substring.toLowerCase()) && d.status === 'ready');
@@ -488,7 +479,6 @@ async function main() {
     return found;
   };
 
-  findDoc('Capítulo_8__Framework_Scrum');    // Scrum chapter
   findDoc('Anotações_Aula_2');               // Class notes
   findDoc('Trabalho_projeto');               // Project work
   findDoc('OBA_marketing');                  // Marketing one-pager
@@ -510,7 +500,7 @@ async function main() {
   const documentIds = targetDocs.map(d => d.id);
 
   // 3. Run queries
-  console.log('\n[3/4] Running 40 queries sequentially...\n');
+  console.log(`\n[3/4] Running ${QUERIES.length} queries sequentially...\n`);
   let conversationId = null;
   const results = [];
   const grades = [];
@@ -645,7 +635,7 @@ async function main() {
       runDate: new Date().toISOString(),
       account: LOGIN_EMAIL,
       baseUrl: BASE,
-      totalQueries: 40,
+      totalQueries: QUERIES.length,
       conversationId,
       documentsAttached: targetDocs.map(d => ({ id: d.id, name: d.filename })),
       retryIncidents: retryCount,
@@ -659,19 +649,19 @@ async function main() {
       partial: partialCount,
       fail: failCount,
       missingSources,
-      missingSourcesRate: ((missingSources / 40) * 100).toFixed(1) + '%',
-      wrongDocRate: ((wrongDocCount / 40) * 100).toFixed(1) + '%',
+      missingSourcesRate: ((missingSources / QUERIES.length) * 100).toFixed(1) + '%',
+      wrongDocRate: ((wrongDocCount / QUERIES.length) * 100).toFixed(1) + '%',
       wrongDocCount,
       truncationIncidence: truncatedCount,
-      truncationRate: ((truncatedCount / 40) * 100).toFixed(1) + '%',
+      truncationRate: ((truncatedCount / QUERIES.length) * 100).toFixed(1) + '%',
       languageIssues: langIssues,
     },
     strictDocsetViolations,
     topIssues: topIssues.slice(0, 10),
   };
 
-  fs.writeFileSync(path.join(REPORTS_DIR, 'queries-40-run.json'), JSON.stringify(jsonReport, null, 2));
-  console.log('  Saved: frontend/e2e/reports/queries-40-run.json');
+  fs.writeFileSync(path.join(REPORTS_DIR, `queries-${QUERIES.length}-run.json`), JSON.stringify(jsonReport, null, 2));
+  console.log(`  Saved: frontend/e2e/reports/queries-${QUERIES.length}-run.json`);
 
   const strictSummary = {
     generatedAt: new Date().toISOString(),
@@ -702,7 +692,7 @@ async function main() {
   console.log('  Saved: frontend/e2e/reports/strict-query-summary.json');
 
   // ── Save Markdown report ──
-  let md = `# 40-Query Regression Grading Report\n\n`;
+  let md = `# ${QUERIES.length}-Query Regression Grading Report\n\n`;
   md += `**Date:** ${new Date().toISOString()}  \n`;
   md += `**Account:** ${LOGIN_EMAIL}  \n`;
   md += `**API Base:** ${BASE}  \n`;
@@ -721,14 +711,14 @@ async function main() {
   md += `| Metric | Value |\n`;
   md += `|---|---|\n`;
   md += `| Aggregate Score | **${avgScore}/100** |\n`;
-  md += `| PASS | ${passCount}/40 |\n`;
-  md += `| PARTIAL | ${partialCount}/40 |\n`;
-  md += `| FAIL | ${failCount}/40 |\n`;
-  md += `| Missing Sources Rate | ${jsonReport.aggregate.missingSourcesRate} (${missingSources}/40) |\n`;
+  md += `| PASS | ${passCount}/${QUERIES.length} |\n`;
+  md += `| PARTIAL | ${partialCount}/${QUERIES.length} |\n`;
+  md += `| FAIL | ${failCount}/${QUERIES.length} |\n`;
+  md += `| Missing Sources Rate | ${jsonReport.aggregate.missingSourcesRate} (${missingSources}/${QUERIES.length}) |\n`;
   md += `| Wrong-Doc Rate | ${jsonReport.aggregate.wrongDocRate} |\n`;
-  md += `| Wrong-Doc Count | ${wrongDocCount}/40 |\n`;
-  md += `| Truncation Incidence | ${truncatedCount}/40 (${jsonReport.aggregate.truncationRate}) |\n`;
-  md += `| Language Issues | ${langIssues}/40 |\n`;
+  md += `| Wrong-Doc Count | ${wrongDocCount}/${QUERIES.length} |\n`;
+  md += `| Truncation Incidence | ${truncatedCount}/${QUERIES.length} (${jsonReport.aggregate.truncationRate}) |\n`;
+  md += `| Language Issues | ${langIssues}/${QUERIES.length} |\n`;
   md += `| Retry Incidents | ${retryCount} |\n`;
 
   md += `\n## Top Recurring Failure Patterns\n\n`;
@@ -796,14 +786,14 @@ async function main() {
     }
   }
 
-  fs.writeFileSync(path.join(REPORTS_DIR, 'queries-40-grading.md'), md);
-  console.log('  Saved: frontend/e2e/reports/queries-40-grading.md');
+  fs.writeFileSync(path.join(REPORTS_DIR, `queries-${QUERIES.length}-grading.md`), md);
+  console.log(`  Saved: frontend/e2e/reports/queries-${QUERIES.length}-grading.md`);
 
   console.log('\n=== RESULTS ===');
   console.log(`  Score:    ${avgScore}/100`);
-  console.log(`  PASS:     ${passCount}/40`);
-  console.log(`  PARTIAL:  ${partialCount}/40`);
-  console.log(`  FAIL:     ${failCount}/40`);
+  console.log(`  PASS:     ${passCount}/${QUERIES.length}`);
+  console.log(`  PARTIAL:  ${partialCount}/${QUERIES.length}`);
+  console.log(`  FAIL:     ${failCount}/${QUERIES.length}`);
   console.log(`  Sources:  ${missingSources} missing (${jsonReport.aggregate.missingSourcesRate})`);
   console.log(`  WrongDoc: ${wrongDocCount}`);
   console.log(`  Truncated:${truncatedCount}`);

@@ -127,8 +127,8 @@
       "preferProfile": "detailed"
     },
     "doc_grounded_table": {
-      "maxCharsDefault": 4000,
-      "maxOutputTokensDefault": 4000,
+      "maxCharsDefault": 5500,
+      "maxOutputTokensDefault": 5000,
       "maxTableRows": 20,
       "preferProfile": "deep"
     },
@@ -169,8 +169,8 @@
       "forceProfile": "micro"
     },
     "general_answer": {
-      "maxCharsDefault": 4000,
-      "maxOutputTokensDefault": 3000,
+      "maxCharsDefault": 5200,
+      "maxOutputTokensDefault": 4000,
       "preferProfile": "deep"
     }
   },

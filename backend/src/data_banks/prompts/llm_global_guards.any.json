@@ -71,6 +71,13 @@
       "skipWhen": [
         "machine_json_mode"
       ]
+    },
+    {
+      "id": "no_evidence_prefix",
+      "text": "Start your answer directly with the content. NEVER begin with meta-phrases like 'From the retrieved snippets', 'Based on the evidence', 'According to the documents', 'Pelos trechos encontrados', 'De acordo com os documentos', or similar evidence-referencing preambles. Just answer naturally.",
+      "skipWhen": [
+        "machine_json_mode"
+      ]
     }
   ]
 }

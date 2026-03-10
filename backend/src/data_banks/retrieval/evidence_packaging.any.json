@@ -37,7 +37,7 @@
         "maxEvidenceItemsHard": 36,
         "maxEvidencePerDocSoft": 6,
         "maxEvidencePerDocHard": 10,
-        "maxDistinctDocsNonCompare": 1,
+        "maxDistinctDocsNonCompare": 3,
         "maxDistinctDocsExploratoryNonCompare": 3,
         "maxPerSectionHard": 1,
         "maxPerSectionExploratoryHard": 2,

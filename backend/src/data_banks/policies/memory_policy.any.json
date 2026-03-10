@@ -265,14 +265,14 @@
             "es": "No encontre detalles especificos sobre esto en tus documentos. Puedes decirme que archivo debo revisar?"
           },
           "hedgePrefixWeak": {
-            "en": "From the retrieved document snippets, ",
-            "pt": "Pelos trechos encontrados, ",
-            "es": "Con base en la informacion limitada disponible, "
+            "en": "",
+            "pt": "",
+            "es": ""
           },
           "hedgePrefixModerateNarrative": {
-            "en": "According to the available documents, ",
-            "pt": "De acordo com os documentos disponiveis, ",
-            "es": "Segun los documentos disponibles, "
+            "en": "",
+            "pt": "",
+            "es": ""
           }
         }
       }
