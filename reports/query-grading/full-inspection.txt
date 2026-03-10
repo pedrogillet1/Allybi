@@ -1,0 +1,1595 @@
+========================================================================================================================
+QUERY RESULTS OVERVIEW
+========================================================================================================================
+Query | Document                  | Ans Len | Sources | Failure Code             | Status
+------------------------------------------------------------------------------------------------------------------------
+Q001 | BESS Market Assessment    |    2112 |       5 | -                         | OK
+Q002 | BESS Market Assessment    |     724 |       5 | -                         | OK
+Q003 | BESS Market Assessment    |     911 |       5 | -                         | OK
+Q004 | BESS Market Assessment    |    1053 |       5 | -                         | OK
+Q005 | BESS Market Assessment    |    1288 |       5 | -                         | OK
+Q006 | BESS Market Assessment    |     630 |       1 | INTENT_NEEDS_CLARIFICATION | FAIL
+Q007 | BESS Market Assessment    |    2251 |       5 | -                         | OK
+Q008 | BESS Market Assessment    |    1051 |       5 | -                         | OK
+Q009 | BESS Market Assessment    |    1168 |       2 | -                         | OK
+Q010 | BESS Market Assessment    |    2075 |       5 | -                         | OK
+Q011 | OBA Marketing Services    |      44 |       1 | missing_provenance        | FAIL
+Q012 | OBA Marketing Services    |       0 |       1 | missing_provenance        | FAIL
+Q013 | OBA Marketing Services    |       0 |       1 | missing_provenance        | FAIL
+Q014 | OBA Marketing Services    |       0 |       2 | missing_provenance        | FAIL
+Q015 | OBA Marketing Services    |       0 |       1 | missing_provenance        | FAIL
+Q016 | OBA Marketing Services    |       0 |       1 | missing_provenance        | FAIL
+Q017 | OBA Marketing Services    |       0 |       1 | missing_provenance        | FAIL
+Q018 | OBA Marketing Services    |       0 |       1 | missing_provenance        | FAIL
+Q019 | OBA Marketing Services    |       0 |       1 | missing_provenance        | FAIL
+Q020 | OBA Marketing Services    |       0 |       1 | missing_provenance        | FAIL
+Q021 | Guarda Bens Self Storage  |      51 |       5 | insufficient_provenance_coverage | FAIL
+Q022 | Guarda Bens Self Storage  |      51 |       5 | insufficient_provenance_coverage | FAIL
+Q023 | Guarda Bens Self Storage  |       0 |       5 | missing_provenance        | FAIL
+Q024 | Guarda Bens Self Storage  |    1829 |       5 | -                         | OK
+Q025 | Guarda Bens Self Storage  |       0 |       5 | missing_provenance        | FAIL
+Q026 | Guarda Bens Self Storage  |       0 |       1 | missing_provenance        | FAIL
+Q027 | Guarda Bens Self Storage  |       0 |       1 | missing_provenance        | FAIL
+Q028 | Guarda Bens Self Storage  |       0 |       1 | missing_provenance        | FAIL
+Q029 | Guarda Bens Self Storage  |       0 |       3 | missing_provenance        | FAIL
+Q030 | Guarda Bens Self Storage  |       0 |       1 | missing_provenance        | FAIL
+Q031 | Trabalho Projeto          |       0 |       5 | missing_provenance        | FAIL
+Q032 | Trabalho Projeto          |       0 |       5 | missing_provenance        | FAIL
+Q033 | Trabalho Projeto          |    1054 |       5 | -                         | OK
+Q034 | Trabalho Projeto          |      51 |       5 | insufficient_provenance_coverage | FAIL
+Q035 | Trabalho Projeto          |       0 |       5 | missing_provenance        | FAIL
+Q036 | Trabalho Projeto          |       0 |       5 | missing_provenance        | FAIL
+Q037 | Trabalho Projeto          |     114 |       5 | language_contract_mismatch | FAIL
+Q038 | Trabalho Projeto          |       0 |       5 | missing_provenance        | FAIL
+Q039 | Trabalho Projeto          |       0 |       5 | missing_provenance        | FAIL
+Q040 | Trabalho Projeto          |    1643 |       5 | -                         | OK
+Q041 | TRABALHO FINAL Image      |       0 |       1 | missing_provenance        | FAIL
+Q042 | TRABALHO FINAL Image      |       0 |       1 | missing_provenance        | FAIL
+Q043 | TRABALHO FINAL Image      |       0 |       1 | missing_provenance        | FAIL
+Q044 | TRABALHO FINAL Image      |       0 |       1 | missing_provenance        | FAIL
+Q045 | TRABALHO FINAL Image      |       0 |       1 | missing_provenance        | FAIL
+Q046 | TRABALHO FINAL Image      |       0 |       1 | missing_provenance        | FAIL
+Q047 | TRABALHO FINAL Image      |       0 |       1 | missing_provenance        | FAIL
+Q048 | TRABALHO FINAL Image      |     114 |       1 | language_contract_mismatch | FAIL
+Q049 | TRABALHO FINAL Image      |       0 |       1 | missing_provenance        | FAIL
+Q050 | TRABALHO FINAL Image      |     114 |       1 | language_contract_mismatch | FAIL
+Q051 | ATT Bill Dec 2023         |     716 |       4 | -                         | OK
+Q052 | ATT Bill Dec 2023         |      51 |       4 | insufficient_provenance_coverage | FAIL
+Q053 | ATT Bill Dec 2023         |     796 |       5 | -                         | OK
+Q054 | ATT Bill Dec 2023         |       0 |       5 | missing_provenance        | FAIL
+Q055 | ATT Bill Dec 2023         |     423 |       3 | INTENT_NEEDS_CLARIFICATION | FAIL
+Q056 | ATT Bill Dec 2023         |     795 |       5 | -                         | OK
+Q057 | ATT Bill Dec 2023         |    1585 |       5 | -                         | OK
+Q058 | ATT Bill Dec 2023         |    1604 |       5 | -                         | OK
+Q059 | ATT Bill Dec 2023         |    1334 |       5 | -                         | OK
+Q060 | ATT Bill Dec 2023         |     805 |       4 | -                         | OK
+Q061 | Certidao Nascimento       |     562 |       1 | INTENT_NEEDS_CLARIFICATION | FAIL
+Q062 | Certidao Nascimento       |       0 |       1 | missing_provenance        | FAIL
+Q063 | Certidao Nascimento       |       0 |       1 | missing_provenance        | FAIL
+Q064 | Certidao Nascimento       |     114 |       2 | language_contract_mismatch | FAIL
+Q065 | Certidao Nascimento       |      44 |       1 | missing_provenance        | FAIL
+Q066 | Certidao Nascimento       |     846 |       1 | -                         | OK
+Q067 | Certidao Nascimento       |     114 |       1 | language_contract_mismatch | FAIL
+Q068 | Certidao Nascimento       |     114 |       2 | language_contract_mismatch | FAIL
+Q069 | Certidao Nascimento       |     114 |       1 | language_contract_mismatch | FAIL
+Q070 | Certidao Nascimento       |       0 |       1 | missing_provenance        | FAIL
+Q071 | SEVIS RTI                 |    1119 |       3 | -                         | OK
+Q072 | SEVIS RTI                 |     365 |       3 | -                         | OK
+Q073 | SEVIS RTI                 |     466 |       3 | -                         | OK
+Q074 | SEVIS RTI                 |    1076 |       5 | -                         | OK
+Q075 | SEVIS RTI                 |    1979 |       5 | INTENT_NEEDS_CLARIFICATION | FAIL
+Q076 | SEVIS RTI                 |     471 |       3 | -                         | OK
+Q077 | SEVIS RTI                 |    1477 |       5 | -                         | OK
+Q078 | SEVIS RTI                 |    1640 |       1 | -                         | OK
+Q079 | SEVIS RTI                 |    2379 |       5 | -                         | OK
+Q080 | SEVIS RTI                 |    1865 |       3 | -                         | OK
+Q081 | Move Out Statement        |    1312 |       5 | -                         | OK
+Q082 | Move Out Statement        |     414 |       5 | -                         | OK
+Q083 | Move Out Statement        |    1381 |       5 | -                         | OK
+Q084 | Move Out Statement        |    1362 |       5 | INTENT_NEEDS_CLARIFICATION | FAIL
+Q085 | Move Out Statement        |    1534 |       5 | -                         | OK
+Q086 | Move Out Statement        |    1375 |       5 | -                         | OK
+Q087 | Move Out Statement        |    1719 |       5 | -                         | OK
+Q088 | Move Out Statement        |    1616 |       5 | -                         | OK
+Q089 | Move Out Statement        |    2365 |       5 | -                         | OK
+Q090 | Move Out Statement        |     886 |       5 | -                         | OK
+Q091 | Mayfair Investor Deck     |    1392 |       5 | -                         | OK
+Q092 | Mayfair Investor Deck     |    1868 |       5 | -                         | OK
+Q093 | Mayfair Investor Deck     |     910 |       5 | -                         | OK
+Q094 | Mayfair Investor Deck     |    1435 |       5 | -                         | OK
+Q095 | Mayfair Investor Deck     |    2192 |       4 | -                         | OK
+Q096 | Mayfair Investor Deck     |    1790 |       5 | INTENT_NEEDS_CLARIFICATION | FAIL
+Q097 | Mayfair Investor Deck     |    1304 |       5 | -                         | OK
+Q098 | Mayfair Investor Deck     |    2880 |       5 | -                         | OK
+Q099 | Mayfair Investor Deck     |    2171 |       2 | -                         | OK
+Q100 | Mayfair Investor Deck     |    1308 |       1 | -                         | OK
+------------------------------------------------------------------------------------------------------------------------
+TOTALS: OK=47  EMPTY=0  FAIL=53  TOTAL=100
+
+========================================================================================================================
+SPEED ANALYSIS (per document block)
+========================================================================================================================
+BESS Market Assessment: 10 queries, total=149.2s, avg=16.6s/query
+OBA Marketing Services: 10 queries, total=129.4s, avg=14.4s/query
+Guarda Bens Self Storage: 10 queries, total=108.7s, avg=12.1s/query
+Trabalho Projeto: 10 queries, total=162.1s, avg=18.0s/query
+TRABALHO FINAL Image: 10 queries, total=112.4s, avg=12.5s/query
+ATT Bill Dec 2023: 10 queries, total=135.3s, avg=15.0s/query
+Certidao Nascimento: 10 queries, total=112.1s, avg=12.5s/query
+SEVIS RTI: 10 queries, total=130.7s, avg=14.5s/query
+Move Out Statement: 10 queries, total=172.0s, avg=19.1s/query
+Mayfair Investor Deck: 10 queries, total=172.3s, avg=19.1s/query
+
+========================================================================================================================
+DETAILED ANSWER INSPECTION (checking for issues)
+========================================================================================================================
+
+Query  | Document                  | Issue Type         | Detail
+------------------------------------------------------------------------------------------------------------------------
+Q006   | BESS Market Assessment    | HARD_FAIL          | failureCode: INTENT_NEEDS_CLARIFICATION
+Q011   | OBA Marketing Services    | HARD_FAIL          | failureCode: missing_provenance
+Q012   | OBA Marketing Services    | HARD_FAIL          | failureCode: missing_provenance
+Q012   | OBA Marketing Services    | EMPTY_ANSWER       | No answer text returned
+Q013   | OBA Marketing Services    | HARD_FAIL          | failureCode: missing_provenance
+Q013   | OBA Marketing Services    | EMPTY_ANSWER       | No answer text returned
+Q014   | OBA Marketing Services    | HARD_FAIL          | failureCode: missing_provenance
+Q014   | OBA Marketing Services    | EMPTY_ANSWER       | No answer text returned
+Q015   | OBA Marketing Services    | HARD_FAIL          | failureCode: missing_provenance
+Q015   | OBA Marketing Services    | EMPTY_ANSWER       | No answer text returned
+Q016   | OBA Marketing Services    | HARD_FAIL          | failureCode: missing_provenance
+Q016   | OBA Marketing Services    | EMPTY_ANSWER       | No answer text returned
+Q017   | OBA Marketing Services    | HARD_FAIL          | failureCode: missing_provenance
+Q017   | OBA Marketing Services    | EMPTY_ANSWER       | No answer text returned
+Q018   | OBA Marketing Services    | HARD_FAIL          | failureCode: missing_provenance
+Q018   | OBA Marketing Services    | EMPTY_ANSWER       | No answer text returned
+Q019   | OBA Marketing Services    | HARD_FAIL          | failureCode: missing_provenance
+Q019   | OBA Marketing Services    | EMPTY_ANSWER       | No answer text returned
+Q020   | OBA Marketing Services    | HARD_FAIL          | failureCode: missing_provenance
+Q020   | OBA Marketing Services    | EMPTY_ANSWER       | No answer text returned
+Q021   | Guarda Bens Self Storage  | HARD_FAIL          | failureCode: insufficient_provenance_coverage
+Q022   | Guarda Bens Self Storage  | HARD_FAIL          | failureCode: insufficient_provenance_coverage
+Q023   | Guarda Bens Self Storage  | HARD_FAIL          | failureCode: missing_provenance
+Q023   | Guarda Bens Self Storage  | EMPTY_ANSWER       | No answer text returned
+Q025   | Guarda Bens Self Storage  | HARD_FAIL          | failureCode: missing_provenance
+Q025   | Guarda Bens Self Storage  | EMPTY_ANSWER       | No answer text returned
+Q026   | Guarda Bens Self Storage  | HARD_FAIL          | failureCode: missing_provenance
+Q026   | Guarda Bens Self Storage  | EMPTY_ANSWER       | No answer text returned
+Q027   | Guarda Bens Self Storage  | HARD_FAIL          | failureCode: missing_provenance
+Q027   | Guarda Bens Self Storage  | EMPTY_ANSWER       | No answer text returned
+Q028   | Guarda Bens Self Storage  | HARD_FAIL          | failureCode: missing_provenance
+Q028   | Guarda Bens Self Storage  | EMPTY_ANSWER       | No answer text returned
+Q029   | Guarda Bens Self Storage  | HARD_FAIL          | failureCode: missing_provenance
+Q029   | Guarda Bens Self Storage  | EMPTY_ANSWER       | No answer text returned
+Q030   | Guarda Bens Self Storage  | HARD_FAIL          | failureCode: missing_provenance
+Q030   | Guarda Bens Self Storage  | EMPTY_ANSWER       | No answer text returned
+Q031   | Trabalho Projeto          | HARD_FAIL          | failureCode: missing_provenance
+Q031   | Trabalho Projeto          | EMPTY_ANSWER       | No answer text returned
+Q032   | Trabalho Projeto          | HARD_FAIL          | failureCode: missing_provenance
+Q032   | Trabalho Projeto          | EMPTY_ANSWER       | No answer text returned
+Q034   | Trabalho Projeto          | HARD_FAIL          | failureCode: insufficient_provenance_coverage
+Q035   | Trabalho Projeto          | HARD_FAIL          | failureCode: missing_provenance
+Q035   | Trabalho Projeto          | EMPTY_ANSWER       | No answer text returned
+Q036   | Trabalho Projeto          | HARD_FAIL          | failureCode: missing_provenance
+Q036   | Trabalho Projeto          | EMPTY_ANSWER       | No answer text returned
+Q037   | Trabalho Projeto          | HARD_FAIL          | failureCode: language_contract_mismatch
+Q037   | Trabalho Projeto          | MISSING_TABLE      | Question asked for table but none found in answer
+Q038   | Trabalho Projeto          | HARD_FAIL          | failureCode: missing_provenance
+Q038   | Trabalho Projeto          | EMPTY_ANSWER       | No answer text returned
+Q039   | Trabalho Projeto          | HARD_FAIL          | failureCode: missing_provenance
+Q039   | Trabalho Projeto          | EMPTY_ANSWER       | No answer text returned
+Q041   | TRABALHO FINAL Image      | HARD_FAIL          | failureCode: missing_provenance
+Q041   | TRABALHO FINAL Image      | EMPTY_ANSWER       | No answer text returned
+Q042   | TRABALHO FINAL Image      | HARD_FAIL          | failureCode: missing_provenance
+Q042   | TRABALHO FINAL Image      | EMPTY_ANSWER       | No answer text returned
+Q043   | TRABALHO FINAL Image      | HARD_FAIL          | failureCode: missing_provenance
+Q043   | TRABALHO FINAL Image      | EMPTY_ANSWER       | No answer text returned
+Q044   | TRABALHO FINAL Image      | HARD_FAIL          | failureCode: missing_provenance
+Q044   | TRABALHO FINAL Image      | EMPTY_ANSWER       | No answer text returned
+Q045   | TRABALHO FINAL Image      | HARD_FAIL          | failureCode: missing_provenance
+Q045   | TRABALHO FINAL Image      | EMPTY_ANSWER       | No answer text returned
+Q046   | TRABALHO FINAL Image      | HARD_FAIL          | failureCode: missing_provenance
+Q046   | TRABALHO FINAL Image      | EMPTY_ANSWER       | No answer text returned
+Q047   | TRABALHO FINAL Image      | HARD_FAIL          | failureCode: missing_provenance
+Q047   | TRABALHO FINAL Image      | EMPTY_ANSWER       | No answer text returned
+Q048   | TRABALHO FINAL Image      | HARD_FAIL          | failureCode: language_contract_mismatch
+Q049   | TRABALHO FINAL Image      | HARD_FAIL          | failureCode: missing_provenance
+Q049   | TRABALHO FINAL Image      | EMPTY_ANSWER       | No answer text returned
+Q050   | TRABALHO FINAL Image      | HARD_FAIL          | failureCode: language_contract_mismatch
+Q052   | ATT Bill Dec 2023         | HARD_FAIL          | failureCode: insufficient_provenance_coverage
+Q054   | ATT Bill Dec 2023         | HARD_FAIL          | failureCode: missing_provenance
+Q054   | ATT Bill Dec 2023         | EMPTY_ANSWER       | No answer text returned
+Q055   | ATT Bill Dec 2023         | HARD_FAIL          | failureCode: INTENT_NEEDS_CLARIFICATION
+Q056   | ATT Bill Dec 2023         | POSSIBLE_TRUNCATION | Ends with: "6, Carol Stream, IL 60197-6416"
+Q061   | Certidao Nascimento       | HARD_FAIL          | failureCode: INTENT_NEEDS_CLARIFICATION
+Q062   | Certidao Nascimento       | HARD_FAIL          | failureCode: missing_provenance
+Q062   | Certidao Nascimento       | EMPTY_ANSWER       | No answer text returned
+Q063   | Certidao Nascimento       | HARD_FAIL          | failureCode: missing_provenance
+Q063   | Certidao Nascimento       | EMPTY_ANSWER       | No answer text returned
+Q064   | Certidao Nascimento       | HARD_FAIL          | failureCode: language_contract_mismatch
+Q065   | Certidao Nascimento       | HARD_FAIL          | failureCode: missing_provenance
+Q067   | Certidao Nascimento       | HARD_FAIL          | failureCode: language_contract_mismatch
+Q068   | Certidao Nascimento       | HARD_FAIL          | failureCode: language_contract_mismatch
+Q069   | Certidao Nascimento       | HARD_FAIL          | failureCode: language_contract_mismatch
+Q070   | Certidao Nascimento       | HARD_FAIL          | failureCode: missing_provenance
+Q070   | Certidao Nascimento       | EMPTY_ANSWER       | No answer text returned
+Q075   | SEVIS RTI                 | HARD_FAIL          | failureCode: INTENT_NEEDS_CLARIFICATION
+Q084   | Move Out Statement        | HARD_FAIL          | failureCode: INTENT_NEEDS_CLARIFICATION
+Q096   | Mayfair Investor Deck     | HARD_FAIL          | failureCode: INTENT_NEEDS_CLARIFICATION
+------------------------------------------------------------------------------------------------------------------------
+Total issues found: 89
+
+========================================================================================================================
+FULL ANSWERS (for manual verification)
+========================================================================================================================
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q001 | BESS Market Assessment | 2112 chars | Sources: 5
+Q: Let's start with the BESS market assessment. Give me a concise overview of what this document is trying to prove.
+────────────────────────────────────────────────────────────────────────────────────────────────────
+This deck is trying to prove that Battery Energy Storage Systems (BESS) are becoming a critical grid asset—and that Brazil has near-term, investable market potential for BESS because the power system’s main constraint is *controllable power* (flexibility) rather than more energy supply.
+
+Key points it advances:
+
+- **The grid need is shifting from “more energy” to “controllable power.”** It frames the core problem as meeting peak demand and covering periods when renewables aren’t producing: *“The system doesn't need more energy—it needs controllable power when demand peaks and renewables don't.”*
+
+- **BESS is positioned as an electrical control asset, not just a battery.** The document emphasizes operational versatility—BESS can act as load, generation, and reserve depending on system needs—and argues that *no thermal, hydro, or renewable resource delivers this combination of attributes simultaneously.*
+
+- **Global momentum supports the investment thesis.** It introduces a “Global Market” section focused on annual global energy storage deployments, using global scale-up as validation that storage is a mainstream solution (not experimental).
+
+- **Brazil-specific value creation is tied to concrete pain points and project economics.** It highlights opportunities where “capital and pain points intersect,” including:
+  - **Renewables + storage:** Collocating storage with wind/solar to reduce curtailment and “firm” delivery profiles, directly improving project economics; it cites an example of CGN + Goldwind deploying pilot BESS with wind farms to reduce curtailment exposure.
+  - **Grid reinforcement needs:** It flags Transmission & Distribution reinforcement as part of the opportunity set (positioning BESS as an alternative/complement to traditional upgrades).
+
+- **Technology viability is supported with durability claims for certain alternatives.** For example, it notes an option where *the electrolyte doesn’t degrade with cycling*, keeping energy capacity stable over **20+ year** lifetimes—supporting the idea that storage can be long-lived infrastructure, not short-life equipment.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q002 | BESS Market Assessment | 724 chars | Sources: 5
+Q: What is the main thesis about the Brazilian market potential in this document?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+The document’s main thesis is that **Brazil is on the verge of rapid (“explosive”) growth in energy storage/BESS**, with **near-term, investable market potential** driven primarily by two forces:
+
+- **A clear market catalyst: Brazil’s first dedicated energy storage auction (LRCAP 2026).**
+- **Strong underlying demand pull from rapid renewable expansion**, which increases the need for storage solutions.
+
+To support that thesis, the deck frames Brazil as a market where **“capital and pain points intersect”**—i.e., there are identifiable system needs and commercial entry points for storage—and it anchors the opportunity with market sizing: **USD 217 million in 2025**, with projections of significant growth thereafter.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q003 | BESS Market Assessment | 911 chars | Sources: 5
+Q: Which market drivers or demand signals are explicitly cited?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+The document explicitly cites these market drivers / demand signals for Brazil’s BESS opportunity:
+
+- **Brazil’s first dedicated energy storage auction (LRCAP 2026)** as a clear near-term market catalyst.
+- **Rapid renewable expansion** as a structural demand pull for storage.
+- **Commercial maturity and bankability tailwinds**: lithium-ion and flow batteries have **reached commercial maturity with proven GWh-scale track records internationally**, alongside **substantially declining costs** and the existence of **project financing frameworks**.
+- **Customer/behind-the-meter value signals**: storage positioned as **“operational insurance”** to maintain operations during **grid disturbances**, and as a way to **optimize energy costs via time-of-use arbitrage**.
+- **Market sizing signal**: the Brazilian energy storage market is cited as **USD 217 million in 2025** (with projections shown beyond that).
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q004 | BESS Market Assessment | 1053 chars | Sources: 5
+Q: Pull out the most important numbers, forecasts, and assumptions.
+────────────────────────────────────────────────────────────────────────────────────────────────────
+## Key numbers & forecasts explicitly stated
+
+- **Market valuation (Brazil energy storage):** **USD 217 million in 2025**.  
+- **Growth catalyst / timing assumption:** Brazil is positioned for “explosive growth” **driven by its first dedicated auction (LRCAP 2026)** and **rapid renewable expansion**.  
+- **Document timing:** The deck is dated **January 2026**.
+
+## Technology / performance assumptions explicitly stated
+
+- **Flow battery lifetime / degradation assumption:** “**The electrolyte doesn’t degrade with cycling**,” and **energy capacity remains stable over “20+ year lifetimes.”**
+
+## Core system/market assumption explicitly stated
+
+- **Operational versatility claim (BESS value proposition):** BESS can **act as load, generation, and reserve** as system needs, and **“no thermal, hydro, or renewable delivers this combination of attributes simultaneously.”**
+
+## Important caveat (explicit)
+
+- The material states it is **not investment advice** and that recipients **should verify accuracy independently** before entering any agreement.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q005 | BESS Market Assessment | 1288 chars | Sources: 5
+Q: What risks, barriers, or market constraints does the document mention?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+The document flags the following risks, barriers, and market constraints (as framed in its “critical questions” and caveats):
+
+- **Unclear/conditional market-entry requirements (strategy & timing risk):**
+  - It highlights the need to clarify the sponsor’s **strategic vision and priority level for Latin America**, the **market conditions required for commitment**, and the **timeline for market entry**.
+
+- **Technology competitiveness / economics risk (especially for LRCAP 2026):**
+  - It explicitly raises **“VFB vs. Lithium-Ion” economics** as a key issue to resolve for **LRCAP 2026 and other market opportunities**—i.e., whether the chosen technology will be cost-competitive in the relevant procurement/market context.
+
+- **Grid reliability as a constraint and value driver (operational risk):**
+  - It notes **grid disturbances** as a real operating condition—positioning storage as “operational insurance” to maintain operations during such disturbances (implying reliability issues are a constraint that customers must manage).
+
+- **Decision-quality / diligence risk (explicit disclaimer):**
+  - It states recipients **should verify the accuracy** of the information and analyses independently before entering any agreement, and that the material is **not investment advice**.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q006 | BESS Market Assessment | 630 chars | Sources: 1
+FAILURE: INTENT_NEEDS_CLARIFICATION
+Q: Put the core findings into a table: topic | claim | evidence.
+────────────────────────────────────────────────────────────────────────────────────────────────────
+| Topic | Claim | Evidence |
+|---|---|---|
+| Behind-the-meter / customer value proposition | Storage is positioned as “operational insurance,” helping customers keep operating through grid disturbances while also reducing energy costs via time-of-use arbitrage. | “Storage becomes operational insurance— enabling continued operation during grid disturbances while optimizing energy costs through time-of-use arbitrage.” (Slide 19) |
+
+Storage is framed less as a standalone technology and more as a reliability-and-cost optimization tool for end users, with resilience (disturbances) and TOU arbitrage as the concrete value levers.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q007 | BESS Market Assessment | 2251 chars | Sources: 5
+Q: If I were skeptical, which assumptions in this assessment would I challenge first?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+If you’re skeptical, the first assumptions to challenge are the ones that carry the most weight in the story but are easiest to be wrong on in practice:
+
+- **That the core system problem is “available power at the right time,” not energy price/availability.**  
+  The deck’s framing is that “the current challenge isn’t cheap energy—it’s available power at the right time.” If that diagnosis is off (or only true in limited nodes/hours), the urgency and value stack for BESS changes materially.
+
+- **That LRCAP 2026 will reliably “transform” storage into a regulated capacity asset (i.e., a bankable market catalyst).**  
+  It asserts LRCAP 2026 “marks the formal entry of storage as a regulated capacity asset,” shifting BESS from complementary to critical infrastructure. A skeptic would pressure-test whether this auction truly creates durable, financeable revenue certainty at scale.
+
+- **That renewable expansion will translate into near-term, monetizable storage demand (not just technical need).**  
+  The assessment links “renewable expansion” to storage opportunity. The challenge is whether that expansion converts into contracted/paid use-cases for storage quickly enough to support the “explosive growth” narrative.
+
+- **That the chosen technology will be competitive for the specific procurement context (VFB vs. Li-ion economics for LRCAP 2026).**  
+  The deck itself flags “VFB vs. Lithium-Ion: Economics for LRCAP 2026 and other market opportunities” as a critical question. If the economics don’t clear, the go-to-market thesis weakens regardless of system need.
+
+- **That long-life performance claims hold as assumed (20+ year stable energy capacity for VFB).**  
+  It states the electrolyte “doesn’t degrade with cycling,” so energy capacity remains stable over “20+ year lifetimes.” A skeptic would challenge how that translates into real-world availability, O&M, and lifecycle cost under Brazilian operating conditions.
+
+- **That the analysis is decision-grade without independent verification.**  
+  The material explicitly says recipients should verify accuracy independently and that it is not investment advice. A skeptic would treat that as a prompt to challenge the robustness of the numbers/analyses before relying on them.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q008 | BESS Market Assessment | 1051 chars | Sources: 5
+Q: Give me a 60-second executive brief based only on this document.
+────────────────────────────────────────────────────────────────────────────────────────────────────
+This January 2026 deck is a preliminary assessment of Brazil’s battery energy storage (BESS) market potential and where near-term opportunities may emerge.
+
+The central thesis is that Brazil’s power system constraint is not a lack of energy overall, but a need for **controllable power** during **peak demand** and when **renewables are not producing** (“the system doesn’t need more energy—it needs controllable power when demand peaks and renewables don’t”). The document positions BESS as an **electrical control asset** with **operational versatility**—able to act as **load, generation, and reserve** as system needs, and claims this combination is not delivered simultaneously by thermal, hydro, or renewables.
+
+On technology, it highlights a flow-battery performance assumption: **electrolyte does not degrade with cycling**, so **energy capacity remains stable over 20+ year lifetimes**.
+
+Finally, it is explicitly framed as non-advisory: recipients are told to **verify accuracy independently**, and the material is **not investment advice**.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q009 | BESS Market Assessment | 1168 chars | Sources: 2
+Q: What would still need external validation before I rely on this assessment?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Several elements in the deck explicitly require independent, external validation before you rely on it for decisions:
+
+- **Accuracy of the information and analyses**
+  - The document states the recipient should **verify the accuracy of the information and analyses by their own means** before deciding whether to enter into any agreement.
+
+- **Decision suitability (it is not advice)**
+  - The material is explicitly **not a recommendation, indication, or investment advice**, so any decision made using it should be validated through your own diligence process (commercial, technical, legal, and financial).
+
+- **Applicability of international “reference projects” to Brazil (especially for LRCAP grid-forming requirements)**
+  - The deck cites a specific reference project—**Wuxi (Ushi), China: 175 MW / 700 MWh with grid-forming capability**—as a “critical reference” for **Brazil’s LRCAP grid-forming requirements** and **transmission-connected applications**. You would need to externally validate that this reference case is truly comparable and transferable to Brazil’s requirements and operating conditions (i.e., that the claimed relevance holds in practice).
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q010 | BESS Market Assessment | 2075 chars | Sources: 5
+Q: Close this document with a strict recap: clearly supported, suggested, and not evidenced.
+────────────────────────────────────────────────────────────────────────────────────────────────────
+## Clearly supported (explicitly stated)
+- **This is a preliminary assessment of Brazil’s BESS market potential (January 2026).**  
+- **Regulatory development:** Brazil’s Ministry of Mines and Energy (MME) has launched a **public consultation** for the country’s **first dedicated battery storage auction**, **LRCAP 2026 – Armazenamento**, aimed at establishing **formal procurement mechanisms and revenue certainty**.  
+- **Behind-the-meter value proposition:** Storage is framed as **“operational insurance”**—helping customers **continue operating during grid disturbances** while **optimizing energy costs via time-of-use arbitrage**.  
+- **Technology claim (as written):** “**The electrolyte doesn’t degrade with cycling**,” so **energy capacity remains stable over **20+ year** lifetimes.  
+- **Use limitation / reliance warning:** Recipients should **verify accuracy independently**; the material is **not a recommendation/indication/investment advice**, and decisions made using it require the recipient’s own validation.
+
+## Suggested (implied or framed as interpretation, not fully substantiated in the provided excerpts)
+- **Time sensitivity / urgency framing:** The deck characterizes the current alignment as **“rare and time-sensitive.”**  
+- **Market attractiveness via policy:** The LRCAP 2026 consultation is positioned as a **“regulatory breakthrough,”** implying a meaningful near-term catalyst for storage deployment and bankability.
+
+## Not evidenced (not supported by the provided excerpts)
+- **Any quantified market size, pipeline, IRR, payback, or cost assumptions** for Brazil BESS.  
+- **Specific auction design details** (e.g., contract length, remuneration structure, eligibility rules, volumes, timelines beyond “LRCAP 2026 – Armazenamento”).  
+- **Comparative performance or cost claims across battery technologies** beyond the single electrolyte/lifetime statement.  
+- **Empirical proof or case-study data** demonstrating the “operational insurance” and TOU arbitrage value in Brazil (e.g., outage frequency, tariff spreads, realized savings).
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q011 | OBA Marketing Services | 44 chars | Sources: 1
+FAILURE: missing_provenance
+Q: Now move to the OBA marketing services document. What exactly is being offered here?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Can you clarify what you want me to do next?
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q012 | OBA Marketing Services | 0 chars | Sources: 1
+FAILURE: missing_provenance
+Q: Who seems to be the target customer or buyer persona in this document?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+[NO ANSWER - EMPTY]
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q013 | OBA Marketing Services | 0 chars | Sources: 1
+FAILURE: missing_provenance
+Q: List the services or capabilities that are explicitly mentioned.
+────────────────────────────────────────────────────────────────────────────────────────────────────
+[NO ANSWER - EMPTY]
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q014 | OBA Marketing Services | 0 chars | Sources: 2
+FAILURE: missing_provenance
+Q: What benefits or differentiators are promised to the client?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+[NO ANSWER - EMPTY]
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q015 | OBA Marketing Services | 0 chars | Sources: 1
+FAILURE: missing_provenance
+Q: Extract any proof points, guarantees, or concrete claims the document makes.
+────────────────────────────────────────────────────────────────────────────────────────────────────
+[NO ANSWER - EMPTY]
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q016 | OBA Marketing Services | 0 chars | Sources: 1
+FAILURE: missing_provenance
+Q: What is missing if I wanted to use this as a strong commercial proposal?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+[NO ANSWER - EMPTY]
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q017 | OBA Marketing Services | 0 chars | Sources: 1
+FAILURE: missing_provenance
+Q: Rewrite the value proposition in simpler customer language without adding new facts.
+────────────────────────────────────────────────────────────────────────────────────────────────────
+[NO ANSWER - EMPTY]
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q018 | OBA Marketing Services | 0 chars | Sources: 1
+FAILURE: missing_provenance
+Q: What buyer objections does this document already answer?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+[NO ANSWER - EMPTY]
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q019 | OBA Marketing Services | 0 chars | Sources: 1
+FAILURE: missing_provenance
+Q: What questions would a serious prospect still ask after reading it?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+[NO ANSWER - EMPTY]
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q020 | OBA Marketing Services | 0 chars | Sources: 1
+FAILURE: missing_provenance
+Q: Finish with an evidence-based commercial summary of this document.
+────────────────────────────────────────────────────────────────────────────────────────────────────
+[NO ANSWER - EMPTY]
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q021 | Guarda Bens Self Storage | 51 chars | Sources: 5
+FAILURE: insufficient_provenance_coverage
+Q: Let's open the self storage deck. What is the overall story the slides are telling?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+I could not complete that safely. Please try again.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q022 | Guarda Bens Self Storage | 51 chars | Sources: 5
+FAILURE: insufficient_provenance_coverage
+Q: Which slides seem to define the problem, the solution, and the offer?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+I could not complete that safely. Please try again.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q023 | Guarda Bens Self Storage | 0 chars | Sources: 5
+FAILURE: missing_provenance
+Q: What market opportunity is described in the presentation?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+[NO ANSWER - EMPTY]
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q024 | Guarda Bens Self Storage | 1829 chars | Sources: 5
+Q: What operating model or business concept is presented?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+The presentation lays out an **end-to-end operating model for a self-storage (“box rental”) service**, described through process-management frameworks (value chain, SIPOC, and BPMN) and focused on how a customer is onboarded, served, and offboarded.
+
+- **Core business concept:** rent storage boxes to customers, managing the full customer journey from first contact through contract, payment, access, and eventual exit.
+
+- **Operating model (primary activities / value chain):**
+  - **Inbound logistics:** initial customer service, needs assessment, and customer registration in the system.
+  - **Operations:** box allocation, key handover, and monitoring of the storage space.
+  - **Outbound logistics:** contract closure, box release, and key return.
+
+- **Current “box rental” process flow (customer journey):**
+  - Customer first contact via **phone, website, WhatsApp, or in person**
+  - Needs assessment (box size, expected duration, etc.)
+  - Present options and pricing
+  - Technical visit
+  - Contract closing
+  - Initial payment
+  - Key handover (and subsequent access to the box)
+
+- **SIPOC framing (how the operation is structured):**
+  - **Suppliers:** parties providing required resources such as the commercial team, management systems, and service channels.
+  - **Inputs:** essential starting information such as customer data and a standard contract (and other necessary items to initiate the process).
+  - This is then mapped through process steps to deliver the service outcome.
+
+- **Process governance / improvement concept:**
+  - The operation is modeled in **BPMN** (general and specific diagrams) and analyzed for bottlenecks—e.g., an **Ishikawa (cause-and-effect) analysis** targeting delays in granting access to boxes across categories like People, Process, Customer, System, Materials, and Environment.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q025 | Guarda Bens Self Storage | 0 chars | Sources: 5
+FAILURE: missing_provenance
+Q: Which numbers, KPIs, or market data points matter most in the deck?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+[NO ANSWER - EMPTY]
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q026 | Guarda Bens Self Storage | 0 chars | Sources: 1
+FAILURE: missing_provenance
+Q: Where does the presentation feel strongest from a persuasion standpoint?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+[NO ANSWER - EMPTY]
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q027 | Guarda Bens Self Storage | 0 chars | Sources: 1
+FAILURE: missing_provenance
+Q: Which claims in the deck need more evidence or support?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+[NO ANSWER - EMPTY]
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q028 | Guarda Bens Self Storage | 0 chars | Sources: 1
+FAILURE: missing_provenance
+Q: Turn the deck into a 90-second spoken pitch.
+────────────────────────────────────────────────────────────────────────────────────────────────────
+[NO ANSWER - EMPTY]
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q029 | Guarda Bens Self Storage | 0 chars | Sources: 3
+FAILURE: missing_provenance
+Q: If I were an investor or partner, what follow-up questions would I ask after this deck?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+[NO ANSWER - EMPTY]
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q030 | Guarda Bens Self Storage | 0 chars | Sources: 1
+FAILURE: missing_provenance
+Q: End with the top 5 evidence-based takeaways from the presentation.
+────────────────────────────────────────────────────────────────────────────────────────────────────
+[NO ANSWER - EMPTY]
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q031 | Trabalho Projeto | 0 chars | Sources: 5
+FAILURE: missing_provenance
+Q: Stay on the document called Trabalho projeto. What is the main objective?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+[NO ANSWER - EMPTY]
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q032 | Trabalho Projeto | 0 chars | Sources: 5
+FAILURE: missing_provenance
+Q: What scope, deliverables, or outputs are defined in this project document?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+[NO ANSWER - EMPTY]
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q033 | Trabalho Projeto | 1054 chars | Sources: 5
+Q: Which deadlines, milestones, or phases are explicitly mentioned?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+### Phases explicitly mentioned
+- **Current project phase (“Fase em que o Projeto se Encontra”)**: the document includes a section dedicated to stating the phase the project is in, and describes the management methods being used at this stage (e.g., Scrum check-ins, Kanban board, Canvas/PM Visual for mapping scope/costs/deadlines/risks, and PERT/COM).  
+- **Work stages (“etapas da obra”)**: it refers to having **more rigorous quality control across the stages of the construction/work**.
+
+### Milestones / intermediate checkpoints explicitly mentioned
+- **Intermediate deliveries**: it calls for **a more detailed schedule (“cronograma mais detalhado”) with intermediate deliverables (“entregas intermediárias”)**.
+- **Weekly follow-up meetings**: it mentions **weekly status/follow-up meetings** to track progress and adjust.
+
+### Deadlines explicitly mentioned
+- The evidence provided refers to **schedules/timelines (“cronograma”)** and improving how they are managed, but it does not show any **specific calendar dates or fixed deadline values**.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q034 | Trabalho Projeto | 51 chars | Sources: 5
+FAILURE: insufficient_provenance_coverage
+Q: Who are the stakeholders, owners, or participants named in the document?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+I could not complete that safely. Please try again.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q035 | Trabalho Projeto | 0 chars | Sources: 5
+FAILURE: missing_provenance
+Q: What requirements, constraints, or success criteria are stated?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+[NO ANSWER - EMPTY]
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q036 | Trabalho Projeto | 0 chars | Sources: 5
+FAILURE: missing_provenance
+Q: What risks, blockers, or unresolved issues appear in the project text?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+[NO ANSWER - EMPTY]
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q037 | Trabalho Projeto | 114 chars | Sources: 5
+FAILURE: language_contract_mismatch
+Q: Put the scope, deliverables, and risks into a table with evidence.
+────────────────────────────────────────────────────────────────────────────────────────────────────
+I could not safely finalize this answer in the requested language. Please retry and I will answer only in English.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q038 | Trabalho Projeto | 0 chars | Sources: 5
+FAILURE: missing_provenance
+Q: Does this project look execution-ready or still conceptual? Explain using only the document.
+────────────────────────────────────────────────────────────────────────────────────────────────────
+[NO ANSWER - EMPTY]
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q039 | Trabalho Projeto | 0 chars | Sources: 5
+FAILURE: missing_provenance
+Q: What would need clarification before a team could actually start execution?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+[NO ANSWER - EMPTY]
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q040 | Trabalho Projeto | 1643 chars | Sources: 5
+Q: Finish with a short project brief based strictly on this document.
+────────────────────────────────────────────────────────────────────────────────────────────────────
+## Short project brief (strictly from *Trabalho projeto*)
+
+**Project objective**  
+Build a **metal mezzanine** inside an existing structure to **expand usable area**, **increase the number of available boxes**, and **make the space more functional**.
+
+**Key participants / stakeholders**  
+- **Project management lead (Gestora): Maria Victoria** (director responsible).  
+- **Mamute Estruturas Metálicas**: engineering, fabrication, assembly, and mezzanine testing.  
+- **Complementary suppliers**: electrical/lighting, painting, signage.  
+- **Unit operational team**: daily interface with clients, access control, and window/communication coordination.
+
+**Current status / approach**  
+The project is being managed using:  
+- **Scrum** (quick check-in meetings to track progress and adjust priorities)  
+- **Kanban** (visual board of work in progress vs. remaining)  
+- **Canvas / PM Visual** (mapping scope, costs, deadlines, and risks)  
+- **PERT/COM** (planning/structuring activities)
+
+**Planned management outputs / controls**  
+- More rigorous **quality control** across construction stages.  
+- A **more detailed schedule** with **intermediate deliverables**.  
+- **Performance indicators** to track **physical and financial** progress.  
+- A **clear communication plan** between all teams.
+
+**Key risks / challenges highlighted**  
+Because it is a **complex construction**, **communication failures** could **delay the schedule** or cause **rework**. The team also notes that, if starting over, they would do a **more complete risk mapping earlier** and use **visual tools/transparency** to keep everyone aligned and avoid surprises.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q041 | TRABALHO FINAL Image | 0 chars | Sources: 1
+FAILURE: missing_provenance
+Q: Now switch to the TRABALHO FINAL image and do a careful OCR-style read.
+────────────────────────────────────────────────────────────────────────────────────────────────────
+[NO ANSWER - EMPTY]
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q042 | TRABALHO FINAL Image | 0 chars | Sources: 1
+FAILURE: missing_provenance
+Q: What are the main headings, labels, or visible sections in the image?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+[NO ANSWER - EMPTY]
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q043 | TRABALHO FINAL Image | 0 chars | Sources: 1
+FAILURE: missing_provenance
+Q: Extract all names, dates, and numbers you can clearly read.
+────────────────────────────────────────────────────────────────────────────────────────────────────
+[NO ANSWER - EMPTY]
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q044 | TRABALHO FINAL Image | 0 chars | Sources: 1
+FAILURE: missing_provenance
+Q: Mark anything uncertain or illegible instead of guessing.
+────────────────────────────────────────────────────────────────────────────────────────────────────
+[NO ANSWER - EMPTY]
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q045 | TRABALHO FINAL Image | 0 chars | Sources: 1
+FAILURE: missing_provenance
+Q: What looks like the central message or conclusion of the image?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+[NO ANSWER - EMPTY]
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q046 | TRABALHO FINAL Image | 0 chars | Sources: 1
+FAILURE: missing_provenance
+Q: Convert the readable content into clean bullet points for a report.
+────────────────────────────────────────────────────────────────────────────────────────────────────
+[NO ANSWER - EMPTY]
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q047 | TRABALHO FINAL Image | 0 chars | Sources: 1
+FAILURE: missing_provenance
+Q: Which visual areas or regions matter most for understanding the image?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+[NO ANSWER - EMPTY]
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q048 | TRABALHO FINAL Image | 114 chars | Sources: 1
+FAILURE: language_contract_mismatch
+Q: Compare the image with Trabalho projeto and say where they align.
+────────────────────────────────────────────────────────────────────────────────────────────────────
+I could not safely finalize this answer in the requested language. Please retry and I will answer only in English.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q049 | TRABALHO FINAL Image | 0 chars | Sources: 1
+FAILURE: missing_provenance
+Q: Compare them again and flag any inconsistency that is actually supported by the files.
+────────────────────────────────────────────────────────────────────────────────────────────────────
+[NO ANSWER - EMPTY]
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q050 | TRABALHO FINAL Image | 114 chars | Sources: 1
+FAILURE: language_contract_mismatch
+Q: Close this document with a clean summary plus confidence notes.
+────────────────────────────────────────────────────────────────────────────────────────────────────
+I could not safely finalize this answer in the requested language. Please retry and I will answer only in English.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q051 | ATT Bill Dec 2023 | 716 chars | Sources: 4
+Q: Let's review the AT&T bill from Dec 2023. What is this bill about at a high level?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+This December 2023 AT&T bill is a **wireless service statement** for **AT&T Mobility** (Account **337215704977**, issue date **Dec 20, 2023**) covering activity for a **wireless number/line**.
+
+At a high level, it includes charges for:
+- **Unlimited Premium (1 line): $85.00**
+- **AutoPay & paperless billing discount:** **$5 off** (noted as “$5 off for credit card”)
+- **Signature member discount on AT&T Unlimited:** **-$10.00**
+- **Protect Advantage for 1 (insurance), Tier 4:** **$17.00**
+- **Company fees & surcharges**, including an **Administrative Fee: $1.99**
+
+It also contains standard billing/payment and customer-notice information (e.g., payment processing notes and dispute/escalation contact details).
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q052 | ATT Bill Dec 2023 | 51 chars | Sources: 4
+FAILURE: insufficient_provenance_coverage
+Q: Pull out the billing period, due date, and total amount due.
+────────────────────────────────────────────────────────────────────────────────────────────────────
+I could not complete that safely. Please try again.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q053 | ATT Bill Dec 2023 | 796 chars | Sources: 5
+Q: Break down the major charges, fees, taxes, and adjustments.
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Here’s the breakdown of the major **charges, fees, and adjustments** shown on the December 2023 AT&T Mobility bill:
+
+## Plan & service charges
+- **Unlimited Premium (1 line): $85.00**
+- **Protect Advantage for 1 (includes insurance) – Tier 4: $17.00**
+
+## Discounts / adjustments (credits)
+- **AutoPay & paperless billing discount:** **$5 off** (listed as “$5 off for credit card”)
+- **Discount for Signature members on AT&T Unlimited:** **-$10.00**
+
+## Fees & surcharges
+- **Administrative Fee:** **$1.99**
+- The bill also includes additional **company fees & surcharges** (the section is present, but only the Administrative Fee amount is visible in the provided bill excerpt).
+
+## Taxes
+- Taxes are not itemized in the provided excerpts.
+
+## Total due (for context)
+- **Total due:** **$98.49**
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q054 | ATT Bill Dec 2023 | 0 chars | Sources: 5
+FAILURE: missing_provenance
+Q: Are there any credits, unusual line items, or one-time charges?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+[NO ANSWER - EMPTY]
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q055 | ATT Bill Dec 2023 | 423 chars | Sources: 3
+FAILURE: INTENT_NEEDS_CLARIFICATION
+Q: Put the financial details into a table: line item | amount | evidence.
+────────────────────────────────────────────────────────────────────────────────────────────────────
+| Line item | Amount | Evidence |
+|---|---:|---|
+| Late payment fee (if not paid in full by due date) | Up to **$7.00** | “The late payment fee for consumer and Signature bills not paid in full by the payment due date is up to **$7. 00**.” |
+| Total amount (as shown in the account/billing string) | **$98.49** | “...000000000**984900000009849**003...” (appears as the billed total in the statement’s encoded amount line) |
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q056 | ATT Bill Dec 2023 | 795 chars | Sources: 5
+Q: What account, service, or subscriber details are visible in the bill?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+## Account details
+- **Provider / service:** AT&T Mobility  
+- **Account number:** 337215704977  
+- **Foundation account:** 02501613  
+- **Issue date:** Dec 20, 2023  
+
+## Subscriber / billing recipient details
+- **Name:** Pedro Marques Gillet  
+- **Attention:** McKay Hall  
+- **Billing address:** 308 1 LMU Drive, MSB 16812, Los Angeles, CA 90404  
+
+## Service details shown
+- **Service activity type:** Wireless  
+- **Plan shown:** Unlimited Premium — **1 line**  
+- **Wireless number:** A “Wireless Number” field is present on the summary page (the number itself isn’t visible in the provided excerpt).  
+
+## Payment / billing handling details visible
+- **AutoPay scheduled for:** Jan 09, 2024  
+- **Remit-to / payment address shown:** AT&T Mobility, PO Box 6416, Carol Stream, IL 60197-6416
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q057 | ATT Bill Dec 2023 | 1585 chars | Sources: 5
+Q: What would I want to verify before paying this statement?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Before paying (or letting AutoPay run) on this AT&T Mobility statement, here are the key things to verify:
+
+- **Total amount due and timing**
+  - Confirm the **total due is $98.49**.
+  - Confirm **AutoPay is scheduled for Jan 09, 2024** (so you’re comfortable with the withdrawal date).
+
+- **Account and recipient details**
+  - Make sure the bill is for the correct **AT&T Mobility account: 337215704977** (Foundation Account **02501613**).
+  - Confirm the statement is addressed correctly (Pedro Marques Gillet, ATTN: McKay Hall, Los Angeles address shown).
+
+- **Service/plan charges match what you expect**
+  - **Unlimited Premium – 1 line: $85.00**
+  - **Protect Advantage for 1 (includes insurance) – Tier 4: $17.00**
+  - Verify you intended to have this plan and the insurance feature active.
+
+- **Discounts/credits are applied as expected**
+  - **AutoPay & paperless billing discount:** “**$5 off for credit card**”
+  - **Signature member discount:** **-$10.00**
+  - Verify you’re receiving the discounts you expect (and that the AutoPay/paperless discount is the correct type for your payment method).
+
+- **Fees and potential extra charges**
+  - Confirm the **Administrative Fee: $1.99** is expected.
+  - Be aware of the **late payment fee** policy: if not paid in full by the due date, it can be **up to $7.00**.
+
+- **Payment method implications (if paying by check)**
+  - If you pay by check, note AT&T may convert it to a **one-time electronic transaction**, and **funds may be withdrawn as soon as payment is received**; the original check may be destroyed after processing.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q058 | ATT Bill Dec 2023 | 1604 chars | Sources: 5
+Q: Explain this bill in plain language for someone who hates telecom bills.
+────────────────────────────────────────────────────────────────────────────────────────────────────
+This AT&T Mobility statement is basically: **your monthly wireless plan + an insurance add‑on − a couple discounts + small fees**, tied to **Account #337215704977** (Foundation Account **02501613**) with an **Issue Date of Dec 20, 2023**.
+
+## The main monthly charges (the “why is this bill so high?” part)
+- **Unlimited Premium (1 line): $85.00**  
+  This is your core wireless plan charge for one phone line.
+- **Protect Advantage for 1 (insurance), Tier 4: $17.00**  
+  This is an add-on protection/insurance feature.
+
+## The credits/discounts (the “good news” part)
+- **AutoPay & paperless billing discount: -$5.00** (shown as “$5 off for credit card”)  
+- **Signature member discount on AT&T Unlimited: -$10.00**
+
+## The extra fees (the “small annoying stuff” part)
+- **Administrative Fee: $1.99**  
+- The bill also has a section labeled **“Company fees & surcharges”** (the excerpt shows the section header and the Administrative Fee line).
+
+## What you’re being asked to pay
+- The statement’s encoded amount line shows a total of **$98.49**.
+
+## Things that are not charges, but matter
+- **Late payment fee:** if the bill isn’t paid in full by the due date, the late fee is **up to $7.00**.
+- **If you pay by check:** AT&T may convert your check into a **one-time electronic payment**, and your original check may be destroyed after processing.
+
+## If you need to dispute something
+- The bill provides a mailing address in **Carol Stream, IL 60197-5074**, and notes you can also contact the **California Public Utilities Commission (CPUC) Consumer Affairs Branch** if AT&T can’t resolve the issue.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q059 | ATT Bill Dec 2023 | 1334 chars | Sources: 5
+Q: If the cost increased, which lines seem to explain the increase?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+The lines on this statement that would most plausibly explain an increase are the ones that *add* to your monthly total (new/changed add‑ons and fees), not the discounts.
+
+### Biggest “increase drivers” on the bill
+- **Protect Advantage for 1 (includes insurance) – Tier 4: $17.00**  
+  If this was added or moved to a higher tier, it would raise the bill by **$17/month**.
+- **Unlimited Premium – 1 Line: $85.00**  
+  If your plan changed to this plan or the plan price went up, this is the main place the increase would show.
+
+### Smaller add-ons that can push the total up
+- **Administrative Fee: $1.99** (listed under “Company fees & surcharges”)  
+  If this fee is new or higher than before, it would increase the total.
+- **Other “Company fees & surcharges” / regulatory surcharges**  
+  The bill references per‑line, per‑month surcharges required by the California Public Utilities Commission (CPUC), which can contribute to higher totals if they change.
+
+### Lines that *reduce* the bill (not causes of an increase)
+- **AutoPay & paperless billing discount: -$5.00**
+- **Discount for Signature members on AT&T Unlimited: -$10.00**
+
+If your total went up, the most likely culprits on this statement are the **$17 insurance add‑on**, the **$85 plan charge**, and the **fees/surcharges (including the $1.99 administrative fee)**.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q060 | ATT Bill Dec 2023 | 805 chars | Sources: 4
+Q: End with a concise payment-oriented recap based only on the bill.
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Here’s what this AT&T Mobility statement is telling you in plain, payment-focused terms:
+
+- **Who/where the bill is addressed to:** Pedro Marques Gillet, ATTN: McKay Hall, 308 1 LMU Drive, MSB 16812, Los Angeles, CA 90404.  
+- **Which account it’s for:** Account Number **337215704977** (Foundation Account **02501613**).  
+- **Statement timing:** **Issue Date: Dec 20, 2023**.  
+- **What you owe:** **Total due: $98.49**.  
+- **How it will be paid (if you do nothing):** **AutoPay is scheduled for Jan 09, 2024**.  
+- **If you pay late:** A late payment fee **up to $7.00** may apply if the bill isn’t paid in full by the due date.
+
+**Payment recap:** Pay **$98.49** for Account **337215704977**; AutoPay is set to draft on **Jan 09, 2024** (late fee up to **$7.00** if not paid in full by the due date).
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q061 | Certidao Nascimento | 562 chars | Sources: 1
+FAILURE: INTENT_NEEDS_CLARIFICATION
+Q: Move to the birth certificate. What kind of official document is this and what is it certifying?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+This is an official **Brazilian civil registry document** (“**Certidão de Nascimento**” / Birth Certificate) issued by the **Civil Registry Office of Natural Persons** (“Oficial de Registro Civil das Pessoas Naturais”), which also functions as a **Notary Public** (“Tabelião de Notas”), for the **30th Subdistrict (Ibirapuera)** in the **Capital District/County of São Paulo, State of São Paulo**.
+
+It is **certifying the civil registration of a birth**—i.e., it is the official record that a person’s birth has been registered with the Brazilian civil registry.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q062 | Certidao Nascimento | 0 chars | Sources: 1
+FAILURE: missing_provenance
+Q: Extract the person's full name, birth date, and place of birth if shown.
+────────────────────────────────────────────────────────────────────────────────────────────────────
+[NO ANSWER - EMPTY]
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q063 | Certidao Nascimento | 0 chars | Sources: 1
+FAILURE: missing_provenance
+Q: Pull out the parent names and any registry or certificate identifiers that appear.
+────────────────────────────────────────────────────────────────────────────────────────────────────
+[NO ANSWER - EMPTY]
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q064 | Certidao Nascimento | 114 chars | Sources: 2
+FAILURE: language_contract_mismatch
+Q: What issuance, registry office, or notarization details are visible?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+I could not safely finalize this answer in the requested language. Please retry and I will answer only in English.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q065 | Certidao Nascimento | 44 chars | Sources: 1
+FAILURE: missing_provenance
+Q: Put the official fields into a table: field | value | evidence.
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Can you clarify what you want me to do next?
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q066 | Certidao Nascimento | 846 chars | Sources: 1
+Q: Are there any handwritten, stamped, or hard-to-read areas worth noting?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Yes—there are a few areas that look stamped/encoded and hard to read:
+
+- **Stamped/encoded header area:** The top line includes dense, partially unclear text such as “**Notarial do Brasil‑SP**” and “**FIRMAT Vilbira 223341**,” which appears stamp-like and is not fully legible.
+- **Hard-to-read service/office line:** The phrase “**Serv. Not. a Reg** …” is truncated/unclear in the visible excerpt.
+- **Long alphanumeric codes (likely registry/authentication identifiers):**  
+  - “**ARP 1367G-17001-22000-0704**” (clear but looks like an authentication/registry code rather than plain text)  
+  - “**ARDEN …**” (cut off/incomplete in the excerpt)
+- **Name/title line is readable but visually dense:** “**DEYSE DE MOURA – ESCREVENTE AUTORIZADA**” appears clearly, but sits within the same crowded header block that can be harder to parse quickly.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q067 | Certidao Nascimento | 114 chars | Sources: 1
+FAILURE: language_contract_mismatch
+Q: Which fields in this certificate would matter most in an identity verification flow?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+I could not safely finalize this answer in the requested language. Please retry and I will answer only in English.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q068 | Certidao Nascimento | 114 chars | Sources: 2
+FAILURE: language_contract_mismatch
+Q: What would still require manual validation from the original record or issuing office?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+I could not safely finalize this answer in the requested language. Please retry and I will answer only in English.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q069 | Certidao Nascimento | 114 chars | Sources: 1
+FAILURE: language_contract_mismatch
+Q: Summarize the document carefully without going beyond what is explicitly shown.
+────────────────────────────────────────────────────────────────────────────────────────────────────
+I could not safely finalize this answer in the requested language. Please retry and I will answer only in English.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q070 | Certidao Nascimento | 0 chars | Sources: 1
+FAILURE: missing_provenance
+Q: Finish with a strict evidence-only recap of the certificate.
+────────────────────────────────────────────────────────────────────────────────────────────────────
+[NO ANSWER - EMPTY]
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q071 | SEVIS RTI | 1119 chars | Sources: 3
+Q: Now look at SEVIS_RTI. What seems to be the purpose of this document?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+SEVIS_RTI appears to be a **Form I‑20 (Certificate of Eligibility for Nonimmigrant Student Status)** issued through SEVIS for an **F‑1 student**. Its purpose is to serve as the **primary document showing the student has been admitted to a U.S. school** and to support the student’s **F‑1 status and related immigration actions**.
+
+Key functions reflected in the document:
+- **Proof of admission/eligibility:** It states that the Form I‑20 is the *primary document* demonstrating admission to school in the U.S.
+- **Tracks/authorizes key status-related items:** It includes sections for **employment authorizations**, **change of status / cap-gap extension**, **authorized reduced course load**, **current session dates**, and **travel endorsement**.
+- **Supports travel and reentry guidance:** It contains a “REENTRY” section describing that **F‑1 students may leave the U.S. and return** under specified conditions.
+- **Legal/administrative notice:** It warns of **severe penalties for falsifying or concealing material facts** and cites the **legal authority for collecting the information** (8 U.S.C. 1101 and 1184).
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q072 | SEVIS RTI | 365 chars | Sources: 3
+Q: Which identifiers, case numbers, or reference numbers are present?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+The document includes these identifiers/reference numbers:
+
+- **SEVIS ID:** **N0034441643** (listed on page 1)
+- **Form identifier and edition date:** **ICE Form I‑20 (04/30/2021)** (shown on page 1)
+- **Statutory authority citations (reference numbers):** **8 U.S.C. 1101** and **8 U.S.C. 1184** (shown in the “Authority for Collecting Information” text on page 3)
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q073 | SEVIS RTI | 466 chars | Sources: 3
+Q: What institution, person, or status details are named in the file?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+- **Status named:** **F‑1 student** (the document’s “REENTRY” section explicitly refers to “F‑1 students”).  
+- **Person named:** **Gillet** (appears in the signature/parent-or-guardian area on page 1).  
+- **Institution named:** The file identifies the student as admitted to a **U.S. school** (it states Form I‑20 is the primary document showing you have been admitted to school in the United States), but no specific school name is shown in the provided excerpts.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q074 | SEVIS RTI | 1076 chars | Sources: 5
+Q: Are there deadlines, actions, or compliance-related steps mentioned?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Yes—there are several compliance steps and at least one explicit time limit mentioned:
+
+- **Reentry time limit:** F‑1 students may leave the United States and **return within five months**.
+- **Reentry requirements (actions to take before returning):** To return, you must have:
+  1) a **valid passport**  
+  2) a **valid F‑1 student visa** (unless exempt)  
+  3) **Form I‑20 (page 2) properly endorsed for reentry**
+- **Employment compliance requirement:** For certain types of student employment (including **OPT**), you **must have written authorization from USCIS before you begin work**, and the document directs you to **contact your DSO for details**.
+- **School reporting/compliance consequence:** It notes that if a school **fails to submit required reports**, DHS **may withdraw the school’s certification** to enroll nonimmigrant students.
+- **Student certification/commitment:** The student attests they have **read and agreed to comply with the terms and conditions of admission** (and any extension of stay) and that the information provided is true and correct.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q075 | SEVIS RTI | 1979 chars | Sources: 5
+FAILURE: INTENT_NEEDS_CLARIFICATION
+Q: Put the key administrative details into a table with evidence.
+────────────────────────────────────────────────────────────────────────────────────────────────────
+| Administrative detail | What the document says | Evidence |
+|---|---|---|
+| SEVIS identifier | **SEVIS ID: N0034441643** | SEVIS_RTI.pdf p.1, “SEVIS ID: N0034441643” |
+| Student status referenced | **F‑1 students** (in the reentry guidance) | SEVIS_RTI.pdf p.3, “REENTRY. F‑1 students…” |
+| Reentry timing rule | F‑1 students may leave the U.S. and **return within five months** | SEVIS_RTI.pdf p.3, “REENTRY. F‑1 students may leave the United States and return within…” |
+| Primary purpose of the form | **Form I‑20 is the primary document** showing you have been **admitted to school in the United States** | SEVIS_RTI.pdf p.2, “FORM I‑20. The Form I‑20 (this form) is the primary document to show that you have been admitte…” |
+| Legal/compliance warning | **Severe penalties** for knowingly/willfully **falsifying or concealing a material fact** or using a false document in submission | SEVIS_RTI.pdf p.2, “The law provides severe penalties for knowingly and willfully falsifying or concealing a material fact…” |
+| School compliance consequence | If a school fails to submit required reports, **DHS may withdraw the school’s certification** to enroll nonimmigrant students | SEVIS_RTI.pdf p.3, “…fail to submit required reports, DHS may withdraw its certification of your school…” |
+| Authority for collecting information | Authority is contained in **8 U.S.C. 1101** (authority statement shown) | SEVIS_RTI.pdf p.3, “AUTHORITY FOR COLLECTING INFORMATION… contained in 8 U. S. C. 1101…” |
+| Student attestation | Student states they **have read and agreed to comply** with admission terms/conditions and certifies the information is **true and correct** | SEVIS_RTI.pdf p.1, “I have read and agreed to comply… I certify that all information provided…” |
+
+Interpretation: Administratively, this Form I‑20 ties the student’s SEVIS record to F‑1 status, sets a key reentry timing rule, and documents compliance obligations (truthfulness, reporting, and statutory authority).
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q076 | SEVIS RTI | 471 chars | Sources: 3
+Q: What appears to be the most important status signal in this document?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+The strongest “status signal” in this document is that it is an **ICE Form I‑20** issued in SEVIS for an **F‑1 student**—the document’s reentry guidance explicitly addresses **“F‑1 students”**, and the form itself is identified as **ICE Form I‑20 (04/30/2021)**.
+
+Supporting identifiers that reinforce this status context:
+- **SEVIS ID:** **N0034441643**
+- **Form type:** **ICE Form I‑20 (04/30/2021)**
+- **Status reference in instructions:** **“REENTRY. F‑1 students…”**
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q077 | SEVIS RTI | 1477 chars | Sources: 5
+Q: What would an immigration or compliance reviewer focus on first here?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+An immigration or compliance reviewer would likely focus first on the **core status/eligibility signals and the identifiers that tie the record to SEVIS**, then on the **explicit compliance conditions** stated in the instructions.
+
+- **Student classification and travel rule (status signal):** The document’s reentry guidance is explicitly for **“F‑1 students”** and states they may leave the U.S. and **return within five months**, provided they have a **valid passport**, a **valid F‑1 visa (unless exempt)**, and a **Form I‑20 (page 2) properly endorsed for reentry**.  
+- **SEVIS tracking identifier:** The **SEVIS ID: N0034441643** is a primary reference number a reviewer would use to match the document to the SEVIS record.  
+- **School/DSO compliance framework:** It notes that if a school fails to submit required reports, **DHS may withdraw the school’s certification** for attendance by nonimmigrant students, and it describes **issuance of Form I‑20 by DSOs** for accepted nonimmigrants for a full course of study.  
+- **Legal authority and integrity warning:** It cites the **authority for collecting information** as **8 U.S.C. 1101 and 1184**, and includes a warning about **severe penalties** for falsifying or concealing material facts.  
+- **Student attestation:** The student certifies they have **read and agreed to comply with the terms and conditions of admission** (and any extension of stay) and that the information on the form is **true and correct**.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q078 | SEVIS RTI | 1640 chars | Sources: 1
+Q: What important questions remain unanswered if someone needed to act on this?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+If someone needed to *act* on this (e.g., plan travel/reentry or ensure compliance), key practical questions that still need answers include:
+
+- **What is the exact “five months” rule being measured from?**  
+  The document states F‑1 students may leave the U.S. and return within five months, but an actor would still need to know what event starts the clock (departure date, program end date, SEVIS status change, etc.).
+
+- **What is the student’s current SEVIS record status right now?**  
+  The text references a condition tied to SEVIS (“until SEVIS shows the student’s record completed or terminated”), but action depends on whether the record is currently Active, Completed, Terminated, etc.
+
+- **What specific financial resources were “admission was based” on, and are they still required/unchanged?**  
+  The excerpt references “financial resources on which admission was based,” but doesn’t identify what those resources are or what documentation would be needed to demonstrate they remain available.
+
+- **What exact “related student” information is being collected, and for what operational purpose?**  
+  The excerpt signals an “Authority for collecting information” section, but someone acting would still need the concrete list of data elements and how they affect required steps (reporting, updates, disclosures).
+
+- **What are the concrete next steps triggered by a SEVIS status moving to “completed or terminated”?**  
+  The excerpt indicates consequences/conditions tied to that SEVIS status endpoint, but doesn’t spell out what the student/school must do when that happens (timelines, notifications, travel limits, etc.).
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q079 | SEVIS RTI | 2379 chars | Sources: 5
+Q: Give me a short briefing note for a person handling this case.
+────────────────────────────────────────────────────────────────────────────────────────────────────
+## Briefing note — SEVIS/ICE Form I‑20 (F‑1)
+
+### Case identifiers / document type
+- **Document:** **ICE Form I‑20 (04/30/2021)** (3 pages).
+- **SEVIS ID:** **N0034441643**.
+- **Student attestation:** The student certifies they have read and agreed to comply with the terms and conditions of admission/extension of stay, and that the information on the form is true and correct.
+
+### Primary status/compliance signals to anchor the review
+- The document’s travel guidance is explicitly framed for **“F‑1 students”** under the **REENTRY** section.
+- **Reentry rule stated:** F‑1 students may leave the U.S. and **return within five months** if they have:
+  - a **valid passport**,
+  - a **valid F‑1 visa** (unless exempt), and
+  - a **Form I‑20 (page 2) properly endorsed for reentry**.
+- The guidance ties continued eligibility to maintaining the **financial resources on which admission was based**, **until SEVIS shows the student’s record completed or terminated**.
+
+### Employment-related compliance points highlighted in the form
+- Employment may be allowed in limited situations (including **on-campus employment**, **severe economic hardship**, and **optional practical training (OPT) related to the degree**), but the form states the student **must have written authorization from USCIS before beginning work** and should **contact the DSO** for details.
+- **F‑2 dependents:** A spouse or child in **F‑2 classification may not work** in the United States.
+
+### Institutional/DSO process notes (for compliance context)
+- The form notes that **DSOs may issue a Form I‑20** for a nonimmigrant accepted for a **full course of study** (subject to listed conditions).
+- It also warns that if a school fails to comply with requirements (including required reporting), **DHS may withdraw the school’s certification** to enroll nonimmigrant students.
+
+### Practical “first checks” for the handler (based on what this form emphasizes)
+- Confirm the case is tracked under **SEVIS ID N0034441643** and that the document is the **ICE Form I‑20** for the student.
+- If travel/reentry is in scope: verify the **I‑20 reentry endorsement** and that the traveler meets the **passport/visa/I‑20** conditions and the **five‑month** return window described.
+- If employment is in scope: ensure **USCIS written authorization** is in place before any work begins; confirm no **F‑2** employment.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q080 | SEVIS RTI | 1865 chars | Sources: 3
+Q: End with an evidence-based summary plus uncertainty notes.
+────────────────────────────────────────────────────────────────────────────────────────────────────
+## Short briefing note — ICE Form I‑20 / SEVIS (F‑1)
+
+### What this document is signaling
+- This is an **ICE Form I‑20** record tied to **SEVIS**, and the operative guidance shown is explicitly for **F‑1 students** (the “REENTRY” section is written for F‑1 travel/reentry).
+
+### Key identifier to anchor the case
+- **SEVIS ID:** **N0034441643**
+
+### Immediate compliance/travel checkpoints a handler would verify
+- **Reentry condition (as stated):** **F‑1 students may leave the United States and return within five months** if they have:
+  - a **valid passport**,
+  - a **valid F‑1 visa** (unless exempt), and
+  - a **Form I‑20 (page 2) properly endorsed for reentry**.
+- **Ongoing obligation tied to SEVIS record status:** The student is expected to maintain the **financial resources on which admission was based** **until SEVIS shows the student’s record “completed or terminated.”**
+- **Student attestation on the form:** The student certifies they have **read and agreed to comply** with the terms/conditions of admission (and any extension of stay) and that the information on the form is **true and correct** to the best of their knowledge.
+
+---
+
+## Evidence-based summary
+- The case is tied to **SEVIS ID N0034441643** and the document’s operative instructions include **F‑1 reentry guidance** (return within **five months** with required documents, including a properly endorsed **I‑20 page 2**) and an expectation to maintain **admission-based financial resources** until SEVIS shows the record **completed or terminated**, alongside the student’s signed **compliance/accuracy certification**.
+
+## Uncertainty notes
+- The excerpts provided do not show the student’s **current SEVIS status** (e.g., Active/Completed/Terminated) or whether the **reentry endorsement** on page 2 is present/current, so those cannot be confirmed from the provided text alone.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q081 | Move Out Statement | 1312 chars | Sources: 5
+Q: Open the 214 Move Out Statement. What is this document settling or explaining?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+The **214 Move Out Statement** is settling the **final accounting after move-out** for **Unit 214**—specifically, it **itemizes how the resident’s security deposit is applied** and what **final charges** are being assessed in connection with the end of the lease.
+
+Key points it explains/settles:
+- **Resident / unit / lease details:** Pedro Gillet, **Unit 00214**, lease **01/17/2024 to 02/16/2025**, move-out **02/16/2025**, statement dated **02/25/2025**.
+- **Security deposit disposition:** An **itemized disposition of the security deposit** is provided “pursuant to Civil Code Section 1950.5,” showing deductions/charges applied to the former resident(s).
+- **Summary of charges:** It includes an **estimated and/or actual summary of charges**, showing **total charges of $733.24** (which are the types of deductions allowed from a security deposit under the cited code section).
+- **Utilities/service billing context:** It includes **Conservice** utility/service line items (e.g., water base charge, pest control, sewer base, trash admin fee) as part of the move-out accounting.
+- **Supporting invoice documentation:** The packet also includes vendor invoice material (e.g., **Real Floors Inc.** invoice dated **01/27/2025** for work associated with **Unit 214**), supporting charges tied to the move-out.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q082 | Move Out Statement | 414 chars | Sources: 5
+Q: Extract the move-out date, tenant or property details, and final balance if available.
+────────────────────────────────────────────────────────────────────────────────────────────────────
+- **Move-out date:** **02/16/2025**
+
+- **Tenant / property details:**
+  - **Tenant name:** **Pedro Gillet**
+  - **Unit:** **00214**
+  - **Property code:** **024551**
+  - **Address:** **5212 Willow Street, Bellaire, TX 77401**
+  - **Lease term:** **01/17/2024 to 02/16/2025**
+  - **Move-in date:** **01/17/2024**
+  - **Statement date:** **02/25/2025**
+
+- **Final balance:** Not shown in the provided pages/snippets.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q083 | Move Out Statement | 1381 chars | Sources: 5
+Q: What deductions, charges, deposits, or refunds are listed?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Listed items on the 214 Move Out Statement include **security-deposit deductions/charges** and **utility/service charges**:
+
+### Security deposit disposition / deductions
+- The statement is an **itemized disposition of the security deposit** for former resident **Pedro Gillet**, dated **February 25, 2025**, issued pursuant to **Civil Code Section 1950.5** (the form explains allowable deduction categories such as unpaid rent, repairs/cleaning, and replacement).
+
+### Total charges
+- **Total charges:** **$733.24** (shown in the “Estimated and/or Actual Summary of Charges” section).
+
+### Itemized utility/service charges shown (Conservice-related)
+- **Water Base Charge (01/01/2025–02/01/2025):** **$21.54**
+- **Pest Control (01/01/2025–01/31/2025):** **$2.00**
+- **Pest Control (01/01/25–01/31/25):** **$2.00** (also appears in the move-out line items)
+- **Sewer Base (01/01/2025–02/01/2025):** **$9.10**
+- **Final Sewer (02/02/25–02/16/25):** **$3.75**
+- **Sewer (01/01/25–02/01/25):** **$6.15**
+- **Final Sewer Base (02/02/25–02/16/25):** (amount not fully visible in the provided excerpt)
+- **Trash Admin Fee:** (listed, but the dollar amount is not visible in the provided excerpt)
+
+### Deposits / refunds
+- A **security deposit** is being accounted for via the itemized disposition, but the **deposit amount and any refund/balance** are not shown in the provided excerpts.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q084 | Move Out Statement | 1362 chars | Sources: 5
+FAILURE: INTENT_NEEDS_CLARIFICATION
+Q: Put the financial lines into a table: charge | amount | evidence.
+────────────────────────────────────────────────────────────────────────────────────────────────────
+| Charge | Amount | Evidence |
+|---|---:|---|
+| Total charges (Estimated and/or Actual Summary of Charges) | $733.24 | 214 Move Out Statement (2).pdf, p.3, “ESTIMATED AND/OR ACTUAL SUMMARY OF CHARGES” |
+| Water Base Charge (01/01/2025–02/01/2025) | $21.54 | 214 Move Out Statement (2).pdf, p.5, “CONSERVICE®” |
+| Pest Control (01/01/2025–01/31/2025) | $2.40 | 214 Move Out Statement (2).pdf, p.5, “CONSERVICE®” |
+| Pest Control (01/01/25–01/31/25) | $2.00 | 214 Move Out Statement (2).pdf, p.1, “Move Out Statement” |
+| Sewer Base (01/01/2025–02/01/2025) | $2.00 | 214 Move Out Statement (2).pdf, p.5, “CONSERVICE®” |
+| Sewer Base (01/01/2025–02/01/2025) | $9.10 | 214 Move Out Statement (2).pdf, p.5, “CONSERVICE®” |
+| Final Sewer (02/02/25–02/16/25) | $3.75 | 214 Move Out Statement (2).pdf, p.1, “Move Out Statement” |
+| Sewer (01/01/25–02/01/25) | $6.15 | 214 Move Out Statement (2).pdf, p.1, “Move Out Statement” |
+| Trash Admin Fee | (amount shown but not legible in snippet) | 214 Move Out Statement (2).pdf, p.5, “CONSERVICE®” |
+| Final Sewer Base (02/02/25–02/16/25) | (amount not legible in snippet) | 214 Move Out Statement (2).pdf, p.1, “Move Out Statement” |
+
+Interpretation: The statement shows a total of $733.24 in move-out charges, with several itemized Conservice utility/service line items (water, pest control, sewer, and trash-related fees).
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q085 | Move Out Statement | 1534 chars | Sources: 5
+Q: Which charges seem routine and which seem potentially unusual?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+### Routine (typical utility / service pass-through) charges
+These look like standard, recurring community utility/service items—especially since they appear under the **CONSERVICE® final bill statement**:
+
+- **Water Base Charge (01/01/2025–02/01/2025): $21.54**
+- **Pest Control (01/01/2025–01/31/2025): $2.40** (also appears as a separate move-out line for **$2.00**)
+- **Sewer Base (01/01/2025–02/01/2025): $2.00**
+- **Trash Admin Fee: $9.10**
+
+Additional routine-looking “final period” utility proration lines on the move-out statement:
+- **Final Sewer (02/02/25–02/16/25): $3.75**
+- **Sewer (01/01/25–02/01/25): $6.15**
+- **Final Sewer Base (02/02/25–02/16/25): $4.xx** (the cents are cut off in the excerpt, but it’s clearly a $4-and-change line)
+
+### Potentially unusual / worth a closer look
+These aren’t necessarily wrong, but they stand out as items you’d typically verify:
+
+- **Duplicate / inconsistent pest control amount:**  
+  - Conservice shows **Pest Control: $2.40** for 01/01/2025–01/31/2025, while the move-out line shows **Pest Control: $2.00** for the same period. That mismatch suggests either two different pest-related charges or a discrepancy.
+
+- **Large “Total charges” vs. small visible utilities:**  
+  - The statement shows **total charges of $733.24** in the “Estimated and/or Actual Summary of Charges.” The utility lines visible in the excerpts are comparatively small, so the bulk of the $733.24 likely comes from other move-out deductions (repairs/cleaning/replacement, etc.) summarized on that page.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q086 | Move Out Statement | 1375 chars | Sources: 5
+Q: Does the statement clearly explain how the final balance was calculated?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Partially.
+
+- The statement **does show a “Total charges” figure of $733.24** in the **“Estimated and/or Actual Summary of Charges”** section, and it frames those charges as **security-deposit-allowable deductions under Civil Code §1950.5(b)** (e.g., unpaid rent, repairs/cleaning, etc.).
+
+- It also provides **some itemized line items** that would feed into the total, including utility/service charges such as:
+  - **Pest Control (01/01/25–01/31/25): $2.00**
+  - **Final Sewer (02/02/25–02/16/25): $3.75**
+  - **Sewer (01/01/25–02/01/25): $6.15**
+  - And a Conservice bill section listing **Water Base Charge $21.54**, **Pest Control $2.40**, **Sewer Base $2.00**, **Trash Admin Fee $9.10**.
+
+- It also includes a **Carpet Damage Pro-rate Calculation** for **Apt #214** (installation **12/14/22**, move-out **2/16/25**) showing **labor cost $467.71** (hourly rate **46**, resident in possession **26.07 months**), indicating at least one larger component that could contribute to the overall charges.
+
+What’s not “clear” from the pages shown is a single, fully reconciled math trail that ties **every component** (all deductions/charges, deposit credits, and any refund or amount due) into one final balance figure. The document provides the **total charges** and **some supporting itemization/calculations**, but not a complete end-to-end balance computation in one place.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q087 | Move Out Statement | 1719 chars | Sources: 5
+Q: What would a tenant most likely dispute or ask about after reading this?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+A tenant would most likely dispute or ask about these items:
+
+- **How the $733.24 “total charges” was built up**
+  - The statement shows a **Total charges: $733.24** in the “Estimated and/or Actual Summary of Charges,” so a tenant will typically ask for the **full itemization that adds up to that number** (especially because only some smaller utility lines are visible elsewhere in the packet).
+
+- **Carpet damage / prorated carpet charge calculation**
+  - There’s a **“Carpet Damage Pro-rate Calculation”** for **Apt #214** with:
+    - **Installation date:** 12/14/22  
+    - **Move-out date:** 2/16/25  
+    - **Resident in possession:** **26.07 months**  
+    - **Hourly rate:** **46**  
+    - **Total cost for labor:** **$467.71**
+  - Tenants commonly question whether carpet work is **damage vs. normal wear**, and whether the **proration method, dates, hours, and rate** are correct.
+
+- **Utility/Conservice line items—especially anything that looks duplicated or inconsistent**
+  - The Conservice section lists items like:
+    - **Water Base Charge (01/01/2025–02/01/2025): $21.54**
+    - **Pest Control (01/01/2025–01/31/2025): $2.40**
+    - **Sewer Base (01/01/2025–02/01/2025): $2.00**
+    - **Trash Admin Fee: $9.10**
+  - A tenant may ask why these appear on a move-out statement and whether any charges overlap with other move-out period charges.
+
+- **Whether the charges are “estimated” or “final,” and what documentation supports them**
+  - The form is presented as an **itemized disposition of the security deposit** “pursuant to Civil Code Section 1950.5,” and it includes an “Estimated” vs “Final” framing—tenants often ask **which charges are final** and what invoices/backup support each deduction.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q088 | Move Out Statement | 1616 chars | Sources: 5
+Q: Summarize this for someone deciding whether the charges look justified.
+────────────────────────────────────────────────────────────────────────────────────────────────────
+The packet supports that **some charges are routine and plausibly justified**, but it **doesn’t clearly show the full itemized math behind the large total**, so it’s hard to confirm whether the overall balance is justified.
+
+### What looks justified / routine
+These items appear as a **final Conservice utility bill** and look like standard pass-through charges with clear descriptions and billing periods:
+
+- **Water Base Charge (01/01/2025–02/01/2025): $21.54**
+- **Pest Control (01/01/2025–01/31/2025): $2.40**
+- **Sewer Base (01/01/2025–02/01/2025): $2.00**
+- **Trash Admin Fee: $9.10**
+
+The Conservice section also provides account and contact details, consistent with a third-party utility billing statement.
+
+### What’s harder to judge as justified from what’s shown
+- The statement lists **“Total charges” of $733.24** under an **“Estimated and/or Actual Summary of Charges”** for **repairs, cleaning, and/or replacement**, and it references **Civil Code §1950.5(b)** as the basis for allowable security-deposit deductions.
+- However, in the provided excerpts, you can see the **total ($733.24)** and the **framework** (repairs/cleaning/replacement, etc.), but you **don’t see the complete line-by-line breakdown that adds up to $733.24**.
+
+### Practical takeaway
+- If the question is “Are the utilities justified?”: **the Conservice items look straightforward and documented.**
+- If the question is “Is the full $733.24 justified?”: **you can’t verify it from the visible itemization here**, because the excerpts show the total and some utility lines, but not the full set of charges that make up the total.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q089 | Move Out Statement | 2365 chars | Sources: 5
+Q: What supporting documents would you want to review alongside this statement?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+To evaluate whether the **$733.24 total charges** and the specific move-out deductions are justified, I’d want to review supporting documents that tie directly to the categories and line items shown in the packet:
+
+- **A complete itemization that adds up to the “Total charges: $733.24”**
+  - The statement shows a single total in the “Estimated and/or Actual Summary of Charges,” so the key companion document is whatever detailed breakdown (by charge type and amount) was used to reach **$733.24**.
+
+- **Utility billing support for the final utility pass-through charges**
+  - The packet includes a **CONSERVICE® Final Bill Statement** (Account **#36581586**) and separate move-out utility lines (e.g., **Pest Control 01/01/25–01/31/25 $2.00**, **Final Sewer 02/02/25–02/16/25 $3.75**, **Sewer 01/01/25–02/01/25 $6.15**, and **Final Sewer Base**).
+  - Supporting documents to review alongside this are the **underlying Conservice bill detail/ledger** for the same periods (the line-by-line bill detail that explains each utility component and proration).
+
+- **Vendor invoice(s) for any repair/replacement charges included in the deductions**
+  - The packet includes a third-party **REAL FLOORS INC invoice** (Invoice date **01/27/2025**) for work at **5550 Grosvenor Blvd, Unit 214, Los Angeles, CA 90066**.
+  - I’d review the **full invoice pages** (scope of work, materials/labor, quantities, and totals) and any related **work order** that explains why the flooring work was charged to the resident.
+
+- **Proof of payment / accounting backup for vendor charges**
+  - If the move-out statement is charging the tenant for vendor work (like the flooring invoice), I’d want the **payment record** (or property accounting ledger entry) showing the amount billed/paid matches what was deducted.
+
+- **Move-out inspection documentation tied to the deductions**
+  - Since the statement is framed as an **itemized disposition of the security deposit** under **Civil Code §1950.5**, the most useful companion documents are the **move-out inspection report/checklist** and any **photos** that correspond to the charged items (especially anything beyond routine utilities).
+
+If you want, I can turn this into a short “request list” you could send to the property manager (focused specifically on the $733.24 build-up, Conservice detail, and the Real Floors invoice backup).
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q090 | Move Out Statement | 886 chars | Sources: 5
+Q: Close with a short evidence-only recap of the move-out statement.
+────────────────────────────────────────────────────────────────────────────────────────────────────
+- **Move-Out Statement details:** Resident **Pedro Gillet** (Unit **00214**) at **5212 Willow Street, Bellaire, TX 77401**. **Lease from 01/17/2024 to 02/16/2025**. **Move-out: 02/16/2025**. **Notice date: 01/10/2025**. Statement **date: 02/25/2025**. Listed rent: **$3,244.00**.  
+
+- **Security deposit disposition framework:** The statement is issued **pursuant to Civil Code §1950.5** and references that deductions may be taken for items such as **unpaid rent** and **repairs/cleaning** (as summarized under §1950.5(b)).  
+
+- **Total charges shown:** The “Estimated and/or Actual Summary of Charges” shows **total charges of $733.24**.  
+
+- **Utility-related line items shown (Conservice):**
+  - **Water Base Charge (01/01/2025–02/01/2025): $21.54**
+  - **Pest Control (01/01/2025–01/31/2025): $2.40**
+  - **Sewer Base (01/01/2025–02/01/2025): $2.00**
+  - **Trash Admin Fee: $9.10**
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q091 | Mayfair Investor Deck | 1392 chars | Sources: 5
+Q: Finally, review the Mayfair Group Investor Deck 2025. What is the core investment story?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Mayfair Group’s core investment story is that it’s building an **AI-native, multi-brand fashion group**—positioned as “the future of fashion” where value is driven by **software (“bits”), not just manufacturing (“stitches”)**—using **proprietary technology** to create a next-generation, scaled fashion platform.
+
+Key pillars of the story in the deck:
+
+- **AI-native fashion empire / multi-brand platform**
+  - The company’s stated ambition is to build the **world’s largest AI-native multi-brand fashion group** and an “AI-native fashion empire for the next generation of global fashion.”
+
+- **Technology-led operating advantages vs. legacy apparel**
+  - The deck highlights AI-driven leverage on core economics and execution, including:
+    - **Design cost per SKU:** **$500 (traditional)** vs **< $5 (AI-generated)**
+    - **Dynamic markdowns:** **25% (industry average)** vs **< 3% (AI forecasting)**
+  - The framing is that AI materially improves both **topline growth** and **bottom-line performance**.
+
+- **Scaled execution with capital efficiency**
+  - The deck emphasizes **“$1B+ revenue with $221M raised”** as proof of capital-efficient scaling.
+
+- **Vertical integration + speed + sustainability positioning**
+  - External commentary in the deck characterizes Mayfair as combining **vertical integration, “zero waste,” and speed at scale**—and as **“a tech company in disguise.”**
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q092 | Mayfair Investor Deck | 1868 chars | Sources: 5
+Q: What business model, market thesis, or product thesis is presented?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Mayfair Group presents a thesis that it can build a **scaled, profitable, AI-native, multi-brand fashion platform**—“the future of fashion,” powered by **software (“bits”), not just stitches**—using **proprietary technology** to create and grow multiple fashion brands under one group.
+
+#### Business model thesis (how it makes money / scales)
+- **Multi-brand digital fashion group at scale:** The stated ambition is to build the **world’s largest AI-native multi-brand fashion group** and “the next generation…multi-brand digital fashion co.”
+- **Proprietary tech as the scaling engine:** The deck positions Mayfair as a fashion company where differentiation and leverage come from **proprietary technology** (i.e., “bits” driving the business, not only manufacturing).
+- **Operational proof point:** It highlights reaching **$1B+ gross sales in 2024**, with **50%+ YoY growth** and **positive net income** in under **3–4 years**, framing this as “profitable at scale” and evidence of operational excellence.
+
+#### Market thesis (why now / why it wins)
+- **Moats + shifting tailwinds:** The deck claims it has built “deep moats,” and that **shifting global dynamics and demographics** are opening **new growth opportunities across more markets**.
+
+#### Product thesis (what it’s building)
+- **AI-native fashion “empire” vision:** It frames the product/company direction as creating an **“AI-native fashion empire for the next generation of global fashion.”**
+- **Tech-enabled capabilities:** The use of funds references product development in **generative design** and **auto-buying**, implying a roadmap centered on AI-driven creation and merchandising decisions.
+
+#### Positioning (how it wants investors to perceive it)
+- It’s characterized as combining **vertical integration, “zero waste,” and speed at scale**, and described as **“a tech company in disguise.”**
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q093 | Mayfair Investor Deck | 910 chars | Sources: 5
+Q: What traction, projections, growth, or performance numbers are shown?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+### Traction / performance numbers shown in the deck
+
+- **Scale & growth**
+  - **$1B+ gross sales in 2024**
+  - Achieved in **less than 3–4 years**
+  - **50%+ YoY growth**
+  - **Positive net income** (positioned as “profitable at scale”)
+
+- **Capital raised / valuation (company financing milestones)**
+  - **$221M total raised** across **4 rounds** (Seed to Series C+)
+  - **$1.55B post-money valuation** in **2024** (last round)
+
+### Operating performance / unit-economics-style benchmarks (AI vs. legacy peers)
+
+- **Design cost per SKU:** **$500 (traditional)** vs **< $5 (AI-generated)**
+- **Dynamic markdowns:** **25% (industry average)** vs **< 3% (AI forecasting)**
+
+### Projections / forward-looking targets explicitly shown
+
+- A **“2030 Vision”** to build the **world’s largest multi-brand digital fashion company** (presented as a long-term goal rather than a numeric forecast in the cited material).
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q094 | Mayfair Investor Deck | 1435 chars | Sources: 5
+Q: What team, strategy, or expansion plans are highlighted?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+### Team highlights
+- **Founders’ backgrounds**
+  - **Chi**: AI at **Google**; **Forbes 30 Under 30**.
+  - **Eddie**: **Strategy at Alibaba**; **Member @ Milken Institute**.
+- **Team composition / capability**
+  - The deck emphasizes a **“deep-tech DNA”** and **global leadership**, with **60% of the team being engineers & scientists** (positioned as core to building the company’s technology advantage).
+
+### Strategy highlights
+- **AI-native, tech-led fashion group strategy**
+  - The company’s stated strategy is to build the **world’s largest AI-native multi-brand fashion group**, framed as building the future of fashion “**powered by bits, not just stitches**,” using **proprietary technology**.
+- **Moats + growth opportunity identification**
+  - The deck states it has built **“deep moats”** and that **shifting global dynamics and demographics** are unlocking **new growth opportunities across more markets**.
+- **Product/tech roadmap focus (use of funds)**
+  - Investment into **product development**, specifically **generative design** and **auto-buying**.
+  - **10%** of use of funds allocated to **talent acquisition**.
+
+### Expansion plans highlighted
+- **Market expansion**
+  - Explicit intent to pursue growth **“across more markets”** as global dynamics/demographics shift.
+- **Vision-level expansion**
+  - An aspirational vision to create an **“AI-native fashion empire for the next generation of global fashion.”**
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q095 | Mayfair Investor Deck | 2192 chars | Sources: 4
+Q: What risks, weak points, or unsupported claims are still visible in the deck?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+## Risks, weak points, and “needs-more-support” claims visible in the deck
+
+### 1) Big vision statements without substantiation on-slide
+- The deck leads with very large positioning claims—e.g., building “the future of fashion,” “powered by bits, not just stitches,” and aiming to build “the world’s largest AI native multi-brand fashion group,” driven by “proprietary technology.”  
+  *Risk/weak point:* these are ambitious outcomes and differentiation claims, but the excerpts shown don’t provide concrete proof (e.g., product validation, defensibility details, or measurable milestones tied to “world’s largest”).  
+
+### 2) “Moats” and expansion thesis asserted more than evidenced
+- It states: “Over time, we’ve built deep moats” and that “shifting global dynamics and demographics are unlocking new growth opportunities across more markets.”  
+  *Risk/weak point:* “deep moats” and the market-expansion rationale are presented as conclusions; the excerpt doesn’t show what the moats are (data advantage, IP, distribution, switching costs, etc.) or which markets/opportunities are being prioritized and why.
+
+### 3) Benchmark-style AI advantage claims may be fragile without methodology
+- The deck contrasts “Legacy Peers” vs “Mayfair (AI)” with large deltas:
+  - Design cost/SKU: **$500 (traditional)** vs **< $5 (AI-generated)**
+  - Dynamic markdowns: **25% (industry avg)** vs **< 3% (AI forecasting)**
+  *Risk/weak point:* these are striking numbers, but the excerpt doesn’t show definitions, sample sizes, time periods, or how “industry avg” and “AI forecasting” were measured—leaving room for questions about comparability and repeatability.
+
+### 4) ESG / ethical supply chain claims create diligence exposure if not fully documented
+- The deck claims:
+  - Manufacturing partners are **SA8000 certified**
+  - **Independent ESG audits** in the **UK and France**
+  - “Result: **100% ESG-compliant suppliers**”
+  - “Recycled and biodegradable packaging used across all brands”
+  *Risk/weak point:* “100% compliant” and “across all brands” are absolute statements; they raise verification expectations (audit scope, cadence, definitions of compliance, and whether any exceptions exist).
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q096 | Mayfair Investor Deck | 1790 chars | Sources: 5
+FAILURE: INTENT_NEEDS_CLARIFICATION
+Q: Put the core investment claims into a table: claim | evidence | risk.
+────────────────────────────────────────────────────────────────────────────────────────────────────
+| Claim | Evidence (as shown in the deck) | Risk / weak point to diligence |
+|---|---|---|
+| Mayfair is building an “AI-native fashion empire” for the next generation of global fashion (not benchmarking 1:1 vs others) | “We’re not comparing ourselves 1:1 — we’re creating the AI-native fashion empire for the next generation of global fashion.” (p.14) | Very aspirational positioning; needs concrete milestones/definition of what “AI-native fashion empire” means operationally and how success is measured. |
+| AI materially improves operating economics vs “legacy peers” (design cost per SKU) | Benchmark table shows **Design Cost/SKU: $500 (traditional) vs \<$5 (AI-generated)** (p.12) | Benchmark framing may not be apples-to-apples; requires validation of methodology, what’s included in “design cost,” and whether savings persist at scale/quality. |
+| AI materially improves profitability via better markdown performance | Benchmark table shows **Dynamic markdowns: 25% (industry avg) vs \<3% (AI forecasting)** (p.12) | Needs proof across seasons/categories and clarity on definitions (e.g., markdown rate calculation, baseline comparables, and whether results generalize beyond select brands/SKUs). |
+| Capital-efficient scale: $1B+ revenue achieved with $221M raised | “Capital Efficiency: $1B+ revenue with $221M raised” (p.16) | “Revenue” definition and time period need confirmation (e.g., net vs gross, audited vs internal); also doesn’t by itself prove durable margins or cash generation. |
+
+Interpretation: The deck’s core investment claims center on an AI-driven step-change in fashion unit economics plus capital-efficient scaling, wrapped in a large “AI-native fashion empire” vision—each of which hinges on validating definitions, comparability, and repeatability at scale.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q097 | Mayfair Investor Deck | 1304 chars | Sources: 5
+Q: If I had 60 seconds with an investor, how should I summarize this deck?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Mayfair Group is pitching itself as **“the future of fashion”**: an **AI-native, multi-brand fashion group** where the core advantage comes from **software (“bits”), not just manufacturing (“stitches”)**, powered by **proprietary technology** with **full vertical integration**.
+
+In one minute, the story is:
+
+- **What they’re building:** “the world’s largest AI native multi-brand fashion group,” using proprietary tech to run the fashion stack end-to-end.  
+- **How they win (the AI lever):** AI-driven economics vs. legacy peers, including **design cost per SKU** moving from **$500 (traditional)** to **< $5 (AI-generated)**, and **dynamic markdowns** from **25% (industry avg)** to **< 3% (AI forecasting)**.  
+- **Platform capabilities highlighted:** **consumer data collection**, **predictive design engine**, **automated content & auto ads**, **smart inventory forecasting**, and an **agile supply chain**—positioned as a vertically integrated system.  
+- **Traction / capital efficiency:** **$1B+ revenue with $221M raised**; **$221M total raised across 4 rounds (Seed to Series C+)**; **last round valuation $1.55B post (2024)**.  
+- **What they’ll do with more capital:** invest in product development—**generative design** and **auto-buying**—plus **10%** allocated to **talent acquisition**.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q098 | Mayfair Investor Deck | 2880 chars | Sources: 5
+Q: What diligence questions should an investor ask next after reading it?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+### Diligence questions an investor should ask next
+
+#### 1) “AI-native fashion group” claim: what is real vs. aspirational?
+- You say you’re building “the world’s largest AI native multi-brand fashion group” and an “AI-native fashion empire.” What does “AI-native” concretely mean in your operating model today (design, buying, pricing, supply chain), and what is still roadmap?
+- What proprietary technology is actually owned in-house vs. built on third-party models/tools? What is defensible and hard to replicate?
+
+#### 2) Moats: what are they, and how are they measured?
+- The deck says you’ve “built deep moats.” What are the specific moats (data advantage, supply chain, brand portfolio, distribution, tech IP), and what proof points show they’re working?
+- What leading indicators do you track that demonstrate moat strength (e.g., repeat rates, CAC efficiency, speed-to-market, forecast accuracy, markdown reduction)?
+
+#### 3) Growth/expansion: which markets, which brands, and why now?
+- You highlight “new growth opportunities across more markets” driven by “shifting global dynamics and demographics.” Which markets are prioritized, and what is the sequencing and go-to-market plan?
+- What is the expected 5-year revenue contribution by market/initiative (the deck references a “5Y Rev” view)—and what assumptions drive those numbers?
+
+#### 4) Capital efficiency and quality of revenue
+- You claim “$1B+ revenue with $221M raised.” Over what time period was the $1B+ generated, and what is the revenue mix by brand/channel/market?
+- What are the unit economics behind that revenue (gross margin, contribution margin, payback periods), and how have they trended as you scaled?
+
+#### 5) Fundraising history, valuation, and current round terms
+- You state “Total Raised: $221M across 4 rounds (Seed to Series C+)” and “Last Round Valuation: $1.55B Post (2024).” What were the key terms of the last round (structure, preferences, pro rata, any unusual rights)?
+- What is the current financing ask (amount, instrument, valuation expectations), and what milestones does it fund?
+
+#### 6) Use of funds: what outcomes will the money buy?
+- The deck allocates funds to “tech development (generative design, auto-buying)” and “talent acquisition.” What are the specific deliverables and timelines for generative design and auto-buying?
+- What headcount/roles are being hired, and how do those hires map to measurable KPI improvements?
+
+#### 7) Third-party validation and governance signals
+- The deck references an investor base and mentions an auditing company focused on ESG in supply chain and a lifestyle impact/innovation asset manager. What work has been completed (audits, certifications, assessments), and what were the results?
+- What is the current governance setup (board composition, oversight of tech and supply chain/ESG), and what will change with the next round?
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q099 | Mayfair Investor Deck | 2171 chars | Sources: 2
+Q: Does the deck make a strong case on its own, or does it depend on unstated assumptions?
+────────────────────────────────────────────────────────────────────────────────────────────────────
+The deck, as shown in the provided pages, leans heavily on **big outcome claims and implied advantages**, and therefore **depends on several unstated assumptions** to feel fully convincing on its own.
+
+### What the deck supports directly (in the excerpts provided)
+- It clearly states the core thesis and ambition: **“building the future of fashion — powered by bits, not just stitches”** and **“building the world’s largest AI native multi-brand fashion group,”** using **“proprietary technology”** (p.1).
+- It presents a quantified “AI lever” comparison versus “legacy peers,” including:
+  - **Design Cost/SKU:** **$500 (traditional)** vs **< $5 (AI-generated)**
+  - **Dynamic markdowns:** **25% (industry avg)** vs **< 3% (AI forecasting)**  
+  (p.12)
+
+These are strong *headline* claims and numbers, and they create a clear narrative: AI-driven operations materially improve unit economics.
+
+### Where it relies on unstated assumptions (based on what’s shown)
+- **Scale/leadership assumption:** The claim of becoming the **“world’s largest”** AI-native multi-brand fashion group is asserted, but the excerpts don’t show the intermediate proof points (e.g., current scale, market share path, or why this team/platform wins that race).
+- **“Proprietary technology” assumption:** The deck states the advantage comes from **proprietary technology** (p.1), but the excerpts don’t show what that technology is, what is owned vs. sourced, or why it’s defensible.
+- **Benchmark validity assumption:** The economics table implies dramatic improvements (e.g., **$500 → < $5** design cost per SKU; **25% → <3%** markdowns) (p.12). To stand alone, the deck would need the underlying methodology, definitions, and evidence that these figures are achieved in practice and are sustainable—not just targets or best-case outcomes.
+
+### Bottom line
+On the provided pages, the deck is **compelling as a vision + economics promise**, but it **does not fully stand on its own** because the most important conclusions (category leadership, defensibility, and the real-world attainability of the benchmarked AI economics) require assumptions that aren’t substantiated in the excerpts shown.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Q100 | Mayfair Investor Deck | 1308 chars | Sources: 1
+Q: End with a strict final recap: clearly supported, suggested, and not evidenced.
+────────────────────────────────────────────────────────────────────────────────────────────────────
+The deck provides a concrete ESG/ethical supply chain claim set, with specific practices and third-party validation elements:
+
+- **Packaging (environmental):**
+  - Uses **recycled and biodegradable packaging across all brands**.
+- **Ethical supply chain (social/compliance):**
+  - Works with **fully vetted manufacturing partners** that are **SA8000 certified**.
+  - Runs **independent ESG audits** in **the UK and France**.
+  - States an outcome: **“Result: 100% ESG…”** (the snippet indicates a “100%” result, but the exact metric/phrase after “100% ESG” is not fully visible in the provided excerpt).
+
+### Strict final recap
+- **Clearly supported:** Recycled/biodegradable packaging across all brands; fully vetted SA8000-certified manufacturing partners; independent ESG audits in the UK and France; a stated “100%” ESG-related result (exact wording truncated).
+- **Suggested:** That these measures collectively constitute a comprehensive, high-performing ESG program across the business (implied by the structure and “Result” framing).
+- **Not evidenced:** The precise definition of the “100% ESG…” result (what is 100%—compliance, coverage, score, etc.); any quantified environmental impact (e.g., emissions, waste reduction); audit frequency, auditor identity, audit outcomes, or remediation findings.

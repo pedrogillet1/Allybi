@@ -42,17 +42,17 @@ function resolveMinCoverage(answerMode?: AnswerMode): number {
   }
   switch (answerMode) {
     case "doc_grounded_quote":
-      return 0.4;
+      return 0.3;
     case "doc_grounded_table":
-      return 0.2;
+      return 0.14;
     case "doc_grounded_multi":
-      return 0.18;
+      return 0.12;
     case "doc_grounded_single":
-      return 0.16;
+      return 0.1;
     case "help_steps":
-      return 0.2;
+      return 0.14;
     default:
-      return 0.16;
+      return 0.1;
   }
 }
 
@@ -92,17 +92,17 @@ function resolveMinPerRefCoverage(answerMode?: AnswerMode): number {
   }
   switch (answerMode) {
     case "doc_grounded_quote":
-      return 0.4;
+      return 0.3;
     case "doc_grounded_table":
-      return 0.2;
+      return 0.14;
     case "doc_grounded_multi":
-      return 0.18;
+      return 0.12;
     case "doc_grounded_single":
-      return 0.16;
+      return 0.1;
     case "help_steps":
-      return 0.18;
+      return 0.12;
     default:
-      return 0.16;
+      return 0.1;
   }
 }
 

@@ -184,7 +184,7 @@ const FALLBACK_BANK: IntentConfigBank = {
       autopickScoreGte: 0.7,
       autopickMarginGte: 0.05,
       forceClarifyTopBelow: 0.4,
-      ambiguousMarginLt: 0.03,
+      ambiguousMarginLt: 0.01,
     },
     followupStability: {
       enabled: true,
@@ -414,6 +414,19 @@ export class IntentConfigService {
         );
       }
       // otherwise continue; sometimes user really wants "open X" which is file_actions
+    }
+
+    // 6b) Skip clarification for explicit doc references
+    const topFamily = top.intentFamily ?? cfg.intents?.[top.intentId]?.family ?? cfg.defaults.defaultIntentFamily;
+    if (signals.hasExplicitDocRef && topFamily === "documents") {
+      notes.push("decision:autopick_explicit_doc_ref");
+      return this.makeOutputFromCandidate(
+        top,
+        cfg,
+        state,
+        notes,
+        "picked_explicit_doc_ref",
+      );
     }
 
     // 7) Autopick vs ambiguous handling

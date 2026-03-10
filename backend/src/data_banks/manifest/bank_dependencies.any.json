@@ -127,7 +127,8 @@
     "ambiguity": [
       "operators",
       "retrieval",
-      "routing"
+      "routing",
+      "semantics"
     ],
     "probes": [
       "formatting",
@@ -247,6 +248,13 @@
       "optional": true
     },
     {
+      "id": "amendment_chain_schema",
+      "dependsOn": [
+        "patterns_doc_refs_versioning_patterns"
+      ],
+      "optional": true
+    },
+    {
       "id": "answer_style_policy",
       "dependsOn": [],
       "optional": true
@@ -281,11 +289,6 @@
     {
       "id": "bank_dependencies",
       "dependsOn": []
-    },
-    {
-      "id": "bank_generation_report",
-      "dependsOn": [],
-      "optional": true
     },
     {
       "id": "bank_manifest",
@@ -558,6 +561,12 @@
       "id": "contradiction_policy",
       "dependsOn": [],
       "optional": true
+    },
+    {
+      "id": "cross_domain_tiebreak_policy",
+      "dependsOn": [
+        "doc_taxonomy"
+      ]
     },
     {
       "id": "crossdoc_alignment_rules",
@@ -4955,11 +4964,6 @@
       "dependsOn": []
     },
     {
-      "id": "doc_taxonomy_vd13afef0",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
       "id": "doc_title_boost_rules",
       "dependsOn": []
     },
@@ -5098,6 +5102,13 @@
     {
       "id": "editing_ux",
       "dependsOn": []
+    },
+    {
+      "id": "effective_date_resolution",
+      "dependsOn": [
+        "patterns_doc_refs_versioning_patterns"
+      ],
+      "optional": true
     },
     {
       "id": "email_routing",
@@ -5495,156 +5506,6 @@
     },
     {
       "id": "layout_cues_v61e6793a",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_doc_taxonomy",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_abbreviations_en",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_abbreviations_pt",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_board_resolution_extraction_hints",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_board_resolution_sections",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_board_resolution_tables",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_dpa_extraction_hints",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_dpa_sections",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_dpa_tables",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_employment_agreement_extraction_hints",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_employment_agreement_sections",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_employment_agreement_tables",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_lexicon_en",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_lexicon_pt",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_msa_extraction_hints",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_msa_sections",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_msa_tables",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_nda_extraction_hints",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_nda_sections",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_nda_tables",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_privacy_policy_extraction_hints",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_privacy_policy_sections",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_privacy_policy_tables",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_sow_extraction_hints",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_sow_sections",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_legal_sow_tables",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_medical_abbreviations_en",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_medical_abbreviations_pt",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_medical_lexicon_en",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "legacy_medical_lexicon_pt",
       "dependsOn": [],
       "optional": true
     },
@@ -8458,11 +8319,6 @@
       "optional": true
     },
     {
-      "id": "quarantine_2026_02_memory_audit_bank_generation_report",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
       "id": "query_family_catalog",
       "dependsOn": [],
       "optional": true
@@ -8656,6 +8512,14 @@
       "optional": true
     },
     {
+      "id": "section_disambiguation_policy",
+      "dependsOn": [
+        "di_section_ontology",
+        "disambiguation_policies"
+      ],
+      "optional": true
+    },
+    {
       "id": "section_priority_accounting",
       "dependsOn": []
     },
@@ -8789,11 +8653,6 @@
       "optional": true
     },
     {
-      "id": "table_header_ontology_accounting_v440f0106",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
       "id": "table_header_ontology_banking",
       "dependsOn": [],
       "optional": true
@@ -8804,12 +8663,12 @@
       "optional": true
     },
     {
-      "id": "table_header_ontology_everyday",
+      "id": "table_header_ontology_education",
       "dependsOn": [],
       "optional": true
     },
     {
-      "id": "table_header_ontology_everyday_v37e0344c",
+      "id": "table_header_ontology_everyday",
       "dependsOn": [],
       "optional": true
     },
@@ -8820,7 +8679,17 @@
       ]
     },
     {
-      "id": "table_header_ontology_finance_v5baba7af",
+      "id": "table_header_ontology_housing",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "table_header_ontology_hr_payroll",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "table_header_ontology_identity",
       "dependsOn": [],
       "optional": true
     },
@@ -8836,20 +8705,10 @@
       ]
     },
     {
-      "id": "table_header_ontology_legal_v439d4f7c",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
       "id": "table_header_ontology_medical",
       "dependsOn": [
         "doc_archetypes_medical"
       ]
-    },
-    {
-      "id": "table_header_ontology_medical_ved51f076",
-      "dependsOn": [],
-      "optional": true
     },
     {
       "id": "table_header_ontology_ops",
@@ -8859,6 +8718,11 @@
     },
     {
       "id": "table_header_ontology_tax",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "table_header_ontology_travel",
       "dependsOn": [],
       "optional": true
     },
@@ -8989,6 +8853,12 @@
       "id": "wrong_doc_lock",
       "dependsOn": [
         "quality_gates"
+      ]
+    },
+    {
+      "id": "wrong_section_lock",
+      "dependsOn": [
+        "wrong_doc_lock"
       ]
     }
   ],

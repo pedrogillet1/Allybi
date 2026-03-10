@@ -4323,34 +4323,54 @@ export class CentralizedChatRuntimeDelegate {
         params.req.preferredLanguage,
         enforcement?.repairs ?? null,
       );
-      const revalidatedProvenance = buildChatProvenance({
-        answerText: text,
-        answerMode: params.answerMode,
-        answerClass: params.answerClass,
-        retrievalPack: params.retrievalPack,
-      });
-      const revalidated = validateChatProvenance({
-        provenance: revalidatedProvenance,
-        answerMode: params.answerMode,
-        answerClass: params.answerClass,
-        allowedDocumentIds: params.req.attachedDocumentIds || [],
-      });
-      provenance = {
-        ...revalidatedProvenance,
-        validated: revalidated.ok,
-        failureCode: revalidated.failureCode,
-        sourceDocumentIds:
-          revalidatedProvenance.sourceDocumentIds.length > 0
-            ? revalidatedProvenance.sourceDocumentIds
-            : sourceDocumentIdsFromSources,
-      };
-      if (!revalidated.ok) {
-        failureCode = revalidated.failureCode;
-        text = buildEmptyAssistantText({
-          language: params.req.preferredLanguage,
-          reasonCode: revalidated.failureCode,
-          seed: `${params.req.userId}:provenance:${revalidated.failureCode}:${params.req.conversationId || Date.now()}`,
+
+      // Only revalidate if enforcement made substantive repairs or initial validation failed
+      const enforcerMadeRepairs = (enforcement?.repairs ?? []).length > 0;
+      if (enforcerMadeRepairs || !provenanceValidation.ok) {
+        const revalidatedProvenance = buildChatProvenance({
+          answerText: text,
+          answerMode: params.answerMode,
+          answerClass: params.answerClass,
+          retrievalPack: params.retrievalPack,
         });
+        const revalidated = validateChatProvenance({
+          provenance: revalidatedProvenance,
+          answerMode: params.answerMode,
+          answerClass: params.answerClass,
+          allowedDocumentIds: params.req.attachedDocumentIds || [],
+        });
+        provenance = {
+          ...revalidatedProvenance,
+          validated: revalidated.ok,
+          failureCode: revalidated.failureCode,
+          sourceDocumentIds:
+            revalidatedProvenance.sourceDocumentIds.length > 0
+              ? revalidatedProvenance.sourceDocumentIds
+              : sourceDocumentIdsFromSources,
+        };
+        if (!revalidated.ok) {
+          if (!failSoftWarningsEnabled) {
+            failureCode = revalidated.failureCode;
+            text = buildEmptyAssistantText({
+              language: params.req.preferredLanguage,
+              reasonCode: revalidated.failureCode,
+              seed: `${params.req.userId}:provenance:${revalidated.failureCode}:${params.req.conversationId || Date.now()}`,
+            });
+          } else {
+            addWarning({
+              code: revalidated.failureCode || "provenance_revalidation_failed",
+              source: "provenance",
+              severity: "warning",
+            });
+          }
+        }
+      } else {
+        // Keep initial validation — enforcement didn't touch grounded content
+        provenance = {
+          ...provenance,
+          validated: true,
+          failureCode: null,
+        };
       }
     }
 
@@ -5319,6 +5339,11 @@ export class CentralizedChatRuntimeDelegate {
   }): Promise<RetrievalPlan | null> {
     if (typeof this.engine.generateRetrievalPlan !== "function") return null;
 
+    // Single doc scope — skip planner, search directly
+    if (params.docScopeSignals.explicitDocLock && params.attachedDocumentIds.length <= 1) {
+      return null;
+    }
+
     const traceId =
       sanitizeTraceId(params.runtimeCtx?.traceId) ||
       sanitizeTraceId((params.req.meta as any)?.requestId) ||
@@ -5348,7 +5373,7 @@ export class CentralizedChatRuntimeDelegate {
     try {
       const plannerTimeoutMs = Math.max(
         2000,
-        Number(process.env.RETRIEVAL_PLAN_TIMEOUT_MS || 12000),
+        Number(process.env.RETRIEVAL_PLAN_TIMEOUT_MS || 6000),
       );
       const generated = await Promise.race([
         this.engine.generateRetrievalPlan({

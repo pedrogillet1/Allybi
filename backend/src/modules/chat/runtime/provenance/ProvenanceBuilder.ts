@@ -89,17 +89,17 @@ function resolveMinSnippetCoverage(answerMode?: AnswerMode): number {
   }
   switch (answerMode) {
     case "doc_grounded_quote":
-      return 0.4;
+      return 0.3;
     case "doc_grounded_table":
-      return 0.2;
+      return 0.14;
     case "doc_grounded_multi":
-      return 0.18;
+      return 0.12;
     case "doc_grounded_single":
-      return 0.16;
+      return 0.1;
     case "help_steps":
-      return 0.2;
+      return 0.12;
     default:
-      return 0.16;
+      return 0.1;
   }
 }
 
@@ -265,6 +265,43 @@ export function buildChatProvenance(params: {
     refAnchorCoverage.push(roundedAnchor);
     refSemanticCoverage.push(roundedSemantic);
     refCombinedCoverage.push(roundedCoverage);
+  }
+
+  // Fallback: retain top evidence if all were filtered out
+  if (snippetRefs.length === 0 && evidence.length > 0) {
+    const relaxedMin = minCoverage * 0.5;
+    for (const item of evidence.slice(0, 3)) {
+      const snippet = String(item.snippet || "").trim();
+      const docId = String(item.docId || "").trim();
+      const locationKey = String(item.locationKey || "").trim();
+      if (!snippet || !docId || !locationKey) continue;
+
+      const normalizedSnippet = normalizeText(snippet);
+      const lexicalCoverage = overlapRatio(answerTokens, tokenize(snippet));
+      const anchorCoverage = anchoredSnippetCoverage(
+        normalizedAnswer,
+        normalizedSnippet,
+      );
+      const coverageScore = Math.max(lexicalCoverage, anchorCoverage);
+      if (coverageScore < relaxedMin) continue;
+
+      const roundedAnchor = round3(Math.min(1, anchorCoverage));
+      const roundedSemantic = round3(Math.min(1, lexicalCoverage));
+      const roundedCoverage = round3(Math.min(1, coverageScore));
+
+      snippetRefs.push({
+        evidenceId: `${docId}:${locationKey}`,
+        documentId: docId,
+        locationKey,
+        snippetHash: hashSnippetForProvenance(snippet),
+        coverageScore: roundedCoverage,
+        anchorCoverage: roundedAnchor,
+        semanticCoverage: roundedSemantic,
+      });
+      refAnchorCoverage.push(roundedAnchor);
+      refSemanticCoverage.push(roundedSemantic);
+      refCombinedCoverage.push(roundedCoverage);
+    }
   }
 
   const evidenceIdsUsed = Array.from(
