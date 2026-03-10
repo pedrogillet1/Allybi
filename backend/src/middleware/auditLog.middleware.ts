@@ -5,10 +5,14 @@ import { logger } from "../utils/logger";
 import { auditStore } from "../services/security/auditStore.service";
 import { securityAlerting } from "../services/security/alerting.service";
 
+if (!process.env.KODA_AUDIT_SALT && process.env.NODE_ENV === "production") {
+  throw new Error("[SECURITY] KODA_AUDIT_SALT is required in production for IP hashing");
+}
+const AUDIT_SALT = process.env.KODA_AUDIT_SALT || "audit-ip-salt-dev";
+
 function hashIp(ip: string | null | undefined): string {
   if (!ip) return "unknown";
-  const salt = process.env.KODA_AUDIT_SALT || "audit-ip-salt";
-  return crypto.createHmac("sha256", salt).update(ip).digest("hex").slice(0, 16);
+  return crypto.createHmac("sha256", AUDIT_SALT).update(ip).digest("hex").slice(0, 16);
 }
 
 /**

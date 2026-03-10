@@ -83,6 +83,41 @@ export async function runEncryptionStep(params: {
     }
 
     logger.info("[Pipeline] Encrypted extracted text stored", { documentId });
+
+    // Encrypt metadata fields (summary, markdownContent, slidesData, pptxMetadata)
+    try {
+      const { getFieldEncryption } = require("../../security/fieldEncryption.service");
+      const fe = getFieldEncryption();
+      const meta = await prisma.documentMetadata.findFirst({ where: { documentId } });
+      if (meta) {
+        const updates: Record<string, string | null> = {};
+        const metaFields = ["summary", "markdownContent", "slidesData", "pptxMetadata"] as const;
+        for (const field of metaFields) {
+          const value = (meta as any)[field];
+          if (value && typeof value === "string") {
+            updates[`${field}Encrypted`] = fe.encryptField(value, {
+              userId: userId || "system",
+              entityId: String(meta.id),
+              field,
+            });
+            updates[field] = null;
+          }
+        }
+        if (Object.keys(updates).length > 0) {
+          await prisma.documentMetadata.update({
+            where: { id: meta.id },
+            data: updates,
+          });
+          logger.info("[Pipeline] Encrypted metadata fields", { documentId, fields: Object.keys(updates).filter(k => k.endsWith("Encrypted")) });
+        }
+      }
+    } catch (metaErr) {
+      // Non-fatal: log but don't block ingestion
+      logger.warn("[EncryptionStep] Metadata encryption failed:", {
+        documentId,
+        error: metaErr instanceof Error ? metaErr.message : String(metaErr),
+      });
+    }
   } catch (encErr: any) {
     if (encryptedOnly) {
       // In encrypted-only mode, encryption failure is fatal

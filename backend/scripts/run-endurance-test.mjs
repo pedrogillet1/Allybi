@@ -144,7 +144,6 @@ function request(urlPath, opts = {}) {
       path: url.pathname + url.search,
       method: opts.method || "GET",
       headers: opts.headers || {},
-      rejectUnauthorized: false,
     };
     const req = https.request(reqOpts, (res) => {
       const chunks = [];

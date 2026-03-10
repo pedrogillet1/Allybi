@@ -15,7 +15,7 @@ if (process.env.NODE_ENV === "production") {
     !dbUrl?.includes("sslmode=require") &&
     !dbUrl?.includes("sslmode=verify")
   ) {
-    console.error(
+    throw new Error(
       "[SECURITY] Production DATABASE_URL must include sslmode=require or sslmode=verify-full",
     );
   }

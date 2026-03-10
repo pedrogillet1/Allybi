@@ -5,6 +5,8 @@ import { UPLOAD_CONFIG } from "../config/upload.config";
 import { logger } from "../utils/logger";
 import { GcsStorageService } from "../services/retrieval/gcsStorage.service";
 import { cleanupExpiredSessions } from "../queues/workers/sessionCleanup.worker";
+import { getKeyRotation } from "../services/security/keyRotation.service";
+import { captureMessage } from "../config/sentry.config";
 
 /**
  * Orphan Cleanup Scheduler
@@ -517,6 +519,19 @@ export function startOrphanCleanupScheduler() {
   cron.schedule("0 4 * * *", async () => {
     logger.info("[OrphanCleanup] Running scheduled daily stale upload cleanup");
     await runStaleUploadCleanup();
+  });
+
+  // Key rotation check daily at 6:00 AM
+  cron.schedule("0 6 * * *", async () => {
+    try {
+      const kr = getKeyRotation();
+      if (await kr.isRotationOverdue()) {
+        captureMessage("[SECURITY] Key rotation overdue (>90 days)", "fatal");
+        logger.error("[KeyRotation] Master key rotation is OVERDUE");
+      }
+    } catch (err) {
+      logger.error("[KeyRotation] Check failed", { error: err instanceof Error ? err.message : String(err) });
+    }
   });
 
   // Session cleanup daily at 2:00 AM

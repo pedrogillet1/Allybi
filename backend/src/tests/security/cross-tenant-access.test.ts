@@ -38,6 +38,12 @@ describe("Cross-tenant isolation", () => {
       "ConnectorToken",
       "TwoFactorAuth",
       "AuditLog",
+      // Phase 2 additions
+      "ConnectorIdentityMap",
+      "AnalyticsUserActivity",
+      "ConversationFeedback",
+      "RAGQueryMetrics",
+      "VerificationCode",
     ];
 
     for (const table of tables) {

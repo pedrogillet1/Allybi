@@ -8,6 +8,10 @@ import * as Sentry from "@sentry/node";
  */
 
 export const initSentry = (app: any) => {
+  if (process.env.NODE_ENV === "production" && !process.env.SENTRY_DSN) {
+    console.error("[SECURITY] SENTRY_DSN not set in production — error monitoring disabled");
+  }
+
   // Skip Sentry in test environment
   if (process.env.NODE_ENV === "test") {
     console.log("⚠️  Sentry: Skipped in test environment");

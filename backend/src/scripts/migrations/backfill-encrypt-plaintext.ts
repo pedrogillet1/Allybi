@@ -87,6 +87,73 @@ async function main() {
   }
 
   console.log(`[backfill] Done. Total processed: ${processed}`);
+
+  // Phase 2: Encrypt DocumentMetadata fields
+  console.log("\n--- Phase 2: DocumentMetadata ---");
+  let metaOffset = 0;
+  let metaProcessed = 0;
+
+  interface MetadataRow {
+    id: string;
+    documentId: string;
+    summary: string | null;
+    markdownContent: string | null;
+    slidesData: string | null;
+    pptxMetadata: string | null;
+  }
+
+  while (true) {
+    const batch: MetadataRow[] = await prisma.$queryRawUnsafe(
+      `SELECT "id", "documentId", "summary", "markdownContent", "slidesData", "pptxMetadata"
+       FROM "document_metadata"
+       WHERE "summary" IS NOT NULL
+         AND "summaryEncrypted" IS NULL
+       ORDER BY "id"
+       LIMIT $1 OFFSET $2`,
+      batchSize,
+      metaOffset,
+    );
+
+    if (batch.length === 0) break;
+
+    for (const rec of batch) {
+      const setClauses: string[] = [];
+      const params: (string | null)[] = [];
+      let paramIdx = 1;
+
+      for (const field of ["summary", "markdownContent", "slidesData", "pptxMetadata"] as const) {
+        const value = rec[field];
+        if (value && typeof value === "string") {
+          const enc = fe.encryptField(value, {
+            userId: "backfill",
+            entityId: rec.id,
+            field,
+          });
+          const encCol = `${field}Encrypted`;
+          setClauses.push(`"${encCol}" = $${paramIdx}`);
+          params.push(enc);
+          paramIdx++;
+          setClauses.push(`"${field}" = NULL`);
+        }
+      }
+
+      if (setClauses.length > 0) {
+        params.push(rec.id);
+        await prisma.$executeRawUnsafe(
+          `UPDATE "document_metadata"
+           SET ${setClauses.join(", ")}
+           WHERE "id" = $${paramIdx}`,
+          ...params,
+        );
+        metaProcessed++;
+      }
+    }
+
+    metaOffset += batchSize;
+    console.log(`[backfill] Metadata: ${metaProcessed} processed...`);
+  }
+
+  console.log(`[backfill] Metadata done. Total: ${metaProcessed}`);
 }
 
 main()

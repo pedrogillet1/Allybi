@@ -98,3 +98,37 @@ CREATE POLICY user_isolation_audit ON "AuditLog"
 -- Grant the application role RLS bypass for background operations
 -- (uncomment and adjust role name for your environment)
 -- ALTER ROLE "koda_app" BYPASSRLS;
+
+-- ============================================================
+-- Additional tables with userId — Phase 2
+-- ============================================================
+
+-- ConnectorIdentityMap
+DROP POLICY IF EXISTS user_isolation_connector_identity ON "ConnectorIdentityMap";
+ALTER TABLE "ConnectorIdentityMap" ENABLE ROW LEVEL SECURITY;
+CREATE POLICY user_isolation_connector_identity ON "ConnectorIdentityMap"
+  FOR ALL USING ("userId" = current_app_user_id());
+
+-- AnalyticsUserActivity
+DROP POLICY IF EXISTS user_isolation_analytics ON "AnalyticsUserActivity";
+ALTER TABLE "AnalyticsUserActivity" ENABLE ROW LEVEL SECURITY;
+CREATE POLICY user_isolation_analytics ON "AnalyticsUserActivity"
+  FOR ALL USING ("userId" = current_app_user_id());
+
+-- ConversationFeedback
+DROP POLICY IF EXISTS user_isolation_feedback ON "ConversationFeedback";
+ALTER TABLE "ConversationFeedback" ENABLE ROW LEVEL SECURITY;
+CREATE POLICY user_isolation_feedback ON "ConversationFeedback"
+  FOR ALL USING ("userId" = current_app_user_id());
+
+-- RAGQueryMetrics
+DROP POLICY IF EXISTS user_isolation_rag_metrics ON "RAGQueryMetrics";
+ALTER TABLE "RAGQueryMetrics" ENABLE ROW LEVEL SECURITY;
+CREATE POLICY user_isolation_rag_metrics ON "RAGQueryMetrics"
+  FOR ALL USING ("userId" = current_app_user_id());
+
+-- VerificationCode
+DROP POLICY IF EXISTS user_isolation_verification_code ON "VerificationCode";
+ALTER TABLE "VerificationCode" ENABLE ROW LEVEL SECURITY;
+CREATE POLICY user_isolation_verification_code ON "VerificationCode"
+  FOR ALL USING ("userId" = current_app_user_id());

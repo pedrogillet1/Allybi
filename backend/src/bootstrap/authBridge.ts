@@ -25,6 +25,12 @@ import type { AuthService } from "../controllers/auth.controller";
 
 const BCRYPT_ROUNDS = 12;
 
+function hashIp(ip: string | null | undefined): string {
+  if (!ip) return "unknown";
+  const salt = process.env.KODA_AUDIT_SALT || "audit-ip-salt-dev";
+  return crypto.createHmac("sha256", salt).update(ip).digest("hex").slice(0, 16);
+}
+
 /**
  * HMAC-SHA256 with a server-side pepper.
  * The pepper is a separate secret from the JWT signing keys —

@@ -19,8 +19,37 @@ import { logger } from "../../../utils/logger";
 import AdmZip from "adm-zip";
 import { downloadFile } from "../../../config/storage";
 import { hkdf32 } from "../../../services/security/hkdf.service";
+import { getFieldEncryption } from "../../../services/security/fieldEncryption.service";
 
 const router = Router();
+
+/**
+ * Helper: encrypt folder name if KODA_MASTER_KEY_BASE64 is set.
+ * Returns { name, nameEncrypted } for the Prisma data payload.
+ */
+function encryptFolderName(
+  plainName: string,
+  userId: string,
+  folderId: string,
+): { name: string | null; nameEncrypted: string | null } {
+  if (!process.env.KODA_MASTER_KEY_BASE64) {
+    return { name: plainName, nameEncrypted: null };
+  }
+  try {
+    const fe = getFieldEncryption();
+    const enc = fe.encryptField(plainName, {
+      userId,
+      entityId: folderId,
+      field: "name",
+    });
+    return { name: null, nameEncrypted: enc };
+  } catch (err) {
+    logger.warn("[Folders] Field encryption failed, storing plaintext", {
+      error: err instanceof Error ? err.message : String(err),
+    });
+    return { name: plainName, nameEncrypted: null };
+  }
+}
 
 // Lazy controller: resolves FolderService from app.locals on first request
 let _ctrl: FolderController | null = null;
@@ -89,12 +118,25 @@ router.post(
         const folder = await prisma.folder.create({
           data: {
             userId,
-            name: entry.name,
+            name: entry.name, // Placeholder; encrypted below
             emoji: defaultEmoji,
             parentFolderId: resolvedParentId,
             path: entry.path || entry.name,
           },
         });
+
+        // Encrypt folder name after creation (needs folderId for AAD)
+        const { name: encName, nameEncrypted } = encryptFolderName(
+          entry.name,
+          userId,
+          folder.id,
+        );
+        if (nameEncrypted) {
+          await prisma.folder.update({
+            where: { id: folder.id },
+            data: { name: encName, nameEncrypted },
+          });
+        }
 
         folderMap[entry.path || entry.name] = folder.id;
       }
@@ -146,12 +188,26 @@ router.post(
       const folder = await prisma.folder.create({
         data: {
           userId,
-          name: name.trim(),
+          name: name.trim(), // Placeholder; encrypted below
           emoji: emoji || null,
           parentFolderId,
         },
         include: { _count: { select: { documents: true, subfolders: true } } },
       });
+
+      // Encrypt folder name after creation (needs folderId for AAD)
+      const { name: encName, nameEncrypted } = encryptFolderName(
+        name.trim(),
+        userId,
+        folder.id,
+      );
+      if (nameEncrypted) {
+        await prisma.folder.update({
+          where: { id: folder.id },
+          data: { name: encName, nameEncrypted },
+        });
+        folder.name = null;
+      }
 
       res.status(201).json({ ok: true, data: folder });
     } catch (e: any) {
@@ -256,7 +312,16 @@ router.patch(
       }
 
       const updateData: any = {};
-      if (name) updateData.name = name.trim();
+      if (name) {
+        // Encrypt folder name if encryption is configured
+        const { name: encName, nameEncrypted } = encryptFolderName(
+          name.trim(),
+          userId,
+          folderId,
+        );
+        updateData.name = encName;
+        if (nameEncrypted) updateData.nameEncrypted = nameEncrypted;
+      }
       if (emoji !== undefined) updateData.emoji = emoji || null;
       if (parentId !== undefined) updateData.parentFolderId = parentId || null;
 
