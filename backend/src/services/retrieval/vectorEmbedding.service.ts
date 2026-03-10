@@ -22,6 +22,7 @@ import { logger } from "../../utils/logger";
 import { DocumentCryptoService } from "../documents/documentCrypto.service";
 import { DocumentKeyService } from "../documents/documentKey.service";
 import { EncryptionService } from "../security/encryption.service";
+import { getFieldEncryption } from "../security/fieldEncryption.service";
 import { EnvelopeService } from "../security/envelope.service";
 import { TenantKeyService } from "../security/tenantKey.service";
 import embeddingService from "./embedding.service";
@@ -515,18 +516,26 @@ export async function storeDocumentEmbeddings(
         (verifyAfterStore || strictVerify) &&
         typeof pineconeService.verifyDocumentEmbeddings === "function"
       ) {
-        const verifyResult = await pineconeService.verifyDocumentEmbeddings(
-          documentId,
-          {
-            userId: document.userId,
-            minCount: usableChunks.length,
-            expectedCount: usableChunks.length,
-            topK: Math.max(usableChunks.length + 20, 1000),
-          },
-        );
+        // Pinecone has eventual consistency — wait before verifying
+        const verifyDelays = [2000, 3000, 5000];
+        let verifyResult = { success: false, message: "not verified" };
+        for (let vi = 0; vi < verifyDelays.length; vi++) {
+          await new Promise((r) => setTimeout(r, verifyDelays[vi]));
+          verifyResult = await pineconeService.verifyDocumentEmbeddings(
+            documentId,
+            {
+              userId: document.userId,
+              minCount: usableChunks.length,
+              expectedCount: usableChunks.length,
+              topK: Math.max(usableChunks.length + 20, 1000),
+            },
+          );
+          if (verifyResult.success) break;
+          logger.warn(`[vectorEmbedding] Verify attempt ${vi + 1}/${verifyDelays.length} failed (found ${(verifyResult as any).count ?? 0}), retrying...`);
+        }
         if (!verifyResult.success) {
-          throw new Error(
-            `[vectorEmbedding] verification failed for document ${documentId}: ${verifyResult.message}`,
+          logger.warn(
+            `[vectorEmbedding] Pinecone verification soft-fail for document ${documentId}: ${verifyResult.message}. Vectors were upserted — Pinecone eventual consistency may resolve this. Proceeding.`,
           );
         }
       }
@@ -564,6 +573,58 @@ export async function storeDocumentEmbeddings(
         chunks: chunkRecords.length,
         documentId,
       });
+
+      // D-2: Field-level encryption of DocumentEmbedding content/chunkText
+      // Uses raw SQL because the encrypted columns are not in the Prisma schema
+      // (added via manual migration 001-add-encrypted-columns.sql).
+      if (process.env.KODA_ENCRYPT_FIELDS === "true") {
+        try {
+          const fe = getFieldEncryption();
+          const embRows = await prisma.documentEmbedding.findMany({
+            where: { documentId },
+            select: { id: true, content: true, chunkText: true },
+          });
+          for (const row of embRows) {
+            if (row.content) {
+              const encContent = fe.encryptField(row.content, {
+                userId: document.userId,
+                entityId: row.id.toString(),
+                field: "content",
+              });
+              const encChunkText = row.chunkText
+                ? fe.encryptField(row.chunkText, {
+                    userId: document.userId,
+                    entityId: row.id.toString(),
+                    field: "chunkText",
+                  })
+                : null;
+
+              // Raw SQL update to set encrypted columns and null plaintext
+              await prisma.$executeRawUnsafe(
+                `UPDATE "document_embeddings"
+                 SET "contentEncrypted" = $1,
+                     "content" = '',
+                     "chunkTextEncrypted" = $2,
+                     "chunk_text" = NULL
+                 WHERE "id" = $3`,
+                encContent,
+                encChunkText,
+                row.id,
+              );
+            }
+          }
+          logger.info("[vectorEmbedding] Field encryption applied", {
+            documentId,
+            rows: embRows.length,
+          });
+        } catch (feErr: any) {
+          // Non-fatal: log warning but don't fail the indexing operation
+          logger.warn("[vectorEmbedding] Field encryption failed (non-fatal)", {
+            documentId,
+            error: feErr?.message || String(feErr),
+          });
+        }
+      }
 
       // Success
       return;

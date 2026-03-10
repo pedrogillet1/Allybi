@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { verifyAccessToken } from "../utils/jwt";
 import prisma from "../config/database";
+import { logger } from "../utils/logger";
 
 /**
  * Extended Request type with authenticated user
@@ -102,6 +103,21 @@ export const authenticateToken = async (
 
     // Attach user to request
     req.user = user;
+
+    // Set RLS session variable for tenant isolation
+    try {
+      await prisma.$executeRawUnsafe(
+        `SELECT set_config('app.current_user_id', $1, true)`,
+        req.user.id,
+      );
+    } catch (rlsErr) {
+      // Non-fatal: log but don't block the request
+      // RLS will fall back to empty string (denying access) which is safe
+      logger.warn("[Auth] Failed to set RLS context", {
+        error: rlsErr instanceof Error ? rlsErr.message : String(rlsErr),
+      });
+    }
+
     next();
   } catch (error) {
     res.status(401).json({ error: "Invalid or expired token" });

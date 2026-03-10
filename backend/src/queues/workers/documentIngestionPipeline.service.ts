@@ -30,6 +30,7 @@ import {
 import { documentStateManager } from "../../services/documents/documentStateManager.service";
 import type { ProcessDocumentJobData } from "../queueConfig";
 import type { ProgressEmitter } from "../../services/ingestion/pipeline/pipelineTypes";
+import { decryptJobData } from "./jobHelpers.service";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -56,9 +57,12 @@ export interface IngestionPipelineResult {
 // ---------------------------------------------------------------------------
 
 export async function runDocumentIngestionPipeline(
-  data: ProcessDocumentJobData,
+  rawData: ProcessDocumentJobData,
   opts?: IngestionPipelineOptions,
 ): Promise<IngestionPipelineResult> {
+  // D-7: Decrypt any encrypted job fields before processing
+  const data = decryptJobData(rawData);
+
   const {
     documentId,
     userId,

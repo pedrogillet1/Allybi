@@ -15,7 +15,7 @@ describe("CentralizedChatRuntimeDelegate doc scope lock behavior", () => {
     expect(signals.singleDocIntent).toBe(false);
   });
 
-  test("conversation-history fallback does not narrow multi-attachment scope but sets activeDocId hint", () => {
+  test("conversation-history fallback does not narrow multi-attachment scope and does not set activeDocId hint", () => {
     const baseSignals = buildAttachmentDocScopeSignals(["doc-a", "doc-b"]);
     const merged = applyConversationHistoryDocScopeFallback({
       signals: baseSignals,
@@ -24,7 +24,7 @@ describe("CentralizedChatRuntimeDelegate doc scope lock behavior", () => {
     });
     expect(merged.docScopeLock.mode).toBe("docset");
     expect(merged.docScopeLock.allowedDocumentIds).toEqual(["doc-a", "doc-b"]);
-    expect(merged.activeDocId).toBe("doc-a");
+    expect(merged.activeDocId).toBeNull();
     expect(merged.singleDocIntent).toBe(false);
   });
 

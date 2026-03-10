@@ -60,7 +60,7 @@ const REQUIRE_DOCUMENTS = String(
   arg('--require-documents', process.env.E2E_REQUIRE_DOCUMENTS || ''),
 ).trim().toLowerCase();
 
-const httpsAgent = new https.Agent({ rejectUnauthorized: false });
+const httpsAgent = new https.Agent();
 const httpAgent = new http.Agent();
 let SESSION = { at: '', rt: '', csrf: '' };
 

@@ -59,6 +59,8 @@ import { DocumentKeyService } from "./services/documents/documentKey.service";
 import { DocumentCryptoService } from "./services/documents/documentCrypto.service";
 import { EncryptedDocumentRepo } from "./services/documents/encryptedDocumentRepo.service";
 import { ChunkCryptoService } from "./services/retrieval/chunkCrypto.service";
+import { bootstrapSecrets } from "./bootstrap/secrets";
+import { startOrphanCleanupScheduler } from "./jobs/orphanCleanup.scheduler";
 
 const driveStorage = {
   provider: "drive",
@@ -86,6 +88,9 @@ const PORT = Number(config.PORT ?? process.env.PORT ?? 3001);
 
 async function startServer() {
   try {
+    // 0. Bootstrap secrets from Secret Manager (prod) or .env (dev)
+    await bootstrapSecrets();
+
     // 1. Initialize service container (loads JSON configs, creates services)
     console.log("[Server] Initializing service container...");
     await initializeContainer();
@@ -457,6 +462,14 @@ async function startServer() {
       } catch {
         console.warn("[Server] Edit worker not available");
       }
+    }
+
+    // 10. Start cleanup schedulers (session cleanup, orphan cleanup)
+    try {
+      startOrphanCleanupScheduler();
+      console.log("[Server] Orphan cleanup scheduler started");
+    } catch {
+      console.warn("[Server] Orphan cleanup scheduler not available");
     }
 
     console.log("[Server] Startup complete");

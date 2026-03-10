@@ -37,7 +37,7 @@ const LOGIN_PASSWORD = String(
 ).trim();
 
 const isHttps = BASE.startsWith('https://');
-const httpsAgent = new https.Agent({ rejectUnauthorized: false });
+const httpsAgent = new https.Agent();
 const httpAgent = new http.Agent();
 const STRICT_DOCSET_LOCK = !process.argv.includes('--no-strict-docset-lock');
 
@@ -444,7 +444,7 @@ async function main() {
   console.log(`=== ${QUERIES.length}-Query Regression Runner ===\n`);
   console.log(`  API base: ${BASE}`);
   console.log(`  Strict docset lock: ${STRICT_DOCSET_LOCK ? 'ON' : 'OFF'}`);
-  console.log(`  TLS verify: ${isHttps ? 'disabled (self-signed allowed)' : 'n/a (http)'}`);
+  console.log(`  TLS verify: ${isHttps ? 'enabled' : 'n/a (http)'}`);
 
   // 1. Login (captures koda_at, koda_rt, koda_csrf cookies)
   console.log(`[1/4] Logging in as ${LOGIN_EMAIL}...`);

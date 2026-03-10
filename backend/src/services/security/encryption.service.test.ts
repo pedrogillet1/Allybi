@@ -18,28 +18,28 @@ describe("EncryptionService", () => {
     test("roundtrip preserves plaintext", () => {
       const key = svc.randomKey32();
       const plaintext = "hello, world!";
-      const json = svc.encryptStringToJson(plaintext, key);
-      const recovered = svc.decryptStringFromJson(json, key);
+      const json = svc.encryptStringToJson(plaintext, key, "test:roundtrip");
+      const recovered = svc.decryptStringFromJson(json, key, "test:roundtrip");
       expect(recovered).toBe(plaintext);
     });
 
     test("wrong key fails decryption", () => {
       const key = svc.randomKey32();
       const wrongKey = svc.randomKey32();
-      const json = svc.encryptStringToJson("secret", key);
-      expect(() => svc.decryptStringFromJson(json, wrongKey)).toThrow();
+      const json = svc.encryptStringToJson("secret", key, "test:wrongkey");
+      expect(() => svc.decryptStringFromJson(json, wrongKey, "test:wrongkey")).toThrow();
     });
 
     test("tampered ciphertext fails", () => {
       const key = svc.randomKey32();
-      const json = svc.encryptStringToJson("secret", key);
+      const json = svc.encryptStringToJson("secret", key, "test:tamper");
       const payload = JSON.parse(json);
       // Flip a character in the ciphertext base64
       const ct = Buffer.from(payload.ctB64, "base64");
       ct[0] ^= 0xff;
       payload.ctB64 = ct.toString("base64");
       expect(() =>
-        svc.decryptStringFromJson(JSON.stringify(payload), key),
+        svc.decryptStringFromJson(JSON.stringify(payload), key, "test:tamper"),
       ).toThrow();
     });
 
@@ -54,16 +54,16 @@ describe("EncryptionService", () => {
     test("16-byte key throws for encrypt", () => {
       const shortKey = crypto.randomBytes(16);
       expect(() =>
-        svc.encryptStringToJson("hello", shortKey),
+        svc.encryptStringToJson("hello", shortKey, "test:short"),
       ).toThrow("AES-256-GCM key must be 32 bytes");
     });
 
     test("16-byte key throws for decrypt", () => {
       const key = svc.randomKey32();
-      const json = svc.encryptStringToJson("hello", key);
+      const json = svc.encryptStringToJson("hello", key, "test:shortdec");
       const shortKey = crypto.randomBytes(16);
       expect(() =>
-        svc.decryptStringFromJson(json, shortKey),
+        svc.decryptStringFromJson(json, shortKey, "test:shortdec"),
       ).toThrow("AES-256-GCM key must be 32 bytes");
     });
   });
@@ -72,8 +72,8 @@ describe("EncryptionService", () => {
     test("roundtrip preserves object", () => {
       const key = svc.randomKey32();
       const obj = { foo: "bar", n: 42, nested: { arr: [1, 2, 3] } };
-      const json = svc.encryptJsonToJson(obj, key);
-      const recovered = svc.decryptJsonFromJson<typeof obj>(json, key);
+      const json = svc.encryptJsonToJson(obj, key, "test:json");
+      const recovered = svc.decryptJsonFromJson<typeof obj>(json, key, "test:json");
       expect(recovered).toEqual(obj);
     });
   });
@@ -82,8 +82,8 @@ describe("EncryptionService", () => {
     test("roundtrip preserves binary data", () => {
       const key = svc.randomKey32();
       const data = crypto.randomBytes(256);
-      const payload = svc.encryptBuffer(data, key);
-      const recovered = svc.decryptBuffer(payload, key);
+      const payload = svc.encryptBuffer(data, key, "test:binary");
+      const recovered = svc.decryptBuffer(payload, key, "test:binary");
       expect(recovered.equals(data)).toBe(true);
     });
 

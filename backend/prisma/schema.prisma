@@ -289,6 +289,10 @@ model DocumentMetadata {
   classificationConfidence Float?
   domain                   String?
   domainConfidence         Float?
+  summaryEncrypted           String?
+  markdownContentEncrypted   String?
+  slidesDataEncrypted        String?
+  pptxMetadataEncrypted      String?
   document                 Document  @relation(fields: [documentId], references: [id], onDelete: Cascade)
 
   @@map("document_metadata")
@@ -472,6 +476,9 @@ model DocumentEmbedding {
   embeddingModel    String?                  @map("embedding_model")
   searchVector      Unsupported("tsvector")? @map("search_vector")
   updatedAt         DateTime?                @map("updated_at")
+  contentEncrypted       String?
+  chunkTextEncrypted     String?
+  microSummaryEncrypted  String?
   document          Document                 @relation(fields: [documentId], references: [id], onDelete: Cascade)
 
   @@index([documentId])

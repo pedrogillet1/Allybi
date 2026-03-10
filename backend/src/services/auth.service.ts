@@ -20,10 +20,31 @@ function hmacSha256(input: string): string {
     .digest("hex");
 }
 
+/** SHA-256 hash for verification codes — one-way, no secret needed */
+function hashVerificationCode(code: string): string {
+  return crypto.createHash("sha256").update(code).digest("hex");
+}
+
 // ---------------------------------------------------------------------------
 // Helper: create session with HMAC-hashed refresh token + session-bound access token
 // ---------------------------------------------------------------------------
 async function createSessionTokens(userId: string, email: string) {
+  // Enforce max 10 active sessions per user
+  const activeSessions = await prisma.session.findMany({
+    where: { userId, isActive: true },
+    orderBy: { createdAt: "asc" },
+    select: { id: true },
+  });
+
+  if (activeSessions.length >= 10) {
+    // Revoke oldest sessions to stay under limit
+    const toRevoke = activeSessions.slice(0, activeSessions.length - 9);
+    await prisma.session.updateMany({
+      where: { id: { in: toRevoke.map((s) => s.id) } },
+      data: { isActive: false, revokedAt: new Date() },
+    });
+  }
+
   const refreshToken = generateRefreshToken({ userId, email });
 
   const session = await prisma.session.create({
@@ -147,7 +168,7 @@ export const registerUser = async ({
       salt,
       firstName: parsedFirstName,
       lastName: parsedLastName,
-      emailCode,
+      emailCode: hashVerificationCode(emailCode),
       expiresAt,
       recoveryKeyHash: hashedRecoveryKey || null,
       masterKeyEncrypted: masterKeyEncrypted || null,
@@ -167,7 +188,7 @@ export const registerUser = async ({
     console.error("Failed to send verification email:", error);
     if (process.env.NODE_ENV !== "production") {
       console.log(
-        `[DEV MODE] Verification code for ${email.toLowerCase()}: ${emailCode}`,
+        `[DEV MODE] Verification code for ${email.toLowerCase()}: ****${emailCode.slice(-2)}`,
       );
     }
   }
@@ -240,7 +261,7 @@ export const resendPendingUserEmail = async (email: string) => {
     console.error("Failed to resend verification email:", error);
     if (process.env.NODE_ENV !== "production") {
       console.log(
-        `[DEV MODE] Would resend verification code ${emailCode} to ${email}`,
+        `[DEV MODE] Would resend verification code ****${emailCode.slice(-2)} to ${email}`,
       );
     }
   }
@@ -283,7 +304,7 @@ export const addPhoneToPendingUser = async (
     const maskedNum =
       formattedPhone.slice(0, -4).replace(/\d/g, "*") +
       formattedPhone.slice(-4);
-    console.log(`SMS Verification Code: ${phoneCode} for ${maskedNum}`);
+    console.log(`SMS Verification Code: ****${phoneCode.slice(-2)} for ${maskedNum}`);
   }
 
   try {
@@ -384,7 +405,7 @@ export const verifyEmailCode = async (userId: string, code: string) => {
     where: {
       userId,
       type: "email",
-      code,
+      code: hashVerificationCode(code),
       isUsed: false,
       expiresAt: { gte: new Date() },
     },
@@ -445,12 +466,12 @@ export const sendPhoneVerificationCode = async (
     where: { userId, type: "phone", isUsed: false },
   });
 
-  // Store the verification code
+  // Store the verification code (hashed)
   await prisma.verificationCode.create({
     data: {
       userId,
       type: "phone",
-      code,
+      code: hashVerificationCode(code),
       expiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes
     },
   });
@@ -470,7 +491,7 @@ export const verifyPhoneCode = async (userId: string, code: string) => {
       where: {
         userId,
         type: "phone",
-        code,
+        code: hashVerificationCode(code),
         isUsed: false,
         expiresAt: { gte: new Date() },
       },
@@ -598,7 +619,7 @@ export const requestPasswordReset = async ({
   });
 
   await prisma.verificationCode.create({
-    data: { userId: user.id, type: "password_reset", code, expiresAt },
+    data: { userId: user.id, type: "password_reset", code: hashVerificationCode(code), expiresAt },
   });
 
   if (email && user.email) {
@@ -649,7 +670,7 @@ export const verifyPasswordResetCode = async ({
     where: {
       userId: user.id,
       type: "password_reset",
-      code,
+      code: hashVerificationCode(code),
       isUsed: false,
       expiresAt: { gte: new Date() },
     },
@@ -690,7 +711,7 @@ export const resetPassword = async ({
     where: {
       userId: user.id,
       type: "password_reset",
-      code,
+      code: hashVerificationCode(code),
       isUsed: false,
       expiresAt: { gte: new Date() },
     },
@@ -973,12 +994,11 @@ export async function resetPasswordWithToken(
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
   if (!passwordRegex.test(newPassword)) throw new Error("WEAK_PASSWORD");
 
-  const salt = await bcrypt.genSalt(12);
-  const passwordHash = await bcrypt.hash(newPassword, salt);
+  const passwordHash = await bcrypt.hash(newPassword, 12);
 
   await prisma.user.update({
     where: { id: userId },
-    data: { passwordHash, salt },
+    data: { passwordHash, salt: "" }, // salt embedded in bcrypt hash; field kept for schema compat
   });
 
   await deleteResetToken(token);

@@ -1,6 +1,11 @@
 import prisma from "../config/database";
 import crypto from "crypto";
 
+/** SHA-256 hash for verification codes — one-way, no secret needed */
+function hashVerificationCode(code: string): string {
+  return crypto.createHash("sha256").update(code).digest("hex");
+}
+
 /**
  * Generate a 6-digit verification code
  */
@@ -30,7 +35,7 @@ export const createPendingUser = async (data: {
       email: data.email.toLowerCase(),
       passwordHash: data.passwordHash,
       salt: data.salt,
-      emailCode,
+      emailCode: hashVerificationCode(emailCode),
       expiresAt,
     },
   });
@@ -58,7 +63,7 @@ export const verifyPendingEmail = async (email: string, code: string) => {
     throw new Error("Registration expired. Please sign up again.");
   }
 
-  if (pendingUser.emailCode !== code) {
+  if (pendingUser.emailCode !== hashVerificationCode(code)) {
     throw new Error("Invalid verification code");
   }
 
@@ -101,10 +106,10 @@ export const resendEmailCode = async (email: string) => {
   // Generate new verification code
   const emailCode = generateVerificationCode();
 
-  // Update pending user with new code
+  // Update pending user with new code (hashed)
   const updated = await prisma.pendingUser.update({
     where: { id: pendingUser.id },
-    data: { emailCode },
+    data: { emailCode: hashVerificationCode(emailCode) },
   });
 
   return { pendingUser: updated, emailCode };
@@ -133,7 +138,7 @@ export const addPhoneToPending = async (email: string, phoneNumber: string) => {
 
   const updated = await prisma.pendingUser.update({
     where: { id: pendingUser.id },
-    data: { phoneNumber, phoneCode },
+    data: { phoneNumber, phoneCode: hashVerificationCode(phoneCode) },
   });
 
   return { pendingUser: updated, phoneCode };
@@ -158,7 +163,7 @@ export const verifyPendingPhone = async (email: string, code: string) => {
     throw new Error("Registration expired. Please sign up again.");
   }
 
-  if (pendingUser.phoneCode !== code) {
+  if (pendingUser.phoneCode !== hashVerificationCode(code)) {
     throw new Error("Invalid verification code");
   }
 

@@ -155,11 +155,18 @@ export const changePassword = async (
       const salt = user.salt;
       const passwordHash = user.passwordHash;
 
-      // Verify current password using bcrypt (plain bcrypt, no custom salt appended)
-      const isPasswordValid = await bcrypt.compare(
+      // Verify current password (try new-style first, then legacy with salt)
+      let isPasswordValid = await bcrypt.compare(
         currentPassword,
         passwordHash,
       );
+      if (!isPasswordValid && salt) {
+        // Legacy fallback: old hashes used password+salt
+        isPasswordValid = await bcrypt.compare(
+          currentPassword + salt,
+          passwordHash,
+        );
+      }
 
       if (!isPasswordValid) {
         res.status(401).json({ error: "Current password is incorrect" });
@@ -200,16 +207,15 @@ export const changePassword = async (
       return;
     }
 
-    // Hash new password using bcrypt (consistent with authBridge.ts)
-    const newSalt = await bcrypt.genSalt(12);
-    const newPasswordHash = await bcrypt.hash(newPassword, newSalt);
+    // Hash new password using bcrypt-12 with built-in salt
+    const newPasswordHash = await bcrypt.hash(newPassword, 12);
 
     // Update password
     await prisma.user.update({
       where: { id: req.user.id },
       data: {
         passwordHash: newPasswordHash,
-        salt: newSalt,
+        salt: "", // salt embedded in bcrypt hash; field kept for schema compat
       },
     });
 

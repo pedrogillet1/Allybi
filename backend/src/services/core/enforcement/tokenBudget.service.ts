@@ -149,13 +149,13 @@ function resolveBaseBudget(
   if (answerMode === "rank_disambiguate") return 220;
   if (answerMode === "doc_grounded_table")
     return routeStage === "final" ? 1500 : 1000;
-  if (answerMode === "doc_grounded_multi") return 1200;
-  if (answerMode === "doc_grounded_single") return 1100;
+  if (answerMode === "doc_grounded_multi") return 1800;
+  if (answerMode === "doc_grounded_single") return 1600;
   if (answerMode === "doc_grounded_quote") return 550;
   if (answerMode === "help_steps") return 900;
   if (answerMode === "no_docs") return 280;
   if (answerMode === "refusal") return 220;
-  return routeStage === "final" ? 1200 : 900;
+  return routeStage === "final" ? 1600 : 1200;
 }
 
 function detectComplexity(params: {

@@ -39,14 +39,53 @@ jobs:
         run: npm run typecheck
 
       - name: Scan for Hardcoded Secrets
+        id: secrets
         run: npx ts-node scripts/security/scan-secrets.ts
 
       - name: Scan for Unprotected Admin Routes
+        id: routes
         run: npx ts-node scripts/security/scan-unprotected-routes.ts
 
       - name: Scan for Plaintext Writes
+        id: plaintext
         run: npx ts-node scripts/security/scan-plaintext.ts
-        continue-on-error: true  # Warn but don't fail (migration in progress)
+
+      - name: Scan for .env secrets in codebase
+        id: env_secrets
+        run: |
+          # Fail if any .env file contains known production secret patterns
+          if grep -rn "KODA_MASTER_KEY_BASE64=.\+" --include="*.env*" . 2>/dev/null | grep -v "\.env\.example" | grep -v "node_modules"; then
+            echo "::error::Production secrets found in .env files!"
+            exit 1
+          fi
+          echo "No production secrets found in committed files"
+
+      - name: npm audit (high/critical)
+        id: audit
+        run: npm audit --audit-level=high --omit=dev
+        continue-on-error: false
+
+      - name: Generate SBOM
+        id: sbom
+        run: npx @cyclonedx/cyclonedx-npm --output-file sbom.json
+        continue-on-error: true
+
+      - name: Upload SBOM artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: backend/sbom.json
+          retention-days: 90
+
+      - name: Trivy vulnerability scan
+        id: trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '1'
 
       - name: Security Summary
         if: always()
@@ -57,4 +96,8 @@ jobs:
           echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
           echo "| Hardcoded Secrets | ${{ steps.secrets.outcome || 'passed' }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Unprotected Routes | ${{ steps.routes.outcome || 'passed' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Plaintext Writes | ${{ steps.plaintext.outcome || 'warning' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Plaintext Writes | ${{ steps.plaintext.outcome || 'passed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| .env Secrets Scan | ${{ steps.env_secrets.outcome || 'passed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| npm audit | ${{ steps.audit.outcome || 'passed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| SBOM | ${{ steps.sbom.outcome || 'passed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Trivy Scan | ${{ steps.trivy.outcome || 'passed' }} |" >> $GITHUB_STEP_SUMMARY

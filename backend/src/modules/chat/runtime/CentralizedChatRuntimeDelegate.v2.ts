@@ -197,10 +197,9 @@ export function applyConversationHistoryDocScopeFallback(params: {
   if (signals.resolvedDocId || signals.singleDocIntent) return signals;
   if (!params.attachedDocumentIds.includes(lastDocumentId)) return signals;
 
-  // With multi-attachment turns, keep the full docset lock but set the
-  // activeDocId hint so follow-up queries have a preferred doc context.
+  // Multi-doc: don't bias toward last-answered document.
+  // User may switch freely between attached docs.
   if (params.attachedDocumentIds.length !== 1) {
-    signals.activeDocId = lastDocumentId;
     return signals;
   }
 
@@ -559,21 +558,47 @@ function filterSourcesByProvenance(
   evidence: EvidenceItem[],
   options: SourceGroundingOptions = {},
 ): ChatSourceEntry[] {
-  void answerText;
   void evidence;
   if (!provenance || sources.length === 0) {
-    return options.enforceScopedSources ? [] : sources;
+    return options.enforceScopedSources ? [] : dedupeSourcesByDocId(sources);
   }
 
   // Primary: use provenance sourceDocumentIds
   if (provenance.sourceDocumentIds.length > 0) {
     const allowed = new Set(provenance.sourceDocumentIds);
     const filtered = sources.filter((s) => allowed.has(s.documentId));
-    if (filtered.length > 0) return filtered;
-    return options.enforceScopedSources ? [] : sources.slice(0, 1);
+    const deduped = dedupeSourcesByDocId(filtered.length > 0 ? filtered : sources);
+
+    // If answer text mentions a specific filename, narrow to only that source
+    if (deduped.length > 1 && answerText) {
+      const mentioned = deduped.filter((s) => {
+        const name = String(s.filename || "").replace(/\.[^.]+$/, ""); // strip extension
+        return name && answerText.includes(name);
+      });
+      if (mentioned.length > 0) return mentioned;
+    }
+
+    // If still multiple, return the first (highest-ranked by evidence order)
+    return deduped.length > 0
+      ? deduped
+      : options.enforceScopedSources
+        ? []
+        : dedupeSourcesByDocId(sources).slice(0, 1);
   }
 
-  return options.enforceScopedSources ? [] : sources;
+  return options.enforceScopedSources ? [] : dedupeSourcesByDocId(sources);
+}
+
+/** Keep only the first source entry per unique documentId. */
+function dedupeSourcesByDocId(sources: ChatSourceEntry[]): ChatSourceEntry[] {
+  const seen = new Set<string>();
+  const out: ChatSourceEntry[] = [];
+  for (const s of sources) {
+    if (seen.has(s.documentId)) continue;
+    seen.add(s.documentId);
+    out.push(s);
+  }
+  return out;
 }
 
 function filterAttachmentByProvenance(
@@ -1362,7 +1387,7 @@ export class CentralizedChatRuntimeDelegate {
     String(process.env.LOW_CONFIDENCE_SURFACE_FALLBACK || "")
       .trim()
       .toLowerCase() === "true";
-  private readonly provenanceUserFailOpenWithEvidence = false;
+  private readonly provenanceUserFailOpenWithEvidence = true;
 
   constructor(
     private readonly engine: ChatEngine,
@@ -5453,8 +5478,12 @@ export class CentralizedChatRuntimeDelegate {
     // resolved in this conversation, the current turn is a follow-up.
     if (contextSignals.isFollowup == null && lastDocumentId) {
       contextSignals.isFollowup = true;
-      contextSignals.activeDocId =
-        contextSignals.activeDocId || lastDocumentId;
+      // Only hint toward last doc in single-doc mode.
+      // In multi-doc, the user may be asking about any attached doc.
+      if (attachedBase.length <= 1) {
+        contextSignals.activeDocId =
+          contextSignals.activeDocId || lastDocumentId;
+      }
     }
     const preferActiveScopeWhenFollowup = Boolean(
       cfg.semanticRetrieval?.preferActiveScopeWhenFollowup,

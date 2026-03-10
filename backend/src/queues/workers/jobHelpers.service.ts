@@ -5,11 +5,75 @@
  */
 
 import { logger } from "../../utils/logger";
+import { getFieldEncryption } from "../../services/security/fieldEncryption.service";
 import { documentQueue } from "../queueConfig";
 import type { ProcessDocumentJobData } from "../queueConfig";
 
+/**
+ * D-7: Encrypt sensitive fields in job data before enqueuing.
+ * Encrypts `plaintextForEmbeddings` when KODA_ENCRYPT_FIELDS is enabled.
+ */
+function encryptJobData(data: ProcessDocumentJobData): ProcessDocumentJobData {
+  if (
+    process.env.KODA_ENCRYPT_FIELDS !== "true" ||
+    !data.plaintextForEmbeddings
+  ) {
+    return data;
+  }
+  try {
+    const fe = getFieldEncryption();
+    const encrypted = fe.encryptField(data.plaintextForEmbeddings, {
+      userId: data.userId,
+      entityId: data.documentId,
+      field: "queue",
+    });
+    return {
+      ...data,
+      plaintextForEmbeddings: undefined,
+      plaintextForEmbeddingsEncrypted: encrypted,
+    };
+  } catch (err: any) {
+    logger.warn("[DocumentQueue] Failed to encrypt job field, sending plaintext", {
+      documentId: data.documentId,
+      error: err?.message || String(err),
+    });
+    return data;
+  }
+}
+
+/**
+ * D-7: Decrypt sensitive fields in job data after dequeuing.
+ * Restores `plaintextForEmbeddings` from its encrypted counterpart.
+ */
+export function decryptJobData(data: ProcessDocumentJobData): ProcessDocumentJobData {
+  const encrypted = (data as any).plaintextForEmbeddingsEncrypted;
+  if (!encrypted || process.env.KODA_ENCRYPT_FIELDS !== "true") {
+    return data;
+  }
+  try {
+    const fe = getFieldEncryption();
+    const plaintext = fe.decryptField(encrypted, {
+      userId: data.userId,
+      entityId: data.documentId,
+      field: "queue",
+    });
+    return {
+      ...data,
+      plaintextForEmbeddings: plaintext,
+      plaintextForEmbeddingsEncrypted: undefined,
+    } as ProcessDocumentJobData;
+  } catch (err: any) {
+    logger.warn("[DocumentQueue] Failed to decrypt job field", {
+      documentId: data.documentId,
+      error: err?.message || String(err),
+    });
+    return data;
+  }
+}
+
 export async function addDocumentJob(data: ProcessDocumentJobData) {
-  const job = await documentQueue.add("process-document", data, {
+  const safeData = encryptJobData(data);
+  const job = await documentQueue.add("process-document", safeData, {
     jobId: `doc-${data.documentId}`, // Prevents duplicate jobs for same doc
   });
   logger.info("[DocumentQueue] Added job", {
@@ -30,7 +94,7 @@ export async function addDocumentJobsBulk(items: ProcessDocumentJobData[]) {
 
   const bulkJobs = items.map((data) => ({
     name: "process-document" as const,
-    data,
+    data: encryptJobData(data),
     opts: {
       jobId: `doc-${data.documentId}`,
     },

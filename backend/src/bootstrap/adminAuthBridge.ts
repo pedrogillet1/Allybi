@@ -1,4 +1,4 @@
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
 import crypto from "crypto";
 import prisma from "../config/database";
 import {
@@ -9,6 +9,12 @@ import {
 import type { AdminJWTPayload } from "../utils/adminJwt";
 
 const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+
+function hashIp(ip: string | null | undefined): string {
+  if (!ip) return "unknown";
+  const salt = process.env.KODA_AUDIT_SALT || "audit-ip-salt-dev";
+  return crypto.createHmac("sha256", salt).update(ip).digest("hex").slice(0, 16);
+}
 
 function sha256(input: string): string {
   return crypto.createHash("sha256").update(input).digest("hex");

@@ -289,13 +289,17 @@ export const disable2FA = async (userId: string, password: string) => {
     where: { id: userId },
   });
 
-  if (!user || !user.passwordHash || !user.salt) {
+  if (!user || !user.passwordHash) {
     throw new Error("Cannot disable 2FA");
   }
 
-  // Verify password
+  // Verify password (try new-style first, then legacy with salt)
   const bcrypt = require("bcrypt");
-  const isValid = await bcrypt.compare(password + user.salt, user.passwordHash);
+  let isValid = await bcrypt.compare(password, user.passwordHash);
+  if (!isValid && user.salt) {
+    // Legacy fallback: old hashes used password+salt
+    isValid = await bcrypt.compare(password + user.salt, user.passwordHash);
+  }
 
   if (!isValid) {
     throw new Error("Invalid password");
