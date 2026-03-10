@@ -243,6 +243,178 @@
       "languages": [
         "en"
       ]
+    },
+    {
+      "id": "BAN_021_evidence_does_not",
+      "category": "excessive_hedging",
+      "regex": "(?i)\\b(?:the |these |those |provided |supplied |available |retrieved )?(?:evidence|document|excerpt|text|snippet|record|material|source)s? (?:does|do) not (?:contain|include|mention|state|say|show|specify|address|reproduce|provide)\\b",
+      "action": "strip",
+      "languages": [
+        "en"
+      ]
+    },
+    {
+      "id": "BAN_022_not_present_in",
+      "category": "excessive_hedging",
+      "regex": "(?i)\\bnot (?:present|included|available|found|visible) in (?:the )?(?:provided |current |available |retrieved |supplied |given )?(?:evidence|documents?|excerpts?|sources?|snippets?|text|data|information|passages?|content)\\b",
+      "action": "strip",
+      "languages": [
+        "en"
+      ]
+    },
+    {
+      "id": "BAN_023_if_you_can_share",
+      "category": "excessive_hedging",
+      "regex": "(?i)\\b(?:if|could|can) you (?:share|paste|provide|upload|send)\\b",
+      "action": "strip",
+      "languages": [
+        "en"
+      ]
+    },
+    {
+      "id": "BAN_024_cant_confirm",
+      "category": "excessive_hedging",
+      "regex": "(?i)\\b(?:I |we )?(?:can't|cannot|couldn't|could not) (?:confirm|determine|verify|assess|establish)\\b",
+      "action": "replace",
+      "replacement": "The available evidence shows",
+      "languages": [
+        "en"
+      ]
+    },
+    {
+      "id": "BAN_025_evidencia_nao_contem",
+      "category": "excessive_hedging",
+      "regex": "(?i)\\b(?:a )?(?:evidência|evidencia|documento|trecho)s? não (?:contém|contem|inclui|menciona|indica|mostra)\\b",
+      "action": "strip",
+      "languages": [
+        "pt"
+      ]
+    },
+    {
+      "id": "BAN_026_evidencia_no_contiene",
+      "category": "excessive_hedging",
+      "regex": "(?i)\\b(?:la )?(?:evidencia|documento|fragmento)s? no (?:contiene|incluye|menciona|indica|muestra)\\b",
+      "action": "strip",
+      "languages": [
+        "es"
+      ]
+    },
+    {
+      "id": "BAN_027_one_clarification",
+      "category": "excessive_hedging",
+      "regex": "(?i)\\b(?:one|a) (?:clarif(?:ying|ication)|follow-up)(?: (?:question|point|note))?\\b",
+      "action": "strip",
+      "languages": [
+        "en"
+      ]
+    },
+    {
+      "id": "BAN_028_if_you_want",
+      "category": "excessive_hedging",
+      "regex": "(?i)\\bif you (?:want|would like|prefer),? I can\\b",
+      "action": "strip",
+      "languages": [
+        "en"
+      ]
+    },
+    {
+      "id": "BAN_029_would_you_like",
+      "category": "excessive_hedging",
+      "regex": "(?i)\\bwould you like (?:me to|more)\\b",
+      "action": "strip",
+      "languages": [
+        "en"
+      ]
+    },
+    {
+      "id": "BAN_030_unfortunately",
+      "category": "excessive_hedging",
+      "regex": "(?i)^unfortunately[,.]?\\s*",
+      "action": "strip",
+      "languages": [
+        "en"
+      ]
+    },
+    {
+      "id": "BAN_031_bare_does_not_verb",
+      "category": "excessive_hedging",
+      "regex": "(?i)\\b(?:does|do) not (?:contain|include|mention|show|state|say|specify|address|reproduce|provide|cover|discuss|reference|cite)\\b",
+      "action": "strip",
+      "languages": [
+        "en"
+      ]
+    },
+    {
+      "id": "BAN_032_doesnt_contraction",
+      "category": "excessive_hedging",
+      "regex": "(?i)\\b(?:doesn't|don't) (?:contain|include|mention|show|state|say|specify|address|provide|cover|discuss|reference|cite)\\b",
+      "action": "strip",
+      "languages": [
+        "en"
+      ]
+    },
+    {
+      "id": "BAN_033_data_conflict_mention",
+      "category": "debug_leakage",
+      "regex": "(?i)(?:###?\\s*)?(?:data|information|metric)\\s+conflicts?\\s+(?:detected|found|identified|flagged)",
+      "action": "strip_line",
+      "languages": [
+        "any"
+      ]
+    },
+    {
+      "id": "BAN_034_evidence_id_leak",
+      "category": "debug_leakage",
+      "regex": "(?i)\\b(?:evidenceId|documentId|locationKey)\\s*[=:]",
+      "action": "strip_line",
+      "languages": [
+        "any"
+      ]
+    },
+    {
+      "id": "BAN_035_metadata_discrepancy",
+      "category": "debug_leakage",
+      "regex": "(?i)\\b(?:metadata|document)\\s+(?:discrepanc|inconsistenc|mismatch)",
+      "action": "strip_line",
+      "languages": [
+        "any"
+      ]
+    },
+    {
+      "id": "BAN_036_conflict_flag_mention",
+      "category": "debug_leakage",
+      "regex": "(?i)\\b(?:conflict|runtime)\\s+(?:flag|metric)s?\\s+(?:shown|listed|mentioned|indicate)",
+      "action": "strip_line",
+      "languages": [
+        "any"
+      ]
+    },
+    {
+      "id": "BAN_037_your_system_flags",
+      "category": "debug_leakage",
+      "regex": "(?i)\\byour\\s+(?:system|runtime)\\s+(?:flags?|detects?|shows?|lists?)",
+      "action": "strip_line",
+      "languages": [
+        "any"
+      ]
+    },
+    {
+      "id": "BAN_038_info_not_explicitly",
+      "category": "excessive_hedging",
+      "regex": "(?i)\\b(?:this|the|that)\\s+information\\s+(?:is|was)\\s+not\\s+(?:explicitly|specifically|directly)\\s+(?:stated|mentioned|provided|included)",
+      "action": "strip",
+      "languages": [
+        "en"
+      ]
+    },
+    {
+      "id": "BAN_039_based_on_available",
+      "category": "excessive_hedging",
+      "regex": "(?i)\\bbased on (?:the )?(?:available|limited|provided)\\s+(?:evidence|information|data|context)\\b",
+      "action": "strip",
+      "languages": [
+        "en"
+      ]
     }
   ],
   "postProcessing": {

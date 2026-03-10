@@ -117,13 +117,13 @@
       "preferProfile": "concise"
     },
     "doc_grounded_single": {
-      "maxCharsDefault": 3200,
-      "maxOutputTokensDefault": 2800,
+      "maxCharsDefault": 4400,
+      "maxOutputTokensDefault": 3600,
       "preferProfile": "detailed"
     },
     "doc_grounded_multi": {
-      "maxCharsDefault": 4000,
-      "maxOutputTokensDefault": 3400,
+      "maxCharsDefault": 5200,
+      "maxOutputTokensDefault": 4200,
       "preferProfile": "detailed"
     },
     "doc_grounded_table": {
@@ -175,10 +175,10 @@
     }
   },
   "paragraphLimits": {
-    "maxSentencesSoft": 2,
-    "maxSentencesHard": 4,
-    "maxCharsSoft": 260,
-    "maxCharsHard": 420
+    "maxSentencesSoft": 3,
+    "maxSentencesHard": 6,
+    "maxCharsSoft": 350,
+    "maxCharsHard": 650
   },
   "bulletLimits": {
     "maxBulletsSoft": 5,

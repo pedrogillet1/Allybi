@@ -146,6 +146,7 @@ type RenderPolicyBank = {
     enabled?: boolean;
     markdown?: {
       allowCodeBlocks?: boolean;
+      allowHeaders?: boolean;
       bulletMarker?: string;
       maxConsecutiveNewlines?: number;
     };
@@ -499,24 +500,49 @@ function limitChars(
 ): { text: string; changed: boolean } {
   const t = text.trim();
   if (t.length <= maxChars) return { text: t, changed: false };
-  // Trim to last sentence boundary within limit
   const slice = t.slice(0, maxChars);
+
+  // 1) Sentence boundary anywhere in the slice (not just > 80)
   const lastPunct = Math.max(
+    slice.lastIndexOf(". "),
+    slice.lastIndexOf(".\n"),
+    slice.lastIndexOf("! "),
+    slice.lastIndexOf("!\n"),
+    slice.lastIndexOf("? "),
+    slice.lastIndexOf("?\n"),
+  );
+  if (lastPunct > 0)
+    return { text: slice.slice(0, lastPunct + 1).trim(), changed: true };
+
+  // 2) Sentence-ending punctuation at end of slice (no trailing space)
+  const lastTerminal = Math.max(
     slice.lastIndexOf("."),
     slice.lastIndexOf("!"),
     slice.lastIndexOf("?"),
   );
-  if (lastPunct > 80)
-    return { text: slice.slice(0, lastPunct + 1).trim(), changed: true };
+  if (lastTerminal > 0 && lastTerminal > maxChars * 0.25)
+    return { text: slice.slice(0, lastTerminal + 1).trim(), changed: true };
+
+  // 3) Clause boundary (semicolon, colon, comma)
+  const lastClause = Math.max(
+    slice.lastIndexOf(";"),
+    slice.lastIndexOf(","),
+    slice.lastIndexOf(":"),
+  );
+  if (lastClause > maxChars * 0.4)
+    return { text: slice.slice(0, lastClause + 1).trim() + "...", changed: true };
+
+  // 4) Word boundary
   const lastWhitespace = Math.max(
     slice.lastIndexOf(" "),
     slice.lastIndexOf("\n"),
     slice.lastIndexOf("\t"),
   );
-  if (lastWhitespace > 80) {
-    return { text: slice.slice(0, lastWhitespace).trim(), changed: true };
+  if (lastWhitespace > 0) {
+    return { text: slice.slice(0, lastWhitespace).trim() + "...", changed: true };
   }
-  return { text: slice.trim(), changed: true };
+
+  return { text: slice.trim() + "...", changed: true };
 }
 
 function charsPerToken(language: ResponseContractContext["language"]): number {
@@ -2344,24 +2370,31 @@ export class ResponseContractEnforcerService {
       });
       if (!provenanceCheck.ok) {
         const reasonCode = provenanceCheck.failureCode || "missing_provenance";
-        provenanceDecision = {
-          action: "block",
-          reasonCode,
-          severity: "error",
-        };
-        return {
-          content: "",
-          attachments,
-          enforcement: {
-            repairs,
-            warnings: [...warnings, ...provenanceCheck.warnings],
-            blocked: true,
+
+        // In encrypted mode, provenance validation always fails because
+        // chunk plaintext is null. Demote to warning when fail-open is set.
+        if (ctx.provenanceFailOpenWithEvidence) {
+          warnings.push(`provenance_demoted:${reasonCode}`);
+        } else {
+          provenanceDecision = {
+            action: "block",
             reasonCode,
-            ...(provenanceDecision
-              ? { provenance: provenanceDecision }
-              : {}),
-          },
-        };
+            severity: "error",
+          };
+          return {
+            content: "",
+            attachments,
+            enforcement: {
+              repairs,
+              warnings: [...warnings, ...provenanceCheck.warnings],
+              blocked: true,
+              reasonCode,
+              ...(provenanceDecision
+                ? { provenance: provenanceDecision }
+                : {}),
+            },
+          };
+        }
       }
 
       if (provenanceCheck.ok) {
@@ -2372,24 +2405,30 @@ export class ResponseContractEnforcerService {
         });
         if (!mapCheck.ok) {
           const mapReasonCode = mapCheck.failureCode || "missing_evidence_map";
-          provenanceDecision = {
-            action: "block",
-            reasonCode: mapReasonCode,
-            severity: "error",
-          };
-          return {
-            content: "",
-            attachments,
-            enforcement: {
-              repairs,
-              warnings: [...warnings, ...mapCheck.warnings],
-              blocked: true,
+          // In encrypted mode, snippet hashes diverge because chunks are
+          // decrypted at different stages. Demote to warning when fail-open.
+          if (ctx.provenanceFailOpenWithEvidence) {
+            warnings.push(`evidence_map_demoted:${mapReasonCode}`);
+          } else {
+            provenanceDecision = {
+              action: "block",
               reasonCode: mapReasonCode,
-              ...(provenanceDecision
-                ? { provenance: provenanceDecision }
-                : {}),
-            },
-          };
+              severity: "error",
+            };
+            return {
+              content: "",
+              attachments,
+              enforcement: {
+                repairs,
+                warnings: [...warnings, ...mapCheck.warnings],
+                blocked: true,
+                reasonCode: mapReasonCode,
+                ...(provenanceDecision
+                  ? { provenance: provenanceDecision }
+                  : {}),
+              },
+            };
+          }
         }
       }
       provenanceEnforcement = provenanceDecision;
@@ -2423,6 +2462,14 @@ export class ResponseContractEnforcerService {
       if (s.changed) repairs.push("STRIPPED_CODE_FENCES");
       content = s.text;
     }
+    // 3b) Strip markdown headers (Koda responses should not have heading formatting)
+    const allowHeaders = this.renderPolicy?.config?.markdown?.allowHeaders ?? false;
+    if (!allowHeaders) {
+      const beforeHeaders = content;
+      content = content.replace(/^(#{1,6})\s+(.+)$/gm, '$2');
+      if (content !== beforeHeaders) repairs.push("STRIPPED_MARKDOWN_HEADERS");
+    }
+
     if (
       this.renderPolicy?.config?.noJsonOutput?.enabled !== false &&
       detectJsonLike(content)
@@ -2450,6 +2497,37 @@ export class ResponseContractEnforcerService {
       repairs.push("JSON_STRIPPED");
     }
 
+
+    // 3c) Split inline bullets onto separate lines (LLM sometimes emits "text - bullet" on one line)
+    {
+      const beforeSplit = content;
+      // Insert newline before dash/number bullets that appear mid-line after sentence-ending punctuation or text
+      content = content.replace(/([.!?:)]) +(- )/g, '$1\n\n$2');
+      content = content.replace(/([.!?:)]) +(\d+\. )/g, '$1\n\n$2');
+      // Also catch bullets after closing parens/quotes mid-sentence
+      content = content.replace(/([a-z0-9"']) +(- \*\*)/gi, '$1\n\n$2');
+      if (content !== beforeSplit) repairs.push("SPLIT_INLINE_BULLETS");
+    }
+
+    // 3d) Break long paragraphs at sentence boundaries (prevent wall-of-text)
+    {
+      const beforeParagraphBreak = content;
+      const MAX_PARAGRAPH_CHARS = 350;
+      const lines = content.split('\n');
+      const result: string[] = [];
+      for (const line of lines) {
+        if (line.length <= MAX_PARAGRAPH_CHARS || line.trimStart().startsWith('-') || /^\d+\.\s/.test(line.trimStart())) {
+          result.push(line);
+          continue;
+        }
+        // Split at sentence boundaries (. ! ?) followed by space and uppercase or **
+        // Use double newline so enforceParagraphCaps treats them as separate paragraphs
+        const split = line.replace(/([.!?])\s+(?=[A-Z\*"(])/g, '$1\n\n');
+        result.push(split);
+      }
+      content = result.join('\n');
+      if (content !== beforeParagraphBreak) repairs.push("SPLIT_LONG_PARAGRAPHS");
+    }
 
     // 4) Normalize bullet lines before table/length checks.
     {
@@ -2752,6 +2830,22 @@ export class ResponseContractEnforcerService {
             : {}),
         },
       };
+    }
+
+    // Final wall-of-text guard: if content exceeds 350 chars with no line breaks,
+    // force-split at sentence boundaries and inline bullets. Runs LAST so no later step can collapse.
+    if (content.length > 350 && !content.includes('\n')) {
+      let wallSplit = content;
+      // Split at sentence boundaries (. ! ?) followed by uppercase, **, ", (
+      wallSplit = wallSplit.replace(/([.!?])\s+(?=[A-Z*"(])/g, '$1\n\n');
+      // Split at inline bullets: ". - " or ") - "
+      wallSplit = wallSplit.replace(/([.!?:)]) +(- )/g, '$1\n\n$2');
+      // Split before bold bullets mid-sentence
+      wallSplit = wallSplit.replace(/([a-z0-9"']) +(- \*\*)/gi, '$1\n\n$2');
+      if (wallSplit !== content) {
+        content = wallSplit;
+        repairs.push("WALL_OF_TEXT_FINAL_SPLIT");
+      }
     }
 
     return {

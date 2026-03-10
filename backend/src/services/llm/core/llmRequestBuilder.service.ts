@@ -561,18 +561,17 @@ export class LlmRequestBuilderService {
         docGroundedFloor,
       );
     }
-    // Latency guardrail: keep draft turns snappy, but do not aggressively cap
-    // final doc-grounded answers where completeness matters most.
+    // Latency guardrail: cap doc-grounded output tokens to keep GPT-5.2
+    // response times under ~8s. The caps (800-900 tokens ≈ 3200-3600 chars)
+    // are generous enough for complete answers.
     const docGroundedLatencyCaps: Record<string, number> = {
       doc_grounded_table: 900,
       doc_grounded_multi: 850,
       doc_grounded_single: 800,
       doc_grounded_quote: 550,
     };
-    const applyDocGroundedLatencyCap =
-      input.route.stage !== "final" || userRequestedShort;
     const docGroundedLatencyCap = docGroundedLatencyCaps[normalizedAnswerMode];
-    if (applyDocGroundedLatencyCap && docGroundedLatencyCap) {
+    if (docGroundedLatencyCap) {
       options.maxOutputTokens = Math.min(
         options.maxOutputTokens ?? docGroundedLatencyCap,
         docGroundedLatencyCap,
@@ -955,8 +954,8 @@ export class LlmRequestBuilderService {
       const conflicts = input.evidencePack.conflicts.slice(0, 5);
       evidenceRenderingTelemetry.conflictsInjected = conflicts.length;
       const conflictBlock = [
-        "### Data Conflicts Detected",
-        "The following metrics differ across documents. Flag uncertainty explicitly in your answer:",
+        "Note: some values differ across sources.",
+        "Use the most authoritative or most recent value. Do NOT mention this note, data conflicts, or document identifiers to the user:",
         ...conflicts.map(
           (c) => `- "${c.metric}": ${c.docA}=${c.valueA} vs ${c.docB}=${c.valueB}`,
         ),
@@ -1003,7 +1002,7 @@ export class LlmRequestBuilderService {
       const answerDepthBlock =
         isTable
           ? `### Answer Depth\nProvide a compact, evidence-grounded table that answers the user's exact request. Prefer key rows first; if the full result is long, summarize the remainder clearly. After the table, add a brief interpretation (1-2 sentences).`
-          : `### Answer Depth\nProvide a complete answer to the specific question using relevant evidence. Include key facts, numbers, and short structured bullets when helpful. Keep the response focused and avoid generic overviews.`;
+          : `### Answer Depth\nProvide a confident, complete answer to the specific question by extracting relevant facts from the evidence. Include key facts, numbers, and short structured bullets when helpful. If evidence addresses the topic, present findings directly without hedging or asking for additional documents.`;
       parts.push(answerDepthBlock);
       stats.answerDepthCharsIncluded = answerDepthBlock.length;
     }
@@ -1067,8 +1066,8 @@ export class LlmRequestBuilderService {
     const lines: string[] = [];
     const header =
       answerMode === "doc_grounded_multi"
-      ? "### Evidence (use only this — synthesize information from all relevant documents below)"
-      : "### Evidence (use only this — answer the specific question, not a generic overview)";
+      ? "### Evidence (synthesize a confident answer from all relevant documents below)"
+      : "### Evidence (answer the specific question directly using this evidence)";
     lines.push(header);
     let sectionChars = header.length;
     let itemsIncluded = 0;

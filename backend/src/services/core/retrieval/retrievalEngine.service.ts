@@ -251,6 +251,7 @@ export interface CandidateChunk {
     scopeViolation?: boolean;
     lowRelevanceChunk?: boolean;
     tableValidated?: boolean;
+    tocCandidate?: boolean;
   };
 
   // Provenance constraints
@@ -566,6 +567,17 @@ export class RetrievalEngineService {
         Pick<DocumentIntelligenceBanksService, "getDocTypeExtractionHints">
       > = getDocumentIntelligenceBanksInstance(),
   ) {}
+
+  /**
+   * Detect whether the system is running in encrypted-only mode.
+   * In this mode lexical and structural indexes return 0 results
+   * because chunk `text` is null.
+   */
+  private isEncryptedOnlyMode(): boolean {
+    const raw = String(process.env.INDEXING_ENCRYPTED_CHUNKS_ONLY || "").trim().toLowerCase();
+    if (!raw) return true; // default is encrypted-only
+    return ["1", "true", "yes", "on"].includes(raw);
+  }
 
   /**
    * Primary entrypoint: run full retrieval pipeline and return EvidencePack.
@@ -2485,6 +2497,30 @@ export class RetrievalEngineService {
   // Negatives
   // -----------------------------
 
+  private static looksLikeTOC(snippet: string): boolean {
+    if (!snippet || snippet.length < 50) return false;
+    const lines = snippet.split(/\n/).map(l => l.trim()).filter(Boolean);
+    if (lines.length < 3) return false;
+
+    // Heuristic 1: High ratio of short lines ending with page numbers
+    const shortWithPageNum = lines.filter(
+      l => l.length < 80 && /\b\d{1,4}\s*$/.test(l),
+    ).length;
+    if (shortWithPageNum / lines.length > 0.5) return true;
+
+    // Heuristic 2: High ratio of numbered-section lines (1. 1.1 Sec. Chapter)
+    const numberedSections = lines.filter(
+      l => /^(?:\d+(?:\.\d+)*\.?\s|(?:Sec(?:tion|\.)|Chapter|Art(?:icle|\.)|Part)\s)/i.test(l),
+    ).length;
+    if (numberedSections / lines.length > 0.6 && lines.length >= 5) return true;
+
+    // Heuristic 3: Dot-leader lines (Table of Contents formatting)
+    const dotLeaders = lines.filter(l => /\.{3,}|_{3,}|-{5,}/.test(l)).length;
+    if (dotLeaders / lines.length > 0.3) return true;
+
+    return false;
+  }
+
   private applyRetrievalNegatives(
     candidates: CandidateChunk[],
     req: RetrievalRequest,
@@ -2501,10 +2537,16 @@ export class RetrievalEngineService {
     if (!negativesBank?.config?.enabled) return candidates;
 
     const cfg = negativesBank.config;
-    const minRelevance = safeNumber(
+    const minRelevanceCfg = safeNumber(
       cfg?.actionsContract?.thresholds?.minRelevanceScore,
       0.55,
     );
+    // In encrypted mode, semantic scores are systematically lower because
+    // lexical/structural channels are dead.  Lower the relevance floor so
+    // valid evidence isn't dropped before ranking.
+    const minRelevance = this.isEncryptedOnlyMode()
+      ? Math.min(minRelevanceCfg, 0.10)
+      : minRelevanceCfg;
 
     const scopeEnforced = this.shouldEnforceScopedDocSet(scope, signals);
     const allowedDocSet = scopeEnforced ? new Set(scope.candidateDocIds) : null;
@@ -2600,6 +2642,12 @@ export class RetrievalEngineService {
             (c.scores.keywordBoost ?? 0) + anchorBoost,
           );
         }
+      }
+
+      // TOC-like content penalty — soft penalty, not a hard block
+      if (RetrievalEngineService.looksLikeTOC(c.snippet ?? "")) {
+        c.scores.final = ((c.scores.final ?? 0) * 0.45);
+        c.signals.tocCandidate = true;
       }
 
       out.push(c);
@@ -3166,7 +3214,7 @@ export class RetrievalEngineService {
     routingPriorityBank?: Record<string, any>,
   ): CandidateChunk[] {
     const cfg = rankerCfg?.config;
-    const weights = cfg?.weights ?? {
+    let weights = cfg?.weights ?? {
       semantic: 0.52,
       lexical: 0.22,
       structural: 0.14,
@@ -3176,6 +3224,14 @@ export class RetrievalEngineService {
       typeBoost: 0.03,
       recencyBoost: 0.03,
     };
+
+    // In encrypted mode, lexical and structural always return 0.
+    // Redistribute their weight to semantic so scores aren't artificially capped.
+    if (this.isEncryptedOnlyMode()) {
+      const deadWeight = (weights.lexical ?? 0) + (weights.structural ?? 0);
+      weights = { ...weights, semantic: (weights.semantic ?? 0) + deadWeight, lexical: 0, structural: 0 };
+    }
+
     const familyPriorityBoost = this.resolveIntentFamilyPriorityBoost(
       signals.intentFamily,
       routingPriorityBank,
@@ -3744,6 +3800,13 @@ export class RetrievalEngineService {
       cfg.actionsContract?.thresholds?.minFinalScore,
       0.28,
     );
+    // In encrypted mode only semantic search works and Pinecone cosine scores
+    // for niche queries can be as low as 0.10-0.17.  After weight redistribution
+    // (semantic weight ≈ 0.88) the final score lands around 0.09-0.15, so we
+    // need a much lower floor to avoid discarding all candidates.
+    const effectiveMinFinalScore = this.isEncryptedOnlyMode()
+      ? Math.min(minFinalScore, 0.05)
+      : minFinalScore;
 
     // When extraction query is active, apply a lower threshold for scoped docs
     // so that we don't discard evidence that the extraction compiler needs.
@@ -3755,7 +3818,7 @@ export class RetrievalEngineService {
       ctx.scope.candidateDocIds.length > 0
         ? new Set(ctx.scope.candidateDocIds)
         : null;
-    let extractionMinScore = minFinalScore;
+    let extractionMinScore = effectiveMinFinalScore;
     if (isExtraction) {
       const rankerCfg = this.safeGetBank<Record<string, any>>("retrieval_ranker_config");
       extractionMinScore = safeNumber(
@@ -3769,7 +3832,7 @@ export class RetrievalEngineService {
     // these docs — a strict keyword-overlap threshold blocks valid evidence,
     // especially for Portuguese meta-questions whose tokens don't appear in
     // document text. Any evidence from attached docs is better than none.
-    const scopedMinScore = ctx.scope.hardScopeActive ? 0 : minFinalScore;
+    const scopedMinScore = ctx.scope.hardScopeActive ? 0 : effectiveMinFinalScore;
 
     // Doc-level aggregation: blend 5% doc score into chunk scores
     const docScores = this.computeDocLevelScores(candidates);
@@ -3789,7 +3852,7 @@ export class RetrievalEngineService {
     const enforceNonComparePurity =
       !ctx.compareIntent &&
       !Boolean(signals.corpusSearchAllowed) &&
-      ctx.classification.confidence >= 0.6 &&
+      ctx.classification.confidence >= 0.35 &&
       (Boolean(primaryDocType) ||
         Boolean(signals.singleDocIntent) ||
         Boolean(signals.explicitDocLock) ||
@@ -3804,10 +3867,38 @@ export class RetrievalEngineService {
           ? extractionMinScore
           : isScoped
             ? scopedMinScore
-            : minFinalScore;
+            : effectiveMinFinalScore;
       if (final < effectiveMin) continue;
 
+      // ── Universal doc-diversity safety net ──
+      // Even when full purity is not enforced, prevent runaway multi-doc
+      // evidence packs by: (a) capping total distinct docs at the exploratory
+      // limit, and (b) requiring secondary docs to score within 55% of the
+      // primary doc's best chunk.
+      if (!ctx.compareIntent && !Boolean(signals.corpusSearchAllowed)) {
+        if (selectedDocs.size > 0 && !selectedDocs.has(c.docId)) {
+          // Score-gap: secondary doc must be within 55% of primary
+          const primaryTopScore = evidence[0]?.score?.finalScore ?? 0;
+          if (primaryTopScore > 0 && final < primaryTopScore * 0.55) {
+            continue;
+          }
+          // Hard cap: never exceed maxDistinctDocsExploratoryNonCompare (3)
+          if (selectedDocs.size >= maxDistinctDocsExploratoryNonCompare) {
+            continue;
+          }
+        }
+      }
+
       if (enforceNonComparePurity) {
+        // Score-gap filter: in exploratory mode, reject secondary docs scoring
+        // far below the primary doc's best chunk to prevent extraneous sources.
+        if (ctx.exploratoryMode && selectedDocs.size > 0 && !selectedDocs.has(c.docId)) {
+          const primaryTopScore = evidence[0]?.score?.finalScore ?? 0;
+          if (primaryTopScore > 0 && final < primaryTopScore * 0.6) {
+            continue;
+          }
+        }
+
         if (
           !selectedDocs.has(c.docId) &&
           selectedDocs.size >= effectiveMaxDistinctDocsNonCompare
@@ -4088,7 +4179,7 @@ export class RetrievalEngineService {
       return true;
     }
 
-    if (params.classification.confidence < 0.6) return true;
+    if (params.classification.confidence < 0.4) return true;
     return false;
   }
 

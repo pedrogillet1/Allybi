@@ -130,7 +130,6 @@
         "anchors": [
           "headings",
           "captions",
-          "toc_signal",
           "table_headers"
         ],
         "reasonCode": "structural_anchor_boost"
