@@ -2113,6 +2113,37 @@ export class RetrievalEngineService {
       const isBaseVariant =
         variantIdx === 0 || variant.sourceRuleId === "base_query";
 
+      if (Date.now() - retrievalStartedAt >= totalPhaseBudgetMs) {
+        return results;
+      }
+
+      // Build phase tasks, then run them in parallel within each variant.
+      const normalizeHits = (
+        rawHits: unknown[],
+        weight: number,
+      ): Array<Record<string, unknown>> =>
+        rawHits.map((hit) => {
+          const normalizedHit =
+            hit && typeof hit === "object"
+              ? (hit as Record<string, unknown>)
+              : {};
+          return {
+            ...normalizedHit,
+            score: clamp01(
+              safeNumber(normalizedHit.score, 0) * weight,
+            ),
+          };
+        });
+
+      type PhaseTask = {
+        promise: Promise<{ output: unknown[]; status: "ok" | "failed" | "timed_out"; note?: string }>;
+        phaseId: string;
+        source: CandidateSource;
+        timedOutCode: string;
+        failedCode: string;
+      };
+      const phaseTasks: PhaseTask[] = [];
+
       for (const phase of phases) {
         if (!phase?.enabled) continue;
         if (
@@ -2125,79 +2156,39 @@ export class RetrievalEngineService {
           continue;
         }
 
-        if (Date.now() - retrievalStartedAt >= totalPhaseBudgetMs) {
-          return results;
-        }
-
         if (phase.type === "semantic") {
           const k = safeNumber(phase.k, 80);
-          const semanticResult = await runWithTimeout<unknown[]>(
-            this.semanticIndex.search({
-              query: variant.text,
-              docIds: opts.scopeDocIds,
-              k,
-            }),
-            [],
-            "semantic_search",
-          );
-          results.push({
+          phaseTasks.push({
+            promise: runWithTimeout<unknown[]>(
+              this.semanticIndex.search({
+                query: variant.text,
+                docIds: opts.scopeDocIds,
+                k,
+              }),
+              [],
+              "semantic_search",
+            ),
             phaseId: `${phase.id ?? "phase_semantic"}::${variant.sourceRuleId}`,
             source: "semantic" as CandidateSource,
-            status: semanticResult.status,
-            failureCode:
-              semanticResult.status === "ok"
-                ? undefined
-                : semanticResult.status === "timed_out"
-                  ? "semantic_search_timed_out"
-                  : "semantic_search_failed",
-            note: semanticResult.note,
-            hits: semanticResult.output.map((hit) => {
-              const normalizedHit =
-                hit && typeof hit === "object"
-                  ? (hit as Record<string, unknown>)
-                  : {};
-              return {
-                ...normalizedHit,
-                score: clamp01(
-                  safeNumber(normalizedHit.score, 0) * variant.weight,
-                ),
-              };
-            }),
+            timedOutCode: "semantic_search_timed_out",
+            failedCode: "semantic_search_failed",
           });
         } else if (phase.type === "lexical") {
           const k = safeNumber(phase.k, 120);
-          const lexicalResult = await runWithTimeout<unknown[]>(
-            this.lexicalIndex.search({
-              query: variant.text,
-              docIds: opts.scopeDocIds,
-              k,
-            }),
-            [],
-            "lexical_search",
-          );
-          results.push({
+          phaseTasks.push({
+            promise: runWithTimeout<unknown[]>(
+              this.lexicalIndex.search({
+                query: variant.text,
+                docIds: opts.scopeDocIds,
+                k,
+              }),
+              [],
+              "lexical_search",
+            ),
             phaseId: `${phase.id ?? "phase_lexical"}::${variant.sourceRuleId}`,
             source: "lexical" as CandidateSource,
-            status: lexicalResult.status,
-            failureCode:
-              lexicalResult.status === "ok"
-                ? undefined
-                : lexicalResult.status === "timed_out"
-                  ? "lexical_search_timed_out"
-                  : "lexical_search_failed",
-            note: lexicalResult.note,
-            hits: lexicalResult.output.map((hit) => {
-              const normalizedHit =
-                hit && typeof hit === "object"
-                  ? (hit as Record<string, unknown>)
-                  : {};
-              return {
-                ...normalizedHit,
-                score: clamp01(
-                  safeNumber(normalizedHit.score, 0) * variant.weight,
-                ),
-              };
-            }),
+            timedOutCode: "lexical_search_timed_out",
+            failedCode: "lexical_search_failed",
           });
         } else if (phase.type === "structural") {
           const k = safeNumber(phase.k, 60);
@@ -2212,41 +2203,46 @@ export class RetrievalEngineService {
                 : []),
             ]),
           ).slice(0, 24);
-          const structuralResult = await runWithTimeout<unknown[]>(
-            this.structuralIndex.search({
-              query: variant.text,
-              docIds: opts.scopeDocIds,
-              k,
-              anchors,
-            }),
-            [],
-            "structural_search",
-          );
-          results.push({
+          phaseTasks.push({
+            promise: runWithTimeout<unknown[]>(
+              this.structuralIndex.search({
+                query: variant.text,
+                docIds: opts.scopeDocIds,
+                k,
+                anchors,
+              }),
+              [],
+              "structural_search",
+            ),
             phaseId: `${phase.id ?? "phase_structural"}::${variant.sourceRuleId}`,
             source: "structural" as CandidateSource,
-            status: structuralResult.status,
-            failureCode:
-              structuralResult.status === "ok"
-                ? undefined
-                : structuralResult.status === "timed_out"
-                  ? "structural_search_timed_out"
-                  : "structural_search_failed",
-            note: structuralResult.note,
-            hits: structuralResult.output.map((hit) => {
-              const normalizedHit =
-                hit && typeof hit === "object"
-                  ? (hit as Record<string, unknown>)
-                  : {};
-              return {
-                ...normalizedHit,
-                score: clamp01(
-                  safeNumber(normalizedHit.score, 0) * variant.weight,
-                ),
-              };
-            }),
+            timedOutCode: "structural_search_timed_out",
+            failedCode: "structural_search_failed",
           });
         }
+      }
+
+      // Run all phases for this variant in parallel.
+      const settled = await Promise.all(
+        phaseTasks.map((t) => t.promise),
+      );
+
+      for (let pi = 0; pi < phaseTasks.length; pi++) {
+        const task = phaseTasks[pi];
+        const phaseResult = settled[pi];
+        results.push({
+          phaseId: task.phaseId,
+          source: task.source,
+          status: phaseResult.status,
+          failureCode:
+            phaseResult.status === "ok"
+              ? undefined
+              : phaseResult.status === "timed_out"
+                ? task.timedOutCode
+                : task.failedCode,
+          note: phaseResult.note,
+          hits: normalizeHits(phaseResult.output, variant.weight),
+        });
       }
     }
 
