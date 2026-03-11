@@ -83,8 +83,21 @@ const MobileBottomNav = () => {
   // Also hide when unauthenticated at root (renders UnifiedAuth inline)
   const isRootAuth = actualPath === '/' && isUnauthenticated;
 
-  // Don't render on desktop, auth pages, or when auth modal is open
-  if (!isMobile || isAuthRoute || isRootAuth || authModalOpen) return null;
+  // Hide when mobile PDF viewer is open (class set by MobilePdfViewer)
+  const [pdfOpen, setPdfOpen] = useState(false);
+  useEffect(() => {
+    const html = document.documentElement;
+    const obs = new MutationObserver(() => {
+      setPdfOpen(html.classList.contains('pdf-mobile-open'));
+    });
+    obs.observe(html, { attributes: true, attributeFilter: ['class'] });
+    // Check initial state
+    setPdfOpen(html.classList.contains('pdf-mobile-open'));
+    return () => obs.disconnect();
+  }, []);
+
+  // Don't render on desktop, auth pages, auth modal open, or mobile PDF viewer
+  if (!isMobile || isAuthRoute || isRootAuth || authModalOpen || pdfOpen) return null;
 
   // Check if current path matches any of the item's paths
   const isActive = (tabConfig) => {

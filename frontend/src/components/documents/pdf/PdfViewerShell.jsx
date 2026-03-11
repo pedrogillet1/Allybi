@@ -4,6 +4,7 @@ import React, {
 import { Document, Page } from 'react-pdf';
 import PdfFloatingControls from './PdfFloatingControls';
 import PdfSidebar from './PdfSidebar';
+import MobilePdfViewer from './MobilePdfViewer';
 import { useIsMobile } from '../../../hooks/useIsMobile';
 
 /* ────────────────────────── constants ────────────────────────── */
@@ -289,6 +290,20 @@ export default function PdfViewerShell({
   /* ── render ─────────────────────────────────────────── */
   const hasPages = Number.isFinite(numPages) && numPages > 0;
 
+  /* ── Mobile: delegate to MobilePdfViewer ─────────── */
+  if (isMobile) {
+    return (
+      <MobilePdfViewer
+        fileConfig={fileConfig}
+        pdfOptions={pdfOptions}
+        initialPage={initialPage}
+        onDocumentLoadSuccess={parentOnLoad}
+        onClose={() => window.history.back()}
+      />
+    );
+  }
+
+  /* ── Desktop: original layout ────────────────────── */
   return (
     <div
       ref={shellRef}
