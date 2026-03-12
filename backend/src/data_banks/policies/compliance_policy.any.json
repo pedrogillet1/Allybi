@@ -1,8 +1,8 @@
 {
   "_meta": {
     "id": "compliance_policy",
-    "version": "1.0.0",
-    "description": "Compliance governance policy for consent gating, restricted export, and legal-hold safeguards.",
+    "version": "1.1.0",
+    "description": "Compliance governance policy for consent gating, restricted export, and legal-hold safeguards. This bank decides only; user-facing copy is owned by compliance_phrases.",
     "languages": [
       "any"
     ],
@@ -47,8 +47,7 @@
         ]
       },
       "then": {
-        "action": "block",
-        "userMessage": "I need explicit consent before continuing with this request."
+        "action": "block"
       },
       "reasonCode": "compliance_missing_consent",
       "terminal": true
@@ -62,8 +61,7 @@
         "value": true
       },
       "then": {
-        "action": "block",
-        "userMessage": "This action is restricted by compliance policy for your workspace."
+        "action": "block"
       },
       "reasonCode": "compliance_export_restricted",
       "terminal": true
@@ -77,8 +75,7 @@
         "value": true
       },
       "then": {
-        "action": "block",
-        "userMessage": "This conversation is under legal hold; sensitive actions are disabled."
+        "action": "block"
       },
       "reasonCode": "compliance_legal_hold_active",
       "terminal": true

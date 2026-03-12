@@ -4,6 +4,7 @@ export type BudgetComplexity = "low" | "medium" | "high";
 
 export interface OutputTokenBudgetInput {
   answerMode?: string | null;
+  outputShape?: string | null;
   outputLanguage?: string | null;
   routeStage?: "draft" | "final" | string | null;
   operator?: string | null;
@@ -11,6 +12,8 @@ export interface OutputTokenBudgetInput {
   evidenceItems?: number | null;
   hasTables?: boolean;
   requestedOverride?: number | null;
+  userRequestedShort?: boolean;
+  styleMaxChars?: number | null;
 }
 
 export interface OutputTokenBudgetResult {
@@ -18,6 +21,34 @@ export interface OutputTokenBudgetResult {
   softOutputTokens: number;
   hardOutputTokens: number;
   complexity: BudgetComplexity;
+}
+
+export interface ResolvedOutputBudget extends OutputTokenBudgetResult {
+  minOutputTokens: number;
+  maxChars: number;
+  profile: string | null;
+  paragraphLimits: {
+    maxSentencesSoft: number | null;
+    maxSentencesHard: number | null;
+    maxCharsSoft: number | null;
+    maxCharsHard: number | null;
+  };
+  bulletLimits: {
+    maxBulletsSoft: number | null;
+    maxBulletsHard: number | null;
+    maxSentencesPerBulletSoft: number | null;
+    maxSentencesPerBulletHard: number | null;
+    maxCharsPerBulletSoft: number | null;
+    maxCharsPerBulletHard: number | null;
+  };
+  tableLimits: {
+    maxRowsSoft: number | null;
+    maxRowsHard: number | null;
+    maxColumnsSoft: number | null;
+    maxColumnsHard: number | null;
+    maxCellCharsSoft: number | null;
+    maxCellCharsHard: number | null;
+  };
 }
 
 export interface TokenTrimOptions {
@@ -39,8 +70,67 @@ type TokenizerRuntime = {
   decode: (input: number[]) => string;
 };
 
+type TruncationAndLimitsBank = {
+  budgetDefaults?: {
+    minOutputTokens?: number;
+    maxOutputTokens?: number;
+    baseOutputTokensDraft?: number;
+    baseOutputTokensFinal?: number;
+    hardOutputMultiplier?: number;
+    hardOutputExtraTokens?: number;
+    hardOutputMaxExtraTokens?: number;
+    evidenceItemTokenStep?: number;
+    tableTokenBonus?: number;
+    shortModeMaxOutputTokens?: number;
+    complexityBoosts?: {
+      medium?: number;
+      high?: number;
+    };
+    languageMultipliers?: Record<string, number>;
+  };
+  profileBudgets?: Record<
+    string,
+    {
+      maxChars?: number;
+    }
+  >;
+  globalLimits?: {
+    maxResponseCharsHard?: number;
+  };
+  answerModeLimits?: Record<
+    string,
+    {
+      maxChars?: number;
+      maxCharsDefault?: number;
+      maxOutputTokens?: number;
+      maxOutputTokensDefault?: number;
+      maxTokens?: number;
+      maxTokensDefault?: number;
+      minOutputTokens?: number;
+      baseOutputTokensDraft?: number;
+      baseOutputTokensFinal?: number;
+      hardOutputTokens?: number;
+      hardOutputMultiplier?: number;
+      hardOutputExtraTokens?: number;
+      docGroundedMinOutputTokens?: number;
+      shortModeMaxOutputTokens?: number;
+      shortModeMaxChars?: number;
+      forceProfile?: string;
+      preferProfile?: string;
+    }
+  >;
+  outputShapeLimits?: Record<
+    string,
+    {
+      maxCharsHard?: number;
+    }
+  >;
+  paragraphLimits?: Record<string, unknown>;
+  bulletLimits?: Record<string, unknown>;
+  tableLimits?: Record<string, unknown>;
+};
+
 let tokenizerRuntime: TokenizerRuntime | null | undefined;
-let modeMaxBankCache: Record<string, number> | null | undefined;
 
 function clampInt(value: number, min: number, max: number): number {
   if (!Number.isFinite(value)) return min;
@@ -54,40 +144,41 @@ function toPositiveNumber(input: unknown): number | null {
   return num;
 }
 
-function readModeMaxFromBank(answerMode: string): number | null {
-  if (modeMaxBankCache === undefined) {
-    modeMaxBankCache = null;
-    try {
-      const bank = getOptionalBank<Record<string, unknown>>("truncation_and_limits");
-      const rawLimits = bank?.answerModeLimits;
-      if (rawLimits && typeof rawLimits === "object") {
-        const next: Record<string, number> = {};
-        for (const [mode, value] of Object.entries(
-          rawLimits as Record<string, unknown>,
-        )) {
-          const asObject =
-            value && typeof value === "object"
-              ? (value as Record<string, unknown>)
-              : null;
-          if (!asObject) continue;
-          const tokenLimit =
-            toPositiveNumber(asObject.maxOutputTokens) ??
-            toPositiveNumber(asObject.maxOutputTokensDefault) ??
-            toPositiveNumber(asObject.maxTokens) ??
-            toPositiveNumber(asObject.maxTokensDefault);
-          if (tokenLimit) next[String(mode)] = Math.round(tokenLimit);
-        }
-        modeMaxBankCache = next;
-      }
-    } catch {
-      // Bank loader may not be initialized in narrow unit tests.
-      modeMaxBankCache = null;
-    }
+function readTruncationBank(): TruncationAndLimitsBank | null {
+  try {
+    return getOptionalBank<TruncationAndLimitsBank>("truncation_and_limits");
+  } catch {
+    return null;
   }
+}
 
-  if (!modeMaxBankCache) return null;
-  const value = modeMaxBankCache[answerMode];
-  return Number.isFinite(value) && value > 0 ? value : null;
+function readModeMaxFromBank(answerMode: string): number | null {
+  const bank = readTruncationBank();
+  const modeLimits = bank?.answerModeLimits?.[answerMode];
+  return (
+    toPositiveNumber(modeLimits?.maxOutputTokens) ??
+    toPositiveNumber(modeLimits?.maxOutputTokensDefault) ??
+    toPositiveNumber(modeLimits?.maxTokens) ??
+    toPositiveNumber(modeLimits?.maxTokensDefault)
+  );
+}
+
+function readBudgetDefaultNumber(
+  key: keyof NonNullable<TruncationAndLimitsBank["budgetDefaults"]>,
+  fallback: number,
+): number {
+  const bank = readTruncationBank();
+  return toPositiveNumber(bank?.budgetDefaults?.[key]) ?? fallback;
+}
+
+function readLanguageMultiplier(language?: string | null): number {
+  const normalized = String(language || "")
+    .trim()
+    .toLowerCase();
+  if (!normalized) return 1;
+  const bank = readTruncationBank();
+  const multiplier = bank?.budgetDefaults?.languageMultipliers?.[normalized];
+  return toPositiveNumber(multiplier) ?? 1;
 }
 
 function readTokenizerRuntime(): TokenizerRuntime | null {
@@ -116,46 +207,32 @@ function readTokenizerRuntime(): TokenizerRuntime | null {
 }
 
 function resolveModeMin(answerMode: string): number {
-  if (answerMode === "nav_pills") return 80;
-  if (answerMode === "rank_disambiguate") return 120;
-  if (answerMode === "doc_grounded_quote") return 320;
-  if (answerMode === "no_docs" || answerMode === "refusal") return 140;
-  return 220;
+  return (
+    toPositiveNumber(resolveModeConfig(answerMode)?.minOutputTokens) ??
+    readBudgetDefaultNumber("minOutputTokens", 220)
+  );
 }
 
 function resolveModeMax(answerMode: string): number {
   const bankModeMax = readModeMaxFromBank(answerMode);
   if (bankModeMax) return bankModeMax;
-
-  if (answerMode === "nav_pills") return 220;
-  if (answerMode === "rank_disambiguate") return 220;
-  if (answerMode === "rank_autopick") return 400;
-  if (answerMode === "doc_grounded_table") return 4000;
-  if (answerMode === "doc_grounded_multi") return 7000;
-  if (answerMode === "doc_grounded_single") return 6000;
-  if (answerMode === "doc_grounded_quote") return 1000;
-  if (answerMode === "help_steps") return 1200;
-  if (answerMode === "no_docs") return 600;
-  if (answerMode === "refusal") return 220;
-  if (answerMode === "general_answer") return 3000;
-  return 3000;
+  return readBudgetDefaultNumber("maxOutputTokens", 3000);
 }
 
 function resolveBaseBudget(
   answerMode: string,
   routeStage: "draft" | "final",
 ): number {
-  if (answerMode === "nav_pills") return 180;
-  if (answerMode === "rank_disambiguate") return 220;
-  if (answerMode === "doc_grounded_table")
-    return routeStage === "final" ? 1500 : 1000;
-  if (answerMode === "doc_grounded_multi") return 1800;
-  if (answerMode === "doc_grounded_single") return 1600;
-  if (answerMode === "doc_grounded_quote") return 550;
-  if (answerMode === "help_steps") return 900;
-  if (answerMode === "no_docs") return 280;
-  if (answerMode === "refusal") return 220;
-  return routeStage === "final" ? 1600 : 1200;
+  const modeConfig = resolveModeConfig(answerMode);
+  const modeBase =
+    routeStage === "draft"
+      ? toPositiveNumber(modeConfig?.baseOutputTokensDraft)
+      : toPositiveNumber(modeConfig?.baseOutputTokensFinal);
+  if (modeBase) return modeBase;
+
+  return routeStage === "draft"
+    ? readBudgetDefaultNumber("baseOutputTokensDraft", 1200)
+    : readBudgetDefaultNumber("baseOutputTokensFinal", 1600);
 }
 
 function detectComplexity(params: {
@@ -207,8 +284,13 @@ function applyComplexityBoost(
   base: number,
   complexity: BudgetComplexity,
 ): number {
-  if (complexity === "high") return base + 260;
-  if (complexity === "medium") return base + 120;
+  const boosts = readTruncationBank()?.budgetDefaults?.complexityBoosts;
+  if (complexity === "high") {
+    return base + (toPositiveNumber(boosts?.high) ?? 260);
+  }
+  if (complexity === "medium") {
+    return base + (toPositiveNumber(boosts?.medium) ?? 120);
+  }
   return base;
 }
 
@@ -216,13 +298,57 @@ function applyLanguageMultiplier(
   tokens: number,
   language?: string | null,
 ): number {
+  return Math.round(tokens * readLanguageMultiplier(language));
+}
+
+function resolveModeConfig(answerMode: string) {
+  return readTruncationBank()?.answerModeLimits?.[answerMode] ?? null;
+}
+
+function resolveProfile(answerMode: string): string | null {
+  const modeConfig = resolveModeConfig(answerMode);
+  return (
+    String(modeConfig?.forceProfile || "").trim() ||
+    String(modeConfig?.preferProfile || "").trim() ||
+    null
+  );
+}
+
+function resolveOutputShapeCharBudget(outputShape?: string | null): number | null {
+  const normalized = String(outputShape || "").trim();
+  if (!normalized) return null;
+  const shapeConfig = readTruncationBank()?.outputShapeLimits?.[normalized];
+  return toPositiveNumber(shapeConfig?.maxCharsHard);
+}
+
+function resolveModeCharBudget(answerMode: string): number | null {
+  const modeConfig = resolveModeConfig(answerMode);
+  return (
+    toPositiveNumber(modeConfig?.maxChars) ??
+    toPositiveNumber(modeConfig?.maxCharsDefault)
+  );
+}
+
+function resolveProfileCharBudget(profile: string | null): number | null {
+  if (!profile) return null;
+  const profileBudget = readTruncationBank()?.profileBudgets?.[profile];
+  return toPositiveNumber(profileBudget?.maxChars);
+}
+
+function charsPerToken(language?: string | null): number {
   const normalized = String(language || "")
     .trim()
     .toLowerCase();
-  if (normalized === "pt" || normalized === "es") {
-    return Math.round(tokens * 1.15);
-  }
-  return tokens;
+  if (normalized === "pt" || normalized === "es") return 3.5;
+  return 4.0;
+}
+
+function readLimitNumber(
+  section: Record<string, unknown> | null | undefined,
+  key: string,
+): number | null {
+  if (!section) return null;
+  return toPositiveNumber(section[key]);
 }
 
 function trimAtBoundary(
@@ -359,9 +485,9 @@ export function trimTextToTokenBudget(
   };
 }
 
-export function resolveOutputTokenBudget(
+export function resolveOutputBudget(
   input: OutputTokenBudgetInput,
-): OutputTokenBudgetResult {
+): ResolvedOutputBudget {
   const answerMode = String(input.answerMode || "").trim() || "general_answer";
   const routeStage = input.routeStage === "draft" ? "draft" : "final";
   const userText = String(input.userText || "").trim();
@@ -378,8 +504,14 @@ export function resolveOutputTokenBudget(
   const override = toPositiveNumber(input.requestedOverride);
   const minTokens = resolveModeMin(answerMode);
   const maxTokens = resolveModeMax(answerMode);
+  const modeConfig = resolveModeConfig(answerMode);
+  const evidenceItemTokenStep = readBudgetDefaultNumber(
+    "evidenceItemTokenStep",
+    14,
+  );
+  const tableTokenBonus = readBudgetDefaultNumber("tableTokenBonus", 120);
 
-  const resolvedMax = override
+  let resolvedMax = override
     ? clampInt(override, minTokens, maxTokens)
     : clampInt(
         applyLanguageMultiplier(
@@ -387,29 +519,144 @@ export function resolveOutputTokenBudget(
             resolveBaseBudget(answerMode, routeStage),
             complexity,
           ) +
-            Math.min(evidenceItems, 12) * 14 +
-            (hasTables ? 120 : 0),
+            Math.min(evidenceItems, 12) * evidenceItemTokenStep +
+            (hasTables ? tableTokenBonus : 0),
           input.outputLanguage,
         ),
         minTokens,
         maxTokens,
       );
 
+  const docGroundedFloor =
+    input.userRequestedShort === true
+      ? null
+      : toPositiveNumber(modeConfig?.docGroundedMinOutputTokens);
+  if (docGroundedFloor) {
+    resolvedMax = Math.max(resolvedMax, docGroundedFloor);
+  }
+
+  const shortModeCap =
+    input.userRequestedShort === true
+      ? toPositiveNumber(modeConfig?.shortModeMaxOutputTokens) ??
+        toPositiveNumber(resolveModeMax(answerMode)) ??
+        readBudgetDefaultNumber("shortModeMaxOutputTokens", 180)
+      : null;
+  if (shortModeCap) {
+    resolvedMax = Math.min(resolvedMax, shortModeCap);
+  }
+
+  const styleMaxChars = toPositiveNumber(input.styleMaxChars);
+  if (input.userRequestedShort === true && styleMaxChars) {
+    const styleTokenCap = Math.max(
+      256,
+      Math.ceil(styleMaxChars / charsPerToken(input.outputLanguage)),
+    );
+    resolvedMax = Math.min(resolvedMax, styleTokenCap);
+  }
+
   const softOutputTokens = clampInt(
     Math.floor(resolvedMax * 0.9),
     Math.max(80, minTokens - 20),
     resolvedMax,
   );
-  const hardOutputTokens = clampInt(
-    Math.ceil(resolvedMax * 1.25),
-    resolvedMax + 40,
-    Math.max(resolvedMax + 40, maxTokens + 320),
-  );
+  const explicitHardTokens = toPositiveNumber(modeConfig?.hardOutputTokens);
+  const hardMultiplier =
+    toPositiveNumber(modeConfig?.hardOutputMultiplier) ??
+    readBudgetDefaultNumber("hardOutputMultiplier", 1.25);
+  const hardExtra =
+    toPositiveNumber(modeConfig?.hardOutputExtraTokens) ??
+    readBudgetDefaultNumber("hardOutputExtraTokens", 40);
+  const hardMaxExtra = readBudgetDefaultNumber("hardOutputMaxExtraTokens", 320);
+  const hardOutputTokens = explicitHardTokens
+    ? Math.max(resolvedMax, Math.round(explicitHardTokens))
+    : clampInt(
+        Math.ceil(resolvedMax * hardMultiplier),
+        resolvedMax + hardExtra,
+        Math.max(resolvedMax + hardExtra, maxTokens + hardMaxExtra),
+      );
+  const truncationBank = readTruncationBank();
+  const resolvedProfile = resolveProfile(answerMode);
+  let maxChars =
+    clampInt(
+      Number(
+        resolveModeCharBudget(answerMode) ??
+          resolveProfileCharBudget(resolvedProfile) ??
+          truncationBank?.globalLimits?.maxResponseCharsHard ??
+          Math.ceil(hardOutputTokens * 4.5),
+      ),
+      120,
+      Math.max(
+        120,
+        Number(
+          truncationBank?.globalLimits?.maxResponseCharsHard ??
+            Math.ceil(hardOutputTokens * 4.5),
+        ),
+      ),
+    ) || Math.ceil(hardOutputTokens * 4.5);
+  const outputShapeMaxChars = resolveOutputShapeCharBudget(input.outputShape);
+  if (outputShapeMaxChars) {
+    maxChars = Math.min(maxChars, outputShapeMaxChars);
+  }
+  if (input.userRequestedShort === true) {
+    const shortModeMaxChars = toPositiveNumber(modeConfig?.shortModeMaxChars);
+    if (shortModeMaxChars) {
+      maxChars = Math.min(maxChars, shortModeMaxChars);
+    }
+  }
+  if (styleMaxChars && input.userRequestedShort === true) {
+    maxChars = Math.min(maxChars, Math.round(styleMaxChars));
+  }
+  const paragraphLimits = truncationBank?.paragraphLimits ?? null;
+  const bulletLimits = truncationBank?.bulletLimits ?? null;
+  const tableLimits = truncationBank?.tableLimits ?? null;
 
   return {
     maxOutputTokens: resolvedMax,
     softOutputTokens,
     hardOutputTokens,
     complexity,
+    minOutputTokens: minTokens,
+    maxChars,
+    profile: resolvedProfile,
+    paragraphLimits: {
+      maxSentencesSoft: readLimitNumber(paragraphLimits, "maxSentencesSoft"),
+      maxSentencesHard: readLimitNumber(paragraphLimits, "maxSentencesHard"),
+      maxCharsSoft: readLimitNumber(paragraphLimits, "maxCharsSoft"),
+      maxCharsHard: readLimitNumber(paragraphLimits, "maxCharsHard"),
+    },
+    bulletLimits: {
+      maxBulletsSoft: readLimitNumber(bulletLimits, "maxBulletsSoft"),
+      maxBulletsHard: readLimitNumber(bulletLimits, "maxBulletsHard"),
+      maxSentencesPerBulletSoft: readLimitNumber(
+        bulletLimits,
+        "maxSentencesPerBulletSoft",
+      ),
+      maxSentencesPerBulletHard: readLimitNumber(
+        bulletLimits,
+        "maxSentencesPerBulletHard",
+      ),
+      maxCharsPerBulletSoft: readLimitNumber(
+        bulletLimits,
+        "maxCharsPerBulletSoft",
+      ),
+      maxCharsPerBulletHard: readLimitNumber(
+        bulletLimits,
+        "maxCharsPerBulletHard",
+      ),
+    },
+    tableLimits: {
+      maxRowsSoft: readLimitNumber(tableLimits, "maxRowsSoft"),
+      maxRowsHard: readLimitNumber(tableLimits, "maxRowsHard"),
+      maxColumnsSoft: readLimitNumber(tableLimits, "maxColumnsSoft"),
+      maxColumnsHard: readLimitNumber(tableLimits, "maxColumnsHard"),
+      maxCellCharsSoft: readLimitNumber(tableLimits, "maxCellCharsSoft"),
+      maxCellCharsHard: readLimitNumber(tableLimits, "maxCellCharsHard"),
+    },
   };
+}
+
+export function resolveOutputTokenBudget(
+  input: OutputTokenBudgetInput,
+): OutputTokenBudgetResult {
+  return resolveOutputBudget(input);
 }

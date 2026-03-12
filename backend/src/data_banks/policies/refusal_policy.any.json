@@ -33,13 +33,6 @@
       "i do not have access",
       "i'm unable to access"
     ],
-    "integrationHooks": {
-      "refusalPhrasesBankId": "refusal_phrases",
-      "bannedPhrasesBankId": "banned_phrases",
-      "clarificationBankId": "clarification_phrases",
-      "privacyMinimalRulesBankId": "privacy_minimal_rules",
-      "hallucinationGuardsBankId": "hallucination_guards"
-    },
     "deterministic": true,
     "dedupe": true,
     "sortBy": "id"

@@ -4,6 +4,7 @@ import fs from "fs";
 import path from "path";
 
 import { writeCertificationGateReport } from "./reporting";
+import { CHAT_ANSWER_MODES } from "../../modules/chat/domain/answerModes";
 
 function readThresholds() {
   const defaultThresholds = {
@@ -80,7 +81,6 @@ describe("Certification: runtime wiring reachability", () => {
     const criticalPaths = [
       "src/controllers/rag.controller.test.ts",
       "src/services/chat/turnRouter.service.test.ts",
-      "src/services/chat/guardrails/editorMode.guard.test.ts",
       "src/services/core/banks/runtimeWiringIntegrity.service.test.ts",
       "src/modules/chat/runtime/ChatRuntimeOrchestrator.test.ts",
     ];
@@ -123,5 +123,72 @@ describe("Certification: runtime wiring reachability", () => {
     });
 
     expect(failures).toEqual([]);
+  });
+});
+
+describe("Certification: type-bank alignment", () => {
+  const KNOWN_BANK_FAMILIES = new Set([
+    "documents",
+    "file_actions",
+    "navigation",
+    "help",
+    "conversation",
+    "account",
+    "unknown",
+    "editing",
+    "connectors",
+    "email",
+    "error",
+    "doc_stats",
+  ]);
+
+  function loadOperatorContracts(): Array<{
+    id: string;
+    family?: string;
+    preferredAnswerMode?: string;
+  }> {
+    const candidates = [
+      path.resolve(
+        process.cwd(),
+        "src/data_banks/operators/operator_contracts.any.json",
+      ),
+      path.resolve(
+        process.cwd(),
+        "backend/src/data_banks/operators/operator_contracts.any.json",
+      ),
+    ];
+    for (const candidate of candidates) {
+      if (!fs.existsSync(candidate)) continue;
+      const parsed = JSON.parse(fs.readFileSync(candidate, "utf8"));
+      return Array.isArray(parsed?.operators) ? parsed.operators : [];
+    }
+    return [];
+  }
+
+  test("every operator_contracts family is a known family", () => {
+    const operators = loadOperatorContracts();
+    expect(operators.length).toBeGreaterThan(0);
+    const unknownFamilies = operators
+      .filter((op) => op.family && !KNOWN_BANK_FAMILIES.has(op.family))
+      .map((op) => `${op.id}:${op.family}`);
+    expect(unknownFamilies).toEqual([]);
+  });
+
+  test("every operator_contracts preferredAnswerMode is a known CHAT_ANSWER_MODE or extended mode", () => {
+    const operators = loadOperatorContracts();
+    expect(operators.length).toBeGreaterThan(0);
+    // Extended modes used by non-chat pipelines (editing/connectors/conversation)
+    const extendedModes = new Set([
+      ...CHAT_ANSWER_MODES,
+      "file_list",
+      "conversation",
+    ]);
+    const unknownModes = operators
+      .filter(
+        (op) =>
+          op.preferredAnswerMode && !extendedModes.has(op.preferredAnswerMode),
+      )
+      .map((op) => `${op.id}:${op.preferredAnswerMode}`);
+    expect(unknownModes).toEqual([]);
   });
 });

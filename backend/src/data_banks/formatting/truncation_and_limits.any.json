@@ -36,6 +36,26 @@
     "dedupe": true,
     "sortBy": "id"
   },
+  "budgetDefaults": {
+    "minOutputTokens": 220,
+    "maxOutputTokens": 4000,
+    "baseOutputTokensDraft": 1200,
+    "baseOutputTokensFinal": 1600,
+    "hardOutputMultiplier": 1.25,
+    "hardOutputExtraTokens": 40,
+    "hardOutputMaxExtraTokens": 320,
+    "evidenceItemTokenStep": 14,
+    "tableTokenBonus": 120,
+    "shortModeMaxOutputTokens": 180,
+    "complexityBoosts": {
+      "medium": 120,
+      "high": 260
+    },
+    "languageMultipliers": {
+      "pt": 1.15,
+      "es": 1.15
+    }
+  },
   "globalLimits": {
     "_comment": "Absolute maximums that override all other settings.",
     "maxResponseCharsHard": 20000,
@@ -94,8 +114,12 @@
   "answerModeLimits": {
     "_comment": "Mode-specific overrides that take precedence over profile budgets. maxOutputTokens/maxOutputTokensDefault are token caps used by runtime enforcers/builders.",
     "nav_pills": {
+      "minOutputTokens": 80,
+      "baseOutputTokensFinal": 180,
       "maxChars": 90,
       "maxOutputTokens": 220,
+      "shortModeMaxOutputTokens": 220,
+      "shortModeMaxChars": 90,
       "maxSentences": 1,
       "maxParagraphs": 1,
       "maxBullets": 0,
@@ -103,8 +127,12 @@
       "forceProfile": "micro"
     },
     "rank_disambiguate": {
+      "minOutputTokens": 120,
+      "baseOutputTokensFinal": 220,
       "maxChars": 180,
       "maxOutputTokens": 220,
+      "shortModeMaxOutputTokens": 220,
+      "shortModeMaxChars": 180,
       "maxSentences": 2,
       "maxParagraphs": 1,
       "maxBullets": 0,
@@ -112,66 +140,94 @@
       "forceProfile": "brief"
     },
     "rank_autopick": {
+      "baseOutputTokensFinal": 320,
       "maxCharsDefault": 600,
       "maxOutputTokensDefault": 400,
       "preferProfile": "concise"
     },
     "doc_grounded_single": {
+      "baseOutputTokensFinal": 1600,
+      "docGroundedMinOutputTokens": 1200,
       "maxCharsDefault": 4400,
       "maxOutputTokensDefault": 6000,
       "preferProfile": "detailed"
     },
     "doc_grounded_multi": {
+      "baseOutputTokensFinal": 1800,
+      "docGroundedMinOutputTokens": 1200,
       "maxCharsDefault": 5200,
       "maxOutputTokensDefault": 7000,
       "preferProfile": "detailed"
     },
     "doc_grounded_table": {
+      "baseOutputTokensDraft": 1000,
+      "baseOutputTokensFinal": 1500,
+      "docGroundedMinOutputTokens": 1400,
       "maxCharsDefault": 5500,
       "maxOutputTokensDefault": 5000,
       "maxTableRows": 20,
       "preferProfile": "deep"
     },
     "doc_grounded_quote": {
+      "minOutputTokens": 320,
+      "baseOutputTokensFinal": 550,
+      "docGroundedMinOutputTokens": 700,
       "maxCharsDefault": 1600,
       "maxOutputTokensDefault": 1000,
       "maxQuoteLines": 12,
       "preferProfile": "standard"
     },
     "doc_discovery_list": {
+      "baseOutputTokensFinal": 900,
       "maxCharsDefault": 2000,
       "maxOutputTokensDefault": 1200,
       "maxBullets": 7,
       "preferProfile": "standard"
     },
     "help_steps": {
+      "baseOutputTokensFinal": 900,
       "maxCharsDefault": 2000,
       "maxOutputTokensDefault": 1200,
       "maxBullets": 7,
       "preferProfile": "standard"
     },
     "no_docs": {
+      "minOutputTokens": 140,
+      "baseOutputTokensFinal": 280,
       "maxChars": 800,
       "maxOutputTokens": 600,
       "maxSentences": 6,
       "forceProfile": "concise"
     },
     "scoped_not_found": {
+      "baseOutputTokensFinal": 220,
+      "shortModeMaxOutputTokens": 220,
+      "shortModeMaxChars": 280,
       "maxChars": 280,
       "maxOutputTokens": 220,
       "maxSentences": 2,
       "forceProfile": "brief"
     },
     "refusal": {
+      "minOutputTokens": 140,
+      "baseOutputTokensFinal": 220,
+      "shortModeMaxOutputTokens": 220,
+      "shortModeMaxChars": 200,
       "maxChars": 200,
       "maxOutputTokens": 220,
       "maxSentences": 2,
       "forceProfile": "micro"
     },
     "general_answer": {
+      "baseOutputTokensFinal": 1600,
       "maxCharsDefault": 5200,
       "maxOutputTokensDefault": 4000,
       "preferProfile": "deep"
+    }
+  },
+  "outputShapeLimits": {
+    "file_list": {
+      "maxCharsHard": 220
     }
   },
   "paragraphLimits": {

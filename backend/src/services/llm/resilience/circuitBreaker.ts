@@ -38,8 +38,8 @@ export class CircuitOpenError extends Error {
   }
 }
 
-const DEFAULT_FAILURE_THRESHOLD = 5;
-const DEFAULT_RESET_TIMEOUT_MS = 30_000;
+const DEFAULT_FAILURE_THRESHOLD = 8;
+const DEFAULT_RESET_TIMEOUT_MS = 15_000;
 const DEFAULT_HALF_OPEN_MAX_CALLS = 1;
 
 export class CircuitBreaker {

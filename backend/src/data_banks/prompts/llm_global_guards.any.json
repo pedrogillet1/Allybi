@@ -1,8 +1,8 @@
 {
   "_meta": {
     "id": "llm_global_guards",
-    "version": "1.0.0",
-    "description": "System-level global guard rules injected into every LLM prompt. Replaces hardcoded applyGlobalGuards() in promptRegistry.",
+    "version": "2.1.0",
+    "description": "Universal output bans applied through the prompt registry as a normal layered prompt bank. Machine-JSON tasks receive a distinct non-conflicting guard contract.",
     "lastUpdated": "2026-03-03",
     "languages": [
       "any"
@@ -21,62 +21,35 @@
     "dedupe": true,
     "sortBy": "id"
   },
-  "rules": [
+  "templates": [
     {
-      "id": "no_raw_json",
-      "text": "Do NOT output raw JSON to the user. Use normal text, bullets, or tables instead.",
-      "skipWhen": [
-        "machine_json_mode"
+      "id": "machine_json_runtime_contract",
+      "priority": 200,
+      "when": {
+        "signalsAny": [
+          "machineJsonOutput",
+          "retrievalPlanning"
+        ]
+      },
+      "messages": [
+        {
+          "role": "system",
+          "content": {
+            "any": "Global bans: never emit control or protocol wrappers such as [KODA_...] blocks; never mention internal fields like evidenceId, documentId, locationKey, metadata diffs, or internal routing/debug state. When the runtime requests machine JSON, return only the requested JSON object with no prose, markdown, or code fences."
+          }
+        }
       ]
     },
     {
-      "id": "max_questions",
-      "text": "Ask at most {maxQuestions} question if you are blocked. Otherwise answer directly."
-    },
-    {
-      "id": "no_irrelevant_phrase",
-      "text": "Never output the phrase \"No relevant information found\" (or equivalents).",
-      "skipWhen": [
-        "machine_json_mode"
-      ]
-    },
-    {
-      "id": "evidence_only",
-      "text": "Use only the provided evidence/context. Do not invent sources or details."
-    },
-    {
-      "id": "no_sources_section",
-      "text": "Do NOT include a Sources section in the text — sources are provided separately via UI buttons.",
-      "skipWhen": [
-        "machine_json_mode"
-      ]
-    },
-    {
-      "id": "no_protocol_wrappers",
-      "text": "Never emit control/protocol wrappers like [KODA_...] blocks in user-facing output.",
-      "skipWhen": [
-        "machine_json_mode"
-      ]
-    },
-    {
-      "id": "no_unnecessary_hedging",
-      "text": "ALWAYS present evidence-backed information as fact. NEVER say the evidence 'does not contain', 'does not mention', 'does not include', 'does not specify', or 'does not address' anything. If a specific data point is genuinely absent from ALL evidence, simply omit it and answer with what IS available. Never ask the user to 'share', 'paste', or 'provide' content.",
-      "skipWhen": [
-        "machine_json_mode"
-      ]
-    },
-    {
-      "id": "no_internal_metadata",
-      "text": "Never mention evidenceId, documentId, locationKey, data conflicts, metadata discrepancies, or any internal system fields in your response. Present information naturally as if you simply know it from the documents.",
-      "skipWhen": [
-        "machine_json_mode"
-      ]
-    },
-    {
-      "id": "no_evidence_prefix",
-      "text": "Start your answer directly with the content. NEVER begin with meta-phrases like 'From the retrieved snippets', 'Based on the evidence', 'According to the documents', 'Pelos trechos encontrados', 'De acordo com os documentos', or similar evidence-referencing preambles. Just answer naturally.",
-      "skipWhen": [
-        "machine_json_mode"
+      "id": "user_visible_output_contract",
+      "priority": 100,
+      "messages": [
+        {
+          "role": "system",
+          "content": {
+            "any": "Global bans: never output raw user-facing JSON; never emit control or protocol wrappers such as [KODA_...] blocks; never mention internal fields like evidenceId, documentId, locationKey, metadata diffs, or internal routing/debug state in user-visible output."
+          }
+        }
       ]
     }
   ]

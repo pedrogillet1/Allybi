@@ -45,7 +45,7 @@ import type {
 import { toCostFamilyModel } from "./llmCostCalculator";
 
 import { BRAND_NAME } from "../../../config/brand";
-import { resolveOutputTokenBudget } from "../../core/enforcement/tokenBudget.service";
+import { resolveOutputBudget } from "../../core/enforcement/tokenBudget.service";
 import { ReasoningPolicyService } from "../../core/policy/reasoningPolicy.service";
 import { getOptionalBank } from "../../core/banks/bankLoader.service";
 
@@ -228,47 +228,38 @@ type BuilderPayloadCaps = {
 };
 
 type BuilderRuntimePolicy = {
-  docGroundedMinOutputTokensByMode: Record<string, number>;
-  styleClampModes: string[];
   payloadCaps: BuilderPayloadCaps;
   evidenceCapsByMode: Record<string, BuilderEvidenceCaps>;
 };
 
 const DEFAULT_BUILDER_POLICY: BuilderRuntimePolicy = {
-  docGroundedMinOutputTokensByMode: {
-    doc_grounded_single: 900,
-    doc_grounded_multi: 900,
-    doc_grounded_quote: 700,
-    doc_grounded_table: 1000,
-  },
-  styleClampModes: ["rank_disambiguate", "scoped_not_found", "refusal"],
   payloadCaps: {
     memoryCharsDefault: 4800,
     memoryCharsDocGrounded: 6800,
     userSectionCharsMax: Math.trunc(42e2),
     toolContextCharsMax: 1400,
-    totalUserPayloadCharsMax: 18000,
+    totalUserPayloadCharsMax: 32000,
   },
   evidenceCapsByMode: {
     doc_grounded_single: {
-      maxItems: 6,
-      maxSnippetChars: 220,
-      maxSectionChars: 2600,
+      maxItems: 10,
+      maxSnippetChars: 600,
+      maxSectionChars: 9600,
     },
     doc_grounded_multi: {
-      maxItems: 10,
-      maxSnippetChars: 280,
-      maxSectionChars: 3800,
+      maxItems: 14,
+      maxSnippetChars: 600,
+      maxSectionChars: 11200,
     },
     doc_grounded_quote: {
-      maxItems: 6,
-      maxSnippetChars: 240,
-      maxSectionChars: 2600,
+      maxItems: 8,
+      maxSnippetChars: 500,
+      maxSectionChars: 7000,
     },
     doc_grounded_table: {
-      maxItems: 8,
-      maxSnippetChars: 480,
-      maxSectionChars: 4800,
+      maxItems: 14,
+      maxSnippetChars: 800,
+      maxSectionChars: 14000,
     },
   },
 };
@@ -295,29 +286,6 @@ function toNormalizedModeKey(value: unknown): string {
   return String(value || "")
     .trim()
     .toLowerCase();
-}
-
-function normalizeStyleClampModes(raw: unknown): string[] {
-  if (!Array.isArray(raw)) return [...DEFAULT_BUILDER_POLICY.styleClampModes];
-  const normalized = raw
-    .map((entry) => toNormalizedModeKey(entry))
-    .filter((entry) => entry.length > 0);
-  return normalized.length > 0
-    ? Array.from(new Set(normalized))
-    : [...DEFAULT_BUILDER_POLICY.styleClampModes];
-}
-
-function normalizeDocFloors(raw: unknown): Record<string, number> {
-  const out: Record<string, number> = {
-    ...DEFAULT_BUILDER_POLICY.docGroundedMinOutputTokensByMode,
-  };
-  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return out;
-  for (const [mode, value] of Object.entries(raw as Record<string, unknown>)) {
-    const key = toNormalizedModeKey(mode);
-    if (!key) continue;
-    out[key] = asPositiveInt(value, out[key] ?? 1600, 128, 16000);
-  }
-  return out;
 }
 
 function normalizePayloadCaps(raw: unknown): BuilderPayloadCaps {
@@ -411,10 +379,6 @@ function readBuilderPolicyFromBank(): BuilderRuntimePolicy {
       ...DEFAULT_BUILDER_POLICY,
       payloadCaps: { ...DEFAULT_BUILDER_POLICY.payloadCaps },
       evidenceCapsByMode: normalizeEvidenceCapsByMode(null),
-      docGroundedMinOutputTokensByMode: {
-        ...DEFAULT_BUILDER_POLICY.docGroundedMinOutputTokensByMode,
-      },
-      styleClampModes: [...DEFAULT_BUILDER_POLICY.styleClampModes],
     };
   }
 
@@ -423,10 +387,6 @@ function readBuilderPolicyFromBank(): BuilderRuntimePolicy {
       ? (bank.config as Record<string, unknown>)
       : (bank as Record<string, unknown>);
   return {
-    docGroundedMinOutputTokensByMode: normalizeDocFloors(
-      source.docGroundedMinOutputTokensByMode,
-    ),
-    styleClampModes: normalizeStyleClampModes(source.styleClampModes),
     payloadCaps: normalizePayloadCaps(source.payloadCaps),
     evidenceCapsByMode: normalizeEvidenceCapsByMode(source.evidenceCapsByMode),
   };
@@ -509,7 +469,7 @@ export class LlmRequestBuilderService {
       .trim()
       .toLowerCase();
     const userRequestedShort = input.signals.userRequestedShort === true;
-    const outputBudget = resolveOutputTokenBudget({
+    const outputBudget = resolveOutputBudget({
       answerMode,
       outputLanguage: input.outputLanguage,
       routeStage: input.route.stage,
@@ -521,6 +481,8 @@ export class LlmRequestBuilderService {
           (item) => item.evidenceType === "table",
         ) ?? false,
       requestedOverride: input.options?.maxOutputTokens,
+      userRequestedShort,
+      styleMaxChars: input.signals.styleMaxChars,
     });
     const maxOutputTokens = outputBudget.maxOutputTokens;
 
@@ -530,73 +492,16 @@ export class LlmRequestBuilderService {
       deterministic: input.route.stage === "final",
       temperature: input.route.stage === "final" ? 0.2 : 0.4,
       topP: 0.9,
-      maxOutputTokens,
       ...input.options,
+      maxOutputTokens,
     };
 
-    const styleMaxCharsRaw = Number(input.signals.styleMaxChars);
-    const styleClampModes = new Set(builderPolicy.styleClampModes);
-    if (
-      Number.isFinite(styleMaxCharsRaw) &&
-      styleMaxCharsRaw > 0 &&
-      (userRequestedShort || styleClampModes.has(normalizedAnswerMode))
-    ) {
-      // PT/ES diacritics → fewer chars per token; use language-aware ratio
-      const cpt = (input.outputLanguage === "pt" || input.outputLanguage === "es") ? 3.5 : 4.0;
-      const styleTokenCap = Math.max(256, Math.ceil(styleMaxCharsRaw / cpt));
-      options.maxOutputTokens = Math.min(
-        options.maxOutputTokens ?? styleTokenCap,
-        styleTokenCap,
-      );
-    }
-
-    const docGroundedFloor =
-      !userRequestedShort && normalizedAnswerMode.startsWith("doc_grounded")
-        ? builderPolicy.docGroundedMinOutputTokensByMode[normalizedAnswerMode]
-          ?? 1600
-        : null;
-    if (docGroundedFloor != null) {
-      options.maxOutputTokens = Math.max(
-        options.maxOutputTokens ?? docGroundedFloor,
-        docGroundedFloor,
-      );
-    }
-    // Latency guardrail: cap doc-grounded output tokens to keep GPT-5.2
-    // response times under ~8s. The caps (800-900 tokens ≈ 3200-3600 chars)
-    // are generous enough for complete answers.
-    const docGroundedLatencyCaps: Record<string, number> = {
-      doc_grounded_table: 900,
-      doc_grounded_multi: 850,
-      doc_grounded_single: 800,
-      doc_grounded_quote: 550,
-    };
-    const docGroundedLatencyCap = docGroundedLatencyCaps[normalizedAnswerMode];
-    if (docGroundedLatencyCap) {
-      options.maxOutputTokens = Math.min(
-        options.maxOutputTokens ?? docGroundedLatencyCap,
-        docGroundedLatencyCap,
-      );
-    }
-
-    // Special case: nav_pills should be short and fast
-    if (answerMode === "nav_pills") {
+    if (answerMode === "nav_pills" || promptType === "disambiguation") {
       options.temperature = 0.2;
-      options.maxOutputTokens = Math.min(options.maxOutputTokens ?? 260, 260);
     }
 
-    // Special case: disambiguation must be short
-    if (promptType === "disambiguation") {
-      options.temperature = 0.2;
-      options.maxOutputTokens = Math.min(options.maxOutputTokens ?? 300, 220);
-    }
-
-    // Special case: quote mode often needs strictness, but keep length bounded
     if (input.signals.operator === "quote") {
       options.temperature = 0.15;
-      options.maxOutputTokens = Math.min(
-        options.maxOutputTokens ?? outputBudget.maxOutputTokens,
-        outputBudget.hardOutputTokens,
-      );
     }
 
     const promptCharCount = messages.reduce(
@@ -604,16 +509,27 @@ export class LlmRequestBuilderService {
       0,
     );
     const finalMaxOutputTokens = Number(options.maxOutputTokens ?? 0);
+    const requestedMaxOutputTokens = Number(input.options?.maxOutputTokens);
+    const docGroundedFloorApplied =
+      !userRequestedShort &&
+      normalizedAnswerMode.startsWith("doc_grounded") &&
+      Number.isFinite(requestedMaxOutputTokens) &&
+      outputBudget.maxOutputTokens > requestedMaxOutputTokens;
     const resolvedTokenPolicy = {
       answerMode: normalizedAnswerMode,
-      source: "tokenBudget+builder",
+      source: "tokenBudget",
       baseBudgetMaxOutputTokens: outputBudget.maxOutputTokens,
-      styleCapApplied:
-        Number.isFinite(styleMaxCharsRaw) &&
-        styleMaxCharsRaw > 0 &&
-        (userRequestedShort || styleClampModes.has(normalizedAnswerMode)),
-      docGroundedFloorApplied: docGroundedFloor != null,
-      docGroundedFloor,
+      minOutputTokens: outputBudget.minOutputTokens,
+      userRequestedShort,
+      styleMaxChars:
+        Number.isFinite(Number(input.signals.styleMaxChars)) &&
+        Number(input.signals.styleMaxChars) > 0
+          ? Number(input.signals.styleMaxChars)
+          : null,
+      docGroundedFloorApplied,
+      docGroundedFloor: docGroundedFloorApplied
+        ? outputBudget.maxOutputTokens
+        : null,
       finalMaxOutputTokens,
     };
 
@@ -753,6 +669,7 @@ export class LlmRequestBuilderService {
     const runtimeSignals = {
       answerMode: input.signals.answerMode,
       promptMode: input.signals.promptMode ?? "compose",
+      machineJsonOutput: input.signals.disallowJsonOutput === false,
       operator: input.signals.operator ?? "",
       intentFamily: input.signals.intentFamily ?? "",
       operatorFamily: input.signals.operatorFamily ?? "",
@@ -1049,7 +966,7 @@ export class LlmRequestBuilderService {
       maxSectionChars: 3400,
     };
     const extractionBoost = opts?.isExtractionQuery
-      ? { maxItems: 12, maxSnippetChars: 420, maxSectionChars: 5200 }
+      ? { maxItems: 16, maxSnippetChars: 800, maxSectionChars: 16000 }
       : null;
     const maxItems = extractionBoost
       ? Math.max(modeLimits.maxItems, extractionBoost.maxItems)
@@ -1076,13 +993,18 @@ export class LlmRequestBuilderService {
     for (const e of top) {
       const title = e.title || e.filename || e.docId;
       const locParts: string[] = [];
-      if (e.location?.page != null) locParts.push(`p.${e.location.page}`);
+      if (e.location?.page != null && Number(e.location.page) >= 0) locParts.push(`p.${e.location.page}`);
       if (e.location?.slide != null) locParts.push(`s.${e.location.slide}`);
       if (e.location?.sheet) locParts.push(`sheet:${e.location.sheet}`);
       if (e.location?.sectionKey && !e.location.sectionKey.startsWith("chunk_")) {
         locParts.push(`sec:${e.location.sectionKey}`);
       }
       const loc = locParts.join(",");
+
+      // Display-safe keys for LLM (strip internal routing metadata like p:-1, c:NN)
+      const displayLocationKey = loc || title || "text";
+      const displayEvidenceId = `${e.docId}:${displayLocationKey}`;
+
       const locationKey = String(
         e.locationKey || loc || `${e.docId}:${e.evidenceType || "text"}`,
       ).trim();
@@ -1097,7 +1019,7 @@ export class LlmRequestBuilderService {
       ) {
         const hdr = e.table.header.map((h) => String(h ?? "")).join(" | ");
         const rows = (e.table.rows || [])
-          .slice(0, 8)
+          .slice(0, 20)
           .map((r) => (r || []).map((c) => String(c ?? "")).join(" | "));
         const sep = e.table.header.map(() => "---").join(" | ");
         const tableText = [hdr, sep, ...rows].join("\n");
@@ -1138,7 +1060,7 @@ export class LlmRequestBuilderService {
         }
       }
 
-      const line = `- evidenceId=${evidenceId} | documentId=${e.docId} | locationKey=${locationKey} | title=${title}${loc ? ` | location=${loc}` : ""} | snippet=${clipped}`;
+      const line = `- evidenceId=${displayEvidenceId} | documentId=${e.docId} | locationKey=${displayLocationKey} | title=${title}${loc ? ` | location=${loc}` : ""} | snippet=${clipped}`;
       if (sectionChars + line.length + 1 > maxSectionChars) {
         break;
       }

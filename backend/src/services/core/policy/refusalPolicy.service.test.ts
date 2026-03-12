@@ -6,6 +6,7 @@ jest.mock("../banks/bankLoader.service", () => ({
 
 import { getOptionalBank } from "../banks/bankLoader.service";
 import { RefusalPolicyService } from "./refusalPolicy.service";
+import { RefusalPhraseResolverService } from "./refusalPhraseResolver.service";
 
 const mockedGetOptionalBank = getOptionalBank as jest.MockedFunction<
   typeof getOptionalBank
@@ -49,17 +50,24 @@ describe("RefusalPolicyService", () => {
     expect(decision.reasonCode).toBe("self_harm_blocked");
   });
 
-  test("buildUserFacingText localizes message and safe alternative", () => {
+  test("phrase resolver localizes message and safe alternative", () => {
     mockedGetOptionalBank.mockReturnValue({
-      config: { enabled: true },
+      config: {
+        enabled: true,
+        actionsContract: { thresholds: { maxRefusalChars: 220 } },
+      },
       rules: [],
     } as any);
 
-    const service = new RefusalPolicyService();
+    const service = new RefusalPhraseResolverService();
     const text = service.buildUserFacingText({
       preferredLanguage: "pt",
       decision: {
         blocked: true,
+        action: "refuse",
+        ruleId: "R1",
+        reasonCode: "policy_refusal_required",
+        terminal: true,
         category: "other",
         safeAlternatives: ["safe_help"],
       },
@@ -69,4 +77,3 @@ describe("RefusalPolicyService", () => {
     expect(text).toContain("alternativa segura");
   });
 });
-

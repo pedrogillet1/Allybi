@@ -177,18 +177,30 @@ describe("Cross-Bank Numeric Consistency", () => {
       expect(failures).toEqual([]);
     });
 
-    it("maxBulletsHard matches between quality_gates and truncation_and_limits", () => {
-      const qg = qualityGates.config.limits.maxBulletsHard;
-      const tal = truncationAndLimits.globalLimits.maxBulletsHard;
-      const failures: string[] = [];
-      if (qg !== tal) {
-        failures.push(`quality_gates=${qg} vs truncation_and_limits=${tal}`);
-      }
+    it("quality_gates does not own formatting hard caps covered by truncation_and_limits", () => {
+      const forbiddenKeys = [
+        "maxCharsHard",
+        "maxBlocksHard",
+        "maxBulletsHard",
+        "maxTablesHard",
+        "maxQuotesHard",
+      ] as const;
+      const present = forbiddenKeys.filter(
+        (key) => qualityGates?.config?.limits?.[key] != null,
+      );
+      const failures = present.map(
+        (key) => `QUALITY_GATES_DUPLICATE_LIMIT:${key}`,
+      );
 
-      writeCertificationGateReport("numeric-consistency-maxBulletsHard-cross", {
+      writeCertificationGateReport("numeric-consistency-quality-gates-ownership", {
         passed: failures.length === 0,
-        metrics: { qualityGates: qg, truncationAndLimits: tal },
-        thresholds: { requirement: "values must match" },
+        metrics: {
+          qualityGateLimitKeys: Object.keys(qualityGates?.config?.limits || {}),
+          truncationOwnedKeys: forbiddenKeys,
+        },
+        thresholds: {
+          requirement: "quality_gates must not duplicate formatting or truncation hard caps",
+        },
         failures,
       });
 

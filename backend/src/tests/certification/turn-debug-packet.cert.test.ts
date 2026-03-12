@@ -2,7 +2,7 @@ import "reflect-metadata";
 import path from "path";
 import { beforeAll, describe, expect, test } from "@jest/globals";
 
-import type { EvidencePack } from "../../services/core/retrieval/retrievalEngine.service";
+import type { EvidencePack } from "../../services/core/retrieval/retrieval.types";
 import { CentralizedChatRuntimeDelegate } from "../../modules/chat/runtime/CentralizedChatRuntimeDelegate";
 import type { ChatEngine } from "../../modules/chat/domain/chat.contracts";
 import { initializeBanks } from "../../services/core/banks/bankLoader.service";

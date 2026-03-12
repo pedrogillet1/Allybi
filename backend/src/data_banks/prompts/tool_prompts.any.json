@@ -36,7 +36,7 @@
       "preferActionableNextStep": true,
       "preferShortParagraphs": true,
       "maxSentencesPerParagraph": 2,
-      "maxCharsPerParagraph": 260
+      "maxCharsPerParagraph": 480
     },
     "uiContracts": {
       "nav_pills": {

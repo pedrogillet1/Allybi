@@ -198,9 +198,10 @@ export async function generateEmbedding(text: string): Promise<number[]> {
 }
 
 /**
- * Store embeddings for a document in Postgres + Pinecone (optional).
+ * Core implementation: Store embeddings for a document in Postgres + Pinecone (optional).
+ * Exposed as `storeDocumentEmbeddingsCore` for testing; callers should use `storeDocumentEmbeddings`.
  */
-export async function storeDocumentEmbeddings(
+export async function storeDocumentEmbeddingsCore(
   documentId: string,
   chunks: InputChunk[],
   options: StoreEmbeddingsOptions = {},
@@ -700,28 +701,150 @@ export async function storeDocumentEmbeddings(
 }
 
 /**
+ * Verify that the Pinecone vector count matches the Postgres chunk count.
+ */
+async function verifyIndexedVectorCount(params: {
+  documentId: string;
+  userId: string;
+}): Promise<void> {
+  const expectedCount = await prisma.documentChunk.count({
+    where: { documentId: params.documentId },
+  });
+  if (expectedCount <= 0) {
+    throw new Error(
+      `[vectorEmbedding] verification failed: no chunk rows found for ${params.documentId}`,
+    );
+  }
+  const verifyResult = await pineconeService.verifyDocumentEmbeddings(
+    params.documentId,
+    {
+      userId: params.userId,
+      minCount: expectedCount,
+      expectedCount,
+      topK: Math.max(expectedCount + 20, 1000),
+    },
+  );
+  if (!verifyResult.success) {
+    throw new Error(
+      `[vectorEmbedding] Pinecone verification mismatch for ${params.documentId}: ${verifyResult.message}`,
+    );
+  }
+}
+
+/**
+ * Store embeddings for a document with verification-first indexing.
+ *
+ * Writes new vectors via storeDocumentEmbeddingsCore (without pre-deleting),
+ * verifies the indexed vector count, then cleans up previous operation vectors.
+ */
+export async function storeDocumentEmbeddings(
+  documentId: string,
+  chunks: InputChunk[],
+  options: StoreEmbeddingsOptions = {},
+): Promise<void> {
+  const docBefore = await prisma.document.findUnique({
+    where: { id: documentId },
+    select: { id: true, userId: true, indexingOperationId: true },
+  });
+  if (!docBefore) {
+    throw new Error(`Document not found: ${documentId}`);
+  }
+
+  const previousOperationId = String(docBefore.indexingOperationId || "").trim();
+  const strictVerify =
+    options.strictVerify ??
+    isFlagEnabled("INDEXING_STRICT_FAIL_CLOSED", true);
+  const requireVerificationBeforeCleanup = isFlagEnabled(
+    "INDEXING_VERIFY_REQUIRED",
+    true,
+  );
+  const allowUnverifiedPreviousOpDelete = isFlagEnabled(
+    "INDEXING_ALLOW_UNVERIFIED_PREVOP_DELETE",
+    false,
+  );
+
+  await storeDocumentEmbeddingsCore(documentId, chunks, {
+    ...options,
+    // Write new vectors first and only delete previous operation vectors
+    // after successful write+verification to avoid pre-delete loss.
+    preDeleteVectors: false,
+    strictVerify: false,
+    verifyAfterStore: false,
+  });
+
+  const docAfter = await prisma.document.findUnique({
+    where: { id: documentId },
+    select: { id: true, userId: true, indexingOperationId: true },
+  });
+  if (!docAfter) {
+    throw new Error(`Document not found after indexing: ${documentId}`);
+  }
+  const currentOperationId = String(docAfter.indexingOperationId || "").trim();
+  const userId = String(docAfter.userId || "").trim();
+  const shouldVerify =
+    pineconeService.isAvailable() &&
+    (strictVerify || requireVerificationBeforeCleanup);
+  let verificationPassed = false;
+
+  if (shouldVerify) {
+    try {
+      await verifyIndexedVectorCount({ documentId, userId });
+      verificationPassed = true;
+    } catch (error: any) {
+      const message = String(error?.message || error || "unknown_error");
+      if (currentOperationId) {
+        try {
+          await pineconeService.deleteEmbeddingsByOperationId(
+            documentId,
+            currentOperationId,
+            { userId },
+          );
+        } catch {
+          // best effort rollback; preserve original error surface
+        }
+      }
+      throw new Error(message);
+    }
+  }
+
+  // Delete previous operation vectors only after verification succeeds, unless
+  // explicitly overridden for emergency rollback scenarios.
+  const mayDeletePreviousOperation =
+    verificationPassed || allowUnverifiedPreviousOpDelete;
+  if (
+    mayDeletePreviousOperation &&
+    previousOperationId &&
+    currentOperationId &&
+    previousOperationId !== currentOperationId &&
+    pineconeService.isAvailable()
+  ) {
+    await pineconeService.deleteEmbeddingsByOperationId(
+      documentId,
+      previousOperationId,
+      { userId },
+    );
+  }
+}
+
+/**
  * Delete embeddings for a document from Pinecone + Postgres.
+ * Looks up the document’s userId for scoped Pinecone deletion.
  */
 export async function deleteDocumentEmbeddings(
   documentId: string,
 ): Promise<void> {
   if (!documentId) return;
 
-  logger.info("[vectorEmbedding] Deleting embeddings", { documentId });
+  const doc = await prisma.document.findUnique({
+    where: { id: documentId },
+    select: { userId: true },
+  });
+  const userId = String(doc?.userId || "").trim();
 
-  // Best-effort Pinecone delete (don’t block doc deletion if it fails)
-  try {
-    if (typeof pineconeService.deleteDocumentEmbeddings === "function") {
-      await pineconeService.deleteDocumentEmbeddings(documentId);
-    }
-  } catch (e: any) {
-    logger.warn("[vectorEmbedding] Pinecone delete failed", {
-      documentId,
-      error: e?.message || String(e),
-    });
+  if (pineconeService.isAvailable() && userId) {
+    await pineconeService.deleteDocumentEmbeddings(documentId, { userId });
   }
 
-  // Postgres delete with configurable timeout for VPS (default 2 minutes)
   const txTimeout = parseInt(
     process.env.PRISMA_TRANSACTION_TIMEOUT || "120000",
     10,
@@ -733,8 +856,6 @@ export async function deleteDocumentEmbeddings(
     },
     { maxWait: 10000, timeout: txTimeout },
   );
-
-  logger.info("[vectorEmbedding] Deleted Pinecone + Postgres rows", { documentId });
 }
 
 /**
@@ -751,6 +872,7 @@ export async function deleteChunkEmbeddings(
 export const vectorEmbeddingService = {
   generateEmbedding,
   storeDocumentEmbeddings,
+  storeDocumentEmbeddingsCore,
   deleteDocumentEmbeddings,
   deleteChunkEmbeddings,
 };

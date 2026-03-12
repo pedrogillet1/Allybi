@@ -915,12 +915,17 @@ export class LlmGatewayService {
     streaming: boolean,
   ): PreparedGatewayRequest {
     const parsed = this.parseIncomingMessages(params);
-    const routeStage: "draft" | "final" =
-      parsed.promptMode === "retrieval_plan" ||
-      parsed.answerMode === "nav_pills" ||
-      parsed.answerMode === "help_steps"
-        ? "draft"
-        : "final";
+    // Default to draft (Gemini Flash) for speed. Only escalate to final
+    // for explicit quality-critical semantic flags or retry reason codes.
+    const needsFinal =
+      (parsed.semanticFlags || []).some((f: string) =>
+        /numeric_strict|quote_strict|hallucination_guard|policy_retry|wrong_doc_detected|short_answer_quality_retry/.test(f),
+      ) ||
+      (parsed.fallback?.reasonCode &&
+        /numeric_truncation_detected|numeric_not_in_source|quote_too_long|hallucination_risk_high|wrong_doc_detected|refusal_required/.test(
+          parsed.fallback.reasonCode,
+        ));
+    const routeStage: "draft" | "final" = needsFinal ? "final" : "draft";
     const routeReasonCodes = [
       ...(parsed.fallback?.reasonCode ? [parsed.fallback.reasonCode] : []),
       ...(parsed.semanticFlags || []),

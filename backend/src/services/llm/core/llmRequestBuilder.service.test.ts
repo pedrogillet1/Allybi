@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, test, jest } from "@jest/globals";
 import { getOptionalBank } from "../../core/banks/bankLoader.service";
+import { resolveOutputBudget } from "../../core/enforcement/tokenBudget.service";
 import {
   LlmRequestBuilderService,
   type PromptRegistryService,
@@ -57,7 +58,60 @@ describe("LlmRequestBuilderService", () => {
 
   beforeEach(() => {
     mockedGetOptionalBank.mockReset();
-    mockedGetOptionalBank.mockReturnValue(null);
+    mockedGetOptionalBank.mockImplementation((bankId: string) => {
+      if (bankId === "truncation_and_limits") {
+        return {
+          budgetDefaults: {
+            minOutputTokens: 220,
+            maxOutputTokens: 4000,
+            baseOutputTokensDraft: 1200,
+            baseOutputTokensFinal: 1600,
+            hardOutputMultiplier: 1.25,
+            hardOutputExtraTokens: 40,
+            hardOutputMaxExtraTokens: 320,
+            evidenceItemTokenStep: 14,
+            tableTokenBonus: 120,
+            shortModeMaxOutputTokens: 180,
+            complexityBoosts: { medium: 120, high: 260 },
+            languageMultipliers: { pt: 1.15, es: 1.15 },
+          },
+          answerModeLimits: {
+            nav_pills: {
+              minOutputTokens: 80,
+              baseOutputTokensFinal: 180,
+              maxOutputTokens: 220,
+              shortModeMaxOutputTokens: 220,
+              shortModeMaxChars: 90,
+              maxChars: 90,
+            },
+            rank_disambiguate: {
+              minOutputTokens: 120,
+              baseOutputTokensFinal: 220,
+              maxOutputTokens: 220,
+              shortModeMaxOutputTokens: 220,
+              shortModeMaxChars: 180,
+              maxChars: 180,
+            },
+            doc_grounded_table: {
+              baseOutputTokensDraft: 1000,
+              baseOutputTokensFinal: 1500,
+              docGroundedMinOutputTokens: 1400,
+              maxOutputTokensDefault: 5000,
+              maxCharsDefault: 5500,
+            },
+            general_answer: {
+              baseOutputTokensFinal: 1600,
+              maxOutputTokensDefault: 4000,
+              maxCharsDefault: 5200,
+            },
+          },
+          globalLimits: {
+            maxResponseCharsHard: 20000,
+          },
+        } as unknown as ReturnType<typeof getOptionalBank>;
+      }
+      return null;
+    });
   });
 
   test("applies a doc-grounded token floor when not explicitly short", () => {
@@ -70,7 +124,7 @@ describe("LlmRequestBuilderService", () => {
       }),
     );
 
-    expect(req.options?.maxOutputTokens).toBe(1200);
+    expect(req.options?.maxOutputTokens).toBe(1400);
   });
 
   test("keeps nav/disambiguation short caps intact", () => {
@@ -85,6 +139,34 @@ describe("LlmRequestBuilderService", () => {
     );
 
     expect((req.options?.maxOutputTokens ?? 0) <= 260).toBe(true);
+  });
+
+  test("uses the centralized token budget for general-answer maxOutputTokens", () => {
+    const builder = new LlmRequestBuilderService(prompts);
+    const input = createInput({
+      outputLanguage: "en",
+      userText: "Summarize the main findings from the current document.",
+      signals: {
+        ...createInput().signals,
+        answerMode: "general_answer",
+        explicitDocLock: false,
+      },
+    });
+
+    const req = builder.build(input);
+    const expectedBudget = resolveOutputBudget({
+      answerMode: input.signals.answerMode,
+      outputLanguage: input.outputLanguage,
+      routeStage: input.route.stage,
+      operator: input.signals.operator,
+      userText: input.userText,
+      evidenceItems: input.evidencePack?.evidence?.length ?? 0,
+      hasTables:
+        input.evidencePack?.evidence?.some((item) => item.evidenceType === "table") ??
+        false,
+    });
+
+    expect(req.options?.maxOutputTokens).toBe(expectedBudget.maxOutputTokens);
   });
 
   test("selects fallback prompt kind when fallback is triggered", () => {
@@ -227,7 +309,7 @@ describe("LlmRequestBuilderService", () => {
       }),
     );
 
-    expect(req.options?.maxOutputTokens).toBe(1200);
+    expect(req.options?.maxOutputTokens).toBe(1400);
     const promptCtx = buildPrompt.mock.calls[0]?.[1] as Record<string, any>;
     expect(promptCtx?.runtimeSignals?.styleProfile).toBe("brief");
     expect(promptCtx?.runtimeSignals?.boldingEnabled).toBe(false);
@@ -262,8 +344,8 @@ describe("LlmRequestBuilderService", () => {
     );
     const meta = req.kodaMeta as Record<string, any>;
     expect(meta?.resolvedTokenPolicy?.docGroundedFloorApplied).toBe(true);
-    expect(meta?.resolvedTokenPolicy?.docGroundedFloor).toBe(1000);
-    expect(meta?.resolvedTokenPolicy?.finalMaxOutputTokens).toBe(1200);
+    expect(meta?.resolvedTokenPolicy?.docGroundedFloor).toBe(1400);
+    expect(meta?.resolvedTokenPolicy?.finalMaxOutputTokens).toBe(1400);
   });
 
   test("combines page and section in evidence location", () => {
@@ -347,13 +429,13 @@ describe("LlmRequestBuilderService", () => {
     );
 
     const userMessage = req.messages.find((msg) => msg.role === "user");
-    expect((userMessage?.content || "").length).toBeLessThanOrEqual(24000);
+    expect((userMessage?.content || "").length).toBeLessThanOrEqual(34000);
 
     const meta = req.kodaMeta as Record<string, any>;
     const payloadStats = meta?.payloadStats as Record<string, any>;
     expect(payloadStats?.memoryCharsIncluded).toBeLessThanOrEqual(9000);
     expect(payloadStats?.evidenceItemsIncluded).toBeLessThanOrEqual(14);
-    expect(payloadStats?.evidenceCharsIncluded).toBeLessThanOrEqual(5600);
+    expect(payloadStats?.evidenceCharsIncluded).toBeLessThanOrEqual(11200);
     expect(payloadStats?.estimatedPromptTokens).toBeGreaterThan(0);
   });
 
@@ -494,7 +576,7 @@ describe("LlmRequestBuilderService", () => {
     );
 
     const userContent = req.messages.find((m) => m.role === "user")?.content ?? "";
-    expect(userContent).toContain("Data Conflicts");
+    expect(userContent).toContain("some values differ across sources");
     expect(userContent).toContain("revenue");
     expect(userContent).toContain("1500000");
     expect(userContent).toContain("2100000");

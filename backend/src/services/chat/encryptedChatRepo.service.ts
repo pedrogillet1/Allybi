@@ -25,7 +25,6 @@ export class EncryptedChatRepo {
     const ck = await this.convoKeys.getConversationKey(userId, conversationId);
 
     const messageId = crypto.randomUUID();
-    assertNoPlaintext("plain-chat-message", plaintext);
 
     const encrypted = this.chatCrypto.encryptMessage(
       userId,
@@ -63,7 +62,6 @@ export class EncryptedChatRepo {
       params.conversationId,
     );
     const messageId = crypto.randomUUID();
-    assertNoPlaintext("plain-chat-message-with-metadata", params.plaintext);
     const encrypted = this.chatCrypto.encryptMessage(
       params.userId,
       params.conversationId,
@@ -149,7 +147,6 @@ export class EncryptedChatRepo {
     titlePlain: string,
   ) {
     const ck = await this.convoKeys.getConversationKey(userId, conversationId);
-    assertNoPlaintext("encrypted-title-plain", titlePlain);
     const titleEnc = this.chatCrypto.encryptTitle(
       userId,
       conversationId,

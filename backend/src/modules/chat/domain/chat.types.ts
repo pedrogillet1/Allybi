@@ -1,133 +1,43 @@
+/**
+ * CHAT TYPES
+ *
+ * Shared types are canonically defined in chat.contracts.ts and re-exported here.
+ * This file defines only turn-level types unique to the chat kernel layer.
+ */
+
 import type {
   StreamSink,
   LLMStreamingConfig,
 } from "../../../services/llm/types/llmStreaming.types";
-import type { ChatAnswerMode } from "./answerModes";
 
-export type ChatRole = "user" | "assistant" | "system";
+// ---------------------------------------------------------------------------
+// Re-export canonical types from chat.contracts.ts (SSOT)
+// ---------------------------------------------------------------------------
+export type {
+  ChatRole,
+  ChatRequest,
+  AnswerMode,
+  AnswerClass,
+  NavType,
+  ChatResultStatus,
+  ChatCompletionState,
+  ChatTruncationState,
+  ChatEvidenceState,
+  ChatWarningState,
+  ChatSourceDTO,
+  ChatProvenanceSnippetRefDTO,
+  ChatProvenanceDTO,
+  ChatQualityGateFailure,
+  ChatQualityGateState,
+  ChatResult,
+} from "./chat.contracts";
 
-export interface ChatRequest {
-  userId: string;
-  conversationId?: string;
-  message: string;
-  attachedDocumentIds?: string[];
-  preferredLanguage?: "en" | "pt" | "es";
-  confirmationToken?: string;
-  context?: Record<string, unknown>;
-  meta?: Record<string, unknown>;
-  isRegenerate?: boolean;
-  truncationRetry?: boolean;
-  connectorContext?: {
-    activeProvider?: "gmail" | "outlook" | "slack" | null;
-    gmail?: { connected: boolean; canSend?: boolean };
-    outlook?: { connected: boolean; canSend?: boolean };
-    slack?: { connected: boolean; canSend?: boolean };
-  };
-}
+// Import types used by the unique types below
+import type { ChatRequest, ChatResult } from "./chat.contracts";
 
-export type AnswerMode = ChatAnswerMode;
-
-export type AnswerClass = "DOCUMENT" | "NAVIGATION" | "GENERAL";
-export type NavType = "open" | "discover" | "where" | null;
-export type ChatResultStatus =
-  | "success"
-  | "partial"
-  | "clarification_required"
-  | "blocked"
-  | "failed";
-
-export interface ChatCompletionState {
-  answered: boolean;
-  missingSlots: string[];
-  nextAction?: string | null;
-}
-
-export interface ChatTruncationState {
-  occurred: boolean;
-  reason?: string | null;
-  resumeToken?: string | null;
-  providerOccurred?: boolean;
-  providerReason?: string | null;
-  detectorVersion?: string | null;
-}
-
-export interface ChatEvidenceState {
-  required: boolean;
-  provided: boolean;
-  sourceIds: string[];
-}
-
-export interface ChatWarningState {
-  code: string;
-  message: string;
-  severity: "warning" | "error";
-  source?: "runtime" | "quality_gate" | "enforcer" | "provenance";
-}
-
-export interface ChatProvenanceSnippetRefDTO {
-  evidenceId: string;
-  documentId: string;
-  locationKey: string;
-  snippetHash: string;
-  coverageScore: number;
-}
-
-export interface ChatProvenanceDTO {
-  mode: "hidden_map";
-  required: boolean;
-  validated: boolean;
-  failureCode?: string | null;
-  evidenceIdsUsed: string[];
-  sourceDocumentIds: string[];
-  snippetRefs: ChatProvenanceSnippetRefDTO[];
-  coverageScore: number;
-}
-
-export interface ChatResult {
-  conversationId: string;
-  userMessageId: string;
-  assistantMessageId: string;
-  traceId?: string;
-  assistantText: string;
-  attachmentsPayload?: unknown;
-  assistantTelemetry?: Record<string, unknown>;
-  provenance?: ChatProvenanceDTO;
-  sources?: Array<{
-    documentId: string;
-    docId?: string;
-    filename: string;
-    mimeType: string | null;
-    page: number | null;
-    slide?: number | null;
-    sheet?: string | null;
-    cell?: string | null;
-    section?: string | null;
-    locationKey?: string | null;
-    locationLabel?: string | null;
-    snippet?: string | null;
-  }>;
-  listing?: Array<{
-    kind: "file" | "folder";
-    id: string;
-    title: string;
-    mimeType?: string;
-    itemCount?: number;
-    depth?: number;
-  }>;
-  breadcrumb?: Array<{ id: string; name: string }>;
-  followups?: Array<{ label: string; query: string }>;
-  answerMode?: AnswerMode;
-  answerClass?: AnswerClass;
-  navType?: NavType;
-  generatedTitle?: string;
-  status?: ChatResultStatus;
-  failureCode?: string | null;
-  completion?: ChatCompletionState;
-  truncation?: ChatTruncationState;
-  evidence?: ChatEvidenceState;
-  userWarning?: ChatWarningState | null;
-  warnings?: ChatWarningState[];
-}
+// ---------------------------------------------------------------------------
+// Turn-level types (unique to this file)
+// ---------------------------------------------------------------------------
 
 export type EditorSelectionRange = {
   paragraphId?: string;

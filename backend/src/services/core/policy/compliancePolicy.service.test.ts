@@ -19,9 +19,10 @@ describe("CompliancePolicyService", () => {
 
   test("is fail-open when compliance policy bank is missing", () => {
     const service = new CompliancePolicyService();
-    expect(service.decide({ meta: {}, context: {} })).toEqual({
-      blocked: false,
-    });
+    const result = service.decide({ meta: {}, context: {} });
+    expect(result.blocked).toBe(false);
+    expect(result.action).toBe("allow");
+    expect(result.reasonCode).toBeNull();
   });
 
   test("blocks when compliance is required and user consent is missing", () => {
@@ -37,7 +38,7 @@ describe("CompliancePolicyService", () => {
               { path: "signals.userConsent", op: "neq", value: true },
             ],
           },
-          then: { action: "block", userMessage: "Consent required." },
+          then: { action: "block" },
           reasonCode: "compliance_missing_consent",
           terminal: true,
         },
@@ -51,8 +52,9 @@ describe("CompliancePolicyService", () => {
     });
 
     expect(result.blocked).toBe(true);
+    expect(result.action).toBe("block");
     expect(result.reasonCode).toBe("compliance_missing_consent");
-    expect(result.message).toBe("Consent required.");
+    expect(result.ruleId).toBe("COMP_900_missing_consent");
   });
 
   test("does not block when compliance consent is satisfied", () => {
@@ -68,7 +70,7 @@ describe("CompliancePolicyService", () => {
               { path: "signals.userConsent", op: "neq", value: true },
             ],
           },
-          then: { action: "block", userMessage: "Consent required." },
+          then: { action: "block" },
           reasonCode: "compliance_missing_consent",
           terminal: true,
         },
@@ -81,6 +83,8 @@ describe("CompliancePolicyService", () => {
       context: {},
     });
 
-    expect(result).toEqual({ blocked: false });
+    expect(result.blocked).toBe(false);
+    expect(result.action).toBe("allow");
+    expect(result.reasonCode).toBeNull();
   });
 });

@@ -142,13 +142,18 @@ export function buildInputChunks(
       const isFinancial = sheet.isFinancial ?? extraction.isFinancial ?? false;
       const tableId = `sheet:${sheetName}`;
 
-      // Sheet text content chunks
+      // Sheet text content chunks — chunk per-sheet to preserve context
       const textContent = (sheet.textContent || "").trim();
       if (textContent) {
+        const sheetPrefix = `[Sheet: ${sheetName}] `;
         for (const segment of splitTextIntoChunks(textContent)) {
+          // Prepend sheet name to each chunk so embeddings carry sheet identity
+          const content = segment.startsWith(`=== Sheet: ${sheetName}`)
+            ? segment
+            : sheetPrefix + segment;
           out.push({
             chunkIndex: idx++,
-            content: segment,
+            content,
             metadata: {
               sheetName,
               chunkType: "table",

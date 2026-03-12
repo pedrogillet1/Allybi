@@ -5,6 +5,7 @@ import {
   createDefaultPromptRegistryTelemetry,
   PromptBankLoadError,
   PromptBankMissingError,
+  PromptRegistryConfigError,
   type PromptMetricSink,
   PromptRegistryService,
   PromptRoleValidationError,
@@ -19,6 +20,7 @@ function loadPromptBanks() {
     "system_base",
     "mode_chat",
     "mode_editing",
+    "llm_global_guards",
     "rag_policy",
     "task_answer_with_sources",
     "policy_citations",
@@ -569,6 +571,53 @@ describe("PromptRegistryService compose_answer mode coverage", () => {
         answerMode: "doc_grounded_single",
       }),
     ).toThrow(/duplicate_layer_id/);
+  });
+
+  test("fails fast when one prompt file declares a forbidden concern pair", () => {
+    const loader = {
+      getBank<T = any>(bankId: string): T {
+        if (bankId === "prompt_registry") {
+          return {
+            config: { enabled: true },
+            promptFiles: [
+              {
+                id: "task_answer_with_sources",
+                concerns: ["grounding", "answer_shape"],
+              },
+            ],
+            forbiddenConcernOverlaps: [
+              { left: "grounding", right: "answer_shape" },
+            ],
+            layersByKind: {
+              compose_answer: ["task_answer_with_sources"],
+            },
+          } as T;
+        }
+        if (bankId === "task_answer_with_sources") {
+          return {
+            _meta: { id: "task_answer_with_sources", version: "test" },
+            config: { enabled: true },
+            templates: [
+              {
+                id: "answer_with_sources",
+                priority: 100,
+                when: { answerModes: ["doc_grounded_single"] },
+                messages: [{ role: "system", content: { any: "ok" } }],
+              },
+            ],
+          } as T;
+        }
+        return { config: { enabled: true, messages: [] } } as T;
+      },
+    };
+    const service = new PromptRegistryService(loader);
+    expect(() =>
+      service.buildPrompt("compose_answer", {
+        env: "local",
+        outputLanguage: "en",
+        answerMode: "doc_grounded_single",
+      }),
+    ).toThrow(PromptRegistryConfigError);
   });
 
   test("fails closed with typed missing-bank error for required layer", () => {

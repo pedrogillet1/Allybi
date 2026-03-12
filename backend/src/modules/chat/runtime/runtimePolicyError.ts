@@ -1,41 +1,68 @@
-export type RuntimePolicyErrorCode =
-  | "RUNTIME_POLICY_MISSING"
-  | "RUNTIME_POLICY_INVALID";
+import {
+  type RuntimePolicyErrorCategory,
+  type RuntimePolicyErrorCode,
+  isKnownRuntimePolicyCode,
+  normalizeRuntimeFailureCode,
+  resolveRuntimePolicyErrorCategory,
+} from "./runtimeFailureCodes";
+
+const RUNTIME_POLICY_ERROR_TAG = Symbol.for("koda.runtimePolicyError");
 
 export class RuntimePolicyError extends Error {
   readonly code: RuntimePolicyErrorCode;
+  readonly category: RuntimePolicyErrorCategory;
+  readonly details: Record<string, unknown> | null;
+  readonly [RUNTIME_POLICY_ERROR_TAG] = true;
 
-  constructor(code: RuntimePolicyErrorCode, message: string) {
+  constructor(
+    code: RuntimePolicyErrorCode,
+    message: string,
+    details?: Record<string, unknown> | null,
+  ) {
     super(message);
     this.name = "RuntimePolicyError";
     this.code = code;
+    this.category = resolveRuntimePolicyErrorCategory(code);
+    this.details = details || null;
   }
 }
 
 export function isRuntimePolicyError(
   error: unknown,
 ): error is RuntimePolicyError {
-  if (!error || typeof error !== "object") return false;
-  const anyErr = error as any;
+  if (!(error instanceof Error)) return false;
+  const tagged = error as RuntimePolicyError & {
+    [RUNTIME_POLICY_ERROR_TAG]?: boolean;
+  };
   return (
-    anyErr?.name === "RuntimePolicyError" ||
-    anyErr?.code === "RUNTIME_POLICY_MISSING" ||
-    anyErr?.code === "RUNTIME_POLICY_INVALID"
+    tagged[RUNTIME_POLICY_ERROR_TAG] === true &&
+    isKnownRuntimePolicyCode(tagged.code)
   );
+}
+
+function fromStructuredError(error: unknown): RuntimePolicyErrorCode | null {
+  if (!error || typeof error !== "object") return null;
+  const record = error as Record<string, unknown>;
+  if (isKnownRuntimePolicyCode(record.code)) return record.code;
+  const cause =
+    record.cause && typeof record.cause === "object"
+      ? (record.cause as Record<string, unknown>)
+      : null;
+  if (cause && isKnownRuntimePolicyCode(cause.code)) {
+    return cause.code;
+  }
+  return null;
 }
 
 export function toRuntimePolicyErrorCode(
   error: unknown,
 ): RuntimePolicyErrorCode {
   if (isRuntimePolicyError(error)) return error.code;
-  const message = String((error as any)?.message || "");
-  if (
-    message.includes("memory_policy.config.runtimeTuning") ||
-    message.includes("memory_policy.config.integrationHooks") ||
-    message.includes("memory_policy integration hook banks missing") ||
-    message.includes("Required bank missing: memory_policy")
-  ) {
-    return "RUNTIME_POLICY_INVALID";
-  }
-  return "RUNTIME_POLICY_INVALID";
+
+  const structured = fromStructuredError(error);
+  if (structured) return structured;
+  return "CONTRACT_INVALID";
 }
+
+export { normalizeRuntimeFailureCode };
+export type { RuntimePolicyErrorCategory, RuntimePolicyErrorCode };

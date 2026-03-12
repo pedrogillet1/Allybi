@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, jest, test } from "@jest/globals";
 process.env.KODA_MASTER_KEY_BASE64 = Buffer.alloc(32, 9).toString("base64");
 
 const mockFindDocument = jest.fn();
+const mockFindManyDocuments = jest.fn();
 const mockUpdateDocument = jest.fn();
 const mockEmbeddingCount = jest.fn();
 const mockChunkCount = jest.fn();
@@ -19,6 +20,7 @@ jest.mock("../../config/database", () => ({
   default: {
     document: {
       findUnique: (...args: any[]) => mockFindDocument(...args),
+      findMany: (...args: any[]) => mockFindManyDocuments(...args),
       update: (...args: any[]) => mockUpdateDocument(...args),
     },
     documentEmbedding: {
@@ -61,11 +63,12 @@ jest.mock("../../services/retrieval/pinecone.service", () => ({
   },
 }));
 
-import { storeDocumentEmbeddings } from "../../services/retrieval/vectorEmbedding.service";
+import { storeDocumentEmbeddingsCore } from "../../services/retrieval/vectorEmbedding.service";
 
 describe("vectorEmbedding rollback", () => {
   beforeEach(() => {
     mockFindDocument.mockReset();
+    mockFindManyDocuments.mockReset();
     mockUpdateDocument.mockReset();
     mockEmbeddingCount.mockReset();
     mockChunkCount.mockReset();
@@ -86,7 +89,11 @@ describe("vectorEmbedding rollback", () => {
       status: "ready",
       folderId: null,
       folder: null,
+      parentVersionId: null,
     });
+    mockFindManyDocuments.mockResolvedValue([
+      { id: "doc-1", createdAt: new Date("2026-01-01T00:00:00.000Z") },
+    ]);
     mockUpdateDocument.mockResolvedValue({});
     mockEmbeddingCount.mockResolvedValue(1);
     mockChunkCount.mockResolvedValue(1);
@@ -120,7 +127,7 @@ describe("vectorEmbedding rollback", () => {
     mockChunkCount.mockResolvedValue(0);
 
     await expect(
-      storeDocumentEmbeddings(
+      storeDocumentEmbeddingsCore(
         "doc-1",
         [{ chunkIndex: 0, content: "quarterly revenue", embedding: [0.11] }],
         { maxRetries: 1, strictVerify: true, encryptionMode: "plaintext" },
@@ -166,7 +173,7 @@ describe("vectorEmbedding rollback", () => {
       return { upserted: 1, skipped: 0 };
     });
 
-    await storeDocumentEmbeddings(
+    await storeDocumentEmbeddingsCore(
       "doc-1",
       [{ chunkIndex: 0, content: "quarterly revenue", embedding: [0.11] }],
       {

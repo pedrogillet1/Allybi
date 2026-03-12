@@ -1,5 +1,5 @@
 import type { ChatRequest } from "../../../modules/chat/domain/chat.contracts";
-import type { EvidencePack } from "../retrieval/retrievalEngine.service";
+import type { EvidencePack } from "../retrieval/retrieval.types";
 import { getOptionalBank } from "../banks/bankLoader.service";
 
 type PredicateOp =

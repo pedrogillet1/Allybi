@@ -1,7 +1,19 @@
 import crypto from "crypto";
+import type { BankLoader } from "./retrieval.types";
 
 export function sha256(input: string): string {
   return crypto.createHash("sha256").update(input, "utf8").digest("hex");
+}
+
+/**
+ * Safely load a bank by ID, returning null on failure instead of throwing.
+ */
+export function safeGetBank<T = unknown>(bankLoader: BankLoader, bankId: string): T | null {
+  try {
+    return bankLoader.getBank<T>(bankId);
+  } catch {
+    return null;
+  }
 }
 
 export function clamp01(value: number): number {

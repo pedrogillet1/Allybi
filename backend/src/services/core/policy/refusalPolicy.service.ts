@@ -1,5 +1,10 @@
 import { getOptionalBank } from "../banks/bankLoader.service";
 import { PolicyRuntimeEngine, type PolicyRule } from "./policyRuntimeEngine.service";
+import {
+  allowPolicyDecision,
+  blockedFromAction,
+  type PolicyDecision,
+} from "./policyDecision";
 
 type RefusalPolicyBank = {
   config?: {
@@ -11,14 +16,11 @@ type RefusalPolicyBank = {
   rules?: PolicyRule[];
 };
 
-export type RefusalPolicyDecision = {
+export type RefusalPolicyDecision = PolicyDecision & {
   blocked: boolean;
-  category?: string;
-  responseType?: string;
-  action?: string;
-  reasonCode?: string;
-  ruleId?: string;
+  responseType?: string | null;
   safeAlternatives?: string[];
+  copyBankId?: string | null;
 };
 
 function asObject(value: unknown): Record<string, unknown> {
@@ -28,13 +30,6 @@ function asObject(value: unknown): Record<string, unknown> {
 
 function asBoolean(value: unknown): boolean {
   return value === true;
-}
-
-function normalizeLanguage(language?: string): "en" | "pt" | "es" {
-  const raw = String(language || "").trim().toLowerCase();
-  if (raw === "pt") return "pt";
-  if (raw === "es") return "es";
-  return "en";
 }
 
 function extractPolicySignals(input: Record<string, unknown>): Record<string, unknown> {
@@ -77,7 +72,9 @@ export class RefusalPolicyService {
     context?: Record<string, unknown> | null;
   }): RefusalPolicyDecision {
     const bank = getOptionalBank<RefusalPolicyBank>("refusal_policy");
-    if (!bank?.config?.enabled) return { blocked: false };
+    if (!bank?.config?.enabled) {
+      return { ...allowPolicyDecision(), blocked: false };
+    }
 
     const signals = extractPolicySignals({
       meta: input.meta || {},
@@ -95,56 +92,30 @@ export class RefusalPolicyService {
       rules: Array.isArray(bank.rules) ? bank.rules : [],
       runtime,
     });
-    if (!match) return { blocked: false };
+    if (!match) return { ...allowPolicyDecision(), blocked: false };
+
+    const action = String(match.then.action || "refuse").trim() || "refuse";
+    const constraints =
+      match.then.constraints && typeof match.then.constraints === "object"
+        ? (match.then.constraints as Record<string, unknown>)
+        : null;
 
     return {
-      blocked: true,
+      blocked: blockedFromAction(action),
       category: String(match.then.category || "other"),
       responseType: String(match.then.responseType || "generic_refusal"),
-      action: String(match.then.action || "refuse"),
+      action,
+      terminal: match.terminal === true,
       reasonCode: match.reasonCode || "policy_refusal_required",
-      ruleId: match.ruleId,
+      ruleId: match.ruleId || null,
+      routeTo: null,
+      constraints,
       safeAlternatives: Array.isArray(match.then.safeAlternatives)
         ? match.then.safeAlternatives
             .map((item) => String(item || "").trim())
             .filter(Boolean)
         : [],
+      copyBankId: String(match.then.responseBank || "refusal_phrases").trim() || null,
     };
-  }
-
-  buildUserFacingText(input: {
-    decision: RefusalPolicyDecision;
-    preferredLanguage?: string;
-  }): string {
-    const lang = normalizeLanguage(input.preferredLanguage);
-    const category = String(input.decision.category || "other").trim();
-    const hasAlternative =
-      Array.isArray(input.decision.safeAlternatives) &&
-      input.decision.safeAlternatives.length > 0;
-
-    if (lang === "pt") {
-      const base =
-        category === "self_harm"
-          ? "Nao posso ajudar com isso."
-          : "Nao posso ajudar com esse pedido.";
-      if (!hasAlternative) return base;
-      return `${base} Posso ajudar com uma alternativa segura se quiser.`;
-    }
-
-    if (lang === "es") {
-      const base =
-        category === "self_harm"
-          ? "No puedo ayudar con eso."
-          : "No puedo ayudar con esa solicitud.";
-      if (!hasAlternative) return base;
-      return `${base} Si quieres, te ayudo con una alternativa segura.`;
-    }
-
-    const base =
-      category === "self_harm"
-        ? "I can’t help with that."
-        : "I can’t help with that request.";
-    if (!hasAlternative) return base;
-    return `${base} I can help with a safer alternative.`;
   }
 }

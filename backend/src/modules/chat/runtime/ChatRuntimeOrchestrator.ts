@@ -20,9 +20,11 @@ import type {
   ConversationWithMessagesDTO,
   CreateMessageParams,
 } from "../domain/chat.contracts";
-import { ContractNormalizer } from "./ContractNormalizer";
-import { EvidenceValidator } from "./EvidenceValidator";
 import { ScopeService } from "./ScopeService";
+import { ScopeIntentInterpreter } from "./scopeIntentInterpreter";
+import { resolveScopeRuntimeConfig } from "./scopeRuntimeConfig";
+import { TurnFinalizationService } from "./TurnFinalizationService";
+import type { TurnExecutionDraft } from "./turnExecutionDraft";
 
 type ScopeRuntimeMentionConfig = {
   tokenMinLength: number;
@@ -254,11 +256,15 @@ function normalizeForExactMention(value: string): string {
 }
 
 export type RuntimeDelegate = {
-  chat(req: ChatRequest): Promise<ChatResult>;
+  chat(req: ChatRequest): Promise<TurnExecutionDraft>;
   streamChat(params: {
     req: ChatRequest;
     sink: StreamSink;
     streamingConfig: LLMStreamingConfig;
+  }): Promise<TurnExecutionDraft>;
+  persistFinalizedTurn(params: {
+    draft: TurnExecutionDraft;
+    finalized: ChatResult;
   }): Promise<ChatResult>;
   createConversation(params: {
     userId: string;
@@ -298,17 +304,42 @@ export type RuntimeDelegate = {
 };
 
 export class ChatRuntimeOrchestrator {
-  private readonly normalizer = new ContractNormalizer();
-  private readonly evidenceValidator = new EvidenceValidator();
-  private readonly scopeService = new ScopeService();
-  private readonly scopeRuntime = resolveScopeRuntimeMentionConfig();
+  private readonly scopeService: ScopeService;
+  private readonly scopeIntentInterpreter: ScopeIntentInterpreter;
+  private readonly finalizationService: TurnFinalizationService;
+  private readonly scopeRuntime: ScopeRuntimeMentionConfig;
 
-  constructor(private readonly delegate: RuntimeDelegate) {}
+  constructor(
+    private readonly delegate: RuntimeDelegate,
+    deps: {
+      scopeService?: ScopeService;
+      scopeIntentInterpreter?: ScopeIntentInterpreter;
+      finalizationService?: TurnFinalizationService;
+      scopeRuntime?: ScopeRuntimeMentionConfig;
+    } = {},
+  ) {
+    const scopeRuntimeConfig =
+      deps.scopeService && deps.scopeIntentInterpreter
+        ? null
+        : resolveScopeRuntimeConfig(getBankLoaderInstance());
+    this.scopeService =
+      deps.scopeService ||
+      new ScopeService({
+        prismaClient: prisma as any,
+        runtimeConfig: scopeRuntimeConfig!,
+      });
+    this.scopeIntentInterpreter =
+      deps.scopeIntentInterpreter ||
+      new ScopeIntentInterpreter(scopeRuntimeConfig!);
+    this.finalizationService =
+      deps.finalizationService || new TurnFinalizationService();
+    this.scopeRuntime = deps.scopeRuntime || resolveScopeRuntimeMentionConfig();
+  }
 
   async chat(req: ChatRequest): Promise<ChatResult> {
     const preparedReq = await this.prepareRequest(req);
-    const raw = await this.delegate.chat(preparedReq);
-    return this.postProcess(preparedReq, raw);
+    const draft = await this.delegate.chat(preparedReq);
+    return this.runTurnPipeline(preparedReq, draft);
   }
 
   async streamChat(params: {
@@ -317,11 +348,11 @@ export class ChatRuntimeOrchestrator {
     streamingConfig: LLMStreamingConfig;
   }): Promise<ChatResult> {
     const preparedReq = await this.prepareRequest(params.req);
-    const raw = await this.delegate.streamChat({
+    const draft = await this.delegate.streamChat({
       ...params,
       req: preparedReq,
     });
-    return this.postProcess(preparedReq, raw);
+    return this.runTurnPipeline(preparedReq, draft);
   }
 
   async createConversation(params: {
@@ -400,7 +431,7 @@ export class ChatRuntimeOrchestrator {
     const conversationId = String(req.conversationId || "").trim();
 
     // 1. Clear scope if requested
-    if (conversationId && this.scopeService.shouldClearScope(req)) {
+    if (conversationId && this.scopeIntentInterpreter.shouldClearScope(req)) {
       await this.scopeService.clearConversationScope(
         req.userId,
         conversationId,
@@ -614,15 +645,26 @@ export class ChatRuntimeOrchestrator {
     return matched;
   }
 
-  private async postProcess(
+  private async runTurnPipeline(
     req: ChatRequest,
-    result: ChatResult,
+    draft: TurnExecutionDraft,
   ): Promise<ChatResult> {
-    const normalized = this.normalizer.normalize(result);
-    const conversationId = String(result.conversationId || "").trim();
-    if (!conversationId) return normalized;
+    const conversationId = String(draft.conversationId || "").trim();
+    if (!conversationId) {
+      const finalizedWithoutConversation = await this.finalizationService.finalize(
+        draft,
+        {
+          request: req,
+          scopeDocumentIds: this.scopeService.attachedScope(req),
+        },
+      );
+      return this.delegate.persistFinalizedTurn({
+        draft,
+        finalized: finalizedWithoutConversation,
+      });
+    }
 
-    if (this.scopeService.shouldClearScope(req)) {
+    if (this.scopeIntentInterpreter.shouldClearScope(req)) {
       await this.scopeService.clearConversationScope(
         req.userId,
         conversationId,
@@ -652,20 +694,13 @@ export class ChatRuntimeOrchestrator {
         conversationId,
       });
     }
-    const scoped = this.evidenceValidator.enforceScope(
-      normalized,
-      scopeForValidation,
-    );
-
-    // Keep compatibility flags coherent.
-    if (
-      scoped.status !== "success" &&
-      !scoped.fallbackReasonCode &&
-      scoped.failureCode
-    ) {
-      scoped.fallbackReasonCode = scoped.failureCode;
-    }
-
-    return scoped;
+    const finalized = await this.finalizationService.finalize(draft, {
+      request: req,
+      scopeDocumentIds: scopeForValidation,
+    });
+    return this.delegate.persistFinalizedTurn({
+      draft,
+      finalized,
+    });
   }
 }

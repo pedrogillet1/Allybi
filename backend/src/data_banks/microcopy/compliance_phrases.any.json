@@ -1,0 +1,56 @@
+{
+  "_meta": {
+    "id": "compliance_phrases",
+    "version": "1.0.0",
+    "description": "Deterministic user-facing microcopy for compliance blocks. Owns final wording by reason code; policy services and runtime must not inline these messages.",
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-03-12",
+    "owner": "platform-compliance",
+    "usedBy": [
+      "services/core/policy/compliancePhraseResolver.service.ts"
+    ],
+    "tests": [
+      "services/core/policy/compliancePhraseResolver.service.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id",
+    "actionsContract": {
+      "thresholds": {
+        "maxComplianceChars": 220
+      }
+    }
+  },
+  "phrases": {
+    "default": {
+      "en": "I can't continue with this request because compliance controls are blocking it.",
+      "pt": "Nao posso continuar com esse pedido porque os controles de compliance estao bloqueando a acao.",
+      "es": "No puedo continuar con esta solicitud porque los controles de cumplimiento la estan bloqueando."
+    },
+    "byReasonCode": {
+      "compliance_missing_consent": {
+        "en": "I need explicit consent before continuing with this request.",
+        "pt": "Preciso de consentimento explicito antes de continuar com esse pedido.",
+        "es": "Necesito consentimiento explicito antes de continuar con esta solicitud."
+      },
+      "compliance_export_restricted": {
+        "en": "This action is restricted by compliance policy for your workspace.",
+        "pt": "Essa acao esta restrita pelas regras de compliance do seu workspace.",
+        "es": "Esta accion esta restringida por las reglas de cumplimiento de tu espacio de trabajo."
+      },
+      "compliance_legal_hold_active": {
+        "en": "This conversation is under legal hold; sensitive actions are disabled.",
+        "pt": "Esta conversa esta sob hold legal e acoes sensiveis estao desativadas.",
+        "es": "Esta conversacion esta bajo retencion legal y las acciones sensibles estan deshabilitadas."
+      }
+    }
+  }
+}

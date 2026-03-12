@@ -373,10 +373,6 @@ class KodaV3Container {
     return this._isInitialized;
   }
 
-  public getIntentEngine(): any {
-    return null;
-  }
-
   public getRetrievalEngine(): any {
     return this._services.retrievalEngine ?? null;
   }
@@ -399,10 +395,6 @@ class KodaV3Container {
 
   public getConversationMemory(): any {
     return this._services.conversationMemory ?? null;
-  }
-
-  public getFeedbackLogger(): any {
-    return this._services.feedbackLogger ?? null;
   }
 
   public getService(name: string): any {

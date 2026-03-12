@@ -1,7 +1,7 @@
 import { describe, expect, test } from "@jest/globals";
 
 import seeds from "../../services/core/retrieval/__fixtures__/doclock-benchmark.seeds.json";
-import { RetrievalEngineService } from "../../services/core/retrieval/retrievalEngine.service";
+import { RetrievalEngineService } from "../../modules/retrieval/application";
 import { writeCertificationGateReport } from "./reporting";
 
 type BenchmarkMode =

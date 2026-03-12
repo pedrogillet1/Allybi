@@ -3,7 +3,7 @@ import { describe, expect, test } from "@jest/globals";
 import {
   RetrievalEngineService,
   type RetrievalRequest,
-} from "./retrievalEngine.service";
+} from "./retrievalEngine.legacy.service";
 
 function buildBanks() {
   return {

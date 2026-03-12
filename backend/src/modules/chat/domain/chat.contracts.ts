@@ -83,6 +83,8 @@ export interface ChatCompletionState {
   answered: boolean;
   missingSlots: string[];
   nextAction?: string | null;
+  nextActionCode?: string | null;
+  nextActionArgs?: Record<string, unknown> | null;
 }
 
 export interface ChatTruncationState {
@@ -161,6 +163,7 @@ export interface ChatResult {
   conversationId: string;
   userMessageId: string;
   assistantMessageId: string;
+  turnKey?: string;
   traceId?: string;
   assistantText: string;
 

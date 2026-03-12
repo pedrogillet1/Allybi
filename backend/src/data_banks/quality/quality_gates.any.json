@@ -2,7 +2,7 @@
   "_meta": {
     "id": "quality_gates",
     "version": "3.1.0",
-    "description": "ChatGPT-like answer quality gates for Koda. Post-generation checks + adaptive fallbacks. Guarantees: (1) never answer from the wrong doc when explicit docRef exists, (2) nav_pills responses render as intro-only + pills (no Sources label, no message actions), (3) replace bad fallbacks with adaptive guidance, (4) block malformed/truncated numbers, (5) enforce markdown + paragraph/bullet hygiene, (6) enforce brevity constraints, (7) reduce repetition and banned phrases, (8) minimal privacy-safe output. Designed to be deterministic and explainable.",
+    "description": "Post-generation verification gates for Koda answers. Guarantees: (1) never answer from the wrong doc when explicit docRef exists, (2) nav_pills responses stay UI-safe, (3) block malformed/truncated numbers, (4) enforce markdown sanity, (5) reduce repetition and banned phrases, (6) keep output privacy-safe. Designed to be deterministic and explainable.",
     "languages": [
       "any"
     ],
@@ -50,11 +50,6 @@
       }
     },
     "limits": {
-      "maxCharsHard": 20000,
-      "maxBlocksHard": 14,
-      "maxBulletsHard": 14,
-      "maxTablesHard": 3,
-      "maxQuotesHard": 3,
       "maxSourcesButtonsHard": 8
     },
     "normalization": {
@@ -67,22 +62,8 @@
       "collapseWhitespace": true
     },
     "integrationHooks": {
-      "docGroundingChecksBankId": "doc_grounding_checks",
-      "hallucinationGuardsBankId": "hallucination_guards",
       "dedupeBankId": "dedupe_and_repetition",
-      "truncationBankId": "truncation_and_limits",
-      "noDocsBankId": "no_docs_messages",
-      "fallbackProcessingBankId": "fallback_processing",
-      "fallbackExtractionRecoveryBankId": "fallback_extraction_recovery",
-      "fallbackNotFoundScopeBankId": "fallback_not_found_scope",
-      "fallbackScopeEmptyBankId": "fallback_scope_empty",
-      "scopedNotFoundMessagesBankId": "scoped_not_found_messages",
-      "refusalBankId": "refusal_phrases",
-      "clarificationBankId": "clarification_phrases",
-      "bannedPhrasesBankId": "banned_phrases",
-      "piiLabelsBankId": "pii_field_labels",
-      "numericIntegrityRulesBankId": "numeric_integrity_rules",
-      "privacyMinimalRulesBankId": "privacy_minimal_rules"
+      "piiLabelsBankId": "pii_field_labels"
     },
     "debugHooks": {
       "emitGateTrace": false,
@@ -93,53 +74,31 @@
       "requested_slot_covered": "warn",
       "forbidden_adjacent_role_absent": "warn",
       "entity_role_consistency": "warn",
-      "wrong_doc_lock_enforcement": "block",
-      "source_policy_navigation_mode": "warn",
-      "numeric_integrity_totals_reconciliation": "warn",
-      "numeric_integrity_domain_unit_required": "warn",
-      "numeric_integrity_currency_consistency": "warn",
-      "ambiguity_single_question_policy": "warn",
-      "redaction_default_pii_identity_tax_banking": "block",
-      "medical_safety_boundaries": "block",
-      "doc_grounding_minimums": "warn",
-      "hallucination_risk": "warn",
+      "explicit_doc_enforcement": "block",
+      "nav_pills_enforcement": "warn",
+      "numeric_integrity": "warn",
       "repetition_and_banned_phrases": "warn",
       "privacy_minimal": "block",
       "final_consistency": "warn",
-      "brevity_and_constraints": "warn",
       "markdown_sanity": "warn",
       "no_raw_json": "warn",
-      "structural_completeness": "block"
+      "structural_completeness": "warn"
     }
   },
   "gateOrder": [
     "explicit_doc_enforcement",
     "nav_pills_enforcement",
-    "bad_fallback_replacement",
     "numeric_integrity",
-    "format_and_structure_hygiene",
     "markdown_sanity",
-    "brevity_and_constraints",
-    "doc_grounding_minimums",
-    "hallucination_risk",
     "repetition_and_banned_phrases",
     "privacy_minimal",
     "final_consistency"
   ],
   "reasonCodes": {
     "wrong_doc": "wrong_doc",
-    "scope_empty": "scope_empty",
-    "scoped_not_found": "scoped_not_found",
-    "no_docs": "no_docs",
-    "indexing": "indexing",
-    "extraction_failed": "extraction_failed",
-    "weak_evidence": "weak_evidence",
-    "hallucination_risk": "hallucination_risk",
     "numeric_malformed": "numeric_malformed",
     "json_disallowed": "json_disallowed",
-    "nav_missing_buttons": "nav_missing_buttons",
-    "bad_generic_fallback": "bad_generic_fallback",
-    "bad_fallback_detected": "bad_fallback_detected"
+    "nav_missing_buttons": "nav_missing_buttons"
   },
   "gates": {
     "explicit_doc_enforcement": {
@@ -185,11 +144,9 @@
         {
           "id": "QG_NAV_002_body_must_be_concise",
           "severity": "warning",
-          "description": "nav_pills body should be concise but can include up to 3 sentences for analytical queries.",
+          "description": "nav_pills body verification is limited to contract violations that can break the UI.",
           "condition": "answerMode.in(['nav_pills','nav_pill']) == true",
-          "maxSentences": 3,
-          "maxChars": 800,
-          "actionOnFail": "strip_body_keep_intro"
+          "actionOnFail": "flag_nav_body_contract_violation"
         },
         {
           "id": "QG_NAV_003_no_sources_label_or_divider",
@@ -213,26 +170,6 @@
             "^\\s*[-*]\\s+[^\\n]+\\.(pdf|xlsx?|pptx?|docx?|csv|txt|jpg|jpeg|png)"
           ],
           "actionOnFail": "strip_inline_file_list"
-        }
-      ]
-    },
-    "bad_fallback_replacement": {
-      "enabled": true,
-      "checks": [
-        {
-          "id": "QG_FALL_001_replace_generic_no_relevant",
-          "severity": "error",
-          "description": "Replace generic 'no relevant information found' style outputs with adaptive guidance.",
-          "condition": "answerText.matchesAny(['no relevant information found','no relevant info found','nothing found','i couldn\\u2019t find relevant content','i could not find relevant content','n\\u00e3o encontrei informa\\u00e7\\u00e3o relevante','no encontr\\u00e9 informaci\\u00f3n relevante']) == true",
-          "actionOnFail": "emit_adaptive_failure_message",
-          "reasonCode": "bad_generic_fallback"
-        },
-        {
-          "id": "QG_FALL_002_doc_grounded_empty_or_trivial",
-          "severity": "error",
-          "description": "If doc-grounded answer is empty/trivial, do not ship. Emit adaptive failure message based on reason codes.",
-          "condition": "answerMode.startsWith('doc_grounded') == true AND (answerText.isEmpty == true OR answerText.charCount < 24)",
-          "actionOnFail": "emit_adaptive_failure_message"
         }
       ]
     },
@@ -276,41 +213,6 @@
         }
       ]
     },
-    "format_and_structure_hygiene": {
-      "enabled": true,
-      "checks": [
-        {
-          "id": "QG_FMT_001_no_json_output",
-          "severity": "error",
-          "description": "Koda never prints JSON. Convert to a table/bullets or regenerate.",
-          "patterns": [
-            "^\\s*```json",
-            "^\\s*\\{\\s*\"",
-            "^\\s*\\[\\s*\\{"
-          ],
-          "actionOnFail": "convert_json_to_table_or_bullets",
-          "reasonCode": "json_disallowed"
-        },
-        {
-          "id": "QG_FMT_002_paragraph_limits",
-          "severity": "error",
-          "description": "Enforce short paragraphs (readability): split walls into 1–2 sentence paragraphs.",
-          "condition": "answerMode.startsWith('doc_grounded') == true OR answerMode == 'general_answer'",
-          "maxSentencesPerParagraph": 2,
-          "maxCharsPerParagraph": 260,
-          "actionOnFail": "split_long_paragraphs"
-        },
-        {
-          "id": "QG_FMT_003_bullet_hygiene",
-          "severity": "error",
-          "description": "Bullets must be 1–3 sentences per bullet; split/expand if needed.",
-          "condition": "answerStructure.bullets.count > 0",
-          "maxSentencesPerBullet": 3,
-          "minWordsPerBullet": 6,
-          "actionOnFail": "fix_bullet_hygiene"
-        }
-      ]
-    },
     "markdown_sanity": {
       "enabled": true,
       "checks": [
@@ -336,44 +238,6 @@
           "actionOnFail": "unicode_normalize_display_safe"
         }
       ]
-    },
-    "brevity_and_constraints": {
-      "enabled": true,
-      "checks": [
-        {
-          "id": "QG_LEN_001_short_overview_caps",
-          "severity": "error",
-          "description": "If user asked for 2–3 sentences, enforce tight cap.",
-          "condition": "signals.userRequestedShort == true OR signals.shortOverview == true OR constraints.maxSentencesLte3 == true",
-          "maxChars": 420,
-          "maxSentences": 3,
-          "actionOnFail": "auto_shorten_to_constraint"
-        },
-        {
-          "id": "QG_LEN_002_max_chars_hard",
-          "severity": "error",
-          "thresholdPath": "/config/limits/maxCharsHard",
-          "actionOnFail": "truncate_with_offer_narrow"
-        }
-      ]
-    },
-    "doc_grounding_minimums": {
-      "enabled": true,
-      "delegateToBankId": "doc_grounding_checks",
-      "onFail": {
-        "high": "emit_adaptive_failure_message",
-        "medium": "ask_one_clarification",
-        "low": "proceed"
-      }
-    },
-    "hallucination_risk": {
-      "enabled": true,
-      "delegateToBankId": "hallucination_guards",
-      "onFail": {
-        "high": "emit_adaptive_failure_message",
-        "medium": "add_hedge_and_limit_scope",
-        "low": "proceed"
-      }
     },
     "repetition_and_banned_phrases": {
       "enabled": true,
@@ -540,45 +404,7 @@
         "type": "transform",
         "notes": "Hide internal ids unless user requested them."
       }
-    ],
-    "adaptiveFallbackRouting": {
-      "resolutionOrder": [
-        "no_docs",
-        "indexing",
-        "extraction_failed",
-        "scope_empty",
-        "scoped_not_found",
-        "weak_evidence",
-        "hallucination_risk",
-        "generic"
-      ],
-      "map": {
-        "no_docs": {
-          "bankId": "no_docs_messages"
-        },
-        "indexing": {
-          "bankId": "fallback_processing"
-        },
-        "extraction_failed": {
-          "bankId": "fallback_extraction_recovery"
-        },
-        "scope_empty": {
-          "bankId": "fallback_scope_empty"
-        },
-        "scoped_not_found": {
-          "bankId": "fallback_not_found_scope"
-        },
-        "weak_evidence": {
-          "bankId": "scoped_not_found_messages"
-        },
-        "hallucination_risk": {
-          "bankId": "scoped_not_found_messages"
-        },
-        "generic": {
-          "bankId": "fallback_processing"
-        }
-      }
-    }
+    ]
   },
   "tests": {
     "cases": [

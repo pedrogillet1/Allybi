@@ -117,6 +117,9 @@
           ],
           "userAskedForTable": [
             "\\b(table|sheet|rows?|columns?|tabular)\\b",
+            "\\b(put\\s+(into|in)\\s+a\\s+(structured\\s+)?table)\\b",
+            "\\b(side[- ]by[- ]side|comparison\\s+table|structured\\s+table)\\b",
+            "\\|.*\\|.*\\|",
             "\\b(tabela|tabla|tabular|linhas?|filas?|colunas?|columnas?)\\b"
           ],
           "userAskedForQuote": [
@@ -142,6 +145,9 @@
           "tableExpected": [
             "\\b(table|tabular)\\b",
             "\\b(tabela|tabla|tabular)\\b"
+          ],
+          "deepExtractionCue": [
+            "\\b(extract|extraction|every\\s+(single|one|item|metric|figure|component)|all\\s+(the\\s+)?(items|metrics|figures|data|components|details|fields)|list\\s+(all|every|each)|break\\s*down|enumerate|itemize|line[- ]?by[- ]?line|item[- ]?by[- ]?item|comprehensive\\s+(list|breakdown|analysis)|full\\s+(list|breakdown|extraction|details))\\b"
           ]
         }
       },

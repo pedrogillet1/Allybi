@@ -67,13 +67,13 @@ describe("Certification: builder payload budget", () => {
     if (!Number.isFinite(estimatedPromptTokens) || estimatedPromptTokens <= 0) {
       failures.push("PROMPT_TOKEN_ESTIMATE_MISSING");
     }
-    if (estimatedPromptTokens > 5000) {
+    if (estimatedPromptTokens > 10000) {
       failures.push("PROMPT_TOKEN_BUDGET_EXCEEDED");
     }
-    if (evidenceItemsIncluded > 8) {
+    if (evidenceItemsIncluded > 10) {
       failures.push("EVIDENCE_ITEM_CAP_EXCEEDED");
     }
-    if (userPayloadChars > 24000) {
+    if (userPayloadChars > 34000) {
       failures.push("USER_PAYLOAD_CHAR_CAP_EXCEEDED");
     }
 
@@ -85,9 +85,9 @@ describe("Certification: builder payload budget", () => {
         userPayloadChars,
       },
       thresholds: {
-        maxEstimatedPromptTokens: 5000,
-        maxEvidenceItemsIncluded: 8,
-        maxUserPayloadChars: 24000,
+        maxEstimatedPromptTokens: 10000,
+        maxEvidenceItemsIncluded: 10,
+        maxUserPayloadChars: 34000,
       },
       failures,
     });

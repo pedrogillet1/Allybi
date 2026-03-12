@@ -1,6 +1,7 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 
 import prisma from "../../../config/database";
+import { logger } from "../../../utils/logger";
 import { DocumentCryptoService } from "../../documents/documentCrypto.service";
 import { DocumentKeyService } from "../../documents/documentKey.service";
 import { EmbeddingsService } from "../../retrieval/embedding.service";
@@ -16,7 +17,8 @@ import type {
   LexicalIndex,
   SemanticIndex,
   StructuralIndex,
-} from "./retrievalEngine.service";
+} from "./retrieval.types";
+import { RETRIEVAL_CONFIG } from "./v2/retrieval.config";
 
 const READY_DOCUMENT_STATUSES = [
   "ready",
@@ -377,7 +379,7 @@ function toSnippet(text: string | null): string {
     .replace(/\s+/g, " ")
     .trim();
   if (!clean) return "";
-  return clean.length > 1200 ? `${clean.slice(0, 1199)}…` : clean;
+  return clean.length > 3200 ? `${clean.slice(0, 3199)}…` : clean;
 }
 
 function filenameFromStorageKey(
@@ -1085,10 +1087,16 @@ class PrismaRetrievalUserAdapter
 
     const requestedK = Math.max(1, toSafeInt(opts.k, 10));
     const effectiveTopK = Math.max(requestedK * 4, 24);
-    const minSimilarity = parsePositiveNumber(
+    const baseMinSimilarity = parsePositiveNumber(
       process.env.RETRIEVAL_SEMANTIC_PINECONE_MIN_SIMILARITY,
       0.2,
     );
+    // In encrypted-only mode, Pinecone cosine scores are systematically lower
+    // (0.10–0.55 vs normal 0.3–0.8). Lower the threshold to avoid dropping
+    // all candidates.
+    const minSimilarity = RETRIEVAL_CONFIG.isEncryptedOnlyMode
+      ? Math.min(baseMinSimilarity, 0.10)
+      : baseMinSimilarity;
     const requestedDocIds = uniq(Array.isArray(opts.docIds) ? opts.docIds : []);
     const scopedDocIds = await this.resolveScopedDocIds(requestedDocIds);
     const targetDocIds = scopedDocIds ?? [];
@@ -1492,6 +1500,171 @@ class StructuralIndexAdapter implements StructuralIndex {
   }
 }
 
+export class RetrievalAdapterDependencyError extends Error {
+  readonly code = "RETRIEVAL_ADAPTER_DEPENDENCY_ERROR";
+  readonly operation: string;
+  readonly userId: string;
+
+  constructor(params: {
+    operation: string;
+    userId: string;
+    message: string;
+    cause?: unknown;
+  }) {
+    super(params.message);
+    this.name = "RetrievalAdapterDependencyError";
+    this.operation = params.operation;
+    this.userId = params.userId;
+    if (params.cause !== undefined) {
+      (this as any).cause = params.cause;
+    }
+  }
+}
+
+export function sortHitsStable(hits: RetrievalHit[]): RetrievalHit[] {
+  return [...hits].sort((a, b) => {
+    const scoreDelta = Number(b.score || 0) - Number(a.score || 0);
+    if (scoreDelta !== 0) return scoreDelta;
+    const docDelta = String(a.docId || "").localeCompare(String(b.docId || ""));
+    if (docDelta !== 0) return docDelta;
+    const locDelta = String(a.locationKey || "").localeCompare(
+      String(b.locationKey || ""),
+    );
+    if (locDelta !== 0) return locDelta;
+    return String(a.chunkId || "").localeCompare(String(b.chunkId || ""));
+  });
+}
+
+class StableSemanticIndex implements SemanticIndex {
+  constructor(
+    private readonly userId: string,
+    private readonly delegate: SemanticIndex,
+  ) {}
+
+  async search(opts: {
+    query: string;
+    docIds?: string[];
+    k: number;
+  }): Promise<RetrievalHit[]> {
+    try {
+      const hits = await this.delegate.search(opts);
+      return sortHitsStable(hits).slice(0, Math.max(1, opts.k));
+    } catch (error: any) {
+      logger.warn("[retrieval-adapters] semantic search failed", {
+        userId: this.userId,
+        error: String(error?.message || error || "unknown_error"),
+      });
+      throw new RetrievalAdapterDependencyError({
+        operation: "semantic_search",
+        userId: this.userId,
+        message: "Semantic retrieval dependency failed.",
+        cause: error,
+      });
+    }
+  }
+}
+
+class StableLexicalIndex implements LexicalIndex {
+  constructor(
+    private readonly userId: string,
+    private readonly delegate: LexicalIndex,
+  ) {}
+
+  async search(opts: {
+    query: string;
+    docIds?: string[];
+    k: number;
+  }): Promise<RetrievalHit[]> {
+    try {
+      const hits = await this.delegate.search(opts);
+      return sortHitsStable(hits).slice(0, Math.max(1, opts.k));
+    } catch (error: any) {
+      logger.warn("[retrieval-adapters] lexical search failed", {
+        userId: this.userId,
+        error: String(error?.message || error || "unknown_error"),
+      });
+      throw new RetrievalAdapterDependencyError({
+        operation: "lexical_search",
+        userId: this.userId,
+        message: "Lexical retrieval dependency failed.",
+        cause: error,
+      });
+    }
+  }
+}
+
+class StableStructuralIndex implements StructuralIndex {
+  constructor(
+    private readonly userId: string,
+    private readonly delegate: StructuralIndex,
+  ) {}
+
+  async search(opts: {
+    query: string;
+    docIds?: string[];
+    k: number;
+    anchors: string[];
+  }): Promise<RetrievalHit[]> {
+    try {
+      const hits = await this.delegate.search(opts);
+      return sortHitsStable(hits).slice(0, Math.max(1, opts.k));
+    } catch (error: any) {
+      logger.warn("[retrieval-adapters] structural search failed", {
+        userId: this.userId,
+        error: String(error?.message || error || "unknown_error"),
+      });
+      throw new RetrievalAdapterDependencyError({
+        operation: "structural_search",
+        userId: this.userId,
+        message: "Structural retrieval dependency failed.",
+        cause: error,
+      });
+    }
+  }
+}
+
+class StableDocStore implements DocStore {
+  constructor(
+    private readonly userId: string,
+    private readonly delegate: DocStore,
+  ) {}
+
+  async listDocs() {
+    try {
+      return await this.delegate.listDocs();
+    } catch (error: any) {
+      logger.warn("[retrieval-adapters] listDocs failed", {
+        userId: this.userId,
+        error: String(error?.message || error || "unknown_error"),
+      });
+      throw new RetrievalAdapterDependencyError({
+        operation: "docstore_list_docs",
+        userId: this.userId,
+        message: "Document listing dependency failed.",
+        cause: error,
+      });
+    }
+  }
+
+  async getDocMeta(docId: string) {
+    try {
+      return await this.delegate.getDocMeta(docId);
+    } catch (error: any) {
+      logger.warn("[retrieval-adapters] getDocMeta failed", {
+        userId: this.userId,
+        docId,
+        error: String(error?.message || error || "unknown_error"),
+      });
+      throw new RetrievalAdapterDependencyError({
+        operation: "docstore_get_doc_meta",
+        userId: this.userId,
+        message: `Document metadata dependency failed for ${docId}.`,
+        cause: error,
+      });
+    }
+  }
+}
+
 export interface PrismaRetrievalEngineDependencies {
   docStore: DocStore;
   semanticIndex: SemanticIndex;
@@ -1502,11 +1675,20 @@ export interface PrismaRetrievalEngineDependencies {
 export class PrismaRetrievalAdapterFactory {
   createForUser(userId: string): PrismaRetrievalEngineDependencies {
     const adapter = new PrismaRetrievalUserAdapter(userId);
+    const raw = {
+      docStore: adapter as DocStore,
+      semanticIndex: adapter as SemanticIndex,
+      lexicalIndex: new LexicalIndexAdapter(adapter) as LexicalIndex,
+      structuralIndex: new StructuralIndexAdapter(adapter) as StructuralIndex,
+    };
     return {
-      docStore: adapter,
-      semanticIndex: adapter,
-      lexicalIndex: new LexicalIndexAdapter(adapter),
-      structuralIndex: new StructuralIndexAdapter(adapter),
+      docStore: new StableDocStore(userId, raw.docStore),
+      semanticIndex: new StableSemanticIndex(userId, raw.semanticIndex),
+      lexicalIndex: new StableLexicalIndex(userId, raw.lexicalIndex),
+      structuralIndex: new StableStructuralIndex(userId, raw.structuralIndex),
     };
   }
 }
+
+/** @deprecated Use PrismaRetrievalAdapterFactory directly. */
+export { PrismaRetrievalAdapterFactory as PrismaRetrievalAdapterFactoryV2 };

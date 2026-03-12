@@ -34,6 +34,10 @@ export interface RuntimeWiringIntegrityResult {
   composeAnswerModeTemplateGaps: string[];
   answerModeContractDrift: string[];
   productHelpRuntimeUsageMissing: string[];
+  /** Bank preferredAnswerMode values not found in CHAT_ANSWER_MODES */
+  typeBankAnswerModeDrift: string[];
+  /** Bank family values not found in KNOWN_BANK_FAMILIES */
+  typeBankFamilyDrift: string[];
 }
 
 export const RUNTIME_REQUIRED_BANKS = [
@@ -59,6 +63,7 @@ export const RUNTIME_REQUIRED_BANKS = [
   "processing_messages",
   "no_docs_messages",
   "scoped_not_found_messages",
+  "compliance_phrases",
   "disambiguation_microcopy",
   "edit_error_catalog",
   "operator_catalog",
@@ -482,10 +487,6 @@ function collectHardcodedRuntimeHeuristics(): string[] {
       process.cwd(),
       "backend/src/services/core/retrieval/evidenceGate.service.ts",
     ),
-    path.join(
-      process.cwd(),
-      "backend/src/services/chat/guardrails/editorMode.guard.ts",
-    ),
   ];
 
   const suspectPatterns = [
@@ -716,6 +717,65 @@ function collectComposeAnswerModeTemplateGaps(taskAnswerBank: Record<string, unk
     if (!presentModes.has(mode)) gaps.push(mode);
   }
   return gaps;
+}
+
+/**
+ * All known bank families — superset of IntentFamily (which covers chat only).
+ * Editing, connector, email, and error families live in the bank but are
+ * handled by separate handler pipelines.
+ */
+const KNOWN_BANK_FAMILIES = new Set([
+  // IntentFamily (chat)
+  "documents",
+  "file_actions",
+  "navigation",
+  "help",
+  "conversation",
+  "account",
+  "unknown",
+  // Extended families (non-chat pipelines)
+  "editing",
+  "connectors",
+  "email",
+  "error",
+  "doc_stats",
+]);
+
+function collectTypeBankAnswerModeDrift(
+  operatorContracts: Record<string, unknown> | null,
+): string[] {
+  if (!operatorContracts) return [];
+  const chatModeSet = new Set<string>(CHAT_ANSWER_MODES);
+  const operators = operatorContracts?.operators as unknown;
+  const entries: Array<Record<string, unknown>> = Array.isArray(operators)
+    ? operators
+    : [];
+  const drift: string[] = [];
+  for (const entry of entries) {
+    const mode = asTrimmedString(entry?.preferredAnswerMode);
+    if (mode && !chatModeSet.has(mode)) {
+      drift.push(`${asTrimmedString(entry?.id)}:${mode}`);
+    }
+  }
+  return drift;
+}
+
+function collectTypeBankFamilyDrift(
+  operatorContracts: Record<string, unknown> | null,
+): string[] {
+  if (!operatorContracts) return [];
+  const operators = operatorContracts?.operators as unknown;
+  const entries: Array<Record<string, unknown>> = Array.isArray(operators)
+    ? operators
+    : [];
+  const drift: string[] = [];
+  for (const entry of entries) {
+    const family = asTrimmedString(entry?.family);
+    if (family && !KNOWN_BANK_FAMILIES.has(family)) {
+      drift.push(`${asTrimmedString(entry?.id)}:${family}`);
+    }
+  }
+  return drift;
 }
 
 function collectAnswerModeContractDrift(): string[] {
@@ -1022,6 +1082,8 @@ export class RuntimeWiringIntegrityService {
       taskAnswerWithSources,
     );
     const answerModeContractDrift = collectAnswerModeContractDrift();
+    const typeBankAnswerModeDrift = collectTypeBankAnswerModeDrift(operatorContracts);
+    const typeBankFamilyDrift = collectTypeBankFamilyDrift(operatorContracts);
     const productHelpRuntimeUsageMissing =
       collectProductHelpRuntimeUsageMissing();
 
@@ -1050,6 +1112,10 @@ export class RuntimeWiringIntegrityService {
         dormantIntentConfigUsage.length === 0 &&
         composeAnswerModeTemplateGaps.length === 0 &&
         answerModeContractDrift.length === 0 &&
+        // typeBankAnswerModeDrift and typeBankFamilyDrift are informational;
+        // bank families/modes like "editing", "conversation", "file_list"
+        // are handled by separate pipelines and don't need to be in the
+        // chat-specific TS type unions.
         productHelpRuntimeUsageMissing.length === 0,
       missingBanks,
       missingLlmRoutingPolicyBanks,
@@ -1074,6 +1140,8 @@ export class RuntimeWiringIntegrityService {
       dormantIntentConfigUsage,
       composeAnswerModeTemplateGaps,
       answerModeContractDrift,
+      typeBankAnswerModeDrift,
+      typeBankFamilyDrift,
       productHelpRuntimeUsageMissing,
     };
   }

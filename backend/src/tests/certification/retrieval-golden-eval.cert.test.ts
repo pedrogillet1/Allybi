@@ -1,7 +1,7 @@
 import { describe, expect, test } from "@jest/globals";
 
 import seeds from "../../services/core/retrieval/__fixtures__/golden-eval.seeds.json";
-import { RetrievalEngineService } from "../../services/core/retrieval/retrievalEngine.service";
+import { RetrievalEngineService } from "../../modules/retrieval/application";
 import { writeCertificationGateReport } from "./reporting";
 
 // ── Seed types ──────────────────────────────────────────────────────────

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "@jest/globals";
 
-import { RetrievalEngineService } from "../../services/core/retrieval/retrievalEngine.service";
+import { RetrievalEngineService } from "../../modules/retrieval/application";
 
 function makeRowCapEngine(bankMaxRows: number): RetrievalEngineService {
   const banks: Record<string, unknown> = {

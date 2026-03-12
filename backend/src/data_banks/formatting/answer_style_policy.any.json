@@ -79,7 +79,7 @@
       "paragraphRules": {
         "_comment": "Hard readability rule: short paragraphs only (ChatGPT-like).",
         "maxSentencesPerParagraph": 2,
-        "maxCharsPerParagraph": 260,
+        "maxCharsPerParagraph": 480,
         "splitLongParagraphs": true,
         "splitStrategy": "sentence_boundary_then_length",
         "preserveBlocks": [
@@ -284,6 +284,7 @@
       "single_value_answer",
       "quote_request",
       "discovery_request",
+      "extraction_or_enumeration",
       "table_or_numeric_request",
       "compare_request",
       "multi_part_query",
@@ -350,6 +351,14 @@
         ],
         "choose": "brief"
       },
+      "extraction_or_enumeration": {
+        "_comment": "Extraction queries need more bullets and output budget to avoid INCOMPLETE_LIST.",
+        "whenAny": [
+          "signals.isExtractionQuery",
+          "signals.deepExtractionCue"
+        ],
+        "choose": "detailed"
+      },
       "table_or_numeric_request": {
         "whenAny": [
           "signals.userAskedForTable",
@@ -381,13 +390,13 @@
         "choose": "detailed"
       },
       "low_evidence_or_ocr_low": {
-        "_comment": "Keep brief if evidence is weak to avoid speculation.",
+        "_comment": "Use standard profile even with weak evidence — quality gates handle confidence separately.",
         "whenAny": [
           "signals.groundingFailSoft",
           "signals.lowEvidence",
           "signals.ocrLowConfidence"
         ],
-        "choose": "brief"
+        "choose": "standard"
       },
       "user_requests_detailed": {
         "whenAny": [
@@ -755,7 +764,7 @@
       ],
       "paragraphRulesOverride": {
         "maxSentencesPerParagraph": 2,
-        "maxCharsPerParagraph": 260
+        "maxCharsPerParagraph": 480
       }
     },
     "bullets_key_points": {
@@ -827,7 +836,7 @@
       ],
       "paragraphRulesOverride": {
         "maxSentencesPerParagraph": 2,
-        "maxCharsPerParagraph": 260
+        "maxCharsPerParagraph": 480
       }
     },
     "caveats": {

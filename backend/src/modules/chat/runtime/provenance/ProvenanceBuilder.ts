@@ -3,7 +3,7 @@ import type {
   AnswerMode,
   ChatProvenanceDTO,
 } from "../../domain/chat.contracts";
-import type { EvidencePack } from "../../../../services/core/retrieval/retrievalEngine.service";
+import type { EvidencePack } from "../../../../services/core/retrieval/retrieval.types";
 import {
   hashSnippetForProvenance,
   normalizeSnippetForProvenanceHash,

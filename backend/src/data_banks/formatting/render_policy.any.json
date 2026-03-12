@@ -43,7 +43,7 @@
       "_comment": "Renderer-level expectations; actual splitting happens in composer/normalizer.",
       "preferShortParagraphs": true,
       "maxSentencesPerParagraph": 2,
-      "maxCharsPerParagraph": 260
+      "maxCharsPerParagraph": 480
     },
     "bulletFormatting": {
       "_comment": "Dash bullets only. Enforce spacing and avoid glued bullets.",

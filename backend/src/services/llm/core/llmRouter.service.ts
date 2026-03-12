@@ -425,6 +425,11 @@ export class LlmRouterService {
     // Stage-based defaults
     if (ctx.stage === "final") return "quality_finish";
 
+    // Table queries need the precision lane — Flash often produces
+    // truncated table fragments that fail provenance.
+    if (String(ctx.answerMode || "").toLowerCase() === "doc_grounded_table")
+      return "quality_finish";
+
     // Fast path conditions: nav_pills or low-latency requirements
     if (isNavPills(ctx)) return "fast_path";
     if (

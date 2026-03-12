@@ -6,7 +6,7 @@ import {
   type SemanticIndex,
   type StructuralIndex,
   type BankLoader,
-} from "./retrievalEngine.service";
+} from "./retrievalEngine.legacy.service";
 import { createDocScopeLock } from "./docScopeLock";
 
 const noopIndex: SemanticIndex & LexicalIndex & StructuralIndex = {

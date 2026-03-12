@@ -6,9 +6,11 @@ const normalizer = new ContractNormalizer();
 
 function defaultCompletion(result: ChatResult) {
   return {
-    answered: Boolean(String(result.assistantText || "").trim()),
+    answered: normalizer.normalize(result).completion?.answered ?? false,
     missingSlots: [],
     nextAction: null,
+    nextActionCode: null,
+    nextActionArgs: null,
   };
 }
 

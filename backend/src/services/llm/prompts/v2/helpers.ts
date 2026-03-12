@@ -334,19 +334,32 @@ export function buildSlots(ctx: PromptContext): Record<string, unknown> {
 export function defaultLayerByKind(kind: PromptKind): string[] {
   const defaults: Record<PromptKind, string[]> = {
     system: ["system_base"],
-    retrieval: ["system_base", "mode_chat", "rag_policy", "retrieval_prompt"],
+    retrieval: [
+      "system_base",
+      "mode_chat",
+      "llm_global_guards",
+      "rag_policy",
+      "retrieval_prompt",
+    ],
     compose_answer: [
       "system_base",
       "mode_chat",
+      "llm_global_guards",
       "rag_policy",
       "task_answer_with_sources",
       "policy_citations",
     ],
-    disambiguation: ["system_base", "mode_chat", "disambiguation_prompt"],
-    fallback: ["system_base", "mode_chat", "fallback_prompt"],
+    disambiguation: [
+      "system_base",
+      "mode_chat",
+      "llm_global_guards",
+      "disambiguation_prompt",
+    ],
+    fallback: ["system_base", "mode_chat", "llm_global_guards", "fallback_prompt"],
     tool: [
       "system_base",
       "mode_editing",
+      "llm_global_guards",
       "editing_task_prompts",
       "task_plan_generation",
       "policy_citations",

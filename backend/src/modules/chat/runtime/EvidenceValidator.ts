@@ -1,36 +1,76 @@
 import type { ChatResult } from "../domain/chat.contracts";
 
+export type EvidenceNextActionCode =
+  | "NEEDS_DOC_LOCK"
+  | "NEEDS_PROVENANCE"
+  | "NEEDS_SOURCE_SCOPE";
+
+export type EvidenceFailureCode =
+  | "MISSING_SOURCES"
+  | "MISSING_PROVENANCE"
+  | "OUT_OF_SCOPE_SOURCES"
+  | "OUT_OF_SCOPE_PROVENANCE";
+
+export interface EvidenceValidationDecision {
+  shouldUpdate: boolean;
+  sources: ChatResult["sources"];
+  provenance: ChatResult["provenance"];
+  evidence: NonNullable<ChatResult["evidence"]>;
+  status?: ChatResult["status"];
+  failureCode?: EvidenceFailureCode | null;
+  nextActionCode?: EvidenceNextActionCode | null;
+  nextActionArgs?: Record<string, unknown> | null;
+  scopeRelaxed?: boolean;
+  scopeRelaxReason?: string;
+}
+
+function dedupeIds(values: string[]): string[] {
+  return Array.from(
+    new Set(
+      (values || []).map((value) => String(value || "").trim()).filter(Boolean),
+    ),
+  );
+}
+
 export class EvidenceValidator {
-  enforceScope(result: ChatResult, allowedDocumentIds: string[]): ChatResult {
-    const allowed = new Set(
-      (allowedDocumentIds || [])
-        .map((id) => String(id || "").trim())
-        .filter(Boolean),
-    );
-    if (allowed.size === 0) return result;
-
+  validateScope(
+    result: ChatResult,
+    allowedDocumentIds: string[],
+  ): EvidenceValidationDecision {
+    const allowed = new Set(dedupeIds(allowedDocumentIds || []));
     const currentSources = Array.isArray(result.sources) ? result.sources : [];
-    const scopedSources = currentSources.filter((s) =>
-      allowed.has(String(s.documentId || "").trim()),
-    );
-
     const evidenceRequired = Boolean(result.evidence?.required);
-    const hadAnySources = currentSources.length > 0;
+    if (allowed.size === 0) {
+      return {
+        shouldUpdate: false,
+        sources: currentSources,
+        provenance: result.provenance || undefined,
+        evidence: {
+          required: evidenceRequired,
+          provided: currentSources.length > 0,
+          sourceIds: dedupeIds(currentSources.map((s) => s.documentId)),
+        },
+      };
+    }
+
+    const scopedSources = currentSources.filter((source) =>
+      allowed.has(String(source.documentId || "").trim()),
+    );
     const currentProvenance = result.provenance || null;
     const scopedSnippetRefs = currentProvenance
       ? currentProvenance.snippetRefs.filter((ref) =>
           allowed.has(String(ref.documentId || "").trim()),
         )
       : [];
-    let nextProvenance = currentProvenance
+    const nextProvenance = currentProvenance
       ? {
           ...currentProvenance,
           snippetRefs: scopedSnippetRefs,
-          sourceDocumentIds: Array.from(
-            new Set(scopedSnippetRefs.map((ref) => ref.documentId)),
+          sourceDocumentIds: dedupeIds(
+            scopedSnippetRefs.map((ref) => ref.documentId),
           ),
-          evidenceIdsUsed: Array.from(
-            new Set(scopedSnippetRefs.map((ref) => ref.evidenceId)),
+          evidenceIdsUsed: dedupeIds(
+            scopedSnippetRefs.map((ref) => ref.evidenceId),
           ),
           coverageScore:
             currentProvenance.snippetRefs.length > 0
@@ -44,56 +84,111 @@ export class EvidenceValidator {
             currentProvenance.validated === true &&
             scopedSnippetRefs.length > 0,
           failureCode:
-            scopedSnippetRefs.length > 0 ? null : "out_of_scope_provenance",
+            scopedSnippetRefs.length > 0 ? null : "OUT_OF_SCOPE_PROVENANCE",
         }
       : undefined;
 
-    const next: ChatResult = {
-      ...result,
-      sources: scopedSources,
-      scopeEnforced: true,
-      provenance: nextProvenance,
-      evidence: {
-        required: evidenceRequired,
-        provided: scopedSources.length > 0,
-        sourceIds: scopedSources.map((s) => s.documentId),
-      },
+    const evidence = {
+      required: evidenceRequired,
+      provided: scopedSources.length > 0,
+      sourceIds: dedupeIds(scopedSources.map((source) => source.documentId)),
     };
 
-    if (hadAnySources && scopedSources.length === 0) {
-      next.scopeRelaxed = false;
-      next.scopeRelaxReason = "out_of_scope_sources_removed";
-    }
-
-    const hasScopedSources = scopedSources.length > 0;
     const provenanceMissing =
       Boolean(nextProvenance?.required) &&
       (nextProvenance?.snippetRefs?.length ?? 0) === 0;
+    const missingSources = evidenceRequired && scopedSources.length === 0;
 
-    if (evidenceRequired && (!hasScopedSources || provenanceMissing)) {
-      next.status = "partial";
-      const missingSlots: string[] = [];
-      if (provenanceMissing) missingSlots.push("provenance");
-      if (!hasScopedSources) missingSlots.push("scoped_source");
-      next.failureCode =
-        next.failureCode ||
-        (provenanceMissing ? "missing_provenance" : "MISSING_EVIDENCE");
-      next.completion = {
-        answered: false,
-        missingSlots:
-          Array.isArray(next.completion?.missingSlots) &&
-          next.completion!.missingSlots.length > 0
-            ? next.completion!.missingSlots
-            : missingSlots,
-        nextAction:
-          next.completion?.nextAction ||
-          (!hasScopedSources
-            ? "Attach or select the exact document scope for this question."
-            : "Please ask a more specific question so I can anchor the answer to your document snippets."
-          ),
+    if (!missingSources && !provenanceMissing) {
+      return {
+        shouldUpdate: true,
+        sources: scopedSources,
+        provenance: nextProvenance,
+        evidence,
+        scopeRelaxed: false,
+        scopeRelaxReason:
+          currentSources.length > 0 && scopedSources.length === 0
+            ? "out_of_scope_sources_removed"
+            : undefined,
       };
     }
 
-    return next;
+    const missingSlots: string[] = [];
+    let failureCode: EvidenceFailureCode = "MISSING_SOURCES";
+    let nextActionCode: EvidenceNextActionCode = "NEEDS_DOC_LOCK";
+    if (missingSources) {
+      missingSlots.push("scoped_source");
+      failureCode =
+        currentSources.length > 0 ? "OUT_OF_SCOPE_SOURCES" : "MISSING_SOURCES";
+      nextActionCode = "NEEDS_DOC_LOCK";
+    }
+    if (provenanceMissing) {
+      missingSlots.push("provenance");
+      if (!missingSources) {
+        failureCode =
+          scopedSources.length > 0
+            ? "MISSING_PROVENANCE"
+            : "OUT_OF_SCOPE_PROVENANCE";
+      }
+      nextActionCode = missingSources
+        ? "NEEDS_DOC_LOCK"
+        : scopedSources.length > 0
+          ? "NEEDS_PROVENANCE"
+          : "NEEDS_SOURCE_SCOPE";
+    }
+
+    return {
+      shouldUpdate: true,
+      sources: scopedSources,
+      provenance: nextProvenance,
+      evidence,
+      status: "partial",
+      failureCode,
+      nextActionCode,
+      nextActionArgs: { missingSlots },
+      scopeRelaxed: false,
+      scopeRelaxReason:
+        currentSources.length > 0 && scopedSources.length === 0
+          ? "out_of_scope_sources_removed"
+          : undefined,
+    };
+  }
+
+  enforceScope(result: ChatResult, allowedDocumentIds: string[]): ChatResult {
+    const decision = this.validateScope(result, allowedDocumentIds);
+    if (!decision.shouldUpdate) return result;
+
+    return {
+      ...result,
+      sources: decision.sources,
+      scopeEnforced: true,
+      provenance: decision.provenance,
+      evidence: decision.evidence,
+      status: decision.status || result.status,
+      failureCode: decision.failureCode || result.failureCode || null,
+      scopeRelaxed:
+        typeof decision.scopeRelaxed === "boolean"
+          ? decision.scopeRelaxed
+          : result.scopeRelaxed,
+      scopeRelaxReason:
+        decision.scopeRelaxReason || result.scopeRelaxReason || undefined,
+      completion: {
+        answered:
+          result.completion?.answered ??
+          Boolean(String(result.assistantText || "").trim()),
+        missingSlots:
+          Array.isArray(decision.nextActionArgs?.missingSlots) &&
+          decision.nextActionArgs?.missingSlots.every(
+            (value) => typeof value === "string",
+          )
+            ? (decision.nextActionArgs?.missingSlots as string[])
+            : (result.completion?.missingSlots ?? []),
+        nextAction: null,
+        nextActionCode:
+          decision.nextActionCode || result.completion?.nextActionCode || null,
+        nextActionArgs:
+          decision.nextActionArgs || result.completion?.nextActionArgs || null,
+      },
+    };
   }
 }
