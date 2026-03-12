@@ -20,17 +20,11 @@ import type {
   NavType,
   ChatProvenanceDTO,
   ChatQualityGateFailure,
-  ChatQualityGateState,
   ChatWarningState,
 } from "../domain/chat.contracts";
 import { ConversationNotFoundError } from "../domain/chat.contracts";
 import type { EncryptedChatRepo } from "../../../services/chat/encryptedChatRepo.service";
 import type { EncryptedChatContextService } from "../../../services/chat/encryptedChatContext.service";
-import {
-  resolveRuntimeFallbackMessage,
-  type FallbackMessageContext,
-  type FallbackRouteHints,
-} from "../../../services/chat/chatMicrocopy.service";
 import { ConversationMemoryService } from "../../../services/memory/conversationMemory.service";
 import {
   MemoryPolicyEngine,
@@ -39,7 +33,8 @@ import {
 import { MemoryRedactionService } from "../../../services/memory/memoryRedaction.service";
 import { getBankLoaderInstance, getOptionalBank } from "../../domain/infra";
 import {
-  RetrievalEngineService,
+  type IRetrievalEngine,
+  createRetrievalEngine,
   type EvidencePack,
   type EvidenceItem,
   type RetrievalRequest,
@@ -66,27 +61,16 @@ import {
 import {
   RuntimePolicyError,
   isRuntimePolicyError,
-  toRuntimePolicyErrorCode,
 } from "./runtimePolicyError";
+import { resolveLegacyRuntimePolicyErrorCode } from "./legacyRuntimeErrorFallback";
 import { logger as appLogger } from "../../../utils/logger";
-import {
-  QualityGateRunnerService,
-  type QualityGateContext,
-  type QualityGateResult,
-} from "../../../services/core/enforcement/qualityGateRunner.service";
-import {
-  getResponseContractEnforcer,
-  type ResponseContractContext,
-} from "../../../services/core/enforcement/responseContractEnforcer.service";
-import { trimTextToTokenBudget } from "../../../services/core/enforcement/tokenBudget.service";
+import type { QualityGateResult } from "../../../services/core/enforcement/qualityGateRunner.service";
 import {
   SEMANTIC_TRUNCATION_DETECTOR_VERSION,
   classifyProviderTruncation,
   classifyVisibleTruncation,
   normalizeFinishReason,
 } from "./truncationClassifier";
-import { buildChatProvenance } from "./provenance/ProvenanceBuilder";
-import { validateChatProvenance } from "./provenance/ProvenanceValidator";
 import {
   TraceWriterService,
   type TurnDebugPacket,
@@ -97,6 +81,11 @@ import { ClarificationPolicyService } from "../../../services/core/policy/clarif
 import { CompliancePolicyService } from "../../../services/core/policy/compliancePolicy.service";
 import { FallbackDecisionPolicyService } from "../../../services/core/policy/fallbackDecisionPolicy.service";
 import { stableLocationKey } from "../../../services/core/retrieval/retrievalEngine.utils";
+import {
+  buildTurnKey,
+  resolveOutputContract,
+  type TurnExecutionDraft,
+} from "./turnExecutionDraft";
 
 type _CertificationTraceMarkerSpanWriter = {
   startSpan: (_traceId: string, _step: string) => string;
@@ -764,101 +753,6 @@ function mergeAttachments(
   return [sourceButtonsAttachment, ...model];
 }
 
-function buildEmptyAssistantText(params: {
-  language?: string;
-  reasonCode?: string | null;
-  seed: string;
-  context?: FallbackMessageContext;
-  routeHints?: FallbackRouteHints;
-}): string {
-  const reason = String(params.reasonCode || "")
-    .trim()
-    .toLowerCase();
-  // Fail-closed provenance errors should not emit synthetic prose. Returning
-  // empty text prevents ungrounded fallback content when no valid sources exist.
-  if (reason === "missing_provenance") {
-    return "";
-  }
-  return resolveRuntimeFallbackMessage({
-    language: params.language,
-    reasonCode: params.reasonCode,
-    seed: params.seed,
-    context: params.context,
-    routeHints: params.routeHints,
-  });
-}
-
-function buildFallbackMicrocopyParams(input: {
-  reasonCode?: string | null;
-  query?: string;
-  retrievalPack?: EvidencePack | null;
-  attachedDocumentIds?: string[];
-}): {
-  context: FallbackMessageContext;
-  routeHints: FallbackRouteHints;
-} {
-  const reason = String(input.reasonCode || "")
-    .trim()
-    .toLowerCase();
-  const retrievalPack = input.retrievalPack || null;
-  const evidence = Array.isArray(retrievalPack?.evidence)
-    ? retrievalPack.evidence
-    : [];
-  const firstEvidence = evidence[0] || null;
-  const scope: Partial<EvidencePack["scope"]> = retrievalPack?.scope || {};
-  const candidateDocCount = Array.isArray(scope.candidateDocIds)
-    ? scope.candidateDocIds.length
-    : 0;
-  const fallbackScopeName =
-    candidateDocCount > 0
-      ? candidateDocCount === 1
-        ? "selected document"
-        : "selected documents"
-      : scope.hardScopeActive
-        ? "current scope"
-        : "all documents";
-
-  const suggestedOptions = Array.from(
-    new Set(
-      evidence
-        .map((item) => String(item?.filename || item?.title || "").trim())
-        .filter((value) => value.length > 0),
-    ),
-  ).slice(0, 4);
-
-  const context: FallbackMessageContext = {
-    fileName: firstEvidence?.filename || "",
-    docTitle: firstEvidence?.title || "",
-    scopeName: fallbackScopeName,
-    reasonShort: reason || "unknown",
-    expectedDocTypes: "PDF, DOCX, XLSX, PPTX",
-    uploadLimit: "25 MB",
-    indexName: "knowledge index",
-    queryHint: String(input.query || "").trim().slice(0, 120),
-  };
-
-  const routeHints: FallbackRouteHints = {
-    hasIndexedDocs:
-      reason === "no_docs_indexed"
-        ? false
-        : candidateDocCount > 0 || evidence.length > 0,
-    hardScopeActive: Boolean(scope.hardScopeActive),
-    explicitDocRef: reason === "explicit_doc_not_found",
-    needsDocChoice: reason === "needs_doc_choice" || reason === "doc_ambiguous",
-    disambiguationOptions: suggestedOptions,
-    topConfidence:
-      typeof retrievalPack?.stats?.topScore === "number"
-        ? retrievalPack.stats.topScore
-        : undefined,
-    confidenceGap:
-      typeof retrievalPack?.stats?.scoreGap === "number"
-        ? retrievalPack.stats.scoreGap
-        : undefined,
-  };
-
-  return { context, routeHints };
-}
-
 function normalizeChatLanguage(value: unknown): "en" | "pt" | "es" {
   const lang = String(value || "")
     .trim()
@@ -1174,7 +1068,6 @@ const DEFAULT_BLOCKING_QUALITY_GATES = new Set<string>([
   "redaction_default_pii_identity_tax_banking",
   "medical_safety_boundaries",
   "privacy_minimal",
-  "structural_completeness",
 ]);
 
 type QualityGatesBank = {
@@ -1993,7 +1886,115 @@ export class CentralizedChatRuntimeDelegate {
     });
   }
 
-  async chat(req: ChatRequest): Promise<ChatResult> {
+  async chat(req: ChatRequest): Promise<TurnExecutionDraft> {
+    return this.executeTurn({
+      req,
+      stream: false,
+    });
+  }
+
+  async streamChat(params: {
+    req: ChatRequest;
+    sink: StreamSink;
+    streamingConfig: LLMStreamingConfig;
+  }): Promise<TurnExecutionDraft> {
+    return this.executeTurn({
+      req: params.req,
+      sink: params.sink,
+      streamingConfig: params.streamingConfig,
+      stream: true,
+    });
+  }
+
+  async persistFinalizedTurn(params: {
+    draft: TurnExecutionDraft;
+    finalized: ChatResult;
+  }): Promise<ChatResult> {
+    const { draft, finalized } = params;
+    const outputSpanId = this.traceWriter.startSpan(draft.traceId, "output_contract", {
+      stream: draft.timing.stream,
+    });
+
+    const metadata: Record<string, unknown> = {
+      sources: finalized.sources || [],
+      answerMode: finalized.answerMode,
+      answerClass: finalized.answerClass,
+      navType: finalized.navType,
+      failureCode: finalized.failureCode || null,
+      fallbackReasonCode: finalized.fallbackReasonCode || null,
+      provenance: finalized.provenance || null,
+      qualityGates: finalized.qualityGates || null,
+      userWarning: finalized.userWarning || null,
+      warnings: finalized.warnings || [],
+      turnKey: finalized.turnKey || draft.turnKey,
+      regenerateOfUserMessageId: draft.request.isRegenerate ? draft.userMessage.id : null,
+      priorAssistantMessageId: draft.priorAssistantMessageId || null,
+    };
+
+    const assistantMessage = await this.createMessage({
+      conversationId: finalized.conversationId,
+      role: "assistant",
+      content: finalized.assistantText || "",
+      userId: draft.request.userId,
+      attachments: finalized.attachmentsPayload ?? [],
+      telemetry: finalized.assistantTelemetry ?? null,
+      metadata,
+    });
+
+    this.traceWriter.endSpan(draft.traceId, outputSpanId, {
+      status: "ok",
+      metadata: {
+        assistantMessageId: assistantMessage.id,
+        answerLength: String(finalized.assistantText || "").length,
+      },
+    });
+
+    await this.persistTraceArtifacts({
+      traceId: draft.traceId,
+      req: draft.request,
+      conversationId: draft.conversationId,
+      userMessageId: draft.userMessage.id,
+      assistantMessageId: assistantMessage.id,
+      retrievalPack: draft.retrievalPack,
+      evidenceGateDecision: draft.evidenceGateDecision,
+      answerMode: draft.answerMode,
+      status: finalized.status,
+      failureCode: finalized.failureCode || null,
+      fallbackReasonCode: draft.fallbackReasonCode,
+      fallbackReasonCodeTelemetry: draft.fallbackReasonCodeTelemetry,
+      fallbackPolicyMeta: draft.fallbackPolicyMeta || null,
+      assistantText: finalized.assistantText || "",
+      telemetry: draft.telemetry,
+      totalMs: Date.now() - draft.timing.turnStartedAt,
+      retrievalMs: draft.timing.retrievalMs,
+      llmMs: draft.timing.llmMs,
+      stream: draft.timing.stream,
+      provenance: finalized.provenance || null,
+      truncation: finalized.truncation || null,
+    }).catch((error) => {
+      appLogger.warn("[trace-writer] failed to persist chat trace", {
+        traceId: draft.traceId,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    });
+
+    return this.withGeneratedConversationTitle(
+      {
+        ...finalized,
+        assistantMessageId: assistantMessage.id,
+        traceId: draft.traceId,
+      },
+      draft.generatedConversationTitle || null,
+    );
+  }
+
+  private async executeTurn(params: {
+    req: ChatRequest;
+    stream: boolean;
+    sink?: StreamSink;
+    streamingConfig?: LLMStreamingConfig;
+  }): Promise<TurnExecutionDraft> {
+    const { req, stream, sink, streamingConfig } = params;
     const traceId = this.resolveTraceId(req);
     const turnStartedAt = Date.now();
     const inputSpanId = this.traceWriter.startSpan(
@@ -2001,12 +2002,14 @@ export class CentralizedChatRuntimeDelegate {
       "input_normalization",
       {
         hasConversationId: Boolean(req.conversationId),
+        stream,
       },
     );
     let conversationId = "";
     let lastDocumentId: string | null = null;
     let generatedConversationTitle: string | null = null;
     let userMessage: ChatMessageDTO | null = null;
+    let priorAssistantMessageId: string | null = null;
     let retrievalPack:
       | (EvidencePack & { resolvedDocId?: string | null })
       | null = null;
@@ -2015,23 +2018,18 @@ export class CentralizedChatRuntimeDelegate {
       (req.attachedDocumentIds || []).length > 0
         ? "help_steps"
         : "general_answer";
-    let retrievalMs: number | null = null;
-    let llmMs: number | null = null;
+    let retrievalMs = 0;
+    let llmMs = 0;
+
     try {
-      const conv = await this.ensureConversation(
-        req.userId,
-        req.conversationId,
-      );
+      const conv = await this.ensureConversation(req.userId, req.conversationId);
       conversationId = conv.id;
       lastDocumentId = conv.lastDocumentId;
       const titleWasPlaceholder = isPlaceholderConversationTitle(conv.title);
 
-      userMessage = await this.createMessage({
-        conversationId,
-        role: "user",
-        content: req.message,
-        userId: req.userId,
-      });
+      const turnIdentity = await this.ensureUserTurn(req, conversationId);
+      userMessage = turnIdentity.userMessage;
+      priorAssistantMessageId = turnIdentity.priorAssistantMessageId;
       generatedConversationTitle = await this.resolveGeneratedTitleForTurn({
         conversationId,
         titleWasPlaceholder,
@@ -2039,48 +2037,67 @@ export class CentralizedChatRuntimeDelegate {
 
       const governanceBlock = this.resolveGovernancePolicyBlock(req);
       if (governanceBlock) {
-        const result = await this.buildGovernanceBlockedResult({
+        return this.buildExecutionDraft({
+          traceId,
           req,
           conversationId,
           userMessage,
-          code: governanceBlock.code,
-          text: governanceBlock.text,
-          status: governanceBlock.status,
-        });
-        await this.persistTraceArtifacts({
-          traceId,
-          req,
-          conversationId: result.conversationId,
-          userMessageId: result.userMessageId,
-          assistantMessageId: result.assistantMessageId,
+          generatedConversationTitle,
+          outputContract: "USER_VISIBLE_TEXT",
+          answerMode,
+          answerClass: answerMode === "general_answer" ? "GENERAL" : "DOCUMENT",
+          navType: null,
           retrievalPack,
           evidenceGateDecision,
-          answerMode: result.answerMode || answerMode,
-          status: result.status || "blocked",
-          failureCode: result.failureCode || null,
-          fallbackReasonCode: result.fallbackReasonCode,
-          assistantText: result.assistantText,
-          telemetry: null,
-          totalMs: Date.now() - turnStartedAt,
-          retrievalMs,
-          llmMs,
-          stream: false,
-        }).catch((persistError) => {
-          appLogger.warn(
-            "[trace-writer] failed to persist governance-policy trace",
-            {
-              traceId,
-              error:
-                persistError instanceof Error
-                  ? persistError.message
-                  : String(persistError),
+          sources: [],
+          assistantTextRaw: "",
+          draftResult: {
+            conversationId,
+            userMessageId: userMessage.id,
+            assistantText: "",
+            attachmentsPayload: [],
+            sources: [],
+            followups: [],
+            answerMode,
+            answerClass: answerMode === "general_answer" ? "GENERAL" : "DOCUMENT",
+            navType: null,
+            status: governanceBlock.status,
+            failureCode: governanceBlock.code,
+            completion: {
+              answered: false,
+              missingSlots: [],
+              nextAction: null,
+              nextActionCode: governanceBlock.code,
+              nextActionArgs: null,
             },
-          );
+            truncation: {
+              occurred: false,
+              reason: null,
+              resumeToken: null,
+              providerOccurred: false,
+              providerReason: null,
+              detectorVersion: SEMANTIC_TRUNCATION_DETECTOR_VERSION,
+            },
+            evidence: {
+              required: Boolean(req.attachedDocumentIds?.length),
+              provided: false,
+              sourceIds: [],
+            },
+          },
+          telemetry: null,
+          fallbackReasonCode: governanceBlock.code,
+          priorAssistantMessageId,
+          timing: {
+            turnStartedAt,
+            retrievalMs,
+            llmMs,
+            stream,
+          },
         });
-        return this.withGeneratedConversationTitle(
-          { ...result, traceId },
-          generatedConversationTitle,
-        );
+      }
+
+      if (stream) {
+        this.writeProgress(sink, "retrieval", "RETRIEVAL_IN_PROGRESS");
       }
 
       const history = await this.loadRecentForEngine(
@@ -2095,10 +2112,13 @@ export class CentralizedChatRuntimeDelegate {
           conversationId,
           userMessageId: userMessage.id,
           historyMessages: history.length,
+          regenerate: Boolean(req.isRegenerate),
         },
       });
 
-      const retrievalSpanId = this.traceWriter.startSpan(traceId, "retrieval");
+      const retrievalSpanId = this.traceWriter.startSpan(traceId, "retrieval", {
+        stream,
+      });
       const retrievalStartedAt = Date.now();
       retrievalPack = await this.retrieveEvidence(req, lastDocumentId, {
         traceId,
@@ -2106,14 +2126,12 @@ export class CentralizedChatRuntimeDelegate {
       });
       retrievalMs = Date.now() - retrievalStartedAt;
 
-      // Persist resolved doc for conversation-history follow-up scoping
-      const resolvedDocId = retrievalPack?.resolvedDocId ?? null;
       await this.persistResolvedDocScope({
         traceId,
         conversationId,
         previousDocId: lastDocumentId,
-        resolvedDocId,
-        stream: false,
+        resolvedDocId: retrievalPack?.resolvedDocId ?? null,
+        stream,
       });
 
       this.traceWriter.endSpan(traceId, retrievalSpanId, {
@@ -2126,27 +2144,21 @@ export class CentralizedChatRuntimeDelegate {
         },
       });
 
-      const evidenceGateSpanId = this.traceWriter.startSpan(
-        traceId,
-        "evidence_gate",
-      );
-      evidenceGateDecision = this.evaluateEvidenceGateDecision(
-        req,
-        retrievalPack,
-      );
+      const evidenceGateSpanId = this.traceWriter.startSpan(traceId, "evidence_gate", {
+        stream,
+      });
+      evidenceGateDecision = this.evaluateEvidenceGateDecision(req, retrievalPack);
       answerMode = this.resolveAnswerMode(req, retrievalPack);
+      const answerClass: AnswerClass =
+        answerMode === "general_answer" ? "GENERAL" : "DOCUMENT";
+      const navType: NavType = null;
       this.traceWriter.endSpan(traceId, evidenceGateSpanId, {
         status: "ok",
         metadata: {
           action: evidenceGateDecision?.suggestedAction ?? "answer",
           strength: evidenceGateDecision?.evidenceStrength ?? "none",
-          missingEvidenceCount:
-            evidenceGateDecision?.missingEvidence.length ?? 0,
         },
       });
-      const answerClass: AnswerClass =
-        answerMode === "general_answer" ? "GENERAL" : "DOCUMENT";
-      const navType: NavType = null;
 
       const sourceButtonsAttachment = this.buildSourceButtonsAttachment(
         retrievalPack,
@@ -2158,6 +2170,7 @@ export class CentralizedChatRuntimeDelegate {
         attachedDocumentIds: req.attachedDocumentIds || [],
         retrievalPack,
       });
+
       const bypass = this.resolveEvidenceGateBypass(
         evidenceGateDecision,
         req.preferredLanguage,
@@ -2167,46 +2180,182 @@ export class CentralizedChatRuntimeDelegate {
         },
       );
       if (bypass) {
-        const assistantMessage = await this.createMessage({
+        this.writeProgress(sink, "validation", "EVIDENCE_GATE_BYPASS");
+        return this.buildExecutionDraft({
+          traceId,
+          req,
           conversationId,
-          role: "assistant",
-          content: bypass.text,
-          userId: req.userId,
-          attachments: sourceButtonsAttachment,
-          telemetry: null,
-          metadata: {
+          userMessage,
+          generatedConversationTitle,
+          outputContract: "USER_VISIBLE_TEXT",
+          answerMode,
+          answerClass,
+          navType,
+          retrievalPack,
+          evidenceGateDecision,
+          sources,
+          assistantTextRaw: "",
+          draftResult: {
+            conversationId,
+            userMessageId: userMessage.id,
+            assistantText: "",
+            attachmentsPayload: sourceButtonsAttachment ? [sourceButtonsAttachment] : [],
             sources,
+            followups: [],
             answerMode,
             answerClass,
             navType,
-            fallbackReasonCode: bypass.failureCode,
-            evidenceGate: {
-              action: evidenceGateDecision?.suggestedAction ?? "unknown",
-              strength: evidenceGateDecision?.evidenceStrength ?? "none",
+            status:
+              bypass.failureCode === "EVIDENCE_NEEDS_CLARIFICATION"
+                ? "clarification_required"
+                : "partial",
+            failureCode: bypass.failureCode,
+            completion: {
+              answered: false,
+              missingSlots: [],
+              nextAction: null,
+              nextActionCode: "NEEDS_DOC_LOCK",
+              nextActionArgs: {
+                failureCode: bypass.failureCode,
+              },
+            },
+            truncation: {
+              occurred: false,
+              reason: null,
+              resumeToken: null,
+              providerOccurred: false,
+              providerReason: null,
+              detectorVersion: SEMANTIC_TRUNCATION_DETECTOR_VERSION,
+            },
+            evidence: {
+              required: Boolean(req.attachedDocumentIds?.length),
+              provided: sources.length > 0,
+              sourceIds: sources.map((source) => source.documentId),
             },
           },
+          telemetry: null,
+          fallbackReasonCode: bypass.failureCode,
+          priorAssistantMessageId,
+          timing: {
+            turnStartedAt,
+            retrievalMs,
+            llmMs,
+            stream,
+          },
         });
-        const result: ChatResult = {
+      }
+
+      const messages = this.buildEngineMessages(
+        history,
+        req.message,
+        req.preferredLanguage,
+        evidenceGateDecision,
+      );
+      const fallbackSignal = this.resolveFallbackSignal(req, retrievalPack);
+
+      if (stream && sources.length > 0) {
+        this.writeProgress(sink, "compose", "COMPOSITION_IN_PROGRESS");
+      }
+
+      const composeSpanId = this.traceWriter.startSpan(
+        traceId,
+        stream ? "stream" : "compose",
+      );
+      const llmStartedAt = Date.now();
+      const generated = stream
+        ? await this.engine.stream({
+            traceId,
+            userId: req.userId,
+            conversationId,
+            messages,
+            evidencePack: toEngineEvidencePack(retrievalPack),
+            context: this.buildRuntimeContext(req, retrievalPack, answerMode),
+            meta: this.buildRuntimeMeta(
+              req,
+              retrievalPack,
+              answerMode,
+              evidenceGateDecision,
+              fallbackSignal,
+            ),
+            sink: sink!,
+            streamingConfig: streamingConfig!,
+          })
+        : await this.engine.generate({
+            traceId,
+            userId: req.userId,
+            conversationId,
+            messages,
+            evidencePack: toEngineEvidencePack(retrievalPack),
+            context: this.buildRuntimeContext(req, retrievalPack, answerMode),
+            meta: this.buildRuntimeMeta(
+              req,
+              retrievalPack,
+              answerMode,
+              evidenceGateDecision,
+              fallbackSignal,
+            ),
+          });
+      llmMs = Date.now() - llmStartedAt;
+      this.traceWriter.endSpan(traceId, composeSpanId, {
+        status: "ok",
+        metadata: {
+          finishReason: String(
+            ((generated.telemetry as Record<string, unknown>) || {}).finishReason ||
+              "unknown",
+          ),
+          model: String(
+            ((generated.telemetry as Record<string, unknown>) || {}).model || "",
+          ),
+        },
+      });
+
+      const assistantTextRaw = String(
+        (generated as Record<string, unknown>).finalText ??
+          (generated as Record<string, unknown>).text ??
+          "",
+      ).trim();
+      const attachmentsPayload = mergeAttachments(
+        (generated as Record<string, unknown>).attachmentsPayload,
+        sourceButtonsAttachment,
+      );
+
+      return this.buildExecutionDraft({
+        traceId,
+        req,
+        conversationId,
+        userMessage,
+        generatedConversationTitle,
+        outputContract: resolveOutputContract({
+          answerMode,
+          attachmentsPayload,
+          assistantText: assistantTextRaw,
+        }),
+        answerMode,
+        answerClass,
+        navType,
+        retrievalPack,
+        evidenceGateDecision,
+        sources,
+        sourceButtonsAttachment,
+        assistantTextRaw,
+        draftResult: {
           conversationId,
           userMessageId: userMessage.id,
-          assistantMessageId: assistantMessage.id,
-          traceId,
-          assistantText: bypass.text,
-          attachmentsPayload: sourceButtonsAttachment,
-          assistantTelemetry: undefined,
-          sources: [...sources],
+          assistantText: this.applyEvidenceGatePostProcessText(
+            assistantTextRaw,
+            evidenceGateDecision,
+          ),
+          attachmentsPayload,
+          assistantTelemetry:
+            ((generated.telemetry as Record<string, unknown>) || undefined) ??
+            undefined,
+          sources,
           followups: [],
           answerMode,
           answerClass,
           navType,
-          fallbackReasonCode: bypass.failureCode,
-          status:
-            bypass.failureCode === "EVIDENCE_NEEDS_CLARIFICATION"
-              ? "clarification_required"
-              : "partial",
-          failureCode: bypass.failureCode,
           completion: {
-            answered: false,
+            answered: Boolean(assistantTextRaw),
             missingSlots: [],
             nextAction: null,
           },
@@ -2219,339 +2368,23 @@ export class CentralizedChatRuntimeDelegate {
             detectorVersion: SEMANTIC_TRUNCATION_DETECTOR_VERSION,
           },
           evidence: {
-            required: (req.attachedDocumentIds || []).length > 0,
+            required: Boolean(req.attachedDocumentIds?.length),
             provided: sources.length > 0,
-            sourceIds: sources.map((s) => s.documentId),
+            sourceIds: sources.map((source) => source.documentId),
           },
-        };
-        await this.persistTraceArtifacts({
-          traceId,
-          req,
-          conversationId,
-          userMessageId: userMessage.id,
-          assistantMessageId: assistantMessage.id,
-          retrievalPack,
-          evidenceGateDecision,
-          answerMode,
-          status: result.status,
-          failureCode: result.failureCode,
-          fallbackReasonCode: result.fallbackReasonCode,
-          assistantText: result.assistantText,
-          telemetry: null,
-          totalMs: Date.now() - turnStartedAt,
-          retrievalMs,
-          llmMs,
-          stream: false,
-          truncation: result.truncation,
-        }).catch((error) => {
-          appLogger.warn("[trace-writer] failed to persist bypass trace", {
-            traceId,
-            error: error instanceof Error ? error.message : String(error),
-          });
-        });
-        return this.withGeneratedConversationTitle(
-          result,
-          generatedConversationTitle,
-        );
-      }
-
-      const messages = this.buildEngineMessages(
-        history,
-        req.message,
-        req.preferredLanguage,
-        evidenceGateDecision,
-      );
-      const fallbackSignal = this.resolveFallbackSignal(req, retrievalPack);
-      const fallbackReasonCode = fallbackSignal.reasonCode;
-      const composeSpanId = this.traceWriter.startSpan(traceId, "compose");
-      const llmStartedAt = Date.now();
-      const generated = await this.engine.generate({
-        traceId,
-        userId: req.userId,
-        conversationId,
-        messages,
-        evidencePack: toEngineEvidencePack(retrievalPack),
-        context: this.buildRuntimeContext(req, retrievalPack, answerMode),
-        meta: this.buildRuntimeMeta(
-          req,
-          retrievalPack,
-          answerMode,
-          evidenceGateDecision,
-          fallbackSignal,
-        ),
-      });
-      llmMs = Date.now() - llmStartedAt;
-      this.traceWriter.endSpan(traceId, composeSpanId, {
-        status: "ok",
-        metadata: {
-          finishReason: String(
-            ((generated.telemetry as Record<string, unknown>) || {})
-              .finishReason || "unknown",
-          ),
-          model: String(
-            ((generated.telemetry as Record<string, unknown>) || {}).model ||
-              "",
-          ),
         },
-      });
-
-      const assistantTextRaw = String(generated.text || "").trim();
-      const fallbackMicrocopyParams = buildFallbackMicrocopyParams({
-        reasonCode: fallbackReasonCode,
-        query: req.message,
-        retrievalPack,
-        attachedDocumentIds: req.attachedDocumentIds || [],
-      });
-      const assistantTextBase =
-        assistantTextRaw ||
-        buildEmptyAssistantText({
-          language: req.preferredLanguage,
-          reasonCode: fallbackReasonCode,
-          seed: `${conversationId}:chat:${fallbackReasonCode || "empty_model_response"}`,
-          context: fallbackMicrocopyParams.context,
-          routeHints: fallbackMicrocopyParams.routeHints,
-        });
-      const assistantTextWithGate = this.applyEvidenceGatePostProcessText(
-        assistantTextBase,
-        evidenceGateDecision,
-      );
-
-      // Finalize turn: quality gates + enforcer + followups + truncation recovery
-      const qualitySpanId = this.traceWriter.startSpan(
-        traceId,
-        "quality_gates",
-      );
-      const finalized = await this.finalizeChatTurn({
-        assistantText: assistantTextWithGate,
-        req,
-        answerMode,
-        answerClass,
-        retrievalPack,
-        sources,
-        telemetry: (generated.telemetry as Record<string, unknown>) ?? null,
-      });
-      this.traceWriter.endSpan(traceId, qualitySpanId, {
-        status: "ok",
-        metadata: {
-          followups: finalized.followups.length,
-          failureCode: finalized.failureCode ?? null,
-        },
-      });
-
-      const enforceScopedSources = isDocGroundedAnswerMode(answerMode);
-      let assistantText = finalized.assistantText;
-      const filteredSources = filterSourcesByProvenance(
-        sources,
-        finalized.provenance,
-        assistantText,
-        retrievalPack?.evidence ?? [],
-        { enforceScopedSources },
-      );
-      // Always feed unfiltered sourceButtonsAttachment into merge;
-      // the post-merge clamp below will filter & dedupe to match filteredSources.
-      const attachmentsPayload = mergeAttachments(
-        generated.attachmentsPayload,
-        sourceButtonsAttachment,
-      );
-
-      // Post-merge clamp: ensure source_buttons only contain docs in filteredSources,
-      // deduplicated to one button per documentId (highest-scoring).
-      const allowedSourceDocIds = new Set(filteredSources.map(s => s.documentId));
-      if (allowedSourceDocIds.size > 0) {
-        for (let i = 0; i < attachmentsPayload.length; i++) {
-          const att = attachmentsPayload[i] as Record<string, unknown>;
-          if (att?.type === "source_buttons" && Array.isArray(att.buttons)) {
-            const filtered = (att.buttons as Array<{ documentId: string }>).filter(
-              btn => allowedSourceDocIds.has(btn.documentId),
-            );
-            // Dedupe: keep first button per documentId (already sorted by score)
-            const seenDocIds = new Set<string>();
-            const clamped = filtered.filter(btn => {
-              if (seenDocIds.has(btn.documentId)) return false;
-              seenDocIds.add(btn.documentId);
-              return true;
-            });
-            if (clamped.length > 0) {
-              attachmentsPayload[i] = { ...att, buttons: clamped };
-            } else {
-              attachmentsPayload.splice(i, 1);
-              i--;
-            }
-          }
-        }
-      }
-
-      const sourceInvariantFailureCode = resolveSourceInvariantFailureCode({
-        answerMode,
-        filteredSources,
-      });
-      if (sourceInvariantFailureCode) {
-        const sourceInvariantMicrocopy = buildFallbackMicrocopyParams({
-          reasonCode: sourceInvariantFailureCode,
-          query: req.message,
-          retrievalPack,
-          attachedDocumentIds: req.attachedDocumentIds || [],
-        });
-        assistantText = buildEmptyAssistantText({
-          language: req.preferredLanguage,
-          reasonCode: sourceInvariantFailureCode,
-          seed: `${req.userId}:sources:${sourceInvariantFailureCode}`,
-          context: sourceInvariantMicrocopy.context,
-          routeHints: sourceInvariantMicrocopy.routeHints,
-        });
-      }
-      const assistantTelemetry =
-        (generated.telemetry as Record<string, unknown>) ?? {};
-      if (finalized.provenanceTelemetry) {
-        assistantTelemetry.provenance = finalized.provenanceTelemetry;
-      }
-      const persistedAssistantTelemetry =
-        Object.keys(assistantTelemetry).length > 0 ? assistantTelemetry : null;
-
-      const outputSpanId = this.traceWriter.startSpan(
-        traceId,
-        "output_contract",
-      );
-      const assistantMessage = await this.createMessage({
-        conversationId,
-        role: "assistant",
-        content: assistantText,
-        userId: req.userId,
-        attachments: attachmentsPayload,
-        telemetry: persistedAssistantTelemetry,
-        metadata: {
-          sources: filteredSources,
-          answerMode,
-          answerClass,
-          navType,
-          fallbackReasonCode,
-          fallbackTelemetry: fallbackSignal.telemetryReasonCode
-            ? {
-                reasonCode: fallbackSignal.telemetryReasonCode,
-              }
-            : null,
-          fallbackPolicy: fallbackSignal.policyMeta || null,
-              evidenceGate: evidenceGateDecision
-                ? {
-                    action: evidenceGateDecision.suggestedAction,
-                    strength: evidenceGateDecision.evidenceStrength,
-                  }
-                : null,
-              enforcement: finalized.enforcement ?? null,
-              provenance: finalized.provenance ?? null,
-              provenanceTelemetry: finalized.provenanceTelemetry ?? null,
-              qualityGates: finalized.qualityGates,
-              failureCode:
-                finalized.failureCode || sourceInvariantFailureCode || null,
-              userWarning: finalized.userWarning || null,
-              warnings: Array.isArray(finalized.warnings)
-                ? finalized.warnings
-                : [],
-            },
-          });
-      this.traceWriter.endSpan(traceId, outputSpanId, {
-        status: "ok",
-        metadata: {
-          assistantMessageId: assistantMessage.id,
-          answerLength: assistantText.length,
-        },
-      });
-
-      const resolvedTruncation = resolveTruncationState({
-        telemetry: (generated.telemetry as Record<string, unknown>) ?? null,
-        finalText: assistantText,
-        enforcementRepairs: finalized.enforcement?.repairs || [],
-      });
-      const truncation = {
-        occurred: resolvedTruncation.contractOccurred,
-        reason: resolvedTruncation.contractReason,
-        resumeToken: null,
-        providerOccurred: resolvedTruncation.providerOccurred,
-        providerReason: resolvedTruncation.providerReason,
-        detectorVersion: resolvedTruncation.detectorVersion,
-      };
-      const status =
-        finalized.failureCode ||
-        sourceInvariantFailureCode ||
-        !assistantTextRaw ||
-        (Array.isArray(finalized.warnings) && finalized.warnings.length > 0)
-          ? "partial"
-          : "success";
-      const failureCode =
-        finalized.failureCode ||
-        sourceInvariantFailureCode ||
-        (assistantTextRaw ? null : "EMPTY_MODEL_RESPONSE");
-      const warnings = Array.isArray(finalized.warnings) ? finalized.warnings : [];
-      const userWarning = finalized.userWarning || warnings[0] || null;
-
-      const result: ChatResult = {
-        conversationId,
-        userMessageId: userMessage.id,
-        assistantMessageId: assistantMessage.id,
-        traceId,
-        assistantText,
-        attachmentsPayload,
-        assistantTelemetry: persistedAssistantTelemetry ?? undefined,
-        provenance: finalized.provenance,
-        sources: [...filteredSources],
-        followups: finalized.followups,
-        answerMode,
-        answerClass,
-        navType,
-        fallbackReasonCode,
-        status,
-        failureCode,
-        qualityGates: finalized.qualityGates,
-        userWarning,
-        warnings,
-        completion: {
-          answered: assistantTextRaw.length > 0,
-          missingSlots: [],
-          nextAction: null,
-        },
-        truncation,
-        evidence: {
-          required: (req.attachedDocumentIds || []).length > 0,
-          provided: filteredSources.length > 0,
-          sourceIds: filteredSources.map((s) => s.documentId),
-        },
-      };
-      await this.persistTraceArtifacts({
-        traceId,
-        req,
-        conversationId,
-        userMessageId: userMessage.id,
-        assistantMessageId: assistantMessage.id,
-        retrievalPack,
-        evidenceGateDecision,
-        answerMode,
-        status,
-        failureCode,
-        fallbackReasonCode,
+        telemetry: ((generated.telemetry as Record<string, unknown>) || null) ?? null,
+        fallbackReasonCode: fallbackSignal.reasonCode,
         fallbackReasonCodeTelemetry: fallbackSignal.telemetryReasonCode,
         fallbackPolicyMeta: fallbackSignal.policyMeta || null,
-        assistantText,
-        telemetry: (generated.telemetry as Record<string, unknown>) ?? null,
-        totalMs: Date.now() - turnStartedAt,
-        retrievalMs,
-        llmMs,
-        stream: false,
-        enforcement: finalized.enforcement ?? null,
-        enforcementBlocked: Boolean(finalized.failureCode),
-        enforcementReasonCode: finalized.failureCode ?? null,
-        provenance: finalized.provenance ?? null,
-        provenanceTelemetry: finalized.provenanceTelemetry ?? null,
-        truncation,
-      }).catch((error) => {
-        appLogger.warn("[trace-writer] failed to persist chat trace", {
-          traceId,
-          error: error instanceof Error ? error.message : String(error),
-        });
+        priorAssistantMessageId,
+        timing: {
+          turnStartedAt,
+          retrievalMs,
+          llmMs,
+          stream,
+        },
       });
-      return this.withGeneratedConversationTitle(
-        result,
-        generatedConversationTitle,
-      );
     } catch (error) {
       if (!isRuntimePolicyFailure(error)) {
         await this.persistTraceArtifacts({
@@ -2564,14 +2397,13 @@ export class CentralizedChatRuntimeDelegate {
           evidenceGateDecision,
           answerMode,
           status: "failed",
-          failureCode: "CHAT_RUNTIME_ERROR",
-          fallbackReasonCode: undefined,
+          failureCode: stream ? "CHAT_STREAM_RUNTIME_ERROR" : "CHAT_RUNTIME_ERROR",
           assistantText: "",
           telemetry: null,
           totalMs: Date.now() - turnStartedAt,
           retrievalMs,
           llmMs,
-          stream: false,
+          stream,
         }).catch((persistError) => {
           appLogger.warn("[trace-writer] failed to persist crash trace", {
             traceId,
@@ -2583,306 +2415,55 @@ export class CentralizedChatRuntimeDelegate {
         });
         throw error;
       }
-      const runtimePolicyResult = await this.buildRuntimePolicyFailureResult({
-        req,
-        conversationId,
-        userMessage,
-        code: toRuntimePolicyErrorCode(error),
-      });
-      const result: ChatResult = { ...runtimePolicyResult, traceId };
-      await this.persistTraceArtifacts({
+
+      return this.buildExecutionDraft({
         traceId,
         req,
-        conversationId: result.conversationId,
-        userMessageId: result.userMessageId,
-        assistantMessageId: result.assistantMessageId,
-        retrievalPack,
-        evidenceGateDecision,
-        answerMode: result.answerMode || answerMode,
-        status: result.status || "failed",
-        failureCode: result.failureCode || null,
-        fallbackReasonCode: result.fallbackReasonCode,
-        assistantText: result.assistantText,
-        telemetry: null,
-        totalMs: Date.now() - turnStartedAt,
-        retrievalMs,
-        llmMs,
-        stream: false,
-      }).catch((persistError) => {
-        appLogger.warn(
-          "[trace-writer] failed to persist runtime-policy trace",
-          {
-            traceId,
-            error:
-              persistError instanceof Error
-                ? persistError.message
-                : String(persistError),
-          },
-        );
-      });
-      return this.withGeneratedConversationTitle(
-        result,
+        conversationId:
+          conversationId ||
+          (await this.ensureConversation(req.userId, req.conversationId)).id,
+        userMessage:
+          userMessage ||
+          (await this.ensureUserTurn(
+            { ...req, isRegenerate: false },
+            conversationId || String(req.conversationId || ""),
+          )).userMessage,
         generatedConversationTitle,
-      );
-    }
-  }
-
-  async streamChat(params: {
-    req: ChatRequest;
-    sink: StreamSink;
-    streamingConfig: LLMStreamingConfig;
-  }): Promise<ChatResult> {
-    const { req, sink, streamingConfig } = params;
-    const traceId = this.resolveTraceId(req);
-    const turnStartedAt = Date.now();
-    const inputSpanId = this.traceWriter.startSpan(
-      traceId,
-      "input_normalization",
-      {
-        hasConversationId: Boolean(req.conversationId),
-        stream: true,
-      },
-    );
-    let conversationId = "";
-    let lastDocumentId: string | null = null;
-    let generatedConversationTitle: string | null = null;
-    let userMessage: ChatMessageDTO | null = null;
-    let retrievalPack:
-      | (EvidencePack & { resolvedDocId?: string | null })
-      | null = null;
-    let evidenceGateDecision: EvidenceCheckResult | null = null;
-    let answerMode: AnswerMode =
-      (req.attachedDocumentIds || []).length > 0
-        ? "help_steps"
-        : "general_answer";
-    let retrievalMs: number | null = null;
-    let llmMs: number | null = null;
-    try {
-      const conv = await this.ensureConversation(
-        req.userId,
-        req.conversationId,
-      );
-      conversationId = conv.id;
-      lastDocumentId = conv.lastDocumentId;
-      const titleWasPlaceholder = isPlaceholderConversationTitle(conv.title);
-
-      userMessage = await this.createMessage({
-        conversationId,
-        role: "user",
-        content: req.message,
-        userId: req.userId,
-      });
-      generatedConversationTitle = await this.resolveGeneratedTitleForTurn({
-        conversationId,
-        titleWasPlaceholder,
-      });
-
-      const governanceBlock = this.resolveGovernancePolicyBlock(req);
-      if (governanceBlock) {
-        if (sink.isOpen()) {
-          sink.write({
-            event: "worklog",
-            data: {
-              eventType: "POLICY_BLOCK",
-              summary: governanceBlock.code,
-              t: Date.now(),
-            },
-          } as any);
-        }
-        const result = await this.buildGovernanceBlockedResult({
-          req,
-          conversationId,
-          userMessage,
-          code: governanceBlock.code,
-          text: governanceBlock.text,
-          status: governanceBlock.status,
-        });
-        await this.persistTraceArtifacts({
-          traceId,
-          req,
-          conversationId: result.conversationId,
-          userMessageId: result.userMessageId,
-          assistantMessageId: result.assistantMessageId,
-          retrievalPack,
-          evidenceGateDecision,
-          answerMode: result.answerMode || answerMode,
-          status: result.status || "blocked",
-          failureCode: result.failureCode || null,
-          fallbackReasonCode: result.fallbackReasonCode,
-          assistantText: result.assistantText,
-          telemetry: null,
-          totalMs: Date.now() - turnStartedAt,
-          retrievalMs,
-          llmMs,
-          stream: true,
-        }).catch((persistError) => {
-          appLogger.warn(
-            "[trace-writer] failed to persist stream governance-policy trace",
-            {
-              traceId,
-              error:
-                persistError instanceof Error
-                  ? persistError.message
-                  : String(persistError),
-            },
-          );
-        });
-        return this.withGeneratedConversationTitle(
-          { ...result, traceId },
-          generatedConversationTitle,
-        );
-      }
-
-      if (sink.isOpen()) {
-        sink.write({
-          event: "progress",
-          data: {
-            stage: "retrieval",
-            message: "Retrieving evidence",
-            t: Date.now(),
-          },
-        });
-      }
-
-      const history = await this.loadRecentForEngine(
-        conversationId,
-        this.resolveRecentContextLimit(),
-        req.userId,
-        req.message,
-      );
-      this.traceWriter.endSpan(traceId, inputSpanId, {
-        status: "ok",
-        metadata: {
-          conversationId,
-          userMessageId: userMessage.id,
-          historyMessages: history.length,
-        },
-      });
-
-      const retrievalSpanId = this.traceWriter.startSpan(traceId, "retrieval", {
-        stream: true,
-      });
-      const retrievalStartedAt = Date.now();
-      retrievalPack = await this.retrieveEvidence(req, lastDocumentId, {
-        traceId,
-        conversationId,
-      });
-      retrievalMs = Date.now() - retrievalStartedAt;
-
-      // Persist resolved doc for conversation-history follow-up scoping
-      const resolvedDocId = retrievalPack?.resolvedDocId ?? null;
-      await this.persistResolvedDocScope({
-        traceId,
-        conversationId,
-        previousDocId: lastDocumentId,
-        resolvedDocId,
-        stream: true,
-      });
-
-      this.traceWriter.endSpan(traceId, retrievalSpanId, {
-        status: "ok",
-        metadata: {
-          evidenceItems: retrievalPack?.evidence.length ?? 0,
-          uniqueDocs: retrievalPack?.stats.uniqueDocsInEvidence ?? 0,
-          candidates: retrievalPack?.stats.candidatesConsidered ?? 0,
-          topScore: retrievalPack?.stats.topScore ?? null,
-        },
-      });
-
-      const evidenceGateSpanId = this.traceWriter.startSpan(
-        traceId,
-        "evidence_gate",
-        { stream: true },
-      );
-      evidenceGateDecision = this.evaluateEvidenceGateDecision(
-        req,
-        retrievalPack,
-      );
-      answerMode = this.resolveAnswerMode(req, retrievalPack);
-      this.traceWriter.endSpan(traceId, evidenceGateSpanId, {
-        status: "ok",
-        metadata: {
-          action: evidenceGateDecision?.suggestedAction ?? "answer",
-          strength: evidenceGateDecision?.evidenceStrength ?? "none",
-          missingEvidenceCount:
-            evidenceGateDecision?.missingEvidence.length ?? 0,
-        },
-      });
-      const answerClass: AnswerClass =
-        answerMode === "general_answer" ? "GENERAL" : "DOCUMENT";
-      const navType: NavType = null;
-
-      const sourceButtonsAttachment = this.buildSourceButtonsAttachment(
-        retrievalPack,
-        req.preferredLanguage,
-      );
-      const sources: ChatSourceEntry[] = ensureFallbackSourceCoverage({
-        sources: buildSourcesFromEvidence(retrievalPack?.evidence ?? []),
+        outputContract: "USER_VISIBLE_TEXT",
         answerMode,
-        attachedDocumentIds: req.attachedDocumentIds || [],
+        answerClass: answerMode === "general_answer" ? "GENERAL" : "DOCUMENT",
+        navType: null,
         retrievalPack,
-      });
-      const bypass = this.resolveEvidenceGateBypass(
         evidenceGateDecision,
-        req.preferredLanguage,
-        {
-          attachedDocumentIds: req.attachedDocumentIds,
-          evidenceCount: retrievalPack?.evidence.length ?? 0,
-        },
-      );
-      if (bypass) {
-        if (sink.isOpen()) {
-          sink.write({
-            event: "progress",
-            data: {
-              stage: "validation",
-              message: "Evidence policy requested clarification",
-              t: Date.now(),
-            },
-          });
-        }
-        const assistantMessage = await this.createMessage({
-          conversationId,
-          role: "assistant",
-          content: bypass.text,
-          userId: req.userId,
-          attachments: sourceButtonsAttachment,
-          telemetry: null,
-          metadata: {
-            sources,
-            answerMode,
-            answerClass,
-            navType,
-            fallbackReasonCode: bypass.failureCode,
-            evidenceGate: {
-              action: evidenceGateDecision?.suggestedAction ?? "unknown",
-              strength: evidenceGateDecision?.evidenceStrength ?? "none",
-            },
-          },
-        });
-        const result: ChatResult = {
-          conversationId,
-          userMessageId: userMessage.id,
-          assistantMessageId: assistantMessage.id,
-          traceId,
-          assistantText: bypass.text,
-          attachmentsPayload: sourceButtonsAttachment,
-          assistantTelemetry: undefined,
-          sources: [...sources],
+        sources: [],
+        assistantTextRaw: "",
+        draftResult: {
+          conversationId:
+            conversationId ||
+            (await this.ensureConversation(req.userId, req.conversationId)).id,
+          userMessageId:
+            userMessage?.id ||
+            (
+              await this.ensureUserTurn(
+                { ...req, isRegenerate: false },
+                conversationId || String(req.conversationId || ""),
+              )
+            ).userMessage.id,
+          assistantText: "",
+          attachmentsPayload: [],
+          sources: [],
           followups: [],
           answerMode,
-          answerClass,
-          navType,
-          fallbackReasonCode: bypass.failureCode,
-          status:
-            bypass.failureCode === "EVIDENCE_NEEDS_CLARIFICATION"
-              ? "clarification_required"
-              : "partial",
-          failureCode: bypass.failureCode,
+          answerClass: answerMode === "general_answer" ? "GENERAL" : "DOCUMENT",
+          navType: null,
+          status: "failed",
+          failureCode: resolveLegacyRuntimePolicyErrorCode(error),
           completion: {
             answered: false,
-            missingSlots: [],
+            missingSlots: ["runtime_policy"],
             nextAction: null,
+            nextActionCode: resolveLegacyRuntimePolicyErrorCode(error),
+            nextActionArgs: null,
           },
           truncation: {
             occurred: false,
@@ -2893,455 +2474,141 @@ export class CentralizedChatRuntimeDelegate {
             detectorVersion: SEMANTIC_TRUNCATION_DETECTOR_VERSION,
           },
           evidence: {
-            required: (req.attachedDocumentIds || []).length > 0,
-            provided: sources.length > 0,
-            sourceIds: sources.map((s) => s.documentId),
+            required: Boolean(req.attachedDocumentIds?.length),
+            provided: false,
+            sourceIds: [],
           },
-        };
-        await this.persistTraceArtifacts({
-          traceId,
-          req,
-          conversationId,
-          userMessageId: userMessage.id,
-          assistantMessageId: assistantMessage.id,
-          retrievalPack,
-          evidenceGateDecision,
-          answerMode,
-          status: result.status,
-          failureCode: result.failureCode,
-          fallbackReasonCode: result.fallbackReasonCode,
-          assistantText: result.assistantText,
-          telemetry: null,
-          totalMs: Date.now() - turnStartedAt,
-          retrievalMs,
-          llmMs,
-          stream: true,
-          truncation: result.truncation,
-        }).catch((error) => {
-          appLogger.warn(
-            "[trace-writer] failed to persist stream bypass trace",
-            {
-              traceId,
-              error: error instanceof Error ? error.message : String(error),
-            },
-          );
-        });
-        return this.withGeneratedConversationTitle(
-          result,
-          generatedConversationTitle,
-        );
-      }
-
-      const messages = this.buildEngineMessages(
-        history,
-        req.message,
-        req.preferredLanguage,
-        evidenceGateDecision,
-      );
-
-      if (sink.isOpen() && sources.length > 0) {
-        sink.write({
-          event: "progress",
-          data: {
-            stage: "compose",
-            message: "Composing answer with grounded sources",
-            t: Date.now(),
-          },
-        });
-        sink.write({
-          event: "worklog",
-          data: {
-            eventType: "STEP_ADD",
-            label: `Grounded in ${sources.length} source${sources.length === 1 ? "" : "s"}`,
-            t: Date.now(),
-          },
-        } as any);
-      }
-
-      const fallbackSignal = this.resolveFallbackSignal(req, retrievalPack);
-      const fallbackReasonCode = fallbackSignal.reasonCode;
-      const streamSpanId = this.traceWriter.startSpan(traceId, "stream");
-      const llmStartedAt = Date.now();
-      const streamed = await this.engine.stream({
-        traceId,
-        userId: req.userId,
-        conversationId,
-        messages,
-        evidencePack: toEngineEvidencePack(retrievalPack),
-        context: this.buildRuntimeContext(req, retrievalPack, answerMode),
-        meta: this.buildRuntimeMeta(
-          req,
-          retrievalPack,
-          answerMode,
-          evidenceGateDecision,
-          fallbackSignal,
-        ),
-        sink,
-        streamingConfig,
-      });
-      llmMs = Date.now() - llmStartedAt;
-      this.traceWriter.endSpan(traceId, streamSpanId, {
-        status: "ok",
-        metadata: {
-          finishReason: String(
-            ((streamed.telemetry as Record<string, unknown>) || {})
-              .finishReason || "unknown",
-          ),
-          model: String(
-            ((streamed.telemetry as Record<string, unknown>) || {}).model || "",
-          ),
         },
-      });
-
-      const assistantTextRaw = String(streamed.finalText || "").trim();
-      const fallbackMicrocopyParams = buildFallbackMicrocopyParams({
-        reasonCode: fallbackReasonCode,
-        query: req.message,
-        retrievalPack,
-        attachedDocumentIds: req.attachedDocumentIds || [],
-      });
-      const assistantTextBase =
-        assistantTextRaw ||
-        buildEmptyAssistantText({
-          language: req.preferredLanguage,
-          reasonCode: fallbackReasonCode,
-          seed: `${conversationId}:stream:${fallbackReasonCode || "empty_model_response"}`,
-          context: fallbackMicrocopyParams.context,
-          routeHints: fallbackMicrocopyParams.routeHints,
-        });
-      const assistantTextWithGate = this.applyEvidenceGatePostProcessText(
-        assistantTextBase,
-        evidenceGateDecision,
-      );
-
-      // Finalize turn: quality gates + enforcer + followups + truncation recovery
-      const qualitySpanId = this.traceWriter.startSpan(
-        traceId,
-        "quality_gates",
-        {
-          stream: true,
-        },
-      );
-      const finalized = await this.finalizeChatTurn({
-        assistantText: assistantTextWithGate,
-        req,
-        answerMode,
-        answerClass,
-        retrievalPack,
-        sources,
-        telemetry: (streamed.telemetry as Record<string, unknown>) ?? null,
-      });
-      this.traceWriter.endSpan(traceId, qualitySpanId, {
-        status: "ok",
-        metadata: {
-          followups: finalized.followups.length,
-          failureCode: finalized.failureCode ?? null,
-        },
-      });
-
-      const enforceScopedSources = isDocGroundedAnswerMode(answerMode);
-      let assistantText = finalized.assistantText;
-      const filteredSources = filterSourcesByProvenance(
-        sources,
-        finalized.provenance,
-        assistantText,
-        retrievalPack?.evidence ?? [],
-        { enforceScopedSources },
-      );
-      // Always feed unfiltered sourceButtonsAttachment into merge;
-      // the post-merge clamp below will filter & dedupe to match filteredSources.
-      const attachmentsPayload = mergeAttachments(
-        streamed.attachmentsPayload,
-        sourceButtonsAttachment,
-      );
-
-      // Post-merge clamp: ensure source_buttons only contain docs in filteredSources,
-      // deduplicated to one button per documentId (highest-scoring).
-      const streamAllowedDocIds = new Set(filteredSources.map(s => s.documentId));
-      if (streamAllowedDocIds.size > 0) {
-        for (let i = 0; i < attachmentsPayload.length; i++) {
-          const att = attachmentsPayload[i] as Record<string, unknown>;
-          if (att?.type === "source_buttons" && Array.isArray(att.buttons)) {
-            const filtered = (att.buttons as Array<{ documentId: string }>).filter(
-              btn => streamAllowedDocIds.has(btn.documentId),
-            );
-            // Dedupe: keep first button per documentId (already sorted by score)
-            const seenDocIds = new Set<string>();
-            const clamped = filtered.filter(btn => {
-              if (seenDocIds.has(btn.documentId)) return false;
-              seenDocIds.add(btn.documentId);
-              return true;
-            });
-            if (clamped.length > 0) {
-              attachmentsPayload[i] = { ...att, buttons: clamped };
-            } else {
-              attachmentsPayload.splice(i, 1);
-              i--;
-            }
-          }
-        }
-      }
-
-      const sourceInvariantFailureCode = resolveSourceInvariantFailureCode({
-        answerMode,
-        filteredSources,
-      });
-      if (sourceInvariantFailureCode) {
-        const sourceInvariantMicrocopy = buildFallbackMicrocopyParams({
-          reasonCode: sourceInvariantFailureCode,
-          query: req.message,
-          retrievalPack,
-          attachedDocumentIds: req.attachedDocumentIds || [],
-        });
-        assistantText = buildEmptyAssistantText({
-          language: req.preferredLanguage,
-          reasonCode: sourceInvariantFailureCode,
-          seed: `${req.userId}:sources:${sourceInvariantFailureCode}`,
-          context: sourceInvariantMicrocopy.context,
-          routeHints: sourceInvariantMicrocopy.routeHints,
-        });
-      }
-      const assistantTelemetry =
-        (streamed.telemetry as Record<string, unknown>) ?? {};
-      if (finalized.provenanceTelemetry) {
-        assistantTelemetry.provenance = finalized.provenanceTelemetry;
-      }
-      const persistedAssistantTelemetry =
-        Object.keys(assistantTelemetry).length > 0 ? assistantTelemetry : null;
-
-      const outputSpanId = this.traceWriter.startSpan(
-        traceId,
-        "output_contract",
-        {
-          stream: true,
-        },
-      );
-      const assistantMessage = await this.createMessage({
-        conversationId,
-        role: "assistant",
-        content: assistantText,
-        userId: req.userId,
-        attachments: attachmentsPayload,
-        telemetry: persistedAssistantTelemetry,
-        metadata: {
-          sources: filteredSources,
-          answerMode,
-          answerClass,
-          navType,
-          fallbackReasonCode,
-          fallbackTelemetry: fallbackSignal.telemetryReasonCode
-            ? {
-                reasonCode: fallbackSignal.telemetryReasonCode,
-              }
-            : null,
-          fallbackPolicy: fallbackSignal.policyMeta || null,
-              evidenceGate: evidenceGateDecision
-                ? {
-                    action: evidenceGateDecision.suggestedAction,
-                    strength: evidenceGateDecision.evidenceStrength,
-                  }
-                : null,
-              enforcement: finalized.enforcement ?? null,
-              provenance: finalized.provenance ?? null,
-              provenanceTelemetry: finalized.provenanceTelemetry ?? null,
-              qualityGates: finalized.qualityGates,
-              failureCode:
-                finalized.failureCode || sourceInvariantFailureCode || null,
-              userWarning: finalized.userWarning || null,
-              warnings: Array.isArray(finalized.warnings)
-                ? finalized.warnings
-                : [],
-            },
-          });
-      this.traceWriter.endSpan(traceId, outputSpanId, {
-        status: "ok",
-        metadata: {
-          assistantMessageId: assistantMessage.id,
-          answerLength: assistantText.length,
-        },
-      });
-
-      const resolvedTruncation = resolveTruncationState({
-        telemetry: (streamed.telemetry as Record<string, unknown>) ?? null,
-        finalText: assistantText,
-        enforcementRepairs: finalized.enforcement?.repairs || [],
-      });
-      const truncation = {
-        occurred: resolvedTruncation.contractOccurred,
-        reason: resolvedTruncation.contractReason,
-        resumeToken: null,
-        providerOccurred: resolvedTruncation.providerOccurred,
-        providerReason: resolvedTruncation.providerReason,
-        detectorVersion: resolvedTruncation.detectorVersion,
-      };
-      const status =
-        finalized.failureCode ||
-        sourceInvariantFailureCode ||
-        !assistantTextRaw ||
-        (Array.isArray(finalized.warnings) && finalized.warnings.length > 0)
-          ? "partial"
-          : "success";
-      const failureCode =
-        finalized.failureCode ||
-        sourceInvariantFailureCode ||
-        (assistantTextRaw ? null : "EMPTY_MODEL_RESPONSE");
-      const warnings = Array.isArray(finalized.warnings) ? finalized.warnings : [];
-      const userWarning = finalized.userWarning || warnings[0] || null;
-
-      const result: ChatResult = {
-        conversationId,
-        userMessageId: userMessage.id,
-        assistantMessageId: assistantMessage.id,
-        traceId,
-        assistantText,
-        attachmentsPayload,
-        assistantTelemetry: persistedAssistantTelemetry ?? undefined,
-        provenance: finalized.provenance,
-        sources: [...filteredSources],
-        followups: finalized.followups,
-        answerMode,
-        answerClass,
-        navType,
-        fallbackReasonCode,
-        status,
-        failureCode,
-        qualityGates: finalized.qualityGates,
-        userWarning,
-        warnings,
-        completion: {
-          answered: assistantTextRaw.length > 0,
-          missingSlots: [],
-          nextAction: null,
-        },
-        truncation,
-        evidence: {
-          required: (req.attachedDocumentIds || []).length > 0,
-          provided: filteredSources.length > 0,
-          sourceIds: filteredSources.map((s) => s.documentId),
-        },
-      };
-      await this.persistTraceArtifacts({
-        traceId,
-        req,
-        conversationId,
-        userMessageId: userMessage.id,
-        assistantMessageId: assistantMessage.id,
-        retrievalPack,
-        evidenceGateDecision,
-        answerMode,
-        status,
-        failureCode,
-        fallbackReasonCode,
-        fallbackReasonCodeTelemetry: fallbackSignal.telemetryReasonCode,
-        fallbackPolicyMeta: fallbackSignal.policyMeta || null,
-        assistantText,
-        telemetry: (streamed.telemetry as Record<string, unknown>) ?? null,
-        totalMs: Date.now() - turnStartedAt,
-        retrievalMs,
-        llmMs,
-        stream: true,
-        enforcement: finalized.enforcement ?? null,
-        enforcementBlocked: Boolean(finalized.failureCode),
-        enforcementReasonCode: finalized.failureCode ?? null,
-        provenance: finalized.provenance ?? null,
-        provenanceTelemetry: finalized.provenanceTelemetry ?? null,
-        truncation,
-      }).catch((error) => {
-        appLogger.warn("[trace-writer] failed to persist stream trace", {
-          traceId,
-          error: error instanceof Error ? error.message : String(error),
-        });
-      });
-      return this.withGeneratedConversationTitle(
-        result,
-        generatedConversationTitle,
-      );
-    } catch (error) {
-      if (!isRuntimePolicyFailure(error)) {
-        await this.persistTraceArtifacts({
-          traceId,
-          req,
-          conversationId: conversationId || String(req.conversationId || ""),
-          userMessageId: userMessage?.id || null,
-          assistantMessageId: null,
-          retrievalPack,
-          evidenceGateDecision,
-          answerMode,
-          status: "failed",
-          failureCode: "CHAT_STREAM_RUNTIME_ERROR",
-          fallbackReasonCode: undefined,
-          assistantText: "",
-          telemetry: null,
-          totalMs: Date.now() - turnStartedAt,
-          retrievalMs,
-          llmMs,
-          stream: true,
-        }).catch((persistError) => {
-          appLogger.warn(
-            "[trace-writer] failed to persist stream crash trace",
-            {
-              traceId,
-              error:
-                persistError instanceof Error
-                  ? persistError.message
-                  : String(persistError),
-            },
-          );
-        });
-        throw error;
-      }
-      if (sink.isOpen()) {
-        sink.write({
-          event: "worklog",
-          data: {
-            eventType: "RUN_ERROR",
-            summary: "Runtime policy configuration error",
-            t: Date.now(),
-          },
-        } as any);
-      }
-      const runtimePolicyResult = await this.buildRuntimePolicyFailureResult({
-        req,
-        conversationId,
-        userMessage,
-        code: toRuntimePolicyErrorCode(error),
-      });
-      const result: ChatResult = { ...runtimePolicyResult, traceId };
-      await this.persistTraceArtifacts({
-        traceId,
-        req,
-        conversationId: result.conversationId,
-        userMessageId: result.userMessageId,
-        assistantMessageId: result.assistantMessageId,
-        retrievalPack,
-        evidenceGateDecision,
-        answerMode: result.answerMode || answerMode,
-        status: result.status || "failed",
-        failureCode: result.failureCode || null,
-        fallbackReasonCode: result.fallbackReasonCode,
-        assistantText: result.assistantText,
         telemetry: null,
-        totalMs: Date.now() - turnStartedAt,
-        retrievalMs,
-        llmMs,
-        stream: true,
-      }).catch((persistError) => {
-        appLogger.warn(
-          "[trace-writer] failed to persist stream runtime-policy trace",
-          {
-            traceId,
-            error:
-              persistError instanceof Error
-                ? persistError.message
-                : String(persistError),
-          },
-        );
+        fallbackReasonCode: resolveLegacyRuntimePolicyErrorCode(error),
+        priorAssistantMessageId,
+        timing: {
+          turnStartedAt,
+          retrievalMs,
+          llmMs,
+          stream,
+        },
       });
-      return this.withGeneratedConversationTitle(
-        result,
-        generatedConversationTitle,
-      );
     }
+  }
+
+  private buildExecutionDraft(params: {
+    traceId: string;
+    req: ChatRequest;
+    conversationId: string;
+    userMessage: ChatMessageDTO;
+    generatedConversationTitle?: string | null;
+    outputContract: TurnExecutionDraft["outputContract"];
+    answerMode: AnswerMode;
+    answerClass: AnswerClass;
+    navType: NavType;
+    retrievalPack: (EvidencePack & { resolvedDocId?: string | null }) | null;
+    evidenceGateDecision: EvidenceCheckResult | null;
+    sources: ChatSourceEntry[];
+    sourceButtonsAttachment?: unknown | null;
+    assistantTextRaw: string;
+    draftResult: TurnExecutionDraft["draftResult"];
+    telemetry: Record<string, unknown> | null;
+    fallbackReasonCode?: string;
+    fallbackReasonCodeTelemetry?: string;
+    fallbackPolicyMeta?: Record<string, unknown> | null;
+    priorAssistantMessageId?: string | null;
+    timing: TurnExecutionDraft["timing"];
+  }): TurnExecutionDraft {
+    return {
+      traceId: params.traceId,
+      request: params.req,
+      conversationId: params.conversationId,
+      userMessage: params.userMessage,
+      generatedConversationTitle: params.generatedConversationTitle || null,
+      outputContract: params.outputContract,
+      answerMode: params.answerMode,
+      answerClass: params.answerClass,
+      navType: params.navType,
+      retrievalPack: params.retrievalPack,
+      evidenceGateDecision: params.evidenceGateDecision,
+      sources: params.sources,
+      sourceButtonsAttachment: params.sourceButtonsAttachment,
+      assistantTextRaw: params.assistantTextRaw,
+      draftResult: params.draftResult,
+      telemetry: params.telemetry,
+      fallbackReasonCode: params.fallbackReasonCode,
+      fallbackReasonCodeTelemetry: params.fallbackReasonCodeTelemetry,
+      fallbackPolicyMeta: params.fallbackPolicyMeta || null,
+      priorAssistantMessageId: params.priorAssistantMessageId || null,
+      turnKey: buildTurnKey(params.conversationId, params.userMessage.id),
+      timing: params.timing,
+    };
+  }
+
+  private async ensureUserTurn(
+    req: ChatRequest,
+    conversationId: string,
+  ): Promise<{
+    userMessage: ChatMessageDTO;
+    priorAssistantMessageId: string | null;
+  }> {
+    if (!req.isRegenerate) {
+      return {
+        userMessage: await this.createMessage({
+          conversationId,
+          role: "user",
+          content: req.message,
+          userId: req.userId,
+        }),
+        priorAssistantMessageId: null,
+      };
+    }
+
+    const recent = await this.listMessages(req.userId, conversationId, {
+      limit: 20,
+      order: "desc",
+    });
+    const latestUser = recent.find((message) => message.role === "user");
+    if (!latestUser) {
+      return {
+        userMessage: await this.createMessage({
+          conversationId,
+          role: "user",
+          content: req.message,
+          userId: req.userId,
+        }),
+        priorAssistantMessageId: null,
+      };
+    }
+
+    const latestUserIndex = recent.findIndex(
+      (message) => message.id === latestUser.id,
+    );
+    const priorAssistant =
+      latestUserIndex >= 0
+        ? recent
+            .slice(0, latestUserIndex)
+            .find((message) => message.role === "assistant") || null
+        : null;
+
+    return {
+      userMessage: latestUser,
+      priorAssistantMessageId: priorAssistant?.id || null,
+    };
+  }
+
+  private writeProgress(
+    sink: StreamSink | undefined,
+    stage: string,
+    code: string,
+  ): void {
+    if (!sink) return;
+    const isOpen = typeof (sink as any).isOpen === "function" ? (sink as any).isOpen() : true;
+    if (!isOpen) return;
+    sink.write({
+      event: "progress",
+      data: {
+        stage,
+        code,
+        t: Date.now(),
+      },
+    } as any);
   }
 
   async createConversation(params: {
@@ -3931,503 +3198,6 @@ export class CentralizedChatRuntimeDelegate {
     return followups.slice(0, Math.max(1, Math.min(3, desiredCount)));
   }
 
-  /**
-   * Unified turn finalization: runs quality gates, response contract enforcer,
-   * generates followups, and applies sentence-boundary recovery.
-   *
-   * ALL return paths in chat() and streamChat() must funnel through this.
-   */
-  private async finalizeChatTurn(params: {
-    assistantText: string;
-    req: ChatRequest;
-    answerMode: AnswerMode;
-    answerClass: AnswerClass;
-    retrievalPack: EvidencePack | null;
-    sources: ChatSourceEntry[];
-    telemetry?: Record<string, unknown> | null;
-  }): Promise<{
-    assistantText: string;
-    followups: Array<{ label: string; query: string }>;
-    enforcement?: { repairs: string[]; warnings: string[] };
-    provenance?: ChatProvenanceDTO;
-    provenanceTelemetry?: ProvenanceRuntimeTelemetry | null;
-    failureCode?: string | null;
-    qualityGateIssues: string[];
-    qualityGates: ChatQualityGateState;
-    userWarning?: ChatWarningState | null;
-    warnings?: ChatWarningState[];
-  }> {
-    let text = params.assistantText;
-    let failureCode: string | null = null;
-    let provenanceTelemetry: ProvenanceRuntimeTelemetry | null = null;
-    const preferredLanguage = normalizeChatLanguage(params.req.preferredLanguage);
-    const warningPayloadEnabled = isRuntimeFlagEnabled(
-      "CHAT_RUNTIME_WARNING_PAYLOAD_ENABLED",
-      true,
-    );
-    const failSoftWarningsEnabled = isRuntimeFlagEnabled(
-      "CHAT_RUNTIME_FAIL_SOFT_WARNINGS",
-      false,
-    );
-    const warningByCode = new Map<string, ChatWarningState>();
-    const addWarning = (params: {
-      code: string;
-      severity?: "warning" | "error";
-      source?: ChatWarningState["source"];
-    }) => {
-      if (!warningPayloadEnabled) return;
-      const code = String(params.code || "").trim();
-      if (!code) return;
-      const entry = buildWarningEntry({
-        code,
-        language: preferredLanguage,
-        severity: params.severity,
-        source: params.source,
-      });
-      const existing = warningByCode.get(code);
-      if (!existing) {
-        warningByCode.set(code, entry);
-        return;
-      }
-      if (existing.severity !== "error" && entry.severity === "error") {
-        warningByCode.set(code, entry);
-      }
-    };
-    const sourceDocumentIdsFromSources = Array.from(
-      new Set(
-        (params.sources || [])
-          .map((source) => String(source.documentId || "").trim())
-          .filter(Boolean),
-      ),
-    );
-    const requestedMaxOutputTokens = toPositiveInt(
-      params.telemetry &&
-        typeof params.telemetry === "object" &&
-        "requestedMaxOutputTokens" in params.telemetry
-        ? (params.telemetry as Record<string, unknown>).requestedMaxOutputTokens
-        : null,
-    );
-    const observedOutputTokens = toPositiveInt(
-      params.telemetry &&
-        typeof params.telemetry === "object" &&
-        (params.telemetry as Record<string, unknown>).usage &&
-        typeof (params.telemetry as Record<string, unknown>).usage === "object"
-        ? (
-            (params.telemetry as Record<string, unknown>).usage as Record<
-              string,
-              unknown
-            >
-          ).outputTokens
-        : null,
-    );
-
-    // 1. Sentence boundary recovery for truncated outputs
-    text = this.applySentenceBoundaryRecovery(text, params.telemetry);
-    const preEnforcerTrim = shouldApplyPreEnforcerTrim({
-      telemetry: (params.telemetry as Record<string, unknown>) ?? null,
-      finalText: text,
-      requestedMaxOutputTokens,
-    });
-    if (preEnforcerTrim && requestedMaxOutputTokens) {
-      const trimmed = trimTextToTokenBudget(text, requestedMaxOutputTokens, {
-        preserveSentenceBoundary: true,
-      });
-      if (trimmed.truncated) {
-        text = trimmed.text;
-      }
-    }
-
-    let provenance = buildChatProvenance({
-      answerText: text,
-      answerMode: params.answerMode,
-      answerClass: params.answerClass,
-      retrievalPack: params.retrievalPack,
-    });
-    const provenanceValidation = validateChatProvenance({
-      provenance,
-      answerMode: params.answerMode,
-      answerClass: params.answerClass,
-      allowedDocumentIds: params.req.attachedDocumentIds || [],
-    });
-    provenance = {
-      ...provenance,
-      validated: provenanceValidation.ok,
-      failureCode: provenanceValidation.failureCode,
-      sourceDocumentIds:
-        provenance.sourceDocumentIds.length > 0
-          ? provenance.sourceDocumentIds
-          : sourceDocumentIdsFromSources,
-    };
-
-    // 2. Run quality gates (format checks, brevity, markdown sanity)
-    let qualityGateIssues: string[] = [];
-    let qualityGates: ChatQualityGateState = { allPassed: true, failed: [] };
-    const enforceQualityGates = isRuntimeFlagEnabled(
-      "QUALITY_GATES_ENFORCING",
-      true,
-    );
-    const qualityGateSeverityByName = resolveQualityGateSeverityMap();
-    try {
-      const qualityRunner = new QualityGateRunnerService();
-      const contextSignals = asObject(
-        (params.req.context as Record<string, unknown> | null)?.signals ?? null,
-      );
-      const gateCtx: QualityGateContext = {
-        answerMode: params.answerMode,
-        answerClass: params.answerClass,
-        operator: String((params.req.meta as any)?.operator || "")
-          .trim()
-          .toLowerCase(),
-        intentFamily: String((params.req.meta as any)?.intentFamily || "")
-          .trim()
-          .toLowerCase(),
-        language: normalizeChatLanguage(params.req.preferredLanguage),
-        evidenceItems: params.retrievalPack?.evidence.map((e) => ({
-          snippet: e.snippet,
-          docId: e.docId,
-        })),
-        docLockEnabled:
-          Boolean(params.retrievalPack?.scope?.explicitDocLock) ||
-          (params.req.attachedDocumentIds || []).length > 0,
-        discoveryMode:
-          Boolean(contextSignals.discoveryQuery) ||
-          String(params.answerMode || "")
-            .trim()
-            .toLowerCase() === "nav_pills",
-        requiresClarification:
-          Boolean(contextSignals.requiresClarification) ||
-          String(params.answerMode || "")
-            .trim()
-            .toLowerCase() === "rank_disambiguate",
-        explicitDocRef:
-          Boolean(contextSignals.explicitDocRef) ||
-          Boolean(contextSignals.explicitDocLock) ||
-          (params.req.attachedDocumentIds || []).length === 1,
-        sourceButtonsCount: sourceDocumentIdsFromSources.length,
-        userRequestedShort: params.req.truncationRetry === true,
-      };
-      const gateResult = await qualityRunner.runGates(text, gateCtx);
-      if (!gateResult.allPassed) {
-        const failedGates = gateResult.results
-          .filter((r) => !r.passed)
-          .map((gate) => toQualityGateFailure(gate, qualityGateSeverityByName));
-        qualityGateIssues = failedGates.map((gate) => gate.gateName);
-        qualityGates = {
-          allPassed: false,
-          failed: failedGates,
-        };
-        appLogger.debug("[finalizeChatTurn] Quality gate issues", {
-          issues: qualityGateIssues,
-        });
-        if (enforceQualityGates && !failureCode) {
-          const blockingGate = failedGates.find(
-            (gate) => gate.severity === "block",
-          );
-          if (blockingGate) {
-            const reasonCode = "quality_gate_blocked";
-            const failureMode = resolveRuntimeFailureMode(
-              reasonCode,
-              failSoftWarningsEnabled,
-            );
-            if (failureMode === "fail_closed") {
-              failureCode = reasonCode;
-              text = buildEmptyAssistantText({
-                language: params.req.preferredLanguage,
-                reasonCode: failureCode,
-                seed: `${params.req.userId}:quality_gate:${blockingGate.gateName}`,
-              });
-            } else {
-              addWarning({
-                code: reasonCode,
-                source: "quality_gate",
-                severity: "warning",
-              });
-            }
-          }
-        }
-      }
-    } catch (error) {
-      appLogger.warn("[finalizeChatTurn] Quality gate runner error", {
-        error: error instanceof Error ? error.message : String(error),
-      });
-      if (enforceQualityGates && !failureCode) {
-        const reasonCode = "quality_gate_runner_error";
-        const failureMode = resolveRuntimeFailureMode(
-          reasonCode,
-          failSoftWarningsEnabled,
-        );
-        if (failureMode === "fail_closed") {
-          failureCode = reasonCode;
-          text = buildEmptyAssistantText({
-            language: params.req.preferredLanguage,
-            reasonCode,
-            seed: `${params.req.userId}:quality_gate:${reasonCode}`,
-          });
-        } else {
-          addWarning({
-            code: reasonCode,
-            source: "quality_gate",
-            severity: "warning",
-          });
-        }
-        qualityGates = {
-          allPassed: false,
-          failed: [
-            {
-              gateName: reasonCode,
-              severity: "block",
-              reason: error instanceof Error ? error.message : String(error),
-            },
-          ],
-        };
-        qualityGateIssues = [reasonCode];
-      }
-    }
-
-    // 3. Run response contract enforcer (format repair, strip leakage, length limits)
-    let enforcement: { repairs: string[]; warnings: string[] } | undefined;
-    try {
-      const enforcer = getResponseContractEnforcer();
-      const evidenceMap = buildEvidenceMapForEnforcer(params.retrievalPack);
-      const reqSignals = asObject(
-        (params.req.context as Record<string, unknown> | null)?.signals ?? null,
-      );
-      const styleSignals = this.buildFormattingStyleSignals(
-        params.req,
-        params.answerMode,
-      );
-      const operatorFamily =
-        String(
-          (params.req.meta as any)?.operatorFamily ||
-            reqSignals.operatorFamily ||
-            "",
-        )
-          .trim()
-          .toLowerCase() || null;
-      const mergedSignals = {
-        ...reqSignals,
-        ...(styleSignals || {}),
-        ...(operatorFamily ? { operatorFamily } : {}),
-      };
-      const enforcerCtx: ResponseContractContext = {
-        answerMode: params.answerMode,
-        language: normalizeChatLanguage(params.req.preferredLanguage),
-        operator: String((params.req.meta as any)?.operator || "")
-          .trim()
-          .toLowerCase(),
-        intentFamily: String((params.req.meta as any)?.intentFamily || "")
-          .trim()
-          .toLowerCase(),
-        operatorFamily: operatorFamily || undefined,
-        evidenceRequired: provenance.required,
-        allowedDocumentIds: params.req.attachedDocumentIds || [],
-        provenance,
-        evidenceMapSchemaVersion: "v1",
-        evidenceMap,
-        provenanceFailOpenWithEvidence: this.provenanceUserFailOpenWithEvidence,
-        signals: mergedSignals,
-        constraints: {
-          maxOutputTokens: requestedMaxOutputTokens ?? undefined,
-          hardMaxOutputTokens: requestedMaxOutputTokens
-            ? Math.ceil(requestedMaxOutputTokens * 1.25)
-            : undefined,
-          expectedOutputTokens: observedOutputTokens ?? undefined,
-          userRequestedShort: params.req.truncationRetry === true || undefined,
-        },
-      };
-      const enforced = enforcer.enforce(
-        { content: text, attachments: [] },
-        enforcerCtx,
-      );
-      if (enforced.enforcement.provenance) {
-        provenanceTelemetry = {
-          ...enforced.enforcement.provenance,
-          stage: "enforcer",
-        };
-      }
-      if (enforced.enforcement.blocked && enforced.enforcement.reasonCode) {
-        appLogger.warn("[finalizeChatTurn] Response blocked by enforcer", {
-          reasonCode: enforced.enforcement.reasonCode,
-        });
-        const reasonCode = enforced.enforcement.reasonCode;
-        const failureMode = resolveRuntimeFailureMode(
-          reasonCode,
-          failSoftWarningsEnabled,
-        );
-        if (failureMode === "fail_closed") {
-          failureCode = reasonCode;
-          text =
-            enforced.content ||
-            buildEmptyAssistantText({
-              language: params.req.preferredLanguage,
-              reasonCode,
-              seed: `${params.req.userId}:enforcer:${reasonCode}`,
-            });
-        } else {
-          if (String(enforced.content || "").trim()) {
-            text = enforced.content;
-          }
-          addWarning({
-            code: reasonCode,
-            source: "enforcer",
-            severity: "warning",
-          });
-        }
-      } else {
-        text = enforced.content;
-      }
-      enforcement = {
-        repairs: enforced.enforcement.repairs,
-        warnings: enforced.enforcement.warnings,
-      };
-      if (
-        (enforcement.warnings || []).some((warning) =>
-          String(warning || "")
-            .trim()
-            .toLowerCase()
-            .includes("table_contract_violation"),
-        )
-      ) {
-        addWarning({
-          code: "table_contract_violation",
-          source: "enforcer",
-          severity: "warning",
-        });
-      }
-    } catch (error) {
-      const reasonCode = "enforcer_runtime_error";
-      const modelName =
-        params.telemetry && typeof params.telemetry === "object"
-          ? String(
-              (params.telemetry as Record<string, unknown>).model || "",
-            ).trim() || null
-          : null;
-      appLogger.error("[finalizeChatTurn] enforcer_failed_closed", {
-        event: "enforcer_failed_closed",
-        requestId: this.resolveTraceId(params.req),
-        model: modelName,
-        attachedDocCount: Array.isArray(params.req.attachedDocumentIds)
-          ? params.req.attachedDocumentIds.length
-          : 0,
-        error: error instanceof Error ? error.message : String(error),
-      });
-      const failureMode = resolveRuntimeFailureMode(
-        reasonCode,
-        failSoftWarningsEnabled,
-      );
-      if (failureMode === "fail_closed") {
-        failureCode = reasonCode;
-        text = buildEmptyAssistantText({
-          language: params.req.preferredLanguage,
-          reasonCode,
-          seed: `${params.req.userId}:enforcer:${reasonCode}`,
-        });
-        enforcement = {
-          repairs: [],
-          warnings: ["ENFORCER_RUNTIME_ERROR_FAIL_CLOSED"],
-        };
-      } else {
-        addWarning({
-          code: reasonCode,
-          source: "enforcer",
-          severity: "warning",
-        });
-        enforcement = {
-          repairs: [],
-          warnings: ["ENFORCER_RUNTIME_ERROR_FAIL_OPEN"],
-        };
-      }
-    }
-
-    if (!failureCode) {
-      text = this.repairProviderOverflowStructuredOutput(
-        text,
-        (params.telemetry as Record<string, unknown>) ?? null,
-        params.req.preferredLanguage,
-        enforcement?.repairs ?? null,
-      );
-      const revalidatedProvenance = buildChatProvenance({
-        answerText: text,
-        answerMode: params.answerMode,
-        answerClass: params.answerClass,
-        retrievalPack: params.retrievalPack,
-      });
-      const revalidated = validateChatProvenance({
-        provenance: revalidatedProvenance,
-        answerMode: params.answerMode,
-        answerClass: params.answerClass,
-        allowedDocumentIds: params.req.attachedDocumentIds || [],
-      });
-      provenance = {
-        ...revalidatedProvenance,
-        validated: revalidated.ok,
-        failureCode: revalidated.failureCode,
-        sourceDocumentIds:
-          revalidatedProvenance.sourceDocumentIds.length > 0
-            ? revalidatedProvenance.sourceDocumentIds
-            : sourceDocumentIdsFromSources,
-      };
-      if (!revalidated.ok && !this.provenanceUserFailOpenWithEvidence) {
-        failureCode = revalidated.failureCode;
-        text = buildEmptyAssistantText({
-          language: params.req.preferredLanguage,
-          reasonCode: revalidated.failureCode,
-          seed: `${params.req.userId}:provenance:${revalidated.failureCode}:${params.req.conversationId || Date.now()}`,
-        });
-      }
-    }
-
-    const languageContract = enforceLanguageContract({
-      text,
-      preferredLanguage: params.req.preferredLanguage,
-    });
-    if (languageContract.adjusted) {
-      appLogger.warn("[finalizeChatTurn] language_contract_adjusted", {
-        requestId: this.resolveTraceId(params.req),
-        preferredLanguage: normalizeChatLanguage(params.req.preferredLanguage),
-        failClosed: languageContract.failClosed,
-      });
-      text = languageContract.text;
-      if (languageContract.failClosed && !failureCode) {
-        failureCode = "language_contract_mismatch";
-      }
-    }
-
-    if (failureCode) {
-      addWarning({
-        code: failureCode,
-        source: "runtime",
-        severity: isHardFailClosedReason(failureCode) ? "error" : "warning",
-      });
-    }
-    const warnings = warningPayloadEnabled
-      ? Array.from(warningByCode.values())
-      : [];
-    const userWarning = warningPayloadEnabled
-      ? warnings.find((entry) => entry.severity === "error") || warnings[0] || null
-      : null;
-
-    // 4. Generate followups for doc-grounded answers
-    const followups = this.generateFollowups(
-      params.req,
-      params.answerMode,
-      params.retrievalPack,
-    );
-
-    return {
-      assistantText: text,
-      followups,
-      enforcement,
-      provenance,
-      provenanceTelemetry,
-      failureCode,
-      qualityGateIssues,
-      qualityGates,
-      userWarning,
-      warnings,
-    };
-  }
-
   private async ensureConversation(
     userId: string,
     conversationId?: string,
@@ -4455,100 +3225,8 @@ export class CentralizedChatRuntimeDelegate {
     return { id: created.id, title: created.title ?? null, lastDocumentId: null };
   }
 
-  private async buildRuntimePolicyFailureResult(input: {
-    req: ChatRequest;
-    conversationId: string;
-    userMessage: ChatMessageDTO | null;
-    code: "RUNTIME_POLICY_MISSING" | "RUNTIME_POLICY_INVALID";
-  }): Promise<ChatResult> {
-    const req = input.req;
-    const conversationId =
-      input.conversationId ||
-      (await this.ensureConversation(req.userId, req.conversationId)).id;
-    const userMessage =
-      input.userMessage ||
-      (await this.createMessage({
-        conversationId,
-        role: "user",
-        content: req.message,
-        userId: req.userId,
-      }));
-
-    const assistantText = buildEmptyAssistantText({
-      language: req.preferredLanguage,
-      reasonCode: input.code,
-      seed: `${conversationId}:runtime_policy:${input.code}`,
-    });
-    const answerMode: AnswerMode =
-      (req.attachedDocumentIds || []).length > 0
-        ? "help_steps"
-        : "general_answer";
-    const answerClass: AnswerClass =
-      answerMode === "general_answer" || answerMode === "help_steps"
-        ? "GENERAL"
-        : "DOCUMENT";
-    const warning = buildWarningEntry({
-      code: input.code,
-      language: normalizeChatLanguage(req.preferredLanguage),
-      severity: "error",
-      source: "runtime",
-    });
-
-    const assistantMessage = await this.createMessage({
-      conversationId,
-      role: "assistant",
-      content: assistantText,
-      userId: req.userId,
-      metadata: {
-        failureCode: input.code,
-        answerMode,
-        answerClass,
-        userWarning: warning,
-        warnings: [warning],
-      },
-    });
-
-    return {
-      conversationId,
-      userMessageId: userMessage.id,
-      assistantMessageId: assistantMessage.id,
-      assistantText,
-      attachmentsPayload: [],
-      assistantTelemetry: undefined,
-      sources: [],
-      followups: [],
-      answerMode,
-      answerClass,
-      navType: null,
-      fallbackReasonCode: input.code,
-      status: "failed",
-      failureCode: input.code,
-      userWarning: warning,
-      warnings: [warning],
-      completion: {
-        answered: false,
-        missingSlots: ["runtime_policy"],
-        nextAction: null,
-      },
-      truncation: {
-        occurred: false,
-        reason: null,
-        resumeToken: null,
-        providerOccurred: false,
-        providerReason: null,
-        detectorVersion: SEMANTIC_TRUNCATION_DETECTOR_VERSION,
-      },
-      evidence: {
-        required: (req.attachedDocumentIds || []).length > 0,
-        provided: false,
-        sourceIds: [],
-      },
-    };
-  }
-
   private resolveGovernancePolicyBlock(req: ChatRequest): {
     code: string;
-    text: string;
     status: "blocked" | "clarification_required";
   } | null {
     const compliance = this.compliancePolicy.decide({
@@ -4556,15 +3234,11 @@ export class CentralizedChatRuntimeDelegate {
       context: asObject(req.context),
     });
     if (compliance.blocked) {
+      const complianceReason = String(
+        compliance.reasonCode || "compliance_blocked",
+      );
       return {
-        code: String(compliance.reasonCode || "compliance_blocked"),
-        text:
-          String(compliance.message || "").trim() ||
-          buildEmptyAssistantText({
-            language: req.preferredLanguage,
-            reasonCode: "compliance_blocked",
-            seed: `${req.userId}:compliance_blocked`,
-          }),
+        code: complianceReason,
         status: "blocked",
       };
     }
@@ -4576,103 +3250,11 @@ export class CentralizedChatRuntimeDelegate {
     if (refusal.blocked) {
       return {
         code: "policy_refusal_required",
-        text: this.refusalPolicy.buildUserFacingText({
-          decision: refusal,
-          preferredLanguage: req.preferredLanguage,
-        }),
         status: "blocked",
       };
     }
 
     return null;
-  }
-
-  private async buildGovernanceBlockedResult(input: {
-    req: ChatRequest;
-    conversationId: string;
-    userMessage: ChatMessageDTO | null;
-    code: string;
-    text: string;
-    status: "blocked" | "clarification_required";
-  }): Promise<ChatResult> {
-    const req = input.req;
-    const conversationId =
-      input.conversationId ||
-      (await this.ensureConversation(req.userId, req.conversationId)).id;
-    const userMessage =
-      input.userMessage ||
-      (await this.createMessage({
-        conversationId,
-        role: "user",
-        content: req.message,
-        userId: req.userId,
-      }));
-
-    const answerMode: AnswerMode =
-      (req.attachedDocumentIds || []).length > 0
-        ? "help_steps"
-        : "general_answer";
-    const answerClass: AnswerClass =
-      answerMode === "general_answer" || answerMode === "help_steps"
-        ? "GENERAL"
-        : "DOCUMENT";
-    const warning = buildWarningEntry({
-      code: input.code,
-      language: normalizeChatLanguage(req.preferredLanguage),
-      severity: "error",
-      source: "runtime",
-    });
-
-    const assistantMessage = await this.createMessage({
-      conversationId,
-      role: "assistant",
-      content: input.text,
-      userId: req.userId,
-      metadata: {
-        failureCode: input.code,
-        answerMode,
-        answerClass,
-        userWarning: warning,
-        warnings: [warning],
-      },
-    });
-
-    return {
-      conversationId,
-      userMessageId: userMessage.id,
-      assistantMessageId: assistantMessage.id,
-      assistantText: input.text,
-      attachmentsPayload: [],
-      assistantTelemetry: undefined,
-      sources: [],
-      followups: [],
-      answerMode,
-      answerClass,
-      navType: null,
-      fallbackReasonCode: input.code,
-      status: input.status,
-      failureCode: input.code,
-      userWarning: warning,
-      warnings: [warning],
-      completion: {
-        answered: false,
-        missingSlots: [input.code],
-        nextAction: null,
-      },
-      truncation: {
-        occurred: false,
-        reason: null,
-        resumeToken: null,
-        providerOccurred: false,
-        providerReason: null,
-        detectorVersion: SEMANTIC_TRUNCATION_DETECTOR_VERSION,
-      },
-      evidence: {
-        required: (req.attachedDocumentIds || []).length > 0,
-        provided: false,
-        sourceIds: [],
-      },
-    };
   }
 
   private async loadRecentForEngine(
@@ -5506,13 +4088,13 @@ export class CentralizedChatRuntimeDelegate {
     if (attached.length === 0 && !allowGlobalScope) return null;
 
     const dependencies = this.retrievalFactory.createForUser(req.userId);
-    const retrievalEngine = new RetrievalEngineService(
-      getBankLoaderInstance(),
-      dependencies.docStore,
-      dependencies.semanticIndex,
-      dependencies.lexicalIndex,
-      dependencies.structuralIndex,
-    );
+    const retrievalEngine: IRetrievalEngine = createRetrievalEngine({
+      bankLoader: getBankLoaderInstance(),
+      docStore: dependencies.docStore,
+      semanticIndex: dependencies.semanticIndex,
+      lexicalIndex: dependencies.lexicalIndex,
+      structuralIndex: dependencies.structuralIndex,
+    });
     const semanticSignals = this.collectSemanticSignals(
       req.message,
       contextSignals,
@@ -5773,9 +4355,9 @@ export class CentralizedChatRuntimeDelegate {
       attachedDocumentIds?: string[];
       evidenceCount?: number;
     },
-  ): { text: string; failureCode: string } | null {
+  ): { failureCode: string } | null {
     if (!decision) return null;
-    const lang = normalizeChatLanguage(language);
+    void language;
 
     // RC7 fix: Do NOT bypass with clarification when documents ARE attached
     // AND retrieval found evidence from those docs. The user already provided
@@ -5789,26 +4371,7 @@ export class CentralizedChatRuntimeDelegate {
         // The hedge mechanism will add uncertainty prefix if needed.
         return null;
       }
-      const question =
-        String(decision.clarifyQuestion || "").trim() ||
-        (lang === "pt"
-          ? "Qual parte exata você quer validar no documento?"
-          : lang === "es"
-            ? "¿Qué parte exacta quieres validar en el documento?"
-            : "Which exact part do you want me to validate in the document?");
-      const normalizedQuestion =
-        this.clarificationPolicy.enforceClarificationQuestion({
-          question,
-          preferredLanguage: lang,
-        });
-      const prompt =
-        lang === "pt"
-          ? `Preciso de uma confirmação para responder com precisão: ${normalizedQuestion}`
-          : lang === "es"
-            ? `Necesito una confirmación para responder con precisión: ${normalizedQuestion}`
-            : `I need one clarification to answer precisely: ${normalizedQuestion}`;
       return {
-        text: prompt,
         failureCode: "EVIDENCE_NEEDS_CLARIFICATION",
       };
     }
@@ -5819,14 +4382,7 @@ export class CentralizedChatRuntimeDelegate {
       if (hasAttachedDocs) {
         return null;
       }
-      const text =
-        lang === "pt"
-          ? "Não encontrei evidência suficiente nos documentos para responder com segurança."
-          : lang === "es"
-            ? "No encontré evidencia suficiente en los documentos para responder con seguridad."
-            : "I could not find enough evidence in your documents to answer safely.";
       return {
-        text,
         failureCode: "EVIDENCE_INSUFFICIENT",
       };
     }

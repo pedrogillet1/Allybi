@@ -4,6 +4,7 @@ import path from "path";
 import { initializeBanks } from "../../services/core/banks/bankLoader.service";
 import {
   estimateTokenCount,
+  resolveOutputBudget,
   resolveOutputTokenBudget,
 } from "../../services/core/enforcement/tokenBudget.service";
 import { getResponseContractEnforcer } from "../../services/core/enforcement/responseContractEnforcer.service";
@@ -69,7 +70,6 @@ describe("Certification: truncation and output formatting", () => {
     const estimatedTokens = estimateTokenCount(enforced.content);
 
     const failures: string[] = [];
-    if (enforced.enforcement.blocked) failures.push("ENFORCER_BLOCKED_OUTPUT");
     if (estimatedTokens > hardLimit) failures.push("HARD_TOKEN_LIMIT_EXCEEDED");
     if (rowLines.length < 3) failures.push("TABLE_STRUCTURE_COLLAPSED");
     if (hasOverlongDashRun) failures.push("OVERLONG_DASH_SEPARATOR");
@@ -80,7 +80,6 @@ describe("Certification: truncation and output formatting", () => {
         estimatedTokens,
         hardLimit,
         rowLines: rowLines.length,
-        blocked: enforced.enforcement.blocked,
         hasOverlongDashRun,
       },
       thresholds: {
@@ -112,7 +111,6 @@ describe("Certification: truncation and output formatting", () => {
       },
     );
 
-    expect(enforced.enforcement.blocked).toBe(false);
     expect(
       enforced.enforcement.repairs.includes("SOFT_MAX_TOKENS_TRIMMED"),
     ).toBe(false);
@@ -142,6 +140,28 @@ describe("Certification: truncation and output formatting", () => {
 
     expect(ptBudget.maxOutputTokens).toBeGreaterThanOrEqual(
       enBudget.maxOutputTokens,
+    );
+  });
+
+  test("response enforcer resolves the same fallback budgets as tokenBudget service", () => {
+    const budget = resolveOutputBudget({
+      answerMode: "general_answer",
+      outputLanguage: "en",
+      routeStage: "final",
+      operator: "summarize",
+    });
+    const enforcer = getResponseContractEnforcer();
+    const ctx = {
+      answerMode: "general_answer",
+      language: "en" as const,
+      operator: "summarize",
+      constraints: {},
+    };
+
+    expect(enforcer.resolveSoftTokenLimit(ctx)).toBe(budget.maxOutputTokens);
+    expect(enforcer.resolveHardCharLimit(ctx)).toBe(budget.maxChars);
+    expect(enforcer.resolveHardTokenLimit(ctx, budget.maxOutputTokens)).toBe(
+      budget.hardOutputTokens,
     );
   });
 
@@ -226,7 +246,7 @@ describe("Certification: truncation and output formatting", () => {
       metrics: {
         pipeLines: pipeLines.length,
         contentRows: contentRows.length,
-        blocked: enforced.enforcement.blocked,
+        violationCount: enforced.enforcement.violations.length,
       },
       thresholds: { minContentRows: 2, minPipeLines: 1 },
       failures,

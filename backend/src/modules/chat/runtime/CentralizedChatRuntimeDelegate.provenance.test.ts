@@ -1,348 +1,285 @@
 import "reflect-metadata";
+import fs from "fs";
 import path from "path";
-import {
-  afterEach,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  jest,
-  test,
-} from "@jest/globals";
-
-jest.mock("../../../services/core/retrieval/evidenceGate.service", () => ({
-  EvidenceGateService: class {
-    checkEvidence() {
-      return {
-        hasEvidence: true,
-        evidenceStrength: "strong",
-        suggestedAction: "answer",
-        missingEvidence: [],
-        foundEvidence: [],
-      };
-    }
-  },
-}));
+import { describe, expect, jest, test } from "@jest/globals";
 
 import { CentralizedChatRuntimeDelegate } from "./CentralizedChatRuntimeDelegate";
-import type { ChatEngine } from "../domain/chat.contracts";
-import { initializeBanks } from "../../../services/core/banks/bankLoader.service";
-import * as enforcerModule from "../../../services/core/enforcement/responseContractEnforcer.service";
-import { QualityGateRunnerService } from "../../../services/core/enforcement/qualityGateRunner.service";
 
-describe("CentralizedChatRuntimeDelegate provenance enforcement", () => {
-  let restoreEnforcer:
-    | jest.SpiedFunction<typeof enforcerModule.getResponseContractEnforcer>
-    | null = null;
-  let restoreGenerateFollowups: jest.SpiedFunction<any> | null = null;
-  let restoreQualityRunner:
-    | jest.SpiedFunction<QualityGateRunnerService["runGates"]>
-    | null = null;
-  let priorFailSoftFlag: string | undefined;
-  let priorProvenanceFailOpenFlag: string | undefined;
+describe("CentralizedChatRuntimeDelegate execution ownership", () => {
+  test("chat returns the execution draft from the shared execution path", async () => {
+    const delegate = Object.create(
+      CentralizedChatRuntimeDelegate.prototype,
+    ) as any;
+    const draft = { traceId: "trace-1", turnKey: "conv-1:user-msg-1" };
+    delegate.executeTurn = jest.fn(async (params) => ({
+      ...draft,
+      stream: params.stream,
+    }));
 
-  beforeAll(async () => {
-    await initializeBanks({
-      rootDir: path.resolve(process.cwd(), "src/data_banks"),
-      strict: false,
-      validateSchemas: false,
-      allowEmptyChecksumsInNonProd: true,
-      enableHotReload: false,
+    const out = await delegate.chat({
+      userId: "user-1",
+      conversationId: "conv-1",
+      message: "Question",
     });
+
+    expect(delegate.executeTurn).toHaveBeenCalledWith({
+      req: expect.objectContaining({
+        userId: "user-1",
+        conversationId: "conv-1",
+        message: "Question",
+      }),
+      stream: false,
+    });
+    expect(out).toEqual({
+      traceId: "trace-1",
+      turnKey: "conv-1:user-msg-1",
+      stream: false,
+    });
+    expect("assistantMessageId" in out).toBe(false);
   });
 
-  beforeEach(() => {
-    priorFailSoftFlag = process.env.CHAT_RUNTIME_FAIL_SOFT_WARNINGS;
-    priorProvenanceFailOpenFlag =
-      process.env.PROVENANCE_USER_FAILOPEN_WITH_EVIDENCE;
-    restoreEnforcer = jest
-      .spyOn(enforcerModule, "getResponseContractEnforcer")
-      .mockReturnValue({
-        enforce(payload: { content: string; attachments: unknown[] }) {
-          return {
-            content: payload.content,
-            attachments: payload.attachments,
-            enforcement: {
-              repairs: [],
-              warnings: [],
-              blocked: false,
-            },
-          };
+  test("streamChat returns the execution draft from the same execution path", async () => {
+    const delegate = Object.create(
+      CentralizedChatRuntimeDelegate.prototype,
+    ) as any;
+    const sink = { emit: jest.fn() };
+    const streamingConfig = { emitDelta: true };
+    const draft = { traceId: "trace-2", turnKey: "conv-1:user-msg-1" };
+    delegate.executeTurn = jest.fn(async (params) => ({
+      ...draft,
+      stream: params.stream,
+      sink: params.sink,
+      streamingConfig: params.streamingConfig,
+    }));
+
+    const out = await delegate.streamChat({
+      req: {
+        userId: "user-1",
+        conversationId: "conv-1",
+        message: "Question",
+      },
+      sink: sink as any,
+      streamingConfig: streamingConfig as any,
+    });
+
+    expect(delegate.executeTurn).toHaveBeenCalledWith({
+      req: expect.objectContaining({
+        userId: "user-1",
+        conversationId: "conv-1",
+        message: "Question",
+      }),
+      sink,
+      streamingConfig,
+      stream: true,
+    });
+    expect(out).toEqual({
+      traceId: "trace-2",
+      turnKey: "conv-1:user-msg-1",
+      stream: true,
+      sink,
+      streamingConfig,
+    });
+    expect("assistantMessageId" in out).toBe(false);
+  });
+
+  test("persistFinalizedTurn is the only finalized assistant persistence path", async () => {
+    const delegate = Object.create(
+      CentralizedChatRuntimeDelegate.prototype,
+    ) as any;
+    delegate.traceWriter = {
+      startSpan: jest.fn(() => "span-1"),
+      endSpan: jest.fn(),
+    };
+    delegate.createMessage = jest.fn(async () => ({ id: "assistant-msg-9" }));
+    delegate.persistTraceArtifacts = jest.fn(async () => undefined);
+    delegate.withGeneratedConversationTitle = jest.fn((result) => result);
+
+    const draft = {
+      traceId: "trace-9",
+      conversationId: "conv-1",
+      request: {
+        userId: "user-1",
+        conversationId: "conv-1",
+        message: "Question",
+        isRegenerate: true,
+      },
+      userMessage: { id: "user-msg-1" },
+      generatedConversationTitle: null,
+      fallbackReasonCode: null,
+      fallbackReasonCodeTelemetry: null,
+      fallbackPolicyMeta: null,
+      priorAssistantMessageId: "assistant-msg-8",
+      retrievalPack: null,
+      evidenceGateDecision: null,
+      answerMode: "general_answer",
+      timing: {
+        turnStartedAt: Date.now(),
+        retrievalMs: 3,
+        llmMs: 4,
+        stream: false,
+      },
+      turnKey: "conv-1:user-msg-1",
+      telemetry: null,
+    };
+
+    const finalized = {
+      conversationId: "conv-1",
+      userMessageId: "user-msg-1",
+      assistantText: "Answer",
+      attachmentsPayload: [],
+      assistantTelemetry: null,
+      sources: [],
+      followups: [],
+      answerMode: "general_answer",
+      answerClass: "GENERAL",
+      navType: null,
+      status: "success",
+      failureCode: null,
+      fallbackReasonCode: null,
+      completion: { answered: true, missingSlots: [], nextAction: null },
+      truncation: {
+        occurred: false,
+        reason: null,
+        resumeToken: null,
+        providerOccurred: false,
+        providerReason: null,
+        detectorVersion: null,
+      },
+      evidence: {
+        required: false,
+        provided: false,
+        sourceIds: [],
+      },
+      qualityGates: { allPassed: true, failed: [] },
+      warnings: [],
+      userWarning: null,
+      turnKey: "conv-1:user-msg-1",
+    };
+
+    const out = await delegate.persistFinalizedTurn({
+      draft,
+      finalized,
+    });
+
+    expect(delegate.createMessage).toHaveBeenCalledTimes(1);
+    expect(delegate.createMessage).toHaveBeenCalledWith(
+      expect.objectContaining({
+        conversationId: "conv-1",
+        role: "assistant",
+        content: "Answer",
+        userId: "user-1",
+        metadata: expect.objectContaining({
+          turnKey: "conv-1:user-msg-1",
+          regenerateOfUserMessageId: "user-msg-1",
+          priorAssistantMessageId: "assistant-msg-8",
+        }),
+      }),
+    );
+    expect(out.assistantMessageId).toBe("assistant-msg-9");
+    expect(out.traceId).toBe("trace-9");
+  });
+
+  test("regenerate reuses the latest user message instead of creating a duplicate", async () => {
+    const delegate = Object.create(CentralizedChatRuntimeDelegate.prototype) as any;
+    delegate.listMessages = jest.fn(async () => [
+      {
+        id: "assistant-msg-2",
+        role: "assistant",
+        content: "Old assistant answer",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+      {
+        id: "user-msg-1",
+        role: "user",
+        content: "Original question",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+    ]);
+    delegate.createMessage = jest.fn();
+
+    const result = await delegate.ensureUserTurn(
+      {
+        userId: "user-1",
+        conversationId: "conv-1",
+        message: "Regenerate that",
+        isRegenerate: true,
+      },
+      "conv-1",
+    );
+
+    expect(result.userMessage.id).toBe("user-msg-1");
+    expect(result.priorAssistantMessageId).toBe("assistant-msg-2");
+    expect(delegate.createMessage).not.toHaveBeenCalled();
+  });
+
+  test("builds deterministic turn keys from the user turn identity", () => {
+    const delegate = Object.create(CentralizedChatRuntimeDelegate.prototype) as any;
+
+    const draft = delegate.buildExecutionDraft({
+      traceId: "trace-1",
+      req: {
+        userId: "user-1",
+        conversationId: "conv-1",
+        message: "Question",
+      },
+      conversationId: "conv-1",
+      userMessage: {
+        id: "user-msg-7",
+        role: "user",
+        content: "Question",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+      outputContract: "USER_VISIBLE_TEXT",
+      answerMode: "general_answer",
+      answerClass: "GENERAL",
+      navType: null,
+      retrievalPack: null,
+      evidenceGateDecision: null,
+      sources: [],
+      assistantTextRaw: "Answer",
+      draftResult: {
+        conversationId: "conv-1",
+        userMessageId: "user-msg-7",
+        assistantText: "Answer",
+        attachmentsPayload: [],
+        sources: [],
+        followups: [],
+        answerMode: "general_answer",
+        answerClass: "GENERAL",
+        navType: null,
+        completion: { answered: true, missingSlots: [], nextAction: null },
+        truncation: {
+          occurred: false,
+          reason: null,
+          resumeToken: null,
         },
-      } as any);
-    restoreGenerateFollowups = jest
-      .spyOn(
-        CentralizedChatRuntimeDelegate.prototype as any,
-        "generateFollowups",
-      )
-      .mockResolvedValue([]);
+        evidence: {
+          required: false,
+          provided: false,
+          sourceIds: [],
+        },
+      },
+      telemetry: null,
+      timing: {
+        turnStartedAt: 1,
+        retrievalMs: 2,
+        llmMs: 3,
+        stream: false,
+      },
+    });
+
+    expect(draft.turnKey).toBe("conv-1:user-msg-7");
   });
 
-  afterEach(() => {
-    restoreEnforcer?.mockRestore();
-    restoreEnforcer = null;
-    restoreGenerateFollowups?.mockRestore();
-    restoreGenerateFollowups = null;
-    restoreQualityRunner?.mockRestore();
-    restoreQualityRunner = null;
-    if (priorFailSoftFlag === undefined) {
-      delete process.env.CHAT_RUNTIME_FAIL_SOFT_WARNINGS;
-    } else {
-      process.env.CHAT_RUNTIME_FAIL_SOFT_WARNINGS = priorFailSoftFlag;
-    }
-    if (priorProvenanceFailOpenFlag === undefined) {
-      delete process.env.PROVENANCE_USER_FAILOPEN_WITH_EVIDENCE;
-    } else {
-      process.env.PROVENANCE_USER_FAILOPEN_WITH_EVIDENCE =
-        priorProvenanceFailOpenFlag;
-    }
-  });
+  test("delegate source no longer contains a private finalizer shim", () => {
+    const filePath = path.resolve(__dirname, "CentralizedChatRuntimeDelegate.ts");
+    const source = fs.readFileSync(filePath, "utf8");
 
-  test("fails closed for missing provenance when scoped evidence exists by default", async () => {
-    const engine: ChatEngine = {
-      async generate() {
-        return { text: "unused" };
-      },
-      async stream() {
-        return { text: "unused", chunks: [] };
-      },
-    } as ChatEngine;
-
-    const delegate = new CentralizedChatRuntimeDelegate(engine, {
-      conversationMemory: {} as any,
-    });
-
-    const originalText =
-      "UNRELATED_OUTPUT_WITHOUT_OVERLAP_SHOULD_NOT_PASS_PROVENANCE";
-    const finalized = await (delegate as any).finalizeChatTurn({
-      assistantText: originalText,
-      req: {
-        userId: "user-provenance-1",
-        message: "quais sao os pontos principais do documento?",
-        attachedDocumentIds: ["doc-1"],
-        preferredLanguage: "pt",
-        meta: { requestId: "req-provenance-failclosed" },
-      },
-      answerMode: "doc_grounded_single",
-      answerClass: "DOCUMENT",
-      retrievalPack: {
-        evidence: [
-          {
-            docId: "doc-2",
-            snippet: "Trecho curto sobre framework scrum e papeis de produto.",
-            location: { page: 1 },
-            score: 0.9,
-            locationKey: "d:doc-2|p:1|c:1",
-          },
-        ],
-        debug: null,
-      },
-      sources: [{ documentId: "doc-2", location: { page: 1 }, score: 0.9 }],
-      telemetry: { model: "unit-test-model" },
-    });
-
-    expect(finalized.failureCode).toBe("missing_provenance");
-    expect(finalized.assistantText).not.toBe(originalText);
-    expect(finalized.provenance?.validated).toBe(false);
-    expect(finalized.provenance?.failureCode).toBe("missing_provenance");
-    expect(finalized.provenanceTelemetry).toBeNull();
-  });
-
-  test("keeps missing provenance fail-closed even when override flag is set", async () => {
-    process.env.PROVENANCE_USER_FAILOPEN_WITH_EVIDENCE = "true";
-    const engine: ChatEngine = {
-      async generate() {
-        return { text: "unused" };
-      },
-      async stream() {
-        return { text: "unused", chunks: [] };
-      },
-    } as ChatEngine;
-
-    const delegate = new CentralizedChatRuntimeDelegate(engine, {
-      conversationMemory: {} as any,
-    });
-
-    const originalText =
-      "UNRELATED_OUTPUT_WITHOUT_OVERLAP_SHOULD_NOT_PASS_PROVENANCE";
-    const finalized = await (delegate as any).finalizeChatTurn({
-      assistantText: originalText,
-      req: {
-        userId: "user-provenance-1",
-        message: "quais sao os pontos principais do documento?",
-        attachedDocumentIds: ["doc-1"],
-        preferredLanguage: "pt",
-        meta: { requestId: "req-provenance-failopen-override" },
-      },
-      answerMode: "doc_grounded_single",
-      answerClass: "DOCUMENT",
-      retrievalPack: {
-        evidence: [
-          {
-            docId: "doc-2",
-            snippet: "Trecho curto sobre framework scrum e papeis de produto.",
-            location: { page: 1 },
-            score: 0.9,
-            locationKey: "d:doc-2|p:1|c:1",
-          },
-        ],
-        debug: null,
-      },
-      sources: [{ documentId: "doc-2", location: { page: 1 }, score: 0.9 }],
-      telemetry: { model: "unit-test-model" },
-    });
-
-    expect(finalized.failureCode).toBe("missing_provenance");
-    expect(finalized.assistantText).not.toBe(originalText);
-    expect(finalized.provenance?.validated).toBe(false);
-    expect(finalized.provenance?.failureCode).toBe("missing_provenance");
-    expect(finalized.provenanceTelemetry).toBeNull();
-    expect(finalized.enforcement?.warnings || []).not.toContain(
-      "PROVENANCE_FAILOPEN_WITH_EVIDENCE",
-    );
-  });
-
-  test("fails closed for missing provenance when no scoped evidence exists", async () => {
-    const engine: ChatEngine = {
-      async generate() {
-        return { text: "unused" };
-      },
-      async stream() {
-        return { text: "unused", chunks: [] };
-      },
-    } as ChatEngine;
-
-    const delegate = new CentralizedChatRuntimeDelegate(engine, {
-      conversationMemory: {} as any,
-    });
-
-    const originalText = "Resposta curta sem citacao lexical explicita.";
-    const finalized = await (delegate as any).finalizeChatTurn({
-      assistantText: originalText,
-      req: {
-        userId: "user-provenance-2",
-        message: "quais sao os principais pontos?",
-        attachedDocumentIds: ["doc-1"],
-        preferredLanguage: "pt",
-        meta: { requestId: "req-provenance-demote-missing" },
-      },
-      answerMode: "doc_grounded_single",
-      answerClass: "DOCUMENT",
-      retrievalPack: {
-        evidence: [],
-        debug: null,
-      },
-      sources: [],
-      telemetry: { model: "unit-test-model" },
-    });
-
-    expect(finalized.failureCode).toBe("missing_provenance");
-    expect(finalized.assistantText).not.toBe(originalText);
-    expect(finalized.provenance?.validated).toBe(false);
-    expect(finalized.provenance?.failureCode).toBe("missing_provenance");
-    expect(finalized.provenanceTelemetry).toBeNull();
-  });
-
-  test("soft-opens quality gate blocks with warnings when fail-soft flag is enabled", async () => {
-    process.env.CHAT_RUNTIME_FAIL_SOFT_WARNINGS = "true";
-    restoreQualityRunner = jest
-      .spyOn(QualityGateRunnerService.prototype, "runGates")
-      .mockResolvedValue({
-        allPassed: false,
-        finalScore: 0,
-        results: [
-          {
-            passed: false,
-            gateName: "privacy_minimal",
-            issues: ["blocked for test"],
-          },
-        ],
-      });
-
-    const engine: ChatEngine = {
-      async generate() {
-        return { text: "unused" };
-      },
-      async stream() {
-        return { text: "unused", chunks: [] };
-      },
-    } as ChatEngine;
-
-    const delegate = new CentralizedChatRuntimeDelegate(engine, {
-      conversationMemory: {} as any,
-    });
-
-    const finalized = await (delegate as any).finalizeChatTurn({
-      assistantText: "Grounded answer text that should remain visible.",
-      req: {
-        userId: "user-quality-soft",
-        message: "summarize this",
-        preferredLanguage: "en",
-      },
-      answerMode: "general_answer",
-      answerClass: "GENERAL",
-      retrievalPack: null,
-      sources: [],
-      telemetry: { model: "unit-test-model" },
-    });
-
-    expect(finalized.failureCode).toBeNull();
-    expect(finalized.assistantText).toContain(
-      "Grounded answer text that should remain visible.",
-    );
-    expect(finalized.userWarning?.code).toBe("quality_gate_blocked");
-    expect(finalized.warnings?.map((w: any) => w.code)).toContain(
-      "quality_gate_blocked",
-    );
-  });
-
-  test("fails closed on quality gate blocks when fail-soft flag is disabled", async () => {
-    process.env.CHAT_RUNTIME_FAIL_SOFT_WARNINGS = "false";
-    restoreQualityRunner = jest
-      .spyOn(QualityGateRunnerService.prototype, "runGates")
-      .mockResolvedValue({
-        allPassed: false,
-        finalScore: 0,
-        results: [
-          {
-            passed: false,
-            gateName: "privacy_minimal",
-            issues: ["blocked for test"],
-          },
-        ],
-      });
-
-    const engine: ChatEngine = {
-      async generate() {
-        return { text: "unused" };
-      },
-      async stream() {
-        return { text: "unused", chunks: [] };
-      },
-    } as ChatEngine;
-
-    const delegate = new CentralizedChatRuntimeDelegate(engine, {
-      conversationMemory: {} as any,
-    });
-
-    const finalized = await (delegate as any).finalizeChatTurn({
-      assistantText: "This text should be replaced by fallback.",
-      req: {
-        userId: "user-quality-closed",
-        message: "summarize this",
-        preferredLanguage: "en",
-      },
-      answerMode: "general_answer",
-      answerClass: "GENERAL",
-      retrievalPack: null,
-      sources: [],
-      telemetry: { model: "unit-test-model" },
-    });
-
-    expect(finalized.failureCode).toBe("quality_gate_blocked");
-    expect(finalized.assistantText).not.toBe(
-      "This text should be replaced by fallback.",
-    );
-    expect(finalized.userWarning?.code).toBe("quality_gate_blocked");
+    expect(source).not.toContain("finalizeChatTurn(");
+    expect(source).not.toContain("buildRuntimePolicyFailureResult(");
+    expect(source).not.toContain("buildGovernanceBlockedResult(");
   });
 });
