@@ -108,7 +108,8 @@
       "final_consistency": "warn",
       "brevity_and_constraints": "warn",
       "markdown_sanity": "warn",
-      "no_raw_json": "warn"
+      "no_raw_json": "warn",
+      "structural_completeness": "block"
     }
   },
   "gateOrder": [
@@ -137,7 +138,8 @@
     "numeric_malformed": "numeric_malformed",
     "json_disallowed": "json_disallowed",
     "nav_missing_buttons": "nav_missing_buttons",
-    "bad_generic_fallback": "bad_generic_fallback"
+    "bad_generic_fallback": "bad_generic_fallback",
+    "bad_fallback_detected": "bad_fallback_detected"
   },
   "gates": {
     "explicit_doc_enforcement": {

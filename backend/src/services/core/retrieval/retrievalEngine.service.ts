@@ -2640,9 +2640,10 @@ export class RetrievalEngineService {
         }
       }
 
-      // TOC-like content penalty — soft penalty, not a hard block
+      // TOC-like content penalty — aggressive penalty to prevent TOC entries
+      // from outranking actual content in large legal documents (RC3 fix)
       if (RetrievalEngineService.looksLikeTOC(c.snippet ?? "")) {
-        c.scores.final = ((c.scores.final ?? 0) * 0.45);
+        c.scores.final = ((c.scores.final ?? 0) * 0.20);
         c.signals.tocCandidate = true;
       }
 
@@ -3844,6 +3845,7 @@ export class RetrievalEngineService {
     const selectedDocs = new Set<string>();
     const perDocSectionCounts = new Map<string, Map<string, number>>();
     const perDocSnippetHashes = new Map<string, Map<string, number>>();
+    const tocPerDoc = new Map<string, number>();
     const primaryDocType = this.normalizeDocType(ctx.resolvedDocTypes[0]);
     const enforceNonComparePurity =
       !ctx.compareIntent &&
@@ -3929,6 +3931,13 @@ export class RetrievalEngineService {
         perDocSectionCounts.set(c.docId, sectionMap);
         hashMap.set(snippetHash, hashCount + 1);
         perDocSnippetHashes.set(c.docId, hashMap);
+      }
+
+      // Cap TOC candidates to max 1 per document to prevent TOC domination
+      if (c.signals?.tocCandidate) {
+        const tocCount = tocPerDoc.get(c.docId) ?? 0;
+        if (tocCount >= 1) continue;
+        tocPerDoc.set(c.docId, tocCount + 1);
       }
 
       const n = perDoc.get(c.docId) ?? 0;

@@ -118,12 +118,12 @@
     },
     "doc_grounded_single": {
       "maxCharsDefault": 4400,
-      "maxOutputTokensDefault": 3600,
+      "maxOutputTokensDefault": 6000,
       "preferProfile": "detailed"
     },
     "doc_grounded_multi": {
       "maxCharsDefault": 5200,
-      "maxOutputTokensDefault": 4200,
+      "maxOutputTokensDefault": 7000,
       "preferProfile": "detailed"
     },
     "doc_grounded_table": {
@@ -345,7 +345,7 @@
           "answerMode": "doc_grounded_multi"
         },
         "expect": {
-          "maxOutputTokens": 3400
+          "maxOutputTokens": 7000
         }
       }
     ]

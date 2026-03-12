@@ -315,10 +315,13 @@ function processSheet(
   const temporal = hasTemporalHeaders(headers);
   const financial = rowLabels.some(isFinancialMetric);
 
-  // Extract cell facts (for financial/metric data)
+  // Extract cell facts for any sheet with structured tabular data.
+  // Previously gated on `financial || temporal`, which missed non-financial
+  // spreadsheets (e.g. social assistance entity counts).
   const cellFacts: XlsxCellFact[] = [];
+  const hasStructuredData = headers.length >= 2 && data.length > headerRowIndex + 1;
 
-  if (financial || temporal) {
+  if (hasStructuredData) {
     // Process data rows
     for (let rowIdx = headerRowIndex + 1; rowIdx < data.length; rowIdx++) {
       const row = data[rowIdx];

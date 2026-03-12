@@ -1174,6 +1174,7 @@ const DEFAULT_BLOCKING_QUALITY_GATES = new Set<string>([
   "redaction_default_pii_identity_tax_banking",
   "medical_safety_boundaries",
   "privacy_minimal",
+  "structural_completeness",
 ]);
 
 type QualityGatesBank = {
@@ -3766,7 +3767,7 @@ export class CentralizedChatRuntimeDelegate {
       text.lastIndexOf("?"),
       text.lastIndexOf("。"),
     );
-    if (lastPeriod > text.length * 0.3) {
+    if (lastPeriod > Math.min(text.length * 0.15, 50)) {
       return text.slice(0, lastPeriod + 1).trim();
     }
     // If no good boundary found, keep as-is rather than making it worse

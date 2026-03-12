@@ -131,8 +131,8 @@ function resolveModeMax(answerMode: string): number {
   if (answerMode === "rank_disambiguate") return 220;
   if (answerMode === "rank_autopick") return 400;
   if (answerMode === "doc_grounded_table") return 4000;
-  if (answerMode === "doc_grounded_multi") return 3400;
-  if (answerMode === "doc_grounded_single") return 2800;
+  if (answerMode === "doc_grounded_multi") return 7000;
+  if (answerMode === "doc_grounded_single") return 6000;
   if (answerMode === "doc_grounded_quote") return 1000;
   if (answerMode === "help_steps") return 1200;
   if (answerMode === "no_docs") return 600;
