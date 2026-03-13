@@ -1,0 +1,155 @@
+{
+  "_meta": {
+    "id": "quote_span_rules",
+    "version": "1.0.0",
+    "description": "Precision rules for quote spans, preventing truncated, cross-span, and paraphrased quotes from being presented as exact text.",
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "koda-retrieval",
+    "compat": ">=1.0.0",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id",
+    "quoteMode": "exact_span_required",
+    "requireSingleSpan": true,
+    "allowSpanExpansionWhenDisclosed": true,
+    "minQuoteLength": 10,
+    "maxGapCharsBetweenSegments": 5
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "quote extraction + evidence formatting",
+    "consumer": "quote handling stage",
+    "intent": "ensure quote boundaries are faithful and never fabricate span continuity",
+    "emittedSignals": [
+      "quoteIsExact",
+      "quoteSpanBoundaryRisk",
+      "quoteSourceCount",
+      "quoteGapRisk"
+    ]
+  },
+  "rules": [
+    {
+      "id": "QSR_001_exact_quote_requires_span",
+      "trigger": "A quote is emitted without a source span with start/end offsets",
+      "check": "quote.requestedAsExact == true AND quote.sourceSpan.start == null",
+      "failureAction": "BLOCK_QUOTE_WITHOUT_SPAN",
+      "severity": "error"
+    },
+    {
+      "id": "QSR_002_split_multi_span_quote",
+      "trigger": "Single quote references more than one discontinuous source span",
+      "check": "quote.sourceSpanIds != null AND quote.sourceSpanIds.length > 1",
+      "failureAction": "SPLIT_OR_REPHRASE_WITH_DISCLOSURE",
+      "severity": "warning"
+    },
+    {
+      "id": "QSR_003_forbid_cross_document_quote_merge",
+      "trigger": "Quote spans come from multiple source documents",
+      "check": "quote.sourceDocIds != null AND quote.sourceDocIds.uniq().count > 1",
+      "failureAction": "BLOCK_CROSS_DOC_QUOTE",
+      "severity": "error"
+    },
+    {
+      "id": "QSR_004_prevent_truncated_quote",
+      "trigger": "Quote was inferred with ellipsis but quote.truncationDisclosure is false",
+      "check": "quote.wasTruncated == true AND quote.truncationDisclosure == false",
+      "failureAction": "ASK_TRUNCATION_DISCLOSURE_OR_RECAST",
+      "severity": "warning"
+    },
+    {
+      "id": "QSR_005_prevent_ocr_mishap_quotes",
+      "trigger": "Quote text confidence is below threshold",
+      "check": "quote.extractionConfidence < 0.72",
+      "failureAction": "DISCOURAGE_EXACT_QUOTE",
+      "severity": "warning"
+    },
+    {
+      "id": "QSR_006_minimum_span_length_guard",
+      "trigger": "Quoted snippet is too short to be evidentially meaningful",
+      "check": "quote.length < config.minQuoteLength",
+      "failureAction": "BLOCK_AS_TEXT_SNIPPET",
+      "severity": "info"
+    },
+    {
+      "id": "QSR_007_forbid_hidden_normalization",
+      "trigger": "Quote was normalized but normalizationDetails were not disclosed",
+      "check": "quote.normalizedInOutput == true AND quote.normalizationDisclosure != true",
+      "failureAction": "RENDER_WITH_NUMERIC_NOTE",
+      "severity": "warning"
+    },
+    {
+      "id": "QSR_008_gap_risk_across_segments",
+      "trigger": "Single quote has an unaccounted segment gap",
+      "check": "quote.segmentGapChars > config.maxGapCharsBetweenSegments",
+      "failureAction": "ASK_SPAN_RECONCILIATION",
+      "severity": "warning"
+    },
+    {
+      "id": "QSR_009_inline_quote_and_table_cell_alignment",
+      "trigger": "Quote claims table text but source does not pin table row and column",
+      "check": "quote.origin == 'table' AND (quote.tableRow == null OR quote.tableColumn == null)",
+      "failureAction": "FORCE_TABLE_CELL_CONTEXT",
+      "severity": "warning"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "quote_requires_source_span",
+        "input": {
+          "quote": {
+            "requestedAsExact": true,
+            "sourceSpan": {
+              "start": null
+            }
+          }
+        },
+        "expect": {
+          "failureAction": "BLOCK_QUOTE_WITHOUT_SPAN"
+        }
+      },
+      {
+        "id": "quote_cross_doc_is_blocked",
+        "input": {
+          "quote": {
+            "sourceDocIds": [
+              "docA",
+              "docB"
+            ]
+          }
+        },
+        "expect": {
+          "failureAction": "BLOCK_CROSS_DOC_QUOTE"
+        }
+      },
+      {
+        "id": "table_quote_needs_row_column",
+        "input": {
+          "quote": {
+            "origin": "table",
+            "tableRow": null
+          }
+        },
+        "expect": {
+          "failureAction": "FORCE_TABLE_CELL_CONTEXT"
+        }
+      }
+    ]
+  }
+}

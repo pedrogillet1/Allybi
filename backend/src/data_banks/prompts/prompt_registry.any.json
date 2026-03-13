@@ -100,6 +100,22 @@
       }
     },
     {
+      "id": "compose_style_contract",
+      "path": "prompts/compose_style_contract.any.json",
+      "required": true,
+      "concerns": [
+        "voice_selection",
+        "answer_strategy",
+        "anti_robotic_repair",
+        "uncertainty_wording"
+      ],
+      "purpose": "Live composition style contract derived from runtime style decisions.",
+      "appliesTo": {
+        "allOperators": true,
+        "allDomains": true
+      }
+    },
+    {
       "id": "task_answer_with_sources",
       "path": "prompts/task_answer_with_sources.any.json",
       "required": true,
@@ -219,7 +235,11 @@
       "global_bans",
       "grounding",
       "answer_shape",
-      "citation_contract"
+      "citation_contract",
+      "voice_selection",
+      "answer_strategy",
+      "anti_robotic_repair",
+      "uncertainty_wording"
     ],
     "retrieval": [
       "global_bans",
@@ -254,6 +274,7 @@
       "mode_chat",
       "llm_global_guards",
       "rag_policy",
+      "compose_style_contract",
       "task_answer_with_sources",
       "policy_citations"
     ],

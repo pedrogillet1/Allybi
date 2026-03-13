@@ -1,0 +1,215 @@
+{
+  "_meta": {
+    "id": "legal_validation_rules",
+    "version": "1.0.0",
+    "description": "Legal validation rules for clause-safe interpretation, role-specific obligations, and version precedence.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "domain": "legal"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "validate legal outputs before legal interpretation and recommendations",
+    "consumer": "legal validator",
+    "intent": "Reject unbounded legal claims, role swaps, and mixed-version interpretations.",
+    "emittedSignals": [
+      "legalValidationResult",
+      "legalRoleConflictType",
+      "legalVersionPrecedenceApplied"
+    ]
+  },
+  "exactnessContract": {
+    "forbiddenSubstitutions": [
+      "role_swap_without_source",
+      "signed_term_as_unsigned_term",
+      "obligation_without_party_role",
+      "obligation_without_clause_anchor",
+      "cross_version_hybrid_claim_without_precedence",
+      "liability_without_cap_scope",
+      "currency_without_unit_or_currency"
+    ],
+    "allowedSubstitutions": [
+      "draft_to_final_with_version_anchor",
+      "beneficiary_role_when_exactly_declared",
+      "named_currency_to_equivalent_with_conversion_provenance"
+    ],
+    "requiredAnchors": [
+      "party_role",
+      "clause_anchor",
+      "document_version",
+      "effective_scope",
+      "evidence_location"
+    ],
+    "mustPreservePolicyFlags": true
+  },
+  "validationRules": [
+    {
+      "id": "LEGAL_VAL_001_party_role_lock",
+      "severity": "high",
+      "applies": [
+        "extract",
+        "compare",
+        "evaluate"
+      ],
+      "check": "party_roles_are_bound_and_distinct_per_obligation",
+      "description": "Do not map obligations, rights, or restrictions across signer, witness, owner, beneficiary, issuer, patient, or subscriber roles without explicit role binding.",
+      "failureAction": "BLOCK_AND_REQUIRE_ROLE_BINDING"
+    },
+    {
+      "id": "LEGAL_VAL_002_clause_anchor_gate",
+      "severity": "high",
+      "applies": [
+        "extract",
+        "summarize",
+        "validate"
+      ],
+      "check": "claim_has_clause_anchor_and_definition_state",
+      "description": "Claims touching rights/obligations/limits must include explicit clause and definition anchors.",
+      "failureAction": "BLOCK_AND_REQUIRE_CLAUSE_ANCHOR"
+    },
+    {
+      "id": "LEGAL_VAL_003_version_precedence_gate",
+      "severity": "high",
+      "applies": [
+        "compare",
+        "validate",
+        "evaluate"
+      ],
+      "check": "version_or_effective_status_is_explicit",
+      "description": "Mixed versions, draft/redline, and amendment text must be separated with active version precedence.",
+      "failureAction": "BLOCK_AND_REQUIRE_VERSION_SCOPE"
+    },
+    {
+      "id": "LEGAL_VAL_004_exception_and_cure_gate",
+      "severity": "medium",
+      "applies": [
+        "evaluate",
+        "summarize",
+        "compare"
+      ],
+      "check": "exceptions_linked_to_condition_and_cure_window",
+      "description": "Do not infer obligations or remedies without exception and cure context when exceptions exist.",
+      "failureAction": "WARN_AND_REQUIRE_EXCEPTION_CONTEXT"
+    },
+    {
+      "id": "LEGAL_VAL_005_liability_clarity_gate",
+      "severity": "medium",
+      "applies": [
+        "extract",
+        "evaluate",
+        "validate"
+      ],
+      "check": "liability_or_cap_claims_include_limit_currency_scope",
+      "description": "Liability and indemnity statements require cap/value units, currency, and applicability scope.",
+      "failureAction": "WARN_AND_REQUIRE_LIMIT_SCOPE"
+    },
+    {
+      "id": "LEGAL_VAL_006_gov_law_gate",
+      "severity": "medium",
+      "applies": [
+        "extract",
+        "summarize",
+        "validate"
+      ],
+      "check": "governing_law_or_jurisdiction_context_present",
+      "description": "Jurisdiction outputs should include governing law and forum context or be explicitly marked unavailable.",
+      "failureAction": "WARN_AND_REQUIRE_LAW_CONTEXT"
+    },
+    {
+      "id": "LEGAL_VAL_007_dispute_resolution_scope",
+      "severity": "low",
+      "applies": [
+        "compare",
+        "evaluate"
+      ],
+      "check": "dispute_and_remedy_clause_reference_chain_present",
+      "description": "Dispute-readiness claims should trace from remedy clauses through precedence and related procedural clauses.",
+      "failureAction": "WARN_AND_ANNOTATE_DISPUTE_CHAIN"
+    },
+    {
+      "id": "LEGAL_VAL_008_signature_context_gate",
+      "severity": "low",
+      "applies": [
+        "extract",
+        "validate"
+      ],
+      "check": "signature_or_binding_status_present_when_inferred_binding",
+      "description": "Binding claims should check signature or formal effective-date status.",
+      "failureAction": "WARN_AND_REQUIRE_BINDING_CONTEXT"
+    },
+    {
+      "id": "LEGAL_VAL_009_document_type_lock",
+      "severity": "medium",
+      "applies": [
+        "extract",
+        "compare"
+      ],
+      "check": "doc_type_is_locked_for_query_scope",
+      "description": "Do not merge court notice, policies, and contract claims without explicit doc-type lock.",
+      "failureAction": "BLOCK_AND_REQUIRE_DOC_TYPE_SCOPE"
+    },
+    {
+      "id": "LEGAL_VAL_010_no_legal_advice",
+      "severity": "warning",
+      "applies": [
+        "advise",
+        "evaluate"
+      ],
+      "check": "no_unlicensed_legal_advice",
+      "description": "Avoid replacing interpretation with legal advice or prescriptive legal action language.",
+      "failureAction": "WARN_AND_REPHRASE_TO_INTERPRETIVE_BOUNDARY"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "legal_validation_requires_role_lock",
+        "input": {
+          "scenario": "same_party_name_multiple_roles"
+        },
+        "expect": {
+          "mustCheck": [
+            "LEGAL_VAL_001_party_role_lock"
+          ]
+        }
+      },
+      {
+        "id": "legal_validation_requires_version_scope",
+        "input": {
+          "queryType": "compare",
+          "query": "current vs amended obligations"
+        },
+        "expect": {
+          "mustCheck": [
+            "LEGAL_VAL_003_version_precedence_gate"
+          ]
+        }
+      },
+      {
+        "id": "legal_validation_requires_clause_anchor",
+        "input": {
+          "query": "What is the liability cap and exclusions?"
+        },
+        "expect": {
+          "mustCheck": [
+            "LEGAL_VAL_002_clause_anchor_gate"
+          ]
+        }
+      }
+    ]
+  }
+}

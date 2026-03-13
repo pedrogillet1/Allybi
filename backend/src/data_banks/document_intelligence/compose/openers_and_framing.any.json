@@ -1,0 +1,327 @@
+{
+  "_meta": {
+    "id": "openers_and_framing",
+    "version": "2.0.0",
+    "description": "First-sentence families for grounded answers. The goal is to open from the right angle without sounding templated, salesy, or overly stage-managed.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "composition-brain",
+    "usedBy": [
+      "modules/chat/runtime/CompositionStyleResolver.ts",
+      "data_banks/prompts/compose_style_contract.any.json"
+    ],
+    "tests": [
+      "modules/chat/runtime/CompositionStyleResolver.test.ts",
+      "services/core/enforcement/qualityGateRunner.service.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "first-sentence planning",
+    "consumer": "style decision resolver and compose style contract prompt",
+    "intent": "Choose a useful entry point: answer, scope, metric, quote, delta, status, or stabilizing frame. These are starter families, not lines to repeat verbatim."
+  },
+  "families": {
+    "direct_answer": {
+      "purpose": "Answer first when the user asked a direct question and the evidence is good.",
+      "en": [
+        "{{answer}}.",
+        "{{answer}}, based on the material in view.",
+        "{{answer}} if we stay with the document as written."
+      ],
+      "pt": [
+        "{{answer}}.",
+        "{{answer}}, olhando apenas para o material em vista.",
+        "{{answer}} se ficarmos no que o documento diz."
+      ]
+    },
+    "scope_anchor": {
+      "purpose": "Start by narrowing the scope before answering.",
+      "en": [
+        "In {{scope}}, {{answer}}.",
+        "On the portion you asked about, {{answer}}.",
+        "If we stay inside {{scope}}, {{answer}}."
+      ],
+      "pt": [
+        "Em {{scope}}, {{answer}}.",
+        "Na parte que voce apontou, {{answer}}.",
+        "Se ficarmos dentro de {{scope}}, {{answer}}."
+      ]
+    },
+    "evidence_anchor": {
+      "purpose": "Lead with what the evidence supports when a quote or record matters.",
+      "en": [
+        "The text supports {{answer}}.",
+        "What the document actually says points to {{answer}}.",
+        "The clearest reading of the cited text is {{answer}}."
+      ],
+      "pt": [
+        "O texto sustenta {{answer}}.",
+        "O que o documento realmente diz aponta para {{answer}}.",
+        "A leitura mais clara do trecho citado e {{answer}}."
+      ]
+    },
+    "bottom_line": {
+      "purpose": "Executive opener that leads with the decision signal.",
+      "en": [
+        "Bottom line: {{answer}}.",
+        "The topline is {{answer}}.",
+        "{{answer}}, and that is the part that matters most."
+      ],
+      "pt": [
+        "Linha de fundo: {{answer}}.",
+        "O principal e {{answer}}.",
+        "{{answer}}, e essa e a parte que mais importa."
+      ]
+    },
+    "decision_signal": {
+      "purpose": "Open with the operational consequence.",
+      "en": [
+        "The decision-relevant point is {{answer}}.",
+        "What changes the call here is {{answer}}.",
+        "The point that should drive the decision is {{answer}}."
+      ],
+      "pt": [
+        "O ponto decisorio aqui e {{answer}}.",
+        "O que muda a decisao e {{answer}}.",
+        "O ponto que deve orientar a decisao e {{answer}}."
+      ]
+    },
+    "finding_then_support": {
+      "purpose": "Analyst opener that states the finding before evidence.",
+      "en": [
+        "{{answer}}. The support for that reading comes from {{supportAnchor}}.",
+        "{{answer}}. The record lines up behind that through {{supportAnchor}}.",
+        "{{answer}}. That reading holds because {{supportAnchor}}."
+      ],
+      "pt": [
+        "{{answer}}. O suporte para essa leitura vem de {{supportAnchor}}.",
+        "{{answer}}. O registro converge para isso por meio de {{supportAnchor}}.",
+        "{{answer}}. Essa leitura se sustenta porque {{supportAnchor}}."
+      ]
+    },
+    "comparison_frame": {
+      "purpose": "Open a compare answer with the lens, not with file-name recitation.",
+      "en": [
+        "The key difference is {{delta}}.",
+        "Between the two versions, the important shift is {{delta}}.",
+        "What changes most between them is {{delta}}."
+      ],
+      "pt": [
+        "A diferenca central e {{delta}}.",
+        "Entre as duas versoes, a mudanca importante e {{delta}}.",
+        "O que mais muda entre elas e {{delta}}."
+      ]
+    },
+    "qualified_claim": {
+      "purpose": "Start with a bounded interpretation when certainty is not absolute.",
+      "en": [
+        "The stronger reading is {{answer}}, with one limit.",
+        "On this record, {{answer}}, although one boundary remains.",
+        "The document leans toward {{answer}}, not full certainty."
+      ],
+      "pt": [
+        "A leitura mais forte e {{answer}}, com um limite.",
+        "Nesse registro, {{answer}}, embora uma fronteira permaneca.",
+        "O documento pende para {{answer}}, sem chegar a certeza total."
+      ]
+    },
+    "stabilize_then_answer": {
+      "purpose": "Sensitive-topic opener that lowers temperature while staying concrete.",
+      "en": [
+        "A careful reading points to {{answer}}.",
+        "Staying close to the document, {{answer}}.",
+        "The safest grounded reading here is {{answer}}."
+      ],
+      "pt": [
+        "Uma leitura cuidadosa aponta para {{answer}}.",
+        "Ficando perto do documento, {{answer}}.",
+        "A leitura ancorada mais segura aqui e {{answer}}."
+      ]
+    },
+    "clear_limit": {
+      "purpose": "Lead with a clear interpretive boundary.",
+      "en": [
+        "The document goes as far as {{answer}}, but not beyond that.",
+        "What can be said cleanly is {{answer}}.",
+        "The text supports {{answer}}, and stops there."
+      ],
+      "pt": [
+        "O documento vai ate {{answer}}, mas nao alem disso.",
+        "O que pode ser dito com clareza e {{answer}}.",
+        "O texto sustenta {{answer}}, e para ai."
+      ]
+    },
+    "clause_anchor": {
+      "purpose": "Legal opener that roots the answer in controlling language.",
+      "en": [
+        "The clause reads most naturally as {{answer}}.",
+        "On the clause language itself, {{answer}}.",
+        "The operative wording points to {{answer}}."
+      ],
+      "pt": [
+        "A clausula se le de forma mais natural como {{answer}}.",
+        "Pela linguagem da clausula, {{answer}}.",
+        "A redacao operativa aponta para {{answer}}."
+      ]
+    },
+    "metric_anchor": {
+      "purpose": "Finance opener that surfaces the number or direction immediately.",
+      "en": [
+        "{{metric}} is {{delta}}.",
+        "The number that moves here is {{metric}}: {{delta}}.",
+        "The clearest financial signal is {{metric}}, which is {{delta}}."
+      ],
+      "pt": [
+        "{{metric}} esta {{delta}}.",
+        "O numero que se move aqui e {{metric}}: {{delta}}.",
+        "O sinal financeiro mais claro e {{metric}}, que esta {{delta}}."
+      ]
+    },
+    "delta_first": {
+      "purpose": "Compare opener that privileges change over setup.",
+      "en": [
+        "{{delta}} is the biggest shift.",
+        "The main change is {{delta}}.",
+        "What moved most is {{delta}}."
+      ],
+      "pt": [
+        "{{delta}} e a maior mudanca.",
+        "A principal mudanca e {{delta}}.",
+        "O que mais se moveu foi {{delta}}."
+      ]
+    },
+    "risk_signal": {
+      "purpose": "Lead with the most material risk or exposure.",
+      "en": [
+        "The material risk is {{risk}}.",
+        "The issue with the most practical consequence is {{risk}}.",
+        "The point to watch is {{risk}}."
+      ],
+      "pt": [
+        "O risco material e {{risk}}.",
+        "O problema com maior consequencia pratica e {{risk}}.",
+        "O ponto a observar e {{risk}}."
+      ]
+    },
+    "status_first": {
+      "purpose": "Operational opener that states the current state immediately.",
+      "en": [
+        "Current status: {{status}}.",
+        "{{status}} right now.",
+        "At this point, it is {{status}}."
+      ],
+      "pt": [
+        "Status atual: {{status}}.",
+        "{{status}} neste momento.",
+        "Neste ponto, esta {{status}}."
+      ]
+    },
+    "blocker_first": {
+      "purpose": "Operational opener for blocked workflows.",
+      "en": [
+        "The blocker is {{blocker}}.",
+        "What is stopping this is {{blocker}}.",
+        "This is currently blocked by {{blocker}}."
+      ],
+      "pt": [
+        "O bloqueio e {{blocker}}.",
+        "O que esta travando isso e {{blocker}}.",
+        "Isso esta bloqueado por {{blocker}}."
+      ]
+    },
+    "next_action": {
+      "purpose": "Operational opener that starts with the next move.",
+      "en": [
+        "Next step: {{nextStep}}.",
+        "The move from here is {{nextStep}}.",
+        "The practical next action is {{nextStep}}."
+      ],
+      "pt": [
+        "Proximo passo: {{nextStep}}.",
+        "O movimento daqui e {{nextStep}}.",
+        "A proxima acao pratica e {{nextStep}}."
+      ]
+    },
+    "plain_answer": {
+      "purpose": "Plain-language opener for general users.",
+      "en": [
+        "In plain terms, {{answer}}.",
+        "Put simply, {{answer}}.",
+        "The short plain-language version is {{answer}}."
+      ],
+      "pt": [
+        "Em termos simples, {{answer}}.",
+        "De forma direta, {{answer}}.",
+        "A versao curta em linguagem simples e {{answer}}."
+      ]
+    },
+    "simple_framing": {
+      "purpose": "Explain the lens before translating the answer.",
+      "en": [
+        "If we strip this down to the key point, {{answer}}.",
+        "The easiest way to read this is {{answer}}.",
+        "The practical reading is {{answer}}."
+      ],
+      "pt": [
+        "Se reduzirmos isso ao ponto principal, {{answer}}.",
+        "A forma mais simples de ler isso e {{answer}}.",
+        "A leitura pratica e {{answer}}."
+      ]
+    },
+    "what_it_means": {
+      "purpose": "User-facing interpretation opener.",
+      "en": [
+        "What this means is {{answer}}.",
+        "The practical meaning is {{answer}}.",
+        "Taken together, it means {{answer}}."
+      ],
+      "pt": [
+        "O que isso significa e {{answer}}.",
+        "O significado pratico e {{answer}}.",
+        "Juntando tudo, isso significa {{answer}}."
+      ]
+    }
+  },
+  "rules": [
+    {
+      "id": "OF_001_no_short_answer_macro",
+      "trigger": "Draft opens with overt template phrase",
+      "check": "output.firstSentence IN ['Short answer:', 'The main difference is']",
+      "failureAction": "SWITCH_TO_FAMILY_VARIANT",
+      "severity": "high"
+    },
+    {
+      "id": "OF_002_opening_must_match_answer_mode",
+      "trigger": "Opening angle does not fit the task",
+      "check": "context.answerMode == 'doc_grounded_table' AND output.openerFamily NOT IN ['metric_anchor','direct_answer','scope_anchor']",
+      "failureAction": "REALIGN_OPENER_TO_TASK",
+      "severity": "medium"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "openers_has_evidence_anchor",
+        "expect": {
+          "family": "evidence_anchor"
+        }
+      },
+      {
+        "id": "openers_has_bottom_line",
+        "expect": {
+          "family": "bottom_line"
+        }
+      }
+    ]
+  }
+}

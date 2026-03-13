@@ -1,0 +1,293 @@
+DATA BANK TARGET MATRIX
+Generated: 2026-03-13
+Scope: backend/src/data_banks
+Mission: authoritative gap map before any bank generation starts
+
+INVENTORY SUMMARY
+- Total files under backend/src/data_banks: 1778
+- Total JSON or JSONL banks: 1729
+- Dominant families by bank count:
+  - document_intelligence: 1287
+  - patterns: 96
+  - semantics: 55
+  - operators: 52
+  - policies: 35
+  - retrieval: 26
+  - agents: 21
+  - prompts: 16
+  - quality: 14
+  - microcopy: 13
+  - formatting: 11
+- document_intelligence internal split:
+  - domains: 1168
+  - eval: 45
+  - compose: 21
+  - semantics: 16
+  - retrieval: 10
+  - validation: 7
+  - language: 6
+  - manifest: 5
+  - routing: 5
+  - safety: 3
+
+CORE FAMILY VERIFICATION
+- composition brain: PRESENT but sub-A; current surface is thin and fragmented
+- clarification/repair brain: PRESENT but fragmented; recovery subfamily is missing
+- assistant orchestration brain: PRESENT but diffuse; handoff and tool-choice subfamilies are missing
+- field-exactness/evidence brain: PRESENT and stronger than surface layer; exactness and traceability subfamilies are missing
+- eval/proof brain: PRESENT but incomplete; harsh style and repair proof suites are missing
+- governance/hygiene brain: PRESENT but missing ownership, lifecycle, sharding, and edit-lock SSOTs
+- new domain packs: MISSING for procurement, security_compliance, sales_revops, customer_support
+
+ACTION MATRIX
+
+1. COMPOSITION BRAIN
+Current verdict: PRESENT, WEAK, HIGH PRIORITY
+KEEP
+- backend/src/data_banks/formatting/answer_style_policy.any.json
+- backend/src/data_banks/formatting/render_policy.any.json
+- backend/src/data_banks/formatting/banned_phrases.any.json
+- backend/src/data_banks/microcopy/no_docs_messages.any.json
+EXPAND
+- backend/src/data_banks/prompts/disambiguation_prompt.any.json
+- backend/src/data_banks/prompts/retrieval_prompt.any.json
+- backend/src/data_banks/formatting/truncation_and_limits.any.json
+- backend/src/data_banks/microcopy/followup_suggestions.any.json
+REWRITE
+- Full exact list: docs/bank-expansion/REWRITE_BANKS.csv
+- Main rewrite cluster: backend/src/data_banks/document_intelligence/compose/*
+- Main rewrite cluster: backend/src/data_banks/prompts/system_base.any.json
+- Main rewrite cluster: backend/src/data_banks/prompts/mode_chat.any.json
+- Main rewrite cluster: backend/src/data_banks/prompts/task_answer_with_sources.any.json
+- Main rewrite cluster: backend/src/data_banks/microcopy/allybi_response_style.any.json
+MISSING
+- Full exact list: docs/bank-expansion/MISSING_BANKS.csv
+- Missing composition subfamilies:
+  - answer arc recipes
+  - anti-monotony transforms
+  - contrastive style examples
+  - grounded narrative moves
+  - sentence rhythm profiles
+  - repair rewrite strategies
+  - domain voice overlays
+  - audience adaptation profiles
+Why not A-grade yet
+- Too many tiny composition banks under 100 lines
+- Surface logic is spread across compose, prompts, formatting, and microcopy without a strong narrative core
+- Anti-robotic layer is materially too small for premium output
+
+2. CLARIFICATION / REPAIR BRAIN
+Current verdict: PRESENT, PARTIAL, HIGH PRIORITY
+KEEP
+- backend/src/data_banks/ambiguity/clarification_phrases.any.json
+- backend/src/data_banks/prompts/disambiguation_prompt.any.json
+- backend/src/data_banks/quality/quality_gates.any.json
+- backend/src/data_banks/agents/excel_calc/quality/clarification_policy.any.json
+EXPAND
+- backend/src/data_banks/ambiguity/section_disambiguation_policy.any.json
+- backend/src/data_banks/microcopy/disambiguation_microcopy.any.json
+- backend/src/data_banks/policies/clarification_policy.any.json
+REWRITE
+- backend/src/data_banks/document_intelligence/compose/clarification_prompts.any.json
+- backend/src/data_banks/microcopy/disambiguation_microcopy.any.json
+- backend/src/data_banks/microcopy/scoped_not_found_messages.any.json
+MISSING
+- Full exact list: docs/bank-expansion/MISSING_BANKS.csv
+- Missing clarification subfamilies:
+  - central clarify-vs-autopick strategy catalog
+  - recovery playbooks after bad disambiguation
+  - autopick explanation bank
+  - clarification repair gates
+  - option-label microcopy
+  - repair-response prompt
+Why not A-grade yet
+- Current stack asks questions well enough but does not repair gracefully after a wrong first move
+- Clarification logic exists in ambiguity, microcopy, prompts, and policies with no single SSOT
+
+3. ASSISTANT ORCHESTRATION BRAIN
+Current verdict: PRESENT, DIFFUSE, HIGH PRIORITY
+KEEP
+- backend/src/data_banks/prompts/prompt_registry.any.json
+- backend/src/data_banks/policies/memory_policy.any.json
+- backend/src/data_banks/retrieval/retrieval_ranker_config.any.json
+- backend/src/data_banks/llm/provider_capabilities.any.json
+- backend/src/data_banks/llm/provider_fallbacks.any.json
+EXPAND
+- backend/src/data_banks/prompts/fallback_prompt.any.json
+- backend/src/data_banks/prompts/llm_global_guards.any.json
+- backend/src/data_banks/prompts/policy_citations.any.json
+- backend/src/data_banks/llm/composition_lane_policy.any.json
+- backend/src/data_banks/routing/routing_priority.any.json
+REWRITE
+- backend/src/data_banks/prompts/system_base.any.json
+- backend/src/data_banks/prompts/mode_chat.any.json
+- backend/src/data_banks/prompts/task_answer_with_sources.any.json
+- backend/src/data_banks/prompts/fallback_prompt.any.json
+- backend/src/data_banks/prompts/llm_global_guards.any.json
+MISSING
+- Full exact list: docs/bank-expansion/MISSING_BANKS.csv
+- Missing orchestration subfamilies:
+  - tool choice policy
+  - execution escalation policy
+  - planner/executor handoff
+  - model-role contracts
+  - provider selection policy
+  - orchestration priority map
+  - tool result synthesis prompt
+  - final answer repair prompt
+Why not A-grade yet
+- Orchestration intent is spread across prompts, llm, routing, and policies
+- There is no clear SSOT for answer/clarify/retrieve/edit escalation
+
+4. FIELD-EXACTNESS / EVIDENCE BRAIN
+Current verdict: PRESENT, STRONGEST NON-AGENT LAYER, STILL INCOMPLETE
+KEEP
+- backend/src/data_banks/retrieval/retrieval_ranker_config.any.json
+- backend/src/data_banks/quality/quality_gates.any.json
+- backend/src/data_banks/document_intelligence/validation/numeric_reconciliation_rules.any.json
+- backend/src/data_banks/document_intelligence/validation/quote_integrity_rules.any.json
+- backend/src/data_banks/document_intelligence/domains/legal/reasoning_scaffolds.any.json
+- backend/src/data_banks/document_intelligence/domains/finance/evidence_requirements.any.json
+- backend/src/data_banks/document_intelligence/domains/banking/evidence_requirements.any.json
+EXPAND
+- backend/src/data_banks/document_intelligence/validation/table_cell_evidence_rules.any.json
+- backend/src/data_banks/document_intelligence/validation/unsafe_inference_rules.any.json
+- backend/src/data_banks/document_intelligence/retrieval/evidence_packaging_policy.any.json
+- backend/src/data_banks/document_intelligence/retrieval/crossdoc_alignment_rules.any.json
+- backend/src/data_banks/document_intelligence/retrieval/doc_lock_policy.any.json
+- backend/src/data_banks/document_intelligence/domains/medical/reasoning_scaffolds.any.json
+- backend/src/data_banks/document_intelligence/domains/identity/evidence_requirements.any.json
+- backend/src/data_banks/document_intelligence/domains/tax/evidence_requirements.any.json
+REWRITE
+- Domain answer_style_bank and disclaimer_policy files are too thin to safely carry evidence-facing surface behavior
+- Exact rewrite list is in docs/bank-expansion/REWRITE_BANKS.csv
+MISSING
+- Full exact list: docs/bank-expansion/MISSING_BANKS.csv
+- Missing evidence subfamilies:
+  - field exactness policy
+  - evidence trace contract
+  - span binding rules
+  - field binding retrieval rules
+  - cross-format alignment rules
+  - field exactness quality bank
+  - evidence trace quality bank
+Why not A-grade yet
+- Strong policy exists, but provenance and field-binding are not explicit enough
+- Evidence rigor is better than style rigor, but still lacks end-to-end trace contracts
+
+5. EVAL / PROOF BRAIN
+Current verdict: PRESENT, INSUFFICIENTLY HARSH
+KEEP
+- backend/src/data_banks/document_intelligence/eval/suites/suite_registry.any.json
+- backend/src/data_banks/document_intelligence/eval/retrieval_precision.qa.jsonl
+- backend/src/data_banks/document_intelligence/eval/wrong_doc_traps.qa.jsonl
+- backend/src/data_banks/document_intelligence/eval/crossdoc.qa.jsonl
+- backend/src/data_banks/agents/excel_calc/eval/suite_registry.any.json
+EXPAND
+- backend/src/data_banks/document_intelligence/eval/voice_and_tone.qa.jsonl
+- backend/src/data_banks/document_intelligence/eval/section_detection.qa.jsonl
+- backend/src/data_banks/document_intelligence/eval/truncation_stress.qa.jsonl
+- backend/src/data_banks/document_intelligence/eval/abbreviation_resolution.qa.jsonl
+- backend/src/data_banks/quality/training/intent_training.jsonl
+- backend/src/data_banks/quality/training/multi_intent.jsonl
+REWRITE
+- None required before generation starts; current gap is mostly missing proof coverage
+MISSING
+- Full exact list: docs/bank-expansion/MISSING_BANKS.csv
+- Missing eval subfamilies:
+  - harsh style evals
+  - clarification repair evals
+  - evidence trace evals
+  - field exactness evals
+  - humanity and variation evals
+  - orchestration failover evals
+  - hard-mode wrong-doc evals
+  - negative style training set
+  - negative clarification training set
+
+6. GOVERNANCE / HYGIENE BRAIN
+Current verdict: PRESENT, GOOD BASE, MISSING SSOTS
+KEEP
+- backend/src/data_banks/manifest/bank_registry.any.json
+- backend/src/data_banks/manifest/bank_aliases.any.json
+- backend/src/data_banks/manifest/bank_dependencies.any.json
+- backend/src/data_banks/schemas/bank_schema.any.json
+- backend/src/data_banks/document_intelligence/manifest/runtime_wiring_gates.any.json
+EXPAND
+- backend/src/data_banks/document_intelligence/manifest/usage_manifest.any.json
+- backend/src/data_banks/document_intelligence/manifest/dependency_graph.any.json
+- backend/src/data_banks/manifest/chat_runtime_bank_contract.any.json
+SHARD
+- Full exact list: docs/bank-expansion/SHARD_BANKS.csv
+- Highest-risk monoliths:
+  - backend/src/data_banks/manifest/bank_registry.any.json
+  - backend/src/data_banks/manifest/bank_aliases.any.json
+  - backend/src/data_banks/manifest/bank_dependencies.any.json
+MISSING
+- Full exact list: docs/bank-expansion/MISSING_BANKS.csv
+- Missing governance subfamilies:
+  - bank owners
+  - bank quality tiers
+  - bank sharding policy
+  - bank parallel edit locks
+  - bank lifecycle policy
+  - bank generation contract
+
+7. NEW DOMAIN PACKS
+Current verdict: FOUR HIGH-VALUE PACKS ARE MISSING
+Required new packs
+- procurement
+- security_compliance
+- sales_revops
+- customer_support
+Required file set per new pack
+- domain_profile.any.json
+- domain_detection_rules.any.json
+- evidence_requirements.any.json
+- reasoning_scaffolds.any.json
+- validation_policies.any.json
+- redaction_and_safety_rules.any.json
+- retrieval_strategies.any.json
+- answer_style_bank.any.json
+- disclaimer_policy.any.json
+- abbreviations/<domain>.en.any.json
+- abbreviations/<domain>.pt.any.json
+- lexicons/<domain>.en.any.json
+- lexicons/<domain>.pt.any.json
+- doc_types/doc_type_catalog.any.json
+- eval/domain_specific/<domain>/doc_type_coverage.qa.jsonl
+- eval/domain_specific/<domain>/core.qa.jsonl
+Exact create paths
+- Full exact list: docs/bank-expansion/MISSING_BANKS.csv
+
+CONFLICT AND OWNERSHIP RISKS
+- Style surface conflict: compose, formatting, prompts, and microcopy all influence final answer tone
+- Clarification conflict: ambiguity, policies, prompts, microcopy, and quality all touch the same decision path
+- Retrieval conflict: retrieval/retrieval_ranker_config.any.json and document_intelligence/retrieval/ranker_config.any.json are conceptually overlapping
+- Followup conflict: backend/src/data_banks/document_intelligence/compose/followup_suggestions.any.json and backend/src/data_banks/microcopy/followup_suggestions.any.json overlap
+- Semantics duplication conflict: document_intelligence/semantics/* mirrors exist beside semantics/*
+- Registry conflict: any new bank creation eventually converges on bank_registry.any.json, bank_aliases.any.json, and bank_dependencies.any.json
+- Legacy conflict: _deprecated/document_intelligence_legacy still shadows live legal and medical bank names
+
+SHARD-FIRST MONOLITHS
+- backend/src/data_banks/manifest/bank_registry.any.json
+- backend/src/data_banks/document_intelligence/semantics/table_ontology.any.json
+- backend/src/data_banks/document_intelligence/semantics/section_ontology.any.json
+- backend/src/data_banks/patterns/modes/mode_switch.en.any.json
+- backend/src/data_banks/patterns/modes/mode_switch.pt.any.json
+- backend/src/data_banks/patterns/operators/*.any.json
+
+AUTHORITATIVE EXECUTION ORDER
+1. Rewrite the composition surface and create the missing composition banks
+2. Fill clarification/repair missing banks and gates
+3. Add orchestration missing banks
+4. Add exactness/traceability missing banks
+5. Add eval/proof suites
+6. Create new domain packs in isolated lanes
+7. Merge registry, aliases, dependencies, and ownership SSOTs last
+
+DELIVERABLE INDEX
+- Missing bank paths: docs/bank-expansion/MISSING_BANKS.csv
+- Rewrite bank paths: docs/bank-expansion/REWRITE_BANKS.csv
+- Shard bank paths: docs/bank-expansion/SHARD_BANKS.csv
+- Parallel-safe work plan: docs/bank-expansion/PARALLEL_EXECUTION_PLAN.txt

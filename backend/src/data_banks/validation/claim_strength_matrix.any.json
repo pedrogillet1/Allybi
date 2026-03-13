@@ -1,0 +1,169 @@
+{
+  "_meta": {
+    "id": "claim_strength_matrix",
+    "version": "1.0.0",
+    "description": "Defines confidence thresholds for claim strength (strong, moderate, weak, unavailable) and refusal-to-infer policies.",
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "koda-validation",
+    "compat": ">=1.0.0",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "sortBy": "id",
+    "defaultMode": "decline_when_unsafe"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "claim validation before natural language output",
+    "consumer": "claim-strength evaluator",
+    "intent": "prevent overconfident language on weak evidence and reject unsupported inference",
+    "emittedSignals": [
+      "claimStrengthLevel",
+      "claimStrengthScore",
+      "inferenceAllowed",
+      "declineReason"
+    ]
+  },
+  "levels": [
+    {
+      "id": "strong",
+      "minEvidenceRatio": 0.75,
+      "minSourceCount": 2,
+      "minSpanCertainty": 0.9,
+      "maxConflicts": 0,
+      "minDocMatch": 0.85,
+      "actions": [
+        "answer_with_confident_language",
+        "include_exact_source_links"
+      ]
+    },
+    {
+      "id": "moderate",
+      "minEvidenceRatio": 0.5,
+      "minSourceCount": 1,
+      "minSpanCertainty": 0.8,
+      "maxConflicts": 1,
+      "minDocMatch": 0.75,
+      "actions": [
+        "answer_with_hedged_language",
+        "explicit_scope_statement",
+        "offer_recheck_if_disagreeing_sources"
+      ]
+    },
+    {
+      "id": "weak",
+      "minEvidenceRatio": 0.33,
+      "minSourceCount": 1,
+      "minSpanCertainty": 0.65,
+      "maxConflicts": 2,
+      "minDocMatch": 0.7,
+      "actions": [
+        "partial_answer_with_missing_items",
+        "clarification_offer"
+      ]
+    },
+    {
+      "id": "unavailable",
+      "minEvidenceRatio": 0,
+      "minSourceCount": 0,
+      "minSpanCertainty": 0,
+      "maxConflicts": 99,
+      "minDocMatch": 0,
+      "actions": [
+        "decline_inference",
+        "ask_targeted_question"
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "CSM_001_refuse_without_evidence",
+      "trigger": "No evidence and no source span for requested claim",
+      "check": "claim.evidenceCount == 0",
+      "failureAction": "DECLINE_WITH_CLEAR_EVIDENCE_GAP",
+      "severity": "error"
+    },
+    {
+      "id": "CSM_002_decline_conflict_heavy_claims",
+      "trigger": "Claim has high conflict ratio and low evidence consistency",
+      "check": "claim.conflictRate > 0.25 AND claim.consistencyScore < 0.55",
+      "failureAction": "DECLINE_WITH_CONFLICT_EXPLANATION",
+      "severity": "error"
+    },
+    {
+      "id": "CSM_003_weak_inference_block",
+      "trigger": "Claim requires inference from weak context",
+      "check": "claim.requiresInference == true AND claim.derivedConfidence < 0.6",
+      "failureAction": "DECLINE_WITH_PARTIAL_HINT",
+      "severity": "warning"
+    },
+    {
+      "id": "CSM_004_strong_if_spans_and_multi_source",
+      "trigger": "Evidence has multiple corroborating spans and low conflict",
+      "check": "claim.evidenceCount >= 2 AND claim.conflictRate <= 0.05 AND claim.spanCertainty >= 0.9",
+      "failureAction": "ALLOW_STRONG_CLAIM",
+      "severity": "info"
+    },
+    {
+      "id": "CSM_005_moderate_with_hedging",
+      "trigger": "Moderate conditions met but not strong",
+      "check": "claim.evidenceCount == 1 AND claim.confidence >= 0.7 AND claim.conflictRate <= 0.1",
+      "failureAction": "ALLOW_HEDGED_CLAIM",
+      "severity": "warning"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "claim_decline_on_no_evidence",
+        "input": {
+          "claim": {
+            "evidenceCount": 0
+          }
+        },
+        "expect": {
+          "failureAction": "DECLINE_WITH_CLEAR_EVIDENCE_GAP"
+        }
+      },
+      {
+        "id": "claim_strong_multispan",
+        "input": {
+          "claim": {
+            "evidenceCount": 3,
+            "conflictRate": 0,
+            "spanCertainty": 0.95
+          }
+        },
+        "expect": {
+          "failureAction": "ALLOW_STRONG_CLAIM"
+        }
+      },
+      {
+        "id": "claim_weak_requires_decline",
+        "input": {
+          "claim": {
+            "requiresInference": true,
+            "derivedConfidence": 0.52
+          }
+        },
+        "expect": {
+          "failureAction": "DECLINE_WITH_PARTIAL_HINT"
+        }
+      }
+    ]
+  }
+}

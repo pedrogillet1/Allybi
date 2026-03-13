@@ -1,0 +1,225 @@
+{
+  "_meta": {
+    "id": "di_supply_chain_logistics_doc_type_catalog",
+    "version": "1.0.0",
+    "description": "Supply-chain/logistics document catalog for route, shipment, and fulfillment reasoning.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/retrieval/domainIntentRouter.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/docint-eval-pack.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "supply_chain_logistics"
+  },
+  "domain": "supply_chain_logistics",
+  "docTypes": [
+    {
+      "id": "log_asn_notice",
+      "name": {
+        "en": "Advance Shipment Notice",
+        "pt": "Aviso de Embarque Antecipado"
+      },
+      "description": "ASN notices for arrival expectations and package-level contents.",
+      "detectionPatterns": [
+        "\\badvance shipment notice\\b",
+        "\\basn\\b",
+        "\\baviso antecipado de remessa\\b",
+        "\\bpre-alerta de envio\\b"
+      ],
+      "commonSections": [
+        "shipment_header",
+        "expected_arrival",
+        "carrier",
+        "items",
+        "packing"
+      ],
+      "extractionPriority": 140
+    },
+    {
+      "id": "log_shipment_manifest",
+      "name": {
+        "en": "Shipment Manifest",
+        "pt": "Manifesto de Carga"
+      },
+      "description": "Container-level and route-level shipment manifest records.",
+      "detectionPatterns": [
+        "\\bshipment manifest\\b",
+        "\\bmanifest\\b",
+        "\\bmanifesto de carga\\b",
+        "\\bcaminho de rota\\b"
+      ],
+      "commonSections": [
+        "route",
+        "origin",
+        "destination",
+        "carrier",
+        "packaging",
+        "milestones"
+      ],
+      "extractionPriority": 139
+    },
+    {
+      "id": "log_freight_bill",
+      "name": {
+        "en": "Freight Bill",
+        "pt": "Conhecimento de Frete"
+      },
+      "description": "Carrier charges and freight settlement instrument.",
+      "detectionPatterns": [
+        "\\bfreight bill\\b",
+        "\\btransport bill\\b",
+        "\\bconhecimento de frete\\b",
+        "\\bfrete\\s+factura\\b"
+      ],
+      "commonSections": [
+        "charges",
+        "service_level",
+        "surcharges",
+        "currency",
+        "billing"
+      ],
+      "extractionPriority": 138
+    },
+    {
+      "id": "log_bol",
+      "name": {
+        "en": "Bill of Lading",
+        "pt": "Conhecimento de Transporte"
+      },
+      "description": "Carrier custody and transfer-of-risk evidence for movement.",
+      "detectionPatterns": [
+        "\\bbill of lading\\b",
+        "\\bbol\\b",
+        "\\bconhecimento de transporte\\b",
+        "\\bbl\\b"
+      ],
+      "commonSections": [
+        "consignee",
+        "shipper",
+        "delivery_terms",
+        "risk_event",
+        "signatures"
+      ],
+      "extractionPriority": 136
+    },
+    {
+      "id": "log_inventory_snapshot",
+      "name": {
+        "en": "Inventory Snapshot",
+        "pt": "Fotografia de Estoque"
+      },
+      "description": "Inventory position by warehouse, bin, and age bucket.",
+      "detectionPatterns": [
+        "\\binventory snapshot\\b",
+        "\\bstock position\\b",
+        "\\bfoto de estoque\\b",
+        "\\bposição de inventário\\b"
+      ],
+      "commonSections": [
+        "warehouse_summary",
+        "aging_buckets",
+        "stock_movements",
+        "reserved_stock",
+        "safety_stock"
+      ],
+      "extractionPriority": 134
+    },
+    {
+      "id": "log_demand_plan",
+      "name": {
+        "en": "Demand and Supply Plan",
+        "pt": "Plano de Demanda e Abastecimento"
+      },
+      "description": "Plan-based forecast and expected fulfillment windows.",
+      "detectionPatterns": [
+        "\\bdemand plan\\b",
+        "\\bsupply plan\\b",
+        "\\bplano de demanda\\b",
+        "\\bplano de abastecimento\\b"
+      ],
+      "commonSections": [
+        "forecast",
+        "safety_stock",
+        "reorder_points",
+        "risk_buffer",
+        "service_level"
+      ],
+      "extractionPriority": 132
+    },
+    {
+      "id": "log_warehouse_receipt",
+      "name": {
+        "en": "Warehouse Receipt",
+        "pt": "Comprovante de Armazenagem"
+      },
+      "description": "Inbound receiving and putaway records.",
+      "detectionPatterns": [
+        "\\bwarehouse receipt\\b",
+        "\\breceiving report\\b",
+        "\\bcomprovante de armazenagem\\b"
+      ],
+      "commonSections": [
+        "incoming",
+        "putaway",
+        "damage_notes",
+        "condition",
+        "location"
+      ],
+      "extractionPriority": 131
+    },
+    {
+      "id": "log_carrier_performance",
+      "name": {
+        "en": "Carrier Performance Pack",
+        "pt": "Relatório de Performance do Transportador"
+      },
+      "description": "Carrier KPIs, service-level attainment, and incident records.",
+      "detectionPatterns": [
+        "\\bcarrier performance\\b",
+        "\\btransporter report\\b",
+        "\\bperformance do transportador\\b",
+        "\\bkpi logístico\\b"
+      ],
+      "commonSections": [
+        "sla",
+        "on_time_delivery",
+        "damages",
+        "incident_log",
+        "improvements"
+      ],
+      "extractionPriority": 129
+    },
+    {
+      "id": "log_customs_declaration",
+      "name": {
+        "en": "Customs Declaration",
+        "pt": "Declaração Aduaneira"
+      },
+      "description": "Cross-border customs filing and clearance events.",
+      "detectionPatterns": [
+        "\\bcustoms declaration\\b",
+        "\\bdespacho aduaneiro\\b",
+        "\\bharmonized tariff\\b",
+        "\\bcódigo ncm\\b"
+      ],
+      "commonSections": [
+        "goods_classification",
+        "duty_lines",
+        "clearance_status",
+        "inspection_notes",
+        "broker"
+      ],
+      "extractionPriority": 128
+    }
+  ]
+}

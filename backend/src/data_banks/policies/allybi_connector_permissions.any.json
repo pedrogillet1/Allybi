@@ -23,7 +23,8 @@
   "config": {
     "enabled": true,
     "viewerModeBlocksConnectorFallback": true,
-    "requireExplicitSendClick": true
+    "requireExplicitSendClick": true,
+    "configModeOnly": true
   },
   "actions": {
     "CONNECTOR_READ_LIST": {
@@ -59,6 +60,24 @@
         },
         "expect": {
           "allowedInViewerMode": false
+        }
+      },
+      {
+        "id": "ACP_T_0003_draft_requires_activation",
+        "input": {
+          "action": "CONNECTOR_DRAFT"
+        },
+        "expect": {
+          "requiresExplicitActivation": true
+        }
+      },
+      {
+        "id": "ACP_T_0004_global_explicit_send_click",
+        "input": {
+          "action": "CONNECTOR_SEND_CONFIRM"
+        },
+        "expect": {
+          "requireExplicitSendClick": true
         }
       }
     ]

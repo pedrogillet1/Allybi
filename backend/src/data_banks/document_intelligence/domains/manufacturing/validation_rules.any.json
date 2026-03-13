@@ -1,0 +1,116 @@
+{
+  "_meta": {
+    "id": "manufacturing_validation_rules",
+    "version": "1.0.0",
+    "description": "Manufacturing validation rules to prevent unsafe throughput, yield, and defect inferences.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/validation/claimValidator.service.ts",
+      "services/core/orchestration/answerPlanner.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/domain-validation.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "domain": "manufacturing"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "validate production KPI and quality claims",
+    "consumer": "manufacturing validator",
+    "intent": "Avoid overconfident throughput conclusions and unscoped scrap math."
+  },
+  "exactnessContract": {
+    "forbiddenSubstitutions": [
+      "yield_without_batch",
+      "scrap_without_qty_basis",
+      "downtime_without_duration",
+      "quality_status_without_defect_scope"
+    ],
+    "requiredAnchors": [
+      "work_order",
+      "period",
+      "unit",
+      "material_basis",
+      "line_or_asset"
+    ]
+  },
+  "validationRules": [
+    {
+      "id": "MFG_VAL_001_yield_coherence",
+      "severity": "high",
+      "applies": [
+        "calculate",
+        "compare"
+      ],
+      "check": "yield_math_has_batch_scope",
+      "description": "Yield percentages should only be computed with explicit batch and target quantity context.",
+      "failureAction": "BLOCK_AND_REQUIRE_SCOPE"
+    },
+    {
+      "id": "MFG_VAL_002_scrap_traceability",
+      "severity": "high",
+      "applies": [
+        "extract",
+        "validate",
+        "compare"
+      ],
+      "check": "scrap_has_rejection_cause_or_class",
+      "description": "Scrap claims must include defect category or process root cause.",
+      "failureAction": "WARN_AND_REQUEST_CAUSE"
+    },
+    {
+      "id": "MFG_VAL_003_downtime_integrity",
+      "severity": "medium",
+      "applies": [
+        "monitor",
+        "validate",
+        "calculate"
+      ],
+      "check": "downtime_start_end_present",
+      "description": "Downtime duration requires start and end timestamps.",
+      "failureAction": "BLOCK_AND_EXPLAIN"
+    },
+    {
+      "id": "MFG_VAL_004_maintenance_context",
+      "severity": "medium",
+      "applies": [
+        "evaluate",
+        "summarize"
+      ],
+      "check": "maintenance_claims_link_to_asset_or_order",
+      "description": "Do not generalize maintenance impact without asset context.",
+      "failureAction": "WARN_AND_REQUIRE_ASSET"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "mfg_validation_blocks_unscoped_yield",
+        "input": {
+          "queryType": "compare",
+          "scenario": "yield_delta"
+        },
+        "expect": {
+          "action": "BLOCK_AND_REQUIRE_SCOPE"
+        }
+      },
+      {
+        "id": "mfg_validation_requires_downtime_timestamps",
+        "input": {
+          "scenario": "downtime_no_timestamps"
+        },
+        "expect": {
+          "action": "BLOCK_AND_EXPLAIN"
+        }
+      }
+    ]
+  }
+}

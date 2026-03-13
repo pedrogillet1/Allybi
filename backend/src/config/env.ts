@@ -62,6 +62,19 @@ if (
 interface EnvConfig {
   PORT: number;
   NODE_ENV: string;
+  KODA_RUNTIME_ROLE?: string;
+  KODA_RUNTIME_ENV?: string;
+  KODA_SECRET_SOURCE?: string;
+  KODA_DB_MODE?: string;
+  KODA_REDIS_MODE?: string;
+  KODA_TLS_TERMINATION?: string;
+  KODA_ADMIN_IDENTITY_PROVIDER?: string;
+  KODA_IAP_AUDIENCE?: string;
+  KODA_ENABLE_LEGACY_ADMIN_KEY?: boolean;
+  KODA_ENABLE_SOCKET_REDIS_ADAPTER?: boolean;
+  KODA_PUBLIC_WEB_HOST?: string;
+  KODA_PUBLIC_API_HOST?: string;
+  KODA_PUBLIC_ADMIN_HOST?: string;
   DATABASE_URL: string;
   DIRECT_DATABASE_URL?: string;
   JWT_ACCESS_SECRET: string;
@@ -164,6 +177,22 @@ const getEnvVar = (key: string, required: boolean = true): string => {
 export const config: EnvConfig = {
   PORT: parseInt(process.env.PORT || "5000", 10),
   NODE_ENV: process.env.NODE_ENV || "development",
+  KODA_RUNTIME_ROLE: getEnvVar("KODA_RUNTIME_ROLE", false),
+  KODA_RUNTIME_ENV: getEnvVar("KODA_RUNTIME_ENV", false),
+  KODA_SECRET_SOURCE: getEnvVar("KODA_SECRET_SOURCE", false),
+  KODA_DB_MODE: getEnvVar("KODA_DB_MODE", false),
+  KODA_REDIS_MODE: getEnvVar("KODA_REDIS_MODE", false),
+  KODA_TLS_TERMINATION: process.env.KODA_TLS_TERMINATION || "external-lb",
+  KODA_ADMIN_IDENTITY_PROVIDER:
+    process.env.KODA_ADMIN_IDENTITY_PROVIDER || "iap",
+  KODA_IAP_AUDIENCE: getEnvVar("KODA_IAP_AUDIENCE", false),
+  KODA_ENABLE_LEGACY_ADMIN_KEY:
+    process.env.KODA_ENABLE_LEGACY_ADMIN_KEY === "true",
+  KODA_ENABLE_SOCKET_REDIS_ADAPTER:
+    process.env.KODA_ENABLE_SOCKET_REDIS_ADAPTER === "true",
+  KODA_PUBLIC_WEB_HOST: getEnvVar("KODA_PUBLIC_WEB_HOST", false),
+  KODA_PUBLIC_API_HOST: getEnvVar("KODA_PUBLIC_API_HOST", false),
+  KODA_PUBLIC_ADMIN_HOST: getEnvVar("KODA_PUBLIC_ADMIN_HOST", false),
   DATABASE_URL: getEnvVar("DATABASE_URL"),
   DIRECT_DATABASE_URL: process.env.DIRECT_DATABASE_URL,
   JWT_ACCESS_SECRET: getEnvVar("JWT_ACCESS_SECRET"),

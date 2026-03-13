@@ -25,7 +25,8 @@
     "domain": "legal",
     "deterministic": true,
     "dedupe": true,
-    "sortBy": "id"
+    "sortBy": "id",
+    "configModeOnly": true
   },
   "domain": "legal",
   "audienceStyles": [
@@ -774,7 +775,44 @@
   "tests": {
     "cases": [
       {
-        "id": "LEG_EXPL_SMOKE_001"
+        "id": "EXPLAIN_STYLE_LEGAL_T_001",
+        "input": {
+          "language": "en",
+          "depth": "summary"
+        },
+        "expect": {
+          "requireConfidenceLabel": true
+        }
+      },
+      {
+        "id": "EXPLAIN_STYLE_LEGAL_T_002",
+        "input": {
+          "language": "en",
+          "depth": "paragraph"
+        },
+        "expect": {
+          "forbidFabrication": true
+        }
+      },
+      {
+        "id": "EXPLAIN_STYLE_LEGAL_T_003",
+        "input": {
+          "language": "pt",
+          "depth": "summary"
+        },
+        "expect": {
+          "depth": "summary"
+        }
+      },
+      {
+        "id": "EXPLAIN_STYLE_LEGAL_T_004",
+        "input": {
+          "language": "pt",
+          "depth": "detailed"
+        },
+        "expect": {
+          "minCitations": 3
+        }
       }
     ]
   }

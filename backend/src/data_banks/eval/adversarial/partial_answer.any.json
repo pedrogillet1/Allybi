@@ -1,0 +1,64 @@
+{
+  "_meta": {
+    "id": "eval_adversarial_partial_answer",
+    "version": "1.0.0",
+    "description": "Adversarial catches for incomplete answers and silent drops in multi-fact questions.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "eval-ops",
+    "usedBy": [
+      "services/eval/adversarialHarness.service.ts"
+    ],
+    "tests": [
+      "tests/eval/partialAnswer.proof.test.ts",
+      "tests/eval/adversarialCoverage.proof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "scenarioType": "coverage_gap"
+  },
+  "adversarialCases": [
+    {
+      "id": "partial_answer_001",
+      "lang": "en",
+      "query": "List all owners, signed dates, and execution dates for the agreement.",
+      "expected": {
+        "expectedCoverage": [
+          "all_owners",
+          "signed_date",
+          "execution_date"
+        ],
+        "failureConditions": [
+          "returns_only_owners",
+          "returns_only_dates",
+          "drops_section_due_to_assumed_missing"
+        ],
+        "mustFailOnMissingCount": 1
+      }
+    },
+    {
+      "id": "partial_answer_002",
+      "lang": "pt",
+      "query": "Extraia todas as contas, os valores e as respectivas datas de vencimento.",
+      "expected": {
+        "mustCoverAllItems": true,
+        "mustContain": [
+          "conta",
+          "valor",
+          "vencimento"
+        ],
+        "failureConditions": [
+          "resposta_esta_incompleta",
+          "omite_elementos_sem_notificar"
+        ]
+      }
+    }
+  ],
+  "scoring": {
+    "maxScoreIfIncomplete": 0.3,
+    "requiredCoverageRate": 0.95
+  }
+}

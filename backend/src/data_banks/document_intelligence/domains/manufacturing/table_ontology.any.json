@@ -1,0 +1,130 @@
+{
+  "_meta": {
+    "id": "di_manufacturing_table_ontology",
+    "version": "1.0.0",
+    "description": "Manufacturing table ontology for WO outputs, scrap, inspections, and machine events.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/extraction/tableExtraction.service.ts",
+      "services/core/orchestration/tableResolver.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/domain-validation.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "manufacturing",
+    "tableAxisConfidenceThreshold": 0.67
+  },
+  "domain": "manufacturing",
+  "tableTypes": [
+    {
+      "id": "mfg_table_wo_lines",
+      "name": {
+        "en": "WO Line Table",
+        "pt": "Tabela de Linhas de Ordem"
+      },
+      "aliases": [
+        "work order lines",
+        "production lines"
+      ],
+      "columns": [
+        "wo_id",
+        "item",
+        "planned_qty",
+        "produced_qty",
+        "rejected_qty",
+        "status"
+      ],
+      "quality": {
+        "requiresNumericColumns": [
+          "planned_qty",
+          "produced_qty"
+        ],
+        "riskIfMissing": "critical"
+      }
+    },
+    {
+      "id": "mfg_table_bom_usage",
+      "name": {
+        "en": "BOM Usage Table",
+        "pt": "Tabela de Uso de Matéria-Prima"
+      },
+      "aliases": [
+        "bill of materials",
+        "component consumption"
+      ],
+      "columns": [
+        "component",
+        "planned_qty",
+        "issued_qty",
+        "actual_qty",
+        "waste_qty"
+      ],
+      "quality": {
+        "requiresNumericColumns": [
+          "issued_qty",
+          "actual_qty"
+        ],
+        "riskIfMissing": "high"
+      }
+    },
+    {
+      "id": "mfg_table_quality_results",
+      "name": {
+        "en": "Quality Results Table",
+        "pt": "Tabela de Resultados de Qualidade"
+      },
+      "aliases": [
+        "inspection results",
+        "defect table"
+      ],
+      "columns": [
+        "sample_id",
+        "metric",
+        "passed",
+        "failed",
+        "defect_code"
+      ],
+      "quality": {
+        "requiresTextAndNumericColumns": [
+          "defect_code",
+          "failed"
+        ],
+        "riskIfMissing": "high"
+      }
+    },
+    {
+      "id": "mfg_table_downtime_events",
+      "name": {
+        "en": "Downtime Events Table",
+        "pt": "Tabela de Eventos de Parada"
+      },
+      "aliases": [
+        "downtime",
+        "machine stops"
+      ],
+      "columns": [
+        "line",
+        "start_time",
+        "end_time",
+        "duration_minutes",
+        "cause",
+        "resolver"
+      ],
+      "quality": {
+        "requiresTemporalColumns": [
+          "start_time",
+          "end_time"
+        ],
+        "riskIfMissing": "critical"
+      }
+    }
+  ]
+}

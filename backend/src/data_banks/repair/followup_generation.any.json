@@ -1,0 +1,229 @@
+{
+  "_meta": {
+    "id": "followup_generation",
+    "version": "1.0.0",
+    "description": "Recovery-aware follow-up generation. Suggests the next most useful ask after ambiguity, partial evidence, contradiction, or evidence-gap handling.",
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "koda-repair",
+    "compat": ">=1.0.0",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ],
+    "changeLog": [
+      "Added follow-up generators tuned for partial answers, contradictions, evidence gaps, and repaired retrieval misses",
+      "Added suppression rules so follow-ups stay concrete and do not sound like generic filler",
+      "Added runtime metadata for repair-aware suggestion emission"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id",
+    "maxSuggestions": 3,
+    "preferGapClosingFollowups": true,
+    "preferSameScopeSuggestions": true,
+    "suppressGenericHelpOffers": true
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "after answer composition when follow-up slots are available",
+    "consumer": "follow-up generator",
+    "intent": "Offer the next concrete move that either resolves the gap or extracts more value from the same evidence.",
+    "emittedSignals": [
+      "followupSuggestions",
+      "followupFamily",
+      "followupSuppressed"
+    ]
+  },
+  "followupFamilies": [
+    {
+      "id": "gap_closing",
+      "bestFor": [
+        "missing role",
+        "missing period",
+        "missing section"
+      ],
+      "template": "I can narrow this to {{missingAnchor}} if you want."
+    },
+    {
+      "id": "conflict_review",
+      "bestFor": [
+        "contradictions",
+        "version deltas"
+      ],
+      "template": "I can show the two conflicting passages side by side."
+    },
+    {
+      "id": "partial_completion",
+      "bestFor": [
+        "multi-part answers with one missing piece"
+      ],
+      "template": "I can keep going on the remaining piece: {{missingSubpart}}."
+    },
+    {
+      "id": "retrieval_rescue",
+      "bestFor": [
+        "false negatives",
+        "weak retrieval"
+      ],
+      "template": "I can try a narrower search for {{searchAnchor}}."
+    },
+    {
+      "id": "adjacent_value",
+      "bestFor": [
+        "broad summaries",
+        "single-field asks with nearby relevant fields"
+      ],
+      "template": "I can also pull {{adjacentUsefulField}} from the same section."
+    }
+  ],
+  "rules": [
+    {
+      "id": "FG_001_partial_answers_offer_remaining_piece",
+      "priority": 130,
+      "when": {
+        "all": [
+          {
+            "path": "signals.partialAnswerMode",
+            "op": "eq",
+            "value": true
+          }
+        ]
+      },
+      "action": {
+        "type": "emit_followup_family",
+        "family": "partial_completion"
+      },
+      "reasonCode": "continue_partial_answer",
+      "severity": "medium"
+    },
+    {
+      "id": "FG_002_conflicts_offer_side_by_side_review",
+      "priority": 135,
+      "when": {
+        "all": [
+          {
+            "path": "signals.contradictionDetected",
+            "op": "eq",
+            "value": true
+          }
+        ]
+      },
+      "action": {
+        "type": "emit_followup_family",
+        "family": "conflict_review"
+      },
+      "reasonCode": "help_user_inspect_conflict",
+      "severity": "medium"
+    },
+    {
+      "id": "FG_003_evidence_gaps_offer_gap_closing_step",
+      "priority": 140,
+      "when": {
+        "all": [
+          {
+            "path": "signals.coreEvidenceMissing",
+            "op": "eq",
+            "value": true
+          }
+        ]
+      },
+      "action": {
+        "type": "emit_followup_family",
+        "family": "gap_closing"
+      },
+      "reasonCode": "gap_should_be_closable",
+      "severity": "high"
+    },
+    {
+      "id": "FG_004_false_negative_repair_offers_retry",
+      "priority": 125,
+      "when": {
+        "all": [
+          {
+            "path": "signals.falseNegativeRescueAttempted",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "signals.falseNegativeRescueSucceeded",
+            "op": "neq",
+            "value": true
+          }
+        ]
+      },
+      "action": {
+        "type": "emit_followup_family",
+        "family": "retrieval_rescue"
+      },
+      "reasonCode": "offer_one_more_targeted_search",
+      "severity": "medium"
+    },
+    {
+      "id": "FG_005_suppress_generic_help",
+      "priority": 150,
+      "when": {
+        "all": [
+          {
+            "path": "context.genericFollowupCandidate",
+            "op": "eq",
+            "value": true
+          }
+        ]
+      },
+      "action": {
+        "type": "suppress_followup"
+      },
+      "reasonCode": "generic_followup_not_allowed",
+      "severity": "high"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "partial_answer_emits_partial_completion",
+        "input": {
+          "signals": {
+            "partialAnswerMode": true
+          }
+        },
+        "expect": {
+          "family": "partial_completion"
+        }
+      },
+      {
+        "id": "conflict_emits_review_followup",
+        "input": {
+          "signals": {
+            "contradictionDetected": true
+          }
+        },
+        "expect": {
+          "family": "conflict_review"
+        }
+      },
+      {
+        "id": "generic_followup_is_suppressed",
+        "input": {
+          "context": {
+            "genericFollowupCandidate": true
+          }
+        },
+        "expect": {
+          "action": "suppress_followup"
+        }
+      }
+    ]
+  }
+}

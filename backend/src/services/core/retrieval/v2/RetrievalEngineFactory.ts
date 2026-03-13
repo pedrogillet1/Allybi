@@ -1,9 +1,6 @@
 /**
  * RetrievalEngineFactory — single entry point for constructing the active
- * retrieval engine.  Reads `RETRIEVAL_USE_V2_ORCHESTRATOR` to pick V1 or V2,
- * wraps V2 construction in a try/catch so a build error falls back to V1.
- *
- * Consumers import only `IRetrievalEngine` and `createRetrievalEngine`.
+ * retrieval engine. V2 is the only supported runtime.
  */
 
 import { logger } from "../../../../utils/logger";
@@ -17,12 +14,27 @@ import type {
   QueryNormalizer,
 } from "../retrieval.types";
 import type { DocumentIntelligenceBanksService } from "../../banks/documentIntelligenceBanks.service";
-import { getDocumentIntelligenceBanksInstance } from "../../banks/documentIntelligenceBanks.service";
-import { RetrievalEngineService } from "../retrievalEngine.legacy.service";
+import {
+  createRetrievalEngineCaches,
+  type RetrievalEngineCaches,
+} from "./RetrievalEngineCaches.service";
 import { RetrievalOrchestratorV2 } from "./RetrievalOrchestrator.service";
-import { FallbackRetrievalEngine } from "./FallbackRetrievalEngine";
 
 // ── Dependency bundle ────────────────────────────────────────────────
+
+export type RetrievalDocumentIntelligenceBanks = Pick<
+  DocumentIntelligenceBanksService,
+  | "getCrossDocGroundingPolicy"
+  | "getDocumentIntelligenceDomains"
+  | "getDocTypeCatalog"
+  | "getDocTypeSections"
+  | "getDocTypeTables"
+  | "getDomainDetectionRules"
+  | "getRetrievalBoostRules"
+  | "getQueryRewriteRules"
+  | "getSectionPriorityRules"
+> &
+  Partial<Pick<DocumentIntelligenceBanksService, "getDocTypeExtractionHints">>;
 
 export interface RetrievalEngineDeps {
   bankLoader: BankLoader;
@@ -30,68 +42,84 @@ export interface RetrievalEngineDeps {
   semanticIndex: SemanticIndex;
   lexicalIndex: LexicalIndex;
   structuralIndex: StructuralIndex;
-  queryNormalizer?: QueryNormalizer;
-  documentIntelligenceBanks?: Pick<
-    DocumentIntelligenceBanksService,
-    | "getCrossDocGroundingPolicy"
-    | "getDocumentIntelligenceDomains"
-    | "getDocTypeCatalog"
-    | "getDocTypeSections"
-    | "getDocTypeTables"
-    | "getDomainDetectionRules"
-    | "getRetrievalBoostRules"
-    | "getQueryRewriteRules"
-    | "getSectionPriorityRules"
-  > &
-    Partial<
-      Pick<DocumentIntelligenceBanksService, "getDocTypeExtractionHints">
-    >;
+  queryNormalizer: QueryNormalizer;
+  documentIntelligenceBanks: RetrievalDocumentIntelligenceBanks;
+  caches?: RetrievalEngineCaches;
 }
 
 // ── Factory ──────────────────────────────────────────────────────────
 
-const V2_FLAGS = new Set(["1", "true", "yes", "on"]);
+export type ActiveRetrievalEngineMode = "v2";
+
+const ACTIVE_RETRIEVAL_ENGINE_MODE: ActiveRetrievalEngineMode = "v2";
+
+export function getActiveRetrievalEngineMode(): ActiveRetrievalEngineMode {
+  return ACTIVE_RETRIEVAL_ENGINE_MODE;
+}
+
+export interface RetrievalEngineDescriptor {
+  activeEngineMode: ActiveRetrievalEngineMode;
+  engineId: "retrieval_orchestrator_v2";
+  engineClass: "RetrievalOrchestratorV2";
+}
+
+export const ACTIVE_RETRIEVAL_ENGINE_DESCRIPTOR: RetrievalEngineDescriptor = {
+  activeEngineMode: ACTIVE_RETRIEVAL_ENGINE_MODE,
+  engineId: "retrieval_orchestrator_v2",
+  engineClass: "RetrievalOrchestratorV2",
+};
+
+export function getActiveRetrievalEngineDescriptor(): RetrievalEngineDescriptor {
+  return ACTIVE_RETRIEVAL_ENGINE_DESCRIPTOR;
+}
+
+export function validateRetrievalEngineDeps(
+  deps: RetrievalEngineDeps,
+): void {
+  if (!deps.bankLoader?.getBank) {
+    throw new Error("retrieval_engine_bank_loader_required");
+  }
+  if (!deps.docStore?.listDocs || !deps.docStore?.getDocMeta) {
+    throw new Error("retrieval_engine_doc_store_required");
+  }
+  if (!deps.semanticIndex?.search) {
+    throw new Error("retrieval_engine_semantic_index_required");
+  }
+  if (!deps.lexicalIndex?.search) {
+    throw new Error("retrieval_engine_lexical_index_required");
+  }
+  if (!deps.structuralIndex?.search) {
+    throw new Error("retrieval_engine_structural_index_required");
+  }
+  if (!deps.queryNormalizer?.normalize) {
+    throw new Error("retrieval_engine_query_normalizer_required");
+  }
+  if (
+    !deps.documentIntelligenceBanks?.getCrossDocGroundingPolicy ||
+    !deps.documentIntelligenceBanks?.getDocumentIntelligenceDomains ||
+    !deps.documentIntelligenceBanks?.getDocTypeCatalog ||
+    !deps.documentIntelligenceBanks?.getDomainDetectionRules
+  ) {
+    throw new Error("retrieval_engine_document_intelligence_banks_required");
+  }
+}
 
 /**
- * Create the active retrieval engine based on the `RETRIEVAL_USE_V2_ORCHESTRATOR`
- * environment variable.  If V2 construction fails, falls back to V1 with an
- * error log.
+ * Create the active retrieval engine using the sole supported V2 orchestrator.
  */
 export function createRetrievalEngine(deps: RetrievalEngineDeps): IRetrievalEngine {
-  const diBanks = deps.documentIntelligenceBanks ?? getDocumentIntelligenceBanksInstance();
-  const useV2 = V2_FLAGS.has(
-    String(process.env.RETRIEVAL_USE_V2_ORCHESTRATOR || "").trim().toLowerCase(),
-  );
-
-  const v1Engine = new RetrievalEngineService(
+  validateRetrievalEngineDeps(deps);
+  logger.info("[retrieval] Using V2 orchestrator", {
+    ...ACTIVE_RETRIEVAL_ENGINE_DESCRIPTOR,
+  });
+  return new RetrievalOrchestratorV2(
     deps.bankLoader,
     deps.docStore,
     deps.semanticIndex,
     deps.lexicalIndex,
     deps.structuralIndex,
     deps.queryNormalizer,
-    diBanks,
+    deps.documentIntelligenceBanks,
+    deps.caches ?? createRetrievalEngineCaches(),
   );
-
-  if (useV2) {
-    try {
-      const v2Engine = new RetrievalOrchestratorV2(
-        deps.bankLoader,
-        deps.docStore,
-        deps.semanticIndex,
-        deps.lexicalIndex,
-        deps.structuralIndex,
-        deps.queryNormalizer,
-        diBanks,
-      );
-      logger.info("[retrieval] Using V2 orchestrator with V1 fallback");
-      return new FallbackRetrievalEngine(v2Engine, v1Engine);
-    } catch (err) {
-      logger.error("[retrieval] V2 orchestrator instantiation failed, falling back to V1", {
-        error: err instanceof Error ? err.message : String(err),
-      });
-    }
-  }
-
-  return v1Engine;
 }

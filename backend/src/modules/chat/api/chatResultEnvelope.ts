@@ -184,26 +184,26 @@ export function toChatFinalEvent(result: ChatResult): Record<string, unknown> {
     answerClass: normalized.answerClass || null,
     navType: normalized.navType || null,
     sources: synthesizedSources,
-    provenance: (normalized as any).provenance || null,
+    provenance: normalized.provenance || null,
     attachments: attachmentsPayload,
-    answerProvisional: Boolean((normalized as any).answerProvisional),
-    answerSourceMode: (normalized as any).answerSourceMode || "chunk",
-    indexingInProgress: Boolean((normalized as any).indexingInProgress),
-    scopeRelaxed: Boolean((normalized as any).scopeRelaxed),
-    status: (normalized as any).status || "success",
-    failureCode: (normalized as any).failureCode || null,
-    completion: (normalized as any).completion || defaultCompletion(normalized),
-    truncation: (normalized as any).truncation || defaultTruncation(),
-    evidence: (normalized as any).evidence || defaultEvidence(normalized),
-    qualityGates: (normalized as any).qualityGates || defaultQualityGates(),
-    userWarning: (normalized as any).userWarning || null,
-    warnings: (normalized as any).warnings || defaultWarnings(),
-    assistantTelemetry: (normalized as any).assistantTelemetry || null,
-    ...(String((normalized as any).scopeRelaxReason || "").trim()
-      ? { scopeRelaxReason: (normalized as any).scopeRelaxReason }
+    answerProvisional: Boolean(normalized.answerProvisional),
+    answerSourceMode: normalized.answerSourceMode || "chunk",
+    indexingInProgress: Boolean(normalized.indexingInProgress),
+    scopeRelaxed: Boolean(normalized.scopeRelaxed),
+    status: normalized.status || "success",
+    failureCode: normalized.failureCode || null,
+    completion: normalized.completion || defaultCompletion(normalized),
+    truncation: normalized.truncation || defaultTruncation(),
+    evidence: normalized.evidence || defaultEvidence(normalized),
+    qualityGates: normalized.qualityGates || defaultQualityGates(),
+    userWarning: normalized.userWarning || null,
+    warnings: normalized.warnings || defaultWarnings(),
+    assistantTelemetry: normalized.assistantTelemetry || null,
+    ...(String(normalized.scopeRelaxReason || "").trim()
+      ? { scopeRelaxReason: normalized.scopeRelaxReason }
       : {}),
-    ...(String((normalized as any).fallbackReasonCode || "").trim()
-      ? { fallbackReasonCode: (normalized as any).fallbackReasonCode }
+    ...(String(normalized.fallbackReasonCode || "").trim()
+      ? { fallbackReasonCode: normalized.fallbackReasonCode }
       : {}),
     ...(normalized.listing?.length ? { listing: normalized.listing } : {}),
     ...(normalized.breadcrumb?.length

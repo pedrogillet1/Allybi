@@ -1,0 +1,150 @@
+{
+  "_meta": {
+    "id": "table_reasoning_rules",
+    "version": "1.0.0",
+    "description": "Runtime rules for table interpretation, row/column anchoring, and aggregate/value inference boundaries.",
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "koda-retrieval",
+    "compat": ">=1.0.0",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id",
+    "requireHeaderAndContext": true,
+    "requireRowAndColumnContext": true,
+    "forbidTransposeAssumptions": true,
+    "treatTotalsAsAggregates": true
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "table evidence interpretation",
+    "consumer": "table reasoning stage before packaging",
+    "intent": "avoid arithmetic or semantic inference without explicit row/column and period context",
+    "emittedSignals": [
+      "tableHeaderLocked",
+      "tableRowLocked",
+      "tableColumnLocked",
+      "tableReasoningMode"
+    ]
+  },
+  "tableSemantics": {
+    "numericMode": {
+      "allowDerivedArithmetic": false,
+      "requirePeriodForRateMath": true,
+      "requireSourceScale": true,
+      "forbidCrossSheetInferenceWithoutLabel": true
+    },
+    "headingMode": {
+      "allowRowHeaderAlias": true,
+      "allowColumnHeaderAlias": true,
+      "requireHeaderCuration": true
+    },
+    "integrityMode": {
+      "maxColumnShiftDistance": 2,
+      "forbidRowColumnSwap": true
+    }
+  },
+  "rules": [
+    {
+      "id": "TRR_001_require_full_table_context",
+      "check": "candidate.type == 'table' AND (candidate.tableHeader == null OR candidate.tableRow == null OR candidate.tableColumn == null)",
+      "failureAction": "DROP_TABLE_CELL_OR_REQUEST_CONTEXT",
+      "severity": "high",
+      "reasonCode": "missing_table_context"
+    },
+    {
+      "id": "TRR_002_prevent_implicit_totals",
+      "check": "candidate.isTotal == true AND candidate.usedAsAtomicClaim == true",
+      "failureAction": "TREAT_AS_AGGREGATE_EXPLANATION",
+      "severity": "warning",
+      "reasonCode": "total_row_not_atomic"
+    },
+    {
+      "id": "TRR_003_forbid_transposed_inference",
+      "check": "query.tableTransposeHint == true AND candidate.cannotConfirmTransposedAxis == true",
+      "failureAction": "ASK_TABLE_ORIENTATION",
+      "severity": "error",
+      "reasonCode": "transpose_ambiguity"
+    },
+    {
+      "id": "TRR_004_row_column_swap_check",
+      "check": "candidate.tableRow == candidate.tableColumn",
+      "failureAction": "ASK_OR_REMAP_TABLE_AXIS",
+      "severity": "warning",
+      "reasonCode": "possible_row_column_swap"
+    },
+    {
+      "id": "TRR_005_merged_cell_requires_unwrapped_value",
+      "check": "candidate.isMergedCell == true AND candidate.unwrappedValue == null",
+      "failureAction": "UNWRAP_MERGED_CELL_OR_DROP",
+      "severity": "warning",
+      "reasonCode": "merged_cell_without_value"
+    },
+    {
+      "id": "TRR_006_period_bucket_alignment",
+      "check": "query.requiresPeriod == true AND candidate.periodLabel == null",
+      "failureAction": "ASK_PERIOD",
+      "severity": "error",
+      "reasonCode": "missing_period_for_table_claim"
+    },
+    {
+      "id": "TRR_007_scale_mismatch_guard",
+      "check": "candidate.valueScale != null AND candidate.scaleApplied == false",
+      "failureAction": "ATTACH_SCALE_DISCLOSURE_OR_DROP",
+      "severity": "warning",
+      "reasonCode": "scale_not_applied"
+    },
+    {
+      "id": "TRR_008_currency_header_conflict",
+      "check": "candidate.currencyHeaderConflict == true AND query.requiresCurrencyPrecision == true",
+      "failureAction": "ASK_CURRENCY_SCOPE",
+      "severity": "warning",
+      "reasonCode": "currency_header_conflict"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "table_requires_row_column_context",
+        "input": {
+          "candidate": {
+            "type": "table",
+            "tableHeader": null,
+            "tableRow": "Revenue",
+            "tableColumn": null
+          }
+        },
+        "expect": {
+          "failureAction": "DROP_TABLE_CELL_OR_REQUEST_CONTEXT"
+        }
+      },
+      {
+        "id": "table_total_row_not_atomic",
+        "input": {
+          "candidate": {
+            "isTotal": true,
+            "usedAsAtomicClaim": true
+          }
+        },
+        "expect": {
+          "failureAction": "TREAT_AS_AGGREGATE_EXPLANATION"
+        }
+      }
+    ]
+  }
+}

@@ -1,6 +1,7 @@
 import { describe, expect, test } from "@jest/globals";
 
-import { RetrievalEngineService } from "../../modules/retrieval/application";
+import { RetrievalEngineService } from "../../services/core/retrieval/v2/RetrievalOrchestrator.service";
+import { createDefaultQueryNormalizer } from "../../services/core/retrieval/v2/DefaultQueryNormalizer.service";
 
 const ALL_DOC_IDS = [
   "doc-target",
@@ -118,6 +119,7 @@ function makeScopeTestEngine(): RetrievalEngineService {
     semanticIndex as any,
     lexicalIndex as any,
     structuralIndex as any,
+    createDefaultQueryNormalizer(),
   );
 }
 

@@ -107,4 +107,15 @@ export class ScopeService {
       Array.isArray(req.attachedDocumentIds) ? req.attachedDocumentIds : [],
     );
   }
+
+  shouldClearScope(req: ChatRequest): boolean {
+    if (req.meta?.clearScope === true) {
+      return true;
+    }
+
+    const message = String(req.message || "").toLowerCase();
+    return this.deps.runtimeConfig.clearScopeRegex.some((pattern) =>
+      pattern.test(message),
+    );
+  }
 }

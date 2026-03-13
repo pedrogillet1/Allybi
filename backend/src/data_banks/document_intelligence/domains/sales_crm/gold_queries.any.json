@@ -1,0 +1,157 @@
+{
+  "_meta": {
+    "id": "eval_gold_queries_sales_crm_domain",
+    "version": "1.0.0",
+    "description": "Sales CRM gold queries for stage-accurate, owner-aware, and pricing-safe evaluation.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "eval-domain-brain",
+    "usedBy": [
+      "services/eval/goldQueryRunner.service.ts",
+      "services/core/orchestration/answerPlanner.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/docint-eval-pack.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "sales_crm",
+    "scenarioType": "sales_reasoning"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "evaluation dataset for commercial interpretation",
+    "consumer": "goldQueryRunner",
+    "intent": "Catch stage mixups, weak pricing claims, and missing owner/context failures."
+  },
+  "goldQueries": [
+    {
+      "id": "crm_gold_001",
+      "lang": "en",
+      "query": "Which accounts are in late stages but at risk, and what are the top blockers by owner?",
+      "expected": {
+        "mustReadSource": [
+          "funnel position",
+          "risk register",
+          "activity log",
+          "owner"
+        ],
+        "mustExtract": [
+          "account",
+          "opportunity_id",
+          "stage",
+          "blocker",
+          "owner"
+        ],
+        "mustPreserveOwner": true,
+        "mustPreserveScope": true,
+        "failureConditions": [
+          "stage_mixed_without_definition",
+          "owner_omitted",
+          "risk_without_category"
+        ]
+      }
+    },
+    {
+      "id": "crm_gold_002",
+      "lang": "en",
+      "query": "Validate the quote math for the top 2 opportunities and show discount approvals and term assumptions.",
+      "expected": {
+        "mustFindSection": [
+          "pricing matrix",
+          "quote lines",
+          "approval thresholds",
+          "terms"
+        ],
+        "mustExtract": [
+          "arr",
+          "currency",
+          "discount",
+          "unit_price",
+          "approval_level"
+        ],
+        "mustPreserveCalculationPath": true,
+        "mustShowDefinition": true,
+        "failureConditions": [
+          "missing_discount_authority",
+          "units_inconsistent",
+          "no_term_context"
+        ]
+      }
+    },
+    {
+      "id": "crm_gold_003",
+      "lang": "en",
+      "query": "What renewals are at highest churn risk in the next 60 days, and what next-best-actions are documented?",
+      "expected": {
+        "mustFindSection": [
+          "renewal path",
+          "risk register",
+          "activity log"
+        ],
+        "mustExtract": [
+          "account",
+          "renewal_date",
+          "risk_level",
+          "assigned_owner",
+          "next_action"
+        ],
+        "mustPreservePeriod": true,
+        "mustPreserveOwner": true,
+        "failureConditions": [
+          "aggregates_without_dates",
+          "actions_without_owner",
+          "no_churn_risk_rationale"
+        ]
+      }
+    },
+    {
+      "id": "crm_gold_004",
+      "lang": "pt",
+      "query": "Mostre receita recorrente mensal e anual por fase do funil, com diferenciação de moeda e período.",
+      "expected": {
+        "mustInclude": [
+          "MRR",
+          "ARR",
+          "moeda",
+          "período",
+          "fase"
+        ],
+        "mustPreserveCurrency": true,
+        "mustPreservePeriod": true,
+        "failureConditions": [
+          "mistura_mrr_arr",
+          "sem_definicao_de_fase"
+        ]
+      }
+    }
+  ],
+  "qualityGuards": {
+    "maxAllowedInferenceRate": 0.12,
+    "requiredAnchorDensity": 2.4,
+    "penalties": {
+      "stage_mismatch": -34,
+      "owner_missing": -40,
+      "currency_mix": -28
+    }
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "crm_gold_quote_requires_approval",
+        "input": {
+          "query": "crm_gold_002"
+        },
+        "expect": {
+          "mustCheck": [
+            "mustShowDefinition",
+            "approval_level"
+          ]
+        }
+      }
+    ]
+  }
+}

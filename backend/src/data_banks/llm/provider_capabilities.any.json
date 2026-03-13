@@ -1,232 +1,157 @@
 {
   "_meta": {
     "id": "provider_capabilities",
-    "version": "1.0.0",
-    "description": "Provider capability matrix for Allybi routing, tool-calling, streaming, and safety behavior. Bank-driven, deterministic, no user-facing copy.",
-    "languages": [
-      "any"
-    ],
-    "lastUpdated": "2026-01-27",
-    "owner": "data-bank-governance",
+    "version": "2.0.0",
+    "description": "Canonical provider capability index with explicit routing intent, role eligibility, and policy overrides.",
+    "owner": "assistant-orchestrator",
     "usedBy": [
-      "services/core/banks/dataBankLoader.service.ts"
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/llm/core/llmRouter.service.ts"
     ],
     "tests": [
-      "tests/patternWiringProof.test.ts"
-    ]
+      "tests/patternWiringProof.test.ts",
+      "tests/llm/providerCapabilitiesBaseline.proof.test.ts"
+    ],
+    "languages": [
+      "en"
+    ],
+    "lastUpdated": "2026-03-13"
   },
   "config": {
     "enabled": true,
-    "actionsContract": {
-      "purpose": "Routing + feature gating based on provider/model capabilities",
-      "inputs": [
-        "provider",
-        "model",
-        "mode"
-      ],
-      "outputs": [
-        "capabilities",
-        "limits",
-        "featureFlags"
-      ],
-      "determinism": "Pure lookup; no runtime heuristics"
-    }
+    "sourceOfTruth": "provider_capabilities_expanded.any.json"
   },
   "defaults": {
     "draft": {
       "provider": "gemini",
-      "model": "gemini-2.5-flash"
+      "model": "gemini-2.5-flash",
+      "role": "planner"
     },
     "final": {
       "provider": "openai",
-      "model": "gpt-5.2"
+      "model": "gpt-5.2",
+      "role": "synthesizer"
     }
   },
-  "providers": {
-    "gemini": {
-      "displayName": "Google Gemini",
-      "capabilities": {
-        "text": true,
-        "vision": true,
-        "streaming": true,
-        "toolCalling": true,
-        "jsonMode": false,
-        "seededDeterminism": false,
-        "logProbs": false
-      },
-      "limits": {
-        "maxOutputTokensDefault": 1024,
-        "maxToolsPerTurnDefault": 8,
-        "streaming": {
-          "supportsDeltaText": true,
-          "supportsStructuredMarkers": false,
-          "framing": "newline_json"
-        }
-      },
-      "models": {
-        "gemini-2.5-flash": {
-          "tier": "flash",
-          "pinnedVersion": "gemini-2.5-flash",
-          "supportsStreaming": true,
-          "supportsTools": true,
-          "maxOutputTokens": 8192,
-          "maxInputTokens": 1048576,
-          "capabilities": {
-            "lowLatency": true,
-            "bestFor": [
-              "intent_routing",
-              "scope_resolution",
-              "doc_discovery",
-              "light_summaries",
-              "first_pass_answers_strong_evidence",
-              "retrieval_planning",
-              "multi_step_decomposition"
-            ]
-          }
-        }
-      }
-    },
-    "openai": {
-      "displayName": "OpenAI",
-      "capabilities": {
-        "text": true,
-        "vision": true,
-        "streaming": true,
-        "toolCalling": true,
-        "jsonMode": true,
-        "seededDeterminism": true,
-        "logProbs": true
-      },
-      "limits": {
-        "maxOutputTokensDefault": 2048,
-        "maxToolsPerTurnDefault": 12,
-        "streaming": {
-          "supportsDeltaText": true,
-          "supportsStructuredMarkers": true,
-          "framing": "sse"
-        }
-      },
-      "models": {
-        "gpt-5.2": {
-          "tier": "authority",
-          "pinnedVersion": "gpt-5.2-2026-01-15",
-          "supportsStreaming": true,
-          "supportsTools": true,
-          "maxOutputTokens": 16384,
-          "maxInputTokens": 128000,
-          "capabilities": {
-            "bestFor": [
-              "final_compose_high_stakes",
-              "numeric_integrity",
-              "quote_correctness",
-              "ambiguity_resolution_one_question",
-              "retry_then_regen_when_shaky",
-              "quality_gates_strict"
-            ]
-          }
+  "capabilitiesByTaskFamily": {
+    "document_grounding": {
+      "preferred": [
+        {
+          "provider": "openai",
+          "model": "gpt-5.2",
+          "role": "evidence_specialist"
         },
-        "gpt-5-mini": {
-          "tier": "precision",
-          "pinnedVersion": "gpt-5-mini-2026-01-15",
-          "supportsStreaming": true,
-          "supportsTools": true,
-          "maxOutputTokens": 16384,
-          "maxInputTokens": 128000,
-          "capabilities": {
-            "bestFor": [
-              "final_compose_medium_stakes",
-              "structured_outputs",
-              "formatting_tables_summaries"
-            ]
-          }
+        {
+          "provider": "gemini",
+          "model": "gemini-2.5-flash",
+          "role": "researcher"
         }
+      ],
+      "allowed": [
+        "openai:gpt-5-mini",
+        "openai:gpt-5.2",
+        "gemini:gemini-2.5-flash",
+        "local:local-default"
+      ],
+      "banOnFailure": [
+        "openai:gpt-5.2"
+      ]
+    },
+    "comparison_synthesis": {
+      "preferred": [
+        {
+          "provider": "gemini",
+          "model": "gemini-2.5-flash",
+          "role": "researcher"
+        },
+        {
+          "provider": "openai",
+          "model": "gpt-5-mini",
+          "role": "researcher"
+        }
+      ],
+      "allowed": [
+        "gemini:gemini-2.5-flash",
+        "openai:gpt-5-mini",
+        "openai:gpt-5.2"
+      ]
+    },
+    "numeric_audit": {
+      "preferred": [
+        {
+          "provider": "openai",
+          "model": "gpt-5.2",
+          "role": "numeric_specialist"
+        }
+      ],
+      "allowed": [
+        "openai:gpt-5.2",
+        "openai:gpt-5-mini",
+        "gemini:gemini-2.5-flash"
+      ],
+      "minimum": {
+        "role": "numeric_specialist"
       }
     },
-    "local": {
-      "displayName": "Local LLM",
-      "capabilities": {
-        "text": true,
-        "vision": false,
-        "streaming": true,
-        "toolCalling": false,
-        "jsonMode": false,
-        "seededDeterminism": false,
-        "logProbs": false
-      },
-      "limits": {
-        "maxOutputTokensDefault": 1024,
-        "maxToolsPerTurnDefault": 0,
-        "streaming": {
-          "supportsDeltaText": true,
-          "supportsStructuredMarkers": false,
-          "framing": "ndjson_or_sse"
+    "operational_workflow": {
+      "preferred": [
+        {
+          "provider": "gemini",
+          "model": "gemini-2.5-flash",
+          "role": "planner"
+        },
+        {
+          "provider": "openai",
+          "model": "gpt-5-mini",
+          "role": "planner"
         }
-      },
-      "models": {
-        "ollama:*": {
-          "tier": "local",
-          "capabilities": {
-            "bestFor": [
-              "offline_mode",
-              "low_cost_fallback",
-              "simple_summaries"
-            ]
-          }
+      ],
+      "allowed": [
+        "gemini:gemini-2.5-flash",
+        "openai:gpt-5-mini",
+        "openai:gpt-5.2"
+      ]
+    },
+    "clarification_repair": {
+      "preferred": [
+        {
+          "provider": "gemini",
+          "model": "gemini-2.5-flash",
+          "role": "planner"
+        },
+        {
+          "provider": "openai",
+          "model": "gpt-5-mini",
+          "role": "planner"
         }
-      }
+      ],
+      "allowed": [
+        "gemini:gemini-2.5-flash",
+        "openai:gpt-5-mini",
+        "local:local-default"
+      ]
     }
+  },
+  "qualityOverrides": {
+    "mustUseRole": [
+      {
+        "taskFamily": "numeric_audit",
+        "role": "numeric_specialist"
+      },
+      {
+        "taskFamily": "document_grounding",
+        "riskLevel": "high",
+        "role": "evidence_specialist"
+      }
+    ],
+    "mustEnableShadowFor": [
+      "decision_memo",
+      "quote_pack"
+    ]
   },
   "featureFlags": {
-    "preferGeminiFlashForFastStages": true,
-    "preferOpenAIForHighStakesCompose": true,
-    "disableToolCallingOnLocal": true,
-    "enableStreamingEverywhere": true,
-    "markerHoldRecommended": true
-  },
-  "tests": [
-    {
-      "name": "google_flash_has_streaming_and_toolcalling",
-      "input": {
-        "provider": "gemini",
-        "model": "gemini-2.5-flash",
-        "mode": "answer"
-      },
-      "expect": {
-        "capabilities": {
-          "streaming": true,
-          "toolCalling": true
-        },
-        "providers.gemini.models.gemini-2.5-flash.tier": "flash"
-      }
-    },
-    {
-      "name": "openai_gpt52_is_authority",
-      "input": {
-        "provider": "openai",
-        "model": "gpt-5.2",
-        "mode": "answer"
-      },
-      "expect": {
-        "providers.openai.models.gpt-5.2.tier": "authority",
-        "capabilities": {
-          "jsonMode": true,
-          "toolCalling": true
-        }
-      }
-    },
-    {
-      "name": "local_has_no_toolcalling",
-      "input": {
-        "provider": "local",
-        "model": "ollama:gemma2",
-        "mode": "answer"
-      },
-      "expect": {
-        "capabilities": {
-          "toolCalling": false
-        },
-        "limits.maxToolsPerTurnDefault": 0
-      }
-    }
-  ]
+    "preferFastRouteForUrgent": true,
+    "preferAuthorityForFinal": true,
+    "requireToolAwareRouting": true
+  }
 }

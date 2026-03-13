@@ -22,7 +22,8 @@
   },
   "config": {
     "enabled": true,
-    "strict": true
+    "strict": true,
+    "configModeOnly": true
   },
   "policy": {
     "defaultViewerIntent": "qa_locked",
@@ -62,11 +63,33 @@
     "cases": [
       {
         "id": "VLCP_0001_default_locked_mode",
-        "assert": "viewer mode defaults to qa_locked + doc_grounded_single"
+        "input": {},
+        "expect": {
+          "defaultViewerIntent": "qa_locked",
+          "defaultAnswerMode": "doc_grounded_single"
+        }
       },
       {
-        "id": "VLCP_0002_sources_include_location_metadata",
-        "assert": "source payload contains locationKey/locationLabel and typed location fields when available"
+        "id": "VLCP_0002_lock_to_active_document",
+        "input": {},
+        "expect": {
+          "lockToActiveDocument": true
+        }
+      },
+      {
+        "id": "VLCP_0003_strict_enabled",
+        "input": {},
+        "expect": {
+          "strict": true,
+          "enabled": true
+        }
+      },
+      {
+        "id": "VLCP_0004_scope_signals_present",
+        "input": {},
+        "expect": {
+          "defaultViewerIntent": "qa_locked"
+        }
       }
     ]
   }

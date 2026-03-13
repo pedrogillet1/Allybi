@@ -1,0 +1,196 @@
+{
+  "_meta": {
+    "id": "tool_selection_policy",
+    "version": "1.0.0",
+    "description": "Tool selection policy for task-aware assistant orchestration before invocation.",
+    "owner": "assistant-orchestrator",
+    "usedBy": [
+      "services/assistant/core/assistantOrchestrator.service.ts"
+    ],
+    "tests": [
+      "tests/assistant/toolSelectionPolicy.proof.test.ts"
+    ],
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13"
+  },
+  "config": {
+    "enabled": true,
+    "selectionMode": "deterministic_with_escape_hatches"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "pre_tooling_before_model_call",
+    "inputSignals": [
+      "taskFamily",
+      "intentStrength",
+      "uncertaintyLevel",
+      "sensitivity"
+    ],
+    "output": "ordered_tool_set_with_fallbacks"
+  },
+  "taskFamilies": [
+    {
+      "id": "document_grounding",
+      "signals": [
+        "citationRequested",
+        "quoteExtract",
+        "clauseReference"
+      ],
+      "tools": {
+        "primary": [
+          "document_lookup",
+          "citation_fetch"
+        ],
+        "secondary": [
+          "section_index",
+          "table_reader"
+        ],
+        "tertiary": [
+          "knowledge_search"
+        ]
+      },
+      "constraints": {
+        "must_use_primary": true,
+        "maxTools": 8,
+        "parallelSafe": true
+      }
+    },
+    {
+      "id": "comparison_synthesis",
+      "signals": [
+        "compareVersions",
+        "contrastRows",
+        "deltaRequest"
+      ],
+      "tools": {
+        "primary": [
+          "document_lookup",
+          "table_reader"
+        ],
+        "secondary": [
+          "matrix_aggregator",
+          "numeric_normalizer"
+        ],
+        "tertiary": [
+          "citation_fetch"
+        ]
+      },
+      "constraints": {
+        "must_use_primary": true,
+        "maxTools": 10,
+        "parallelSafe": true
+      }
+    },
+    {
+      "id": "operational_workflow",
+      "signals": [
+        "taskPlanning",
+        "nextStep",
+        "owner",
+        "deadline"
+      ],
+      "tools": {
+        "primary": [
+          "state_fetch",
+          "task_planner",
+          "work_product_formatter"
+        ],
+        "secondary": [
+          "document_lookup"
+        ],
+        "tertiary": [
+          "knowledge_search"
+        ]
+      },
+      "constraints": {
+        "must_use_primary": false,
+        "maxTools": 6,
+        "parallelSafe": false
+      }
+    },
+    {
+      "id": "numeric_audit",
+      "signals": [
+        "calcRequest",
+        "reconciliation",
+        "financialVariance",
+        "unitBinding"
+      ],
+      "tools": {
+        "primary": [
+          "table_reader",
+          "numeric_validator",
+          "citation_fetch"
+        ],
+        "secondary": [
+          "excel_calc"
+        ],
+        "tertiary": [
+          "knowledge_search"
+        ]
+      },
+      "constraints": {
+        "must_use_primary": true,
+        "maxTools": 8,
+        "parallelSafe": true
+      }
+    },
+    {
+      "id": "clarification_repair",
+      "signals": [
+        "insufficientContext",
+        "ambiguityInQuestion",
+        "mixedTaskType"
+      ],
+      "tools": {
+        "primary": [
+          "clarifier",
+          "intent_history_inspector"
+        ],
+        "secondary": [
+          "document_lookup"
+        ],
+        "tertiary": [
+          "history_suggester"
+        ]
+      },
+      "constraints": {
+        "must_use_primary": true,
+        "maxTools": 4,
+        "parallelSafe": false
+      }
+    }
+  ],
+  "toolSelectionPolicy": {
+    "confidenceGate": {
+      "value": 0.74,
+      "onBelowThreshold": "switch_to_clarifier_then_replan"
+    },
+    "riskGate": {
+      "value": 0.82,
+      "onAboveThreshold": "disable_speculative_tooling"
+    }
+  },
+  "rules": [
+    "Select exactly one primary family unless user intent spans two high-value families; then require sequential composition with intermediate state handoff.",
+    "Do not use document tools when no grounding request exists and task is pure planning or state summarization.",
+    "Reject toolchains that exceed maxTools unless each tool adds unique required output." 
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "comparison_uses_table_reader",
+        "input": {
+          "taskFamily": "comparison_synthesis"
+        },
+        "expect": {
+          "tools.primary": [
+            "document_lookup",
+            "table_reader"
+          ]
+        }
+      }
+    ]
+  }
+}

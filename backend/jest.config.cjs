@@ -2,7 +2,7 @@
 module.exports = {
   preset: "ts-jest",
   testEnvironment: "node",
-  roots: ["<rootDir>/src"],
+  roots: ["<rootDir>/src", "<rootDir>/tools"],
   testMatch: ["**/*.test.ts", "**/*.spec.ts"],
   // Some folders contain vitest-based or local/dev harness tests that should not run in Jest.
   testPathIgnorePatterns: [

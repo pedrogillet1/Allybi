@@ -21,7 +21,7 @@
       "tests/patternDeterminism.test.ts"
     ],
     "lastUpdated": "2026-03-03",
-    "bankId": "reconciliation_patterns",
+    "bankId": "patterns_domains_accounting_reconciliation_patterns",
     "id": "patterns_domains_accounting_reconciliation_patterns",
     "description": "Auto-registered bank payload for patterns/domains/accounting/reconciliation_patterns.any.json"
   },

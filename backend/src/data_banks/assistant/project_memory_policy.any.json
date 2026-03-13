@@ -1,0 +1,100 @@
+{
+  "_meta": {
+    "id": "project_memory_policy",
+    "version": "1.0.0",
+    "description": "Project memory policy for long-running or multi-turn domain work.",
+    "owner": "assistant-orchestrator",
+    "usedBy": [
+      "services/assistant/core/projectMemory.service.ts"
+    ],
+    "tests": [
+      "tests/assistant/projectMemory.proof.test.ts"
+    ],
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13"
+  },
+  "config": {
+    "enabled": true,
+    "memoryNamespace": "project"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "after_context_bind",
+    "consumer": "orchestrator and composer",
+    "output": "projectContextEnvelope"
+  },
+  "memoryBuckets": [
+    {
+      "id": "project_objectives",
+      "purpose": "Persistent goals and definitions for the current project thread.",
+      "retentionTurns": 50,
+      "purgeCondition": [
+        "project_closed",
+        "explicit_reset"
+      ]
+    },
+    {
+      "id": "acceptedFacts",
+      "purpose": "Confirmed facts with anchor IDs and versioning.",
+      "retentionTurns": 80,
+      "mustBeGrounded": true,
+      "purgeCondition": [
+        "fact_retracted",
+        "source_removed"
+      ]
+    },
+    {
+      "id": "workflows",
+      "purpose": "Pending and completed procedural steps requested by user.",
+      "retentionTurns": 40,
+      "purgeCondition": [
+        "workflow_complete",
+        "workflow_cancelled"
+      ]
+    },
+    {
+      "id": "openQuestions",
+      "purpose": "Known unknowns to be revisited before final answers.",
+      "retentionTurns": 30,
+      "purgeCondition": [
+        "answered",
+        "out_of_scope"
+      ]
+    },
+    {
+      "id": "qualityChecks",
+      "purpose": "Audit notes, confidence deltas, and correction history.",
+      "retentionTurns": 60,
+      "purgeCondition": [
+        "quality_threshold_restored"
+      ]
+    }
+  ],
+  "pruning": {
+    "maxActiveBuckets": 3,
+    "autoPruneOnProjectOpen": [
+      "acceptedFacts",
+      "qualityChecks"
+    ],
+    "conflictRule": "newer_fact_version_beats_older_when_grounded"
+  },
+  "guards": [
+    "Do not persist unsupported facts without citation_id.",
+    "Do not persist personally identifying user text without explicit user_context_policy flag."
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "open_questions_survive_turns",
+        "input": {
+          "memoryBucket": "openQuestions",
+          "requestingTurn": 5
+        },
+        "expect": {
+          "retentionTurns": 30
+        }
+      }
+    ]
+  }
+}

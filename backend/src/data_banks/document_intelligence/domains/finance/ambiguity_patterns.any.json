@@ -1,0 +1,168 @@
+{
+  "_meta": {
+    "id": "finance_ambiguity_patterns",
+    "version": "1.2.0",
+    "description": "Finance ambiguity patterns for basis alignment, role lock, and table integrity.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "maxQuestions": 1,
+    "preferClarifyOverSpeculation": true,
+    "domain": "finance"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "post-retrieval before role and role-like value binding",
+    "consumer": "finance ambiguity resolver",
+    "intent": "Reduce false precision from role-role collisions, basis drift, and table orientation uncertainty.",
+    "emittedSignals": [
+      "financeAmbiguityDetected",
+      "financeQuestion",
+      "financeRoleLockQuestion",
+      "financeScopeQuestion",
+      "financeAxisQuestion"
+    ]
+  },
+  "patterns": [
+    {
+      "id": "FIN_AMB_001_period_scope",
+      "type": "period_scope_collision",
+      "triggerSignals": [
+        "query.omitsPeriod == true",
+        "periodCandidates > 1",
+        "periodScopesDifferentCalendars"
+      ],
+      "askQuestion": "Which period and calendar should be used: FY, quarter, month-end, YTD, rolling, or custom fiscal window?"
+    },
+    {
+      "id": "FIN_AMB_002_basis_mix",
+      "type": "basis_mix",
+      "triggerSignals": [
+        "query.omitsBasis == true",
+        "numericFactCandidates.fromDifferentBases"
+      ],
+      "askQuestion": "Should figures be interpreted on cash basis, accrual basis, GAAP, IFRS, or a specific memo/model basis?"
+    },
+    {
+      "id": "FIN_AMB_003_currency_mix",
+      "type": "currency_collision",
+      "triggerSignals": [
+        "multipleCurrencySymbolsInScope",
+        "query.omitsConversionPolicy"
+      ],
+      "askQuestion": "Use native currency output, normalize all to one reporting currency, or show both with a conversion policy matrix?"
+    },
+    {
+      "id": "FIN_AMB_004_role_owner_issuer_confusion",
+      "type": "finance_party_role_collision",
+      "triggerSignals": [
+        "partyRoleCandidates > 1",
+        "queryIncludesPartyRole",
+        "queryTerms include('borrower', 'lender', 'owner', 'issuer', 'beneficiary', 'subscriber', 'signer', 'counterparty', 'guarantor')"
+      ],
+      "askQuestion": "For this query, bind party role explicitly: borrower, lender, owner, issuer, beneficiary, subscriber, guarantor, or signer authority?"
+    },
+    {
+      "id": "FIN_AMB_005_table_axis",
+      "type": "table_axis_swap_risk",
+      "triggerSignals": [
+        "queryUsesAxisPhrase('rows/columns')",
+        "tableOrientationUncertain"
+      ],
+      "askQuestion": "For the table, is the primary axis metrics, entity, periods, or scenario scenarios?"
+    },
+    {
+      "id": "FIN_AMB_006_forecast_vs_actual",
+      "type": "forecast_actual_blend",
+      "triggerSignals": [
+        "queryIncludes('forecast')",
+        "queryIncludes('actual')",
+        "queryOmitsForecastScope"
+      ],
+      "askQuestion": "Compare against prior actuals only, guidance only, planning baseline, or both with explicit side-by-side table?"
+    },
+    {
+      "id": "FIN_AMB_007_covenant_basis_mix",
+      "type": "covenant_basis_collision",
+      "triggerSignals": [
+        "queryTargetsCovenant",
+        "multipleCovenantDefinitionsFound",
+        "definitionsWithoutPriority"
+      ],
+      "askQuestion": "Use lender-definition, issuer-definition, or reconciliation-definition covenant formulas for this query?"
+    },
+    {
+      "id": "FIN_AMB_008_scale_resolution",
+      "type": "unit_scale_collision",
+      "triggerSignals": [
+        "tableScaleTokensMixed",
+        "queryTargetsMonetarySeries"
+      ],
+      "askQuestion": "Should scale normalization use as-reported units, thousands, or millions for all participating metrics?"
+    },
+    {
+      "id": "FIN_AMB_009_version_staleness",
+      "type": "version_conflict",
+      "triggerSignals": [
+        "multipleDocumentVersionsDetected",
+        "queryOmitsVersionIntent"
+      ],
+      "askQuestion": "Multiple versions exist (draft/sign/rev or restatement). Compare against latest active version only or map version differences first?"
+    },
+    {
+      "id": "FIN_AMB_010_source_mix",
+      "type": "source_type_collision",
+      "triggerSignals": [
+        "queryTargetsStatementAndForecast",
+        "sourceMixNotBound"
+      ],
+      "askQuestion": "Should statement/forecast outputs stay in separate sections or be compared as a scenario pair?"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "finance_ambiguity_role_collision",
+        "input": {
+          "scenario": "borrower_lender_issuer_overlap"
+        },
+        "expect": {
+          "action": "askQuestion",
+          "mustAskContains": "signer"
+        }
+      },
+      {
+        "id": "finance_ambiguity_axis_requires_one_question",
+        "input": {
+          "scenario": "table_axis_risk"
+        },
+        "expect": {
+          "action": "askQuestion",
+          "maxQuestions": 1
+        }
+      },
+      {
+        "id": "finance_ambiguity_currency_policy",
+        "input": {
+          "query": "Compare total revenue and adjusted EBITDA."
+        },
+        "expect": {
+          "mustAskContains": "conversion"
+        }
+      }
+    ]
+  }
+}

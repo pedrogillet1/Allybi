@@ -21,7 +21,7 @@
       "tests/patternDeterminism.test.ts"
     ],
     "lastUpdated": "2026-03-03",
-    "bankId": "journal_entry_patterns",
+    "bankId": "patterns_domains_accounting_journal_entry_patterns",
     "id": "patterns_domains_accounting_journal_entry_patterns",
     "description": "Auto-registered bank payload for patterns/domains/accounting/journal_entry_patterns.any.json"
   },

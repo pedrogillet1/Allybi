@@ -28,6 +28,7 @@ type AdminTelemetryAppService = {
     domain?: string;
     intent?: string;
   }) => Promise<any>;
+  latency: (params: { range: string; limit: number }) => Promise<any>;
   intents: (params: { range: string; limit: number }) => Promise<any>;
   intentDetail: (params: { intent: string; range: string }) => Promise<any>;
   domains: (params: { range: string; limit: number }) => Promise<any>;
@@ -267,6 +268,22 @@ export async function adminTelemetryQueries(
     const intent = parseOptionalString(req.query.intent);
     const data = await svc.queries({ range, limit, cursor, domain, intent });
     res.json({ ok: true, range, ...data });
+  } catch (e) {
+    next(e);
+  }
+}
+
+export async function adminTelemetryLatency(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const svc = getSvc(req);
+    const range = parseRange(req.query.range, "7d");
+    const limit = parseLimit(req.query.limit, 20);
+    const data = await svc.latency({ range, limit });
+    res.json({ ok: true, range, data });
   } catch (e) {
     next(e);
   }

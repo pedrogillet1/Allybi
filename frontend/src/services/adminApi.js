@@ -18,9 +18,15 @@ adminApi.interceptors.request.use((config) => {
     config.headers.Authorization = `Bearer ${token}`;
   }
 
-  // Attach X-KODA-ADMIN-KEY for /api/admin/* routes (not /api/auth/admin/*)
+  const adminIdentityProvider =
+    String(process.env.REACT_APP_ADMIN_IDENTITY_PROVIDER || 'iap').toLowerCase();
   const adminKey = process.env.REACT_APP_ADMIN_KEY;
-  if (adminKey && config.url?.includes('/api/admin/') && !config.url?.includes('/api/auth/admin/')) {
+  if (
+    adminIdentityProvider === 'legacy-header' &&
+    adminKey &&
+    config.url?.includes('/api/admin/') &&
+    !config.url?.includes('/api/auth/admin/')
+  ) {
     config.headers['X-KODA-ADMIN-KEY'] = adminKey;
   }
 

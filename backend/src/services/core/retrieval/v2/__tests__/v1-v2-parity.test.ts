@@ -1,16 +1,8 @@
 /**
- * B3: V1/V2 parity — contract-level comparison tests
- *
- * Verifies that createRetrievalEngine() toggles between V1 and V2 correctly,
- * and that both engines produce structurally compatible EvidencePack outputs
- * for the same seed requests. These are contract-level comparisons, NOT
- * bit-for-bit equality (internal ordering, phase timing, etc. may differ).
- *
- * Tests marked with `.skip` are not deterministic due to internal pipeline
- * differences between V1 and V2 (e.g., tie-breaking, floating-point order).
+ * Retrieval factory contract — single active V2 engine tests.
  */
 
-import { describe, expect, test, jest, beforeEach, afterEach } from "@jest/globals";
+import { describe, expect, test, jest, beforeEach } from "@jest/globals";
 
 import type {
   BankLoader,
@@ -65,7 +57,11 @@ jest.mock("../retrieval.config", () => mockConfig);
 
 // ── Import factory AFTER mocking ────────────────────────────────────
 
-import { createRetrievalEngine, type RetrievalEngineDeps } from "../RetrievalEngineFactory";
+import {
+  createRetrievalEngine,
+  type RetrievalEngineDeps,
+} from "../RetrievalEngineFactory";
+import { createDefaultQueryNormalizer } from "../DefaultQueryNormalizer.service";
 
 // ── Helpers ─────────────────────────────────────────────────────────
 
@@ -222,6 +218,7 @@ function makeDeps(): RetrievalEngineDeps {
     semanticIndex: makeSemanticIndex(),
     lexicalIndex: makeLexicalIndex(),
     structuralIndex: makeStructuralIndex(),
+    queryNormalizer: createDefaultQueryNormalizer(),
     documentIntelligenceBanks: stubDocIntelBanks,
   };
 }
@@ -283,103 +280,30 @@ const seedRequests: Array<{ name: string; request: RetrievalRequest; skipParity?
 
 // ── Tests ───────────────────────────────────────────────────────────
 
-describe("V1/V2 parity — contract-level comparison", () => {
-  let savedV2Env: string | undefined;
-
+describe("retrieval factory contract", () => {
   beforeEach(() => {
-    savedV2Env = process.env.RETRIEVAL_USE_V2_ORCHESTRATOR;
     jest.restoreAllMocks();
   });
 
-  afterEach(() => {
-    if (savedV2Env !== undefined) {
-      process.env.RETRIEVAL_USE_V2_ORCHESTRATOR = savedV2Env;
-    } else {
-      delete process.env.RETRIEVAL_USE_V2_ORCHESTRATOR;
-    }
+  test("factory always creates the active V2 engine", () => {
+    const engine = createRetrievalEngine(makeDeps());
+    expect(engine).toBeDefined();
+    expect(typeof engine.retrieve).toBe("function");
+    expect(engine.constructor.name).toBe("RetrievalOrchestratorV2");
   });
 
-  describe("factory toggle — env var selects correct engine", () => {
-    test("RETRIEVAL_USE_V2_ORCHESTRATOR=true creates V2 engine (possibly wrapped)", () => {
-      process.env.RETRIEVAL_USE_V2_ORCHESTRATOR = "true";
-      const engine = createRetrievalEngine(makeDeps());
-      expect(engine).toBeDefined();
-      expect(typeof engine.retrieve).toBe("function");
-      // V2 engine may be wrapped in a FallbackRetrievalEngine decorator
-      const name = engine.constructor.name;
-      expect(
-        name === "RetrievalOrchestratorV2" || name === "FallbackRetrievalEngine",
-      ).toBe(true);
-    });
-
-    test("RETRIEVAL_USE_V2_ORCHESTRATOR unset creates V1 engine", () => {
-      delete process.env.RETRIEVAL_USE_V2_ORCHESTRATOR;
-      const engine = createRetrievalEngine(makeDeps());
-      expect(engine).toBeDefined();
-      expect(typeof engine.retrieve).toBe("function");
-      expect(engine.constructor.name).toBe("RetrievalEngineService");
-    });
+  test("active engine satisfies IRetrievalEngine", async () => {
+    const engine = createRetrievalEngine(makeDeps());
+    const pack = await engine.retrieve(seedRequests[0].request);
+    assertValidEvidencePack(pack);
   });
-
-  describe("IRetrievalEngine contract — both engines satisfy interface", () => {
-    test("V1 engine satisfies IRetrievalEngine", async () => {
-      delete process.env.RETRIEVAL_USE_V2_ORCHESTRATOR;
-      const engine = createRetrievalEngine(makeDeps());
-      const pack = await engine.retrieve(seedRequests[0].request);
-      assertValidEvidencePack(pack);
-    });
-
-    test("V2 engine satisfies IRetrievalEngine", async () => {
-      process.env.RETRIEVAL_USE_V2_ORCHESTRATOR = "true";
-      const engine = createRetrievalEngine(makeDeps());
-      const pack = await engine.retrieve(seedRequests[0].request);
-      assertValidEvidencePack(pack);
-    });
-  });
-
-  // ── Parity tests per seed request ─────────────────────────────────
 
   for (const seed of seedRequests) {
-    const testFn = seed.skipParity ? test.skip : test;
-
-    testFn(`parity — ${seed.name}: V1 and V2 evidence doc IDs match within tolerance`, async () => {
-      // Create V1
-      delete process.env.RETRIEVAL_USE_V2_ORCHESTRATOR;
-      const deps1 = makeDeps();
-      const v1 = createRetrievalEngine(deps1);
-
-      // Create V2
-      process.env.RETRIEVAL_USE_V2_ORCHESTRATOR = "true";
-      const deps2 = makeDeps();
-      const v2 = createRetrievalEngine(deps2);
-
-      const packV1 = await v1.retrieve(seed.request);
-      const packV2 = await v2.retrieve(seed.request);
-
-      // Both must be valid packs
-      assertValidEvidencePack(packV1);
-      assertValidEvidencePack(packV2);
-
-      // Evidence count within +/- 1
-      expect(
-        Math.abs(packV1.evidence.length - packV2.evidence.length),
-      ).toBeLessThanOrEqual(1);
-
-      // Doc IDs should overlap significantly
-      const v1DocIds = new Set(packV1.evidence.map((e) => e.docId));
-      const v2DocIds = new Set(packV2.evidence.map((e) => e.docId));
-      const intersection = new Set(Array.from(v1DocIds).filter((id) => v2DocIds.has(id)));
-
-      // At least one common doc (if both have evidence)
-      if (packV1.evidence.length > 0 && packV2.evidence.length > 0) {
-        expect(intersection.size).toBeGreaterThanOrEqual(1);
-      }
-
-      // Top score within 5% delta (if both have evidence)
-      if (packV1.stats.topScore != null && packV2.stats.topScore != null) {
-        const delta = Math.abs(packV1.stats.topScore - packV2.stats.topScore);
-        expect(delta).toBeLessThanOrEqual(0.05);
-      }
+    test(`active engine handles ${seed.name}`, async () => {
+      const engine = createRetrievalEngine(makeDeps());
+      const pack = await engine.retrieve(seed.request);
+      assertValidEvidencePack(pack);
+      expect(["ok", "degraded", "failed"]).toContain(pack.runtimeStatus);
     });
   }
 });

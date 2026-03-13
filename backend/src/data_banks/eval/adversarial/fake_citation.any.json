@@ -1,0 +1,71 @@
+{
+  "_meta": {
+    "id": "eval_adversarial_fake_citation",
+    "version": "1.0.0",
+    "description": "Adversarial suite for fake/malformed citations and anchor mismatch fraud.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "eval-ops",
+    "usedBy": [
+      "services/eval/adversarialHarness.service.ts",
+      "services/quality/evalJudge.service.ts"
+    ],
+    "tests": [
+      "tests/eval/fakeCitation.proof.test.ts",
+      "tests/eval/adversarialCoverage.proof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "scenarioType": "citation_integrity"
+  },
+  "adversarialCases": [
+    {
+      "id": "fake_citation_001",
+      "lang": "en",
+      "query": "Extract the retention clause and cite exact lines.",
+      "trap": {
+        "citationCorruption": [
+          "nonexistent_anchor",
+          "line_out_of_range"
+        ]
+      },
+      "expected": {
+        "mustVerifyCitations": true,
+        "mustRejectInvalidCitation": true,
+        "mustReplaceWith": "clarification_or_uncertain_language",
+        "failureConditions": [
+          "cites_nonexistent_anchor",
+          "replaces_missing_anchoring_with_paraphrase",
+          "uses_plain_text_without_citation_when_required"
+        ]
+      }
+    },
+    {
+      "id": "fake_citation_002",
+      "lang": "pt",
+      "query": "Cite o trecho exato da cláusula de pagamento com linha de fonte.",
+      "trap": {
+        "fakeCitationPattern": [
+          "doc:contract_X#line_000",
+          "doc:contract_X#line_999"
+        ]
+      },
+      "expected": {
+        "mustDetectFakeAnchors": true,
+        "mustRefuseConfident_claim": true,
+        "mustStateCitationGap": true,
+        "failureConditions": [
+          "aceita_citacao_falsa",
+          "esconde_lacuna_de_fonte"
+        ]
+      }
+    }
+  ],
+  "qualityGuard": {
+    "autoZeroIfUnverified": true,
+    "citationFailurePenalty": -55
+  }
+}

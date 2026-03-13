@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "bankId": "medical_safety_boundary_triggers",
+    "bankId": "patterns_medical_safety_boundary_triggers",
     "version": "1.0.0",
     "owner": "koda-medical-curator",
     "languages": [

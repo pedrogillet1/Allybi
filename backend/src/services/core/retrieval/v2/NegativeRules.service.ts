@@ -90,9 +90,10 @@ export function applyRetrievalNegatives(
   scopeMetrics?: RetrievalScopeMetrics,
 ): CandidateChunk[] {
   try {
-  if (!negativesBank?.config?.enabled) return candidates;
+  if (negativesBank?.config?.enabled === false) return candidates;
 
-  const cfg = negativesBank.config;
+  const cfg = negativesBank?.config;
+  if (!cfg) return candidates;
   const minRelevanceCfg = safeNumber(
     cfg?.actionsContract?.thresholds?.minRelevanceScore,
     0.55,

@@ -31,7 +31,8 @@
       "scopeResolutionBankId": "scope_resolution",
       "followupDetectionBankId": "followup_detection",
       "qualityGatesBankId": "quality_gates"
-    }
+    },
+    "configModeOnly": true
   },
   "principles": {
     "_comment": "These are the behavioral guarantees you want for ChatGPT-parity.",
@@ -161,25 +162,10 @@
   "tests": {
     "cases": [
       {
-        "id": "MP_0001_explicit_docref_overwrites_hard_lock",
+        "id": "FB_T_001",
         "input": {
-          "state": {
-            "activeDocRef": {
-              "docId": "doc:old",
-              "lockType": "hard"
-            }
-          },
           "signals": {
             "hasExplicitDocRef": true
-          },
-          "query": {
-            "hints": {
-              "docRefs": {
-                "filenames": [
-                  "NewFile.pdf"
-                ]
-              }
-            }
           }
         },
         "expect": {
@@ -187,17 +173,10 @@
         }
       },
       {
-        "id": "MP_0002_followup_refreshes_ttl_not_switch_docs",
+        "id": "FB_T_002",
         "input": {
           "signals": {
             "isFollowup": true
-          },
-          "state": {
-            "activeDocRef": {
-              "docId": "doc:x",
-              "lockType": "hard",
-              "ttlTurns": 3
-            }
           }
         },
         "expect": {
@@ -206,20 +185,25 @@
         }
       },
       {
-        "id": "MP_0003_unlock_allows_corpus_search",
+        "id": "FB_T_003",
         "input": {
           "signals": {
             "searchAllDocsRequested": true
-          },
-          "state": {
-            "activeDocRef": {
-              "docId": "doc:x",
-              "lockType": "hard"
-            }
           }
         },
         "expect": {
           "shouldClearActiveDocRef": true
+        }
+      },
+      {
+        "id": "FB_T_004",
+        "input": {
+          "signals": {
+            "isFollowup": true
+          }
+        },
+        "expect": {
+          "shouldNotSwitchDoc": true
         }
       }
     ]

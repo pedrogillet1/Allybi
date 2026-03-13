@@ -1,0 +1,438 @@
+{
+  "_meta": {
+    "id": "field_role_disambiguation",
+    "version": "1.0.0",
+    "description": "Role-aware disambiguation rules for people and entities that commonly collide in documents. Prevents brittle extraction that confuses signer, owner, witness, beneficiary, issuer, patient, subscriber, and similar roles.",
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "koda-ambiguity",
+    "compat": ">=1.0.0",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ],
+    "changeLog": [
+      "Added role families for execution, ownership, healthcare, insurance, payment, and issuance contexts",
+      "Added generic label collision rules so nearby field names are not mistaken for canonical roles",
+      "Added deterministic question and autopick policies for common role confusions"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id",
+    "maxQuestions": 1,
+    "preferObservedRoleLabelOverInferredRole": true,
+    "blockRoleSubstitutionWithoutDirectEvidence": true,
+    "autopickIfSingleRoleHasExplicitLabel": true,
+    "autopickMinConfidence": 0.9
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "during field normalization and before final answer wording",
+    "consumer": "field role resolver",
+    "intent": "Resolve who a field belongs to when documents contain several people or organizations with adjacent but different legal or operational roles.",
+    "emittedSignals": [
+      "fieldRoleAmbiguous",
+      "resolvedRole",
+      "roleQuestionRequired",
+      "roleEvidenceStrength"
+    ]
+  },
+  "roleFamilies": [
+    {
+      "id": "execution_roles",
+      "roles": [
+        "signer",
+        "co_signer",
+        "witness",
+        "notary",
+        "authorized_representative",
+        "issuer"
+      ],
+      "commonConfusions": [
+        "signer vs witness",
+        "signer vs authorized representative",
+        "issuer vs signer"
+      ]
+    },
+    {
+      "id": "ownership_and_control_roles",
+      "roles": [
+        "owner",
+        "co_owner",
+        "beneficial_owner",
+        "account_holder",
+        "tenant",
+        "landlord",
+        "borrower",
+        "guarantor"
+      ],
+      "commonConfusions": [
+        "owner vs beneficial owner",
+        "owner vs account holder",
+        "tenant vs landlord",
+        "borrower vs guarantor"
+      ]
+    },
+    {
+      "id": "healthcare_roles",
+      "roles": [
+        "patient",
+        "subscriber",
+        "policyholder",
+        "member",
+        "provider",
+        "guarantor"
+      ],
+      "commonConfusions": [
+        "patient vs subscriber",
+        "patient vs member",
+        "provider vs issuer",
+        "subscriber vs guarantor"
+      ]
+    },
+    {
+      "id": "benefit_and_insurance_roles",
+      "roles": [
+        "beneficiary",
+        "insured",
+        "primary_insured",
+        "dependent",
+        "claimant",
+        "policyholder"
+      ],
+      "commonConfusions": [
+        "beneficiary vs insured",
+        "primary insured vs dependent",
+        "claimant vs beneficiary"
+      ]
+    },
+    {
+      "id": "payment_and_statement_roles",
+      "roles": [
+        "issuer",
+        "payer",
+        "payee",
+        "cardholder",
+        "account_owner",
+        "billing_contact"
+      ],
+      "commonConfusions": [
+        "issuer vs payee",
+        "payer vs account owner",
+        "cardholder vs billing contact"
+      ]
+    }
+  ],
+  "confusionRules": [
+    {
+      "id": "FRD_001_signature_block_not_owner_by_default",
+      "ambiguousTerms": [
+        "name",
+        "signature",
+        "signed by"
+      ],
+      "likelyRoles": [
+        "signer",
+        "authorized_representative",
+        "witness"
+      ],
+      "doNotInfer": [
+        "owner",
+        "beneficiary"
+      ],
+      "askWhen": "multiplePeopleInExecutionBlock == true AND explicitRoleLabelMissing == true",
+      "autopickWhen": "onlyOnePersonAdjacentToSignatureMarker == true"
+    },
+    {
+      "id": "FRD_002_owner_vs_beneficial_owner",
+      "ambiguousTerms": [
+        "owner",
+        "ownership",
+        "holder"
+      ],
+      "likelyRoles": [
+        "owner",
+        "beneficial_owner",
+        "account_holder"
+      ],
+      "doNotInfer": [
+        "beneficial_owner_from_owner",
+        "owner_from_account_holder"
+      ],
+      "askWhen": "documentContainsRoles(['owner','beneficial_owner']) == true",
+      "autopickWhen": "requestedFieldLabelMatchesExactRole == true"
+    },
+    {
+      "id": "FRD_003_patient_vs_subscriber",
+      "ambiguousTerms": [
+        "member name",
+        "covered person",
+        "name"
+      ],
+      "likelyRoles": [
+        "patient",
+        "subscriber",
+        "policyholder",
+        "member"
+      ],
+      "doNotInfer": [
+        "patient_from_subscriber",
+        "subscriber_from_patient"
+      ],
+      "askWhen": "patientName != subscriberName",
+      "autopickWhen": "questionMentionsClinicalEvent == true AND patientRoleEvidence >= 0.9"
+    },
+    {
+      "id": "FRD_004_beneficiary_vs_claimant",
+      "ambiguousTerms": [
+        "recipient",
+        "payable to",
+        "benefit to"
+      ],
+      "likelyRoles": [
+        "beneficiary",
+        "claimant",
+        "insured"
+      ],
+      "doNotInfer": [
+        "beneficiary_from_claim_filer"
+      ],
+      "askWhen": "claimFilerAndPaymentRecipientDiffer == true",
+      "autopickWhen": "paymentInstructionNamesSingleRecipient == true"
+    },
+    {
+      "id": "FRD_005_issuer_vs_provider_vs_sender",
+      "ambiguousTerms": [
+        "issued by",
+        "from",
+        "provider"
+      ],
+      "likelyRoles": [
+        "issuer",
+        "provider",
+        "sender"
+      ],
+      "doNotInfer": [
+        "issuer_from_logo_only"
+      ],
+      "askWhen": "topHeaderEntityDiffersFromContractingEntity == true",
+      "autopickWhen": "fieldLabelExplicitlySaysIssuedBy == true"
+    },
+    {
+      "id": "FRD_006_payer_vs_payee_vs_account_holder",
+      "ambiguousTerms": [
+        "account name",
+        "payment party",
+        "customer"
+      ],
+      "likelyRoles": [
+        "payer",
+        "payee",
+        "account_holder",
+        "cardholder"
+      ],
+      "doNotInfer": [
+        "payer_from_payee",
+        "account_holder_from_billing_contact"
+      ],
+      "askWhen": "paymentInstrumentHasThreeOrMoreNamedParties == true",
+      "autopickWhen": "statementExplicitlyLabelsAccountHolder == true"
+    }
+  ],
+  "questionTemplates": [
+    {
+      "id": "frd_question_execution_roles",
+      "appliesTo": [
+        "signer",
+        "witness",
+        "authorized_representative"
+      ],
+      "template": "Do you mean the {{roleA}} or the {{roleB}}?",
+      "renderPolicy": "include person names if distinct"
+    },
+    {
+      "id": "frd_question_health_roles",
+      "appliesTo": [
+        "patient",
+        "subscriber",
+        "policyholder",
+        "member"
+      ],
+      "template": "Should I use the {{roleA}} or the {{roleB}}?",
+      "renderPolicy": "prefer role plus full name"
+    },
+    {
+      "id": "frd_question_ownership_roles",
+      "appliesTo": [
+        "owner",
+        "beneficial_owner",
+        "account_holder",
+        "guarantor"
+      ],
+      "template": "Do you want the {{roleA}} or the {{roleB}}?",
+      "renderPolicy": "use role labels exactly as shown in the document when possible"
+    }
+  ],
+  "rules": [
+    {
+      "id": "FRD_RULE_001_autopick_exact_role_label",
+      "priority": 140,
+      "when": {
+        "all": [
+          {
+            "path": "signals.exactRoleLabelFound",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "metrics.roleConfidence",
+            "op": "gte",
+            "value": 0.9
+          }
+        ]
+      },
+      "action": {
+        "type": "autopick_role"
+      },
+      "reasonCode": "explicit_role_label_present",
+      "severity": "low"
+    },
+    {
+      "id": "FRD_RULE_002_ask_when_role_names_diverge",
+      "priority": 130,
+      "when": {
+        "all": [
+          {
+            "path": "signals.fieldRoleAmbiguous",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "context.distinctNamedPeopleCount",
+            "op": "gte",
+            "value": 2
+          }
+        ]
+      },
+      "action": {
+        "type": "ask_role_question",
+        "maxQuestions": 1
+      },
+      "reasonCode": "distinct_people_have_distinct_roles",
+      "severity": "high"
+    },
+    {
+      "id": "FRD_RULE_003_never_substitute_owner_for_signer",
+      "priority": 150,
+      "when": {
+        "all": [
+          {
+            "path": "context.requestedRole",
+            "op": "eq",
+            "value": "owner"
+          },
+          {
+            "path": "context.availableRoles",
+            "op": "contains",
+            "value": "signer"
+          },
+          {
+            "path": "signals.explicitOwnerRolePresent",
+            "op": "neq",
+            "value": true
+          }
+        ]
+      },
+      "action": {
+        "type": "reject_substitution"
+      },
+      "reasonCode": "owner_not_supported_by_signer_only",
+      "severity": "critical"
+    },
+    {
+      "id": "FRD_RULE_004_answer_with_role_label_if_user_asks_generic_name",
+      "priority": 125,
+      "when": {
+        "all": [
+          {
+            "path": "signals.userAskedGenericName",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "context.singleBestRole",
+            "op": "neq",
+            "value": null
+          }
+        ]
+      },
+      "action": {
+        "type": "answer_with_explicit_role_label"
+      },
+      "reasonCode": "generic_name_question_needs_role_tag",
+      "severity": "medium"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "patient_and_subscriber_split_requires_question",
+        "input": {
+          "signals": {
+            "fieldRoleAmbiguous": true
+          },
+          "context": {
+            "distinctNamedPeopleCount": 2,
+            "availableRoles": [
+              "patient",
+              "subscriber"
+            ]
+          }
+        },
+        "expect": {
+          "action": "ask_role_question"
+        }
+      },
+      {
+        "id": "signature_block_does_not_answer_owner",
+        "input": {
+          "context": {
+            "requestedRole": "owner",
+            "availableRoles": [
+              "signer"
+            ]
+          }
+        },
+        "expect": {
+          "action": "reject_substitution",
+          "reasonCode": "owner_not_supported_by_signer_only"
+        }
+      },
+      {
+        "id": "exact_issued_by_label_autopicks_issuer",
+        "input": {
+          "signals": {
+            "exactRoleLabelFound": true
+          },
+          "metrics": {
+            "roleConfidence": 0.96
+          }
+        },
+        "expect": {
+          "action": "autopick_role"
+        }
+      }
+    ]
+  }
+}

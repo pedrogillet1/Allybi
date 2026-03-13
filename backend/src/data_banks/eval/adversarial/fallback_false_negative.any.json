@@ -1,0 +1,57 @@
+{
+  "_meta": {
+    "id": "eval_adversarial_fallback_false_negative",
+    "version": "1.0.0",
+    "description": "Adversarial negative tests for false-negative fallback behavior and missed answer opportunities.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "eval-ops",
+    "usedBy": [
+      "services/eval/adversarialHarness.service.ts"
+    ],
+    "tests": [
+      "tests/eval/fallbackFalseNegative.proof.test.ts",
+      "tests/eval/adversarialCoverage.proof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "scenarioType": "fallback_avoidance"
+  },
+  "adversarialCases": [
+    {
+      "id": "fallback_fn_001",
+      "lang": "en",
+      "query": "Find the exact EBITDA value for quarter 3 in the active report.",
+      "expected": {
+        "mustAttemptAnswer": true,
+        "mustNotReturnGenericFallback": true,
+        "mustIncludeEvidence": true,
+        "failureConditions": [
+          "answers_with_unrelated_fallback",
+          "uses_scope_error_message_when_context_exists"
+        ]
+      }
+    },
+    {
+      "id": "fallback_fn_002",
+      "lang": "pt",
+      "query": "Qual é o valor de encerramento de caixa do trimestre mais recente?",
+      "expected": {
+        "mustAttemptAnswer": true,
+        "mustNotOverEscalate": true,
+        "mustShowEvidenceAnchor": true,
+        "failureConditions": [
+          "recusa_sem_tentar",
+          "declara_falta_de_dados_quando_havia_dados"
+        ]
+      }
+    }
+  ],
+  "failureScoring": {
+    "falseNegativePenalty": -45,
+    "maxFallbackScore": 0.2
+  }
+}

@@ -1,0 +1,180 @@
+{
+  "_meta": {
+    "id": "di_compliance_regulatory_section_ontology",
+    "version": "1.0.0",
+    "description": "Compliance section ontology for control design, testing evidence, and corrective actions.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/orchestration/sectionResolver.service.ts",
+      "services/core/orchestration/answerPlanner.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/section-detection.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "compliance_regulatory"
+  },
+  "domain": "compliance_regulatory",
+  "sections": [
+    {
+      "id": "comp_section_risk_scoping",
+      "name": {
+        "en": "Risk Scope",
+        "pt": "Escopo de Risco"
+      },
+      "aliases": [
+        "risk scope",
+        "risk boundary",
+        "inherent risk"
+      ],
+      "canonicalPurpose": "Defines regulatory and process boundaries that bound control expectations.",
+      "importance": "critical"
+    },
+    {
+      "id": "comp_section_control_objective",
+      "name": {
+        "en": "Control Objective",
+        "pt": "Objetivo de Controle"
+      },
+      "aliases": [
+        "control objective",
+        "objective",
+        "objetivo"
+      ],
+      "canonicalPurpose": "Captures intended control outcomes and expected evidence."
+    },
+    {
+      "id": "comp_section_test_plan",
+      "name": {
+        "en": "Test Plan",
+        "pt": "Plano de Teste"
+      },
+      "aliases": [
+        "testing approach",
+        "sampling",
+        "procedures"
+      ],
+      "canonicalPurpose": "Holds scope, sample, thresholds, and execution approach for control testing.",
+      "importance": "high"
+    },
+    {
+      "id": "comp_section_test_result",
+      "name": {
+        "en": "Test Results",
+        "pt": "Resultado de Testes"
+      },
+      "aliases": [
+        "test findings",
+        "conclusion",
+        "outcome"
+      ],
+      "canonicalPurpose": "Consolidates pass/fail, exceptions, and residual risk.",
+      "importance": "critical"
+    },
+    {
+      "id": "comp_section_exceptions_and_findings",
+      "name": {
+        "en": "Exceptions and Findings",
+        "pt": "Exceções e Achados"
+      },
+      "aliases": [
+        "deficiency",
+        "issue",
+        "non-compliance"
+      ],
+      "canonicalPurpose": "Groups issues with severity, root cause, and business impact.",
+      "importance": "critical"
+    },
+    {
+      "id": "comp_section_remediation_plan",
+      "name": {
+        "en": "Remediation Plan",
+        "pt": "Plano de Remediação"
+      },
+      "aliases": [
+        "corrective actions",
+        "action plan",
+        "treatment"
+      ],
+      "canonicalPurpose": "Defines owners, milestones, and closure criteria."
+    },
+    {
+      "id": "comp_section_regulatory_notice",
+      "name": {
+        "en": "Regulatory Notice",
+        "pt": "Notificação Reguladora"
+      },
+      "aliases": [
+        "notice",
+        "directive",
+        "authority letter"
+      ],
+      "canonicalPurpose": "Stores mandatory actions, deadlines, and legal expectations."
+    },
+    {
+      "id": "comp_section_evidence_index",
+      "name": {
+        "en": "Evidence Index",
+        "pt": "Índice de Evidências"
+      },
+      "aliases": [
+        "evidence inventory",
+        "evidence map",
+        "source list"
+      ],
+      "canonicalPurpose": "Creates the explicit source map for each control and finding."
+    },
+    {
+      "id": "comp_section_owner_governance",
+      "name": {
+        "en": "Owner and Governance",
+        "pt": "Propriedade e Governança"
+      },
+      "aliases": [
+        "owner",
+        "accountability",
+        "approver"
+      ],
+      "canonicalPurpose": "Binds accountability and escalation paths to each issue and recommendation."
+    }
+  ],
+  "sectionAliases": {
+    "severity": [
+      "high",
+      "critical",
+      "low",
+      "grave",
+      "moderado"
+    ],
+    "exception": [
+      "exception",
+      "waiver",
+      "dispensation"
+    ],
+    "control": [
+      "controle",
+      "control",
+      "mitigation"
+    ]
+  },
+  "runtimeHints": {
+    "priorityOrder": [
+      "comp_section_risk_scoping",
+      "comp_section_control_objective",
+      "comp_section_test_plan",
+      "comp_section_test_result",
+      "comp_section_exceptions_and_findings",
+      "comp_section_remediation_plan",
+      "comp_section_evidence_index",
+      "comp_section_owner_governance"
+    ],
+    "mustAnchorCrossQueryIf": "queryType in ['compare','validate','evaluate','advise']"
+  }
+}

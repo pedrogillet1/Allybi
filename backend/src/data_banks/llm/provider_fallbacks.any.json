@@ -1,92 +1,177 @@
 {
   "_meta": {
     "id": "provider_fallbacks",
-    "version": "2.1.0",
-    "description": "Fallback chains for LLM provider failures (when/try schema)",
-    "lastUpdated": "2026-03-04",
-    "owner": "data-bank-governance",
+    "version": "3.0.0",
+    "description": "Failure-aware provider fallback ladders with shadow compare and quality-aware branching.",
+    "lastUpdated": "2026-03-13",
+    "owner": "assistant-orchestrator",
     "usedBy": [
-      "services/core/banks/dataBankLoader.service.ts"
+      "services/llm/core/llmRouter.service.ts"
     ],
     "tests": [
-      "tests/patternWiringProof.test.ts"
+      "tests/patternWiringProof.test.ts",
+      "tests/llm/providerFallbacks.proof.test.ts"
     ],
     "languages": [
       "en"
     ]
   },
   "config": {
-    "enabled": true
+    "enabled": true,
+    "maxAttempts": 4
   },
-  "fallbacks": [
+  "fallbackChains": [
     {
+      "id": "openai_main_authority_chain",
       "when": {
-        "provider": "gemini"
-      },
-      "try": [
-        {
+        "primary": {
           "provider": "openai",
           "model": "gpt-5.2"
-        },
+        }
+      },
+      "reasons": [
+        "timeout",
+        "policyViolation",
+        "rateLimit",
+        "qualityReject"
+      ],
+      "then": [
         {
           "provider": "openai",
-          "model": "gpt-5-mini"
+          "model": "gpt-5-mini",
+          "role": "synthesizer",
+          "reason": "retain authority family, lower-cost retry"
+        },
+        {
+          "provider": "gemini",
+          "model": "gemini-2.5-flash",
+          "role": "planner",
+          "reason": "preserve response path and avoid full stall"
         },
         {
           "provider": "local",
-          "model": "local-default"
+          "model": "local-default",
+          "role": "planner",
+          "reason": "recover responsiveness if all cloud routes unavailable"
+        }
+      ],
+      "qualityStep": {
+        "type": "post_fallback_compare",
+        "shadowProvider": "openai",
+        "shadowModel": "gpt-5-mini"
+      }
+    },
+    {
+      "id": "gemini_fast_chain",
+      "when": {
+        "primary": {
+          "provider": "gemini",
+          "model": "gemini-2.5-flash"
+        }
+      },
+      "reasons": [
+        "timeout",
+        "toolingTimeout",
+        "qualityReject"
+      ],
+      "then": [
+        {
+          "provider": "openai",
+          "model": "gpt-5-mini",
+          "role": "researcher",
+          "reason": "preserve extraction quality with fallback authority"
+        },
+        {
+          "provider": "openai",
+          "model": "gpt-5.2",
+          "role": "evidence_specialist",
+          "reason": "high-fidelity rerun for ambiguous results"
+        },
+        {
+          "provider": "local",
+          "model": "local-default",
+          "role": "planner",
+          "reason": "degrade to grounded short response"
         }
       ]
     },
     {
+      "id": "numeric_high_risk_chain",
       "when": {
-        "provider": "openai",
-        "model": "gpt-5-mini"
+        "taskFamily": "numeric_audit",
+        "riskLevel": "high"
       },
-      "try": [
+      "reasons": [
+        "invalidNumericOutput",
+        "missingVariance",
+        "highUncertainty"
+      ],
+      "then": [
         {
           "provider": "openai",
-          "model": "gpt-5.2"
-        },
-        {
-          "provider": "gemini",
-          "model": "gemini-2.5-flash"
-        },
-        {
-          "provider": "local",
-          "model": "local-default"
-        }
-      ]
-    },
-    {
-      "when": {
-        "provider": "openai"
-      },
-      "try": [
-        {
-          "provider": "gemini",
-          "model": "gemini-2.5-flash"
-        },
-        {
-          "provider": "local",
-          "model": "local-default"
-        }
-      ]
-    },
-    {
-      "when": {
-        "provider": "local"
-      },
-      "try": [
-        {
-          "provider": "gemini",
-          "model": "gemini-2.5-flash"
+          "model": "gpt-5.2",
+          "role": "numeric_specialist",
+          "reason": "authoritative numeric role rerun"
         },
         {
           "provider": "openai",
-          "model": "gpt-5-mini"
+          "model": "gpt-5-mini",
+          "role": "numeric_specialist",
+          "reason": "secondary numeric rerun"
+        },
+        {
+          "provider": "openai",
+          "model": "gpt-5.2",
+          "role": "risk_orchestrator",
+          "reason": "risk containment and conservative output"
         }
-      ]
+      ],
+      "qualityStep": {
+        "type": "strict_check",
+        "required": [
+          "variance_explicit",
+          "source_lineage_stated"
+        ]
+      }
+    },
+    {
+      "id": "quote_integrity_chain",
+      "when": {
+        "workProductType": "quote_pack"
+      },
+      "reasons": [
+        "anchorMismatch",
+        "quoteDrift",
+        "coverageGap"
+      ],
+      "then": [
+        {
+          "provider": "openai",
+          "model": "gpt-5.2",
+          "role": "evidence_specialist",
+          "reason": "quote integrity rerun"
+        },
+        {
+          "provider": "openai",
+          "model": "gpt-5.2",
+          "role": "risk_orchestrator",
+          "reason": "conservative fallback when uncertainty remains"
+        },
+        {
+          "provider": "openai",
+          "model": "gpt-5-mini",
+          "role": "planner",
+          "reason": "degrade to evidence summary + caveats"
+        }
+      ],
+      "qualityStep": {
+        "type": "quote_diff_compare",
+        "requireAnchorMatch": true
+      }
     }
+  ],
+  "fallbackPrinciples": [
+    "Never downgrade from evidence-specialist to generic planner when risk is high unless user only requested a short high-level recap.",
+    "Always include a comparison attempt before final downgrade to minimal response."
   ]
 }

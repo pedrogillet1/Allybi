@@ -17,6 +17,7 @@ import type {
   DocumentClassificationResult,
 } from "../retrieval.types";
 import { isProductionEnv } from "../retrievalEngine.utils";
+import { resolveDocScopeLockFromSignals } from "../docScopeLock";
 
 // ── Telemetry diagnostics builder ────────────────────────────────────
 
@@ -75,14 +76,41 @@ export function emptyPack(
   dbg: { reasonCodes: string[]; note?: string },
   telemetry?: EvidencePack["telemetry"],
 ): EvidencePack {
+  const docScopeLock = resolveDocScopeLockFromSignals(req.signals);
+  const candidateDocIds =
+    docScopeLock.mode !== "none"
+      ? docScopeLock.allowedDocumentIds
+      : Array.from(
+          new Set(
+            [
+              ...(Array.isArray(req.signals.allowedDocumentIds)
+                ? req.signals.allowedDocumentIds
+                : []),
+              req.signals.resolvedDocId ?? "",
+              req.signals.activeDocId ?? "",
+            ]
+              .map((value) => String(value || "").trim())
+              .filter(Boolean),
+          ),
+        );
+  const hardScopeActive =
+    Boolean(req.signals.hardScopeActive) ||
+    docScopeLock.mode !== "none" ||
+    (Boolean(req.signals.explicitDocLock) &&
+      Boolean(req.signals.activeDocId)) ||
+    (Boolean(req.signals.singleDocIntent) &&
+      Boolean(req.signals.activeDocId)) ||
+    (Boolean(req.signals.explicitDocRef) &&
+      Boolean(req.signals.resolvedDocId));
+
   return {
     runtimeStatus: "ok",
     query: { original: req.query, normalized: (req.query ?? "").trim() },
     scope: {
       activeDocId: req.signals.activeDocId ?? null,
       explicitDocLock: Boolean(req.signals.explicitDocLock),
-      candidateDocIds: [],
-      hardScopeActive: Boolean(req.signals.hardScopeActive),
+      candidateDocIds,
+      hardScopeActive,
       sheetName: req.signals.resolvedSheetName ?? null,
       rangeA1: req.signals.resolvedRangeA1 ?? null,
     },

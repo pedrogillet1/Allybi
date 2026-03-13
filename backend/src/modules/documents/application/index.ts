@@ -35,9 +35,3 @@ export {
   RevisionService,
   RevisionServiceError,
 } from "../../../services/documents/revision.service";
-
-// Extraction pipeline — text extraction from various document formats
-export * from "../../../services/extraction";
-
-// Ingestion pipeline — file validation, conversion, title generation
-export * from "../../../services/ingestion";

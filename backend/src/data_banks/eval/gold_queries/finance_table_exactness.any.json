@@ -1,0 +1,109 @@
+{
+  "_meta": {
+    "id": "eval_gold_queries_finance_table_exactness",
+    "version": "1.0.0",
+    "description": "Finance gold queries focused on exact table and numeric extraction.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "eval-ops",
+    "usedBy": [
+      "services/eval/goldQueryRunner.service.ts",
+      "services/quality/evalJudge.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/eval/financeTableExactness.proof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance",
+    "scenarioType": "table_exactness",
+    "strictNumericUnits": true
+  },
+  "goldQueries": [
+    {
+      "id": "finance_table_exactness_001",
+      "lang": "en",
+      "query": "Give the quarter-over-quarter revenue and variance for Q3 vs Q2 as written in the table.",
+      "expected": {
+        "mustReadSource": [
+          "income statement",
+          "financial table"
+        ],
+        "mustExtract": [
+          {
+            "metric": "revenue",
+            "columns": [
+              "q3",
+              "q2",
+              "variance"
+            ],
+            "rows": 1
+          }
+        ],
+        "mustMatchColumnsExactly": true,
+        "mustPreserveSign": true,
+        "mustPreserveUnit": true,
+        "mustNotInferUnits": true,
+        "mustContain": [
+          "Q2",
+          "Q3",
+          "%"
+        ],
+        "failureConditions": [
+          "swap_cells_between_rows",
+          "normalize_to_percent_without_anchor",
+          "returns_summary_without_table_values"
+        ]
+      }
+    },
+    {
+      "id": "finance_table_exactness_002",
+      "lang": "pt",
+      "query": "Mostre a linha de EBITDA e margem do DRE para o trimestre mais recente e o trimestre anterior.",
+      "expected": {
+        "mustReadSource": [
+          "table",
+          "statement"
+        ],
+        "mustExtract": [
+          {
+            "metric": "ebitda",
+            "metricAliases": [
+              "lucro antes de juros, impostos, depreciação e amortização"
+            ]
+          }
+        ],
+        "mustPreserveNumericFormatting": true,
+        "mustContain": [
+          "margem",
+          "EBITDA"
+        ],
+        "mustNotConflateWith": [
+          "operating_income",
+          "net_income"
+        ],
+        "failureConditions": [
+          "drops_column_period_headers",
+          "translates_units without evidence",
+          "uses_textual guess for percent"
+        ]
+      }
+    }
+  ],
+  "qualityGuards": {
+    "inflationGuard": {
+      "maxConfidenceWithoutEvidence": 0.4,
+      "requiredEvidenceDensity": 2,
+      "mustIncludeSourceLines": 3
+    },
+    "invalidScoringPenalty": {
+      "wrong_columns": -35,
+      "single_cell_answer": -15,
+      "no_unit": -20
+    }
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "_meta": {
+    "id": "table_narration",
+    "version": "1.0.0",
+    "description": "Table narration patterns that keep tabular answers readable by adding a short lead-in and a concise takeaway instead of dropping a table cold.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "composition-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "table answer render planning",
+    "consumer": "composition layer",
+    "intent": "Add the shortest useful framing around a table: what the table shows and what the reader should notice."
+  },
+  "leadIns": {
+    "en": [
+      "Here is the cleanest slice of the data.",
+      "This table pulls together the relevant fields.",
+      "The table below isolates the rows that matter."
+    ],
+    "pt": [
+      "Aqui esta o recorte mais limpo dos dados.",
+      "Esta tabela junta os campos relevantes.",
+      "A tabela abaixo isola as linhas que importam."
+    ]
+  },
+  "takeawayPatterns": {
+    "en": [
+      "The main pattern is {{takeaway}}.",
+      "The most important signal here is {{takeaway}}.",
+      "What stands out most is {{takeaway}}."
+    ],
+    "pt": [
+      "O padrao principal aqui e {{takeaway}}.",
+      "O sinal mais importante aqui e {{takeaway}}.",
+      "O que mais se destaca e {{takeaway}}."
+    ]
+  },
+  "rules": [
+    {
+      "id": "TN_001_table_requires_lead_or_takeaway",
+      "trigger": "Table answer has no framing",
+      "check": "context.answerMode == 'doc_grounded_table' AND output.hasTable == true AND output.hasLeadIn != true AND output.hasTakeaway != true",
+      "failureAction": "ADD_MINIMAL_TABLE_FRAMING"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "table_narration_adds_context",
+        "input": {
+          "answerMode": "doc_grounded_table"
+        },
+        "expect": {
+          "minimalFraming": true
+        }
+      }
+    ]
+  }
+}

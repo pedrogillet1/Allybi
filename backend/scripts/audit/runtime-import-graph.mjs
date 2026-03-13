@@ -41,6 +41,7 @@ function readBudgetMinCoverage() {
   const candidates = [
     path.resolve(CWD, "scripts/audit/reachability-budget.json"),
     path.resolve(CWD, "backend/scripts/audit/reachability-budget.json"),
+    path.join(BACKEND_ROOT, "scripts/audit/reachability-budget.json"),
   ];
   for (const candidate of candidates) {
     if (!fs.existsSync(candidate)) continue;
@@ -53,7 +54,7 @@ function readBudgetMinCoverage() {
       // ignore malformed budget and continue with default fallback.
     }
   }
-  return 0.59;
+  return 0.6;
 }
 
 const MIN_RUNTIME_COVERAGE = Number.parseFloat(
@@ -97,10 +98,13 @@ function listSourceFiles(root) {
       const full = path.join(current, entry.name);
       if (entry.isDirectory()) {
         if (entry.name === "__tests__") continue;
+        if (entry.name === "coverage") continue;
         stack.push(full);
         continue;
       }
-      if (/\.(ts|tsx|js|mjs|cjs)$/.test(entry.name)) out.push(full);
+      if (/\.(ts|tsx|js|mjs|cjs)$/.test(entry.name)) {
+        out.push(full);
+      }
     }
   }
   return out;
@@ -121,7 +125,9 @@ function parseSpecifiers(code) {
     let m;
     while ((m = pattern.exec(sanitized)) !== null) {
       const spec = String(m[1] || "").trim();
-      if (spec) specs.add(spec);
+      if (spec) {
+        specs.add(spec);
+      }
     }
   }
   return [...specs];
@@ -189,13 +195,15 @@ function buildMoveMap() {
       from: "src/routes/*",
       to: "src/entrypoints/http/routes/*",
       status: "in_progress",
-      note: "Replace wrapper re-exports with real route files in entrypoints.",
+      note:
+        "Replace wrapper re-exports with real route files in entrypoints.",
     },
     {
       from: "src/controllers/*",
       to: "src/entrypoints/http/controllers/*",
       status: "planned",
-      note: "Controllers should own request parsing and call module services.",
+      note:
+        "Controllers should own request parsing and call module services.",
     },
     {
       from: "src/queues/*",
@@ -213,13 +221,15 @@ function buildMoveMap() {
       from: "src/services/chat/*",
       to: "src/modules/chat/{application,runtime,infrastructure}/*",
       status: "in_progress",
-      note: "Keep thin compatibility wrappers during migration only.",
+      note:
+        "Keep thin compatibility wrappers during migration only.",
     },
     {
       from: "src/services/editing/*",
       to: "src/modules/editing/{application,runtime,engines,infrastructure}/*",
       status: "planned",
-      note: "Split revision orchestration from per-domain appliers.",
+      note:
+        "Split revision orchestration from per-domain appliers.",
     },
     {
       from: "src/services/core/banks/*",
@@ -237,7 +247,8 @@ function buildMoveMap() {
       from: "src/utils/*",
       to: "src/shared/* or module-owned utils",
       status: "planned",
-      note: "Remove junk-drawer utilities; keep ownership explicit.",
+      note:
+        "Remove junk-drawer utilities; keep ownership explicit.",
     },
   ];
 }
@@ -360,9 +371,7 @@ function main() {
     const routeFiles = fs
       .readdirSync(routeEntryDir)
       .map((name) => path.join(routeEntryDir, name))
-      .filter(
-        (file) => fs.statSync(file).isFile() && /\.(ts|js|mjs|cjs)$/.test(file),
-      );
+      .filter((file) => fs.statSync(file).isFile() && /\.(ts|js|mjs|cjs)$/.test(file));
     for (const file of routeFiles) {
       const source = fs.readFileSync(file, "utf8");
       const wrapper = classifyWrapper(file, source);

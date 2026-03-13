@@ -1,0 +1,180 @@
+{
+  "_meta": {
+    "id": "di_procurement_section_ontology",
+    "version": "1.0.0",
+    "description": "Procurement-specific section ontology for reasoning-intensive sourcing workflows.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/orchestration/sectionResolver.service.ts",
+      "services/core/orchestration/answerPlanner.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/section-detection.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "procurement"
+  },
+  "domain": "procurement",
+  "sections": [
+    {
+      "id": "proc_section_requirements",
+      "name": {
+        "en": "Requirements",
+        "pt": "Requisitos"
+      },
+      "aliases": [
+        "scope",
+        "requirements",
+        "especificacoes",
+        "especificações técnicas"
+      ],
+      "canonicalPurpose": "Captures functional needs, constraints, and qualification criteria.",
+      "importance": "highest",
+      "forbiddenCrossMix": [
+        "financial statement footnotes",
+        "vendor marketing copy"
+      ]
+    },
+    {
+      "id": "proc_section_evaluation_matrix",
+      "name": {
+        "en": "Evaluation Matrix",
+        "pt": "Matriz de Avaliação"
+      },
+      "aliases": [
+        "scorecard",
+        "technical evaluation",
+        "comparative scoring",
+        "matriz de avaliação"
+      ],
+      "canonicalPurpose": "Houses the actual bidder ranking logic.",
+      "importance": "critical"
+    },
+    {
+      "id": "proc_section_award_rationale",
+      "name": {
+        "en": "Award Rationale",
+        "pt": "Justificativa de Adjudicação"
+      },
+      "aliases": [
+        "award memo",
+        "justificativa",
+        "reason for award"
+      ],
+      "canonicalPurpose": "Explains why one supplier won and what trade-offs were accepted.",
+      "importance": "critical",
+      "requiredIn": [
+        "compare",
+        "evaluate",
+        "extract"
+      ]
+    },
+    {
+      "id": "proc_section_delivery_plan",
+      "name": {
+        "en": "Delivery Plan",
+        "pt": "Plano de Entrega"
+      },
+      "aliases": [
+        "milestones",
+        "delivery schedule",
+        "cronograma de entrega"
+      ],
+      "canonicalPurpose": "Defines due dates, milestones, delays, and owner commitments.",
+      "importance": "high"
+    },
+    {
+      "id": "proc_section_contract_obligations",
+      "name": {
+        "en": "Contractual Obligations",
+        "pt": "Obrigações Contratuais"
+      },
+      "aliases": [
+        "commercial obligations",
+        "SLAs",
+        "penalties",
+        "obrigações contratuais"
+      ],
+      "canonicalPurpose": "Defines obligations, remedy clauses, and enforcement path.",
+      "importance": "critical"
+    },
+    {
+      "id": "proc_section_invoice_reconciliation",
+      "name": {
+        "en": "Invoice Reconciliation",
+        "pt": "Conciliação de Faturas"
+      },
+      "aliases": [
+        "three-way match",
+        "matching",
+        "nota fiscal"
+      ],
+      "canonicalPurpose": "Captures open variances and the resolution logic.",
+      "importance": "high"
+    },
+    {
+      "id": "proc_section_supplier_performance",
+      "name": {
+        "en": "Supplier Performance",
+        "pt": "Desempenho do Fornecedor"
+      },
+      "aliases": [
+        "service levels",
+        "performance metrics",
+        "desempenho"
+      ],
+      "canonicalPurpose": "Evidence for renewal, penalties, and improvement actions.",
+      "importance": "medium"
+    },
+    {
+      "id": "proc_section_compliance",
+      "name": {
+        "en": "Compliance",
+        "pt": "Conformidade"
+      },
+      "aliases": [
+        "controls",
+        "audit notes",
+        "conformidade"
+      ],
+      "canonicalPurpose": "Checklist-like evidence for policy, anti-corruption, and authority constraints.",
+      "importance": "high"
+    }
+  ],
+  "sectionAliases": {
+    "po": [
+      "purchase order",
+      "pedido de compra",
+      "ordem de compra"
+    ],
+    "rfp": [
+      "request for proposal",
+      "solicitação de proposta",
+      "chamamento"
+    ],
+    "tco": [
+      "total cost",
+      "total cost of ownership",
+      "custo total"
+    ]
+  },
+  "runtimeHints": {
+    "priorityOrder": [
+      "proc_section_requirements",
+      "proc_section_evaluation_matrix",
+      "proc_section_award_rationale",
+      "proc_section_contract_obligations",
+      "proc_section_delivery_plan",
+      "proc_section_invoice_reconciliation",
+      "proc_section_supplier_performance"
+    ],
+    "mustAnchorCrossQueryIf": "queryType in ['compare','evaluate','validate']"
+  }
+}

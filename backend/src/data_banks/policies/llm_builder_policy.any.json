@@ -69,6 +69,47 @@
         "maxSnippetChars": 400,
         "maxSectionChars": 6000
       }
-    }
+    },
+    "configModeOnly": true
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "LLM_BUILD_T_001",
+        "input": {},
+        "expect": {
+          "payloadCaps": {
+            "memoryCharsDefault": 4800
+          }
+        }
+      },
+      {
+        "id": "LLM_BUILD_T_002",
+        "input": {},
+        "expect": {
+          "payloadCaps": {
+            "memoryCharsDocGrounded": 6800
+          }
+        }
+      },
+      {
+        "id": "LLM_BUILD_T_003",
+        "input": {},
+        "expect": {
+          "payloadCaps": {
+            "toolContextCharsMax": 1400
+          }
+        }
+      },
+      {
+        "id": "LLM_BUILD_T_004",
+        "input": {},
+        "expect": {
+          "payloadCaps": {
+            "totalUserPayloadCharsMax": 32000
+          }
+        }
+      }
+    ]
   }
 }

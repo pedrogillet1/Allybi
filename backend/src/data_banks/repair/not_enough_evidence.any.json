@@ -1,0 +1,204 @@
+{
+  "_meta": {
+    "id": "not_enough_evidence",
+    "version": "1.0.0",
+    "description": "Graceful response policy for genuine evidence gaps. Prevents empty fallback language by requiring specificity about what is missing and what the next best move is.",
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "koda-repair",
+    "compat": ">=1.0.0",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ],
+    "changeLog": [
+      "Added response-shape requirements for evidence-gap answers",
+      "Added non-empty language patterns that mention the missing fact class and nearest available signal",
+      "Added bans on robotic empty phrasing and repetitive apology loops"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id",
+    "requireMissingFactClass": true,
+    "requireNextBestStep": true,
+    "allowNearbyEvidenceMention": true,
+    "noApologyLoops": true,
+    "noBareRefusal": true
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "terminal fallback after repair attempts are exhausted or a true evidence gap is confirmed",
+    "consumer": "answer composer",
+    "intent": "Explain the gap clearly, mention what was checked or what nearby evidence exists, and keep the user moving.",
+    "emittedSignals": [
+      "evidenceGapResponse",
+      "missingFactClass",
+      "nextBestStep",
+      "nearbyEvidenceMentioned"
+    ]
+  },
+  "responseShape": {
+    "requiredSequence": [
+      "gap_statement",
+      "specific_missing_anchor",
+      "nearest_available_signal_or_scope_note",
+      "next_best_step"
+    ],
+    "maxSentences": 4,
+    "tone": "direct_calm_specific"
+  },
+  "messagePolicies": [
+    {
+      "id": "nee_missing_fact_inside_doc",
+      "when": "documentInScope == true AND requestedFactMissing == true",
+      "pattern": "I do not see {{missingFactClass}} in the material I checked. I do see {{nearestAvailableSignal}}. If you want, I can look for {{bestNextStep}}."
+    },
+    {
+      "id": "nee_question_requires_external_fact",
+      "when": "answerDependsOnExternalState == true",
+      "pattern": "The document states {{documentCondition}}, but it does not say whether {{externalFactClass}} actually happened. If you know that status, I can apply the clause to it."
+    },
+    {
+      "id": "nee_wrong_scope_or_doc",
+      "when": "relatedEvidenceFoundOutsideLockedScope == true",
+      "pattern": "I do not see that answer in the selected material. I found related information in {{nearbyScope}}, but not in the current scope. I can switch to that source if you want."
+    },
+    {
+      "id": "nee_total_absence",
+      "when": "noRelevantEvidenceFound == true",
+      "pattern": "I do not have enough evidence in the current materials to answer that directly. A useful next step would be {{bestNextStep}}."
+    }
+  ],
+  "bannedPatterns": [
+    "I cannot answer that.",
+    "Not enough information.",
+    "Sorry, I do not know.",
+    "Insufficient evidence."
+  ],
+  "rules": [
+    {
+      "id": "NEE_001_never_emit_bare_refusal",
+      "priority": 150,
+      "when": {
+        "all": [
+          {
+            "path": "signals.coreEvidenceMissing",
+            "op": "eq",
+            "value": true
+          }
+        ]
+      },
+      "action": {
+        "type": "compose_with_response_shape",
+        "responseShape": "requiredSequence"
+      },
+      "reasonCode": "evidence_gap_must_still_be_helpful",
+      "severity": "critical"
+    },
+    {
+      "id": "NEE_002_prefer_doc_specific_gap_over_generic_gap",
+      "priority": 140,
+      "when": {
+        "all": [
+          {
+            "path": "context.documentInScope",
+            "op": "eq",
+            "value": true
+          }
+        ]
+      },
+      "action": {
+        "type": "compose_constraint",
+        "constraint": "name_missing_fact_class"
+      },
+      "reasonCode": "document_specificity_required",
+      "severity": "high"
+    },
+    {
+      "id": "NEE_003_mention_related_signal_when_present",
+      "priority": 120,
+      "when": {
+        "all": [
+          {
+            "path": "signals.nearbyEvidenceExists",
+            "op": "eq",
+            "value": true
+          }
+        ]
+      },
+      "action": {
+        "type": "compose_constraint",
+        "constraint": "mention_nearest_available_signal"
+      },
+      "reasonCode": "non_empty_gap_response",
+      "severity": "medium"
+    },
+    {
+      "id": "NEE_004_next_step_must_be_concrete",
+      "priority": 130,
+      "when": {
+        "all": [
+          {
+            "path": "signals.coreEvidenceMissing",
+            "op": "eq",
+            "value": true
+          }
+        ]
+      },
+      "action": {
+        "type": "compose_constraint",
+        "constraint": "next_step_must_be_actionable"
+      },
+      "reasonCode": "user_should_not_be_stuck",
+      "severity": "high"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "gap_answers_are_not_bare_refusals",
+        "input": {
+          "signals": {
+            "coreEvidenceMissing": true
+          }
+        },
+        "expect": {
+          "responseShape": "requiredSequence"
+        }
+      },
+      {
+        "id": "doc_specific_gap_names_missing_fact",
+        "input": {
+          "context": {
+            "documentInScope": true
+          }
+        },
+        "expect": {
+          "constraint": "name_missing_fact_class"
+        }
+      },
+      {
+        "id": "nearby_signal_is_mentioned_when_available",
+        "input": {
+          "signals": {
+            "nearbyEvidenceExists": true
+          }
+        },
+        "expect": {
+          "constraint": "mention_nearest_available_signal"
+        }
+      }
+    ]
+  }
+}

@@ -109,7 +109,7 @@ export function stopPreviewReconciliationWorker() {
 
 let previewWorker: Worker | null = null;
 
-export function startPreviewGenerationWorker() {
+export function startPreviewGenerationWorker(concurrencyOverride?: number) {
   if (previewWorker) {
     logger.info("[PreviewGeneration] Worker already running");
     return;
@@ -163,7 +163,10 @@ export function startPreviewGenerationWorker() {
     },
     {
       connection,
-      concurrency: parseInt(process.env.PREVIEW_WORKER_CONCURRENCY || "4", 10),
+      concurrency:
+        concurrencyOverride ??
+        (Number(process.env.KODA_EMBEDDED_PREVIEW_WORKER_CONCURRENCY || 0) ||
+          parseInt(process.env.PREVIEW_WORKER_CONCURRENCY || "4", 10)),
     },
   );
 

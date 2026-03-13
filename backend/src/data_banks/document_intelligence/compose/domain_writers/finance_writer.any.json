@@ -1,0 +1,89 @@
+{
+  "_meta": {
+    "id": "domain_writer_finance",
+    "version": "1.0.0",
+    "description": "Finance writer overlay for metric-driven answers. Prioritizes deltas, periods, units, and material implications.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "composition-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance",
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "domain writer overlay",
+    "consumer": "composition layer",
+    "intent": "Make finance answers read like an informed review: metric first, period explicit, implication visible."
+  },
+  "preferences": {
+    "prefer": [
+      "metric_anchor",
+      "delta_first",
+      "period_and_unit_explicit"
+    ],
+    "avoid": [
+      "unitless_numbers",
+      "buried_deltas",
+      "qualitative_claims_without_numeric_anchor"
+    ]
+  },
+  "structures": [
+    {
+      "id": "finance_metric_readout",
+      "sequence": [
+        "metric",
+        "period_and_unit",
+        "delta_or_implication"
+      ]
+    },
+    {
+      "id": "finance_compare",
+      "sequence": [
+        "top_delta",
+        "driver",
+        "why_it_matters"
+      ]
+    }
+  ],
+  "phrasingSignals": {
+    "en": [
+      "{{metric}} is {{value}} for {{period}}.",
+      "The biggest swing is {{delta}}.",
+      "That matters because {{implication}}."
+    ],
+    "pt": [
+      "{{metric}} e {{value}} em {{period}}.",
+      "A maior variacao e {{delta}}.",
+      "Isso importa porque {{implication}}."
+    ]
+  },
+  "guardrails": [
+    "Never state a metric without period or unit when the source provides them.",
+    "Do not bury the main variance under secondary metrics.",
+    "Do not use strong directional language if the numeric evidence is thin."
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "finance_writer_prefers_metric_anchor",
+        "expect": {
+          "prefer": "metric_anchor"
+        }
+      }
+    ]
+  }
+}

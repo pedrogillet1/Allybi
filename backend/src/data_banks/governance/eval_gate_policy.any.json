@@ -1,0 +1,154 @@
+{
+  "_meta": {
+    "id": "governance_eval_gate_policy",
+    "version": "1.0.0",
+    "description": "Pre-ship governance gates that must be satisfied before a bank lands in non-local envs.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "governance-team",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "minFailFast": true,
+    "defaultBlocking": true
+  },
+  "preShippingChecklist": {
+    "metadata": {
+      "required": [
+        "_meta.owner",
+        "_meta.usedBy",
+        "_meta.tests",
+        "_meta.version"
+      ],
+      "requiredOwnerAllowedPrefixes": [
+        "composition-",
+        "assistant-",
+        "eval-",
+        "governance-team",
+        "data-bank-governance"
+      ]
+    },
+    "tests": {
+      "mustRun": [
+        "patternWiringProof.test.ts",
+        "bankSchemaValidation.test.ts"
+      ],
+      "mustHaveAtLeastOneCase": 1,
+      "mustNotHaveOnlyNegativeCases": true
+    },
+    "functional": {
+      "requiresUsedByRuntimeWiring": [
+        "document_intelligence",
+        "assistant",
+        "eval",
+        "governance"
+      ],
+      "requiresRegistryPresence": true,
+      "requiresRegistryVersionMatch": true,
+      "requiresRuntimeSmoke": true
+    },
+    "quality": {
+      "maxOpenIssuesForShip": 0,
+      "maxOpenCriticalForShip": 0,
+      "maxOpenHighForShip": 0
+    }
+  },
+  "stages": {
+    "precommit": {
+      "requiredChecks": [
+        "meta_validation",
+        "json_validity",
+        "schema_validation",
+        "tests_block_present"
+      ],
+      "failOnFail": true
+    },
+    "ci": {
+      "requiredChecks": [
+        "proof_proofs",
+        "eval_regression_smoke",
+        "shard_size_guard",
+        "runtime_wiring_guard"
+      ],
+      "parallelAllowed": true,
+      "failOnFail": true
+    },
+    "staging": {
+      "requiredChecks": [
+        "cross_suite_regression",
+        "locale_parity",
+        "wrong_doc_guard"
+      ],
+      "rolloutHold": "6_hours"
+    },
+    "production": {
+      "requiredChecks": [
+        "ci_plus_manufacturer_gate",
+        "schema_checksum_match",
+        "owner_signature_present"
+      ],
+      "releaseHold": "24_hours"
+    }
+  },
+  "autoRejectRules": [
+    {
+      "id": "gate_no_metadata",
+      "condition": {
+        "missing": [
+          "_meta.owner",
+          "_meta.usedBy",
+          "_meta.tests",
+          "_meta.version"
+        ]
+      },
+      "action": "reject"
+    },
+    {
+      "id": "gate_no_eval_for_risky_banks",
+      "condition": {
+        "tags": [
+          "evidence",
+          "highrisk"
+        ],
+        "testsCount": 0
+      },
+      "action": "reject"
+    },
+    {
+      "id": "gate_wrong_doc_risk",
+      "condition": {
+        "domain": "legal",
+        "tags": [
+          "wrong_doc",
+          "fake_citation"
+        ],
+        "coverageCheck": "missing"
+      },
+      "action": "reject_with_mandatory_remediation"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "eval_gate_blocks_missing_tests",
+        "input": {
+          "bankHasTests": false
+        },
+        "expect": {
+          "allowed": false
+        }
+      }
+    ]
+  },
+  "runtimeUsageNotes": "CI and release tooling should block merge/promote when this policy fails, with stricter requirements in staging and production stages."
+}

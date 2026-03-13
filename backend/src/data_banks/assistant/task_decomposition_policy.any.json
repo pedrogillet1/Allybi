@@ -1,0 +1,143 @@
+{
+  "_meta": {
+    "id": "task_decomposition_policy",
+    "version": "1.0.0",
+    "description": "Decomposition policies that decide when a user request becomes single-step, multi-step, or orchestration chain.",
+    "owner": "assistant-orchestrator",
+    "usedBy": [
+      "services/assistant/core/assistantOrchestrator.service.ts"
+    ],
+    "tests": [
+      "tests/assistant/taskDecomposition.proof.test.ts"
+    ],
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13"
+  },
+  "config": {
+    "enabled": true,
+    "decompositionMode": "goal_oriented"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "post_tool_selection_pre_model",
+    "inputSignals": [
+      "questionComplexity",
+      "artifactDemand",
+      "evidenceScope",
+      "risk"
+    ],
+    "output": "execution_plan"
+  },
+  "decompositionProfiles": [
+    {
+      "id": "single_step",
+      "criteria": {
+        "maxEvidenceItems": 2,
+        "complexity": "low",
+        "uncertainty": "low",
+        "risk": "low"
+      },
+      "steps": [
+        {
+          "role": "planner",
+          "goal": "Resolve direct answer with minimum supporting artifacts."
+        },
+        {
+          "role": "composer",
+          "goal": "Emit concise, grounded response."
+        }
+      ],
+      "failureStrategy": "single_pass_retry_then_clarify"
+    },
+    {
+      "id": "multi_step_research",
+      "criteria": {
+        "maxEvidenceItems": 10,
+        "complexity": "medium",
+        "uncertainty": "medium"
+      },
+      "steps": [
+        {
+          "role": "planner",
+          "goal": "Build evidence plan and define acceptance thresholds."
+        },
+        {
+          "role": "researcher",
+          "goal": "Collect quotes, tables, and section anchors."
+        },
+        {
+          "role": "synthesizer",
+          "goal": "Construct stitched narrative with caveats."
+        }
+      ],
+      "failureStrategy": "drop_to_shortest_safe_plan"
+    },
+    {
+      "id": "complex_orchestration",
+      "criteria": {
+        "maxEvidenceItems": 40,
+        "complexity": "high",
+        "risk": "high",
+        "artifactDemand": "matrix_or_plan"
+      },
+      "steps": [
+        {
+          "role": "planner",
+          "goal": "Split into bounded sub-questions and assign owners."
+        },
+        {
+          "role": "researcher",
+          "goal": "Parallel gather per-subquestion evidence with source lineage."
+        },
+        {
+          "role": "reconciler",
+          "goal": "Resolve conflicts and prioritize higher quality anchors."
+        },
+        {
+          "role": "synthesizer",
+          "goal": "Deliver final answer with uncertainty, limits, and action options."
+        }
+      ],
+      "failureStrategy": "reduce_to_authoritative_subset"
+    },
+    {
+      "id": "repair_or_refocus",
+      "criteria": {
+        "ambiguity": "high",
+        "clarificationNeeded": true
+      },
+      "steps": [
+        {
+          "role": "clarifier",
+          "goal": "Ask one focused question that increases grounding confidence."
+        },
+        {
+          "role": "planner",
+          "goal": "Resume with updated objective and narrower scope."
+        }
+      ],
+      "failureStrategy": "ask_for_constraints_and_scope"
+    }
+  ],
+  "rules": [
+    "Do not emit decomposition with fewer than two steps when evidence span includes multiple files.",
+    "Split tasks when any step reaches unknown input requirements.",
+    "Use repair_or_refocus before adding tool calls that do not materially reduce uncertainty."
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "high_risk_uses_complex_orchestration",
+        "input": {
+          "complexity": "high",
+          "risk": "high",
+          "artifactDemand": "matrix_or_plan"
+        },
+        "expect": {
+          "decompositionProfile": "complex_orchestration"
+        }
+      }
+    ]
+  }
+}

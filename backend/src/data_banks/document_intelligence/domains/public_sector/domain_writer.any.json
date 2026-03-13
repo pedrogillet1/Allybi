@@ -1,0 +1,114 @@
+{
+  "_meta": {
+    "id": "di_public_sector_domain_writer",
+    "version": "1.0.0",
+    "description": "Public sector writer profile for authority-aware and audit-safe narrative synthesis.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/orchestration/answerPlanner.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/docint-eval-pack.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "domain": "public_sector",
+    "interpretationMode": "authority_first_public_accountability",
+    "requireLegalAnchor": true,
+    "requireVersionLocks": true
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "before final public-sector narrative",
+    "consumer": "public sector domain writer",
+    "intent": "Emit decision-ready compliance and execution narratives with audit-grade traceability."
+  },
+  "writingProfile": {
+    "audience": "policy analyst, controller, auditor, citizen transparency officer",
+    "goal": "Translate legal and budget evidence into explicit risk-positioned conclusions.",
+    "allowedAnswerForms": [
+      "authority_bound_status_readout",
+      "budget_execution_summary",
+      "award_comparison_trace",
+      "oversight_action_plan"
+    ],
+    "forbiddenAnswerForms": [
+      "winner statement without legal anchor",
+      "compliance claim without status evidence",
+      "total budget totals without line-level breakdown"
+    ],
+    "docTypeAnchors": [
+      "public_tender_notice",
+      "public_budget_allocation",
+      "public_audit_report",
+      "public_contract",
+      "public_grant_progress",
+      "public_compliance_certificate"
+    ],
+    "sectionPriority": [
+      "legal_basis",
+      "award_and_contract",
+      "budget_breakdown",
+      "disbursement_status",
+      "audit_findings",
+      "performance_indicator",
+      "oversight_actions"
+    ]
+  },
+  "interpretiveRules": [
+    {
+      "id": "GOV_WRITER_001_law_before_claim",
+      "description": "Any normative or compliance statement must be paired with explicit law or directive reference.",
+      "requiredFor": "evaluate"
+    },
+    {
+      "id": "GOV_WRITER_002_budget_lineing",
+      "description": "Budget narratives must always show line-level values before totals."
+    },
+    {
+      "id": "GOV_WRITER_003_audit_risk_callout",
+      "description": "When findings are open, include severity, owner, and next deadline explicitly."
+    },
+    {
+      "id": "GOV_WRITER_004_scope_lock",
+      "description": "Keep fiscal period and authority in scope lock for every comparative sentence."
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "gov_writer_audit_open",
+        "input": {
+          "query": "How many open findings exist and who owns remediation?"
+        },
+        "expect": {
+          "mustInclude": [
+            "severity",
+            "deadline",
+            "owner"
+          ]
+        }
+      },
+      {
+        "id": "gov_writer_budget_breakdown",
+        "input": {
+          "query": "Show budget execution against line items"
+        },
+        "expect": {
+          "mustInclude": [
+            "budget_line",
+            "period",
+            "executed"
+          ]
+        }
+      }
+    ]
+  }
+}

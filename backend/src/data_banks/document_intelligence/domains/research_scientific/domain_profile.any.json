@@ -1,0 +1,114 @@
+{
+  "_meta": {
+    "id": "di_research_scientific_domain_profile",
+    "version": "1.0.0",
+    "description": "Scientific research profile for protocols, experimental methods, analyses, and evidence quality checks.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/orchestration/answerPlanner.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/domain-validation.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "research_scientific",
+    "minEvidenceScore": 0.86
+  },
+  "domain": "research_scientific",
+  "displayName": {
+    "en": "Research & Scientific",
+    "pt": "Pesquisa Científica"
+  },
+  "scope": "Study protocol interpretation, cohort handling, statistical inference, reproducibility claims, and method limitation reporting.",
+  "coreConcepts": [
+    "randomized controlled trial",
+    "cohort selection",
+    "sample size",
+    "endpoint",
+    "p value",
+    "confidence interval",
+    "effect size",
+    "blinding",
+    "methodology",
+    "replication",
+    "bias",
+    "null hypothesis",
+    "significance threshold",
+    "data completeness"
+  ],
+  "supportedDocTypes": [
+    "research_protocol",
+    "research_inclusion_criteria",
+    "research_dataset_dictionary",
+    "research_experiment_log",
+    "research_analysis_plan",
+    "research_results_report",
+    "research_power_calculation",
+    "research_irb_approval",
+    "research_funding_acknowledgment"
+  ],
+  "supportedOperators": [
+    "advise",
+    "calculate",
+    "compare",
+    "extract",
+    "locate",
+    "monitor",
+    "summarize",
+    "validate"
+  ],
+  "supportedSections": [
+    "hypothesis",
+    "method",
+    "population",
+    "endpoints",
+    "data_collection",
+    "analysis",
+    "results",
+    "sensitivity",
+    "limitations",
+    "safety"
+  ],
+  "detectionSignals": {
+    "highConfidence": [
+      "randomized",
+      "double blind",
+      "protocol",
+      "sample size",
+      "p-value",
+      "confidence interval",
+      "cohort",
+      "endpoint"
+    ],
+    "mediumConfidence": [
+      "statistical",
+      "analysis plan",
+      "methodology",
+      "results",
+      "significance"
+    ]
+  },
+  "negativeBoundaries": [
+    "Do not infer causality unless design and method sections explicitly support it.",
+    "Do not treat early trends as validated findings without pre-specified endpoint and method."
+  ],
+  "ontologyPrefix": "rs",
+  "qualityDefaults": {
+    "requireEndpointDefinitionForEffectClaims": true,
+    "requireMethodForComparison": true,
+    "requireConfidentialityComplianceCheck": false
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "research domain classification and analytical answer shaping",
+    "consumer": "research domain router",
+    "intent": "Prevent statistical overreach and preserve reproducibility context."
+  }
+}

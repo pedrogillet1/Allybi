@@ -2,9 +2,10 @@ import "reflect-metadata";
 import path from "path";
 import { beforeAll, describe, expect, test } from "@jest/globals";
 
+import prisma from "../../config/database";
 import type { EvidencePack } from "../../services/core/retrieval/retrieval.types";
-import { CentralizedChatRuntimeDelegate } from "../../modules/chat/runtime/CentralizedChatRuntimeDelegate";
-import type { ChatEngine } from "../../modules/chat/domain/chat.contracts";
+import { ChatTraceArtifactsService } from "../../modules/chat/runtime/ChatTraceArtifactsService";
+import { TraceWriterService } from "../../services/telemetry/traceWriter.service";
 import { initializeBanks } from "../../services/core/banks/bankLoader.service";
 import { writeCertificationGateReport } from "./reporting";
 
@@ -72,18 +73,10 @@ describe("Certification: turn debug packet", () => {
   });
 
   test("runtime emits complete turn debug packet for doc-scoped turns", async () => {
-    const engine: ChatEngine = {
-      async generate() {
-        return { text: "ok" };
-      },
-      async stream() {
-        return { text: "ok", chunks: [] as string[] };
-      },
-    } as ChatEngine;
-
-    const delegate = new CentralizedChatRuntimeDelegate(engine, {
-      conversationMemory: {} as any,
-    });
+    const traceArtifacts = new ChatTraceArtifactsService(
+      new TraceWriterService(prisma),
+      { environment: "dev" },
+    );
 
     const traceId = "tr_debug_packet_cert_1";
     const req = {
@@ -95,7 +88,7 @@ describe("Certification: turn debug packet", () => {
       meta: { requestId: "req-debug-1" },
     } as any;
 
-    await (delegate as any).persistTraceArtifacts({
+    await traceArtifacts.persistTraceArtifacts({
       traceId,
       req,
       conversationId: "c1",
@@ -141,9 +134,7 @@ describe("Certification: turn debug packet", () => {
       },
     });
 
-    const packet = (delegate as any).traceWriter.getLatestTurnDebugPacket(
-      traceId,
-    ) as any;
+    const packet = traceArtifacts.getLatestTurnDebugPacket(traceId) as any;
 
     const failures: string[] = [];
     if (!packet) failures.push("DEBUG_PACKET_MISSING");

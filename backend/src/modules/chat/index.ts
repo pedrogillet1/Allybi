@@ -43,16 +43,6 @@ export type {
   TurnResult,
 } from "./domain/chat.types";
 
-// ── Runtime ──
-export type { RuntimeDelegate } from "./runtime/ChatRuntimeOrchestrator";
-export { ChatRuntimeOrchestrator } from "./runtime/ChatRuntimeOrchestrator";
-
-export { CentralizedChatRuntimeDelegate } from "./runtime/CentralizedChatRuntimeDelegate";
-
-export { ScopeService } from "./runtime/ScopeService";
-export { EvidenceValidator } from "./runtime/EvidenceValidator";
-export { ContractNormalizer } from "./runtime/ContractNormalizer";
-
 export type { RuntimePolicyErrorCode } from "./runtime/runtimePolicyError";
 export {
   RuntimePolicyError,

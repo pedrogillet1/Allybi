@@ -1,0 +1,128 @@
+{
+  "_meta": {
+    "id": "di_commercial_real_estate_entity_ontology",
+    "version": "1.0.0",
+    "description": "Commercial real estate entity ontology for property identity, lease economics, and risk exposures.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/orchestration/entityResolver.service.ts",
+      "services/core/validation/claimValidator.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/domain-validation.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "commercial_real_estate",
+    "entityNormalization": "strict"
+  },
+  "domain": "commercial_real_estate",
+  "entities": [
+    {
+      "id": "cre_entity_property_id",
+      "label": {
+        "en": "Property ID",
+        "pt": "ID do Imóvel"
+      },
+      "aliases": [
+        "property id",
+        "property code",
+        "imóvel"
+      ],
+      "mustBindToSourceIdentity": true
+    },
+    {
+      "id": "cre_entity_tenant_name",
+      "label": {
+        "en": "Tenant Name",
+        "pt": "Nome do Inquilino"
+      },
+      "aliases": [
+        "tenant",
+        "lessee",
+        "locatário"
+      ],
+      "mustBindToLease": true
+    },
+    {
+      "id": "cre_entity_gross_leasable_area",
+      "label": {
+        "en": "Gross Leasable Area",
+        "pt": "Área Bruta Locável"
+      },
+      "aliases": [
+        "gla",
+        "gross area",
+        "área locável"
+      ],
+      "requiresUnit": true
+    },
+    {
+      "id": "cre_entity_monthly_rent",
+      "label": {
+        "en": "Monthly Rent",
+        "pt": "Aluguel Mensal"
+      },
+      "aliases": [
+        "rent",
+        "monthly rent",
+        "renda mensal"
+      ],
+      "requiresCurrencyOrNativeUnit": true
+    },
+    {
+      "id": "cre_entity_occupancy_rate",
+      "label": {
+        "en": "Occupancy Rate",
+        "pt": "Taxa de Ocupação"
+      },
+      "aliases": [
+        "occupancy",
+        "vacancy",
+        "taxa de ocupação"
+      ],
+      "requiresPercent": true
+    },
+    {
+      "id": "cre_entity_lease_expiry",
+      "label": {
+        "en": "Lease Expiry",
+        "pt": "Vencimento de Locação"
+      },
+      "aliases": [
+        "expiry",
+        "end date",
+        "vencimento"
+      ],
+      "requiresDateContext": true
+    },
+    {
+      "id": "cre_entity_cap_rate",
+      "label": {
+        "en": "Cap Rate",
+        "pt": "Taxa de Capitalização"
+      },
+      "aliases": [
+        "cap rate",
+        "captação",
+        "rendimento"
+      ],
+      "requiresNumericRange": true
+    }
+  ],
+  "normalization": {
+    "trimWhitespace": true,
+    "caseFold": true,
+    "aliasPriority": [
+      "property id",
+      "tenant",
+      "lease id"
+    ]
+  }
+}

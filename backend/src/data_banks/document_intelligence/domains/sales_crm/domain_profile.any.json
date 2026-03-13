@@ -1,0 +1,114 @@
+{
+  "_meta": {
+    "id": "di_sales_crm_domain_profile",
+    "version": "1.0.0",
+    "description": "Sales and CRM profile for funnel interpretation, quote logic, and retention-sensitive reporting.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/orchestration/answerPlanner.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/domain-validation.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "sales_crm",
+    "minEvidenceScore": 0.8
+  },
+  "domain": "sales_crm",
+  "displayName": {
+    "en": "Sales & CRM",
+    "pt": "Vendas e CRM"
+  },
+  "scope": "CRM documents including leads, opportunities, quotas, quotes, contract terms, churn, and sales performance."
+,
+  "coreConcepts": [
+    "lead qualification",
+    "opportunity stage",
+    "pipeline conversion",
+    "account ownership",
+    "quote margin",
+    "annual recurring revenue",
+    "monthly recurring revenue",
+    "discount authorization",
+    "sales velocity",
+    "churn prediction",
+    "territory coverage",
+    "quota attainment",
+    "renewal timing",
+    "escalation path"
+  ],
+  "supportedDocTypes": [
+    "sales_lead_profile",
+    "sales_opportunity_pack",
+    "sales_quote_proposal",
+    "sales_pipeline_report",
+    "sales_account_plan",
+    "sales_renewal_pack",
+    "sales_winloss_review",
+    "sales_pricing_pack",
+    "sales_crm_dashboard"
+  ],
+  "supportedOperators": [
+    "advise",
+    "calculate",
+    "compare",
+    "extract",
+    "locate",
+    "monitor",
+    "summarize",
+    "validate"
+  ],
+  "supportedSections": [
+    "account_summary",
+    "opportunity_funnel",
+    "lead_scoring",
+    "pricing_matrix",
+    "contract_terms",
+    "revenue_forecast",
+    "activity_log",
+    "risk_register",
+    "next_best_action",
+    "winloss_analysis"
+  ],
+  "detectionSignals": {
+    "highConfidence": [
+      "opportunity",
+      "pipeline",
+      "quote",
+      "deal stage",
+      "CRM",
+      "account owner",
+      "close date"
+    ],
+    "mediumConfidence": [
+      "lead",
+      "renewal",
+      "arr",
+      "discount",
+      "churn"
+    ]
+  },
+  "negativeBoundaries": [
+    "Do not interpret tax or general procurement files as sales pipelines unless opportunity identifiers and stage signals are explicit.",
+    "Do not infer revenue attribution across accounts without explicit ownership and period."
+  ],
+  "ontologyPrefix": "crm",
+  "qualityDefaults": {
+    "currencyDefault": "document_currency",
+    "mustPreserveCloseDate": true,
+    "requireAccountAnchorForRevenue": true
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "sales context and funnel reasoning path",
+    "consumer": "sales CRM domain router",
+    "intent": "Support decision quality by forcing stage-aware and owner-aware interpretation."
+  }
+}

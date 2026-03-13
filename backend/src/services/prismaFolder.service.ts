@@ -13,6 +13,7 @@ import type {
 } from "../controllers/folder.controller";
 import type { FolderKeyService } from "./folders/folderKey.service";
 import type { FolderCryptoService } from "./folders/folderCrypto.service";
+import { getFieldEncryption } from "./security/fieldEncryption.service";
 
 interface CryptoServices {
   folderKeys: FolderKeyService;
@@ -116,8 +117,16 @@ export class PrismaFolderService implements FolderService {
           fk,
         );
       } catch {
-        // Fallback to plaintext if decryption fails
-        return folder.name ?? "Unnamed";
+        try {
+          const fe = getFieldEncryption();
+          return fe.decryptField(folder.nameEncrypted, {
+            userId,
+            entityId: folder.id,
+            field: "name",
+          });
+        } catch {
+          return folder.name ?? "Unnamed";
+        }
       }
     }
     return folder.name ?? "Unnamed";

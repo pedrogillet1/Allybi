@@ -15,6 +15,10 @@ export type PromptConcern =
   | "retrieval_planner"
   | "answer_shape"
   | "citation_contract"
+  | "voice_selection"
+  | "answer_strategy"
+  | "anti_robotic_repair"
+  | "uncertainty_wording"
   | "clarification_render"
   | "fallback_render"
   | "tool_contract";

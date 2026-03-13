@@ -1,0 +1,129 @@
+{
+  "_meta": {
+    "id": "sales_crm_validation_rules",
+    "version": "1.0.0",
+    "description": "Sales CRM validation rules to prevent incorrect revenue, stage, and discount conclusions.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/validation/claimValidator.service.ts",
+      "services/core/orchestration/answerPlanner.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/domain-validation.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "domain": "sales_crm"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "validate pre-executive summary and advisory outputs",
+    "consumer": "sales CRM validator",
+    "intent": "Prevent noncomparable stage mixing and unsupported commercial claims."
+  },
+  "exactnessContract": {
+    "forbiddenSubstitutions": [
+      "stage_inference_without_evidence",
+      "revenue_without_currency_and_period",
+      "discount_without_approval_level",
+      "arr_without_method",
+      "renewal_risk_without_expiry_date"
+    ],
+    "requiredAnchors": [
+      "opportunity_id",
+      "account",
+      "stage",
+      "owner",
+      "period"
+    ]
+  },
+  "validationRules": [
+    {
+      "id": "CRM_VAL_001_stage_alignment",
+      "severity": "high",
+      "applies": [
+        "compare",
+        "summarize"
+      ],
+      "check": "stage_comparison_uses_same_stage_definition",
+      "description": "Only compare opportunities when stage semantics are aligned and explicit.",
+      "failureAction": "ASK_AND_REQUIRE_STAGE_ALIGNMENT"
+    },
+    {
+      "id": "CRM_VAL_002_owner_trace",
+      "severity": "high",
+      "applies": [
+        "extract",
+        "summarize",
+        "advise"
+      ],
+      "check": "owner_is_bound_to_account_and_opportunity",
+      "description": "Do not attribute activity or outcome without owner anchor.",
+      "failureAction": "BLOCK_AND_REQUIRE_OWNER"
+    },
+    {
+      "id": "CRM_VAL_003_pricing_guard",
+      "severity": "high",
+      "applies": [
+        "calculate",
+        "compare",
+        "evaluate"
+      ],
+      "check": "pricing_claims_have_terms_and_discount_basis",
+      "description": "Reject mixed discount or term claims without explicit quote line context.",
+      "failureAction": "BLOCK_AND_ASK_FOR_quote_context"
+    },
+    {
+      "id": "CRM_VAL_004_renewal_expiry_lock",
+      "severity": "medium",
+      "applies": [
+        "monitor",
+        "advise"
+      ],
+      "check": "renewal_statements_include_expiry",
+      "description": "All retention or churn recommendations should include contract expiry or renewal date.",
+      "failureAction": "WARN_AND_REQUIRE_EXPIRY"
+    },
+    {
+      "id": "CRM_VAL_005_kpi_consistency",
+      "severity": "medium",
+      "applies": [
+        "compare",
+        "calculate"
+      ],
+      "check": "arr_mrr_consistency_or_explained_diff",
+      "description": "ARR/MRR transitions must be tagged to definitions.",
+      "failureAction": "WARN_AND_REQUIRE_METHOD"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "sales_crm_validation_blocks_stage_mix",
+        "input": {
+          "queryType": "compare"
+        },
+        "expect": {
+          "mustCheck": [
+            "CRM_VAL_001_stage_alignment"
+          ]
+        }
+      },
+      {
+        "id": "sales_crm_validation_requires_quote_context",
+        "input": {
+          "scenario": "discount_without_quote_section"
+        },
+        "expect": {
+          "action": "BLOCK_AND_ASK_FOR_quote_context"
+        }
+      }
+    ]
+  }
+}

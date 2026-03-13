@@ -1,0 +1,197 @@
+{
+  "_meta": {
+    "id": "evidence_packaging_strategies",
+    "version": "1.0.0",
+    "description": "Packaging strategies for exact and table-sensitive responses, including partial-support fallback and cross-document constraints.",
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "koda-retrieval",
+    "compat": ">=1.0.0",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id",
+    "requireProvenance": true,
+    "requireSpanPerClaim": true,
+    "preserveFieldOrder": true
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "after scoring, before final validation",
+    "consumer": "evidence assembler",
+    "intent": "package evidence in minimal, exact units matched to requested role/field",
+    "emittedSignals": [
+      "packagingMode",
+      "packagingCoverage",
+      "packagingWarnings",
+      "selectedEvidenceClaims"
+    ]
+  },
+  "modes": [
+    {
+      "id": "exact_single_field",
+      "match": {
+        "queryType": "extract_field",
+        "queryFieldRoleComplexity": "single",
+        "crossDocAllowed": false
+      },
+      "policy": {
+        "maxEvidenceItems": 3,
+        "requireExactFieldMatch": true,
+        "requireSourceSpan": true,
+        "allowSubstitutions": false,
+        "explanation": "single atomic claim must be traceable to one span"
+      }
+    },
+    {
+      "id": "exact_role_field_set",
+      "match": {
+        "queryType": "extract_field",
+        "queryFieldRoleComplexity": "multi",
+        "requiresRoleSeparation": true
+      },
+      "policy": {
+        "maxEvidenceItems": 6,
+        "maxPerRole": 3,
+        "requireRoleLocked": true,
+        "allowSubstitutions": false,
+        "explanation": "multi-role requests must keep owner, signer, witness, etc. separate"
+      }
+    },
+    {
+      "id": "table_cell_exact",
+      "match": {
+        "queryType": "extract_field",
+        "evidenceType": "table",
+        "requiresRowAndColumn": true
+      },
+      "policy": {
+        "maxEvidenceItems": 4,
+        "requireTableHeader": true,
+        "requireRowContext": true,
+        "requireColumnContext": true,
+        "forbidAggregateAsAtomic": true,
+        "explanation": "table claims must include header, row and column context"
+      }
+    },
+    {
+      "id": "comparison_across_documents",
+      "match": {
+        "queryType": "compare",
+        "crossDocRequested": true
+      },
+      "policy": {
+        "maxEvidenceItems": 18,
+        "maxDocs": 4,
+        "requireDisclosedSources": true,
+        "allowCrossDocMerge": true,
+        "requireConflictDisclosure": true,
+        "explanation": "explicit comparisons keep provenance and disclose divergence"
+      }
+    },
+    {
+      "id": "partial_support_with_disclosure",
+      "match": {
+        "queryType": "extract_field",
+        "supportedSubpartsRatioMax": 0.99,
+        "supportedSubpartsRatioMin": 0.33
+      },
+      "policy": {
+        "maxEvidenceItems": 8,
+        "packPartialClaims": true,
+        "requireMissingClaimMarker": true,
+        "requireRepairHint": true,
+        "explanation": "show what is supported and what remains open"
+      }
+    },
+    {
+      "id": "fallback_not_enough_evidence",
+      "match": {
+        "queryType": "any",
+        "evidenceRatio": "lt_0.33",
+        "queryCanClarify": true
+      },
+      "policy": {
+        "maxEvidenceItems": 1,
+        "emitNotEnoughEvidence": true,
+        "askClarifyingQuestion": true,
+        "explanation": "short and clear response path when confidence is structurally low"
+      }
+    }
+  ],
+  "rules": [
+    {
+      "id": "EPS_001_apply_mode_by_match",
+      "check": "context.packagingCandidate != null AND strategies.contains(context.packagingCandidate.mode)",
+      "failureAction": "SELECT_MODE",
+      "severity": "info"
+    },
+    {
+      "id": "EPS_002_exact_mode_requires_high_match",
+      "check": "selectedMode == 'exact_single_field' AND binding.confidence < 0.88",
+      "failureAction": "DEGRADE_TO_PARTIAL_MODE",
+      "severity": "warning"
+    },
+    {
+      "id": "EPS_003_protect_single_doc_when_no_permission",
+      "check": "selectedMode == 'comparison_across_documents' AND context.queryCrossDocExplicit == false",
+      "failureAction": "ASK_CROSS_DOC_SCOPE",
+      "severity": "error"
+    },
+    {
+      "id": "EPS_004_partial_packaging_requires_marker",
+      "check": "selectedMode == 'partial_support_with_disclosure' AND output.missingPiecesNotMarked == true",
+      "failureAction": "FORCE_MISSING_MARKERS",
+      "severity": "warning"
+    },
+    {
+      "id": "EPS_005_no_substitution_in_exact_mode",
+      "check": "selectedMode in ['exact_single_field','exact_role_field_set'] AND binding.substitutionAttempted == true",
+      "failureAction": "BLOCK_SUBSTITUTION_MODE",
+      "severity": "error"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "packaging_table_mode_selected",
+        "input": {
+          "context": {
+            "packagingCandidate": {
+              "mode": "table_cell_exact"
+            }
+          }
+        },
+        "expect": {
+          "action": "SELECT_MODE"
+        }
+      },
+      {
+        "id": "packaging_exact_mode_demoted_on_low_confidence",
+        "input": {
+          "selectedMode": "exact_single_field",
+          "binding": {
+            "confidence": 0.65
+          }
+        },
+        "expect": {
+          "failureAction": "DEGRADE_TO_PARTIAL_MODE"
+        }
+      }
+    ]
+  }
+}

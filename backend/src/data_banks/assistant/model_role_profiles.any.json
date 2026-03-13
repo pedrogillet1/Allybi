@@ -1,0 +1,136 @@
+{
+  "_meta": {
+    "id": "model_role_profiles",
+    "version": "1.0.0",
+    "description": "Model role contract for orchestration so routing can target behavior-specific capabilities.",
+    "owner": "assistant-orchestrator",
+    "usedBy": [
+      "services/assistant/core/assistantOrchestrator.service.ts",
+      "services/llm/core/llmRouter.service.ts"
+    ],
+    "tests": [
+      "tests/assistant/modelRoleProfiles.proof.test.ts"
+    ],
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13"
+  },
+  "config": {
+    "enabled": true,
+    "fallbackRole": "planner"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "post_tool_selection_post_decomposition",
+    "consumer": "provider router"
+  },
+  "roles": [
+    {
+      "id": "planner",
+      "description": "Constructs task decomposition and sequencing.",
+      "selectionConditions": {
+        "taskFamilies": [
+          "clarification_repair",
+          "operational_workflow"
+        ],
+        "maxLatency": "fast"
+      },
+      "candidateProviders": [
+        "gemini:gemini-2.5-flash",
+        "openai:gpt-5-mini"
+      ],
+      "qualityProfile": "planner_precision"
+    },
+    {
+      "id": "researcher",
+      "description": "Collects raw evidence from tools with neutral interpretation.",
+      "selectionConditions": {
+        "taskFamilies": [
+          "document_grounding",
+          "comparison_synthesis",
+          "numeric_audit"
+        ]
+      },
+      "candidateProviders": [
+        "gemini:gemini-2.5-flash",
+        "openai:gpt-5-mini",
+        "openai:gpt-5.2"
+      ],
+      "qualityProfile": "research_precision"
+    },
+    {
+      "id": "evidence_specialist",
+      "description": "Transforms claims into bounded evidence statements and exceptions.",
+      "selectionConditions": {
+        "risk": "high",
+        "taskFamilies": [
+          "forensic_scan",
+          "document_grounding"
+        ]
+      },
+      "candidateProviders": [
+        "openai:gpt-5.2",
+        "openai:gpt-5-mini"
+      ],
+      "qualityProfile": "evidence_fidelity"
+    },
+    {
+      "id": "synthesizer",
+      "description": "Creates readable answer composition with explicit uncertainty and caveats.",
+      "selectionConditions": {
+        "taskComplexity": "medium_or_high"
+      },
+      "candidateProviders": [
+        "openai:gpt-5.2",
+        "openai:gpt-5-mini"
+      ],
+      "qualityProfile": "synthesis_guardrails"
+    },
+    {
+      "id": "numeric_specialist",
+      "description": "Checks numeric consistency, deltas, and normalization integrity.",
+      "selectionConditions": {
+        "taskFamilies": [
+          "numeric_audit"
+        ],
+      "evidenceDensity": "high"
+      },
+      "candidateProviders": [
+        "openai:gpt-5.2",
+        "openai:gpt-5-mini"
+      ],
+      "qualityProfile": "numeric_integrity"
+    },
+    {
+      "id": "risk_orchestrator",
+      "description": "Monitors uncertainty and decides whether to recurse, shadow, or escalate.",
+      "selectionConditions": {
+        "risk": "high",
+        "complexity": "high"
+      },
+      "candidateProviders": [
+        "openai:gpt-5.2"
+      ],
+      "qualityProfile": "risk_gating"
+    }
+  ],
+  "shadowHooks": {
+    "enabled": true,
+    "parallelRole": "planner",
+    "compareRole": "synthesizer",
+    "comparePolicy": "if role outputs differ materially, prefer risk_orchestrator review"
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "numeric_request_maps_numeric_specialist",
+        "input": {
+          "taskFamily": "numeric_audit"
+        },
+        "expect": {
+          "role": "numeric_specialist"
+        }
+      }
+    ]
+  }
+}

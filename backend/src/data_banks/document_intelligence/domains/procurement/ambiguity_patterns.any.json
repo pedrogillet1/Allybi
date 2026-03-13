@@ -1,0 +1,93 @@
+{
+  "_meta": {
+    "id": "procurement_ambiguity_patterns",
+    "version": "1.0.0",
+    "description": "Procurement ambiguity patterns for award logic, unit basis, and document-scope collisions.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/orchestration/ambiguityResolver.service.ts",
+      "services/core/repair/ambiguityRepair.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/ambiguity-domain.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "maxQuestions": 1,
+    "preferClarifyOverSpeculation": true,
+    "domain": "procurement"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "after initial procurement retrieval and before scoring assertions",
+    "consumer": "procurement ambiguity layer",
+    "intent": "Stop weak winner/variance claims from mixing vendors, scopes, and periods."
+  },
+  "patterns": [
+    {
+      "id": "PROC_AMB_001_multi_version_rfx",
+      "type": "version_collision",
+      "trigger": "rfx_version_or_revision > 1",
+      "askQuestion": "There are multiple RFX versions. Use the latest issued version only, or compare across versions with a version map first?"
+    },
+    {
+      "id": "PROC_AMB_002_score_scale_mix",
+      "type": "scoring_scale_mismatch",
+      "trigger": "scores_in_multiple_scales",
+      "askQuestion": "Should comparisons use weighted score only, raw criteria score only, or both side-by-side?"
+    },
+    {
+      "id": "PROC_AMB_003_vendor_name_collision",
+      "type": "entity_collision",
+      "trigger": "same_vendor_name_multiple_legal_entities",
+      "askQuestion": "Should I lock supplier by legal ID, tax number, or internal vendor code?"
+    },
+    {
+      "id": "PROC_AMB_004_currency_or_term_blend",
+      "type": "currency_term_blend",
+      "trigger": "mixed_currency_or_payment_terms_without_policy",
+      "askQuestion": "Do you want normalized comparison using a single reporting currency and standardized payment baseline?"
+    },
+    {
+      "id": "PROC_AMB_005_delivery_scope_mix",
+      "type": "delivery_definition_collision",
+      "trigger": "delivery_date_appears_without_scope",
+      "askQuestion": "Should delivery status be interpreted as committed ETA, received date, or accepted date?"
+    },
+    {
+      "id": "PROC_AMB_006_po_line_vs_total",
+      "type": "aggregation_collision",
+      "trigger": "queryAmbiguousBetweenLineTotalsAndGrandTotal",
+      "askQuestion": "Do you want total contract amount, selected winning line total, or budgeted amount in scope?"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "proc_amb_vendor_collision_asks_one",
+        "input": {
+          "scenario": "duplicate_vendor_names"
+        },
+        "expect": {
+          "action": "askQuestion",
+          "maxQuestions": 1
+        }
+      },
+      {
+        "id": "proc_amb_score_mix_requires_choice",
+        "input": {
+          "scenario": "scores_in_mixed_scales"
+        },
+        "expect": {
+          "mustAskContains": "weighted"
+        }
+      }
+    ]
+  }
+}

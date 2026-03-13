@@ -1,0 +1,67 @@
+{
+  "_meta": {
+    "id": "eval_style_repetition",
+    "version": "1.0.0",
+    "description": "Style checks for repetitive syntax, clause recycling, and template-like output.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "eval-ops",
+    "usedBy": [
+      "services/eval/styleJudge.service.ts"
+    ],
+    "tests": [
+      "tests/eval/repetition.proof.test.ts",
+      "tests/eval/styleCoverage.proof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "scenarioType": "repetition"
+  },
+  "checks": [
+    {
+      "id": "repetition_001",
+      "lang": "en",
+      "query": "Give a concise interpretation of the three clauses and next action.",
+      "expected": {
+        "mustLimitRepetitionScore": 0.28,
+        "mustUseAtLeastTwoSyntaxShapes": true,
+        "mustAvoid": [
+          "same_connector_every_sentence",
+          "same_sentence_start_repeats"
+        ],
+        "failureConditions": [
+          "three_sentences_with_same_opening",
+          "copy_paste_listing_without_context"
+        ]
+      }
+    },
+    {
+      "id": "repetition_002",
+      "lang": "pt",
+      "query": "Explique brevemente as implicações principais da cláusula e uma ação recomendada.",
+      "expected": {
+        "mustLimitRepetitionScore": 0.28,
+        "mustUseAtLeastTwoSyntaxShapes": true,
+        "mustAvoid": [
+          "repetir 'entao', 'assim', 'logo'",
+          "frase_formulaica_repetida"
+        ],
+        "failureConditions": [
+          "estilo_moldado",
+          "fraseologia_repetitiva"
+        ]
+      }
+    }
+  ],
+  "thresholds": {
+    "maxRepeatedBigrams": 6,
+    "maxRepeatedSentenceStems": 2,
+    "maxTemplateMatchRate": 0.35
+  },
+  "penalty": {
+    "repetitionPenaltyPerExcessUnit": -4
+  }
+}

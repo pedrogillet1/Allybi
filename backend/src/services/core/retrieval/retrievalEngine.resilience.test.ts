@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test } from "@jest/globals";
 
-import { RetrievalEngineService } from "./retrievalEngine.legacy.service";
+import { RetrievalEngineService } from "./v2/RetrievalOrchestrator.service";
 
 const originalFailMode = process.env.RETRIEVAL_FAIL_MODE;
 

@@ -744,13 +744,19 @@ export async function storeDocumentEmbeddings(
 ): Promise<void> {
   const docBefore = await prisma.document.findUnique({
     where: { id: documentId },
-    select: { id: true, userId: true, indexingOperationId: true },
+    select: {
+      id: true,
+      userId: true,
+      indexingOperationId: true,
+      indexingState: true,
+    },
   });
   if (!docBefore) {
     throw new Error(`Document not found: ${documentId}`);
   }
 
   const previousOperationId = String(docBefore.indexingOperationId || "").trim();
+  const hadSuccessfulPriorIndex = docBefore.indexingState === "indexed";
   const strictVerify =
     options.strictVerify ??
     isFlagEnabled("INDEXING_STRICT_FAIL_CLOSED", true);
@@ -792,18 +798,35 @@ export async function storeDocumentEmbeddings(
       verificationPassed = true;
     } catch (error: any) {
       const message = String(error?.message || error || "unknown_error");
-      if (currentOperationId) {
-        try {
-          await pineconeService.deleteEmbeddingsByOperationId(
+      const canSoftFailVerification =
+        !previousOperationId || !hadSuccessfulPriorIndex;
+      if (canSoftFailVerification) {
+        logger.warn(
+          "[vectorEmbedding] Document verification soft-fail; keeping Postgres chunks and continuing",
+          {
             documentId,
-            currentOperationId,
-            { userId },
-          );
-        } catch {
-          // best effort rollback; preserve original error surface
+            userId,
+            operationId: currentOperationId,
+            previousOperationId,
+            previousIndexingState: docBefore.indexingState,
+            error: message,
+          },
+        );
+        verificationPassed = false;
+      } else {
+        if (currentOperationId) {
+          try {
+            await pineconeService.deleteEmbeddingsByOperationId(
+              documentId,
+              currentOperationId,
+              { userId },
+            );
+          } catch {
+            // best effort rollback; preserve original error surface
+          }
         }
+        throw new Error(message);
       }
-      throw new Error(message);
     }
   }
 

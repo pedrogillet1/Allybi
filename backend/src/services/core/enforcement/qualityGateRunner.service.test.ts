@@ -219,4 +219,137 @@ describe("QualityGateRunnerService", () => {
     expect(gate?.passed).toBe(false);
     expect(gate?.failureCode).toBe("PII_DETECTED");
   });
+
+  test("evaluates style sub-gates for robotic lead-ins, canned empathy, repetition, and confidence mismatch", async () => {
+    process.env.NODE_ENV = "development";
+    mockGetOptionalBank.mockImplementation((bankId: string) => {
+      if (bankId === "quality_gates") {
+        return {
+          _meta: { id: "quality_gates" },
+          config: {
+            integrationHooks: {
+              antiRoboticBankId: "anti_robotic_style_rules",
+              cannedEmpathyBankId: "eval_style_canned_empathy",
+            },
+          },
+          gateOrder: [
+            "style_opener_naturalness",
+            "style_empathy_authenticity",
+            "style_repetition_control",
+            "style_confidence_alignment",
+            "style_domain_voice_match",
+            "style_conversational_flow",
+          ],
+        };
+      }
+      if (bankId === "anti_robotic_style_rules") {
+        return {
+          _meta: { id: "anti_robotic_style_rules" },
+          bannedLeadins: {
+            en: ["Based on the provided information,"],
+          },
+        };
+      }
+      if (bankId === "eval_style_canned_empathy") {
+        return {
+          _meta: { id: "eval_style_canned_empathy" },
+          bans: ["I know this can be difficult"],
+        };
+      }
+      return null;
+    });
+
+    const { QualityGateRunnerService } =
+      await import("./qualityGateRunner.service");
+    const runner = new QualityGateRunnerService();
+
+    const out = await runner.runGates(
+      "Based on the provided information, I know this can be difficult. The document shows the clause applies. The document shows the clause applies.",
+      {
+        answerMode: "general_answer",
+        language: "en",
+        domainHint: "legal",
+        evidenceStrength: "low",
+        turnStyleState: {
+          recentLeadSignatures: ["the document shows"],
+          recentCloserSignatures: ["clause applies"],
+        },
+      },
+    );
+
+    const openerGate = out.results.find((g) => g.gateName === "style_opener_naturalness");
+    const empathyGate = out.results.find((g) => g.gateName === "style_empathy_authenticity");
+    const repetitionGate = out.results.find((g) => g.gateName === "style_repetition_control");
+    const confidenceGate = out.results.find((g) => g.gateName === "style_confidence_alignment");
+
+    expect(openerGate?.passed).toBe(false);
+    expect(openerGate?.failureCode).toBe("STYLE_OPENER_NOT_NATURAL");
+    expect(empathyGate?.passed).toBe(false);
+    expect(empathyGate?.failureCode).toBe("STYLE_EMPATHY_INAUTHENTIC");
+    expect(repetitionGate?.passed).toBe(false);
+    expect(repetitionGate?.failureCode).toBe("STYLE_REPETITION_DETECTED");
+    expect(confidenceGate?.passed).toBe(false);
+    expect(confidenceGate?.failureCode).toBe("STYLE_CONFIDENCE_MISMATCH");
+    expect(openerGate?.issues ?? []).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining("Robotic lead-in detected"),
+      ]),
+    );
+  });
+
+  test("style contract aggregates sub-gate failures for compatibility", async () => {
+    process.env.NODE_ENV = "development";
+    mockGetOptionalBank.mockImplementation((bankId: string) => {
+      if (bankId === "quality_gates") {
+        return {
+          _meta: { id: "quality_gates" },
+          config: {
+            integrationHooks: {
+              antiRoboticBankId: "anti_robotic_style_rules",
+              cannedEmpathyBankId: "eval_style_canned_empathy",
+            },
+          },
+          gateOrder: ["style_contract"],
+        };
+      }
+      if (bankId === "anti_robotic_style_rules") {
+        return {
+          _meta: { id: "anti_robotic_style_rules" },
+          bannedLeadins: {
+            en: ["Based on the provided information,"],
+          },
+        };
+      }
+      if (bankId === "eval_style_canned_empathy") {
+        return {
+          _meta: { id: "eval_style_canned_empathy" },
+          bans: ["I know this can be difficult"],
+        };
+      }
+      return null;
+    });
+
+    const { QualityGateRunnerService } = await import("./qualityGateRunner.service");
+    const runner = new QualityGateRunnerService();
+
+    const out = await runner.runGates(
+      "Based on the provided information, I know this can be difficult. The document shows the clause applies.",
+      {
+        answerMode: "general_answer",
+        language: "en",
+        evidenceStrength: "low",
+      },
+    );
+
+    const gate = out.results.find((g) => g.gateName === "style_contract");
+    expect(gate?.passed).toBe(false);
+    expect(gate?.failureCode).toBe("STYLE_CONTRACT_VIOLATION");
+    expect(gate?.issues ?? []).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining("Robotic lead-in detected"),
+        expect.stringContaining("Canned empathy detected"),
+        expect.stringContaining("Confidence is stronger than the evidence justifies."),
+      ]),
+    );
+  });
 });

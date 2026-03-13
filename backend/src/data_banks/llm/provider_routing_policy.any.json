@@ -1,0 +1,180 @@
+{
+  "_meta": {
+    "id": "provider_routing_policy",
+    "version": "1.0.0",
+    "description": "Task-aware model routing policy with explicit scoring and hard constraints.",
+    "owner": "assistant-orchestrator",
+    "usedBy": [
+      "services/llm/core/llmRouter.service.ts"
+    ],
+    "tests": [
+      "tests/llm/providerRouting.proof.test.ts"
+    ],
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13"
+  },
+  "config": {
+    "enabled": true,
+    "defaultProvider": "openai",
+    "defaultModel": "gpt-5.2"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "provider_routing_step",
+    "consumer": "llmRouter.service.ts",
+    "output": "provider + model + role + rationale"
+  },
+  "routingSignals": [
+    "taskFamily",
+    "workProductType",
+    "urgency",
+    "riskLevel",
+    "outputSurface",
+    "evidenceDensity",
+    "requiredCertainty"
+  ],
+  "routes": [
+    {
+      "id": "high_stakes_quote_authority",
+      "match": {
+        "taskFamily": "document_grounding",
+        "riskLevel": "high",
+        "workProductType": "quote_pack"
+      },
+      "select": {
+        "provider": "openai",
+        "model": "gpt-5.2",
+        "role": "evidence_specialist"
+      },
+      "constraints": {
+        "maxRetries": 2,
+        "mustUseShadow": true
+      },
+      "qualityHook": "quote_fidelity",
+      "reason": "Highest precision on claims tied to exact quote interpretation."
+    },
+    {
+      "id": "numeric_integrity_authority",
+      "match": {
+        "taskFamily": "numeric_audit",
+        "evidenceDensity": "high"
+      },
+      "select": {
+        "provider": "openai",
+        "model": "gpt-5.2",
+        "role": "numeric_specialist"
+      },
+      "constraints": {
+        "maxRetries": 1,
+        "requiresToolTrace": true
+      },
+      "qualityHook": "numeric_integrity",
+      "reason": "Numerical interpretation requires strict constraint checks."
+    },
+    {
+      "id": "comparison_speed_balance",
+      "match": {
+        "taskFamily": "comparison_synthesis",
+        "riskLevel": "medium",
+        "urgency": "high"
+      },
+      "select": {
+        "provider": "gemini",
+        "model": "gemini-2.5-flash",
+        "role": "researcher"
+      },
+      "constraints": {
+        "maxRetries": 1,
+        "maxLatencyMs": 2500
+      },
+      "reason": "Fast structure with table-ready extraction before final synthesis."
+    },
+    {
+      "id": "planning_repair_fast",
+      "match": {
+        "taskFamily": "clarification_repair",
+        "urgency": "high"
+      },
+      "select": {
+        "provider": "gemini",
+        "model": "gemini-2.5-flash",
+        "role": "planner"
+      },
+      "constraints": {
+        "maxRetries": 1
+      },
+      "reason": "Low-latency turn recovery and scope stabilization."
+    },
+    {
+      "id": "final_decision_memo",
+      "match": {
+        "workProductType": "decision_memo",
+        "riskLevel": "high"
+      },
+      "select": {
+        "provider": "openai",
+        "model": "gpt-5.2",
+        "role": "synthesizer"
+      },
+      "constraints": {
+        "maxRetries": 2,
+        "mustUseShadow": true,
+        "mustIncludeUncertainty": true
+      },
+      "qualityHook": "policy_reasoning",
+      "reason": "Decision output requires high-quality synthesis and caveat control."
+    },
+    {
+      "id": "default_draft_fast",
+      "match": {
+        "taskFamily": "operational_workflow",
+        "urgency": "normal"
+      },
+      "select": {
+        "provider": "gemini",
+        "model": "gemini-2.5-flash",
+        "role": "planner"
+      },
+      "constraints": {
+        "maxRetries": 1
+      },
+      "reason": "Task updates and status summaries prefer latency-sensitive provider."
+    },
+    {
+      "id": "default_authority_finish",
+      "match": {
+        "stage": "final",
+        "urgency": "normal"
+      },
+      "select": {
+        "provider": "openai",
+        "model": "gpt-5.2",
+        "role": "synthesizer"
+      },
+      "constraints": {
+        "maxRetries": 2,
+        "mustUseUncertaintyHook": true
+      },
+      "reason": "Final messages need stronger calibration and bounded language."
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "numeric_audit_routes_to_authority",
+        "input": {
+          "taskFamily": "numeric_audit",
+          "evidenceDensity": "high"
+        },
+        "expect": {
+          "route": {
+            "provider": "openai",
+            "model": "gpt-5.2",
+            "role": "numeric_specialist"
+          }
+        }
+      }
+    ]
+  }
+}

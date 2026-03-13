@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "bankId": "aggregation_patterns",
+    "bankId": "patterns_core_aggregation_patterns",
     "version": "1.0.0",
     "owner": "pattern-core-curator",
     "languages": [

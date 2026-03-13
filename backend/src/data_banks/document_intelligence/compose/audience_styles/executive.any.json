@@ -1,0 +1,89 @@
+{
+  "_meta": {
+    "id": "audience_style_executive",
+    "version": "1.0.0",
+    "description": "Executive audience style overlay focused on topline outcomes, material change, and decision-ready framing.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "composition-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "audience": "executive",
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "audience overlay after voice selection",
+    "consumer": "composition layer",
+    "intent": "Compress to the top line, the key support, and the practical implication."
+  },
+  "preferences": {
+    "prefer": [
+      "bottom_line_first",
+      "risk_or_decision_signal",
+      "one_key_support_sentence"
+    ],
+    "avoid": [
+      "long_scene_setting",
+      "taxonomy_dumps",
+      "exhaustive_evidence_lists"
+    ]
+  },
+  "structures": [
+    {
+      "id": "executive_briefing",
+      "sequence": [
+        "bottom_line",
+        "single_support",
+        "decision_implication"
+      ]
+    },
+    {
+      "id": "executive_compare",
+      "sequence": [
+        "main_delta",
+        "material_effect",
+        "optional_risk_line"
+      ]
+    }
+  ],
+  "phrasingSignals": {
+    "en": [
+      "What matters most is {{finding}}.",
+      "The key takeaway is {{finding}}.",
+      "The decision-relevant point is {{finding}}."
+    ],
+    "pt": [
+      "O que mais importa e {{finding}}.",
+      "O principal resumo e {{finding}}.",
+      "O ponto relevante para a decisao e {{finding}}."
+    ]
+  },
+  "guardrails": [
+    "Do not open with process detail before the conclusion.",
+    "Do not list more than three supporting points unless the user explicitly asks for a detailed breakdown.",
+    "Do not end with generic help offers when a concrete next move is available."
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "executive_style_prefers_bottom_line",
+        "expect": {
+          "prefer": "bottom_line_first"
+        }
+      }
+    ]
+  }
+}

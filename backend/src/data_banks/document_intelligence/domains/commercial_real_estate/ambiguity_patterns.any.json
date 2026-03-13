@@ -1,0 +1,94 @@
+{
+  "_meta": {
+    "id": "di_commercial_real_estate_ambiguity_patterns",
+    "version": "1.0.0",
+    "description": "Commercial real estate ambiguity patterns for lease scope collisions, valuation basis ambiguity, and concentration risk.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/orchestration/ambiguityResolver.service.ts",
+      "services/core/repair/ambiguityRepair.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/ambiguity-domain.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "maxQuestions": 1,
+    "preferClarifyOverSpeculation": true,
+    "domain": "commercial_real_estate"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "after lease and rent extraction before monetary interpretation",
+    "consumer": "commercial real estate ambiguity layer",
+    "intent": "Resolve tenant/property/value collisions before financial statements."
+  },
+  "patterns": [
+    {
+      "id": "CRE_AMB_001_multi_property_query",
+      "type": "property_scope_collision",
+      "trigger": "multiple_property_ids_without_scope",
+      "askQuestion": "Do you want analysis by property separately or portfolio-level with property-level breakdowns?"
+    },
+    {
+      "id": "CRE_AMB_002_lease_period_overlap",
+      "type": "lease_period_collision",
+      "trigger": "same_tenant_multiple_active_terms",
+      "askQuestion": "Should comparisons use effective date ranges, latest term only, or term-by-term view?"
+    },
+    {
+      "id": "CRE_AMB_003_valuation_method_mix",
+      "type": "valuation_method_collision",
+      "trigger": "mixed_valuation_assumptions",
+      "askQuestion": "Use DCF assumptions, income capitalization, comparable approach, or separate by method?"
+    },
+    {
+      "id": "CRE_AMB_004_vacancy_definition",
+      "type": "vacancy_definition_collision",
+      "trigger": "vacancy_inconsistent_definitions",
+      "askQuestion": "Interpret vacancy by leased area, rentable area, or net leased area only?"
+    },
+    {
+      "id": "CRE_AMB_005_rent_roll_owner_collision",
+      "type": "tenant_owner_collision",
+      "trigger": "tenant_name_ambiguous_or_branches",
+      "askQuestion": "Use legal tenant name, trade name, or account number as primary owner key?"
+    },
+    {
+      "id": "CRE_AMB_006_capex_priority",
+      "type": "maintenance_priority_collision",
+      "trigger": "simultaneous_critical_and_planned",
+      "askQuestion": "Would you like urgent-first ranking or budget-first ranking for capex actions?"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "cre_amb_property_scope",
+        "input": {
+          "scenario": "multiple_property_ids_without_scope"
+        },
+        "expect": {
+          "action": "askQuestion",
+          "mustAskContains": "property"
+        }
+      },
+      {
+        "id": "cre_amb_vacancy_definition",
+        "input": {
+          "scenario": "vacancy_inconsistent_definitions"
+        },
+        "expect": {
+          "action": "askQuestion",
+          "mustAskContains": "vacancy"
+        }
+      }
+    ]
+  }
+}

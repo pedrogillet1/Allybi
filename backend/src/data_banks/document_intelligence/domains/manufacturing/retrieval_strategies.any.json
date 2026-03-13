@@ -1,0 +1,173 @@
+{
+  "_meta": {
+    "id": "di_manufacturing_retrieval_strategies",
+    "version": "1.0.0",
+    "description": "Manufacturing retrieval strategy prioritizing yield loss, downtime, and quality evidence.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/retrieval/hybridRetriever.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/retrievalPrecision.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "manufacturing",
+    "maxBoostRules": 90,
+    "maxQueryExpansionTerms": 150
+  },
+  "domain": "manufacturing",
+  "sectionPriority": [
+    {
+      "section": "mfg_section_routing",
+      "weight": 8.5,
+      "operators": [
+        "extract",
+        "compare",
+        "summarize"
+      ]
+    },
+    {
+      "section": "mfg_section_yield",
+      "weight": 9,
+      "operators": [
+        "compare",
+        "calculate",
+        "summarize",
+        "validate"
+      ]
+    },
+    {
+      "section": "mfg_section_quality",
+      "weight": 9,
+      "operators": [
+        "validate",
+        "extract",
+        "evaluate"
+      ]
+    },
+    {
+      "section": "mfg_section_downtime",
+      "weight": 8.8,
+      "operators": [
+        "extract",
+        "monitor",
+        "summarize",
+        "compare"
+      ]
+    },
+    {
+      "section": "mfg_section_materials",
+      "weight": 8.2,
+      "operators": [
+        "calculate",
+        "compare",
+        "validate"
+      ]
+    },
+    {
+      "section": "mfg_section_oee",
+      "weight": 8.3,
+      "operators": [
+        "summarize",
+        "calculate",
+        "compare"
+      ]
+    },
+    {
+      "section": "mfg_section_safety",
+      "weight": 7.6,
+      "operators": [
+        "extract",
+        "evaluate",
+        "summarize"
+      ]
+    }
+  ],
+  "tablePriority": [
+    {
+      "table": "mfg_table_wo_lines",
+      "weight": 9,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare"
+      ]
+    },
+    {
+      "table": "mfg_table_bom_usage",
+      "weight": 8.5,
+      "operators": [
+        "calculate",
+        "compare",
+        "validate"
+      ]
+    },
+    {
+      "table": "mfg_table_quality_results",
+      "weight": 8.9,
+      "operators": [
+        "validate",
+        "extract",
+        "summarize"
+      ]
+    },
+    {
+      "table": "mfg_table_downtime_events",
+      "weight": 8.7,
+      "operators": [
+        "extract",
+        "monitor",
+        "summarize"
+      ]
+    }
+  ],
+  "queryExpansion": [
+    "yield",
+    "OEE",
+    "rework",
+    "scrap",
+    "downtime",
+    "work order completion",
+    "defect rate",
+    "MTTR"
+  ],
+  "strategies": [
+    {
+      "id": "mfg_strategy_yield_tieout",
+      "operators": [
+        "calculate",
+        "validate"
+      ],
+      "description": "Tie yield claims to planned quantity, produced quantity, and batch identifiers.",
+      "steps": [
+        "extract WO lines and material consumption",
+        "compute yield from planned vs produced with rejection exclusions",
+        "link to batch and date range",
+        "report assumptions and known unknowns"
+      ]
+    },
+    {
+      "id": "mfg_strategy_downtime_causal",
+      "operators": [
+        "evaluate",
+        "summarize",
+        "monitor"
+      ],
+      "description": "Classify downtime by root cause and identify capacity impact before throughput recommendation.",
+      "steps": [
+        "load downtime events and maintenance records",
+        "match causes and MTTR per asset",
+        "rank recurring causes",
+        "surface recommended actions if recurrent"
+      ]
+    }
+  ]
+}

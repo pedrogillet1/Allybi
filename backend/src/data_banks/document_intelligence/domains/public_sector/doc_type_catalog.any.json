@@ -1,0 +1,226 @@
+{
+  "_meta": {
+    "id": "di_public_sector_doc_type_catalog",
+    "version": "1.0.0",
+    "description": "Public sector document catalog for tenders, budgets, grants, and compliance audits.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/retrieval/domainIntentRouter.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/docint-eval-pack.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "public_sector"
+  },
+  "domain": "public_sector",
+  "docTypes": [
+    {
+      "id": "public_tender_notice",
+      "name": {
+        "en": "Tender Notice",
+        "pt": "Aviso de Licitação"
+      },
+      "description": "Public tender publication and award notice information.",
+      "detectionPatterns": [
+        "\\btender notice\\b",
+        "\\blicitação\\b",
+        "\\bchamada\\s+publica\\b",
+        "\\bedital\\b"
+      ],
+      "commonSections": [
+        "object",
+        "eligibility",
+        "evaluation",
+        "timeline",
+        "awarding authority",
+        "legal basis"
+      ],
+      "extractionPriority": 140
+    },
+    {
+      "id": "public_budget_allocation",
+      "name": {
+        "en": "Budget Allocation",
+        "pt": "Alocação Orçamentária"
+      },
+      "description": "Budget commitments, line items, and disbursement schedules.",
+      "detectionPatterns": [
+        "\\bbudget allocation\\b",
+        "\\ballocation\\b",
+        "\\boração orçamentária\\b",
+        "\\balocação\\b"
+      ],
+      "commonSections": [
+        "budget_line",
+        "total_budget",
+        "sub_allocation",
+        "disbursement",
+        "remaining"
+      ],
+      "extractionPriority": 138
+    },
+    {
+      "id": "public_procurement_plan",
+      "name": {
+        "en": "Procurement Plan",
+        "pt": "Plano de Compras Públicas"
+      },
+      "description": "Plan and execution roadmap for public contracting.",
+      "detectionPatterns": [
+        "\\bprocurement plan\\b",
+        "\\bplano de contratação\\b",
+        "\\bplanejamento de compras públicas\\b"
+      ],
+      "commonSections": [
+        "need_statement",
+        "market_approach",
+        "timeline",
+        "risk_map",
+        "controls"
+      ],
+      "extractionPriority": 137
+    },
+    {
+      "id": "public_audit_report",
+      "name": {
+        "en": "Audit Report",
+        "pt": "Relatório de Auditoria"
+      },
+      "description": "Audit findings, severity, and remediation requirements.",
+      "detectionPatterns": [
+        "\\baudit report\\b",
+        "\\bauditoria\\b",
+        "\\bhall report\\b",
+        "\\brelatório de fiscalização\\b"
+      ],
+      "commonSections": [
+        "findings",
+        "materiality",
+        "recommendation",
+        "management_reply",
+        "deadline"
+      ],
+      "extractionPriority": 136
+    },
+    {
+      "id": "public_grant_application",
+      "name": {
+        "en": "Grant Application",
+        "pt": "Pedido de Financiamento"
+      },
+      "description": "Grant or subsidy request with objective and deliverables.",
+      "detectionPatterns": [
+        "\\bgrant application\\b",
+        "\\bfunding request\\b",
+        "\\bchamado\\s+de\\s+projeto\\b",
+        "\\bsubvenção\\b"
+      ],
+      "commonSections": [
+        "project_goal",
+        "budget",
+        "deliverables",
+        "compliance_conditions",
+        "timeline"
+      ],
+      "extractionPriority": 135
+    },
+    {
+      "id": "public_grant_progress",
+      "name": {
+        "en": "Grant Progress Report",
+        "pt": "Relatório de Progresso de Subvenção"
+      },
+      "description": "Execution progress and condition compliance for public funding.",
+      "detectionPatterns": [
+        "\\bgrant progress\\b",
+        "\\bgrant report\\b",
+        "\\brelatório de execução\\b",
+        "\\brelatório de prestação\\b"
+      ],
+      "commonSections": [
+        "status",
+        "milestones",
+        "expenditure",
+        "compliance_status",
+        "deviations"
+      ],
+      "extractionPriority": 133
+    },
+    {
+      "id": "public_contract",
+      "name": {
+        "en": "Public Contract",
+        "pt": "Contrato Público"
+      },
+      "description": "Contract commitments and performance obligations for public entities.",
+      "detectionPatterns": [
+        "\\bpublic contract\\b",
+        "\\bcontrato público\\b",
+        "\\bcontrato administrativo\\b",
+        "\\bacordo de repasse\\b"
+      ],
+      "commonSections": [
+        "scope",
+        "parties",
+        "obligations",
+        "payment",
+        "penalties",
+        "oversight"
+      ],
+      "extractionPriority": 132
+    },
+    {
+      "id": "public_compliance_certificate",
+      "name": {
+        "en": "Compliance Certificate",
+        "pt": "Certificado de Conformidade"
+      },
+      "description": "Compliance certification and legal attestation documents.",
+      "detectionPatterns": [
+        "\\bcompliance certificate\\b",
+        "\\bcertificado de conformidade\\b",
+        "\\bcertidões\\b",
+        "\\bcomprovante de regularidade\\b"
+      ],
+      "commonSections": [
+        "scope",
+        "issuer",
+        "validity",
+        "conditions",
+        "reference_law"
+      ],
+      "extractionPriority": 131
+    },
+    {
+      "id": "public_service_report",
+      "name": {
+        "en": "Public Service Report",
+        "pt": "Relatório de Serviço Público"
+      },
+      "description": "Service delivery outcomes and civic performance tracking.",
+      "detectionPatterns": [
+        "\\bpublic service report\\b",
+        "\\brelatório de serviço\\b",
+        "\\bindicadores\\b",
+        "\\brelatório de gestão\\b"
+      ],
+      "commonSections": [
+        "service_coverage",
+        "beneficiary_impact",
+        "costs",
+        "issues",
+        "future_plan"
+      ],
+      "extractionPriority": 129
+    }
+  ]
+}

@@ -11,7 +11,7 @@
     "usedBy": [
       "services/chat/turnRoutePolicy.service.ts",
       "services/core/retrieval/retrievalEngine.service.ts",
-      "modules/chat/runtime/CentralizedChatRuntimeDelegate.ts"
+      "modules/chat/runtime/ChatTurnExecutor.ts"
     ],
     "tests": [
       "search_en_positive_1",

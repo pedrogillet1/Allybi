@@ -1,0 +1,81 @@
+{
+  "_meta": {
+    "id": "manufacturing_ambiguity_patterns",
+    "version": "1.0.0",
+    "description": "Manufacturing ambiguity patterns for batch boundaries, yield loss interpretation, and maintenance cause ambiguity.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/orchestration/ambiguityResolver.service.ts",
+      "services/core/repair/ambiguityRepair.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/ambiguity-domain.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "domain": "manufacturing",
+    "maxQuestions": 1,
+    "preferClarifyOverSpeculation": true
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "pre-calculation and before throughput/yield statements",
+    "consumer": "manufacturing ambiguity resolver",
+    "intent": "Avoid mixing batches, shifts, and unit definitions in one interpretation."
+  },
+  "patterns": [
+    {
+      "id": "MFG_AMB_001_batch_boundary",
+      "type": "batch_boundary_collision",
+      "trigger": "multiple_batches_in_query_scope_without_filter",
+      "askQuestion": "Should I compute metrics by all batches, only active batch, or a chosen batch ID?"
+    },
+    {
+      "id": "MFG_AMB_002_unit_scale_collision",
+      "type": "units_collision",
+      "trigger": "quantity_fields_mix_units",
+      "askQuestion": "Do you want conversion normalized to one unit, or native-unit comparison with unit labels preserved?"
+    },
+    {
+      "id": "MFG_AMB_003_defect_cause_unknown",
+      "type": "cause_missing",
+      "trigger": "defect_count_without_classification",
+      "askQuestion": "Do you want to treat unknown defects as process-related, material-related, or supplier-related by default?"
+    },
+    {
+      "id": "MFG_AMB_004_downtime_window",
+      "type": "time_window_collision",
+      "trigger": "downtime_events_cross_shifts",
+      "askQuestion": "Compare by shift, by equipment class, or by date window?"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "mfg_amb_batch_boundary_prompt",
+        "input": {
+          "scenario": "multi_batch_yield"
+        },
+        "expect": {
+          "action": "askQuestion",
+          "maxQuestions": 1
+        }
+      },
+      {
+        "id": "mfg_amb_unit_scale_prompt",
+        "input": {
+          "scenario": "unit_mix"
+        },
+        "expect": {
+          "mustAskContains": "unidade"
+        }
+      }
+    ]
+  }
+}

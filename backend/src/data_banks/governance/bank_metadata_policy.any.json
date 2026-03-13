@@ -1,0 +1,114 @@
+{
+  "_meta": {
+    "id": "governance_bank_metadata_policy",
+    "version": "1.0.0",
+    "description": "Canonical requirements for metadata consistency and deterministic bank identity.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "governance-team",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "strictSemver": true,
+    "deterministicSortEnabled": true
+  },
+  "requiredMeta": {
+    "id": {
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "maxLength": 80
+    },
+    "version": "semver",
+    "description": {
+      "minLength": 12,
+      "maxLength": 1000
+    },
+    "languages": {
+      "min": 1,
+      "max": 12
+    },
+    "lastUpdated": {
+      "required": true,
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+    },
+    "owner": {
+      "required": true,
+      "minLength": 4
+    },
+    "usedBy": {
+      "required": true,
+      "minItems": 1
+    },
+    "tests": {
+      "required": true,
+      "minItems": 1
+    },
+    "checksumHint": {
+      "requiredForGovernanceTier": [
+        "production",
+        "staging"
+      ]
+    }
+  },
+  "sortingAndDedupe": {
+    "sortBy": [
+      "category",
+      "path",
+      "id"
+    ],
+    "locale": "en-US",
+    "dedupeKeys": {
+      "bankId": true,
+      "path": true
+    },
+    "dedupePolicy": {
+      "keep": "highestVersion",
+      "tieBreaker": "mostRecentLastUpdated",
+      "actionOnConflict": "rejectAndListAllCollisions"
+    },
+    "lineBreakRule": "lf",
+    "jsonFormattingRule": "stable_key_order"
+  },
+  "requiredLintRules": [
+    "version_follows_semver",
+    "lastUpdated_present_and_valid",
+    "description_not_placeholder",
+    "owner_not_empty",
+    "usedBy_non_empty",
+    "tests_non_empty",
+    "path_not_duplicate",
+    "registry_id_match"
+  ],
+  "registrySync": {
+    "requiresMatchById": true,
+    "requiresMatchByPath": true,
+    "requiresSchemaId": "bank_schema",
+    "checksumGeneration": "sha256_at_checkout"
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "required_metadata_fields_present",
+        "input": {
+          "bank": "sample"
+        },
+        "expect": {
+          "meta.owner": "required",
+          "meta.usedBy": "required",
+          "meta.tests": "required",
+          "meta.version": "required"
+        }
+      }
+    ]
+  },
+  "runtimeUsageNotes": "Schema validators and bank ingestion tools should enforce this contract when onboarding new banks, regenerating checksums, and refreshing manifests."
+}

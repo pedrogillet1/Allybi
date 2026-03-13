@@ -1,0 +1,118 @@
+{
+  "_meta": {
+    "id": "di_commercial_real_estate_domain_writer",
+    "version": "1.0.0",
+    "description": "Commercial real estate writer profile for valuation-safe, tenant-accountable, and risk-aware responses.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/orchestration/answerPlanner.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/docint-eval-pack.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "domain": "commercial_real_estate",
+    "interpretationMode": "property_and_lease_bound"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "before final commercial real estate narrative",
+    "consumer": "commercial real estate domain writer",
+    "intent": "Keep finance and risk conclusions tied to explicit property-tenant-period slices."
+  },
+  "writingProfile": {
+    "audience": "property manager, acquisition team, investor",
+    "goal": "Translate data into defensible lease, vacancy, and valuation decisions.",
+    "allowedAnswerForms": [
+      "lease_health_readout",
+      "rent_roll_risk_summary",
+      "valuation_sensitivity_note",
+      "due_diligence_action_plan"
+    ],
+    "forbiddenAnswerForms": [
+      "portfolio summary with mixed property basis",
+      "valuation_without cap rate assumptions",
+      "occupancy claim without denominator"
+    ],
+    "docTypeAnchors": [
+      "cre_lease_agreement",
+      "cre_rent_roll",
+      "cre_appraisal_report",
+      "cre_due_diligence",
+      "cre_title_report",
+      "cre_inspection_report",
+      "cre_financial_model"
+    ],
+    "sectionPriority": [
+      "property profile",
+      "lease terms",
+      "rent roll",
+      "occupancy and risk",
+      "valuation inputs",
+      "title and encumbrances",
+      "capex plan",
+      "compliance and inspection"
+    ]
+  },
+  "interpretiveRules": [
+    {
+      "id": "CRE_WRITER_001_slice_first",
+      "description": "Every revenue or occupancy claim requires an explicit property, tenant, and period slice.",
+      "requiredFor": "calculate"
+    },
+    {
+      "id": "CRE_WRITER_002_risk_weighted",
+      "description": "Present high concentration and near-expiry risks before presenting averages."
+    },
+    {
+      "id": "CRE_WRITER_003_title_guard",
+      "description": "Report title/encumbrance position before asserting no legal blockers."
+    },
+    {
+      "id": "CRE_WRITER_004_assumption_disclosure",
+      "description": "Explicitly disclose valuation method and any adjustment assumptions."
+    },
+    {
+      "id": "CRE_WRITER_005_capex_accountability",
+      "description": "Any capex recommendation includes owner, budget window, and urgency."
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "cre_writer_requires_property_tenant",
+        "input": {
+          "query": "What is the monthly rent performance?"
+        },
+        "expect": {
+          "mustInclude": [
+            "property",
+            "tenant",
+            "period"
+          ]
+        }
+      },
+      {
+        "id": "cre_writer_requires_assumptions",
+        "input": {
+          "query": "What is the valuation estimate?"
+        },
+        "expect": {
+          "mustInclude": [
+            "cap rate",
+            "assumptions",
+            "method"
+          ]
+        }
+      }
+    ]
+  }
+}

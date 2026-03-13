@@ -33,8 +33,8 @@ import { ConversationNotFoundError } from "../../../services/prismaChat.service"
 import {
   resolveChatPreferredLanguage,
   type ChatLanguage,
-} from "../../../services/chat/chatLanguage.service";
-import { resolveGenericChatFailureMessage } from "../../../services/chat/chatMicrocopy.service";
+} from "../../../modules/chat/presentation/chatLanguage.service";
+import { resolveGenericChatFailureMessage } from "../../../modules/chat/presentation/chatMicrocopy.service";
 import {
   toChatFinalEvent,
   toChatHttpEnvelope,
@@ -139,6 +139,74 @@ const DEFAULT_STREAMING_CONFIG: LLMStreamingConfig = {
   markerHold: { enabled: false, flushAt: "final", maxBufferedMarkers: 0 },
 };
 
+type StreamLatencyTracker = {
+  requestStartedAt: number;
+  ackMs: number | null;
+  streamStarted: boolean;
+  streamStartedAt: number | null;
+  firstTokenReceived: boolean;
+  firstTokenMs: number | null;
+  firstUsefulContentMs: number | null;
+  streamEnded: boolean;
+  clientDisconnected: boolean;
+  wasAborted: boolean;
+  sseErrors: string[];
+  chunksSent: number;
+  streamDurationMs: number | null;
+  visibleText: string;
+};
+
+function createStreamLatencyTracker(
+  requestStartedAt: number,
+): StreamLatencyTracker {
+  return {
+    requestStartedAt,
+    ackMs: null,
+    streamStarted: false,
+    streamStartedAt: null,
+    firstTokenReceived: false,
+    firstTokenMs: null,
+    firstUsefulContentMs: null,
+    streamEnded: false,
+    clientDisconnected: false,
+    wasAborted: false,
+    sseErrors: [],
+    chunksSent: 0,
+    streamDurationMs: null,
+    visibleText: "",
+  };
+}
+
+function noteFirstUsefulContent(
+  telemetry: StreamLatencyTracker,
+  incomingText: string,
+): void {
+  if (telemetry.firstUsefulContentMs !== null) return;
+  telemetry.visibleText += incomingText;
+  const normalized = telemetry.visibleText.replace(/\s+/g, " ").trim();
+  const hasBullet = /(^|\n)\s*(?:[-*•]|\d+\.)\s+\S/m.test(
+    telemetry.visibleText,
+  );
+  const hasTableRow = /\|[^|\n]+\|[^|\n]+\|/.test(telemetry.visibleText);
+  if (normalized.length >= 120 || hasBullet || hasTableRow) {
+    telemetry.firstUsefulContentMs = Date.now() - telemetry.requestStartedAt;
+  }
+}
+
+function markStreamStarted(telemetry: StreamLatencyTracker): void {
+  if (telemetry.streamStarted) return;
+  telemetry.streamStarted = true;
+  telemetry.streamStartedAt = Date.now();
+}
+
+function markStreamEnded(telemetry: StreamLatencyTracker): void {
+  if (telemetry.streamEnded) return;
+  telemetry.streamEnded = true;
+  if (telemetry.streamStartedAt !== null) {
+    telemetry.streamDurationMs = Date.now() - telemetry.streamStartedAt;
+  }
+}
+
 /**
  * SSE StreamSink adapter: maps LLM StreamEvents to SSE data frames
  * the frontend expects (type: "delta", "error", etc.).
@@ -151,6 +219,7 @@ class SseStreamSink implements StreamSink {
   constructor(
     private res: Response,
     private language: ChatLanguage = "en",
+    private telemetry?: StreamLatencyTracker,
   ) {}
 
   private normalizeStage(raw: unknown): string {
@@ -175,6 +244,15 @@ class SseStreamSink implements StreamSink {
     if (ev === "delta") {
       const text = (event.data as StreamDelta).text;
       if (text) {
+        if (this.telemetry) {
+          this.telemetry.chunksSent += 1;
+          if (!this.telemetry.firstTokenReceived) {
+            this.telemetry.firstTokenReceived = true;
+            this.telemetry.firstTokenMs =
+              Date.now() - this.telemetry.requestStartedAt;
+          }
+          noteFirstUsefulContent(this.telemetry, text);
+        }
         this.res.write(`data: ${JSON.stringify({ type: "delta", text })}\n\n`);
       }
     } else if (ev === "meta") {
@@ -209,6 +287,10 @@ class SseStreamSink implements StreamSink {
         `data: ${JSON.stringify({ type: "worklog", ...(data || {}) })}\n\n`,
       );
     } else if (ev === "sources") {
+      if (this.telemetry && this.telemetry.firstUsefulContentMs === null) {
+        this.telemetry.firstUsefulContentMs =
+          Date.now() - this.telemetry.requestStartedAt;
+      }
       // Forward sources (from RAG integration) → frontend sources event
       const data = event.data as any;
       this.res.write(
@@ -227,6 +309,10 @@ class SseStreamSink implements StreamSink {
         `data: ${JSON.stringify({ type: "action", ...data })}\n\n`,
       );
     } else if (ev === "listing") {
+      if (this.telemetry && this.telemetry.firstUsefulContentMs === null) {
+        this.telemetry.firstUsefulContentMs =
+          Date.now() - this.telemetry.requestStartedAt;
+      }
       // Forward structured file/folder listing → frontend listing event (with optional breadcrumb)
       const data = event.data as any;
       this.res.write(
@@ -234,6 +320,9 @@ class SseStreamSink implements StreamSink {
       );
     } else if (ev === "error") {
       const data = event.data as any;
+      if (this.telemetry && data?.message) {
+        this.telemetry.sseErrors.push(String(data.message).slice(0, 240));
+      }
       const safeMessage =
         resolveGenericChatFailureMessage(
           this.language,
@@ -251,6 +340,9 @@ class SseStreamSink implements StreamSink {
 
   close(): void {
     this._open = false;
+    if (this.telemetry) {
+      markStreamEnded(this.telemetry);
+    }
     // Do NOT end the response — the route handler does that after sending final
   }
 
@@ -274,6 +366,7 @@ router.post(
   authorizeChat,
   rateLimitMiddleware,
   async (req: Request, res: Response): Promise<void> => {
+    const requestStartedAt = Date.now();
     const userId = getUserId(req);
     if (!userId) {
       res.status(401).json({ error: "Not authenticated" });
@@ -305,6 +398,8 @@ router.post(
       ...(rawMeta || {}),
       viewerMode: false,
     };
+    const streamTelemetry = createStreamLatencyTracker(requestStartedAt);
+    meta.streamTelemetry = streamTelemetry;
     attachRequestIdToMeta(req, meta);
     // Never trust viewer-only context on the normal chat endpoint.
     delete (meta as any).viewerContext;
@@ -326,6 +421,16 @@ router.post(
     if (sseTraceId) sseHeaders["x-trace-id"] = sseTraceId;
     res.writeHead(200, sseHeaders);
     res.flushHeaders();
+    markStreamStarted(streamTelemetry);
+    res.write(`data: ${JSON.stringify({ type: "chat_start" })}\n\n`);
+    streamTelemetry.ackMs = Date.now() - requestStartedAt;
+    res.on("close", () => {
+      if (!res.writableEnded) {
+        streamTelemetry.clientDisconnected = true;
+        streamTelemetry.wasAborted = true;
+        markStreamEnded(streamTelemetry);
+      }
+    });
 
     try {
       const isViewerMode = Boolean((meta as any)?.viewerMode);
@@ -340,7 +445,7 @@ router.post(
       const chat = getChatService(req);
 
       // Create SSE sink
-      const sink = new SseStreamSink(res, preferredLanguage);
+      const sink = new SseStreamSink(res, preferredLanguage, streamTelemetry);
 
       // SSE keepalive: send a comment every 15s to prevent proxies/browsers
       // from closing the connection during long operations (e.g. slide generation).
@@ -386,6 +491,7 @@ router.post(
         res.write(`data: ${JSON.stringify(toChatFinalEvent(result))}\n\n`);
       }
     } catch (e: any) {
+      streamTelemetry.sseErrors.push(String(e?.message || "stream_route_error"));
       if (isConversationNotFoundError(e)) {
         if (!res.writableEnded) {
           res.write(
@@ -420,6 +526,7 @@ router.post(
         );
       }
     } finally {
+      markStreamEnded(streamTelemetry);
       if (!res.writableEnded) {
         res.write(`data: ${JSON.stringify({ type: "done" })}\n\n`);
         res.end();
@@ -860,6 +967,7 @@ router.post(
   authorizeChat,
   rateLimitMiddleware,
   async (req: Request, res: Response): Promise<void> => {
+    const requestStartedAt = Date.now();
     const userId = getUserId(req);
     if (!userId) {
       res.status(401).json({ error: "Not authenticated" });
@@ -878,6 +986,8 @@ router.post(
       ...(rawMeta || {}),
       viewerMode: false,
     };
+    const streamTelemetry = createStreamLatencyTracker(requestStartedAt);
+    meta.streamTelemetry = streamTelemetry;
     attachRequestIdToMeta(req, meta);
     delete (meta as any).viewerContext;
     delete (meta as any).viewerSelection;
@@ -898,15 +1008,25 @@ router.post(
       const adaptiveTraceId = String(meta.requestId || meta.httpRequestId || "").trim();
       if (adaptiveTraceId) res.setHeader("x-trace-id", adaptiveTraceId);
 
+      markStreamStarted(streamTelemetry);
+      res.write(`data: ${JSON.stringify({ type: "chat_start" })}\n\n`);
+      streamTelemetry.ackMs = Date.now() - requestStartedAt;
       res.write(
         `data: ${JSON.stringify({ type: "connected", conversationId })}\n\n`,
       );
+      res.on("close", () => {
+        if (!res.writableEnded) {
+          streamTelemetry.clientDisconnected = true;
+          streamTelemetry.wasAborted = true;
+          markStreamEnded(streamTelemetry);
+        }
+      });
 
       const preferredLanguage = resolvePreferredLanguage(
         req.body?.language,
         message,
       );
-      const sink = new SseStreamSink(res, preferredLanguage);
+      const sink = new SseStreamSink(res, preferredLanguage, streamTelemetry);
 
       // SSE keepalive for long operations (e.g. slide generation)
       const heartbeat = setInterval(() => {
@@ -938,8 +1058,10 @@ router.post(
         res.write(`data: ${JSON.stringify({ type: "done" })}\n\n`);
       }
 
+      markStreamEnded(streamTelemetry);
       res.end();
     } catch (e: any) {
+      streamTelemetry.sseErrors.push(String(e?.message || "adaptive_stream_error"));
       if (isConversationNotFoundError(e)) {
         if (!res.headersSent) {
           res.status(404).json({
@@ -950,6 +1072,7 @@ router.post(
           res.write(
             `data: ${JSON.stringify({ type: "error", message: "Conversation not found" })}\n\n`,
           );
+          markStreamEnded(streamTelemetry);
           res.end();
         }
         return;
@@ -965,6 +1088,7 @@ router.post(
         res.write(
           `data: ${JSON.stringify({ type: "error", message: resolveGenericChatFailureMessage(preferredLanguage, "adaptive_stream_route_error") })}\n\n`,
         );
+        markStreamEnded(streamTelemetry);
         res.end();
       }
     }
@@ -1030,7 +1154,7 @@ router.delete(
       const graceCutoff = new Date(Date.now() - 60_000);
 
       const emptyConvos = await (
-        await import("../../../platform/db/prismaClient")
+        await import("../../../config/database")
       ).default.conversation.findMany({
         where: {
           userId,
@@ -1043,7 +1167,7 @@ router.delete(
 
       if (emptyConvos.length > 0) {
         await (
-          await import("../../../platform/db/prismaClient")
+          await import("../../../config/database")
         ).default.conversation.updateMany({
           where: { id: { in: emptyConvos.map((c: any) => c.id) } },
           data: { isDeleted: true, deletedAt: new Date() },

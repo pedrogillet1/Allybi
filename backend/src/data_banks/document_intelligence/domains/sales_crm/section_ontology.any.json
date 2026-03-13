@@ -1,0 +1,146 @@
+{
+  "_meta": {
+    "id": "di_sales_crm_section_ontology",
+    "version": "1.0.0",
+    "description": "CRM section ontology for opportunity, pricing, and retention reasoning.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/orchestration/sectionResolver.service.ts",
+      "services/core/orchestration/answerPlanner.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/section-detection.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "sales_crm"
+  },
+  "domain": "sales_crm",
+  "sections": [
+    {
+      "id": "crm_section_account_summary",
+      "name": {
+        "en": "Account Summary",
+        "pt": "Resumo da Conta"
+      },
+      "aliases": [
+        "customer",
+        "account",
+        "perfil do cliente"
+      ],
+      "canonicalPurpose": "Anchor for ownership, geography, and segment context."
+    },
+    {
+      "id": "crm_section_funnel_position",
+      "name": {
+        "en": "Funnel Position",
+        "pt": "Posição no Funil"
+      },
+      "aliases": [
+        "stage",
+        "pipeline stage",
+        "etapa"
+      ],
+      "canonicalPurpose": "Represents progress and conversion probability."
+    },
+    {
+      "id": "crm_section_pricing_matrix",
+      "name": {
+        "en": "Pricing Matrix",
+        "pt": "Matriz de Preços"
+      },
+      "aliases": [
+        "quote table",
+        "preço",
+        "margem"
+      ],
+      "canonicalPurpose": "Captures unit price, discount, approval limit, and commercial terms."
+    },
+    {
+      "id": "crm_section_risk_register",
+      "name": {
+        "en": "CRM Risk Register",
+        "pt": "Registro de Riscos Comerciais"
+      },
+      "aliases": [
+        "risk",
+        "churn drivers",
+        "risk factors"
+      ],
+      "canonicalPurpose": "Classifies risk factors and mitigations."
+    },
+    {
+      "id": "crm_section_activity_log",
+      "name": {
+        "en": "Activity Log",
+        "pt": "Histórico de Atividades"
+      },
+      "aliases": [
+        "tasks",
+        "notes",
+        "follow-ups"
+      ],
+      "canonicalPurpose": "Supports timing and ownership of account actions."
+    },
+    {
+      "id": "crm_section_winloss",
+      "name": {
+        "en": "Win/Loss Notes",
+        "pt": "Notas de Ganho/Perda"
+      },
+      "aliases": [
+        "win reasons",
+        "loss reasons",
+        "motivos"
+      ],
+      "canonicalPurpose": "Separates why deals converted or were lost."
+    },
+    {
+      "id": "crm_section_renewal_path",
+      "name": {
+        "en": "Renewal Path",
+        "pt": "Rota de Renovação"
+      },
+      "aliases": [
+        "renewal",
+        "retention plan",
+        "renovação"
+      ],
+      "canonicalPurpose": "Defines expiry, risk, and renewal actions."
+    }
+  ],
+  "sectionAliases": {
+    "pipeline": [
+      "pipeline",
+      "funil",
+      "sales funnel"
+    ],
+    "close_date": [
+      "expected close",
+      "data prevista",
+      "fechamento"
+    ],
+    "owner": [
+      "account owner",
+      "owner",
+      "proprietário"
+    ]
+  },
+  "runtimeHints": {
+    "priorityOrder": [
+      "crm_section_account_summary",
+      "crm_section_funnel_position",
+      "crm_section_pricing_matrix",
+      "crm_section_activity_log",
+      "crm_section_risk_register",
+      "crm_section_renewal_path",
+      "crm_section_winloss"
+    ]
+  }
+}

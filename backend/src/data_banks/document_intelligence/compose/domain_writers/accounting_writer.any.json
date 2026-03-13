@@ -1,0 +1,88 @@
+{
+  "_meta": {
+    "id": "domain_writer_accounting",
+    "version": "1.0.0",
+    "description": "Accounting writer overlay for reconciliation and control-heavy answers. Prioritizes balance, tie-out, control failure, and source lineage language.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "composition-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "accounting",
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "domain writer overlay",
+    "consumer": "composition layer",
+    "intent": "Make accounting answers read like reconciliations rather than generic finance summaries."
+  },
+  "preferences": {
+    "prefer": [
+      "reconciliation_status",
+      "tie_out_language",
+      "control_gap_if_present"
+    ],
+    "avoid": [
+      "hand_wavy_variance_statements",
+      "missing_source_lineage"
+    ]
+  },
+  "structures": [
+    {
+      "id": "accounting_reconciliation_readout",
+      "sequence": [
+        "tie_out_status",
+        "variance_if_any",
+        "source_lineage"
+      ]
+    },
+    {
+      "id": "accounting_control_readout",
+      "sequence": [
+        "control_signal",
+        "affected_balance_or_process",
+        "followup_action"
+      ]
+    }
+  ],
+  "phrasingSignals": {
+    "en": [
+      "The balances tie out at {{status}}.",
+      "The remaining variance is {{variance}}.",
+      "The source trail runs from {{sourceA}} to {{sourceB}}."
+    ],
+    "pt": [
+      "Os saldos batem com status {{status}}.",
+      "A variacao restante e {{variance}}.",
+      "A trilha de origem vai de {{sourceA}} para {{sourceB}}."
+    ]
+  },
+  "guardrails": [
+    "Do not say reconciled if a material unexplained variance remains.",
+    "Do not describe a control gap without naming the affected process or balance.",
+    "Do not omit the source lineage when the conclusion depends on a tie-out."
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "accounting_writer_prefers_tie_out",
+        "expect": {
+          "prefer": "tie_out_language"
+        }
+      }
+    ]
+  }
+}

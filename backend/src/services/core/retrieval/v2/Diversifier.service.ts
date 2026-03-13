@@ -80,7 +80,7 @@ export function applyDiversification(
   signals: RetrievalRequest["signals"],
   diversificationBank: Record<string, any> | null,
 ): CandidateChunk[] {
-  if (!diversificationBank?.config?.enabled) return candidates;
+  if (diversificationBank?.config?.enabled === false) return candidates;
 
   // Disable diversification when explicit lock or single doc intent (bank policy)
   const explicitDocLock = Boolean(signals.explicitDocLock);
@@ -90,23 +90,21 @@ export function applyDiversification(
     return dedupeNearDuplicates(candidates, 3, 280);
   }
 
+  const thresholds = diversificationBank?.config?.actionsContract?.thresholds;
   const maxPerDocHard = safeNumber(
-    diversificationBank.config.actionsContract?.thresholds?.maxPerDocHard,
+    thresholds?.maxPerDocHard,
     10,
   );
   const maxTotalHard = safeNumber(
-    diversificationBank.config.actionsContract?.thresholds
-      ?.maxTotalChunksHard,
+    thresholds?.maxTotalChunksHard,
     36,
   );
   const maxNearDupPerDoc = safeNumber(
-    diversificationBank.config.actionsContract?.thresholds
-      ?.maxNearDuplicatesPerDoc,
+    thresholds?.maxNearDuplicatesPerDoc,
     3,
   );
   const windowChars = safeNumber(
-    diversificationBank.config.actionsContract?.thresholds
-      ?.nearDuplicateWindowChars,
+    thresholds?.nearDuplicateWindowChars,
     280,
   );
 

@@ -1,0 +1,94 @@
+{
+  "_meta": {
+    "id": "di_compliance_regulatory_ambiguity_patterns",
+    "version": "1.0.0",
+    "description": "Compliance ambiguity patterns for evidence ownership, severity scales, control scope, and legal references.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/orchestration/ambiguityResolver.service.ts",
+      "services/core/repair/ambiguityRepair.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/ambiguity-domain.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "maxQuestions": 1,
+    "preferClarifyOverSpeculation": true,
+    "domain": "compliance_regulatory"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "after retrieval and before compliance risk synthesis",
+    "consumer": "compliance ambiguity layer",
+    "intent": "Resolve control ID scope, severity normalization, and legal anchoring before claims."
+  },
+  "patterns": [
+    {
+      "id": "COMP_AMB_001_multiple_control_ids",
+      "type": "control_id_collision",
+      "trigger": "same_finding_referenced_by_multiple_control_ids",
+      "askQuestion": "Should the query focus on one control id at a time, or compare controls side-by-side with a matrix?"
+    },
+    {
+      "id": "COMP_AMB_002_severity_scale_mix",
+      "type": "severity_scale_mismatch",
+      "trigger": "severity_terms_without_scale_definition",
+      "askQuestion": "Use regulator severity scale, internal audit scale, or executive risk scale for this comparison?"
+    },
+    {
+      "id": "COMP_AMB_003_remediation_owner_missing",
+      "type": "owner_collision",
+      "trigger": "finding_has_multiple_possible_owners",
+      "askQuestion": "Which owner should be treated as accountable versus technical backup?"
+    },
+    {
+      "id": "COMP_AMB_004_deadline_conflict",
+      "type": "due_date_collision",
+      "trigger": "multiple_deadlines_present_without_clear_primary",
+      "askQuestion": "Should deadlines be interpreted as reporting date, correction date, or closure date?"
+    },
+    {
+      "id": "COMP_AMB_005_law_reference_overlap",
+      "type": "legal_reference_collision",
+      "trigger": "multiple_law_references_with_similar_names",
+      "askQuestion": "Use the most recent law version, the one cited by auditors, or all versions with a precedence matrix?"
+    },
+    {
+      "id": "COMP_AMB_006_exception_scope",
+      "type": "exception_scope_collision",
+      "trigger": "exception_request_without_clear_expiry",
+      "askQuestion": "Should the exception be treated as temporary, project-based, or conditional on mitigation completion?"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "comp_amb_control_collision_asks_one",
+        "input": {
+          "scenario": "same_finding_referenced_by_multiple_control_ids"
+        },
+        "expect": {
+          "action": "askQuestion",
+          "maxQuestions": 1
+        }
+      },
+      {
+        "id": "comp_amb_severity_scale_asks_preferred",
+        "input": {
+          "scenario": "severity_terms_without_scale_definition"
+        },
+        "expect": {
+          "action": "askQuestion",
+          "mustAskContains": "scale"
+        }
+      }
+    ]
+  }
+}

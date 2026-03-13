@@ -1,8 +1,8 @@
 {
   "_meta": {
     "id": "quality_gates",
-    "version": "3.1.0",
-    "description": "Post-generation verification gates for Koda answers. Guarantees: (1) never answer from the wrong doc when explicit docRef exists, (2) nav_pills responses stay UI-safe, (3) block malformed/truncated numbers, (4) enforce markdown sanity, (5) reduce repetition and banned phrases, (6) keep output privacy-safe. Designed to be deterministic and explainable.",
+    "version": "3.2.0",
+    "description": "Post-generation verification gates for Koda answers. Guarantees: (1) never answer from the wrong doc when explicit docRef exists, (2) nav_pills responses stay UI-safe, (3) block malformed/truncated numbers, (4) enforce markdown sanity, (5) catch robotic, repetitive, confidence-mismatched style drift, and (6) keep output privacy-safe. Designed to be deterministic and explainable.",
     "languages": [
       "any"
     ],
@@ -63,7 +63,9 @@
     },
     "integrationHooks": {
       "dedupeBankId": "dedupe_and_repetition",
-      "piiLabelsBankId": "pii_field_labels"
+      "piiLabelsBankId": "pii_field_labels",
+      "antiRoboticBankId": "anti_robotic_style_rules",
+      "cannedEmpathyBankId": "eval_style_canned_empathy"
     },
     "debugHooks": {
       "emitGateTrace": false,
@@ -78,6 +80,13 @@
       "nav_pills_enforcement": "warn",
       "numeric_integrity": "warn",
       "repetition_and_banned_phrases": "warn",
+      "style_contract": "block",
+      "style_opener_naturalness": "block",
+      "style_empathy_authenticity": "block",
+      "style_repetition_control": "block",
+      "style_confidence_alignment": "block",
+      "style_domain_voice_match": "block",
+      "style_conversational_flow": "block",
       "privacy_minimal": "block",
       "final_consistency": "warn",
       "markdown_sanity": "warn",
@@ -91,6 +100,12 @@
     "numeric_integrity",
     "markdown_sanity",
     "repetition_and_banned_phrases",
+    "style_opener_naturalness",
+    "style_empathy_authenticity",
+    "style_repetition_control",
+    "style_confidence_alignment",
+    "style_domain_voice_match",
+    "style_conversational_flow",
     "privacy_minimal",
     "final_consistency"
   ],

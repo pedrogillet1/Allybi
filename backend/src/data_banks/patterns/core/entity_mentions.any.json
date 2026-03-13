@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "bankId": "entity_mentions",
+    "bankId": "patterns_core_entity_mentions",
     "version": "1.0.0",
     "owner": "pattern-core-curator",
     "languages": [

@@ -14,37 +14,45 @@ import {
   folderUpdateSchema,
   folderMoveSchema,
 } from "../../../schemas/request.schemas";
-import prisma from "../../../platform/db/prismaClient";
+import prisma from "../../../config/database";
 import { logger } from "../../../utils/logger";
 import AdmZip from "adm-zip";
 import { downloadFile } from "../../../config/storage";
 import { hkdf32 } from "../../../services/security/hkdf.service";
-import { getFieldEncryption } from "../../../services/security/fieldEncryption.service";
+import type { FolderKeyService } from "../../../services/folders/folderKey.service";
+import type { FolderCryptoService } from "../../../services/folders/folderCrypto.service";
 
 const router = Router();
 
-/**
- * Helper: encrypt folder name if KODA_MASTER_KEY_BASE64 is set.
- * Returns { name, nameEncrypted } for the Prisma data payload.
- */
-function encryptFolderName(
+type FolderEncryptionServices = {
+  folderKeys: FolderKeyService;
+  crypto: FolderCryptoService;
+};
+
+function getFolderEncryptionServices(req: any): FolderEncryptionServices | null {
+  const services = req.app?.locals?.services?.encryptedFolders;
+  if (!services?.folderKeys || !services?.crypto) return null;
+  return services as FolderEncryptionServices;
+}
+
+async function encryptFolderPayload(
+  req: any,
   plainName: string,
   userId: string,
   folderId: string,
-): { name: string | null; nameEncrypted: string | null } {
-  if (!process.env.KODA_MASTER_KEY_BASE64) {
+): Promise<{ name: string | null; nameEncrypted: string | null }> {
+  const services = getFolderEncryptionServices(req);
+  if (!services) {
     return { name: plainName, nameEncrypted: null };
   }
   try {
-    const fe = getFieldEncryption();
-    const enc = fe.encryptField(plainName, {
-      userId,
-      entityId: folderId,
-      field: "name",
-    });
-    return { name: null, nameEncrypted: enc };
+    const fk = await services.folderKeys.getFolderKey(userId, folderId);
+    return {
+      name: null,
+      nameEncrypted: services.crypto.encryptName(userId, folderId, plainName, fk),
+    };
   } catch (err) {
-    logger.warn("[Folders] Field encryption failed, storing plaintext", {
+    logger.warn("[Folders] Folder-name encryption failed, storing plaintext", {
       error: err instanceof Error ? err.message : String(err),
     });
     return { name: plainName, nameEncrypted: null };
@@ -115,18 +123,20 @@ router.post(
           resolvedParentId = folderMap[entry.parentPath];
         }
 
+        const shouldEncrypt = !!getFolderEncryptionServices(req);
         const folder = await prisma.folder.create({
           data: {
             userId,
-            name: entry.name, // Placeholder; encrypted below
+            name: shouldEncrypt ? null : entry.name,
+            nameEncrypted: shouldEncrypt ? "" : null,
             emoji: defaultEmoji,
             parentFolderId: resolvedParentId,
             path: entry.path || entry.name,
           },
         });
 
-        // Encrypt folder name after creation (needs folderId for AAD)
-        const { name: encName, nameEncrypted } = encryptFolderName(
+        const { name: encName, nameEncrypted } = await encryptFolderPayload(
+          req,
           entry.name,
           userId,
           folder.id,
@@ -185,18 +195,20 @@ router.post(
     }
 
     try {
+      const shouldEncrypt = !!getFolderEncryptionServices(req);
       const folder = await prisma.folder.create({
         data: {
           userId,
-          name: name.trim(), // Placeholder; encrypted below
+          name: shouldEncrypt ? null : name.trim(),
+          nameEncrypted: shouldEncrypt ? "" : null,
           emoji: emoji || null,
           parentFolderId,
         },
         include: { _count: { select: { documents: true, subfolders: true } } },
       });
 
-      // Encrypt folder name after creation (needs folderId for AAD)
-      const { name: encName, nameEncrypted } = encryptFolderName(
+      const { name: encName, nameEncrypted } = await encryptFolderPayload(
+        req,
         name.trim(),
         userId,
         folder.id,
@@ -206,8 +218,9 @@ router.post(
           where: { id: folder.id },
           data: { name: encName, nameEncrypted },
         });
-        folder.name = null;
       }
+      folder.name = name.trim();
+      folder.nameEncrypted = nameEncrypted;
 
       res.status(201).json({ ok: true, data: folder });
     } catch (e: any) {
@@ -313,8 +326,8 @@ router.patch(
 
       const updateData: any = {};
       if (name) {
-        // Encrypt folder name if encryption is configured
-        const { name: encName, nameEncrypted } = encryptFolderName(
+        const { name: encName, nameEncrypted } = await encryptFolderPayload(
+          req,
           name.trim(),
           userId,
           folderId,
@@ -330,6 +343,9 @@ router.patch(
         data: updateData,
         include: { _count: { select: { documents: true, subfolders: true } } },
       });
+      if (name) {
+        folder.name = name.trim();
+      }
 
       res.json({ ok: true, data: folder });
     } catch (e: any) {

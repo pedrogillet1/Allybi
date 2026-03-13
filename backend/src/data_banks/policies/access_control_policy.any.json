@@ -125,6 +125,30 @@
         "expect": {
           "action": "allow"
         }
+      },
+      {
+        "id": "ACP_T_003_duplicate_deny",
+        "runtime": {
+          "signals": {
+            "role": "member",
+            "action": "rotate_secret"
+          }
+        },
+        "expect": {
+          "action": "deny"
+        }
+      },
+      {
+        "id": "ACP_T_004_duplicate_allow",
+        "runtime": {
+          "signals": {
+            "role": "admin",
+            "action": "rotate_secret"
+          }
+        },
+        "expect": {
+          "action": "allow"
+        }
       }
     ]
   }

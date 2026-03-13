@@ -21,6 +21,7 @@ function loadPromptBanks() {
     "llm_global_guards",
     "rag_policy",
     "task_answer_with_sources",
+    "compose_style_contract",
     "task_plan_generation",
     "editing_task_prompts",
     "policy_citations",
@@ -230,11 +231,14 @@ describe("Certification: control plane ownership", () => {
     const clarificationSource = readFile(
       "src/services/core/policy/clarificationPolicy.service.ts",
     );
+    const compliancePhraseResolverSource = readFile(
+      "src/services/core/policy/compliancePhraseResolver.service.ts",
+    );
     const complianceBank = readFile(
       "src/data_banks/policies/compliance_policy.any.json",
     );
     const runtimeSource = readFile(
-      "src/modules/chat/runtime/CentralizedChatRuntimeDelegate.ts",
+      "src/modules/chat/runtime/ChatTurnExecutor.ts",
     );
 
     expect(readFile("src/services/core/policy/policyDecision.ts")).toContain(
@@ -243,7 +247,9 @@ describe("Certification: control plane ownership", () => {
     expect(refusalSource).not.toContain("buildUserFacingText(");
     expect(complianceSource).not.toContain("userMessage");
     expect(complianceBank).not.toContain("userMessage");
-    expect(runtimeSource).toContain("CompliancePhraseResolverService");
+    expect(compliancePhraseResolverSource).toContain(
+      "CompliancePhraseResolverService",
+    );
     expect(runtimeSource).not.toContain(
       "I need explicit consent before continuing with this request.",
     );
@@ -273,9 +279,6 @@ describe("Certification: control plane ownership", () => {
     const scopeServiceSource = readFile(
       "src/modules/chat/runtime/ScopeService.ts",
     );
-    const scopeInterpreterSource = readFile(
-      "src/modules/chat/runtime/scopeIntentInterpreter.ts",
-    );
     const runtimePolicyErrorSource = readFile(
       "src/modules/chat/runtime/runtimePolicyError.ts",
     );
@@ -284,8 +287,7 @@ describe("Certification: control plane ownership", () => {
     );
 
     expect(scopeServiceSource).not.toContain("getBankLoaderInstance");
-    expect(scopeServiceSource).not.toContain("shouldClearScope(");
-    expect(scopeInterpreterSource).toContain("shouldClearScope(");
+    expect(scopeServiceSource).toContain("shouldClearScope(");
     expect(runtimePolicyErrorSource).not.toContain("message.includes(");
     expect(legacyFallbackSource).toContain("message.includes(");
   });

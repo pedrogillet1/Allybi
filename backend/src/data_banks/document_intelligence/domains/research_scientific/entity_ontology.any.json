@@ -1,0 +1,127 @@
+{
+  "_meta": {
+    "id": "di_research_scientific_entity_ontology",
+    "version": "1.0.0",
+    "description": "Research entity ontology for hypotheses, endpoints, statistics, and reproducibility markers.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/orchestration/entityResolver.service.ts",
+      "services/core/validation/claimValidator.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/domain-validation.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "research_scientific",
+    "entityNormalization": "strict"
+  },
+  "domain": "research_scientific",
+  "entities": [
+    {
+      "id": "rs_entity_study_id",
+      "label": {
+        "en": "Study ID",
+        "pt": "ID do Estudo"
+      },
+      "aliases": [
+        "study id",
+        "trial id",
+        "protocol number"
+      ],
+      "mustMatchWithinDocument": true
+    },
+    {
+      "id": "rs_entity_cohort",
+      "label": {
+        "en": "Cohort",
+        "pt": "Coorte"
+      },
+      "aliases": [
+        "arm",
+        "group",
+        "cohort"
+      ],
+      "requiredContextForComparisons": true
+    },
+    {
+      "id": "rs_entity_endpoint",
+      "label": {
+        "en": "Endpoint",
+        "pt": "Desfecho"
+      },
+      "aliases": [
+        "primary endpoint",
+        "secondary endpoint",
+        "endpoint"
+      ],
+      "requiresDefinition": true
+    },
+    {
+      "id": "rs_entity_sample_size",
+      "label": {
+        "en": "Sample Size",
+        "pt": "Tamanho da Amostra"
+      },
+      "aliases": [
+        "n",
+        "sample n",
+        "n final"
+      ],
+      "requiresNumericConfidence": true
+    },
+    {
+      "id": "rs_entity_p_value",
+      "label": {
+        "en": "p-Value",
+        "pt": "Valor de p"
+      },
+      "aliases": [
+        "p value",
+        "significance"
+      ],
+      "requiresPrecision": 0.0001
+    },
+    {
+      "id": "rs_entity_effect_size",
+      "label": {
+        "en": "Effect Size",
+        "pt": "Tamanho do Efeito"
+      },
+      "aliases": [
+        "effect",
+        "delta",
+        "hazard ratio"
+      ],
+      "requiresCIWhenPossible": true
+    },
+    {
+      "id": "rs_entity_power",
+      "label": {
+        "en": "Power",
+        "pt": "Poder Estatístico"
+      },
+      "aliases": [
+        "power",
+        "1-beta",
+        "capacidade estatística"
+      ],
+      "requiresMethodContext": true
+    }
+  ],
+  "normalization": {
+    "trimWhitespace": true,
+    "caseFold": true,
+    "aliasPriority": [
+      "study id",
+      "endpoint",
+      "cohort"
+    ]
+  }
+}

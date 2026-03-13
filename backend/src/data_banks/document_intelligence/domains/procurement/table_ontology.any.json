@@ -1,0 +1,146 @@
+{
+  "_meta": {
+    "id": "di_procurement_table_ontology",
+    "version": "1.0.0",
+    "description": "Procurement table ontology for bid comparison, order tracking, and supplier performance evidence.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/orchestration/tableResolver.service.ts",
+      "services/core/extraction/tableExtraction.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/domain-validation.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "procurement",
+    "axisConfidenceThreshold": 0.68,
+    "allowNestedTables": true
+  },
+  "domain": "procurement",
+  "tableTypes": [
+    {
+      "id": "proc_table_bid_comparison",
+      "name": {
+        "en": "Bid Comparison Table",
+        "pt": "Tabela de Comparação de Propostas"
+      },
+      "aliases": [
+        "bid table",
+        "comparativo de propostas",
+        "matriz de preços"
+      ],
+      "columns": [
+        "vendor",
+        "price",
+        "term",
+        "score",
+        "validity",
+        "delivery"
+      ],
+      "rowPatterns": [
+        "\\bvendor\\b",
+        "\\bprice\\b",
+        "\\bsupplier\\b",
+        "\\bpontuação\\b"
+      ],
+      "quality": {
+        "requiresNumericHeaders": [
+          "price",
+          "score"
+        ],
+        "riskIfMissing": "medium"
+      }
+    },
+    {
+      "id": "proc_table_line_items",
+      "name": {
+        "en": "Line Item Schedule",
+        "pt": "Cronograma de Itens"
+      },
+      "aliases": [
+        "po lines",
+        "item schedule",
+        "itens do pedido"
+      ],
+      "columns": [
+        "line_id",
+        "sku",
+        "description",
+        "quantity",
+        "unit_price",
+        "currency",
+        "delivery_date"
+      ],
+      "rowPatterns": [
+        "\\bitem\\b",
+        "\\bquantity\\b",
+        "\\bquantity unit\\b"
+      ],
+      "quality": {
+        "requiresNumericHeaders": [
+          "quantity",
+          "unit_price"
+        ],
+        "riskIfMissing": "high"
+      }
+    },
+    {
+      "id": "proc_table_contract_milestones",
+      "name": {
+        "en": "Contract Milestones",
+        "pt": "Marcos Contratuais"
+      },
+      "aliases": [
+        "milestones",
+        "cronograma",
+        "etapas contratuais"
+      ],
+      "columns": [
+        "milestone",
+        "owner",
+        "due_date",
+        "status",
+        "evidence"
+      ],
+      "quality": {
+        "requiresDateColumns": [
+          "due_date"
+        ],
+        "riskIfMissing": "high"
+      }
+    },
+    {
+      "id": "proc_table_invoice_recon",
+      "name": {
+        "en": "Invoice Reconciliation Table",
+        "pt": "Tabela de Conciliação de Fatura"
+      },
+      "aliases": [
+        "invoice matching",
+        "conferencia de nota",
+        "discrepancy table"
+      ],
+      "columns": [
+        "po_reference",
+        "invoice_reference",
+        "received_qty",
+        "invoiced_qty",
+        "variance",
+        "resolution_status"
+      ],
+      "quality": {
+        "requiresVarianceColumns": [
+          "variance"
+        ],
+        "riskIfMissing": "critical"
+      }
+    }
+  ]
+}

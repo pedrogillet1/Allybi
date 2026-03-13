@@ -1,0 +1,168 @@
+{
+  "_meta": {
+    "id": "di_public_sector_table_ontology",
+    "version": "1.0.0",
+    "description": "Public sector table ontology for budget, compliance, and grant execution reconciliation.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/orchestration/tableResolver.service.ts",
+      "services/core/extraction/tableExtraction.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/domain-validation.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "public_sector",
+    "axisConfidenceThreshold": 0.67,
+    "allowNestedTables": true
+  },
+  "domain": "public_sector",
+  "tableTypes": [
+    {
+      "id": "gov_table_budget_grid",
+      "name": {
+        "en": "Budget Grid",
+        "pt": "Grade Orçamentária"
+      },
+      "aliases": [
+        "budget allocation",
+        "budget table",
+        "orçamento"
+      ],
+      "columns": [
+        "fiscal_year",
+        "budget_line",
+        "amount_authorized",
+        "amount_executed",
+        "remaining",
+        "unit"
+      ],
+      "quality": {
+        "requiresNumericColumns": [
+          "amount_authorized",
+          "amount_executed"
+        ],
+        "requiresCodeColumn": [
+          "budget_line"
+        ],
+        "riskIfMissing": "high"
+      }
+    },
+    {
+      "id": "gov_table_award_rank_matrix",
+      "name": {
+        "en": "Award Rank Matrix",
+        "pt": "Matriz de Classificação"
+      },
+      "aliases": [
+        "award scoring",
+        "ranking matrix",
+        "nota de julgamento"
+      ],
+      "columns": [
+        "supplier",
+        "score",
+        "technical_grade",
+        "financial_grade",
+        "award_rationale",
+        "winning_status"
+      ],
+      "quality": {
+        "requiresNumericColumns": [
+          "score"
+        ],
+        "riskIfMissing": "critical"
+      }
+    },
+    {
+      "id": "gov_table_disbursement_plan",
+      "name": {
+        "en": "Disbursement Plan",
+        "pt": "Plano de Desembolso"
+      },
+      "aliases": [
+        "payment plan",
+        "release schedule",
+        "cronograma de repasses"
+      ],
+      "columns": [
+        "milestone",
+        "trigger_condition",
+        "percentage",
+        "release_amount",
+        "date_due",
+        "status"
+      ],
+      "quality": {
+        "requiresDateColumns": [
+          "date_due"
+        ],
+        "riskIfMissing": "high"
+      }
+    },
+    {
+      "id": "gov_table_audit_defect_register",
+      "name": {
+        "en": "Audit Defect Register",
+        "pt": "Registro de Achados"
+      },
+      "aliases": [
+        "audit findings",
+        "defects",
+        "não conformidades"
+      ],
+      "columns": [
+        "finding_id",
+        "severity",
+        "control_gap",
+        "remedy",
+        "deadline",
+        "status"
+      ],
+      "quality": {
+        "requiresDateColumns": [
+          "deadline"
+        ],
+        "requiresSeverityScale": [
+          "severity"
+        ],
+        "riskIfMissing": "critical"
+      }
+    },
+    {
+      "id": "gov_table_service_metrics",
+      "name": {
+        "en": "Service Delivery Metrics",
+        "pt": "Métricas de Entrega"
+      },
+      "aliases": [
+        "kpi table",
+        "result indicator",
+        "impact metrics"
+      ],
+      "columns": [
+        "indicator",
+        "baseline",
+        "target",
+        "actual",
+        "unit",
+        "evidence_source"
+      ],
+      "quality": {
+        "requiresNumericColumns": [
+          "baseline",
+          "target",
+          "actual"
+        ],
+        "riskIfMissing": "medium"
+      }
+    }
+  ]
+}

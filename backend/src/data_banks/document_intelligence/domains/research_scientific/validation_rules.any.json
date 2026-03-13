@@ -1,0 +1,135 @@
+{
+  "_meta": {
+    "id": "di_research_scientific_validation_rules",
+    "version": "1.0.0",
+    "description": "Research validation rules to block false confidence, endpoint drift, and unsupported causal claims.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/validation/claimValidator.service.ts",
+      "services/core/orchestration/answerPlanner.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/domain-validation.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "domain": "research_scientific"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "before statistical interpretation outputs",
+    "consumer": "research validator",
+    "intent": "Preserve epistemic rigor and prevent over-interpretation."
+  },
+  "exactnessContract": {
+    "forbiddenSubstitutions": [
+      "correlation_without_definition",
+      "causality_without_design",
+      "endpoint_merged_without_alignment",
+      "pvalue_only_conclusion",
+      "effect_without_ci_or_sd"
+    ],
+    "requiredAnchors": [
+      "study_id",
+      "endpoint",
+      "cohort",
+      "method",
+      "period"
+    ],
+    "mustPreserveUncertainty": true
+  },
+  "validationRules": [
+    {
+      "id": "RS_VAL_001_endpoint_lock",
+      "severity": "critical",
+      "applies": [
+        "compare",
+        "evaluate",
+        "summarize"
+      ],
+      "check": "endpoint_is_constant_and_defined",
+      "description": "Comparisons require the same explicit endpoint and population definitions.",
+      "failureAction": "BLOCK_AND_REQUIRE_ENDPOINT_LOCK"
+    },
+    {
+      "id": "RS_VAL_002_power_awareness",
+      "severity": "high",
+      "applies": [
+        "calculate",
+        "validate",
+        "summarize"
+      ],
+      "check": "sample_size_with_power_and_effect_context",
+      "description": "Effect claims must include sample size context and uncertainty when power is available or low.",
+      "failureAction": "WARN_AND_REQUIRE_CONTEXT"
+    },
+    {
+      "id": "RS_VAL_003_control_bias_guard",
+      "severity": "high",
+      "applies": [
+        "evaluate",
+        "summarize"
+      ],
+      "check": "causality_needs_randomization_or_adjustment",
+      "description": "Avoid causal language without proper design or adjustment methods.",
+      "failureAction": "BLOCK_AND_REPHRASE_TO_ASSOCIATION"
+    },
+    {
+      "id": "RS_VAL_004_missingness_guard",
+      "severity": "medium",
+      "applies": [
+        "calculate",
+        "compare",
+        "validate"
+      ],
+      "check": "missing_data_handling_is_explicit",
+      "description": "When missingness strategy differs by endpoint, do not merge trend claims.",
+      "failureAction": "WARN_AND_SHOW_MISSINGNESS_RULE"
+    },
+    {
+      "id": "RS_VAL_005_reproducibility_guard",
+      "severity": "medium",
+      "applies": [
+        "validate",
+        "monitor",
+        "summarize"
+      ],
+      "check": "protocol_changes_are_captured",
+      "description": "Protocol versions and deviations must be surfaced with any claim about continuity.",
+      "failureAction": "WARN_AND_REQUIRE_PROTOCOL_VERSION"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "research_validation_requires_endpoint_lock",
+        "input": {
+          "scenario": "compare_across_diff_endpoints"
+        },
+        "expect": {
+          "action": "BLOCK_AND_REQUIRE_ENDPOINT_LOCK"
+        }
+      },
+      {
+        "id": "research_validation_no_causal_drift",
+        "input": {
+          "signal": {
+            "designType": "observational",
+            "causalLanguage": true
+          }
+        },
+        "expect": {
+          "mustCheck": [
+            "RS_VAL_003_control_bias_guard"
+          ]
+        }
+      }
+    ]
+  }
+}

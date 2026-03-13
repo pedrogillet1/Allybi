@@ -1,0 +1,189 @@
+{
+  "_meta": {
+    "id": "di_research_scientific_retrieval_strategies",
+    "version": "1.0.0",
+    "description": "Research retrieval strategy for endpoint-first extraction, statistical interpretation, and reproducibility checks.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/retrieval/hybridRetriever.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/retrievalPrecision.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "research_scientific",
+    "maxBoostRules": 95,
+    "maxQueryExpansionTerms": 150
+  },
+  "domain": "research_scientific",
+  "sectionPriority": [
+    {
+      "section": "rs_section_hypothesis",
+      "weight": 9,
+      "operators": [
+        "extract",
+        "validate",
+        "summarize"
+      ]
+    },
+    {
+      "section": "rs_section_design",
+      "weight": 8.8,
+      "operators": [
+        "extract",
+        "validate",
+        "advise",
+        "calculate"
+      ]
+    },
+    {
+      "section": "rs_section_cohort",
+      "weight": 8.3,
+      "operators": [
+        "extract",
+        "calculate",
+        "validate"
+      ]
+    },
+    {
+      "section": "rs_section_endpoints",
+      "weight": 9.2,
+      "operators": [
+        "extract",
+        "compare",
+        "validate"
+      ]
+    },
+    {
+      "section": "rs_section_analysis",
+      "weight": 9.1,
+      "operators": [
+        "extract",
+        "calculate",
+        "evaluate"
+      ]
+    },
+    {
+      "section": "rs_section_results",
+      "weight": 9.4,
+      "operators": [
+        "extract",
+        "summarize",
+        "evaluate"
+      ]
+    },
+    {
+      "section": "rs_section_limitations",
+      "weight": 8.6,
+      "operators": [
+        "evaluate",
+        "summarize",
+        "advise"
+      ]
+    },
+    {
+      "section": "rs_section_reproducibility",
+      "weight": 8.1,
+      "operators": [
+        "validate",
+        "summarize",
+        "monitor"
+      ]
+    }
+  ],
+  "tablePriority": [
+    {
+      "table": "rs_table_sample_flow",
+      "weight": 8.3,
+      "operators": [
+        "extract",
+        "validate",
+        "summarize"
+      ]
+    },
+    {
+      "table": "rs_table_baseline_table",
+      "weight": 8.7,
+      "operators": [
+        "compare",
+        "calculate",
+        "validate"
+      ]
+    },
+    {
+      "table": "rs_table_primary_outcomes",
+      "weight": 9.4,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare"
+      ]
+    },
+    {
+      "table": "rs_table_subgroup_analysis",
+      "weight": 8.6,
+      "operators": [
+        "compare",
+        "evaluate"
+      ]
+    },
+    {
+      "table": "rs_table_sensitivity_runs",
+      "weight": 8.9,
+      "operators": [
+        "evaluate",
+        "extract",
+        "summarize"
+      ]
+    }
+  ],
+  "queryExpansion": [
+    "primary endpoint",
+    "confidence interval",
+    "sample size",
+    "effect size",
+    "randomization",
+    "blinding",
+    "p value",
+    "power",
+    "attrition"
+  ],
+  "strategies": [
+    {
+      "id": "rs_strategy_endpoint_guarded_compare",
+      "operators": [
+        "compare",
+        "evaluate"
+      ],
+      "description": "Compare outcomes only when endpoint and population are held constant.",
+      "steps": [
+        "extract endpoint definitions",
+        "load cohort criteria",
+        "align sample sizes and arms",
+        "validate p-value and CI from same table"
+      ]
+    },
+    {
+      "id": "rs_strategy_reproducibility_check",
+      "operators": [
+        "validate",
+        "summarize"
+      ],
+      "description": "Surface reproducibility and sensitivity limitations before high-confidence claims.",
+      "steps": [
+        "load methods and protocol versions",
+        "extract deviations and missingness",
+        "load sensitivity scenarios",
+        "report claim confidence and caveats"
+      ]
+    }
+  ]
+}

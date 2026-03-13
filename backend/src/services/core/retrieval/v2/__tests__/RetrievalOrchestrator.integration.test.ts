@@ -17,6 +17,7 @@ import type {
   EvidencePack,
   DocMeta,
 } from "../../retrieval.types";
+import { createDefaultQueryNormalizer } from "../DefaultQueryNormalizer.service";
 
 // ── Mock retrieval.config so cache + timeouts are deterministic ──────
 
@@ -248,7 +249,7 @@ describe("RetrievalOrchestratorV2 — integration", () => {
         semanticIndex,
         lexicalIndex,
         structuralIndex,
-        undefined,
+        createDefaultQueryNormalizer(),
         stubDocIntelBanks,
       );
 
@@ -287,7 +288,7 @@ describe("RetrievalOrchestratorV2 — integration", () => {
         semanticIndex,
         lexicalIndex,
         structuralIndex,
-        undefined,
+        createDefaultQueryNormalizer(),
         stubDocIntelBanks,
       );
 
@@ -313,7 +314,7 @@ describe("RetrievalOrchestratorV2 — integration", () => {
         semanticIndex,
         lexicalIndex,
         structuralIndex,
-        undefined,
+        createDefaultQueryNormalizer(),
         stubDocIntelBanks,
       );
 
@@ -348,7 +349,7 @@ describe("RetrievalOrchestratorV2 — integration", () => {
         failingIndex,
         lexicalIndex,
         structuralIndex,
-        undefined,
+        createDefaultQueryNormalizer(),
         stubDocIntelBanks,
       );
 
@@ -385,7 +386,7 @@ describe("RetrievalOrchestratorV2 — integration", () => {
         slowIndex,
         lexicalIndex,
         structuralIndex,
-        undefined,
+        createDefaultQueryNormalizer(),
         stubDocIntelBanks,
       );
 
@@ -419,7 +420,7 @@ describe("RetrievalOrchestratorV2 — integration", () => {
           semanticIndex,
           lexicalIndex,
           structuralIndex,
-          undefined,
+          createDefaultQueryNormalizer(),
           stubDocIntelBanks,
         );
 
@@ -462,7 +463,7 @@ describe("RetrievalOrchestratorV2 — integration", () => {
         semanticIndex,
         lexicalIndex,
         structuralIndex,
-        undefined,
+        createDefaultQueryNormalizer(),
         stubDocIntelBanks,
       );
 

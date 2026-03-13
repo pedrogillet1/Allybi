@@ -22,6 +22,7 @@ function loadPromptBanks() {
     "mode_editing",
     "llm_global_guards",
     "rag_policy",
+    "compose_style_contract",
     "task_answer_with_sources",
     "policy_citations",
     "retrieval_prompt",
@@ -82,6 +83,50 @@ describe("PromptRegistryService compose_answer mode coverage", () => {
         expectedTemplate,
       );
     }
+  });
+
+  test("injects compose style contract with runtime style decisions", () => {
+    const service = new PromptRegistryService(loadPromptBanks());
+    const bundle = service.buildPrompt("compose_answer", {
+      env: "local",
+      outputLanguage: "en",
+      answerMode: "doc_grounded_single",
+      operator: "extract",
+      operatorFamily: "qa",
+      runtimeSignals: {
+        styleDecision: {
+          voiceProfile: "executive_brief",
+          domainVoiceModifier: "finance_analytic",
+          interactionModifier: "compressed",
+          answerStrategy: "direct_answer_then_support",
+          templateFamily: "direct_answer",
+          uncertaintyBand: "medium_confidence",
+          paragraphPlan: "single_paragraph_compressed",
+          clarificationPolicy: "answer_directly_without_clarifier",
+          fallbackPosture: "direct_answer",
+          antiRoboticFocus: ["no_generic_leadins", "synthesize_then_support"],
+          empathyMode: null,
+        },
+        turnStyleState: {
+          recentLeadSignatures: ["the document shows"],
+        },
+      },
+    });
+
+    expect(bundle.debug?.selectedTemplateIds ?? []).toContain(
+      "compose_style_contract_default",
+    );
+
+    const systemText = bundle.messages
+      .filter((message) => message.role === "system")
+      .map((message) => message.content)
+      .join("\n");
+
+    expect(systemText).toContain("executive_brief");
+    expect(systemText).toContain("finance_analytic");
+    expect(systemText).toContain("direct_answer_then_support");
+    expect(systemText).toContain("medium_confidence");
+    expect(systemText).toContain("single_paragraph_compressed");
   });
 
   test("fails fast for uncovered strict compose mode when strict flag is enabled", () => {

@@ -79,7 +79,7 @@ export const RETRIEVAL_CONFIG: Readonly<RetrievalConfig> = Object.freeze({
   // Encrypted mode
   isEncryptedOnlyMode: (() => {
     const raw = String(process.env.INDEXING_ENCRYPTED_CHUNKS_ONLY || "").trim().toLowerCase();
-    if (!raw) return true;
+    if (!raw) return false;
     return ["1", "true", "yes", "on"].includes(raw);
   })(),
 });

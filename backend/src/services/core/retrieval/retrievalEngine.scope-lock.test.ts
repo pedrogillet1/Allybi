@@ -1,12 +1,14 @@
 import {
   RetrievalEngineService,
-  type DocStore,
-  type LexicalIndex,
-  type RetrievalRequest,
-  type SemanticIndex,
-  type StructuralIndex,
-  type BankLoader,
-} from "./retrievalEngine.legacy.service";
+} from "./v2/RetrievalOrchestrator.service";
+import type {
+  DocStore,
+  LexicalIndex,
+  RetrievalRequest,
+  SemanticIndex,
+  StructuralIndex,
+  BankLoader,
+} from "./retrieval.types";
 import { createDocScopeLock } from "./docScopeLock";
 
 const noopIndex: SemanticIndex & LexicalIndex & StructuralIndex = {

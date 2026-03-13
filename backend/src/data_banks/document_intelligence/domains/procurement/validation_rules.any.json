@@ -1,0 +1,146 @@
+{
+  "_meta": {
+    "id": "procurement_validation_rules",
+    "version": "1.0.0",
+    "description": "Procurement validation rules to avoid unsafe comparisons, award bias, and unsupported financial claims.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/validation/claimValidator.service.ts",
+      "services/core/orchestration/answerPlanner.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/domain-validation.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "domain": "procurement"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "validate before final comparative or evaluative response",
+    "consumer": "procurement validator",
+    "intent": "Prevent winner claims, compliance inferences, and invoice conclusions without explicit anchors."
+  },
+  "exactnessContract": {
+    "forbiddenSubstitutions": [
+      "winner_without_award_basis",
+      "delivery_sla_without_deadline",
+      "currency_without_rate_or_anchor",
+      "variance_without_po_reference",
+      "single_number_inflation_without_method"
+    ],
+    "requiredAnchors": [
+      "vendor_or_supplier",
+      "document_scope",
+      "period_or_version",
+      "currency",
+      "method"
+    ],
+    "mustPreservePolicyFlags": true
+  },
+  "validationRules": [
+    {
+      "id": "PROC_VAL_001_award_traceability",
+      "severity": "high",
+      "applies": [
+        "compare",
+        "evaluate",
+        "extract"
+      ],
+      "check": "award_claim_has_document_anchor",
+      "description": "Winner claims must explicitly tie to award memo, scorecard, or contract section.",
+      "failureAction": "BLOCK_AND_EXPLAIN"
+    },
+    {
+      "id": "PROC_VAL_002_supplier_identity_consistency",
+      "severity": "high",
+      "applies": [
+        "extract",
+        "validate",
+        "compare"
+      ],
+      "check": "supplier_name_is_consistent_with_id_or_code",
+      "description": "Do not merge homonymous vendors without identifier confirmation.",
+      "failureAction": "ASK_OR_RETRY_ENTITY_RESOLUTION"
+    },
+    {
+      "id": "PROC_VAL_003_invoice_match_integrity",
+      "severity": "high",
+      "applies": [
+        "validate",
+        "calculate"
+      ],
+      "check": "invoice_lines_are_reconciled_to_po",
+      "description": "Require PO reference and unit-level tie for invoice discrepancy assertions.",
+      "failureAction": "BLOCK_AND_LIST_OPEN_EXCEPTIONS"
+    },
+    {
+      "id": "PROC_VAL_004_term_alignment",
+      "severity": "medium",
+      "applies": [
+        "compare",
+        "extract"
+      ],
+      "check": "commercial_terms_have_payment_and_currency_scope",
+      "description": "Do not compare discounts, taxes, or terms across mixed commercial scopes.",
+      "failureAction": "ASK_OR_ANNOTATE_SCOPE"
+    },
+    {
+      "id": "PROC_VAL_005_score_merge_guard",
+      "severity": "medium",
+      "applies": [
+        "calculate",
+        "compare"
+      ],
+      "check": "scores_compatible_weights_reported",
+      "description": "Comparisons may only merge scores when weight vectors are explicit.",
+      "failureAction": "WARN_AND_SHOW_weights"
+    },
+    {
+      "id": "PROC_VAL_006_delivery_breach_guard",
+      "severity": "medium",
+      "applies": [
+        "evaluate",
+        "validate",
+        "summarize"
+      ],
+      "check": "delivery_risk_has_time_basis",
+      "description": "Delivery claims must include schedule basis and observed date window.",
+      "failureAction": "WARN_AND_REQUIRE_DATE_WINDOW"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "procurement_validation_requires_award_anchor",
+        "input": {
+          "queryType": "compare",
+          "candidate": "winner_is_vendor_x"
+        },
+        "expect": {
+          "mustCheck": [
+            "PROC_VAL_001_award_traceability"
+          ]
+        }
+      },
+      {
+        "id": "procurement_validation_blocks_unreconciled_invoice",
+        "input": {
+          "signal": {
+            "poReference": false,
+            "invoiceVariance": true
+          }
+        },
+        "expect": {
+          "action": "BLOCK_AND_LIST_OPEN_EXCEPTIONS"
+        }
+      }
+    ]
+  }
+}

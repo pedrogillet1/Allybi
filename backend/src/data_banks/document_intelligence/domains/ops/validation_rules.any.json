@@ -1,0 +1,216 @@
+{
+  "_meta": {
+    "id": "ops_validation_rules",
+    "version": "1.0.0",
+    "description": "Operations validation rules for actor role precision, status maturity, lifecycle integrity, and KPI-safe interpretation.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "domain": "ops"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "before final operations response validation and risk callout assembly",
+    "consumer": "ops validator",
+    "intent": "Block unsafe operational conclusions from merged sources, status drift, and ungrounded actor assignments.",
+    "emittedSignals": [
+      "opsValidationOutcome",
+      "opsStatusConflictType",
+      "opsActorLockState"
+    ]
+  },
+  "exactnessContract": {
+    "forbiddenSubstitutions": [
+      "status_rename_without_evidence",
+      "open_to_closed_without_completion_evidence",
+      "planned_date_as_actual_without_completion_link",
+      "actor_substitution_without_source_map",
+      "shipping_eta_from_only_origin_without_receiver_context",
+      "quality_pass_without_test_result"
+    ],
+    "allowedSubstitutions": [
+      "status_pairing_by_open_closed_with_count",
+      "cross_doc_aggregation_when_request_execution_completion_linked",
+      "targeted_unit_normalization_with_conversion_basis",
+      "incident_chain_grouping_when_timeline_anchored"
+    ],
+    "requiredAnchors": [
+      "doc_type",
+      "status",
+      "actor_role",
+      "time_window",
+      "unit",
+      "source_document"
+    ],
+    "mustPreservePolicyFlags": true
+  },
+  "validationRules": [
+    {
+      "id": "OPS_VAL_001_status_integrity",
+      "severity": "high",
+      "applies": [
+        "validate",
+        "compare",
+        "summarize"
+      ],
+      "check": "status_is_locked_and_distinct",
+      "description": "Do not merge open, in-progress, and completed operational states without explicit lifecycle separation.",
+      "failureAction": "BLOCK_AND_REQUIRE_LIFECYCLE_BREAKDOWN"
+    },
+    {
+      "id": "OPS_VAL_002_actor_role_lock",
+      "severity": "high",
+      "applies": [
+        "extract",
+        "summarize",
+        "validate"
+      ],
+      "check": "actors_are_bound_to_requestor_assignee_approver_reviewer_or_consignee",
+      "description": "Claims about accountability must keep actor role explicit and stable within the answer.",
+      "failureAction": "BLOCK_AND_REQUIRE_ACTOR_BINDING"
+    },
+    {
+      "id": "OPS_VAL_003_date_axis_consistency",
+      "severity": "high",
+      "applies": [
+        "calculate",
+        "compare",
+        "validate"
+      ],
+      "check": "scheduled_requested_completion_dates_not_blended",
+      "description": "Readiness and delay calculations must select one date axis and expose it in scope.",
+      "failureAction": "BLOCK_AND_REQUIRE_DATE_AXIS"
+    },
+    {
+      "id": "OPS_VAL_004_unit_and_threshold_guard",
+      "severity": "high",
+      "applies": [
+        "calculate",
+        "compare"
+      ],
+      "check": "kpi_values_have_unit_and_threshold_or_method",
+      "description": "SLA/KPI claims require unit and threshold context unless explicitly unavailable.",
+      "failureAction": "WARN_AND_REQUIRE_THRESHOLD_CONTEXT"
+    },
+    {
+      "id": "OPS_VAL_005_incident_timeline_guard",
+      "severity": "medium",
+      "applies": [
+        "evaluate",
+        "summarize",
+        "compare"
+      ],
+      "check": "incident_outputs_preserve_timeline_sequence",
+      "description": "Incident conclusions require ordered timeline or explicit reason for missing sequence.",
+      "failureAction": "WARN_AND_REQUIRE_TIMELINE"
+    },
+    {
+      "id": "OPS_VAL_006_shipping_route_guard",
+      "severity": "medium",
+      "applies": [
+        "extract",
+        "validate",
+        "compare"
+      ],
+      "check": "shipping_variance_links_to_route_and_endpoint",
+      "description": "Shipping status/ETA/delivery assertions should include route ID and destination context.",
+      "failureAction": "WARN_AND_REQUIRE_ROUTE_SCOPE"
+    },
+    {
+      "id": "OPS_VAL_007_quality_trace_guard",
+      "severity": "medium",
+      "applies": [
+        "extract",
+        "summarize",
+        "validate"
+      ],
+      "check": "non_conformance_claims_include_id_and_disposition",
+      "description": "Quality pass/fail and defect claims must include non-conformance IDs and disposition when present.",
+      "failureAction": "WARN_AND_REQUIRE_NON_CONFORMANCE_ID"
+    },
+    {
+      "id": "OPS_VAL_008_workorder_log_join_guard",
+      "severity": "medium",
+      "applies": [
+        "validate",
+        "compare"
+      ],
+      "check": "work_order_and_log_summary_have_request_execution_completion_links",
+      "description": "Do not present merged work-order completion statistics without explicit linking artifacts.",
+      "failureAction": "ASK_OR_EXPLAIN_LINK_MISSING"
+    },
+    {
+      "id": "OPS_VAL_009_cross_doc_conflict_guard",
+      "severity": "high",
+      "applies": [
+        "validate",
+        "summarize"
+      ],
+      "check": "doc_type_conflicts_or_duplicate_scope_are_explained",
+      "description": "If docs disagree on same KPI or status, output must expose conflict basis before synthesis.",
+      "failureAction": "BLOCK_AND_REQUEST_CONFLICT_SCOPE"
+    },
+    {
+      "id": "OPS_VAL_010_cross_reference_guard",
+      "severity": "low",
+      "applies": [
+        "summarize",
+        "monitor",
+        "evaluate"
+      ],
+      "check": "followup_or_action_plans_link_to_specific_owner_and_due_date",
+      "description": "Action recommendations in operations should only be returned when owner and due date are available or explicitly missing.",
+      "failureAction": "WARN_AND_REQUIRE_ACTION_METADATA"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "ops_validation_actor_lock",
+        "input": {
+          "query": "Who owns each blocker?"
+        },
+        "expect": {
+          "mustCheck": [
+            "OPS_VAL_002_actor_role_lock"
+          ]
+        }
+      },
+      {
+        "id": "ops_validation_sla_requires_threshold",
+        "input": {
+          "query": "Check SLA variance"
+        },
+        "expect": {
+          "mustCheck": [
+            "OPS_VAL_004_unit_and_threshold_guard"
+          ]
+        }
+      },
+      {
+        "id": "ops_validation_workorder_date_axis",
+        "input": {
+          "query": "How late are these maintenance tasks?"
+        },
+        "expect": {
+          "mustCheck": [
+            "OPS_VAL_003_date_axis_consistency"
+          ]
+        }
+      }
+    ]
+  }
+}

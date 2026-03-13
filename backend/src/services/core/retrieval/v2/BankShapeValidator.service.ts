@@ -91,9 +91,6 @@ const SHAPE_SPECS: Record<string, ShapeSpec> = {
         errors.push("Missing 'config' object");
         return errors;
       }
-      if (typeof (config as Record<string, unknown>).enabled !== "boolean") {
-        errors.push("Missing 'config.enabled' boolean");
-      }
       return errors;
     },
   },
@@ -134,9 +131,6 @@ const SHAPE_SPECS: Record<string, ShapeSpec> = {
       if (!isObject(config)) {
         errors.push("Missing 'config' object");
         return errors;
-      }
-      if (typeof (config as Record<string, unknown>).enabled !== "boolean") {
-        errors.push("Missing 'config.enabled' boolean");
       }
       return errors;
     },

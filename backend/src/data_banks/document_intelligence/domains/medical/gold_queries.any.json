@@ -1,0 +1,176 @@
+{
+  "_meta": {
+    "id": "eval_gold_queries_medical_domain_deepening",
+    "version": "1.0.0",
+    "description": "Medical domain-deepening evaluation pack for unit-safe interpretation, trend fidelity, and safe follow-up language.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "eval-domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "medical",
+    "scenarioType": "clinical_exactness"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "evaluation pack execution for medical interpretation and safety behavior",
+    "consumer": "goldQueryRunner",
+    "intent": "Drive clinically relevant safety/interpretation regression checks with encounter-bound coverage.",
+    "emittedSignals": [
+      "medicalGoldQueryPassFail",
+      "medicalGoldQuerySafetySignal"
+    ]
+  },
+  "goldQueries": [
+    {
+      "id": "medical_deepen_001",
+      "lang": "en",
+      "query": "Summarize blood pressure, creatinine, and oxygen saturation trend for the current encounter and flag any abnormal trajectory.",
+      "sourceLock": "current_encounter_only",
+      "expected": {
+        "mustReadSource": [
+          "vitals_and_measurements",
+          "labs_imaging",
+          "encounter_context",
+          "objective_findings"
+        ],
+        "mustExtract": [
+          "measurement",
+          "value",
+          "unit",
+          "reference_range",
+          "encounter_date",
+          "abnormal_flag"
+        ],
+        "mustPreserveUnit": true,
+        "mustPreserveTimestamp": true,
+        "mustShowMethod": true,
+        "mustNotInfer": [
+          "diagnosis_from_values",
+          "treatment_change_without_authority"
+        ],
+        "failureConditions": [
+          "unit_drift",
+          "unscoped_multiple_encounters",
+          "missing_reference_range"
+        ]
+      }
+    },
+    {
+      "id": "medical_deepen_002",
+      "lang": "en",
+      "query": "What medications are listed and do any listed allergies conflict? Provide follow-up timing from the note.",
+      "expected": {
+        "mustFindSection": [
+          "medications_allergies",
+          "assessment_documented",
+          "plan_and_orders",
+          "followup_and_disposition"
+        ],
+        "mustExtract": [
+          "medication_name",
+          "allergy_substance",
+          "allergy_reaction",
+          "followup_window",
+          "disposition_status"
+        ],
+        "mustPreserveActor": true,
+        "mustPreserveSafety": true,
+        "failureConditions": [
+          "medication_without_linked_allergy_data",
+          "followup_missing_when_documented",
+          "diagnostic_conclusion_without_support"
+        ]
+      }
+    },
+    {
+      "id": "medical_deepen_003",
+      "lang": "en",
+      "query": "Compare this week's radiology impression with prior exam language and list unresolved terminology or terminology changes.",
+      "expected": {
+        "mustFindSection": [
+          "labs_imaging"
+        ],
+        "mustExtract": [
+          "imaging_modality",
+          "impression",
+          "reporting_clinician",
+          "finding_text",
+          "change_over_time"
+        ],
+        "mustShowConflictTags": true,
+        "mustPreserveSource": true,
+        "failureConditions": [
+          "collapsed_text_without_conflict_note",
+          "impression_without_documented_source"
+        ]
+      }
+    },
+    {
+      "id": "medical_deepen_004",
+      "lang": "pt",
+      "query": "Descreva os achados do atendimento com valores e intervalo de referencia, incluindo sinal verde/amarelo/vermelho se houver.",
+      "expected": {
+        "mustInclude": [
+          "valor",
+          "unidade",
+          "intervalo de referencia",
+          "critico",
+          "observacao clinica"
+        ],
+        "mustPreserveSafetyBoundary": true,
+        "failureConditions": [
+          "omitindo_unidade",
+          "sugestao_de_tratamento",
+          "confundir_encaminhamento_com_diagnostico"
+        ]
+      }
+    }
+  ],
+  "qualityGuards": {
+    "maxAllowedInferenceRate": 0.12,
+    "requiredAnchorDensity": 2.8,
+    "penalties": {
+      "unit_missing": -35,
+      "diagnostic_inference": -45,
+      "missing_follow_up": -30
+    }
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "medical_gold_trend_unit_lock",
+        "input": {
+          "query": "medical_deepen_001"
+        },
+        "expect": {
+          "mustPreserveUnit": true,
+          "mustPreserveTimestamp": true
+        }
+      },
+      {
+        "id": "medical_gold_allergy_conflict",
+        "input": {
+          "query": "medical_deepen_002"
+        },
+        "expect": {
+          "mustPreserveSafety": true,
+          "mustExtract": [
+            "allergy_substance",
+            "allergy_reaction"
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -1,4 +1,4 @@
-import { PolicyCertificationRunnerService } from "../../src/services/core/policy/policyCertificationRunner.service";
+import { PolicyCertificationRunnerService } from "../../tools/policy/certification/policyCertificationRunner.service";
 
 function main() {
   const strict = process.argv.includes("--strict");

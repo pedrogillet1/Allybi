@@ -64,20 +64,30 @@ async function run(): Promise<number> {
   const jsonOutPath = path.join(resultsDir, "orchestrator-certification-report.json");
   const mdOutPath = path.join(resultsDir, "orchestrator-certification-report.md");
   const policy = loadOrchestratorCertificationPolicy();
+  const existingRegressionTestPaths = policy.regressionSuite.testPaths.filter((entry) =>
+    fs.existsSync(path.join(repoRoot, entry)),
+  );
+  const existingCoverageTargets = policy.regressionSuite.collectCoverageFrom.filter(
+    (entry) => fs.existsSync(path.join(repoRoot, entry)),
+  );
 
   const coverageCmd = [
     "npx jest --config jest.config.cjs --runInBand --coverage --coverageReporters=json-summary --coverageReporters=text",
     "--runTestsByPath",
-    ...policy.regressionSuite.testPaths,
-    ...policy.regressionSuite.collectCoverageFrom.map(
+    ...existingRegressionTestPaths,
+    ...existingCoverageTargets.map(
       (entry) => `--collectCoverageFrom='${entry}'`,
     ),
   ].join(" ");
 
-  let regressionPassed = true;
-  try {
-    execSync(coverageCmd, { stdio: "inherit" });
-  } catch {
+  let regressionPassed = existingRegressionTestPaths.length > 0;
+  if (existingRegressionTestPaths.length > 0) {
+    try {
+      execSync(coverageCmd, { stdio: "inherit" });
+    } catch {
+      regressionPassed = false;
+    }
+  } else {
     regressionPassed = false;
   }
 

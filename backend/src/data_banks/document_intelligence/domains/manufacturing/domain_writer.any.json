@@ -1,0 +1,115 @@
+{
+  "_meta": {
+    "id": "manufacturing_domain_writer",
+    "version": "1.0.0",
+    "description": "Manufacturing writer profile for plant operations and quality-focused reasoning.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/orchestration/answerPlanner.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/docint-eval-pack.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "domain": "manufacturing",
+    "interpretationMode": "production_control",
+    "requireBatchScope": true,
+    "requireLineOrAsset": true
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "prior to final manufacturing narrative",
+    "consumer": "manufacturing writer",
+    "intent": "Emit actionable operational summaries with explicit assumptions and variance logic.",
+    "emittedSignals": [
+      "mfgYieldMode",
+      "mfgDowntimeMode",
+      "mfgQualityMode",
+      "mfgBatchScoped"
+    ]
+  },
+  "writingProfile": {
+    "audience": "plant engineer, operations manager, quality lead",
+    "goal": "Explain throughput and defects without overgeneralization across runs.",
+    "allowedAnswerForms": [
+      "yield_report",
+      "downtime_root_cause_report",
+      "quality_exception_summary",
+      "material_variance_snapshot"
+    ],
+    "forbiddenAnswerForms": [
+      "single throughput number without base quantity",
+      "yield claim without batch and shift",
+      "downtime claim without time endpoints"
+    ],
+    "docTypeAnchors": [
+      "mfg_work_order",
+      "mfg_bom_pack",
+      "mfg_quality_inspection",
+      "mfg_downtime_log",
+      "mfg_wip_snapshot"
+    ],
+    "sectionPriority": [
+      "yield",
+      "quality",
+      "downtime",
+      "materials",
+      "oee",
+      "safety"
+    ]
+  },
+  "interpretiveRules": [
+    {
+      "id": "MFG_WRITER_001_batch_guard",
+      "description": "Yield and scrap statements must always show batch and period."
+    },
+    {
+      "id": "MFG_WRITER_002_causal_separation",
+      "description": "Separate defect root-cause from process recommendations."
+    },
+    {
+      "id": "MFG_WRITER_003_time_anchor_rule",
+      "description": "All downtime or incident claims show duration calculation method and window."
+    },
+    {
+      "id": "MFG_WRITER_004_asset_attribution",
+      "description": "Operational losses must identify line/asset when attributing capacity loss."
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "mfg_writer_requires_batch",
+        "input": {
+          "query": "Compute yield trend"
+        },
+        "expect": {
+          "mustInclude": [
+            "batch",
+            "period"
+          ]
+        }
+      },
+      {
+        "id": "mfg_writer_requires_asset_for_outage",
+        "input": {
+          "query": "How much did outages impact throughput"
+        },
+        "expect": {
+          "mustInclude": [
+            "line",
+            "duration"
+          ]
+        }
+      }
+    ]
+  }
+}

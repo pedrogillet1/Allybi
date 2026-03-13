@@ -44,11 +44,6 @@
     ]
   },
   "checksums": {
-    "__reports/bank_audit_report.any.json": {
-      "sha256": "289f3cab65dacdf69ef673f38d68b7957097749d40d0fb181dd458a1c2f082af",
-      "required": false,
-      "category": "semantics"
-    },
     ".compiled/alias_trie.any.json": {
       "sha256": "321ad2308de3fa6c5dda7ae18ec7e6525e1e095b627149600c9edeae5f85df27",
       "required": false,
@@ -210,7 +205,12 @@
       "category": "semantics"
     },
     "document_intelligence/compose/anti_robotic_style_rules.any.json": {
-      "sha256": "fa013c823ec68c0dbab2b6e3f8ae1f65799df6df8655ac90ab1b786408858159",
+      "sha256": "1ddc474a712a7e9bef6f55536ba4edb87d9c93307848da4cfa214fc5feef9423",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/compose/anti_repetition_patterns.any.json": {
+      "sha256": "b42e7ba22daacdcc94f4c8bf2e60f03b9cda82e8455185f13c1dfabc4d17bdd3",
       "required": false,
       "category": "semantics"
     },
@@ -230,7 +230,7 @@
       "category": "semantics"
     },
     "document_intelligence/compose/empathy_and_support_language.any.json": {
-      "sha256": "3d115390e689cf40916c154b97bea1f687c79aba7fc34b1ed073d4a590d1e622",
+      "sha256": "dfc3416ed9f24104fcf0f1f4a30a95fccdc29cfe42b1c0117d4392ea09d8cbb5",
       "required": false,
       "category": "semantics"
     },
@@ -274,13 +274,23 @@
       "required": false,
       "category": "semantics"
     },
+    "document_intelligence/compose/openers_and_framing.any.json": {
+      "sha256": "31c2e66c81eb21cbf28210d8ccc7b624bae4f9ecb8045d07220b5d5001fc3d2f",
+      "required": false,
+      "category": "semantics"
+    },
     "document_intelligence/compose/response_templates.any.json": {
-      "sha256": "67ef12bf6f58481ee12d87c124ff4d05971175adb3e925b8e62e040f770d0d38",
+      "sha256": "4e68933208e2a81f45afec11f65a9abd8fdb06204151ee12dbf3bddcf0506bb9",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/compose/safety_tone_overrides.any.json": {
       "sha256": "640b97b884f5164dfe1ff0d58ec1818358e1444f2d6ca6ff6d945f6c1a703dfb",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/compose/sentence_rhythm_and_variety.any.json": {
+      "sha256": "a86d422e500f17b090bc5e09b1e7f29b72df2794fe45e05b98db55e43cf55158",
       "required": false,
       "category": "semantics"
     },
@@ -299,6 +309,11 @@
       "required": false,
       "category": "semantics"
     },
+    "document_intelligence/compose/uncertainty_calibration.any.json": {
+      "sha256": "160fd551015490b55c9e642ad60e19071741e9224c0bd454acab2bee3e212174",
+      "required": false,
+      "category": "semantics"
+    },
     "document_intelligence/compose/verb_phrase_bank.any.json": {
       "sha256": "6ff86e60780c81cc0ee934a6c497e0279e4a4d564c310bc30430a6c60e460422",
       "required": false,
@@ -310,7 +325,12 @@
       "category": "semantics"
     },
     "document_intelligence/compose/voice_personality_profiles.any.json": {
-      "sha256": "16518195d4b58788e7c81f051970fa52fac6ec0f0d48756c055797e97b37955c",
+      "sha256": "a0ff48ccba928a9dcf978192d763125ba5a31b6bf9006b06693b81e4f41fd56b",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/compose/claim_strength_language.any.json": {
+      "sha256": "7e06314d9ee7ff78a856b8884a146be2841478aad11345b9e70e89017c29ed6a",
       "required": false,
       "category": "semantics"
     },
@@ -5385,27 +5405,27 @@
       "category": "llm"
     },
     "manifest/bank_aliases.any.json": {
-      "sha256": "01962dcf827905d63fd4ff3369c662610befb975d9e1c50bbaa9fd48e2bb812e",
+      "sha256": "5b70372fc3ac88f66332d5fdb7cd278e5a08152423d2a0c5a2e92e4a8a226a5d",
       "required": true,
       "category": "manifest"
     },
     "manifest/bank_checksums.any.json": {
-      "sha256": "773aaa0ebd8e2def112ad15dfc7c7db462f095705eb243f8c9736b1c5cc10d46",
+      "sha256": "604869a57e80c27e3a9f4a7936d32d73b27ba48f8a6b3d3e2e31196dc694c7fb",
       "required": false,
       "category": "manifest"
     },
     "manifest/bank_dependencies.any.json": {
-      "sha256": "33f84c4a1e23cca87811e17e74938658b21e436f45e28a999a6fb74f5bcf2fca",
+      "sha256": "fa1df3567affcd3475e9d9e3b505741188fe74081119d0850b6275e3f09e4824",
       "required": true,
       "category": "manifest"
     },
     "manifest/bank_manifest.any.json": {
-      "sha256": "fbf5ac8dbfe1963db58c848bd4b7c65c00337d1f16d9585929a6e266a1d7e806",
+      "sha256": "72ed6914f04c9793f977cf20482ccea4793412fb908f5b4a8adceeb781379c42",
       "required": true,
       "category": "manifest"
     },
     "manifest/bank_registry.any.json": {
-      "sha256": "cca0d6f7f58c76c9badb3ef48ebd67a23756c66a4fbedddadab7329f9012eef2",
+      "sha256": "b0221dfeae30f8f53602aa2f981509fcced6c15b191fb37067447c403d913a2e",
       "required": true,
       "category": "manifest"
     },
@@ -6455,7 +6475,7 @@
       "category": "semantics"
     },
     "policies/orchestrator_certification.any.json": {
-      "sha256": "e8eb8297f7d549318f278f6195456282b34c9d1e0dab31d86af09ad93cea7e03",
+      "sha256": "dd404f13e3ad3790f99ea2855e5d1f3c55ac0b133674190c82e1a4a8220092d8",
       "required": true,
       "category": "policies"
     },
@@ -6654,8 +6674,13 @@
       "required": false,
       "category": "prompts"
     },
+    "prompts/compose_style_contract.any.json": {
+      "sha256": "48835b067a5717040b936c0b1e6e11435b29a6fe3b30f3558a06e418f5a33b31",
+      "required": false,
+      "category": "prompts"
+    },
     "prompts/prompt_registry.any.json": {
-      "sha256": "1a3e31cb35ef35e7f0125fef551ee9d327e21e041bef607506ef7b1208402532",
+      "sha256": "1d2c07e7dbb45f4b9a397abe2aa267b14d20dab75bcb254f4d5c25f90b8b0ddc",
       "required": false,
       "category": "prompts"
     },
@@ -6745,7 +6770,7 @@
       "category": "semantics"
     },
     "quality/quality_gates.any.json": {
-      "sha256": "cc103debeb031f9643726ead40ccfc6e295d50e1d723a6c737530800177c1daf",
+      "sha256": "e4f6e4f263602a0757bee32369b93b219b9a8851b341c88ec7703a8e442f461e",
       "required": true,
       "category": "quality"
     },
@@ -7320,7 +7345,480 @@
       "category": "triggers"
     },
     "microcopy/compliance_phrases.any.json": "bc26d8d8927afa98f6ddf6752728ab67e1081f677d5145afe3f84ad97cbc14a0",
-    "operators/operator_canonical_registry.any.json": "c295cde1bb47b30cd85cf5b4c8acd24fe407349322c3a655c6a6f34e511490c8"
+    "operators/operator_canonical_registry.any.json": "c295cde1bb47b30cd85cf5b4c8acd24fe407349322c3a655c6a6f34e511490c8",
+    "ambiguity/clarification_question_bank.any.json": {
+      "sha256": "4f7f9afd6f1b04147af5c92a4389d2a7e0fe00b2b70b3eadb4bd47a787131d36",
+      "required": false,
+      "category": "ambiguity"
+    },
+    "ambiguity/field_role_disambiguation.any.json": {
+      "sha256": "e1a02e81193bdc4f1ecaa599e6d248b7328294bd7f9cd1a9c82a95fb48b667ca",
+      "required": false,
+      "category": "ambiguity"
+    },
+    "ambiguity/one_best_question_policy.any.json": {
+      "sha256": "6751716e43c596971c68fba95837fdac69655f9a9612d40da452315c4307e208",
+      "required": false,
+      "category": "policies"
+    },
+    "repair/answer_recovery_strategies.any.json": {
+      "sha256": "e210d9bae4150fc373660f5c39ea2aa0fc6c78608aa33a703113cf63311672ee",
+      "required": false,
+      "category": "quality"
+    },
+    "repair/partial_answer_recovery.any.json": {
+      "sha256": "f47ca5b273f11c7689c18e685c528674d4f3d576dc7dd49d3cc4199d750cda2a",
+      "required": false,
+      "category": "quality"
+    },
+    "repair/not_enough_evidence.any.json": {
+      "sha256": "a476d4e43f66e6caaf9ea6ec6c206240067c5a42eed4932d91bc508b1c84a89b",
+      "required": false,
+      "category": "quality"
+    },
+    "repair/contradiction_resolution.any.json": {
+      "sha256": "19e75ab72305697eb2cc13b9b2aab23de87f718f664ab6de5bd942c3a04a99da",
+      "required": false,
+      "category": "quality"
+    },
+    "repair/followup_generation.any.json": {
+      "sha256": "b2542257b5d13b2b922856117d2ffd102a900485b5586f30ba747bf746585ca5",
+      "required": false,
+      "category": "quality"
+    },
+    "repair/false_negative_rescue.any.json": {
+      "sha256": "249135c3fb70bcbebd401d246b5632227bded2afcd370799212b091367703d31",
+      "required": false,
+      "category": "quality"
+    },
+    "repair/reask_vs_answer_policy.any.json": {
+      "sha256": "272c1d1fb1f80bc529ea1a7cb73f55b223ee373c834fb4bec39d7e02992d7576",
+      "required": false,
+      "category": "policies"
+    },
+    "retrieval/evidence_binding_contract.any.json": {
+      "sha256": "00d87ae3b55496a7bdd7f4f78907b9adbe2dc721f8677e4d1676b23da6b03036",
+      "required": false,
+      "category": "retrieval"
+    },
+    "retrieval/field_role_ontology.any.json": {
+      "sha256": "d6fc24a0ebb59471ea808b0249daf0af4b9873db8ca90a7ca82ad4ac2c04b6cd",
+      "required": false,
+      "category": "semantics"
+    },
+    "retrieval/field_lock_patterns.any.json": {
+      "sha256": "0122cfbc57d08068ce2bfd819962cc4db27d17a469d01d6f80050028b3df7291",
+      "required": false,
+      "category": "retrieval"
+    },
+    "retrieval/quote_span_rules.any.json": {
+      "sha256": "70a0f0617942abeb676fbed3ac1bcd52c87b183a36e9282d1f04f683ed6d1dd3",
+      "required": false,
+      "category": "retrieval"
+    },
+    "retrieval/table_reasoning_rules.any.json": {
+      "sha256": "a4b7b509d5d8fc5d9fd47246d288a78c1434569cab1843771880af3e7101a4d5",
+      "required": false,
+      "category": "retrieval"
+    },
+    "retrieval/row_column_disambiguation.any.json": {
+      "sha256": "e2315aaca86fea844374d4456c62b88a98e991941b8b878594374633248aafab",
+      "required": false,
+      "category": "retrieval"
+    },
+    "retrieval/cross_doc_synthesis_rules.any.json": {
+      "sha256": "d6bb09af6643689c8049ebe38cdf148349920ccbc09bf3a6c64068b598226b37",
+      "required": false,
+      "category": "retrieval"
+    },
+    "retrieval/evidence_packaging_strategies.any.json": {
+      "sha256": "afc9cac34f8895bf4a5ea1ed2f1b460aede06bd346669a0029c3eeaaa349340e",
+      "required": false,
+      "category": "retrieval"
+    },
+    "validation/field_exactness_rules.any.json": {
+      "sha256": "58461abed2737852a14ef48b6f1b9d949711256794c238a1bd6f671d0770d316",
+      "required": false,
+      "category": "quality"
+    },
+    "validation/claim_strength_matrix.any.json": {
+      "sha256": "b835d0580862cc599184751014b29fa376bc926e80e28f87a811fd7594ba0667",
+      "required": false,
+      "category": "quality"
+    },
+    "validation/fact_type_requirements_expanded.any.json": {
+      "sha256": "91c4fefc648d7d0c9e1b8fbbdb81eba18edb9069cf40499cb77d74f43b269931",
+      "required": false,
+      "category": "quality"
+    },
+    "validation/conflict_resolution_rules.any.json": {
+      "sha256": "27bf0397fba3ab1446a1a8c85326740109e46f72a48784c6451e8e852cf9d99b",
+      "required": false,
+      "category": "quality"
+    },
+    "validation/table_integrity_rules.any.json": {
+      "sha256": "05b57ff8e1c0b6310cc4cb75e742bacc1f781d96254b80a6682aca61e443b256",
+      "required": false,
+      "category": "quality"
+    },
+    "document_intelligence/domains/finance/domain_writer.any.json": {
+      "sha256": "fd653d8d465850e38b698e2aeb85ccad515685af1e0a960ba306ee6be68a86c5",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/finance/ambiguity_patterns.any.json": {
+      "sha256": "175864a009a45bffe9dd1604ecba569918b7531de5dcaccb6052818940501cfe",
+      "required": false,
+      "category": "ambiguity"
+    },
+    "document_intelligence/domains/finance/validation_rules.any.json": {
+      "sha256": "1cfd401e40229687d90f96a49b18e936ff5137f1191b7e23978ada5ba171e206",
+      "required": false,
+      "category": "quality"
+    },
+    "document_intelligence/domains/finance/gold_queries.any.json": {
+      "sha256": "44efac2771631b05b52ed4d1e0d1257b8bac25fcf4a4ebd3f1d0ed6fbb765be4",
+      "required": false,
+      "category": "tests"
+    },
+    "document_intelligence/domains/accounting/domain_writer.any.json": {
+      "sha256": "ffd2dce3410fc29e63345b384966dcd6748ea7e8cd05bec5225fcce583950751",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/accounting/ambiguity_patterns.any.json": {
+      "sha256": "7bdeacf77b814cdeab037a3a334e27d7ba0fff89b1d48ff1506005aa8e6ca3f8",
+      "required": false,
+      "category": "ambiguity"
+    },
+    "document_intelligence/domains/accounting/validation_rules.any.json": {
+      "sha256": "8db0288b701f6e6ce7849fd3ecd668ae8805453b92159463e7839cc83b6103c1",
+      "required": false,
+      "category": "quality"
+    },
+    "document_intelligence/domains/accounting/gold_queries.any.json": {
+      "sha256": "304346c9b90de847626e4958437e0f997fb4fb7794af1a1e4eca31e11be01d32",
+      "required": false,
+      "category": "tests"
+    },
+    "document_intelligence/domains/legal/domain_writer.any.json": {
+      "sha256": "fbf79114615ac0b024f47a5ba6ff855b21911848eb20651ea5841e2a6105d00c",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/legal/ambiguity_patterns.any.json": {
+      "sha256": "c28d978b32dd40c7cfee1f7cbc9767fd5e8e70e2878a85685a628bf8de068b66",
+      "required": false,
+      "category": "ambiguity"
+    },
+    "document_intelligence/domains/legal/validation_rules.any.json": {
+      "sha256": "70168c74b499cce6945ce2d7ce1fc94b87b126c3b014db5246d7b324b7fdd877",
+      "required": false,
+      "category": "quality"
+    },
+    "document_intelligence/domains/legal/gold_queries.any.json": {
+      "sha256": "5421b3124287b9904b5dd8748428f859e233d3acfef19630150fbe03fa54b37f",
+      "required": false,
+      "category": "tests"
+    },
+    "document_intelligence/domains/medical/domain_writer.any.json": {
+      "sha256": "7f04126aea5eb635f72c5f6199b0e26c409423b77d7bee25ab5747ac1d0062b0",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/medical/ambiguity_patterns.any.json": {
+      "sha256": "a2c06a4457b3ebc78c9e1515199656a32163bada9fc7af1245ddd984e91cda69",
+      "required": false,
+      "category": "ambiguity"
+    },
+    "document_intelligence/domains/medical/validation_rules.any.json": {
+      "sha256": "f5dde000dab577b853bc3e57dc6d2866b3eb5c9cae94a22fd179182f7bd32362",
+      "required": false,
+      "category": "quality"
+    },
+    "document_intelligence/domains/medical/gold_queries.any.json": {
+      "sha256": "ce2c5db7e173fb77c1c13fdad4e0211536c5146f5f13f854fdfe472b5bcc59fc",
+      "required": false,
+      "category": "tests"
+    },
+    "document_intelligence/domains/ops/domain_writer.any.json": {
+      "sha256": "06dc2891d7492cc9a7d81717415e4250194fb3ce6615009b82e9e78bcac06394",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/ops/ambiguity_patterns.any.json": {
+      "sha256": "bc7b4ab0b8598e210d1f8bebf3e11cc68254bd3a50aff07b8378eb454eae513f",
+      "required": false,
+      "category": "ambiguity"
+    },
+    "document_intelligence/domains/ops/validation_rules.any.json": {
+      "sha256": "729aad82468e8eacfc6bb5e3ec24878f48d4ae1b2d105a467a31c0c0e6f46d3c",
+      "required": false,
+      "category": "quality"
+    },
+    "document_intelligence/domains/ops/gold_queries.any.json": {
+      "sha256": "de45a9cb6a720cb092ad9d9b340f615291e0750bb2dcfac859f2c290f3f8981d",
+      "required": false,
+      "category": "tests"
+    },
+    "governance/bank_metadata_policy.any.json": {
+      "sha256": "fc617f4c0aa26fa28f8bc71b7e6c29a5526b27d095a11bdc87f7aec47abc537d",
+      "required": false,
+      "category": "governance"
+    },
+    "governance/bank_quality_contract.any.json": {
+      "sha256": "52cd48b3ca8738effd5df34d150c5b43e6a2cf8ebc8c98cf7ffb1a7407037b13",
+      "required": false,
+      "category": "governance"
+    },
+    "governance/eval_gate_policy.any.json": {
+      "sha256": "70f2a34f7926d32a721a60ec0ac17426ac9c753513f6047b0e8d5db22d7c950d",
+      "required": false,
+      "category": "governance"
+    },
+    "governance/runtime_wiring_requirements.any.json": {
+      "sha256": "7939237f31917aa1c3f0b1a9f9ff15833f4f637fff1750d29c49a3b1b43c01a6",
+      "required": false,
+      "category": "governance"
+    },
+    "governance/sharding_policy.any.json": {
+      "sha256": "2627a043a0bf7f34c3fcda8c4ccc92b052718b91780a3be1253208fafe913040",
+      "required": false,
+      "category": "governance"
+    },
+    "governance/ssot_contract.any.json": {
+      "sha256": "d8151e97c730f1066355d9aac9623c37ca98eb72c0ed5d0ffdf8d32b90e02bc1",
+      "required": false,
+      "category": "governance"
+    },
+    "assistant/canvas_output_modes.any.json": {"sha256": "82b8a12f2186fa412dfe0fff88500458f8cd581d2df81c8cfb5f624eb1e49150", "required": false, "category": "semantics"},
+    "assistant/context_container_profiles.any.json": {"sha256": "e0e089b1dac95e1434f5a723d532314b40574b4738965102c4ac33d22b44e245", "required": false, "category": "semantics"},
+    "assistant/conversation_state_carryover.any.json": {"sha256": "1600713b541df72866176b80644eacbe11d7d0927d7c97c9989fb57d88963d3f", "required": false, "category": "semantics"},
+    "assistant/custom_agent_profiles.any.json": {"sha256": "6bd274747d061716c3aca05cb9ecdaa1ef6ae01e7ba8ffb515dcfcb7edc46d61", "required": false, "category": "semantics"},
+    "assistant/model_role_profiles.any.json": {"sha256": "1f4b7037f4854716c14f24f318a620fc9b4dcc030e0822f4f4d7fe02a699ecec", "required": false, "category": "semantics"},
+    "assistant/project_memory_policy.any.json": {"sha256": "d9d1f6e1517355f42dbc373668a74fcfa7b9af56ce017f87540bb4024b6642d5", "required": false, "category": "semantics"},
+    "assistant/research_planning.any.json": {"sha256": "976a44b1449db92bbcebe5fd9adf9195b7bb6dcfbf41d633127b5ad190560a45", "required": false, "category": "semantics"},
+    "assistant/task_decomposition_policy.any.json": {"sha256": "abbd4b3ac538fddb09fc28ea662489a128fa9a932437b404437d4ff65ec31a6d", "required": false, "category": "semantics"},
+    "assistant/tool_selection_policy.any.json": {"sha256": "bd9db62d9db8cc1f4aead5b99ddd377b85cdb37f883c45f1cb8ea0ba6beb5121", "required": false, "category": "semantics"},
+    "assistant/work_product_types.any.json": {"sha256": "a241bf1851783a91e75ff362dc903fb35051e585d35620ab0c86ed191e582961", "required": false, "category": "semantics"},
+    "document_intelligence/compose/answer_strategies.any.json": {"sha256": "a7e80631a8271cbfb75f97c62ca1941d4de3b7b5f3283c1317f80ce6f8439177", "required": false, "category": "semantics"},
+    "document_intelligence/compose/anti_repetition_patterns.any.json": {"sha256": "b42e7ba22daacdcc94f4c8bf2e60f03b9cda82e8455185f13c1dfabc4d17bdd3", "required": false, "category": "semantics"},
+    "document_intelligence/compose/anti_robotic_style_rules.any.json": {"sha256": "1ddc474a712a7e9bef6f55536ba4edb87d9c93307848da4cfa214fc5feef9423", "required": false, "category": "semantics"},
+    "document_intelligence/compose/audience_styles/analyst.any.json": {"sha256": "f8f6b22127f2d535de32b5a5df0ce44e8cbcc3b562f26c32b469f0da8b69bf4c", "required": false, "category": "semantics"},
+    "document_intelligence/compose/audience_styles/executive.any.json": {"sha256": "41dff71b6d1879e10c5edd7fe55226aa7a6b10ba660cb855bda743770f4312ff", "required": false, "category": "semantics"},
+    "document_intelligence/compose/audience_styles/general_user.any.json": {"sha256": "b504d29458930d01fe7a915825c475db9f617d44826c96aad4bfd3128ec8b138", "required": false, "category": "semantics"},
+    "document_intelligence/compose/audience_styles/operator.any.json": {"sha256": "7fe601482a8dc5cf976fbd48018e140f8900973fa9b920512583a2bd8e232e4c", "required": false, "category": "semantics"},
+    "document_intelligence/compose/claim_strength_language.any.json": {"sha256": "7e06314d9ee7ff78a856b8884a146be2841478aad11345b9e70e89017c29ed6a", "required": false, "category": "semantics"},
+    "document_intelligence/compose/closers_and_next_steps.any.json": {"sha256": "b32652e84d3b443e348a3cfed656cc0f9635150390576b65a52f2d696100623d", "required": false, "category": "semantics"},
+    "document_intelligence/compose/compare_and_contrast.any.json": {"sha256": "2e50dcc7d732f60a4afc7a0cf3403c396311d17682072d8e5501df231ec37c38", "required": false, "category": "semantics"},
+    "document_intelligence/compose/domain_writers/accounting_writer.any.json": {"sha256": "8c518c03ebc22ce3b8305738857a2179456bbea441383d2800f030c745a5e000", "required": false, "category": "semantics"},
+    "document_intelligence/compose/domain_writers/finance_writer.any.json": {"sha256": "267f28ba64bc1fde1347a6d39d998447782618cb2ef5e4da69bc49cd807cede2", "required": false, "category": "semantics"},
+    "document_intelligence/compose/domain_writers/legal_writer.any.json": {"sha256": "3f1e625d06e7d91a95dec7dc1d224584abac9d33eaa295a83462e718f69e1a1f", "required": false, "category": "semantics"},
+    "document_intelligence/compose/domain_writers/medical_writer.any.json": {"sha256": "efbc6131f938895ad36a387153a4f0e7290f9b8e8fddfb631f148fe6ea9dd892", "required": false, "category": "semantics"},
+    "document_intelligence/compose/domain_writers/ops_writer.any.json": {"sha256": "92375cdef3a1cfd78c3b6cd9e32ca13e48699f0a51858392cb092467230b9a66", "required": false, "category": "semantics"},
+    "document_intelligence/compose/empathy_and_support_language.any.json": {"sha256": "dfc3416ed9f24104fcf0f1f4a30a95fccdc29cfe42b1c0117d4392ea09d8cbb5", "required": false, "category": "semantics"},
+    "document_intelligence/compose/evidence_synthesis.any.json": {"sha256": "c4691cb1a941893f2bac94b20b48aaba0283c01f521d599f84013698af6f9a3b", "required": false, "category": "semantics"},
+    "document_intelligence/compose/openers_and_framing.any.json": {"sha256": "31c2e66c81eb21cbf28210d8ccc7b624bae4f9ecb8045d07220b5d5001fc3d2f", "required": false, "category": "semantics"},
+    "document_intelligence/compose/quote_explanation_patterns.any.json": {"sha256": "2325ef4c57001eb912d82e0dc46d4d2db2edbafbbfa46ed87b728da39453af87", "required": false, "category": "semantics"},
+    "document_intelligence/compose/response_templates.any.json": {"sha256": "4e68933208e2a81f45afec11f65a9abd8fdb06204151ee12dbf3bddcf0506bb9", "required": false, "category": "semantics"},
+    "document_intelligence/compose/rhetorical_moves.any.json": {"sha256": "ba5529e232bba2e9571ab11437dec1f1e33ed1c3f1757490d8fa9408a5dc75c3", "required": false, "category": "semantics"},
+    "document_intelligence/compose/sentence_rhythm_and_variety.any.json": {"sha256": "a86d422e500f17b090bc5e09b1e7f29b72df2794fe45e05b98db55e43cf55158", "required": false, "category": "semantics"},
+    "document_intelligence/compose/table_narration.any.json": {"sha256": "b867c9438526c94a576fabe5eed59ebef1cb9bd187bdbe55451295d4b934c3be", "required": false, "category": "semantics"},
+    "document_intelligence/compose/uncertainty_calibration.any.json": {"sha256": "160fd551015490b55c9e642ad60e19071741e9224c0bd454acab2bee3e212174", "required": false, "category": "semantics"},
+    "document_intelligence/compose/voice_personality_profiles.any.json": {"sha256": "a0ff48ccba928a9dcf978192d763125ba5a31b6bf9006b06693b81e4f41fd56b", "required": false, "category": "semantics"},
+    "document_intelligence/domains/commercial_real_estate/ambiguity_patterns.any.json": {"sha256": "2c1a9c4db65c0cc2962054ee807767a3e27b31de74b586b690f2a7ccc5e81dc2", "required": false, "category": "ambiguity"},
+    "document_intelligence/domains/commercial_real_estate/doc_type_catalog.any.json": {"sha256": "e9ad8b35fd40c17e2b7e21aafcfd1484e1c9b18ff131cdc03ad2c06b77a16df4", "required": false, "category": "semantics"},
+    "document_intelligence/domains/commercial_real_estate/domain_profile.any.json": {"sha256": "b72b162dcb0c16b7780905371caa805d179ca352bd67b2c3f545bfe9b778457f", "required": false, "category": "semantics"},
+    "document_intelligence/domains/commercial_real_estate/domain_writer.any.json": {"sha256": "82e9d164e51b6216129a4df80e46a068bbdc7a20e61dee53e857c3ea7ea2814f", "required": false, "category": "semantics"},
+    "document_intelligence/domains/commercial_real_estate/entity_ontology.any.json": {"sha256": "9a6e09f04d750b2a8a7601b5c954726761c40e95e5ce6de421dc8b89b45dd5f3", "required": false, "category": "semantics"},
+    "document_intelligence/domains/commercial_real_estate/gold_queries.any.json": {"sha256": "2d368154b49a3c9ed1347c4c09c8fcbb29ea8990f8b911348c5bf4ab18b47f64", "required": false, "category": "tests"},
+    "document_intelligence/domains/commercial_real_estate/retrieval_strategies.any.json": {"sha256": "8fe540d1507ab63373b79f5b38ac84945e618db6d319145cf5d4ec3e6ac65852", "required": false, "category": "retrieval"},
+    "document_intelligence/domains/commercial_real_estate/section_ontology.any.json": {"sha256": "e6a08666246f96e039fcf71866987c931fe54db4549f728ab1b9c093123f3798", "required": false, "category": "semantics"},
+    "document_intelligence/domains/commercial_real_estate/table_ontology.any.json": {"sha256": "71664bc30c0cd240008119d6a7e3bb85d9d4d3c441138579096b2f2e21fa3be2", "required": false, "category": "semantics"},
+    "document_intelligence/domains/commercial_real_estate/validation_rules.any.json": {"sha256": "6d891a79deec0d627c7732f934d67b67cdc833be28e43ff9837ce77daf7cc1b4", "required": false, "category": "quality"},
+    "document_intelligence/domains/compliance_regulatory/ambiguity_patterns.any.json": {"sha256": "45e229dd089aa5945ed675bce64e9d48ea35acc12ec5714ec69031b4463d165e", "required": false, "category": "ambiguity"},
+    "document_intelligence/domains/compliance_regulatory/doc_type_catalog.any.json": {"sha256": "fe3f41b1f237dbf713570f5a750a6ad72a2df73f7834729fc80179984b0bada8", "required": false, "category": "semantics"},
+    "document_intelligence/domains/compliance_regulatory/domain_profile.any.json": {"sha256": "a080e1d3419c373efed535f5f1e01ff5cd363f8bc3938998f6dc36a66fde146b", "required": false, "category": "semantics"},
+    "document_intelligence/domains/compliance_regulatory/domain_writer.any.json": {"sha256": "50d86bb6d6bf01c0773e3adeba07f2f102c46952eb9cd8384de783870e60332b", "required": false, "category": "semantics"},
+    "document_intelligence/domains/compliance_regulatory/entity_ontology.any.json": {"sha256": "9e04425535fcaa7b3aa531da663e9014293ef041840f7b612646fae509def580", "required": false, "category": "semantics"},
+    "document_intelligence/domains/compliance_regulatory/gold_queries.any.json": {"sha256": "46d0bb49e4da94d58fde597c63ea3e55cf5cbd19cd2fb75003bc5118805b98c8", "required": false, "category": "tests"},
+    "document_intelligence/domains/compliance_regulatory/retrieval_strategies.any.json": {"sha256": "c63bc71e1c43ec1d7e604dc2df2fda3f759d67af6e642a4cba67c339d0e2fe17", "required": false, "category": "retrieval"},
+    "document_intelligence/domains/compliance_regulatory/section_ontology.any.json": {"sha256": "4296b223823c4658651d05bfcc3c0dc48308ae5b59e6a488d383aec2ceb33ed2", "required": false, "category": "semantics"},
+    "document_intelligence/domains/compliance_regulatory/table_ontology.any.json": {"sha256": "f11065d01e6fca316279dfeafd5c714e360caa9a5077d857ff5f4f00e83f2728", "required": false, "category": "semantics"},
+    "document_intelligence/domains/compliance_regulatory/validation_rules.any.json": {"sha256": "54b3b5312abbc7a1e2faa1d76aff3722fc48c18e4a433bce3258c4a0ce9983fd", "required": false, "category": "quality"},
+    "document_intelligence/domains/manufacturing/ambiguity_patterns.any.json": {"sha256": "828c83b59a56bd7c97ed9d85f953b42991d0ecd7b5eca900f7b58f535a4ca55c", "required": false, "category": "ambiguity"},
+    "document_intelligence/domains/manufacturing/doc_type_catalog.any.json": {"sha256": "f8e382daa864bb475a76dbc28f889a4b8bc30c4d5f3ab5bbee209bbf3283cf47", "required": false, "category": "semantics"},
+    "document_intelligence/domains/manufacturing/domain_profile.any.json": {"sha256": "fd859bec504b72f399fcb1be4d2b2fe232352181a86c427bc231bec286b5c067", "required": false, "category": "semantics"},
+    "document_intelligence/domains/manufacturing/domain_writer.any.json": {"sha256": "f5a09d84b1c26395882a130f7025e215e49cfeb2c84359438c0012ef8b569403", "required": false, "category": "semantics"},
+    "document_intelligence/domains/manufacturing/entity_ontology.any.json": {"sha256": "826036b4041a08dd60be4a2b4f746a105adbcf9d5872455a9582b3e3ee0d4d71", "required": false, "category": "semantics"},
+    "document_intelligence/domains/manufacturing/gold_queries.any.json": {"sha256": "9446e1a7d256cd16c0ce66d93532c77e4487690716dc712a2cd8db9c24b754f3", "required": false, "category": "tests"},
+    "document_intelligence/domains/manufacturing/retrieval_strategies.any.json": {"sha256": "4b2bf0d65441fe54136646fd019e079c5cf0f84364d6c04c25af2e193c1e2a8b", "required": false, "category": "retrieval"},
+    "document_intelligence/domains/manufacturing/section_ontology.any.json": {"sha256": "b07503a792a3da2e4b19ac0c079540a768501f775560e610ae51436e3f682519", "required": false, "category": "semantics"},
+    "document_intelligence/domains/manufacturing/table_ontology.any.json": {"sha256": "efecb23989116de6e69bc5e62a594237e801906a809cd1a360496511d949ed5f", "required": false, "category": "semantics"},
+    "document_intelligence/domains/manufacturing/validation_rules.any.json": {"sha256": "4a3069ae4159b99c4e43750b29a980a0b61a124df8847722072a735f86990543", "required": false, "category": "quality"},
+    "document_intelligence/domains/procurement/ambiguity_patterns.any.json": {"sha256": "3571f3068aed19bcb0bcb763184ec7533f6c43376de842414023445b87c782e3", "required": false, "category": "ambiguity"},
+    "document_intelligence/domains/procurement/doc_type_catalog.any.json": {"sha256": "74c0eb85eab0cba211a100b069b29b3b6e4a03290fe82bb35417e00f796083f5", "required": false, "category": "semantics"},
+    "document_intelligence/domains/procurement/domain_profile.any.json": {"sha256": "0a13ad0e5b0f0c58f959326a1a255628cffcd49facadc378300d75902ab9d601", "required": false, "category": "semantics"},
+    "document_intelligence/domains/procurement/domain_writer.any.json": {"sha256": "31eb8ffebf68b32bf93f221a4528bef0fecd800f2327bedf5b6b0eea3efe7499", "required": false, "category": "semantics"},
+    "document_intelligence/domains/procurement/entity_ontology.any.json": {"sha256": "a7ddc495dfa428e862aa551af4a5611a946662d095f4fc1fc89e964f50a8040a", "required": false, "category": "semantics"},
+    "document_intelligence/domains/procurement/gold_queries.any.json": {"sha256": "f52c63185280f093bcdd789e8477b5ac576b706cd45febf43c5471c48870d544", "required": false, "category": "tests"},
+    "document_intelligence/domains/procurement/retrieval_strategies.any.json": {"sha256": "65989145f762b66311cfe74d84bbee5210ef6603cbd178b7dfcefa02d31b708a", "required": false, "category": "retrieval"},
+    "document_intelligence/domains/procurement/section_ontology.any.json": {"sha256": "55284143094ba0c3de4fcbe607f47a85eccc2afb7e175cbf9101675bcfc63903", "required": false, "category": "semantics"},
+    "document_intelligence/domains/procurement/table_ontology.any.json": {"sha256": "4f5a0a076d84173d1c6c2e10da30b3de8758e703125acdb2a8cbe1116835b163", "required": false, "category": "semantics"},
+    "document_intelligence/domains/procurement/validation_rules.any.json": {"sha256": "41fa1442fe2d6b32b213a1c2f2924f803c9e77b6a13239b98611d8f5a74f8ec4", "required": false, "category": "quality"},
+    "document_intelligence/domains/public_sector/ambiguity_patterns.any.json": {"sha256": "e041f75cb0a601d17263bdf1dac38ace063c0c452d0b47dc254e33c4c4c59ca0", "required": false, "category": "ambiguity"},
+    "document_intelligence/domains/public_sector/doc_type_catalog.any.json": {"sha256": "550fbcc67ae1f9de55ac678ae22700dafccba09ba72a15974f9e1f8b59adf2bd", "required": false, "category": "semantics"},
+    "document_intelligence/domains/public_sector/domain_profile.any.json": {"sha256": "760a0be3526153b2e3e5807115a0a9b0a7fabfc25ab3247de007813ead165080", "required": false, "category": "semantics"},
+    "document_intelligence/domains/public_sector/domain_writer.any.json": {"sha256": "2c06ee6a8794f2e6263a8f160addf7327f6a59dce9568eda71c5f1a53bb55aee", "required": false, "category": "semantics"},
+    "document_intelligence/domains/public_sector/entity_ontology.any.json": {"sha256": "4cf9695e05d584e715dd4c9eb1692457d22b28ad47afdeca05e1f1a5c8ed5cc1", "required": false, "category": "semantics"},
+    "document_intelligence/domains/public_sector/gold_queries.any.json": {"sha256": "4558eb2412c2aa561e27c697b3014724eaef37e4f5174266f2f321e1e26d5552", "required": false, "category": "tests"},
+    "document_intelligence/domains/public_sector/retrieval_strategies.any.json": {"sha256": "c003a2bcd578167431e92bae90694aa939394bb69dfff2d4e2f1e40cc7de9daa", "required": false, "category": "retrieval"},
+    "document_intelligence/domains/public_sector/section_ontology.any.json": {"sha256": "d6e06cae4b09160894e8878f9f3c531748be0843d2a9c97a0f38c86027033ee5", "required": false, "category": "semantics"},
+    "document_intelligence/domains/public_sector/table_ontology.any.json": {"sha256": "2bb6005a5c07c736a7af02e2338583fd41d90daafd74324e9e76b1ed143e4bd9", "required": false, "category": "semantics"},
+    "document_intelligence/domains/public_sector/validation_rules.any.json": {"sha256": "4bc1a3cef1143e49a07efc6fc696ba4dbebe9244fbb43e38db20ed6a116e32ce", "required": false, "category": "quality"},
+    "document_intelligence/domains/research_scientific/ambiguity_patterns.any.json": {"sha256": "4fe7a64ae8aad4ffc53e14d3ee19be8573e47e99b9e074ee2d067c9d1639bad5", "required": false, "category": "ambiguity"},
+    "document_intelligence/domains/research_scientific/doc_type_catalog.any.json": {"sha256": "49649a7d5f73f5a0df51b960c674225b07af2eacdce3b3c1903dc0b576dfe706", "required": false, "category": "semantics"},
+    "document_intelligence/domains/research_scientific/domain_profile.any.json": {"sha256": "dbf00482eb800435cd2b9713fd6b1386f3a4d152e134bf86d714943e87b9364b", "required": false, "category": "semantics"},
+    "document_intelligence/domains/research_scientific/domain_writer.any.json": {"sha256": "c525c83c0fa3d6b204128aa1cd95cec30a0a78e933ea4e0825e6533ac72f3764", "required": false, "category": "semantics"},
+    "document_intelligence/domains/research_scientific/entity_ontology.any.json": {"sha256": "aeb950c07e3fdf5a592a9721b58c2e526b934a33bb9482dacd9ed73f26bc4b57", "required": false, "category": "semantics"},
+    "document_intelligence/domains/research_scientific/gold_queries.any.json": {"sha256": "7ab41ba135b62473f704c312c6e3c2be833a449d4645a8e9950c120b0b973343", "required": false, "category": "tests"},
+    "document_intelligence/domains/research_scientific/retrieval_strategies.any.json": {"sha256": "9f00fa6e1d048d8b63a3e769a29a392ae1366254bd8a9c3966f23c29892d35d8", "required": false, "category": "retrieval"},
+    "document_intelligence/domains/research_scientific/section_ontology.any.json": {"sha256": "eb5c3129fb845ca623c5f3315c28eaee5a3677b974360f0540d09143a82388dc", "required": false, "category": "semantics"},
+    "document_intelligence/domains/research_scientific/table_ontology.any.json": {"sha256": "524f6d54d4114a6b7bd491f5f5650ee614e6f47a8510dd3eae25f455be2b8614", "required": false, "category": "semantics"},
+    "document_intelligence/domains/research_scientific/validation_rules.any.json": {"sha256": "76f119261cef9f1fc669f308bb9e08fa00c7ba68163ee3d9869b087a097e2ad1", "required": false, "category": "quality"},
+    "document_intelligence/domains/sales_crm/ambiguity_patterns.any.json": {"sha256": "02f830db37903e073410a29a0b3cd155f19a9995917276b089578541d3fc3c36", "required": false, "category": "ambiguity"},
+    "document_intelligence/domains/sales_crm/doc_type_catalog.any.json": {"sha256": "80d15c15cd27821e9f4f8c0d936ea3772ce3cad1439ee28ae6288b02a78851aa", "required": false, "category": "semantics"},
+    "document_intelligence/domains/sales_crm/domain_profile.any.json": {"sha256": "914ac89afd11f4450904d722931483645dc5e8804d2fc7da0a26be7f31e03928", "required": false, "category": "semantics"},
+    "document_intelligence/domains/sales_crm/domain_writer.any.json": {"sha256": "a9995cfe912a50112092863468290b82d8c1a3187f5bc127f2afec132d53129b", "required": false, "category": "semantics"},
+    "document_intelligence/domains/sales_crm/entity_ontology.any.json": {"sha256": "b4014b489e1bf962019718c8ffc89c8ad2bbb734027b74d80c2a43b033b66e2a", "required": false, "category": "semantics"},
+    "document_intelligence/domains/sales_crm/gold_queries.any.json": {"sha256": "e6bc23773535db559f7c2770fdb54dbce5d51e3129a96f972767f4a7f7f53512", "required": false, "category": "tests"},
+    "document_intelligence/domains/sales_crm/retrieval_strategies.any.json": {"sha256": "7363b596b9a420d46cb479769111f26398963487cc06fd75fdf3f159eb792972", "required": false, "category": "retrieval"},
+    "document_intelligence/domains/sales_crm/section_ontology.any.json": {"sha256": "3dc29f7d8ad24ad5ec18792cfb9b5f6ffe59f670fa0cf9a273d84e128c1ac26a", "required": false, "category": "semantics"},
+    "document_intelligence/domains/sales_crm/table_ontology.any.json": {"sha256": "a550279156ac9d993830a1a570473edf547f3e52f60a299b95c303a3fc130ebc", "required": false, "category": "semantics"},
+    "document_intelligence/domains/sales_crm/validation_rules.any.json": {"sha256": "9d2c6a6caeaff8b5144aea9177e7e55023673112491e655bb02284598b4b7265", "required": false, "category": "quality"},
+    "document_intelligence/domains/supply_chain_logistics/ambiguity_patterns.any.json": {"sha256": "c82079a092c7aeb578018a3d9e2c22bb42aa28311ff22bcd5cc608a5dc91e4e8", "required": false, "category": "ambiguity"},
+    "document_intelligence/domains/supply_chain_logistics/doc_type_catalog.any.json": {"sha256": "174ff3f6671929a9dc0223597e85ddfe5c0103fa0232f322a06cbb5481f773d1", "required": false, "category": "semantics"},
+    "document_intelligence/domains/supply_chain_logistics/domain_profile.any.json": {"sha256": "25d2e14d0d071d4cc961ffde046d2d9c941146275103b33536b353404c52a99c", "required": false, "category": "semantics"},
+    "document_intelligence/domains/supply_chain_logistics/domain_writer.any.json": {"sha256": "0b6b76d229ea8dab1dc8e13d2ad2b5a35543d342b41e7a53972fe6bf9e6fb46e", "required": false, "category": "semantics"},
+    "document_intelligence/domains/supply_chain_logistics/entity_ontology.any.json": {"sha256": "217975d3284af3bb8933e96746713ae5ecd8a377e4a21b7e04d61d8a738914bd", "required": false, "category": "semantics"},
+    "document_intelligence/domains/supply_chain_logistics/gold_queries.any.json": {"sha256": "4886b5763254091a201cf986c95c858089aff77b53a93e88887ed46b694dac7d", "required": false, "category": "tests"},
+    "document_intelligence/domains/supply_chain_logistics/retrieval_strategies.any.json": {"sha256": "17cfcf3c9c1b46686416b125037248e84e4197df421a29f452a46f0924f181c6", "required": false, "category": "retrieval"},
+    "document_intelligence/domains/supply_chain_logistics/section_ontology.any.json": {"sha256": "4daa6710e03938edd02b1bfef1442367e0f38652c89575031069b56e5a991bdb", "required": false, "category": "semantics"},
+    "document_intelligence/domains/supply_chain_logistics/table_ontology.any.json": {"sha256": "edcb5b2e888569a75289adb83fc9388667684a46e504b3b51e349454f871672d", "required": false, "category": "semantics"},
+    "document_intelligence/domains/supply_chain_logistics/validation_rules.any.json": {"sha256": "5743664ae183c1cc961a314a96c6399969ecf10a841624a060a4c772504f505d", "required": false, "category": "quality"},
+    "document_intelligence/manifest/dependency_graph.any.json": {"sha256": "2e7d6fca78aa8f7bb5726bcd4e71f69dd3462e92593155d0eab686739e9c49da", "required": false, "category": "manifest"},
+    "eval/adversarial/ambiguity_followups.any.json": {"sha256": "315a59539d3cabd1bc0a5536666398a59f9d2585d266bd4dd95be8d4c738abc9", "required": false, "category": "tests"},
+    "eval/adversarial/fake_citation.any.json": {"sha256": "24dd9876cd3e47d06063b7ffb4160067e49fcaa41099f0a929b2a123eaad9c57", "required": false, "category": "tests"},
+    "eval/adversarial/fallback_false_negative.any.json": {"sha256": "fc10da3f86b6f85cee5c19f7e481a519273e464e1e9ec176311dd5c3f08554fc", "required": false, "category": "tests"},
+    "eval/adversarial/high_latency_weak_answer.any.json": {"sha256": "2b70fca501d5b2555fb46815393ee90f50826c9ad3a43eb3950eac474d0fefcf", "required": false, "category": "tests"},
+    "eval/adversarial/owners_vs_signers.any.json": {"sha256": "d7cfc68aa9e77249e99d7c4ab3141ca3e8ae001d642e233446e575b57753f430", "required": false, "category": "tests"},
+    "eval/adversarial/partial_answer.any.json": {"sha256": "2c2baa48678914e91d66d7e8c11dc2fcd44a73a0085b255900175595546c9083", "required": false, "category": "tests"},
+    "eval/adversarial/table_corruption.any.json": {"sha256": "0e8b34aeafbcd2eaa0ea036fa6615bd68a6ab6c49eb926782178bf896b0984d6", "required": false, "category": "tests"},
+    "eval/adversarial/title_only_extraction.any.json": {"sha256": "cadc95efa6e1850df6c2c9dd0beca1935f32deed48f0980fae96ebb6dd2af96c", "required": false, "category": "tests"},
+    "eval/adversarial/wrong_doc.any.json": {"sha256": "8dd7cd6558f14d5538f2623e4629777df2762993561d445c1dfe257782e654e2", "required": false, "category": "tests"},
+    "eval/gold_queries/accounting_reconciliation.any.json": {"sha256": "b89474914bd18b38e6378e2d5f8a51649c972187e02f8c5fcac4bc6294a028ca", "required": false, "category": "tests"},
+    "eval/gold_queries/finance_table_exactness.any.json": {"sha256": "4e5d975d54a481367942257d32d61e139bcffc25c68e904f0d2454730d9649ac", "required": false, "category": "tests"},
+    "eval/gold_queries/general_assistant_open_ended.any.json": {"sha256": "afd9b8f66aabb1b57a35343286e0f99ce4bd9cb34244c412583e77af623327d9", "required": false, "category": "tests"},
+    "eval/gold_queries/legal_field_exactness.any.json": {"sha256": "6509524e7cdfd64bb4676d1bc9fe205065b8fb5e8cc3267bd6f926939a0ac429", "required": false, "category": "tests"},
+    "eval/gold_queries/medical_report_safety.any.json": {"sha256": "28af3ccb8a28cdfa209dbf0299c9424328ecefe24eea160a76245d3cef816354", "required": false, "category": "tests"},
+    "eval/multilingual/locale_number_parity.any.json": {"sha256": "25b02f408d5ce8aa1640ac8b9191ec0e62321b7585cc56f9aeedb2ea8a69056b", "required": false, "category": "tests"},
+    "eval/multilingual/pt_en_parity.any.json": {"sha256": "80dcbbade8f810769f5e8541bcad2afcc01b0bdf41b24d28fcdd2423f9d309a9", "required": false, "category": "tests"},
+    "eval/style/anti_robotic.any.json": {"sha256": "8930ee58fefa12c921c5ac4df327a77bb1383f98dd1071f4f5693c9d980f5dd3", "required": false, "category": "tests"},
+    "eval/style/canned_empathy.any.json": {"sha256": "2cf8eb8ad8fc12a5426f61e27a26f11b840f0626b69defb1abae9d3bd8007f94", "required": false, "category": "tests"},
+    "eval/style/repetition.any.json": {"sha256": "931a606616be9713381f5cc10c5ecd53353209b1cd5e97bac69dab943baaa12e", "required": false, "category": "tests"},
+    "eval/style/rhythm_and_variety.any.json": {"sha256": "e65e68f8fe5f28a22b73319515465ce7eea618f564136bf255195f1a4a1b6297", "required": false, "category": "tests"},
+    "llm/provider_capabilities.any.json": {"sha256": "c696a81102b676ba8ddd6c1e7a66fcf800943ada6dee40aea3d005879acc4d89", "required": false, "category": "llm"},
+    "llm/provider_capabilities_expanded.any.json": {"sha256": "fcf25f8cb43a136c253931c01edf851eec2518fe122d4ee2c7cbb9c992ed605b", "required": false, "category": "llm"},
+    "llm/provider_failure_ladders.any.json": {"sha256": "7a3e16e805596d8f46a9b4037ddbd078f2ad0f041152c38bf28796bafa5ee0d5", "required": false, "category": "llm"},
+    "llm/provider_fallbacks.any.json": {"sha256": "50c482f2c38ecd1764f7b4fd93f9d77245fd57b266a88ad28cac3e9882e2fd2e", "required": false, "category": "llm"},
+    "llm/provider_quality_profiles.any.json": {"sha256": "71133fff6fd297a83c0211eefb58fbe42179c686ff0cec50958b5b15fc8a21d4", "required": false, "category": "llm"},
+    "llm/provider_routing_policy.any.json": {"sha256": "e46baf6b75a7cffab6a4c2d55cb8d2341615fc05912b6b27e0e34197b6ca9444", "required": false, "category": "llm"},
+    "manifest/bank_aliases.any.json": {"sha256": "23271ddd570fb9327fce60e9fe539d18085d22b09ab52674ceb4387d9bf10b73", "required": false, "category": "manifest"},
+    "manifest/bank_checksums.any.json": {"sha256": "333e79b1cf1d43850181c9445d89b3638a5b4ccd1ec5470d7fb181bb044933e2", "required": false, "category": "manifest"},
+    "manifest/bank_dependencies.any.json": {"sha256": "2d5bdb28b680a814244d1140a041f4c64db00a90af4df2178bdd9d1112eab14e", "required": false, "category": "manifest"},
+    "manifest/bank_registry.any.json": {"sha256": "21a6c84a662102013b0a315eceda99b82103e98a566e5986e920429cc282cf31", "required": false, "category": "manifest"},
+    "microcopy/allybi_response_style.any.json": {"sha256": "5ec5901e6a5c872aacf15d63020d55c8a919c7e0d288dd1056028e8a6b223d90", "required": false, "category": "microcopy"},
+    "patterns/core/aggregation_patterns.any.json": {"sha256": "5c039f353e9ace3b640af798f922ca088f0455625f3a2a89f833b266d7aa4770", "required": false, "category": "semantics"},
+    "patterns/core/entity_mentions.any.json": {"sha256": "65a5b5cd2fe9b1507f04df60afdf9e6ecbe0e57340f818e127c3b3d9e777ed4c", "required": false, "category": "semantics"},
+    "patterns/core/intent_families.any.json": {"sha256": "3a97c8f4f6bdd1a94903824e040079f9063eb22b60cb5d1bbc66ebf4b3f112f9", "required": false, "category": "semantics"},
+    "patterns/core/multi_intent_connectors.en.any.json": {"sha256": "68b78b9ba3cd01016a2d296e3f0c8460ae265440275af26df512cb5a7a435488", "required": false, "category": "semantics"},
+    "patterns/core/multi_intent_connectors.pt.any.json": {"sha256": "7e7f31dac486a64d36e593987d944eb88bd228924d6e98900e084c969942a5d0", "required": false, "category": "semantics"},
+    "patterns/core/question_shapes.any.json": {"sha256": "46b2e3a18c9cf94c73962e09a7277e168f25ba1870662c3313508522864fbe32", "required": false, "category": "semantics"},
+    "patterns/core/time_scope_patterns.any.json": {"sha256": "1f8b164556898e802ad12a0a63b8ebfa1c63b348f7a8eef69263cb4aefd493fb", "required": false, "category": "semantics"},
+    "patterns/doc_refs/doc_ref_phrases.accounting.any.json": {"sha256": "086d19bb5d5c70ce7557b9d65d311723540eb6a70bae61ae570a12c37efb34fe", "required": false, "category": "semantics"},
+    "patterns/doc_refs/doc_ref_phrases.everyday.any.json": {"sha256": "796b7ca54238c28a60fcd309d84c335bb85469b82aa41e07bc384afb06047b04", "required": false, "category": "semantics"},
+    "patterns/doc_refs/doc_ref_phrases.finance.any.json": {"sha256": "21f9f9a6d3311d167e4930b2426ed3280243775c0807dabd3341ed6c03a38acf", "required": false, "category": "semantics"},
+    "patterns/doc_refs/doc_ref_phrases.legal.any.json": {"sha256": "2526e2e71518e6b06c0299ea6212daac26f8eaf211058a6bdd714692a6abff97", "required": false, "category": "semantics"},
+    "patterns/doc_refs/doc_ref_phrases.medical.any.json": {"sha256": "5f06fe7fcc84436a7b07bdbd3b7eb0cd8626210114138e7d712ed6755200fe39", "required": false, "category": "semantics"},
+    "patterns/doc_refs/doc_set_compare_patterns.any.json": {"sha256": "66c43cfdc9fb2b0534f61256d16b9804ebc0dfada521afc80d342f7ca9666931", "required": false, "category": "semantics"},
+    "patterns/doc_refs/folder_scope_patterns.any.json": {"sha256": "833a76622fb659b87423e0f3e73056e9aea7ed4d5f2f14ecc924c75a910d0a45", "required": false, "category": "semantics"},
+    "patterns/doc_refs/versioning_patterns.any.json": {"sha256": "b5d24a62c1ab909728b65a2201ede9213777a2f143f2731d8df9852cd0032a4c", "required": false, "category": "semantics"},
+    "patterns/domains/accounting/aging_report_patterns.any.json": {"sha256": "ecbc8024bc42bec8eae1783064989ed53b7ec6c263262b3190cdff3dd764180e", "required": false, "category": "semantics"},
+    "patterns/domains/accounting/gl_export_patterns.any.json": {"sha256": "6e614af9162d255461faf7081104b2f6b41a416f637dc488d13a3ef975574bad", "required": false, "category": "semantics"},
+    "patterns/domains/accounting/journal_entry_patterns.any.json": {"sha256": "e6b26a62c6b82e646455157ebd6a58a8bc2fea657810cc62e1459dd41cdae8b9", "required": false, "category": "semantics"},
+    "patterns/domains/accounting/reconciliation_patterns.any.json": {"sha256": "c6ecf94f5b1e815331cd031713210d0033b40846240e6fa917e114f730182b8f", "required": false, "category": "semantics"},
+    "patterns/domains/accounting/trial_balance_patterns.any.json": {"sha256": "d49566634bd21b2d4d7784da2fe437a73187060685dd86c8148da26b9ca7037c", "required": false, "category": "semantics"},
+    "patterns/domains/finance/anomaly_patterns.any.json": {"sha256": "acfa401d9a6d681b87ac4a44d3b8bf8c5d4706d845d5acd900f397e7803b48ce", "required": false, "category": "semantics"},
+    "patterns/domains/finance/footnote_priority_patterns.any.json": {"sha256": "63ac39aea284e229cc2389c3890a10262958f113adadc4e16628fc54378b7de9", "required": false, "category": "semantics"},
+    "patterns/domains/finance/kpi_patterns.any.json": {"sha256": "b8029cf2d8b18cfd8f0e53ab36ce122ace48a8cfcb91e1612f40634ce79123c6", "required": false, "category": "semantics"},
+    "patterns/domains/finance/period_and_unit_patterns.any.json": {"sha256": "f1bd42592f9f7787336adaf841e509f388112b85e14a2a521ae3f9d44fe01be2", "required": false, "category": "semantics"},
+    "patterns/domains/finance/statement_structures.any.json": {"sha256": "2a1c9c2fbff2b9effeea13d05a53fb8606120b04c55a88c2f5f6589b0afae24b", "required": false, "category": "semantics"},
+    "patterns/domains/legal/amendment_and_version_patterns.any.json": {"sha256": "e37b9ea65ab99e42a189cc437aed1a944120bce539231d3429a7f895eecc038d", "required": false, "category": "semantics"},
+    "patterns/domains/legal/clause_patterns.any.json": {"sha256": "4972154db3d2e816593cf61ccdc9cdb51034ad749e38f0ec9c14ad6236222f63", "required": false, "category": "semantics"},
+    "patterns/domains/legal/cross_reference_patterns.any.json": {"sha256": "18342d03a4f11aa37852d172bf337f56bd95d2411e279bcc55e6dbf3f3a7daa0", "required": false, "category": "semantics"},
+    "patterns/domains/legal/quote_requirements.any.json": {"sha256": "1a6a1256377db047d92a6639f494127a5ccce62524d48fbc2d4dd31f22fef6ee", "required": false, "category": "semantics"},
+    "patterns/domains/legal/risk_flag_patterns.any.json": {"sha256": "42e2cee7745da6cec91e3a3f86643e7a798340397aab1def78796163f62671eb", "required": false, "category": "semantics"},
+    "patterns/domains/medical/encounter_timeline_patterns.any.json": {"sha256": "d95583b2db47dc8ff47f6e4ba98bf03586d5e0b05c4847ad56e0dd85e97ce5d7", "required": false, "category": "semantics"},
+    "patterns/domains/medical/lab_panel_patterns.any.json": {"sha256": "0b6f19a611f3df66ea7dd5b5e98bc2fdf5947d6df8b1713e68f84c718c90b344", "required": false, "category": "semantics"},
+    "patterns/domains/medical/red_flag_patterns.any.json": {"sha256": "255c4fddd56458e9e412d85c7a98af64f87b9bd401f01f8c2808cef31f74ae8e", "required": false, "category": "semantics"},
+    "patterns/domains/medical/safety_boundary_triggers.any.json": {"sha256": "9279ccdd5d2acd3f7140c64e75a37d458a3b2c12858e5118b02aa8dc96efc773", "required": false, "category": "semantics"},
+    "patterns/domains/medical/unit_and_reference_range_patterns.any.json": {"sha256": "3bba2411a05249189692ea5bb088698e1f9650e982510a1eca7c6bd1f35f0963", "required": false, "category": "semantics"},
+    "patterns/integrations/connect_intents.en.any.json": {"sha256": "f1713946688c7524ab9a62ac330410801041e118ea180efa8bf82f94776ea56b", "required": false, "category": "semantics"},
+    "patterns/integrations/connect_intents.pt.any.json": {"sha256": "db24f6e4e1b3b71a9fd5b18ac063a0cbea36d7c24fa40e8b732640140864d1fd", "required": false, "category": "semantics"},
+    "patterns/integrations/search_intents.en.any.json": {"sha256": "041aa836a81d9fe9ef1d97880a9f80dc56923653199adc610b987505bbcfa8a7", "required": false, "category": "semantics"},
+    "patterns/integrations/search_intents.pt.any.json": {"sha256": "fcff0ff80ea5c140eb3cc167df4844511b31d14fb416d940f3baa5f19f59f352", "required": false, "category": "semantics"},
+    "patterns/integrations/send_intents.en.any.json": {"sha256": "550ad6dd660d35fdaefdb851fa4f433127ab7acf8feb7a3aaec0012d683e1f26", "required": false, "category": "semantics"},
+    "patterns/integrations/send_intents.pt.any.json": {"sha256": "56b2bee3fd1dc4e6862f2c7ea959309f3102bc3092354559bb87fc05505a9e72", "required": false, "category": "semantics"},
+    "patterns/integrations/sync_intents.en.any.json": {"sha256": "6986740ce0efbc43feca1de6e341ded44c58c1b06babad0bd0d0fd9c48482061", "required": false, "category": "semantics"},
+    "patterns/integrations/sync_intents.pt.any.json": {"sha256": "3320090c0e69a1020d658dd4e205353f2949d031510f2e9dd6f53668617a8829", "required": false, "category": "semantics"},
+    "policies/access_control_policy.any.json": {"sha256": "b75dd315a36465937136e55b15474c08606c4259483cdf7632d39a23842d083b", "required": false, "category": "semantics"},
+    "policies/allybi_connector_permissions.any.json": {"sha256": "134fa101188362a3e54b7c8a8ab7aa99cbb7188009ced41cee8dad2e852ee1d5", "required": false, "category": "policies"},
+    "policies/compliance_policy.any.json": {"sha256": "92fac1a3d9009716d2d490858b3b9a8355ce46231bb8a1a77e415e57e3e25c6d", "required": false, "category": "semantics"},
+    "policies/data_retention_deletion_policy.any.json": {"sha256": "9bc4f67de886e092d48fabcedbfced0da8a002f34845fd3a76c88277a7a77a70", "required": false, "category": "semantics"},
+    "policies/editing.policy.any.json": {"sha256": "ac7480aa63087900e73f25d1888483b5278c9ef8586acb91e4b880a6af7515f8", "required": false, "category": "policies"},
+    "policies/editing_agent_policy.any.json": {"sha256": "f4fb3b1f9fb03cb1c9189f691f178bfaef0e6000d68b966a8640af1468f17ea6", "required": false, "category": "policies"},
+    "policies/fallback_policy.any.json": {"sha256": "4d4a15444454b1bf25fcd5654f4271cd6c725aaec57bedd31820d012ba75fb5c", "required": false, "category": "policies"},
+    "policies/incident_response_policy.any.json": {"sha256": "b800f19d299261efda7707f0c99fb3dcf491e9a19ccac4414ff1c6a10e094cee", "required": false, "category": "semantics"},
+    "policies/llm_builder_policy.any.json": {"sha256": "853aee1e0c423518fca6276473dd5c30b8486c6cea88a952f2208e6f4b237442", "required": false, "category": "policies"},
+    "policies/logging_policy.any.json": {"sha256": "b944fd49b49fae977ec17c392f5924ef20d0fee93a5a73ef3a9020764f024d27", "required": false, "category": "semantics"},
+    "policies/memory_policy_tests.any.json": {"sha256": "7bc456972ddd00193872d04e1753b371a5fb67291db19d4b9dda0db12d774d61", "required": false, "category": "policies"},
+    "policies/model_release_policy.any.json": {"sha256": "45f80ce4a2d0ac52f7188664711a80023f494e19ab399ba2515fc89d9d58ae59", "required": false, "category": "semantics"},
+    "policies/policy_exceptions_policy.any.json": {"sha256": "ed81823a6af77515ff0cdd371176058f60bc56cbe26ca0cc66632a8965c68b29", "required": false, "category": "semantics"},
+    "policies/python_sandbox_policy.any.json": {"sha256": "f210bdabd47358b3f94c39165aee8ba8322c19bece0fad68321f6efa15faec80", "required": false, "category": "policies"},
+    "policies/rate_limit_policy.any.json": {"sha256": "1cbb34b1a48416aec01a1c9266dfab2a365fa210ac9d87e72162f8cfeed8daf4", "required": false, "category": "semantics"},
+    "policies/reasoning/assumption_policy.any.json": {"sha256": "5757c40ac4099f88799973c8540b443c688674125e28aacfac5f7001ab8bb954", "required": false, "category": "policies"},
+    "policies/reasoning/decision_support.accounting.any.json": {"sha256": "ce2da3819b88ec11c116b40462da79700a6771184f9be2c29e23122a6bccbd1b", "required": false, "category": "policies"},
+    "policies/reasoning/decision_support.everyday.any.json": {"sha256": "4474e27562a2d7c46b8bf237a12e9d757c81c87ca4b05fcf6a80e6df1957881b", "required": false, "category": "semantics"},
+    "policies/reasoning/decision_support.finance.any.json": {"sha256": "81bd98dc13bb679c7bfb319e642dbe1d2f61b22a2c0348dcf9de9cdf81d7cb67", "required": false, "category": "policies"},
+    "policies/reasoning/decision_support.legal.any.json": {"sha256": "31a4025a4075e38cb994ea7a841e741fb3b56c10ad3357612eb111f1bd130af7", "required": false, "category": "policies"},
+    "policies/reasoning/decision_support.medical.any.json": {"sha256": "7d3508e328119bad0217a30d826a1b7a917530ab4068e03c67b551a10d65db87", "required": false, "category": "policies"},
+    "policies/reasoning/decision_support.ops.any.json": {"sha256": "176e89ab1a54205fb6347c4c7796cde927672d3a36bb9dfafefd6f6db5d4caf2", "required": false, "category": "policies"},
+    "policies/reasoning/explain_style.accounting.any.json": {"sha256": "a71fdbd4fd6ae105ef0d71d0a6774d1100643c80a5539cdf36cdf656ce24a64a", "required": false, "category": "policies"},
+    "policies/reasoning/explain_style.everyday.any.json": {"sha256": "b2eeea742d43848af67ba2778faa3caf28ba0dd529e0c1b9d4c5b585b95b3280", "required": false, "category": "semantics"},
+    "policies/reasoning/explain_style.finance.any.json": {"sha256": "fdc8ea3786777d690e32a72ac4d8582d5f7f2136359229b02599f59d67d130e3", "required": false, "category": "policies"},
+    "policies/reasoning/explain_style.legal.any.json": {"sha256": "c15e472d227ee682b11dac0c7e3430059c16006d20c013d1705f6603262a7173", "required": false, "category": "policies"},
+    "policies/reasoning/explain_style.medical.any.json": {"sha256": "af3d5876ebd844a398778a56bd1e5b4594b6bed29c14b73c7983504e50abcd82", "required": false, "category": "policies"},
+    "policies/reasoning/explain_style.ops.any.json": {"sha256": "22e31991417933b2d09f48044382fa757fb86d6c816af324ee7659508f85cf13", "required": false, "category": "policies"},
+    "policies/refusal_policy.any.json": {"sha256": "6b2c6f5c8f8b3bceb8c49db67e54731bf8d29b0ae141a2eccb30f08c85c8b632", "required": false, "category": "policies"},
+    "policies/secrets_rotation_policy.any.json": {"sha256": "28b4aee51b5016142315c427af2884685bf0de9f98655e1e397a0ff1b3ca62c7", "required": false, "category": "semantics"},
+    "policies/token_rate_limits.any.json": {"sha256": "bbdd9c1df51938a33e754b260a513f6ed3e36f484d6aa9251b08395370ca8f99", "required": false, "category": "policies"},
+    "policies/viewer_locked_chat_policy.any.json": {"sha256": "5ee7ec9c36827be0032906c941db5d12f0ee7b993f70ac8d91e8e257ad90a1db", "required": false, "category": "policies"},
+    "prompts/system_base.any.json": {"sha256": "bbdbb31a7f3f9a4bdc1cfc7ec583504c546f82c6f778af81a872d9580b60bea3", "required": false, "category": "prompts"},
+    "governance/runtime_wiring_requirements.any.json": {"sha256": "b43e263eec4a490f44730db8f9da80755d96fb10b3de80cc638b1e6f486d1345", "required": false, "category": "governance"},
+    "manifest/bank_aliases.any.json": {"sha256": "a37645edaf3ab246e7a1549d8c72eed0d1f1e415567fd448f0ad3dcfe07060ec", "required": false, "category": "manifest"},
+    "manifest/bank_dependencies.any.json": {"sha256": "8529495c4b4752eae084ce3fe9750f90e287b022a29064c60c63486a04220a63", "required": false, "category": "manifest"},
+    "manifest/bank_registry.any.json": {"sha256": "40292bee0023ff3d0e6932cf433e536a5261e571915dcd236e803d17e7f32555", "required": false, "category": "manifest"},
+    "manifest/bank_checksums.any.json": {"sha256": "", "required": false, "category": "manifest"}
   },
   "envOverrides": {
     "_comment": "Optional: override checksum strictness behavior per environment.",

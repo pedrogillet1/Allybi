@@ -14,6 +14,10 @@ import { Request, Response, NextFunction } from "express";
 import crypto from "crypto";
 import { verifyAdminAccessToken, AdminJWTPayload } from "../../utils/adminJwt";
 import prisma from "../../config/database";
+import {
+  getAdminIdentityProvider,
+  isLegacyAdminKeyEnabled,
+} from "../../config/runtimeMode";
 
 /**
  * Log security event for admin access control (fire-and-forget).
@@ -107,6 +111,13 @@ function getValidAdminJwt(req: Request): AdminJWTPayload | null {
  * Check if request has valid admin API key
  */
 function hasValidAdminKey(req: Request): boolean {
+  if (
+    process.env.NODE_ENV === "production" &&
+    (getAdminIdentityProvider() === "iap" || !isLegacyAdminKeyEnabled())
+  ) {
+    return false;
+  }
+
   if (!ADMIN_KEY) return false;
 
   // Check Authorization header: Bearer <key> (for direct API key usage)
@@ -200,6 +211,25 @@ export function requireAdmin(
     ).adminAuth = {
       type: "owner",
       userId: OWNER_USER_ID,
+    };
+    next();
+    return;
+  }
+
+  const iapIdentity = (req as Request & { adminIdentity?: { provider: string; email: string; subject: string } }).adminIdentity;
+  if (iapIdentity?.provider === "iap") {
+    (
+      req as Request & {
+        adminAuth: {
+          type: string;
+          email: string;
+          subject: string;
+        };
+      }
+    ).adminAuth = {
+      type: "iap",
+      email: iapIdentity.email,
+      subject: iapIdentity.subject,
     };
     next();
     return;

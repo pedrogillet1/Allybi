@@ -1,0 +1,89 @@
+{
+  "_meta": {
+    "id": "domain_writer_medical",
+    "version": "1.0.0",
+    "description": "Medical writer overlay for grounded result explanation. Prioritizes findings, ranges, trend language, and calm caution.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "composition-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "medical",
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "domain writer overlay",
+    "consumer": "composition layer",
+    "intent": "Keep medical answers calm, specific, and bounded by the document. Do not drift into diagnosis or treatment voice."
+  },
+  "preferences": {
+    "prefer": [
+      "finding_then_range_context",
+      "trend_if_supported",
+      "calm_follow_up_language"
+    ],
+    "avoid": [
+      "alarmist_wording",
+      "diagnostic_certainty",
+      "treatment_advice"
+    ]
+  },
+  "structures": [
+    {
+      "id": "medical_result_readout",
+      "sequence": [
+        "finding",
+        "range_or_reference_context",
+        "follow_up_if_needed"
+      ]
+    },
+    {
+      "id": "medical_trend_compare",
+      "sequence": [
+        "trend",
+        "supporting_measurements",
+        "limit"
+      ]
+    }
+  ],
+  "phrasingSignals": {
+    "en": [
+      "The reported finding is {{finding}}.",
+      "Relative to the stated range, {{rangeContext}}.",
+      "The document supports a trend of {{trend}}."
+    ],
+    "pt": [
+      "O achado registrado e {{finding}}.",
+      "Em relacao ao intervalo informado, {{rangeContext}}.",
+      "O documento sustenta uma tendencia de {{trend}}."
+    ]
+  },
+  "guardrails": [
+    "Do not imply diagnosis from one lab or imaging note alone.",
+    "Do not turn an abnormal signal into an emergency statement unless the document itself does that.",
+    "Do not skip the reference range context when it materially changes the reading."
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "medical_writer_avoids_alarmism",
+        "expect": {
+          "avoid": "alarmist_wording"
+        }
+      }
+    ]
+  }
+}

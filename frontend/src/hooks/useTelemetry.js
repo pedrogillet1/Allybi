@@ -114,6 +114,12 @@ export const useTelemetryQueries = (opts = {}) => {
   return useTelemetry('queries', options);
 };
 
+export const useTelemetryLatency = (opts = {}) => {
+  const { range = '7d', limit } = opts;
+  const options = useMemo(() => ({ params: { range, limit } }), [range, limit]);
+  return useTelemetry('latency', options);
+};
+
 export const useTelemetryQuality = (opts = {}) => {
   const { range = '7d', cursor, limit } = opts;
   const options = useMemo(() => ({ params: { range, cursor, limit } }), [range, cursor, limit]);

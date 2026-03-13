@@ -360,7 +360,7 @@ export interface RetrievalScopeMetrics {
 // ── Engine Interface ─────────────────────────────────────────────────
 
 /**
- * Shared interface for V1 (RetrievalEngineService) and V2 (RetrievalOrchestratorV2).
+ * Shared interface for the active retrieval engine.
  * Consumers depend on this interface only — never on engine classes directly.
  */
 export interface IRetrievalEngine {

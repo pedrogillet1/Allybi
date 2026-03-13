@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "bankId": "intent_families",
+    "bankId": "patterns_core_intent_families",
     "version": "1.0.0",
     "owner": "pattern-core-curator",
     "languages": [

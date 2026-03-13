@@ -15,6 +15,7 @@ function loadPromptBanks() {
     "llm_global_guards",
     "rag_policy",
     "task_answer_with_sources",
+    "compose_style_contract",
     "task_plan_generation",
     "editing_task_prompts",
     "policy_citations",

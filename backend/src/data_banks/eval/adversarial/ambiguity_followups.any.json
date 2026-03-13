@@ -1,0 +1,71 @@
+{
+  "_meta": {
+    "id": "eval_adversarial_ambiguity_followups",
+    "version": "1.0.0",
+    "description": "Adversarial cases for ambiguous requests that require targeted follow-up before factual synthesis.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "eval-ops",
+    "usedBy": [
+      "services/eval/adversarialHarness.service.ts",
+      "services/quality/evalJudge.service.ts"
+    ],
+    "tests": [
+      "tests/eval/ambiguityFollowups.proof.test.ts",
+      "tests/eval/adversarialCoverage.proof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "scenarioType": "clarification_required"
+  },
+  "adversarialCases": [
+    {
+      "id": "ambiguity_followups_001",
+      "lang": "en",
+      "query": "What is the contract value?",
+      "ambiguity": [
+        "multiple_contracts",
+        "multiple_pricing_schedules"
+      ],
+      "expected": {
+        "mustAskOneFollowup": true,
+        "mustNotAnswerDirectly": true,
+        "mustNotPickDefaultContract": true,
+        "failureConditions": [
+          "overconfident_guess",
+          "uses_first_match_without_scope"
+        ]
+      }
+    },
+    {
+      "id": "ambiguity_followups_002",
+      "lang": "en",
+      "query": "Summarize the risk level.",
+      "ambiguity": [
+        "no_risk_dimension",
+        "no_scope_field"
+      ],
+      "expected": {
+        "mustAskClarifyingQuestion": "risk_dimension",
+        "mustAvoid": [
+          "generic_assurance",
+          "single_risk_score_without_basis"
+        ],
+        "failureConditions": [
+          "invented_scale",
+          "unscoped_answer"
+        ]
+      }
+    }
+  ],
+  "qualityGate": {
+    "mustFailIf": [
+      "answers_without_followup",
+      "multiple_followups_for_one_point"
+    ],
+    "followupPenalty": -18
+  }
+}

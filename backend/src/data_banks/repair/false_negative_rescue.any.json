@@ -1,0 +1,266 @@
+{
+  "_meta": {
+    "id": "false_negative_rescue",
+    "version": "1.0.0",
+    "description": "Rescue playbooks for weak retrieval or extraction false negatives. Helps the system keep searching intelligently before giving up.",
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "koda-repair",
+    "compat": ">=1.0.0",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ],
+    "changeLog": [
+      "Added rescue playbooks for alias expansion, role-aware rewrites, structural search, OCR normalization, and neighboring section traversal",
+      "Added stop conditions so retries stay bounded and deterministic",
+      "Added runtime signals for rescue attempts and outcomes"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id",
+    "maxRescuePasses": 3,
+    "minTriggerLikelihood": 0.55,
+    "retryWithinActiveScopeFirst": true,
+    "allowNeighborSectionSearch": true,
+    "stopAfterFirstStrongHit": true
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "after low-hit retrieval or low-coverage extraction and before terminal fallback",
+    "consumer": "retrieval engine",
+    "intent": "Recover likely missed evidence through targeted rewrites rather than broad random retries.",
+    "emittedSignals": [
+      "falseNegativeRescueAttempted",
+      "falseNegativeRescueSucceeded",
+      "rescuePlaybookUsed",
+      "rescueRetryCount"
+    ]
+  },
+  "playbooks": [
+    {
+      "id": "fnr_alias_expansion",
+      "bestFor": [
+        "abbreviations",
+        "entity nicknames",
+        "alternate field labels"
+      ],
+      "steps": [
+        "expand_aliases",
+        "retry_exact_and_semantic_search"
+      ]
+    },
+    {
+      "id": "fnr_role_aware_rewrite",
+      "bestFor": [
+        "generic person labels",
+        "signer vs owner vs witness confusion",
+        "patient vs subscriber confusion"
+      ],
+      "steps": [
+        "substitute_role_candidates",
+        "retry_with_role_labels"
+      ]
+    },
+    {
+      "id": "fnr_structural_search",
+      "bestFor": [
+        "signature blocks",
+        "tables",
+        "headers",
+        "footers",
+        "key-value layouts"
+      ],
+      "steps": [
+        "search_section_titles",
+        "search_layout_anchors",
+        "retry_with_structural_terms"
+      ]
+    },
+    {
+      "id": "fnr_ocr_normalization",
+      "bestFor": [
+        "noisy OCR",
+        "hyphenation and spacing errors",
+        "common character confusions"
+      ],
+      "steps": [
+        "normalize_ocr_noise",
+        "retry_keyword_search"
+      ]
+    },
+    {
+      "id": "fnr_neighbor_section_traversal",
+      "bestFor": [
+        "question points to a nearby but mislabeled section",
+        "table answer spills into adjacent page or section"
+      ],
+      "steps": [
+        "expand_to_neighbor_sections",
+        "re-rank_local_hits"
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "FNR_001_alias_rescue_for_label_mismatch",
+      "priority": 130,
+      "when": {
+        "all": [
+          {
+            "path": "signals.noDirectHits",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "signals.aliasMismatchLikely",
+            "op": "eq",
+            "value": true
+          }
+        ]
+      },
+      "action": {
+        "type": "run_playbook",
+        "playbook": "fnr_alias_expansion"
+      },
+      "reasonCode": "label_mismatch_false_negative",
+      "severity": "medium"
+    },
+    {
+      "id": "FNR_002_role_aware_rescue_for_generic_people_terms",
+      "priority": 140,
+      "when": {
+        "all": [
+          {
+            "path": "signals.fieldRoleAmbiguous",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "signals.noDirectHits",
+            "op": "eq",
+            "value": true
+          }
+        ]
+      },
+      "action": {
+        "type": "run_playbook",
+        "playbook": "fnr_role_aware_rewrite"
+      },
+      "reasonCode": "generic_role_query_needs_role_labels",
+      "severity": "high"
+    },
+    {
+      "id": "FNR_003_structural_search_for_forms_and_tables",
+      "priority": 135,
+      "when": {
+        "all": [
+          {
+            "path": "signals.layoutHeavyDocument",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "signals.noDirectHits",
+            "op": "eq",
+            "value": true
+          }
+        ]
+      },
+      "action": {
+        "type": "run_playbook",
+        "playbook": "fnr_structural_search"
+      },
+      "reasonCode": "layout_anchor_rescue",
+      "severity": "medium"
+    },
+    {
+      "id": "FNR_004_ocr_noise_rescue",
+      "priority": 125,
+      "when": {
+        "all": [
+          {
+            "path": "metrics.ocrConfidence",
+            "op": "lt",
+            "value": 0.72
+          }
+        ]
+      },
+      "action": {
+        "type": "run_playbook",
+        "playbook": "fnr_ocr_normalization"
+      },
+      "reasonCode": "ocr_noise_likely_hid_hit",
+      "severity": "medium"
+    },
+    {
+      "id": "FNR_005_neighbor_search_when_target_section_is_nearby",
+      "priority": 120,
+      "when": {
+        "all": [
+          {
+            "path": "signals.neighborSectionLikely",
+            "op": "eq",
+            "value": true
+          }
+        ]
+      },
+      "action": {
+        "type": "run_playbook",
+        "playbook": "fnr_neighbor_section_traversal"
+      },
+      "reasonCode": "answer_may_be_adjacent",
+      "severity": "low"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "generic_owner_query_tries_role_aware_rewrite",
+        "input": {
+          "signals": {
+            "fieldRoleAmbiguous": true,
+            "noDirectHits": true
+          }
+        },
+        "expect": {
+          "playbook": "fnr_role_aware_rewrite"
+        }
+      },
+      {
+        "id": "forms_use_structural_search_when_hits_missing",
+        "input": {
+          "signals": {
+            "layoutHeavyDocument": true,
+            "noDirectHits": true
+          }
+        },
+        "expect": {
+          "playbook": "fnr_structural_search"
+        }
+      },
+      {
+        "id": "ocr_noise_tries_normalization",
+        "input": {
+          "metrics": {
+            "ocrConfidence": 0.61
+          }
+        },
+        "expect": {
+          "playbook": "fnr_ocr_normalization"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,182 @@
+{
+  "_meta": {
+    "id": "legal_ambiguity_patterns",
+    "version": "1.0.0",
+    "description": "Legal ambiguity patterns for party-role mapping, clause precedence, and term boundary interpretation.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "maxQuestions": 1,
+    "preferClarifyOverSpeculation": true,
+    "domain": "legal"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "post-retrieval when roles, versions, and precedence are not fully resolved",
+    "consumer": "legal ambiguity resolver",
+    "intent": "Prevent role drift, mixed-version interpretation, and ambiguous term scope before legal conclusions.",
+    "emittedSignals": [
+      "legalAmbiguityType",
+      "legalRoleLockRequested",
+      "legalAmbiguitySeverity"
+    ]
+  },
+  "patterns": [
+    {
+      "id": "LEGAL_AMB_001_party_role_collision",
+      "type": "party_role_collision",
+      "triggerSignals": [
+        "queryIncludesRoleWords && multiple_party_roles_detected",
+        "same_party_name_with_multiple_role_labels"
+      ],
+      "askQuestion": "Bind the query role first: signer, witness, beneficiary, issuer, owner, counterparty, patient, or subscriber where present?"
+    },
+    {
+      "id": "LEGAL_AMB_002_version_or_effective_date_conflict",
+      "type": "version_conflict",
+      "triggerSignals": [
+        "multipleVersionsDetected",
+        "versionOverrideClausesPresent"
+      ],
+      "askQuestion": "Use latest active version only, or compare legacy vs current with precedence matrix?"
+    },
+    {
+      "id": "LEGAL_AMB_003_definition_resolution_gap",
+      "type": "undefined_term_collision",
+      "triggerSignals": [
+        "queryUsesDefinedTerm",
+        "termDefinitionIncompleteOrMissing"
+      ],
+      "askQuestion": "Should defined terms be treated as document-local definitions or external legal definitions when unresolved?"
+    },
+    {
+      "id": "LEGAL_AMB_004_clause_scope_collision",
+      "type": "clause_scope_collision",
+      "triggerSignals": [
+        "queryIncludesObligationOrRight",
+        "same_clause_keywordAcrossSections"
+      ],
+      "askQuestion": "Resolve obligations per section (scope_of_services, termination, liability, audit rights), or aggregate with explicit precedence?"
+    },
+    {
+      "id": "LEGAL_AMB_005_currency_cap_collision",
+      "type": "financial_value_ambiguity",
+      "triggerSignals": [
+        "liability_or_penalty_query",
+        "currencyOrUnitMissing",
+        "currency_or_period_not_locked"
+      ],
+      "askQuestion": "Return value interpretation in contract native currency with raw text, or converted currency with explicit conversion basis?"
+    },
+    {
+      "id": "LEGAL_AMB_006_exception_ordering",
+      "type": "exception_coverage_collision",
+      "triggerSignals": [
+        "exceptionsMentioned",
+        "exceptionsNotMappedToTriggerOrLimit"
+      ],
+      "askQuestion": "Apply exceptions before obligations, after obligations, or split as a risk-first branch?"
+    },
+    {
+      "id": "LEGAL_AMB_007_cure_timeline_collision",
+      "type": "timeline_collision",
+      "triggerSignals": [
+        "terminationOr_notice_query",
+        "notice_period_without_event_mapping",
+        "cure_window_present"
+      ],
+      "askQuestion": "Should cure periods be interpreted from breach event, notice trigger, or termination event?"
+    },
+    {
+      "id": "LEGAL_AMB_008_governing_law_overlap",
+      "type": "governance_overlap",
+      "triggerSignals": [
+        "governing_law_and_jurisdiction_multiple_sources",
+        "documentContainsForumSelectionPlusGoverningLaw"
+      ],
+      "askQuestion": "Use governing law, forum, or the latest specific venue clause when outputs are conflicting?"
+    },
+    {
+      "id": "LEGAL_AMB_009_conflict_of_documents",
+      "type": "policy_source_collision",
+      "triggerSignals": [
+        "queryReferencesPolicyAndAgreement",
+        "same_obligation_in_multiple_documents"
+      ],
+      "askQuestion": "Prioritize agreement text only, policy text only, or resolve precedence across both sources?"
+    },
+    {
+      "id": "LEGAL_AMB_010_security_incident_scope",
+      "type": "security_scope_collision",
+      "triggerSignals": [
+        "queryReferencesBreachOrSecurityIncident",
+        "dpa_vs_nda_terms_conflict"
+      ],
+      "askQuestion": "Should security incident handling follow DPA language, NDA confidentiality, or incident-response annex if present?"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "legal_amb_role_collision_asks_role",
+        "input": {
+          "scenario": "same_party_role_collision"
+        },
+        "expect": {
+          "action": "askQuestion",
+          "mustAskContains": "signer"
+        }
+      },
+      {
+        "id": "legal_amb_version_lock",
+        "input": {
+          "scenario": "amendment_and_base_terms"
+        },
+        "expect": {
+          "action": "askQuestion",
+          "mustAskContains": [
+            "version",
+            "active"
+          ]
+        }
+      },
+      {
+        "id": "legal_amb_exception_precedence",
+        "input": {
+          "query": "What happens if cure window is missed?"
+        },
+        "expect": {
+          "mustAskContains": [
+            "cure",
+            "exception"
+          ]
+        }
+      },
+      {
+        "id": "legal_amb_governing_law",
+        "input": {
+          "query": "Which law applies now?"
+        },
+        "expect": {
+          "mustAskContains": [
+            "governing law",
+            "forum"
+          ]
+        }
+      }
+    ]
+  }
+}

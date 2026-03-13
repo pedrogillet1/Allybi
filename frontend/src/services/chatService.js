@@ -674,7 +674,9 @@ export const sendAdaptiveMessageStreaming = async (
             const data = JSON.parse(line.slice(6));
             console.log('✅ PARSED DATA:', data);
 
-            if (data.type === 'connected') {
+            if (data.type === 'chat_start') {
+              console.log('🚀 Chat stream started');
+            } else if (data.type === 'connected') {
               console.log('🔗 Connected to conversation:', data.conversationId);
             } else if (data.type === 'meta') {
               // Meta event with answerMode and navType

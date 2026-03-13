@@ -310,16 +310,19 @@ class KodaV3Container {
       });
 
       await this.tryLoad("retrievalEngine", async () => {
-        const { PrismaRetrievalAdapterFactory } =
-          await import("../services/core/retrieval/prismaRetrievalAdapters.service");
+        const {
+          createUserScopedRetrievalRuntime,
+        } = await import("../services/core/retrieval/v2/RetrievalRuntimeBootstrap.service");
         const db = (await import("../config/database")).default;
+        const retrievalRuntime = createUserScopedRetrievalRuntime();
         return {
-          id: "centralized_retrieval_runtime",
+          id: "user_scoped_retrieval_runtime",
           centralized: true,
-          adapterFactory: new PrismaRetrievalAdapterFactory(),
+          runtime: retrievalRuntime,
+          activeEngineMode: retrievalRuntime.getActiveEngineMode(),
           health: async () => {
             await db.$queryRaw`SELECT 1 FROM "document_chunks" LIMIT 1`;
-            return { ok: true };
+            return { ok: true, ...retrievalRuntime.describe() };
           },
         };
       });

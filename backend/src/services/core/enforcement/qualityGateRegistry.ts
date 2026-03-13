@@ -23,6 +23,7 @@ export interface QualityGateContext {
   answerMode?: string;
   answerClass?: string;
   domainHint?: string;
+  audienceHint?: string;
   docTypeId?: string;
   operator?: string;
   intentFamily?: string;
@@ -36,6 +37,9 @@ export interface QualityGateContext {
   explicitDocRef?: boolean;
   sourceButtonsCount?: number;
   userRequestedShort?: boolean;
+  evidenceStrength?: string | null;
+  styleDecision?: Record<string, unknown> | null;
+  turnStyleState?: Record<string, unknown> | null;
 }
 
 export type QualityGatesBank = {
@@ -56,6 +60,8 @@ type HookBank = {
   bannedPhrases?: string[];
   bannedPatterns?: string[];
   piiPatterns?: string[];
+  bannedLeadins?: Record<string, string[]>;
+  bans?: string[];
 };
 
 type GateEvaluatorContext = {
@@ -74,6 +80,12 @@ const DEFAULT_GATE_ORDER = [
   "numeric_integrity",
   "markdown_sanity",
   "repetition_and_banned_phrases",
+  "style_opener_naturalness",
+  "style_empathy_authenticity",
+  "style_repetition_control",
+  "style_confidence_alignment",
+  "style_domain_voice_match",
+  "style_conversational_flow",
   "privacy_minimal",
   "final_consistency",
 ] as const;
@@ -86,6 +98,13 @@ const EXTRACTION_GATE_ORDER = [
 
 const REQUIRED_HOOK_BY_GATE: Record<string, string[]> = {
   repetition_and_banned_phrases: ["dedupeBankId"],
+  style_contract: ["antiRoboticBankId", "cannedEmpathyBankId"],
+  style_opener_naturalness: ["antiRoboticBankId"],
+  style_empathy_authenticity: ["cannedEmpathyBankId"],
+  style_repetition_control: ["antiRoboticBankId"],
+  style_confidence_alignment: ["antiRoboticBankId"],
+  style_domain_voice_match: ["antiRoboticBankId"],
+  style_conversational_flow: ["antiRoboticBankId"],
   privacy_minimal: ["piiLabelsBankId"],
 };
 
@@ -105,6 +124,70 @@ function detectRepeatedSentence(text: string): boolean {
   return false;
 }
 
+function collectLanguagePhrases(
+  bank: HookBank | null,
+  language: string,
+  field: "bannedLeadins" | "bans",
+): string[] {
+  if (!bank) return [];
+  if (field === "bans" && Array.isArray(bank.bans)) {
+    return bank.bans.map((value) => String(value || "").trim()).filter(Boolean);
+  }
+  if (field === "bannedLeadins" && bank.bannedLeadins) {
+    const normalized = String(language || "en").trim().toLowerCase();
+    const ordered = normalized === "pt" ? ["pt", "any", "en"] : ["en", "any", "pt"];
+    for (const key of ordered) {
+      const values = bank.bannedLeadins[key];
+      if (Array.isArray(values)) {
+        return values.map((value) => String(value || "").trim()).filter(Boolean);
+      }
+    }
+  }
+  return [];
+}
+
+function sentenceStarters(text: string): string[] {
+  return splitSentences(text).map((sentence) =>
+    sentence
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/gi, " ")
+      .trim()
+      .split(/\s+/)
+      .slice(0, 2)
+      .join(" "),
+  );
+}
+
+function leadSignature(text: string): string {
+  return sentenceStarters(text)[0] || "";
+}
+
+function closerSignature(text: string): string {
+  const sentences = splitSentences(text);
+  const last = sentences[sentences.length - 1] || "";
+  const tokens = last
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/gi, " ")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+  return tokens.slice(Math.max(0, tokens.length - 3)).join(" ");
+}
+
+function hasRepeatedStarterRun(text: string): boolean {
+  const starters = sentenceStarters(text).filter(Boolean);
+  for (let index = 1; index < starters.length; index += 1) {
+    if (starters[index] && starters[index] === starters[index - 1]) return true;
+  }
+  return false;
+}
+
+function asStringList(value: unknown): string[] {
+  return Array.isArray(value)
+    ? value.map((entry) => String(entry || "").trim()).filter(Boolean)
+    : [];
+}
+
 function resolveSeverity(
   gateName: string,
   bank: QualityGatesBank | null,
@@ -118,6 +201,70 @@ function resolveSeverity(
 
 function getHookBank<T>(bankId: string): T | null {
   return getOptionalBank<T>(bankId);
+}
+
+function resolveStyleBanks(evalCtx: GateEvaluatorContext): {
+  antiRoboticBankId: string;
+  cannedEmpathyBankId: string;
+  antiRoboticBank: HookBank | null;
+  cannedEmpathyBank: HookBank | null;
+} {
+  const antiRoboticBankId = String(
+    evalCtx.qualityBank?.config?.integrationHooks?.antiRoboticBankId || "",
+  ).trim();
+  const cannedEmpathyBankId = String(
+    evalCtx.qualityBank?.config?.integrationHooks?.cannedEmpathyBankId || "",
+  ).trim();
+  return {
+    antiRoboticBankId,
+    cannedEmpathyBankId,
+    antiRoboticBank: antiRoboticBankId ? getHookBank<HookBank>(antiRoboticBankId) : null,
+    cannedEmpathyBank: cannedEmpathyBankId
+      ? getHookBank<HookBank>(cannedEmpathyBankId)
+      : null,
+  };
+}
+
+function buildStyleSignalContext(
+  response: string,
+  ctx: QualityGateContext,
+  evalCtx: GateEvaluatorContext,
+): {
+  language: string;
+  lower: string;
+  lead: string;
+  close: string;
+  recentLeadSignatures: string[];
+  recentCloserSignatures: string[];
+  evidenceStrength: string;
+  domainHint: string;
+  antiRoboticBankId: string;
+  cannedEmpathyBankId: string;
+  antiRoboticBank: HookBank | null;
+  cannedEmpathyBank: HookBank | null;
+} {
+  const { antiRoboticBankId, cannedEmpathyBankId, antiRoboticBank, cannedEmpathyBank } =
+    resolveStyleBanks(evalCtx);
+  const turnStyleState =
+    ctx.turnStyleState && typeof ctx.turnStyleState === "object" ? ctx.turnStyleState : {};
+  return {
+    language: String(ctx.language || "en").trim().toLowerCase(),
+    lower: String(response || "").toLowerCase(),
+    lead: leadSignature(response),
+    close: closerSignature(response),
+    recentLeadSignatures: asStringList(
+      (turnStyleState as Record<string, unknown>).recentLeadSignatures,
+    ),
+    recentCloserSignatures: asStringList(
+      (turnStyleState as Record<string, unknown>).recentCloserSignatures,
+    ),
+    evidenceStrength: String(ctx.evidenceStrength || "").trim().toLowerCase(),
+    domainHint: String(ctx.domainHint || "").trim().toLowerCase(),
+    antiRoboticBankId,
+    cannedEmpathyBankId,
+    antiRoboticBank,
+    cannedEmpathyBank,
+  };
 }
 
 function gateRequestedSlotCovered(
@@ -340,6 +487,191 @@ const VERIFIER_GATES: Record<string, GateEvaluator> = {
           ].filter(Boolean)
         : undefined,
       sourceBankId: dedupeBankId || evalCtx.qualityBank?._meta?.id || "quality_gates",
+    };
+  },
+  style_opener_naturalness: (response, ctx, evalCtx) => {
+    const gateName = "style_opener_naturalness";
+    const signals = buildStyleSignalContext(response, ctx, evalCtx);
+    const leadinHit = collectLanguagePhrases(
+      signals.antiRoboticBank,
+      signals.language,
+      "bannedLeadins",
+    ).find((phrase) => signals.lower.startsWith(phrase.toLowerCase()));
+    const macroHit =
+      /^\s*(short answer:|bottom line:|current status:|in summary,)/i.test(response) ||
+      /\bthe main difference is\b/i.test(response);
+    const repeatedTurnLead =
+      signals.lead.length > 0 && signals.recentLeadSignatures.includes(signals.lead);
+    const issues = [
+      leadinHit ? `Robotic lead-in detected: '${leadinHit}'` : "",
+      macroHit ? "Visible macro-style opener detected." : "",
+      repeatedTurnLead ? "Opening echoes a recent assistant turn." : "",
+    ].filter(Boolean);
+    const passed = issues.length === 0;
+    return {
+      gateName,
+      passed,
+      failureCode: passed ? undefined : "STYLE_OPENER_NOT_NATURAL",
+      severity: resolveSeverity(gateName, evalCtx.qualityBank, "block"),
+      score: passed ? 1 : Math.max(0.2, 1 - issues.length * 0.25),
+      issues: passed ? undefined : issues,
+      sourceBankId: signals.antiRoboticBankId || evalCtx.qualityBank?._meta?.id || "quality_gates",
+    };
+  },
+  style_empathy_authenticity: (response, ctx, evalCtx) => {
+    const gateName = "style_empathy_authenticity";
+    const signals = buildStyleSignalContext(response, ctx, evalCtx);
+    const empathyHit = collectLanguagePhrases(
+      signals.cannedEmpathyBank,
+      signals.language,
+      "bans",
+    ).find((phrase) => signals.lower.includes(phrase.toLowerCase()));
+    const selfReferentialSupport =
+      /\bi will keep this anchored\b/i.test(response) ||
+      /\bi completely understand\b/i.test(response) ||
+      /\byou are not alone\b/i.test(response);
+    const issues = [
+      empathyHit ? `Canned empathy detected: '${empathyHit}'` : "",
+      selfReferentialSupport ? "Self-referential or therapeutic support language detected." : "",
+    ].filter(Boolean);
+    const passed = issues.length === 0;
+    return {
+      gateName,
+      passed,
+      failureCode: passed ? undefined : "STYLE_EMPATHY_INAUTHENTIC",
+      severity: resolveSeverity(gateName, evalCtx.qualityBank, "block"),
+      score: passed ? 1 : Math.max(0.25, 1 - issues.length * 0.3),
+      issues: passed ? undefined : issues,
+      sourceBankId:
+        signals.cannedEmpathyBankId || evalCtx.qualityBank?._meta?.id || "quality_gates",
+    };
+  },
+  style_repetition_control: (response, ctx, evalCtx) => {
+    const gateName = "style_repetition_control";
+    const signals = buildStyleSignalContext(response, ctx, evalCtx);
+    const repeatedTurnLead =
+      signals.lead.length > 0 && signals.recentLeadSignatures.includes(signals.lead);
+    const repeatedTurnClose =
+      signals.close.length > 0 && signals.recentCloserSignatures.includes(signals.close);
+    const repeatedStarterRun = hasRepeatedStarterRun(response);
+    const repeatedSentence = detectRepeatedSentence(response);
+    const issues = [
+      repeatedTurnLead ? "Opening signature repeats a recent assistant turn." : "",
+      repeatedTurnClose ? "Closing signature repeats a recent assistant turn." : "",
+      repeatedStarterRun ? "Adjacent sentences reuse the same starter." : "",
+      repeatedSentence ? "Exact repeated sentence detected in response output." : "",
+    ].filter(Boolean);
+    const passed = issues.length === 0;
+    return {
+      gateName,
+      passed,
+      failureCode: passed ? undefined : "STYLE_REPETITION_DETECTED",
+      severity: resolveSeverity(gateName, evalCtx.qualityBank, "block"),
+      score: passed ? 1 : Math.max(0.2, 1 - issues.length * 0.2),
+      issues: passed ? undefined : issues,
+      sourceBankId: signals.antiRoboticBankId || evalCtx.qualityBank?._meta?.id || "quality_gates",
+    };
+  },
+  style_confidence_alignment: (response, ctx, evalCtx) => {
+    const gateName = "style_confidence_alignment";
+    const signals = buildStyleSignalContext(response, ctx, evalCtx);
+    const tooStrongForWeakEvidence =
+      (signals.evidenceStrength === "low" || signals.evidenceStrength === "missing") &&
+      /\b(the document shows|the record confirms|clearly|definitively|the strongest reading is)\b/i.test(
+        response,
+      );
+    const tooWeakForStrongEvidence =
+      signals.evidenceStrength === "high" &&
+      /\b(the document suggests, but does not settle,|there is some support for|the available evidence leans toward|it may be)\b/i.test(
+        response,
+      );
+    const issues = [
+      tooStrongForWeakEvidence ? "Confidence is stronger than the evidence justifies." : "",
+      tooWeakForStrongEvidence ? "Confidence is weaker than the evidence justifies." : "",
+    ].filter(Boolean);
+    const passed = issues.length === 0;
+    return {
+      gateName,
+      passed,
+      failureCode: passed ? undefined : "STYLE_CONFIDENCE_MISMATCH",
+      severity: resolveSeverity(gateName, evalCtx.qualityBank, "block"),
+      score: passed ? 1 : 0.35,
+      issues: passed ? undefined : issues,
+      sourceBankId: evalCtx.qualityBank?._meta?.id || "quality_gates",
+    };
+  },
+  style_domain_voice_match: (response, ctx, evalCtx) => {
+    const gateName = "style_domain_voice_match";
+    const signals = buildStyleSignalContext(response, ctx, evalCtx);
+    const seriousDomain =
+      signals.domainHint === "legal" ||
+      signals.domainHint === "finance" ||
+      signals.domainHint === "accounting" ||
+      signals.domainHint === "medical";
+    const casualMismatch =
+      seriousDomain &&
+      /\b(basically|obviously|super|kinda|pretty much)\b/i.test(response);
+    const issues = [
+      casualMismatch ? `Tone is too casual for ${signals.domainHint || "high-stakes"} context.` : "",
+    ].filter(Boolean);
+    const passed = issues.length === 0;
+    return {
+      gateName,
+      passed,
+      failureCode: passed ? undefined : "STYLE_DOMAIN_MISMATCH",
+      severity: resolveSeverity(gateName, evalCtx.qualityBank, "block"),
+      score: passed ? 1 : 0.45,
+      issues: passed ? undefined : issues,
+      sourceBankId: evalCtx.qualityBank?._meta?.id || "quality_gates",
+    };
+  },
+  style_conversational_flow: (response, ctx, evalCtx) => {
+    const gateName = "style_conversational_flow";
+    const signals = buildStyleSignalContext(response, ctx, evalCtx);
+    const bureaucraticLead =
+      /^\s*(to elaborate,|from a holistic perspective,|it is important to note)/i.test(
+        response,
+      );
+    const transitionOverload =
+      (response.match(/\b(furthermore|additionally|moreover)\b/gi) || []).length > 2;
+    const issues = [
+      bureaucraticLead ? "Opening sounds bureaucratic or documentation-like." : "",
+      transitionOverload ? "Response relies on stacked transition phrases." : "",
+      signals.recentLeadSignatures.length > 0 && hasRepeatedStarterRun(response)
+        ? "Flow is stiff because sentence entry does not vary enough."
+        : "",
+    ].filter(Boolean);
+    const passed = issues.length === 0;
+    return {
+      gateName,
+      passed,
+      failureCode: passed ? undefined : "STYLE_FLOW_STIFF",
+      severity: resolveSeverity(gateName, evalCtx.qualityBank, "block"),
+      score: passed ? 1 : Math.max(0.35, 1 - issues.length * 0.2),
+      issues: passed ? undefined : issues,
+      sourceBankId: signals.antiRoboticBankId || evalCtx.qualityBank?._meta?.id || "quality_gates",
+    };
+  },
+  style_contract: (response, ctx, evalCtx) => {
+    const gateName = "style_contract";
+    const subResults = [
+      VERIFIER_GATES.style_opener_naturalness(response, ctx, evalCtx),
+      VERIFIER_GATES.style_empathy_authenticity(response, ctx, evalCtx),
+      VERIFIER_GATES.style_repetition_control(response, ctx, evalCtx),
+      VERIFIER_GATES.style_confidence_alignment(response, ctx, evalCtx),
+      VERIFIER_GATES.style_domain_voice_match(response, ctx, evalCtx),
+      VERIFIER_GATES.style_conversational_flow(response, ctx, evalCtx),
+    ];
+    const issues = subResults.flatMap((result) => result.issues || []);
+    const passed = issues.length === 0;
+    return {
+      gateName,
+      passed,
+      failureCode: passed ? undefined : "STYLE_CONTRACT_VIOLATION",
+      severity: resolveSeverity(gateName, evalCtx.qualityBank, "block"),
+      score: passed ? 1 : Math.max(0.25, 1 - issues.length * 0.25),
+      issues: passed ? undefined : issues,
+      sourceBankId: evalCtx.qualityBank?._meta?.id || "quality_gates",
     };
   },
   privacy_minimal: (response, _ctx, evalCtx) => {

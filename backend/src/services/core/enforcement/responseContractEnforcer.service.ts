@@ -71,6 +71,17 @@ export interface ResponseContractContext {
   operator?: string;
   intentFamily?: string;
   operatorFamily?: string;
+  contractShape?:
+    | "paragraph"
+    | "bullets"
+    | "numbered_list"
+    | "steps"
+    | "table"
+    | "quote"
+    | "breadcrumbs"
+    | "file_list"
+    | "button_only"
+    | "doc_discovery_list";
 
   constraints?: {
     maxChars?: number;
@@ -2200,26 +2211,9 @@ export class ResponseContractEnforcerService {
     const violations: EnforcedResponse["enforcement"]["violations"] = [];
     const listStyleEnabled = this.listStyles?.config?.enabled !== false;
     const tableStyleEnabled = this.tableStyles?.config?.enabled !== false;
-    const operatorContract = this.resolveOperatorContract(ctx.operator);
     let effectiveOutputShape =
-      normalizeShape(ctx.constraints?.outputShape) ||
-      operatorContract.defaultShape;
-
-    if (
-      operatorContract.preferredAnswerMode &&
-      String(ctx.answerMode || "").trim() !==
-        operatorContract.preferredAnswerMode
-    ) {
-      warnings.push("ANSWER_MODE_CONTRACT_DRIFT");
-    }
-    if (
-      effectiveOutputShape &&
-      operatorContract.allowedShapes.length > 0 &&
-      !operatorContract.allowedShapes.includes(effectiveOutputShape)
-    ) {
-      warnings.push("OUTPUT_SHAPE_NOT_ALLOWED_FOR_OPERATOR");
-      effectiveOutputShape = operatorContract.defaultShape;
-    }
+      normalizeShape(ctx.contractShape) ||
+      normalizeShape(ctx.constraints?.outputShape);
 
     // 0) Normalize whitespace/newlines
     const maxNL =
@@ -2589,6 +2583,18 @@ export class ResponseContractEnforcerService {
       if (sanitizedTables.changed) {
         repairs.push("TABLE_LAYOUT_NORMALIZED");
         content = sanitizedTables.text;
+      }
+    }
+
+    if (shouldEnforceAnalyticalStructure(ctx)) {
+      const structured = enforceAnalyticalStructuredTemplate(
+        content,
+        attachments,
+        ctx.language,
+      );
+      if (structured !== content) {
+        content = structured;
+        repairs.push("ANALYTICAL_STRUCTURE_ENFORCED");
       }
     }
 

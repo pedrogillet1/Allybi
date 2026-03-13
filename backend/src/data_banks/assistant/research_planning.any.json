@@ -1,0 +1,120 @@
+{
+  "_meta": {
+    "id": "research_planning",
+    "version": "1.0.0",
+    "description": "Research planning policy for evidence sequencing, stop conditions, and quality guardrails.",
+    "owner": "assistant-orchestrator",
+    "usedBy": [
+      "services/assistant/core/assistantOrchestrator.service.ts"
+    ],
+    "tests": [
+      "tests/assistant/researchPlanning.proof.test.ts"
+    ],
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13"
+  },
+  "config": {
+    "enabled": true
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "after_decomposition",
+    "inputSignals": [
+      "decompositionProfile",
+      "questionType",
+      "documentCoverage"
+    ],
+    "output": "research_plan"
+  },
+  "planningModes": [
+    {
+      "id": "fast_scan",
+      "description": "Use for simple confirmations where precision cost is low.",
+      "stepBudget": 2,
+      "plan": [
+        "collect_anchor_quote",
+        "collect_supporting_context"
+      ],
+      "stopRules": [
+        "found_anchor_in_primary_document",
+        "uncertaintyUnder0.45"
+      ]
+    },
+    {
+      "id": "forensic_scan",
+      "description": "Use when conflicts or exceptions are explicitly requested.",
+      "stepBudget": 6,
+      "plan": [
+        "collect_multiple_documents",
+        "collect_contradicting_lines",
+        "collect_exception_language",
+        "collect_dates_and_version"
+      ],
+      "stopRules": [
+        "two_confirming_sources_plus_version_line",
+        "conflictExplainedOrMarked",
+        "timeoutAtStepBudget"
+      ]
+    },
+    {
+      "id": "quantitative_trace",
+      "description": "Use for numeric, delta, or reconciliation style requests.",
+      "stepBudget": 5,
+      "plan": [
+        "locate_all_numeric_cells",
+        "normalize_units",
+        "compute_delta",
+        "check_rounding_or_scope",
+        "trace_source_lineage"
+      ],
+      "stopRules": [
+        "unitAndSourceResolved",
+        "varianceFlaggedIfUnbalanced",
+        "fallbackToManualIfMismatch"
+      ]
+    },
+    {
+      "id": "audience_focused_bounded",
+      "description": "Use when user asks for summary oriented to role audience or action planning.",
+      "stepBudget": 4,
+      "plan": [
+        "collect_user_relevant_constraints",
+        "collect_top_finding",
+        "collect_two_support_points",
+        "build_action_sentence"
+      ],
+      "stopRules": [
+        "top_findingVerified",
+        "maxLengthBudgetObserved",
+        "no_unverified_assumption_in_answer"
+      ]
+    }
+  ],
+  "constraints": {
+    "citationFloor": {
+      "low_risk": 1,
+      "medium_risk": 2,
+      "high_risk": 3
+    },
+    "mustPauseForReview": [
+      "policy_exception",
+      "regulatory_citation",
+      "medical_alarm_term"
+    ]
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "numeric_request_uses_quantitative_trace",
+        "input": {
+          "questionType": "numeric_audit",
+          "evidenceScope": "multi_source"
+        },
+        "expect": {
+          "planningMode": "quantitative_trace"
+        }
+      }
+    ]
+  }
+}

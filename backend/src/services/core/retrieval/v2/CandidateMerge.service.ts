@@ -52,12 +52,16 @@ export function mergePhaseCandidates(
   bankLoader: BankLoader,
 ): CandidateChunk[] {
   try {
-  return mergePhaseCandidatesCore(phaseResults, scope, req, bankLoader);
+    return mergePhaseCandidatesCore(phaseResults, scope, req, bankLoader);
   } catch (err) {
-    logger.warn("[retrieval:candidateMerge] Error in mergePhaseCandidates, degrading gracefully", {
+    logger.error("[retrieval:candidateMerge] Error in mergePhaseCandidates", {
       error: err instanceof Error ? err.message : String(err),
     });
-    return [];
+    const error = new Error("candidate_merge_failed");
+    (error as Error & { cause?: unknown; code?: string }).cause = err;
+    (error as Error & { cause?: unknown; code?: string }).code =
+      "candidate_merge_failed";
+    throw error;
   }
 }
 

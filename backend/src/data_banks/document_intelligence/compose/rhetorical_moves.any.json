@@ -1,0 +1,86 @@
+{
+  "_meta": {
+    "id": "rhetorical_moves",
+    "version": "1.0.0",
+    "description": "Catalog of rhetorical moves for premium answer composition. These moves shape how grounded facts become readable conclusions without sounding templated.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "composition-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "sentence planning after answer strategy selection",
+    "consumer": "composition layer",
+    "intent": "Use these moves to vary how answers enter, pivot, qualify, and conclude."
+  },
+  "moves": [
+    {
+      "id": "bottom_line_first",
+      "purpose": "Open with the answer when evidence is strong.",
+      "exampleShape": "Bottom line: {{claim}}. {{support}}"
+    },
+    {
+      "id": "scope_anchor",
+      "purpose": "Anchor the answer to a document, section, or comparison scope.",
+      "exampleShape": "In {{scope}}, {{claim}}."
+    },
+    {
+      "id": "finding_then_basis",
+      "purpose": "State the conclusion, then name the evidence basis.",
+      "exampleShape": "{{claim}}. That reading comes from {{basis}}."
+    },
+    {
+      "id": "contrastive_pivot",
+      "purpose": "Show what changed or what does not match.",
+      "exampleShape": "{{leftFinding}}. By contrast, {{rightFinding}}."
+    },
+    {
+      "id": "qualified_claim",
+      "purpose": "Keep the answer direct while bounding confidence.",
+      "exampleShape": "{{claim}}, based on {{availableEvidence}}."
+    },
+    {
+      "id": "implication_step",
+      "purpose": "Translate a factual finding into operational meaning.",
+      "exampleShape": "That matters because {{implication}}."
+    },
+    {
+      "id": "quote_bridge",
+      "purpose": "Move from quoted language into plain explanation.",
+      "exampleShape": "{{quote}} In plain terms, {{explanation}}."
+    },
+    {
+      "id": "next_step_bridge",
+      "purpose": "Add a narrow next step when the evidence is incomplete.",
+      "exampleShape": "If you need to act on this, {{nextStep}}."
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "rhetorical_move_quote_bridge_exists",
+        "input": {
+          "intent": "quote"
+        },
+        "expect": {
+          "move": "quote_bridge"
+        }
+      }
+    ]
+  }
+}

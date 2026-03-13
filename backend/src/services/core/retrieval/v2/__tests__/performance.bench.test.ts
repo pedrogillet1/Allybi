@@ -18,6 +18,7 @@ import type {
   RetrievalRequest,
   DocMeta,
 } from "../../retrieval.types";
+import { createDefaultQueryNormalizer } from "../DefaultQueryNormalizer.service";
 
 // ── Mock retrieval.config ───────────────────────────────────────────
 
@@ -224,7 +225,7 @@ describe("performance benchmarks", () => {
       semanticIndex,
       lexicalIndex,
       structuralIndex,
-      undefined,
+      createDefaultQueryNormalizer(),
       stubDocIntelBanks,
     );
 
@@ -264,7 +265,7 @@ describe("performance benchmarks", () => {
       semanticIndex,
       lexicalIndex,
       structuralIndex,
-      undefined,
+      createDefaultQueryNormalizer(),
       stubDocIntelBanks,
     );
 
@@ -301,7 +302,7 @@ describe("performance benchmarks", () => {
         semanticIndex,
         lexicalIndex,
         structuralIndex,
-        undefined,
+        createDefaultQueryNormalizer(),
         stubDocIntelBanks,
       );
 
@@ -349,7 +350,7 @@ describe("performance benchmarks", () => {
       semanticIndex,
       lexicalIndex,
       structuralIndex,
-      undefined,
+      createDefaultQueryNormalizer(),
       stubDocIntelBanks,
     );
 

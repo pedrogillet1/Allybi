@@ -1,0 +1,134 @@
+{
+  "_meta": {
+    "id": "di_public_sector_validation_rules",
+    "version": "1.0.0",
+    "description": "Public sector validation rules for legal-grounded claims and budget safety.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/validation/claimValidator.service.ts",
+      "services/core/orchestration/answerPlanner.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/domain-validation.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "domain": "public_sector"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "pre-answer checks for compliance and budget-impact assertions",
+    "consumer": "public-sector validator",
+    "intent": "Block policy overreach and prevent non-authorized budget/compliance claims."
+  },
+  "exactnessContract": {
+    "forbiddenSubstitutions": [
+      "winner_without_tender_anchor",
+      "budget_without_fiscal_year",
+      "disbursement_without_condition",
+      "compliance_without_authority",
+      "impact_without_time_window"
+    ],
+    "requiredAnchors": [
+      "authority",
+      "budget_line",
+      "period",
+      "law_reference",
+      "scope"
+    ],
+    "mustPreservePolicyFlags": true
+  },
+  "validationRules": [
+    {
+      "id": "GOV_VAL_001_legal_anchor",
+      "severity": "high",
+      "applies": [
+        "extract",
+        "validate",
+        "evaluate"
+      ],
+      "check": "public_claims_have_legal_reference",
+      "description": "Public-sector claims touching legality or award outcomes must include law or regulation references.",
+      "failureAction": "BLOCK_AND_REQUEST_LAW_REFERENCE"
+    },
+    {
+      "id": "GOV_VAL_002_budget_lock",
+      "severity": "critical",
+      "applies": [
+        "calculate",
+        "compare",
+        "summarize"
+      ],
+      "check": "budget_values_have_line_and_period",
+      "description": "Budget or disbursement claims must include budget line and fiscal period.",
+      "failureAction": "BLOCK_AND_REQUIRE_PERIOD_AND_CODE"
+    },
+    {
+      "id": "GOV_VAL_003_audit_fidelity",
+      "severity": "high",
+      "applies": [
+        "validate",
+        "summarize"
+      ],
+      "check": "audit_finding_has_severity_and_deadline",
+      "description": "No finding can be summarized as closed without status and remedy evidence.",
+      "failureAction": "ASK_AND_REQUIRE_STATUS"
+    },
+    {
+      "id": "GOV_VAL_004_compliance_state",
+      "severity": "high",
+      "applies": [
+        "evaluate",
+        "compare"
+      ],
+      "check": "compliance_statement_has_evidence_basis",
+      "description": "Compliance or non-compliance cannot be inferred solely from template wording.",
+      "failureAction": "BLOCK_AND_LIST_required_evidence"
+    },
+    {
+      "id": "GOV_VAL_005_impact_cadence",
+      "severity": "medium",
+      "applies": [
+        "evaluate",
+        "summarize"
+      ],
+      "check": "impact_metric_is_period_bound",
+      "description": "Impact statements need period alignment and baseline/target if trend is claimed.",
+      "failureAction": "ASK_AND_REQUIRE_TIME_WINDOW"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "gov_validation_requires_budget_code",
+        "input": {
+          "queryType": "calculate",
+          "signal": {
+            "hasBudgetValue": true,
+            "hasBudgetCode": false
+          }
+        },
+        "expect": {
+          "action": "BLOCK_AND_REQUIRE_PERIOD_AND_CODE"
+        }
+      },
+      {
+        "id": "gov_validation_public_award_needs_law",
+        "input": {
+          "scenario": "winner_claim"
+        },
+        "expect": {
+          "mustCheck": [
+            "GOV_VAL_001_legal_anchor"
+          ]
+        }
+      }
+    ]
+  }
+}

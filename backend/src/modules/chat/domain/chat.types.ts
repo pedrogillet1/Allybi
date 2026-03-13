@@ -2,7 +2,7 @@
  * CHAT TYPES
  *
  * Shared types are canonically defined in chat.contracts.ts and re-exported here.
- * This file defines only turn-level types unique to the chat kernel layer.
+ * This file defines only turn-level types unique to the chat execution layer.
  */
 
 import type {

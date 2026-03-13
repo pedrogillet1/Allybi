@@ -1,0 +1,134 @@
+{
+  "_meta": {
+    "id": "di_public_sector_entity_ontology",
+    "version": "1.0.0",
+    "description": "Public sector entity ontology for authority, funds, and accountability evidence.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/orchestration/entityResolver.service.ts",
+      "services/core/validation/claimValidator.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/domain-validation.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "public_sector",
+    "entityNormalization": "strict"
+  },
+  "domain": "public_sector",
+  "entities": [
+    {
+      "id": "gov_entity_authority",
+      "label": {
+        "en": "Public Authority",
+        "pt": "Órgão Público"
+      },
+      "aliases": [
+        "authority",
+        "agency",
+        "ministry",
+        "secretariat"
+      ],
+      "mustBindToSourceIdentity": true
+    },
+    {
+      "id": "gov_entity_budget_line",
+      "label": {
+        "en": "Budget Line",
+        "pt": "Código Orçamentário"
+      },
+      "aliases": [
+        "budget code",
+        "line item",
+        "program element"
+      ],
+      "mustMatchWithinDocument": true
+    },
+    {
+      "id": "gov_entity_grant_id",
+      "label": {
+        "en": "Grant ID",
+        "pt": "Identificador do Convênio"
+      },
+      "aliases": [
+        "grant id",
+        "convenio id",
+        "project number"
+      ],
+      "requiresPeriodContext": true
+    },
+    {
+      "id": "gov_entity_oversight_rule",
+      "label": {
+        "en": "Oversight Rule",
+        "pt": "Regra de Fiscalização"
+      },
+      "aliases": [
+        "control",
+        "compliance rule",
+        "regulatory requirement"
+      ],
+      "requiresArticleReference": true
+    },
+    {
+      "id": "gov_entity_compliance_status",
+      "label": {
+        "en": "Compliance Status",
+        "pt": "Status de Conformidade"
+      },
+      "aliases": [
+        "compliance",
+        "regularity",
+        "conformidade"
+      ],
+      "allowedValues": [
+        "compliant",
+        "non_compliant",
+        "conditional",
+        "pending_evidence"
+      ]
+    },
+    {
+      "id": "gov_entity_disbursement_amount",
+      "label": {
+        "en": "Disbursement Amount",
+        "pt": "Valor de Desembolso"
+      },
+      "aliases": [
+        "release amount",
+        "payment amount",
+        "valor liberado"
+      ],
+      "requiresCurrencyOrNativeUnit": true
+    },
+    {
+      "id": "gov_entity_impact_metric",
+      "label": {
+        "en": "Impact Metric",
+        "pt": "Indicador de Impacto"
+      },
+      "aliases": [
+        "impact",
+        "result metric",
+        "outcome"
+      ],
+      "requiresSourceTableOrAnnex": true
+    }
+  ],
+  "normalization": {
+    "trimWhitespace": true,
+    "caseFold": true,
+    "aliasPriority": [
+      "legal code",
+      "authority name",
+      "document id"
+    ]
+  }
+}

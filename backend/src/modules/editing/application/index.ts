@@ -5,54 +5,16 @@ export type {
 } from "../../../services/core/handlers/editHandler.service";
 export { EditHandlerService } from "../../../services/core/handlers/editHandler.service";
 
-// Editing facade, orchestrator, and supporting services
 export {
-  EditOrchestratorService,
-  EditTelemetryService,
-  TargetResolverService,
   EditingFacadeService,
-  EditingAgentRouterService,
-  ApplyVerificationService,
-  BankIntegrityService,
-  EditingPolicyService,
-  AllybiEditing,
 } from "../../../services/editing";
 
 export type {
   DocxParagraphNode,
-  EditAction,
-  EditApplyRequest,
-  EditApplyResult,
-  EditConstraintSet,
-  EditDiffPayload,
   EditDomain,
-  EditExecutionContext,
   EditOperator,
-  EditOutcomeType,
-  EditPolicy,
-  EditPlan,
-  EditPlanDiagnostics,
-  EditPlanRequest,
-  EditPlanResult,
-  EditPreviewRequest,
-  EditPreviewResult,
-  EditRationale,
-  EditReceipt,
-  EditBlockedReason,
-  EditSupportGateId,
-  EditIntentSource,
-  EditRevisionStore,
-  EditTelemetry,
-  EditDiffChange,
   ResolvedTarget,
   ResolvedTargetCandidate,
   SheetsTargetNode,
   SlidesTargetNode,
-  UndoRequest,
-  UndoResult,
-  EditingAgentExecution,
-  EditingAgentId,
 } from "../../../services/editing";
-
-// Intent runtime — pattern-matching pipeline for edit instructions
-export { analyzeMessageToPlan } from "../../../services/editing/intentRuntime";

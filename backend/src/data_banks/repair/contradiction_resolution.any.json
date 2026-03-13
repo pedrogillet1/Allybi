@@ -1,0 +1,225 @@
+{
+  "_meta": {
+    "id": "contradiction_resolution",
+    "version": "1.0.0",
+    "description": "Resolution rules for contradictory evidence. Prefers principled precedence and transparent answers over brittle single-passage extraction.",
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "koda-repair",
+    "compat": ">=1.0.0",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ],
+    "changeLog": [
+      "Added precedence ladder for amendments, explicit supersession, scoped specificity, and OCR quality",
+      "Added answer modes for resolved contradictions vs unresolved conflicts",
+      "Added escalation rules for user clarification only when contradiction materially blocks a single answer"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id",
+    "maxConflictsToSurface": 2,
+    "preferExplicitSupersession": true,
+    "preferHigherQualityEvidence": true,
+    "askQuestionOnlyIfConflictRemainsMaterial": true
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "after evidence synthesis detects conflicting claims",
+    "consumer": "contradiction resolver",
+    "intent": "Resolve conflicts with source-aware rules first. If a clean winner does not exist, surface the conflict plainly instead of pretending certainty.",
+    "emittedSignals": [
+      "contradictionResolved",
+      "winningEvidence",
+      "conflictNoteRequired",
+      "clarificationNeededForConflict"
+    ]
+  },
+  "precedenceLadder": [
+    {
+      "rank": 1,
+      "rule": "explicit amendment or restatement that says it supersedes an earlier term"
+    },
+    {
+      "rank": 2,
+      "rule": "same-document clause with more specific scope beats a generic summary"
+    },
+    {
+      "rank": 3,
+      "rule": "final signed or issued version beats draft when version lineage is explicit"
+    },
+    {
+      "rank": 4,
+      "rule": "clean high-confidence extraction beats low-confidence OCR noise"
+    },
+    {
+      "rank": 5,
+      "rule": "if none of the above resolves the conflict, present both and avoid a singular answer"
+    }
+  ],
+  "rules": [
+    {
+      "id": "CR_001_use_explicit_supersession",
+      "priority": 150,
+      "when": {
+        "all": [
+          {
+            "path": "signals.explicitSupersessionDetected",
+            "op": "eq",
+            "value": true
+          }
+        ]
+      },
+      "action": {
+        "type": "resolve_conflict",
+        "winner": "superseding_evidence"
+      },
+      "reasonCode": "explicit_supersession",
+      "severity": "critical"
+    },
+    {
+      "id": "CR_002_specific_clause_beats_summary",
+      "priority": 140,
+      "when": {
+        "all": [
+          {
+            "path": "signals.summaryVsSpecificConflict",
+            "op": "eq",
+            "value": true
+          }
+        ]
+      },
+      "action": {
+        "type": "resolve_conflict",
+        "winner": "specific_clause"
+      },
+      "reasonCode": "specificity_precedence",
+      "severity": "high"
+    },
+    {
+      "id": "CR_003_high_quality_text_beats_ocr_noise",
+      "priority": 135,
+      "when": {
+        "all": [
+          {
+            "path": "signals.ocrConflictDetected",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "metrics.cleanExtractionConfidence",
+            "op": "gte",
+            "value": 0.85
+          }
+        ]
+      },
+      "action": {
+        "type": "resolve_conflict",
+        "winner": "clean_extraction"
+      },
+      "reasonCode": "ocr_noise_deprioritized",
+      "severity": "medium"
+    },
+    {
+      "id": "CR_004_unresolved_material_conflict_requires_conflict_note",
+      "priority": 145,
+      "when": {
+        "all": [
+          {
+            "path": "signals.contradictionDetected",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "signals.contradictionResolved",
+            "op": "neq",
+            "value": true
+          }
+        ]
+      },
+      "action": {
+        "type": "answer_with_conflict_note"
+      },
+      "reasonCode": "conflict_remains_visible",
+      "severity": "high"
+    },
+    {
+      "id": "CR_005_ask_only_if_conflict_changes_requested_outcome",
+      "priority": 130,
+      "when": {
+        "all": [
+          {
+            "path": "signals.contradictionDetected",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "metrics.conflictMateriality",
+            "op": "gte",
+            "value": 0.2
+          },
+          {
+            "path": "context.userCanResolveConflict",
+            "op": "eq",
+            "value": true
+          }
+        ]
+      },
+      "action": {
+        "type": "ask_one_question"
+      },
+      "reasonCode": "user_input_can_resolve_material_conflict",
+      "severity": "medium"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "superseding_amendment_wins",
+        "input": {
+          "signals": {
+            "explicitSupersessionDetected": true
+          }
+        },
+        "expect": {
+          "winner": "superseding_evidence"
+        }
+      },
+      {
+        "id": "specific_clause_beats_summary",
+        "input": {
+          "signals": {
+            "summaryVsSpecificConflict": true
+          }
+        },
+        "expect": {
+          "winner": "specific_clause"
+        }
+      },
+      {
+        "id": "unresolved_conflict_requires_note",
+        "input": {
+          "signals": {
+            "contradictionDetected": true,
+            "contradictionResolved": false
+          }
+        },
+        "expect": {
+          "action": "answer_with_conflict_note"
+        }
+      }
+    ]
+  }
+}

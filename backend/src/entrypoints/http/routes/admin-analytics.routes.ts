@@ -9,7 +9,7 @@ import type { Request, Response, NextFunction } from "express";
 import { authenticateAdmin } from "../../../middleware/admin.middleware";
 import { requireAdminKey } from "../../../middleware/adminKey.middleware";
 import { authLimiter } from "../../../middleware/rateLimit.middleware";
-import prisma from "../../../platform/db/prismaClient";
+import prisma from "../../../config/database";
 
 const router = Router();
 

@@ -1,0 +1,201 @@
+{
+  "_meta": {
+    "id": "eval_gold_queries_finance_domain_deepening",
+    "version": "1.1.0",
+    "description": "Finance domain-deepening queries to test interpretive + exactness behavior in cross-field financial outputs.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "eval-domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance",
+    "scenarioType": "interpretive_exactness"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "evaluation pack generation and behavior regression",
+    "consumer": "goldQueryRunner",
+    "intent": "Exercise finance deepening coverage for interpretive and driver-analysis queries during regression.",
+    "emittedSignals": [
+      "financeGoldQueryPassFail",
+      "financeGoldQueryCoverage"
+    ]
+  },
+  "goldQueries": [
+    {
+      "id": "finance_deepen_001",
+      "lang": "en",
+      "query": "What was operating margin trajectory from Q1 to Q4 and what were the material drivers behind the change?",
+      "expected": {
+        "mustReadSource": [
+          "financial_statements",
+          "notes",
+          "ratio"
+        ],
+        "mustExtract": [
+          "operating_revenue",
+          "operating_expenses",
+          "operating_margin",
+          "period",
+          "basis",
+          "currency",
+          "scale"
+        ],
+        "mustPreservePeriod": true,
+        "mustPreserveUnit": true,
+        "mustPreserveSignConvention": true,
+        "mustShowDriverDecomposition": true,
+        "mustShowFormula": true,
+        "mustNotInfer": [
+          "single_number_without_basis",
+          "direction_without_basis"
+        ],
+        "failureConditions": [
+          "uses_mixed_periods",
+          "drops_basis_when_not_explicit",
+          "missing_driver_breakdown"
+        ]
+      }
+    },
+    {
+      "id": "finance_deepen_002",
+      "lang": "en",
+      "query": "List the latest covenant test with pass/fail and show the exact calculation path, including thresholds and any cure rights.",
+      "expected": {
+        "mustFindSection": [
+          "covenant",
+          "notes",
+          "definitions"
+        ],
+        "mustReadSource": [
+          "covenant report",
+          "governance notes",
+          "compliance section"
+        ],
+        "mustExtract": [
+          "covenant_name",
+          "metric_name",
+          "formula",
+          "threshold",
+          "result_status",
+          "effective_version",
+          "measurement_window",
+          "cure_rights"
+        ],
+        "mustPreserveCalculationPath": true,
+        "mustPreserveScope": true,
+        "mustNotInfer": [
+          "unanchored_covenant_summary",
+          "silent_pass_without_evidence"
+        ],
+        "failureConditions": [
+          "swaps_borrower_lender_anchors",
+          "omits_version",
+          "omits_method"
+        ]
+      }
+    },
+    {
+      "id": "finance_deepen_003",
+      "lang": "en",
+      "query": "Calculate net cash burn over the latest 12 months and compute implied runway in months.",
+      "expected": {
+        "mustReadSource": [
+          "cash_flow",
+          "cash_movement_summary",
+          "assumptions"
+        ],
+        "mustExtract": [
+          "net_cash_burn",
+          "starting_cash",
+          "ending_cash",
+          "average_mthly_burn",
+          "runway_months",
+          "currency"
+        ],
+        "mustPreserveMethod": true,
+        "mustPreserveScope": true,
+        "mustShowFormula": true,
+        "mustNotInfer": [
+          "no_runway_window",
+          "annualization_without_basis"
+        ],
+        "failureConditions": [
+          "no_burn_formula",
+          "runway_without_assumption_window"
+        ]
+      }
+    },
+    {
+      "id": "finance_deepen_004",
+      "lang": "pt",
+      "query": "Explique em português as diferenças entre liquidez corrente e liquidez seca e mostre risco de caixa para os próximos três meses.",
+      "expected": {
+        "mustInclude": [
+          "liquidez corrente",
+          "caixa",
+          "janela temporal",
+          "pressuposto"
+        ],
+        "mustPreserveBasis": true,
+        "mustPreservePeriodo": true,
+        "mustNotConflate": [
+          "caixa_operacional_com_caixa_total"
+        ],
+        "failureConditions": [
+          "resposta_sem_periodo",
+          "ausencia_de_suposição"
+        ]
+      }
+    }
+  ],
+  "qualityGuards": {
+    "maxAllowedInferenceRate": 0.15,
+    "requiredAnchorDensity": 2.6,
+    "penalties": {
+      "missing_role_lock": -40,
+      "missing_period_binder": -30,
+      "driver_chain_missing": -30,
+      "missing_formula": -25
+    }
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "finance_query_requires_role_lock",
+        "input": {
+          "query": "finance_deepen_002"
+        },
+        "expect": {
+          "mustCheck": [
+            "covenant_name",
+            "effective_version"
+          ]
+        }
+      },
+      {
+        "id": "finance_query_requires_scope_and_basis",
+        "input": {
+          "query": "finance_deepen_001"
+        },
+        "expect": {
+          "mustCheck": [
+            "period",
+            "basis",
+            "scale"
+          ]
+        }
+      }
+    ]
+  }
+}

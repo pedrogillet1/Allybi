@@ -3,23 +3,12 @@
   "version": "1.0.0",
   "description": "Speed testing system for KODA adaptive AI",
   "scripts": {
-    "test:speed": "node scripts/testChatSpeed.js",
-    "test:speed:all": "node scripts/testChatSpeed.js all",
-    "test:speed:greeting": "node scripts/testChatSpeed.js type greeting",
-    "test:speed:simple": "node scripts/testChatSpeed.js type simple",
-    "test:speed:factual": "node scripts/testChatSpeed.js type factual",
-    "test:speed:explanation": "node scripts/testChatSpeed.js type explanation",
-    "test:speed:comprehensive": "node scripts/testChatSpeed.js type comprehensive",
-    "brand:scan": "node scripts/brand-scan.mjs",
     "typecheck": "npm run typecheck:backend && npm run typecheck:frontend",
     "typecheck:backend": "cd backend && npm run typecheck",
     "typecheck:frontend": "cd frontend && npm run build",
     "typecheck:chat": "cd backend && npm run typecheck:chat",
     "setup:hooks": "bash scripts/setup-git-hooks.sh",
-    "check:typescript": "bash scripts/check_chat_typescript_errors.sh",
-    "fix:typescript": "bash scripts/fix_chat_typescript_errors.sh",
-    "audit:dead-artifacts": "node scripts/dead-artifacts-check.mjs",
-    "audit:orphan-entrypoints": "node scripts/unreferenced-entrypoints-report.mjs"
+    "check:typescript": "bash scripts/check_chat_typescript_errors.sh"
   },
   "dependencies": {
     "axios": "^1.12.2",

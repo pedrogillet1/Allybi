@@ -214,15 +214,9 @@ export function classifyVisibleTruncation(
   };
 }
 
-export function isSemanticTruncationV2Enabled(env = process.env): boolean {
-  const value = String(env.TRUNCATION_SEMANTIC_V2_ENABLED || "")
-    .trim()
-    .toLowerCase();
-  if (value === "1" || value === "true" || value === "yes" || value === "on") {
-    return true;
-  }
-  if (value === "0" || value === "false" || value === "no" || value === "off") {
-    return false;
-  }
-  return DEFAULT_TRUNCATION_CLASSIFIER_CONFIG.enabledByDefault;
+export function isSemanticTruncationV2Enabled(
+  env?: NodeJS.ProcessEnv,
+): boolean {
+  return resolveTruncationRuntimeConfig(env).semanticTruncationV2;
 }
+import { resolveTruncationRuntimeConfig } from "../config/chatRuntimeConfig";

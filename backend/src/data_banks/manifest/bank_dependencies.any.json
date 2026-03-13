@@ -8227,6 +8227,13 @@
       "optional": true
     },
     {
+      "id": "compose_style_contract",
+      "dependsOn": [
+        "prompt_registry"
+      ],
+      "optional": true
+    },
+    {
       "id": "provider_capabilities",
       "dependsOn": []
     },
@@ -8405,11 +8412,6 @@
     },
     {
       "id": "render_policy",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "reports_bank_audit_report",
       "dependsOn": [],
       "optional": true
     },
@@ -8851,7 +8853,557 @@
       "dependsOn": [
         "wrong_doc_lock"
       ]
-    }
+    },
+    {
+      "id": "clarification_question_bank",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "field_role_disambiguation",
+      "dependsOn": [
+        "entity_role_ontology"
+      ],
+      "optional": true
+    },
+    {
+      "id": "one_best_question_policy",
+      "dependsOn": [
+        "quality_gates"
+      ],
+      "optional": true
+    },
+    {
+      "id": "answer_recovery_strategies",
+      "dependsOn": [
+        "quality_gates"
+      ],
+      "optional": true
+    },
+    {
+      "id": "partial_answer_recovery",
+      "dependsOn": [
+        "quality_gates"
+      ],
+      "optional": true
+    },
+    {
+      "id": "not_enough_evidence",
+      "dependsOn": [
+        "quality_gates"
+      ],
+      "optional": true
+    },
+    {
+      "id": "contradiction_resolution",
+      "dependsOn": [
+        "quality_gates"
+      ],
+      "optional": true
+    },
+    {
+      "id": "followup_generation",
+      "dependsOn": [
+        "quality_gates"
+      ],
+      "optional": true
+    },
+    {
+      "id": "false_negative_rescue",
+      "dependsOn": [
+        "quality_gates"
+      ],
+      "optional": true
+    },
+    {
+      "id": "reask_vs_answer_policy",
+      "dependsOn": [
+        "quality_gates"
+      ],
+      "optional": true
+    },
+    {
+      "id": "evidence_binding_contract",
+      "dependsOn": [
+        "field_role_ontology"
+      ],
+      "optional": true
+    },
+    {
+      "id": "field_role_ontology",
+      "dependsOn": [
+        "entity_role_ontology"
+      ],
+      "optional": true
+    },
+    {
+      "id": "field_lock_patterns",
+      "dependsOn": [
+        "field_role_ontology"
+      ],
+      "optional": true
+    },
+    {
+      "id": "quote_span_rules",
+      "dependsOn": [
+        "evidence_packaging"
+      ],
+      "optional": true
+    },
+    {
+      "id": "table_reasoning_rules",
+      "dependsOn": [
+        "field_lock_patterns"
+      ],
+      "optional": true
+    },
+    {
+      "id": "row_column_disambiguation",
+      "dependsOn": [
+        "table_reasoning_rules"
+      ],
+      "optional": true
+    },
+    {
+      "id": "cross_doc_synthesis_rules",
+      "dependsOn": [
+        "evidence_binding_contract",
+        "table_reasoning_rules"
+      ],
+      "optional": true
+    },
+    {
+      "id": "evidence_packaging_strategies",
+      "dependsOn": [
+        "cross_doc_synthesis_rules"
+      ],
+      "optional": true
+    },
+    {
+      "id": "field_exactness_rules",
+      "dependsOn": [
+        "fact_type_requirements_expanded"
+      ],
+      "optional": true
+    },
+    {
+      "id": "claim_strength_matrix",
+      "dependsOn": [
+        "field_exactness_rules"
+      ],
+      "optional": true
+    },
+    {
+      "id": "fact_type_requirements_expanded",
+      "dependsOn": [
+        "fact_type_requirements"
+      ],
+      "optional": true
+    },
+    {
+      "id": "conflict_resolution_rules",
+      "dependsOn": [
+        "field_exactness_rules",
+        "claim_strength_matrix"
+      ],
+      "optional": true
+    },
+    {
+      "id": "table_integrity_rules",
+      "dependsOn": [
+        "table_reasoning_rules"
+      ],
+      "optional": true
+    },
+    {
+      "id": "finance_domain_writer",
+      "dependsOn": [
+        "finance_doc_logic",
+        "finance_kpi_ontology",
+        "di_finance_domain_profile"
+      ],
+      "optional": true
+    },
+    {
+      "id": "finance_ambiguity_patterns",
+      "dependsOn": [
+        "di_finance_domain_profile",
+        "finance_domain_writer"
+      ],
+      "optional": true
+    },
+    {
+      "id": "finance_validation_rules",
+      "dependsOn": [
+        "di_finance_domain_profile",
+        "finance_domain_writer"
+      ],
+      "optional": true
+    },
+    {
+      "id": "eval_gold_queries_finance_domain_deepening",
+      "dependsOn": [
+        "finance_domain_writer",
+        "finance_validation_rules"
+      ],
+      "optional": true
+    },
+    {
+      "id": "accounting_domain_writer",
+      "dependsOn": [
+        "accounting_rules",
+        "di_accounting_domain_profile_v2"
+      ],
+      "optional": true
+    },
+    {
+      "id": "accounting_ambiguity_patterns",
+      "dependsOn": [
+        "di_accounting_domain_profile_v2",
+        "accounting_domain_writer"
+      ],
+      "optional": true
+    },
+    {
+      "id": "accounting_validation_rules",
+      "dependsOn": [
+        "di_accounting_domain_profile_v2",
+        "accounting_domain_writer"
+      ],
+      "optional": true
+    },
+    {
+      "id": "eval_gold_queries_accounting_domain_deepening",
+      "dependsOn": [
+        "accounting_domain_writer",
+        "accounting_validation_rules"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_domain_writer",
+      "dependsOn": [
+        "legal_domain_profile"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_ambiguity_patterns",
+      "dependsOn": [
+        "legal_domain_profile",
+        "legal_domain_writer"
+      ],
+      "optional": true
+    },
+    {
+      "id": "legal_validation_rules",
+      "dependsOn": [
+        "legal_domain_profile",
+        "legal_domain_writer"
+      ],
+      "optional": true
+    },
+    {
+      "id": "eval_gold_queries_legal_domain_deepening",
+      "dependsOn": [
+        "legal_domain_writer",
+        "legal_validation_rules"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_domain_writer",
+      "dependsOn": [
+        "medical_domain_profile"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_ambiguity_patterns",
+      "dependsOn": [
+        "medical_domain_profile",
+        "medical_domain_writer"
+      ],
+      "optional": true
+    },
+    {
+      "id": "medical_validation_rules",
+      "dependsOn": [
+        "medical_domain_profile",
+        "medical_domain_writer"
+      ],
+      "optional": true
+    },
+    {
+      "id": "eval_gold_queries_medical_domain_deepening",
+      "dependsOn": [
+        "medical_domain_writer",
+        "medical_validation_rules"
+      ],
+      "optional": true
+    },
+    {
+      "id": "ops_domain_writer",
+      "dependsOn": [
+        "di_ops_domain_profile",
+        "ops_kpi_ontology",
+        "ops_doc_logic"
+      ],
+      "optional": true
+    },
+    {
+      "id": "ops_ambiguity_patterns",
+      "dependsOn": [
+        "di_ops_domain_profile",
+        "ops_domain_writer"
+      ],
+      "optional": true
+    },
+    {
+      "id": "ops_validation_rules",
+      "dependsOn": [
+        "di_ops_domain_profile",
+        "ops_domain_writer"
+      ],
+      "optional": true
+    },
+    {
+      "id": "eval_gold_queries_ops_domain_deepening",
+      "dependsOn": [
+        "ops_domain_writer",
+        "ops_validation_rules"
+      ],
+      "optional": true
+    },
+    {
+      "id": "governance_bank_metadata_policy",
+      "dependsOn": [
+        "bank_manifest",
+        "bank_registry"
+      ],
+      "optional": true
+    },
+    {
+      "id": "governance_bank_quality_contract",
+      "dependsOn": [
+        "governance_bank_metadata_policy",
+        "governance_eval_gate_policy",
+        "governance_runtime_wiring_requirements"
+      ],
+      "optional": true
+    },
+    {
+      "id": "governance_eval_gate_policy",
+      "dependsOn": [
+        "governance_bank_metadata_policy"
+      ],
+      "optional": true
+    },
+    {
+      "id": "governance_runtime_wiring_requirements",
+      "dependsOn": [
+        "bank_manifest",
+        "bank_registry",
+        "bank_dependencies"
+      ],
+      "optional": true
+    },
+    {
+      "id": "governance_sharding_policy",
+      "dependsOn": [
+        "governance_ssot_contract"
+      ],
+      "optional": true
+    },
+    {
+      "id": "governance_ssot_contract",
+      "dependsOn": [
+        "bank_manifest",
+        "bank_registry",
+        "bank_dependencies"
+      ],
+      "optional": true
+    },
+    {
+      "id": "abbreviations",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "allybi_python_operators",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "compliance_phrases",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "conversation_state_schema",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "followup_detection",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "memory_decay_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "operator_canonical_registry",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "state_update_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "terminology_domains",
+      "dependsOn": [],
+      "optional": true
+    },
+    {"id":"canvas_output_modes","dependsOn":[],"optional":true},
+    {"id":"context_container_profiles","dependsOn":[],"optional":true},
+    {"id":"conversation_state_carryover","dependsOn":[],"optional":true},
+    {"id":"custom_agent_profiles","dependsOn":[],"optional":true},
+    {"id":"model_role_profiles","dependsOn":[],"optional":true},
+    {"id":"project_memory_policy","dependsOn":[],"optional":true},
+    {"id":"research_planning","dependsOn":[],"optional":true},
+    {"id":"task_decomposition_policy","dependsOn":[],"optional":true},
+    {"id":"tool_selection_policy","dependsOn":[],"optional":true},
+    {"id":"work_product_types","dependsOn":[],"optional":true},
+    {"id":"answer_strategies","dependsOn":[],"optional":true},
+    {"id":"anti_repetition_patterns","dependsOn":[],"optional":true},
+    {"id":"audience_style_analyst","dependsOn":[],"optional":true},
+    {"id":"audience_style_executive","dependsOn":[],"optional":true},
+    {"id":"audience_style_general_user","dependsOn":[],"optional":true},
+    {"id":"audience_style_operator","dependsOn":[],"optional":true},
+    {"id":"claim_strength_language","dependsOn":[],"optional":true},
+    {"id":"closers_and_next_steps","dependsOn":[],"optional":true},
+    {"id":"compare_and_contrast","dependsOn":[],"optional":true},
+    {"id":"domain_writer_accounting","dependsOn":[],"optional":true},
+    {"id":"domain_writer_finance","dependsOn":[],"optional":true},
+    {"id":"domain_writer_legal","dependsOn":[],"optional":true},
+    {"id":"domain_writer_medical","dependsOn":[],"optional":true},
+    {"id":"domain_writer_ops","dependsOn":[],"optional":true},
+    {"id":"evidence_synthesis","dependsOn":[],"optional":true},
+    {"id":"openers_and_framing","dependsOn":[],"optional":true},
+    {"id":"quote_explanation_patterns","dependsOn":[],"optional":true},
+    {"id":"rhetorical_moves","dependsOn":[],"optional":true},
+    {"id":"sentence_rhythm_and_variety","dependsOn":[],"optional":true},
+    {"id":"table_narration","dependsOn":[],"optional":true},
+    {"id":"uncertainty_calibration","dependsOn":[],"optional":true},
+    {"id":"di_commercial_real_estate_ambiguity_patterns","dependsOn":[],"optional":true},
+    {"id":"di_commercial_real_estate_doc_type_catalog","dependsOn":[],"optional":true},
+    {"id":"di_commercial_real_estate_domain_profile","dependsOn":[],"optional":true},
+    {"id":"di_commercial_real_estate_domain_writer","dependsOn":[],"optional":true},
+    {"id":"di_commercial_real_estate_entity_ontology","dependsOn":[],"optional":true},
+    {"id":"eval_gold_queries_commercial_real_estate_domain","dependsOn":[],"optional":true},
+    {"id":"di_commercial_real_estate_retrieval_strategies","dependsOn":[],"optional":true},
+    {"id":"di_commercial_real_estate_section_ontology","dependsOn":[],"optional":true},
+    {"id":"di_commercial_real_estate_table_ontology","dependsOn":[],"optional":true},
+    {"id":"di_commercial_real_estate_validation_rules","dependsOn":[],"optional":true},
+    {"id":"di_compliance_regulatory_ambiguity_patterns","dependsOn":[],"optional":true},
+    {"id":"di_compliance_regulatory_doc_type_catalog","dependsOn":[],"optional":true},
+    {"id":"di_compliance_regulatory_domain_profile","dependsOn":[],"optional":true},
+    {"id":"di_compliance_regulatory_domain_writer","dependsOn":[],"optional":true},
+    {"id":"di_compliance_regulatory_entity_ontology","dependsOn":[],"optional":true},
+    {"id":"eval_gold_queries_compliance_regulatory_domain","dependsOn":[],"optional":true},
+    {"id":"di_compliance_regulatory_retrieval_strategies","dependsOn":[],"optional":true},
+    {"id":"di_compliance_regulatory_section_ontology","dependsOn":[],"optional":true},
+    {"id":"di_compliance_regulatory_table_ontology","dependsOn":[],"optional":true},
+    {"id":"di_compliance_regulatory_validation_rules","dependsOn":[],"optional":true},
+    {"id":"manufacturing_ambiguity_patterns","dependsOn":[],"optional":true},
+    {"id":"di_manufacturing_doc_type_catalog","dependsOn":[],"optional":true},
+    {"id":"di_manufacturing_domain_profile","dependsOn":[],"optional":true},
+    {"id":"manufacturing_domain_writer","dependsOn":[],"optional":true},
+    {"id":"di_manufacturing_entity_ontology","dependsOn":[],"optional":true},
+    {"id":"eval_gold_queries_manufacturing_domain","dependsOn":[],"optional":true},
+    {"id":"di_manufacturing_retrieval_strategies","dependsOn":[],"optional":true},
+    {"id":"di_manufacturing_section_ontology","dependsOn":[],"optional":true},
+    {"id":"di_manufacturing_table_ontology","dependsOn":[],"optional":true},
+    {"id":"manufacturing_validation_rules","dependsOn":[],"optional":true},
+    {"id":"procurement_ambiguity_patterns","dependsOn":[],"optional":true},
+    {"id":"di_procurement_doc_type_catalog","dependsOn":[],"optional":true},
+    {"id":"di_procurement_domain_profile","dependsOn":[],"optional":true},
+    {"id":"procurement_domain_writer","dependsOn":[],"optional":true},
+    {"id":"di_procurement_entity_ontology","dependsOn":[],"optional":true},
+    {"id":"eval_gold_queries_procurement_domain","dependsOn":[],"optional":true},
+    {"id":"di_procurement_retrieval_strategies","dependsOn":[],"optional":true},
+    {"id":"di_procurement_section_ontology","dependsOn":[],"optional":true},
+    {"id":"di_procurement_table_ontology","dependsOn":[],"optional":true},
+    {"id":"procurement_validation_rules","dependsOn":[],"optional":true},
+    {"id":"di_public_sector_ambiguity_patterns","dependsOn":[],"optional":true},
+    {"id":"di_public_sector_doc_type_catalog","dependsOn":[],"optional":true},
+    {"id":"di_public_sector_domain_profile","dependsOn":[],"optional":true},
+    {"id":"di_public_sector_domain_writer","dependsOn":[],"optional":true},
+    {"id":"di_public_sector_entity_ontology","dependsOn":[],"optional":true},
+    {"id":"eval_gold_queries_public_sector_domain","dependsOn":[],"optional":true},
+    {"id":"di_public_sector_retrieval_strategies","dependsOn":[],"optional":true},
+    {"id":"di_public_sector_section_ontology","dependsOn":[],"optional":true},
+    {"id":"di_public_sector_table_ontology","dependsOn":[],"optional":true},
+    {"id":"di_public_sector_validation_rules","dependsOn":[],"optional":true},
+    {"id":"di_research_scientific_ambiguity_patterns","dependsOn":[],"optional":true},
+    {"id":"di_research_scientific_doc_type_catalog","dependsOn":[],"optional":true},
+    {"id":"di_research_scientific_domain_profile","dependsOn":[],"optional":true},
+    {"id":"di_research_scientific_domain_writer","dependsOn":[],"optional":true},
+    {"id":"di_research_scientific_entity_ontology","dependsOn":[],"optional":true},
+    {"id":"eval_gold_queries_research_scientific_domain","dependsOn":[],"optional":true},
+    {"id":"di_research_scientific_retrieval_strategies","dependsOn":[],"optional":true},
+    {"id":"di_research_scientific_section_ontology","dependsOn":[],"optional":true},
+    {"id":"di_research_scientific_table_ontology","dependsOn":[],"optional":true},
+    {"id":"di_research_scientific_validation_rules","dependsOn":[],"optional":true},
+    {"id":"sales_crm_ambiguity_patterns","dependsOn":[],"optional":true},
+    {"id":"di_sales_crm_doc_type_catalog","dependsOn":[],"optional":true},
+    {"id":"di_sales_crm_domain_profile","dependsOn":[],"optional":true},
+    {"id":"sales_crm_domain_writer","dependsOn":[],"optional":true},
+    {"id":"di_sales_crm_entity_ontology","dependsOn":[],"optional":true},
+    {"id":"eval_gold_queries_sales_crm_domain","dependsOn":[],"optional":true},
+    {"id":"di_sales_crm_retrieval_strategies","dependsOn":[],"optional":true},
+    {"id":"di_sales_crm_section_ontology","dependsOn":[],"optional":true},
+    {"id":"di_sales_crm_table_ontology","dependsOn":[],"optional":true},
+    {"id":"sales_crm_validation_rules","dependsOn":[],"optional":true},
+    {"id":"supply_chain_logistics_ambiguity_patterns","dependsOn":[],"optional":true},
+    {"id":"di_supply_chain_logistics_doc_type_catalog","dependsOn":[],"optional":true},
+    {"id":"di_supply_chain_logistics_domain_profile","dependsOn":[],"optional":true},
+    {"id":"supply_chain_logistics_domain_writer","dependsOn":[],"optional":true},
+    {"id":"di_supply_chain_logistics_entity_ontology","dependsOn":[],"optional":true},
+    {"id":"eval_gold_queries_supply_chain_logistics","dependsOn":[],"optional":true},
+    {"id":"di_supply_chain_logistics_retrieval_strategies","dependsOn":[],"optional":true},
+    {"id":"di_supply_chain_logistics_section_ontology","dependsOn":[],"optional":true},
+    {"id":"di_supply_chain_logistics_table_ontology","dependsOn":[],"optional":true},
+    {"id":"supply_chain_logistics_validation_rules","dependsOn":[],"optional":true},
+    {"id":"eval_adversarial_ambiguity_followups","dependsOn":[],"optional":true},
+    {"id":"eval_adversarial_fake_citation","dependsOn":[],"optional":true},
+    {"id":"eval_adversarial_fallback_false_negative","dependsOn":[],"optional":true},
+    {"id":"eval_adversarial_high_latency_weak_answer","dependsOn":[],"optional":true},
+    {"id":"eval_adversarial_owners_vs_signers","dependsOn":[],"optional":true},
+    {"id":"eval_adversarial_partial_answer","dependsOn":[],"optional":true},
+    {"id":"eval_adversarial_table_corruption","dependsOn":[],"optional":true},
+    {"id":"eval_adversarial_title_only_extraction","dependsOn":[],"optional":true},
+    {"id":"eval_adversarial_wrong_doc","dependsOn":[],"optional":true},
+    {"id":"eval_gold_queries_accounting_reconciliation","dependsOn":[],"optional":true},
+    {"id":"eval_gold_queries_finance_table_exactness","dependsOn":[],"optional":true},
+    {"id":"eval_gold_queries_general_open_ended","dependsOn":[],"optional":true},
+    {"id":"eval_gold_queries_legal_field_exactness","dependsOn":[],"optional":true},
+    {"id":"eval_gold_queries_medical_report_safety","dependsOn":[],"optional":true},
+    {"id":"eval_multilingual_locale_number_parity","dependsOn":[],"optional":true},
+    {"id":"eval_multilingual_pt_en_parity","dependsOn":[],"optional":true},
+    {"id":"eval_style_anti_robotic","dependsOn":[],"optional":true},
+    {"id":"eval_style_canned_empathy","dependsOn":[],"optional":true},
+    {"id":"eval_style_repetition","dependsOn":[],"optional":true},
+    {"id":"eval_style_rhythm_and_variety","dependsOn":[],"optional":true},
+    {"id":"provider_capabilities_expanded","dependsOn":[],"optional":true},
+    {"id":"provider_failure_ladders","dependsOn":[],"optional":true},
+    {"id":"provider_quality_profiles","dependsOn":[],"optional":true},
+    {"id":"provider_routing_policy","dependsOn":[],"optional":true}
   ],
   "tests": {
     "cases": [

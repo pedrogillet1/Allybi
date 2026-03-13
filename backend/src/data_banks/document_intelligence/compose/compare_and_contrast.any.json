@@ -1,0 +1,101 @@
+{
+  "_meta": {
+    "id": "compare_and_contrast",
+    "version": "1.0.0",
+    "description": "Composition patterns for compare-and-contrast answers, with emphasis on leading with the main delta instead of flat side-by-side narration.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "composition-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id",
+    "defaultOrdering": "main_delta_first"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "compare answer planning",
+    "consumer": "composition layer",
+    "intent": "Prevent low-value compare answers that just describe left and right independently."
+  },
+  "comparisonShapes": [
+    {
+      "id": "main_delta_first",
+      "sequence": [
+        "main_difference",
+        "supporting_differences",
+        "impact"
+      ]
+    },
+    {
+      "id": "same_then_different",
+      "sequence": [
+        "shared_ground",
+        "difference",
+        "why_difference_matters"
+      ]
+    },
+    {
+      "id": "version_change_readout",
+      "sequence": [
+        "what_changed",
+        "what_stayed",
+        "risk_or_operational_effect"
+      ]
+    }
+  ],
+  "contrastVerbs": {
+    "en": [
+      "widens",
+      "narrows",
+      "adds",
+      "drops",
+      "tightens",
+      "softens",
+      "moves",
+      "locks in"
+    ],
+    "pt": [
+      "amplia",
+      "reduz",
+      "adiciona",
+      "remove",
+      "aperta",
+      "suaviza",
+      "desloca",
+      "fixa"
+    ]
+  },
+  "rules": [
+    {
+      "id": "CAC_001_compare_needs_top_delta",
+      "trigger": "Compare answer starts with neutral overview",
+      "check": "context.intent == 'compare' AND output.hasTopDeltaSentence != true",
+      "failureAction": "INSERT_MAIN_DELTA_FIRST"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "compare_and_contrast_prefers_main_delta",
+        "input": {
+          "intent": "compare"
+        },
+        "expect": {
+          "ordering": "main_delta_first"
+        }
+      }
+    ]
+  }
+}

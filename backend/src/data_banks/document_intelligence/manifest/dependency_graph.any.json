@@ -1327,6 +1327,146 @@
       "dependsOn": [
         "quality_gates"
       ]
+    },
+    {
+      "id": "finance_domain_writer",
+      "dependsOn": [
+        "finance_doc_logic",
+        "finance_kpi_ontology",
+        "di_finance_domain_profile"
+      ]
+    },
+    {
+      "id": "finance_ambiguity_patterns",
+      "dependsOn": [
+        "di_finance_domain_profile",
+        "finance_domain_writer"
+      ]
+    },
+    {
+      "id": "finance_validation_rules",
+      "dependsOn": [
+        "di_finance_domain_profile",
+        "finance_domain_writer"
+      ]
+    },
+    {
+      "id": "eval_gold_queries_finance_domain_deepening",
+      "dependsOn": [
+        "finance_domain_writer",
+        "finance_validation_rules"
+      ]
+    },
+    {
+      "id": "accounting_domain_writer",
+      "dependsOn": [
+        "accounting_rules",
+        "di_accounting_domain_profile_v2"
+      ]
+    },
+    {
+      "id": "accounting_ambiguity_patterns",
+      "dependsOn": [
+        "di_accounting_domain_profile_v2",
+        "accounting_domain_writer"
+      ]
+    },
+    {
+      "id": "accounting_validation_rules",
+      "dependsOn": [
+        "di_accounting_domain_profile_v2",
+        "accounting_domain_writer"
+      ]
+    },
+    {
+      "id": "eval_gold_queries_accounting_domain_deepening",
+      "dependsOn": [
+        "accounting_domain_writer",
+        "accounting_validation_rules"
+      ]
+    },
+    {
+      "id": "legal_domain_writer",
+      "dependsOn": [
+        "legal_domain_profile"
+      ]
+    },
+    {
+      "id": "legal_ambiguity_patterns",
+      "dependsOn": [
+        "legal_domain_profile",
+        "legal_domain_writer"
+      ]
+    },
+    {
+      "id": "legal_validation_rules",
+      "dependsOn": [
+        "legal_domain_profile",
+        "legal_domain_writer"
+      ]
+    },
+    {
+      "id": "eval_gold_queries_legal_domain_deepening",
+      "dependsOn": [
+        "legal_domain_writer",
+        "legal_validation_rules"
+      ]
+    },
+    {
+      "id": "medical_domain_writer",
+      "dependsOn": [
+        "medical_domain_profile"
+      ]
+    },
+    {
+      "id": "medical_ambiguity_patterns",
+      "dependsOn": [
+        "medical_domain_profile",
+        "medical_domain_writer"
+      ]
+    },
+    {
+      "id": "medical_validation_rules",
+      "dependsOn": [
+        "medical_domain_profile",
+        "medical_domain_writer"
+      ]
+    },
+    {
+      "id": "eval_gold_queries_medical_domain_deepening",
+      "dependsOn": [
+        "medical_domain_writer",
+        "medical_validation_rules"
+      ]
+    },
+    {
+      "id": "ops_domain_writer",
+      "dependsOn": [
+        "di_ops_domain_profile",
+        "ops_kpi_ontology",
+        "ops_doc_logic"
+      ]
+    },
+    {
+      "id": "ops_ambiguity_patterns",
+      "dependsOn": [
+        "di_ops_domain_profile",
+        "ops_domain_writer"
+      ]
+    },
+    {
+      "id": "ops_validation_rules",
+      "dependsOn": [
+        "di_ops_domain_profile",
+        "ops_domain_writer"
+      ]
+    },
+    {
+      "id": "eval_gold_queries_ops_domain_deepening",
+      "dependsOn": [
+        "ops_domain_writer",
+        "ops_validation_rules"
+      ]
     }
   ],
   "familyDependencies": [

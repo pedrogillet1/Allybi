@@ -17,8 +17,8 @@ import { buildMultiIntentPlan } from "../../../services/editing/allybi";
 import {
   resolveChatPreferredLanguage,
   type ChatLanguage,
-} from "../../../services/chat/chatLanguage.service";
-import { resolveGenericChatFailureMessage } from "../../../services/chat/chatMicrocopy.service";
+} from "../../../modules/chat/presentation/chatLanguage.service";
+import { resolveGenericChatFailureMessage } from "../../../modules/chat/presentation/chatMicrocopy.service";
 import { toChatFinalEvent } from "../../../modules/chat/api/chatResultEnvelope";
 import type {
   LLMStreamingConfig,

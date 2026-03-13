@@ -34,7 +34,7 @@
       "creditCard"
     ],
     "runtimePathsNoRawConsole": [
-      "src/modules/chat/runtime/CentralizedChatRuntimeDelegate.ts",
+      "src/modules/chat/runtime/ChatTurnExecutor.ts",
       "src/modules/chat/runtime/ChatRuntimeOrchestrator.ts",
       "src/services/core/retrieval/evidenceGate.service.ts",
       "src/services/llm/core/llmGateway.service.ts"
@@ -50,6 +50,54 @@
         },
         "expect": {
           "redacted": true
+        }
+      },
+      {
+        "id": "LOG_POL_T_002",
+        "input": {
+          "token": "abc"
+        },
+        "expect": {
+          "redacted": true
+        }
+      },
+      {
+        "id": "LOG_POL_T_003",
+        "input": {
+          "authorization": "Bearer xyz"
+        },
+        "expect": {
+          "redacted": true
+        }
+      },
+      {
+        "id": "LOG_POL_T_004",
+        "input": {
+          "nested": {
+            "apiKey": "123"
+          }
+        },
+        "expect": {
+          "redacted": true
+        }
+      },
+      {
+        "id": "LOG_POL_T_005",
+        "input": {
+          "safe": "ok"
+        },
+        "expect": {
+          "redacted": false
+        }
+      },
+      {
+        "id": "LOG_POL_T_006",
+        "input": {
+          "safe": "ok"
+        },
+        "expect": {
+          "strict": true,
+          "failClosedInProd": true
         }
       }
     ]

@@ -19,6 +19,17 @@ export interface LLMChatEngineConfig {
   maxOutputTokens?: number;
 }
 
+function mergeExecutionTelemetry(
+  telemetry: Record<string, unknown> | undefined,
+  fallback: { provider: LLMProvider; model: string },
+): Record<string, unknown> {
+  return {
+    provider: telemetry?.provider ?? fallback.provider,
+    model: telemetry?.model ?? fallback.model,
+    ...(telemetry || {}),
+  };
+}
+
 export class LLMChatEngine implements ChatEngine {
   private readonly modelId: string;
   private readonly provider: LLMProvider;
@@ -60,11 +71,10 @@ export class LLMChatEngine implements ChatEngine {
 
     return {
       text: out.text,
-      telemetry: {
+      telemetry: mergeExecutionTelemetry(out.telemetry, {
         provider: this.provider,
         model: this.modelId,
-        ...out.telemetry,
-      },
+      }),
     };
   }
 
@@ -97,11 +107,10 @@ export class LLMChatEngine implements ChatEngine {
 
     return {
       text: out.text,
-      telemetry: {
+      telemetry: mergeExecutionTelemetry(out.telemetry, {
         provider: this.provider,
         model: this.modelId,
-        ...out.telemetry,
-      },
+      }),
     };
   }
 
@@ -138,11 +147,10 @@ export class LLMChatEngine implements ChatEngine {
 
     return {
       finalText: out.finalText,
-      telemetry: {
+      telemetry: mergeExecutionTelemetry(out.telemetry, {
         provider: this.provider,
         model: this.modelId,
-        ...out.telemetry,
-      },
+      }),
     };
   }
 }

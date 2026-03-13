@@ -1,0 +1,119 @@
+{
+  "_meta": {
+    "id": "di_procurement_domain_profile",
+    "version": "1.0.0",
+    "description": "Procurement domain profile for source-to-pay interpretation and bid-to-award reasoning.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/orchestration/answerPlanner.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/domain-validation.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "procurement",
+    "minEvidenceScore": 0.82
+  },
+  "domain": "procurement",
+  "displayName": {
+    "en": "Procurement",
+    "pt": "Compras e Suprimentos"
+  },
+  "scope": "Strategic sourcing, sourcing events, purchase intent, vendor selection, contract award, order management, and post-award supplier performance.",
+  "coreConcepts": [
+    "requisition",
+    "rfx",
+    "vendor qualification",
+    "bid scoring",
+    "award decision",
+    "contract execution",
+    "purchase order",
+    "invoice discrepancy",
+    "delivery commitment",
+    "payment terms",
+    "commercial negotiation",
+    "compliance checklist",
+    "tax impact",
+    "sourcing policy",
+    "preferred supplier",
+    "total cost of ownership",
+    "savings capture"
+  ],
+  "supportedDocTypes": [
+    "proc_rfx_pack",
+    "proc_vendor_registration",
+    "proc_purchase_order",
+    "proc_contract",
+    "proc_bid_analysis",
+    "proc_invoice_match",
+    "proc_sourcing_policy",
+    "proc_supplier_scorecard"
+  ],
+  "supportedOperators": [
+    "advise",
+    "extract",
+    "compare",
+    "calculate",
+    "validate",
+    "summarize",
+    "locate",
+    "monitor",
+    "evaluate"
+  ],
+  "supportedSections": [
+    "business_need",
+    "requirements",
+    "sourcing_strategy",
+    "evaluation_matrix",
+    "award_rationale",
+    "commercial_terms",
+    "delivery_plan",
+    "contract_obligations",
+    "invoice_reconciliation",
+    "supplier_performance",
+    "exceptions",
+    "approvals"
+  ],
+  "detectionSignals": {
+    "highConfidence": [
+      "request for proposal",
+      "request for quotation",
+      "bid",
+      "supplier evaluation",
+      "purchase order",
+      "supplier scorecard",
+      "award memo"
+    ],
+    "mediumConfidence": [
+      "contract",
+      "procurement policy",
+      "invoice variance",
+      "lead time",
+      "pricing model",
+      "payment term"
+    ]
+  },
+  "negativeBoundaries": [
+    "Do not classify generic inventory lists as procurement unless they include sourcing, contract, or award context.",
+    "Do not treat unrelated finance accounting records as procurement unless PO, vendor, or bidding structure is explicit."
+  ],
+  "ontologyPrefix": "proc",
+  "qualityDefaults": {
+    "currencyNormalization": "prefer_source_currency",
+    "unitNormalization": "prefer_original_units",
+    "requireVendorIdForClaims": true
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "domain classification and strategy synthesis",
+    "consumer": "domain router and procurement writer",
+    "intent": "Keep sourcing decisions auditable: every comparative claim must include tie-break logic and source page anchors."
+  }
+}

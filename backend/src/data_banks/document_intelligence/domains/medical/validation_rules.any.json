@@ -1,0 +1,218 @@
+{
+  "_meta": {
+    "id": "medical_validation_rules",
+    "version": "1.0.0",
+    "description": "Medical validation rules for measurement exactness, role scoping, and interpretation safety.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "domain": "medical"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "validate clinical findings, trend claims, and safety statements",
+    "consumer": "medical validator",
+    "intent": "Block unsafe medical inference and keep claims tied to units, references, and documented context.",
+    "emittedSignals": [
+      "medicalSafetyValidationState",
+      "medicalUnitConflict",
+      "medicalEncounterConsistency"
+    ]
+  },
+  "exactnessContract": {
+    "forbiddenSubstitutions": [
+      "diagnosis_without_source_support",
+      "treatment_recommendation_without_authority",
+      "unitless_numeric_statement",
+      "numeric_comparison_across_mismatched_units",
+      "medication_allergy_linking_without_claim",
+      "patient_context_merge_across_encounters"
+    ],
+    "allowedSubstitutions": [
+      "normalize_units_with_documented_basis",
+      "trend_without_precision_if_uncertain_with_uncertainty_block",
+      "documented_followup_note_with_unmet_condition_flag"
+    ],
+    "requiredAnchors": [
+      "patient_scope",
+      "measurement_unit",
+      "encounter_date",
+      "reference_range",
+      "source_location"
+    ],
+    "mustPreserveSafetyContext": true
+  },
+  "validationRules": [
+    {
+      "id": "MED_VAL_001_units_required",
+      "severity": "high",
+      "applies": [
+        "extract",
+        "summarize",
+        "compare",
+        "validate"
+      ],
+      "check": "numeric_values_have_unit_and_reference_frame",
+      "description": "Numeric findings must preserve unit and measurement basis before interpretation.",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "MED_VAL_002_patient_context_lock",
+      "severity": "high",
+      "applies": [
+        "extract",
+        "summarize",
+        "compare"
+      ],
+      "check": "patient_and_encounter_context_is_locked",
+      "description": "Clinical summaries should not merge unlinked encounters or masked patients without explicit link.",
+      "failureAction": "BLOCK_AND_REQUIRE_CONTEXT"
+    },
+    {
+      "id": "MED_VAL_003_reference_range_guard",
+      "severity": "high",
+      "applies": [
+        "evaluate",
+        "summarize",
+        "validate"
+      ],
+      "check": "range_context_present_when_abnormality_implied",
+      "description": "If findings are flagged as abnormal/critical, include reference range and basis.",
+      "failureAction": "WARN_AND_REQUIRE_RANGE_CONTEXT"
+    },
+    {
+      "id": "MED_VAL_004_safe_language_guard",
+      "severity": "high",
+      "applies": [
+        "advise",
+        "evaluate",
+        "summarize"
+      ],
+      "check": "no_diagnosis_or_treatment_recommendation_output",
+      "description": "Block treatment planning and diagnosis certainty unless explicitly document-grounded and within allowed policy.",
+      "failureAction": "BLOCK_AND_REPHRASE_CLINICAL_BOUNDARY"
+    },
+    {
+      "id": "MED_VAL_005_role_actor_guard",
+      "severity": "medium",
+      "applies": [
+        "extract",
+        "summarize",
+        "validate"
+      ],
+      "check": "actor_roles_are_explicit_and_distinct",
+      "description": "Distinguish patient, subscriber, caregiver, and clinician roles before assigning follow-up obligations.",
+      "failureAction": "WARN_AND_REQUIRE_ROLE_CLARITY"
+    },
+    {
+      "id": "MED_VAL_006_followup_timeline_guard",
+      "severity": "medium",
+      "applies": [
+        "monitor",
+        "summarize",
+        "evaluate"
+      ],
+      "check": "followup_timeline_is_extracted_if_present",
+      "description": "Follow-up related outputs must include timing and responsible actor when available.",
+      "failureAction": "WARN_AND_REQUIRE_FOLLOWUP"
+    },
+    {
+      "id": "MED_VAL_007_medication_allergy_link_guard",
+      "severity": "medium",
+      "applies": [
+        "evaluate",
+        "validate",
+        "extract"
+      ],
+      "check": "medication_or_allergy_claim_has_pairing_source",
+      "description": "Do not assert medication-allergy safety status without linked source entries.",
+      "failureAction": "WARN_AND_REQUIRE_MEDICATION_ALLERGY_LINK"
+    },
+    {
+      "id": "MED_VAL_008_trend_consistency_guard",
+      "severity": "medium",
+      "applies": [
+        "compare",
+        "evaluate"
+      ],
+      "check": "trend_claims_are_time_locked_and_unit_locked",
+      "description": "Trend claims must include comparable time points and stable units.",
+      "failureAction": "WARN_AND_REQUIRE_TREND_METADATA"
+    },
+    {
+      "id": "MED_VAL_009_imaging_report_gate",
+      "severity": "low",
+      "applies": [
+        "summarize",
+        "validate"
+      ],
+      "check": "imaging_claims_include_impression_and_signer_context",
+      "description": "Radiology/imaging conclusions should include impression context and interpretation scope.",
+      "failureAction": "WARN_AND_ANNOTATE_REPORT_SCOPE"
+    },
+    {
+      "id": "MED_VAL_010_criticality_escalation_guard",
+      "severity": "low",
+      "applies": [
+        "evaluate",
+        "monitor"
+      ],
+      "check": "critical_flag_handled_with_clinical_followup_note",
+      "description": "Critical flags should be presented as observation with escalation context, not diagnosis conclusion.",
+      "failureAction": "WARN_AND_REQUIRE_CLINICAL_ESCALATION_CONTEXT"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "medical_validation_units_required",
+        "input": {
+          "query": "Summarize labs for creatinine trend."
+        },
+        "expect": {
+          "mustCheck": [
+            "MED_VAL_001_units_required"
+          ]
+        }
+      },
+      {
+        "id": "medical_validation_patient_scope_lock",
+        "input": {
+          "queryType": "summarize",
+          "signal": {
+            "multiple_encounters": true
+          }
+        },
+        "expect": {
+          "mustCheck": [
+            "MED_VAL_002_patient_context_lock"
+          ]
+        }
+      },
+      {
+        "id": "medical_validation_safe_language_guard",
+        "input": {
+          "query": "recommend treatment change"
+        },
+        "expect": {
+          "mustCheck": [
+            "MED_VAL_004_safe_language_guard"
+          ]
+        }
+      }
+    ]
+  }
+}

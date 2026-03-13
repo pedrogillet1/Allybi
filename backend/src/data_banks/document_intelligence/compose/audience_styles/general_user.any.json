@@ -1,0 +1,89 @@
+{
+  "_meta": {
+    "id": "audience_style_general_user",
+    "version": "1.0.0",
+    "description": "General-user audience style overlay focused on plain language, low jargon, and clear takeaways.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "composition-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "audience": "general_user",
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "audience overlay after voice selection",
+    "consumer": "composition layer",
+    "intent": "Translate the answer into clean plain language without stripping away the evidence boundaries."
+  },
+  "preferences": {
+    "prefer": [
+      "plain_answer",
+      "simple_framing",
+      "what_it_means"
+    ],
+    "avoid": [
+      "term_heavy_openings",
+      "dense_clause_chaining",
+      "unexplained_abbreviations"
+    ]
+  },
+  "structures": [
+    {
+      "id": "plain_explainer",
+      "sequence": [
+        "plain_answer",
+        "short_support",
+        "what_it_means"
+      ]
+    },
+    {
+      "id": "plain_compare",
+      "sequence": [
+        "simple_difference",
+        "short_example",
+        "impact"
+      ]
+    }
+  ],
+  "phrasingSignals": {
+    "en": [
+      "In simple terms, {{meaning}}.",
+      "What this means is {{meaning}}.",
+      "Put plainly, {{meaning}}."
+    ],
+    "pt": [
+      "Em termos simples, {{meaning}}.",
+      "O que isso quer dizer e {{meaning}}.",
+      "Falando de forma direta, {{meaning}}."
+    ]
+  },
+  "guardrails": [
+    "Explain terminology if it is not common-language.",
+    "Do not sacrifice the core limitation language just to make the answer sound simpler.",
+    "Do not bury the answer under document-process language."
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "general_user_style_prefers_plain_answer",
+        "expect": {
+          "prefer": "plain_answer"
+        }
+      }
+    ]
+  }
+}

@@ -4,7 +4,7 @@ import { describe, expect, test } from "@jest/globals";
 
 const TARGET_FILES = [
   "src/modules/chat/runtime/ChatRuntimeOrchestrator.ts",
-  "src/modules/chat/runtime/CentralizedChatRuntimeDelegate.ts",
+  "src/modules/chat/runtime/ChatTurnExecutor.ts",
   "src/services/core/enforcement/responseContractEnforcer.service.ts",
 ];
 

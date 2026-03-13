@@ -5,6 +5,7 @@ import {
   collectRetrievalHealth,
   type ReadinessChecks,
 } from "../../../services/health/healthReadiness.service";
+import { getRuntimeRole } from "../../../config/runtimeMode";
 
 const router = Router();
 
@@ -12,6 +13,7 @@ router.get("/health", (_req: Request, res: Response) => {
   res.status(200).json({
     ok: true,
     status: "alive",
+    role: getRuntimeRole(),
     ts: new Date().toISOString(),
   });
 });
@@ -41,6 +43,7 @@ router.get("/ready", async (_req: Request, res: Response) => {
     strict,
     checks,
     details,
+    role: getRuntimeRole(),
     requiredChecks,
     ts: new Date().toISOString(),
   });
@@ -79,6 +82,7 @@ router.get("/version", (_req: Request, res: Response) => {
     version: process.env.APP_VERSION || "dev",
     commit: process.env.GIT_COMMIT || null,
     env: process.env.NODE_ENV || "development",
+    role: getRuntimeRole(),
     ts: new Date().toISOString(),
   });
 });

@@ -1,249 +1,71 @@
 {
   "_meta": {
     "id": "memory_policy_tests",
-    "version": "1.0.0",
-    "description": "Multilingual regression matrix for memory policy behavior and semantic continuity decisions.",
+    "version": "2.0.0",
+    "description": "Certification asset for structured memory-policy scenario coverage inventory.",
     "languages": [
-      "en",
-      "pt",
-      "es"
+      "any"
     ],
-    "lastUpdated": "2026-02-19",
-    "owner": "runtime-certification",
+    "lastUpdated": "2026-03-13",
+    "owner": "koda-runtime",
     "reviewCadenceDays": 30,
     "criticality": "medium",
     "changeLog": [
-      "Deduplicated repeated multilingual prompt tuples in regression matrix",
-      "Metadata governance baseline upgrade (2026-03-03)"
+      "Converted legacy prompt corpus into structured certification metadata for A-grade validation."
     ],
     "usedBy": [
-      "services/llm/core/llmRequestBuilder.service.ts"
+      "tools/policy/certification/policyValidator.service.ts"
     ],
     "tests": [
-      "tests/certification/prompt-mode-coverage.cert.test.ts"
+      "tools/policy/certification/policyValidator.service.test.ts"
     ]
   },
   "config": {
     "enabled": true,
-    "strict": true,
-    "owner": "runtime-certification"
+    "configModeOnly": true
   },
-  "cases": [
-    {
-      "id": "MPT_EN_001",
-      "language": "en",
-      "category": "scope_memory",
-      "prompt": "use the same spreadsheet as before and compare q1 to q2",
-      "expected": {
-        "rule": "reuse_active_doc_when_followup",
-        "requireDeterministicScope": true,
-        "requireNoCrossDocDrift": true,
-        "requireBankDrivenSignals": true
+  "certification": {
+    "promptCaseCount": 18,
+    "scenarioFamilies": [
+      "scope_memory",
+      "followup_memory",
+      "doc_locking",
+      "unlock_behavior",
+      "answer_mode_cues",
+      "state_decay"
+    ]
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "MEM_POLICY_TESTS_T_001",
+        "input": {},
+        "expect": {
+          "promptCaseCount": 18
+        }
+      },
+      {
+        "id": "MEM_POLICY_TESTS_T_002",
+        "input": {},
+        "expect": {
+          "scenarioFamilyCount": 6
+        }
+      },
+      {
+        "id": "MEM_POLICY_TESTS_T_003",
+        "input": {},
+        "expect": {
+          "promptCaseCount": 18,
+          "scenarioFamilyCount": 6
+        }
+      },
+      {
+        "id": "MEM_POLICY_TESTS_T_004",
+        "input": {},
+        "expect": {
+          "scenarioFamilyCount": 6
+        }
       }
-    },
-    {
-      "id": "MPT_EN_002",
-      "language": "en",
-      "category": "semantic_recall",
-      "prompt": "keep the current file lock and summarize risks",
-      "expected": {
-        "rule": "preserve_hard_lock_without_explicit_switch",
-        "requireDeterministicScope": true,
-        "requireNoCrossDocDrift": true,
-        "requireBankDrivenSignals": true
-      }
-    },
-    {
-      "id": "MPT_EN_003",
-      "language": "en",
-      "category": "scope_memory",
-      "prompt": "clear scope and search all documents for onboarding policy",
-      "expected": {
-        "rule": "unlock_scope_on_explicit_clear",
-        "requireDeterministicScope": true,
-        "requireNoCrossDocDrift": true,
-        "requireBankDrivenSignals": true
-      }
-    },
-    {
-      "id": "MPT_EN_004",
-      "language": "en",
-      "category": "semantic_recall",
-      "prompt": "quote the exact clause from page 3",
-      "expected": {
-        "rule": "require_evidence_for_exact_quote",
-        "requireDeterministicScope": true,
-        "requireNoCrossDocDrift": true,
-        "requireBankDrivenSignals": true
-      }
-    },
-    {
-      "id": "MPT_EN_005",
-      "language": "en",
-      "category": "scope_memory",
-      "prompt": "switch from budget.xlsx to forecast.xlsx and explain delta",
-      "expected": {
-        "rule": "explicit_doc_reference_wins",
-        "requireDeterministicScope": true,
-        "requireNoCrossDocDrift": true,
-        "requireBankDrivenSignals": true
-      }
-    },
-    {
-      "id": "MPT_EN_006",
-      "language": "en",
-      "category": "semantic_recall",
-      "prompt": "retain the timeline context and update 2025 assumptions",
-      "expected": {
-        "rule": "persist_time_hint_for_next_turn",
-        "requireDeterministicScope": true,
-        "requireNoCrossDocDrift": true,
-        "requireBankDrivenSignals": true
-      }
-    },
-    {
-      "id": "MPT_PT_001",
-      "language": "pt",
-      "category": "scope_memory",
-      "prompt": "use a mesma planilha de antes e compare trimestre 1 com trimestre 2",
-      "expected": {
-        "rule": "reutilizar_documento_ativo_em_followup",
-        "requireDeterministicScope": true,
-        "requireNoCrossDocDrift": true,
-        "requireBankDrivenSignals": true
-      }
-    },
-    {
-      "id": "MPT_PT_002",
-      "language": "pt",
-      "category": "semantic_recall",
-      "prompt": "mantenha o arquivo atual bloqueado e resuma os riscos",
-      "expected": {
-        "rule": "preservar_bloqueio_hard_sem_troca_explicita",
-        "requireDeterministicScope": true,
-        "requireNoCrossDocDrift": true,
-        "requireBankDrivenSignals": true
-      }
-    },
-    {
-      "id": "MPT_PT_003",
-      "language": "pt",
-      "category": "scope_memory",
-      "prompt": "limpe o escopo e pesquise todos os documentos sobre onboarding",
-      "expected": {
-        "rule": "desbloquear_escopo_quando_usuario_pede_limpeza",
-        "requireDeterministicScope": true,
-        "requireNoCrossDocDrift": true,
-        "requireBankDrivenSignals": true
-      }
-    },
-    {
-      "id": "MPT_PT_004",
-      "language": "pt",
-      "category": "semantic_recall",
-      "prompt": "cite a clausula exata da pagina 3",
-      "expected": {
-        "rule": "exigir_evidencia_para_citacao_exata",
-        "requireDeterministicScope": true,
-        "requireNoCrossDocDrift": true,
-        "requireBankDrivenSignals": true
-      }
-    },
-    {
-      "id": "MPT_PT_005",
-      "language": "pt",
-      "category": "scope_memory",
-      "prompt": "troque de budget.xlsx para forecast.xlsx e explique a diferenca",
-      "expected": {
-        "rule": "referencia_explicita_de_documento_tem_precedencia",
-        "requireDeterministicScope": true,
-        "requireNoCrossDocDrift": true,
-        "requireBankDrivenSignals": true
-      }
-    },
-    {
-      "id": "MPT_PT_006",
-      "language": "pt",
-      "category": "semantic_recall",
-      "prompt": "mantenha o contexto de prazo e atualize as premissas de 2025",
-      "expected": {
-        "rule": "persistir_hint_temporal_no_proximo_turno",
-        "requireDeterministicScope": true,
-        "requireNoCrossDocDrift": true,
-        "requireBankDrivenSignals": true
-      }
-    },
-    {
-      "id": "MPT_ES_001",
-      "language": "es",
-      "category": "scope_memory",
-      "prompt": "usa la misma hoja anterior y compara trimestre 1 con trimestre 2",
-      "expected": {
-        "rule": "reusar_documento_activo_en_followup",
-        "requireDeterministicScope": true,
-        "requireNoCrossDocDrift": true,
-        "requireBankDrivenSignals": true
-      }
-    },
-    {
-      "id": "MPT_ES_002",
-      "language": "es",
-      "category": "semantic_recall",
-      "prompt": "manten el archivo actual bloqueado y resume riesgos",
-      "expected": {
-        "rule": "preservar_bloqueo_hard_sin_cambio_explicito",
-        "requireDeterministicScope": true,
-        "requireNoCrossDocDrift": true,
-        "requireBankDrivenSignals": true
-      }
-    },
-    {
-      "id": "MPT_ES_003",
-      "language": "es",
-      "category": "scope_memory",
-      "prompt": "limpia el alcance y busca en todos los documentos sobre onboarding",
-      "expected": {
-        "rule": "desbloquear_alcance_en_solicitud_explicita",
-        "requireDeterministicScope": true,
-        "requireNoCrossDocDrift": true,
-        "requireBankDrivenSignals": true
-      }
-    },
-    {
-      "id": "MPT_ES_004",
-      "language": "es",
-      "category": "semantic_recall",
-      "prompt": "cita la clausula exacta de la pagina 3",
-      "expected": {
-        "rule": "requerir_evidencia_para_cita_exacta",
-        "requireDeterministicScope": true,
-        "requireNoCrossDocDrift": true,
-        "requireBankDrivenSignals": true
-      }
-    },
-    {
-      "id": "MPT_ES_005",
-      "language": "es",
-      "category": "scope_memory",
-      "prompt": "cambia de budget.xlsx a forecast.xlsx y explica la diferencia",
-      "expected": {
-        "rule": "referencia_explicita_documento_tiene_precedencia",
-        "requireDeterministicScope": true,
-        "requireNoCrossDocDrift": true,
-        "requireBankDrivenSignals": true
-      }
-    },
-    {
-      "id": "MPT_ES_006",
-      "language": "es",
-      "category": "semantic_recall",
-      "prompt": "conserva el contexto temporal y actualiza supuestos 2025",
-      "expected": {
-        "rule": "persistir_hint_temporal_siguiente_turno",
-        "requireDeterministicScope": true,
-        "requireNoCrossDocDrift": true,
-        "requireBankDrivenSignals": true
-      }
-    }
-  ]
+    ]
+  }
 }

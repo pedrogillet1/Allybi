@@ -56,7 +56,9 @@
     "ambiguity",
     "probes",
     "templates",
-    "tests"
+    "tests",
+    "llm",
+    "governance"
   ],
   "schemaMap": {
     "manifest": "bank_schema",
@@ -622,7 +624,7 @@
       "category": "semantics",
       "filename": "anti_robotic_style_rules.any.json",
       "path": "document_intelligence/compose/anti_robotic_style_rules.any.json",
-      "version": "1.0.0",
+      "version": "2.1.0",
       "schemaId": "bank_schema",
       "contentType": "json",
       "dependsOn": [],
@@ -638,8 +640,8 @@
         "dev": false,
         "local": false
       },
-      "checksumSha256": "fa013c823ec68c0dbab2b6e3f8ae1f65799df6df8655ac90ab1b786408858159",
-      "lastUpdated": "2026-03-03"
+      "checksumSha256": "1ddc474a712a7e9bef6f55536ba4edb87d9c93307848da4cfa214fc5feef9423",
+      "lastUpdated": "2026-03-13"
     },
     {
       "id": "assumption_policy",
@@ -690,8 +692,8 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "01962dcf827905d63fd4ff3369c662610befb975d9e1c50bbaa9fd48e2bb812e",
-      "lastUpdated": "2026-01-25"
+      "checksumSha256": "5b70372fc3ac88f66332d5fdb7cd278e5a08152423d2a0c5a2e92e4a8a226a5d",
+      "lastUpdated": "2026-03-12"
     },
     {
       "id": "bank_checksums",
@@ -723,8 +725,8 @@
       "filename": "bank_dependencies.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26",
-      "checksumSha256": "33f84c4a1e23cca87811e17e74938658b21e436f45e28a999a6fb74f5bcf2fca",
+      "lastUpdated": "2026-03-12",
+      "checksumSha256": "fa1df3567affcd3475e9d9e3b505741188fe74081119d0850b6275e3f09e4824",
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -20919,7 +20921,7 @@
       "category": "semantics",
       "filename": "empathy_and_support_language.any.json",
       "path": "document_intelligence/compose/empathy_and_support_language.any.json",
-      "version": "1.0.0",
+      "version": "3.0.0",
       "schemaId": "bank_schema",
       "contentType": "json",
       "dependsOn": [],
@@ -20935,8 +20937,8 @@
         "dev": false,
         "local": false
       },
-      "checksumSha256": "3d115390e689cf40916c154b97bea1f687c79aba7fc34b1ed073d4a590d1e622",
-      "lastUpdated": "2026-03-03"
+      "checksumSha256": "dfc3416ed9f24104fcf0f1f4a30a95fccdc29cfe42b1c0117d4392ea09d8cbb5",
+      "lastUpdated": "2026-03-13"
     },
     {
       "id": "entity_role_ontology",
@@ -31983,8 +31985,8 @@
         "dev": true,
         "local": true
       },
-      "checksumSha256": "e8eb8297f7d549318f278f6195456282b34c9d1e0dab31d86af09ad93cea7e03",
-      "lastUpdated": "2026-02-20",
+      "checksumSha256": "dd404f13e3ad3790f99ea2855e5d1f3c55ac0b133674190c82e1a4a8220092d8",
+      "lastUpdated": "2026-03-12",
       "dependsOn": []
     },
     {
@@ -33664,8 +33666,31 @@
       "filename": "prompt_registry.any.json",
       "version": "1.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-02-27",
-      "checksumSha256": "1a3e31cb35ef35e7f0125fef551ee9d327e21e041bef607506ef7b1208402532",
+      "lastUpdated": "2026-03-13",
+      "checksumSha256": "1d2c07e7dbb45f4b9a397abe2aa267b14d20dab75bcb254f4d5c25f90b8b0ddc",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": []
+    },
+    {
+      "id": "compose_style_contract",
+      "category": "prompts",
+      "path": "prompts/compose_style_contract.any.json",
+      "filename": "compose_style_contract.any.json",
+      "version": "1.0.0",
+      "schemaId": "bank_schema",
+      "lastUpdated": "2026-03-13",
+      "checksumSha256": "48835b067a5717040b936c0b1e6e11435b29a6fe3b30f3558a06e418f5a33b31",
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -33817,8 +33842,8 @@
       "filename": "quality_gates.any.json",
       "version": "3.0.0",
       "schemaId": "bank_schema",
-      "lastUpdated": "2026-01-26",
-      "checksumSha256": "cc103debeb031f9643726ead40ccfc6e295d50e1d723a6c737530800177c1daf",
+      "lastUpdated": "2026-03-13",
+      "checksumSha256": "e4f6e4f263602a0757bee32369b93b219b9a8851b341c88ec7703a8e442f461e",
       "enabledByEnv": {
         "production": true,
         "staging": true,
@@ -34489,35 +34514,11 @@
       "dependsOn": []
     },
     {
-      "id": "reports_bank_audit_report",
-      "category": "semantics",
-      "filename": "bank_audit_report.any.json",
-      "path": "__reports/bank_audit_report.any.json",
-      "version": "1.0.0",
-      "schemaId": "bank_schema",
-      "contentType": "json",
-      "dependsOn": [],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "289f3cab65dacdf69ef673f38d68b7957097749d40d0fb181dd458a1c2f082af",
-      "lastUpdated": "2026-03-03"
-    },
-    {
       "id": "response_templates",
       "category": "semantics",
       "path": "document_intelligence/compose/response_templates.any.json",
       "filename": "response_templates.any.json",
-      "version": "1.0.0",
+      "version": "3.0.0",
       "contentType": "json",
       "schemaId": "bank_schema",
       "dependsOn": [],
@@ -34533,8 +34534,8 @@
         "dev": false,
         "local": false
       },
-      "checksumSha256": "67ef12bf6f58481ee12d87c124ff4d05971175adb3e925b8e62e040f770d0d38",
-      "lastUpdated": "2026-02-27"
+      "checksumSha256": "4e68933208e2a81f45afec11f65a9abd8fdb06204151ee12dbf3bddcf0506bb9",
+      "lastUpdated": "2026-03-13"
     },
     {
       "id": "result_verification_policy",
@@ -36383,7 +36384,7 @@
       "category": "semantics",
       "filename": "voice_personality_profiles.any.json",
       "path": "document_intelligence/compose/voice_personality_profiles.any.json",
-      "version": "1.0.0",
+      "version": "3.0.0",
       "schemaId": "bank_schema",
       "contentType": "json",
       "dependsOn": [],
@@ -36399,8 +36400,8 @@
         "dev": false,
         "local": false
       },
-      "checksumSha256": "16518195d4b58788e7c81f051970fa52fac6ec0f0d48756c055797e97b37955c",
-      "lastUpdated": "2026-03-03"
+      "checksumSha256": "a0ff48ccba928a9dcf978192d763125ba5a31b6bf9006b06693b81e4f41fd56b",
+      "lastUpdated": "2026-03-13"
     },
     {
       "id": "wrong_doc_lock",
@@ -36646,719 +36647,6 @@
       "dependsOn": []
     },
     {
-      "id": "aggregation_patterns",
-      "category": "semantics",
-      "path": "patterns/core/aggregation_patterns.any.json",
-      "filename": "aggregation_patterns.any.json",
-      "version": "1.0.0",
-      "contentType": "patterns",
-      "schemaId": "bank_schema",
-      "lastUpdated": "2026-03-12",
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "dependsOn": []
-    },
-    {
-      "id": "entity_mentions",
-      "category": "semantics",
-      "path": "patterns/core/entity_mentions.any.json",
-      "filename": "entity_mentions.any.json",
-      "version": "1.0.0",
-      "contentType": "patterns",
-      "schemaId": "bank_schema",
-      "lastUpdated": "2026-03-12",
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "dependsOn": []
-    },
-    {
-      "id": "intent_families",
-      "category": "semantics",
-      "path": "patterns/core/intent_families.any.json",
-      "filename": "intent_families.any.json",
-      "version": "1.0.0",
-      "contentType": "patterns",
-      "schemaId": "bank_schema",
-      "lastUpdated": "2026-03-12",
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "dependsOn": []
-    },
-    {
-      "id": "multi_intent_connectors_en",
-      "category": "semantics",
-      "path": "patterns/core/multi_intent_connectors.en.any.json",
-      "filename": "multi_intent_connectors.en.any.json",
-      "version": "1.0.0",
-      "contentType": "patterns",
-      "schemaId": "bank_schema",
-      "lastUpdated": "2026-03-12",
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "dependsOn": []
-    },
-    {
-      "id": "multi_intent_connectors_pt",
-      "category": "semantics",
-      "path": "patterns/core/multi_intent_connectors.pt.any.json",
-      "filename": "multi_intent_connectors.pt.any.json",
-      "version": "1.0.0",
-      "contentType": "patterns",
-      "schemaId": "bank_schema",
-      "lastUpdated": "2026-03-12",
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "dependsOn": []
-    },
-    {
-      "id": "question_shapes",
-      "category": "semantics",
-      "path": "patterns/core/question_shapes.any.json",
-      "filename": "question_shapes.any.json",
-      "version": "1.0.0",
-      "contentType": "patterns",
-      "schemaId": "bank_schema",
-      "lastUpdated": "2026-03-12",
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "dependsOn": []
-    },
-    {
-      "id": "time_scope_patterns",
-      "category": "semantics",
-      "path": "patterns/core/time_scope_patterns.any.json",
-      "filename": "time_scope_patterns.any.json",
-      "version": "1.0.0",
-      "contentType": "patterns",
-      "schemaId": "bank_schema",
-      "lastUpdated": "2026-03-12",
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "dependsOn": []
-    },
-    {
-      "id": "doc_ref_phrases_accounting",
-      "category": "semantics",
-      "path": "patterns/doc_refs/doc_ref_phrases.accounting.any.json",
-      "filename": "doc_ref_phrases.accounting.any.json",
-      "version": "1.0.0",
-      "contentType": "patterns",
-      "schemaId": "bank_schema",
-      "lastUpdated": "2026-03-12",
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "dependsOn": []
-    },
-    {
-      "id": "doc_ref_phrases_everyday",
-      "category": "semantics",
-      "path": "patterns/doc_refs/doc_ref_phrases.everyday.any.json",
-      "filename": "doc_ref_phrases.everyday.any.json",
-      "version": "1.0.0",
-      "contentType": "patterns",
-      "schemaId": "bank_schema",
-      "lastUpdated": "2026-03-12",
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "dependsOn": []
-    },
-    {
-      "id": "doc_ref_phrases_finance",
-      "category": "semantics",
-      "path": "patterns/doc_refs/doc_ref_phrases.finance.any.json",
-      "filename": "doc_ref_phrases.finance.any.json",
-      "version": "1.0.0",
-      "contentType": "patterns",
-      "schemaId": "bank_schema",
-      "lastUpdated": "2026-03-12",
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "dependsOn": []
-    },
-    {
-      "id": "doc_ref_phrases_legal",
-      "category": "semantics",
-      "path": "patterns/doc_refs/doc_ref_phrases.legal.any.json",
-      "filename": "doc_ref_phrases.legal.any.json",
-      "version": "1.0.0",
-      "contentType": "patterns",
-      "schemaId": "bank_schema",
-      "lastUpdated": "2026-03-12",
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "dependsOn": []
-    },
-    {
-      "id": "doc_ref_phrases_medical",
-      "category": "semantics",
-      "path": "patterns/doc_refs/doc_ref_phrases.medical.any.json",
-      "filename": "doc_ref_phrases.medical.any.json",
-      "version": "1.0.0",
-      "contentType": "patterns",
-      "schemaId": "bank_schema",
-      "lastUpdated": "2026-03-12",
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "dependsOn": []
-    },
-    {
-      "id": "doc_set_compare_patterns",
-      "category": "semantics",
-      "path": "patterns/doc_refs/doc_set_compare_patterns.any.json",
-      "filename": "doc_set_compare_patterns.any.json",
-      "version": "1.0.0",
-      "contentType": "patterns",
-      "schemaId": "bank_schema",
-      "lastUpdated": "2026-03-12",
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "dependsOn": []
-    },
-    {
-      "id": "folder_scope_patterns",
-      "category": "semantics",
-      "path": "patterns/doc_refs/folder_scope_patterns.any.json",
-      "filename": "folder_scope_patterns.any.json",
-      "version": "1.0.0",
-      "contentType": "patterns",
-      "schemaId": "bank_schema",
-      "lastUpdated": "2026-03-12",
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "dependsOn": []
-    },
-    {
-      "id": "doc_versioning_patterns",
-      "category": "semantics",
-      "path": "patterns/doc_refs/versioning_patterns.any.json",
-      "filename": "versioning_patterns.any.json",
-      "version": "1.0.0",
-      "contentType": "patterns",
-      "schemaId": "bank_schema",
-      "lastUpdated": "2026-03-12",
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "dependsOn": []
-    },
-    {
-      "id": "aging_report_patterns",
-      "category": "semantics",
-      "path": "patterns/domains/accounting/aging_report_patterns.any.json",
-      "filename": "aging_report_patterns.any.json",
-      "version": "1.0.0",
-      "contentType": "patterns",
-      "schemaId": "bank_schema",
-      "lastUpdated": "2026-03-12",
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "dependsOn": []
-    },
-    {
-      "id": "gl_export_patterns",
-      "category": "semantics",
-      "path": "patterns/domains/accounting/gl_export_patterns.any.json",
-      "filename": "gl_export_patterns.any.json",
-      "version": "1.0.0",
-      "contentType": "patterns",
-      "schemaId": "bank_schema",
-      "lastUpdated": "2026-03-12",
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "dependsOn": []
-    },
-    {
-      "id": "journal_entry_patterns",
-      "category": "semantics",
-      "path": "patterns/domains/accounting/journal_entry_patterns.any.json",
-      "filename": "journal_entry_patterns.any.json",
-      "version": "1.0.0",
-      "contentType": "patterns",
-      "schemaId": "bank_schema",
-      "lastUpdated": "2026-03-12",
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "dependsOn": []
-    },
-    {
-      "id": "reconciliation_patterns",
-      "category": "semantics",
-      "path": "patterns/domains/accounting/reconciliation_patterns.any.json",
-      "filename": "reconciliation_patterns.any.json",
-      "version": "1.0.0",
-      "contentType": "patterns",
-      "schemaId": "bank_schema",
-      "lastUpdated": "2026-03-12",
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "dependsOn": []
-    },
-    {
-      "id": "trial_balance_patterns",
-      "category": "semantics",
-      "path": "patterns/domains/accounting/trial_balance_patterns.any.json",
-      "filename": "trial_balance_patterns.any.json",
-      "version": "1.0.0",
-      "contentType": "patterns",
-      "schemaId": "bank_schema",
-      "lastUpdated": "2026-03-12",
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "dependsOn": []
-    },
-    {
-      "id": "finance_patterns",
-      "category": "semantics",
-      "path": "patterns/domains/finance/anomaly_patterns.any.json",
-      "filename": "anomaly_patterns.any.json",
-      "version": "1.0.0",
-      "contentType": "patterns",
-      "schemaId": "bank_schema",
-      "lastUpdated": "2026-03-12",
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "dependsOn": []
-    },
-    {
-      "id": "amendment_and_version_patterns",
-      "category": "semantics",
-      "path": "patterns/domains/legal/amendment_and_version_patterns.any.json",
-      "filename": "amendment_and_version_patterns.any.json",
-      "version": "1.0.0",
-      "contentType": "patterns",
-      "schemaId": "bank_schema",
-      "lastUpdated": "2026-03-12",
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "dependsOn": []
-    },
-    {
-      "id": "clause_patterns",
-      "category": "semantics",
-      "path": "patterns/domains/legal/clause_patterns.any.json",
-      "filename": "clause_patterns.any.json",
-      "version": "1.0.0",
-      "contentType": "patterns",
-      "schemaId": "bank_schema",
-      "lastUpdated": "2026-03-12",
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "dependsOn": []
-    },
-    {
-      "id": "cross_reference_patterns",
-      "category": "semantics",
-      "path": "patterns/domains/legal/cross_reference_patterns.any.json",
-      "filename": "cross_reference_patterns.any.json",
-      "version": "1.0.0",
-      "contentType": "patterns",
-      "schemaId": "bank_schema",
-      "lastUpdated": "2026-03-12",
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "dependsOn": []
-    },
-    {
-      "id": "quote_requirements",
-      "category": "semantics",
-      "path": "patterns/domains/legal/quote_requirements.any.json",
-      "filename": "quote_requirements.any.json",
-      "version": "1.0.0",
-      "contentType": "patterns",
-      "schemaId": "bank_schema",
-      "lastUpdated": "2026-03-12",
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "dependsOn": []
-    },
-    {
-      "id": "risk_flag_patterns",
-      "category": "semantics",
-      "path": "patterns/domains/legal/risk_flag_patterns.any.json",
-      "filename": "risk_flag_patterns.any.json",
-      "version": "1.0.0",
-      "contentType": "patterns",
-      "schemaId": "bank_schema",
-      "lastUpdated": "2026-03-12",
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "dependsOn": []
-    },
-    {
-      "id": "medical_encounter_timeline_patterns",
-      "category": "semantics",
-      "path": "patterns/domains/medical/encounter_timeline_patterns.any.json",
-      "filename": "encounter_timeline_patterns.any.json",
-      "version": "1.0.0",
-      "contentType": "patterns",
-      "schemaId": "bank_schema",
-      "lastUpdated": "2026-03-12",
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "dependsOn": []
-    },
-    {
-      "id": "medical_lab_panel_patterns",
-      "category": "semantics",
-      "path": "patterns/domains/medical/lab_panel_patterns.any.json",
-      "filename": "lab_panel_patterns.any.json",
-      "version": "1.0.0",
-      "contentType": "patterns",
-      "schemaId": "bank_schema",
-      "lastUpdated": "2026-03-12",
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "dependsOn": []
-    },
-    {
-      "id": "medical_red_flag_patterns",
-      "category": "semantics",
-      "path": "patterns/domains/medical/red_flag_patterns.any.json",
-      "filename": "red_flag_patterns.any.json",
-      "version": "1.0.0",
-      "contentType": "patterns",
-      "schemaId": "bank_schema",
-      "lastUpdated": "2026-03-12",
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "dependsOn": []
-    },
-    {
-      "id": "medical_safety_boundary_triggers",
-      "category": "semantics",
-      "path": "patterns/domains/medical/safety_boundary_triggers.any.json",
-      "filename": "safety_boundary_triggers.any.json",
-      "version": "1.0.0",
-      "contentType": "patterns",
-      "schemaId": "bank_schema",
-      "lastUpdated": "2026-03-12",
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "dependsOn": []
-    },
-    {
-      "id": "medical_unit_reference_patterns",
-      "category": "semantics",
-      "path": "patterns/domains/medical/unit_and_reference_range_patterns.any.json",
-      "filename": "unit_and_reference_range_patterns.any.json",
-      "version": "1.0.0",
-      "contentType": "patterns",
-      "schemaId": "bank_schema",
-      "lastUpdated": "2026-03-12",
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "dependsOn": []
-    },
-    {
       "id": "conversation_state_schema",
       "category": "schemas",
       "path": "schemas/conversation_state_schema.any.json",
@@ -37495,7 +36783,1558 @@
         "local": false
       },
       "dependsOn": []
-    }
+    },
+    {
+      "id": "clarification_question_bank",
+      "category": "ambiguity",
+      "path": "ambiguity/clarification_question_bank.any.json",
+      "filename": "clarification_question_bank.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "4f7f9afd6f1b04147af5c92a4389d2a7e0fe00b2b70b3eadb4bd47a787131d36",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "field_role_disambiguation",
+      "category": "ambiguity",
+      "path": "ambiguity/field_role_disambiguation.any.json",
+      "filename": "field_role_disambiguation.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "entity_role_ontology"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "e1a02e81193bdc4f1ecaa599e6d248b7328294bd7f9cd1a9c82a95fb48b667ca",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "one_best_question_policy",
+      "category": "policies",
+      "path": "ambiguity/one_best_question_policy.any.json",
+      "filename": "one_best_question_policy.any.json",
+      "version": "1.0.0",
+      "contentType": "policy",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "quality_gates"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "6751716e43c596971c68fba95837fdac69655f9a9612d40da452315c4307e208",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "answer_recovery_strategies",
+      "category": "quality",
+      "path": "repair/answer_recovery_strategies.any.json",
+      "filename": "answer_recovery_strategies.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "quality_gates"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "e210d9bae4150fc373660f5c39ea2aa0fc6c78608aa33a703113cf63311672ee",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "partial_answer_recovery",
+      "category": "quality",
+      "path": "repair/partial_answer_recovery.any.json",
+      "filename": "partial_answer_recovery.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "quality_gates"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "f47ca5b273f11c7689c18e685c528674d4f3d576dc7dd49d3cc4199d750cda2a",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "not_enough_evidence",
+      "category": "quality",
+      "path": "repair/not_enough_evidence.any.json",
+      "filename": "not_enough_evidence.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "quality_gates"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "a476d4e43f66e6caaf9ea6ec6c206240067c5a42eed4932d91bc508b1c84a89b",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "contradiction_resolution",
+      "category": "quality",
+      "path": "repair/contradiction_resolution.any.json",
+      "filename": "contradiction_resolution.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "quality_gates"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "19e75ab72305697eb2cc13b9b2aab23de87f718f664ab6de5bd942c3a04a99da",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "followup_generation",
+      "category": "quality",
+      "path": "repair/followup_generation.any.json",
+      "filename": "followup_generation.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "quality_gates"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "b2542257b5d13b2b922856117d2ffd102a900485b5586f30ba747bf746585ca5",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "false_negative_rescue",
+      "category": "quality",
+      "path": "repair/false_negative_rescue.any.json",
+      "filename": "false_negative_rescue.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "quality_gates"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "249135c3fb70bcbebd401d246b5632227bded2afcd370799212b091367703d31",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "reask_vs_answer_policy",
+      "category": "policies",
+      "path": "repair/reask_vs_answer_policy.any.json",
+      "filename": "reask_vs_answer_policy.any.json",
+      "version": "1.0.0",
+      "contentType": "policy",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "quality_gates"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "272c1d1fb1f80bc529ea1a7cb73f55b223ee373c834fb4bec39d7e02992d7576",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "evidence_binding_contract",
+      "category": "retrieval",
+      "path": "retrieval/evidence_binding_contract.any.json",
+      "filename": "evidence_binding_contract.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "field_role_ontology"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "00d87ae3b55496a7bdd7f4f78907b9adbe2dc721f8677e4d1676b23da6b03036",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "field_role_ontology",
+      "category": "semantics",
+      "path": "retrieval/field_role_ontology.any.json",
+      "filename": "field_role_ontology.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "entity_role_ontology"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "d6fc24a0ebb59471ea808b0249daf0af4b9873db8ca90a7ca82ad4ac2c04b6cd",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "field_lock_patterns",
+      "category": "retrieval",
+      "path": "retrieval/field_lock_patterns.any.json",
+      "filename": "field_lock_patterns.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "field_role_ontology"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "0122cfbc57d08068ce2bfd819962cc4db27d17a469d01d6f80050028b3df7291",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "quote_span_rules",
+      "category": "retrieval",
+      "path": "retrieval/quote_span_rules.any.json",
+      "filename": "quote_span_rules.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "evidence_packaging"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "70a0f0617942abeb676fbed3ac1bcd52c87b183a36e9282d1f04f683ed6d1dd3",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "table_reasoning_rules",
+      "category": "retrieval",
+      "path": "retrieval/table_reasoning_rules.any.json",
+      "filename": "table_reasoning_rules.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "field_lock_patterns"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "a4b7b509d5d8fc5d9fd47246d288a78c1434569cab1843771880af3e7101a4d5",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "row_column_disambiguation",
+      "category": "retrieval",
+      "path": "retrieval/row_column_disambiguation.any.json",
+      "filename": "row_column_disambiguation.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "table_reasoning_rules"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "e2315aaca86fea844374d4456c62b88a98e991941b8b878594374633248aafab",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "cross_doc_synthesis_rules",
+      "category": "retrieval",
+      "path": "retrieval/cross_doc_synthesis_rules.any.json",
+      "filename": "cross_doc_synthesis_rules.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "evidence_binding_contract",
+        "table_reasoning_rules"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "d6bb09af6643689c8049ebe38cdf148349920ccbc09bf3a6c64068b598226b37",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "evidence_packaging_strategies",
+      "category": "retrieval",
+      "path": "retrieval/evidence_packaging_strategies.any.json",
+      "filename": "evidence_packaging_strategies.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "cross_doc_synthesis_rules"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "afc9cac34f8895bf4a5ea1ed2f1b460aede06bd346669a0029c3eeaaa349340e",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "field_exactness_rules",
+      "category": "quality",
+      "path": "validation/field_exactness_rules.any.json",
+      "filename": "field_exactness_rules.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "fact_type_requirements_expanded"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "58461abed2737852a14ef48b6f1b9d949711256794c238a1bd6f671d0770d316",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "claim_strength_matrix",
+      "category": "quality",
+      "path": "validation/claim_strength_matrix.any.json",
+      "filename": "claim_strength_matrix.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "field_exactness_rules"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "b835d0580862cc599184751014b29fa376bc926e80e28f87a811fd7594ba0667",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "fact_type_requirements_expanded",
+      "category": "quality",
+      "path": "validation/fact_type_requirements_expanded.any.json",
+      "filename": "fact_type_requirements_expanded.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "fact_type_requirements"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "91c4fefc648d7d0c9e1b8fbbdb81eba18edb9069cf40499cb77d74f43b269931",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "conflict_resolution_rules",
+      "category": "quality",
+      "path": "validation/conflict_resolution_rules.any.json",
+      "filename": "conflict_resolution_rules.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "field_exactness_rules",
+        "claim_strength_matrix"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "27bf0397fba3ab1446a1a8c85326740109e46f72a48784c6451e8e852cf9d99b",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "table_integrity_rules",
+      "category": "quality",
+      "path": "validation/table_integrity_rules.any.json",
+      "filename": "table_integrity_rules.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "table_reasoning_rules"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "05b57ff8e1c0b6310cc4cb75e742bacc1f781d96254b80a6682aca61e443b256",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "finance_domain_writer",
+      "category": "semantics",
+      "path": "document_intelligence/domains/finance/domain_writer.any.json",
+      "filename": "domain_writer.any.json",
+      "version": "1.2.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "finance_doc_logic",
+        "finance_kpi_ontology",
+        "di_finance_domain_profile"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "fd653d8d465850e38b698e2aeb85ccad515685af1e0a960ba306ee6be68a86c5",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "finance_ambiguity_patterns",
+      "category": "ambiguity",
+      "path": "document_intelligence/domains/finance/ambiguity_patterns.any.json",
+      "filename": "ambiguity_patterns.any.json",
+      "version": "1.2.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "di_finance_domain_profile",
+        "finance_domain_writer"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "175864a009a45bffe9dd1604ecba569918b7531de5dcaccb6052818940501cfe",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "finance_validation_rules",
+      "category": "quality",
+      "path": "document_intelligence/domains/finance/validation_rules.any.json",
+      "filename": "validation_rules.any.json",
+      "version": "1.1.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "di_finance_domain_profile",
+        "finance_domain_writer"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "1cfd401e40229687d90f96a49b18e936ff5137f1191b7e23978ada5ba171e206",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "eval_gold_queries_finance_domain_deepening",
+      "category": "tests",
+      "path": "document_intelligence/domains/finance/gold_queries.any.json",
+      "filename": "gold_queries.any.json",
+      "version": "1.1.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "finance_domain_writer",
+        "finance_validation_rules"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "44efac2771631b05b52ed4d1e0d1257b8bac25fcf4a4ebd3f1d0ed6fbb765be4",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "accounting_domain_writer",
+      "category": "semantics",
+      "path": "document_intelligence/domains/accounting/domain_writer.any.json",
+      "filename": "domain_writer.any.json",
+      "version": "2.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "accounting_rules",
+        "di_accounting_domain_profile_v2"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "ffd2dce3410fc29e63345b384966dcd6748ea7e8cd05bec5225fcce583950751",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "accounting_ambiguity_patterns",
+      "category": "ambiguity",
+      "path": "document_intelligence/domains/accounting/ambiguity_patterns.any.json",
+      "filename": "ambiguity_patterns.any.json",
+      "version": "1.1.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "di_accounting_domain_profile_v2",
+        "accounting_domain_writer"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "7bdeacf77b814cdeab037a3a334e27d7ba0fff89b1d48ff1506005aa8e6ca3f8",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "accounting_validation_rules",
+      "category": "quality",
+      "path": "document_intelligence/domains/accounting/validation_rules.any.json",
+      "filename": "validation_rules.any.json",
+      "version": "1.1.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "di_accounting_domain_profile_v2",
+        "accounting_domain_writer"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "8db0288b701f6e6ce7849fd3ecd668ae8805453b92159463e7839cc83b6103c1",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "eval_gold_queries_accounting_domain_deepening",
+      "category": "tests",
+      "path": "document_intelligence/domains/accounting/gold_queries.any.json",
+      "filename": "gold_queries.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "accounting_domain_writer",
+        "accounting_validation_rules"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "304346c9b90de847626e4958437e0f997fb4fb7794af1a1e4eca31e11be01d32",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "legal_domain_writer",
+      "category": "semantics",
+      "path": "document_intelligence/domains/legal/domain_writer.any.json",
+      "filename": "domain_writer.any.json",
+      "version": "1.1.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "legal_domain_profile"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "fbf79114615ac0b024f47a5ba6ff855b21911848eb20651ea5841e2a6105d00c",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "legal_ambiguity_patterns",
+      "category": "ambiguity",
+      "path": "document_intelligence/domains/legal/ambiguity_patterns.any.json",
+      "filename": "ambiguity_patterns.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "legal_domain_profile",
+        "legal_domain_writer"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "c28d978b32dd40c7cfee1f7cbc9767fd5e8e70e2878a85685a628bf8de068b66",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "legal_validation_rules",
+      "category": "quality",
+      "path": "document_intelligence/domains/legal/validation_rules.any.json",
+      "filename": "validation_rules.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "legal_domain_profile",
+        "legal_domain_writer"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "70168c74b499cce6945ce2d7ce1fc94b87b126c3b014db5246d7b324b7fdd877",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "eval_gold_queries_legal_domain_deepening",
+      "category": "tests",
+      "path": "document_intelligence/domains/legal/gold_queries.any.json",
+      "filename": "gold_queries.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "legal_domain_writer",
+        "legal_validation_rules"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "5421b3124287b9904b5dd8748428f859e233d3acfef19630150fbe03fa54b37f",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "medical_domain_writer",
+      "category": "semantics",
+      "path": "document_intelligence/domains/medical/domain_writer.any.json",
+      "filename": "domain_writer.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "medical_domain_profile"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "7f04126aea5eb635f72c5f6199b0e26c409423b77d7bee25ab5747ac1d0062b0",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "medical_ambiguity_patterns",
+      "category": "ambiguity",
+      "path": "document_intelligence/domains/medical/ambiguity_patterns.any.json",
+      "filename": "ambiguity_patterns.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "medical_domain_profile",
+        "medical_domain_writer"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "a2c06a4457b3ebc78c9e1515199656a32163bada9fc7af1245ddd984e91cda69",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "medical_validation_rules",
+      "category": "quality",
+      "path": "document_intelligence/domains/medical/validation_rules.any.json",
+      "filename": "validation_rules.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "medical_domain_profile",
+        "medical_domain_writer"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "f5dde000dab577b853bc3e57dc6d2866b3eb5c9cae94a22fd179182f7bd32362",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "eval_gold_queries_medical_domain_deepening",
+      "category": "tests",
+      "path": "document_intelligence/domains/medical/gold_queries.any.json",
+      "filename": "gold_queries.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "medical_domain_writer",
+        "medical_validation_rules"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "ce2c5db7e173fb77c1c13fdad4e0211536c5146f5f13f854fdfe472b5bcc59fc",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "ops_domain_writer",
+      "category": "semantics",
+      "path": "document_intelligence/domains/ops/domain_writer.any.json",
+      "filename": "domain_writer.any.json",
+      "version": "2.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "di_ops_domain_profile",
+        "ops_kpi_ontology",
+        "ops_doc_logic"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "06dc2891d7492cc9a7d81717415e4250194fb3ce6615009b82e9e78bcac06394",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "ops_ambiguity_patterns",
+      "category": "ambiguity",
+      "path": "document_intelligence/domains/ops/ambiguity_patterns.any.json",
+      "filename": "ambiguity_patterns.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "di_ops_domain_profile",
+        "ops_domain_writer"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "bc7b4ab0b8598e210d1f8bebf3e11cc68254bd3a50aff07b8378eb454eae513f",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "ops_validation_rules",
+      "category": "quality",
+      "path": "document_intelligence/domains/ops/validation_rules.any.json",
+      "filename": "validation_rules.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "di_ops_domain_profile",
+        "ops_domain_writer"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "729aad82468e8eacfc6bb5e3ec24878f48d4ae1b2d105a467a31c0c0e6f46d3c",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "eval_gold_queries_ops_domain_deepening",
+      "category": "tests",
+      "path": "document_intelligence/domains/ops/gold_queries.any.json",
+      "filename": "gold_queries.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "ops_domain_writer",
+        "ops_validation_rules"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "de45a9cb6a720cb092ad9d9b340f615291e0750bb2dcfac859f2c290f3f8981d",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "governance_bank_metadata_policy",
+      "category": "governance",
+      "path": "governance/bank_metadata_policy.any.json",
+      "filename": "bank_metadata_policy.any.json",
+      "version": "1.0.0",
+      "contentType": "policy",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "bank_manifest",
+        "bank_registry"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "fc617f4c0aa26fa28f8bc71b7e6c29a5526b27d095a11bdc87f7aec47abc537d",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "governance_bank_quality_contract",
+      "category": "governance",
+      "path": "governance/bank_quality_contract.any.json",
+      "filename": "bank_quality_contract.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "governance_bank_metadata_policy",
+        "governance_eval_gate_policy",
+        "governance_runtime_wiring_requirements"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "52cd48b3ca8738effd5df34d150c5b43e6a2cf8ebc8c98cf7ffb1a7407037b13",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "governance_eval_gate_policy",
+      "category": "governance",
+      "path": "governance/eval_gate_policy.any.json",
+      "filename": "eval_gate_policy.any.json",
+      "version": "1.0.0",
+      "contentType": "policy",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "governance_bank_metadata_policy"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "70f2a34f7926d32a721a60ec0ac17426ac9c753513f6047b0e8d5db22d7c950d",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "governance_runtime_wiring_requirements",
+      "category": "governance",
+      "path": "governance/runtime_wiring_requirements.any.json",
+      "filename": "runtime_wiring_requirements.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "bank_manifest",
+        "bank_registry",
+        "bank_dependencies"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "7939237f31917aa1c3f0b1a9f9ff15833f4f637fff1750d29c49a3b1b43c01a6",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "governance_sharding_policy",
+      "category": "governance",
+      "path": "governance/sharding_policy.any.json",
+      "filename": "sharding_policy.any.json",
+      "version": "1.0.0",
+      "contentType": "policy",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "governance_ssot_contract"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "2627a043a0bf7f34c3fcda8c4ccc92b052718b91780a3be1253208fafe913040",
+      "lastUpdated": "2026-03-13"
+    },
+    {
+      "id": "governance_ssot_contract",
+      "category": "governance",
+      "path": "governance/ssot_contract.any.json",
+      "filename": "ssot_contract.any.json",
+      "version": "1.0.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "bank_manifest",
+        "bank_registry",
+        "bank_dependencies"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "d8151e97c730f1066355d9aac9623c37ca98eb72c0ed5d0ffdf8d32b90e02bc1",
+      "lastUpdated": "2026-03-13"
+    },
+    {"id":"canvas_output_modes","category":"semantics","path":"assistant/canvas_output_modes.any.json"},
+    {"id":"context_container_profiles","category":"semantics","path":"assistant/context_container_profiles.any.json"},
+    {"id":"conversation_state_carryover","category":"semantics","path":"assistant/conversation_state_carryover.any.json"},
+    {"id":"custom_agent_profiles","category":"semantics","path":"assistant/custom_agent_profiles.any.json"},
+    {"id":"model_role_profiles","category":"semantics","path":"assistant/model_role_profiles.any.json"},
+    {"id":"project_memory_policy","category":"semantics","path":"assistant/project_memory_policy.any.json"},
+    {"id":"research_planning","category":"semantics","path":"assistant/research_planning.any.json"},
+    {"id":"task_decomposition_policy","category":"semantics","path":"assistant/task_decomposition_policy.any.json"},
+    {"id":"tool_selection_policy","category":"semantics","path":"assistant/tool_selection_policy.any.json"},
+    {"id":"work_product_types","category":"semantics","path":"assistant/work_product_types.any.json"},
+    {"id":"answer_strategies","category":"semantics","path":"document_intelligence/compose/answer_strategies.any.json"},
+    {
+      "id": "anti_repetition_patterns",
+      "category": "semantics",
+      "path": "document_intelligence/compose/anti_repetition_patterns.any.json",
+      "filename": "anti_repetition_patterns.any.json",
+      "version": "2.0.0",
+      "schemaId": "bank_schema",
+      "contentType": "json",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "b42e7ba22daacdcc94f4c8bf2e60f03b9cda82e8455185f13c1dfabc4d17bdd3",
+      "lastUpdated": "2026-03-13"
+    },
+    {"id":"audience_style_analyst","category":"semantics","path":"document_intelligence/compose/audience_styles/analyst.any.json"},
+    {"id":"audience_style_executive","category":"semantics","path":"document_intelligence/compose/audience_styles/executive.any.json"},
+    {"id":"audience_style_general_user","category":"semantics","path":"document_intelligence/compose/audience_styles/general_user.any.json"},
+    {"id":"audience_style_operator","category":"semantics","path":"document_intelligence/compose/audience_styles/operator.any.json"},
+    {
+      "id": "claim_strength_language",
+      "category": "semantics",
+      "path": "document_intelligence/compose/claim_strength_language.any.json",
+      "filename": "claim_strength_language.any.json",
+      "version": "2.0.0",
+      "schemaId": "bank_schema",
+      "contentType": "json",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "7e06314d9ee7ff78a856b8884a146be2841478aad11345b9e70e89017c29ed6a",
+      "lastUpdated": "2026-03-13"
+    },
+    {"id":"closers_and_next_steps","category":"semantics","path":"document_intelligence/compose/closers_and_next_steps.any.json"},
+    {"id":"compare_and_contrast","category":"semantics","path":"document_intelligence/compose/compare_and_contrast.any.json"},
+    {"id":"domain_writer_accounting","category":"semantics","path":"document_intelligence/compose/domain_writers/accounting_writer.any.json"},
+    {"id":"domain_writer_finance","category":"semantics","path":"document_intelligence/compose/domain_writers/finance_writer.any.json"},
+    {"id":"domain_writer_legal","category":"semantics","path":"document_intelligence/compose/domain_writers/legal_writer.any.json"},
+    {"id":"domain_writer_medical","category":"semantics","path":"document_intelligence/compose/domain_writers/medical_writer.any.json"},
+    {"id":"domain_writer_ops","category":"semantics","path":"document_intelligence/compose/domain_writers/ops_writer.any.json"},
+    {"id":"evidence_synthesis","category":"semantics","path":"document_intelligence/compose/evidence_synthesis.any.json"},
+    {
+      "id": "openers_and_framing",
+      "category": "semantics",
+      "path": "document_intelligence/compose/openers_and_framing.any.json",
+      "filename": "openers_and_framing.any.json",
+      "version": "2.0.0",
+      "schemaId": "bank_schema",
+      "contentType": "json",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "31c2e66c81eb21cbf28210d8ccc7b624bae4f9ecb8045d07220b5d5001fc3d2f",
+      "lastUpdated": "2026-03-13"
+    },
+    {"id":"quote_explanation_patterns","category":"semantics","path":"document_intelligence/compose/quote_explanation_patterns.any.json"},
+    {"id":"rhetorical_moves","category":"semantics","path":"document_intelligence/compose/rhetorical_moves.any.json"},
+    {
+      "id": "sentence_rhythm_and_variety",
+      "category": "semantics",
+      "path": "document_intelligence/compose/sentence_rhythm_and_variety.any.json",
+      "filename": "sentence_rhythm_and_variety.any.json",
+      "version": "2.0.0",
+      "schemaId": "bank_schema",
+      "contentType": "json",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "a86d422e500f17b090bc5e09b1e7f29b72df2794fe45e05b98db55e43cf55158",
+      "lastUpdated": "2026-03-13"
+    },
+    {"id":"table_narration","category":"semantics","path":"document_intelligence/compose/table_narration.any.json"},
+    {
+      "id": "uncertainty_calibration",
+      "category": "semantics",
+      "path": "document_intelligence/compose/uncertainty_calibration.any.json",
+      "filename": "uncertainty_calibration.any.json",
+      "version": "2.0.0",
+      "schemaId": "bank_schema",
+      "contentType": "json",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "160fd551015490b55c9e642ad60e19071741e9224c0bd454acab2bee3e212174",
+      "lastUpdated": "2026-03-13"
+    },
+    {"id":"di_commercial_real_estate_ambiguity_patterns","category":"ambiguity","path":"document_intelligence/domains/commercial_real_estate/ambiguity_patterns.any.json"},
+    {"id":"di_commercial_real_estate_doc_type_catalog","category":"semantics","path":"document_intelligence/domains/commercial_real_estate/doc_type_catalog.any.json"},
+    {"id":"di_commercial_real_estate_domain_profile","category":"semantics","path":"document_intelligence/domains/commercial_real_estate/domain_profile.any.json"},
+    {"id":"di_commercial_real_estate_domain_writer","category":"semantics","path":"document_intelligence/domains/commercial_real_estate/domain_writer.any.json"},
+    {"id":"di_commercial_real_estate_entity_ontology","category":"semantics","path":"document_intelligence/domains/commercial_real_estate/entity_ontology.any.json"},
+    {"id":"eval_gold_queries_commercial_real_estate_domain","category":"tests","path":"document_intelligence/domains/commercial_real_estate/gold_queries.any.json"},
+    {"id":"di_commercial_real_estate_retrieval_strategies","category":"retrieval","path":"document_intelligence/domains/commercial_real_estate/retrieval_strategies.any.json"},
+    {"id":"di_commercial_real_estate_section_ontology","category":"semantics","path":"document_intelligence/domains/commercial_real_estate/section_ontology.any.json"},
+    {"id":"di_commercial_real_estate_table_ontology","category":"semantics","path":"document_intelligence/domains/commercial_real_estate/table_ontology.any.json"},
+    {"id":"di_commercial_real_estate_validation_rules","category":"quality","path":"document_intelligence/domains/commercial_real_estate/validation_rules.any.json"},
+    {"id":"di_compliance_regulatory_ambiguity_patterns","category":"ambiguity","path":"document_intelligence/domains/compliance_regulatory/ambiguity_patterns.any.json"},
+    {"id":"di_compliance_regulatory_doc_type_catalog","category":"semantics","path":"document_intelligence/domains/compliance_regulatory/doc_type_catalog.any.json"},
+    {"id":"di_compliance_regulatory_domain_profile","category":"semantics","path":"document_intelligence/domains/compliance_regulatory/domain_profile.any.json"},
+    {"id":"di_compliance_regulatory_domain_writer","category":"semantics","path":"document_intelligence/domains/compliance_regulatory/domain_writer.any.json"},
+    {"id":"di_compliance_regulatory_entity_ontology","category":"semantics","path":"document_intelligence/domains/compliance_regulatory/entity_ontology.any.json"},
+    {"id":"eval_gold_queries_compliance_regulatory_domain","category":"tests","path":"document_intelligence/domains/compliance_regulatory/gold_queries.any.json"},
+    {"id":"di_compliance_regulatory_retrieval_strategies","category":"retrieval","path":"document_intelligence/domains/compliance_regulatory/retrieval_strategies.any.json"},
+    {"id":"di_compliance_regulatory_section_ontology","category":"semantics","path":"document_intelligence/domains/compliance_regulatory/section_ontology.any.json"},
+    {"id":"di_compliance_regulatory_table_ontology","category":"semantics","path":"document_intelligence/domains/compliance_regulatory/table_ontology.any.json"},
+    {"id":"di_compliance_regulatory_validation_rules","category":"quality","path":"document_intelligence/domains/compliance_regulatory/validation_rules.any.json"},
+    {"id":"manufacturing_ambiguity_patterns","category":"ambiguity","path":"document_intelligence/domains/manufacturing/ambiguity_patterns.any.json"},
+    {"id":"di_manufacturing_doc_type_catalog","category":"semantics","path":"document_intelligence/domains/manufacturing/doc_type_catalog.any.json"},
+    {"id":"di_manufacturing_domain_profile","category":"semantics","path":"document_intelligence/domains/manufacturing/domain_profile.any.json"},
+    {"id":"manufacturing_domain_writer","category":"semantics","path":"document_intelligence/domains/manufacturing/domain_writer.any.json"},
+    {"id":"di_manufacturing_entity_ontology","category":"semantics","path":"document_intelligence/domains/manufacturing/entity_ontology.any.json"},
+    {"id":"eval_gold_queries_manufacturing_domain","category":"tests","path":"document_intelligence/domains/manufacturing/gold_queries.any.json"},
+    {"id":"di_manufacturing_retrieval_strategies","category":"retrieval","path":"document_intelligence/domains/manufacturing/retrieval_strategies.any.json"},
+    {"id":"di_manufacturing_section_ontology","category":"semantics","path":"document_intelligence/domains/manufacturing/section_ontology.any.json"},
+    {"id":"di_manufacturing_table_ontology","category":"semantics","path":"document_intelligence/domains/manufacturing/table_ontology.any.json"},
+    {"id":"manufacturing_validation_rules","category":"quality","path":"document_intelligence/domains/manufacturing/validation_rules.any.json"},
+    {"id":"procurement_ambiguity_patterns","category":"ambiguity","path":"document_intelligence/domains/procurement/ambiguity_patterns.any.json"},
+    {"id":"di_procurement_doc_type_catalog","category":"semantics","path":"document_intelligence/domains/procurement/doc_type_catalog.any.json"},
+    {"id":"di_procurement_domain_profile","category":"semantics","path":"document_intelligence/domains/procurement/domain_profile.any.json"},
+    {"id":"procurement_domain_writer","category":"semantics","path":"document_intelligence/domains/procurement/domain_writer.any.json"},
+    {"id":"di_procurement_entity_ontology","category":"semantics","path":"document_intelligence/domains/procurement/entity_ontology.any.json"},
+    {"id":"eval_gold_queries_procurement_domain","category":"tests","path":"document_intelligence/domains/procurement/gold_queries.any.json"},
+    {"id":"di_procurement_retrieval_strategies","category":"retrieval","path":"document_intelligence/domains/procurement/retrieval_strategies.any.json"},
+    {"id":"di_procurement_section_ontology","category":"semantics","path":"document_intelligence/domains/procurement/section_ontology.any.json"},
+    {"id":"di_procurement_table_ontology","category":"semantics","path":"document_intelligence/domains/procurement/table_ontology.any.json"},
+    {"id":"procurement_validation_rules","category":"quality","path":"document_intelligence/domains/procurement/validation_rules.any.json"},
+    {"id":"di_public_sector_ambiguity_patterns","category":"ambiguity","path":"document_intelligence/domains/public_sector/ambiguity_patterns.any.json"},
+    {"id":"di_public_sector_doc_type_catalog","category":"semantics","path":"document_intelligence/domains/public_sector/doc_type_catalog.any.json"},
+    {"id":"di_public_sector_domain_profile","category":"semantics","path":"document_intelligence/domains/public_sector/domain_profile.any.json"},
+    {"id":"di_public_sector_domain_writer","category":"semantics","path":"document_intelligence/domains/public_sector/domain_writer.any.json"},
+    {"id":"di_public_sector_entity_ontology","category":"semantics","path":"document_intelligence/domains/public_sector/entity_ontology.any.json"},
+    {"id":"eval_gold_queries_public_sector_domain","category":"tests","path":"document_intelligence/domains/public_sector/gold_queries.any.json"},
+    {"id":"di_public_sector_retrieval_strategies","category":"retrieval","path":"document_intelligence/domains/public_sector/retrieval_strategies.any.json"},
+    {"id":"di_public_sector_section_ontology","category":"semantics","path":"document_intelligence/domains/public_sector/section_ontology.any.json"},
+    {"id":"di_public_sector_table_ontology","category":"semantics","path":"document_intelligence/domains/public_sector/table_ontology.any.json"},
+    {"id":"di_public_sector_validation_rules","category":"quality","path":"document_intelligence/domains/public_sector/validation_rules.any.json"},
+    {"id":"di_research_scientific_ambiguity_patterns","category":"ambiguity","path":"document_intelligence/domains/research_scientific/ambiguity_patterns.any.json"},
+    {"id":"di_research_scientific_doc_type_catalog","category":"semantics","path":"document_intelligence/domains/research_scientific/doc_type_catalog.any.json"},
+    {"id":"di_research_scientific_domain_profile","category":"semantics","path":"document_intelligence/domains/research_scientific/domain_profile.any.json"},
+    {"id":"di_research_scientific_domain_writer","category":"semantics","path":"document_intelligence/domains/research_scientific/domain_writer.any.json"},
+    {"id":"di_research_scientific_entity_ontology","category":"semantics","path":"document_intelligence/domains/research_scientific/entity_ontology.any.json"},
+    {"id":"eval_gold_queries_research_scientific_domain","category":"tests","path":"document_intelligence/domains/research_scientific/gold_queries.any.json"},
+    {"id":"di_research_scientific_retrieval_strategies","category":"retrieval","path":"document_intelligence/domains/research_scientific/retrieval_strategies.any.json"},
+    {"id":"di_research_scientific_section_ontology","category":"semantics","path":"document_intelligence/domains/research_scientific/section_ontology.any.json"},
+    {"id":"di_research_scientific_table_ontology","category":"semantics","path":"document_intelligence/domains/research_scientific/table_ontology.any.json"},
+    {"id":"di_research_scientific_validation_rules","category":"quality","path":"document_intelligence/domains/research_scientific/validation_rules.any.json"},
+    {"id":"sales_crm_ambiguity_patterns","category":"ambiguity","path":"document_intelligence/domains/sales_crm/ambiguity_patterns.any.json"},
+    {"id":"di_sales_crm_doc_type_catalog","category":"semantics","path":"document_intelligence/domains/sales_crm/doc_type_catalog.any.json"},
+    {"id":"di_sales_crm_domain_profile","category":"semantics","path":"document_intelligence/domains/sales_crm/domain_profile.any.json"},
+    {"id":"sales_crm_domain_writer","category":"semantics","path":"document_intelligence/domains/sales_crm/domain_writer.any.json"},
+    {"id":"di_sales_crm_entity_ontology","category":"semantics","path":"document_intelligence/domains/sales_crm/entity_ontology.any.json"},
+    {"id":"eval_gold_queries_sales_crm_domain","category":"tests","path":"document_intelligence/domains/sales_crm/gold_queries.any.json"},
+    {"id":"di_sales_crm_retrieval_strategies","category":"retrieval","path":"document_intelligence/domains/sales_crm/retrieval_strategies.any.json"},
+    {"id":"di_sales_crm_section_ontology","category":"semantics","path":"document_intelligence/domains/sales_crm/section_ontology.any.json"},
+    {"id":"di_sales_crm_table_ontology","category":"semantics","path":"document_intelligence/domains/sales_crm/table_ontology.any.json"},
+    {"id":"sales_crm_validation_rules","category":"quality","path":"document_intelligence/domains/sales_crm/validation_rules.any.json"},
+    {"id":"supply_chain_logistics_ambiguity_patterns","category":"ambiguity","path":"document_intelligence/domains/supply_chain_logistics/ambiguity_patterns.any.json"},
+    {"id":"di_supply_chain_logistics_doc_type_catalog","category":"semantics","path":"document_intelligence/domains/supply_chain_logistics/doc_type_catalog.any.json"},
+    {"id":"di_supply_chain_logistics_domain_profile","category":"semantics","path":"document_intelligence/domains/supply_chain_logistics/domain_profile.any.json"},
+    {"id":"supply_chain_logistics_domain_writer","category":"semantics","path":"document_intelligence/domains/supply_chain_logistics/domain_writer.any.json"},
+    {"id":"di_supply_chain_logistics_entity_ontology","category":"semantics","path":"document_intelligence/domains/supply_chain_logistics/entity_ontology.any.json"},
+    {"id":"eval_gold_queries_supply_chain_logistics","category":"tests","path":"document_intelligence/domains/supply_chain_logistics/gold_queries.any.json"},
+    {"id":"di_supply_chain_logistics_retrieval_strategies","category":"retrieval","path":"document_intelligence/domains/supply_chain_logistics/retrieval_strategies.any.json"},
+    {"id":"di_supply_chain_logistics_section_ontology","category":"semantics","path":"document_intelligence/domains/supply_chain_logistics/section_ontology.any.json"},
+    {"id":"di_supply_chain_logistics_table_ontology","category":"semantics","path":"document_intelligence/domains/supply_chain_logistics/table_ontology.any.json"},
+    {"id":"supply_chain_logistics_validation_rules","category":"quality","path":"document_intelligence/domains/supply_chain_logistics/validation_rules.any.json"},
+    {"id":"eval_adversarial_ambiguity_followups","category":"tests","path":"eval/adversarial/ambiguity_followups.any.json"},
+    {"id":"eval_adversarial_fake_citation","category":"tests","path":"eval/adversarial/fake_citation.any.json"},
+    {"id":"eval_adversarial_fallback_false_negative","category":"tests","path":"eval/adversarial/fallback_false_negative.any.json"},
+    {"id":"eval_adversarial_high_latency_weak_answer","category":"tests","path":"eval/adversarial/high_latency_weak_answer.any.json"},
+    {"id":"eval_adversarial_owners_vs_signers","category":"tests","path":"eval/adversarial/owners_vs_signers.any.json"},
+    {"id":"eval_adversarial_partial_answer","category":"tests","path":"eval/adversarial/partial_answer.any.json"},
+    {"id":"eval_adversarial_table_corruption","category":"tests","path":"eval/adversarial/table_corruption.any.json"},
+    {"id":"eval_adversarial_title_only_extraction","category":"tests","path":"eval/adversarial/title_only_extraction.any.json"},
+    {"id":"eval_adversarial_wrong_doc","category":"tests","path":"eval/adversarial/wrong_doc.any.json"},
+    {"id":"eval_gold_queries_accounting_reconciliation","category":"tests","path":"eval/gold_queries/accounting_reconciliation.any.json"},
+    {"id":"eval_gold_queries_finance_table_exactness","category":"tests","path":"eval/gold_queries/finance_table_exactness.any.json"},
+    {"id":"eval_gold_queries_general_open_ended","category":"tests","path":"eval/gold_queries/general_assistant_open_ended.any.json"},
+    {"id":"eval_gold_queries_legal_field_exactness","category":"tests","path":"eval/gold_queries/legal_field_exactness.any.json"},
+    {"id":"eval_gold_queries_medical_report_safety","category":"tests","path":"eval/gold_queries/medical_report_safety.any.json"},
+    {"id":"eval_multilingual_locale_number_parity","category":"tests","path":"eval/multilingual/locale_number_parity.any.json"},
+    {"id":"eval_multilingual_pt_en_parity","category":"tests","path":"eval/multilingual/pt_en_parity.any.json"},
+    {"id":"eval_style_anti_robotic","category":"tests","path":"eval/style/anti_robotic.any.json"},
+    {"id":"eval_style_canned_empathy","category":"tests","path":"eval/style/canned_empathy.any.json"},
+    {"id":"eval_style_repetition","category":"tests","path":"eval/style/repetition.any.json"},
+    {"id":"eval_style_rhythm_and_variety","category":"tests","path":"eval/style/rhythm_and_variety.any.json"},
+    {"id":"provider_capabilities_expanded","category":"llm","path":"llm/provider_capabilities_expanded.any.json"},
+    {"id":"provider_failure_ladders","category":"llm","path":"llm/provider_failure_ladders.any.json"},
+    {"id":"provider_quality_profiles","category":"llm","path":"llm/provider_quality_profiles.any.json"},
+    {"id":"provider_routing_policy","category":"llm","path":"llm/provider_routing_policy.any.json"}
   ],
   "tests": [
     {

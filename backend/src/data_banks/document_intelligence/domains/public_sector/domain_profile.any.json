@@ -1,0 +1,110 @@
+{
+  "_meta": {
+    "id": "di_public_sector_domain_profile",
+    "version": "1.0.0",
+    "description": "Public sector profile for procurement notices, budget allocations, compliance obligations, and reporting outcomes.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/orchestration/answerPlanner.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/domain-validation.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "public_sector",
+    "minEvidenceScore": 0.82
+  },
+  "domain": "public_sector",
+  "displayName": {
+    "en": "Public Sector",
+    "pt": "Setor Público"
+  },
+  "scope": "Public notices, budget execution, grant operations, policy compliance, performance reporting, and administrative controls.",
+  "coreConcepts": [
+    "public tender",
+    "budget line",
+    "allocation",
+    "governance",
+    "projected impact",
+    "compliance certificate",
+    "auditor findings",
+    "public contract",
+    "performance indicator",
+    "service commitment",
+    "disbursement",
+    "grant conditions",
+    "oversight body"
+  ],
+  "supportedDocTypes": [
+    "public_tender_notice",
+    "public_budget_allocation",
+    "public_procurement_plan",
+    "public_audit_report",
+    "public_grant_application",
+    "public_grant_progress",
+    "public_contract",
+    "public_compliance_certificate",
+    "public_service_report"
+  ],
+  "supportedOperators": [
+    "advise",
+    "calculate",
+    "compare",
+    "extract",
+    "locate",
+    "monitor",
+    "summarize",
+    "validate"
+  ],
+  "supportedSections": [
+    "legal_basis",
+    "budget_breakdown",
+    "procurement_notice",
+    "compliance",
+    "performance_indicators",
+    "execution_status",
+    "audit_observations",
+    "oversight_actions",
+    "citizen_impact"
+  ],
+  "detectionSignals": {
+    "highConfidence": [
+      "public tender",
+      "allocation",
+      "minister",
+      "auditor",
+      "governance",
+      "contract award"
+    ],
+    "mediumConfidence": [
+      "budget",
+      "disbursement",
+      "grant",
+      "progress report",
+      "impact indicators"
+    ]
+  },
+  "negativeBoundaries": [
+    "Do not classify internal invoices as public-sector unless they reference public authority, budget lines, or policy obligations.",
+    "Do not infer compliance status without explicit legal basis or audit findings."
+  ],
+  "ontologyPrefix": "gov",
+  "qualityDefaults": {
+    "requireLawReferenceWhenAvailable": true,
+    "requireAuthorityAnchor": true,
+    "requireDateScope": true
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "public-sector classification and legal-aware synthesis",
+    "consumer": "public sector domain resolver",
+    "intent": "Prevent policy misreadings and ensure references are traceable to authority and date."
+  }
+}

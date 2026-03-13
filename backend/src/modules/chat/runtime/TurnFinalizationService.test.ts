@@ -171,4 +171,48 @@ describe("TurnFinalizationService", () => {
     expect(finalized.failureCode).toBe("TRUNCATED_OUTPUT");
     expect(finalized.truncation?.occurred).toBe(true);
   });
+
+  test("repairs macro-style openings before final output", async () => {
+    const service = new TurnFinalizationService();
+    const request = makeRequest({
+      context: {
+        styleDecision: {
+          openerFamily: "evidence_anchor",
+        },
+        turnStyleState: {
+          assistantTurnsSeen: 1,
+          recentLeadSignatures: ["the document shows"],
+          recentCloserSignatures: [],
+          lastAssistantPreview: "The document shows the earlier clause applies.",
+          repeatedLeadRisk: true,
+          repeatedCloserRisk: false,
+        },
+        signals: {
+          evidenceStrength: "low",
+        },
+      },
+    });
+
+    const finalized = await service.finalize(
+      makeDraft({
+        request,
+        draftResult: {
+          ...makeDraft().draftResult,
+          assistantText:
+            "Short answer: I know this can be difficult. The document shows the clause applies.",
+        },
+      }),
+      { request },
+    );
+
+    expect(finalized.assistantText).not.toMatch(/^Short answer:/i);
+    expect(finalized.assistantText).not.toContain("I know this can be difficult");
+    expect(finalized.assistantTelemetry?.styleRepairTrace).toEqual(
+      expect.arrayContaining([
+        "strip_short_answer_prefix",
+        "remove_fake_empathy",
+        "rotate_turn_opener",
+      ]),
+    );
+  });
 });

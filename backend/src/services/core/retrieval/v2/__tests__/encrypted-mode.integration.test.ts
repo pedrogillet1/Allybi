@@ -19,6 +19,7 @@ import type {
   DocMeta,
   RetrievalScopeMetrics,
 } from "../../retrieval.types";
+import { createDefaultQueryNormalizer } from "../DefaultQueryNormalizer.service";
 
 // ── Mock retrieval.config for encrypted mode ────────────────────────
 
@@ -397,7 +398,7 @@ describe("encrypted mode — integration", () => {
         lowScoreSemantic,
         emptyLexical,
         emptyStructural,
-        undefined,
+        createDefaultQueryNormalizer(),
         stubDocIntelBanks,
       );
 

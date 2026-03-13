@@ -1,0 +1,149 @@
+{
+  "_meta": {
+    "id": "eval_gold_queries_public_sector_domain",
+    "version": "1.0.0",
+    "description": "Public sector gold queries for legal anchor fidelity, budget execution, and compliance auditability.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "eval-domain-brain",
+    "usedBy": [
+      "services/eval/goldQueryRunner.service.ts",
+      "services/core/orchestration/answerPlanner.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/docint-eval-pack.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "public_sector",
+    "scenarioType": "public_sector_governance"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "public sector eval pack generation",
+    "consumer": "goldQueryRunner",
+    "intent": "Catch legal/budget/compliance bleed through and unsupported impact claims."
+  },
+  "goldQueries": [
+    {
+      "id": "public_gold_001",
+      "lang": "en",
+      "query": "Which supplier was awarded in the latest tender, what legal basis and scoring criteria were used, and what were the two highest scored criteria?",
+      "expected": {
+        "mustReadSource": [
+          "legal basis",
+          "procurement notice",
+          "award and contract"
+        ],
+        "mustExtract": [
+          "vendor",
+          "law_reference",
+          "scoring_criteria",
+          "criterion_scores"
+        ],
+        "mustPreserveScope": true,
+        "failureConditions": [
+          "winner_without_law_reference",
+          "missing_criterion_breakdown",
+          "aggregates_without_scales"
+        ]
+      }
+    },
+    {
+      "id": "public_gold_002",
+      "lang": "en",
+      "query": "Summarize budget execution for the selected fiscal year with remaining balance by budget line and identify which areas are below 60% execution.",
+      "expected": {
+        "mustReadSource": [
+          "budget breakdown",
+          "disbursement status"
+        ],
+        "mustExtract": [
+          "budget_line",
+          "amount_authorized",
+          "amount_executed",
+          "remaining"
+        ],
+        "mustPreserveTimeWindow": true,
+        "mustPreserveCurrency": true,
+        "failureConditions": [
+          "missing_fiscal_year",
+          "mixing_fiscal_years",
+          "aggregates_without_remaining"
+        ]
+      }
+    },
+    {
+      "id": "public_gold_003",
+      "lang": "en",
+      "query": "List all active audit findings with severity and required remedy owner, and state which are blocking disbursement.",
+      "expected": {
+        "mustFindSection": [
+          "audit findings",
+          "oversight actions",
+          "disbursement status"
+        ],
+        "mustExtract": [
+          "finding_id",
+          "severity",
+          "remedy_owner",
+          "deadline",
+          "disbursement_block"
+        ],
+        "failureConditions": [
+          "missing_status",
+          "owner_omitted",
+          "no_blocking_flag"
+        ]
+      }
+    },
+    {
+      "id": "public_gold_004",
+      "lang": "pt",
+      "query": "Mostre se os indicadores de impacto do último trimestre estão melhorando e cite a base legal da política de incentivo.",
+      "expected": {
+        "mustInclude": [
+          "indicadores de desempenho",
+          "base legal",
+          "evolução",
+          "trimestre"
+        ],
+        "mustPreservePeriod": true,
+        "mustShowDefinition": true,
+        "failureConditions": [
+          "sem_periodo",
+          "sem_base_legal",
+          "metrica_sem_unit"
+        ]
+      }
+    }
+  ],
+  "qualityGuards": {
+    "maxAllowedInferenceRate": 0.1,
+    "requiredAnchorDensity": 2.6,
+    "penalties": {
+      "missing_law_reference": -40,
+      "missing_budget_code": -35,
+      "missing_fiscal_scope": -30
+    }
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "public_gold_budget_has_line_and_gap",
+        "input": {
+          "query": "public_gold_002"
+        },
+        "expect": {
+          "mustCheck": [
+            "mustPreserveTimeWindow",
+            "mustPreserveCurrency"
+          ]
+        }
+      }
+    ]
+  }
+}

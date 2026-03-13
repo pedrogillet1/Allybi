@@ -1,0 +1,118 @@
+{
+  "_meta": {
+    "id": "di_supply_chain_logistics_domain_profile",
+    "version": "1.0.0",
+    "description": "Supply-chain and logistics profile for movement, inventory flow, and service-level reasoning.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/orchestration/answerPlanner.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/domain-validation.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "supply_chain_logistics",
+    "minEvidenceScore": 0.8
+  },
+  "domain": "supply_chain_logistics",
+  "displayName": {
+    "en": "Supply Chain & Logistics",
+    "pt": "Cadeia de Suprimento e Logística"
+  },
+  "scope": "Transport, warehousing, demand visibility, customs, distribution execution, and logistics performance diagnostics.",
+  "coreConcepts": [
+    "asn",
+    "bill of lading",
+    "carrier",
+    "delivery window",
+    "inventory velocity",
+    "lead time",
+    "order fulfillment",
+    "stockout",
+    "cycle time",
+    "transit time",
+    "temperature chain",
+    "route",
+    "freight terms",
+    "customs clearance",
+    "hub utilization",
+    "exception management",
+    "carrier scorecard"
+  ],
+  "supportedDocTypes": [
+    "log_asn_notice",
+    "log_shipment_manifest",
+    "log_freight_bill",
+    "log_bol",
+    "log_inventory_snapshot",
+    "log_demand_plan",
+    "log_warehouse_receipt",
+    "log_carrier_performance",
+    "log_customs_declaration"
+  ],
+  "supportedOperators": [
+    "advise",
+    "calculate",
+    "compare",
+    "extract",
+    "locate",
+    "monitor",
+    "navigate",
+    "summarize",
+    "validate"
+  ],
+  "supportedSections": [
+    "shipment_manifest",
+    "carrier_performance",
+    "exception_log",
+    "inventory_status",
+    "inbound_instructions",
+    "outbound_dispatch",
+    "customs_check",
+    "delivery_timeline",
+    "cost_breakdown",
+    "temperature_control"
+  ],
+  "detectionSignals": {
+    "highConfidence": [
+      "asn",
+      "bill of lading",
+      "freight",
+      "shipment",
+      "warehouse",
+      "customs",
+      "inventory snapshot"
+    ],
+    "mediumConfidence": [
+      "carrier",
+      "lead time",
+      "route",
+      "stock",
+      "eta",
+      "exception"
+    ]
+  },
+  "negativeBoundaries": [
+    "Do not treat unrelated HR or HR payroll tables as logistics unless shipment or fulfillment markers are present.",
+    "Do not infer transit times from invoice totals without route or carrier references."
+  ],
+  "ontologyPrefix": "scl",
+  "qualityDefaults": {
+    "timezoneAwarePeriods": true,
+    "distanceUnits": "prefer_native",
+    "temperatureUnit": "prefer_document_unit"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "domain selection and service operator resolution",
+    "consumer": "logistics orchestrator",
+    "intent": "Keep chain explanations causally tied to date-stamped logistics evidence."
+  }
+}

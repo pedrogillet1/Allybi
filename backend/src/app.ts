@@ -19,7 +19,7 @@ import { secureLogsMiddleware } from "./middleware/secureLogs.middleware";
 import { csrfProtection } from "./middleware/csrf.middleware";
 import { requestIdMiddleware } from "./middleware/requestId.middleware";
 
-import { apiRouteMounts, healthRoutes } from "./app/http";
+import { apiRouteMounts, healthRoutes } from "./entrypoints/http/routes";
 
 const app: Application = express();
 
@@ -102,6 +102,8 @@ const corsOptions: cors.CorsOptions = {
     "x-request-id",
     "X-Admin-Key",
     "x-admin-key",
+    "X-Goog-IAP-JWT-Assertion",
+    "X-Goog-Authenticated-User-Email",
     "X-CSRF-Token",
     "x-csrf-token",
     "X-Delete-Source",

@@ -1,0 +1,87 @@
+{
+  "_meta": {
+    "id": "supply_chain_logistics_ambiguity_patterns",
+    "version": "1.0.0",
+    "description": "Logistics ambiguity patterns for shipment scope, route, and inventory interpretation conflicts.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/orchestration/ambiguityResolver.service.ts",
+      "services/core/repair/ambiguityRepair.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/ambiguity-domain.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "maxQuestions": 1,
+    "preferClarifyOverSpeculation": true,
+    "domain": "supply_chain_logistics"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "after initial extraction and before route/cost synthesis",
+    "consumer": "logistics ambiguity resolver",
+    "intent": "Avoid false delay math, wrong route assumptions, and unscoped stock depletion claims."
+  },
+  "patterns": [
+    {
+      "id": "SCL_AMB_001_eta_reference_collision",
+      "type": "time_base_collision",
+      "trigger": "containsPlannedAndActualButNoComparisonWindow",
+      "askQuestion": "Should ETA comparison use planned ETA, latest schedule, or signed acceptance timestamp?"
+  },
+    {
+      "id": "SCL_AMB_002_multi_carrier_plan",
+      "type": "carrier_interleaving",
+      "trigger": "multiple_carriers_for_same_shipment",
+      "askQuestion": "Do you want carrier-level comparison by leg or full journey summary?"
+    },
+    {
+      "id": "SCL_AMB_003_inventory_snapshot_collision",
+      "type": "snapshot_overlap",
+      "trigger": "multiple_inventory_snapshots_with_overlapping_timestamps",
+      "askQuestion": "Use latest snapshot only, peak snapshot, or user-defined checkpoint?"
+    },
+    {
+      "id": "SCL_AMB_004_currency_mix_logistics_costs",
+      "type": "cost_currency_mix",
+      "trigger": "freight_cost_rows_show_mixed_currencies",
+      "askQuestion": "Should freight costs be shown in native currency or normalized to one reporting currency?"
+    },
+    {
+      "id": "SCL_AMB_005_route_scope_uncertain",
+      "type": "route_scope",
+      "trigger": "route_section_contains_partial_milestones",
+      "askQuestion": "Interpret route as shipment-level, lane-level, or destination-specific segment?"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "scl_amb_eta_requires_scope",
+        "input": {
+          "scenario": "planned_actual_collision"
+        },
+        "expect": {
+          "action": "askQuestion",
+          "maxQuestions": 1
+        }
+      },
+      {
+        "id": "scl_amb_multi_snapshot_choice",
+        "input": {
+          "scenario": "multiple_snapshots"
+        },
+        "expect": {
+          "mustAskContains": "snapshot"
+        }
+      }
+    ]
+  }
+}

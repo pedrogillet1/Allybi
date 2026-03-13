@@ -9,9 +9,8 @@
     "start": "NODE_ENV=production node dist/index.js",
     "preview": "vite preview --host",
     "check": "tsc --noEmit",
-    "format": "prettier --write .",
-    "verify:connectivity": "node scripts/verify-admin-connectivity.mjs",
-    "verify:screens": "node scripts/verify-admin-screen-wiring.mjs"
+    "format:check": "prettier --check .",
+    "format:write": "prettier --write ."
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

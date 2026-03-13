@@ -44,6 +44,17 @@ const mockedReadFileSync = fs.readFileSync as jest.MockedFunction<
  */
 function makeCleanBanks(): Record<string, unknown> {
   const out: Record<string, unknown> = {
+    bank_registry: {
+      banks: [],
+    },
+    governance_runtime_wiring_requirements: {
+      config: { enabled: true },
+      servicePathRules: ["services/core/*", "services/llm/*"],
+      managedAuditSet: {
+        bankIds: [],
+        requireProductionAndStagingRequiredByEnv: false,
+      },
+    },
     intent_config: {
       intentFamilies: [{ operatorsAllowed: ["op_a"] }],
     },
@@ -217,6 +228,11 @@ describe("RuntimeWiringIntegrityService – structural contract", () => {
     const expectedFields: Array<keyof typeof result> = [
       "ok",
       "missingBanks",
+      "missingGovernanceRuntimeWiringRequirements",
+      "managedBankRegistryDrift",
+      "managedBankUsedByPathDrift",
+      "managedBankTestPathDrift",
+      "managedBankRequiredByEnvGaps",
       "missingLlmRoutingPolicyBanks",
       "missingRuntimePolicyConsumers",
       "runtimePolicyEnvGaps",
@@ -377,7 +393,108 @@ describe("RuntimeWiringIntegrityService – missing banks", () => {
 });
 
 // ==============================================================================
-// 4. Operator cross-checks (contracts & output shapes)
+// 4. Managed runtime audit coverage
+// ==============================================================================
+
+describe("RuntimeWiringIntegrityService – managed runtime audit coverage", () => {
+  function wireManagedAuditBank(options?: {
+    usedBy?: string[];
+    tests?: string[];
+    requiredByEnv?: Record<string, boolean>;
+  }): void {
+    const banks = makeCleanBanks();
+    banks.bank_registry = {
+      banks: [
+        {
+          id: "clarification_question_bank",
+          requiredByEnv: {
+            production: options?.requiredByEnv?.production ?? true,
+            staging: options?.requiredByEnv?.staging ?? true,
+          },
+        },
+      ],
+    };
+    banks.governance_runtime_wiring_requirements = {
+      config: { enabled: true },
+      servicePathRules: ["services/core/*"],
+      managedAuditSet: {
+        bankIds: ["clarification_question_bank"],
+        requireProductionAndStagingRequiredByEnv: true,
+      },
+    };
+    banks.clarification_question_bank = {
+      _meta: {
+        id: "clarification_question_bank",
+        usedBy:
+          options?.usedBy ?? ["services/core/banks/dataBankLoader.service.ts"],
+        tests:
+          options?.tests ?? [
+            "src/tests/certification/runtime-wiring.cert.test.ts",
+          ],
+      },
+      config: { enabled: true },
+      runtimeUsageNotes: { selectionStage: "test" },
+    };
+
+    mockedGetOptionalBank.mockImplementation(
+      (id: string) => (banks[id] ?? null) as ReturnType<typeof getOptionalBank>,
+    );
+  }
+
+  test("managed audit stays clean when governance bank and metadata paths resolve", () => {
+    wireManagedAuditBank();
+    mockedExistsSync.mockImplementation((p) => {
+      const normalized = String(p).replace(/\\/g, "/");
+      return (
+        normalized.endsWith(
+          "backend/src/services/core/banks/dataBankLoader.service.ts",
+        ) ||
+        normalized.endsWith(
+          "backend/src/tests/certification/runtime-wiring.cert.test.ts",
+        ) ||
+        MEMORY_POLICY_PATHS_SUFFIX.some((suffix) =>
+          normalized.endsWith(suffix),
+        )
+      );
+    });
+
+    const result = buildService().validate();
+    expect(result.missingGovernanceRuntimeWiringRequirements).toEqual([]);
+    expect(result.managedBankRegistryDrift).toEqual([]);
+    expect(result.managedBankUsedByPathDrift).toEqual([]);
+    expect(result.managedBankTestPathDrift).toEqual([]);
+    expect(result.managedBankRequiredByEnvGaps).toEqual([]);
+  });
+
+  test("managed audit reports drift when audited bank metadata points to missing paths", () => {
+    wireManagedAuditBank({
+      usedBy: ["services/core/orchestration/answerPlanner.service.ts"],
+      tests: ["tests/document-intelligence/ambiguity-repair-brain.test.ts"],
+      requiredByEnv: { production: false, staging: false },
+    });
+    mockedExistsSync.mockImplementation((p) =>
+      MEMORY_POLICY_PATHS_SUFFIX.some((suffix) => String(p).endsWith(suffix)),
+    );
+
+    const result = buildService().validate();
+    expect(result.managedBankUsedByPathDrift).toContain(
+      "clarification_question_bank",
+    );
+    expect(result.managedBankTestPathDrift).toContain(
+      "clarification_question_bank",
+    );
+    expect(result.managedBankRequiredByEnvGaps).toEqual(
+      expect.arrayContaining([
+        "clarification_question_bank:requiredByEnv.production!=true",
+        "clarification_question_bank:requiredByEnv.staging!=true",
+      ]),
+    );
+    expect(result.ok).toBe(false);
+  });
+});
+
+// ==============================================================================
+// 5. Operator cross-checks (contracts & output shapes)
 // ==============================================================================
 
 describe("RuntimeWiringIntegrityService – operator cross-checks", () => {
@@ -915,7 +1032,7 @@ describe("RuntimeWiringIntegrityService – memoryDelegateDirectInstantiation", 
     wireCleanBanks();
 
     mockedExistsSync.mockImplementation((p) =>
-      String(p).includes("CentralizedChatRuntimeDelegate.ts"),
+      String(p).includes("ChatTurnExecutor.ts"),
     );
     mockedReadFileSync.mockReturnValue(
       "const svc = new ConversationMemoryService(prisma);" as unknown as Buffer,
@@ -931,7 +1048,7 @@ describe("RuntimeWiringIntegrityService – memoryDelegateDirectInstantiation", 
     wireCleanBanks();
 
     mockedExistsSync.mockImplementation((p) =>
-      String(p).includes("CentralizedChatRuntimeDelegate.ts"),
+      String(p).includes("ChatTurnExecutor.ts"),
     );
     mockedReadFileSync.mockReturnValue(
       "const svc = container.resolve(ConversationMemoryService);" as unknown as Buffer,
@@ -959,7 +1076,7 @@ describe("RuntimeWiringIntegrityService – memoryRawPersistencePatterns", () =>
     wireCleanBanks();
 
     mockedExistsSync.mockImplementation((p) =>
-      String(p).includes("CentralizedChatRuntimeDelegate.ts"),
+      String(p).includes("ChatMemoryContextService.ts"),
     );
     mockedReadFileSync.mockReturnValue(
       "const entry = { content: sanitizeSnippet(input.content) };" as unknown as Buffer,
@@ -975,7 +1092,7 @@ describe("RuntimeWiringIntegrityService – memoryRawPersistencePatterns", () =>
     wireCleanBanks();
 
     mockedExistsSync.mockImplementation((p) =>
-      String(p).includes("CentralizedChatRuntimeDelegate.ts"),
+      String(p).includes("ChatMemoryContextService.ts"),
     );
     mockedReadFileSync.mockReturnValue(
       "return { summary: summary };" as unknown as Buffer,
@@ -1056,7 +1173,7 @@ describe("RuntimeWiringIntegrityService – dormantIntentConfigUsage", () => {
     wireCleanBanks();
 
     mockedExistsSync.mockImplementation((p) =>
-      String(p).includes("turnRouter.service.ts"),
+      String(p).includes("modules/chat/application/turnRouter.service.ts"),
     );
     mockedReadFileSync.mockReturnValue(
       "const svc = new IntentConfigService(opts);\nsvc.load();" as unknown as Buffer,
@@ -1072,7 +1189,7 @@ describe("RuntimeWiringIntegrityService – dormantIntentConfigUsage", () => {
     wireCleanBanks();
 
     mockedExistsSync.mockImplementation((p) =>
-      String(p).includes("turnRouter.service.ts"),
+      String(p).includes("modules/chat/application/turnRouter.service.ts"),
     );
     mockedReadFileSync.mockReturnValue(
       "intentConfig.decide(turn);" as unknown as Buffer,
@@ -1088,7 +1205,7 @@ describe("RuntimeWiringIntegrityService – dormantIntentConfigUsage", () => {
     wireCleanBanks();
 
     mockedExistsSync.mockImplementation((p) =>
-      String(p).includes("turnRouter.service.ts"),
+      String(p).includes("modules/chat/application/turnRouter.service.ts"),
     );
     mockedReadFileSync.mockReturnValue(
       [
@@ -1156,10 +1273,10 @@ describe("RuntimeWiringIntegrityService – answer mode parity and product help 
   test("productHelpRuntimeUsageMissing flags gateway when product help markers are absent", () => {
     wireCleanBanks();
     mockedExistsSync.mockImplementation((p) =>
-      String(p).includes("llmGateway.service.ts"),
+      String(p).includes("gatewayRequestPreparation.ts"),
     );
     mockedReadFileSync.mockImplementation((p) => {
-      if (String(p).includes("llmGateway.service.ts")) {
+      if (String(p).includes("gatewayRequestPreparation.ts")) {
         return "const x = 1; // no product help wiring" as unknown as Buffer;
       }
       if (

@@ -1,0 +1,67 @@
+{
+  "_meta": {
+    "id": "eval_multilingual_pt_en_parity",
+    "version": "1.0.0",
+    "description": "Parity checks requiring equivalent extraction behavior across EN/PT query formulations.",
+    "languages": [
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "eval-ops",
+    "usedBy": [
+      "services/eval/multilingualParity.service.ts",
+      "services/quality/evalJudge.service.ts"
+    ],
+    "tests": [
+      "tests/eval/ptEnParity.proof.test.ts",
+      "tests/eval/multilingualCoverage.proof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "scenarioType": "lang_parity"
+  },
+  "pairs": [
+    {
+      "id": "pt_en_parity_001",
+      "queryEn": "Extract the governing law and jurisdiction clauses.",
+      "queryPt": "Extraia as cláusulas de lei aplicável e jurisdição.",
+      "expected": {
+        "mustMatchKeyFacts": [
+          "law",
+          "jurisdiction",
+          "defined_terms"
+        ],
+        "mustPreserveSource": true,
+        "mustAvoid": [
+          "language-only drift",
+          "different_scope_between_langs"
+        ],
+        "failureConditions": [
+          "pt_skips_jurisdiction",
+          "en_misses_legal_basis"
+        ]
+      }
+    },
+    {
+      "id": "pt_en_parity_002",
+      "queryEn": "What is the exact late payment penalty formula?",
+      "queryPt": "Qual é a fórmula exata da multa por atraso?",
+      "expected": {
+        "mustMatchNumericExactness": true,
+        "mustMatchFormula": true,
+        "mustMatchUnits": true,
+        "failureConditions": [
+          "unit_lost_in_translation",
+          "pt_generalizes_en_formula"
+        ]
+      }
+    }
+  ],
+  "parityRules": {
+    "scoreDeltaCap": 0.2,
+    "mustFailIfLangGap": true,
+    "mustFailIfDifferentCitations": true
+  }
+}

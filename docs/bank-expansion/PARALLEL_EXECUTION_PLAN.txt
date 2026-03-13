@@ -1,0 +1,239 @@
+PARALLEL EXECUTION PLAN
+Generated: 2026-03-13
+Scope: merge-safe generation lanes for backend/src/data_banks
+
+RULES OF ENGAGEMENT
+1. Do not edit registry files in parallel with any lane that adds or renames banks.
+2. Do not edit prompt surface files in parallel if they share final-answer behavior.
+3. Domain-pack lanes may run in parallel only if they stay inside their own domain directory and their own eval directory.
+4. Sharding lanes run before large-scale content generation for any file they touch.
+5. Integrate bank_registry.any.json, bank_aliases.any.json, bank_dependencies.any.json, and ownership SSOTs only in the final merge phase.
+
+FILES THAT MUST BE SINGLE-OWNER
+- backend/src/data_banks/manifest/bank_registry.any.json
+- backend/src/data_banks/manifest/bank_aliases.any.json
+- backend/src/data_banks/manifest/bank_dependencies.any.json
+- backend/src/data_banks/prompts/prompt_registry.any.json
+- backend/src/data_banks/prompts/system_base.any.json
+- backend/src/data_banks/prompts/mode_chat.any.json
+- backend/src/data_banks/prompts/task_answer_with_sources.any.json
+- backend/src/data_banks/formatting/answer_style_policy.any.json
+- backend/src/data_banks/policies/memory_policy.any.json
+- backend/src/data_banks/retrieval/retrieval_ranker_config.any.json
+- backend/src/data_banks/document_intelligence/semantics/table_ontology.any.json
+- backend/src/data_banks/document_intelligence/semantics/section_ontology.any.json
+
+OVERLAP RISKS TO RESOLVE BEFORE GENERATION
+- Clarification logic overlap:
+  - backend/src/data_banks/ambiguity/clarification_phrases.any.json
+  - backend/src/data_banks/policies/clarification_policy.any.json
+  - backend/src/data_banks/microcopy/disambiguation_microcopy.any.json
+  - backend/src/data_banks/prompts/disambiguation_prompt.any.json
+  - backend/src/data_banks/document_intelligence/compose/clarification_prompts.any.json
+- Followup overlap:
+  - backend/src/data_banks/document_intelligence/compose/followup_suggestions.any.json
+  - backend/src/data_banks/microcopy/followup_suggestions.any.json
+- Retrieval overlap:
+  - backend/src/data_banks/retrieval/retrieval_ranker_config.any.json
+  - backend/src/data_banks/document_intelligence/retrieval/ranker_config.any.json
+- Semantics mirror overlap:
+  - backend/src/data_banks/semantics/*
+  - backend/src/data_banks/document_intelligence/semantics/*
+- Duplicate source overlap:
+  - backend/src/data_banks/connector_operators.any.json
+  - backend/src/data_banks/operators/connector_operators.any.json
+
+SAFE PARALLEL LANES
+
+LANE 01: COMPOSITION REWRITE
+Scope
+- backend/src/data_banks/document_intelligence/compose/*
+- backend/src/data_banks/microcopy/allybi_response_style.any.json
+- backend/src/data_banks/microcopy/compliance_phrases.any.json
+Do not touch
+- backend/src/data_banks/prompts/system_base.any.json
+- backend/src/data_banks/prompts/mode_chat.any.json
+- backend/src/data_banks/formatting/answer_style_policy.any.json
+Why safe
+- This lane owns only composition-surface banks and avoids shared prompt registry files
+
+LANE 02: CLARIFICATION / REPAIR
+Scope
+- backend/src/data_banks/ambiguity/*
+- backend/src/data_banks/microcopy/disambiguation_microcopy.any.json
+- backend/src/data_banks/microcopy/scoped_not_found_messages.any.json
+- backend/src/data_banks/prompts/disambiguation_prompt.any.json
+- backend/src/data_banks/prompts/repair_response_prompt.any.json
+- backend/src/data_banks/quality/document_intelligence/clarification_repair_gates.any.json
+Do not touch
+- backend/src/data_banks/document_intelligence/compose/clarification_prompts.any.json from another lane at the same time
+- backend/src/data_banks/policies/clarification_policy.any.json if another lane is revising policy SSOT
+Why safe
+- All clarify and repair work can be consolidated here behind one owner
+
+LANE 03: ORCHESTRATION
+Scope
+- backend/src/data_banks/prompts/system_base.any.json
+- backend/src/data_banks/prompts/mode_chat.any.json
+- backend/src/data_banks/prompts/task_answer_with_sources.any.json
+- backend/src/data_banks/prompts/llm_global_guards.any.json
+- backend/src/data_banks/prompts/fallback_prompt.any.json
+- backend/src/data_banks/policies/tool_choice_policy.any.json
+- backend/src/data_banks/policies/execution_escalation_policy.any.json
+- backend/src/data_banks/policies/planner_executor_handoff.any.json
+- backend/src/data_banks/llm/model_role_contracts.any.json
+- backend/src/data_banks/llm/provider_selection_policy.any.json
+- backend/src/data_banks/routing/orchestration_priority.any.json
+- backend/src/data_banks/prompts/tool_result_synthesis.any.json
+- backend/src/data_banks/prompts/final_answer_repair_prompt.any.json
+Do not touch
+- backend/src/data_banks/prompts/prompt_registry.any.json until merge phase
+- backend/src/data_banks/policies/memory_policy.any.json unless explicitly assigned here
+Why safe
+- Centralizes all handoff and tool-choice logic
+
+LANE 04: FIELD EXACTNESS / EVIDENCE
+Scope
+- backend/src/data_banks/document_intelligence/validation/*
+- backend/src/data_banks/document_intelligence/retrieval/*
+- backend/src/data_banks/quality/document_intelligence/*
+- selected domain evidence banks
+Do not touch
+- backend/src/data_banks/retrieval/retrieval_ranker_config.any.json and backend/src/data_banks/document_intelligence/retrieval/ranker_config.any.json in separate lanes
+Why safe
+- Keeps provenance and evidence rigor under one owner
+
+LANE 05: EVAL / PROOF
+Scope
+- backend/src/data_banks/document_intelligence/eval/*
+- backend/src/data_banks/quality/training/*
+- backend/src/data_banks/tests/*
+Do not touch
+- Shared registry files
+Why safe
+- Eval files are isolated and can progress independently once contracts are defined
+
+LANE 06: PROCUREMENT DOMAIN PACK
+Scope
+- backend/src/data_banks/document_intelligence/domains/procurement/**
+- backend/src/data_banks/document_intelligence/eval/domain_specific/procurement/**
+Do not touch
+- manifest files until merge phase
+Why safe
+- Fully isolated domain directory
+
+LANE 07: SECURITY_COMPLIANCE DOMAIN PACK
+Scope
+- backend/src/data_banks/document_intelligence/domains/security_compliance/**
+- backend/src/data_banks/document_intelligence/eval/domain_specific/security_compliance/**
+Do not touch
+- manifest files until merge phase
+Why safe
+- Fully isolated domain directory
+
+LANE 08: SALES_REVOPS DOMAIN PACK
+Scope
+- backend/src/data_banks/document_intelligence/domains/sales_revops/**
+- backend/src/data_banks/document_intelligence/eval/domain_specific/sales_revops/**
+Do not touch
+- manifest files until merge phase
+Why safe
+- Fully isolated domain directory
+
+LANE 09: CUSTOMER_SUPPORT DOMAIN PACK
+Scope
+- backend/src/data_banks/document_intelligence/domains/customer_support/**
+- backend/src/data_banks/document_intelligence/eval/domain_specific/customer_support/**
+Do not touch
+- manifest files until merge phase
+Why safe
+- Fully isolated domain directory
+
+LANE 10: REGISTRY SHARDING
+Scope
+- backend/src/data_banks/manifest/bank_registry.any.json
+- backend/src/data_banks/manifest/bank_aliases.any.json
+- backend/src/data_banks/manifest/bank_dependencies.any.json
+- backend/src/data_banks/manifest/bank_sharding_policy.any.json
+- backend/src/data_banks/manifest/bank_parallel_edit_locks.any.json
+Why safe
+- This lane owns the highest-conflict files and should be single-author
+
+LANE 11: ONTOLOGY SHARDING
+Scope
+- backend/src/data_banks/document_intelligence/semantics/table_ontology.any.json
+- backend/src/data_banks/document_intelligence/semantics/section_ontology.any.json
+- backend/src/data_banks/semantics/domain/medical_report_ontology.any.json
+- backend/src/data_banks/semantics/domain/medical_explanation_templates.any.json
+Why safe
+- Large ontology files need early decomposition before domain work scales
+
+LANE 12: PATTERN / OPERATOR SHARDING
+Scope
+- backend/src/data_banks/patterns/modes/mode_switch.en.any.json
+- backend/src/data_banks/patterns/modes/mode_switch.pt.any.json
+- backend/src/data_banks/patterns/editor/highlight_intents.en.any.json
+- backend/src/data_banks/patterns/editor/highlight_intents.pt.any.json
+- backend/src/data_banks/patterns/editor/locate_target_phrases.any.json
+- backend/src/data_banks/patterns/domains/legal/clause_patterns.any.json
+- backend/src/data_banks/patterns/domains/medical/lab_panel_patterns.any.json
+- backend/src/data_banks/patterns/domains/medical/unit_and_reference_range_patterns.any.json
+- backend/src/data_banks/patterns/operators/*.any.json
+Why safe
+- Keeps gigantic pattern-bank surgery away from active generation lanes
+
+MERGE PHASES
+
+PHASE 0: FREEZE
+- Lock single-owner files
+- Publish lane assignments
+- Publish bank_parallel_edit_locks.any.json once created
+
+PHASE 1: SHARD FIRST
+- Run Lane 10
+- Run Lane 11
+- Run Lane 12
+- Do not begin domain-pack generation against files that are still being sharded
+
+PHASE 2: CORE BRAINS
+- Run Lane 01
+- Run Lane 02
+- Run Lane 03
+- Run Lane 04
+- Run Lane 05
+
+PHASE 3: NEW DOMAIN PACKS
+- Run Lane 06
+- Run Lane 07
+- Run Lane 08
+- Run Lane 09
+
+PHASE 4: INTEGRATION
+- Update backend/src/data_banks/manifest/bank_registry.any.json
+- Update backend/src/data_banks/manifest/bank_aliases.any.json
+- Update backend/src/data_banks/manifest/bank_dependencies.any.json
+- Update backend/src/data_banks/prompts/prompt_registry.any.json only after orchestration files are stable
+
+PROMPTS THAT CAN RUN IN PARALLEL WITHOUT TOUCHING THE SAME FILES
+- Composition rewrite prompt: Lane 01 only
+- Clarification and repair prompt: Lane 02 only
+- Orchestration prompt: Lane 03 only
+- Evidence exactness prompt: Lane 04 only
+- Eval generation prompt: Lane 05 only
+- Procurement domain-pack prompt: Lane 06 only
+- Security_compliance domain-pack prompt: Lane 07 only
+- Sales_revops domain-pack prompt: Lane 08 only
+- Customer_support domain-pack prompt: Lane 09 only
+
+PROMPTS THAT MUST NOT RUN TOGETHER
+- Any prompt touching backend/src/data_banks/manifest/bank_registry.any.json with any other generation prompt
+- Any prompt touching backend/src/data_banks/prompts/system_base.any.json with another prompt touching backend/src/data_banks/prompts/mode_chat.any.json or backend/src/data_banks/prompts/task_answer_with_sources.any.json
+- Any prompt touching backend/src/data_banks/retrieval/retrieval_ranker_config.any.json with another prompt touching backend/src/data_banks/document_intelligence/retrieval/ranker_config.any.json
+- Any prompt touching backend/src/data_banks/document_intelligence/compose/followup_suggestions.any.json with another prompt touching backend/src/data_banks/microcopy/followup_suggestions.any.json
+
+DONE CRITERIA BEFORE CONTENT GENERATION
+- All missing core family files are path-authorized
+- All rewrite files have a single lane owner
+- All shard candidates have a decomposition target
+- All new domain packs have isolated directories and eval homes
+- Registry integration is deferred to the final merge batch

@@ -1,0 +1,85 @@
+{
+  "_meta": {
+    "id": "eval_style_anti_robotic",
+    "version": "1.0.0",
+    "description": "Style proof bank enforcing anti-robotic phrasing and non-stereotyped language.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "eval-ops",
+    "usedBy": [
+      "services/eval/styleJudge.service.ts"
+    ],
+    "tests": [
+      "tests/eval/antiRobotic.proof.test.ts",
+      "tests/eval/styleCoverage.proof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "scenarioType": "anti_robotic"
+  },
+  "patterns": {
+    "bannedRobotPhrases": [
+      "Certainly!",
+      "As an AI",
+      "I'd be happy to",
+      "Hope this helps",
+      "In summary, I can provide",
+      "Feel free to let me know if you need anything else"
+    ],
+    "allowedVariants": [
+      "I can answer that from the document source.",
+      "Based on the cited lines, this reads as:",
+      "The direct source says:"
+    ]
+  },
+  "cases": [
+    {
+      "id": "anti_robotic_001",
+      "lang": "en",
+      "query": "Why is the payment split delayed according to this contract?",
+      "expected": {
+        "mustNotMatchPattern": [
+          "Hope this helps",
+          "Certainly",
+          "As an AI"
+        ],
+        "mustHavePhraseShape": [
+          "document-grounded",
+          "based on",
+          "section"
+        ],
+        "failureConditions": [
+          "uses_standard_intro_closing",
+          "no_documented_anchor"
+        ]
+      }
+    },
+    {
+      "id": "anti_robotic_002",
+      "lang": "pt",
+      "query": "Porque o pagamento foi distribuído desta forma?",
+      "expected": {
+        "mustNotMatchPattern": [
+          "Claro!",
+          "Eu ficarei feliz em ajudar"
+        ],
+        "mustHavePhraseShape": [
+          "com base no trecho",
+          "o texto indica"
+        ],
+        "failureConditions": [
+          "linguagem_robotica",
+          "frases_genericas_de_atendimento"
+        ]
+      }
+    }
+  ],
+  "penalties": {
+    "roboticPhrasePenalty": -12,
+    "introFallbackPenalty": -8,
+    "insufficientVarietyPenalty": -10
+  }
+}

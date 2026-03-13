@@ -40,4 +40,36 @@ describe("LLMChatEngine retrieval planner delegation", () => {
     expect((out.telemetry as any)?.provider).toBe("openai");
     expect((out.telemetry as any)?.model).toBe("gpt-5-mini");
   });
+
+  test("gateway execution telemetry wins over engine fallback metadata", async () => {
+    const gateway: any = {
+      generate: jest.fn(),
+      stream: jest.fn(),
+      generateRetrievalPlan: jest.fn(async () => ({
+        text: '{"schemaVersion":"koda_retrieval_plan_v1","queryVariants":["revenue"]}',
+        telemetry: {
+          provider: "google",
+          model: "gemini-2.5-flash",
+          finishReason: "stop",
+        },
+      })),
+    };
+
+    const engine = new LLMChatEngine(gateway, {
+      provider: "openai",
+      modelId: "gpt-5-mini",
+    });
+
+    const out = await engine.generateRetrievalPlan({
+      traceId: "tr-2",
+      userId: "user-1",
+      conversationId: "conv-1",
+      messages: [{ role: "user", content: "find revenue trends" }],
+      meta: { operator: "extract" },
+    });
+
+    expect((out.telemetry as any)?.provider).toBe("google");
+    expect((out.telemetry as any)?.model).toBe("gemini-2.5-flash");
+    expect((out.telemetry as any)?.finishReason).toBe("stop");
+  });
 });

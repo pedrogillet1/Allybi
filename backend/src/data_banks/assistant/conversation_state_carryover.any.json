@@ -1,0 +1,101 @@
+{
+  "_meta": {
+    "id": "conversation_state_carryover",
+    "version": "1.0.0",
+    "description": "State carryover rules between turns to preserve intent, constraints, and verified anchors.",
+    "owner": "assistant-orchestrator",
+    "usedBy": [
+      "services/assistant/core/conversationState.service.ts"
+    ],
+    "tests": [
+      "tests/assistant/stateCarryover.proof.test.ts"
+    ],
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13"
+  },
+  "config": {
+    "enabled": true,
+    "maxCarryoverTurns": 10
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "conversation_loop_entry",
+    "consumer": "orchestrator + composer"
+  },
+  "slots": [
+    {
+      "key": "activeGoal",
+      "persistForTurns": 10,
+      "required": true,
+      "source": "latest_user_intent"
+    },
+    {
+      "key": "scopeTokens",
+      "persistForTurns": 8,
+      "required": false,
+      "source": "intent_or_domain_resolver"
+    },
+    {
+      "key": "confirmedCaveats",
+      "persistForTurns": 10,
+      "required": false,
+      "source": "composer_notes"
+    },
+    {
+      "key": "evidenceAnchors",
+      "persistForTurns": 10,
+      "required": false,
+      "source": "retrieval_events"
+    },
+    {
+      "key": "riskFlags",
+      "persistForTurns": 10,
+      "required": false,
+      "source": "uncertainty_bank"
+    },
+    {
+      "key": "stylePolicy",
+      "persistForTurns": 6,
+      "required": false,
+      "source": "voice_or_audience_overlay"
+    }
+  ],
+  "refreshRules": {
+    "onHighRisk": {
+      "retainTurns": 20,
+      "forceCarryover": [
+        "evidenceAnchors",
+        "riskFlags",
+        "activeGoal"
+      ]
+    },
+    "onTopicShift": {
+      "clearAfterTurns": 4,
+      "slotsToPurge": [
+        "activeGoal",
+        "confirmedCaveats",
+        "riskFlags"
+      ]
+    }
+  },
+  "guards": [
+    "Do not carry forward claims that failed trust checks.",
+    "Purge medical and legal sensitive details after scope exit."
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "high_risk_expands_retain_window",
+        "input": {
+          "riskFlags": [
+            "policy_conflict"
+          ]
+        },
+        "expect": {
+          "retainTurns": 20
+        }
+      }
+    ]
+  }
+}

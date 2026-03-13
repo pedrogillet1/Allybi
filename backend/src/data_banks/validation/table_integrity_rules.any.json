@@ -1,0 +1,141 @@
+{
+  "_meta": {
+    "id": "table_integrity_rules",
+    "version": "1.0.0",
+    "description": "Final-layer integrity checks for headers, rows, columns, and table-derived cell claims.",
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "koda-validation",
+    "compat": ">=1.0.0",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id",
+    "blockOnCriticalIntegrityLoss": true
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "validation after field binding and before final output",
+    "consumer": "table integrity checker",
+    "intent": "guard against header drift, row/column drift, and merged-cell hallucinations",
+    "emittedSignals": [
+      "tableIntegrityPassed",
+      "headerMatchState",
+      "rowColumnLockState",
+      "integrityViolations"
+    ]
+  },
+  "rules": [
+    {
+      "id": "TIR_001_header_consistency",
+      "trigger": "Claim header does not match canonical table header context",
+      "check": "fact.tableSource == true AND fact.tableHeaderCanonical != fact.tableHeaderInText",
+      "failureAction": "BLOCK_HEADER_DIVERGENCE",
+      "severity": "error"
+    },
+    {
+      "id": "TIR_002_row_integrity",
+      "trigger": "Table row claim has no explicit row label or repeated ambiguous row key",
+      "check": "fact.tableSource == true AND (fact.tableRow == null OR fact.rowKeyUnique == false)",
+      "failureAction": "ASK_ROW_DISAMBIGUATION",
+      "severity": "warning"
+    },
+    {
+      "id": "TIR_003_column_integrity",
+      "trigger": "Table claim has duplicate or missing column context",
+      "check": "fact.tableSource == true AND (fact.tableColumn == null OR fact.tableColumnUnique == false)",
+      "failureAction": "ASK_COLUMN_DISAMBIGUATION",
+      "severity": "warning"
+    },
+    {
+      "id": "TIR_004_merged_cell_drop_guard",
+      "trigger": "Merged cell value was used as standalone fact without row/column expansion",
+      "check": "fact.tableCellMerged == true AND fact.mergedExpanded == false",
+      "failureAction": "REQUIRE_MERGED_CELL_EXPANSION",
+      "severity": "warning"
+    },
+    {
+      "id": "TIR_005_axis_swap_guard",
+      "trigger": "Detected plausible row/column swap for same value pattern",
+      "check": "fact.rowColumnSwapSignal == true",
+      "failureAction": "ASK_TABLE_AXIS_ORIENTATION",
+      "severity": "error"
+    },
+    {
+      "id": "TIR_006_total_row_context",
+      "trigger": "Total/subtotal row used without aggregate framing",
+      "check": "fact.tableIsTotalRow == true AND fact.outputMode != 'aggregate_label'",
+      "failureAction": "FORCE_AGGREGATE_LABEL",
+      "severity": "warning"
+    },
+    {
+      "id": "TIR_007_quote_from_table_requires_cell_anchor",
+      "trigger": "Table origin quote missing row/column anchor",
+      "check": "fact.quoteSource == true AND fact.tableSource == true AND (fact.tableRow == null OR fact.tableColumn == null)",
+      "failureAction": "FORCE_TABLE_CELL_CONTEXT",
+      "severity": "error"
+    },
+    {
+      "id": "TIR_008_multi_doc_table_fusion_guard",
+      "trigger": "Same table metric fused across docs without explicit merge rule",
+      "check": "fact.tableSource == true AND fact.sourceDocCount > 1 AND fact.mergeRule == null",
+      "failureAction": "ASK_CROSS_DOC_TABLE_FUSION",
+      "severity": "error"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "table_row_integrity_requires_disambiguation",
+        "input": {
+          "fact": {
+            "tableSource": true,
+            "tableRow": null
+          }
+        },
+        "expect": {
+          "failureAction": "ASK_ROW_DISAMBIGUATION"
+        }
+      },
+      {
+        "id": "table_merge_cell_requires_expansion",
+        "input": {
+          "fact": {
+            "tableSource": true,
+            "tableCellMerged": true,
+            "mergedExpanded": false
+          }
+        },
+        "expect": {
+          "failureAction": "REQUIRE_MERGED_CELL_EXPANSION"
+        }
+      },
+      {
+        "id": "table_axis_swap_request",
+        "input": {
+          "fact": {
+            "tableSource": true,
+            "rowColumnSwapSignal": true
+          }
+        },
+        "expect": {
+          "failureAction": "ASK_TABLE_AXIS_ORIENTATION"
+        }
+      }
+    ]
+  }
+}

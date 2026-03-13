@@ -2,8 +2,8 @@ import type {
   LLMStreamingConfig,
   StreamSink,
 } from "../../../services/llm/types/llmStreaming.types";
-import type { EncryptedChatRepo } from "../../../services/chat/encryptedChatRepo.service";
-import type { EncryptedChatContextService } from "../../../services/chat/encryptedChatContext.service";
+import type { EncryptedChatRepo } from "../../../modules/chat/infrastructure/encryptedChatRepo.service";
+import type { EncryptedChatContextService } from "../../../modules/chat/infrastructure/encryptedChatContext.service";
 import { ConversationMemoryService } from "../../../services/memory/conversationMemory.service";
 import {
   ConversationNotFoundError,
@@ -22,8 +22,11 @@ import {
   type NavType,
 } from "../domain/chat.contracts";
 import { ChatRuntimeOrchestrator } from "../runtime/ChatRuntimeOrchestrator";
-import type { RuntimeDelegate } from "../runtime/ChatRuntimeOrchestrator";
-import { CentralizedChatRuntimeDelegate } from "../runtime/CentralizedChatRuntimeDelegate";
+import { ChatTurnExecutor } from "../runtime/ChatTurnExecutor";
+import {
+  createChatRuntimeFacade,
+  type ChatRuntimeFactoryOptions,
+} from "./chat-runtime.factory";
 
 export type {
   AnswerClass,
@@ -50,33 +53,23 @@ export { ConversationNotFoundError } from "../domain/chat.contracts";
  * - applies contract normalization + scope/evidence policies in orchestrator
  */
 export class ChatRuntimeService {
-  private readonly delegate: CentralizedChatRuntimeDelegate;
+  private readonly executor: ChatTurnExecutor;
   private readonly orchestrator: ChatRuntimeOrchestrator;
 
   constructor(
     engine: ChatEngine,
-    opts?: {
-      encryptedRepo?: EncryptedChatRepo;
-      encryptedContext?: EncryptedChatContextService;
-      conversationMemory?: ConversationMemoryService;
-    },
+    opts: ChatRuntimeFactoryOptions = {},
   ) {
-    const conversationMemory =
-      opts?.conversationMemory || new ConversationMemoryService();
-    this.delegate = new CentralizedChatRuntimeDelegate(engine, {
-      encryptedRepo: opts?.encryptedRepo,
-      encryptedContext: opts?.encryptedContext,
-      conversationMemory,
-    });
-    const delegate: RuntimeDelegate = this.delegate;
-    this.orchestrator = new ChatRuntimeOrchestrator(delegate);
+    const runtime = createChatRuntimeFacade(engine, opts);
+    this.executor = runtime.executor;
+    this.orchestrator = runtime.orchestrator;
   }
 
   wireEncryption(
     encryptedRepo: EncryptedChatRepo,
     encryptedContext?: EncryptedChatContextService,
   ): void {
-    this.delegate.wireEncryption(encryptedRepo, encryptedContext);
+    this.executor.wireEncryption(encryptedRepo, encryptedContext);
   }
 
   async chat(req: ChatRequest): Promise<ChatResult> {

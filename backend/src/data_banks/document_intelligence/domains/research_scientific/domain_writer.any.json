@@ -1,0 +1,116 @@
+{
+  "_meta": {
+    "id": "di_research_scientific_domain_writer",
+    "version": "1.0.0",
+    "description": "Research writer profile for careful statistical interpretation and reproducibility-aware summaries.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/orchestration/answerPlanner.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/docint-eval-pack.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "domain": "research_scientific",
+    "interpretationMode": "evidence_weighted_inference",
+    "requireEndpointLock": true
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "before final scientific write-up",
+    "consumer": "research domain writer",
+    "intent": "Deliver nuanced conclusions with explicit uncertainty, scale, and causal limits."
+  },
+  "writingProfile": {
+    "audience": "researcher, clinician, analyst, data scientist",
+    "goal": "Explain what is supported by data and what remains uncertain.",
+    "allowedAnswerForms": [
+      "hypothesis_to_result_chain",
+      "effect_size_summary",
+      "study_design_risk_profile",
+      "reproducibility_readout"
+    ],
+    "forbiddenAnswerForms": [
+      "causal_statement_without_design",
+      "single_number_conclusion_without_ci",
+      "subgroup_merge_without_sample_context"
+    ],
+    "docTypeAnchors": [
+      "research_protocol",
+      "research_analysis_plan",
+      "research_results_report",
+      "research_experiment_log",
+      "research_dataset_dictionary",
+      "research_power_calculation"
+    ],
+    "sectionPriority": [
+      "hypothesis",
+      "design",
+      "cohort",
+      "endpoints",
+      "analysis",
+      "results",
+      "limitations",
+      "reproducibility"
+    ]
+  },
+  "interpretiveRules": [
+    {
+      "id": "RS_WRITER_001_no_causal_overreach",
+      "description": "Use association phrasing unless randomization, model assumptions, and confounder handling are explicit.",
+      "requiredFor": "evaluate"
+    },
+    {
+      "id": "RS_WRITER_002_ci_and_power",
+      "description": "Report CI/CI-like uncertainty and power context for each effect claim."
+    },
+    {
+      "id": "RS_WRITER_003_endpoints_first",
+      "description": "Lead with primary endpoint interpretation before subgroup summaries."
+    },
+    {
+      "id": "RS_WRITER_004_limitations_frontload",
+      "description": "Any conclusion with low sample or high attrition must lead with uncertainty explanation."
+    },
+    {
+      "id": "RS_WRITER_005_reproducibility_tag",
+      "description": "Tag claims that depend on protocol versions or post-hoc adjustments."
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "research_writer_preserves_uncertainty",
+        "input": {
+          "query": "Summarize treatment effect"
+        },
+        "expect": {
+          "mustInclude": [
+            "confidence",
+            "uncertainty"
+          ]
+        }
+      },
+      {
+        "id": "research_writer_requires_endpoint",
+        "input": {
+          "query": "Compare two treatment outcomes"
+        },
+        "expect": {
+          "mustInclude": [
+            "endpoint",
+            "cohort"
+          ]
+        }
+      }
+    ]
+  }
+}

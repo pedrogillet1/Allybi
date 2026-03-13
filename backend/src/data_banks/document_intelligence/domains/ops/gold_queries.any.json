@@ -1,0 +1,214 @@
+{
+  "_meta": {
+    "id": "eval_gold_queries_ops_domain_deepening",
+    "version": "1.0.0",
+    "description": "Operations domain-deepening evaluation pack for interpretive, actor-locked, and constraint-aware operations synthesis.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "eval-domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops",
+    "scenarioType": "operations_readiness"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "evaluation pack execution for operations interpretive behavior",
+    "consumer": "goldQueryRunner",
+    "intent": "Measure operations-domain reasoning quality and safety posture through targeted deep-eval cases.",
+    "emittedSignals": [
+      "opsGoldQueryPassFail",
+      "opsGoldQueryRiskFlag"
+    ]
+  },
+  "goldQueries": [
+    {
+      "id": "ops_deepen_001",
+      "lang": "en",
+      "query": "Which work orders are overdue, who owns them, and what is the next action with due dates?",
+      "sourceLock": "latest_active_scope",
+      "expected": {
+        "mustFindSource": [
+          "header",
+          "work_description",
+          "scheduling",
+          "summary",
+          "requestor_and_assignee",
+          "corrective_actions"
+        ],
+        "mustReadSource": [
+          "work_description",
+          "scheduling",
+          "summary"
+        ],
+        "mustExtract": [
+          "work_order_id",
+          "status",
+          "owner_or_assignee",
+          "requestor",
+          "due_date",
+          "next_action",
+          "overdue_days"
+        ],
+        "mustPreserveActor": true,
+        "mustPreserveScope": true,
+        "mustShowLifecycle": true,
+        "mustNotInfer": [
+          "closed_status_without_completion_date",
+          "ownerless_overdue_task"
+        ],
+        "failureConditions": [
+          "status_mixed_without_lifecycle"
+        ]
+      }
+    },
+    {
+      "id": "ops_deepen_002",
+      "lang": "en",
+      "query": "Evaluate SLA compliance for the last month and list any breached KPIs with root causes and owner actions.",
+      "sourceLock": "active_sla_report",
+      "expected": {
+        "mustFindSource": [
+          "service_overview",
+          "compliance_summary",
+          "kpi_details",
+          "breaches",
+          "improvement_actions"
+        ],
+        "mustExtract": [
+          "kpi_name",
+          "target",
+          "actual",
+          "measurement_window",
+          "result",
+          "variance",
+          "owner",
+          "root_cause"
+        ],
+        "mustPreserveUnit": true,
+        "mustPreserveThreshold": true,
+        "mustShowMethod": true,
+        "mustShowConflictTags": true,
+        "mustNotInfer": [
+          "unanchored_threshold_breach",
+          "compliance_without_window"
+        ],
+        "failureConditions": [
+          "missing_window_or_threshold",
+          "missing_actor_for_breach"
+        ]
+      }
+    },
+    {
+      "id": "ops_deepen_003",
+      "lang": "en",
+      "query": "Summarize incident details with timeline, impact, root cause, and the corrective action status.",
+      "sourceLock": "incident_doc_first",
+      "expected": {
+        "mustFindSource": [
+          "incident_details",
+          "timeline",
+          "impact_assessment",
+          "root_cause_analysis",
+          "corrective_actions"
+        ],
+        "mustExtract": [
+          "event_time",
+          "severity",
+          "impact_value",
+          "root_cause",
+          "corrective_status",
+          "assigned_owner"
+        ],
+        "mustPreserveTimeline": true,
+        "mustPreserveActor": true,
+        "mustShowSourceDiscrepancy": true,
+        "failureConditions": [
+          "timeline_without_sequence",
+          "root_cause_without_support"
+        ]
+      }
+    },
+    {
+      "id": "ops_deepen_004",
+      "lang": "pt",
+      "query": "Comparar manifestos recentes: origem, destino, peso planejado e peso real, atraso e responsável pelo desvio.",
+      "sourceLock": "shipping_manifest_active",
+      "expected": {
+        "mustFindSource": [
+          "shipper_consignee",
+          "routing",
+          "item_list",
+          "totals"
+        ],
+        "mustExtract": [
+          "manifest_id",
+          "origem",
+          "destino",
+          "peso_planejado",
+          "peso_real",
+          "atraso",
+          "responsavel"
+        ],
+        "mustPreserveUnit": true,
+        "mustPreserveRouteScope": true,
+        "mustNotConflate": [
+          "origem_com_destino",
+          "planejado_com_real"
+        ],
+        "failureConditions": [
+          "ausencia_de_origem_destino",
+          "sem_responsavel"
+        ]
+      }
+    }
+  ],
+  "qualityGuards": {
+    "coverageThreshold": {
+      "actorClaims": 4,
+      "sourceAnchors": 2
+    },
+    "requiredAnchorDensity": 2.5,
+    "maxAllowedInferenceRate": 0.16,
+    "penalties": {
+      "missing_owner": -35,
+      "status_blend": -30,
+      "missing_threshold_context": -30,
+      "missing_route_scope": -35
+    }
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "ops_gold_overdue_requires_owner",
+        "input": {
+          "query": "ops_deepen_001"
+        },
+        "expect": {
+          "mustHaveLifecycle": true,
+          "mustPreserveActor": true
+        }
+      },
+      {
+        "id": "ops_gold_incident_requires_timeline",
+        "input": {
+          "query": "ops_deepen_003"
+        },
+        "expect": {
+          "mustPreserveTimeline": true,
+          "mustShowSourceDiscrepancy": true
+        }
+      }
+    ]
+  }
+}

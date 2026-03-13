@@ -37,6 +37,10 @@ function toAbsolute(pathLike: string): string {
   return path.resolve(process.cwd(), pathLike);
 }
 
+function pathExists(pathLike: string): boolean {
+  return fs.existsSync(toAbsolute(pathLike));
+}
+
 function readIfExists(pathLike: string): string | null {
   const abs = toAbsolute(pathLike);
   if (!fs.existsSync(abs)) return null;
@@ -230,6 +234,16 @@ export class OrchestratorCertificationService {
     const coverageFindings: CertificationFinding[] = [];
     const coverageSummary = options.coverageSummary || {};
     for (const threshold of policy.coverage.thresholds) {
+      if (!pathExists(threshold.suffix)) {
+        coverageFindings.push(
+          makeFinding({
+            code: "TEST_FAILURE",
+            message: `Coverage target file is missing: ${threshold.suffix}.`,
+            evidence: [threshold.suffix],
+          }),
+        );
+        continue;
+      }
       const result = findCoverageEntry(coverageSummary, threshold.suffix);
       if (!result) {
         coverageFindings.push(
@@ -266,6 +280,18 @@ export class OrchestratorCertificationService {
     });
 
     const regressionFindings: CertificationFinding[] = [];
+    const missingRegressionTestPaths = policy.regressionSuite.testPaths.filter(
+      (testPath) => !pathExists(testPath),
+    );
+    if (missingRegressionTestPaths.length > 0) {
+      regressionFindings.push(
+        makeFinding({
+          code: "TEST_FAILURE",
+          message: "Regression suite references missing test files.",
+          evidence: missingRegressionTestPaths,
+        }),
+      );
+    }
     if (!options.regressionPassed) {
       regressionFindings.push(
         makeFinding({

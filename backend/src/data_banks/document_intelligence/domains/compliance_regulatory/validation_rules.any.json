@@ -1,0 +1,135 @@
+{
+  "_meta": {
+    "id": "di_compliance_regulatory_validation_rules",
+    "version": "1.0.0",
+    "description": "Compliance validation rules to prevent silent control drift and unsupported regulatory conclusions.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/validation/claimValidator.service.ts",
+      "services/core/orchestration/answerPlanner.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/domain-validation.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "domain": "compliance_regulatory"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "before advisory or status outputs involving compliance",
+    "consumer": "compliance validator",
+    "intent": "Prevent false assurance and unscoped violation claims."
+  },
+  "exactnessContract": {
+    "forbiddenSubstitutions": [
+      "control_status_without_evidence",
+      "remediation_without_owner",
+      "finding_without_control_link",
+      "severity_without_scale",
+      "regulatory_claim_without_reference"
+    ],
+    "requiredAnchors": [
+      "control_id",
+      "severity",
+      "owner",
+      "deadline",
+      "domain"
+    ],
+    "mustPreservePolicyFlags": true
+  },
+  "validationRules": [
+    {
+      "id": "COMP_VAL_001_control_traceability",
+      "severity": "critical",
+      "applies": [
+        "validate",
+        "extract",
+        "compare"
+      ],
+      "check": "each_control_statement_has_control_id",
+      "description": "All control and finding claims must reference a control identifier.",
+      "failureAction": "BLOCK_AND_REQUIRE_CONTROL_ID"
+    },
+    {
+      "id": "COMP_VAL_002_owner_and_due",
+      "severity": "high",
+      "applies": [
+        "advise",
+        "monitor",
+        "summarize"
+      ],
+      "check": "remediation_has_owner_and_due_date",
+      "description": "Remediation claims without owner or due date are not actionable.",
+      "failureAction": "ASK_AND_REQUIRE_OWNER_AND_DEADLINE"
+    },
+    {
+      "id": "COMP_VAL_003_finding_scope",
+      "severity": "high",
+      "applies": [
+        "extract",
+        "evaluate",
+        "validate"
+      ],
+      "check": "finding_scope_matches_rule_text",
+      "description": "Findings cannot be collapsed across different domains or time windows.",
+      "failureAction": "WARN_AND_REQUEST_SCOPE_LOCK"
+    },
+    {
+      "id": "COMP_VAL_004_regulatory_belief",
+      "severity": "critical",
+      "applies": [
+        "evaluate",
+        "extract"
+      ],
+      "check": "law_claim_has_reference",
+      "description": "Do not state regulator or law violations without exact legal citation.",
+      "failureAction": "BLOCK_AND_REQUEST_LAW_REFERENCE"
+    },
+    {
+      "id": "COMP_VAL_005_penalty_exposure",
+      "severity": "medium",
+      "applies": [
+        "compare",
+        "evaluate",
+        "summarize"
+      ],
+      "check": "penalty_mentions_state_exposure",
+      "description": "Penalty language should include severity/exposure category and trigger condition.",
+      "failureAction": "WARN_AND_REQUIRE_PENALTY_CONTEXT"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "compliance_validation_control_id_required",
+        "input": {
+          "scenario": "control_statement_without_id"
+        },
+        "expect": {
+          "action": "BLOCK_AND_REQUIRE_CONTROL_ID"
+        }
+      },
+      {
+        "id": "compliance_validation_rule_reference_required",
+        "input": {
+          "queryType": "evaluate",
+          "signal": {
+            "hasLawReference": false
+          }
+        },
+        "expect": {
+          "mustCheck": [
+            "COMP_VAL_004_regulatory_belief"
+          ]
+        }
+      }
+    ]
+  }
+}

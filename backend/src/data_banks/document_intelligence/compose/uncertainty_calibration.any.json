@@ -1,0 +1,148 @@
+{
+  "_meta": {
+    "id": "uncertainty_calibration",
+    "version": "2.0.0",
+    "description": "Confidence and uncertainty language tuned to evidence quality, domain risk, and ambiguity. The goal is confident when justified, bounded when not.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "composition-brain",
+    "usedBy": [
+      "modules/chat/runtime/CompositionStyleResolver.ts",
+      "data_banks/prompts/compose_style_contract.any.json"
+    ],
+    "tests": [
+      "modules/chat/runtime/CompositionStyleResolver.test.ts",
+      "services/llm/prompts/promptRegistry.service.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "final wording calibration",
+    "consumer": "style decision resolver and compose style contract prompt",
+    "intent": "Pick a confidence band that matches the record. Avoid both fake certainty and reflexive hedging."
+  },
+  "bands": [
+    {
+      "id": "high_confidence",
+      "when": "direct grounded support with no major conflicts",
+      "openingPhrases": {
+        "en": [
+          "The document shows",
+          "The strongest reading is",
+          "The record supports"
+        ],
+        "pt": [
+          "O documento mostra",
+          "A leitura mais forte e",
+          "O registro sustenta"
+        ]
+      },
+      "limitBehavior": "omit_limit_unless_material_exception"
+    },
+    {
+      "id": "medium_confidence",
+      "when": "good support with one open interpretive edge",
+      "openingPhrases": {
+        "en": [
+          "The document points to",
+          "The best grounded reading is",
+          "On balance, the material indicates"
+        ],
+        "pt": [
+          "O documento aponta para",
+          "A leitura mais ancorada e",
+          "No conjunto, o material indica"
+        ]
+      },
+      "limitBehavior": "keep_one_real_boundary"
+    },
+    {
+      "id": "low_confidence",
+      "when": "partial, indirect, or conflicting support",
+      "openingPhrases": {
+        "en": [
+          "The document suggests, but does not settle,",
+          "There is some support for",
+          "The available evidence leans toward"
+        ],
+        "pt": [
+          "O documento sugere, mas nao fecha,",
+          "Ha algum suporte para",
+          "A evidencia disponivel inclina para"
+        ]
+      },
+      "limitBehavior": "state_boundary_up_front"
+    }
+  ],
+  "domainModifiers": [
+    {
+      "id": "UC_DM_legal",
+      "domain": "legal",
+      "preferBands": [
+        "medium_confidence",
+        "low_confidence"
+      ],
+      "note": "Legal interpretation should stay bounded unless the clause is unusually explicit."
+    },
+    {
+      "id": "UC_DM_medical",
+      "domain": "medical",
+      "preferBands": [
+        "medium_confidence",
+        "low_confidence"
+      ],
+      "note": "Medical material should avoid overstatement unless the document is directly conclusive."
+    }
+  ],
+  "rules": [
+    {
+      "id": "UC_001_low_evidence_blocks_strong_claim",
+      "trigger": "Low-evidence answer uses high-confidence wording",
+      "check": "context.evidenceStrength == 'low' AND output.claimStrength == 'strong'",
+      "failureAction": "DOWNGRADE_TO_LOW_CONFIDENCE_LANGUAGE",
+      "severity": "critical"
+    },
+    {
+      "id": "UC_002_high_evidence_blocks_weakness",
+      "trigger": "High-evidence answer sounds needlessly timid",
+      "check": "context.evidenceStrength == 'high' AND output.claimStrength == 'weak'",
+      "failureAction": "UPGRADE_TO_HIGH_CONFIDENCE_LANGUAGE",
+      "severity": "medium"
+    },
+    {
+      "id": "UC_003_sensitive_domains_need_clean_limit",
+      "trigger": "Sensitive domain answer omits the relevant boundary",
+      "check": "context.domain IN ['legal','medical'] AND context.evidenceStrength != 'high' AND output.limitStatementMissing == true",
+      "failureAction": "ADD_ONE_LIMIT_STATEMENT",
+      "severity": "high"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "uncertainty_calibration_low_support",
+        "input": {
+          "evidenceStrength": "low"
+        },
+        "expect": {
+          "band": "low_confidence"
+        }
+      },
+      {
+        "id": "uncertainty_calibration_has_medium_band",
+        "expect": {
+          "band": "medium_confidence"
+        }
+      }
+    ]
+  }
+}

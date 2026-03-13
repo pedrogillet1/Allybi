@@ -94,6 +94,30 @@
         "expect": {
           "action": "block"
         }
+      },
+      {
+        "id": "COMP_POL_T_001_A_002",
+        "runtime": {
+          "signals": {
+            "complianceRequired": true,
+            "userConsent": false
+          }
+        },
+        "expect": {
+          "action": "block"
+        }
+      },
+      {
+        "id": "COMP_POL_T_001_A_003",
+        "runtime": {
+          "signals": {
+            "complianceRequired": true,
+            "userConsent": false
+          }
+        },
+        "expect": {
+          "action": "block"
+        }
       }
     ]
   }

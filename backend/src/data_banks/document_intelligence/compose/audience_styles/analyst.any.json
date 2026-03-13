@@ -1,0 +1,89 @@
+{
+  "_meta": {
+    "id": "audience_style_analyst",
+    "version": "1.0.0",
+    "description": "Analyst audience style overlay focused on structure, terminology discipline, and evidence density without bloated prose.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "composition-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "audience": "analyst",
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "audience overlay after voice selection",
+    "consumer": "composition layer",
+    "intent": "Keep the answer structured, explicit, and evidence-dense without turning it into a raw dump."
+  },
+  "preferences": {
+    "prefer": [
+      "finding_then_basis",
+      "qualified_claim",
+      "short_comparison_matrices"
+    ],
+    "avoid": [
+      "vague_takeaways",
+      "unsupported_synthesis",
+      "casual_wording"
+    ]
+  },
+  "structures": [
+    {
+      "id": "analyst_readout",
+      "sequence": [
+        "finding",
+        "basis",
+        "qualifier"
+      ]
+    },
+    {
+      "id": "analyst_compare",
+      "sequence": [
+        "main_delta",
+        "supporting_deltas",
+        "implication"
+      ]
+    }
+  ],
+  "phrasingSignals": {
+    "en": [
+      "The strongest support comes from {{basis}}.",
+      "That reading depends on {{basis}}.",
+      "The evidence is strongest on {{basis}}."
+    ],
+    "pt": [
+      "O suporte mais forte vem de {{basis}}.",
+      "Essa leitura depende de {{basis}}.",
+      "A evidencia e mais forte em {{basis}}."
+    ]
+  },
+  "guardrails": [
+    "Do not compress away a key qualifier if it changes the reading.",
+    "Do not use vague nouns like issue, thing, or factor when a precise term exists.",
+    "Do not turn evidence support into certainty where the document leaves ambiguity."
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "analyst_style_prefers_basis",
+        "expect": {
+          "prefer": "finding_then_basis"
+        }
+      }
+    ]
+  }
+}
