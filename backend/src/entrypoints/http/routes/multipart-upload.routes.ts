@@ -6,7 +6,7 @@
 import { Router, Response } from "express";
 import { authMiddleware } from "../../../middleware/auth.middleware";
 import { multipartUploadLimiter } from "../../../middleware/rateLimit.middleware";
-import prisma from "../../../platform/db/prismaClient";
+import prisma from "../../../config/database";
 import { GcsStorageService } from "../../../services/retrieval/gcsStorage.service";
 import { UPLOAD_CONFIG } from "../../../config/upload.config";
 import { randomUUID } from "crypto";

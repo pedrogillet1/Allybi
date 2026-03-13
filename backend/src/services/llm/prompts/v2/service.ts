@@ -6,8 +6,6 @@ import {
   PromptTemplateSelectionError,
 } from "./errors";
 import {
-  applyGlobalGuards,
-  applyNavPillsGuard,
   minimalSafePrompt,
 } from "./guard-injector";
 import {
@@ -19,6 +17,7 @@ import {
 } from "./helpers";
 import {
   assertPromptRegistryLayersValid,
+  assertRequiredConcernCoverage,
   resolveBankIdsForKind,
   resolveRequiredFlags,
 } from "./layer-resolver";
@@ -27,9 +26,7 @@ import {
   loadRequiredPromptBank,
 } from "./registry-loader";
 import {
-  GlobalGuardsBankSchema,
   MinimalSafePromptBankSchema,
-  NavPillsGuardBankSchema,
   PromptRegistryBankSchema,
 } from "./schemas";
 import { createDefaultPromptRegistryTelemetry } from "./telemetry";
@@ -132,6 +129,7 @@ export class PromptRegistryServiceV2 {
     this.validateRegistryIfChanged(registry);
 
     const bankIds = resolveBankIdsForKind(kind, registry);
+    assertRequiredConcernCoverage({ kind, registry, bankIds, ctx });
     const requiredByBankId = resolveRequiredFlags(registry);
     const slots = buildSlots(ctx);
 
@@ -223,41 +221,6 @@ export class PromptRegistryServiceV2 {
       });
     }
 
-    const guardBank = loadPromptBank<{
-      rules?: Array<{ id?: string; text?: string; skipWhen?: string[] }>;
-    }>({
-      bankLoader: this.bankLoader,
-      bankId: "llm_global_guards",
-      kind,
-      required: false,
-      schema: GlobalGuardsBankSchema,
-    });
-
-    messages = applyGlobalGuards({
-      messages,
-      ctx,
-      applied: appliedGuards,
-      guardRules: guardBank?.rules || null,
-    });
-
-    if (answerMode === "nav_pills") {
-      const navBank = loadPromptBank<{
-        rules?: Array<{ id?: string; text?: string }>;
-      }>({
-        bankLoader: this.bankLoader,
-        bankId: "llm_nav_pills_contract",
-        kind,
-        required: false,
-        schema: NavPillsGuardBankSchema,
-      });
-
-      messages = applyNavPillsGuard({
-        messages,
-        applied: appliedGuards,
-        navRules: navBank?.rules || null,
-      });
-    }
-
     return {
       kind,
       messages,
@@ -280,6 +243,8 @@ export class PromptRegistryServiceV2 {
       JSON.stringify({
         layersByKind: registry.layersByKind ?? null,
         promptFiles: registry.promptFiles ?? null,
+        requiredConcernsByKind: registry.requiredConcernsByKind ?? null,
+        forbiddenConcernOverlaps: registry.forbiddenConcernOverlaps ?? null,
       }),
     );
     if (signature === this.validatedRegistrySignature) return;

@@ -1,0 +1,121 @@
+{
+  "_meta": {
+    "id": "custom_agent_profiles",
+    "version": "1.0.0",
+    "description": "Composable micro-agent profiles with explicit competencies and output expectations.",
+    "owner": "assistant-orchestrator",
+    "usedBy": [
+      "services/assistant/core/assistantOrchestrator.service.ts"
+    ],
+    "tests": [
+      "tests/assistant/customAgentProfiles.proof.test.ts"
+    ],
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13"
+  },
+  "config": {
+    "enabled": true
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "orchestration_task_binding",
+    "consumer": "agent selector + task decomposition"
+  },
+  "agents": [
+    {
+      "id": "legal_guardian",
+      "name": "Legal Guardian",
+      "purpose": "Clamp interpretive claims to source clauses and exceptions.",
+      "taskFamilies": [
+        "document_grounding",
+        "forensic_scan"
+      ],
+      "tools": [
+        "citation_fetch",
+        "section_index",
+        "document_lookup"
+      ],
+      "workProducts": [
+        "quote_pack",
+        "evidence_brief"
+      ],
+      "defaultModelRole": "evidence_specialist"
+    },
+    {
+      "id": "finance_auditor",
+      "name": "Finance Auditor",
+      "purpose": "Drive numeric consistency checks and delta rationale.",
+      "taskFamilies": [
+        "numeric_audit",
+        "comparison_synthesis"
+      ],
+      "tools": [
+        "table_reader",
+        "numeric_validator",
+        "excel_calc"
+      ],
+      "workProducts": [
+        "comparison_matrix",
+        "action_plan",
+        "direct_answer"
+      ],
+      "defaultModelRole": "numeric_specialist"
+    },
+    {
+      "id": "ops_dispatcher",
+      "name": "Operations Dispatcher",
+      "purpose": "Resolve workflow sequencing, blockers, and next actions.",
+      "taskFamilies": [
+        "operational_workflow"
+      ],
+      "tools": [
+        "state_fetch",
+        "task_planner",
+        "work_product_formatter"
+      ],
+      "workProducts": [
+        "action_plan",
+        "decision_memo"
+      ],
+      "defaultModelRole": "planner"
+    },
+    {
+      "id": "risk_controller",
+      "name": "Risk Controller",
+      "purpose": "Flag precision-risk, uncertainty, and escalation conditions.",
+      "taskFamilies": [
+        "document_grounding",
+        "forensic_scan",
+        "numeric_audit"
+      ],
+      "tools": [
+        "uncertainty_scorer",
+        "policy_check",
+        "evidence_checker"
+      ],
+      "workProducts": [
+        "evidence_brief",
+        "decision_memo"
+      ],
+      "defaultModelRole": "risk_orchestrator"
+    }
+  ],
+  "selectionPolicy": {
+    "multiAgentCap": 2,
+    "handoffRule": "single_primary_agent_then_support_agent_if_conflict_found"
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "financial_audit_selects_auditor",
+        "input": {
+          "taskFamily": "numeric_audit"
+        },
+        "expect": {
+          "primaryAgent": "finance_auditor"
+        }
+      }
+    ]
+  }
+}

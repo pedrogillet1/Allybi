@@ -22,7 +22,8 @@
   },
   "config": {
     "enabled": true,
-    "domain": "ops"
+    "domain": "ops",
+    "configModeOnly": true
   },
   "domain": "ops",
   "audienceStyles": [
@@ -732,5 +733,49 @@
       "uncertaintyStyle": "Declare confianca explicitamente e separe fatos de suposicoes.",
       "template": "Audiencia=auditor; Profundidade=detailed; Forneca explicacao com limites de evidencia, opcoes, riscos e o que muda minha opiniao."
     }
-  ]
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "EXPLAIN_STYLE_OPS_T_001",
+        "input": {
+          "language": "en",
+          "depth": "summary"
+        },
+        "expect": {
+          "requireConfidenceLabel": true
+        }
+      },
+      {
+        "id": "EXPLAIN_STYLE_OPS_T_002",
+        "input": {
+          "language": "en",
+          "depth": "paragraph"
+        },
+        "expect": {
+          "forbidFabrication": true
+        }
+      },
+      {
+        "id": "EXPLAIN_STYLE_OPS_T_003",
+        "input": {
+          "language": "pt",
+          "depth": "summary"
+        },
+        "expect": {
+          "depth": "summary"
+        }
+      },
+      {
+        "id": "EXPLAIN_STYLE_OPS_T_004",
+        "input": {
+          "language": "pt",
+          "depth": "detailed"
+        },
+        "expect": {
+          "minCitations": 3
+        }
+      }
+    ]
+  }
 }

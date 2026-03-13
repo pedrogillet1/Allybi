@@ -1,0 +1,123 @@
+{
+  "_meta": {
+    "id": "di_supply_chain_logistics_entity_ontology",
+    "version": "1.0.0",
+    "description": "Logistics entity ontology for route timing, shipment, and inventory-critical fields.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/orchestration/entityResolver.service.ts",
+      "services/core/validation/claimValidator.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/domain-validation.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "supply_chain_logistics",
+    "normalizeEntities": true
+  },
+  "domain": "supply_chain_logistics",
+  "entities": [
+    {
+      "id": "scl_entity_shipment_id",
+      "label": {
+        "en": "Shipment ID",
+        "pt": "ID de Envio"
+      },
+      "aliases": [
+        "tracking id",
+        "shipment number",
+        "id de remessa"
+      ],
+      "mustMatchExactWhenPossible": true
+    },
+    {
+      "id": "scl_entity_carrier",
+      "label": {
+        "en": "Carrier",
+        "pt": "Transportadora"
+      },
+      "aliases": [
+        "transport provider",
+        "carrier",
+        "transportador"
+      ],
+      "requiresContext": "document_scope"
+    },
+    {
+      "id": "scl_entity_eta",
+      "label": {
+        "en": "ETA",
+        "pt": "ETA"
+      },
+      "aliases": [
+        "estimated arrival",
+        "arrival time",
+        "tempo estimado"
+      ]
+    },
+    {
+      "id": "scl_entity_route",
+      "label": {
+        "en": "Route",
+        "pt": "Rota"
+      },
+      "aliases": [
+        "origin-destination",
+        "path",
+        "itinerary"
+      ],
+      "mustIncludeOriginAndDestination": true
+    },
+    {
+      "id": "scl_entity_quantity",
+      "label": {
+        "en": "Quantity",
+        "pt": "Quantidade"
+      },
+      "aliases": [
+        "qty",
+        "quantity",
+        "volume"
+      ],
+      "requiresUnitValidation": true
+    },
+    {
+      "id": "scl_entity_inventory_level",
+      "label": {
+        "en": "Inventory Level",
+        "pt": "Nível de Estoque"
+      },
+      "aliases": [
+        "available",
+        "on hand",
+        "disponível"
+      ],
+      "riskIfAmbiguous": "high"
+    },
+    {
+      "id": "scl_entity_hs_code",
+      "label": {
+        "en": "HS Code",
+        "pt": "NCM"
+      },
+      "aliases": [
+        "tariff code",
+        "hscode",
+        "código de tarifa"
+      ],
+      "requiresCustomsContext": true
+    }
+  ],
+  "normalization": {
+    "trimWhitespace": true,
+    "caseFold": true,
+    "stripDiacritics": true
+  }
+}

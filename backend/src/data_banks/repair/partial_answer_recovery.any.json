@@ -1,0 +1,218 @@
+{
+  "_meta": {
+    "id": "partial_answer_recovery",
+    "version": "1.0.0",
+    "description": "Policies for giving partial but genuinely useful answers when only part of the requested evidence is available.",
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "koda-repair",
+    "compat": ">=1.0.0",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ],
+    "changeLog": [
+      "Added partial-answer thresholds and answer arcs for multi-part asks",
+      "Added coverage language rules so the answer stays useful instead of sounding empty",
+      "Added guidance for tables and structured field extraction with blanks instead of invention"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id",
+    "minSupportedSubpartsRatio": 0.35,
+    "minEvidenceConfidence": 0.55,
+    "preferAnswerSupportedPartsFirst": true,
+    "requireGapLabel": true,
+    "forbidFabricatedFillers": true
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "after evidence synthesis identifies partial support",
+    "consumer": "answer composer",
+    "intent": "Preserve momentum by answering the grounded portion first, then naming the missing portion plainly and briefly.",
+    "emittedSignals": [
+      "partialAnswerMode",
+      "answeredSubparts",
+      "missingSubparts",
+      "coverageNoticeRequired"
+    ]
+  },
+  "answerArcs": [
+    {
+      "id": "par_arc_supported_then_missing",
+      "sequence": [
+        "supported_answer",
+        "gap_label",
+        "next_step"
+      ],
+      "bestFor": [
+        "2-5 requested subparts",
+        "one missing fact blocks only part of the request"
+      ]
+    },
+    {
+      "id": "par_arc_table_with_blanks",
+      "sequence": [
+        "table_headers",
+        "supported_cells",
+        "blank_or_unknown_cells",
+        "coverage_note"
+      ],
+      "bestFor": [
+        "field extraction",
+        "document review checklists"
+      ]
+    },
+    {
+      "id": "par_arc_scope_limit_then_answer",
+      "sequence": [
+        "limit",
+        "best_supported_answer",
+        "offer_narrowing"
+      ],
+      "bestFor": [
+        "broad summary asks",
+        "weak retrieval with one strong section"
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "PAR_001_answer_supported_subparts_before_gap_notice",
+      "priority": 130,
+      "when": {
+        "all": [
+          {
+            "path": "metrics.supportedSubpartsRatio",
+            "op": "gte",
+            "value": 0.35
+          },
+          {
+            "path": "metrics.supportedSubpartsRatio",
+            "op": "lt",
+            "value": 1
+          }
+        ]
+      },
+      "action": {
+        "type": "answer_arc",
+        "arc": "par_arc_supported_then_missing"
+      },
+      "reasonCode": "partial_multi_part_support",
+      "severity": "medium"
+    },
+    {
+      "id": "PAR_002_return_structured_output_with_blanks_not_guesses",
+      "priority": 145,
+      "when": {
+        "all": [
+          {
+            "path": "context.outputShape",
+            "op": "eq",
+            "value": "table"
+          },
+          {
+            "path": "signals.partialFieldCoverage",
+            "op": "eq",
+            "value": true
+          }
+        ]
+      },
+      "action": {
+        "type": "answer_arc",
+        "arc": "par_arc_table_with_blanks"
+      },
+      "reasonCode": "structured_partial_extraction",
+      "severity": "high"
+    },
+    {
+      "id": "PAR_003_do_not_lead_with_failure_language",
+      "priority": 150,
+      "when": {
+        "all": [
+          {
+            "path": "signals.partialAnswerPossible",
+            "op": "eq",
+            "value": true
+          }
+        ]
+      },
+      "action": {
+        "type": "compose_constraint",
+        "constraint": "lead_with_supported_content"
+      },
+      "reasonCode": "partial_answers_should_still_help",
+      "severity": "medium"
+    },
+    {
+      "id": "PAR_004_do_not_overstate_missing_piece",
+      "priority": 135,
+      "when": {
+        "all": [
+          {
+            "path": "metrics.supportedSubpartsRatio",
+            "op": "gte",
+            "value": 0.6
+          }
+        ]
+      },
+      "action": {
+        "type": "compose_constraint",
+        "constraint": "keep_gap_notice_brief"
+      },
+      "reasonCode": "missing_piece_is_secondary",
+      "severity": "low"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "partial_multi_part_answers_supported_first",
+        "input": {
+          "metrics": {
+            "supportedSubpartsRatio": 0.5
+          }
+        },
+        "expect": {
+          "arc": "par_arc_supported_then_missing"
+        }
+      },
+      {
+        "id": "table_outputs_use_blanks",
+        "input": {
+          "context": {
+            "outputShape": "table"
+          },
+          "signals": {
+            "partialFieldCoverage": true
+          }
+        },
+        "expect": {
+          "arc": "par_arc_table_with_blanks"
+        }
+      },
+      {
+        "id": "partial_answers_do_not_start_with_failure",
+        "input": {
+          "signals": {
+            "partialAnswerPossible": true
+          }
+        },
+        "expect": {
+          "constraint": "lead_with_supported_content"
+        }
+      }
+    ]
+  }
+}

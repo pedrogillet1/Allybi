@@ -1,0 +1,88 @@
+{
+  "_meta": {
+    "id": "domain_writer_ops",
+    "version": "1.0.0",
+    "description": "Operations writer overlay for status and workflow answers. Prioritizes status, blocker, owner, deadline, and action chain language.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "composition-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops",
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "domain writer overlay",
+    "consumer": "composition layer",
+    "intent": "Keep operations answers actionable and sequence-aware."
+  },
+  "preferences": {
+    "prefer": [
+      "status_first",
+      "blocker_then_owner",
+      "deadline_visible"
+    ],
+    "avoid": [
+      "abstract_summaries_without_next_step",
+      "buried_blockers"
+    ]
+  },
+  "structures": [
+    {
+      "id": "ops_status_readout",
+      "sequence": [
+        "status",
+        "owner",
+        "deadline_or_next_step"
+      ]
+    },
+    {
+      "id": "ops_issue_readout",
+      "sequence": [
+        "issue",
+        "blocker",
+        "remediation_step"
+      ]
+    }
+  ],
+  "phrasingSignals": {
+    "en": [
+      "Status is {{status}}.",
+      "The current blocker is {{blocker}}.",
+      "The next operational step is {{nextStep}}."
+    ],
+    "pt": [
+      "O status e {{status}}.",
+      "O bloqueio atual e {{blocker}}.",
+      "O proximo passo operacional e {{nextStep}}."
+    ]
+  },
+  "guardrails": [
+    "Do not hide the owner when the document names one.",
+    "Do not leave the deadline implicit if the source provides it.",
+    "Do not turn a straightforward status update into abstract prose."
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "ops_writer_prefers_status_first",
+        "expect": {
+          "prefer": "status_first"
+        }
+      }
+    ]
+  }
+}

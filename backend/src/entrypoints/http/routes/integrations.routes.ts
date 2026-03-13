@@ -16,7 +16,7 @@ import { SlackOAuthService } from "../../../services/connectors/slack/slackOAuth
 import { SlackClientService } from "../../../services/connectors/slack/slackClient.service";
 import { SlackSyncService } from "../../../services/connectors/slack/slackSync.service";
 import SlackEventsController from "../../../services/connectors/slack/slackEvents.controller";
-import prisma from "../../../platform/db/prismaClient";
+import prisma from "../../../config/database";
 import { TokenVaultService } from "../../../services/connectors/tokenVault.service";
 import { getConnectorQueueStats } from "../../../queues/connector.queue";
 import { signEmailSendConfirmationToken } from "../../../services/connectors/emailSendConfirmation.service";

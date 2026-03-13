@@ -1,0 +1,68 @@
+{
+  "_meta": {
+    "id": "closers_and_next_steps",
+    "version": "1.0.0",
+    "description": "Closing lines and next-step patterns for grounded answers. Keeps endings purposeful, short, and non-generic.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "composition-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id",
+    "maxCloserSentences": 2
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "final answer wrap-up",
+    "consumer": "composition layer",
+    "intent": "End with a narrow conclusion or next step, not with filler."
+  },
+  "families": {
+    "bounded_wrap": {
+      "en": [
+        "That is the strongest document-grounded reading from what is attached here.",
+        "That is as far as the document support cleanly goes.",
+        "That is the clearest supported takeaway from the material in scope."
+      ],
+      "pt": [
+        "Essa e a leitura mais forte baseada no documento dentro do que esta anexado aqui.",
+        "Esse e o limite limpo do que o documento sustenta.",
+        "Esse e o resumo mais claro sustentado pelo material em escopo."
+      ]
+    },
+    "actionable_next_step": {
+      "en": [
+        "If you want, I can pull the exact clause, row, or page that drives this conclusion next.",
+        "If you need to act on this, the next useful move is to isolate the exact source language or numbers.",
+        "If you want a tighter view, I can turn this into a focused comparison table or extraction list."
+      ],
+      "pt": [
+        "Se voce quiser, posso puxar a clausula, linha ou pagina exata que sustenta essa conclusao.",
+        "Se voce precisar agir com base nisso, o proximo passo util e isolar a linguagem ou os numeros exatos da fonte.",
+        "Se voce quiser uma visao mais fechada, posso transformar isso em tabela comparativa ou lista de extracao."
+      ]
+    }
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "closers_and_next_steps_stays_short",
+        "expect": {
+          "maxCloserSentences": 2
+        }
+      }
+    ]
+  }
+}

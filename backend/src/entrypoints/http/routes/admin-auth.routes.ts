@@ -5,7 +5,7 @@ import {
   authLimiter,
   adminLimiter,
 } from "../../../middleware/rateLimit.middleware";
-import prisma from "../../../platform/db/prismaClient";
+import prisma from "../../../config/database";
 
 const router = Router();
 

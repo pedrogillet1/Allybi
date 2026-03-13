@@ -1,0 +1,83 @@
+{
+  "_meta": {
+    "id": "quote_explanation_patterns",
+    "version": "1.0.0",
+    "description": "Patterns for introducing a quote, preserving it exactly, and explaining its practical meaning without over-interpreting the source.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "composition-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "quote answer generation",
+    "consumer": "composition layer",
+    "intent": "Keep the quote exact, then explain it in plain language and only to the extent supported by the quoted wording."
+  },
+  "patterns": [
+    {
+      "id": "quote_then_plain_meaning",
+      "sequence": [
+        "quote_intro",
+        "exact_quote",
+        "plain_meaning"
+      ]
+    },
+    {
+      "id": "quote_then_operational_effect",
+      "sequence": [
+        "quote_intro",
+        "exact_quote",
+        "operational_effect",
+        "limit"
+      ]
+    },
+    {
+      "id": "quote_then_compare_with_context",
+      "sequence": [
+        "quote_intro",
+        "exact_quote",
+        "contrast_with_other_text"
+      ]
+    }
+  ],
+  "quoteIntroductions": {
+    "en": [
+      "The exact wording is:",
+      "The document says:",
+      "The relevant line is:"
+    ],
+    "pt": [
+      "A redacao exata e:",
+      "O documento diz:",
+      "A linha relevante e:"
+    ]
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "quote_explanation_uses_exact_quote",
+        "input": {
+          "intent": "quote"
+        },
+        "expect": {
+          "requiresExactQuote": true
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,181 @@
+{
+  "_meta": {
+    "id": "di_commercial_real_estate_section_ontology",
+    "version": "1.0.0",
+    "description": "Commercial real estate section ontology for property, lease, tenant, and valuation interpretation.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/orchestration/sectionResolver.service.ts",
+      "services/core/orchestration/answerPlanner.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/section-detection.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "commercial_real_estate"
+  },
+  "domain": "commercial_real_estate",
+  "sections": [
+    {
+      "id": "cre_section_property_profile",
+      "name": {
+        "en": "Property Profile",
+        "pt": "Perfil do Imóvel"
+      },
+      "aliases": [
+        "property master",
+        "property details",
+        "ficha do imóvel"
+      ],
+      "canonicalPurpose": "Defines legal identity, size, zoning, and usage constraints.",
+      "importance": "critical"
+    },
+    {
+      "id": "cre_section_tenant_summary",
+      "name": {
+        "en": "Tenant Summary",
+        "pt": "Resumo de Inquilinos"
+      },
+      "aliases": [
+        "tenant profile",
+        "occupancy portfolio",
+        "inquilinos"
+      ],
+      "canonicalPurpose": "Captures anchor entities and concentration concentration risk.",
+      "importance": "high"
+    },
+    {
+      "id": "cre_section_rent_roll",
+      "name": {
+        "en": "Rent Roll",
+        "pt": "Planilha de Aluguéis"
+      },
+      "aliases": [
+        "rent roll",
+        "receitas de locação",
+        "alugueis"
+      ],
+      "canonicalPurpose": "Source of unit-level revenue, area, status, and expiry data.",
+      "importance": "critical"
+    },
+    {
+      "id": "cre_section_lease_terms",
+      "name": {
+        "en": "Lease Terms",
+        "pt": "Termos de Locação"
+      },
+      "aliases": [
+        "lease agreement",
+        "lease clause",
+        "contrato de locação"
+      ],
+      "canonicalPurpose": "Defines payment schedule, options, renewals, and landlord remedies.",
+      "importance": "critical"
+    },
+    {
+      "id": "cre_section_valuation_inputs",
+      "name": {
+        "en": "Valuation Inputs",
+        "pt": "Premissas de Valoração"
+      },
+      "aliases": [
+        "valuation basis",
+        "noi",
+        "cap rate"
+      ],
+      "canonicalPurpose": "Captures assumptions that can be challenged by comparables and sensitivity.",
+      "importance": "high"
+    },
+    {
+      "id": "cre_section_occupancy_risk",
+      "name": {
+        "en": "Occupancy and Risk",
+        "pt": "Ocupação e Riscos"
+      },
+      "aliases": [
+        "vacancy",
+        "occupancy",
+        "risk"
+      ],
+      "canonicalPurpose": "Tracks vacancy, concentration, and rollover exposures.",
+      "importance": "high"
+    },
+    {
+      "id": "cre_section_title_and_encumbrances",
+      "name": {
+        "en": "Title and Encumbrances",
+        "pt": "Título e Ônus"
+      },
+      "aliases": [
+        "title",
+        "encumbrance",
+        "liens"
+      ],
+      "canonicalPurpose": "Preserves ownership certainty and legal risk boundaries."
+    },
+    {
+      "id": "cre_section_compliance_and_inspection",
+      "name": {
+        "en": "Compliance and Inspection",
+        "pt": "Compliance e Inspeção"
+      },
+      "aliases": [
+        "inspection",
+        "compliance",
+        "building condition"
+      ],
+      "canonicalPurpose": "Captures structural, environmental, and operational condition status."
+    },
+    {
+      "id": "cre_section_capex_plan",
+      "name": {
+        "en": "CapEx Plan",
+        "pt": "Plano de CAPEX"
+      },
+      "aliases": [
+        "capex",
+        "capital expenditure",
+        "maintenance plan"
+      ],
+      "canonicalPurpose": "Tracks planned/required maintenance and renewal cost exposure."
+    }
+  ],
+  "sectionAliases": {
+    "vacancy": [
+      "vacancy",
+      "taxa de vacância",
+      "desocupação"
+    ],
+    "rent": [
+      "rent",
+      "aluguel",
+      "valor locatício"
+    ],
+    "expiry": [
+      "expiry",
+      "expiration",
+      "vencimento"
+    ]
+  },
+  "runtimeHints": {
+    "priorityOrder": [
+      "cre_section_property_profile",
+      "cre_section_lease_terms",
+      "cre_section_tenant_summary",
+      "cre_section_rent_roll",
+      "cre_section_valuation_inputs",
+      "cre_section_occupancy_risk",
+      "cre_section_title_and_encumbrances",
+      "cre_section_compliance_and_inspection",
+      "cre_section_capex_plan"
+    ],
+    "mustAnchorCrossQueryIf": "queryType in ['compare','evaluate','calculate','validate']"
+  }
+}

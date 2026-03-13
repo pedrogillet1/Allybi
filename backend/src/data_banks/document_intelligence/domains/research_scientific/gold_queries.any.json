@@ -1,0 +1,154 @@
+{
+  "_meta": {
+    "id": "eval_gold_queries_research_scientific_domain",
+    "version": "1.0.0",
+    "description": "Scientific gold queries for protocol fidelity, statistical interpretation, and reproducibility safeguards.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "eval-domain-brain",
+    "usedBy": [
+      "services/eval/goldQueryRunner.service.ts",
+      "services/core/orchestration/answerPlanner.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/docint-eval-pack.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "research_scientific",
+    "scenarioType": "scientific_reasoning"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "evaluation pack for inference safety and statistic correctness",
+    "consumer": "goldQueryRunner",
+    "intent": "Catch endpoint drift, CI omission, and unsupported causal language."
+  },
+  "goldQueries": [
+    {
+      "id": "research_gold_001",
+      "lang": "en",
+      "query": "What is the primary endpoint result, including estimate, confidence interval, p-value, and sample size by arm?",
+      "expected": {
+        "mustReadSource": [
+          "endpoints",
+          "results",
+          "analysis"
+        ],
+        "mustExtract": [
+          "endpoint",
+          "estimate",
+          "ci_low",
+          "ci_high",
+          "p_value",
+          "sample_size",
+          "cohort"
+        ],
+        "mustPreserveMethod": true,
+        "failureConditions": [
+          "endpoint_omitted",
+          "no_ci",
+          "pvalue_without_endpoint",
+          "sample_mismatch"
+        ]
+      }
+    },
+    {
+      "id": "research_gold_002",
+      "lang": "en",
+      "query": "Show all protocol deviations and indicate whether they affected primary endpoint interpretation.",
+           "expected": {
+        "mustReadSource": [
+          "study design",
+          "analysis",
+          "limitations",
+          "data collection"
+        ],
+        "mustExtract": [
+          "protocol_version",
+          "deviation",
+          "impact_on_endpoints",
+          "endpoint"
+        ],
+        "mustPreserveScope": true,
+        "failureConditions": [
+          "aggregate_deviation_without_detail",
+          "no_protocol_version",
+          "no_impact_statement"
+        ]
+      }
+    },
+    {
+      "id": "research_gold_003",
+      "lang": "en",
+      "query": "Compare subgroup effects for at least two predefined subgroups and state whether interaction tests support heterogeneity.",
+      "expected": {
+        "mustFindSection": [
+          "subgroup analysis",
+          "analysis",
+          "results"
+        ],
+        "mustExtract": [
+          "subgroup",
+          "endpoint",
+          "interaction_p",
+          "sample_size",
+          "estimate"
+        ],
+        "mustPreserveMethod": true,
+        "failureConditions": [
+          "subgroup_merge_without_lock",
+          "p_values_without_interaction_context",
+          "cohort_not_specified"
+        ]
+      }
+    },
+    {
+      "id": "research_gold_004",
+      "lang": "pt",
+      "query": "Com base no plano de análise, explique se o tamanho amostral foi suficiente para detectar o efeito esperado.",
+      "expected": {
+        "mustInclude": [
+          "cálculo de poder",
+          "tamanho da amostra",
+          "efeito esperado",
+          "limitações"
+        ],
+        "mustPreserveUncertainty": true,
+        "failureConditions": [
+          "falta_de_poder",
+          "sem_alcance_do_efeito",
+          "sem_incerteza"
+        ]
+      }
+    }
+  ],
+  "qualityGuards": {
+    "maxAllowedInferenceRate": 0.08,
+    "requiredAnchorDensity": 2.9,
+    "penalties": {
+      "causal_overreach": -40,
+      "missing_ci": -35,
+      "missing_endpoint": -45
+    }
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "research_gold_requires_ci_for_effect",
+        "input": {
+          "query": "research_gold_001"
+        },
+        "expect": {
+          "mustCheck": [
+            "mustPreserveMethod",
+            "mustExtract"
+          ]
+        }
+      }
+    ]
+  }
+}

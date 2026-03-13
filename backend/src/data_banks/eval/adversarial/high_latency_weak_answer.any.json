@@ -1,0 +1,69 @@
+{
+  "_meta": {
+    "id": "eval_adversarial_high_latency_weak_answer",
+    "version": "1.0.0",
+    "description": "Adversarial checks that prevent weak generic answers under timeout or degraded latency conditions.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "eval-ops",
+    "usedBy": [
+      "services/eval/adversarialHarness.service.ts"
+    ],
+    "tests": [
+      "tests/eval/highLatencyWeakAnswer.proof.test.ts",
+      "tests/eval/adversarialCoverage.proof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "scenarioType": "resilience_under_latency"
+  },
+  "adversarialCases": [
+    {
+      "id": "high_latency_weak_answer_001",
+      "lang": "en",
+      "query": "Compute both revenue and operating margin from the table and explain variance.",
+      "latencyContext": "delayed",
+      "expected": {
+        "mustMaintainDepth": true,
+        "mustNotUsePlaceholder": [
+          "I cannot compute right now",
+          "please try again",
+          "I might not be able to answer"
+        ],
+        "mustReturnWith": [
+          "bounded_confidence",
+          "evidence_plan"
+        ],
+        "failureConditions": [
+          "weak_two_sentence_reply",
+          "abandons_computation",
+          "false_confidence_drop"
+        ]
+      }
+    },
+    {
+      "id": "high_latency_weak_answer_002",
+      "lang": "pt",
+      "query": "Resuma o estado da empresa e destaque os principais riscos.",
+      "latencyContext": "delayed",
+      "expected": {
+        "mustReturnStructured": true,
+        "mustIncludeRiskBucket": true,
+        "mustIncludeActionHint": true,
+        "failureConditions": [
+          "resposta_super_geral",
+          "sem_priorizacao",
+          "sem_confianca_explicita"
+        ]
+      }
+    }
+  ],
+  "qualityThreshold": {
+    "minLengthAtLatency": 180,
+    "minEvidenceDensity": 0.35,
+    "minConfidenceSignal": true
+  }
+}

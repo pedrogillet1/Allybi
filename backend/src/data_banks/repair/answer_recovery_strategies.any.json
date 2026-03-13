@@ -1,0 +1,280 @@
+{
+  "_meta": {
+    "id": "answer_recovery_strategies",
+    "version": "1.0.0",
+    "description": "Primary recovery strategies when initial retrieval or extraction is weak. Guides the system to repair, continue, and still be useful before falling back.",
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "koda-repair",
+    "compat": ">=1.0.0",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ],
+    "changeLog": [
+      "Added recovery strategy selection for false negatives, partial evidence, contradictions, cautious answers, and explicit evidence gaps",
+      "Added sequencing so the system attempts repair before empty fallback language",
+      "Added runtime signals for repair mode orchestration"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id",
+    "maxRecoveryPasses": 2,
+    "preferRepairBeforeFallback": true,
+    "allowScopedAnswerAfterRepair": true,
+    "blockSpeculationDuringRepair": true
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "after initial answer planning detects weak evidence",
+    "consumer": "repair orchestrator",
+    "intent": "Choose a repair path that improves usefulness without fabricating certainty.",
+    "emittedSignals": [
+      "repairStrategy",
+      "repairAttempted",
+      "repairTerminalState",
+      "repairNextAction"
+    ]
+  },
+  "strategies": [
+    {
+      "id": "rescue_retrieval_then_answer",
+      "bestFor": [
+        "zero or weak hits with strong document-likelihood",
+        "alias or role mismatch"
+      ],
+      "sequence": [
+        "rewrite_query",
+        "expand_aliases",
+        "retry_retrieval",
+        "answer_if_supported"
+      ]
+    },
+    {
+      "id": "answer_partial_then_label_gap",
+      "bestFor": [
+        "some requested fields are grounded",
+        "multi-part questions with partial evidence"
+      ],
+      "sequence": [
+        "answer_supported_portion",
+        "mark_missing_piece",
+        "offer_next_best_step"
+      ]
+    },
+    {
+      "id": "reconcile_then_answer",
+      "bestFor": [
+        "contradictory passages",
+        "version conflicts"
+      ],
+      "sequence": [
+        "apply_precedence_rules",
+        "surface_remaining_conflict_if_any",
+        "answer_or_clarify"
+      ]
+    },
+    {
+      "id": "cautious_answer_then_invite_narrowing",
+      "bestFor": [
+        "answer mostly stable despite one missing detail",
+        "broad exploratory asks"
+      ],
+      "sequence": [
+        "state_scope_limit",
+        "give_best_supported_answer",
+        "invite_one_targeted_followup"
+      ]
+    },
+    {
+      "id": "explicit_not_enough_evidence_then_next_best_step",
+      "bestFor": [
+        "core fact missing from available evidence",
+        "question depends on external fact not present in documents"
+      ],
+      "sequence": [
+        "state_missing_evidence",
+        "mention_nearest_available_signal",
+        "suggest_concrete_next_step"
+      ]
+    },
+    {
+      "id": "secondary_signal_answer_low_confidence",
+      "bestFor": [
+        "indirect but converging clues",
+        "OCR-degraded but still legible evidence"
+      ],
+      "sequence": [
+        "signal_low_confidence",
+        "answer_from_secondary_signal",
+        "invite_verification"
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "ARS_001_try_false_negative_rescue_before_empty_fallback",
+      "priority": 140,
+      "when": {
+        "all": [
+          {
+            "path": "signals.noDirectHits",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "signals.documentLikelyContainsAnswer",
+            "op": "eq",
+            "value": true
+          }
+        ]
+      },
+      "action": {
+        "type": "select_strategy",
+        "strategy": "rescue_retrieval_then_answer"
+      },
+      "reasonCode": "probable_false_negative",
+      "severity": "high"
+    },
+    {
+      "id": "ARS_002_partial_support_prefers_partial_answer",
+      "priority": 130,
+      "when": {
+        "all": [
+          {
+            "path": "metrics.supportedSubpartsRatio",
+            "op": "gte",
+            "value": 0.35
+          },
+          {
+            "path": "metrics.supportedSubpartsRatio",
+            "op": "lt",
+            "value": 1
+          }
+        ]
+      },
+      "action": {
+        "type": "select_strategy",
+        "strategy": "answer_partial_then_label_gap"
+      },
+      "reasonCode": "partial_support_available",
+      "severity": "medium"
+    },
+    {
+      "id": "ARS_003_conflict_prefers_reconcile",
+      "priority": 145,
+      "when": {
+        "all": [
+          {
+            "path": "signals.contradictionDetected",
+            "op": "eq",
+            "value": true
+          }
+        ]
+      },
+      "action": {
+        "type": "select_strategy",
+        "strategy": "reconcile_then_answer"
+      },
+      "reasonCode": "conflict_requires_repair",
+      "severity": "high"
+    },
+    {
+      "id": "ARS_004_safe_broad_question_prefers_cautious_answer",
+      "priority": 120,
+      "when": {
+        "all": [
+          {
+            "path": "signals.safeScopedAnswerAvailable",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "metrics.answerRisk",
+            "op": "lt",
+            "value": 0.4
+          }
+        ]
+      },
+      "action": {
+        "type": "select_strategy",
+        "strategy": "cautious_answer_then_invite_narrowing"
+      },
+      "reasonCode": "safe_to_continue",
+      "severity": "medium"
+    },
+    {
+      "id": "ARS_005_true_gap_uses_explicit_evidence_gap",
+      "priority": 135,
+      "when": {
+        "all": [
+          {
+            "path": "signals.coreEvidenceMissing",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "signals.documentLikelyContainsAnswer",
+            "op": "neq",
+            "value": true
+          }
+        ]
+      },
+      "action": {
+        "type": "select_strategy",
+        "strategy": "explicit_not_enough_evidence_then_next_best_step"
+      },
+      "reasonCode": "evidence_gap_is_real",
+      "severity": "high"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "false_negative_rescue_selected_before_fallback",
+        "input": {
+          "signals": {
+            "noDirectHits": true,
+            "documentLikelyContainsAnswer": true
+          }
+        },
+        "expect": {
+          "strategy": "rescue_retrieval_then_answer"
+        }
+      },
+      {
+        "id": "partial_support_picks_partial_answer_strategy",
+        "input": {
+          "metrics": {
+            "supportedSubpartsRatio": 0.5
+          }
+        },
+        "expect": {
+          "strategy": "answer_partial_then_label_gap"
+        }
+      },
+      {
+        "id": "conflict_picks_reconcile",
+        "input": {
+          "signals": {
+            "contradictionDetected": true
+          }
+        },
+        "expect": {
+          "strategy": "reconcile_then_answer"
+        }
+      }
+    ]
+  }
+}

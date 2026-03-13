@@ -3604,6 +3604,20 @@ export default function ChatInterface({
           );
         }
 
+        if (type === "chat_start") {
+          stageHasBackendEventRef.current = true;
+          if (stageFallbackTimerRef.current) {
+            try { window.clearTimeout(stageFallbackTimerRef.current); } catch {}
+            stageFallbackTimerRef.current = null;
+          }
+          setStage({
+            stage: "starting",
+            message: "",
+            key: "allybi.stage.chat.start",
+            params: null,
+          });
+        }
+
         if (type === "worklog") {
           setMessages((prev) =>
             prev.map((m) => (

@@ -1,0 +1,139 @@
+{
+  "_meta": {
+    "id": "di_compliance_regulatory_entity_ontology",
+    "version": "1.0.0",
+    "description": "Compliance entity ontology for control IDs, owners, severities, and evidence obligations.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/orchestration/entityResolver.service.ts",
+      "services/core/validation/claimValidator.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/domain-validation.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "compliance_regulatory",
+    "entityNormalization": "strict"
+  },
+  "domain": "compliance_regulatory",
+  "entities": [
+    {
+      "id": "comp_entity_control_id",
+      "label": {
+        "en": "Control ID",
+        "pt": "ID de Controle"
+      },
+      "aliases": [
+        "control id",
+        "controle",
+        "id de controle"
+      ],
+      "mustMatchExactCodes": true
+    },
+    {
+      "id": "comp_entity_finding_id",
+      "label": {
+        "en": "Finding ID",
+        "pt": "ID de Achado"
+      },
+      "aliases": [
+        "finding id",
+        "issue id",
+        "achado id"
+      ],
+      "mustBindToSeverity": true
+    },
+    {
+      "id": "comp_entity_risk_score",
+      "label": {
+        "en": "Risk Score",
+        "pt": "Pontuação de Risco"
+      },
+      "aliases": [
+        "risk score",
+        "inherent risk",
+        "risk rating"
+      ],
+      "requiresNumericRange": true
+    },
+    {
+      "id": "comp_entity_evidence_owner",
+      "label": {
+        "en": "Evidence Owner",
+        "pt": "Responsável pela Evidência"
+      },
+      "aliases": [
+        "owner",
+        "responsible party",
+        "accountable person"
+      ],
+      "mustBeExplicitFor": [
+        "exception",
+        "remediation_action"
+      ]
+    },
+    {
+      "id": "comp_entity_regulator_ref",
+      "label": {
+        "en": "Regulatory Reference",
+        "pt": "Referência Reguladora"
+      },
+      "aliases": [
+        "law",
+        "article",
+        "regulation",
+        "norma"
+      ],
+      "requiresDocumentSource": true
+    },
+    {
+      "id": "comp_entity_deadline",
+      "label": {
+        "en": "Deadline",
+        "pt": "Prazo"
+      },
+      "aliases": [
+        "due date",
+        "deadline",
+        "target date"
+      ],
+      "requiresDateContext": true
+    },
+    {
+      "id": "comp_entity_penalty_level",
+      "label": {
+        "en": "Penalty Level",
+        "pt": "Nível de Penalidade"
+      },
+      "aliases": [
+        "penalty",
+        "sanction",
+        "exposure"
+      ],
+      "allowedValues": [
+        "none",
+        "advisory",
+        "corrective",
+        "monetary",
+        "operational_restriction",
+        "suspension"
+      ]
+    }
+  ],
+  "normalization": {
+    "trimWhitespace": true,
+    "caseFold": true,
+    "aliasPriority": [
+      "control id",
+      "finding id",
+      "regulatory reference"
+    ]
+  }
+}

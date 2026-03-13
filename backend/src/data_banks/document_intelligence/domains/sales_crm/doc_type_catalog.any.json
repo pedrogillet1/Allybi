@@ -1,0 +1,224 @@
+{
+  "_meta": {
+    "id": "di_sales_crm_doc_type_catalog",
+    "version": "1.0.0",
+    "description": "Sales and CRM document type catalog with commercial decision and funnel semantics.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/retrieval/domainIntentRouter.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/docint-eval-pack.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "sales_crm"
+  },
+  "domain": "sales_crm",
+  "docTypes": [
+    {
+      "id": "sales_lead_profile",
+      "name": {
+        "en": "Lead Profile",
+        "pt": "Perfil de Lead"
+      },
+      "description": "Lead qualification, channel, and readiness summary.",
+      "detectionPatterns": [
+        "\\blead profile\\b",
+        "\\blead generation\\b",
+        "\\bperfil de lead\\b",
+        "\\bprospecção\\b"
+      ],
+      "commonSections": [
+        "account_summary",
+        "lead_score",
+        "pain_points",
+        "next_step",
+        "owner"
+      ],
+      "extractionPriority": 140
+    },
+    {
+      "id": "sales_opportunity_pack",
+      "name": {
+        "en": "Opportunity Pack",
+        "pt": "Pacote de Oportunidade"
+      },
+      "description": "Opportunity documents with stage and close-likelihood signals.",
+      "detectionPatterns": [
+        "\\bopportunity\\b",
+        "\\bdeal stage\\b",
+        "\\bfonte de oportunidade\\b",
+        "\\bpipeline\\b"
+      ],
+      "commonSections": [
+        "opportunity_overview",
+        "stage",
+        "probability",
+        "close_plan",
+        "risk"
+      ],
+      "extractionPriority": 138
+    },
+    {
+      "id": "sales_quote_proposal",
+      "name": {
+        "en": "Sales Quote",
+        "pt": "Cotação Comercial"
+      },
+      "description": "Pricing proposals with terms, discounts, and quote validity.",
+      "detectionPatterns": [
+        "\\bsales quote\\b",
+        "\\bquote proposal\\b",
+        "\\bcotação\\b",
+        "\\borçamento\\b"
+      ],
+      "commonSections": [
+        "pricing_matrix",
+        "scope",
+        "validity",
+        "discounts",
+        "terms"
+      ],
+      "extractionPriority": 136
+    },
+    {
+      "id": "sales_pipeline_report",
+      "name": {
+        "en": "Pipeline Report",
+        "pt": "Relatório de Pipeline"
+      },
+      "description": "Sales motion summaries by stage, owner, and forecast period.",
+      "detectionPatterns": [
+        "\\bpipeline report\\b",
+        "\\bsales forecast\\b",
+        "\\brelatório de pipeline\\b",
+        "\\brelatório de funil\\b"
+      ],
+      "commonSections": [
+        "pipeline_overview",
+        "stage_distribution",
+        "forecast_commit",
+        "deltas",
+        "risks"
+      ],
+      "extractionPriority": 134
+    },
+    {
+      "id": "sales_account_plan",
+      "name": {
+        "en": "Account Plan",
+        "pt": "Plano de Conta"
+      },
+      "description": "Account strategy and annual growth plans.",
+      "detectionPatterns": [
+        "\\baccount plan\\b",
+        "\\baccount strategy\\b",
+        "\\bplano de conta\\b",
+        "\\bplano de conta\\b"
+      ],
+      "commonSections": [
+        "account_goals",
+        "stakeholders",
+        "expansion_plan",
+        "cross_sell",
+        "churn_risk"
+      ],
+      "extractionPriority": 132
+    },
+    {
+      "id": "sales_renewal_pack",
+      "name": {
+        "en": "Renewal Pack",
+        "pt": "Pacote de Renovação"
+      },
+      "description": "Renewal status, churn risk, and retention playbook notes.",
+      "detectionPatterns": [
+        "\\brenewal\\b",
+        "\\bcontract renewal\\b",
+        "\\brenovação\\b",
+        "\\bretenção\\b"
+      ],
+      "commonSections": [
+        "renewal_date",
+        "contract_value",
+        "risk",
+        "escalation",
+        "action_plan"
+      ],
+      "extractionPriority": 130
+    },
+    {
+      "id": "sales_winloss_review",
+      "name": {
+        "en": "Win/Loss Review",
+        "pt": "Revisão de Ganho/Perda"
+      },
+      "description": "Post-mortem notes for won or lost deals.",
+      "detectionPatterns": [
+        "\\bwin loss\\b",
+        "\\bgained\\b",
+        "\\bperdido\\b",
+        "\\brevisão de ganho\\b"
+      ],
+      "commonSections": [
+        "reasoning",
+        "competitor_comparison",
+        "customer_feedback",
+        "lessons",
+        "loss_reason"
+      ],
+      "extractionPriority": 129
+    },
+    {
+      "id": "sales_pricing_pack",
+      "name": {
+        "en": "Pricing Pack",
+        "pt": "Pacote de Precificação"
+      },
+      "description": "Commercial policy, discount ladders, and margin rules.",
+      "detectionPatterns": [
+        "\\bpricing pack\\b",
+        "\\bdiscount matrix\\b",
+        "\\bmatriz de preços\\b",
+        "\\bpolítica de preços\\b"
+      ],
+      "commonSections": [
+        "pricing_rules",
+        "approval_thresholds",
+        "margins",
+        "exceptions"
+      ],
+      "extractionPriority": 128
+    },
+    {
+      "id": "sales_crm_dashboard",
+      "name": {
+        "en": "Sales Dashboard Snapshot",
+        "pt": "Painel de Vendas"
+      },
+      "description": "Operational KPIs and activity snapshots for a date range.",
+      "detectionPatterns": [
+        "\\bsales dashboard\\b",
+        "\\bsales snapshot\\b",
+        "\\bpainel de vendas\\b",
+        "\\bvisão de vendas\\b"
+      ],
+      "commonSections": [
+        "kpi_summary",
+        "lead_volume",
+        "activity",
+        "win_rate",
+        "open_deals"
+      ],
+      "extractionPriority": 126
+    }
+  ]
+}

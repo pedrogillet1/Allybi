@@ -96,6 +96,30 @@
         "expect": {
           "action": "page_immediately"
         }
+      },
+      {
+        "id": "IRP_T_001_A_002",
+        "runtime": {
+          "signals": {
+            "category": "security",
+            "severity": "critical"
+          }
+        },
+        "expect": {
+          "action": "page_immediately"
+        }
+      },
+      {
+        "id": "IRP_T_001_A_003",
+        "runtime": {
+          "signals": {
+            "category": "security",
+            "severity": "critical"
+          }
+        },
+        "expect": {
+          "action": "page_immediately"
+        }
       }
     ]
   }

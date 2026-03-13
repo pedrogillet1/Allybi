@@ -1,0 +1,134 @@
+{
+  "_meta": {
+    "id": "di_commercial_real_estate_validation_rules",
+    "version": "1.0.0",
+    "description": "Commercial real estate validation rules for lease math, occupancy claims, and valuation assumptions.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/validation/claimValidator.service.ts",
+      "services/core/orchestration/answerPlanner.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/domain-validation.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "domain": "commercial_real_estate"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "before value/cashflow and lease compliance outputs",
+    "consumer": "commercial real estate validator",
+    "intent": "Protect against mixing tenants, scopes, and periods on financial claims."
+  },
+  "exactnessContract": {
+    "forbiddenSubstitutions": [
+      "property_summary_without_property_id",
+      "valuation_without_assumptions",
+      "rent_without_lease_context",
+      "occupancy_without_area_or_period",
+      "expiry_without_scope"
+    ],
+    "requiredAnchors": [
+      "property_id",
+      "tenant",
+      "lease_term",
+      "period",
+      "currency"
+    ],
+    "mustPreserveCurrency": true
+  },
+  "validationRules": [
+    {
+      "id": "CRE_VAL_001_lease_bound",
+      "severity": "critical",
+      "applies": [
+        "extract",
+        "compare",
+        "evaluate"
+      ],
+      "check": "rent_claims_have_tenant_and_lease_id",
+      "description": "Revenue or occupancy claims cannot be tenant-agnostic.",
+      "failureAction": "BLOCK_AND_REQUIRE_TENANT_SCOPE"
+    },
+    {
+      "id": "CRE_VAL_002_expiry_and_risk",
+      "severity": "high",
+      "applies": [
+        "evaluate",
+        "monitor",
+        "summarize"
+      ],
+      "check": "expiry_and_renewal_risks_have_period",
+      "description": "Lease horizon warnings must include effective period and close-expiry windows.",
+      "failureAction": "ASK_AND_REQUIRE_PERIOD"
+    },
+    {
+      "id": "CRE_VAL_003_valuation_support",
+      "severity": "high",
+      "applies": [
+        "validate",
+        "calculate",
+        "compare"
+      ],
+      "check": "valuation_has_cap_rate_and_source_assumption",
+      "description": "Valuation outputs must show cap rate and source assumptions with comparables.",
+      "failureAction": "BLOCK_AND_REQUIRE_VALUATION_CONTEXT"
+    },
+    {
+      "id": "CRE_VAL_004_maintenance_alignment",
+      "severity": "medium",
+      "applies": [
+        "advise",
+        "monitor"
+      ],
+      "check": "capex_actions_have_cost_and_schedule",
+      "description": "Capex advice requires cost schedule and responsible owner.",
+      "failureAction": "WARN_AND_REQUIRE_COST"
+    },
+    {
+      "id": "CRE_VAL_005_title_safety",
+      "severity": "critical",
+      "applies": [
+        "validate",
+        "extract",
+        "evaluate"
+      ],
+      "check": "title_claim_has_encumbrance_status",
+      "description": "Do not claim clean title if encumbrance status is unknown.",
+      "failureAction": "ASK_AND_REQUIRE_ENCUMBRANCE_STATUS"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "cre_validation_lease_claims_require_tenant",
+        "input": {
+          "scenario": "rent_claim_without_tenant"
+        },
+        "expect": {
+          "action": "BLOCK_AND_REQUIRE_TENANT_SCOPE"
+        }
+      },
+      {
+        "id": "cre_validation_title_requires_encumbrance",
+        "input": {
+          "signal": {
+            "titleChecked": false
+          }
+        },
+        "expect": {
+          "mustCheck": [
+            "CRE_VAL_005_title_safety"
+          ]
+        }
+      }
+    ]
+  }
+}

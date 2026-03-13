@@ -732,10 +732,19 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
       // Generic fallback for unknown types
       'application/octet-stream': ['.ai', '.sketch', '.fig', '.xd'],
     },
+    onDropRejected: (rejections) => {
+      if (rejections.length > 0) {
+        console.warn('[Upload] Files rejected:', rejections.map(r => ({ name: r.file.name, errors: r.errors })));
+        const names = rejections.map(r => r.file.name).slice(0, 3).join(', ');
+        const suffix = rejections.length > 3 ? ` +${rejections.length - 3} more` : '';
+        showError(`Unsupported file type: ${names}${suffix}`);
+      }
+    },
     maxSize: 500 * 1024 * 1024, // 500MB
     multiple: true,
     noClick: true, // Disable click on root div, we'll use manual button
     noDrag: false, // Enable drag-and-drop
+    useFsAccessApi: false, // Disable File System Access API — its async fallback breaks on non-HTTPS (localhost)
   });
 
   const formatFileSize = (bytes) => {
@@ -1397,7 +1406,7 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
 
   return (
     <div
-      onClick={onClose}
+      onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
       style={{
         position: 'fixed',
         top: isMobile ? 56 : 0,
@@ -1614,9 +1623,11 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
               maxWidth: isMobile ? 200 : 'none'
             }}>
               {/* Select Files button */}
-              <div
+              <button
+                type="button"
                 onClick={(e) => {
                   e.stopPropagation();
+                  e.preventDefault();
                   open();
                 }}
                 style={{
@@ -1638,27 +1649,27 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
                   display: 'flex',
                   cursor: 'pointer',
                   whiteSpace: 'nowrap',
-                  boxSizing: 'border-box'
-                }}
-              >
-                <div style={{
+                  boxSizing: 'border-box',
+                  border: 'none',
+                  fontFamily: 'Plus Jakarta Sans',
                   color: '#323232',
                   fontSize: isMobile ? 14 : 15,
-                  fontFamily: 'Plus Jakarta Sans',
                   fontWeight: '600',
                   textTransform: 'capitalize',
                   lineHeight: '24px',
                   textAlign: 'center'
-                }}>
-                  {t('upload.selectFiles')}
-                </div>
-              </div>
+                }}
+              >
+                {t('upload.selectFiles')}
+              </button>
 
               {/* Select Folder button - desktop only */}
               {!isMobile && (
-                <div
+                <button
+                  type="button"
                   onClick={(e) => {
                     e.stopPropagation();
+                    e.preventDefault();
                     folderInputRef.current?.click();
                   }}
                   style={{
@@ -1680,20 +1691,19 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
                     display: 'flex',
                     cursor: 'pointer',
                     whiteSpace: 'nowrap',
-                    boxSizing: 'border-box'
-                  }}>
-                  <div style={{
+                    boxSizing: 'border-box',
+                    border: 'none',
+                    fontFamily: 'Plus Jakarta Sans',
                     color: '#323232',
                     fontSize: 15,
-                    fontFamily: 'Plus Jakarta Sans',
                     fontWeight: '600',
                     textTransform: 'capitalize',
                     lineHeight: '24px',
                     textAlign: 'center'
-                  }}>
-                    {t('upload.selectFolder')}
-                  </div>
-                </div>
+                  }}
+                >
+                  {t('upload.selectFolder')}
+                </button>
               )}
 
               {/* Scan Document button (mobile only) */}

@@ -24,10 +24,11 @@ import { OpenAIClientService, OpenAILLMClientAdapter } from "../providers/openai
 import { LocalClientService } from "../providers/local/localClient.service";
 import type { OpenAIProviderConfig } from "../providers/openai/openaiConfig";
 import type { LocalProviderConfig, LocalConfig } from "../providers/local/localConfig";
-import { ResilienceLLMClient } from "../resilience/resilienceLlmClient.decorator";
-import { Semaphore } from "../resilience/semaphore";
-import { CircuitBreaker } from "../resilience/circuitBreaker";
-import { isRetryableError } from "../resilience/retry";
+import {
+  resolveFactoryResilienceConfig,
+  type FactoryResilienceConfig,
+} from "./llmClientFactoryConfig";
+import { wrapClientWithResilience } from "./llmClientResilience";
 
 export type LLMClientKey = "openai" | "google" | "local";
 
@@ -49,24 +50,12 @@ export interface LLMClientFactoryConfig {
    * If provided, factory uses these instances instead of constructing new ones.
    */
   prebuilt?: Partial<Record<LLMClientKey, LLMClient>>;
-}
 
-function envInt(key: string, fallback: number): number {
-  const v = Number(process.env[key]);
-  return Number.isFinite(v) && v > 0 ? Math.floor(v) : fallback;
-}
-
-function wrapWithResilience(raw: LLMClient, name: string, concurrency: number): LLMClient {
-  return new ResilienceLLMClient(raw, {
-    semaphore: new Semaphore(concurrency),
-    circuitBreaker: new CircuitBreaker(`llm:${name}`),
-    retry: {
-      maxRetries: envInt(`${name.toUpperCase()}_RETRY_MAX`, 2),
-      baseDelayMs: envInt(`${name.toUpperCase()}_RETRY_BASE_DELAY_MS`, 500),
-      maxDelayMs: envInt(`${name.toUpperCase()}_RETRY_MAX_DELAY_MS`, 8000),
-      shouldRetry: isRetryableError,
-    },
-  });
+  /**
+   * Optional resilience overrides. If omitted, defaults are resolved from env
+   * by the factory-config helper rather than inline in the factory.
+   */
+  resilience?: FactoryResilienceConfig;
 }
 
 export class LLMClientFactory {
@@ -84,6 +73,8 @@ export class LLMClientFactory {
    * - Otherwise build enabled providers from config, wrapped with resilience
    */
   private init(): void {
+    const resilience = resolveFactoryResilienceConfig(this.cfg.resilience);
+
     // 1) Prebuilt (test-friendly)
     if (this.cfg.prebuilt) {
       for (const [k, v] of Object.entries(this.cfg.prebuilt)) {
@@ -98,17 +89,26 @@ export class LLMClientFactory {
       const raw = new OpenAILLMClientAdapter(
         new OpenAIClientService(p.openai.config as Partial<ConstructorParameters<typeof OpenAIClientService>[0]>),
       );
-      this.clients.set("openai", wrapWithResilience(raw, "openai", envInt("OPENAI_MAX_CONCURRENT", 8)));
+      this.clients.set(
+        "openai",
+        wrapClientWithResilience(raw, "openai", resilience.openai),
+      );
     }
 
     if (!this.clients.has("google") && p.google?.enabled) {
       const raw = new GeminiClientService(p.google.config as GeminiClientConfig);
-      this.clients.set("google", wrapWithResilience(raw, "google", envInt("GEMINI_CONCURRENCY", 6)));
+      this.clients.set(
+        "google",
+        wrapClientWithResilience(raw, "google", resilience.google),
+      );
     }
 
     if (!this.clients.has("local") && p.local?.enabled) {
       const raw = new LocalClientService(p.local.config as LocalConfig | undefined);
-      this.clients.set("local", wrapWithResilience(raw, "local", envInt("LOCAL_LLM_CONCURRENCY", 2)));
+      this.clients.set(
+        "local",
+        wrapClientWithResilience(raw, "local", resilience.local),
+      );
     }
   }
 

@@ -87,6 +87,28 @@
         "expect": {
           "action": "retain"
         }
+      },
+      {
+        "id": "DRP_T_001_A_002",
+        "runtime": {
+          "signals": {
+            "legalHold": true
+          }
+        },
+        "expect": {
+          "action": "retain"
+        }
+      },
+      {
+        "id": "DRP_T_001_A_003",
+        "runtime": {
+          "signals": {
+            "legalHold": true
+          }
+        },
+        "expect": {
+          "action": "retain"
+        }
       }
     ]
   }

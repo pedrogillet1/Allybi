@@ -1,0 +1,155 @@
+{
+  "_meta": {
+    "id": "eval_gold_queries_procurement_domain",
+    "version": "1.0.0",
+    "description": "Procurement gold queries for adjudication, value, and reconciliation reasoning tests.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "eval-domain-brain",
+    "usedBy": [
+      "services/eval/goldQueryRunner.service.ts",
+      "services/core/orchestration/answerPlanner.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/docint-eval-pack.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "procurement",
+    "scenarioType": "procurement_reasoning"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "evaluation pack expansion",
+    "consumer": "goldQueryRunner",
+    "intent": "Verify sourcing, winner logic, and invoice reconciliation stay explicit."
+  },
+  "goldQueries": [
+    {
+      "id": "proc_gold_001",
+      "lang": "en",
+      "query": "Which vendor won the latest RFQ, what was its weighted technical + commercial score, and which criteria drove the decision?",
+      "expected": {
+        "mustReadSource": [
+          "evaluation matrix",
+          "selection criteria",
+          "award rationale"
+        ],
+        "mustExtract": [
+          "vendor",
+          "score",
+          "criteria_weighting",
+          "award_justification"
+        ],
+        "mustPreserveScope": true,
+        "mustPreserveTimeWindow": true,
+        "mustNotInfer": [
+          "winner_without_anchor",
+          "single_score_without_weights"
+        ],
+        "failureConditions": [
+          "uses_best_price_only",
+          "drops_competing_scores",
+          "omits_weighting"
+        ]
+      }
+    },
+    {
+      "id": "proc_gold_002",
+      "lang": "en",
+      "query": "Find all PO-to-invoice mismatches and classify each by exception type and evidence location.",
+      "expected": {
+        "mustFindSection": [
+          "line_items",
+          "invoice_reconciliation",
+          "exceptions"
+        ],
+        "mustExtract": [
+          "po_reference",
+          "invoice_reference",
+          "variance_type",
+          "evidence_page"
+        ],
+        "mustPreservePeriod": true,
+        "mustShowVariance": true,
+        "failureConditions": [
+          "masses_variances_without_po",
+          "omits_evidence",
+          "mixes_historical_and_active"
+        ]
+      }
+    },
+    {
+      "id": "proc_gold_003",
+      "lang": "en",
+      "query": "How did supplier service levels change across last two score periods, and are penalties or remediation plans linked to each degradation?",
+      "expected": {
+        "mustFindSection": [
+          "supplier_performance",
+          "contractual obligations",
+          "supplier scorecard"
+        ],
+        "mustExtract": [
+          "period",
+          "vendor",
+          "service_level_metric",
+          "penalty_or_plan"
+        ],
+        "mustPreserveComparison": true,
+        "mustShowTrendLogic": true,
+        "failureConditions": [
+          "aggregates_without_period_axis",
+          "no_period_alignment",
+          "no_remediation_reference"
+        ]
+      }
+    },
+    {
+      "id": "proc_gold_004",
+      "lang": "pt",
+      "query": "Identifique o fornecedor vencedor, valor vencedor, e as condições comerciais principais em português.",
+      "expected": {
+        "mustInclude": [
+          "fornecedor vencedor",
+          "condições comerciais",
+          "valor contratado"
+        ],
+        "mustPreserveCurrency": true,
+        "mustPreserveBasis": true,
+        "failureConditions": [
+          "resposta_sem_fornecedor_vencedor",
+          "sem_valor_ou_unidade",
+          "sem_termo_pagamento"
+        ]
+      }
+    }
+  ],
+  "qualityGuards": {
+    "maxAllowedInferenceRate": 0.10,
+    "requiredAnchorDensity": 2.5,
+    "penalties": {
+      "missing_weight_vector": -30,
+      "missing_po_reference": -35,
+      "missing_exception_classification": -25
+    }
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "proc_gold_reconciles_po_invoice",
+        "input": {
+          "query": "proc_gold_002"
+        },
+        "expect": {
+          "mustCheck": [
+            "mustReadSource",
+            "mustShowVariance"
+          ]
+        }
+      }
+    ]
+  }
+}

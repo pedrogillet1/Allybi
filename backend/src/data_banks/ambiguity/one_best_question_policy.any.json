@@ -1,0 +1,229 @@
+{
+  "_meta": {
+    "id": "one_best_question_policy",
+    "version": "1.0.0",
+    "description": "Ranking policy for choosing exactly one clarification question when several ambiguities are present. Optimized for unblock value, low user burden, and premium-assistant flow.",
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "koda-ambiguity",
+    "compat": ">=1.0.0",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ],
+    "changeLog": [
+      "Added weighted ranking for blocker severity, answer unlock value, user effort, and safety impact",
+      "Added tie-breaks to prefer closed questions and current-scope questions over speculative open prompts",
+      "Added suppression policy so lower-value questions do not stack after one is asked"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id",
+    "maxQuestions": 1,
+    "rankWeights": {
+      "primaryBlockerScore": 0.35,
+      "answerUnlockScore": 0.25,
+      "safetyImpactScore": 0.15,
+      "userEffortPenalty": -0.1,
+      "questionSpecificityScore": 0.1,
+      "conversationContinuityScore": 0.05
+    },
+    "preferClosedChoiceQuestions": true,
+    "preferQuestionsInsideActiveScope": true,
+    "dropQuestionsBelowScore": 0.45,
+    "cooldownTurnsAfterQuestion": 2
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "after candidate questions are generated and before rendering",
+    "consumer": "clarification planner",
+    "intent": "Pick the one question that most increases answer quality or correctness, then suppress the rest.",
+    "emittedSignals": [
+      "bestClarificationQuestion",
+      "suppressedClarificationCandidates",
+      "questionRankExplanation"
+    ]
+  },
+  "rankingLadder": [
+    {
+      "rank": 1,
+      "questionFamily": "document_scope",
+      "chooseWhen": "without document resolution the answer could target the wrong source"
+    },
+    {
+      "rank": 2,
+      "questionFamily": "field_role",
+      "chooseWhen": "the requested person or entity changes the meaning of the answer"
+    },
+    {
+      "rank": 3,
+      "questionFamily": "period_scope",
+      "chooseWhen": "multiple periods materially change the numeric or legal answer"
+    },
+    {
+      "rank": 4,
+      "questionFamily": "comparison_target",
+      "chooseWhen": "comparison intent is impossible without a baseline"
+    },
+    {
+      "rank": 5,
+      "questionFamily": "granularity",
+      "chooseWhen": "aggregate vs item-level output affects shape but not correctness"
+    }
+  ],
+  "rules": [
+    {
+      "id": "OBQ_001_pick_question_that_unblocks_wrong_source_risk",
+      "priority": 150,
+      "when": {
+        "all": [
+          {
+            "path": "metrics.documentTargetRisk",
+            "op": "gte",
+            "value": 0.75
+          }
+        ]
+      },
+      "action": {
+        "type": "prefer_question_family",
+        "questionFamily": "document_scope"
+      },
+      "reasonCode": "wrong_source_risk_dominates",
+      "severity": "critical"
+    },
+    {
+      "id": "OBQ_002_pick_role_over_period_when_person_changes_truth_value",
+      "priority": 145,
+      "when": {
+        "all": [
+          {
+            "path": "metrics.roleImpactScore",
+            "op": "gt",
+            "value": "metrics.periodImpactScore"
+          }
+        ]
+      },
+      "action": {
+        "type": "prefer_question_family",
+        "questionFamily": "field_role"
+      },
+      "reasonCode": "role_choice_changes_answer_subject",
+      "severity": "high"
+    },
+    {
+      "id": "OBQ_003_break_ties_with_lowest_user_effort",
+      "priority": 120,
+      "when": {
+        "all": [
+          {
+            "path": "metrics.topQuestionScoreGap",
+            "op": "lt",
+            "value": 0.05
+          }
+        ]
+      },
+      "action": {
+        "type": "break_tie_by",
+        "field": "estimatedUserEffort",
+        "direction": "asc"
+      },
+      "reasonCode": "minimize_user_burden",
+      "severity": "medium"
+    },
+    {
+      "id": "OBQ_004_prefer_closed_choice_over_open_probe",
+      "priority": 125,
+      "when": {
+        "all": [
+          {
+            "path": "context.closedChoiceCandidateExists",
+            "op": "eq",
+            "value": true
+          }
+        ]
+      },
+      "action": {
+        "type": "demote_open_questions"
+      },
+      "reasonCode": "closed_choice_is_more_efficient",
+      "severity": "medium"
+    },
+    {
+      "id": "OBQ_005_suppress_all_questions_if_safe_answer_survives",
+      "priority": 155,
+      "when": {
+        "all": [
+          {
+            "path": "signals.safeScopedAnswerAvailable",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "metrics.answerRisk",
+            "op": "lt",
+            "value": 0.35
+          }
+        ]
+      },
+      "action": {
+        "type": "suppress_all_questions",
+        "strategy": "answer_cautiously"
+      },
+      "reasonCode": "no_question_needed_after_ranking",
+      "severity": "high"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "document_scope_beats_period_for_wrong_doc_risk",
+        "input": {
+          "metrics": {
+            "documentTargetRisk": 0.82,
+            "periodImpactScore": 0.7
+          }
+        },
+        "expect": {
+          "preferredFamily": "document_scope"
+        }
+      },
+      {
+        "id": "role_beats_period_when_person_changes_meaning",
+        "input": {
+          "metrics": {
+            "roleImpactScore": 0.74,
+            "periodImpactScore": 0.51
+          }
+        },
+        "expect": {
+          "preferredFamily": "field_role"
+        }
+      },
+      {
+        "id": "safe_answer_suppresses_question_set",
+        "input": {
+          "signals": {
+            "safeScopedAnswerAvailable": true
+          },
+          "metrics": {
+            "answerRisk": 0.12
+          }
+        },
+        "expect": {
+          "action": "suppress_all_questions"
+        }
+      }
+    ]
+  }
+}

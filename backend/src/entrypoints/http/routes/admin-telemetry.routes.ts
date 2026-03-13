@@ -22,6 +22,7 @@ import {
   adminTelemetryFileDetail,
   // Queries
   adminTelemetryQueries,
+  adminTelemetryLatency,
   adminTelemetryRetrievalTopRewriteRules,
   adminTelemetryRetrievalTopBoostRules,
   adminTelemetryRetrievalWorstRules,
@@ -108,6 +109,7 @@ router.get("/files/:fileId", adminTelemetryFileDetail);
 // QUERIES
 // ============================================================================
 router.get("/queries", adminTelemetryQueries);
+router.get("/latency", adminTelemetryLatency);
 router.get(
   "/retrieval/rules/rewrite/top",
   adminTelemetryRetrievalTopRewriteRules,

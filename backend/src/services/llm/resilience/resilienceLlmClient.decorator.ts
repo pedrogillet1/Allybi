@@ -26,6 +26,24 @@ export interface ResilienceConfig {
   retry?: RetryConfig;
 }
 
+function extractStatusFromError(err: unknown): number | null {
+  if (err && typeof err === "object") {
+    const e = err as Record<string, unknown>;
+    if (typeof e.status === "number") return e.status;
+    if (typeof e.statusCode === "number") return e.statusCode;
+    if (e.response && typeof e.response === "object") {
+      const resp = e.response as Record<string, unknown>;
+      if (typeof resp.status === "number") return resp.status;
+    }
+    // Gemini errors often include JSON with status in the message
+    if (typeof e.message === "string") {
+      const m = e.message.match(/\b([45]\d{2})\b/);
+      if (m) return parseInt(m[1], 10);
+    }
+  }
+  return null;
+}
+
 export class ResilienceLLMClient implements LLMClient {
   readonly provider: LLMProvider;
 
@@ -63,7 +81,10 @@ export class ResilienceLLMClient implements LLMClient {
       (result as unknown as Record<string, unknown>).__retryAttempts = attempts;
       return result;
     } catch (err) {
-      circuitBreaker.recordFailure();
+      const status = extractStatusFromError(err);
+      if (!status || status >= 500 || status === 429) {
+        circuitBreaker.recordFailure();
+      }
       throw err;
     } finally {
       semaphore.release();
@@ -133,7 +154,10 @@ export class ResilienceLLMClient implements LLMClient {
       (result as unknown as Record<string, unknown>).__retryAttempts = attempts;
       return result;
     } catch (err) {
-      circuitBreaker.recordFailure();
+      const status = extractStatusFromError(err);
+      if (!status || status >= 500 || status === 429) {
+        circuitBreaker.recordFailure();
+      }
       throw err;
     } finally {
       semaphore.release();

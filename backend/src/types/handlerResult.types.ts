@@ -22,52 +22,18 @@ import type {
   FileListAttachment,
 } from "./files.types";
 import type { SourceButtonsAttachment } from "./attachments.types";
+import type {
+  IntentFamily,
+  Operator,
+  ConfidenceInfo,
+} from "./intents.types";
+import type { ChatAnswerMode } from "../modules/chat/domain/answerModes";
 
-/** Intent family chosen by the intent engine */
-export type IntentFamily =
-  | "documents"
-  | "file_actions"
-  | "navigation"
-  | "help"
-  | "conversation"
-  | "account"
-  | "unknown";
+// Re-export canonical types so existing consumers don't break
+export type { IntentFamily, Operator, ConfidenceInfo };
 
-/** Operator chosen by the router */
-export type Operator =
-  | "summarize"
-  | "extract"
-  | "compute"
-  | "compare"
-  | "quote"
-  | "locate_content"
-  | "locate_docs"
-  | "open"
-  | "where"
-  | "list"
-  | "filter"
-  | "sort"
-  | "group"
-  | "count"
-  | "stats"
-  | "help"
-  | "greeting"
-  | "fallback";
-
-/** Answer mode (maps to render_policy + frontend UI contract) */
-export type AnswerMode =
-  | "doc_grounded_single"
-  | "doc_grounded_multi"
-  | "doc_grounded_table"
-  | "doc_grounded_quote"
-  | "rank_autopick"
-  | "rank_disambiguate"
-  | "nav_pills"
-  | "help_steps"
-  | "no_docs"
-  | "scoped_not_found"
-  | "refusal"
-  | "general_answer";
+/** Answer mode — canonical source: answerModes.ts */
+export type AnswerMode = ChatAnswerMode;
 
 /** Why a fallback happened (drives adaptive microcopy) */
 export type ReasonCode =
@@ -83,13 +49,7 @@ export type ReasonCode =
   | "bad_fallback_detected"
   | "unknown_error";
 
-/** Confidence breakdown for routing + retrieval */
-export interface ConfidenceInfo {
-  topScore?: number; // 0..1
-  margin?: number; // 0..1
-  level?: "low" | "medium" | "high";
-  reasons?: string[];
-}
+// ConfidenceInfo — canonical source: intents.types.ts (imported above)
 
 /** Explicit doc ref present in the query (filename or docId) */
 export interface ExplicitDocRef {
@@ -140,37 +100,8 @@ export interface EvidenceSnippet {
   tags?: string[];
 }
 
-/** Generic attachment union (frontend renders by type) */
-export type Attachment =
-  | SourceButtonsAttachment
-  | FileListAttachment
-  | SelectFileAttachment
-  | GroupedFilesAttachment;
-
-/** Selection attachment (disambiguation UI) */
-export interface SelectFileAttachment {
-  type: "select_file";
-  prompt: string;
-  options: Array<{
-    documentId: DocId;
-    title: string;
-    filename: string;
-    mimeType?: MimeType;
-    docType?: DocType;
-    uploadedAt?: ISODateTime;
-  }>;
-}
-
-/** Grouped files attachment (optional, for folder breakdown UI) */
-export interface GroupedFilesAttachment {
-  type: "grouped_files";
-  groups: Array<{
-    label: string; // folder/category name
-    items: DocumentFile[];
-    count: number;
-  }>;
-  totalCount: number;
-}
+import type { Attachment, SelectFileAttachment, GroupedFilesAttachment } from "./attachments.types";
+export type { Attachment, SelectFileAttachment, GroupedFilesAttachment } from "./attachments.types";
 
 /** Output constraints requested by the user (affects composer) */
 export interface OutputConstraints {

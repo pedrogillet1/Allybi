@@ -1,0 +1,220 @@
+{
+  "_meta": {
+    "id": "fact_type_requirements_expanded",
+    "version": "1.0.0",
+    "description": "Expanded fact-type requirements for exact role fields, table cells, spans, comparisons, and refusal-to-infer safety.",
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "koda-validation",
+    "compat": ">=1.0.0",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "requireEvidenceForFacts": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "pre-answer validation gate",
+    "consumer": "fact type validator",
+    "intent": "enforce evidence completeness and role-safe fact acceptance before a claim is considered answer-ready",
+    "emittedSignals": [
+      "factTypeRequirementSatisfied",
+      "factTypeRequirementBreached",
+      "factTypeInferenceBlocked",
+      "factTypeRepairSuggested"
+    ]
+  },
+  "factTypes": [
+    {
+      "id": "numeric_amount_exact",
+      "category": "numeric",
+      "requiredEvidenceFields": [
+        "value",
+        "unit",
+        "currency",
+        "period",
+        "tableHeader",
+        "tableRow",
+        "tableColumn",
+        "sourceSpan"
+      ],
+      "checks": [
+        "valueNumeric",
+        "unitPresent",
+        "periodScopeMatch",
+        "scaleHandled"
+      ]
+    },
+    {
+      "id": "party_role_value",
+      "category": "entity",
+      "requiredEvidenceFields": [
+        "roleCanonical",
+        "partyName",
+        "sourceSpan",
+        "sourceDoc",
+        "fieldAnchor"
+      ],
+      "checks": [
+        "roleNotSubstituted",
+        "no_merge_with_other_roles",
+        "sourceSpanAligned"
+      ]
+    },
+    {
+      "id": "quote_exact_text",
+      "category": "text",
+      "requiredEvidenceFields": [
+        "quoteText",
+        "sourceSpan",
+        "sourceDoc",
+        "spanStart",
+        "spanEnd"
+      ],
+      "checks": [
+        "quoteSpanExact",
+        "no_multispan_without_notice",
+        "cross_doc_single_source"
+      ]
+    },
+    {
+      "id": "table_cell",
+      "category": "tabular",
+      "requiredEvidenceFields": [
+        "tableId",
+        "tableRow",
+        "tableColumn",
+        "tableHeader",
+        "sourceSpan"
+      ],
+      "checks": [
+        "exact_row_and_column",
+        "headerResolved",
+        "mergedCellResolved",
+        "aggregateHandled"
+      ]
+    },
+    {
+      "id": "cross_doc_aggregate",
+      "category": "comparison",
+      "requiredEvidenceFields": [
+        "sourceDocs",
+        "sourceSpans",
+        "disclosedDocList",
+        "mergeRule"
+      ],
+      "checks": [
+        "crossDocExplicit",
+        "consistentMetric",
+        "disclosurePresent"
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "FTR_001_missing_period_with_numeric",
+      "trigger": "Numeric fact lacks period in a time-sensitive query",
+      "check": "fact.type == 'numeric_amount_exact' AND fact.period == null",
+      "failureAction": "ASK_PERIOD_OR_SCOPE",
+      "severity": "error"
+    },
+    {
+      "id": "FTR_002_role_canonicality_violation",
+      "trigger": "Party role fact uses a role that does not match canonical role ontology",
+      "check": "fact.type == 'party_role_value' AND fact.roleCanonicalized == false",
+      "failureAction": "DECLINE_WITH_ROLE_CLARIFICATION",
+      "severity": "error"
+    },
+    {
+      "id": "FTR_003_quote_without_exact_span",
+      "trigger": "Quote fact has quote text but no exact source offsets",
+      "check": "fact.type == 'quote_exact_text' AND fact.sourceSpan == null",
+      "failureAction": "DECLINE_WITH_QUOTE_GAP",
+      "severity": "error"
+    },
+    {
+      "id": "FTR_004_ambiguous_table_cell",
+      "trigger": "Table cell fact missing row or column label",
+      "check": "fact.type == 'table_cell' AND (fact.tableRow == null OR fact.tableColumn == null)",
+      "failureAction": "ASK_TABLE_CELL_COORDINATES",
+      "severity": "error"
+    },
+    {
+      "id": "FTR_005_cross_doc_aggregate_without_disclosure",
+      "trigger": "Cross-doc aggregate requested but docs list not disclosed in output contract",
+      "check": "fact.type == 'cross_doc_aggregate' AND fact.disclosedDocList == false",
+      "failureAction": "ASK_DOC_LIST_DISCLOSURE",
+      "severity": "error"
+    },
+    {
+      "id": "FTR_006_inferred_value_without_rule",
+      "trigger": "Fact was inferred but no inference rule was attached",
+      "check": "fact.wasInferred == true AND fact.inferenceRule == null",
+      "failureAction": "DECLINE_WITH_NO_INFERENCE",
+      "severity": "warning"
+    },
+    {
+      "id": "FTR_007_multi_fact_conflict_risk",
+      "trigger": "Same fact key appears with conflicting values and no conflict rule",
+      "check": "fact.keyCollisionCount > 1 AND fact.conflictRule == null",
+      "failureAction": "REQUEST_CONFLICT_RESOLUTION",
+      "severity": "warning"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "fact_type_requires_role_canonical",
+        "input": {
+          "fact": {
+            "type": "party_role_value",
+            "roleCanonicalized": false
+          }
+        },
+        "expect": {
+          "failureAction": "DECLINE_WITH_ROLE_CLARIFICATION"
+        }
+      },
+      {
+        "id": "fact_type_table_cell_row_missing",
+        "input": {
+          "fact": {
+            "type": "table_cell",
+            "tableColumn": "value",
+            "tableRow": null
+          }
+        },
+        "expect": {
+          "failureAction": "ASK_TABLE_CELL_COORDINATES"
+        }
+      },
+      {
+        "id": "fact_type_quote_span_missing",
+        "input": {
+          "fact": {
+            "type": "quote_exact_text",
+            "sourceSpan": null
+          }
+        },
+        "expect": {
+          "failureAction": "DECLINE_WITH_QUOTE_GAP"
+        }
+      }
+    ]
+  }
+}

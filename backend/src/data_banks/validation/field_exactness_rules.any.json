@@ -1,0 +1,126 @@
+{
+  "_meta": {
+    "id": "field_exactness_rules",
+    "version": "1.0.0",
+    "description": "Rejects partial, alias-only, or role-shifted fields when the query asks for exact field or role values.",
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "koda-validation",
+    "compat": ">=1.0.0",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "strictMatch": true,
+    "forbidRoleMerging": true,
+    "sortBy": "id",
+    "requireCanonicalField": true
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "validation before answer draft",
+    "consumer": "field validity checker",
+    "intent": "ensure field-level output cannot drift from requested label",
+    "emittedSignals": [
+      "fieldExactnessPassed",
+      "fieldExactnessFailure",
+      "forbiddenFieldSubstitutionDetected",
+      "exactnessConfidence"
+    ]
+  },
+  "checks": [
+    {
+      "id": "FER_001_missing_requested_field",
+      "trigger": "No canonical requested field mapped from extraction",
+      "check": "fact.requestedField == null",
+      "failureAction": "DECLINE_WITH_ASK_FIELD",
+      "severity": "error"
+    },
+    {
+      "id": "FER_002_forbidden_field_substitution",
+      "trigger": "Extracted field uses forbidden alias substitution for same answer",
+      "check": "fact.fieldMatchedBy == 'forbidden_substitution'",
+      "failureAction": "DECLINE_WITH_FORBIDDEN_SUBSTITUTION",
+      "severity": "error"
+    },
+    {
+      "id": "FER_003_weak_field_match",
+      "trigger": "Canonical similarity is below exactness floor",
+      "check": "fact.fieldMatchScore < 0.86 AND fact.requiresExactness == true",
+      "failureAction": "ASK_FIELD_CLARIFICATION",
+      "severity": "warning"
+    },
+    {
+      "id": "FER_004_role_shift_without_confirmation",
+      "trigger": "Output role differs from queried role without explicit confirmation",
+      "check": "query.requestedRole != null AND fact.outputRole != query.requestedRole AND fact.outputRoleConfirmed != true",
+      "failureAction": "BLOCK_ROLE_SHIFT",
+      "severity": "error"
+    },
+    {
+      "id": "FER_005_non_exact_row_column_binding",
+      "trigger": "Row/column only loosely matched for exact table field request",
+      "check": "query.requiresExactTableField == true AND (fact.rowMatchType != 'exact' OR fact.columnMatchType != 'exact')",
+      "failureAction": "ASK_TABLE_COORDINATE_QUESTION",
+      "severity": "warning"
+    },
+    {
+      "id": "FER_006_merge_without_evidence",
+      "trigger": "Field output merges two different evidence spans without explicit merge rule",
+      "check": "fact.mergeMode == 'implicit' AND fact.mergeRule == null",
+      "failureAction": "DECLINE_WITH_RETRIEVAL_GAP",
+      "severity": "warning"
+    },
+    {
+      "id": "FER_007_multi_field_expected_single_field",
+      "trigger": "Query asks one field but output produces two independent field labels",
+      "check": "query.isSingleFieldRequest == true AND fact.labels.count > 1",
+      "failureAction": "BLOCK_MULTI_FIELD_DIVERGENCE",
+      "severity": "warning"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "exactness_blocks_forbidden_substitution",
+        "input": {
+          "query": {
+            "requestedField": "owner"
+          },
+          "fact": {
+            "outputField": "signer",
+            "fieldMatchedBy": "forbidden_substitution"
+          }
+        },
+        "expect": {
+          "failureAction": "DECLINE_WITH_FORBIDDEN_SUBSTITUTION"
+        }
+      },
+      {
+        "id": "exactness_flags_weak_match",
+        "input": {
+          "fact": {
+            "fieldMatchScore": 0.7,
+            "requestedField": "balance_due",
+            "requiresExactness": true
+          }
+        },
+        "expect": {
+          "failureAction": "ASK_FIELD_CLARIFICATION"
+        }
+      }
+    ]
+  }
+}

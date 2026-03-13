@@ -22,6 +22,7 @@ function isKnownProdWebHost(host) {
     'allybi.co',
     'www.allybi.co',
     'app.allybi.co',
+    'admin.allybi.co',
     'getkoda.ai',
     'www.getkoda.ai',
     'app.getkoda.ai',

@@ -2,7 +2,7 @@
   "_meta": {
     "id": "marketing_query_templates",
     "version": "1.0.0",
-    "description": "Parameterized marketing discovery query templates with EN/PT support and explicit placeholders.",
+    "description": "Parameterized marketing discovery query templates with EN/PT support and variable-driven slot filling for metrics, vendors, properties, and years.",
     "languages": [
       "any",
       "en",

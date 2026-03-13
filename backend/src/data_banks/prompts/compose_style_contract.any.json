@@ -1,0 +1,55 @@
+{
+  "_meta": {
+    "id": "compose_style_contract",
+    "version": "1.0.0",
+    "description": "Live compose-time style contract sourced from runtime style decisions and composition banks.",
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "composition-brain",
+    "usedBy": [
+      "services/llm/prompts/v2/service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/llm/composeStyleContract.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true
+  },
+  "templates": [
+    {
+      "id": "compose_style_contract_default",
+      "priority": 200,
+      "messages": [
+        {
+          "role": "system",
+          "content": {
+            "any": "Composition style contract: use voice profile {{voiceProfile}} with domain modifier {{domainVoiceModifier}} and interaction modifier {{interactionModifier}}. Use opener family {{openerFamily}}, rhythm profile {{rhythmProfile}}, paragraph plan {{paragraphPlan}}, answer strategy {{answerStrategy}}, template family {{templateFamily}}, claim-strength profile {{claimStrengthProfile}}, clarification policy {{clarificationPolicy}}, fallback posture {{fallbackPosture}}, and uncertainty band {{uncertaintyBand}}. Keep the answer natural and user-facing, not like a prompt template. Avoid generic lead-ins, visible macro phrasing, repeated sentence stems, and cross-turn opener echo. Apply this anti-robotic focus: {{antiRoboticFocus}}. Apply these repetition guards: {{repetitionGuard}}. Respect empathy budget {{empathyBudget}} and empathy mode {{empathyMode}}. Current turn-style state: {{turnStyleState}}. Current style key: {{turnStyleStateKey}}."
+          }
+        }
+      ]
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "compose_style_contract_includes_voice_strategy",
+        "input": {
+          "voiceProfile": "executive_brief",
+          "answerStrategy": "direct_answer_then_support"
+        },
+        "expect": {
+          "promptApplied": true,
+          "mustReferenceVoiceProfile": true,
+          "mustReferenceAnswerStrategy": true
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,184 @@
+{
+  "_meta": {
+    "id": "eval_gold_queries_legal_domain_deepening",
+    "version": "1.0.0",
+    "description": "Legal domain-deepening evaluation pack for interpretive, role-anchored, and version-safe responses.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "eval-domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "legal",
+    "scenarioType": "legal_interpretive_exactness"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "evaluation pack execution and interpretation regression",
+    "consumer": "goldQueryRunner",
+    "intent": "Enforce legal-domain deepening behavior in evaluation harness and record query-level outcomes.",
+    "emittedSignals": [
+      "legalGoldQueryPassFail",
+      "legalGoldQueryFailureMode"
+    ]
+  },
+  "goldQueries": [
+    {
+      "id": "legal_deepen_001",
+      "lang": "en",
+      "query": "Compare the current active agreement against the prior amendment and explain which termination trigger, notice period, and cure right changed.",
+      "sourceLock": "active_terms_with_precedence",
+      "expected": {
+        "mustReadSource": [
+          "termination",
+          "definitions",
+          "exceptions",
+          "governing_law",
+          "signatures"
+        ],
+        "mustExtract": [
+          "event",
+          "notice_period_days",
+          "cure_period",
+          "trigger",
+          "active_version",
+          "priority_clause"
+        ],
+        "mustShowClauseDiff": true,
+        "mustPreserveScope": true,
+        "mustShowMethod": true,
+        "failureConditions": [
+          "blended_versions",
+          "missing_precedence_chain",
+          "ambiguous_party_role",
+          "missing_notice_reference"
+        ]
+      }
+    },
+    {
+      "id": "legal_deepen_002",
+      "lang": "en",
+      "query": "What are the signed parties' obligations for data processing, including owner/beneficiary/processor responsibilities and breach response windows?",
+      "expected": {
+        "mustFindSection": [
+          "definitions",
+          "scope_of_services",
+          "security_compliance",
+          "breach_notice",
+          "governing_law"
+        ],
+        "mustExtract": [
+          "party_role",
+          "responsibility",
+          "obligation_type",
+          "window",
+          "clause_location"
+        ],
+        "mustPreserveRole": true,
+        "mustPreserveScope": true,
+        "mustNotInfer": [
+          "role_merge_from_ambiguous_sections",
+          "single_party_summary_without_role_matrix"
+        ],
+        "failureConditions": [
+          "missing_role_binding",
+          "missing_exception_context",
+          "unanchored_responsibility_claim"
+        ]
+      }
+    },
+    {
+      "id": "legal_deepen_003",
+      "lang": "en",
+      "query": "List the governing law, jurisdiction, and dispute route, and indicate precedence with any conflicting clauses.",
+      "expected": {
+        "mustFindSection": [
+          "governing_law",
+          "dispute_resolution",
+          "signatures",
+          "exceptions"
+        ],
+        "mustExtract": [
+          "governing_law",
+          "jurisdiction",
+          "resolution_process",
+          "precedence_basis",
+          "effective_status"
+        ],
+        "mustPreservePrecedence": true,
+        "mustPreserveClauseAnchor": true,
+        "failureConditions": [
+          "one_line_jurisdiction_without_scope",
+          "conflict_without_precedence",
+          "missing_clause_anchors"
+        ]
+      }
+    },
+    {
+      "id": "legal_deepen_004",
+      "lang": "pt",
+      "query": "Quais sao as obrigacoes e direitos do contrato em vigor, por assinatura e papel da parte, incluindo prazos de aviso e penalidades?",
+      "expected": {
+        "mustExtract": [
+          "papeis",
+          "obrigacoes",
+          "direitos",
+          "prazo_de_aviso",
+          "responsavel"
+        ],
+        "mustPreserveClause": true,
+        "mustShowRoleMatrix": true,
+        "failureConditions": [
+          "misturar_versoes",
+          "omitindo_termo_critico",
+          "ausencia_de_clausula"
+        ]
+      }
+    }
+  ],
+  "qualityGuards": {
+    "maxAllowedInferenceRate": 0.14,
+    "requiredAnchorDensity": 2.7,
+    "penalties": {
+      "missing_role_lock": -40,
+      "missing_precedence": -35,
+      "missing_clause_anchor": -30,
+      "missing_scope": -25
+    }
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "legal_gold_version_compare_uses_precedence",
+        "input": {
+          "query": "legal_deepen_001"
+        },
+        "expect": {
+          "mustPreservePrecedence": true,
+          "mustPreserveScope": true
+        }
+      },
+      {
+        "id": "legal_gold_role_obligations_matrix",
+        "input": {
+          "query": "legal_deepen_002"
+        },
+        "expect": {
+          "mustExtract": [
+            "party_role",
+            "obligation_type"
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -171,7 +171,8 @@ export default function ContinueCard({ onUpload }) {
           {t('home.continue.getStartedMessage')}
         </div>
         <button
-          onClick={onUpload}
+          type="button"
+          onClick={(e) => { e.preventDefault(); onUpload(); }}
           style={{
             height: 40,
             padding: '0 20px',

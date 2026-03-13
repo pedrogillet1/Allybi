@@ -1836,7 +1836,52 @@
           "import": "os"
         },
         "expect": {
-          "enforcement": "deny"
+          "enforcement": "block"
+        }
+      },
+      {
+        "id": "PY_SANDBOX_T_002",
+        "input": {
+          "import": "subprocess"
+        },
+        "expect": {
+          "enforcement": "block"
+        }
+      },
+      {
+        "id": "PY_SANDBOX_T_003",
+        "input": {
+          "import": "numpy"
+        },
+        "expect": {
+          "enforcement": "allow"
+        }
+      },
+      {
+        "id": "PY_SANDBOX_T_004",
+        "input": {
+          "import": "pandas"
+        },
+        "expect": {
+          "enforcement": "allow"
+        }
+      },
+      {
+        "id": "PY_SANDBOX_T_005",
+        "input": {
+          "import": "matplotlib.pyplot"
+        },
+        "expect": {
+          "enforcement": "allow"
+        }
+      },
+      {
+        "id": "PY_SANDBOX_T_006",
+        "input": {
+          "import": "socket"
+        },
+        "expect": {
+          "enforcement": "block"
         }
       }
     ]

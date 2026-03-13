@@ -1,0 +1,243 @@
+{
+  "_meta": {
+    "id": "accounting_validation_rules",
+    "version": "1.1.0",
+    "description": "Accounting validation rules to prevent unsafe substitutions, weak tie-outs, and uncontrolled reconciliation claims.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "domain": "accounting"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "validate pre-executive summary and control narratives",
+    "consumer": "accounting validator",
+    "intent": "Block unsafe numeric substitutions and prevent misleading balance/tie-out conclusions.",
+    "emittedSignals": [
+      "acctRuleHit",
+      "acctRuleBlock",
+      "acctExactnessScore",
+      "acctNeedsSource",
+      "acctTieOutRisk"
+    ]
+  },
+  "exactnessContract": {
+    "forbiddenSubstitutions": [
+      "debit_from_credit_field",
+      "credit_from_debit_field",
+      "account_label_without_code",
+      "period_from_different_run",
+      "subtotal_as_total",
+      "unreconciled_variance_as_zero",
+      "cross_currency_as_inherent_equal",
+      "accrual_without_basis",
+      "cash_without_timing_bridge"
+    ],
+    "allowedSubstitutions": [
+      "single_currency_normalized_with_rate",
+      "account_name_to_account_code_with_evidence",
+      "subtotal_to_total_with_reconciled_mapping",
+      "subledger_total_to_control_total_when_tied"
+    ],
+    "requiredAnchors": [
+      "account_code",
+      "entry_date",
+      "currency",
+      "document_scope",
+      "entity",
+      "basis"
+    ],
+    "mustPreserveBasis": [
+      "accrual",
+      "cash",
+      "forecast"
+    ]
+  },
+  "validationRules": [
+    {
+      "id": "ACCT_VAL_001_tb_balance_identity",
+      "severity": "high",
+      "applies": [
+        "validate",
+        "compare"
+      ],
+      "check": "debit_total_matches_credit_total_or_documented_exception",
+      "description": "Do not pass tie-out claims when trial balance is not balanced or exception is not explicit.",
+      "failureAction": "BLOCK_AND_EXPLAIN"
+    },
+    {
+      "id": "ACCT_VAL_002_period_containment",
+      "severity": "high",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare"
+      ],
+      "check": "entry_date_within_selected_period_or_scope",
+      "description": "Reject statements that mix different reporting dates without explicit period anchoring.",
+      "failureAction": "REQUIRE_SCOPE_QUALIFIER"
+    },
+    {
+      "id": "ACCT_VAL_003_account_code_matching",
+      "severity": "high",
+      "applies": [
+        "extract",
+        "validate"
+      ],
+      "check": "account_name_and_code_are_coherent",
+      "description": "Do not collapse accounts when label and account code namespaces conflict.",
+      "failureAction": "ANNOTATE_AND_REQUIRE_CLARIFICATION"
+    },
+    {
+      "id": "ACCT_VAL_004_recon_tieout",
+      "severity": "high",
+      "applies": [
+        "validate",
+        "compare"
+      ],
+      "check": "reconciliation_summary_matches_detail_or_documented_open_items",
+      "description": "Tie-out narratives must map every reconciling amount to a visible line item and status.",
+      "failureAction": "BLOCK_AND_LIST_OPEN_ITEMS"
+    },
+    {
+      "id": "ACCT_VAL_005_sign_convention_consistency",
+      "severity": "medium",
+      "applies": [
+        "extract",
+        "validate",
+        "calculate"
+      ],
+      "check": "sign_convention_consistent_with_heading",
+      "description": "Numeric claims must not invert debit/credit convention between tables without declared translation.",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "ACCT_VAL_006_cross_subledger_tieout",
+      "severity": "medium",
+      "applies": [
+        "validate",
+        "compare"
+      ],
+      "check": "subledger_totals_tie_to_control_account_or_open_items_annotated",
+      "description": "AR/AP total-to-control-account claims should include missing lines and residual status.",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "ACCT_VAL_007_table_axis_guard",
+      "severity": "medium",
+      "applies": [
+        "extract",
+        "calculate"
+      ],
+      "check": "row_column_heading_detected_and_stable",
+      "description": "Extracted table values are invalid if the axis orientation is not explicitly resolved.",
+      "failureAction": "ASK_OR_AXIS_ANNOTATE"
+    },
+    {
+      "id": "ACCT_VAL_008_basis_alignment",
+      "severity": "high",
+      "applies": [
+        "calculate",
+        "compare",
+        "validate"
+      ],
+      "check": "cash_accrual_forecast_claims_are_basis_locked",
+      "description": "Claims comparing revenue/expense totals must lock basis and disallow cross-basis arithmetic.",
+      "failureAction": "BLOCK_AND_REQUIRE_BASIS"
+    },
+    {
+      "id": "ACCT_VAL_009_consolidation_boundary",
+      "severity": "high",
+      "applies": [
+        "compare",
+        "summarize"
+      ],
+      "check": "entity_scope_is_explicit_for_consolidated_claims",
+      "description": "Entity and consolidation mode must be explicit when comparing book, GL, or group totals.",
+      "failureAction": "BLOCK_AND_REQUIRE_ENTITY_SCOPE"
+    },
+    {
+      "id": "ACCT_VAL_010_version_lock",
+      "severity": "medium",
+      "applies": [
+        "validate",
+        "extract",
+        "compare"
+      ],
+      "check": "version_or_revision_not_blended_without_precedence",
+      "description": "Reject claims that blend draft and final or different run versions without explicit precedence.",
+      "failureAction": "ASK_AND_REQUIRE_VERSION_SCOPE"
+    },
+    {
+      "id": "ACCT_VAL_011_control_owner_guard",
+      "severity": "medium",
+      "applies": [
+        "evaluate",
+        "summarize"
+      ],
+      "check": "control_claims_have_owner_and_status",
+      "description": "Do not conclude control effectiveness or risk score without owner and status traceability.",
+      "failureAction": "WARN_AND_REQUIRE_OWNER"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "accounting_validation_blocks_role_mismatch",
+        "input": {
+          "scenario": "account_name_collision_without_code"
+        },
+        "expect": {
+          "action": "ANNOTATE_AND_REQUIRE_CLARIFICATION"
+        }
+      },
+      {
+        "id": "accounting_validation_requires_basis",
+        "input": {
+          "queryType": "compare",
+          "query": "cash versus accrual trend"
+        },
+        "expect": {
+          "mustCheck": [
+            "ACCT_VAL_008_basis_alignment"
+          ]
+        }
+      },
+      {
+        "id": "accounting_validation_requires_entity_scope",
+        "input": {
+          "query": "group wide trial balance reconciliation"
+        },
+        "expect": {
+          "mustCheck": [
+            "ACCT_VAL_009_consolidation_boundary"
+          ]
+        }
+      },
+      {
+        "id": "accounting_validation_requires_tieout",
+        "input": {
+          "queryType": "bank_reconciliation"
+        },
+        "expect": {
+          "mustCheck": [
+            "ACCT_VAL_004_recon_tieout"
+          ]
+        }
+      }
+    ]
+  }
+}

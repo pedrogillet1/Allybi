@@ -1,0 +1,163 @@
+{
+  "_meta": {
+    "id": "cross_doc_synthesis_rules",
+    "version": "1.0.0",
+    "description": "Controls whether and how facts can be merged across documents, with strict conflict, disclosure, and disclosure precedence.",
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "koda-retrieval",
+    "compat": ">=1.0.0",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id",
+    "defaultCrossDocMode": "prohibited",
+    "allowCrossDocOnlyWithExplicitIntent": true,
+    "maxDocsForImplicitMerge": 1,
+    "requiredDisclosedDocList": true
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "post-retrieval synthesis",
+    "consumer": "synthesis planner",
+    "intent": "prevent accidental cross-document contamination and define explicit merge precedence",
+    "emittedSignals": [
+      "crossDocAllowed",
+      "crossDocMergeMode",
+      "docMergeDiscrepancyCount",
+      "crossDocDisclosureRequired"
+    ]
+  },
+  "precedenceRules": [
+    {
+      "id": "CDS_001_implicit_is_forbidden",
+      "description": "Synthesis across multiple docs is blocked when user query has single-doc intent.",
+      "applyWhen": {
+        "queryIntent": "single_doc",
+        "retrievedDocsCount": "gt_1"
+      },
+      "action": "ASK_SINGLE_DOC_LOCK"
+    },
+    {
+      "id": "CDS_002_explicit_cross_doc_requires_permission",
+      "description": "Cross-doc is allowed only when query explicitly signals comparison, audit, or all-doc scan.",
+      "applyWhen": {
+        "queryIntent": "not_set",
+        "retrievedDocsCount": "gt_1"
+      },
+      "action": "ASK_SCOPE_DISAMBIGUATION"
+    },
+    {
+      "id": "CDS_003_versioned_documents_priority",
+      "description": "Within same source family, prefer newest version unless user asks for specific historical version.",
+      "applyWhen": {
+        "docFamilyMatch": true,
+        "userVersionSpecified": false
+      },
+      "action": "PREFER_DOC_VERSION_DESC"
+    },
+    {
+      "id": "CDS_004_conflict_prefers_user_scope",
+      "description": "When same field differs by document and no user direction exists, surface as conflict rather than merging.",
+      "applyWhen": {
+        "fieldConflictAcrossDocs": true,
+        "queryExplicitVersion": false
+      },
+      "action": "SURFACE_CONFLICT_WITH_SOURCES"
+    },
+    {
+      "id": "CDS_005_cross_doc_merge_with_credibility",
+      "description": "If merging is allowed, keep document-level scores and never discard source ids.",
+      "applyWhen": {
+        "crossDocAllowed": true,
+        "evidenceQuality": "meets_threshold"
+      },
+      "action": "MERGE_WITH_DOC_CREDIBILITY_WEIGHTS"
+    }
+  ],
+  "rules": [
+    {
+      "id": "CDR_001_block_implicit_multi_doc_synthesis",
+      "check": "context.queryIntent in ['extract','summarize'] AND evidence.sourceDocs.count > 1 AND context.crossDocExplicit == false",
+      "failureAction": "ASK_CROSS_DOC_PERMISSIONS",
+      "severity": "error"
+    },
+    {
+      "id": "CDR_002_require_disclosure_for_multi_doc_merge",
+      "check": "evidence.sourceDocs.count > 1 AND context.discloseSources == false",
+      "failureAction": "ASK_SOURCE_DISCLOSURE",
+      "severity": "high"
+    },
+    {
+      "id": "CDR_003_forbid_version_collision_merge",
+      "check": "evidence.versionedDocs == true AND query.versionSelection == null",
+      "failureAction": "ASK_VERSION_CLARIFICATION",
+      "severity": "error"
+    },
+    {
+      "id": "CDR_004_keep_parallel_when_conflicting",
+      "check": "crossDocConflictRate > 0.15 AND context.queryAllowsCollapse == false",
+      "failureAction": "RETURN_PARALLEL_CLAIMS_WITH_DOC_LABELS",
+      "severity": "warning"
+    },
+    {
+      "id": "CDR_005_block_cross_doc_numeric_calculation",
+      "check": "query.requestType == 'calculation' AND evidence.sourceDocs.count > 1 AND query.mathAcrossDocsNotRequested == true",
+      "failureAction": "ASK_RESTRICTED_SCOPE",
+      "severity": "error"
+    },
+    {
+      "id": "CDR_006_allow_cross_doc_compare_when_requested",
+      "check": "query.requestType == 'compare' AND evidence.sourceDocs.count >= 2 AND context.docLock.active == false",
+      "failureAction": "ALLOW_CROSS_DOC_COMPARE",
+      "severity": "info"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "cross_doc_requires_explicit_permission",
+        "input": {
+          "context": {
+            "queryIntent": "extract",
+            "crossDocExplicit": false
+          },
+          "evidence": {
+            "sourceDocs": {
+              "count": 3
+            }
+          }
+        },
+        "expect": {
+          "failureAction": "ASK_CROSS_DOC_PERMISSIONS"
+        }
+      },
+      {
+        "id": "cross_doc_conflict_surfaces_disclosure",
+        "input": {
+          "crossDocConflictRate": 0.4,
+          "context": {
+            "queryAllowsCollapse": false
+          }
+        },
+        "expect": {
+          "failureAction": "RETURN_PARALLEL_CLAIMS_WITH_DOC_LABELS"
+        }
+      }
+    ]
+  }
+}

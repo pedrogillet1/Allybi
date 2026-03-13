@@ -40,44 +40,43 @@ function baseResult(overrides: Partial<ChatResult> = {}): ChatResult {
 }
 
 describe("EvidenceValidator", () => {
-  test("removes out-of-scope sources and fails partial when evidence is required", () => {
+  test("returns machine-readable codes instead of user-facing text", () => {
     const validator = new EvidenceValidator();
-    const result = baseResult({
-      sources: [
-        { documentId: "doc-out", filename: "out.pdf", mimeType: null, page: 2 },
-      ],
-      evidence: { required: true, provided: true, sourceIds: ["doc-out"] },
-      provenance: {
-        ...baseResult().provenance!,
-        snippetRefs: [
-          {
-            evidenceId: "doc-out:loc-1",
-            documentId: "doc-out",
-            locationKey: "loc-1",
-            snippetHash: "hash-out",
-            coverageScore: 1,
-          },
+    const scoped = validator.enforceScope(
+      baseResult({
+        sources: [
+          { documentId: "doc-out", filename: "out.pdf", mimeType: null, page: 2 },
         ],
-        sourceDocumentIds: ["doc-out"],
-        evidenceIdsUsed: ["doc-out:loc-1"],
-      },
+        evidence: { required: true, provided: true, sourceIds: ["doc-out"] },
+        provenance: {
+          ...baseResult().provenance!,
+          snippetRefs: [
+            {
+              evidenceId: "doc-out:loc-1",
+              documentId: "doc-out",
+              locationKey: "doc-out:loc-1",
+              snippetHash: "hash-out",
+              coverageScore: 1,
+            },
+          ],
+          sourceDocumentIds: ["doc-out"],
+          evidenceIdsUsed: ["doc-out:loc-1"],
+        },
+      }),
+      ["doc-1"],
+    );
+
+    expect(scoped.failureCode).toBe("OUT_OF_SCOPE_SOURCES");
+    expect(scoped.completion?.nextAction).toBeNull();
+    expect(scoped.completion?.nextActionCode).toBe("NEEDS_DOC_LOCK");
+    expect(scoped.completion?.nextActionArgs).toEqual({
+      missingSlots: ["scoped_source", "provenance"],
     });
-
-    const scoped = validator.enforceScope(result, ["doc-1"]);
-
-    expect(scoped.sources).toEqual([]);
-    expect(scoped.status).toBe("partial");
-    expect(scoped.failureCode).toBe("missing_provenance");
-    expect(scoped.evidence?.provided).toBe(false);
-    expect(scoped.scopeEnforced).toBe(true);
   });
 
   test("downgrades to partial when scoped sources remain but provenance refs are missing", () => {
     const validator = new EvidenceValidator();
     const result = baseResult({
-      sources: [
-        { documentId: "doc-1", filename: "in.pdf", mimeType: null, page: 1 },
-      ],
       provenance: {
         ...baseResult().provenance!,
         validated: false,
@@ -91,10 +90,10 @@ describe("EvidenceValidator", () => {
     const scoped = validator.enforceScope(result, ["doc-1"]);
     expect(scoped.sources?.length).toBe(1);
     expect(scoped.status).toBe("partial");
-    expect(scoped.failureCode).toBe("missing_provenance");
+    expect(scoped.failureCode).toBe("MISSING_PROVENANCE");
     expect(scoped.completion?.missingSlots).toContain("provenance");
     expect(scoped.provenance?.validated).toBe(false);
-    expect(scoped.provenance?.failureCode).toBe("out_of_scope_provenance");
+    expect(scoped.provenance?.failureCode).toBe("OUT_OF_SCOPE_PROVENANCE");
   });
 
   test("returns input unchanged when no allowed scope is provided", () => {

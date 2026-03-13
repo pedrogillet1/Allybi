@@ -1,0 +1,155 @@
+{
+  "_meta": {
+    "id": "eval_gold_queries_compliance_regulatory_domain",
+    "version": "1.0.0",
+    "description": "Compliance and regulatory gold queries for control traceability, exception handling, and remediation readiness.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "eval-domain-brain",
+    "usedBy": [
+      "services/eval/goldQueryRunner.service.ts",
+      "services/core/orchestration/answerPlanner.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/docint-eval-pack.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "compliance_regulatory",
+    "scenarioType": "compliance_risk_assurance"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "eval pack execution for compliance reasoning",
+    "consumer": "goldQueryRunner",
+    "intent": "Catch claims without control linkage, owner drift, and unbound remediation assertions."
+  },
+  "goldQueries": [
+    {
+      "id": "compliance_gold_001",
+      "lang": "en",
+      "query": "List all high-severity findings, their control IDs, assigned owners, and deadlines with current status.",
+      "expected": {
+        "mustReadSource": [
+          "exceptions and findings",
+          "evidence index",
+          "owner and governance"
+        ],
+        "mustExtract": [
+          "finding_id",
+          "control_id",
+          "severity",
+          "owner",
+          "deadline",
+          "status"
+        ],
+        "mustPreserveScope": true,
+        "failureConditions": [
+          "missing_control_id",
+          "owner_aggregated_without_mapping",
+          "status_without_deadline"
+        ]
+      }
+    },
+    {
+      "id": "compliance_gold_002",
+      "lang": "en",
+      "query": "Which controls have remediation actions past due date, and what evidence is still missing?",
+      "expected": {
+        "mustFindSection": [
+          "remediation plan",
+          "test results",
+          "control matrix"
+        ],
+        "mustExtract": [
+          "control_id",
+          "expected_end",
+          "evidence_owner",
+          "status",
+          "evidence_required"
+        ],
+        "mustPreserveTimeWindow": true,
+        "failureConditions": [
+          "late_finds_without_due_date",
+          "missing_evidence_requirements",
+          "cross_control_mix"
+        ]
+      }
+    },
+    {
+      "id": "compliance_gold_003",
+      "lang": "en",
+      "query": "For regulator notices in scope, map each required action to the responsible control and report blockers.",
+      "expected": {
+        "mustFindSection": [
+          "regulatory notice",
+          "control objective",
+          "remediation plan",
+          "owner and governance"
+        ],
+        "mustExtract": [
+          "regulatory_reference",
+          "required_action",
+          "control_id",
+          "owner",
+          "blocker"
+        ],
+        "mustPreserveMethod": true,
+        "failureConditions": [
+          "notice_without_action_link",
+          "action_without_owner",
+          "no_blocker_tracking"
+        ]
+      }
+    },
+    {
+      "id": "compliance_gold_004",
+      "lang": "pt",
+      "query": "Mostre exceções ativas por severidade e proprietário, com prazo e impacto regulatório.",
+      "expected": {
+        "mustInclude": [
+          "exceções",
+          "severidade",
+          "responsável",
+          "prazo",
+          "impacto regulatório"
+        ],
+        "mustPreserveScope": true,
+        "failureConditions": [
+          "sem_classificacao_de_severidade",
+          "proprietario_ausente",
+          "sem_prazo"
+        ]
+      }
+    }
+  ],
+  "qualityGuards": {
+    "maxAllowedInferenceRate": 0.09,
+    "requiredAnchorDensity": 2.7,
+    "penalties": {
+      "missing_control_id": -40,
+      "missing_owner": -35,
+      "missing_deadline": -30,
+      "mixed_severity_scale": -28
+    }
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "compliance_gold_control_link",
+        "input": {
+          "query": "compliance_gold_001"
+        },
+        "expect": {
+          "mustCheck": [
+            "mustExtract",
+            "failureConditions"
+          ]
+        }
+      }
+    ]
+  }
+}

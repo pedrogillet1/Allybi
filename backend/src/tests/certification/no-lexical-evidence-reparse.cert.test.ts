@@ -14,14 +14,12 @@ function walkTsFiles(dir: string): string[] {
 }
 
 describe("Certification: provenance-only source filtering", () => {
-  test("retrieval module index does not export lexical usage helpers", () => {
+  test("dead retrieval module facade stays removed", () => {
     const indexPath = path.resolve(
       process.cwd(),
       "src/modules/retrieval/application/index.ts",
     );
-    const raw = fs.readFileSync(indexPath, "utf8");
-    expect(raw.includes("extractUsedDocuments")).toBe(false);
-    expect(raw.includes("EvidenceChunkForFiltering")).toBe(false);
+    expect(fs.existsSync(indexPath)).toBe(false);
   });
 
   test("no runtime file imports lexical evidence reparse helpers", () => {

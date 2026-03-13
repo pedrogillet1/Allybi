@@ -1,0 +1,172 @@
+{
+  "_meta": {
+    "id": "di_sales_crm_retrieval_strategies",
+    "version": "1.0.0",
+    "description": "Sales CRM retrieval strategy for stage-aware and owner-aware comparative queries.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/retrieval/hybridRetriever.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/retrievalPrecision.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "sales_crm",
+    "maxBoostRules": 90,
+    "maxQueryExpansionTerms": 150
+  },
+  "domain": "sales_crm",
+  "sectionPriority": [
+    {
+      "section": "crm_section_account_summary",
+      "weight": 8.8,
+      "operators": [
+        "extract",
+        "validate",
+        "summarize"
+      ]
+    },
+    {
+      "section": "crm_section_funnel_position",
+      "weight": 9,
+      "operators": [
+        "compare",
+        "summarize",
+        "predict"
+      ]
+    },
+    {
+      "section": "crm_section_pricing_matrix",
+      "weight": 8.7,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare"
+      ]
+    },
+    {
+      "section": "crm_section_activity_log",
+      "weight": 7.6,
+      "operators": [
+        "extract",
+        "summarize",
+        "advise"
+      ]
+    },
+    {
+      "section": "crm_section_risk_register",
+      "weight": 7.8,
+      "operators": [
+        "evaluate",
+        "summarize",
+        "advise"
+      ]
+    },
+    {
+      "section": "crm_section_renewal_path",
+      "weight": 8.2,
+      "operators": [
+        "extract",
+        "monitor",
+        "advise"
+      ]
+    },
+    {
+      "section": "crm_section_winloss",
+      "weight": 7.5,
+      "operators": [
+        "extract",
+        "analyze",
+        "summarize"
+      ]
+    }
+  ],
+  "tablePriority": [
+    {
+      "table": "crm_table_pipeline_summary",
+      "weight": 8.9,
+      "operators": [
+        "compare",
+        "summarize",
+        "validate"
+      ]
+    },
+    {
+      "table": "crm_table_quote_lines",
+      "weight": 8.7,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare"
+      ]
+    },
+    {
+      "table": "crm_table_activity_timeline",
+      "weight": 8,
+      "operators": [
+        "extract",
+        "advise",
+        "monitor"
+      ]
+    },
+    {
+      "table": "crm_table_revenue_mix",
+      "weight": 8.3,
+      "operators": [
+        "compare",
+        "calculate",
+        "summarize"
+      ]
+    }
+  ],
+  "queryExpansion": [
+    "opportunity stage",
+    "close probability",
+    "arr",
+    "mrr",
+    "renewal risk",
+    "discount",
+    "pricing approval",
+    "churn",
+    "owner"
+  ],
+  "strategies": [
+    {
+      "id": "crm_strategy_stage_safe_compare",
+      "operators": [
+        "compare",
+        "summarize"
+      ],
+      "description": "Compare opportunities only when stages, close dates, and owner are explicit.",
+      "steps": [
+        "resolve stages with canonical labels",
+        "lock owner and period",
+        "compare metrics on same stage family",
+        "append caveat if approval differs"
+      ]
+    },
+    {
+      "id": "crm_strategy_renewal_diagnostic",
+      "operators": [
+        "monitor",
+        "advise",
+        "evaluate"
+      ],
+      "description": "Surface renewal risk with immediate actions and dependency on close-date and owner context.",
+      "steps": [
+        "extract renewal candidates",
+        "find churn or risk flags",
+        "produce next-best-actions",
+        "link each suggestion to owner and date"
+      ]
+    }
+  ]
+}

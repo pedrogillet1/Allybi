@@ -1,0 +1,149 @@
+{
+  "_meta": {
+    "id": "answer_strategies",
+    "version": "1.0.0",
+    "description": "Primary answer strategies for document-grounded composition. Maps user asks and evidence conditions to answer arcs that sound deliberate, compressed, and useful.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "composition-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id",
+    "defaultStrategy": "direct_answer_then_support"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "answer planning before sentence generation",
+    "consumer": "composition layer",
+    "intent": "Pick one strategy per answer. It defines ordering, not exact wording."
+  },
+  "strategies": [
+    {
+      "id": "direct_answer_then_support",
+      "bestFor": [
+        "single question",
+        "sufficient evidence",
+        "user wants a bottom line"
+      ],
+      "sequence": [
+        "answer",
+        "support",
+        "limit_if_needed"
+      ]
+    },
+    {
+      "id": "finding_then_implication",
+      "bestFor": [
+        "risk interpretation",
+        "operational decisions",
+        "material deltas"
+      ],
+      "sequence": [
+        "finding",
+        "implication",
+        "evidence"
+      ]
+    },
+    {
+      "id": "compare_then_why_it_matters",
+      "bestFor": [
+        "version comparison",
+        "cross-document comparison"
+      ],
+      "sequence": [
+        "top_delta",
+        "supporting_deltas",
+        "impact"
+      ]
+    },
+    {
+      "id": "quote_then_explain",
+      "bestFor": [
+        "exact quote requests",
+        "clause interpretation",
+        "sensitive wording"
+      ],
+      "sequence": [
+        "quote",
+        "plain_explanation",
+        "limit_if_needed"
+      ]
+    },
+    {
+      "id": "table_then_takeaway",
+      "bestFor": [
+        "tabular outputs",
+        "numeric comparisons",
+        "field extraction"
+      ],
+      "sequence": [
+        "table_lead",
+        "table",
+        "takeaway"
+      ]
+    },
+    {
+      "id": "scope_limit_then_safe_answer",
+      "bestFor": [
+        "partial evidence",
+        "high ambiguity",
+        "safety-bounded answers"
+      ],
+      "sequence": [
+        "limit",
+        "safe_answer",
+        "next_step"
+      ]
+    },
+    {
+      "id": "status_then_action",
+      "bestFor": [
+        "ops monitoring",
+        "editing UX",
+        "workflow tasks"
+      ],
+      "sequence": [
+        "status",
+        "action",
+        "dependency_if_needed"
+      ]
+    },
+    {
+      "id": "evidence_synthesis_cluster",
+      "bestFor": [
+        "multi-row extraction",
+        "several converging clues"
+      ],
+      "sequence": [
+        "synthesized_finding",
+        "clustered_evidence",
+        "confidence"
+      ]
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "answer_strategy_compare_selects_delta",
+        "input": {
+          "intent": "compare"
+        },
+        "expect": {
+          "strategy": "compare_then_why_it_matters"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,152 @@
+{
+  "_meta": {
+    "id": "eval_gold_queries_supply_chain_logistics",
+    "version": "1.0.0",
+    "description": "Supply-chain and logistics gold queries to test route, fulfillment, and service-level reasoning.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "eval-domain-brain",
+    "usedBy": [
+      "services/eval/goldQueryRunner.service.ts",
+      "services/core/orchestration/answerPlanner.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/docint-eval-pack.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "supply_chain_logistics",
+    "scenarioType": "logistics_reasoning"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "evaluation and regression coverage",
+    "consumer": "goldQueryRunner",
+    "intent": "Detect timing mistakes, stock mis-aggregation, and false route claims."
+  },
+  "goldQueries": [
+    {
+      "id": "scl_gold_001",
+      "lang": "en",
+      "query": "Which shipment is delayed relative to ETA, by how many hours, and what is the root cause category?",
+      "expected": {
+        "mustReadSource": [
+          "shipment event table",
+          "ETA section",
+          "exception log"
+        ],
+        "mustExtract": [
+          "shipment_id",
+          "planned_arrival",
+          "actual_arrival",
+          "delay_hours",
+          "exception_root_cause"
+        ],
+        "mustPreservePeriod": true,
+        "mustNotInfer": [
+          "implied_delay_without_dates",
+          "aggregated_delay_without_context"
+        ],
+        "failureConditions": [
+          "mixes_events_from_multiple_shipments",
+          "omits_delay_window",
+          "no_root_cause"
+        ]
+      }
+    },
+    {
+      "id": "scl_gold_002",
+      "lang": "en",
+      "query": "Compare current inventory snapshot versus last cycle and identify the top 3 stockouts by age bucket.",
+      "expected": {
+        "mustFindSection": [
+          "inventory status",
+          "aging buckets",
+          "stockout alerts"
+        ],
+        "mustExtract": [
+          "snapshot_date",
+          "sku",
+          "age_bucket",
+          "available_qty",
+          "reserved_qty",
+          "stockout_risk"
+        ],
+        "mustShowTrendLogic": true,
+        "failureConditions": [
+          "no_snapshot_date",
+          "compares_across_units",
+          "ignores_reserved_stock"
+        ]
+      }
+    },
+    {
+      "id": "scl_gold_003",
+      "lang": "en",
+      "query": "Calculate carrier SLA for the top three carriers and flag any with sustained on-time degradation.",
+      "expected": {
+        "mustExtract": [
+          "carrier",
+          "on_time_rate",
+          "avg_delay",
+          "delivery_count",
+          "degradation_signal"
+        ],
+        "mustPreservePeriod": true,
+        "mustShowTrendLogic": true,
+        "failureConditions": [
+          "mixes_carrier_levels_without_period",
+          "omits_degradation_rule",
+          "no_evidence_of_rates"
+        ]
+      }
+    },
+    {
+      "id": "scl_gold_004",
+      "lang": "pt",
+      "query": "Mostre o custo total de frete por rota e indique se os valores foram normalizados para uma moeda única.",
+      "expected": {
+        "mustInclude": [
+          "rota",
+          "custos de frete",
+          "moeda",
+          "método de conversão"
+        ],
+        "mustPreserveCurrency": true,
+        "mustShowNormalizationDecision": true,
+        "failureConditions": [
+          "mistura_moeda_sem_fx",
+          "omitir_base_de_custo"
+        ]
+      }
+    }
+  ],
+  "qualityGuards": {
+    "maxAllowedInferenceRate": 0.11,
+    "requiredAnchorDensity": 2.2,
+    "penalties": {
+      "missing_shipment_id": -30,
+      "missing_delay_window": -35,
+      "missing_stockout_risk": -20
+    }
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "scl_gold_delay_requires_dates",
+        "input": {
+          "query": "scl_gold_001"
+        },
+        "expect": {
+          "mustCheck": [
+            "mustExtract",
+            "mustPreservePeriod"
+          ]
+        }
+      }
+    ]
+  }
+}

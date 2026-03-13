@@ -90,4 +90,50 @@ describe("TraceWriterService", () => {
       code: "TRACE_WRITER_STRICT_FAILURE",
     });
   });
+
+  test("persists latency metrics inside constraints and stream fields", async () => {
+    const prisma = makePrismaMocks();
+    prisma.queryTelemetry.upsert.mockResolvedValue({});
+
+    const service = new TraceWriterService(prisma as unknown as PrismaClient, {
+      enabled: true,
+    });
+
+    await service.upsertQueryTelemetry({
+      ...buildTelemetryInput(),
+      ackMs: 120,
+      ttft: 640,
+      firstUsefulContentMs: 1280,
+      totalMs: 4200,
+      streamStarted: true,
+      firstTokenReceived: true,
+      streamEnded: true,
+      clientDisconnected: false,
+      wasAborted: false,
+      chunksSent: 11,
+      streamDurationMs: 4100,
+      sseErrors: ["timeout_recovered"],
+    });
+
+    expect(prisma.queryTelemetry.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        create: expect.objectContaining({
+          ttft: 640,
+          totalMs: 4200,
+          streamStarted: true,
+          firstTokenReceived: true,
+          streamEnded: true,
+          chunksSent: 11,
+          streamDurationMs: 4100,
+          sseErrors: ["timeout_recovered"],
+          constraints: {
+            latency: {
+              ackMs: 120,
+              firstUsefulContentMs: 1280,
+            },
+          },
+        }),
+      }),
+    );
+  });
 });

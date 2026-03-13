@@ -115,10 +115,64 @@
       {
         "id": "RATE_LIMIT_T_001",
         "input": {
-          "route": "auth"
+          "route": "auth",
+          "env": "production"
         },
         "expect": {
-          "windowMs": 900000
+          "windowMs": 900000,
+          "max": 10
+        }
+      },
+      {
+        "id": "RATE_LIMIT_T_002",
+        "input": {
+          "route": "auth",
+          "env": "local"
+        },
+        "expect": {
+          "max": 100
+        }
+      },
+      {
+        "id": "RATE_LIMIT_T_003",
+        "input": {
+          "route": "ai",
+          "env": "production"
+        },
+        "expect": {
+          "windowMs": 60000,
+          "max": 30
+        }
+      },
+      {
+        "id": "RATE_LIMIT_T_004",
+        "input": {
+          "route": "upload",
+          "env": "production"
+        },
+        "expect": {
+          "windowMs": 3600000,
+          "max": 200
+        }
+      },
+      {
+        "id": "RATE_LIMIT_T_005",
+        "input": {
+          "route": "status_polling",
+          "env": "production"
+        },
+        "expect": {
+          "max": 120
+        }
+      },
+      {
+        "id": "RATE_LIMIT_T_006",
+        "input": {
+          "route": "status_polling",
+          "env": "local"
+        },
+        "expect": {
+          "max": 180
         }
       }
     ]

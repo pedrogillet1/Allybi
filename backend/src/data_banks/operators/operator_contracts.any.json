@@ -188,7 +188,7 @@
         "requireConclusion": true,
         "paragraphs": {
           "maxSentencesPerParagraph": 2,
-          "maxCharsPerParagraph": 260
+          "maxCharsPerParagraph": 480
         },
         "bullets": {
           "allowed": true,
@@ -252,7 +252,7 @@
         "requireConclusion": true,
         "paragraphs": {
           "maxSentencesPerParagraph": 2,
-          "maxCharsPerParagraph": 260
+          "maxCharsPerParagraph": 480
         },
         "bullets": {
           "maxSentencesPerBullet": 3

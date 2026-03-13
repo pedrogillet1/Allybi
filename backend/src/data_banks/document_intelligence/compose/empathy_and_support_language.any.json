@@ -1,46 +1,244 @@
 {
   "_meta": {
     "id": "empathy_and_support_language",
-    "version": "1.0.0",
-    "description": "Empathetic language patterns for sensitive outputs.",
+    "version": "3.0.0",
+    "description": "Grounded support language for sensitive answers. The goal is steadiness and clarity, not customer-service softness or therapy voice.",
     "languages": [
       "any",
       "en",
       "pt"
     ],
-    "lastUpdated": "2026-03-03",
-    "owner": "data-bank-governance",
+    "lastUpdated": "2026-03-13",
+    "owner": "composition-brain",
     "usedBy": [
-      "services/core/banks/dataBankLoader.service.ts"
+      "modules/chat/runtime/CompositionStyleResolver.ts",
+      "data_banks/prompts/compose_style_contract.any.json"
     ],
     "tests": [
-      "tests/patternWiringProof.test.ts"
+      "modules/chat/runtime/CompositionStyleResolver.test.ts",
+      "services/core/enforcement/qualityGateRunner.service.test.ts"
     ]
   },
-  "phrases": {
-    "en": [
-      "I know this can be sensitive",
-      "I can verify this safely",
-      "Let me keep this grounded"
-    ],
-    "pt": [
-      "Sei que isso pode ser sensivel",
-      "Posso verificar com seguranca",
-      "Manterei isso baseado no documento"
-    ]
-  },
-  "rules": [
-    {
-      "id": "ES_001",
-      "trigger": "Sensitive domain query",
-      "check": "context.domain IN ['medical','legal']",
-      "failureAction": "APPLY_EMPATHETIC_TONE"
-    }
-  ],
   "config": {
     "enabled": true,
     "deterministic": true,
     "dedupe": true,
-    "sortBy": "id"
+    "sortBy": "id",
+    "maxEmpathyTouches": 2
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "voice shaping before final render",
+    "consumer": "style decision resolver and compose style contract prompt",
+    "intent": "Permit small, grounded support moves only when the task or the source is sensitive. These moves should lower heat and increase clarity, not turn the answer into counseling."
+  },
+  "situations": [
+    {
+      "id": "medical_results",
+      "when": "context.domain == 'medical'",
+      "touchBudget": 2,
+      "allowedMoves": [
+        "steady_grounding",
+        "materiality_without_alarm",
+        "careful_next_step"
+      ]
+    },
+    {
+      "id": "legal_exposure",
+      "when": "context.domain == 'legal' AND context.riskLevel IN ['medium','high']",
+      "touchBudget": 2,
+      "allowedMoves": [
+        "stakes_without_drama",
+        "explicit_limit",
+        "source_first_next_step"
+      ]
+    },
+    {
+      "id": "identity_or_privacy",
+      "when": "context.domain IN ['identity','insurance'] OR context.containsSensitivePersonalData == true",
+      "touchBudget": 1,
+      "allowedMoves": [
+        "privacy_minimization",
+        "scope_boundary",
+        "narrow_task_frame"
+      ]
+    }
+  ],
+  "languageMoves": {
+    "steady_grounding": {
+      "purpose": "Calm the answer by anchoring it to the document rather than to emotion.",
+      "en": [
+        "The document gives a few concrete signals, and they need to be read in context.",
+        "There is enough here to say something useful, but it still needs a careful reading.",
+        "A grounded reading starts with what is actually stated, not with the worst-case implication."
+      ],
+      "pt": [
+        "O documento traz alguns sinais concretos, e eles precisam ser lidos no contexto.",
+        "Ha base suficiente para dizer algo util, mas ainda exige leitura cuidadosa.",
+        "Uma leitura ancorada comeca pelo que esta escrito, nao pelo pior cenario."
+      ]
+    },
+    "materiality_without_alarm": {
+      "purpose": "Signal that something matters without escalating emotional temperature.",
+      "en": [
+        "A few findings are worth attention, but the document alone does not settle the whole picture.",
+        "Some items matter here, though they should not be overstated beyond what is written.",
+        "There are signals to pay attention to, but they still need context."
+      ],
+      "pt": [
+        "Alguns achados merecem atencao, mas o documento sozinho nao fecha o quadro inteiro.",
+        "Existem pontos relevantes aqui, sem extrapolar o que esta escrito.",
+        "Ha sinais que pedem atencao, mas ainda dependem de contexto."
+      ]
+    },
+    "careful_next_step": {
+      "purpose": "Offer one real-world next step for consequential medical material.",
+      "en": [
+        "If this affects a real decision, the next step is to confirm it with the appropriate clinician or reviewer.",
+        "For anything consequential, treat this as document interpretation and confirm the underlying result with the relevant professional.",
+        "If action depends on this, the safest move is to verify the exact finding with the person responsible for that result."
+      ],
+      "pt": [
+        "Se isso influenciar uma decisao real, o proximo passo e confirmar com o clinico ou revisor adequado.",
+        "Para algo com impacto real, trate isso como interpretacao do documento e confirme o achado com o profissional responsavel.",
+        "Se houver decisao ligada a isso, o caminho mais seguro e validar o resultado com quem responde por ele."
+      ]
+    },
+    "stakes_without_drama": {
+      "purpose": "Acknowledge legal or contractual stakes without sounding alarmist.",
+      "en": [
+        "This point matters because it can change obligations, timing, or risk allocation.",
+        "This is one of the terms that can change the practical outcome.",
+        "The clause is material enough to read carefully because it can shift what each side owes."
+      ],
+      "pt": [
+        "Esse ponto importa porque pode mudar obrigacoes, prazo ou alocacao de risco.",
+        "Esse e um dos termos que pode alterar o resultado pratico.",
+        "A clausula e relevante o bastante para ser lida com cuidado, porque pode mudar o que cada lado deve."
+      ]
+    },
+    "explicit_limit": {
+      "purpose": "Set a clean boundary around what the document does and does not prove.",
+      "en": [
+        "The text supports a reading, but it does not erase the limits around that reading.",
+        "The clause can be interpreted here, but not converted into certainty where the wording stays open.",
+        "The document lets us map the likely reading, not pretend ambiguity is gone."
+      ],
+      "pt": [
+        "O texto sustenta uma leitura, mas nao apaga os limites dessa leitura.",
+        "A clausula pode ser interpretada aqui, mas nao vira certeza quando a redacao continua aberta.",
+        "O documento permite mapear a leitura provavel, nao fingir que a ambiguidade sumiu."
+      ]
+    },
+    "source_first_next_step": {
+      "purpose": "Keep the next step document-grounded.",
+      "en": [
+        "The useful next step is to isolate the controlling clause and any exception language around it.",
+        "A practical next step is to compare the exact source text side by side before deciding on the operational meaning.",
+        "If this needs action, pull the exact clause language first and then test the exceptions against it."
+      ],
+      "pt": [
+        "O proximo passo util e isolar a clausula controladora e a linguagem de excecao ao redor dela.",
+        "Um passo pratico e comparar o texto exato da fonte lado a lado antes de fechar o significado operacional.",
+        "Se isso exigir acao, primeiro traga a linguagem exata da clausula e depois teste as excecoes."
+      ]
+    },
+    "privacy_minimization": {
+      "purpose": "Stabilize identity or privacy tasks by narrowing exposure.",
+      "en": [
+        "Only the fields needed for the check should stay in view.",
+        "The response should stay narrow because the document includes sensitive personal data.",
+        "This is best handled by focusing on the exact field or mismatch rather than on the broader identity picture."
+      ],
+      "pt": [
+        "So os campos necessarios para a verificacao devem permanecer em foco.",
+        "A resposta deve ficar estreita porque o documento inclui dados pessoais sensiveis.",
+        "O melhor aqui e focar no campo exato ou na divergencia, nao no quadro amplo de identidade."
+      ]
+    },
+    "scope_boundary": {
+      "purpose": "State uncertainty cleanly when a field is unclear.",
+      "en": [
+        "If a field is missing or unclear, it should be left unresolved rather than inferred.",
+        "Anything not clearly supported by the document should remain uncertain.",
+        "Where the record is thin, the answer should stop at that boundary."
+      ],
+      "pt": [
+        "Se um campo estiver ausente ou pouco claro, ele deve ficar como nao resolvido, sem inferencia.",
+        "Tudo o que nao estiver claramente sustentado pelo documento deve permanecer incerto.",
+        "Quando o registro for fino, a resposta precisa parar nessa fronteira."
+      ]
+    },
+    "narrow_task_frame": {
+      "purpose": "Keep the answer task-bounded instead of identity-conclusive.",
+      "en": [
+        "This should stay a narrow verification task, not a broad identity conclusion.",
+        "The response should do only the requested check and nothing more expansive.",
+        "Keep the output to the minimum needed for the extraction or verification task."
+      ],
+      "pt": [
+        "Isso deve permanecer uma verificacao estreita, nao uma conclusao ampla de identidade.",
+        "A resposta deve fazer apenas a verificacao pedida, sem ampliar o escopo.",
+        "Mantenha a saida no minimo necessario para a tarefa de extracao ou verificacao."
+      ]
+    }
+  },
+  "bannedMoves": {
+    "en": [
+      "I completely understand",
+      "don't worry",
+      "I know this is difficult",
+      "you are not alone"
+    ],
+    "pt": [
+      "eu entendo completamente",
+      "nao se preocupe",
+      "eu sei que isso e dificil",
+      "voce nao esta sozinho"
+    ]
+  },
+  "rules": [
+    {
+      "id": "ES_001_sensitive_domain_gets_grounded_support_only",
+      "trigger": "Sensitive domain query",
+      "check": "context.domain IN ['medical','legal','identity']",
+      "failureAction": "APPLY_CONTEXTUAL_EMPATHY",
+      "severity": "high"
+    },
+    {
+      "id": "ES_002_no_customer_service_warmth",
+      "trigger": "Draft contains generic reassurance or service-script empathy",
+      "check": "output.containsGenericReassurance == true OR output.containsTherapyVoice == true",
+      "failureAction": "REPLACE_WITH_GROUNDED_SUPPORT",
+      "severity": "critical"
+    },
+    {
+      "id": "ES_003_limit_support_density",
+      "trigger": "Draft uses more support language than the situation allows",
+      "check": "output.empathyTouches > context.maxEmpathyTouches",
+      "failureAction": "TRIM_TO_ALLOWED_TOUCH_BUDGET",
+      "severity": "medium"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "empathy_medical_uses_grounding",
+        "input": {
+          "domain": "medical"
+        },
+        "expect": {
+          "allowedMove": "steady_grounding"
+        }
+      },
+      {
+        "id": "empathy_privacy_stays_minimal",
+        "input": {
+          "containsSensitivePersonalData": true
+        },
+        "expect": {
+          "allowedMove": "privacy_minimization"
+        }
+      }
+    ]
   }
 }

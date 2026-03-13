@@ -1,0 +1,202 @@
+{
+  "_meta": {
+    "id": "medical_domain_writer",
+    "version": "1.0.0",
+    "description": "Medical writer profile for evidence-tied interpretation, timeline-based safety cues, and cautious recommendation language.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "domain": "medical",
+    "interpretationMode": "clinical_evidence_routing",
+    "requireClinicalScope": true,
+    "requireUnitLock": true,
+    "requireTimeline": true,
+    "forbidTreatmentAdvice": true,
+    "forbidDiagnosisClaims": true
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "before final clinical-grounded response synthesis",
+    "consumer": "medical domain writer",
+    "intent": "Convert raw observations into conservative interpretation with exact units, trend context, and follow-up clarity.",
+    "emittedSignals": [
+      "medicalInterpretiveMode",
+      "medicalPatientContextBound",
+      "medicalReferenceRangeUsed",
+      "medicalCriticalityScore",
+      "medicalRecommendationMode"
+    ]
+  },
+  "writingProfile": {
+    "audience": "clinician, care coordinator, medical analyst",
+    "goal": "Report what documents say with quantified findings, context, and uncertainty rather than assumptions.",
+    "mandatorySections": [
+      "patient_context_guardrail",
+      "finding_matrix",
+      "measurement_unit_and_range",
+      "trend_or_delta_notes",
+      "risk_flags",
+      "medication_allergy_matrix",
+      "follow_up_or_monitoring_plan",
+      "uncertainty_and_limits"
+    ],
+    "allowedAnswerForms": [
+      "finding_readout",
+      "trend_explanation",
+      "medication_safety_snapshot",
+      "procedure_followup_matrix",
+      "criticality_summary"
+    ],
+    "forbiddenAnswerForms": [
+      "diagnosis_without_claim_in_source",
+      "medication_dose_recommendation",
+      "dosage_calculation_without_evidence",
+      "unitless_numeric_summary",
+      "unanchored_trend_assertion"
+    ],
+    "docTypeAnchors": [
+      "med_soap_note",
+      "med_history_and_physical",
+      "med_progress_note",
+      "med_consult_note",
+      "med_emergency_note",
+      "med_nursing_note",
+      "med_care_plan",
+      "med_discharge_summary",
+      "med_followup_instructions",
+      "med_referral_letter",
+      "med_lab_results_report",
+      "med_radiology_report",
+      "med_pathology_report",
+      "med_ecg_report",
+      "med_vitals_chart",
+      "med_medication_list",
+      "med_prescription",
+      "med_allergy_list",
+      "med_immunization_record",
+      "med_problem_list"
+    ],
+    "sectionPriority": [
+      "document_header",
+      "patient_identification",
+      "encounter_context",
+      "chief_complaint_reason",
+      "objective_findings",
+      "vitals_and_measurements",
+      "labs_imaging",
+      "assessment_documented",
+      "plan_and_orders",
+      "medications_allergies",
+      "followup_and_disposition"
+    ]
+  },
+  "interpretiveRules": [
+    {
+      "id": "MED_WRITER_001_unit_lock",
+      "description": "Every numeric result must include unit and measurement basis before interpretation or trending.",
+      "requiredFor": "extract, compare, summarize"
+    },
+    {
+      "id": "MED_WRITER_002_reference_range_first",
+      "description": "Include reference/normal ranges whenever available before labeling findings as high, low, or abnormal.",
+      "requiredFor": "evaluate, summarize"
+    },
+    {
+      "id": "MED_WRITER_003_patient_scope",
+      "description": "Bind patient context at summary start (masked token, encounter date, setting) and avoid cross-encounter fusion unless linked.",
+      "requiredFor": "extract, monitor, compare"
+    },
+    {
+      "id": "MED_WRITER_004_role_chain",
+      "description": "For treatment instructions and safety notes, separate patient, clinician, and caregiver responsibilities with explicit actors.",
+      "requiredFor": "summarize, monitor"
+    },
+    {
+      "id": "MED_WRITER_005_abnormality_handling",
+      "description": "When a critical flag is present, preserve criticality and include clinician follow-up wording instead of direct clinical escalation language.",
+      "requiredFor": "evaluate, monitor"
+    },
+    {
+      "id": "MED_WRITER_006_medication_allergy_guard",
+      "description": "Medication, allergy, and adverse reaction claims require claim-level linkage between drug and reaction entries.",
+      "requiredFor": "evaluate, validate"
+    },
+    {
+      "id": "MED_WRITER_007_trend_consistency",
+      "description": "Trend statements (e.g., rising creatinine, dropping saturation) must show comparable timestamps and unchanged units.",
+      "requiredFor": "compare, summarize"
+    },
+    {
+      "id": "MED_WRITER_008_follow_up_cadence",
+      "description": "If follow-up or return precautions exist, return explicit timing windows and trigger condition for completion.",
+      "requiredFor": "monitor, evaluate"
+    },
+    {
+      "id": "MED_WRITER_009_conflict_annotation",
+      "description": "Conflicting findings across sections (e.g., vitals vs nursing note) must be surfaced as unresolved conflicts with sources.",
+      "requiredFor": "compare, summarize"
+    },
+    {
+      "id": "MED_WRITER_010_referral_chain",
+      "description": "Referral and continuity-of-care outputs should include reason, recipient, and transfer of responsibility context.",
+      "requiredFor": "evaluate, summarize"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "medical_writer_unit_lock_required",
+        "input": {
+          "query": "Summarize vitals and labs with interpretation."
+        },
+        "expect": {
+          "mustInclude": [
+            "measurement_unit_and_range",
+            "vitals_and_measurements"
+          ]
+        }
+      },
+      {
+        "id": "medical_writer_no_diagnosis_language",
+        "input": {
+          "query": "What is the diagnosis and next treatment?"
+        },
+        "expect": {
+          "mustExclude": [
+            "treatment_recommendation"
+          ],
+          "mustInclude": [
+            "criticality_score",
+            "follow_up_or_monitoring_plan"
+          ]
+        }
+      },
+      {
+        "id": "medical_writer_trend_requires_timestamps",
+        "input": {
+          "query": "Is creatinine improving over time?"
+        },
+        "expect": {
+          "mustInclude": [
+            "trend",
+            "timestamp",
+            "unit"
+          ]
+        }
+      }
+    ]
+  }
+}

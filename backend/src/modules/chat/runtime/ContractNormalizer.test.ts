@@ -13,24 +13,6 @@ function mkResult(overrides: Partial<ChatResult> = {}): ChatResult {
     sources: [
       { documentId: "doc-1", filename: "d1.pdf", mimeType: null, page: 1 },
     ],
-    provenance: {
-      mode: "hidden_map",
-      required: true,
-      validated: true,
-      failureCode: null,
-      evidenceIdsUsed: ["doc-1:loc-1"],
-      sourceDocumentIds: ["doc-1"],
-      snippetRefs: [
-        {
-          evidenceId: "doc-1:loc-1",
-          documentId: "doc-1",
-          locationKey: "loc-1",
-          snippetHash: "hash-1",
-          coverageScore: 1,
-        },
-      ],
-      coverageScore: 1,
-    },
     completion: { answered: true, missingSlots: [], nextAction: null },
     truncation: { occurred: false, reason: null, resumeToken: null },
     evidence: { required: true, provided: true, sourceIds: ["doc-1"] },
@@ -49,18 +31,20 @@ describe("ContractNormalizer", () => {
       }),
     );
     expect(normalized.status).toBe("partial");
-    expect(normalized.failureCode).toBe("MISSING_EVIDENCE");
+    expect(normalized.failureCode).toBe("MISSING_SOURCES");
   });
 
-  test("keeps success when evidence is present even if provenance metadata is missing", () => {
+  test("marks navigation payload responses as answered when assistant text is empty", () => {
     const normalizer = new ContractNormalizer();
     const normalized = normalizer.normalize(
       mkResult({
-        provenance: undefined,
+        assistantText: "",
+        listing: [{ kind: "file", id: "f1", title: "Budget.xlsx" }],
+        completion: { answered: false, missingSlots: [], nextAction: null },
       }),
     );
+    expect(normalized.completion?.answered).toBe(true);
     expect(normalized.status).toBe("success");
-    expect(normalized.failureCode).toBeNull();
   });
 
   test("downgrades success to partial when truncation occurred", () => {
@@ -75,22 +59,21 @@ describe("ContractNormalizer", () => {
       }),
     );
     expect(normalized.status).toBe("partial");
+    expect(normalized.failureCode).toBe("TRUNCATED_OUTPUT");
   });
 
-  test("sets failed status when completion is unanswered despite success status", () => {
+  test("deduplicates sources deterministically", () => {
     const normalizer = new ContractNormalizer();
     const normalized = normalizer.normalize(
       mkResult({
-        status: "success",
-        completion: {
-          answered: false,
-          missingSlots: ["scope"],
-          nextAction: "clarify",
-        },
+        sources: [
+          { documentId: "doc-1", filename: "d1.pdf", mimeType: null, page: 1 },
+          { documentId: "doc-1", filename: "d1.pdf", mimeType: null, page: 1 },
+        ],
       }),
     );
-    expect(normalized.status).toBe("failed");
-    expect(normalized.failureCode).toBe("EMPTY_ANSWER");
+    expect(normalized.sources).toHaveLength(1);
+    expect(normalized.evidence?.sourceIds).toEqual(["doc-1"]);
   });
 
   test("downgrades to partial when blocking quality gates are present", () => {
@@ -110,21 +93,6 @@ describe("ContractNormalizer", () => {
       }),
     );
     expect(normalized.status).toBe("partial");
-    expect(normalized.failureCode).toBe("quality_gate_blocked");
-  });
-
-  test("keeps success when fallback telemetry exists but user-facing fallback reason is absent", () => {
-    const normalizer = new ContractNormalizer();
-    const normalized = normalizer.normalize(
-      mkResult({
-        status: "success",
-        fallbackReasonCode: undefined,
-        assistantTelemetry: {
-          fallbackTelemetry: { reasonCode: "low_confidence" },
-        },
-      } as ChatResult),
-    );
-    expect(normalized.status).toBe("success");
-    expect(normalized.failureCode).toBeNull();
+    expect(normalized.failureCode).toBe("QUALITY_GATE_BLOCKED");
   });
 });

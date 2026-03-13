@@ -4,7 +4,7 @@ import {
   calculateLatencyMetrics,
   calculateLatencyByRoute,
   type ApiPerfEvent,
-} from "../../analytics/calculators/latency.calculator";
+} from "../../../tools/analytics/calculators/latency.calculator";
 
 // ---------------------------------------------------------------------------
 // Helpers

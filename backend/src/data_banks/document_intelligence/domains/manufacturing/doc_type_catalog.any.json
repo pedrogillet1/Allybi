@@ -1,0 +1,222 @@
+{
+  "_meta": {
+    "id": "di_manufacturing_doc_type_catalog",
+    "version": "1.0.0",
+    "description": "Manufacturing doc type catalog for execution, yield, and quality-critical interpretation.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/retrieval/domainIntentRouter.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/docint-eval-pack.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "manufacturing"
+  },
+  "domain": "manufacturing",
+  "docTypes": [
+    {
+      "id": "mfg_work_order",
+      "name": {
+        "en": "Work Order",
+        "pt": "Ordem de Produção"
+      },
+      "description": "Discrete plan execution records with routing and quantity targets.",
+      "detectionPatterns": [
+        "\\bwork order\\b",
+        "\\bordem de produção\\b",
+        "\\bordem\\s+de\\s+fabricação\\b",
+        "\\bwo\\b"
+      ],
+      "commonSections": [
+        "work_item",
+        "routing",
+        "planned_qty",
+        "due_date",
+        "status"
+      ],
+      "extractionPriority": 140
+    },
+    {
+      "id": "mfg_bom_pack",
+      "name": {
+        "en": "BOM and Components",
+        "pt": "Lista de Materiais"
+      },
+      "description": "Material requirements and component-level consumption.",
+      "detectionPatterns": [
+        "\\bbill of materials\\b",
+        "\\bbom\\b",
+        "\\blista de materiais\\b",
+        "\\bcomponentes\\b"
+      ],
+      "commonSections": [
+        "header",
+        "components",
+        "quantities",
+        "alternatives",
+        "yield_impact"
+      ],
+      "extractionPriority": 139
+    },
+    {
+      "id": "mfg_production_plan",
+      "name": {
+        "en": "Production Plan",
+        "pt": "Plano de Produção"
+      },
+      "description": "Scheduled production volumes and target completion windows.",
+      "detectionPatterns": [
+        "\\bproduction plan\\b",
+        "\\bplano de produção\\b",
+        "\\bplanejamento fabril\\b"
+      ],
+      "commonSections": [
+        "capacity",
+        "schedule",
+        "targets",
+        "constraints",
+        "forecast"
+      ],
+      "extractionPriority": 138
+    },
+    {
+      "id": "mfg_quality_inspection",
+      "name": {
+        "en": "Quality Inspection Report",
+        "pt": "Relatório de Inspeção de Qualidade"
+      },
+      "description": "Inspection outcomes, defect classification, and correction actions.",
+      "detectionPatterns": [
+        "\\bquality inspection\\b",
+        "\\binspection report\\b",
+        "\\brelatório de inspeção\\b",
+        "\\bresultado de teste\\b"
+      ],
+      "commonSections": [
+        "inspection_criteria",
+        "results",
+        "defect_codes",
+        "corrective_actions",
+        "release_status"
+      ],
+      "extractionPriority": 136
+    },
+    {
+      "id": "mfg_downtime_log",
+      "name": {
+        "en": "Downtime Log",
+        "pt": "Registro de Paradas"
+      },
+      "description": "Unplanned stoppage and MTBF/MTTR related events.",
+      "detectionPatterns": [
+        "\\bdowntime\\b",
+        "\\bline stop\\b",
+        "\\bregistro de parada\\b",
+        "\\barretos\\b"
+      ],
+      "commonSections": [
+        "root_cause",
+        "start_time",
+        "end_time",
+        "duration",
+        "repair_action"
+      ],
+      "extractionPriority": 134
+    },
+    {
+      "id": "mfg_maintenance_order",
+      "name": {
+        "en": "Maintenance Order",
+        "pt": "Ordem de Manutenção"
+      },
+      "description": "Maintenance interventions and machine readiness impact.",
+      "detectionPatterns": [
+        "\\bmaintenance order\\b",
+        "\\bworkshop maintenance\\b",
+        "\\bordem de manutenção\\b",
+        "\\bsla de manutenção\\b"
+      ],
+      "commonSections": [
+        "asset",
+        "issue",
+        "parts",
+        "scheduled_window",
+        "status"
+      ],
+      "extractionPriority": 133
+    },
+    {
+      "id": "mfg_wip_snapshot",
+      "name": {
+        "en": "WIP Snapshot",
+        "pt": "Fotografia de WIP"
+      },
+      "description": "Work-in-process inventory and queue depth by stage.",
+      "detectionPatterns": [
+        "\\bwip snapshot\\b",
+        "\\bwork in process\\b",
+        "\\bwip\\b",
+        "\\bestoque em processo\\b"
+      ],
+      "commonSections": [
+        "stage",
+        "in_process_qty",
+        "queue",
+        "aging",
+        "bottlenecks"
+      ],
+      "extractionPriority": 132
+    },
+    {
+      "id": "mfg_safety_incident",
+      "name": {
+        "en": "Safety Incident Report",
+        "pt": "Relatório de Incidente de Segurança"
+      },
+      "description": "Safety and compliance events with root cause and mitigation.",
+      "detectionPatterns": [
+        "\\bsafety incident\\b",
+        "\\bincidente\\b",
+        "\\binvestigação de segurança\\b",
+        "\\bnear miss\\b"
+      ],
+      "commonSections": [
+        "incident_timeline",
+        "impact",
+        "root_cause",
+        "corrective_action",
+        "closure"
+      ],
+      "extractionPriority": 131
+    },
+    {
+      "id": "mfg_inventory_variance",
+      "name": {
+        "en": "Inventory Variance",
+        "pt": "Variação de Inventário"
+      },
+      "description": "Material variance reconciliation across issue, consumption, and scrap.",
+      "detectionPatterns": [
+        "\\binventory variance\\b",
+        "\\bmaterial variance\\b",
+        "\\bvariação de inventário\\b"
+      ],
+      "commonSections": [
+        "expected_vs_actual",
+        "variance_reason",
+        "adjustment",
+        "approver"
+      ],
+      "extractionPriority": 130
+    }
+  ]
+}

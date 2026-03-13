@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "bankId": "risk_flag_patterns",
+    "bankId": "patterns_domains_legal_risk_flag_patterns",
     "version": "1.0.0",
     "owner": "legal-pattern-curator",
     "languages": [

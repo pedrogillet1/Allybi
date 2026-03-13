@@ -6,6 +6,7 @@ import PptxSidebar from './PptxSidebar';
 import PptxSlideCard from './PptxSlideCard';
 import usePptxSlides from './usePptxSlides';
 import { useIsMobile } from '../../../hooks/useIsMobile';
+import MobilePptxViewer from './MobilePptxViewer';
 
 /* ────────────────────────── constants ────────────────────────── */
 const ZOOM_STEPS = [25, 33, 50, 67, 75, 100, 125, 150, 200, 300, 400, 500];
@@ -249,6 +250,18 @@ export default function PptxViewerShell({ document: doc, version = 0 }) {
   const placeholderH = Math.round(renderedSlideW * SLIDE_ASPECT);
 
   const hasSlides = slides.length > 0;
+
+  /* ── Mobile: delegate to MobilePptxViewer ─────────── */
+  if (isMobile) {
+    return (
+      <MobilePptxViewer
+        document={doc}
+        version={version}
+        filename={doc?.filename}
+        onClose={() => window.history.back()}
+      />
+    );
+  }
 
   /* ── render ─────────────────────────────────────────── */
   return (

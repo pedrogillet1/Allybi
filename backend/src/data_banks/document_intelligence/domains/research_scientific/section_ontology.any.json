@@ -1,0 +1,182 @@
+{
+  "_meta": {
+    "id": "di_research_scientific_section_ontology",
+    "version": "1.0.0",
+    "description": "Research section ontology for inferential fidelity, reproducibility, and evidence boundaries.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/orchestration/sectionResolver.service.ts",
+      "services/core/orchestration/answerPlanner.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/section-detection.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "research_scientific"
+  },
+  "domain": "research_scientific",
+  "sections": [
+    {
+      "id": "rs_section_hypothesis",
+      "name": {
+        "en": "Hypothesis",
+        "pt": "Hipótese"
+      },
+      "aliases": [
+        "primary hypothesis",
+        "secondary hypothesis",
+        "working hypothesis"
+      ],
+      "canonicalPurpose": "Captures explicit causal or associative testable claim.",
+      "importance": "critical"
+    },
+    {
+      "id": "rs_section_design",
+      "name": {
+        "en": "Study Design",
+        "pt": "Desenho do Estudo"
+      },
+      "aliases": [
+        "design",
+        "randomization",
+        "blinding",
+        "estudo"
+      ],
+      "canonicalPurpose": "Defines design choices, controls, and potential internal validity risks.",
+      "importance": "critical"
+    },
+    {
+      "id": "rs_section_cohort",
+      "name": {
+        "en": "Population and Cohort",
+        "pt": "População e Coorte"
+      },
+      "aliases": [
+        "population",
+        "cohort",
+        "participants",
+        "sample"
+      ],
+      "canonicalPurpose": "Anchors inference scope to inclusion/exclusion and subgroup definitions."
+    },
+    {
+      "id": "rs_section_endpoints",
+      "name": {
+        "en": "Endpoints",
+        "pt": "Desfechos"
+      },
+      "aliases": [
+        "primary endpoint",
+        "secondary endpoint",
+        "outcome"
+      ],
+      "canonicalPurpose": "Defines what is measured and when significance is relevant.",
+      "importance": "critical"
+    },
+    {
+      "id": "rs_section_data_collection",
+      "name": {
+        "en": "Data Collection",
+        "pt": "Coleta de Dados"
+      },
+      "aliases": [
+        "data collection",
+        "exposure",
+        "measurements"
+      ],
+      "canonicalPurpose": "Records acquisition methodology and missingness conditions."
+    },
+    {
+      "id": "rs_section_analysis",
+      "name": {
+        "en": "Analysis",
+        "pt": "Análise"
+      },
+      "aliases": [
+        "statistical analysis",
+        "models",
+        "adjustment"
+      ],
+      "canonicalPurpose": "Holds methods, confounding controls, and model assumptions.",
+      "importance": "high"
+    },
+    {
+      "id": "rs_section_results",
+      "name": {
+        "en": "Results",
+        "pt": "Resultados"
+      },
+      "aliases": [
+        "effect",
+        "findings",
+        "significance"
+      ],
+      "canonicalPurpose": "Records measured effects with statistics and uncertainty.",
+      "importance": "critical"
+    },
+    {
+      "id": "rs_section_limitations",
+      "name": {
+        "en": "Limitations",
+        "pt": "Limitações"
+      },
+      "aliases": [
+        "limitations",
+        "bias",
+        "confounding"
+      ],
+      "canonicalPurpose": "Stores caveats that cap inference strength.",
+      "importance": "high"
+    },
+    {
+      "id": "rs_section_reproducibility",
+      "name": {
+        "en": "Reproducibility",
+        "pt": "Reprodutibilidade"
+      },
+      "aliases": [
+        "replication",
+        "reproducibility",
+        "protocol"
+      ],
+      "canonicalPurpose": "Tracks reproducibility conditions and deviations."
+    }
+  ],
+  "sectionAliases": {
+    "sample_size": [
+      "n",
+      "sample number",
+      "tamanho da amostra"
+    ],
+    "p_value": [
+      "p value",
+      "significância",
+      "valor de p"
+    ],
+    "effect_size": [
+      "effect size",
+      "d de Cohen",
+      "impacto"
+    ]
+  },
+  "runtimeHints": {
+    "priorityOrder": [
+      "rs_section_hypothesis",
+      "rs_section_design",
+      "rs_section_cohort",
+      "rs_section_endpoints",
+      "rs_section_analysis",
+      "rs_section_results",
+      "rs_section_limitations",
+      "rs_section_reproducibility"
+    ],
+    "mustAnchorCrossQueryIf": "queryType in ['compare','validate','evaluate','summarize']"
+  }
+}

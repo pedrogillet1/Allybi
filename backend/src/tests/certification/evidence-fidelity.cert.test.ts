@@ -96,33 +96,39 @@ describe("Certification: evidence fidelity", () => {
     );
 
     const failures: string[] = [];
-    if (!missingMap.enforcement.blocked)
-      failures.push("MISSING_MAP_NOT_BLOCKED");
-    if (missingMap.enforcement.reasonCode !== "missing_evidence_map") {
-      failures.push("MISSING_MAP_REASON_CODE_INVALID");
+    if (
+      !missingMap.enforcement.violations.some(
+        (violation) => violation.code === "MISSING_EVIDENCE_MAP",
+      )
+    ) {
+      failures.push("MISSING_MAP_VIOLATION_INVALID");
     }
-    if (!mismatched.enforcement.blocked)
-      failures.push("HASH_MISMATCH_NOT_BLOCKED");
-    if (mismatched.enforcement.reasonCode !== "evidence_map_hash_mismatch") {
-      failures.push("HASH_MISMATCH_REASON_CODE_INVALID");
+    if (
+      !mismatched.enforcement.violations.some(
+        (violation) => violation.code === "EVIDENCE_MAP_HASH_MISMATCH",
+      )
+    ) {
+      failures.push("HASH_MISMATCH_VIOLATION_INVALID");
     }
-    if (valid.enforcement.blocked) failures.push("VALID_MAP_BLOCKED");
+    if (valid.enforcement.violations.length > 0) {
+      failures.push("VALID_MAP_HAS_VIOLATIONS");
+    }
 
     writeCertificationGateReport("evidence-fidelity", {
       passed: failures.length === 0,
       metrics: {
-        missingMapBlocked: missingMap.enforcement.blocked,
-        missingMapReasonCode: missingMap.enforcement.reasonCode || null,
-        hashMismatchBlocked: mismatched.enforcement.blocked,
-        hashMismatchReasonCode: mismatched.enforcement.reasonCode || null,
-        validMapPasses: !valid.enforcement.blocked,
+        missingMapViolations: missingMap.enforcement.violations.map(
+          (violation) => violation.code,
+        ),
+        hashMismatchViolations: mismatched.enforcement.violations.map(
+          (violation) => violation.code,
+        ),
+        validMapViolationCount: valid.enforcement.violations.length,
       },
       thresholds: {
-        missingMapBlocked: true,
-        missingMapReasonCode: "missing_evidence_map",
-        hashMismatchBlocked: true,
-        hashMismatchReasonCode: "evidence_map_hash_mismatch",
-        validMapPasses: true,
+        missingMapViolation: "MISSING_EVIDENCE_MAP",
+        hashMismatchViolation: "EVIDENCE_MAP_HASH_MISMATCH",
+        validMapViolationCount: 0,
       },
       failures,
     });

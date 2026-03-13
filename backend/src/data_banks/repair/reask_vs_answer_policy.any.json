@@ -1,0 +1,280 @@
+{
+  "_meta": {
+    "id": "reask_vs_answer_policy",
+    "version": "1.0.0",
+    "description": "Decision policy for whether to ask again, answer cautiously, repair first, or state that evidence is not enough. Designed to reduce brittle re-asking and keep the assistant moving intelligently.",
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "koda-repair",
+    "compat": ">=1.0.0",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ],
+    "changeLog": [
+      "Added explicit branching between answer, cautious answer, repair, re-ask, and true evidence-gap response",
+      "Added one-question limit and re-ask suppression after repair attempts",
+      "Added rules for best-effort user intent and exploratory asks"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id",
+    "maxClarificationQuestions": 1,
+    "maxReasksPerTurn": 1,
+    "preferAnswerOverReaskWhenSafe": true,
+    "preferRepairOverReaskWhenSystemCanResolveInternally": true,
+    "reaskCooldownTurns": 2
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "final decision stage before response rendering",
+    "consumer": "answer planner",
+    "intent": "Avoid unnecessary clarification loops. Ask only when the user can provide the missing key and the system cannot repair or answer safely without it.",
+    "emittedSignals": [
+      "finalDecisionMode",
+      "reaskSuppressed",
+      "repairPreferred",
+      "cautiousAnswerPreferred"
+    ]
+  },
+  "decisionModes": [
+    {
+      "id": "answer_directly",
+      "chooseWhen": [
+        "evidence is sufficient",
+        "or a dominant interpretation is explicit in the source"
+      ]
+    },
+    {
+      "id": "answer_cautiously",
+      "chooseWhen": [
+        "missing detail is non-blocking",
+        "and the answer remains materially correct within stated scope"
+      ]
+    },
+    {
+      "id": "repair_then_answer",
+      "chooseWhen": [
+        "system likely missed evidence and can search or normalize better"
+      ]
+    },
+    {
+      "id": "ask_one_question",
+      "chooseWhen": [
+        "user holds the missing key",
+        "and the answer would materially change depending on it"
+      ]
+    },
+    {
+      "id": "state_not_enough_evidence",
+      "chooseWhen": [
+        "core fact is absent after repair attempts",
+        "or answer depends on unsupported external reality"
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "RVA_001_repair_before_reask_when_system_can_self_rescue",
+      "priority": 150,
+      "when": {
+        "all": [
+          {
+            "path": "signals.documentLikelyContainsAnswer",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "signals.noDirectHits",
+            "op": "eq",
+            "value": true
+          }
+        ]
+      },
+      "action": {
+        "type": "final_decision",
+        "mode": "repair_then_answer"
+      },
+      "reasonCode": "system_should_try_rescue_first",
+      "severity": "high"
+    },
+    {
+      "id": "RVA_002_answer_cautiously_when_detail_is_non_blocking",
+      "priority": 140,
+      "when": {
+        "all": [
+          {
+            "path": "signals.safeScopedAnswerAvailable",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "metrics.answerRisk",
+            "op": "lt",
+            "value": 0.35
+          }
+        ]
+      },
+      "action": {
+        "type": "final_decision",
+        "mode": "answer_cautiously"
+      },
+      "reasonCode": "safe_answer_beats_reask",
+      "severity": "medium"
+    },
+    {
+      "id": "RVA_003_reask_only_when_user_can_resolve_material_split",
+      "priority": 145,
+      "when": {
+        "all": [
+          {
+            "path": "signals.userResolvableAmbiguity",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "metrics.materialAnswerDelta",
+            "op": "gte",
+            "value": 0.15
+          },
+          {
+            "path": "signals.safeScopedAnswerAvailable",
+            "op": "neq",
+            "value": true
+          }
+        ]
+      },
+      "action": {
+        "type": "final_decision",
+        "mode": "ask_one_question"
+      },
+      "reasonCode": "user_choice_changes_answer",
+      "severity": "high"
+    },
+    {
+      "id": "RVA_004_best_effort_user_intent_suppresses_reask",
+      "priority": 135,
+      "when": {
+        "all": [
+          {
+            "path": "signals.userRequestedBestEffort",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "signals.safeScopedAnswerAvailable",
+            "op": "eq",
+            "value": true
+          }
+        ]
+      },
+      "action": {
+        "type": "final_decision",
+        "mode": "answer_cautiously"
+      },
+      "reasonCode": "best_effort_request_prefers_continuation",
+      "severity": "medium"
+    },
+    {
+      "id": "RVA_005_true_gap_after_repair_states_not_enough_evidence",
+      "priority": 155,
+      "when": {
+        "all": [
+          {
+            "path": "signals.repairExhausted",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "signals.coreEvidenceMissing",
+            "op": "eq",
+            "value": true
+          }
+        ]
+      },
+      "action": {
+        "type": "final_decision",
+        "mode": "state_not_enough_evidence"
+      },
+      "reasonCode": "repair_failed_and_gap_is_real",
+      "severity": "high"
+    },
+    {
+      "id": "RVA_006_exploratory_queries_prefer_answer_then_narrow",
+      "priority": 125,
+      "when": {
+        "all": [
+          {
+            "path": "signals.exploratoryIntent",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "signals.safeScopedAnswerAvailable",
+            "op": "eq",
+            "value": true
+          }
+        ]
+      },
+      "action": {
+        "type": "final_decision",
+        "mode": "answer_cautiously"
+      },
+      "reasonCode": "exploration_should_not_be_blocked",
+      "severity": "low"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "repair_happens_before_reask_for_false_negative",
+        "input": {
+          "signals": {
+            "documentLikelyContainsAnswer": true,
+            "noDirectHits": true
+          }
+        },
+        "expect": {
+          "mode": "repair_then_answer"
+        }
+      },
+      {
+        "id": "safe_answer_prefers_cautious_answer",
+        "input": {
+          "signals": {
+            "safeScopedAnswerAvailable": true
+          },
+          "metrics": {
+            "answerRisk": 0.18
+          }
+        },
+        "expect": {
+          "mode": "answer_cautiously"
+        }
+      },
+      {
+        "id": "true_gap_after_repair_becomes_not_enough_evidence",
+        "input": {
+          "signals": {
+            "repairExhausted": true,
+            "coreEvidenceMissing": true
+          }
+        },
+        "expect": {
+          "mode": "state_not_enough_evidence"
+        }
+      }
+    ]
+  }
+}

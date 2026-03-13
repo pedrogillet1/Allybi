@@ -1,0 +1,187 @@
+{
+  "_meta": {
+    "id": "governance_runtime_wiring_requirements",
+    "version": "1.0.0",
+    "description": "Contract defining what qualifies a bank as runtime-wired and how wiring is validated.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "governance-team",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "strictMode": true
+  },
+  "runtimeWiredDefinition": {
+    "coreConditions": {
+      "mustAppearInRegistry": true,
+      "mustAppearInManifest": true,
+      "mustHaveLoaderPath": true,
+      "mustReferenceServicePathInUsedBy": true,
+      "mustHaveTestsThatExercisePath": true
+    },
+    "servicePathRules": [
+      "services/chat/*",
+      "services/core/*",
+      "services/llm/*",
+      "services/admin/*"
+    ],
+    "minimumRuntimeSignalCount": 1,
+    "minimumSmokeChecks": 1,
+    "mustNotBeDataOnly": true
+  },
+  "wireabilityClasses": {
+    "orchestration": {
+      "eligibleCategories": [
+        "assistant",
+        "llm",
+        "routing",
+        "operators",
+        "prompts",
+        "policies"
+      ],
+      "mustIncludeUsedByService": [
+        "services/core/banks/dataBankLoader.service.ts",
+        "services/chat/turnRouter.service.ts",
+        "modules/chat/runtime/ChatRuntimeOrchestrator.ts"
+      ],
+      "wireChecks": [
+        "dependencyResolved",
+        "schemaValidated",
+        "nonEmptyTests",
+        "runtimeSmokePass"
+      ]
+    },
+    "evidence": {
+      "eligibleCategories": [
+        "document_intelligence",
+        "retrieval",
+        "formatting",
+        "quality",
+        "triggers",
+        "ambiguity",
+        "eval"
+      ],
+      "mustIncludeUsedByService": [
+        "services/core/banks/dataBankLoader.service.ts",
+        "services/admin/answerQuality.service.ts"
+      ]
+    },
+    "governance": {
+      "eligibleCategories": [
+        "governance"
+      ],
+      "mustIncludeUsedByService": [
+        "services/core/policy/governanceRuntimePolicy.service.ts",
+        "services/core/banks/dataBankLoader.service.ts"
+      ]
+    }
+  },
+  "wiringAudit": {
+    "requiredAtBoot": true,
+    "allowGraceUntilWired": false,
+    "orphanPolicy": "fail_if_runtimeUsedByPresent_and_notInRegistry",
+    "unusedCandidatePolicy": "warn_if_usedByEmpty_noRuntime"
+  },
+  "runtimeFailingSignals": {
+    "hardFailSignals": [
+      "usedByMissing",
+      "loaderPathMissing",
+      "checksumMissing",
+      "dependencyMissing",
+      "testSuiteMissingForRuntimeBanks"
+    ],
+    "warningSignals": [
+      "usedByPresentWithoutSmoke",
+      "categoryNoCategoryDependency"
+    ]
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "runtime_wired_when_usedBy_points_to_service",
+        "input": {
+          "usedBy": [
+            "services/chat/turnRouter.service.ts"
+          ]
+        },
+        "expect": {
+          "runtimeWired": true
+        }
+      }
+    ]
+  },
+  "runtimeUsageNotes": "Runtime auditors should load this bank at boot, use coreConditions to classify wires as runtime-critical, and fail fast when hardFailSignals fire.",
+  "servicePathRules": [
+    "services/chat/*",
+    "services/core/*",
+    "services/llm/*",
+    "services/admin/*"
+  ],
+  "managedAuditSet": {
+    "description": "Managed audit set for newly expanded ambiguity, repair, retrieval, validation, domain, eval, and governance banks.",
+    "bankIds": [
+      "governance_bank_metadata_policy",
+      "governance_bank_quality_contract",
+      "governance_eval_gate_policy",
+      "governance_runtime_wiring_requirements",
+      "governance_sharding_policy",
+      "governance_ssot_contract",
+      "clarification_question_bank",
+      "field_role_disambiguation",
+      "one_best_question_policy",
+      "answer_recovery_strategies",
+      "partial_answer_recovery",
+      "not_enough_evidence",
+      "contradiction_resolution",
+      "followup_generation",
+      "false_negative_rescue",
+      "reask_vs_answer_policy",
+      "evidence_binding_contract",
+      "field_role_ontology",
+      "field_lock_patterns",
+      "quote_span_rules",
+      "table_reasoning_rules",
+      "row_column_disambiguation",
+      "cross_doc_synthesis_rules",
+      "evidence_packaging_strategies",
+      "field_exactness_rules",
+      "claim_strength_matrix",
+      "fact_type_requirements_expanded",
+      "conflict_resolution_rules",
+      "table_integrity_rules",
+      "finance_domain_writer",
+      "finance_ambiguity_patterns",
+      "finance_validation_rules",
+      "eval_gold_queries_finance_domain_deepening",
+      "accounting_domain_writer",
+      "accounting_ambiguity_patterns",
+      "accounting_validation_rules",
+      "eval_gold_queries_accounting_domain_deepening",
+      "legal_domain_writer",
+      "legal_ambiguity_patterns",
+      "legal_validation_rules",
+      "eval_gold_queries_legal_domain_deepening",
+      "medical_domain_writer",
+      "medical_ambiguity_patterns",
+      "medical_validation_rules",
+      "eval_gold_queries_medical_domain_deepening",
+      "ops_domain_writer",
+      "ops_ambiguity_patterns",
+      "ops_validation_rules",
+      "eval_gold_queries_ops_domain_deepening"
+    ],
+    "enforceExistingUsedByPaths": true,
+    "enforceExistingTestPaths": true,
+    "requireProductionAndStagingRequiredByEnv": false
+  }
+}

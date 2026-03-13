@@ -15,13 +15,16 @@ import { documentDlqQueue } from "../queueConfig";
 
 let worker: Worker | null = null;
 
-export function startDocumentWorker() {
+export function startDocumentWorker(concurrencyOverride?: number) {
   if (worker) {
     logger.info("[DocumentQueue] Worker already running");
     return;
   }
 
-  const concurrency = config.WORKER_CONCURRENCY;
+  const concurrency =
+    concurrencyOverride ??
+    (Number(process.env.KODA_EMBEDDED_DOCUMENT_WORKER_CONCURRENCY || 0) ||
+      config.WORKER_CONCURRENCY);
   logger.info("[DocumentQueue] Starting worker", { concurrency });
 
   worker = new Worker(

@@ -1,0 +1,190 @@
+{
+  "_meta": {
+    "id": "finance_validation_rules",
+    "version": "1.1.0",
+    "description": "Finance exactness and anti-inference rules for interpretation-level responses.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "domain": "finance"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "claim validation immediately before final response packaging",
+    "consumer": "finance validator",
+    "intent": "Block weak substitutions, prevent unsafe financial claim scope drift, and keep role/value provenance explicit.",
+    "emittedSignals": [
+      "financeRuleApplied",
+      "financeRuleBlocked",
+      "financeNeedMoreEvidence",
+      "financeRoleAlignment"
+    ]
+  },
+  "exactnessContract": {
+    "forbiddenSubstitutions": [
+      "accrual_vs_cash_without_source",
+      "net_vs_gross_without_definition",
+      "multi_currency_without_rate",
+      "period_alias_without_boundary",
+      "forecast_as_actual_or_actual_as_forecast",
+      "subscriber_or_beneficiary_role_swap"
+    ],
+    "allowedSubstitutions": [
+      "currency_to_common_currency_when_rate_shown",
+      "raw_and_normalized_scale_pairing",
+      "cross_doc_merge_when_scope_and_basis_same",
+      "variance_reason_breakdown_from_source_components"
+    ],
+    "requiredAnchors": [
+      "metric_name",
+      "period",
+      "entity",
+      "currency",
+      "basis",
+      "role"
+    ]
+  },
+  "validationRules": [
+    {
+      "id": "FIN_VAL_001_role_lock",
+      "severity": "high",
+      "applies": [
+        "summarize",
+        "compare",
+        "evaluate"
+      ],
+      "check": "claims_respect_party_role_lock",
+      "description": "Financial party values must not be reassigned across borrower/lender/owner/issuer/beneficiary/signer roles.",
+      "failureAction": "BLOCK_AND_ASK"
+    },
+    {
+      "id": "FIN_VAL_002_period_alignment",
+      "severity": "high",
+      "applies": [
+        "compare",
+        "calculate",
+        "validate"
+      ],
+      "check": "periods_have_matching_anchor",
+      "description": "Do not compare values without period boundary, reporting period, and fiscal calendar alignment.",
+      "failureAction": "REQUIRE_SCOPE_LOCK"
+    },
+    {
+      "id": "FIN_VAL_003_basis_alignment",
+      "severity": "high",
+      "applies": [
+        "compare",
+        "calculate"
+      ],
+      "check": "basis_is_consistent_per_query",
+      "description": "Do not blend basis (cash/accrual/GAAP/IFRS/projection) without explicit separation.",
+      "failureAction": "BLOCK_AND_ASK"
+    },
+    {
+      "id": "FIN_VAL_004_currency_tieout",
+      "severity": "high",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare"
+      ],
+      "check": "currency_is_normalized_or_scoped",
+      "description": "Currency in multi-currency comparisons must include fx treatment and output unit.",
+      "failureAction": "ASK_OR_EXPLAIN_NORMALIZATION"
+    },
+    {
+      "id": "FIN_VAL_005_table_axis_guard",
+      "severity": "medium",
+      "applies": [
+        "extract",
+        "validate",
+        "summarize"
+      ],
+      "check": "row_and_column_axis_resolved",
+      "description": "Table claims require resolved axis orientation and explicit value placement.",
+      "failureAction": "ASK_OR_ANNOTATE_AXIS"
+    },
+    {
+      "id": "FIN_VAL_006_covenant_precedence",
+      "severity": "high",
+      "applies": [
+        "evaluate",
+        "validate"
+      ],
+      "check": "active_version_and_definition_selected",
+      "description": "Covenant queries must anchor one active definition and one active compliance calculation.",
+      "failureAction": "BLOCK_AND_REQUIRE_VERSION"
+    },
+    {
+      "id": "FIN_VAL_007_source_mix_boundaries",
+      "severity": "medium",
+      "applies": [
+        "compare",
+        "summarize"
+      ],
+      "check": "statement_and_forecast_boundaries_not_mixed",
+      "description": "Forecast and statement values cannot be pooled without explicit forecast label.",
+      "failureAction": "WARN_AND_REQUIRE_BOUNDARY_LABEL"
+    },
+    {
+      "id": "FIN_VAL_008_sign_convention_guard",
+      "severity": "low",
+      "applies": [
+        "calculate",
+        "summarize"
+      ],
+      "check": "sign_convention_declared",
+      "description": "Cashflow direction and cash-burn sign policy should be explicit when inversion is possible.",
+      "failureAction": "WARN_AND_LABEL"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "finance_validation_blocks_role_mismatch",
+        "input": {
+          "scenario": "role_collision_without_lock"
+        },
+        "expect": {
+          "action": "BLOCK_AND_ASK"
+        }
+      },
+      {
+        "id": "finance_validation_requires_basis",
+        "input": {
+          "queryType": "compare",
+          "query": "covenant coverage"
+        },
+        "expect": {
+          "mustCheck": [
+            "FIN_VAL_003_basis_alignment"
+          ]
+        }
+      },
+      {
+        "id": "finance_validation_requires_axis_for_table",
+        "input": {
+          "query": "variance across quarter table"
+        },
+        "expect": {
+          "mustCheck": [
+            "FIN_VAL_005_table_axis_guard"
+          ]
+        }
+      }
+    ]
+  }
+}

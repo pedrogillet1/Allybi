@@ -1,5 +1,10 @@
 import { getOptionalBank } from "../banks/bankLoader.service";
 import { PolicyRuntimeEngine, type PolicyRule } from "./policyRuntimeEngine.service";
+import {
+  allowPolicyDecision,
+  blockedFromAction,
+  type PolicyDecision,
+} from "./policyDecision";
 
 type CompliancePolicyBank = {
   config?: {
@@ -8,10 +13,8 @@ type CompliancePolicyBank = {
   rules?: PolicyRule[];
 };
 
-export type ComplianceDecision = {
+export type ComplianceDecision = PolicyDecision & {
   blocked: boolean;
-  reasonCode?: string;
-  message?: string;
 };
 
 function asObject(value: unknown): Record<string, unknown> {
@@ -27,7 +30,9 @@ export class CompliancePolicyService {
     context?: Record<string, unknown> | null;
   }): ComplianceDecision {
     const policy = getOptionalBank<CompliancePolicyBank>("compliance_policy");
-    if (!policy?.config?.enabled) return { blocked: false };
+    if (!policy?.config?.enabled) {
+      return { ...allowPolicyDecision(), blocked: false };
+    }
 
     const meta = asObject(input.meta);
     const context = asObject(input.context);
@@ -49,13 +54,23 @@ export class CompliancePolicyService {
       runtime,
     });
 
-    if (!match) return { blocked: false };
+    if (!match) return { ...allowPolicyDecision(), blocked: false };
 
-    const message = String(match.then.userMessage || "").trim();
+    const action = String(match.then.action || "block").trim() || "block";
+    const routeTo = String(match.then.routeTo || "").trim() || null;
+    const constraints =
+      match.then.constraints && typeof match.then.constraints === "object"
+        ? (match.then.constraints as Record<string, unknown>)
+        : null;
     return {
-      blocked: true,
+      blocked: blockedFromAction(action),
+      action,
+      terminal: match.terminal === true,
+      ruleId: match.ruleId || null,
       reasonCode: match.reasonCode || "compliance_blocked",
-      message,
+      routeTo,
+      category: null,
+      constraints,
     };
   }
 }

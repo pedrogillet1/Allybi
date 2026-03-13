@@ -1,0 +1,69 @@
+{
+  "_meta": {
+    "id": "eval_adversarial_table_corruption",
+    "version": "1.0.0",
+    "description": "Adversarial table corruption tests for corrupted headers, split rows, and missing cells.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "eval-ops",
+    "usedBy": [
+      "services/eval/adversarialHarness.service.ts",
+      "services/quality/evalJudge.service.ts"
+    ],
+    "tests": [
+      "tests/eval/tableCorruption.proof.test.ts",
+      "tests/eval/adversarialCoverage.proof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "scenarioType": "table_robustness"
+  },
+  "adversarialCases": [
+    {
+      "id": "table_corruption_001",
+      "lang": "en",
+      "query": "Extract cash balance row across all quarters from this malformed table.",
+      "tableState": {
+        "headerShift": true,
+        "missingCellRate": 0.18,
+        "rowMerged": true
+      },
+      "expected": {
+        "mustRecoverByIndex": true,
+        "mustCallRowAlignment": true,
+        "mustIncludeRecoveryNote": true,
+        "mustNotReturnSingleValueWhenRowsMissing": true,
+        "failureConditions": [
+          "naive_row_reading",
+          "ignores_header_shift",
+          "no_reconstruction_note"
+        ]
+      }
+    },
+    {
+      "id": "table_corruption_002",
+      "lang": "en",
+      "query": "Give the reconciled variance values and indicate which columns are unreliable.",
+      "tableState": {
+        "splitRows": true,
+        "invalidThousandSeparators": true
+      },
+      "expected": {
+        "mustMarkUnreliableColumns": true,
+        "mustFlagNumericAmbiguity": true,
+        "mustAnchorVariance": true,
+        "failureConditions": [
+          "claims precision when column unreliable",
+          "removes_uncertainty_terms"
+        ]
+      }
+    }
+  ],
+  "qualityGuard": {
+    "falseConfidencePenalty": -25,
+    "mustRejectInflatedClaims": true
+  }
+}

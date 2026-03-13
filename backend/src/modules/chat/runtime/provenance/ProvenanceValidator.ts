@@ -3,6 +3,7 @@ import type {
   AnswerMode,
   ChatProvenanceDTO,
 } from "../../domain/chat.contracts";
+import { resolveProvenanceRuntimeConfig } from "../../config/chatRuntimeConfig";
 
 export type ProvenanceFailureCode =
   | "missing_provenance"
@@ -24,7 +25,7 @@ function requiresProvenance(
 }
 
 function resolveMinCoverage(answerMode?: AnswerMode): number {
-  if (!isProvenanceThresholdsV3Enabled()) {
+  if (!resolveProvenanceRuntimeConfig().thresholdsV3) {
     switch (answerMode) {
       case "doc_grounded_quote":
         return 0.55;
@@ -56,14 +57,6 @@ function resolveMinCoverage(answerMode?: AnswerMode): number {
   }
 }
 
-function isStrictProvenanceV2Enabled(): boolean {
-  const raw = String(process.env.STRICT_PROVENANCE_V2 || "")
-    .trim()
-    .toLowerCase();
-  if (!raw) return true;
-  return !["0", "false", "off", "no"].includes(raw);
-}
-
 function resolveMinRefCount(answerMode?: AnswerMode): number {
   switch (answerMode) {
     case "doc_grounded_multi":
@@ -74,7 +67,7 @@ function resolveMinRefCount(answerMode?: AnswerMode): number {
 }
 
 function resolveMinPerRefCoverage(answerMode?: AnswerMode): number {
-  if (!isProvenanceThresholdsV3Enabled()) {
+  if (!resolveProvenanceRuntimeConfig().thresholdsV3) {
     switch (answerMode) {
       case "doc_grounded_quote":
         return 0.55;
@@ -106,16 +99,6 @@ function resolveMinPerRefCoverage(answerMode?: AnswerMode): number {
   }
 }
 
-function isProvenanceThresholdsV3Enabled(): boolean {
-  const raw = String(process.env.PROVENANCE_THRESHOLDS_V3 || "")
-    .trim()
-    .toLowerCase();
-  if (!raw) return true;
-  if (["1", "true", "on", "yes"].includes(raw)) return true;
-  if (["0", "false", "off", "no"].includes(raw)) return false;
-  return true;
-}
-
 export function validateChatProvenance(params: {
   provenance?: ChatProvenanceDTO | null;
   answerMode?: AnswerMode;
@@ -136,7 +119,7 @@ export function validateChatProvenance(params: {
     };
   }
 
-  if (!isStrictProvenanceV2Enabled()) {
+  if (!resolveProvenanceRuntimeConfig().strictV2) {
     if (
       provenance.coverageScore <
       (params.answerMode === "doc_grounded_multi"

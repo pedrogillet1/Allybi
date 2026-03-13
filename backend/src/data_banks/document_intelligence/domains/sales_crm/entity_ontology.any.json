@@ -1,0 +1,123 @@
+{
+  "_meta": {
+    "id": "di_sales_crm_entity_ontology",
+    "version": "1.0.0",
+    "description": "CRM entity ontology for opportunity logic and pricing interpretation.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/orchestration/entityResolver.service.ts",
+      "services/core/validation/claimValidator.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/domain-validation.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "sales_crm",
+    "normalizeEntities": true
+  },
+  "domain": "sales_crm",
+  "entities": [
+    {
+      "id": "crm_entity_account",
+      "label": {
+        "en": "Account",
+        "pt": "Conta"
+      },
+      "aliases": [
+        "customer",
+        "client",
+        "company"
+      ],
+      "mustBindToOwner": true
+    },
+    {
+      "id": "crm_entity_opportunity",
+      "label": {
+        "en": "Opportunity",
+        "pt": "Oportunidade"
+      },
+      "aliases": [
+        "deal",
+        "pipeline deal",
+        "oportunidade"
+      ],
+      "requiresStageContext": true
+    },
+    {
+      "id": "crm_entity_owner",
+      "label": {
+        "en": "Owner",
+        "pt": "Responsável"
+      },
+      "aliases": [
+        "account owner",
+        "sales owner",
+        "responsável"
+      ]
+    },
+    {
+      "id": "crm_entity_close_date",
+      "label": {
+        "en": "Close Date",
+        "pt": "Data de Fechamento"
+      },
+      "aliases": [
+        "expected close",
+        "forecast close",
+        "data de fechamento"
+      ],
+      "mustAlignToPeriod": true
+    },
+    {
+      "id": "crm_entity_arr",
+      "label": {
+        "en": "ARR",
+        "pt": "ARR"
+      },
+      "aliases": [
+        "annual recurring revenue",
+        "receita recorrente anual",
+        "rra"
+      ],
+      "requiresCurrencyContext": true
+    },
+    {
+      "id": "crm_entity_discount",
+      "label": {
+        "en": "Discount",
+        "pt": "Desconto"
+      },
+      "aliases": [
+        "discount pct",
+        "rebate",
+        "desconto"
+      ],
+      "requiresApprovalEvidence": true
+    },
+    {
+      "id": "crm_entity_stage",
+      "label": {
+        "en": "Stage",
+        "pt": "Etapa"
+      },
+      "aliases": [
+        "pipeline stage",
+        "stage",
+        "estágio"
+      ],
+      "mustUseCanonicalValues": true
+    }
+  ],
+  "normalization": {
+    "trimWhitespace": true,
+    "caseFold": true,
+    "stripDiacritics": true
+  }
+}

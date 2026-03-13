@@ -1,0 +1,112 @@
+{
+  "_meta": {
+    "id": "context_container_profiles",
+    "version": "1.0.0",
+    "description": "Context window and memory profiles by orchestration mode.",
+    "owner": "assistant-orchestrator",
+    "usedBy": [
+      "services/assistant/core/contextContainer.service.ts"
+    ],
+    "tests": [
+      "tests/assistant/contextContainers.proof.test.ts"
+    ],
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13"
+  },
+  "config": {
+    "enabled": true
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "pre_provider_route",
+    "consumer": "provider selector + composer"
+  },
+  "containers": [
+    {
+      "id": "light_context",
+      "goal": "fast answering and short answers.",
+      "inputBudget": 4000,
+      "historyBudget": 6,
+      "mustInclude": [
+        "activeGoal",
+        "scopeTokens",
+        "latestEvidenceAnchor"
+      ],
+      "forbidden": [
+        "stale_project_objectives",
+        "noncritical_quality_notes"
+      ]
+    },
+    {
+      "id": "standard_context",
+      "goal": "multi-turn continuity and medium-complexity synthesis.",
+      "inputBudget": 12000,
+      "historyBudget": 12,
+      "mustInclude": [
+        "activeGoal",
+        "confirmedCaveats",
+        "scopeTokens",
+        "evidenceAnchors",
+        "riskFlags"
+      ],
+      "optional": [
+        "openQuestions"
+      ]
+    },
+    {
+      "id": "deep_context",
+      "goal": "complex research, comparisons, or policy-sensitive tasks.",
+      "inputBudget": 32000,
+      "historyBudget": 24,
+      "mustInclude": [
+        "activeGoal",
+        "scopeTokens",
+        "confirmedCaveats",
+        "evidenceAnchors",
+        "qualityChecks",
+        "project_objectives"
+      ],
+      "optional": [
+        "workflowState",
+        "riskFlags"
+      ],
+      "guardrails": [
+        "Drop non-essential quotes if budget risk before tool execution."
+      ]
+    },
+    {
+      "id": "legal_review_context",
+      "goal": "legal or policy-heavy interpretation with clause sensitivity.",
+      "inputBudget": 20000,
+      "historyBudget": 20,
+      "mustInclude": [
+        "activeGoal",
+        "confirmedCaveats",
+        "evidenceAnchors",
+        "project_objectives"
+      ],
+      "optional": [
+        "workflowState"
+      ]
+    }
+  ],
+  "selectionRules": [
+    "Use deep_context when task decomposition profile is complex_orchestration.",
+    "Use legal_review_context when domain is legal and risk is high.",
+    "Use light_context for clarification_repair responses."
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "complex_orchestration_uses_deep_context",
+        "input": {
+          "decompositionProfile": "complex_orchestration"
+        },
+        "expect": {
+          "container": "deep_context"
+        }
+      }
+    ]
+  }
+}

@@ -79,6 +79,17 @@ export class AnswerModeRouterService {
       input.operator,
       input.operatorFamily,
     );
+
+    // Table/comparison query detection — upgrade to table mode
+    const queryText = String(input.queryText || "").trim();
+    const TABLE_QUERY_PATTERN = /\b(tabela|table|compar[ae]|compare|diferenças|differences|matrix|matriz|side.by.side|versus|vs\.?)\b/i;
+    if (queryText && TABLE_QUERY_PATTERN.test(queryText)) {
+      if (!modeFromFamily || modeFromFamily.startsWith("doc_grounded")) {
+        reasons.push("query_text_table_upgrade");
+        return { answerMode: "doc_grounded_table", reasonCodes: reasons };
+      }
+    }
+
     if (modeFromFamily) {
       reasons.push("operator_family_default");
       return { answerMode: modeFromFamily, reasonCodes: reasons };

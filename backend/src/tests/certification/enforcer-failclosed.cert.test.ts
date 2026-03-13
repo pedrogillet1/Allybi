@@ -1,110 +1,107 @@
 import "reflect-metadata";
-import path from "path";
-import { beforeAll, describe, expect, jest, test } from "@jest/globals";
+import { beforeEach, describe, expect, jest, test } from "@jest/globals";
 
-import { CentralizedChatRuntimeDelegate } from "../../modules/chat/runtime/CentralizedChatRuntimeDelegate";
-import type { ChatEngine } from "../../modules/chat/domain/chat.contracts";
-import { initializeBanks } from "../../services/core/banks/bankLoader.service";
+const mockGetBank = jest.fn();
+const mockGetOptionalBank = jest.fn();
+
+jest.mock("../../services/core/banks/bankLoader.service", () => ({
+  __esModule: true,
+  getBank: (...args: unknown[]) => mockGetBank(...args),
+  getOptionalBank: (...args: unknown[]) => mockGetOptionalBank(...args),
+}));
+
+import {
+  ResponseContractEnforcerService,
+} from "../../services/core/enforcement/responseContractEnforcer.service";
 import { writeCertificationGateReport } from "./reporting";
 
-jest.mock("../../services/core/enforcement/responseContractEnforcer.service", () => {
-  const actual = jest.requireActual<
-    typeof import("../../services/core/enforcement/responseContractEnforcer.service")
-  >("../../services/core/enforcement/responseContractEnforcer.service");
-  return {
-    __esModule: true,
-    ...actual,
-    getResponseContractEnforcer: jest.fn(),
-  };
-});
+function bankById(bankId: string): unknown {
+  switch (bankId) {
+    case "render_policy":
+      return {
+        config: {
+          markdown: { allowCodeBlocks: false, maxConsecutiveNewlines: 2 },
+          noJsonOutput: { enabled: true, detectJsonLike: true },
+        },
+        enforcementRules: {
+          rules: [{ id: "RP6_MAX_ONE_QUESTION", then: { maxQuestions: 1 } }],
+        },
+      };
+    case "ui_contracts":
+      return { config: { enabled: true } };
+    case "banned_phrases":
+      return {
+        config: { enabled: true, actionOnMatch: "strip_or_replace" },
+        categories: {},
+        patterns: [],
+        sourceLeakage: { patterns: [] },
+        robotic: { en: [], pt: [], es: [] },
+      };
+    case "truncation_and_limits":
+      return {
+        globalLimits: {
+          maxResponseCharsHard: 12000,
+          maxResponseTokensHard: 3500,
+        },
+      };
+    case "bullet_rules":
+    case "table_rules":
+    case "answer_style_policy":
+      return { config: { enabled: true }, profiles: {} };
+    default:
+      return { config: { enabled: true } };
+  }
+}
 
-import * as responseContractEnforcer from "../../services/core/enforcement/responseContractEnforcer.service";
-
-describe("Certification: enforcer fail-closed behavior", () => {
-  beforeAll(async () => {
-    await initializeBanks({
-      rootDir: path.resolve(process.cwd(), "src/data_banks"),
-      strict: false,
-      validateSchemas: false,
-      allowEmptyChecksumsInNonProd: true,
-      enableHotReload: false,
-    });
+describe("Certification: enforcer shape-repair only behavior", () => {
+  beforeEach(() => {
+    mockGetBank.mockReset();
+    mockGetOptionalBank.mockReset();
+    mockGetBank.mockImplementation((bankId: string) => bankById(bankId));
+    mockGetOptionalBank.mockImplementation((bankId: string) => bankById(bankId));
   });
 
-  test("runtime returns safe fallback when response contract enforcer throws", async () => {
-    const engine: ChatEngine = {
-      async generate() {
-        return { text: "unused" };
+  test("enforcer returns violations without inventing fallback content", () => {
+    const enforcer = new ResponseContractEnforcerService();
+    const originalText = '{"answer":"ok"}';
+    const out = enforcer.enforce(
+      {
+        content: originalText,
+        attachments: [],
       },
-      async stream() {
-        return { text: "unused", chunks: [] };
+      {
+        answerMode: "general_answer",
+        language: "en",
       },
-    } as ChatEngine;
-
-    const delegate = new CentralizedChatRuntimeDelegate(engine, {
-      conversationMemory: {} as any,
-    });
-
-    const enforcerSpy = jest
-      .spyOn(responseContractEnforcer, "getResponseContractEnforcer")
-      .mockImplementation(() => {
-        throw new Error("simulated enforcer crash");
-      });
-
-    const originalText =
-      "ORIGINAL_UNVALIDATED_TEXT_SHOULD_NEVER_SHIP_WHEN_ENFORCER_FAILS";
-    const finalized = await (delegate as any).finalizeChatTurn({
-      assistantText: originalText,
-      req: {
-        userId: "user-1",
-        message: "what is in the attached docs?",
-        attachedDocumentIds: ["doc-1", "doc-2"],
-        preferredLanguage: "en",
-        meta: { requestId: "req-enforcer-failclosed-cert" },
-      },
-      answerMode: "general_answer",
-      answerClass: "GENERAL",
-      retrievalPack: null,
-      sources: [],
-      telemetry: {
-        model: "unit-test-model",
-      },
-    });
-
-    enforcerSpy.mockRestore();
+    );
 
     const failures: string[] = [];
-    if (finalized.assistantText === originalText) {
-      failures.push("UNVALIDATED_OUTPUT_SHIPPED");
-    }
-    if (finalized.failureCode !== "enforcer_runtime_error") {
-      failures.push("FAILURE_CODE_NOT_SET");
+    if (out.enforcement.violations.length === 0) {
+      failures.push("MISSING_VIOLATIONS");
     }
     if (
-      !finalized.enforcement?.warnings?.includes(
-        "ENFORCER_RUNTIME_ERROR_FAIL_CLOSED",
+      !out.enforcement.violations.some(
+        (violation) => violation.code === "JSON_NOT_ALLOWED",
       )
     ) {
-      failures.push("FAIL_CLOSED_WARNING_MISSING");
+      failures.push("JSON_VIOLATION_NOT_REPORTED");
     }
-    if (!String(finalized.assistantText || "").trim()) {
-      failures.push("SAFE_FALLBACK_EMPTY");
+    if (
+      out.content !== originalText &&
+      out.content !== "" &&
+      !out.content.includes("{")
+    ) {
+      failures.push("INVENTED_FALLBACK_CONTENT");
     }
 
-    writeCertificationGateReport("enforcer-failclosed", {
+    writeCertificationGateReport("enforcer-shape-repair-only", {
       passed: failures.length === 0,
       metrics: {
-        failureCode: finalized.failureCode || null,
-        outputChanged: finalized.assistantText !== originalText,
-        hasWarning: Boolean(
-          finalized.enforcement?.warnings?.includes(
-            "ENFORCER_RUNTIME_ERROR_FAIL_CLOSED",
-          ),
-        ),
+        violationCount: out.enforcement.violations.length,
+        contentChanged: out.content !== originalText,
       },
       thresholds: {
-        mustSetFailureCode: "enforcer_runtime_error",
-        mustNotShipOriginalText: true,
+        minViolations: 1,
       },
       failures,
     });

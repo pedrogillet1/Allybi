@@ -1,0 +1,113 @@
+{
+  "_meta": {
+    "id": "di_compliance_regulatory_domain_profile",
+    "version": "1.0.0",
+    "description": "Compliance and regulatory profile for policy controls, obligations, sanctions, and remediation planning.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/orchestration/answerPlanner.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/domain-validation.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "compliance_regulatory",
+    "minEvidenceScore": 0.84
+  },
+  "domain": "compliance_regulatory",
+  "displayName": {
+    "en": "Compliance & Regulatory",
+    "pt": "Conformidade e Regulação"
+  },
+  "scope": "Policy controls, internal controls, risk assessments, regulator communications, investigations, and remediation tracking.",
+  "coreConcepts": [
+    "control framework",
+    "risk appetite",
+    "control design",
+    "control operating effectiveness",
+    "regulatory expectation",
+    "evidence owner",
+    "finding",
+    "remediation",
+    "exception",
+    "sanction",
+    "third-party risk",
+    "AML",
+    "privacy",
+    "anti-corruption"
+  ],
+  "supportedDocTypes": [
+    "compliance_policy_pack",
+    "compliance_risk_map",
+    "compliance_control_test_plan",
+    "compliance_control_test_result",
+    "compliance_audit_report",
+    "compliance_regulator_notice",
+    "compliance_incident_report",
+    "compliance_exception_request",
+    "compliance_remediation_plan"
+  ],
+  "supportedOperators": [
+    "advise",
+    "calculate",
+    "compare",
+    "extract",
+    "locate",
+    "monitor",
+    "summarize",
+    "validate"
+  ],
+  "supportedSections": [
+    "control_objective",
+    "control_design",
+    "risk_appetite",
+    "test_plan",
+    "test_result",
+    "exception",
+    "remediation",
+    "sanction",
+    "evidence_owner",
+    "status_timeline"
+  ],
+  "detectionSignals": {
+    "highConfidence": [
+      "policy",
+      "compliance",
+      "control",
+      "audit",
+      "remediation",
+      "sanction",
+      "risk assessment"
+    ],
+    "mediumConfidence": [
+      "evidence",
+      "exception",
+      "regulatory",
+      "gap analysis",
+      "owner"
+    ]
+  },
+  "negativeBoundaries": [
+    "Do not classify general operational playbooks as compliance unless they include control, policy, or sanction context.",
+    "Do not generate violation conclusions without explicit regulator or control test evidence."
+  ],
+  "ontologyPrefix": "com",
+  "qualityDefaults": {
+    "requireRiskScoreWhenAvailable": true,
+    "requireExceptionOwner": true,
+    "preferControlTraceability": true
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "compliance domain classification and legal-safe response shaping",
+    "consumer": "compliance domain router",
+    "intent": "Keep claims explicit to control IDs, owners, and remediation state."
+  }
+}

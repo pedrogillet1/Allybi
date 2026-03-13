@@ -1,0 +1,231 @@
+{
+  "_meta": {
+    "id": "di_procurement_doc_type_catalog",
+    "version": "1.0.0",
+    "description": "Procurement document-type catalog with sourcing and supplier lifecycle anchors.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/routing/domainRouter.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/docint-eval-pack.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "procurement"
+  },
+  "domain": "procurement",
+  "docTypes": [
+    {
+      "id": "proc_rfx_pack",
+      "name": {
+        "en": "RFx and Request Documents",
+        "pt": "Documentos RFx"
+      },
+      "description": "RFP, RFQ, RFI, and sourcing invitation documents.",
+      "detectionPatterns": [
+        "\\brfp\\b",
+        "\\brf[xq]\\b",
+        "\\brequest for proposal\\b",
+        "\\bsolicitação de proposta\\b",
+        "\\bpacote de sourcing\\b"
+      ],
+      "canonicalSections": [
+        "business_need",
+        "requirements",
+        "evaluation_rules",
+        "submission_instructions",
+        "selection_criteria",
+        "timelines",
+        "appendix"
+      ],
+      "extractionPriority": 140,
+      "riskTier": "high",
+      "criticalFields": [
+        "submission_deadline",
+        "evaluation_criteria",
+        "budget_cap",
+        "required_compliance"
+      ]
+    },
+    {
+      "id": "proc_vendor_registration",
+      "name": {
+        "en": "Vendor Registration Dossier",
+        "pt": "Dossiê de Cadastro de Fornecedor"
+      },
+      "description": "Vendor qualification package with certifications, banking, and contract metadata.",
+      "detectionPatterns": [
+        "\\bvendor registration\\b",
+        "\\bfornecedor cadastrado\\b",
+        "\\bqualificação de fornecedor\\b",
+        "\\bsupplier onboarding\\b"
+      ],
+      "canonicalSections": [
+        "vendor_profile",
+        "qualification_evidence",
+        "compliance_checklist",
+        "insurance",
+        "bank_details"
+      ],
+      "extractionPriority": 138,
+      "riskTier": "high"
+    },
+    {
+      "id": "proc_purchase_order",
+      "name": {
+        "en": "Purchase Order",
+        "pt": "Pedido de Compra"
+      },
+      "description": "Purchase orders with line-level commitments and delivery promises.",
+      "detectionPatterns": [
+        "\\bpurchase order\\b",
+        "\\bpo\\b",
+        "\\bpedido de compra\\b",
+        "\\bordem de compra\\b"
+      ],
+      "canonicalSections": [
+        "header",
+        "line_items",
+        "delivery_terms",
+        "payment_terms",
+        "signatures",
+        "exceptions"
+      ],
+      "extractionPriority": 136,
+      "riskTier": "critical",
+      "criticalFields": [
+        "po_number",
+        "vendor",
+        "line_items",
+        "delivery_date",
+        "net_amount"
+      ]
+    },
+    {
+      "id": "proc_contract",
+      "name": {
+        "en": "Procurement Contract",
+        "pt": "Contrato de Fornecimento"
+      },
+      "description": "Contract award and commercial addendum documents.",
+      "detectionPatterns": [
+        "\\baward contract\\b",
+        "\\bprocurement contract\\b",
+        "\\bcontrato de fornecimento\\b",
+        "\\bcontrato de compra\\b"
+      ],
+      "canonicalSections": [
+        "parties",
+        "commercial_terms",
+        "obligations",
+        "termination",
+        "penalties",
+        "sla",
+        "appendix"
+      ],
+      "extractionPriority": 132,
+      "riskTier": "critical"
+    },
+    {
+      "id": "proc_bid_analysis",
+      "name": {
+        "en": "Bid Analysis Report",
+        "pt": "Análise de Propostas"
+      },
+      "description": "Comparative bid scorecards and award memo.",
+      "detectionPatterns": [
+        "\\bbid analysis\\b",
+        "\\bawarded bids\\b",
+        "\\banálise de propostas\\b",
+        "\\baward memo\\b"
+      ],
+      "canonicalSections": [
+        "evaluation_matrix",
+        "scoring_summary",
+        "technical_comparison",
+        "financial_comparison",
+        "award_rationale"
+      ],
+      "extractionPriority": 134,
+      "riskTier": "critical"
+    },
+    {
+      "id": "proc_invoice_match",
+      "name": {
+        "en": "Invoice Matching Pack",
+        "pt": "Conferência de Faturas"
+      },
+      "description": "Three-way matching and invoice-to-order validation reports.",
+      "detectionPatterns": [
+        "\\binvoice matching\\b",
+        "\\bthree-way match\\b",
+        "\\bconferência de fatura\\b",
+        "\\bcomparação de pedido\\b"
+      ],
+      "canonicalSections": [
+        "match_results",
+        "po_tolerance",
+        "exception_log",
+        "approved_variances"
+      ],
+      "extractionPriority": 133,
+      "riskTier": "medium"
+    },
+    {
+      "id": "proc_sourcing_policy",
+      "name": {
+        "en": "Procurement Policy Pack",
+        "pt": "Política de Compras"
+      },
+      "description": "Policy booklets and control thresholds guiding sourcing decisions.",
+      "detectionPatterns": [
+        "\\bprocurement policy\\b",
+        "\\bpolítica de compras\\b",
+        "\\bsourcing policy\\b",
+        "\\bpolítica de suprimentos\\b"
+      ],
+      "canonicalSections": [
+        "delegation",
+        "approvals",
+        "thresholds",
+        "compliance",
+        "audit_triggers",
+        "records_retention"
+      ],
+      "extractionPriority": 125,
+      "riskTier": "medium"
+    },
+    {
+      "id": "proc_supplier_scorecard",
+      "name": {
+        "en": "Supplier Scorecard",
+        "pt": "Scorecard do Fornecedor"
+      },
+      "description": "Vendor quality, cost, and service-level monitoring by period.",
+      "detectionPatterns": [
+        "\\bsupplier scorecard\\b",
+        "\\bperformance\\s+rating\\b",
+        "\\bscorecard de fornecedor\\b",
+        "\\bfornecedor\\s+desempenho\\b"
+      ],
+      "canonicalSections": [
+        "service_levels",
+        "quality",
+        "delivery",
+        "commercial_health",
+        "exceptions",
+        "action_plan"
+      ],
+      "extractionPriority": 124,
+      "riskTier": "medium"
+    }
+  ]
+}

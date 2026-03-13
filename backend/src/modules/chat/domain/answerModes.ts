@@ -1,8 +1,10 @@
 export const CHAT_ANSWER_MODES = [
+  "conversation",
   "doc_grounded_single",
   "doc_grounded_multi",
   "doc_grounded_quote",
   "doc_grounded_table",
+  "file_list",
   "nav_pills",
   "rank_autopick",
   "rank_disambiguate",

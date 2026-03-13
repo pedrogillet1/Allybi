@@ -1,0 +1,76 @@
+{
+  "_meta": {
+    "id": "eval_adversarial_owners_vs_signers",
+    "version": "1.0.0",
+    "description": "Adversarial checks for owner/signature role confusion in legal and governance docs.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "eval-ops",
+    "usedBy": [
+      "services/eval/adversarialHarness.service.ts",
+      "services/quality/evalJudge.service.ts"
+    ],
+    "tests": [
+      "tests/eval/ownerSigner.proof.test.ts",
+      "tests/eval/adversarialCoverage.proof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "scenarioType": "role_conflation"
+  },
+  "adversarialCases": [
+    {
+      "id": "owner_signer_001",
+      "lang": "en",
+      "query": "Who owns the IP and who signed section 9.2?",
+      "expected": {
+        "mustExtractSeparately": {
+          "owner_field": true,
+          "signer_field": true
+        },
+        "mustUseSectionAnchors": [
+          "ownership",
+          "signatures"
+        ],
+        "mustNot": [
+          "single_field_merge",
+          "infer_signer_as_owner"
+        ],
+        "failureConditions": [
+          "missing_owner_name",
+          "missing_signer_name",
+          "cross_merge"
+        ]
+      }
+    },
+    {
+      "id": "owner_signer_002",
+      "lang": "pt",
+      "query": "Diferencie titular da conta e pessoa que assinou o aditivo.",
+      "expected": {
+        "mustExtractSeparately": {
+          "titular": true,
+          "assinante": true
+        },
+        "mustUseExactLabels": [
+          "titular",
+          "assinante"
+        ],
+        "failureConditions": [
+          "traduz_termos_sem_preservar_funcoes",
+          "usa_mesma_entidade_para_ambos"
+        ]
+      }
+    }
+  ],
+  "qualitySignals": {
+    "mustFailIf": [
+      "owner_signer_confabulation",
+      "role_swap_without_source"
+    ],
+    "penaltyOnConflation": -35
+  }
+}

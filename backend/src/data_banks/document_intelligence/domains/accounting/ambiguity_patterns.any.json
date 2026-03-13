@@ -1,0 +1,184 @@
+{
+  "_meta": {
+    "id": "accounting_ambiguity_patterns",
+    "version": "1.1.0",
+    "description": "Accounting ambiguity patterns for account identity, basis discipline, subledger mapping, and tie-out integrity.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "domain": "accounting",
+    "maxQuestions": 1,
+    "preferClarifyOverSpeculation": true
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "post-retrieval when account, basis, and period fields are not yet locked",
+    "consumer": "accounting ambiguity resolver",
+    "intent": "Stop role, basis, and tie-out drift before reconciliation synthesis.",
+    "emittedSignals": [
+      "acctAmbiguityDetected",
+      "acctQuestionRequired",
+      "acctDocScopeNeed",
+      "acctSourceScopeQuestion",
+      "acctSubledgerLockQuestion"
+    ]
+  },
+  "patterns": [
+    {
+      "id": "ACCT_AMB_001_account_code_collision",
+      "type": "account_identity_collision",
+      "triggerSignals": [
+        "same_label_maps_to_multiple_account_codes",
+        "queryRefersTo_account_by_label_only"
+      ],
+      "askQuestion": "Bind to account code (e.g., 4xx vs 4xy), reporting entity, and chart version before comparing balances?"
+    },
+    {
+      "id": "ACCT_AMB_002_dr_cr_convention",
+      "type": "sign_convention_collision",
+      "triggerSignals": [
+        "debit_credit_orientation_unclear",
+        "queryRequests_signed_arithmetic_with_implicit_signs"
+      ],
+      "askQuestion": "Should this report use debit/credit columns or single signed amount convention for movement math?"
+    },
+    {
+      "id": "ACCT_AMB_003_period_cutoff",
+      "type": "posting_period_uncertainty",
+      "triggerSignals": [
+        "period_not_explicit",
+        "multiple_reporting_dates_present",
+        "periodMixWithoutLock"
+      ],
+      "askQuestion": "Use latest reporting date, accounting cutoff date, or user-specified period window for this query?"
+    },
+    {
+      "id": "ACCT_AMB_004_reconciliation_scope",
+      "type": "reconciliation_scope_overlap",
+      "triggerSignals": [
+        "multiple_statement_windows_detected",
+        "queryAcross_reconciliation_and_trial_balance"
+      ],
+      "askQuestion": "Do you want the latest active run only, period-by-period matrix, or complete historical tie-out series?"
+    },
+    {
+      "id": "ACCT_AMB_005_currency_mix",
+      "type": "multi_currency_ambiguity",
+      "triggerSignals": [
+        "row_has_multiple_currency_markers",
+        "queryOmitsConversionPolicy"
+      ],
+      "askQuestion": "Report in each native currency, or normalize to one reporting currency with explicit rate policy and as-of date?"
+    },
+    {
+      "id": "ACCT_AMB_006_party_role_confusion",
+      "type": "role_collision",
+      "triggerSignals": [
+        "payer_payee_vendor_customer_vendor_code_collision"
+      ],
+      "askQuestion": "For amounts, lock party role as vendor, customer, payer, payer-basis, account holder, or subledger counterparty."
+    },
+    {
+      "id": "ACCT_AMB_007_aging_bucket_collision",
+      "type": "aging_bucket_ambiguity",
+      "triggerSignals": [
+        "bucket_window_definitions_inconsistent",
+        "same_bucket_name_with_varied_ranges"
+      ],
+      "askQuestion": "Use document-defined aging windows, accounting policy standard buckets, or explicit policy mapping before delinquency analysis?"
+    },
+    {
+      "id": "ACCT_AMB_008_billing_basis_mix",
+      "type": "basis_definition_mix",
+      "triggerSignals": [
+        "queryTargets_accrual_and_cash_sections",
+        "no_basis_tagging_for_rev_or_exp"
+      ],
+      "askQuestion": "Should this be accrual basis only, cash basis only, or explicitly reconciled basis bridge?"
+    },
+    {
+      "id": "ACCT_AMB_009_version_or_revision_conflict",
+      "type": "version_or_revision_conflict",
+      "triggerSignals": [
+        "draft_and_final_versions_present",
+        "multiple_release_marks_same_run"
+      ],
+      "askQuestion": "Use latest approved version, latest draft-only for planning, or compare revision deltas for this request?"
+    },
+    {
+      "id": "ACCT_AMB_010_control_account_merge_risk",
+      "type": "control_account_merge_risk",
+      "triggerSignals": [
+        "queryUses_control_account_and_child_accounts",
+        "control_account_totals_not_tied_to_subledger"
+      ],
+      "askQuestion": "Treat control account totals separately, or include subledger totals only when reconciliation status is explicit?"
+    },
+    {
+      "id": "ACCT_AMB_011_entity_consolidation_blend",
+      "type": "consolidation_scope_overlap",
+      "triggerSignals": [
+        "multi_entity_values_without_consolidation_mode",
+        "queryAcross_hierarchical_ledger_runs"
+      ],
+      "askQuestion": "Keep legal entity scope separate, roll-up to consolidation, or report both with an exception matrix?"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "acct_amb_account_collision_asks_one",
+        "input": {
+          "scenario": "account_name_collision"
+        },
+        "expect": {
+          "action": "askQuestion",
+          "maxQuestions": 1
+        }
+      },
+      {
+        "id": "acct_amb_signing_ambiguity",
+        "input": {
+          "scenario": "dr_cr_missing_definition"
+        },
+        "expect": {
+          "mustAskContains": "debit/credit convention"
+        }
+      },
+      {
+        "id": "acct_amb_version_conflict_requires_scope_lock",
+        "input": {
+          "scenario": "draft_and_final_documents"
+        },
+        "expect": {
+          "mustAskContains": [
+            "version",
+            "consolidation"
+          ]
+        }
+      },
+      {
+        "id": "acct_amb_scope_mode",
+        "input": {
+          "query": "summarize AR aging and total AR now"
+        },
+        "expect": {
+          "action": "askQuestion"
+        }
+      }
+    ]
+  }
+}

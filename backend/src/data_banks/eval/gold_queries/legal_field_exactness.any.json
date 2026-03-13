@@ -1,0 +1,141 @@
+{
+  "_meta": {
+    "id": "eval_gold_queries_legal_field_exactness",
+    "version": "1.0.0",
+    "description": "Gold queries for exact legal field extraction and clause-bound constraints.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "eval-ops",
+    "usedBy": [
+      "services/eval/goldQueryRunner.service.ts",
+      "services/quality/evalJudge.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/eval/legalFieldExactness.proof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "legal",
+    "scenarioType": "field_exactness",
+    "scoringPolicy": "exact_clause_match",
+    "minimumConfidence": 0.82
+  },
+  "goldQueries": [
+    {
+      "id": "legal_field_exactness_001",
+      "lang": "en",
+      "query": "What is the termination for convenience clause and required cure period?",
+      "sourceLock": "active_doc_only",
+      "expected": {
+        "mustFindSection": [
+          "termination",
+          "cure",
+          "termination_for_convenience"
+        ],
+        "mustContain": [
+          "30 days",
+          "cure period",
+          "written notice"
+        ],
+        "mustQuote": true,
+        "quoteCoverage": "full_sentence",
+        "mustUseDefinedTerms": true,
+        "mustDistinguish": [
+          "termination for convenience",
+          "termination for cause"
+        ],
+        "prohibit": [
+          "paraphrased legal interpretation",
+          "unsourced summary without anchor"
+        ],
+        "goldAnswerForm": {
+          "answerType": "short_clause_summary",
+          "citationCountMin": 2,
+          "uncertaintyLabel": true
+        },
+        "failureConditions": [
+          "answers_convenience_from_section_title_only",
+          "confuses_cause_with_convenience",
+          "omits_notice_deadline"
+        ]
+      }
+    },
+    {
+      "id": "legal_field_exactness_002",
+      "lang": "en",
+      "query": "Extract the exact liability cap amount and cap basis for this agreement.",
+      "sourceLock": "active_doc_only",
+      "expected": {
+        "mustFindSection": [
+          "limitation of liability",
+          "indemnity",
+          "cap"
+        ],
+        "mustContain": [
+          "not exceeding",
+          "shall not exceed",
+          "aggregate cap"
+        ],
+        "mustCaptureNumeric": true,
+        "mustIncludeCurrency": true,
+        "numericForm": "exact",
+        "requireExceptionLine": true,
+        "mustNotInfer": [
+          "no-fault damages",
+          "indirect loss cap"
+        ],
+        "failureConditions": [
+          "reports_range_when_range_absent",
+          "uses_soft_language_like about likely or around",
+          "drops_currency_or_unit"
+        ]
+      }
+    },
+    {
+      "id": "legal_field_exactness_003",
+      "lang": "en",
+      "query": "What governing law and venue are stated in this agreement?",
+      "sourceLock": "active_doc_only",
+      "expected": {
+        "mustFindSection": [
+          "governing law",
+          "jurisdiction"
+        ],
+        "mustContain": [
+          "law of",
+          "exclusive jurisdiction"
+        ],
+        "mustDistinguish": [
+          "choice of law",
+          "forum"
+        ],
+        "mustNotUse": [
+          "best effort",
+          "likely jurisdiction"
+        ],
+        "failureConditions": [
+          "replaces_absence_with_assumption",
+          "borrows_jurisdiction_from_other_document"
+        ]
+      }
+    }
+  ],
+  "negativeConditions": [
+    {
+      "id": "legal_wrong_doc_injection",
+      "mustRejectIf": [
+        "reference_to_other_doc",
+        "cross_contract_mix",
+        "title_only_extraction_without_anchor"
+      ],
+      "expected": {
+        "scoreFloor": 0.15,
+        "fallback": "ask_doc_scope_question"
+      }
+  }
+  ]
+}

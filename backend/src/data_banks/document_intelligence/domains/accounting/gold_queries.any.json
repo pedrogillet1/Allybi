@@ -1,0 +1,168 @@
+{
+  "_meta": {
+    "id": "eval_gold_queries_accounting_domain_deepening",
+    "version": "1.0.0",
+    "description": "Accounting domain-deepening gold queries for tie-out and control-native reasoning.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "eval-domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "accounting",
+    "scenarioType": "reconciliation_exactness"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "evaluation query pack execution",
+    "consumer": "document-intelligence eval harness",
+    "intent": "assert deep accounting behaviors with reconcile-grade evidence requirements",
+    "emittedSignals": [
+      "evalQueryCoverage",
+      "evalScopeLockApplied",
+      "evalFailureMode"
+    ]
+  },
+  "goldQueries": [
+    {
+      "id": "accounting_deepen_001",
+      "lang": "en",
+      "query": "Does this trial balance tie? Show total debit, total credit, and any out-of-balance control tags by account class.",
+      "sourceLock": "active_doc_only",
+      "expected": {
+        "mustExtract": [
+          "debit_total",
+          "credit_total",
+          "difference_if_any",
+          "account_code",
+          "control_status"
+        ],
+        "mustExtractFrom": [
+          "header",
+          "line_items",
+          "summary"
+        ],
+        "mustNotInfer": [
+          "balanced_without_summary"
+        ],
+        "mustHaveLineLevel": true,
+        "failureConditions": [
+          "reports_trial_balance_without_sum_check",
+          "uses_total_as_total_without_account_codes"
+        ]
+      }
+    },
+    {
+      "id": "accounting_deepen_002",
+      "lang": "en",
+      "query": "Reconcile bank and GL balances and list every adjustment used to close to a clean tie.",
+      "sourceLock": "active_doc_only",
+      "expected": {
+        "mustFindSection": [
+          "bank_reconciliation",
+          "book_balance",
+          "adjustments"
+        ],
+        "mustContain": [
+          "outstanding checks",
+          "deposits in transit",
+          "adjusted balance"
+        ],
+        "mustPreserveSign": true,
+        "mustShowScope": [
+          "statement date",
+          "account",
+          "period"
+        ],
+        "failureConditions": [
+          "omits_scope",
+          "drops_open_items",
+          "mixes_different_currency"
+        ]
+      }
+    },
+    {
+      "id": "accounting_deepen_003",
+      "lang": "en",
+      "query": "Which top aging buckets are still materially delinquent, and do AR/AP totals still tie to their control accounts?",
+      "expected": {
+        "mustExtract": [
+          "aging_bucket",
+          "bucket_amount",
+          "outstanding_aging_total",
+          "control_account_tie_status"
+        ],
+        "mustPreserveBuckets": true,
+        "mustShowVariance": true,
+        "mustExplainBasis": true,
+        "failureConditions": [
+          "sums_without_bucket_headers",
+          "reports_tie_without_control_account",
+          "assumes_currency_when_missing"
+        ]
+      }
+    },
+    {
+      "id": "accounting_deepen_004",
+      "lang": "pt",
+      "query": "Confirme se o relatório de ajuste de caixa está fechado: quais lançamentos não conciliam e qual o efeito por conta?",
+      "expected": {
+        "mustFindSection": [
+          "line_items",
+          "reconciliation_summary",
+          "signoff"
+        ],
+        "mustContain": [
+          "lancamentos",
+          "saldo de ajuste",
+          "conta"
+        ],
+        "mustNotConflate": [
+          "valor_liquido_com_ajuste",
+          "contas_devedoras_com_creditoras"
+        ],
+        "failureConditions": [
+          "resposta_agrupada_sem_codigo_de_conta",
+          "omite_periodo"
+        ]
+      }
+    }
+  ],
+  "qualityGuards": {
+    "coverageThreshold": {
+      "lineItems": 3,
+      "sourceAnchors": 2
+    },
+    "scoring": {
+      "tie_out_accuracy": 0.35,
+      "sign_consistency": 0.25,
+      "control_visibility": 0.2,
+      "variance_explanation": 0.2
+    }
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "accounting_gold_requires_tie_out_open_items",
+        "input": {
+          "query": "accounting_deepen_001"
+        },
+        "expect": {
+          "mustHaveLineLevel": true,
+          "mustContain": [
+            "difference_if_any"
+          ]
+        }
+      }
+    ]
+  }
+}

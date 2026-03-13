@@ -29,7 +29,7 @@ const DEFAULT_REDACT_KEYS = [
 ];
 
 const DEFAULT_RUNTIME_PATHS_NO_RAW_CONSOLE = [
-  "src/modules/chat/runtime/CentralizedChatRuntimeDelegate.ts",
+  "src/modules/chat/runtime/ChatTurnExecutor.ts",
   "src/modules/chat/runtime/ChatRuntimeOrchestrator.ts",
   "src/services/core/retrieval/evidenceGate.service.ts",
   "src/services/llm/core/llmGateway.service.ts",

@@ -56,31 +56,6 @@
       "neverAskSameQuestionWithinTurns": 3
     }
   },
-  "integrationHooks": {
-    "dependsOn": [
-      "ambiguity_rank_features",
-      "disambiguation_policies",
-      "disambiguation_render_policy",
-      "clarification_phrases",
-      "option_labeling_rules",
-      "followup_indicators",
-      "scope_hints",
-      "state_update_rules",
-      "memory_decay_rules"
-    ],
-    "signalsExpected": [
-      "isBlocked",
-      "isAmbiguous",
-      "candidateCount",
-      "topScore",
-      "scoreGap",
-      "hasConcreteOptions",
-      "explicitDocLock",
-      "intentFamily",
-      "isFollowup",
-      "followupStrength"
-    ]
-  },
   "policies": {
     "rules": [
       {
@@ -291,9 +266,6 @@
         "action": "route",
         "routeTo": "rank_disambiguate",
         "constraints": {
-          "renderPolicy": "disambiguation_render_policy",
-          "phrasesPolicy": "clarification_phrases",
-          "labelingPolicy": "option_labeling_rules",
           "maxOptions": 4,
           "maxQuestions": 1
         }

@@ -1,0 +1,76 @@
+{
+  "_meta": {
+    "id": "eval_style_canned_empathy",
+    "version": "1.0.0",
+    "description": "Canned empathy detector and replacement rules for grounded, specific supportive language.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "eval-ops",
+    "usedBy": [
+      "services/eval/styleJudge.service.ts"
+    ],
+    "tests": [
+      "tests/eval/cannedEmpathy.proof.test.ts",
+      "tests/eval/styleCoverage.proof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "scenarioType": "empathy_cadence"
+  },
+  "bans": [
+    "I understand how frustrating",
+    "I know this can be difficult",
+    "don't worry",
+    "no worries",
+    "I completely understand"
+  ],
+  "cases": [
+    {
+      "id": "canned_empathy_001",
+      "lang": "en",
+      "query": "The contract seems very long. Can you extract the indemnity section quickly?",
+      "expected": {
+        "mustNotUse": [
+          "I understand how frustrating",
+          "it can be difficult"
+        ],
+        "mustUse": [
+          "Direct section extraction",
+          "Specific next boundary"
+        ],
+        "mustContainEvidence": true,
+        "failureConditions": [
+          "soft_intro_without_action",
+          "no_documented_path"
+        ]
+      }
+    },
+    {
+      "id": "canned_empathy_002",
+      "lang": "pt",
+      "query": "Esse relatório é grande, consegue pegar os pontos de risco?",
+      "expected": {
+        "mustNotUse": [
+          "entendo que seja dificil",
+          "n\u00e3o se preocupe"
+        ],
+        "mustUse": [
+          "extra\u00e7\u00e3o de risco com se\u00e7\u00f5es",
+          "fronteira de fonte definida"
+        ],
+        "failureConditions": [
+          "resposta_como_atendimento",
+          "resposta_sem_ancora"
+        ]
+      }
+    }
+  ],
+  "penalties": {
+    "cannedEmpathyScore": -10,
+    "lowSpecificityWithCaring": -8,
+    "roboticWarmthPenalty": -6
+  }
+}

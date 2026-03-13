@@ -470,6 +470,51 @@
         "expect": {
           "maxAssumptionsPerAnswer": 2
         }
+      },
+      {
+        "id": "ASSUME_T_002",
+        "runtime": {
+          "context": "low_risk_context"
+        },
+        "expect": {
+          "maxAssumptionsPerAnswer": 2
+        }
+      },
+      {
+        "id": "ASSUME_T_003",
+        "runtime": {
+          "context": "low_risk_context"
+        },
+        "expect": {
+          "maxAssumptionsPerAnswer": 2
+        }
+      },
+      {
+        "id": "ASSUME_T_004",
+        "runtime": {
+          "context": "low_risk_context"
+        },
+        "expect": {
+          "maxAssumptionsPerAnswer": 2
+        }
+      },
+      {
+        "id": "ASSUME_T_005",
+        "runtime": {
+          "context": "low_risk_context"
+        },
+        "expect": {
+          "maxAssumptionsPerAnswer": 2
+        }
+      },
+      {
+        "id": "ASSUME_T_006",
+        "runtime": {
+          "context": "low_risk_context"
+        },
+        "expect": {
+          "maxAssumptionsPerAnswer": 2
+        }
       }
     ]
   },

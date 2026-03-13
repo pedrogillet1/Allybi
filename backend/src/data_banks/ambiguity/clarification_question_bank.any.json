@@ -1,0 +1,311 @@
+{
+  "_meta": {
+    "id": "clarification_question_bank",
+    "version": "1.0.0",
+    "description": "High-yield clarification question recipes for ambiguity that genuinely blocks a grounded answer. Optimized for one brief premium-assistant question rather than brittle extractor retries.",
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "koda-ambiguity",
+    "compat": ">=1.0.0",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ],
+    "changeLog": [
+      "Added clarification question archetypes for document, period, role, unit, comparison, and missing-condition ambiguity",
+      "Added suppression rules so the system answers cautiously instead of asking when the missing detail is non-blocking",
+      "Added runtime and test metadata for deterministic one-question behavior"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id",
+    "maxQuestions": 1,
+    "minOptions": 2,
+    "maxOptions": 4,
+    "preferClosedChoice": true,
+    "openQuestionOnlyWhenNoConcreteChoicesExist": true,
+    "suppressIfCautiousAnswerIsViable": true,
+    "requireQuestionToResolvePrimaryBlocker": true
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "after ambiguity detection and before answer composition",
+    "consumer": "clarification planner",
+    "intent": "Choose one concise question that unlocks the highest-value next step, or suppress clarification if the answer can proceed safely.",
+    "emittedSignals": [
+      "clarificationQuestionPlan",
+      "clarificationReasonCode",
+      "clarificationSuppressed",
+      "clarificationQuestionType"
+    ]
+  },
+  "questionArchetypes": [
+    {
+      "id": "cqb_select_document",
+      "questionType": "document_scope",
+      "bestFor": [
+        "multiple candidate documents",
+        "same section or term appears in more than one document"
+      ],
+      "promptShape": "Which document should I use: {{options}}?",
+      "optionRenderPolicy": "use_short_human_labels",
+      "answerInsteadWhen": "topDocumentConfidence >= 0.88 AND topDocumentGap >= 0.25"
+    },
+    {
+      "id": "cqb_select_period",
+      "questionType": "period_scope",
+      "bestFor": [
+        "time-sensitive metric",
+        "multiple periods materially change the answer"
+      ],
+      "promptShape": "Which period should I use: {{options}}?",
+      "optionRenderPolicy": "prefer_specific_dates_or_quarters",
+      "answerInsteadWhen": "requestedPeriodIsImplicitlyActive == true AND periodConflictMateriality < 0.1"
+    },
+    {
+      "id": "cqb_select_role",
+      "questionType": "field_role",
+      "bestFor": [
+        "one label maps to several people or roles",
+        "generic asks like owner, signer, patient, beneficiary, subscriber"
+      ],
+      "promptShape": "Do you mean {{options}}?",
+      "optionRenderPolicy": "use_role_plus_person_or_entity_name",
+      "answerInsteadWhen": "onlyOneRoleHasDirectEvidence == true"
+    },
+    {
+      "id": "cqb_select_metric_definition",
+      "questionType": "metric_definition",
+      "bestFor": [
+        "metric name collision",
+        "gross vs net or local vs normalized variants"
+      ],
+      "promptShape": "Which definition should I use: {{options}}?",
+      "optionRenderPolicy": "show_short_definition_deltas",
+      "answerInsteadWhen": "oneDefinitionIsExplicitlyNamedInSource == true"
+    },
+    {
+      "id": "cqb_supply_missing_condition",
+      "questionType": "missing_external_condition",
+      "bestFor": [
+        "document answer depends on an external state not established in the file",
+        "renewed, approved, paid, delivered, activated"
+      ],
+      "promptShape": "Has {{conditionLabel}} happened yet?",
+      "optionRenderPolicy": "prefer_yes_no_if_binary",
+      "answerInsteadWhen": "canAnswerConditionallyWithoutPretendingCondition == true"
+    },
+    {
+      "id": "cqb_select_unit_or_currency",
+      "questionType": "unit_currency",
+      "bestFor": [
+        "conflicting units",
+        "multiple currencies",
+        "normalized vs raw values"
+      ],
+      "promptShape": "Should I use {{options}}?",
+      "optionRenderPolicy": "keep_units_verbatim",
+      "answerInsteadWhen": "dominantUnitCoverage >= 0.9"
+    },
+    {
+      "id": "cqb_select_comparison_target",
+      "questionType": "comparison_target",
+      "bestFor": [
+        "compare intent with only one side specified",
+        "higher or lower relative to unknown baseline"
+      ],
+      "promptShape": "What should I compare it against: {{options}}?",
+      "optionRenderPolicy": "prefer_recent_or_contextual_defaults",
+      "answerInsteadWhen": "conversationHasSingleStableBaseline == true"
+    },
+    {
+      "id": "cqb_select_granularity",
+      "questionType": "granularity",
+      "bestFor": [
+        "aggregate vs line-item ambiguity",
+        "person-level vs household-level ambiguity"
+      ],
+      "promptShape": "Do you want {{options}}?",
+      "optionRenderPolicy": "keep choices parallel and concrete",
+      "answerInsteadWhen": "userIntentStronglyImpliesRequestedGranularity == true"
+    }
+  ],
+  "rules": [
+    {
+      "id": "CQB_001_role_question_when_people_are_distinct",
+      "priority": 120,
+      "when": {
+        "all": [
+          {
+            "path": "signals.fieldRoleAmbiguous",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "context.roleCandidates.count",
+            "op": "gte",
+            "value": 2
+          }
+        ]
+      },
+      "action": {
+        "type": "emit_question",
+        "questionArchetype": "cqb_select_role"
+      },
+      "reasonCode": "role_confusion_blocks_answer",
+      "severity": "high"
+    },
+    {
+      "id": "CQB_002_period_question_when_material_answer_changes",
+      "priority": 115,
+      "when": {
+        "all": [
+          {
+            "path": "signals.periodAmbiguous",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "metrics.periodMateriality",
+            "op": "gte",
+            "value": 0.15
+          }
+        ]
+      },
+      "action": {
+        "type": "emit_question",
+        "questionArchetype": "cqb_select_period"
+      },
+      "reasonCode": "period_required_for_precise_answer",
+      "severity": "high"
+    },
+    {
+      "id": "CQB_003_use_open_condition_question_only_when_choices_missing",
+      "priority": 105,
+      "when": {
+        "all": [
+          {
+            "path": "signals.externalConditionMissing",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "context.binaryConditionAvailable",
+            "op": "neq",
+            "value": true
+          }
+        ]
+      },
+      "action": {
+        "type": "emit_question",
+        "questionArchetype": "cqb_supply_missing_condition"
+      },
+      "reasonCode": "answer_depends_on_missing_condition",
+      "severity": "medium"
+    },
+    {
+      "id": "CQB_004_suppress_question_when_best_effort_answer_is_safe",
+      "priority": 130,
+      "when": {
+        "all": [
+          {
+            "path": "signals.safeScopedAnswerAvailable",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "metrics.answerRisk",
+            "op": "lt",
+            "value": 0.35
+          }
+        ]
+      },
+      "action": {
+        "type": "suppress_question",
+        "strategy": "answer_cautiously"
+      },
+      "reasonCode": "clarification_not_required",
+      "severity": "medium"
+    },
+    {
+      "id": "CQB_005_question_must_target_primary_blocker",
+      "priority": 140,
+      "when": {
+        "all": [
+          {
+            "path": "context.primaryBlockerResolvedByQuestion",
+            "op": "neq",
+            "value": true
+          }
+        ]
+      },
+      "action": {
+        "type": "reject_question"
+      },
+      "reasonCode": "question_would_not_unlock_answer",
+      "severity": "critical"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "clarify_role_not_doc_when_same_doc_has_signer_and_owner",
+        "input": {
+          "signals": {
+            "fieldRoleAmbiguous": true,
+            "periodAmbiguous": false
+          },
+          "context": {
+            "roleCandidates": {
+              "count": 2
+            }
+          }
+        },
+        "expect": {
+          "questionArchetype": "cqb_select_role",
+          "maxQuestions": 1
+        }
+      },
+      {
+        "id": "suppress_question_if_safe_answer_exists",
+        "input": {
+          "signals": {
+            "safeScopedAnswerAvailable": true
+          },
+          "metrics": {
+            "answerRisk": 0.2
+          }
+        },
+        "expect": {
+          "action": "suppress_question",
+          "strategy": "answer_cautiously"
+        }
+      },
+      {
+        "id": "period_question_when_quarters_change_answer",
+        "input": {
+          "signals": {
+            "periodAmbiguous": true
+          },
+          "metrics": {
+            "periodMateriality": 0.22
+          }
+        },
+        "expect": {
+          "questionArchetype": "cqb_select_period"
+        }
+      }
+    ]
+  }
+}

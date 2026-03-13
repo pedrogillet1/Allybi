@@ -2,7 +2,7 @@
   "_meta": {
     "id": "editing_microcopy",
     "version": "2.0.0",
-    "description": "Microcopy for edit flows (preview/confirm/apply/undo/error), localized for EN/PT. Includes canonical-operator overrides with {{placeholder}} interpolation.",
+    "description": "Localized microcopy for edit flows (preview, confirm, apply, undo, noop, error) in EN/PT. Includes per-operator overrides for DOCX and XLSX actions with mustache-style variable interpolation.",
     "languages": [
       "any",
       "en",

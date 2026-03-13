@@ -1,0 +1,386 @@
+{
+  "_meta": {
+    "id": "field_role_ontology",
+    "version": "1.0.0",
+    "description": "Canonical role ontology and role-confusion graph used before exact-field binding.",
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "koda-retrieval",
+    "compat": ">=1.0.0",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "sortBy": "id",
+    "minRoleSignalConfidence": 0.8,
+    "requireRoleAnchorIfAmbiguous": true
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "before field binding and table row disambiguation",
+    "consumer": "retrieval role resolver",
+    "intent": "resolve signer/owner/witness/beneficiary/patient/subscriber role labels without silent role substitution",
+    "emittedSignals": [
+      "resolvedRole",
+      "roleAnchorConfidence",
+      "roleConfusionRisk",
+      "requiresRoleClarification"
+    ]
+  },
+  "roles": [
+    {
+      "id": "owner",
+      "canonical": "owner",
+      "aliases": [
+        "owner",
+        "proprietor",
+        "property owner",
+        "holder",
+        "registered owner",
+        "outorgante",
+        "proprietario",
+        "titular",
+        "titular da conta"
+      ],
+      "forbiddenSubstitutions": [
+        "signer",
+        "beneficiary",
+        "witness",
+        "patient"
+      ],
+      "confusionWith": [
+        "signer",
+        "beneficiary",
+        "guarantor",
+        "subscriber"
+      ],
+      "resolutionSignals": [
+        "owns title",
+        "property owned",
+        "benefit of ownership",
+        "registered as owner"
+      ]
+    },
+    {
+      "id": "signer",
+      "canonical": "signer",
+      "aliases": [
+        "signer",
+        "signatory",
+        "subscriber",
+        "undersigned",
+        "assinante",
+        "assinado por",
+        "firmante"
+      ],
+      "forbiddenSubstitutions": [
+        "owner",
+        "witness",
+        "beneficiary"
+      ],
+      "confusionWith": [
+        "owner",
+        "witness",
+        "guarantor"
+      ],
+      "resolutionSignals": [
+        "signed",
+        "in witness whereof",
+        "by signature",
+        "assinado"
+      ]
+    },
+    {
+      "id": "witness",
+      "canonical": "witness",
+      "aliases": [
+        "witness",
+        "attesting witness",
+        "attendee",
+        "testemunha",
+        "na presenca de"
+      ],
+      "forbiddenSubstitutions": [
+        "signer",
+        "owner"
+      ],
+      "confusionWith": [
+        "signer"
+      ],
+      "resolutionSignals": [
+        "attested by",
+        "in witness whereof",
+        "presence of witness"
+      ]
+    },
+    {
+      "id": "beneficiary",
+      "canonical": "beneficiary",
+      "aliases": [
+        "beneficiary",
+        "payee",
+        "recipient",
+        "insured",
+        "beneficiario",
+        "favorecido"
+      ],
+      "forbiddenSubstitutions": [
+        "owner",
+        "signer",
+        "subscriber",
+        "patient"
+      ],
+      "confusionWith": [
+        "subscriber",
+        "payee"
+      ],
+      "resolutionSignals": [
+        "benefits",
+        "payment is made to",
+        "pays",
+        "recipient"
+      ]
+    },
+    {
+      "id": "issuer",
+      "canonical": "issuer",
+      "aliases": [
+        "issuer",
+        "issuer party",
+        "emitter",
+        "emissor",
+        "provider",
+        "institution",
+        "authorizing body"
+      ],
+      "forbiddenSubstitutions": [
+        "owner",
+        "signer",
+        "subscriber",
+        "beneficiary"
+      ],
+      "confusionWith": [
+        "provider",
+        "payee"
+      ],
+      "resolutionSignals": [
+        "issued by",
+        "document issued",
+        "approved by",
+        "emitente"
+      ]
+    },
+    {
+      "id": "patient",
+      "canonical": "patient",
+      "aliases": [
+        "patient",
+        "insured person",
+        "client",
+        "patient",
+        "utente",
+        "paciente"
+      ],
+      "forbiddenSubstitutions": [
+        "subscriber",
+        "owner",
+        "beneficiary"
+      ],
+      "confusionWith": [
+        "subscriber",
+        "beneficiary",
+        "account_holder"
+      ],
+      "resolutionSignals": [
+        "treatment",
+        "medical record",
+        "health coverage",
+        "claimant is patient"
+      ]
+    },
+    {
+      "id": "subscriber",
+      "canonical": "subscriber",
+      "aliases": [
+        "subscriber",
+        "subscriber id",
+        "policy holder",
+        "contract holder",
+        "associado",
+        "segurado",
+        "assinante"
+      ],
+      "forbiddenSubstitutions": [
+        "patient",
+        "owner",
+        "beneficiary"
+      ],
+      "confusionWith": [
+        "policy_holder",
+        "account_holder",
+        "owner"
+      ],
+      "resolutionSignals": [
+        "policy number",
+        "contracting party",
+        "enrollment",
+        "subscriber details"
+      ]
+    },
+    {
+      "id": "account_holder",
+      "canonical": "account_holder",
+      "aliases": [
+        "account holder",
+        "account owner",
+        "accounting holder",
+        "titular da conta",
+        "holder"
+      ],
+      "forbiddenSubstitutions": [
+        "payee",
+        "beneficiary",
+        "witness"
+      ],
+      "confusionWith": [
+        "owner",
+        "subscriber",
+        "payer"
+      ],
+      "resolutionSignals": [
+        "account number",
+        "bank account",
+        "payor account",
+        "account linked to"
+      ]
+    },
+    {
+      "id": "payer",
+      "canonical": "payer",
+      "aliases": [
+        "payer",
+        "payer id",
+        "who pays",
+        "payor",
+        "pagador",
+        "pagante"
+      ],
+      "forbiddenSubstitutions": [
+        "beneficiary",
+        "witness",
+        "signer",
+        "patient"
+      ],
+      "confusionWith": [
+        "subscriber",
+        "account_holder"
+      ],
+      "resolutionSignals": [
+        "payment obligation",
+        "invoice paid by",
+        "payer",
+        "who bears cost"
+      ]
+    }
+  ],
+  "forbiddenPairs": [
+    {
+      "left": "signer",
+      "right": "owner",
+      "reason": "same lexical context can exist but role semantics differ"
+    },
+    {
+      "left": "patient",
+      "right": "subscriber",
+      "reason": "can co-refer but should never auto-substitute"
+    },
+    {
+      "left": "beneficiary",
+      "right": "issuer",
+      "reason": "recipient vs source authority"
+    },
+    {
+      "left": "witness",
+      "right": "signer",
+      "reason": "presence in same sentence often causes accidental collapse"
+    }
+  ],
+  "rules": [
+    {
+      "id": "FRO_001_require_exact_role_forbidden_subs",
+      "check": "query.roleMentioned == true AND binding.roleSubstitutionAttempted == true AND roles.canSubstitute == false",
+      "failureAction": "BLOCK_ROLE_SUBSTITUTION",
+      "severity": "high"
+    },
+    {
+      "id": "FRO_002_patient_subscriber_disambiguation",
+      "check": "context.roleCandidates.contains('patient') AND context.roleCandidates.contains('subscriber') AND context.roleCandidates.count > 1",
+      "failureAction": "ASK_ROLE_DISAMBIGUATION",
+      "severity": "error"
+    },
+    {
+      "id": "FRO_003_owner_signer_disambiguation",
+      "check": "context.roleCandidates.contains('owner') AND context.roleCandidates.contains('signer') AND context.roleCandidates.count > 1",
+      "failureAction": "ASK_ROLE_DISAMBIGUATION",
+      "severity": "error"
+    },
+    {
+      "id": "FRO_004_witness_context_guard",
+      "check": "binding.role == 'witness' AND binding.roleSource.hasNoSignatureCue == true",
+      "failureAction": "ASK_SIGNING_CONTEXT",
+      "severity": "warning"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "role_ontology_forbids_owner_as_signer",
+        "input": {
+          "query": {
+            "roleCandidates": [
+              "owner",
+              "signer"
+            ]
+          },
+          "context": {
+            "roleCandidates": {
+              "count": 2
+            }
+          }
+        },
+        "expect": {
+          "failureAction": "ASK_ROLE_DISAMBIGUATION"
+        }
+      },
+      {
+        "id": "role_ontology_patient_vs_subscriber_disambiguate",
+        "input": {
+          "context": {
+            "roleCandidates": {
+              "contains": {
+                "patient": true,
+                "subscriber": true
+              },
+              "count": 2
+            }
+          }
+        },
+        "expect": {
+          "failureAction": "ASK_ROLE_DISAMBIGUATION"
+        }
+      }
+    ]
+  }
+}

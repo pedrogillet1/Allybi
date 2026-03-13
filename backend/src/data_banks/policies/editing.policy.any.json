@@ -358,6 +358,19 @@
           "reasonCode": "revision_not_created",
           "action": "block"
         }
+      },
+      {
+        "id": "EDIT_POL_T_004",
+        "runtime": {
+          "signals": {
+            "targetConfidence": 0.45,
+            "userConfirmed": false
+          }
+        },
+        "expect": {
+          "reasonCode": "low_target_confidence",
+          "action": "route"
+        }
       }
     ]
   }

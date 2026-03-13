@@ -1,0 +1,248 @@
+import * as fs from "fs";
+import * as os from "os";
+import * as path from "path";
+
+import { describe, expect, test } from "@jest/globals";
+
+import { PolicyValidatorService } from "./policyValidator.service";
+
+describe("PolicyValidatorService", () => {
+  test("flags missing strict meta contract fields", () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "policy-validator-"));
+    const filePath = path.join(dir, "sample.any.json");
+    fs.writeFileSync(
+      filePath,
+      JSON.stringify(
+        {
+          _meta: {
+            id: "sample_policy",
+            version: "1.0.0",
+            description: "sample",
+            lastUpdated: "2026-03-03",
+          },
+          config: { enabled: true },
+          rules: [{ id: "R1", when: { any: true }, then: { action: "allow" } }],
+        },
+        null,
+        2,
+      ),
+    );
+
+    const service = new PolicyValidatorService();
+    const result = service.validateFile(filePath);
+
+    expect(result.ok).toBe(false);
+    expect(result.issues.some((issue) => issue.code === "meta_missing_owner")).toBe(
+      true,
+    );
+    expect(
+      result.issues.some((issue) => issue.code === "meta_missing_reviewCadenceDays"),
+    ).toBe(true);
+    expect(
+      result.issues.some((issue) => issue.code === "meta_missing_criticality"),
+    ).toBe(true);
+  });
+
+  test("detects duplicate policy case prompt tuples", () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "policy-validator-"));
+    const filePath = path.join(dir, "memory_policy_tests.any.json");
+    fs.writeFileSync(
+      filePath,
+      JSON.stringify(
+        {
+          _meta: {
+            id: "memory_policy_tests",
+            version: "1.0.0",
+            description: "sample",
+            lastUpdated: "2026-03-03",
+            owner: "runtime-certification",
+            reviewCadenceDays: 30,
+            criticality: "low",
+          },
+          config: { enabled: true },
+          cases: [
+            {
+              id: "A",
+              language: "en",
+              category: "scope_memory",
+              prompt: "use same file",
+            },
+            {
+              id: "B",
+              language: "en",
+              category: "scope_memory",
+              prompt: "use same file",
+            },
+          ],
+        },
+        null,
+        2,
+      ),
+    );
+
+    const service = new PolicyValidatorService();
+    const result = service.validateFile(filePath);
+    expect(
+      result.issues.some((issue) => issue.code === "duplicate_prompt_case"),
+    ).toBe(true);
+  });
+
+  test("requires executable rules for high/critical banks unless configModeOnly", () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "policy-validator-"));
+    const filePath = path.join(dir, "logging_policy.any.json");
+    fs.writeFileSync(
+      filePath,
+      JSON.stringify(
+        {
+          _meta: {
+            id: "logging_policy",
+            version: "1.0.0",
+            description: "logging policy",
+            lastUpdated: "2026-03-03",
+            owner: "platform-observability",
+            reviewCadenceDays: 30,
+            criticality: "high",
+          },
+          config: { enabled: true },
+          tests: { cases: [{ id: "LOG1" }] },
+        },
+        null,
+        2,
+      ),
+    );
+
+    const service = new PolicyValidatorService();
+    const result = service.validateFile(filePath);
+    expect(
+      result.issues.some((issue) => issue.code === "critical_policy_missing_rules"),
+    ).toBe(true);
+  });
+
+  test("executes behavior cases when runtime + expect.action are present", () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "policy-validator-"));
+    const filePath = path.join(dir, "sample_behavior.any.json");
+    fs.writeFileSync(
+      filePath,
+      JSON.stringify(
+        {
+          _meta: {
+            id: "sample_behavior",
+            version: "1.0.0",
+            description: "behavior test",
+            lastUpdated: "2026-03-03",
+            owner: "runtime-certification",
+            reviewCadenceDays: 30,
+            criticality: "medium",
+          },
+          config: { enabled: true },
+          rules: [
+            {
+              id: "DENY_A",
+              priority: 100,
+              when: { path: "signals.block", op: "eq", value: true },
+              then: { action: "deny" },
+            },
+          ],
+          tests: {
+            cases: [
+              {
+                id: "CASE_1",
+                runtime: { signals: { block: true } },
+                expect: { action: "allow" },
+              },
+            ],
+          },
+        },
+        null,
+        2,
+      ),
+    );
+
+    const service = new PolicyValidatorService();
+    const result = service.validateFile(filePath);
+    expect(
+      result.issues.some((issue) => issue.code === "policy_case_expectation_mismatch"),
+    ).toBe(true);
+  });
+
+  test("supports non-action structured expectations in A-grade mode", () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "policy-validator-"));
+    const filePath = path.join(dir, "logging_policy.any.json");
+    fs.writeFileSync(
+      filePath,
+      JSON.stringify(
+        {
+          _meta: {
+            id: "logging_policy",
+            version: "1.0.0",
+            description: "logging policy",
+            lastUpdated: "2026-03-03",
+            owner: "platform-observability",
+            reviewCadenceDays: 30,
+            criticality: "high",
+          },
+          config: {
+            enabled: true,
+            strict: true,
+            failClosedInProd: true,
+            configModeOnly: true,
+            redactKeys: ["password"],
+          },
+          tests: {
+            cases: Array.from({ length: 6 }, (_, index) => ({
+              id: `LOG_${index + 1}`,
+              input: { password: "secret" },
+              expect: { redacted: true },
+            })),
+          },
+        },
+        null,
+        2,
+      ),
+    );
+
+    const service = new PolicyValidatorService();
+    const result = service.validateFile(filePath, { gradeMode: "a" });
+    expect(result.ok).toBe(true);
+    expect(result.grade).toBe("A");
+    expect(result.validatedCaseCount).toBe(6);
+  });
+
+  test("fails A-grade mode when cases use legacy assert text", () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "policy-validator-"));
+    const filePath = path.join(dir, "viewer_locked_chat_policy.any.json");
+    fs.writeFileSync(
+      filePath,
+      JSON.stringify(
+        {
+          _meta: {
+            id: "viewer_locked_chat_policy",
+            version: "1.0.0",
+            description: "viewer policy",
+            lastUpdated: "2026-03-03",
+            owner: "allybi-viewer",
+            reviewCadenceDays: 30,
+            criticality: "medium",
+          },
+          config: {
+            enabled: true,
+            strict: true,
+            configModeOnly: true,
+          },
+          tests: {
+            cases: [{ id: "VIEW_1", assert: "viewer mode defaults to qa_locked" }],
+          },
+        },
+        null,
+        2,
+      ),
+    );
+
+    const service = new PolicyValidatorService();
+    const result = service.validateFile(filePath, { gradeMode: "a" });
+    expect(result.ok).toBe(false);
+    expect(
+      result.issues.some((issue) => issue.code === "policy_case_uses_legacy_assert"),
+    ).toBe(true);
+  });
+});

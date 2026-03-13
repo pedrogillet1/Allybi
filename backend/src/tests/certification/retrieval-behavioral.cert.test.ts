@@ -1,7 +1,8 @@
 import { describe, expect, test } from "@jest/globals";
 
 import seeds from "../../services/core/retrieval/__fixtures__/doclock-benchmark.seeds.json";
-import { RetrievalEngineService } from "../../services/core/retrieval/retrievalEngine.service";
+import { RetrievalEngineService } from "../../services/core/retrieval/v2/RetrievalOrchestrator.service";
+import { createDefaultQueryNormalizer } from "../../services/core/retrieval/v2/DefaultQueryNormalizer.service";
 import { writeCertificationGateReport } from "./reporting";
 
 type BenchmarkMode =
@@ -210,6 +211,7 @@ function makeBenchmarkEngine(): RetrievalEngineService {
     semanticIndex as any,
     lexicalIndex as any,
     structuralIndex as any,
+    createDefaultQueryNormalizer(),
   );
 }
 

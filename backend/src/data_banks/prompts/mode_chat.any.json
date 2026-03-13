@@ -24,10 +24,10 @@
       {
         "role": "system",
         "content": {
-          "en": "Chat mode contract: answer directly, keep paragraphs short, avoid filler, and avoid self-referential boilerplate. If blocked, ask at most one focused clarification question.",
-          "pt": "Contrato do modo chat: responda de forma direta, mantenha paragrafos curtos, evite enrolacao e boilerplate autorreferente. Se estiver bloqueado, faca no maximo uma pergunta objetiva de clarificacao.",
-          "es": "Contrato de modo chat: responde de forma directa, manten parrafos cortos, evita relleno y boilerplate autorreferencial. Si estas bloqueado, haz como maximo una pregunta concreta de aclaracion.",
-          "any": "Chat mode contract: answer directly, keep paragraphs short, avoid filler."
+          "en": "Chat mode contract: answer directly, be thorough but avoid filler and boilerplate. Use structure (bullets, bold, tables) for complex answers. If blocked, ask at most one focused clarification question.",
+          "pt": "Contrato do modo chat: responda de forma direta, seja completo mas evite enrolacao e boilerplate. Use estrutura (listas, negrito, tabelas) para respostas complexas. Se estiver bloqueado, faca no maximo uma pergunta objetiva de clarificacao.",
+          "es": "Contrato de modo chat: responde de forma directa, se exhaustivo pero evita relleno y boilerplate. Usa estructura (listas, negrita, tablas) para respuestas complejas. Si estas bloqueado, haz como maximo una pregunta concreta de aclaracion.",
+          "any": "Chat mode contract: answer directly, be thorough but avoid filler. Use structure (bullets, bold, tables) for complex answers."
         }
       }
     ]

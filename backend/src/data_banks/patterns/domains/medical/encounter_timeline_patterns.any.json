@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "bankId": "medical_encounter_timeline_patterns",
+    "bankId": "patterns_medical_encounter_timeline_patterns",
     "version": "1.0.0",
     "owner": "koda-medical-curator",
     "languages": [

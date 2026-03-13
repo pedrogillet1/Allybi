@@ -9,7 +9,8 @@
  * runtimePatterns / triggers / intent engine / router.
  */
 
-export type LanguageCode = "en" | "pt" | "es";
+import type { LanguageCode } from "./common.types";
+export type { LanguageCode } from "./common.types";
 
 /** High-level family (used to choose routing branches + fallback style) */
 export type IntentFamily =

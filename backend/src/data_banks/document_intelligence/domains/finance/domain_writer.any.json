@@ -1,0 +1,219 @@
+{
+  "_meta": {
+    "id": "finance_domain_writer",
+    "version": "1.2.0",
+    "description": "Finance interpretive writer bank for evidence-bound, role-locked, and cross-entity financial reasoning.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "domain": "finance",
+    "interpretationMode": "analytic_interpretive",
+    "requireScopeLock": true,
+    "requireFieldRoleLock": true,
+    "requireCrossDocSynthesis": true,
+    "strictBasisAndPeriodAnchors": true
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "before final response assembly for finance queries",
+    "consumer": "finance domain writer",
+    "intent": "Move from exact extraction to financially coherent interpretation with explicit uncertainty and role locks.",
+    "emittedSignals": [
+      "financeInterpretiveMode",
+      "financeRoleLockState",
+      "financeBasisLock",
+      "financeScopeLock",
+      "financeDriverMatrix",
+      "financeConfidenceModifier"
+    ]
+  },
+  "writingProfile": {
+    "audience": "finance analyst, investor relations, finance operations reviewer",
+    "goal": "Convert extracted accounting figures into bounded conclusions on trend, runway, covenant health, and driver decomposition.",
+    "mandatorySections": [
+      "basis_and_scope_lock",
+      "executive_summary",
+      "metric_definition_and_formula",
+      "driver_analysis",
+      "variance_reconciliation",
+      "covenant_or_commitment_status",
+      "risk_flags",
+      "uncertainty_and_next_steps"
+    ],
+    "allowedAnswerForms": [
+      "driver_explanation",
+      "variance_trend_summary",
+      "covenant_health_dashboard",
+      "forecast_with_boundary",
+      "cross_doc_rollforward"
+    ],
+    "forbiddenAnswerForms": [
+      "single_number_without_basis",
+      "unscoped_period_merge",
+      "role_ambiguous_party_metric",
+      "forecast_or_model_statement_without_citation",
+      "assumptions_not_isolated"
+    ],
+    "docTypeAnchors": [
+      "fin_10k",
+      "fin_10q",
+      "fin_8k",
+      "fin_annual_report",
+      "fin_annual_financials",
+      "fin_income_statement",
+      "fin_balance_sheet",
+      "fin_cash_flow",
+      "fin_budget",
+      "fin_forecast",
+      "fin_budget_vs_actual",
+      "fin_rolling_forecast",
+      "fin_covenant",
+      "fin_covenant_report",
+      "fin_covenant_compliance_certificate",
+      "fin_cap_table",
+      "fin_debt_schedule",
+      "fin_bank_statement",
+      "fin_cash_management",
+      "fin_financing_term_sheet",
+      "fin_credit_facility",
+      "fin_arr_mrr_report",
+      "fin_cohort_analysis"
+    ],
+    "sectionPriority": [
+      "document_header",
+      "executive_summary",
+      "financial_statements",
+      "notes",
+      "ratios",
+      "cash_management",
+      "covenant_tracking",
+      "forecast_model",
+      "assumptions",
+      "disclosures",
+      "appendix"
+    ]
+  },
+  "interpretiveRules": [
+    {
+      "id": "FIN_WRITER_001_role_lock_first",
+      "description": "Resolve party and role before synthesis; never combine borrower/lender/owner/issuer/beneficiary/subscriber values across roles.",
+      "requiredFor": "compare, evaluate, summarize"
+    },
+    {
+      "id": "FIN_WRITER_002_anchor_before_math",
+      "description": "Before any arithmetic, emit the exact metric definition, period, entity, basis, and currency in the response.",
+      "requiredFor": "calculate, compare, validate"
+    },
+    {
+      "id": "FIN_WRITER_003_scale_normalization",
+      "description": "When scale markers differ, show as-reported and normalized values and preserve chosen normalization policy.",
+      "requiredFor": "compare, calculate"
+    },
+    {
+      "id": "FIN_WRITER_004_driver_before_verdict",
+      "description": "For trend and variance statements, produce driver chain (volume, pricing, mix, exchange, seasonality, accounting-policy effect) before conclusion.",
+      "requiredFor": "variance, trend"
+    },
+    {
+      "id": "FIN_WRITER_005_covenant_treatment",
+      "description": "For covenant checks, return metric, numerator/denominator, threshold, measurement date, calculation basis, and pass/fail state with cure/deadline if present.",
+      "requiredFor": "evaluate, summarize"
+    },
+    {
+      "id": "FIN_WRITER_006_forecast_clarity",
+      "description": "Forecast outputs must classify source (guidance, company model, scenario, or assumption) and avoid presenting scenario logic as fact.",
+      "requiredFor": "calculate, evaluate"
+    },
+    {
+      "id": "FIN_WRITER_007_currency_bound",
+      "description": "Report currency treatment explicitly and keep currency conversion assumptions next to any cross-currency comparison.",
+      "requiredFor": "compare, calculate"
+    },
+    {
+      "id": "FIN_WRITER_008_table_axis_guard",
+      "description": "State declared table axis orientation and keep row/column meaning stable from extraction until result.",
+      "requiredFor": "table_query, compare"
+    },
+    {
+      "id": "FIN_WRITER_009_version_hygiene",
+      "description": "When mixed versions exist, use the selected version scope only and preserve the active/in-effect date in each claim.",
+      "requiredFor": "compare, validate"
+    },
+    {
+      "id": "FIN_WRITER_010_infer_with_bounds",
+      "description": "Any inferred conclusion must include confidence band and explicit open assumptions.",
+      "requiredFor": "infer, predict"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "finance_writer_blocks_role_mix",
+        "input": {
+          "query": "Borrower vs lender cash flow exposure."
+        },
+        "expect": {
+          "mustInclude": [
+            "financeRoleLockState",
+            "role",
+            "basis",
+            "period"
+          ]
+        }
+      },
+      {
+        "id": "finance_writer_requires_driver_chain",
+        "input": {
+          "query": "Why did margin improve from Q1 to Q2?"
+        },
+        "expect": {
+          "mustInclude": [
+            "driver"
+          ]
+        }
+      },
+      {
+        "id": "finance_writer_requires_covenant_status_fields",
+        "input": {
+          "query": "What is covenant compliance?"
+        },
+        "expect": {
+          "mustInclude": [
+            "covenant",
+            "metric",
+            "threshold",
+            "result"
+          ],
+          "mustNotInclude": [
+            "single_number"
+          ]
+        }
+      },
+      {
+        "id": "finance_writer_surfaces_assumption_scope",
+        "input": {
+          "query": "Runway estimate and forecast confidence."
+        },
+        "expect": {
+          "mustInclude": [
+            "assumption",
+            "uncertainty"
+          ]
+        }
+      }
+    ]
+  }
+}

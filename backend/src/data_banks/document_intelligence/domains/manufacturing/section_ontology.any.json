@@ -1,0 +1,145 @@
+{
+  "_meta": {
+    "id": "di_manufacturing_section_ontology",
+    "version": "1.0.0",
+    "description": "Manufacturing section ontology for process control and quality-critical interpretation.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/orchestration/sectionResolver.service.ts",
+      "services/core/orchestration/answerPlanner.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/section-detection.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "manufacturing"
+  },
+  "domain": "manufacturing",
+  "sections": [
+    {
+      "id": "mfg_section_routing",
+      "name": {
+        "en": "Work Routing",
+        "pt": "Roteamento de Trabalho"
+      },
+      "aliases": [
+        "routing",
+        "operation sequence",
+        "roteiro"
+      ],
+      "canonicalPurpose": "Defines sequence and resource requirements for each production line."
+    },
+    {
+      "id": "mfg_section_yield",
+      "name": {
+        "en": "Yield and Yield Loss",
+        "pt": "Rendimento"
+      },
+      "aliases": [
+        "yield",
+        "rework",
+        "scrap"
+      ],
+      "canonicalPurpose": "Captures output quality, acceptance, and reject rates."
+    },
+    {
+      "id": "mfg_section_quality",
+      "name": {
+        "en": "Quality Checks",
+        "pt": "Controles de Qualidade"
+      },
+      "aliases": [
+        "inspection",
+        "acceptance",
+        "quality"
+      ],
+      "canonicalPurpose": "Supports pass/fail and defect root-cause statements."
+    },
+    {
+      "id": "mfg_section_downtime",
+      "name": {
+        "en": "Downtime and Stops",
+        "pt": "Paradas"
+      },
+      "aliases": [
+        "stoppage",
+        "line stop",
+        "manutenção"
+      ],
+      "canonicalPurpose": "Captures reasons and timing of throughput interruption."
+    },
+    {
+      "id": "mfg_section_materials",
+      "name": {
+        "en": "Materials Consumption",
+        "pt": "Consumo de Materiais"
+      },
+      "aliases": [
+        "bom",
+        "components",
+        "matéria-prima"
+      ],
+      "canonicalPurpose": "Ties component usage to planned vs actual consumption."
+    },
+    {
+      "id": "mfg_section_oee",
+      "name": {
+        "en": "OEE and Throughput",
+        "pt": "OEE e Capacidade"
+      },
+      "aliases": [
+        "oee",
+        "throughput",
+        "cycle time"
+      ],
+      "canonicalPurpose": "Provides availability, performance, and quality-based utilization."
+    },
+    {
+      "id": "mfg_section_safety",
+      "name": {
+        "en": "Safety",
+        "pt": "Segurança"
+      },
+      "aliases": [
+        "incident",
+        "near miss",
+        "risk"
+      ],
+      "canonicalPurpose": "Captures risks and required corrective action evidence."
+    }
+  ],
+  "sectionAliases": {
+    "work_order": [
+      "ordem de produção",
+      "ordem operativa"
+    ],
+    "scrap": [
+      "desperdício",
+      "refugo",
+      "rejeito"
+    ],
+    "mttr": [
+      "tempo de reparo",
+      "repair duration"
+    ]
+  },
+  "runtimeHints": {
+    "priorityOrder": [
+      "mfg_section_routing",
+      "mfg_section_oee",
+      "mfg_section_yield",
+      "mfg_section_quality",
+      "mfg_section_materials",
+      "mfg_section_downtime",
+      "mfg_section_safety"
+    ],
+    "mustAnchorCrossQueryIf": "queryType in ['compare','evaluate','validate']"
+  }
+}

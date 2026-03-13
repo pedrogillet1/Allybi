@@ -1,0 +1,228 @@
+{
+  "_meta": {
+    "id": "di_research_scientific_doc_type_catalog",
+    "version": "1.0.0",
+    "description": "Scientific document catalog for protocols, trials, datasets, analyses, and publication-grade interpretation.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/retrieval/domainIntentRouter.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/docint-eval-pack.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "research_scientific"
+  },
+  "domain": "research_scientific",
+  "docTypes": [
+    {
+      "id": "research_protocol",
+      "name": {
+        "en": "Study Protocol",
+        "pt": "Protocolo do Estudo"
+      },
+      "description": "Design and rationale defining hypotheses, endpoints, and inclusion/exclusion.",
+      "detectionPatterns": [
+        "\\bstudy protocol\\b",
+        "\\bprotocol\\b",
+        "\\bprotocolo do estudo\\b",
+        "\\bhypothesis\\b"
+      ],
+      "canonicalSections": [
+        "hypothesis",
+        "population",
+        "endpoints",
+        "method",
+        "sample criteria"
+      ],
+      "extractionPriority": 142,
+      "riskTier": "high"
+    },
+    {
+      "id": "research_inclusion_criteria",
+      "name": {
+        "en": "Inclusion/Exclusion Criteria",
+        "pt": "Critérios de Inclusão/Exclusão"
+      },
+      "description": "Population eligibility and exclusions that define inference scope.",
+      "detectionPatterns": [
+        "\\binclusion criteria\\b",
+        "\\bexclusion criteria\\b",
+        "\\bcriterios de inclusão\\b",
+        "\\beligibility\\b"
+      ],
+      "canonicalSections": [
+        "population",
+        "inclusion",
+        "exclusion",
+        "special groups"
+      ],
+      "extractionPriority": 137,
+      "riskTier": "critical"
+    },
+    {
+      "id": "research_dataset_dictionary",
+      "name": {
+        "en": "Dataset Dictionary",
+        "pt": "Dicionário de Dados"
+      },
+      "description": "Variable definitions, coding, units, and accepted value domains.",
+      "detectionPatterns": [
+        "\\bdataset dictionary\\b",
+        "\\bvariable dictionary\\b",
+        "\\bdicionário de dados\\b",
+        "\\bdata dictionary\\b"
+      ],
+      "canonicalSections": [
+        "variables",
+        "units",
+        "coding",
+        "missingness"
+      ],
+      "extractionPriority": 136,
+      "riskTier": "high"
+    },
+    {
+      "id": "research_experiment_log",
+      "name": {
+        "en": "Experiment Log",
+        "pt": "Registro Experimental"
+      },
+      "description": "Chronological test operations and protocol deviation notes.",
+      "detectionPatterns": [
+        "\\bexperiment log\\b",
+        "\\blab log\\b",
+        "\\bregistro experimental\\b",
+        "\\bvisita\\b"
+      ],
+      "canonicalSections": [
+        "timeline",
+        "deviation",
+        "quality",
+        "batch",
+        "operator"
+      ],
+      "extractionPriority": 134,
+      "riskTier": "high"
+    },
+    {
+      "id": "research_analysis_plan",
+      "name": {
+        "en": "Analysis Plan",
+        "pt": "Plano de Análise"
+      },
+      "description": "Pre-specified statistical tests, covariates, and multiplicity controls.",
+      "detectionPatterns": [
+        "\\banalysis plan\\b",
+        "\\bstatistical plan\\b",
+        "\\bplano de análise\\b",
+        "\\bhipótese\\b"
+      ],
+      "canonicalSections": [
+        "analysis",
+        "power",
+        "missing_data",
+        "multiplicity"
+      ],
+      "extractionPriority": 135,
+      "riskTier": "critical"
+    },
+    {
+      "id": "research_results_report",
+      "name": {
+        "en": "Results Report",
+        "pt": "Relatório de Resultados"
+      },
+      "description": "Primary and secondary outcomes, tables, and interpretation.",
+      "detectionPatterns": [
+        "\\bresults report\\b",
+        "\\brelatório de resultados\\b",
+        "\\bstudy findings\\b",
+        "\\bencontro\\b"
+      ],
+      "canonicalSections": [
+        "results",
+        "endpoints",
+        "statistical_summary",
+        "limitations",
+        "conclusion"
+      ],
+      "extractionPriority": 133,
+      "riskTier": "critical"
+    },
+    {
+      "id": "research_power_calculation",
+      "name": {
+        "en": "Power Calculation",
+        "pt": "Cálculo de Poder"
+      },
+      "description": "Sample size and power justification for effect detectability.",
+      "detectionPatterns": [
+        "\\bpower calculation\\b",
+        "\\bsample size\\b",
+        "\\bcálculo de poder\\b",
+        "\\beffect size\\b"
+      ],
+      "canonicalSections": [
+        "sample_size",
+        "effect_size_assumption",
+        "alpha",
+        "beta",
+        "power"
+      ],
+      "extractionPriority": 132,
+      "riskTier": "high"
+    },
+    {
+      "id": "research_irb_approval",
+      "name": {
+        "en": "IRB / Ethics Approval",
+        "pt": "Aprovação Ética"
+      },
+      "description": "Ethics committee approval and protocol amendment history.",
+      "detectionPatterns": [
+        "\\birb\\b",
+        "\\bethics\\b",
+        "\\bethics approval\\b",
+        "\\bcomitê de ética\\b"
+      ],
+      "canonicalSections": [
+        "approval_id",
+        "protocol_version",
+        "effective_date",
+        "modifications"
+      ],
+      "extractionPriority": 130,
+      "riskTier": "medium"
+    },
+    {
+      "id": "research_funding_acknowledgment",
+      "name": {
+        "en": "Funding Acknowledgment",
+        "pt": "Reconhecimento de Financiamento"
+      },
+      "description": "Funding sources and conflict-of-interest disclosures.",
+      "detectionPatterns": [
+        "\\bfunding\\b",
+        "\\backnowledgment\\b",
+        "\\bconflito de interesse\\b",
+        "\\bsponsor\\b"
+      ],
+      "canonicalSections": [
+        "funding source",
+        "conflict",
+        "sponsor role"
+      ],
+      "extractionPriority": 128,
+      "riskTier": "medium"
+    }
+  ]
+}

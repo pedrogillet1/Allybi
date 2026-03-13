@@ -1,0 +1,128 @@
+{
+  "_meta": {
+    "id": "di_sales_crm_table_ontology",
+    "version": "1.0.0",
+    "description": "Sales and CRM table ontology for pipeline, pricing, and activity analysis.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/extraction/tableExtraction.service.ts",
+      "services/core/orchestration/tableResolver.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/domain-validation.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "sales_crm",
+    "tableAxisConfidenceThreshold": 0.66
+  },
+  "domain": "sales_crm",
+  "tableTypes": [
+    {
+      "id": "crm_table_pipeline_summary",
+      "name": {
+        "en": "Pipeline Summary Table",
+        "pt": "Tabela de Resumo de Pipeline"
+      },
+      "aliases": [
+        "pipeline stage table",
+        "funil"
+      ],
+      "columns": [
+        "stage",
+        "opportunity_count",
+        "pipeline_value",
+        "close_probability",
+        "owner"
+      ],
+      "quality": {
+        "requiresStageColumn": [
+          "stage"
+        ],
+        "riskIfMissing": "high"
+      }
+    },
+    {
+      "id": "crm_table_quote_lines",
+      "name": {
+        "en": "Quote Line Table",
+        "pt": "Tabela de Linhas de Cotação"
+      },
+      "aliases": [
+        "quote schedule",
+        "quote breakdown",
+        "linha de proposta"
+      ],
+      "columns": [
+        "item",
+        "quantity",
+        "unit_price",
+        "discount",
+        "term",
+        "currency"
+      ],
+      "quality": {
+        "requiresNumericColumns": [
+          "quantity",
+          "unit_price"
+        ],
+        "riskIfMissing": "critical"
+      }
+    },
+    {
+      "id": "crm_table_activity_timeline",
+      "name": {
+        "en": "Activity Timeline Table",
+        "pt": "Tabela de Linha do Tempo de Atividades"
+      },
+      "aliases": [
+        "activity log",
+        "tarefas"
+      ],
+      "columns": [
+        "date",
+        "actor",
+        "activity",
+        "outcome",
+        "owner"
+      ],
+      "quality": {
+        "requiresTemporalColumns": [
+          "date"
+        ],
+        "riskIfMissing": "medium"
+      }
+    },
+    {
+      "id": "crm_table_revenue_mix",
+      "name": {
+        "en": "Revenue Mix Table",
+        "pt": "Tabela de Composição de Receita"
+      },
+      "aliases": [
+        "revenue breakdown",
+        "mix"
+      ],
+      "columns": [
+        "period",
+        "arr",
+        "mrr",
+        "new_arr",
+        "churned_arr"
+      ],
+      "quality": {
+        "requiresNumericColumns": [
+          "arr",
+          "mrr"
+        ],
+        "riskIfMissing": "medium"
+      }
+    }
+  ]
+}

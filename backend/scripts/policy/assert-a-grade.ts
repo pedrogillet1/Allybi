@@ -1,6 +1,6 @@
 import { RuntimeWiringIntegrityService } from "../../src/services/core/banks/runtimeWiringIntegrity.service";
 import * as path from "path";
-import { PolicyCertificationRunnerService } from "../../src/services/core/policy/policyCertificationRunner.service";
+import { PolicyCertificationRunnerService } from "../../tools/policy/certification/policyCertificationRunner.service";
 import { initializeBanks } from "../../src/services/core/banks/bankLoader.service";
 
 async function main() {
@@ -14,7 +14,7 @@ async function main() {
   });
 
   const policyRunner = new PolicyCertificationRunnerService();
-  const policyReport = policyRunner.run({ strict: true });
+  const policyReport = policyRunner.run({ strict: true, gradeMode: "a" });
 
   const wiring = new RuntimeWiringIntegrityService().validate();
 

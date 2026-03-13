@@ -1,0 +1,65 @@
+{
+  "_meta": {
+    "id": "eval_style_rhythm_and_variety",
+    "version": "1.0.0",
+    "description": "Evaluation checks for sentence rhythm, clause variety, and tonal movement.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "eval-ops",
+    "usedBy": [
+      "services/eval/styleJudge.service.ts"
+    ],
+    "tests": [
+      "tests/eval/rhythmAndVariety.proof.test.ts",
+      "tests/eval/styleCoverage.proof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "scenarioType": "rhythm_and_variety"
+  },
+  "checks": [
+    {
+      "id": "rhythm_001",
+      "lang": "en",
+      "query": "Compare two contracts and give me final recommendation.",
+      "expected": {
+        "mustUseVariedLength": true,
+        "mustIncludeRhetoricalShift": true,
+        "mustAvoid": [
+          "all_short_fragments",
+          "all_long_fragments"
+        ],
+        "failureConditions": [
+          "monotone_three_sentence_chain",
+          "no_transition_markers",
+          "uniform_sentence_prefix"
+        ]
+      }
+    },
+    {
+      "id": "rhythm_002",
+      "lang": "pt",
+      "query": "Compare dois modelos de contrato e recomende um deles.",
+      "expected": {
+        "mustUseVariedLength": true,
+        "mustIncludeRhetoricalShift": true,
+        "mustAvoid": [
+          "estrutura_formulaica_igual",
+          "todos_frases_curta"
+        ],
+        "failureConditions": [
+          "resposta_monotona",
+          "sem_pivot_de_tom"
+        ]
+      }
+    }
+  ],
+  "scoring": {
+    "variationThreshold": 0.45,
+    "transitionRequiredMin": 1,
+    "penaltyPerLowVariety": -7
+  }
+}

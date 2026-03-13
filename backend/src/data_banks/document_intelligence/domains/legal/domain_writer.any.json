@@ -1,0 +1,195 @@
+{
+  "_meta": {
+    "id": "legal_domain_writer",
+    "version": "1.1.0",
+    "description": "Legal writer profile for clause-anchored legal interpretation with role precision and obligation risk framing.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "domain": "legal",
+    "interpretationMode": "clause_reasoning",
+    "requireScopeLock": true,
+    "requireVersionResolution": true,
+    "requireRoleLock": true,
+    "forbidAdviceBeyondText": true
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "before final legal answer and before risk statement synthesis",
+    "consumer": "legal domain writer",
+    "intent": "Move from extracted clause listing to bounded legal interpretation with role-anchored obligations and clause precedence.",
+    "emittedSignals": [
+      "legalInterpretiveMode",
+      "legalScopeLocked",
+      "legalPartyRoleMatrix",
+      "legalClauseConflictState",
+      "legalVersionAnchor"
+    ]
+  },
+  "writingProfile": {
+    "audience": "legal ops and business counsel",
+    "goal": "Return what the agreement permits, requires, and excludes with explicit role/section anchors and bounded caveats.",
+    "mandatorySections": [
+      "clause_matrix",
+      "obligations_by_role",
+      "exceptions_and_overrides",
+      "timeline_and_deadlines",
+      "definition_resolution",
+      "cross_reference_status",
+      "risk_summary",
+      "obligation_gap_register"
+    ],
+    "forbiddenAnswerForms": [
+      "obligation_without_clause_anchor",
+      "obligation_without_party_role",
+      "single_sentence_summary_without_conflict_surface",
+      "unqualified_validity_statement",
+      "role_neutral_currency_statement"
+    ],
+    "docTypeAnchors": [
+      "legal_nda",
+      "legal_msa",
+      "legal_sla",
+      "legal_sow",
+      "legal_dpa",
+      "legal_baa",
+      "legal_cookie_policy",
+      "legal_terms_of_service",
+      "legal_privacy_policy",
+      "legal_employment_agreement",
+      "legal_contractor_agreement",
+      "legal_board_resolution",
+      "legal_lease_agreement",
+      "legal_license_agreement",
+      "legal_ip_assignment",
+      "legal_data_retention_policy",
+      "legal_eula",
+      "legal_written_consent"
+    ],
+    "sectionPriority": [
+      "document_header",
+      "parties",
+      "definitions",
+      "scope_of_services",
+      "representations",
+      "liability_and_indemnity",
+      "termination",
+      "governing_law",
+      "dispute_resolution",
+      "security_compliance",
+      "signatures",
+      "effective_date",
+      "exceptions"
+    ]
+  },
+  "interpretiveRules": [
+    {
+      "id": "LEGAL_WRITER_001_clause_anchor_first",
+      "description": "Start every claim with clause anchor, section, and source location; no legal meaning before location context.",
+      "requiredFor": "extract, evaluate, compare, summarize"
+    },
+    {
+      "id": "LEGAL_WRITER_002_party_exactness",
+      "description": "Require exact role mapping for signer, witness, beneficiary, issuer, owner, and counterparty before assigning rights/obligations.",
+      "requiredFor": "compare, evaluate"
+    },
+    {
+      "id": "LEGAL_WRITER_003_definition_first",
+      "description": "Resolve all defining terms and map defined-term usage to claims before interpreting carveouts or obligations.",
+      "requiredFor": "extract, validate"
+    },
+    {
+      "id": "LEGAL_WRITER_004_precedence_resolution",
+      "description": "When multiple versions or amendment references exist, emit an explicit precedence chain and separate legacy and active text.",
+      "requiredFor": "compare, evaluate"
+    },
+    {
+      "id": "LEGAL_WRITER_005_exception_visibility",
+      "description": "Render carveouts, survival clauses, cure conditions, and fee exceptions as separate structured blocks before conclusions.",
+      "requiredFor": "validate, summarize"
+    },
+    {
+      "id": "LEGAL_WRITER_006_lifecycle_logic",
+      "description": "For termination/renewal requests, show effective date, notice period, cure window, and condition triggers explicitly.",
+      "requiredFor": "evaluate, monitor"
+    },
+    {
+      "id": "LEGAL_WRITER_007_liability_care",
+      "description": "Liability and indemnity outputs require unit/type/cap text, exceptions, and explicit residue scope.",
+      "requiredFor": "evaluate, summarize"
+    },
+    {
+      "id": "LEGAL_WRITER_008_dispute_grounding",
+      "description": "Dispute and forum outputs require jurisdiction text and hierarchy of clauses used (definitions, governing law, precedence).",
+      "requiredFor": "evaluate"
+    },
+    {
+      "id": "LEGAL_WRITER_009_conflict_labeling",
+      "description": "If obligations conflict across sections, annotate conflict basis and unresolved interpretation explicitly.",
+      "requiredFor": "compare, validate"
+    },
+    {
+      "id": "LEGAL_WRITER_010_boundary_language",
+      "description": "Do not claim enforceability of any value-based limit without indicating temporal and document status boundaries.",
+      "requiredFor": "extract, evaluate"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "legal_writer_requires_party_role_matrix",
+        "input": {
+          "query": "What are the termination and liability obligations by party and signatory role?"
+        },
+        "expect": {
+          "mustInclude": [
+            "obligations_by_role",
+            "party_role",
+            "role"
+          ]
+        }
+      },
+      {
+        "id": "legal_writer_surfaces_exceptions",
+        "input": {
+          "query": "List termination triggers, cure rights, and carveout exceptions."
+        },
+        "expect": {
+          "mustInclude": [
+            "exceptions_and_overrides",
+            "timeline_and_deadlines",
+            "obligation_gap_register"
+          ]
+        }
+      },
+      {
+        "id": "legal_writer_version_precedence",
+        "input": {
+          "query": "Compare current term and amendment text.",
+          "signal": {
+            "has_versions": true
+          }
+        },
+        "expect": {
+          "mustInclude": [
+            "cross_reference_status",
+            "legalVersionAnchor"
+          ]
+        }
+      }
+    ]
+  }
+}

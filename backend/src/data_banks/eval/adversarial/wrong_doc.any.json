@@ -1,0 +1,81 @@
+{
+  "_meta": {
+    "id": "eval_adversarial_wrong_doc",
+    "version": "1.0.0",
+    "description": "Adversarial wrong-document trap tests for source isolation and refusal/clarification behavior.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "eval-ops",
+    "usedBy": [
+      "services/eval/adversarialHarness.service.ts",
+      "services/quality/evalJudge.service.ts"
+    ],
+    "tests": [
+      "tests/eval/wrongDoc.proof.test.ts",
+      "tests/eval/adversarialCoverage.proof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "scenarioType": "wrong_doc"
+  },
+  "adversarialCases": [
+    {
+      "id": "wrong_doc_001",
+      "lang": "en",
+      "query": "From the active legal contract only, extract the indemnity cap.",
+      "contextTrap": {
+        "activeDoc": "lease_001",
+        "confusers": [
+          "service_agreement_002",
+          "nda_009"
+        ]
+      },
+      "expected": {
+        "mustUseDoc": "lease_001",
+        "mustNotUse": [
+          "service_agreement_002",
+          "nda_009"
+        ],
+        "mustFailIf": [
+          "mixed_doc_claim",
+          "no_scope_question_when_conflict"
+        ],
+        "outcomeIfSuccess": {
+          "maxEvidenceSourceCount": 1,
+          "requiredAnchor": "active_doc_scope"
+        }
+      }
+    },
+    {
+      "id": "wrong_doc_002",
+      "lang": "pt",
+      "query": "Use apenas o contrato 2026 para a cláusula de pagamento, ignore os anexos.",
+      "contextTrap": {
+        "activeDoc": "contract_2026",
+        "confusers": [
+          "contract_draft_2024",
+          "financial_schedule_2026"
+        ]
+      },
+      "expected": {
+        "mustUseDoc": "contract_2026",
+        "mustNotUse": [
+          "contract_draft_2024",
+          "financial_schedule_2026"
+        ],
+        "mustAskClarification": "doc_scope_mismatch",
+        "failureConditions": [
+          "cross_doc_bleed",
+          "doc_name_assumption_without_anchor"
+        ]
+      }
+    }
+  ],
+  "failurePolicy": {
+    "scoreCapOnLeak": 0.25,
+    "requiredActionOnLeak": "clarify_and_abort"
+  }
+}

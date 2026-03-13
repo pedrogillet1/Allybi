@@ -1,0 +1,122 @@
+{
+  "_meta": {
+    "id": "canvas_output_modes",
+    "version": "1.0.0",
+    "description": "Output surface definitions for chat-only, canvas-rendered, and structured work-product modes.",
+    "owner": "assistant-orchestrator",
+    "usedBy": [
+      "services/assistant/core/outputComposer.service.ts",
+      "services/frontend/canvas.service.ts"
+    ],
+    "tests": [
+      "tests/assistant/canvasOutputModes.proof.test.ts"
+    ],
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13"
+  },
+  "config": {
+    "enabled": true
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "post_work_product",
+    "consumer": "delivery adapter"
+  },
+  "modes": [
+    {
+      "id": "chat_inline",
+      "channel": "chat",
+      "supports": [
+        "direct_answer",
+        "evidence_brief",
+        "decision_memo"
+      ],
+      "constraints": {
+        "maxParagraphs": 5,
+        "markdownAllowed": true
+      },
+      "selectionPolicy": {
+        "preferDefault": true
+      }
+    },
+    {
+      "id": "canvas_table",
+      "channel": "canvas",
+      "supports": [
+        "comparison_matrix"
+      ],
+      "constraints": {
+        "maxCells": 320,
+        "requireStructuredRows": true
+      },
+      "selectionPolicy": {
+        "when": {
+          "workProductType": "comparison_matrix"
+        }
+      }
+    },
+    {
+      "id": "canvas_timeline",
+      "channel": "canvas",
+      "supports": [
+        "action_plan"
+      ],
+      "constraints": {
+        "maxHops": 20,
+        "requireOwnerField": true
+      },
+      "selectionPolicy": {
+        "when": {
+          "workProductType": "action_plan"
+        }
+      }
+    },
+    {
+      "id": "canvas_quote_sheet",
+      "channel": "canvas",
+      "supports": [
+        "quote_pack"
+      ],
+      "constraints": {
+        "maxQuoteLines": 60,
+        "requireExactAnchors": true
+      },
+      "selectionPolicy": {
+        "when": {
+          "workProductType": "quote_pack"
+        }
+      }
+    },
+    {
+      "id": "chat_with_canvas_summary",
+      "channel": "hybrid",
+      "supports": [
+        "decision_memo",
+        "evidence_brief",
+        "direct_answer"
+      ],
+      "constraints": {
+        "maxSections": 4,
+        "appendCanvasRef": true
+      }
+    }
+  ],
+  "guards": [
+    "Do not send large evidence payloads through chat_inline if canvas is available and table/timeline semantics are required.",
+    "If work-product has citations and 6+ evidence units, prefer canvas with reference sidebar."
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "comparison_matrix_uses_canvas_table",
+        "input": {
+          "workProductType": "comparison_matrix"
+        },
+        "expect": {
+          "canvasMode": "canvas_table"
+        }
+      }
+    ]
+  }
+}

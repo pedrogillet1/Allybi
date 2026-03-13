@@ -25,7 +25,8 @@
     "domain": "accounting",
     "deterministic": true,
     "dedupe": true,
-    "sortBy": "id"
+    "sortBy": "id",
+    "configModeOnly": true
   },
   "domain": "accounting",
   "audienceStyles": [
@@ -774,7 +775,44 @@
   "tests": {
     "cases": [
       {
-        "id": "ACC_EXPL_SMOKE_001"
+        "id": "EXPLAIN_STYLE_ACCOUNTING_T_001",
+        "input": {
+          "language": "en",
+          "depth": "summary"
+        },
+        "expect": {
+          "requireConfidenceLabel": true
+        }
+      },
+      {
+        "id": "EXPLAIN_STYLE_ACCOUNTING_T_002",
+        "input": {
+          "language": "en",
+          "depth": "paragraph"
+        },
+        "expect": {
+          "forbidFabrication": true
+        }
+      },
+      {
+        "id": "EXPLAIN_STYLE_ACCOUNTING_T_003",
+        "input": {
+          "language": "pt",
+          "depth": "summary"
+        },
+        "expect": {
+          "depth": "summary"
+        }
+      },
+      {
+        "id": "EXPLAIN_STYLE_ACCOUNTING_T_004",
+        "input": {
+          "language": "pt",
+          "depth": "detailed"
+        },
+        "expect": {
+          "minCitations": 3
+        }
       }
     ]
   }

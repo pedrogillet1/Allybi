@@ -1,0 +1,184 @@
+{
+  "_meta": {
+    "id": "di_supply_chain_logistics_retrieval_strategies",
+    "version": "1.0.0",
+    "description": "Logistics retrieval strategies prioritizing timing, cost, route exceptions, and fulfillment state.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/retrieval/hybridRetriever.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/retrievalPrecision.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "supply_chain_logistics",
+    "maxBoostRules": 90,
+    "maxQueryExpansionTerms": 150
+  },
+  "domain": "supply_chain_logistics",
+  "sectionPriority": [
+    {
+      "section": "scl_section_eta",
+      "weight": 9,
+      "operators": [
+        "monitor",
+        "compare",
+        "summarize",
+        "validate"
+      ]
+    },
+    {
+      "section": "scl_section_shipment",
+      "weight": 8.6,
+      "operators": [
+        "extract",
+        "summarize",
+        "locate"
+      ]
+    },
+    {
+      "section": "scl_section_exception_log",
+      "weight": 8.8,
+      "operators": [
+        "extract",
+        "evaluate",
+        "monitor",
+        "summarize"
+      ]
+    },
+    {
+      "section": "scl_section_inventory_state",
+      "weight": 8.2,
+      "operators": [
+        "extract",
+        "compare",
+        "monitor",
+        "calculate"
+      ]
+    },
+    {
+      "section": "scl_section_customs",
+      "weight": 7.5,
+      "operators": [
+        "extract",
+        "validate",
+        "summarize"
+      ]
+    },
+    {
+      "section": "scl_section_cost_breakdown",
+      "weight": 7.4,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare"
+      ]
+    },
+    {
+      "section": "scl_section_inbound",
+      "weight": 7,
+      "operators": [
+        "extract",
+        "calculate",
+        "summarize"
+      ]
+    },
+    {
+      "section": "scl_section_outbound",
+      "weight": 7.1,
+      "operators": [
+        "extract",
+        "monitor",
+        "summarize"
+      ]
+    }
+  ],
+  "tablePriority": [
+    {
+      "table": "scl_table_shipment_events",
+      "weight": 8.9,
+      "operators": [
+        "monitor",
+        "extract",
+        "validate"
+      ]
+    },
+    {
+      "table": "scl_table_inventory_aging",
+      "weight": 8.4,
+      "operators": [
+        "compare",
+        "extract",
+        "monitor"
+      ]
+    },
+    {
+      "table": "scl_table_carrier_sla",
+      "weight": 8.6,
+      "operators": [
+        "compare",
+        "evaluate",
+        "summarize"
+      ]
+    },
+    {
+      "table": "scl_table_freight_cost",
+      "weight": 8.3,
+      "operators": [
+        "calculate",
+        "compare",
+        "extract"
+      ]
+    }
+  ],
+  "queryExpansion": [
+    "ETA",
+    "ETA delay",
+    "route deviation",
+    "carrier",
+    "inventory aging",
+    "on-time delivery",
+    "customs clearance",
+    "freight surcharge"
+  ],
+  "strategies": [
+    {
+      "id": "scl_strategy_ontime",
+      "operators": [
+        "monitor",
+        "compare",
+        "summarize"
+      ],
+      "description": "Prioritize ETA/route sections and compare planned versus actual arrival windows before interpreting delay.",
+      "steps": [
+        "load ETA and event tables",
+        "align shipment IDs across notices",
+        "compute delay deltas",
+        "return with root-cause labels"
+      ]
+    },
+    {
+      "id": "scl_strategy_inventory_health",
+      "operators": [
+        "monitor",
+        "calculate",
+        "validate"
+      ],
+      "description": "Prioritize inventory aging and stock snapshots before service recommendations.",
+      "steps": [
+        "load latest snapshot",
+        "calculate aging pressure bands",
+        "identify stockout windows",
+        "emit replenishment risk"
+      ]
+    }
+  ]
+}

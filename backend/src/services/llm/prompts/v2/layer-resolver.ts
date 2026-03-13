@@ -1,6 +1,20 @@
 import { PromptRegistryConfigError } from "./errors";
 import { defaultLayerByKind, safeStr, uniq } from "./helpers";
-import type { PromptKind, PromptRegistryBank } from "./types";
+import type {
+  PromptConcern,
+  PromptContext,
+  PromptKind,
+  PromptRegistryBank,
+} from "./types";
+
+function toConcernSet(value: unknown): Set<string> {
+  if (!Array.isArray(value)) return new Set<string>();
+  return new Set(
+    value
+      .map((entry) => safeStr(entry).trim())
+      .filter((entry: string) => entry.length > 0),
+  );
+}
 
 export function assertPromptRegistryLayersValid(registry: PromptRegistryBank): void {
   const layers =
@@ -16,6 +30,14 @@ export function assertPromptRegistryLayersValid(registry: PromptRegistryBank): v
           .filter((id: string) => id.length > 0)
       : [],
   );
+  const promptFileConcerns = new Map<string, Set<string>>();
+  if (Array.isArray(registry?.promptFiles)) {
+    for (const row of registry.promptFiles) {
+      const id = safeStr(row?.id).trim();
+      if (!id) continue;
+      promptFileConcerns.set(id, toConcernSet(row?.concerns));
+    }
+  }
 
   const failures: string[] = [];
   for (const [kind, rawIds] of Object.entries(layers)) {
@@ -38,6 +60,24 @@ export function assertPromptRegistryLayersValid(registry: PromptRegistryBank): v
       if (promptFileIds.size > 0 && !promptFileIds.has(layerId)) {
         failures.push(`unknown_layer_id:${kind}:${layerId}`);
       }
+    }
+
+    if (!Array.isArray(registry?.forbiddenConcernOverlaps)) continue;
+    const layerIds = rawIds
+      .map((value) => safeStr(value).trim())
+      .filter((value: string) => value.length > 0);
+    for (const pair of registry.forbiddenConcernOverlaps) {
+      const left = safeStr(pair?.left).trim();
+      const right = safeStr(pair?.right).trim();
+      if (!left || !right) continue;
+
+      for (const layerId of layerIds) {
+        const concerns = promptFileConcerns.get(layerId) ?? new Set<string>();
+        if (concerns.has(left) && concerns.has(right)) {
+          failures.push(`bank_conflicting_concerns:${layerId}:${left}:${right}`);
+        }
+      }
+
     }
   }
 
@@ -85,4 +125,82 @@ export function resolveRequiredFlags(registry: PromptRegistryBank): Map<string, 
   }
 
   return requiredByBankId;
+}
+
+const DEFAULT_REQUIRED_CONCERNS: Partial<Record<PromptKind, PromptConcern[]>> = {
+  compose_answer: [
+    "global_bans",
+    "grounding",
+    "answer_shape",
+    "citation_contract",
+    "voice_selection",
+    "answer_strategy",
+    "anti_robotic_repair",
+    "uncertainty_wording",
+  ],
+  retrieval: ["global_bans", "grounding", "retrieval_planner"],
+  disambiguation: ["global_bans", "clarification_render"],
+  fallback: ["global_bans", "fallback_render"],
+  tool: ["global_bans", "tool_contract"],
+};
+
+function resolvePromptFileConcerns(
+  registry: PromptRegistryBank,
+): Map<string, Set<string>> {
+  const promptFileConcerns = new Map<string, Set<string>>();
+  for (const row of registry.promptFiles || []) {
+    const id = safeStr(row?.id).trim();
+    if (!id) continue;
+    promptFileConcerns.set(id, toConcernSet(row?.concerns));
+  }
+  return promptFileConcerns;
+}
+
+export function assertRequiredConcernCoverage(params: {
+  kind: PromptKind;
+  registry: PromptRegistryBank;
+  bankIds: string[];
+  ctx?: PromptContext;
+}): void {
+  const { kind, registry, bankIds, ctx } = params;
+  if (!registry.requiredConcernsByKind) return;
+  const declared =
+    (registry.requiredConcernsByKind as
+      | Partial<Record<PromptKind, PromptConcern[]>>
+      | undefined)?.[kind] ?? DEFAULT_REQUIRED_CONCERNS[kind];
+  if (!Array.isArray(declared) || declared.length === 0) return;
+
+  const requiredConcerns = new Set(
+    declared.map((value) => safeStr(value).trim()).filter(Boolean),
+  );
+
+  const runtimeSignals =
+    ctx?.runtimeSignals && typeof ctx.runtimeSignals === "object"
+      ? (ctx.runtimeSignals as Record<string, unknown>)
+      : {};
+  if (kind === "tool" && runtimeSignals.userVisibleCitations !== true) {
+    requiredConcerns.delete("citation_contract");
+  }
+
+  const promptFileConcerns = resolvePromptFileConcerns(registry);
+  const covered = new Set<string>();
+  for (const bankId of bankIds) {
+    for (const concern of promptFileConcerns.get(bankId) || []) {
+      covered.add(concern);
+    }
+  }
+
+  const missing = Array.from(requiredConcerns).filter(
+    (concern) => !covered.has(concern),
+  );
+  if (missing.length === 0) return;
+
+  throw new PromptRegistryConfigError(
+    `prompt_registry.any.json is missing required concern coverage for ${kind}: ${missing.join(", ")}`,
+    {
+      kind,
+      missing,
+      bankIds,
+    },
+  );
 }

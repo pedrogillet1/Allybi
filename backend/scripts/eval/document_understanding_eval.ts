@@ -6,12 +6,12 @@ import path from "path";
 import {
   DOCUMENT_UNDERSTANDING_THRESHOLD_PROFILES,
   evaluateDocumentUnderstanding,
-} from "../../src/document_understanding/evaluation";
+} from "../../tools/document_understanding/evaluation";
 import type {
   DocumentUnderstandingOutput,
   EvaluationCase,
   ThresholdProfile,
-} from "../../src/document_understanding/types";
+} from "../../tools/document_understanding/types";
 
 function parseFlag(argv: string[], key: string): string | null {
   const inlinePrefix = `--${key}=`;

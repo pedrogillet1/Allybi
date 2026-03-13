@@ -1,0 +1,159 @@
+{
+  "_meta": {
+    "id": "provider_failure_ladders",
+    "version": "1.0.0",
+    "description": "Failure ladders with compare/repair actions for model/tool failures.",
+    "owner": "assistant-orchestrator",
+    "usedBy": [
+      "services/llm/core/llmRouter.service.ts"
+    ],
+    "tests": [
+      "tests/llm/providerFailureLadders.proof.test.ts"
+    ],
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13"
+  },
+  "config": {
+    "enabled": true,
+    "maxTotalSteps": 6
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "post_route_failure",
+    "consumer": "retry manager"
+  },
+  "ladders": [
+    {
+      "id": "timeout_or_rate_limit_ladder",
+      "trigger": [
+        "timeout",
+        "rateLimit",
+        "providerUnavailable"
+      ],
+      "steps": [
+        {
+          "action": "retry_same_provider_same_model",
+          "maxAttempts": 1,
+          "waitMs": 250
+        },
+        {
+          "action": "retry_same_provider_with_budget_reduction",
+          "maxAttempts": 1,
+          "contextTrim": "light_context"
+        },
+        {
+          "action": "switch_provider",
+          "targetProvider": "openai",
+          "targetModel": "gpt-5-mini",
+          "reason": "lower cost then escalate"
+        },
+        {
+          "action": "switch_provider",
+          "targetProvider": "local",
+          "targetModel": "local-default",
+          "reason": "restore responsiveness if no strict fidelity requirement"
+        }
+      ]
+    },
+    {
+      "id": "quality_failure_ladder",
+      "trigger": [
+        "schemaMismatch",
+        "invalidCitation",
+        "policyViolation",
+        "hallucinatedClaimRisk"
+      ],
+      "steps": [
+        {
+          "action": "retry_with_stronger_role",
+          "targetRole": "risk_orchestrator"
+        },
+        {
+          "action": "retry_with_shadow_compare",
+          "shadowProvider": "openai",
+          "shadowModel": "gpt-5.2",
+          "mergeRule": "prefer_lower_risk_output"
+        },
+        {
+          "action": "replan_task",
+          "targetRole": "planner",
+          "includeClarification": true
+        },
+        {
+          "action": "force_evidence_only_mode",
+          "reason": "output minimal with explicit uncertainty instead of narrative completion"
+        }
+      ]
+    },
+    {
+      "id": "tool_failure_ladder",
+      "trigger": [
+        "toolUnavailable",
+        "toolAuthError",
+        "toolTimeout"
+      ],
+      "steps": [
+        {
+          "action": "retry_tool_with_backoff",
+          "maxAttempts": 1
+        },
+        {
+          "action": "tool_switch",
+          "from": "table_reader",
+          "to": "document_lookup"
+        },
+        {
+          "action": "tool_switch",
+          "from": "citation_fetch",
+          "to": "section_index"
+        },
+        {
+          "action": "degrade_to_anchor_only",
+          "reason": "preserve trust when full tool chain fails"
+        }
+      ]
+    },
+    {
+      "id": "shadow_compare_ladder",
+      "trigger": [
+        "confidenceBelowThreshold",
+        "highImpactUserQuery"
+      ],
+      "steps": [
+        {
+          "action": "run_shadow_same_stage",
+          "provider": "openai",
+          "model": "gpt-5.2",
+          "role": "synthesizer"
+        },
+        {
+          "action": "run_shadow_structural_validator",
+          "provider": "gemini",
+          "model": "gemini-2.5-flash",
+          "role": "planner"
+        },
+        {
+          "action": "compare_outputs_and_keep_higher",
+          "comparisonPolicy": "prefer_conservative_factuality"
+        },
+        {
+          "action": "annotate_uncertainty_and_continue"
+        }
+      ]
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "quality_failure_uses_shadow",
+        "input": {
+          "failureType": "hallucinatedClaimRisk"
+        },
+        "expect": {
+          "firstFallbackAction": "retry_with_stronger_role"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,120 @@
+{
+  "_meta": {
+    "id": "governance_bank_quality_contract",
+    "version": "1.0.0",
+    "description": "Minimum quality contract for governance and production bank behavior, output quality, and anti-degeneration controls.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "governance-team",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "strictMode": true
+  },
+  "qualitySignals": {
+    "minimumCoverage": {
+      "metaFields": 1,
+      "testsCoverage": 1,
+      "runtimeCoverage": 0.8
+    },
+    "allowedGrowthRate": {
+      "weeklyBankCount": 40,
+      "weeklyLineGrowth": 15000
+    },
+    "antiEntropy": {
+      "maxStubScore": 0.25,
+      "maxPlaceholderRatio": 0.06,
+      "mustContainConcreteCases": true
+    }
+  },
+  "deterministicRules": {
+    "sortDedupeRequirements": {
+      "sortBy": [
+        "_meta.id",
+        "config.enabled",
+        "id"
+      ],
+      "dedupeRules": [
+        "exactIdPathPairMustBeUnique",
+        "exactTestCaseIdsMustBeUnique",
+        "equalAnchorConflictIsError"
+      ],
+      "sortMethod": "stable"
+    },
+    "naming": {
+      "useSnakeCase": true,
+      "maxNameLength": 90,
+      "forbidSpaces": true,
+      "forbidUppercase": true
+    }
+  },
+  "evaluationGuardrails": {
+    "inflationControl": {
+      "requireEvidenceForHighPrecisionClaims": true,
+      "maxConfidenceWithoutEvidence": 0.45,
+      "maxFallbackAsSuccessRate": 0.2
+    },
+    "style": {
+      "mustTrackRepetitionPenalty": true,
+      "mustTrackRoboticityPenalty": true,
+      "mustTrackCannedEmpathyPenalty": true,
+      "mustDetectLocaleRegression": true
+    },
+    "safety": {
+      "mustFailOnFakeCitation": true,
+      "mustFailOnWrongDocLeak": true,
+      "mustFailOnTitleOnlyResponses": true
+    }
+  },
+  "releasePolicy": {
+    "qualityGate": {
+      "preCommitMinScore": 82,
+      "ciMinScore": 88,
+      "stagingMinScore": 92,
+      "productionMinScore": 95
+    },
+    "rollbackOn": [
+      "qualityRegressionAbove2Percent",
+      "localeParityRegression",
+      "wrongDocRegression"
+    ],
+    "postReleaseChecks": [
+      "smoke_response_regression",
+      "registry_consistency",
+      "runtime_wiring_smoke"
+    ]
+  },
+  "penalties": {
+    "missingRuntimeWiring": -40,
+    "missingUsedBy": -30,
+    "missingTests": -35,
+    "sortOrderViolation": -20,
+    "dedupeCollision": -50,
+    "invalidMetadata": -45
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "quality_contract_passes_sorted_deduped_bank",
+        "input": {
+          "sortCompliant": true,
+          "dedupeCompliant": true
+        },
+        "expect": {
+          "qualityPass": true
+        }
+      }
+    ]
+  },
+  "runtimeUsageNotes": "Use this contract when scoring bank PR batches before merge and when evaluating whether to raise governance exceptions in controlled rollouts."
+}

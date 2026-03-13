@@ -3,6 +3,7 @@ import http from "http";
 import fs from "fs";
 import path from "path";
 import { Application } from "express";
+import { shouldUseExternalTls } from "./runtimeMode";
 
 /**
  * SSL/HTTPS Configuration
@@ -28,6 +29,10 @@ interface SSLConfig {
  * Get SSL configuration from environment
  */
 export const getSSLConfig = (): SSLConfig | null => {
+  if (shouldUseExternalTls()) {
+    return null;
+  }
+
   const sslCertPath = process.env.SSL_CERT_PATH;
   const nodeEnv = process.env.NODE_ENV;
   const forceSsl = String(process.env.FORCE_SSL || "").toLowerCase() === "true";

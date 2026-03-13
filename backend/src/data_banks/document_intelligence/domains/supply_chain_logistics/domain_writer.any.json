@@ -1,0 +1,117 @@
+{
+  "_meta": {
+    "id": "supply_chain_logistics_domain_writer",
+    "version": "1.0.0",
+    "description": "Logistics writer profile for operational and shipment-critical answers.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/orchestration/answerPlanner.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/docint-eval-pack.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "domain": "supply_chain_logistics",
+    "interpretationMode": "event_and_kpi_rich",
+    "requireTimeWindow": true,
+    "requireRouteLock": true
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "before final response wording",
+    "consumer": "logistics domain writer",
+    "intent": "Deliver actionable operational answers with explicit timestamps, scope, and recovery actions.",
+    "emittedSignals": [
+      "sclDelayMode",
+      "sclInventoryMode",
+      "sclCarrierMode",
+      "sclScopeLocked"
+    ]
+  },
+  "writingProfile": {
+    "audience": "ops manager, logistics lead, planning analyst",
+    "goal": "Connect operational observations to service impact and remediation.",
+    "allowedAnswerForms": [
+      "shipment_status_summary",
+      "inventory_health_readout",
+      "route_risk_report",
+      "cost_deviation_report"
+    ],
+    "forbiddenAnswerForms": [
+      "timing statement without timestamp",
+      "route claim without origin/destination",
+      "aggregate costs without currency and basis"
+    ],
+    "docTypeAnchors": [
+      "log_asn_notice",
+      "log_shipment_manifest",
+      "log_bol",
+      "log_inventory_snapshot",
+      "log_freight_bill",
+      "log_carrier_performance"
+    ],
+    "sectionPriority": [
+      "shipment_header",
+      "ETA",
+      "exception_log",
+      "inventory_state",
+      "carrier_performance",
+      "cost_breakdown"
+    ]
+  },
+  "interpretiveRules": [
+    {
+      "id": "SCL_WRITER_001_time_first",
+      "description": "State planned vs actual timing before delay interpretation."
+    },
+    {
+      "id": "SCL_WRITER_002_scope_guard",
+      "description": "All operational claims include shipment/route scope plus period window."
+    },
+    {
+      "id": "SCL_WRITER_003_quantization_guard",
+      "description": "Do not mix daily and weekly inventory windows in one claim without explicit conversion."
+    },
+    {
+      "id": "SCL_WRITER_004_exception_chain",
+      "description": "Every exception should include symptom, root cause, and mitigation status."
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "scl_writer_requires_route_context",
+        "input": {
+          "query": "Why is this route delayed?"
+        },
+        "expect": {
+          "mustInclude": [
+            "origin",
+            "destination",
+            "planned_arrival"
+          ]
+        }
+      },
+      {
+        "id": "scl_writer_requires_currency_trace",
+        "input": {
+          "query": "Compare freight cost by carrier."
+        },
+        "expect": {
+          "mustInclude": [
+            "currency",
+            "time window"
+          ]
+        }
+      }
+    ]
+  }
+}

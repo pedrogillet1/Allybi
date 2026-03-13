@@ -2,14 +2,6 @@ import type {
   LLMStreamingConfig,
   StreamSink,
 } from "../../../services/llm/types/llmStreaming.types";
-import type { DocumentStatus } from "@prisma/client";
-import prisma from "../../../config/database";
-import { getBankLoaderInstance } from "../../../services/core/banks/bankLoader.service";
-import { logger } from "../../../utils/logger";
-import {
-  resolveDocumentReference,
-  type DocumentReferenceDoc,
-} from "../../../services/core/scope/documentReferenceResolver.service";
 import type {
   ChatMessageDTO,
   ChatRequest,
@@ -20,245 +12,28 @@ import type {
   ConversationWithMessagesDTO,
   CreateMessageParams,
 } from "../domain/chat.contracts";
-import { ContractNormalizer } from "./ContractNormalizer";
-import { EvidenceValidator } from "./EvidenceValidator";
 import { ScopeService } from "./ScopeService";
-
-type ScopeRuntimeMentionConfig = {
-  tokenMinLength: number;
-  docNameMinLength: number;
-  tokenOverlapThreshold: number;
-  candidateFilenameRegex: RegExp[];
-  candidateDocRefRegex: RegExp[];
-  docStatusesAllowed: string[];
-  stopWords: Set<string>;
-};
-
-const KNOWN_DOCUMENT_STATUSES: ReadonlySet<DocumentStatus> = new Set([
-  "ready",
-  "indexed",
-  "enriching",
-  "available",
-  "completed",
-]);
-const GENERIC_FILE_TOKENS = new Set([
-  "pdf",
-  "doc",
-  "docx",
-  "xls",
-  "xlsx",
-  "ppt",
-  "pptx",
-  "csv",
-  "txt",
-]);
-
-function filenameFromStorageKey(
-  storageKey: string | null | undefined,
-): string | null {
-  const key = String(storageKey || "").trim();
-  if (!key) return null;
-  const tail = key.split("/").pop();
-  if (!tail) return null;
-  try {
-    return decodeURIComponent(tail);
-  } catch {
-    return tail;
-  }
-}
-
-function resolveScopeRuntimeMentionConfig(): ScopeRuntimeMentionConfig {
-  const bank = getBankLoaderInstance().getBank<any>("memory_policy");
-  const runtime = bank?.config?.runtimeTuning?.scopeRuntime;
-  if (!runtime || typeof runtime !== "object") {
-    throw new Error(
-      "memory_policy.config.runtimeTuning.scopeRuntime is required",
-    );
-  }
-
-  const tokenMinLength = Number(runtime.tokenMinLength);
-  const docNameMinLength = Number(runtime.docNameMinLength);
-  const tokenOverlapThreshold = Number(runtime.tokenOverlapThreshold);
-
-  if (!Number.isFinite(tokenMinLength) || tokenMinLength < 1) {
-    throw new Error(
-      "memory_policy.config.runtimeTuning.scopeRuntime.tokenMinLength is required",
-    );
-  }
-  if (!Number.isFinite(docNameMinLength) || docNameMinLength < 1) {
-    throw new Error(
-      "memory_policy.config.runtimeTuning.scopeRuntime.docNameMinLength is required",
-    );
-  }
-  if (
-    !Number.isFinite(tokenOverlapThreshold) ||
-    tokenOverlapThreshold <= 0 ||
-    tokenOverlapThreshold > 1
-  ) {
-    throw new Error(
-      "memory_policy.config.runtimeTuning.scopeRuntime.tokenOverlapThreshold is required",
-    );
-  }
-
-  const filenamePatterns = Array.isArray(runtime?.candidatePatterns?.filename)
-    ? runtime.candidatePatterns.filename
-    : [];
-  const phrasePatterns = Array.isArray(
-    runtime?.candidatePatterns?.docReferencePhrase,
-  )
-    ? runtime.candidatePatterns.docReferencePhrase
-    : [];
-  if (filenamePatterns.length === 0 || phrasePatterns.length === 0) {
-    throw new Error(
-      "memory_policy.config.runtimeTuning.scopeRuntime.candidatePatterns is required",
-    );
-  }
-
-  const candidateFilenameRegex = filenamePatterns.map((pattern: unknown) => {
-    const source = String(pattern || "").trim();
-    if (!source) {
-      throw new Error(
-        "memory_policy scopeRuntime candidate filename regex cannot be empty",
-      );
-    }
-    try {
-      return new RegExp(source, "gi");
-    } catch {
-      throw new Error(`Invalid scopeRuntime filename regex: ${source}`);
-    }
-  });
-  const candidateDocRefRegex = phrasePatterns.map((pattern: unknown) => {
-    const source = String(pattern || "").trim();
-    if (!source) {
-      throw new Error(
-        "memory_policy scopeRuntime doc reference regex cannot be empty",
-      );
-    }
-    try {
-      return new RegExp(source, "gi");
-    } catch {
-      throw new Error(`Invalid scopeRuntime doc reference regex: ${source}`);
-    }
-  });
-
-  const docStatusesAllowed = (
-    Array.isArray(runtime.docStatusesAllowed) ? runtime.docStatusesAllowed : []
-  )
-    .map((value: unknown) => String(value || "").trim())
-    .filter(Boolean);
-  if (docStatusesAllowed.length === 0) {
-    throw new Error(
-      "memory_policy.config.runtimeTuning.scopeRuntime.docStatusesAllowed is required",
-    );
-  }
-
-  const stopWords = new Set<string>(
-    (Array.isArray(runtime.docStopWords) ? runtime.docStopWords : [])
-      .map((value: unknown) => lower(String(value || "")))
-      .filter((value: string): value is string => value.length > 0),
-  );
-  if (stopWords.size === 0) {
-    throw new Error(
-      "memory_policy.config.runtimeTuning.scopeRuntime.docStopWords is required",
-    );
-  }
-
-  return {
-    tokenMinLength: Math.floor(tokenMinLength),
-    docNameMinLength: Math.floor(docNameMinLength),
-    tokenOverlapThreshold,
-    candidateFilenameRegex,
-    candidateDocRefRegex,
-    docStatusesAllowed,
-    stopWords,
-  };
-}
-
-function normSpace(s: string): string {
-  return (s ?? "").trim().replace(/\s+/g, " ");
-}
-
-function lower(s: string): string {
-  return normSpace(s).toLowerCase();
-}
-
-function resetRegex(pattern: RegExp): void {
-  pattern.lastIndex = 0;
-}
-
-function matchRegexPatterns(patterns: RegExp[], input: string): string[] {
-  const matches: string[] = [];
-  for (const pattern of patterns) {
-    resetRegex(pattern);
-    if (pattern.global) {
-      let result: RegExpExecArray | null = null;
-      while ((result = pattern.exec(input)) !== null) {
-        for (const chunk of result) {
-          const value = normSpace(String(chunk || ""));
-          if (value) matches.push(value);
-        }
-        if (result[0] === "") {
-          pattern.lastIndex += 1;
-        }
-      }
-    } else {
-      const result = pattern.exec(input);
-      if (!result) continue;
-      for (const chunk of result) {
-        const value = normSpace(String(chunk || ""));
-        if (value) matches.push(value);
-      }
-    }
-  }
-  return matches;
-}
-
-function tokenizeForScope(
-  input: string,
-  config: Pick<ScopeRuntimeMentionConfig, "tokenMinLength" | "stopWords">,
-): string[] {
-  const normalized = lower(input)
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9\s]/g, " ");
-  return normalized
-    .split(/\s+/)
-    .map((token) => token.trim())
-    .filter(
-      (token) =>
-        token.length >= config.tokenMinLength &&
-        !config.stopWords.has(token) &&
-        !GENERIC_FILE_TOKENS.has(token),
-    );
-}
-
-function lexicalOverlapScore(
-  messageTokens: Set<string>,
-  docTokens: string[],
-): number {
-  if (docTokens.length === 0 || messageTokens.size === 0) return 0;
-  let overlap = 0;
-  for (const token of docTokens) {
-    if (messageTokens.has(token)) overlap += 1;
-  }
-  return overlap / docTokens.length;
-}
-
-function normalizeForExactMention(value: string): string {
-  return lower(String(value || ""))
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9.\s_-]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
+import { TurnFinalizationService } from "./TurnFinalizationService";
+import {
+  type PreparedTurnIdentity,
+  type TurnExecutionDraft,
+} from "./turnExecutionDraft";
+import { ScopeMentionResolver } from "./ScopeMentionResolver";
+import { RuntimePolicyGate } from "./RuntimePolicyGate";
+import { buildBlockedTurnDraft } from "./BlockedTurnDraftBuilder";
 
 export type RuntimeDelegate = {
-  chat(req: ChatRequest): Promise<ChatResult>;
-  streamChat(params: {
+  prepareTurnIdentity(req: ChatRequest): Promise<PreparedTurnIdentity>;
+  executePreparedTurn(params: {
     req: ChatRequest;
-    sink: StreamSink;
-    streamingConfig: LLMStreamingConfig;
+    prepared: PreparedTurnIdentity;
+    stream: boolean;
+    sink?: StreamSink;
+    streamingConfig?: LLMStreamingConfig;
+  }): Promise<TurnExecutionDraft>;
+  persistFinalizedTurn(params: {
+    draft: TurnExecutionDraft;
+    finalized: ChatResult;
   }): Promise<ChatResult>;
   createConversation(params: {
     userId: string;
@@ -297,18 +72,32 @@ export type RuntimeDelegate = {
   createMessage(params: CreateMessageParams): Promise<ChatMessageDTO>;
 };
 
-export class ChatRuntimeOrchestrator {
-  private readonly normalizer = new ContractNormalizer();
-  private readonly evidenceValidator = new EvidenceValidator();
-  private readonly scopeService = new ScopeService();
-  private readonly scopeRuntime = resolveScopeRuntimeMentionConfig();
+type ChatRuntimeOrchestratorDeps = {
+  scopeService: ScopeService;
+  scopeMentionResolver: ScopeMentionResolver;
+  finalizationService?: TurnFinalizationService;
+  runtimePolicyGate?: RuntimePolicyGate;
+};
 
-  constructor(private readonly delegate: RuntimeDelegate) {}
+export class ChatRuntimeOrchestrator {
+  private readonly finalizationService: TurnFinalizationService;
+  private readonly runtimePolicyGate: RuntimePolicyGate;
+
+  constructor(
+    private readonly delegate: RuntimeDelegate,
+    private readonly deps: ChatRuntimeOrchestratorDeps,
+  ) {
+    this.finalizationService =
+      deps.finalizationService || new TurnFinalizationService();
+    this.runtimePolicyGate = deps.runtimePolicyGate || new RuntimePolicyGate();
+  }
 
   async chat(req: ChatRequest): Promise<ChatResult> {
     const preparedReq = await this.prepareRequest(req);
-    const raw = await this.delegate.chat(preparedReq);
-    return this.postProcess(preparedReq, raw);
+    return this.runTurnPipeline({
+      req: preparedReq,
+      stream: false,
+    });
   }
 
   async streamChat(params: {
@@ -317,11 +106,12 @@ export class ChatRuntimeOrchestrator {
     streamingConfig: LLMStreamingConfig;
   }): Promise<ChatResult> {
     const preparedReq = await this.prepareRequest(params.req);
-    const raw = await this.delegate.streamChat({
-      ...params,
+    return this.runTurnPipeline({
       req: preparedReq,
+      stream: true,
+      sink: params.sink,
+      streamingConfig: params.streamingConfig,
     });
-    return this.postProcess(preparedReq, raw);
   }
 
   async createConversation(params: {
@@ -399,9 +189,11 @@ export class ChatRuntimeOrchestrator {
     };
     const conversationId = String(req.conversationId || "").trim();
 
-    // 1. Clear scope if requested
-    if (conversationId && this.scopeService.shouldClearScope(req)) {
-      await this.scopeService.clearConversationScope(
+    if (
+      conversationId &&
+      this.deps.scopeService.shouldClearScope(req)
+    ) {
+      await this.deps.scopeService.clearConversationScope(
         req.userId,
         conversationId,
       );
@@ -409,263 +201,107 @@ export class ChatRuntimeOrchestrator {
       return next;
     }
 
-    const explicitScope = this.scopeService.attachedScope(next);
+    const explicitScope = this.deps.scopeService.attachedScope(next);
     if (explicitScope.length > 0) {
-      const narrowedFromExplicit = await this.detectDocumentMentions(
+      const narrowed = await this.deps.scopeMentionResolver.detect(
         req.userId,
         req.message,
-        {
-          restrictToDocumentIds: explicitScope,
-        },
+        { restrictToDocumentIds: explicitScope },
       );
-      if (narrowedFromExplicit.length > 0) {
-        logger.debug("[Scope] narrowed explicit scope from semantic mention", {
-          detected: narrowedFromExplicit,
-          previousIds: explicitScope,
-          userId: req.userId,
-        });
-        next.attachedDocumentIds = narrowedFromExplicit;
-      } else {
-        next.attachedDocumentIds = explicitScope;
-      }
+      next.attachedDocumentIds = narrowed.length > 0 ? narrowed : explicitScope;
       return next;
     }
 
     if (!conversationId) {
-      const detected = await this.detectDocumentMentions(
+      const detected = await this.deps.scopeMentionResolver.detect(
         req.userId,
         req.message,
       );
       if (detected.length > 0) {
-        logger.debug("[Scope] detected document mentions", {
-          detected,
-          previousIds: [],
-          userId: req.userId,
-        });
         next.attachedDocumentIds = detected;
       }
       return next;
     }
 
-    // 3. Fall back to conversation-persisted scope
-    const persisted = await this.scopeService.getConversationScope(
+    const persisted = await this.deps.scopeService.getConversationScope(
       req.userId,
       conversationId,
     );
     if (persisted.length > 0) {
-      const narrowedFromPersisted = await this.detectDocumentMentions(
+      const narrowed = await this.deps.scopeMentionResolver.detect(
         req.userId,
         req.message,
-        {
-          restrictToDocumentIds: persisted,
-        },
+        { restrictToDocumentIds: persisted },
       );
-      if (narrowedFromPersisted.length > 0) {
-        logger.debug("[Scope] narrowed persisted scope from semantic mention", {
-          detected: narrowedFromPersisted,
-          previousIds: persisted,
-          userId: req.userId,
-        });
-        next.attachedDocumentIds = narrowedFromPersisted;
-      } else {
-        next.attachedDocumentIds = persisted;
-      }
+      next.attachedDocumentIds = narrowed.length > 0 ? narrowed : persisted;
       return next;
     }
 
-    const detected = await this.detectDocumentMentions(req.userId, req.message);
+    const detected = await this.deps.scopeMentionResolver.detect(
+      req.userId,
+      req.message,
+    );
     if (detected.length > 0) {
-      logger.debug("[Scope] detected document mentions", {
-        detected,
-        previousIds: [],
-        userId: req.userId,
-      });
       next.attachedDocumentIds = detected;
     }
     return next;
   }
 
-  /**
-   * Extract document filenames mentioned in the user's message and resolve
-   * them to document IDs by matching against the user's indexed documents.
-   */
-  private async detectDocumentMentions(
-    userId: string,
-    message: string,
-    options?: {
-      restrictToDocumentIds?: string[];
-    },
-  ): Promise<string[]> {
-    if (!message || !userId) return [];
-    const mentionSignals = [
-      ...matchRegexPatterns(this.scopeRuntime.candidateFilenameRegex, message),
-      ...matchRegexPatterns(this.scopeRuntime.candidateDocRefRegex, message),
-    ];
-    if (mentionSignals.length === 0) return [];
-    const restrictedDocIds = Array.isArray(options?.restrictToDocumentIds)
-      ? options?.restrictToDocumentIds
-          .map((id) => String(id || "").trim())
-          .filter(Boolean)
-      : [];
+  private async runTurnPipeline(params: {
+    req: ChatRequest;
+    stream: boolean;
+    sink?: StreamSink;
+    streamingConfig?: LLMStreamingConfig;
+  }): Promise<ChatResult> {
+    const prepared = await this.delegate.prepareTurnIdentity(params.req);
+    const policyDecision = this.runtimePolicyGate.evaluate(params.req);
+    const draft = policyDecision.blocked
+      ? buildBlockedTurnDraft({
+          req: params.req,
+          prepared,
+          decision: policyDecision,
+          stream: params.stream,
+        })
+      : await this.delegate.executePreparedTurn({
+          req: params.req,
+          prepared,
+          stream: params.stream,
+          sink: params.sink,
+          streamingConfig: params.streamingConfig,
+        });
 
-    if (options?.restrictToDocumentIds && restrictedDocIds.length === 0) {
-      return [];
+    const conversationId = String(draft.conversationId || "").trim();
+    if (conversationId) {
+      if (this.deps.scopeService.shouldClearScope(params.req)) {
+        await this.deps.scopeService.clearConversationScope(
+          params.req.userId,
+          conversationId,
+        );
+      }
+
+      const attachedScope = this.deps.scopeService.attachedScope(params.req);
+      if (attachedScope.length > 0) {
+        await this.deps.scopeService.setConversationScope(
+          params.req.userId,
+          conversationId,
+          attachedScope,
+        );
+      }
     }
-    const allowedStatuses = this.scopeRuntime.docStatusesAllowed
-      .map((status) =>
-        String(status || "")
-          .trim()
-          .toLowerCase(),
-      )
-      .filter((status): status is DocumentStatus =>
-        KNOWN_DOCUMENT_STATUSES.has(status as DocumentStatus),
-      );
-    if (allowedStatuses.length === 0) return [];
 
-    // Fetch user's ready/indexed documents
-    const docs = await prisma.document.findMany({
-      where: {
-        userId,
-        status: { in: allowedStatuses },
-        ...(restrictedDocIds.length > 0
-          ? { id: { in: restrictedDocIds } }
-          : {}),
-      },
-      select: {
-        id: true,
-        filename: true,
-        displayTitle: true,
-        encryptedFilename: true,
-      },
+    const scopeDocumentIds = conversationId
+      ? await this.deps.scopeService.getConversationScope(
+          params.req.userId,
+          conversationId,
+        )
+      : this.deps.scopeService.attachedScope(params.req);
+    const finalized = await this.finalizationService.finalize(draft, {
+      request: params.req,
+      scopeDocumentIds,
     });
-    if (!docs.length) return [];
-
-    const referenceDocs: DocumentReferenceDoc[] = docs.map((doc) => ({
-      docId: doc.id,
-      filename:
-        doc.filename ||
-        doc.displayTitle ||
-        filenameFromStorageKey(doc.encryptedFilename),
-      title:
-        doc.displayTitle ||
-        doc.filename ||
-        filenameFromStorageKey(doc.encryptedFilename),
-    }));
-    const resolution = resolveDocumentReference(message, referenceDocs);
-    const scopeTokens = new Set(
-      tokenizeForScope(`${message}\n${mentionSignals.join(" ")}`, this.scopeRuntime),
-    );
-    const lexicalMatches = referenceDocs
-      .map((doc) => {
-        const docText = normSpace(`${doc.filename || ""} ${doc.title || ""}`);
-        if (docText.length < this.scopeRuntime.docNameMinLength) return null;
-        const docTokens = tokenizeForScope(docText, this.scopeRuntime);
-        const score = lexicalOverlapScore(scopeTokens, docTokens);
-        if (score < this.scopeRuntime.tokenOverlapThreshold) return null;
-        return { docId: doc.docId, score };
-      })
-      .filter(
-        (entry): entry is { docId: string; score: number } =>
-          Boolean(entry?.docId),
-      )
-      .sort((a, b) => b.score - a.score);
-
-    const lexicalMatchedDocIds = new Set(lexicalMatches.map((entry) => entry.docId));
-    const resolverCandidates = (resolution.matchedDocIds || []).filter(Boolean);
-    const mentionSignalCorpus = normalizeForExactMention(
-      `${message}\n${mentionSignals.join(" ")}`,
-    );
-    const resolverQualifiedDocIds = resolverCandidates.filter((docId) => {
-      const doc = referenceDocs.find((item) => item.docId === docId);
-      if (!doc) return false;
-      const names = [doc.filename, doc.title]
-        .map((value) => normalizeForExactMention(String(value || "")))
-        .filter(Boolean);
-      if (names.length === 0) return false;
-      return names.some((name) => mentionSignalCorpus.includes(name));
+    return this.delegate.persistFinalizedTurn({
+      draft,
+      finalized,
     });
-
-    // Strict acceptance: lexical threshold wins; resolver-only fallback is
-    // allowed only for explicit high-confidence exact mentions.
-    let matched: string[] = Array.from(lexicalMatchedDocIds);
-    if (matched.length === 0) {
-      const resolverOnlyAllowed =
-        resolution.explicitDocRef &&
-        resolution.method === "exact" &&
-        resolution.confidence >= 0.9 &&
-        resolverQualifiedDocIds.length > 0;
-      if (!resolverOnlyAllowed) return [];
-      matched = resolverQualifiedDocIds;
-    }
-
-    logger.debug("[Scope] document mention matches", {
-      matchedIds: matched,
-      lexicalMatches: lexicalMatches.map((entry) => ({
-        docId: entry.docId,
-        score: entry.score,
-      })),
-      docsChecked: docs.length,
-      confidence: resolution.confidence,
-      method: resolution.method,
-      candidates: resolution.candidates,
-      mentionSignals,
-    });
-
-    return matched;
-  }
-
-  private async postProcess(
-    req: ChatRequest,
-    result: ChatResult,
-  ): Promise<ChatResult> {
-    const normalized = this.normalizer.normalize(result);
-    const conversationId = String(result.conversationId || "").trim();
-    if (!conversationId) return normalized;
-
-    if (this.scopeService.shouldClearScope(req)) {
-      await this.scopeService.clearConversationScope(
-        req.userId,
-        conversationId,
-      );
-    }
-
-    const attachedScope = this.scopeService.attachedScope(req);
-    if (attachedScope.length > 0) {
-      await this.scopeService.setConversationScope(
-        req.userId,
-        conversationId,
-        attachedScope,
-      );
-    }
-
-    const persistedScope = await this.scopeService.getConversationScope(
-      req.userId,
-      conversationId,
-    );
-
-    const scopeForValidation =
-      attachedScope.length > 0 ? attachedScope : persistedScope;
-    if (scopeForValidation.length > 0) {
-      logger.debug("[Scope] persisted scope", {
-        scopeForValidation,
-        userId: req.userId,
-        conversationId,
-      });
-    }
-    const scoped = this.evidenceValidator.enforceScope(
-      normalized,
-      scopeForValidation,
-    );
-
-    // Keep compatibility flags coherent.
-    if (
-      scoped.status !== "success" &&
-      !scoped.fallbackReasonCode &&
-      scoped.failureCode
-    ) {
-      scoped.fallbackReasonCode = scoped.failureCode;
-    }
-
-    return scoped;
   }
 }

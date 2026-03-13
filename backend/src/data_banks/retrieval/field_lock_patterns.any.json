@@ -1,0 +1,238 @@
+{
+  "_meta": {
+    "id": "field_lock_patterns",
+    "version": "1.0.0",
+    "description": "Defines strict lock behavior for role- and field-sensitive retrieval so high-risk labels cannot be silently re-used across turns or documents.",
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "koda-retrieval",
+    "compat": ">=1.0.0",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id",
+    "defaultLockTtlTurns": 6,
+    "strictOnHighRiskRoles": true
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "after role/field extraction and before cross-turn answer reuse",
+    "consumer": "query state layer",
+    "intent": "avoid mixing owner, signer, patient, beneficiary, and similar high-risk roles across ambiguous contexts",
+    "emittedSignals": [
+      "activeFieldLocks",
+      "lockedRoleContexts",
+      "lockSource",
+      "lockReleaseReason"
+    ]
+  },
+  "locks": [
+    {
+      "id": "FLP_owner_lock",
+      "field": "owner",
+      "highRisk": true,
+      "matchMode": "exact_canonical",
+      "forbidSubstitutions": [
+        "signer",
+        "beneficiary",
+        "witness",
+        "subscriber"
+      ],
+      "requiredEvidence": [
+        "field_anchor",
+        "role_anchor",
+        "source_span"
+      ],
+      "expireOn": [
+        "explicit_new_query_scope",
+        "doc_change",
+        "field_conflict_not_resolved"
+      ]
+    },
+    {
+      "id": "FLP_signer_lock",
+      "field": "signer",
+      "highRisk": true,
+      "matchMode": "exact_canonical",
+      "forbidSubstitutions": [
+        "owner",
+        "witness",
+        "beneficiary"
+      ],
+      "requiredEvidence": [
+        "source_span",
+        "signature_marker"
+      ],
+      "expireOn": [
+        "explicit_new_query_scope",
+        "doc_change",
+        "query_request_disambiguate",
+        "role_context_explicit"
+      ]
+    },
+    {
+      "id": "FLP_patient_lock",
+      "field": "patient",
+      "highRisk": true,
+      "matchMode": "exact_canonical",
+      "forbidSubstitutions": [
+        "subscriber",
+        "beneficiary",
+        "account_holder"
+      ],
+      "requiredEvidence": [
+        "source_span",
+        "person_context"
+      ],
+      "expireOn": [
+        "explicit_new_query_scope",
+        "doc_change",
+        "subscriber_context_discovered"
+      ]
+    },
+    {
+      "id": "FLP_subscriber_lock",
+      "field": "subscriber",
+      "highRisk": true,
+      "matchMode": "exact_canonical",
+      "forbidSubstitutions": [
+        "patient",
+        "beneficiary",
+        "owner"
+      ],
+      "requiredEvidence": [
+        "field_anchor",
+        "document_anchor"
+      ],
+      "expireOn": [
+        "explicit_new_query_scope",
+        "doc_change",
+        "query_request_clarification"
+      ]
+    },
+    {
+      "id": "FLP_beneficiary_lock",
+      "field": "beneficiary",
+      "highRisk": true,
+      "matchMode": "exact_canonical",
+      "forbidSubstitutions": [
+        "owner",
+        "payee",
+        "account_holder",
+        "issuer",
+        "patient"
+      ],
+      "requiredEvidence": [
+        "payment_direction",
+        "field_anchor",
+        "source_span"
+      ],
+      "expireOn": [
+        "explicit_new_query_scope",
+        "doc_change"
+      ]
+    },
+    {
+      "id": "FLP_issuer_lock",
+      "field": "issuer",
+      "highRisk": true,
+      "matchMode": "exact_canonical",
+      "forbidSubstitutions": [
+        "owner",
+        "signer",
+        "subscriber",
+        "beneficiary"
+      ],
+      "requiredEvidence": [
+        "source_span",
+        "authority_marker"
+      ],
+      "expireOn": [
+        "explicit_new_query_scope",
+        "doc_change",
+        "role_context_explicit"
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "FLP_001_lock_activation",
+      "check": "query.explicitRoleMention == true AND query.roleConfidence >= 0.75",
+      "failureAction": "ACTIVATE_FIELD_LOCK",
+      "severity": "high"
+    },
+    {
+      "id": "FLP_002_forbid_unlocked_cross_substitution",
+      "check": "candidate.forbiddenSubstitutionAttempted == true AND activeFieldLocks.containsAny(candidate.lockForbiddenRoleRefs) == true",
+      "failureAction": "BLOCK_CROSS_FIELD_SUBSTITUTION",
+      "severity": "error"
+    },
+    {
+      "id": "FLP_003_release_lock_on_explicit_doc_change",
+      "check": "query.explicitDocRefChanged == true",
+      "failureAction": "RELEASE_ALL_FIELD_LOCKS",
+      "severity": "warning"
+    },
+    {
+      "id": "FLP_004_followup_lock_persistence",
+      "check": "conversation.followup == true AND activeFieldLocks.count > 0",
+      "failureAction": "PRESERVE_LOCK_CONTEXT",
+      "severity": "info"
+    },
+    {
+      "id": "FLP_005_lock_conflict_requires_clarification",
+      "check": "activeFieldLocks.intersects(candidate.mutuallyExclusiveField) == true",
+      "failureAction": "ASK_ROLE_DISAMBIGUATION",
+      "severity": "error"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "lock_forbids_owner_signer_merge",
+        "input": {
+          "query": {
+            "explicitRoleMention": true
+          },
+          "activeFieldLocks": [
+            "owner"
+          ],
+          "candidate": {
+            "forbiddenSubstitutionAttempted": true,
+            "lockForbiddenRoleRefs": [
+              "signer"
+            ]
+          }
+        },
+        "expect": {
+          "failureAction": "BLOCK_CROSS_FIELD_SUBSTITUTION"
+        }
+      },
+      {
+        "id": "lock_releases_on_doc_change",
+        "input": {
+          "query": {
+            "explicitDocRefChanged": true
+          }
+        },
+        "expect": {
+          "failureAction": "RELEASE_ALL_FIELD_LOCKS"
+        }
+      }
+    ]
+  }
+}

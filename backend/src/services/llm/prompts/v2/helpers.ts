@@ -293,6 +293,26 @@ export function buildSlots(ctx: PromptContext): Record<string, unknown> {
     0;
   const runtimeSignals =
     ctx.runtimeSignals ?? customSlots.runtimeSignals ?? "";
+  const styleDecision =
+    (ctx.runtimeSignals &&
+      typeof ctx.runtimeSignals === "object" &&
+      !Array.isArray(ctx.runtimeSignals) &&
+      typeof (ctx.runtimeSignals as Record<string, unknown>).styleDecision === "object" &&
+      (ctx.runtimeSignals as Record<string, unknown>).styleDecision) ||
+    customSlots.styleDecision ||
+    "";
+  const styleDecisionObj =
+    typeof styleDecision === "object" && !Array.isArray(styleDecision)
+      ? (styleDecision as Record<string, unknown>)
+      : parseJsonObject(styleDecision) || {};
+  const turnStyleState =
+    (ctx.runtimeSignals &&
+      typeof ctx.runtimeSignals === "object" &&
+      !Array.isArray(ctx.runtimeSignals) &&
+      typeof (ctx.runtimeSignals as Record<string, unknown>).turnStyleState === "object" &&
+      (ctx.runtimeSignals as Record<string, unknown>).turnStyleState) ||
+    customSlots.turnStyleState ||
+    "";
 
   return {
     env: ctx.env,
@@ -327,6 +347,55 @@ export function buildSlots(ctx: PromptContext): Record<string, unknown> {
     semanticFlags: asSlotString(ctx.semanticFlags ?? customSlots.semanticFlags ?? ""),
     state: asSlotString(ext.state ?? customSlots.state ?? ""),
     runtimeSignals: asSlotString(runtimeSignals),
+    styleDecision: asSlotString(styleDecision),
+    voiceProfile: asSlotString(styleDecisionObj.voiceProfile ?? customSlots.voiceProfile ?? ""),
+    domainVoiceModifier: asSlotString(
+      styleDecisionObj.domainVoiceModifier ?? customSlots.domainVoiceModifier ?? "",
+    ),
+    interactionModifier: asSlotString(
+      styleDecisionObj.interactionModifier ?? customSlots.interactionModifier ?? "",
+    ),
+    answerStrategy: asSlotString(
+      styleDecisionObj.answerStrategy ?? customSlots.answerStrategy ?? "",
+    ),
+    templateFamily: asSlotString(
+      styleDecisionObj.templateFamily ?? customSlots.templateFamily ?? "",
+    ),
+    uncertaintyBand: asSlotString(
+      styleDecisionObj.uncertaintyBand ?? customSlots.uncertaintyBand ?? "",
+    ),
+    openerFamily: asSlotString(
+      styleDecisionObj.openerFamily ?? customSlots.openerFamily ?? "",
+    ),
+    rhythmProfile: asSlotString(
+      styleDecisionObj.rhythmProfile ?? customSlots.rhythmProfile ?? "",
+    ),
+    claimStrengthProfile: asSlotString(
+      styleDecisionObj.claimStrengthProfile ?? customSlots.claimStrengthProfile ?? "",
+    ),
+    clarificationPolicy: asSlotString(
+      styleDecisionObj.clarificationPolicy ?? customSlots.clarificationPolicy ?? "",
+    ),
+    fallbackPosture: asSlotString(
+      styleDecisionObj.fallbackPosture ?? customSlots.fallbackPosture ?? "",
+    ),
+    paragraphPlan: asSlotString(
+      styleDecisionObj.paragraphPlan ?? customSlots.paragraphPlan ?? "",
+    ),
+    empathyBudget: asSlotString(
+      styleDecisionObj.empathyBudget ?? customSlots.empathyBudget ?? "",
+    ),
+    turnStyleStateKey: asSlotString(
+      styleDecisionObj.turnStyleStateKey ?? customSlots.turnStyleStateKey ?? "",
+    ),
+    repetitionGuard: asSlotString(
+      styleDecisionObj.repetitionGuard ?? customSlots.repetitionGuard ?? "",
+    ),
+    antiRoboticFocus: asSlotString(
+      styleDecisionObj.antiRoboticFocus ?? customSlots.antiRoboticFocus ?? "",
+    ),
+    empathyMode: asSlotString(styleDecisionObj.empathyMode ?? customSlots.empathyMode ?? ""),
+    turnStyleState: asSlotString(turnStyleState),
     ...customSlots,
   };
 }
@@ -334,19 +403,32 @@ export function buildSlots(ctx: PromptContext): Record<string, unknown> {
 export function defaultLayerByKind(kind: PromptKind): string[] {
   const defaults: Record<PromptKind, string[]> = {
     system: ["system_base"],
-    retrieval: ["system_base", "mode_chat", "rag_policy", "retrieval_prompt"],
+    retrieval: [
+      "system_base",
+      "mode_chat",
+      "llm_global_guards",
+      "rag_policy",
+      "retrieval_prompt",
+    ],
     compose_answer: [
       "system_base",
       "mode_chat",
+      "llm_global_guards",
       "rag_policy",
       "task_answer_with_sources",
       "policy_citations",
     ],
-    disambiguation: ["system_base", "mode_chat", "disambiguation_prompt"],
-    fallback: ["system_base", "mode_chat", "fallback_prompt"],
+    disambiguation: [
+      "system_base",
+      "mode_chat",
+      "llm_global_guards",
+      "disambiguation_prompt",
+    ],
+    fallback: ["system_base", "mode_chat", "llm_global_guards", "fallback_prompt"],
     tool: [
       "system_base",
       "mode_editing",
+      "llm_global_guards",
       "editing_task_prompts",
       "task_plan_generation",
       "policy_citations",

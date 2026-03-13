@@ -1,0 +1,131 @@
+{
+  "_meta": {
+    "id": "di_supply_chain_logistics_table_ontology",
+    "version": "1.0.0",
+    "description": "Table ontology for shipment, inventory, and performance logistics evidence.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/extraction/tableExtraction.service.ts",
+      "services/core/orchestration/tableResolver.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/domain-validation.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "supply_chain_logistics",
+    "tableAxisConfidenceThreshold": 0.66
+  },
+  "domain": "supply_chain_logistics",
+  "tableTypes": [
+    {
+      "id": "scl_table_shipment_events",
+      "name": {
+        "en": "Shipment Event Table",
+        "pt": "Tabela de Eventos de Envio"
+      },
+      "aliases": [
+        "tracking events",
+        "event log",
+        "histórico de rota"
+      ],
+      "columns": [
+        "event_time",
+        "location",
+        "carrier_status",
+        "eta",
+        "notes"
+      ],
+      "quality": {
+        "requiresTemporalColumns": [
+          "event_time"
+        ],
+        "riskIfMissing": "high"
+      }
+    },
+    {
+      "id": "scl_table_inventory_aging",
+      "name": {
+        "en": "Inventory Aging Table",
+        "pt": "Tabela de Envelhecimento de Estoque"
+      },
+      "aliases": [
+        "age buckets",
+        "inventory age",
+        "aging"
+      ],
+      "columns": [
+        "sku",
+        "batch",
+        "age_bucket",
+        "qty",
+        "risk"
+      ],
+      "quality": {
+        "requiresBucketColumn": [
+          "age_bucket"
+        ],
+        "riskIfMissing": "medium"
+      }
+    },
+    {
+      "id": "scl_table_carrier_sla",
+      "name": {
+        "en": "Carrier SLA Table",
+        "pt": "Tabela de SLA do Transportador"
+      },
+      "aliases": [
+        "sla scorecard",
+        "carrier score"
+      ],
+      "columns": [
+        "carrier",
+        "on_time_rate",
+        "damage_incidents",
+        "avg_delay",
+        "penalty_days"
+      ],
+      "quality": {
+        "requiresRateColumns": [
+          "on_time_rate",
+          "avg_delay"
+        ],
+        "riskIfMissing": "high"
+      }
+    },
+    {
+      "id": "scl_table_freight_cost",
+      "name": {
+        "en": "Freight Cost Matrix",
+        "pt": "Matriz de Custos de Frete"
+      },
+      "aliases": [
+        "freight charges",
+        "shipping cost matrix",
+        "custos"
+      ],
+      "columns": [
+        "route",
+        "carrier",
+        "weight",
+        "base_charge",
+        "surcharges",
+        "currency",
+        "total"
+      ],
+      "quality": {
+        "requiresNumericColumns": [
+          "base_charge",
+          "total"
+        ],
+        "riskIfMissing": "critical"
+      }
+    }
+  ]
+}

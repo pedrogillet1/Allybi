@@ -14,7 +14,7 @@ import type {
 } from "../modules/editing/application";
 import { normalizeEditOperator } from "../services/editing/editOperatorAliases.service";
 import DocumentRevisionStoreService from "../services/editing/documentRevisionStore.service";
-import prisma from "../platform/db/prismaClient";
+import prisma from "../config/database";
 
 import type {
   EditorSessionApplyRequest,

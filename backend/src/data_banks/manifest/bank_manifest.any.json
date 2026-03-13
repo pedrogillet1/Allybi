@@ -6,7 +6,7 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-03-01",
+    "lastUpdated": "2026-03-13",
     "owner": "data-bank-governance",
     "usedBy": [
       "services/core/banks/dataBankLoader.service.ts"
@@ -54,7 +54,8 @@
     "probes",
     "templates",
     "tests",
-    "llm"
+    "llm",
+    "governance"
   ],
   "loadOrder": [
     "manifest",
@@ -81,7 +82,8 @@
     "probes",
     "templates",
     "tests",
-    "llm"
+    "llm",
+    "governance"
   ],
   "categories": [
     {
@@ -676,6 +678,27 @@
         "staging": false,
         "dev": false,
         "local": false
+      }
+    },
+    {
+      "id": "governance",
+      "folder": "governance",
+      "description": "Governance contracts for metadata quality, SSOT, sharding, eval gates, and runtime wiring adoption.",
+      "schemaId": "bank_schema",
+      "policy": {
+        "strictLoad": true,
+        "failOnMissingRequired": true,
+        "allowOptionalSkip": false
+      },
+      "dependsOnCategories": [
+        "manifest",
+        "schemas"
+      ],
+      "requiredInEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
       }
     }
   ],

@@ -1,0 +1,164 @@
+{
+  "_meta": {
+    "id": "di_commercial_real_estate_table_ontology",
+    "version": "1.0.0",
+    "description": "Commercial real estate table ontology for rent, occupancy, valuation, and diligence comparisons.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/orchestration/tableResolver.service.ts",
+      "services/core/extraction/tableExtraction.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/domain-validation.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "commercial_real_estate",
+    "axisConfidenceThreshold": 0.67,
+    "allowNestedTables": true
+  },
+  "domain": "commercial_real_estate",
+  "tableTypes": [
+    {
+      "id": "cre_table_rent_roll",
+      "name": {
+        "en": "Rent Roll",
+        "pt": "Rol de Aluguéis"
+      },
+      "aliases": [
+        "rent roll",
+        "tenant rent table",
+        "folha de renda"
+      ],
+      "columns": [
+        "tenant",
+        "unit",
+        "area_sqm",
+        "monthly_rent",
+        "expiry",
+        "status"
+      ],
+      "quality": {
+        "requiresNumericColumns": [
+          "area_sqm",
+          "monthly_rent"
+        ],
+        "requiresDateColumns": [
+          "expiry"
+        ],
+        "riskIfMissing": "critical"
+      }
+    },
+    {
+      "id": "cre_table_lease_terms",
+      "name": {
+        "en": "Lease Term Schedule",
+        "pt": "Cronograma de Locação"
+      },
+      "aliases": [
+        "lease schedule",
+        "term sheet",
+        "agenda de contratos"
+      ],
+      "columns": [
+        "lease_id",
+        "tenant",
+        "start_date",
+        "end_date",
+        "option_to_renew",
+        "rent_increase_rule"
+      ],
+      "quality": {
+        "requiresDateColumns": [
+          "start_date",
+          "end_date"
+        ],
+        "riskIfMissing": "critical"
+      }
+    },
+    {
+      "id": "cre_table_valuation_comps",
+      "name": {
+        "en": "Valuation Comps",
+        "pt": "Comparáveis de Valor"
+      },
+      "aliases": [
+        "comps",
+        "comparable properties",
+        "comparáveis"
+      ],
+      "columns": [
+        "property_id",
+        "metric",
+        "value",
+        "cap_rate",
+        "distance",
+        "adjustments"
+      ],
+      "quality": {
+        "requiresNumericColumns": [
+          "value",
+          "cap_rate"
+        ],
+        "riskIfMissing": "high"
+      }
+    },
+    {
+      "id": "cre_table_maintenance_log",
+      "name": {
+        "en": "Maintenance Log",
+        "pt": "Log de Manutenção"
+      },
+      "aliases": [
+        "maintenance",
+        "work orders",
+        "reparos"
+      ],
+      "columns": [
+        "item",
+        "priority",
+        "estimated_cost",
+        "scheduled",
+        "status",
+        "owner"
+      ],
+      "quality": {
+        "requiresDateColumns": [
+          "scheduled"
+        ],
+        "riskIfMissing": "medium"
+      }
+    },
+    {
+      "id": "cre_table_occupancy_trends",
+      "name": {
+        "en": "Occupancy Trends",
+        "pt": "Tendências de Ocupação"
+      },
+      "aliases": [
+        "occupancy trend",
+        "vacancy trend",
+        "ocupação"
+      ],
+      "columns": [
+        "period",
+        "leased_area",
+        "vacant_area",
+        "occupancy_rate",
+        "concentration_top_tenant"
+      ],
+      "quality": {
+        "requiresNumericColumns": [
+          "occupancy_rate"
+        ],
+        "riskIfMissing": "high"
+      }
+    }
+  ]
+}

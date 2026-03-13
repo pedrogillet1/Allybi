@@ -1,0 +1,244 @@
+{
+  "_meta": {
+    "id": "accounting_domain_writer",
+    "version": "2.0.0",
+    "description": "Accounting writer profile for control-native interpretation, tie-out continuity, and owner-aware reconciliation synthesis.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "domain": "accounting",
+    "interpretationMode": "control_reconciliation",
+    "requireTieOutEvidence": true,
+    "requireRoleLock": true,
+    "requireSourceLock": true,
+    "requireUnitAndSignConvention": true
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "before accounting-style narrative assembly",
+    "consumer": "accounting domain writer",
+    "intent": "Transform reconciliations into explicit control narratives with version-aware tie-out logic, owner traceability, and bounded exceptions.",
+    "emittedSignals": [
+      "acctInterpretiveMode",
+      "acctTieOutState",
+      "acctOpenItemList",
+      "acctRoleLockState",
+      "acctControlRisk",
+      "acctSourceLockState",
+      "acctUnitAndSignState",
+      "acctConsolidationBoundary"
+    ]
+  },
+  "writingProfile": {
+    "audience": "finance controller, internal audit, operations owner",
+    "goal": "Return accounting outcomes with exact anchor chains, evidence-bound tie-out logic, and residual risk context.",
+    "mandatorySections": [
+      "tie_out_scope",
+      "opening_to_closing_chain",
+      "reconciliation_summary",
+      "control_and_approvals",
+      "exception_matrix",
+      "materiality_risk",
+      "basis_reconciliation",
+      "cross_entity_scope"
+    ],
+    "mandatorySectionsDetail": {
+      "reconciliation_scope": [
+        "source type",
+        "report date window",
+        "entity scope",
+        "method/basis",
+        "consolidation flag"
+      ],
+      "variance_statement": [
+        "variance amount",
+        "variance method",
+        "variance driver summary"
+      ],
+      "risk_section": [
+        "control status",
+        "evidence gaps",
+        "required follow-up"
+      ]
+    },
+    "allowedAnswerForms": [
+      "tie_out_readout",
+      "variance_breakdown",
+      "control_gap_matrix",
+      "reconciliation_narrative",
+      "owner_action_plan",
+      "basis_comparison_readout",
+      "cross_subledger_synthesis"
+    ],
+    "forbiddenAnswerForms": [
+      "single_total_without_line_trace",
+      "subtotal_as_total",
+      "unbound_currency_mix",
+      "claim_without_account_context",
+      "cure_without_action_owner",
+      "consolidated_total_without_entity_scope"
+    ],
+    "docTypeAnchors": [
+      "acct_trial_balance",
+      "acct_trial_balance_reclass",
+      "acct_general_ledger",
+      "acct_chart_of_accounts",
+      "acct_bank_reconciliation",
+      "acct_payment_run",
+      "acct_bankbook",
+      "acct_ap_aging",
+      "acct_ar_aging",
+      "acct_subledger_vendor",
+      "acct_subledger_customer",
+      "acct_journal_entry_adjusting",
+      "acct_revenue_recognition",
+      "acct_cashbook",
+      "acct_depreciation_schedule",
+      "acct_amortization_schedule",
+      "acct_inventory_valuation",
+      "acct_fixed_asset_register",
+      "acct_tax_reconciliation",
+      "acct_forecast_pack",
+      "acct_audit_workpaper",
+      "acct_audit_confirmation",
+      "acct_month_end_close",
+      "acct_year_end_close",
+      "acct_intercompany_reconciliation"
+    ],
+    "sectionPriority": [
+      "header",
+      "line_items",
+      "summary",
+      "reconciliation_summary",
+      "open_items",
+      "cross_subledger_notes",
+      "variance_decomposition",
+      "controls",
+      "signoff"
+    ]
+  },
+  "interpretiveRules": [
+    {
+      "id": "ACCT_WRITER_001_balance_integrity",
+      "description": "Any numeric reconciliation must begin with opening -> movement -> closing and preserve the accounting equation.",
+      "requiredFor": "summarize, validate, compare"
+    },
+    {
+      "id": "ACCT_WRITER_002_role_and_approval",
+      "description": "Show authorizer, preparer, approver, and reviewer fields when adjustments or exceptions exist before asserting control adequacy."
+    },
+    {
+      "id": "ACCT_WRITER_003_line_item_traceability",
+      "description": "Claims on totals must reference representative line items and not only summary buckets."
+    },
+    {
+      "id": "ACCT_WRITER_004_currency_and_scale",
+      "description": "Report multi-currency accounts with base currency and reporting currency separately."
+    },
+    {
+      "id": "ACCT_WRITER_005_exception_governance",
+      "description": "Classify open exceptions by severity, age, owner, and remediation due date before concluding residual risk."
+    },
+    {
+      "id": "ACCT_WRITER_006_control_risk_callout",
+      "description": "If tie-out confidence is weak, explicitly downgrade conclusions and request follow-up evidence."
+    },
+    {
+      "id": "ACCT_WRITER_007_basis_guard",
+      "description": "Do not merge accrual, cash, forecast, and roll-forward values in one calculation without explicit basis bridge lines."
+    },
+    {
+      "id": "ACCT_WRITER_008_version_scope",
+      "description": "If multiple versions of statements or ledgers are present, keep each version separate and only compare after version and date locks."
+    },
+    {
+      "id": "ACCT_WRITER_009_cross_entity_lock",
+      "description": "Consolidated claims must name entity scope or consolidation policy before comparing subsidiary-level values."
+    },
+    {
+      "id": "ACCT_WRITER_010_subledger_alignment",
+      "description": "For control-account reconciliations, show AR/AP linkage and unreconciled items with status before aggregate comment."
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "acct_writer_requires_tieout_scaffold",
+        "input": {
+          "query": "Is this trial balance tied out?"
+        },
+        "expect": {
+          "mustInclude": [
+            "opening_to_closing_chain",
+            "reconciliation_summary",
+            "acctRoleLockState"
+          ]
+        }
+      },
+      {
+        "id": "acct_writer_requires_owner_action_matrix",
+        "input": {
+          "query": "What are the open reconciling items and owners?"
+        },
+        "expect": {
+          "mustInclude": [
+            "exception_matrix",
+            "owner",
+            "action"
+          ]
+        }
+      },
+      {
+        "id": "acct_writer_flags_unbound_currency",
+        "input": {
+          "scenario": "currency_mix"
+        },
+        "expect": {
+          "action": "warn",
+          "mustInclude": [
+            "currency"
+          ]
+        }
+      },
+      {
+        "id": "acct_writer_requires_consolidation_boundary",
+        "input": {
+          "query": "Combine this month-end trial balance with subsidiary ledgers"
+        },
+        "expect": {
+          "mustInclude": [
+            "entity",
+            "scope",
+            "consolidation"
+          ]
+        }
+      },
+      {
+        "id": "acct_writer_requires_basis_bridge",
+        "input": {
+          "query": "Compare bank reconciliation and explain timing"
+        },
+        "expect": {
+          "mustInclude": [
+            "basis",
+            "timing_differences",
+            "reconciliation_method"
+          ]
+        }
+      }
+    ]
+  }
+}

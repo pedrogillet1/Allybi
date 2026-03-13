@@ -1,0 +1,145 @@
+{
+  "_meta": {
+    "id": "work_product_types",
+    "version": "1.0.0",
+    "description": "Work-product mode taxonomy for output shape and evaluator expectations.",
+    "owner": "assistant-orchestrator",
+    "usedBy": [
+      "services/assistant/core/assistantOrchestrator.service.ts",
+      "services/assistant/core/outputComposer.service.ts"
+    ],
+    "tests": [
+      "tests/assistant/workProductTypes.proof.test.ts"
+    ],
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13"
+  },
+  "config": {
+    "enabled": true,
+    "defaultType": "direct_answer"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "post_synthesis",
+    "consumer": "output composer",
+    "output": "work_product_type_id"
+  },
+  "types": [
+    {
+      "id": "direct_answer",
+      "intent": "single_question_focused",
+      "surface": {
+        "maxParagraphs": 2,
+        "mustInclude": [
+          "answer",
+          "evidence_anchor",
+          "certainty_label"
+        ],
+        "optional": [
+          "next_step"
+        ]
+      },
+      "constraints": {
+        "no_tables": true,
+        "no_work_plan": true
+      }
+    },
+    {
+      "id": "evidence_brief",
+      "intent": "evidence_centric",
+      "surface": {
+        "maxSections": 5,
+        "mustInclude": [
+          "evidence_block",
+          "limitation_block",
+          "confidence_block"
+        ]
+      },
+      "constraints": {
+        "requireCitations": true,
+        "maxEvidenceItems": 8
+      }
+    },
+    {
+      "id": "decision_memo",
+      "intent": "strategic_decision_support",
+      "surface": {
+        "maxSections": 7,
+        "mustInclude": [
+          "position",
+          "evidence",
+          "risks",
+          "next_action"
+        ],
+        "style": "executive_compatible"
+      },
+      "constraints": {
+        "noSpeculation": true,
+        "riskSignalRequired": true
+      }
+    },
+    {
+      "id": "comparison_matrix",
+      "intent": "compare_entities_or_periods",
+      "surface": {
+        "mustInclude": [
+          "dimension_headers",
+          "delta_signals",
+          "winner_or_material_change"
+        ],
+        "tableRequired": true
+      },
+      "constraints": {
+        "maxRows": 20,
+        "maxColumns": 7
+      }
+    },
+    {
+      "id": "action_plan",
+      "intent": "operational_follow_through",
+      "surface": {
+        "mustInclude": [
+          "step_list",
+          "owner",
+          "blocking_dependency",
+          "estimated_effort"
+        ],
+        "format": "task_list"
+      },
+      "constraints": {
+        "noRhetoricalClaims": true,
+        "nextStepRequired": true
+      }
+    },
+    {
+      "id": "quote_pack",
+      "intent": "quote_or_clause_driven",
+      "surface": {
+        "mustInclude": [
+          "quote_lines",
+          "plain_interpretation",
+          "exception_or_limit"
+        ],
+        "tableOptional": false
+      },
+      "constraints": {
+        "requireExactQuoteMatch": true,
+        "maxQuoteClusters": 6
+      }
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "compare_request_selects_matrix",
+        "input": {
+          "intent": "compare_entities_or_periods"
+        },
+        "expect": {
+          "workProductType": "comparison_matrix"
+        }
+      }
+    ]
+  }
+}

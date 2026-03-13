@@ -19,25 +19,34 @@ describe("Certification: observability integrity", () => {
       process.cwd(),
       "src/services/telemetry/traceWriter.service.ts",
     );
-    const delegatePath = path.resolve(
+    const executorPath = path.resolve(
       process.cwd(),
-      "src/modules/chat/runtime/CentralizedChatRuntimeDelegate.ts",
+      "src/modules/chat/runtime/ChatTurnExecutor.ts",
+    );
+    const finalizationPath = path.resolve(
+      process.cwd(),
+      "src/modules/chat/runtime/TurnFinalizationService.ts",
     );
 
     const traceWriterSource = fs.readFileSync(traceWriterPath, "utf8");
-    const delegateSource = fs.readFileSync(delegatePath, "utf8");
+    const executorSource = fs.readFileSync(executorPath, "utf8");
+    const finalizationSource = fs.readFileSync(finalizationPath, "utf8");
 
     const missingInTraceType = REQUIRED_TRACE_STEPS.filter(
       (step) => !new RegExp(`\\|\\s*\"${step}\"`, "m").test(traceWriterSource),
     );
-    const missingInDelegate = REQUIRED_TRACE_STEPS.filter(
-      (step) =>
-        !new RegExp(`startSpan\\([^\\)]*\"${step}\"`, "m").test(delegateSource),
-    );
+    const executorSteps = ["input_normalization", "retrieval", "evidence_gate", "compose"];
+    const missingInRuntime = [
+      ...executorSteps.filter(
+        (step) => !new RegExp(`startSpan\\([^\\)]*\"${step}\"`, "m").test(executorSource),
+      ),
+      ...(!/runGates\(/.test(finalizationSource) ? ["quality_gates"] : []),
+      ...(!/enforce\(/.test(finalizationSource) ? ["output_contract"] : []),
+    ];
 
     const failures: string[] = [];
     if (missingInTraceType.length > 0) failures.push("TRACE_STEP_TYPE_MISSING");
-    if (missingInDelegate.length > 0) failures.push("DELEGATE_SPAN_MISSING");
+    if (missingInRuntime.length > 0) failures.push("RUNTIME_TRACE_STEP_MISSING");
     const strictModeWiringPresent =
       traceWriterSource.includes("strictWriteFailures") &&
       traceWriterSource.includes("OBS_TRACE_STRICT_WRITE_FAILURES") &&
@@ -50,18 +59,18 @@ describe("Certification: observability integrity", () => {
       metrics: {
         requiredStepCount: REQUIRED_TRACE_STEPS.length,
         traceTypeMissingCount: missingInTraceType.length,
-        delegateSpanMissingCount: missingInDelegate.length,
+        runtimeStepMissingCount: missingInRuntime.length,
         strictModeWiringPresent,
       },
       thresholds: {
         traceTypeMissingCount: 0,
-        delegateSpanMissingCount: 0,
+        runtimeStepMissingCount: 0,
         strictModeWiringPresent: true,
       },
       failures: [
         ...failures,
         ...missingInTraceType.map((step) => `TRACE_TYPE_MISSING:${step}`),
-        ...missingInDelegate.map((step) => `DELEGATE_SPAN_MISSING:${step}`),
+        ...missingInRuntime.map((step) => `RUNTIME_STEP_MISSING:${step}`),
       ],
     });
 

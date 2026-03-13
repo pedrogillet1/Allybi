@@ -1,0 +1,110 @@
+{
+  "_meta": {
+    "id": "di_manufacturing_entity_ontology",
+    "version": "1.0.0",
+    "description": "Manufacturing entity ontology for batch, work order, and yield-specific extraction.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/orchestration/entityResolver.service.ts",
+      "services/core/validation/claimValidator.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/domain-validation.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "manufacturing",
+    "normalizeEntities": true
+  },
+  "domain": "manufacturing",
+  "entities": [
+    {
+      "id": "mfg_entity_work_order",
+      "label": {
+        "en": "Work Order",
+        "pt": "Ordem de Produção"
+      },
+      "aliases": [
+        "wo",
+        "ordem de produção",
+        "ordem de trabalho"
+      ],
+      "mustUseExactIdentifier": true
+    },
+    {
+      "id": "mfg_entity_batch",
+      "label": {
+        "en": "Batch",
+        "pt": "Lote"
+      },
+      "aliases": [
+        "lot",
+        "série",
+        "lote"
+      ],
+      "requiredForYieldClaims": true
+    },
+    {
+      "id": "mfg_entity_line_speed",
+      "label": {
+        "en": "Line Speed",
+        "pt": "Velocidade da Linha"
+      },
+      "aliases": [
+        "cycle time",
+        "throughput",
+        "produção por hora"
+      ]
+    },
+    {
+      "id": "mfg_entity_scrap_qty",
+      "label": {
+        "en": "Scrap Quantity",
+        "pt": "Quantidade de Refugo"
+      },
+      "aliases": [
+        "scrap",
+        "rejeito",
+        "qty rejected"
+      ],
+      "requiresUnitValidation": true
+    },
+    {
+      "id": "mfg_entity_defect_code",
+      "label": {
+        "en": "Defect Code",
+        "pt": "Código de Defeito"
+      },
+      "aliases": [
+        "defect",
+        "fault code",
+        "código de falha"
+      ],
+      "mustBeClassified": true
+    },
+    {
+      "id": "mfg_entity_maintenance_asset",
+      "label": {
+        "en": "Asset",
+        "pt": "Ativo"
+      },
+      "aliases": [
+        "machine",
+        "equipment",
+        "linha"
+      ],
+      "mustIncludeLocation": true
+    }
+  ],
+  "normalization": {
+    "trimWhitespace": true,
+    "caseFold": true,
+    "stripDiacritics": true
+  }
+}

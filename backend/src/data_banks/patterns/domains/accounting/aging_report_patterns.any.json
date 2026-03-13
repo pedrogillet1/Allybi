@@ -21,7 +21,7 @@
       "tests/patternDeterminism.test.ts"
     ],
     "lastUpdated": "2026-03-03",
-    "bankId": "aging_report_patterns",
+    "bankId": "patterns_domains_accounting_aging_report_patterns",
     "id": "patterns_domains_accounting_aging_report_patterns",
     "description": "Auto-registered bank payload for patterns/domains/accounting/aging_report_patterns.any.json"
   },

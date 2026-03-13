@@ -1,0 +1,94 @@
+{
+  "_meta": {
+    "id": "di_research_scientific_ambiguity_patterns",
+    "version": "1.0.0",
+    "description": "Research ambiguity patterns for endpoint mismatch, statistical scale, and protocol version uncertainty.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/orchestration/ambiguityResolver.service.ts",
+      "services/core/repair/ambiguityRepair.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/ambiguity-domain.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "maxQuestions": 1,
+    "preferClarifyOverSpeculation": true,
+    "domain": "research_scientific"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "after data extraction before interpretation drafting",
+    "consumer": "research ambiguity layer",
+    "intent": "Resolve design and scale ambiguity before comparative scientific statements."
+  },
+  "patterns": [
+    {
+      "id": "RS_AMB_001_endpoint_mix",
+      "type": "endpoint_collision",
+      "trigger": "different_endpoints_in_same_compare_query",
+      "askQuestion": "Should the comparison use only primary endpoint, only secondary endpoint, or a parallelized panel with separate results?"
+    },
+    {
+      "id": "RS_AMB_002_scale_conflict",
+      "type": "scale_mismatch",
+      "trigger": "effect_sizes_in_mixed_scales",
+      "askQuestion": "Use standardized effect size, raw mean difference, or odds ratio only, and keep units explicit?"
+    },
+    {
+      "id": "RS_AMB_003_protocol_version",
+      "type": "protocol_version_collision",
+      "trigger": "multiple_protocol_versions",
+      "askQuestion": "Should claims use latest protocol version, historical version by period, or version-drift comparison?"
+    },
+    {
+      "id": "RS_AMB_004_missingness_mode",
+      "type": "missing_data_collision",
+      "trigger": "different_missing_data_rules_detected",
+      "askQuestion": "Should imputation strategy be stated as complete-case, multiple imputation, or sensitivity-specific?"
+    },
+    {
+      "id": "RS_AMB_005_cohort_overlap",
+      "type": "cohort_collision",
+      "trigger": "cohort_boundaries_overlap",
+      "askQuestion": "Analyze per protocol arm, pooled per intention-to-treat, or both with separate confidence intervals?"
+    },
+    {
+      "id": "RS_AMB_006_pvalue_unit",
+      "type": "significance_threshold_collision",
+      "trigger": "multiple_alpha_levels",
+      "askQuestion": "Use default alpha, corrected alpha with multiplicity, or report both with explicit caveat?"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "research_amb_endpoint_mix",
+        "input": {
+          "scenario": "different_endpoints_in_same_compare_query"
+        },
+        "expect": {
+          "action": "askQuestion",
+          "mustAskContains": "primary"
+        }
+      },
+      {
+        "id": "research_amb_protocol_version",
+        "input": {
+          "scenario": "multiple_protocol_versions"
+        },
+        "expect": {
+          "action": "askQuestion",
+          "mustAskContains": "version"
+        }
+      }
+    ]
+  }
+}

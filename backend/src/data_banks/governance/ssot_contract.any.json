@@ -1,0 +1,149 @@
+{
+  "_meta": {
+    "id": "governance_ssot_contract",
+    "version": "1.0.0",
+    "description": "Single source of truth contract that binds banks to registry entries, load order, and dependency graph expectations.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "governance-team",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "sourceOfTruth": {
+      "registry": "manifest/bank_registry.any.json",
+      "manifest": "manifest/bank_manifest.any.json",
+      "checksums": "manifest/bank_checksums.any.json"
+    }
+  },
+  "contract": {
+    "requiredRegistryFields": [
+      "id",
+      "category",
+      "path",
+      "version",
+      "schemaId",
+      "checksumSha256",
+      "lastUpdated",
+      "requiredByEnv"
+    ],
+    "requiredBankFields": [
+      "_meta.id",
+      "_meta.version",
+      "_meta.owner",
+      "_meta.usedBy",
+      "_meta.tests",
+      "_meta.languages",
+      "_meta.description",
+      "_meta.lastUpdated"
+    ],
+    "ssotRules": {
+      "onePathOneId": true,
+      "idMustBeUnique": true,
+      "pathPrefixMustMatchCategory": true,
+      "categoryOrderMustMatchManifest": true,
+      "checksumMustExistInProduction": true,
+      "cannotPromoteBeforeChecksum": true,
+      "cannotDeleteWithoutRegistryLog": true
+    },
+    "environmentMatrix": {
+      "production": {
+        "requiredByEnv": true,
+        "mustValidateAtBoot": true
+      },
+      "staging": {
+        "requiredByEnv": true,
+        "mustValidateAtBoot": true
+      },
+      "dev": {
+        "requiredByEnv": false,
+        "mustValidateAtBoot": false
+      },
+      "local": {
+        "requiredByEnv": false,
+        "mustValidateAtBoot": false
+      }
+    },
+    "allowedCategories": {
+      "current": [
+        "manifest",
+        "schemas",
+        "normalizers",
+        "routing",
+        "operators",
+        "semantics",
+        "scope",
+        "retrieval",
+        "formatting",
+        "dictionaries",
+        "lexicons",
+        "parsers",
+        "intent_patterns",
+        "microcopy",
+        "overlays",
+        "prompts",
+        "policies",
+        "fallbacks",
+        "quality",
+        "triggers",
+        "ambiguity",
+        "probes",
+        "templates",
+        "tests",
+        "llm",
+        "assistant",
+        "eval",
+        "governance"
+      ],
+      "newCategoryHandling": "mustAddToManifestThenManifestIsRefreshed"
+    },
+    "dependencyRules": {
+      "categoryDependency": {
+        "routing": [
+          "normalizers"
+        ],
+        "operators": [
+          "routing"
+        ],
+        "prompts": [
+          "operators",
+          "routing"
+        ],
+        "quality": [
+          "operators",
+          "retrieval"
+        ],
+        "governance": [
+          "manifest"
+        ]
+      },
+      "maxDependencyDepth": 5,
+      "prohibitCircularDependency": true
+    }
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "ssot_id_and_path_match",
+        "input": {
+          "matchLevel": "strict"
+        },
+        "expect": {
+          "registryConsistency": true,
+          "manifestConsistency": true,
+          "checksumConsistency": true
+        }
+      }
+    ]
+  },
+  "runtimeUsageNotes": "SSOT loaders and manifest tooling should validate registry/manifest/checksum consistency before runtime bootstrap and before promotion between envs."
+}

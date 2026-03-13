@@ -41,29 +41,75 @@
       "memoryCharsDocGrounded": 6800,
       "userSectionCharsMax": 4200,
       "toolContextCharsMax": 1400,
-      "totalUserPayloadCharsMax": 18000
+      "totalUserPayloadCharsMax": 32000
     },
     "evidenceCapsByMode": {
       "doc_grounded_single": {
-        "maxItems": 6,
-        "maxSnippetChars": 220,
-        "maxSectionChars": 2600
+        "maxItems": 10,
+        "maxSnippetChars": 600,
+        "maxSectionChars": 9600
       },
       "doc_grounded_multi": {
-        "maxItems": 10,
-        "maxSnippetChars": 280,
-        "maxSectionChars": 3800
+        "maxItems": 14,
+        "maxSnippetChars": 600,
+        "maxSectionChars": 11200
       },
       "doc_grounded_quote": {
-        "maxItems": 6,
-        "maxSnippetChars": 240,
-        "maxSectionChars": 2600
+        "maxItems": 8,
+        "maxSnippetChars": 500,
+        "maxSectionChars": 7000
       },
       "doc_grounded_table": {
+        "maxItems": 14,
+        "maxSnippetChars": 800,
+        "maxSectionChars": 14000
+      },
+      "general_answer": {
         "maxItems": 8,
-        "maxSnippetChars": 260,
-        "maxSectionChars": 3200
+        "maxSnippetChars": 400,
+        "maxSectionChars": 6000
       }
-    }
+    },
+    "configModeOnly": true
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "LLM_BUILD_T_001",
+        "input": {},
+        "expect": {
+          "payloadCaps": {
+            "memoryCharsDefault": 4800
+          }
+        }
+      },
+      {
+        "id": "LLM_BUILD_T_002",
+        "input": {},
+        "expect": {
+          "payloadCaps": {
+            "memoryCharsDocGrounded": 6800
+          }
+        }
+      },
+      {
+        "id": "LLM_BUILD_T_003",
+        "input": {},
+        "expect": {
+          "payloadCaps": {
+            "toolContextCharsMax": 1400
+          }
+        }
+      },
+      {
+        "id": "LLM_BUILD_T_004",
+        "input": {},
+        "expect": {
+          "payloadCaps": {
+            "totalUserPayloadCharsMax": 32000
+          }
+        }
+      }
+    ]
   }
 }

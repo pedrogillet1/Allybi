@@ -1,0 +1,158 @@
+{
+  "_meta": {
+    "id": "di_compliance_regulatory_table_ontology",
+    "version": "1.0.0",
+    "description": "Compliance table ontology for control matrices, exceptions, and evidence ownership.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/orchestration/tableResolver.service.ts",
+      "services/core/extraction/tableExtraction.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/domain-validation.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "compliance_regulatory",
+    "axisConfidenceThreshold": 0.7,
+    "allowNestedTables": true
+  },
+  "domain": "compliance_regulatory",
+  "tableTypes": [
+    {
+      "id": "comp_table_control_matrix",
+      "name": {
+        "en": "Control Matrix",
+        "pt": "Matriz de Controles"
+      },
+      "aliases": [
+        "control matrix",
+        "risc map",
+        "matriz de risco"
+      ],
+      "columns": [
+        "risk_id",
+        "risk_category",
+        "control_id",
+        "owner",
+        "residual_risk",
+        "mitigation_status"
+      ],
+      "quality": {
+        "requiresControlId": true,
+        "requiresOwnerBinding": true,
+        "riskIfMissing": "high"
+      }
+    },
+    {
+      "id": "comp_table_test_sampling",
+      "name": {
+        "en": "Test Sampling Plan",
+        "pt": "Plano de Amostragem"
+      },
+      "aliases": [
+        "sample plan",
+        "testing sample",
+        "amostragem"
+      ],
+      "columns": [
+        "control_id",
+        "sample_size",
+        "sampling_method",
+        "period",
+        "acceptance_criteria"
+      ],
+      "quality": {
+        "requiresNumericColumns": [
+          "sample_size"
+        ],
+        "riskIfMissing": "medium"
+      }
+    },
+    {
+      "id": "comp_table_exception_register",
+      "name": {
+        "en": "Exception Register",
+        "pt": "Registro de Exceções"
+      },
+      "aliases": [
+        "exceptions",
+        "findings register",
+        "registro de achados"
+      ],
+      "columns": [
+        "finding_id",
+        "severity",
+        "evidence",
+        "owner",
+        "status",
+        "due_date"
+      ],
+      "quality": {
+        "requiresDateColumns": [
+          "due_date"
+        ],
+        "riskIfMissing": "critical"
+      }
+    },
+    {
+      "id": "comp_table_remediation_track",
+      "name": {
+        "en": "Remediation Tracker",
+        "pt": "Acompanhamento de Remediação"
+      },
+      "aliases": [
+        "remediation tracker",
+        "action tracker",
+        "correction log"
+      ],
+      "columns": [
+        "finding_id",
+        "owner",
+        "action",
+        "status",
+        "start_date",
+        "expected_end",
+        "evidence_required"
+      ],
+      "quality": {
+        "requiresDateColumns": [
+          "start_date",
+          "expected_end"
+        ],
+        "riskIfMissing": "critical"
+      }
+    },
+    {
+      "id": "comp_table_penalty_matrix",
+      "name": {
+        "en": "Penalty Matrix",
+        "pt": "Matriz de Penalidades"
+      },
+      "aliases": [
+        "penalty",
+        "sanction map",
+        "multa"
+      ],
+      "columns": [
+        "law_reference",
+        "issue_type",
+        "potential_penalty",
+        "trigger_condition",
+        "governance_impact"
+      ],
+      "quality": {
+        "requiresLegalColumn": [
+          "law_reference"
+        ],
+        "riskIfMissing": "high"
+      }
+    }
+  ]
+}

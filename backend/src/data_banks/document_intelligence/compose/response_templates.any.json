@@ -1,20 +1,22 @@
 {
   "_meta": {
     "id": "response_templates",
-    "version": "1.0.0",
-    "description": "Composable response templates for doc-grounded, comparison, and clarification outputs.",
+    "version": "3.0.0",
+    "description": "Structural answer arcs for the composition layer. These are hidden scaffolds for planning and repair, not canned output strings.",
     "languages": [
       "any",
       "en",
       "pt"
     ],
-    "lastUpdated": "2026-03-03",
-    "owner": "data-bank-governance",
+    "lastUpdated": "2026-03-13",
+    "owner": "composition-brain",
     "usedBy": [
-      "services/core/banks/dataBankLoader.service.ts"
+      "modules/chat/runtime/CompositionStyleResolver.ts",
+      "data_banks/prompts/compose_style_contract.any.json"
     ],
     "tests": [
-      "tests/patternWiringProof.test.ts"
+      "modules/chat/runtime/CompositionStyleResolver.test.ts",
+      "services/llm/prompts/promptRegistry.service.test.ts"
     ]
   },
   "config": {
@@ -23,125 +25,462 @@
     "defaultLanguage": "en",
     "deterministic": true,
     "dedupe": true,
-    "sortBy": "id"
+    "sortBy": "id",
+    "maxTemplateCandidates": 5
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "draft planning before final render",
+    "consumer": "style decision resolver and compose style contract prompt",
+    "intent": "Select a structural arc that matches the task and evidence form. The renderer should realize the arc naturally instead of emitting the literal scaffold."
   },
   "templates": [
     {
-      "id": "TML_DOC_SINGLE_SUMMARY",
+      "id": "TML_DIRECT_ANSWER_EN",
       "domain": "any",
       "intent": "summary",
       "language": "en",
-      "tone": "concise",
-      "template": "From {{document}}, I found {{evidenceCount}} evidence item(s). {{result}} {{confidence}}",
+      "tone": "direct",
+      "shape": "answer_then_support",
+      "hiddenScaffold": [
+        "opening",
+        "finding",
+        "support",
+        "implication_or_boundary"
+      ],
+      "entryRules": [
+        "start with the answer, not with commentary about the process",
+        "keep the first sentence declarative unless the evidence is weak"
+      ],
+      "supportRules": [
+        "use one synthesis sentence before evidence fragments",
+        "drop the implication slot if it adds no value"
+      ],
       "requiredParts": [
-        "document",
-        "result",
-        "evidenceCount",
-        "confidence"
-      ]
+        "answer",
+        "support"
+      ],
+      "surfacePattern": "{{answer}} {{support}} {{implicationOrBoundary}}"
     },
     {
-      "id": "TML_DOC_SINGLE_SUMMARY_PT",
+      "id": "TML_DIRECT_ANSWER_PT",
       "domain": "any",
       "intent": "summary",
       "language": "pt",
-      "tone": "conciso",
-      "template": "Em {{document}}, encontrei {{evidenceCount}} evidencias. {{result}} {{confidence}}",
+      "tone": "direct",
+      "shape": "answer_then_support",
+      "hiddenScaffold": [
+        "opening",
+        "finding",
+        "support",
+        "implication_or_boundary"
+      ],
+      "entryRules": [
+        "comecar pela resposta, nao pelo processo",
+        "manter a primeira frase declarativa quando a evidencia permitir"
+      ],
+      "supportRules": [
+        "fazer uma sintese antes dos fragmentos de suporte",
+        "remover implicacao se ela nao agregar"
+      ],
       "requiredParts": [
-        "document",
-        "result",
-        "evidenceCount",
-        "confidence"
-      ]
+        "answer",
+        "support"
+      ],
+      "surfacePattern": "{{answer}} {{support}} {{implicationOrBoundary}}"
     },
     {
-      "id": "TML_COMPARE_RESULT",
+      "id": "TML_EVIDENCE_SYNTHESIS_EN",
+      "domain": "any",
+      "intent": "extract",
+      "language": "en",
+      "tone": "precise",
+      "shape": "finding_then_evidence",
+      "hiddenScaffold": [
+        "finding",
+        "evidence_synthesis",
+        "why_it_matters",
+        "limit_if_needed"
+      ],
+      "entryRules": [
+        "lead with the resolved finding, not with a quote dump",
+        "make the support sentence explain why the evidence fits together"
+      ],
+      "supportRules": [
+        "prefer synthesis over list-like citation recitals",
+        "use the limit slot only for a real unresolved boundary"
+      ],
+      "requiredParts": [
+        "finding",
+        "evidenceSummary"
+      ],
+      "surfacePattern": "{{finding}} {{evidenceSummary}} {{whyItMatters}} {{limit}}"
+    },
+    {
+      "id": "TML_EVIDENCE_SYNTHESIS_PT",
+      "domain": "any",
+      "intent": "extract",
+      "language": "pt",
+      "tone": "precise",
+      "shape": "finding_then_evidence",
+      "hiddenScaffold": [
+        "finding",
+        "evidence_synthesis",
+        "why_it_matters",
+        "limit_if_needed"
+      ],
+      "entryRules": [
+        "abrir com o achado resolvido, nao com despejo de trechos",
+        "fazer a frase de suporte explicar por que a evidencia converge"
+      ],
+      "supportRules": [
+        "preferir sintese a recitacao de citacoes",
+        "usar limite apenas quando houver fronteira real"
+      ],
+      "requiredParts": [
+        "finding",
+        "evidenceSummary"
+      ],
+      "surfacePattern": "{{finding}} {{evidenceSummary}} {{whyItMatters}} {{limit}}"
+    },
+    {
+      "id": "TML_COMPARE_DELTA_EN",
       "domain": "any",
       "intent": "compare",
       "language": "en",
       "tone": "structured",
-      "template": "I compared {{leftDoc}} and {{rightDoc}} on {{topic}}. Key diff: {{differences}}. Evidence footprint: {{evidenceCount}}. {{confidence}}",
+      "shape": "delta_then_implication",
+      "hiddenScaffold": [
+        "top_delta",
+        "evidence_of_difference",
+        "why_the_difference_matters",
+        "exception_or_hold_constant"
+      ],
+      "entryRules": [
+        "name the largest or most decision-relevant delta first",
+        "avoid openers that restate both document names without saying the difference"
+      ],
+      "supportRules": [
+        "keep the support comparative, not document-by-document",
+        "use the final slot to note the stable point or exception if useful"
+      ],
       "requiredParts": [
-        "leftDoc",
-        "rightDoc",
-        "topic",
-        "differences",
-        "evidenceCount",
-        "confidence"
-      ]
+        "topDelta",
+        "support"
+      ],
+      "surfacePattern": "{{topDelta}} {{support}} {{implication}} {{holdConstantOrException}}"
     },
     {
-      "id": "TML_COMPARE_RESULT_PT",
+      "id": "TML_COMPARE_DELTA_PT",
       "domain": "any",
       "intent": "compare",
       "language": "pt",
-      "tone": "estruturado",
-      "template": "Comparei {{leftDoc}} e {{rightDoc}} em {{topic}}. Diferenças-chave: {{differences}}. Evidencias: {{evidenceCount}}. {{confidence}}",
+      "tone": "structured",
+      "shape": "delta_then_implication",
+      "hiddenScaffold": [
+        "top_delta",
+        "evidence_of_difference",
+        "why_the_difference_matters",
+        "exception_or_hold_constant"
+      ],
+      "entryRules": [
+        "nomear primeiro a diferenca mais relevante",
+        "evitar abrir apenas repetindo os nomes dos documentos"
+      ],
+      "supportRules": [
+        "manter o suporte comparativo, nao documento por documento",
+        "usar o ultimo slot para excecao ou ponto estavel quando ajudar"
+      ],
       "requiredParts": [
-        "leftDoc",
-        "rightDoc",
-        "topic",
-        "differences",
-        "evidenceCount",
-        "confidence"
-      ]
+        "topDelta",
+        "support"
+      ],
+      "surfacePattern": "{{topDelta}} {{support}} {{implication}} {{holdConstantOrException}}"
     },
     {
-      "id": "TML_QUESTION_CLARIFY",
+      "id": "TML_TABLE_READOUT_EN",
+      "domain": "any",
+      "intent": "table",
+      "language": "en",
+      "tone": "concise",
+      "shape": "table_with_takeaway",
+      "hiddenScaffold": [
+        "table_frame",
+        "row_or_column_readout",
+        "takeaway",
+        "boundary_if_needed"
+      ],
+      "entryRules": [
+        "tell the user what the table resolves before enumerating cells",
+        "surface units, periods, or definitions when they change the reading"
+      ],
+      "supportRules": [
+        "group related cells instead of narrating row by row unless requested",
+        "end with the takeaway, not with the final cell value"
+      ],
+      "requiredParts": [
+        "tableLead",
+        "table"
+      ],
+      "surfacePattern": "{{tableLead}} {{table}} {{takeaway}} {{limit}}"
+    },
+    {
+      "id": "TML_TABLE_READOUT_PT",
+      "domain": "any",
+      "intent": "table",
+      "language": "pt",
+      "tone": "concise",
+      "shape": "table_with_takeaway",
+      "hiddenScaffold": [
+        "table_frame",
+        "row_or_column_readout",
+        "takeaway",
+        "boundary_if_needed"
+      ],
+      "entryRules": [
+        "dizer o que a tabela resolve antes de listar celulas",
+        "trazer unidade, periodo ou definicao quando isso muda a leitura"
+      ],
+      "supportRules": [
+        "agrupar celulas relacionadas em vez de narrar linha a linha",
+        "fechar com takeaway, nao com a ultima celula"
+      ],
+      "requiredParts": [
+        "tableLead",
+        "table"
+      ],
+      "surfacePattern": "{{tableLead}} {{table}} {{takeaway}} {{limit}}"
+    },
+    {
+      "id": "TML_QUOTE_EXPLANATION_EN",
+      "domain": "any",
+      "intent": "quote",
+      "language": "en",
+      "tone": "careful",
+      "shape": "quote_then_explain",
+      "hiddenScaffold": [
+        "quote_frame",
+        "quoted_text",
+        "plain_language_explanation",
+        "limit_or_context"
+      ],
+      "entryRules": [
+        "frame the quote in plain language before or immediately after quoting it",
+        "never let the quote stand without interpretation"
+      ],
+      "supportRules": [
+        "translate legalistic or technical wording into direct meaning",
+        "use the limit slot if the quote is partial or conditional"
+      ],
+      "requiredParts": [
+        "quote",
+        "explanation"
+      ],
+      "surfacePattern": "{{quoteLead}} {{quote}} {{explanation}} {{limit}}"
+    },
+    {
+      "id": "TML_QUOTE_EXPLANATION_PT",
+      "domain": "any",
+      "intent": "quote",
+      "language": "pt",
+      "tone": "careful",
+      "shape": "quote_then_explain",
+      "hiddenScaffold": [
+        "quote_frame",
+        "quoted_text",
+        "plain_language_explanation",
+        "limit_or_context"
+      ],
+      "entryRules": [
+        "enquadrar a citacao em linguagem simples antes ou logo depois",
+        "nao deixar a citacao sem interpretacao"
+      ],
+      "supportRules": [
+        "traduzir redacao tecnica para significado direto",
+        "usar limite quando a citacao for parcial ou condicional"
+      ],
+      "requiredParts": [
+        "quote",
+        "explanation"
+      ],
+      "surfacePattern": "{{quoteLead}} {{quote}} {{explanation}} {{limit}}"
+    },
+    {
+      "id": "TML_RISK_READOUT_EN",
+      "domain": "any",
+      "intent": "evaluate",
+      "language": "en",
+      "tone": "sharp",
+      "shape": "risk_then_basis",
+      "hiddenScaffold": [
+        "risk_headline",
+        "basis",
+        "scope_or_limit",
+        "next_step"
+      ],
+      "entryRules": [
+        "name the risk plainly",
+        "keep the basis factual rather than emotional"
+      ],
+      "supportRules": [
+        "explain what creates the risk, not just that risk exists",
+        "offer one next step when the issue is actionable"
+      ],
+      "requiredParts": [
+        "riskHeadline",
+        "basis"
+      ],
+      "surfacePattern": "{{riskHeadline}} {{basis}} {{limit}} {{nextStep}}"
+    },
+    {
+      "id": "TML_RISK_READOUT_PT",
+      "domain": "any",
+      "intent": "evaluate",
+      "language": "pt",
+      "tone": "sharp",
+      "shape": "risk_then_basis",
+      "hiddenScaffold": [
+        "risk_headline",
+        "basis",
+        "scope_or_limit",
+        "next_step"
+      ],
+      "entryRules": [
+        "nomear o risco de forma direta",
+        "manter a base factual, nao emocional"
+      ],
+      "supportRules": [
+        "explicar o que cria o risco",
+        "oferecer um proximo passo quando houver acao pratica"
+      ],
+      "requiredParts": [
+        "riskHeadline",
+        "basis"
+      ],
+      "surfacePattern": "{{riskHeadline}} {{basis}} {{limit}} {{nextStep}}"
+    },
+    {
+      "id": "TML_CLARIFY_ONE_DECISION_EN",
       "domain": "any",
       "intent": "clarify",
       "language": "en",
-      "tone": "helpful",
-      "template": "I need one clarification to answer safely: {{question}}",
+      "tone": "clear",
+      "shape": "one_question_with_options",
+      "hiddenScaffold": [
+        "decision_point",
+        "single_question",
+        "tight_option_set"
+      ],
+      "entryRules": [
+        "ask only the missing decision",
+        "frame the options as path choices, not as restatements"
+      ],
+      "supportRules": [
+        "keep the question to one sentence",
+        "show two or three mutually exclusive options only"
+      ],
       "requiredParts": [
-        "question"
-      ]
+        "question",
+        "options"
+      ],
+      "surfacePattern": "{{question}} {{options}}"
     },
     {
-      "id": "TML_QUESTION_CLARIFY_PT",
+      "id": "TML_CLARIFY_ONE_DECISION_PT",
       "domain": "any",
       "intent": "clarify",
       "language": "pt",
-      "tone": "ajudavel",
-      "template": "Preciso de uma clarificacao para responder com seguranca: {{question}}",
+      "tone": "clear",
+      "shape": "one_question_with_options",
+      "hiddenScaffold": [
+        "decision_point",
+        "single_question",
+        "tight_option_set"
+      ],
+      "entryRules": [
+        "perguntar apenas o ponto decisorio ausente",
+        "montar opcoes como caminhos, nao repeticoes"
+      ],
+      "supportRules": [
+        "manter a pergunta em uma frase",
+        "mostrar so duas ou tres opcoes exclusivas"
+      ],
       "requiredParts": [
-        "question"
+        "question",
+        "options"
+      ],
+      "surfacePattern": "{{question}} {{options}}"
+    }
+  ],
+  "selectionPolicy": [
+    {
+      "id": "RTS_001_quote_mode_prefers_quote_explanation",
+      "when": "context.answerMode == 'doc_grounded_quote'",
+      "preferTemplates": [
+        "TML_QUOTE_EXPLANATION_EN",
+        "TML_QUOTE_EXPLANATION_PT"
+      ]
+    },
+    {
+      "id": "RTS_002_table_mode_prefers_table_readout",
+      "when": "context.answerMode == 'doc_grounded_table'",
+      "preferTemplates": [
+        "TML_TABLE_READOUT_EN",
+        "TML_TABLE_READOUT_PT"
+      ]
+    },
+    {
+      "id": "RTS_003_compare_mode_prefers_delta",
+      "when": "context.intent == 'compare'",
+      "preferTemplates": [
+        "TML_COMPARE_DELTA_EN",
+        "TML_COMPARE_DELTA_PT"
+      ]
+    },
+    {
+      "id": "RTS_004_risk_queries_use_risk_readout",
+      "when": "context.intent == 'evaluate' OR context.signals.riskHeavy == true",
+      "preferTemplates": [
+        "TML_RISK_READOUT_EN",
+        "TML_RISK_READOUT_PT"
       ]
     }
   ],
   "rules": [
     {
       "id": "RT_001_required_parts_enforced",
-      "trigger": "template selected but required parts missing",
+      "trigger": "Template selected but required parts missing",
       "check": "context.templateSelected == true AND output.missingRequiredParts == true",
-      "failureAction": "REJECT_TEMPLATE_RENDER"
+      "failureAction": "SWITCH_TO_SAFER_TEMPLATE",
+      "severity": "critical"
     },
     {
-      "id": "RT_002_compare_template_requires_two_docs",
-      "trigger": "compare intent resolves to compare template without both docs",
-      "check": "context.intent == 'compare' AND context.templateId LIKE 'TML_COMPARE_RESULT' AND (context.leftDocId == null OR context.rightDocId == null)",
-      "failureAction": "ASK_FOR_COMPARISON_DOCS"
-    },
-    {
-      "id": "RT_003_language_template_alignment",
-      "trigger": "template language not aligned with user language",
-      "check": "context.userLanguage == 'pt' AND context.templateLanguage != 'pt'",
-      "failureAction": "SWITCH_TEMPLATE_LANGUAGE_PT"
-    },
-    {
-      "id": "RT_004_evidence_confidence_binding",
-      "trigger": "template output has low evidence count but no confidence tag",
-      "check": "output.evidenceCount <= 0 AND output.confidence == null",
-      "failureAction": "INJECT_LOW_CONFIDENCE_GUARD"
-    },
-    {
-      "id": "RT_005_summary_style_guard",
-      "trigger": "summary intent with long narrative length",
-      "check": "context.intent == 'summary' AND output.wordCount > 360",
-      "failureAction": "CONDENSE_TO_SUMMARY_TEMPLATE"
+      "id": "RT_002_no_visible_scaffold",
+      "trigger": "Literal scaffold language appears in final answer",
+      "check": "output.containsLiteralTemplateMarkers == true OR output.containsMacroLeadins == true",
+      "failureAction": "RENDER_NATURAL_SURFACE_VARIANT",
+      "severity": "high"
     }
   ],
-  "patterns": [
-    "\\b(query|document|evidence)\\b"
-  ]
+  "tests": {
+    "cases": [
+      {
+        "id": "response_templates_quote_available",
+        "input": {
+          "answerMode": "doc_grounded_quote"
+        },
+        "expect": {
+          "templateId": "TML_QUOTE_EXPLANATION_EN"
+        }
+      },
+      {
+        "id": "response_templates_table_available",
+        "input": {
+          "answerMode": "doc_grounded_table"
+        },
+        "expect": {
+          "templateId": "TML_TABLE_READOUT_EN"
+        }
+      }
+    ]
+  }
 }

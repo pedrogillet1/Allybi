@@ -20,7 +20,7 @@ import {
   DocumentController,
   createDocumentController,
 } from "../../../controllers/document.controller";
-import prisma from "../../../platform/db/prismaClient";
+import prisma from "../../../config/database";
 import {
   downloadFile,
   getSignedUrl,
@@ -49,8 +49,8 @@ import { buildDocumentCapabilities } from "../../../services/editing/allybi/capa
 import { RevisionService } from "../../../modules/documents/application";
 import { Document as DocxDocument, Packer, Paragraph } from "docx";
 import * as cloudConvert from "../../../services/conversion/cloudConvertPptx.service";
-import slidesStudioRouter from "../../../routes/slidesStudio.routes";
-import sheetsStudioRouter from "../../../routes/sheetsStudio.routes";
+import slidesStudioRouter from "./slidesStudio.routes";
+import sheetsStudioRouter from "./sheetsStudio.routes";
 
 const router = Router();
 

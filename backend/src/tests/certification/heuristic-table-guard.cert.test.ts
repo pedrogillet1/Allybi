@@ -1,6 +1,7 @@
 import { describe, expect, test } from "@jest/globals";
 
-import { RetrievalEngineService } from "../../services/core/retrieval/retrievalEngine.service";
+import { RetrievalEngineService } from "../../services/core/retrieval/v2/RetrievalOrchestrator.service";
+import { createDefaultQueryNormalizer } from "../../services/core/retrieval/v2/DefaultQueryNormalizer.service";
 
 function makeHeuristicTableEngine(): RetrievalEngineService {
   const banks: Record<string, unknown> = {
@@ -86,6 +87,7 @@ function makeHeuristicTableEngine(): RetrievalEngineService {
       semanticIndex as any,
       lexicalIndex as any,
       structuralIndex as any,
+      createDefaultQueryNormalizer(),
     );
 
     return engine.retrieve({

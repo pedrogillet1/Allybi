@@ -1,0 +1,115 @@
+{
+  "_meta": {
+    "id": "di_compliance_regulatory_domain_writer",
+    "version": "1.0.0",
+    "description": "Compliance domain writer for control-aware, owner-responsible, and regulator-safe responses.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/orchestration/answerPlanner.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/docint-eval-pack.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "domain": "compliance_regulatory",
+    "interpretationMode": "control_traceability_first",
+    "requireControlId": true
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "before final compliance and advisory response",
+    "consumer": "compliance domain writer",
+    "intent": "Produce outputs with explicit control IDs, owners, deadlines, and remediation paths."
+  },
+  "writingProfile": {
+    "audience": "compliance officer, risk owner, internal audit lead",
+    "goal": "Convert raw findings into clear risk decisions, ownership, and next steps.",
+    "allowedAnswerForms": [
+      "control_effectiveness_dashboard",
+      "exception_tracker",
+      "regulatory_readiness_readout",
+      "remediation_backlog"
+    ],
+    "forbiddenAnswerForms": [
+      "control_status_without_id",
+      "single_owner_summary_for_multi_owner_finding",
+      "closure_conclusion_without_evidence"
+    ],
+    "docTypeAnchors": [
+      "compliance_control_test_result",
+      "compliance_audit_report",
+      "compliance_exception_request",
+      "compliance_remediation_plan",
+      "compliance_regulator_notice",
+      "compliance_control_test_plan"
+    ],
+    "sectionPriority": [
+      "exceptions_and_findings",
+      "control_objective",
+      "test_plan",
+      "test_result",
+      "remediation_plan",
+      "owner_governance"
+    ]
+  },
+  "interpretiveRules": [
+    {
+      "id": "COMP_WRITER_001_control_first",
+      "description": "Every non-trivial claim starts with control objective and control id.",
+      "requiredFor": "extract, validate, compare"
+    },
+    {
+      "id": "COMP_WRITER_002_owner_lock",
+      "description": "Always show accountable owner and approver fields before prioritizing recommendations."
+    },
+    {
+      "id": "COMP_WRITER_003_exception_clarity",
+      "description": "Do not label exceptions as resolved unless explicit closure criteria are reached."
+    },
+    {
+      "id": "COMP_WRITER_004_regulatory_clarity",
+      "description": "Pair every regulator claim with reference and effective date."
+    },
+    {
+      "id": "COMP_WRITER_005_risk_severity_guard",
+      "description": "If severity differs by framework, show both scales explicitly rather than merging."
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "comp_writer_enforces_control_id",
+        "input": {
+          "query": "Summarize all high-risk findings"
+        },
+        "expect": {
+          "mustInclude": [
+            "control_id",
+            "severity"
+          ]
+        }
+      },
+      {
+        "id": "comp_writer_remediation_deadline",
+        "input": {
+          "query": "What is the remediation status?"
+        },
+        "expect": {
+          "mustInclude": [
+            "owner",
+            "expected_end",
+            "status"
+          ]
+        }
+      }
+    ]
+  }
+}

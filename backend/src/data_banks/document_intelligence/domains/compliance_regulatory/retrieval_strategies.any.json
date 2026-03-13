@@ -1,0 +1,192 @@
+{
+  "_meta": {
+    "id": "di_compliance_regulatory_retrieval_strategies",
+    "version": "1.0.0",
+    "description": "Compliance retrieval strategy with control traceability and exception-to-remediation prioritization.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/retrieval/hybridRetriever.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/retrievalPrecision.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "compliance_regulatory",
+    "maxBoostRules": 95,
+    "maxQueryExpansionTerms": 150
+  },
+  "domain": "compliance_regulatory",
+  "sectionPriority": [
+    {
+      "section": "comp_section_risk_scoping",
+      "weight": 8.7,
+      "operators": [
+        "summarize",
+        "extract",
+        "validate"
+      ]
+    },
+    {
+      "section": "comp_section_control_objective",
+      "weight": 8.4,
+      "operators": [
+        "extract",
+        "compare",
+        "evaluate"
+      ]
+    },
+    {
+      "section": "comp_section_test_plan",
+      "weight": 8,
+      "operators": [
+        "extract",
+        "validate",
+        "summarize"
+      ]
+    },
+    {
+      "section": "comp_section_test_result",
+      "weight": 9.2,
+      "operators": [
+        "extract",
+        "compare",
+        "validate"
+      ]
+    },
+    {
+      "section": "comp_section_exceptions_and_findings",
+      "weight": 9.4,
+      "operators": [
+        "validate",
+        "summarize",
+        "advise"
+      ]
+    },
+    {
+      "section": "comp_section_remediation_plan",
+      "weight": 8.9,
+      "operators": [
+        "monitor",
+        "advise",
+        "summarize"
+      ]
+    },
+    {
+      "section": "comp_section_regulatory_notice",
+      "weight": 8.6,
+      "operators": [
+        "extract",
+        "validate",
+        "advise"
+      ]
+    },
+    {
+      "section": "comp_section_owner_governance",
+      "weight": 8.3,
+      "operators": [
+        "advise",
+        "summarize",
+        "validate"
+      ]
+    }
+  ],
+  "tablePriority": [
+    {
+      "table": "comp_table_control_matrix",
+      "weight": 9.1,
+      "operators": [
+        "compare",
+        "validate",
+        "summarize"
+      ]
+    },
+    {
+      "table": "comp_table_exception_register",
+      "weight": 9.2,
+      "operators": [
+        "extract",
+        "validate",
+        "summarize"
+      ]
+    },
+    {
+      "table": "comp_table_remediation_track",
+      "weight": 8.8,
+      "operators": [
+        "monitor",
+        "advise",
+        "validate"
+      ]
+    },
+    {
+      "table": "comp_table_test_sampling",
+      "weight": 8,
+      "operators": [
+        "validate",
+        "compare",
+        "extract"
+      ]
+    },
+    {
+      "table": "comp_table_penalty_matrix",
+      "weight": 8.6,
+      "operators": [
+        "advise",
+        "evaluate",
+        "summarize"
+      ]
+    }
+  ],
+  "queryExpansion": [
+    "control effectiveness",
+    "finding severity",
+    "remediation owner",
+    "exception request",
+    "compliance deadline",
+    "regulatory notice",
+    "risk appetite",
+    "audit finding",
+    "evidence owner",
+    "sanction"
+  ],
+  "strategies": [
+    {
+      "id": "comp_strategy_findings_to_action",
+      "operators": [
+        "extract",
+        "validate",
+        "advise"
+      ],
+      "description": "Translate control exceptions into explicit action backlog with owners and due dates.",
+      "steps": [
+        "load exceptions and findings section",
+        "anchor each issue to control_id",
+        "join remediation plan and owner",
+        "return with risk and blocking status"
+      ]
+    },
+    {
+      "id": "comp_strategy_regulatory_readiness",
+      "operators": [
+        "compare",
+        "validate",
+        "summarize"
+      ],
+      "description": "Assess readiness for upcoming regulator expectations by linking notices and control coverage.",
+      "steps": [
+        "resolve regulator notice scope",
+        "extract required actions with deadlines",
+        "compare against control matrix and test coverage",
+        "flag uncovered requirements"
+      ]
+    }
+  ]
+}

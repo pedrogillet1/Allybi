@@ -1,0 +1,93 @@
+{
+  "_meta": {
+    "id": "eval_gold_queries_accounting_reconciliation",
+    "version": "1.0.0",
+    "description": "Accounting reconciliation gold queries for tie-out and variance provenance.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "eval-ops",
+    "usedBy": [
+      "services/eval/goldQueryRunner.service.ts",
+      "services/quality/evalJudge.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/eval/accountingReconciliation.proof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "accounting",
+    "scenarioType": "reconciliation_exactness"
+  },
+  "goldQueries": [
+    {
+      "id": "accounting_recon_001",
+      "lang": "en",
+      "query": "What is the reconciled bank balance, and are there unresolved variances by source?",
+      "expected": {
+        "mustExtract": [
+          "reconciled_balance",
+          "outstanding_variance",
+          "source_lineage"
+        ],
+        "mustPreserveSign": true,
+        "mustPreservePeriod": true,
+        "mustShowStatus": [
+          "tie_out_status",
+          "unreconciled_items_if_any"
+        ],
+        "mustShowControl": true,
+        "failureConditions": [
+          "returns_balance_without_variance_context",
+          "invents_control_gap",
+          "omits_period_label"
+        ]
+      }
+    },
+    {
+      "id": "accounting_recon_002",
+      "lang": "pt",
+      "query": "Confirme se o saldos batem entre geral e extrato bancario e descreva o que falta.",
+      "expected": {
+        "mustExtract": [
+          "saldo_reconciliado",
+          "variancia_restante",
+          "origem_do_dado"
+        ],
+        "mustContain": [
+          "book",
+          "bank",
+          "diferença"
+        ],
+        "mustNotUse": [
+          "aproximado",
+          "estimado sem fonte"
+        ],
+        "failureConditions": [
+          "usa_termo_conforme sem verificar",
+          "ignora_fonte_de_origem",
+          "agrupa_reconciliacoes_distintas"
+        ]
+      }
+    }
+  ],
+  "checks": {
+    "mustFailIf": [
+      "no_reconciliation_status",
+      "single_source_claim_without_audit_trail",
+      "missing_variance_or_zero_when_var_exists"
+    ],
+    "qualityFloor": 0.78
+  },
+  "scoring": {
+    "weights": {
+      "source_lineage": 0.32,
+      "variance_accuracy": 0.28,
+      "period_specificity": 0.2,
+      "control_risk_language": 0.2
+    }
+  }
+}

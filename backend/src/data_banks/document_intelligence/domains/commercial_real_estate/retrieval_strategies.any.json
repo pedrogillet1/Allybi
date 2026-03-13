@@ -1,0 +1,198 @@
+{
+  "_meta": {
+    "id": "di_commercial_real_estate_retrieval_strategies",
+    "version": "1.0.0",
+    "description": "Commercial real estate retrieval strategy for lease economics, tenant risk, and valuation sensitivity.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/retrieval/hybridRetriever.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/retrievalPrecision.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "commercial_real_estate",
+    "maxBoostRules": 95,
+    "maxQueryExpansionTerms": 140
+  },
+  "domain": "commercial_real_estate",
+  "sectionPriority": [
+    {
+      "section": "cre_section_property_profile",
+      "weight": 8.8,
+      "operators": [
+        "extract",
+        "validate",
+        "summarize"
+      ]
+    },
+    {
+      "section": "cre_section_lease_terms",
+      "weight": 9.3,
+      "operators": [
+        "extract",
+        "compare",
+        "validate"
+      ]
+    },
+    {
+      "section": "cre_section_tenant_summary",
+      "weight": 8.9,
+      "operators": [
+        "extract",
+        "summarize",
+        "monitor"
+      ]
+    },
+    {
+      "section": "cre_section_rent_roll",
+      "weight": 9.1,
+      "operators": [
+        "calculate",
+        "validate",
+        "extract"
+      ]
+    },
+    {
+      "section": "cre_section_occupancy_risk",
+      "weight": 8.6,
+      "operators": [
+        "evaluate",
+        "summarize"
+      ]
+    },
+    {
+      "section": "cre_section_valuation_inputs",
+      "weight": 8.7,
+      "operators": [
+        "calculate",
+        "compare",
+        "summarize"
+      ]
+    },
+    {
+      "section": "cre_section_title_and_encumbrances",
+      "weight": 8.7,
+      "operators": [
+        "validate",
+        "extract"
+      ]
+    },
+    {
+      "section": "cre_section_capex_plan",
+      "weight": 8.2,
+      "operators": [
+        "monitor",
+        "summarize",
+        "advise"
+      ]
+    },
+    {
+      "section": "cre_section_compliance_and_inspection",
+      "weight": 8.4,
+      "operators": [
+        "validate",
+        "advise",
+        "summarize"
+      ]
+    }
+  ],
+  "tablePriority": [
+    {
+      "table": "cre_table_rent_roll",
+      "weight": 9.5,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare"
+      ]
+    },
+    {
+      "table": "cre_table_lease_terms",
+      "weight": 9.1,
+      "operators": [
+        "extract",
+        "validate",
+        "compare"
+      ]
+    },
+    {
+      "table": "cre_table_valuation_comps",
+      "weight": 8.7,
+      "operators": [
+        "compare",
+        "evaluate",
+        "summarize"
+      ]
+    },
+    {
+      "table": "cre_table_occupancy_trends",
+      "weight": 8.6,
+      "operators": [
+        "calculate",
+        "monitor",
+        "summarize"
+      ]
+    },
+    {
+      "table": "cre_table_maintenance_log",
+      "weight": 8.1,
+      "operators": [
+        "extract",
+        "monitor",
+        "advise"
+      ]
+    }
+  ],
+  "queryExpansion": [
+    "rent roll",
+    "lease expiry",
+    "vacancy rate",
+    "cap rate",
+    "tenant concentration",
+    "renewal",
+    "CAM",
+    "default",
+    "encumbrance"
+  ],
+  "strategies": [
+    {
+      "id": "cre_strategy_lease_cashflow",
+      "operators": [
+        "calculate",
+        "validate",
+        "summarize"
+      ],
+      "description": "Build rental and vacancy-sensitive cashflow logic before valuation projection.",
+      "steps": [
+        "resolve property and tenant scope",
+        "load lease terms and rent roll",
+        "anchor vacancy and expiry windows",
+        "surface concentration and risk owners"
+      ]
+    },
+    {
+      "id": "cre_strategy_diligence_risk_map",
+      "operators": [
+        "compare",
+        "validate",
+        "advise"
+      ],
+      "description": "Identify blockers in title, inspection, and compliance before transaction decisions.",
+      "steps": [
+        "collect title and inspection findings",
+        "map issues to lease obligations and deadlines",
+        "map remediation and reserve need",
+        "rate urgency by payment and legal impact"
+      ]
+    }
+  ]
+}

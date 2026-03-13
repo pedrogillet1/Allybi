@@ -1,0 +1,169 @@
+{
+  "_meta": {
+    "id": "row_column_disambiguation",
+    "version": "1.0.0",
+    "description": "Disambiguates repeated row and column labels, blocks wrong-axis substitutions, and requires exact table coordinates for requested fields.",
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "koda-retrieval",
+    "compat": ">=1.0.0",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id",
+    "allowAxisAliases": true,
+    "maxAliasDistance": 0.82,
+    "forbiddenAxisSwap": true,
+    "axisConfidenceFloor": 0.7
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "table candidate scoring before claim binding",
+    "consumer": "table anchor resolver",
+    "intent": "ensure requested row/column are exact and not swapped with similar labels",
+    "emittedSignals": [
+      "rowDisambiguated",
+      "columnDisambiguated",
+      "axisSwapRisk",
+      "rowColumnTieBreak"
+    ]
+  },
+  "allowedAxisAliases": [
+    {
+      "axis": "row",
+      "canonical": "name",
+      "aliases": [
+        "item",
+        "line",
+        "metric",
+        "entity"
+      ]
+    },
+    {
+      "axis": "column",
+      "canonical": "amount",
+      "aliases": [
+        "value",
+        "total",
+        "sum",
+        "amount",
+        "quantity",
+        "balance"
+      ]
+    },
+    {
+      "axis": "column",
+      "canonical": "period",
+      "aliases": [
+        "month",
+        "quarter",
+        "year",
+        "period"
+      ]
+    }
+  ],
+  "forbiddenAxisSubstitutions": [
+    {
+      "axis": "column",
+      "from": "period",
+      "to": "amount",
+      "reason": "period/date swapped with numeric metric"
+    },
+    {
+      "axis": "row",
+      "from": "entity",
+      "to": "currency",
+      "reason": "entity axis used as currency axis without explicit mapping"
+    }
+  ],
+  "rules": [
+    {
+      "id": "RCD_001_ambiguous_column_in_multiple_tables",
+      "check": "query.columnMentioned == true AND context.columnCandidates.count > 1 AND context.disambiguatingSignals == 0",
+      "failureAction": "ASK_COLUMN_DISAMBIGUATION",
+      "severity": "error"
+    },
+    {
+      "id": "RCD_002_ambiguous_row_in_multiple_tables",
+      "check": "query.rowMentioned == true AND context.rowCandidates.count > 1 AND context.disambiguatingSignals == 0",
+      "failureAction": "ASK_ROW_DISAMBIGUATION",
+      "severity": "error"
+    },
+    {
+      "id": "RCD_003_forbid_forbidden_axis_substitution",
+      "check": "disambiguation.axisSwapAttempt == true OR context.forbiddenAxisSubstitution == true",
+      "failureAction": "FORBID_AXIS_SWAP",
+      "severity": "error"
+    },
+    {
+      "id": "RCD_004_missing_axis_context_for_exact_field",
+      "check": "query.requiresExactField == true AND (candidate.tableRow == null OR candidate.tableColumn == null)",
+      "failureAction": "ASK_TABLE_COORDINATES",
+      "severity": "warning"
+    },
+    {
+      "id": "RCD_005_duplicate_row_key_with_no_sheet_context",
+      "check": "table.rowKeyUnique == false AND table.sheetContext == null",
+      "failureAction": "ASK_SHEET_CONTEXT",
+      "severity": "warning"
+    },
+    {
+      "id": "RCD_006_multi_table_same_header_uses_scope_tiebreak",
+      "check": "context.columnCandidates.count > 1 AND context.headerNameMatch == true AND context.headerCandidatesFromSamePage == false",
+      "failureAction": "TIE_BREAK_BY_DOC_SCOPE",
+      "severity": "info"
+    },
+    {
+      "id": "RCD_007_low_confidence_row_column_alignment",
+      "check": "candidate.rowConfidence < config.axisConfidenceFloor OR candidate.columnConfidence < config.axisConfidenceFloor",
+      "failureAction": "CLOSED_QUESTION_FOR_axis_alignment",
+      "severity": "warning"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "column_disambiguation_required",
+        "input": {
+          "query": {
+            "columnMentioned": true
+          },
+          "context": {
+            "columnCandidates": {
+              "count": 3
+            },
+            "disambiguatingSignals": 0
+          }
+        },
+        "expect": {
+          "failureAction": "ASK_COLUMN_DISAMBIGUATION"
+        }
+      },
+      {
+        "id": "axis_swap_forbidden",
+        "input": {
+          "disambiguation": {
+            "axisSwapAttempt": true
+          }
+        },
+        "expect": {
+          "failureAction": "FORBID_AXIS_SWAP"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,167 @@
+{
+  "_meta": {
+    "id": "conflict_resolution_rules",
+    "version": "1.0.0",
+    "description": "Structured conflict detection and resolution policy for numeric, role, quote, and cross-document contradictions.",
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "koda-validation",
+    "compat": ">=1.0.0",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "requireDisambiguationOrDisclosure": true,
+    "maxConflictToleratedPerClaim": 1,
+    "sortBy": "id"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "post-validation before final response assembly",
+    "consumer": "conflict resolution policy",
+    "intent": "never infer through contradictions; expose conflicting evidence clearly",
+    "emittedSignals": [
+      "conflictDetected",
+      "conflictSeverity",
+      "resolutionStrategy",
+      "requiresUserChoice"
+    ]
+  },
+  "conflictTypes": [
+    {
+      "id": "contradiction_numeric",
+      "triggers": [
+        "same_field_different_values",
+        "same_field_different_units",
+        "same_field_different_period"
+      ],
+      "defaultSeverity": "high",
+      "resolutionPolicy": "present_with_labels_or_request_disambiguation"
+    },
+    {
+      "id": "conflict_role",
+      "triggers": [
+        "same_name_diff_roles",
+        "required_roles_from_different_docs"
+      ],
+      "defaultSeverity": "high",
+      "resolutionPolicy": "split_by_role_and_block_auto_merge"
+    },
+    {
+      "id": "conflict_quote",
+      "triggers": [
+        "quote_uses_different_spans",
+        "quote_cross_doc_merge"
+      ],
+      "defaultSeverity": "medium",
+      "resolutionPolicy": "reveal_span_pair_and_keep_safe"
+    },
+    {
+      "id": "conflict_table_axes",
+      "triggers": [
+        "row_column_swap_signals",
+        "duplicate_header_map"
+      ],
+      "defaultSeverity": "medium",
+      "resolutionPolicy": "request_axis_verification"
+    }
+  ],
+  "rules": [
+    {
+      "id": "CRR_001_num_conflict_request_disambiguation",
+      "trigger": "Conflicting numeric values for same field and period",
+      "check": "conflict.type == 'contradiction_numeric' AND conflict.docCount > 1",
+      "failureAction": "ASK_CONFLICT_DISAMBIGUATION",
+      "severity": "error"
+    },
+    {
+      "id": "CRR_002_role_conflict_split_by_role",
+      "trigger": "Role mismatch conflict without doc-scoped separation",
+      "check": "conflict.type == 'conflict_role' AND conflict.docScopeMixed == true",
+      "failureAction": "SPLIT_WITH_ROLE_TITLES",
+      "severity": "error"
+    },
+    {
+      "id": "CRR_003_quote_cross_doc_conflict_hard_block",
+      "trigger": "Quote spans from multiple docs merged as one exact quote",
+      "check": "conflict.type == 'conflict_quote' AND quote.wasMergedAcrossDocs == true",
+      "failureAction": "BLOCK_AND_REPACK_QUOTE",
+      "severity": "error"
+    },
+    {
+      "id": "CRR_004_table_axis_conflict_requires_question",
+      "trigger": "Table conflict appears from row/column swap or duplicate headers",
+      "check": "conflict.type == 'conflict_table_axes'",
+      "failureAction": "ASK_TABLE_AXIS_QUESTION",
+      "severity": "warning"
+    },
+    {
+      "id": "CRR_005_tolerated_conflict_in_weak_mode",
+      "trigger": "Single minor conflict with low impact query and explicit allow-weak",
+      "check": "conflict.severity == 'low' AND query.weakModeAllowed == true",
+      "failureAction": "SURFACE_WITH_DISCRETION_FLAG",
+      "severity": "info"
+    },
+    {
+      "id": "CRR_006_unresolvable_conflict_decline",
+      "trigger": "Conflict count exceeds tolerance and no clarification channel is open",
+      "check": "conflict.count > config.maxConflictToleratedPerClaim AND context.canClarify == false",
+      "failureAction": "DECLINE_AND_EXPLAIN_LIMITS",
+      "severity": "error"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "conflict_numeric_requests_disambiguation",
+        "input": {
+          "conflict": {
+            "type": "contradiction_numeric",
+            "docCount": 3
+          }
+        },
+        "expect": {
+          "failureAction": "ASK_CONFLICT_DISAMBIGUATION"
+        }
+      },
+      {
+        "id": "conflict_role_splits_by_role",
+        "input": {
+          "conflict": {
+            "type": "conflict_role",
+            "docScopeMixed": true
+          }
+        },
+        "expect": {
+          "failureAction": "SPLIT_WITH_ROLE_TITLES"
+        }
+      },
+      {
+        "id": "conflict_unresolvable_declines",
+        "input": {
+          "conflict": {
+            "count": 3
+          },
+          "context": {
+            "canClarify": false
+          }
+        },
+        "expect": {
+          "failureAction": "DECLINE_AND_EXPLAIN_LIMITS"
+        }
+      }
+    ]
+  }
+}

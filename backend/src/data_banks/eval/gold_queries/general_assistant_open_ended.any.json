@@ -1,0 +1,88 @@
+{
+  "_meta": {
+    "id": "eval_gold_queries_general_open_ended",
+    "version": "1.0.0",
+    "description": "General-domain open ended answer quality with bounded confidence and evidence expectation.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "eval-ops",
+    "usedBy": [
+      "services/eval/goldQueryRunner.service.ts",
+      "services/quality/evalJudge.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/eval/openEndedGeneral.proof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "scenarioType": "open_ended_reasoning",
+    "requiresConfidenceLabel": true
+  },
+  "goldQueries": [
+    {
+      "id": "general_open_ended_001",
+      "lang": "en",
+      "query": "How should a small team structure their first 30 days after a missed invoice deadline?",
+      "expected": {
+        "mustHaveAtLeast": 4,
+        "mustContainTopics": [
+          "immediate assessment",
+          "owner assignment",
+          "customer communication",
+          "preventive follow-up"
+        ],
+        "mustHaveEvidencePolicy": false,
+        "mustContain": [
+          "recommended order of actions",
+          "risk note"
+        ],
+        "mustNotUse": [
+          "generic motivational slogans",
+          "vague filler",
+          "single-sentence answers"
+        ],
+        "failureConditions": [
+          "weak_plan_without_steps",
+          "ignores_owner_risk",
+          "no_call_to_action"
+        ]
+      }
+    },
+    {
+      "id": "general_open_ended_002",
+      "lang": "en",
+      "query": "Compare two options and recommend one with uncertainty disclosure.",
+      "expected": {
+        "mustCompare": [
+          "option_a",
+          "option_b"
+        ],
+        "mustIncludeTradeoffs": true,
+        "mustIncludeUncertainty": true,
+        "mustAvoid": [
+          "false certainty",
+          "single-option bias"
+        ],
+        "failureConditions": [
+          "one-sided_recommendation",
+          "no caveat for missing data"
+        ]
+      }
+    }
+  ],
+  "scoring": {
+    "minReasoningDepth": 2.7,
+    "minStructureScore": 0.65,
+    "maxRepetitionPenalty": -12,
+    "inflateProofGuard": {
+      "ifNoEvidenceEvidence": 0.22,
+      "mustNotUse": [
+        "looks_like_template_response"
+      ]
+    }
+  }
+}

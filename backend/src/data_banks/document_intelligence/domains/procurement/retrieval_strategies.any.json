@@ -1,0 +1,187 @@
+{
+  "_meta": {
+    "id": "di_procurement_retrieval_strategies",
+    "version": "1.0.0",
+    "description": "Procurement retrieval strategy with section/table priorities and ambiguity-aware expansion.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/retrieval/hybridRetriever.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/retrievalPrecision.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "procurement",
+    "maxBoostRules": 90,
+    "maxQueryExpansionTerms": 150
+  },
+  "domain": "procurement",
+  "sectionPriority": [
+    {
+      "section": "proc_section_requirements",
+      "weight": 8,
+      "operators": [
+        "extract",
+        "evaluate",
+        "compare",
+        "summarize"
+      ]
+    },
+    {
+      "section": "proc_section_evaluation_matrix",
+      "weight": 8.5,
+      "operators": [
+        "compare",
+        "extract",
+        "summarize",
+        "validate"
+      ]
+    },
+    {
+      "section": "proc_section_award_rationale",
+      "weight": 9,
+      "operators": [
+        "extract",
+        "compare",
+        "evaluate",
+        "validate"
+      ]
+    },
+    {
+      "section": "proc_section_contract_obligations",
+      "weight": 7.5,
+      "operators": [
+        "extract",
+        "summarize",
+        "validate",
+        "navigate"
+      ]
+    },
+    {
+      "section": "proc_section_delivery_plan",
+      "weight": 6.8,
+      "operators": [
+        "extract",
+        "compare",
+        "monitor",
+        "summarize"
+      ]
+    },
+    {
+      "section": "proc_section_invoice_reconciliation",
+      "weight": 7.9,
+      "operators": [
+        "extract",
+        "validate",
+        "calculate"
+      ]
+    },
+    {
+      "section": "proc_section_supplier_performance",
+      "weight": 6.2,
+      "operators": [
+        "extract",
+        "evaluate",
+        "summarize"
+      ]
+    },
+    {
+      "section": "proc_section_compliance",
+      "weight": 6.5,
+      "operators": [
+        "extract",
+        "validate",
+        "evaluate"
+      ]
+    }
+  ],
+  "tablePriority": [
+    {
+      "table": "proc_table_bid_comparison",
+      "weight": 9.1,
+      "operators": [
+        "compare",
+        "extract",
+        "summarize"
+      ]
+    },
+    {
+      "table": "proc_table_line_items",
+      "weight": 8.7,
+      "operators": [
+        "extract",
+        "calculate",
+        "validate"
+      ]
+    },
+    {
+      "table": "proc_table_contract_milestones",
+      "weight": 8.2,
+      "operators": [
+        "extract",
+        "monitor",
+        "validate"
+      ]
+    },
+    {
+      "table": "proc_table_invoice_recon",
+      "weight": 8.8,
+      "operators": [
+        "extract",
+        "calculate",
+        "validate"
+      ]
+    }
+  ],
+  "queryExpansion": [
+    "vendor evaluation score",
+    "award criteria",
+    "delivery date",
+    "PO number",
+    "invoice mismatch",
+    "SLA penalties",
+    "preferred supplier",
+    "contract term",
+    "escolha de fornecedor",
+    "adjudicação"
+  ],
+  "strategies": [
+    {
+      "id": "proc_strategy_tie_out",
+      "operators": [
+        "validate",
+        "compare"
+      ],
+      "description": "Tie bid claims to source sections before ranking or score comparison.",
+      "steps": [
+        "resolve the active sourcing document",
+        "load evaluation matrix and award rationale",
+        "extract bid-level evidence with weights",
+        "recompute winner only if formulas are explicit"
+      ]
+    },
+    {
+      "id": "proc_strategy_recon",
+      "operators": [
+        "extract",
+        "calculate",
+        "validate"
+      ],
+      "description": "Prioritize invoice reconciliation tables for variance and exception reporting.",
+      "steps": [
+        "pull PO and delivery context",
+        "match invoice quantities and prices",
+        "separate approved versus blocked exceptions",
+        "quote variance basis and owner"
+      ]
+    }
+  ]
+}

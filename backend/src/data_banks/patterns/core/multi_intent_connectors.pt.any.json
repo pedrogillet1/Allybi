@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "bankId": "multi_intent_connectors_pt",
+    "bankId": "patterns_core_multi_intent_connectors_pt",
     "version": "1.0.0",
     "owner": "pattern-core-curator",
     "languages": [

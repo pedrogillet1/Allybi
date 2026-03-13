@@ -2,8 +2,8 @@ import { describe, expect, test } from "@jest/globals";
 
 import {
   RetrievalEngineService,
-  type RetrievalRequest,
-} from "./retrievalEngine.service";
+} from "./v2/RetrievalOrchestrator.service";
+import type { RetrievalRequest } from "./retrieval.types";
 
 type Domain = "finance" | "legal" | "medical" | "ops";
 

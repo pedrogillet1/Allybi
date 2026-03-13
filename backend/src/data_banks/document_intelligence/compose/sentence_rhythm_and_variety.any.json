@@ -1,0 +1,176 @@
+{
+  "_meta": {
+    "id": "sentence_rhythm_and_variety",
+    "version": "2.0.0",
+    "description": "Cadence profiles for answer composition. These patterns keep prose from flattening into same-length, same-entry assistant language.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "composition-brain",
+    "usedBy": [
+      "modules/chat/runtime/CompositionStyleResolver.ts",
+      "data_banks/prompts/compose_style_contract.any.json"
+    ],
+    "tests": [
+      "modules/chat/runtime/CompositionStyleResolver.test.ts",
+      "services/core/enforcement/qualityGateRunner.service.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "sentence assembly and post-draft repair",
+    "consumer": "style decision resolver and compose style contract prompt",
+    "intent": "Give the composer a small set of repeatable cadence plans. Rhythm should feel controlled and natural, not stylized for its own sake."
+  },
+  "patterns": [
+    {
+      "id": "short_then_supported",
+      "purpose": "Useful for executive and finance answers.",
+      "shape": [
+        "short_claim",
+        "medium_support"
+      ],
+      "effect": "Puts the conclusion early, then backs it with one fuller sentence."
+    },
+    {
+      "id": "medium_then_short_takeaway",
+      "purpose": "Good default when the answer needs a little explanation and then a clean landing.",
+      "shape": [
+        "medium_explanation",
+        "short_takeaway"
+      ],
+      "effect": "Lets the answer breathe without becoming rambly."
+    },
+    {
+      "id": "contrastive_pair",
+      "purpose": "Useful when the answer turns on a condition, exception, or distinction.",
+      "shape": [
+        "finding",
+        "contrast_sentence"
+      ],
+      "effect": "Keeps nuance tight instead of scattering caveats everywhere."
+    },
+    {
+      "id": "dense_then_release",
+      "purpose": "Analyst cadence for a dense support sentence followed by a simpler synthesis.",
+      "shape": [
+        "dense_support",
+        "release_sentence"
+      ],
+      "effect": "Allows precision without trapping the whole paragraph in analyst prose."
+    },
+    {
+      "id": "careful_two_step",
+      "purpose": "Sensitive cadence that stays measured without sounding clinical.",
+      "shape": [
+        "steady_claim",
+        "bounded_support"
+      ],
+      "effect": "Keeps emotional temperature low and control high."
+    },
+    {
+      "id": "compare_pulse",
+      "purpose": "Compare cadence that alternates delta and consequence.",
+      "shape": [
+        "delta_sentence",
+        "implication_sentence"
+      ],
+      "effect": "Prevents compare answers from turning into side-by-side document summaries."
+    },
+    {
+      "id": "action_runway",
+      "purpose": "Operational cadence for status, blocker, next step.",
+      "shape": [
+        "status_sentence",
+        "constraint_sentence",
+        "next_action_sentence"
+      ],
+      "effect": "Keeps work-product answers directional and usable."
+    },
+    {
+      "id": "short_sharp_close",
+      "purpose": "Finish a paragraph with a decisive line after explanation.",
+      "shape": [
+        "support_sentence",
+        "short_close"
+      ],
+      "effect": "Adds crispness without sounding dramatic."
+    }
+  ],
+  "paragraphPlans": [
+    {
+      "id": "PR_001_single_paragraph_answer",
+      "when": "context.answerLength == 'short'",
+      "preferredPatterns": [
+        "short_then_supported",
+        "medium_then_short_takeaway"
+      ]
+    },
+    {
+      "id": "PR_002_compare_answer",
+      "when": "context.answerMode CONTAINS 'compare'",
+      "preferredPatterns": [
+        "compare_pulse",
+        "contrastive_pair"
+      ]
+    },
+    {
+      "id": "PR_003_sensitive_answer",
+      "when": "context.safetyGate == true OR context.domain IN ['medical','legal']",
+      "preferredPatterns": [
+        "careful_two_step",
+        "medium_then_short_takeaway"
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "SRV_001_break_flat_sequence",
+      "trigger": "Three same-length sentences in a row",
+      "check": "output.sameLengthBandRun >= 3",
+      "failureAction": "INSERT_SHORT_OR_LONG_CONTRAST",
+      "severity": "high"
+    },
+    {
+      "id": "SRV_002_break_same_entry_run",
+      "trigger": "Too many sentences start the same way",
+      "check": "output.sameStarterRun >= 3",
+      "failureAction": "ROTATE_ENTRY_CLASS",
+      "severity": "high"
+    },
+    {
+      "id": "SRV_003_lists_need_prose_release",
+      "trigger": "List-heavy answer stays list-heavy to the end",
+      "check": "output.listBlockCount > 0 AND output.endsWithList == true",
+      "failureAction": "ADD_ONE_PROSE_TAKEAWAY",
+      "severity": "medium"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "sentence_rhythm_breaks_flatline",
+        "input": {
+          "sameLengthBandRun": 3
+        },
+        "expect": {
+          "repair": "INSERT_SHORT_OR_LONG_CONTRAST"
+        }
+      },
+      {
+        "id": "sentence_rhythm_has_careful_two_step",
+        "expect": {
+          "pattern": "careful_two_step"
+        }
+      }
+    ]
+  }
+}

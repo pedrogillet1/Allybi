@@ -1,34 +1,246 @@
 {
   "_meta": {
     "id": "anti_robotic_style_rules",
-    "version": "1.0.0",
-    "description": "Humanizing output style rules.",
+    "version": "2.1.0",
+    "description": "High-signal anti-robotic composition rules that reduce canned phrasing, repetitive cadence, filler transitions, and policy-sounding tone while preserving document grounding.",
     "languages": [
       "any",
       "en",
       "pt"
     ],
-    "lastUpdated": "2026-03-03",
-    "owner": "data-bank-governance",
+    "lastUpdated": "2026-03-13",
+    "owner": "composition-brain",
     "usedBy": [
-      "services/core/banks/dataBankLoader.service.ts"
+      "services/core/enforcement/qualityGateRegistry.ts",
+      "data_banks/prompts/compose_style_contract.any.json"
     ],
     "tests": [
-      "tests/patternWiringProof.test.ts"
+      "services/core/enforcement/qualityGateRunner.service.test.ts"
     ]
   },
-  "rules": [
-    {
-      "id": "ARS_001",
-      "trigger": "More than two identical sentence starters",
-      "check": "output.duplicateStarterRatio > 0.2",
-      "failureAction": "REPHRASE_STARTER"
-    }
-  ],
   "config": {
     "enabled": true,
     "deterministic": true,
     "dedupe": true,
-    "sortBy": "id"
+    "sortBy": "id",
+    "strictness": "high",
+    "maxTriggeredRepairs": 4
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "post-draft composition repair",
+    "consumer": "answer composer and quality gates",
+    "intent": "Use these rules after a grounded draft exists. They are not for making answers cute; they are for making them read like a capable analyst instead of a template."
+  },
+  "bannedLeadins": {
+    "en": [
+      "Based on the provided information,",
+      "According to the information provided,",
+      "I hope this helps.",
+      "Let me break this down for you.",
+      "Here is a concise summary:",
+      "It is important to note that",
+      "Short answer:",
+      "The main difference is",
+      "I will keep this anchored"
+    ],
+    "pt": [
+      "Com base nas informacoes fornecidas,",
+      "De acordo com as informacoes fornecidas,",
+      "Espero que isso ajude.",
+      "Deixe-me detalhar isso para voce.",
+      "Aqui esta um resumo conciso:",
+      "E importante observar que",
+      "Resposta curta:",
+      "A principal diferenca e",
+      "Vou manter isso ancorado"
+    ]
+  },
+  "roboticPatterns": [
+    {
+      "id": "starter_echo",
+      "description": "Repeated sentence openings flatten the voice quickly.",
+      "signals": [
+        "output.duplicateStarterRatio > 0.18",
+        "output.firstTokenReuseAcrossSentences > 2"
+      ],
+      "repair": "vary_sentence_entry"
+    },
+    {
+      "id": "template_triads",
+      "description": "Three-piece stock structures like overview-plus-list-plus-generic-wrap create visible templating.",
+      "signals": [
+        "output.matchesTemplateTriad == true"
+      ],
+      "repair": "collapse_to_single_clear_arc"
+    },
+    {
+      "id": "cushion_overload",
+      "description": "Too many softeners make the answer feel evasive and machine-generated.",
+      "signals": [
+        "output.softenerCount > 3",
+        "output.hedgeDensity > 0.14"
+      ],
+      "repair": "keep_one_caveat_then_answer"
+    },
+    {
+      "id": "cheerleading_leak",
+      "description": "Motivational or overly positive framing breaks trust in grounded tasks.",
+      "signals": [
+        "output.containsCheerleading == true"
+      ],
+      "repair": "replace_with_direct_confident_tone"
+    },
+    {
+      "id": "obvious_restatement",
+      "description": "Restating the user ask without adding meaning slows the answer and sounds scripted.",
+      "signals": [
+        "output.userAskRestatementRatio > 0.22"
+      ],
+      "repair": "compress_restatement_to_anchor_phrase"
+    },
+    {
+      "id": "evidence_dump",
+      "description": "Listing evidence fragments without synthesis sounds robotic even when factually correct.",
+      "signals": [
+        "output.evidenceBulletsWithoutSynthesis >= 3"
+      ],
+      "repair": "synthesize_then_support"
+    },
+    {
+      "id": "rhythm_flatline",
+      "description": "Uniform sentence length makes the response feel generated.",
+      "signals": [
+        "output.sentenceLengthVariance < 0.12",
+        "output.sameSentencePatternCount > 3"
+      ],
+      "repair": "introduce_length_contrast"
+    },
+    {
+      "id": "verb_genericity",
+      "description": "Weak verbs reduce specificity and make every answer sound the same.",
+      "signals": [
+        "output.genericVerbRatio > 0.2"
+      ],
+      "repair": "swap_to_domain_specific_verbs"
+    },
+    {
+      "id": "macro_opener",
+      "description": "Overt macro starters expose the template and make premium answers feel manufactured.",
+      "signals": [
+        "output.startsWithMacroLeadin == true"
+      ],
+      "repair": "replace_macro_with_contextual_opener"
+    }
+  ],
+  "rewriteMoves": [
+    {
+      "id": "vary_sentence_entry",
+      "instruction": "Switch at least one repeated starter to a factual noun phrase, one to a contrastive bridge, and one to a direct conclusion."
+    },
+    {
+      "id": "collapse_to_single_clear_arc",
+      "instruction": "Use a single answer arc: answer first, supporting evidence second, implication third if needed."
+    },
+    {
+      "id": "keep_one_caveat_then_answer",
+      "instruction": "Keep the strongest caveat only. Remove the rest and make the claim directly."
+    },
+    {
+      "id": "replace_with_direct_confident_tone",
+      "instruction": "Drop enthusiasm language and use factual verbs, concrete nouns, and bounded confidence."
+    },
+    {
+      "id": "compress_restatement_to_anchor_phrase",
+      "instruction": "Reduce user-ask restatement to a short anchor such as 'In this document' or 'Between these two versions'."
+    },
+    {
+      "id": "synthesize_then_support",
+      "instruction": "State the takeaway in one sentence before citing the supporting rows, clauses, or pages."
+    },
+    {
+      "id": "introduce_length_contrast",
+      "instruction": "Mix one short decisive sentence with one denser supporting sentence instead of uniform sentence lengths."
+    },
+    {
+      "id": "swap_to_domain_specific_verbs",
+      "instruction": "Prefer verbs like 'shows', 'locks', 'limits', 'reconciles', 'flags', 'states', or 'conflicts' over generic verbs."
+    },
+    {
+      "id": "replace_macro_with_contextual_opener",
+      "instruction": "Replace visible macros like 'Short answer' or 'The main difference is' with an opener tied to answer, evidence, delta, risk, or scope."
+    }
+  ],
+  "rules": [
+    {
+      "id": "ARS_001_duplicate_starters",
+      "trigger": "More than two identical sentence starters",
+      "check": "output.duplicateStarterRatio > 0.18",
+      "failureAction": "vary_sentence_entry",
+      "severity": "high"
+    },
+    {
+      "id": "ARS_002_overhedged_answer",
+      "trigger": "Draft uses too many softeners or hedges",
+      "check": "output.hedgeDensity > 0.14 OR output.softenerCount > 3",
+      "failureAction": "keep_one_caveat_then_answer",
+      "severity": "high"
+    },
+    {
+      "id": "ARS_003_cheerleading_block",
+      "trigger": "Draft sounds motivational instead of grounded",
+      "check": "output.containsCheerleading == true",
+      "failureAction": "replace_with_direct_confident_tone",
+      "severity": "critical"
+    },
+    {
+      "id": "ARS_004_evidence_dump",
+      "trigger": "Evidence is listed without synthesis",
+      "check": "output.evidenceBulletsWithoutSynthesis >= 3",
+      "failureAction": "synthesize_then_support",
+      "severity": "high"
+    },
+    {
+      "id": "ARS_005_flat_rhythm",
+      "trigger": "Sentence rhythm is too uniform",
+      "check": "output.sentenceLengthVariance < 0.12",
+      "failureAction": "introduce_length_contrast",
+      "severity": "medium"
+    },
+    {
+      "id": "ARS_006_generic_verbs",
+      "trigger": "Verb choice is too generic for the active domain",
+      "check": "output.genericVerbRatio > 0.2",
+      "failureAction": "swap_to_domain_specific_verbs",
+      "severity": "medium"
+    },
+    {
+      "id": "ARS_007_macro_leadin_block",
+      "trigger": "Answer opens with a visible macro phrase",
+      "check": "output.startsWithMacroLeadin == true",
+      "failureAction": "replace_macro_with_contextual_opener",
+      "severity": "medium"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "anti_robotic_starter_diversity",
+        "input": {
+          "duplicateStarterRatio": 0.24
+        },
+        "expect": {
+          "preferredRepair": "vary_sentence_entry"
+        }
+      },
+      {
+        "id": "anti_robotic_evidence_synthesis",
+        "input": {
+          "evidenceBulletsWithoutSynthesis": 4
+        },
+        "expect": {
+          "preferredRepair": "synthesize_then_support"
+        }
+      }
+    ]
   }
 }

@@ -1,0 +1,88 @@
+{
+  "_meta": {
+    "id": "domain_writer_legal",
+    "version": "1.0.0",
+    "description": "Legal writer overlay for clause-grounded answers. Prioritizes clause anchors, defined terms, exception ordering, and bounded interpretation.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "composition-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "legal",
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "domain writer overlay",
+    "consumer": "composition layer",
+    "intent": "Make legal answers sound clause-literate and bounded instead of generic."
+  },
+  "preferences": {
+    "prefer": [
+      "clause_anchor",
+      "defined_term_frame",
+      "exception_before_conclusion_when_material"
+    ],
+    "avoid": [
+      "casual_paraphrase_without_anchor",
+      "certainty_beyond_clause_text"
+    ]
+  },
+  "structures": [
+    {
+      "id": "legal_clause_readout",
+      "sequence": [
+        "clause_anchor",
+        "plain_reading",
+        "exception_or_limit"
+      ]
+    },
+    {
+      "id": "legal_version_compare",
+      "sequence": [
+        "delta",
+        "old_vs_new_effect",
+        "risk_or_next_step"
+      ]
+    }
+  ],
+  "phrasingSignals": {
+    "en": [
+      "The controlling language appears in {{anchor}}.",
+      "Read narrowly, the clause does {{effect}}.",
+      "That conclusion depends on how {{definedTerm}} is used in the surrounding text."
+    ],
+    "pt": [
+      "A linguagem controladora aparece em {{anchor}}.",
+      "Numa leitura estreita, a clausula {{effect}}.",
+      "Essa conclusao depende de como {{definedTerm}} aparece no texto ao redor."
+    ]
+  },
+  "guardrails": [
+    "Do not skip exceptions if they materially narrow the claim.",
+    "Do not paraphrase away legally meaningful qualifiers such as may, must, except, or unless.",
+    "Do not present interpretive ambiguity as settled law."
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "legal_writer_prefers_clause_anchor",
+        "expect": {
+          "prefer": "clause_anchor"
+        }
+      }
+    ]
+  }
+}

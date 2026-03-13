@@ -5,6 +5,7 @@ import {
   createDefaultPromptRegistryTelemetry,
   PromptBankLoadError,
   PromptBankMissingError,
+  PromptRegistryConfigError,
   type PromptMetricSink,
   PromptRegistryService,
   PromptRoleValidationError,
@@ -19,7 +20,9 @@ function loadPromptBanks() {
     "system_base",
     "mode_chat",
     "mode_editing",
+    "llm_global_guards",
     "rag_policy",
+    "compose_style_contract",
     "task_answer_with_sources",
     "policy_citations",
     "retrieval_prompt",
@@ -80,6 +83,50 @@ describe("PromptRegistryService compose_answer mode coverage", () => {
         expectedTemplate,
       );
     }
+  });
+
+  test("injects compose style contract with runtime style decisions", () => {
+    const service = new PromptRegistryService(loadPromptBanks());
+    const bundle = service.buildPrompt("compose_answer", {
+      env: "local",
+      outputLanguage: "en",
+      answerMode: "doc_grounded_single",
+      operator: "extract",
+      operatorFamily: "qa",
+      runtimeSignals: {
+        styleDecision: {
+          voiceProfile: "executive_brief",
+          domainVoiceModifier: "finance_analytic",
+          interactionModifier: "compressed",
+          answerStrategy: "direct_answer_then_support",
+          templateFamily: "direct_answer",
+          uncertaintyBand: "medium_confidence",
+          paragraphPlan: "single_paragraph_compressed",
+          clarificationPolicy: "answer_directly_without_clarifier",
+          fallbackPosture: "direct_answer",
+          antiRoboticFocus: ["no_generic_leadins", "synthesize_then_support"],
+          empathyMode: null,
+        },
+        turnStyleState: {
+          recentLeadSignatures: ["the document shows"],
+        },
+      },
+    });
+
+    expect(bundle.debug?.selectedTemplateIds ?? []).toContain(
+      "compose_style_contract_default",
+    );
+
+    const systemText = bundle.messages
+      .filter((message) => message.role === "system")
+      .map((message) => message.content)
+      .join("\n");
+
+    expect(systemText).toContain("executive_brief");
+    expect(systemText).toContain("finance_analytic");
+    expect(systemText).toContain("direct_answer_then_support");
+    expect(systemText).toContain("medium_confidence");
+    expect(systemText).toContain("single_paragraph_compressed");
   });
 
   test("fails fast for uncovered strict compose mode when strict flag is enabled", () => {
@@ -569,6 +616,53 @@ describe("PromptRegistryService compose_answer mode coverage", () => {
         answerMode: "doc_grounded_single",
       }),
     ).toThrow(/duplicate_layer_id/);
+  });
+
+  test("fails fast when one prompt file declares a forbidden concern pair", () => {
+    const loader = {
+      getBank<T = any>(bankId: string): T {
+        if (bankId === "prompt_registry") {
+          return {
+            config: { enabled: true },
+            promptFiles: [
+              {
+                id: "task_answer_with_sources",
+                concerns: ["grounding", "answer_shape"],
+              },
+            ],
+            forbiddenConcernOverlaps: [
+              { left: "grounding", right: "answer_shape" },
+            ],
+            layersByKind: {
+              compose_answer: ["task_answer_with_sources"],
+            },
+          } as T;
+        }
+        if (bankId === "task_answer_with_sources") {
+          return {
+            _meta: { id: "task_answer_with_sources", version: "test" },
+            config: { enabled: true },
+            templates: [
+              {
+                id: "answer_with_sources",
+                priority: 100,
+                when: { answerModes: ["doc_grounded_single"] },
+                messages: [{ role: "system", content: { any: "ok" } }],
+              },
+            ],
+          } as T;
+        }
+        return { config: { enabled: true, messages: [] } } as T;
+      },
+    };
+    const service = new PromptRegistryService(loader);
+    expect(() =>
+      service.buildPrompt("compose_answer", {
+        env: "local",
+        outputLanguage: "en",
+        answerMode: "doc_grounded_single",
+      }),
+    ).toThrow(PromptRegistryConfigError);
   });
 
   test("fails closed with typed missing-bank error for required layer", () => {

@@ -1,0 +1,94 @@
+{
+  "_meta": {
+    "id": "di_public_sector_ambiguity_patterns",
+    "version": "1.0.0",
+    "description": "Public sector ambiguity patterns for legal anchor, budget period, and award scope collisions.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/orchestration/ambiguityResolver.service.ts",
+      "services/core/repair/ambiguityRepair.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/ambiguity-domain.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "maxQuestions": 1,
+    "preferClarifyOverSpeculation": true,
+    "domain": "public_sector"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "after doc classification and before evaluation",
+    "consumer": "public sector ambiguity layer",
+    "intent": "Stop weak conclusions from mixing legal bases, fiscal years, and authority scopes."
+  },
+  "patterns": [
+    {
+      "id": "GOV_AMB_001_multi_fiscal_year",
+      "type": "fiscal_window_collision",
+      "trigger": "multiple_fiscal_years_detected",
+      "askQuestion": "Do you want this analysis for a single fiscal year, multi-year trend, or latest period only?"
+    },
+    {
+      "id": "GOV_AMB_002_award_doc_collision",
+      "type": "award_scope_collision",
+      "trigger": "award_mentions_with_multiple_notice_versions",
+      "askQuestion": "Should we analyze the latest active notice only, or compare notice versions chronologically?"
+    },
+    {
+      "id": "GOV_AMB_003_rule_reference_missing",
+      "type": "authority_reference_mismatch",
+      "trigger": "compliance_status_asserted_without_law_reference",
+      "askQuestion": "Which authority rule or law should be used as the compliance baseline?"
+    },
+    {
+      "id": "GOV_AMB_004_budget_line_disambiguation",
+      "type": "budget_line_collision",
+      "trigger": "shared_budget_code_across_programs",
+      "askQuestion": "Which program or suballocation should be locked before budget arithmetic?"
+    },
+    {
+      "id": "GOV_AMB_005_metric_definition",
+      "type": "impact_metric_collision",
+      "trigger": "impact_metrics_without_unit_or_baseline",
+      "askQuestion": "Should trends be shown as absolute, percentage-point, or ratio-change?"
+    },
+    {
+      "id": "GOV_AMB_006_disbursement_basis",
+      "type": "trigger_condition_collision",
+      "trigger": "release_condition_ambiguous",
+      "askQuestion": "Do you want status by approved milestone, actual completion, or both with exception markers?"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "gov_amb_fiscal_year_request",
+        "input": {
+          "scenario": "multiple_fiscal_years_detected"
+        },
+        "expect": {
+          "action": "askQuestion",
+          "mustAskContains": "fiscal"
+        }
+      },
+      {
+        "id": "gov_amb_award_scope_request",
+        "input": {
+          "scenario": "award_mentions_with_multiple_notice_versions"
+        },
+        "expect": {
+          "action": "askQuestion",
+          "mustAskContains": "notice"
+        }
+      }
+    ]
+  }
+}

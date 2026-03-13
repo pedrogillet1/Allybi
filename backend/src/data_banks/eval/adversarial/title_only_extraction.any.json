@@ -1,0 +1,77 @@
+{
+  "_meta": {
+    "id": "eval_adversarial_title_only_extraction",
+    "version": "1.0.0",
+    "description": "Adversarial tests to catch title-only extraction and force section-level evidence use.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "eval-ops",
+    "usedBy": [
+      "services/eval/adversarialHarness.service.ts"
+    ],
+    "tests": [
+      "tests/eval/titleOnly.proof.test.ts",
+      "tests/eval/adversarialCoverage.proof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "scenarioType": "title_only"
+  },
+  "adversarialCases": [
+    {
+      "id": "title_only_001",
+      "lang": "en",
+      "query": "Extract the exact payment terms and late fee formula.",
+      "triggers": [
+        "financial_schedule_title_present",
+        "payment_title_appears_without_body_access"
+      ],
+      "expected": {
+        "mustReadSections": [
+          "payment_terms_body",
+          "late_fee_formula"
+        ],
+        "mustContainEvidence": [
+          "line_reference",
+          "exact_numeric_term"
+        ],
+        "failureConditions": [
+          "responds_with_title_only",
+          "replaces_terms_with_hypothesis",
+          "no_line_reference"
+        ]
+      }
+    },
+    {
+      "id": "title_only_002",
+      "lang": "pt",
+      "query": "Pegue a fórmula exata da multa no contrato e a taxa usada.",
+      "triggers": [
+        "title_contains_multa",
+        "section_body_hidden"
+      ],
+      "expected": {
+        "mustReadSections": [
+          "clausula_de_multa",
+          "metodologia_de_calculo"
+        ],
+        "mustContainEvidence": [
+          "percentual",
+          "prazo",
+          "base_calculo"
+        ],
+        "failureConditions": [
+          "declara_apenas_titulo",
+          "sem_fontes_na_resposta"
+        ]
+      }
+    }
+  ],
+  "qualityFail": {
+    "titleOnlyPenalty": -40,
+    "noEvidencePenalty": -30
+  }
+}

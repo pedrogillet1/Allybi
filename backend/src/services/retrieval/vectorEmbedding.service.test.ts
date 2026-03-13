@@ -117,6 +117,7 @@ jest.mock("crypto", () => ({
 
 import {
   storeDocumentEmbeddings,
+  storeDocumentEmbeddingsCore,
   generateEmbedding,
   deleteDocumentEmbeddings,
 } from "./vectorEmbedding.service";
@@ -226,7 +227,7 @@ describe("vectorEmbedding.service", () => {
   /* ================================================================ */
   test("throws on empty documentId", async () => {
     await expect(
-      storeDocumentEmbeddings("", makeChunks(1)),
+      storeDocumentEmbeddingsCore("", makeChunks(1)),
     ).rejects.toThrow("documentId is required");
   });
 
@@ -235,7 +236,7 @@ describe("vectorEmbedding.service", () => {
   /* ================================================================ */
   test("throws on empty chunks array", async () => {
     await expect(
-      storeDocumentEmbeddings(DOC_ID, []),
+      storeDocumentEmbeddingsCore(DOC_ID, []),
     ).rejects.toThrow(/No chunks provided/);
   });
 
@@ -251,7 +252,7 @@ describe("vectorEmbedding.service", () => {
     mockEmbeddingCount.mockResolvedValue(1);
     mockChunkCount.mockResolvedValue(1);
 
-    await storeDocumentEmbeddings(DOC_ID, chunks, {
+    await storeDocumentEmbeddingsCore(DOC_ID, chunks, {
       maxRetries: 1,
       strictVerify: false,
       encryptionMode: "plaintext",
@@ -280,7 +281,7 @@ describe("vectorEmbedding.service", () => {
     mockEmbeddingCount.mockResolvedValue(2);
     mockChunkCount.mockResolvedValue(2);
 
-    await storeDocumentEmbeddings(DOC_ID, chunks, {
+    await storeDocumentEmbeddingsCore(DOC_ID, chunks, {
       maxRetries: 1,
       strictVerify: false,
       encryptionMode: "plaintext",
@@ -301,7 +302,7 @@ describe("vectorEmbedding.service", () => {
     mockEmbeddingCount.mockResolvedValue(3);
     mockChunkCount.mockResolvedValue(3);
 
-    await storeDocumentEmbeddings(DOC_ID, chunks, {
+    await storeDocumentEmbeddingsCore(DOC_ID, chunks, {
       maxRetries: 1,
       strictVerify: false,
       encryptionMode: "plaintext",
@@ -320,7 +321,7 @@ describe("vectorEmbedding.service", () => {
     const chunks = makeChunks(2);
     mockGenerateBatchEmbeddings.mockResolvedValue(makeBatchResult(2));
 
-    await storeDocumentEmbeddings(DOC_ID, chunks, {
+    await storeDocumentEmbeddingsCore(DOC_ID, chunks, {
       maxRetries: 1,
       strictVerify: false,
       encryptionMode: "plaintext",
@@ -341,7 +342,7 @@ describe("vectorEmbedding.service", () => {
     const chunks = makeChunks(2);
     mockGenerateBatchEmbeddings.mockResolvedValue(makeBatchResult(2));
 
-    await storeDocumentEmbeddings(DOC_ID, chunks, {
+    await storeDocumentEmbeddingsCore(DOC_ID, chunks, {
       maxRetries: 1,
       preDeleteVectors: true,
       strictVerify: false,
@@ -370,7 +371,7 @@ describe("vectorEmbedding.service", () => {
     const chunks = makeChunks(2);
     mockGenerateBatchEmbeddings.mockResolvedValue(makeBatchResult(2));
 
-    await storeDocumentEmbeddings(DOC_ID, chunks, {
+    await storeDocumentEmbeddingsCore(DOC_ID, chunks, {
       maxRetries: 1,
       strictVerify: false,
       encryptionMode: "plaintext",
@@ -407,7 +408,7 @@ describe("vectorEmbedding.service", () => {
       },
     ];
 
-    await storeDocumentEmbeddings(DOC_ID, chunks as any, {
+    await storeDocumentEmbeddingsCore(DOC_ID, chunks as any, {
       maxRetries: 1,
       strictVerify: false,
       encryptionMode: "plaintext",
@@ -438,7 +439,7 @@ describe("vectorEmbedding.service", () => {
       },
     ]);
 
-    await storeDocumentEmbeddings(
+    await storeDocumentEmbeddingsCore(
       DOC_ID,
       [{ chunkIndex: 0, content: "chunk body content long enough" }],
       {
@@ -466,7 +467,7 @@ describe("vectorEmbedding.service", () => {
     mockEmbeddingCount.mockResolvedValue(1);
     mockChunkCount.mockResolvedValue(1);
 
-    await storeDocumentEmbeddings(DOC_ID, chunks, {
+    await storeDocumentEmbeddingsCore(DOC_ID, chunks, {
       maxRetries: 1,
       strictVerify: false,
       encryptionMode: "encrypted_only",
@@ -517,7 +518,7 @@ describe("vectorEmbedding.service", () => {
       });
     });
 
-    await storeDocumentEmbeddings(DOC_ID, chunks, {
+    await storeDocumentEmbeddingsCore(DOC_ID, chunks, {
       maxRetries: 2,
       strictVerify: false,
       encryptionMode: "plaintext",
@@ -535,7 +536,7 @@ describe("vectorEmbedding.service", () => {
     mockTransaction.mockRejectedValue(new Error("permanent failure"));
 
     await expect(
-      storeDocumentEmbeddings(DOC_ID, chunks, {
+      storeDocumentEmbeddingsCore(DOC_ID, chunks, {
         maxRetries: 1,
         strictVerify: false,
         encryptionMode: "plaintext",
@@ -562,7 +563,7 @@ describe("vectorEmbedding.service", () => {
     mockTransaction.mockRejectedValue(new Error("pg failure"));
 
     await expect(
-      storeDocumentEmbeddings(DOC_ID, chunks, {
+      storeDocumentEmbeddingsCore(DOC_ID, chunks, {
         maxRetries: 1,
         strictVerify: false,
         encryptionMode: "plaintext",
@@ -597,6 +598,7 @@ describe("vectorEmbedding.service", () => {
   /*  14. deleteDocumentEmbeddings removes from Pinecone and Postgres  */
   /* ================================================================ */
   test("deleteDocumentEmbeddings removes from Pinecone and Postgres", async () => {
+    mockDocumentFindUnique.mockResolvedValue({ userId: USER_ID });
     mockTransaction.mockImplementation(async (fn: any) => {
       return fn({
         documentEmbedding: {
@@ -610,7 +612,7 @@ describe("vectorEmbedding.service", () => {
 
     await deleteDocumentEmbeddings(DOC_ID);
 
-    expect(mockPineconeDeleteDocumentEmbeddings).toHaveBeenCalledWith(DOC_ID);
+    expect(mockPineconeDeleteDocumentEmbeddings).toHaveBeenCalledWith(DOC_ID, { userId: USER_ID });
     expect(mockTransaction).toHaveBeenCalledTimes(1);
   });
 
@@ -624,7 +626,7 @@ describe("vectorEmbedding.service", () => {
     mockGenerateBatchEmbeddings.mockResolvedValue(makeBatchResult(2));
     mockPineconeIsAvailable.mockReturnValue(false);
 
-    await storeDocumentEmbeddings(DOC_ID, chunks, {
+    await storeDocumentEmbeddingsCore(DOC_ID, chunks, {
       maxRetries: 1,
       strictVerify: false,
       encryptionMode: "plaintext",
@@ -647,7 +649,7 @@ describe("vectorEmbedding.service", () => {
     mockEmbeddingCount.mockResolvedValue(2);
     mockChunkCount.mockResolvedValue(2);
 
-    await storeDocumentEmbeddings(DOC_ID, chunks, {
+    await storeDocumentEmbeddingsCore(DOC_ID, chunks, {
       maxRetries: 1,
       verifyAfterStore: true,
       strictVerify: false,

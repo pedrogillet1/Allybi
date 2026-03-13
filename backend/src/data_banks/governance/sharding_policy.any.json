@@ -1,0 +1,140 @@
+{
+  "_meta": {
+    "id": "governance_sharding_policy",
+    "version": "1.0.0",
+    "description": "Governance contract for deterministic bank sharding, naming, and ownership boundaries.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "governance-team",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "maxFilesPerShard": 120,
+    "maxLinesPerShard": 4200,
+    "maxTokensPerShard": 460000
+  },
+  "naming": {
+    "allowedFamilyNames": [
+      "core",
+      "domain",
+      "overlays",
+      "quality",
+      "policy",
+      "proof",
+      "ops"
+    ],
+    "pattern": "^(?<family>[a-z][a-z0-9_]*)_(?<scope>[a-z0-9_]+)_(?<index>\\d+)\\.any\\.json$",
+    "examples": [
+      "routing_core_001.any.json",
+      "semantics_domain_012.any.json",
+      "quality_proof_004.any.json",
+      "policy_ops_001.any.json"
+    ],
+    "folderRules": {
+      "sameFamilySameFolder": true,
+      "subfolderOptional": [
+        "domain",
+        "audience",
+        "adversarial",
+        "multilingual",
+        "style"
+      ]
+    },
+    "indexingRules": {
+      "startAt": 1,
+      "zeroPad": 3,
+      "contiguousAllowed": true,
+      "renumberOnSplit": true
+    }
+  },
+  "shardCriteria": {
+    "whenToShard": {
+      "lineCount": 900,
+      "testCaseCount": 80,
+      "ownerTeamExpansion": 5,
+      "crossDomainCollisionRisk": 0.08
+    },
+    "mustShardBy": [
+      {
+        "key": "domain",
+        "threshold": 200
+      },
+      {
+        "key": "queryComplexity",
+        "threshold": 3
+      },
+      {
+        "key": "changeVelocityPerWeek",
+        "threshold": 18
+      }
+    ],
+    "shardingStrategy": "deterministic_hash_by_query_family",
+    "sortBeforeShard": [
+      "family",
+      "scope",
+      "id"
+    ]
+  },
+  "deterministicSortDedupe": {
+    "sortFields": [
+      "id",
+      "scope",
+      "owner"
+    ],
+    "dedupeRules": [
+      {
+        "level": "bank_id",
+        "selector": "id",
+        "action": "reject_duplicate"
+      },
+      {
+        "level": "test_case_id",
+        "selector": "tests.cases.id",
+        "action": "reject_duplicate_with_context"
+      },
+      {
+        "level": "pattern_overlap",
+        "selector": "config.sortableItems",
+        "action": "dedupe_keep_latest"
+      }
+    ]
+  },
+  "lifecycle": {
+    "splitThresholdExceeded": "create_new_shards",
+    "splitOwner": "governance_banking_engine",
+    "mergeTrigger": "stable_for_8_weeks_and_low_collision"
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "shard_name_conforms",
+        "input": {
+          "filename": "semantics_domain_001.any.json"
+        },
+        "expect": {
+          "naming.valid": true
+        }
+      },
+      {
+        "id": "shard_dedupe_keep_latest",
+        "input": {
+          "shardType": "test_case_overlap"
+        },
+        "expect": {
+          "dedupe": "deterministic_last_updated"
+        }
+      }
+    ]
+  },
+  "runtimeUsageNotes": "Generation tooling and CI should read this bank before adding, sharding, or regenerating any bank file. Sorting, naming, and dedupe rules must be applied deterministically before commit."
+}

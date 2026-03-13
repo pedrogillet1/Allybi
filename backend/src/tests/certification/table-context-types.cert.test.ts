@@ -6,7 +6,7 @@
  * are present and accessible on the CandidateChunk.table type.
  */
 import { describe, expect, it } from "@jest/globals";
-import type { CandidateChunk } from "../../services/core/retrieval/retrievalEngine.service";
+import type { CandidateChunk } from "../../services/core/retrieval/retrieval.types";
 
 describe("CandidateChunk.table context fields", () => {
   const baseChunk: CandidateChunk = {

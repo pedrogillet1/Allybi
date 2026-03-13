@@ -1,14 +1,14 @@
 {
   "_meta": {
     "id": "allybi_response_style",
-    "version": "1.0.0",
-    "description": "Bilingual response templates for deterministic editing UX microcopy.",
+    "version": "2.0.0",
+    "description": "Editing response style bank for Allybi. Covers editing receipts, draft updates, review guidance, and worklog phrasing with enough variation to avoid repetitive editing UX.",
     "languages": [
       "en",
       "pt"
     ],
-    "lastUpdated": "2026-02-12",
-    "owner": "allybi-editing",
+    "lastUpdated": "2026-03-13",
+    "owner": "composition-brain",
     "usedBy": [
       "services/core/banks/dataBankLoader.service.ts"
     ],
@@ -18,38 +18,115 @@
   },
   "config": {
     "enabled": true,
-    "defaultLocale": "pt-BR"
+    "defaultLocale": "pt-BR",
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id",
+    "maxWorklogLines": 4
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "editing mode UX composition",
+    "consumer": "editing runtime",
+    "intent": "Use these templates for editing mode only. They should sound clear, professional, and operational rather than robotic or overly formal."
   },
   "templates": {
     "what_i_will_change": {
-      "en": "I will update {{scope}} using {{operator}}.",
-      "pt": "Vou atualizar {{scope}} usando {{operator}}."
+      "en": [
+        "I will update {{scope}} with {{operator}} and keep the existing structure intact where possible.",
+        "I will revise {{scope}} using {{operator}} and preserve any content that does not need to move.",
+        "I will apply {{operator}} to {{scope}} and keep the change set as narrow as the request allows."
+      ],
+      "pt": [
+        "Vou atualizar {{scope}} com {{operator}} e preservar a estrutura existente sempre que possivel.",
+        "Vou revisar {{scope}} usando {{operator}} e manter o conteudo que nao precisa mudar.",
+        "Vou aplicar {{operator}} em {{scope}} e manter o conjunto de mudancas o mais estreito possivel."
+      ]
     },
     "what_i_changed_in_draft": {
-      "en": "Draft ready: {{changeCount}} change(s) prepared.",
-      "pt": "Rascunho pronto: {{changeCount}} alteração(ões) preparada(s)."
+      "en": [
+        "Draft ready: {{changeCount}} change(s) are prepared for review.",
+        "Draft is ready. I prepared {{changeCount}} change(s) for you to inspect.",
+        "Preview is ready with {{changeCount}} prepared change(s)."
+      ],
+      "pt": [
+        "Rascunho pronto: {{changeCount}} alteracao(oes) estao preparadas para revisao.",
+        "O rascunho esta pronto. Preparei {{changeCount}} alteracao(oes) para voce inspecionar.",
+        "A previa esta pronta com {{changeCount}} alteracao(oes) preparadas."
+      ]
     },
     "what_you_should_review": {
-      "en": "Review target, diff, and formatting before applying.",
-      "pt": "Revise alvo, diff e formatação antes de aplicar."
+      "en": [
+        "Review the target, the diff, and any formatting shifts before applying.",
+        "Check the selected target, the exact diff, and whether the formatting still reads the way you want.",
+        "Before applying, confirm the target, the wording changes, and any spacing or list behavior."
+      ],
+      "pt": [
+        "Revise o alvo, o diff e qualquer mudanca de formatacao antes de aplicar.",
+        "Confira o alvo selecionado, o diff exato e se a formatacao continua do jeito que voce quer.",
+        "Antes de aplicar, confirme o alvo, as mudancas de texto e qualquer comportamento de espaco ou lista."
+      ]
     },
     "apply_undo_instructions": {
-      "en": "Apply commits the revision. Undo restores the previous revision and clears selection locks.",
-      "pt": "Aplicar confirma a revisão. Desfazer restaura a revisão anterior e limpa os bloqueios de seleção."
+      "en": [
+        "Apply commits the revision. Undo restores the previous revision and clears selection locks.",
+        "Apply makes this revision live. Undo rolls back to the previous revision and removes active locks.",
+        "Use Apply to commit the draft. Use Undo to restore the prior revision and release selection state."
+      ],
+      "pt": [
+        "Aplicar confirma a revisao. Desfazer restaura a revisao anterior e limpa os bloqueios de selecao.",
+        "Aplicar torna esta revisao ativa. Desfazer volta para a revisao anterior e remove os bloqueios ativos.",
+        "Use Aplicar para confirmar o rascunho. Use Desfazer para restaurar a revisao anterior e liberar a selecao."
+      ]
+    },
+    "blocked_by_scope": {
+      "en": [
+        "I found the edit pattern, but I still need a narrower target before I prepare a safe draft.",
+        "I can make the change, but I need you to pin down the exact target so the draft stays safe.",
+        "The edit is clear, but the target is still broad. I need a narrower scope before drafting."
+      ],
+      "pt": [
+        "Encontrei o padrao de edicao, mas ainda preciso de um alvo mais estreito antes de preparar um rascunho seguro.",
+        "Posso fazer a mudanca, mas preciso que voce defina o alvo exato para manter o rascunho seguro.",
+        "A edicao esta clara, mas o alvo ainda esta amplo. Preciso de um escopo mais estreito antes de montar o rascunho."
+      ]
     }
   },
   "worklogPhrases": {
     "en": [
-      "Identifying targets...",
-      "Planning deterministic edits...",
-      "Rendering preview...",
-      "Ready for review."
+      "Locking onto the exact target...",
+      "Planning the smallest safe edit set...",
+      "Building the preview diff...",
+      "Checking formatting stability...",
+      "Preview is ready for review."
     ],
     "pt": [
-      "Identificando alvos...",
-      "Planejando edições determinísticas...",
-      "Renderizando prévia...",
-      "Pronto para revisão."
+      "Travando no alvo exato...",
+      "Planejando o menor conjunto seguro de edicoes...",
+      "Montando o diff de previa...",
+      "Conferindo a estabilidade da formatacao...",
+      "A previa esta pronta para revisao."
+    ]
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "allybi_response_style_preview_message",
+        "input": {
+          "changeCount": 3
+        },
+        "expect": {
+          "template": "what_i_changed_in_draft"
+        }
+      },
+      {
+        "id": "allybi_response_style_scope_block",
+        "input": {
+          "scopeResolved": false
+        },
+        "expect": {
+          "template": "blocked_by_scope"
+        }
+      }
     ]
   }
 }

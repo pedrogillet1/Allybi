@@ -1,0 +1,65 @@
+{
+  "_meta": {
+    "id": "eval_multilingual_locale_number_parity",
+    "version": "1.0.0",
+    "description": "Numeric locale parity tests to ensure pt/en spacing, decimal separators, and thousand grouping are interpreted correctly.",
+    "languages": [
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "eval-ops",
+    "usedBy": [
+      "services/eval/multilingualParity.service.ts",
+      "services/quality/evalJudge.service.ts"
+    ],
+    "tests": [
+      "tests/eval/localeNumberParity.proof.test.ts",
+      "tests/eval/multilingualCoverage.proof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "scenarioType": "numeric_locale"
+  },
+  "numberPairs": [
+    {
+      "id": "locale_num_001",
+      "queryEn": "What is the reported total in USD from the table? 1,234,567.89",
+      "queryPt": "Qual e o total em BRL apresentado? 1.234.567,89",
+      "expected": {
+        "mustPreserveMagnitude": true,
+        "mustKeepCurrency": true,
+        "mustKeepDecimals": true,
+        "mustTranslateNumericMeaningOnly": true,
+        "failureConditions": [
+          "swaps_separator_units",
+          "drops_currency_after_parse",
+          "rounds_without_policy"
+          ]
+      }
+    },
+    {
+      "id": "locale_num_002",
+      "queryEn": "Compare 12.5% and 0.12.",
+      "queryPt": "Compare 12,5% e 0,12.",
+      "expected": {
+        "mustConvertForParity": true,
+        "mustInterpretScale": true,
+        "mustAvoid": [
+          "interpret_pt_percent_as_en_float"
+        ],
+        "failureConditions": [
+          "incorrect_scale_in_comparison"
+        ]
+      }
+  }
+  ],
+  "qualityGuard": {
+    "mustFailIf": [
+      "numeric_truncation",
+      "locale_swap_without_disambiguation"
+    ],
+    "scorePenalty": -30
+  }
+}

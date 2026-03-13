@@ -73,7 +73,10 @@ export interface GeminiProviderConfig {
     heartbeatEveryMs: number; // 0 disables
   };
 
-  // Generation defaults (adapter-level safety baselines)
+  // Generation defaults — reference baselines only.
+  // Actual maxOutputTokens is resolved by tokenBudget.service from
+  // truncation_and_limits bank. These values are safety nets if the
+  // budget pipeline is bypassed.
   generationDefaults: {
     draft: {
       temperature: number;
@@ -160,7 +163,7 @@ const DEFAULTS: Omit<GeminiProviderConfig, "env" | "apiKey"> = {
       temperature: Number(process.env.GEMINI_DRAFT_TEMPERATURE || 0.5),
       topP: Number(process.env.GEMINI_DRAFT_TOP_P || 0.9),
       maxOutputTokens: Number(
-        process.env.GEMINI_DRAFT_MAX_OUTPUT_TOKENS || 1600,
+        process.env.GEMINI_DRAFT_MAX_OUTPUT_TOKENS || 3200,
       ),
     },
 
@@ -169,7 +172,7 @@ const DEFAULTS: Omit<GeminiProviderConfig, "env" | "apiKey"> = {
       temperature: Number(process.env.GEMINI_FINAL_TEMPERATURE || 0.25),
       topP: Number(process.env.GEMINI_FINAL_TOP_P || 0.9),
       maxOutputTokens: Number(
-        process.env.GEMINI_FINAL_MAX_OUTPUT_TOKENS || 4096,
+        process.env.GEMINI_FINAL_MAX_OUTPUT_TOKENS || 6500,
       ),
     },
 
@@ -191,7 +194,7 @@ const DEFAULTS: Omit<GeminiProviderConfig, "env" | "apiKey"> = {
     quoteStrict: {
       temperature: Number(process.env.GEMINI_QUOTE_TEMPERATURE || 0.2),
       maxOutputTokens: Number(
-        process.env.GEMINI_QUOTE_MAX_OUTPUT_TOKENS || 500,
+        process.env.GEMINI_QUOTE_MAX_OUTPUT_TOKENS || 1600,
       ),
     },
   },

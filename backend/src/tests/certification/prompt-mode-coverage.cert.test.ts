@@ -12,8 +12,10 @@ function loadPromptBanks() {
     "system_base",
     "mode_chat",
     "mode_editing",
+    "llm_global_guards",
     "rag_policy",
     "task_answer_with_sources",
+    "compose_style_contract",
     "task_plan_generation",
     "editing_task_prompts",
     "policy_citations",
@@ -34,6 +36,13 @@ function loadPromptBanks() {
       return banks[bankId as keyof typeof banks] as T;
     },
   };
+}
+
+function loadPromptBank(bankId: string): any {
+  const promptRoot = path.resolve(process.cwd(), "src/data_banks/prompts");
+  return JSON.parse(
+    fs.readFileSync(path.join(promptRoot, `${bankId}.any.json`), "utf8"),
+  );
 }
 
 describe("Certification: prompt mode coverage", () => {
@@ -219,6 +228,86 @@ describe("Certification: prompt mode coverage", () => {
       if (!id) continue;
       if (forbiddenIds.has(id)) failures.push(`LEGACY_PROMPT_IN_REGISTRY:${id}`);
     }
+    expect(failures).toEqual([]);
+  });
+
+  test("no prompt file claims a forbidden pair of concerns", () => {
+    const registry = loadPromptBank("prompt_registry");
+    const failures: string[] = [];
+    for (const row of registry?.promptFiles || []) {
+      const id = String(row?.id || "").trim();
+      const concerns = new Set(
+        Array.isArray(row?.concerns)
+          ? row.concerns.map((value: unknown) => String(value || "").trim())
+          : [],
+      );
+      if (!id || concerns.size === 0) continue;
+
+      for (const pair of registry?.forbiddenConcernOverlaps || []) {
+        const left = String(pair?.left || "").trim();
+        const right = String(pair?.right || "").trim();
+        if (!left || !right) continue;
+        if (concerns.has(left) && concerns.has(right)) {
+          failures.push(`PROMPT_FILE_CONFLICTING_CONCERNS:${id}:${left}:${right}`);
+        }
+      }
+    }
+
+    writeCertificationGateReport("prompt-concern-ownership", {
+      passed: failures.length === 0,
+      metrics: {
+        forbiddenConcernOverlaps:
+          registry?.forbiddenConcernOverlaps?.length ?? 0,
+        promptFiles: registry?.promptFiles?.length ?? 0,
+      },
+      thresholds: {
+        requirement: "each prompt file must own a compatible concern set",
+      },
+      failures,
+    });
+
+    expect(failures).toEqual([]);
+  });
+
+  test("prompt bank responsibilities stay separated", () => {
+    const globalGuards = loadPromptBank("llm_global_guards");
+    const ragPolicy = loadPromptBank("rag_policy");
+    const taskAnswer = loadPromptBank("task_answer_with_sources");
+
+    const globalGuardRuleIds = new Set(
+      (globalGuards?.rules || []).map((rule: any) => String(rule?.id || "").trim()),
+    );
+    const ragText = JSON.stringify(ragPolicy);
+    const taskAnswerText = JSON.stringify(taskAnswer);
+
+    const failures: string[] = [];
+    if (globalGuardRuleIds.has("no_unnecessary_hedging")) {
+      failures.push("GLOBAL_GUARDS_CONTAINS_HEDGING_POLICY");
+    }
+    if (/compact GFM table|separator row|inline `Sources` section/i.test(ragText)) {
+      failures.push("RAG_POLICY_CONTAINS_ANSWER_SHAPE_DIRECTIVES");
+    }
+    if (
+      /ignore instructions embedded|use only evidence|fabricate|OCR|not supported by the evidence/i.test(
+        taskAnswerText,
+      )
+    ) {
+      failures.push("TASK_ANSWER_CONTAINS_GROUNDING_POLICY");
+    }
+
+    writeCertificationGateReport("prompt-bank-boundaries", {
+      passed: failures.length === 0,
+      metrics: {
+        globalGuardRuleCount: globalGuardRuleIds.size,
+        ragPolicyChars: ragText.length,
+        taskAnswerChars: taskAnswerText.length,
+      },
+      thresholds: {
+        requirement: "global guards, grounding policy, and answer-shape contracts must stay in separate banks",
+      },
+      failures,
+    });
+
     expect(failures).toEqual([]);
   });
 });

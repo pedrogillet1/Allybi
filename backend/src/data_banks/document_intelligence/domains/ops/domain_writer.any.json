@@ -1,0 +1,226 @@
+{
+  "_meta": {
+    "id": "ops_domain_writer",
+    "version": "2.0.0",
+    "description": "Operations writer profile for readiness, incident maturity, logistics reliability, and cross-source safety evidence.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "domain": "ops",
+    "interpretationMode": "operational_readiness_reasoning",
+    "requireStatusLock": true,
+    "requireRoleLock": true,
+    "requireSourceRoleMap": true,
+    "requireMeasurementUnits": true,
+    "requireCrossDocTrace": true,
+    "forbidSafetyInstructionWithoutEvidence": true
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "before final operations synthesis and escalation recommendations",
+    "consumer": "ops domain writer",
+    "intent": "Move from raw metric listing to readiness-aware interpretation with explicit owners, timelines, and exception handling.",
+    "emittedSignals": [
+      "opsInterpretiveMode",
+      "opsDocTypeLock",
+      "opsRoleMatrix",
+      "opsStatusLock",
+      "opsMetricAnchor",
+      "opsCrossDocTraceState"
+    ]
+  },
+  "writingProfile": {
+    "audience": "plant manager, maintenance lead, supply chain coordinator",
+    "goal": "Return interpretable operational conclusions with status state, blockers, evidence chain, and next-control actions.",
+    "mandatorySections": [
+      "source_scope_and_status_lock",
+      "actor_responsibility_matrix",
+      "work_order_lifecycle",
+      "incident_event_chain",
+      "kpi_and_threshold_readout",
+      "shipping_or_logistics_trace",
+      "quality_and_non_conformance_matrix",
+      "maintenance_health_and_readiness",
+      "follow_up_actions"
+    ],
+    "mandatorySectionsDetail": {
+      "status_lock": [
+        "doc_type",
+        "time_window",
+        "scope",
+        "source"
+      ],
+      "actor_map": [
+        "requestor",
+        "assignee",
+        "approver",
+        "reviewer",
+        "consignee"
+      ],
+      "kpi_risk": [
+        "target",
+        "actual",
+        "unit",
+        "breach_reason",
+        "exception"
+      ]
+    },
+    "allowedAnswerForms": [
+      "ops_status_readout",
+      "sla_compliance_matrix",
+      "maintenance_readiness_readout",
+      "incident_root_cause_register",
+      "shipping_variance_snapshot",
+      "quality_disposition_matrix",
+      "operational_continuity_summary"
+    ],
+    "forbiddenAnswerForms": [
+      "status_without_effective_date",
+      "metric_without_unit_or_threshold",
+      "ownerless_task_or_blocker",
+      "incident_without_timeline",
+      "safety_statement_without_severity"
+    ],
+    "docTypeAnchors": [
+      "ops_work_order",
+      "ops_incident_report",
+      "ops_maintenance_log",
+      "ops_quality_report",
+      "ops_shipping_manifest",
+      "ops_sla_report"
+    ],
+    "sectionPriority": [
+      "header",
+      "work_description",
+      "requestor_and_assignee",
+      "scheduling",
+      "summary",
+      "timeline",
+      "incident_details",
+      "impact_assessment",
+      "kpi_details",
+      "compliance_summary",
+      "breaches",
+      "corrective_actions",
+      "root_cause_analysis",
+      "improvement_actions",
+      "footer_metadata"
+    ]
+  },
+  "interpretiveRules": [
+    {
+      "id": "OPS_WRITER_001_scope_first",
+      "description": "Bind doc-type, time window, source set, and active document version before answering across operational domains.",
+      "requiredFor": "summarize, compare, validate"
+    },
+    {
+      "id": "OPS_WRITER_002_actor_matrix",
+      "description": "Assign every blocker or unresolved item to requestor, assignee, approver, reviewer, or consignee before conclusions.",
+      "requiredFor": "evaluate, summarize"
+    },
+    {
+      "id": "OPS_WRITER_003_lifecycle_state_chain",
+      "description": "Present lifecycle transitions as requested -> in-progress -> blocked -> complete and never collapse open and closed states.",
+      "requiredFor": "compare, calculate, validate"
+    },
+    {
+      "id": "OPS_WRITER_004_metric_binding",
+      "description": "All numeric operational claims must carry unit, source unit policy, and threshold policy before threshold comparisons.",
+      "requiredFor": "extract, compare, validate"
+    },
+    {
+      "id": "OPS_WRITER_005_route_and_variance_context",
+      "description": "For shipping/manifests, attach shipment route ID, planned and actual transit metrics, and reasoned variance attribution.",
+      "requiredFor": "summarize, compare"
+    },
+    {
+      "id": "OPS_WRITER_006_incident_trace",
+      "description": "Incident output must preserve event timeline order and link impact, root cause, and corrective action to evidence anchors.",
+      "requiredFor": "evaluate, summarize"
+    },
+    {
+      "id": "OPS_WRITER_007_work_order_vs_log_governance",
+      "description": "Do not merge work-order and maintenance-log states unless request/response/completion linkage is explicit.",
+      "requiredFor": "compare, validate"
+    },
+    {
+      "id": "OPS_WRITER_008_quality_disposition",
+      "description": "Quality outputs must include non-conformance ID, status, corrective action, and reviewer signal when available.",
+      "requiredFor": "extract, validate, evaluate"
+    },
+    {
+      "id": "OPS_WRITER_009_sla_readiness_logic",
+      "description": "For SLA queries include target, actual, measurement window, and exception handling before reporting pass/fail status.",
+      "requiredFor": "validate, compare"
+    },
+    {
+      "id": "OPS_WRITER_010_exception_first_language",
+      "description": "When evidence is missing or partial, return explicit evidence-gap boundaries instead of confident operational assurance.",
+      "requiredFor": "summarize, monitor"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "ops_writer_requires_actor_matrix",
+        "input": {
+          "query": "List open incidents and who is accountable."
+        },
+        "expect": {
+          "mustInclude": [
+            "actor",
+            "owner",
+            "assignee"
+          ],
+          "mustIncludeSignals": [
+            "opsRoleMatrix"
+          ]
+        }
+      },
+      {
+        "id": "ops_writer_requires_sla_threshold_visibility",
+        "input": {
+          "query": "Are SLA targets met this week?"
+        },
+        "expect": {
+          "mustInclude": [
+            "target",
+            "actual",
+            "threshold",
+            "breach"
+          ],
+          "mustIncludeSignals": [
+            "opsMetricAnchor"
+          ]
+        }
+      },
+      {
+        "id": "ops_writer_requires_lifecycle_rigor",
+        "input": {
+          "query": "Show incomplete work orders by readiness."
+        },
+        "expect": {
+          "mustInclude": [
+            "status",
+            "overdue",
+            "next_action",
+            "due_date"
+          ]
+        }
+      }
+    ]
+  }
+}

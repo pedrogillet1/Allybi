@@ -1,0 +1,93 @@
+{
+  "_meta": {
+    "id": "sales_crm_ambiguity_patterns",
+    "version": "1.0.0",
+    "description": "Sales CRM ambiguity patterns for stage definitions, owner overlap, and forecast assumptions.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/orchestration/ambiguityResolver.service.ts",
+      "services/core/repair/ambiguityRepair.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/ambiguity-domain.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "maxQuestions": 1,
+    "domain": "sales_crm",
+    "preferClarifyOverSpeculation": true
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "after extraction when stage, owner, or revenue definitions are ambiguous",
+    "consumer": "sales CRM ambiguity layer",
+    "intent": "Prevent wrong close rate math from mixed definitions or ambiguous owners."
+  },
+  "patterns": [
+    {
+      "id": "CRM_AMB_001_stage_mapping_collision",
+      "type": "funnel_stage_collision",
+      "trigger": "multiple_stage_vocabularies_detected",
+      "askQuestion": "Use your sales org stages (Discovery, Proposal, Negotiate, Closed Won/Lost) or document-defined stages?"
+    },
+    {
+      "id": "CRM_AMB_002_owner_overlap",
+      "type": "owner_collision",
+      "trigger": "multiple_account_owners_or_shared_accounts",
+      "askQuestion": "Should I report by primary account owner, billing owner, or territory owner?"
+    },
+    {
+      "id": "CRM_AMB_003_arr_definition_mix",
+      "type": "metric_definition_mix",
+      "trigger": "arr_and_mrr_without_definition_scope",
+      "askQuestion": "Do you want ARR from signed contracts only, forecasted bookings, or active subscriptions only?"
+    },
+    {
+      "id": "CRM_AMB_004_discount_authority",
+      "type": "authority_collision",
+      "trigger": "discount_percentage_present_without_approval_section",
+      "askQuestion": "Should I use commercial-authority thresholds or treat this as pending discount requiring validation?"
+    },
+    {
+      "id": "CRM_AMB_005_renewal_date_collision",
+      "type": "date_collision",
+      "trigger": "multiple_renewal_dates_or_expiries_detected",
+      "askQuestion": "Which renewal date should drive risk ranking: contract end, auto-renewal date, or notice period?"
+    },
+    {
+      "id": "CRM_AMB_006_activity_vs_sales_result",
+      "type": "action_result_mix",
+      "trigger": "activity_log_present_with_no_stage_progress",
+      "askQuestion": "Should activity-only records be treated as active progression or non-converted follow-up?"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "sales_crm_ambiguity_stage_asks_once",
+        "input": {
+          "scenario": "mixed_stage_labels"
+        },
+        "expect": {
+          "action": "askQuestion",
+          "maxQuestions": 1
+        }
+      },
+      {
+        "id": "sales_crm_ambiguity_owner_choice",
+        "input": {
+          "scenario": "owner_overlap"
+        },
+        "expect": {
+          "mustAskContains": "owner"
+        }
+      }
+    ]
+  }
+}

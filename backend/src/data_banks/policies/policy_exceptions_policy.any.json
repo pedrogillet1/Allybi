@@ -79,6 +79,39 @@
         "expect": {
           "action": "deny_exception"
         }
+      },
+      {
+        "id": "PEP_T_001_A_002",
+        "runtime": {
+          "signals": {
+            "approved": false
+          }
+        },
+        "expect": {
+          "action": "deny_exception"
+        }
+      },
+      {
+        "id": "PEP_T_001_A_003",
+        "runtime": {
+          "signals": {
+            "approved": false
+          }
+        },
+        "expect": {
+          "action": "deny_exception"
+        }
+      },
+      {
+        "id": "PEP_T_001_A_004",
+        "runtime": {
+          "signals": {
+            "approved": false
+          }
+        },
+        "expect": {
+          "action": "deny_exception"
+        }
       }
     ]
   }

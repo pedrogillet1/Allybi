@@ -9,6 +9,20 @@ export type PromptKind =
   | "fallback"
   | "tool";
 
+export type PromptConcern =
+  | "global_bans"
+  | "grounding"
+  | "retrieval_planner"
+  | "answer_shape"
+  | "citation_contract"
+  | "voice_selection"
+  | "answer_strategy"
+  | "anti_robotic_repair"
+  | "uncertainty_wording"
+  | "clarification_render"
+  | "fallback_render"
+  | "tool_contract";
+
 export type LlmRole = "system" | "developer" | "user";
 
 export interface BankLoader {
@@ -100,12 +114,20 @@ export interface PromptFileEntry {
   id: string;
   path?: string;
   required?: boolean;
+  concerns?: PromptConcern[];
+}
+
+export interface PromptConcernConflict {
+  left: PromptConcern;
+  right: PromptConcern;
 }
 
 export interface PromptRegistryBank extends PromptRegistryMeta {
   promptFiles?: PromptFileEntry[];
   layersByKind?: Partial<Record<PromptKind, string[]>>;
+  requiredConcernsByKind?: Partial<Record<PromptKind, PromptConcern[]>>;
   map?: Partial<Record<PromptKind, string>>;
+  forbiddenConcernOverlaps?: PromptConcernConflict[];
 }
 
 export interface PromptBuildStartEvent {

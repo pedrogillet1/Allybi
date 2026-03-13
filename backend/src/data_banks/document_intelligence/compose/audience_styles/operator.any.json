@@ -1,0 +1,89 @@
+{
+  "_meta": {
+    "id": "audience_style_operator",
+    "version": "1.0.0",
+    "description": "Operator audience style overlay focused on task clarity, blockers, sequence, and what to do next.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "composition-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "audience": "operator",
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "audience overlay after voice selection",
+    "consumer": "composition layer",
+    "intent": "Make status, blockers, and next action immediately visible."
+  },
+  "preferences": {
+    "prefer": [
+      "status_then_action",
+      "blocker_first",
+      "one_next_step"
+    ],
+    "avoid": [
+      "long_framing",
+      "theoretical_digressions",
+      "soft_ambiguous_endings"
+    ]
+  },
+  "structures": [
+    {
+      "id": "operator_status_card",
+      "sequence": [
+        "status",
+        "blocker_or_clear_path",
+        "next_action"
+      ]
+    },
+    {
+      "id": "operator_issue_readout",
+      "sequence": [
+        "issue",
+        "owner_or_scope",
+        "followup_action"
+      ]
+    }
+  ],
+  "phrasingSignals": {
+    "en": [
+      "Current status: {{status}}.",
+      "The blocker is {{blocker}}.",
+      "The next useful move is {{nextAction}}."
+    ],
+    "pt": [
+      "Status atual: {{status}}.",
+      "O bloqueio e {{blocker}}.",
+      "O proximo passo util e {{nextAction}}."
+    ]
+  },
+  "guardrails": [
+    "Do not hide the blocker after background detail.",
+    "Do not leave the answer without a clear next step when the workflow is actionable.",
+    "Do not inflate a routine status readout into a long narrative."
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "operator_style_prefers_action",
+        "expect": {
+          "prefer": "status_then_action"
+        }
+      }
+    ]
+  }
+}

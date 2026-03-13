@@ -44,9 +44,52 @@
           "scope": "perUserPerHour"
         },
         "expect": {
-          "inputTokens": 500000,
-          "outputTokens": 100000,
+          "inputTokens": 500000
+        }
+      },
+      {
+        "id": "TOKEN_RATE_LIMITS_T_002",
+        "input": {
+          "scope": "perUserPerHour"
+        },
+        "expect": {
+          "outputTokens": 100000
+        }
+      },
+      {
+        "id": "TOKEN_RATE_LIMITS_T_003",
+        "input": {
+          "scope": "perUserPerHour"
+        },
+        "expect": {
           "costUsd": 1
+        }
+      },
+      {
+        "id": "TOKEN_RATE_LIMITS_T_004",
+        "input": {
+          "scope": "perUserPerDay"
+        },
+        "expect": {
+          "inputTokens": 2000000
+        }
+      },
+      {
+        "id": "TOKEN_RATE_LIMITS_T_005",
+        "input": {
+          "scope": "perUserPerDay"
+        },
+        "expect": {
+          "outputTokens": 500000
+        }
+      },
+      {
+        "id": "TOKEN_RATE_LIMITS_T_006",
+        "input": {
+          "scope": "perUserPerDay"
+        },
+        "expect": {
+          "costUsd": 5
         }
       }
     ]

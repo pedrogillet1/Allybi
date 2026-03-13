@@ -33,13 +33,6 @@
       "i do not have access",
       "i'm unable to access"
     ],
-    "integrationHooks": {
-      "refusalPhrasesBankId": "refusal_phrases",
-      "bannedPhrasesBankId": "banned_phrases",
-      "clarificationBankId": "clarification_phrases",
-      "privacyMinimalRulesBankId": "privacy_minimal_rules",
-      "hallucinationGuardsBankId": "hallucination_guards"
-    },
     "deterministic": true,
     "dedupe": true,
     "sortBy": "id"
@@ -343,29 +336,45 @@
         }
       },
       {
-        "id": "RPT_0002_privacy_sensitive_routes_refusal",
+        "id": "REFUSE_T_002",
         "input": {
           "signals": {
             "policy": {
-              "sensitivePersonalDataExtraction": true
+              "selfHarm": true
             }
           }
         },
         "expect": {
-          "category": "privacy_sensitive_extraction"
+          "category": "self_harm",
+          "action": "refuse_and_redirect"
         }
       },
       {
-        "id": "RPT_0003_copyright_routes_refusal",
+        "id": "REFUSE_T_003",
         "input": {
           "signals": {
             "policy": {
-              "copyright": true
+              "selfHarm": true
             }
           }
         },
         "expect": {
-          "category": "copyright_violation"
+          "category": "self_harm",
+          "action": "refuse_and_redirect"
+        }
+      },
+      {
+        "id": "REFUSE_T_004",
+        "input": {
+          "signals": {
+            "policy": {
+              "selfHarm": true
+            }
+          }
+        },
+        "expect": {
+          "category": "self_harm",
+          "action": "refuse_and_redirect"
         }
       }
     ]

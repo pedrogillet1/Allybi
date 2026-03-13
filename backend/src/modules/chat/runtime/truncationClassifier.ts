@@ -17,6 +17,18 @@ const TRIM_REPAIR_CODES = new Set([
 
 export const SEMANTIC_TRUNCATION_DETECTOR_VERSION = "semantic_v2";
 
+export interface TruncationClassifierConfig {
+  semanticWordThreshold: number;
+  semanticCharThreshold: number;
+  enabledByDefault: boolean;
+}
+
+const DEFAULT_TRUNCATION_CLASSIFIER_CONFIG: TruncationClassifierConfig = {
+  semanticWordThreshold: 10,
+  semanticCharThreshold: 120,
+  enabledByDefault: true,
+};
+
 export interface ProviderTruncationState {
   occurred: boolean;
   reason: string | null;
@@ -94,7 +106,10 @@ function endsWithContinuationPunctuation(text: string): boolean {
   return /[,:;\-\/\\(“"']$/.test(text);
 }
 
-function looksSemanticallyIncomplete(text: string): boolean {
+function looksSemanticallyIncomplete(
+  text: string,
+  config: TruncationClassifierConfig,
+): boolean {
   const value = String(text || "").trim();
   if (!value) return true;
   if (hasUnbalancedMarkdownOrDelimiters(value)) return true;
@@ -106,8 +121,8 @@ function looksSemanticallyIncomplete(text: string): boolean {
     .split(/\s+/)
     .map((part) => part.trim())
     .filter(Boolean);
-  if (words.length >= 10) return true;
-  if (value.length >= 120) return true;
+  if (words.length >= config.semanticWordThreshold) return true;
+  if (value.length >= config.semanticCharThreshold) return true;
   return false;
 }
 
@@ -130,7 +145,12 @@ export function classifyProviderTruncation(
 
 export function classifyVisibleTruncation(
   input: VisibleTruncationInput,
+  config: Partial<TruncationClassifierConfig> = {},
 ): SemanticTruncationState {
+  const resolvedConfig = {
+    ...DEFAULT_TRUNCATION_CLASSIFIER_CONFIG,
+    ...config,
+  };
   const signals: string[] = [];
   const repairs = Array.isArray(input.enforcementRepairs)
     ? input.enforcementRepairs
@@ -142,7 +162,10 @@ export function classifyVisibleTruncation(
 
   if (repairs.some((repair) => TRIM_REPAIR_CODES.has(String(repair || "")))) {
     signals.push("enforcer_trim_repair");
-    const incompleteAfterTrim = looksSemanticallyIncomplete(input.finalText);
+    const incompleteAfterTrim = looksSemanticallyIncomplete(
+      input.finalText,
+      resolvedConfig,
+    );
     if (incompleteAfterTrim) {
       signals.push("semantic_incomplete_after_trim");
       return {
@@ -170,7 +193,7 @@ export function classifyVisibleTruncation(
     };
   }
 
-  if (looksSemanticallyIncomplete(input.finalText)) {
+  if (looksSemanticallyIncomplete(input.finalText, resolvedConfig)) {
     signals.push("provider_overflow");
     signals.push("semantic_incomplete");
     return {
@@ -191,15 +214,9 @@ export function classifyVisibleTruncation(
   };
 }
 
-export function isSemanticTruncationV2Enabled(env = process.env): boolean {
-  const value = String(env.TRUNCATION_SEMANTIC_V2_ENABLED || "")
-    .trim()
-    .toLowerCase();
-  if (value === "1" || value === "true" || value === "yes" || value === "on") {
-    return true;
-  }
-  if (value === "0" || value === "false" || value === "no" || value === "off") {
-    return false;
-  }
-  return true;
+export function isSemanticTruncationV2Enabled(
+  env?: NodeJS.ProcessEnv,
+): boolean {
+  return resolveTruncationRuntimeConfig(env).semanticTruncationV2;
 }
+import { resolveTruncationRuntimeConfig } from "../config/chatRuntimeConfig";

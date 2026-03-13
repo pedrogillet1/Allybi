@@ -25,7 +25,8 @@
     "domain": "finance",
     "deterministic": true,
     "dedupe": true,
-    "sortBy": "id"
+    "sortBy": "id",
+    "configModeOnly": true
   },
   "domain": "finance",
   "framework": {
@@ -1567,7 +1568,33 @@
   "tests": {
     "cases": [
       {
-        "id": "FIN_DEC_SMOKE_001"
+        "id": "DECISION_SUPPORT_FINANCE_T_001",
+        "input": {},
+        "expect": {
+          "requireOptions": true
+        }
+      },
+      {
+        "id": "DECISION_SUPPORT_FINANCE_T_002",
+        "input": {},
+        "expect": {
+          "requireRiskTradeoffs": true
+        }
+      },
+      {
+        "id": "DECISION_SUPPORT_FINANCE_T_003",
+        "input": {},
+        "expect": {
+          "requireEvidenceSummary": true,
+          "requireUncertaintyStatement": true
+        }
+      },
+      {
+        "id": "DECISION_SUPPORT_FINANCE_T_004",
+        "input": {},
+        "expect": {
+          "minimumOptionCount": 2
+        }
       }
     ]
   }

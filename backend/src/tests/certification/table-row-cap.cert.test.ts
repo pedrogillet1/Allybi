@@ -1,6 +1,7 @@
 import { describe, expect, test } from "@jest/globals";
 
-import { RetrievalEngineService } from "../../services/core/retrieval/retrievalEngine.service";
+import { RetrievalEngineService } from "../../services/core/retrieval/v2/RetrievalOrchestrator.service";
+import { createDefaultQueryNormalizer } from "../../services/core/retrieval/v2/DefaultQueryNormalizer.service";
 
 function makeRowCapEngine(bankMaxRows: number): RetrievalEngineService {
   const banks: Record<string, unknown> = {
@@ -92,6 +93,7 @@ function makeRowCapEngine(bankMaxRows: number): RetrievalEngineService {
     semanticIndex as any,
     lexicalIndex as any,
     structuralIndex as any,
+    createDefaultQueryNormalizer(),
   );
 }
 

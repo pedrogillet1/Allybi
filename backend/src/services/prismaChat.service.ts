@@ -20,10 +20,10 @@ import type {
   AnswerClass,
   NavType,
 } from "./chatRuntime.contracts";
-import type { EncryptedChatRepo } from "./chat/encryptedChatRepo.service";
-import type { EncryptedChatContextService } from "./chat/encryptedChatContext.service";
+import type { EncryptedChatRepo } from "../modules/chat/infrastructure/encryptedChatRepo.service";
+import type { EncryptedChatContextService } from "../modules/chat/infrastructure/encryptedChatContext.service";
 import type { ConversationMemoryService } from "./memory/conversationMemory.service";
-import { ChatKernelService } from "./chat/chatKernel.service";
+import { ChatKernelService } from "../modules/chat/application/chatKernel.service";
 
 export type {
   ChatEngine,

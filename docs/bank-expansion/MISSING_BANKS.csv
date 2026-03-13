@@ -1,0 +1,109 @@
+target_family,priority,create_path,rationale,parallel_group,owner_risk
+composition_brain,P0,backend/src/data_banks/document_intelligence/compose/answer_arc_recipes.any.json,"Missing answer arc planner",composition_lane,surface_shared
+composition_brain,P0,backend/src/data_banks/document_intelligence/compose/anti_monotony_transforms.any.json,"Missing monotony breaker bank",composition_lane,surface_shared
+composition_brain,P0,backend/src/data_banks/document_intelligence/compose/contrastive_style_examples.any.json,"Missing good-vs-bad premium style examples",composition_lane,surface_shared
+composition_brain,P0,backend/src/data_banks/document_intelligence/compose/grounded_narrative_moves.any.json,"Missing evidence-to-narrative move catalog",composition_lane,surface_shared
+composition_brain,P1,backend/src/data_banks/document_intelligence/compose/sentence_rhythm_profiles.any.json,"Missing cadence and sentence rhythm control",composition_lane,surface_shared
+composition_brain,P1,backend/src/data_banks/document_intelligence/compose/repair_rewrite_strategies.any.json,"Missing self-repair rewrite transforms",composition_lane,surface_shared
+composition_brain,P1,backend/src/data_banks/document_intelligence/compose/domain_voice_overlays.any.json,"Missing domain-specific voice overlays",composition_lane,surface_shared
+composition_brain,P1,backend/src/data_banks/document_intelligence/compose/audience_adaptation_profiles.any.json,"Missing audience adaptation bank",composition_lane,surface_shared
+clarification_repair_brain,P0,backend/src/data_banks/ambiguity/clarification_strategy_catalog.any.json,"Missing central clarify-vs-autopick strategy catalog",clarification_lane,clarification_shared
+clarification_repair_brain,P0,backend/src/data_banks/ambiguity/recovery_playbooks.any.json,"Missing recovery playbooks for failed clarification and wrong picks",clarification_lane,clarification_shared
+clarification_repair_brain,P1,backend/src/data_banks/ambiguity/autopick_explanations.any.json,"Missing concise autopick explanation bank",clarification_lane,clarification_shared
+clarification_repair_brain,P1,backend/src/data_banks/quality/document_intelligence/clarification_repair_gates.any.json,"Missing post-generation clarify/repair quality gates",clarification_lane,clarification_shared
+clarification_repair_brain,P1,backend/src/data_banks/microcopy/clarification_option_microcopy.any.json,"Missing option-label microcopy bank",clarification_lane,clarification_shared
+clarification_repair_brain,P1,backend/src/data_banks/prompts/repair_response_prompt.any.json,"Missing repair prompt for bad first-pass answers",clarification_lane,clarification_shared
+assistant_orchestration_brain,P0,backend/src/data_banks/policies/tool_choice_policy.any.json,"Missing tool selection policy",orchestration_lane,orchestration_shared
+assistant_orchestration_brain,P0,backend/src/data_banks/policies/execution_escalation_policy.any.json,"Missing escalation policy across answer clarify retrieve edit",orchestration_lane,orchestration_shared
+assistant_orchestration_brain,P0,backend/src/data_banks/policies/planner_executor_handoff.any.json,"Missing planner executor handoff contract",orchestration_lane,orchestration_shared
+assistant_orchestration_brain,P1,backend/src/data_banks/llm/model_role_contracts.any.json,"Missing model-role specialization contracts",orchestration_lane,orchestration_shared
+assistant_orchestration_brain,P1,backend/src/data_banks/llm/provider_selection_policy.any.json,"Missing provider and model selection policy",orchestration_lane,orchestration_shared
+assistant_orchestration_brain,P1,backend/src/data_banks/routing/orchestration_priority.any.json,"Missing orchestration priority map",orchestration_lane,orchestration_shared
+assistant_orchestration_brain,P1,backend/src/data_banks/prompts/tool_result_synthesis.any.json,"Missing prompt for tool-result synthesis",orchestration_lane,orchestration_shared
+assistant_orchestration_brain,P1,backend/src/data_banks/prompts/final_answer_repair_prompt.any.json,"Missing last-mile answer repair prompt",orchestration_lane,orchestration_shared
+field_exactness_evidence_brain,P0,backend/src/data_banks/document_intelligence/validation/field_exactness_policy.any.json,"Missing field exactness contract",evidence_lane,evidence_shared
+field_exactness_evidence_brain,P0,backend/src/data_banks/document_intelligence/validation/evidence_trace_contract.any.json,"Missing evidence traceability contract",evidence_lane,evidence_shared
+field_exactness_evidence_brain,P0,backend/src/data_banks/document_intelligence/validation/span_binding_rules.any.json,"Missing span-to-claim binding rules",evidence_lane,evidence_shared
+field_exactness_evidence_brain,P1,backend/src/data_banks/document_intelligence/retrieval/field_binding_rules.any.json,"Missing retrieval-time field binding rules",evidence_lane,evidence_shared
+field_exactness_evidence_brain,P1,backend/src/data_banks/document_intelligence/retrieval/cross_format_alignment_rules.any.json,"Missing cross-format evidence alignment rules",evidence_lane,evidence_shared
+field_exactness_evidence_brain,P1,backend/src/data_banks/quality/document_intelligence/field_exactness.any.json,"Missing field exactness quality bank",evidence_lane,evidence_shared
+field_exactness_evidence_brain,P1,backend/src/data_banks/quality/document_intelligence/evidence_trace.any.json,"Missing evidence trace quality bank",evidence_lane,evidence_shared
+eval_proof_brain,P0,backend/src/data_banks/document_intelligence/eval/assistant_style_harsh.qa.jsonl,"Missing harsh style eval suite",eval_lane,eval_shared
+eval_proof_brain,P0,backend/src/data_banks/document_intelligence/eval/clarification_repair.qa.jsonl,"Missing clarification and repair eval suite",eval_lane,eval_shared
+eval_proof_brain,P0,backend/src/data_banks/document_intelligence/eval/evidence_trace.qa.jsonl,"Missing evidence trace eval suite",eval_lane,eval_shared
+eval_proof_brain,P0,backend/src/data_banks/document_intelligence/eval/field_exactness.qa.jsonl,"Missing field exactness eval suite",eval_lane,eval_shared
+eval_proof_brain,P1,backend/src/data_banks/document_intelligence/eval/humanity_and_variation.qa.jsonl,"Missing human-likeness and variation eval suite",eval_lane,eval_shared
+eval_proof_brain,P1,backend/src/data_banks/document_intelligence/eval/orchestration_failover.qa.jsonl,"Missing orchestration failover eval suite",eval_lane,eval_shared
+eval_proof_brain,P1,backend/src/data_banks/document_intelligence/eval/wrong_doc_hardmode.qa.jsonl,"Missing hard-mode wrong-doc eval suite",eval_lane,eval_shared
+eval_proof_brain,P1,backend/src/data_banks/quality/training/style_negative_examples.jsonl,"Missing negative style training set",eval_lane,eval_shared
+eval_proof_brain,P1,backend/src/data_banks/quality/training/clarification_negative_examples.jsonl,"Missing negative clarification training set",eval_lane,eval_shared
+governance_hygiene_brain,P0,backend/src/data_banks/manifest/bank_owners.any.json,"Missing ownership SSOT",governance_lane,registry_shared
+governance_hygiene_brain,P0,backend/src/data_banks/manifest/bank_quality_tiers.any.json,"Missing quality-tier contract",governance_lane,registry_shared
+governance_hygiene_brain,P0,backend/src/data_banks/manifest/bank_sharding_policy.any.json,"Missing sharding policy SSOT",governance_lane,registry_shared
+governance_hygiene_brain,P0,backend/src/data_banks/manifest/bank_parallel_edit_locks.any.json,"Missing merge-safe edit lock map",governance_lane,registry_shared
+governance_hygiene_brain,P1,backend/src/data_banks/manifest/bank_lifecycle_policy.any.json,"Missing lifecycle policy",governance_lane,registry_shared
+governance_hygiene_brain,P1,backend/src/data_banks/manifest/bank_generation_contract.any.json,"Missing generation contract",governance_lane,registry_shared
+new_domain_packs,P0,backend/src/data_banks/document_intelligence/domains/procurement/domain_profile.any.json,"Missing procurement domain pack core profile",domain_procurement_lane,domain_registry_shared
+new_domain_packs,P0,backend/src/data_banks/document_intelligence/domains/procurement/domain_detection_rules.any.json,"Missing procurement domain detection",domain_procurement_lane,domain_registry_shared
+new_domain_packs,P0,backend/src/data_banks/document_intelligence/domains/procurement/evidence_requirements.any.json,"Missing procurement evidence requirements",domain_procurement_lane,domain_registry_shared
+new_domain_packs,P0,backend/src/data_banks/document_intelligence/domains/procurement/reasoning_scaffolds.any.json,"Missing procurement reasoning scaffolds",domain_procurement_lane,domain_registry_shared
+new_domain_packs,P0,backend/src/data_banks/document_intelligence/domains/procurement/validation_policies.any.json,"Missing procurement validation policies",domain_procurement_lane,domain_registry_shared
+new_domain_packs,P0,backend/src/data_banks/document_intelligence/domains/procurement/redaction_and_safety_rules.any.json,"Missing procurement redaction and safety rules",domain_procurement_lane,domain_registry_shared
+new_domain_packs,P0,backend/src/data_banks/document_intelligence/domains/procurement/retrieval_strategies.any.json,"Missing procurement retrieval strategies",domain_procurement_lane,domain_registry_shared
+new_domain_packs,P1,backend/src/data_banks/document_intelligence/domains/procurement/answer_style_bank.any.json,"Missing procurement answer style bank",domain_procurement_lane,domain_registry_shared
+new_domain_packs,P1,backend/src/data_banks/document_intelligence/domains/procurement/disclaimer_policy.any.json,"Missing procurement disclaimer policy",domain_procurement_lane,domain_registry_shared
+new_domain_packs,P1,backend/src/data_banks/document_intelligence/domains/procurement/abbreviations/procurement.en.any.json,"Missing procurement EN abbreviations",domain_procurement_lane,domain_registry_shared
+new_domain_packs,P1,backend/src/data_banks/document_intelligence/domains/procurement/abbreviations/procurement.pt.any.json,"Missing procurement PT abbreviations",domain_procurement_lane,domain_registry_shared
+new_domain_packs,P1,backend/src/data_banks/document_intelligence/domains/procurement/lexicons/procurement.en.any.json,"Missing procurement EN lexicon",domain_procurement_lane,domain_registry_shared
+new_domain_packs,P1,backend/src/data_banks/document_intelligence/domains/procurement/lexicons/procurement.pt.any.json,"Missing procurement PT lexicon",domain_procurement_lane,domain_registry_shared
+new_domain_packs,P0,backend/src/data_banks/document_intelligence/domains/procurement/doc_types/doc_type_catalog.any.json,"Missing procurement doc type catalog",domain_procurement_lane,domain_registry_shared
+new_domain_packs,P0,backend/src/data_banks/document_intelligence/eval/domain_specific/procurement/doc_type_coverage.qa.jsonl,"Missing procurement doc type coverage eval",domain_procurement_lane,domain_registry_shared
+new_domain_packs,P1,backend/src/data_banks/document_intelligence/eval/domain_specific/procurement/core.qa.jsonl,"Missing procurement core eval suite",domain_procurement_lane,domain_registry_shared
+new_domain_packs,P0,backend/src/data_banks/document_intelligence/domains/security_compliance/domain_profile.any.json,"Missing security_compliance domain pack core profile",domain_security_compliance_lane,domain_registry_shared
+new_domain_packs,P0,backend/src/data_banks/document_intelligence/domains/security_compliance/domain_detection_rules.any.json,"Missing security_compliance domain detection",domain_security_compliance_lane,domain_registry_shared
+new_domain_packs,P0,backend/src/data_banks/document_intelligence/domains/security_compliance/evidence_requirements.any.json,"Missing security_compliance evidence requirements",domain_security_compliance_lane,domain_registry_shared
+new_domain_packs,P0,backend/src/data_banks/document_intelligence/domains/security_compliance/reasoning_scaffolds.any.json,"Missing security_compliance reasoning scaffolds",domain_security_compliance_lane,domain_registry_shared
+new_domain_packs,P0,backend/src/data_banks/document_intelligence/domains/security_compliance/validation_policies.any.json,"Missing security_compliance validation policies",domain_security_compliance_lane,domain_registry_shared
+new_domain_packs,P0,backend/src/data_banks/document_intelligence/domains/security_compliance/redaction_and_safety_rules.any.json,"Missing security_compliance redaction and safety rules",domain_security_compliance_lane,domain_registry_shared
+new_domain_packs,P0,backend/src/data_banks/document_intelligence/domains/security_compliance/retrieval_strategies.any.json,"Missing security_compliance retrieval strategies",domain_security_compliance_lane,domain_registry_shared
+new_domain_packs,P1,backend/src/data_banks/document_intelligence/domains/security_compliance/answer_style_bank.any.json,"Missing security_compliance answer style bank",domain_security_compliance_lane,domain_registry_shared
+new_domain_packs,P1,backend/src/data_banks/document_intelligence/domains/security_compliance/disclaimer_policy.any.json,"Missing security_compliance disclaimer policy",domain_security_compliance_lane,domain_registry_shared
+new_domain_packs,P1,backend/src/data_banks/document_intelligence/domains/security_compliance/abbreviations/security_compliance.en.any.json,"Missing security_compliance EN abbreviations",domain_security_compliance_lane,domain_registry_shared
+new_domain_packs,P1,backend/src/data_banks/document_intelligence/domains/security_compliance/abbreviations/security_compliance.pt.any.json,"Missing security_compliance PT abbreviations",domain_security_compliance_lane,domain_registry_shared
+new_domain_packs,P1,backend/src/data_banks/document_intelligence/domains/security_compliance/lexicons/security_compliance.en.any.json,"Missing security_compliance EN lexicon",domain_security_compliance_lane,domain_registry_shared
+new_domain_packs,P1,backend/src/data_banks/document_intelligence/domains/security_compliance/lexicons/security_compliance.pt.any.json,"Missing security_compliance PT lexicon",domain_security_compliance_lane,domain_registry_shared
+new_domain_packs,P0,backend/src/data_banks/document_intelligence/domains/security_compliance/doc_types/doc_type_catalog.any.json,"Missing security_compliance doc type catalog",domain_security_compliance_lane,domain_registry_shared
+new_domain_packs,P0,backend/src/data_banks/document_intelligence/eval/domain_specific/security_compliance/doc_type_coverage.qa.jsonl,"Missing security_compliance doc type coverage eval",domain_security_compliance_lane,domain_registry_shared
+new_domain_packs,P1,backend/src/data_banks/document_intelligence/eval/domain_specific/security_compliance/core.qa.jsonl,"Missing security_compliance core eval suite",domain_security_compliance_lane,domain_registry_shared
+new_domain_packs,P0,backend/src/data_banks/document_intelligence/domains/sales_revops/domain_profile.any.json,"Missing sales_revops domain pack core profile",domain_sales_revops_lane,domain_registry_shared
+new_domain_packs,P0,backend/src/data_banks/document_intelligence/domains/sales_revops/domain_detection_rules.any.json,"Missing sales_revops domain detection",domain_sales_revops_lane,domain_registry_shared
+new_domain_packs,P0,backend/src/data_banks/document_intelligence/domains/sales_revops/evidence_requirements.any.json,"Missing sales_revops evidence requirements",domain_sales_revops_lane,domain_registry_shared
+new_domain_packs,P0,backend/src/data_banks/document_intelligence/domains/sales_revops/reasoning_scaffolds.any.json,"Missing sales_revops reasoning scaffolds",domain_sales_revops_lane,domain_registry_shared
+new_domain_packs,P0,backend/src/data_banks/document_intelligence/domains/sales_revops/validation_policies.any.json,"Missing sales_revops validation policies",domain_sales_revops_lane,domain_registry_shared
+new_domain_packs,P0,backend/src/data_banks/document_intelligence/domains/sales_revops/redaction_and_safety_rules.any.json,"Missing sales_revops redaction and safety rules",domain_sales_revops_lane,domain_registry_shared
+new_domain_packs,P0,backend/src/data_banks/document_intelligence/domains/sales_revops/retrieval_strategies.any.json,"Missing sales_revops retrieval strategies",domain_sales_revops_lane,domain_registry_shared
+new_domain_packs,P1,backend/src/data_banks/document_intelligence/domains/sales_revops/answer_style_bank.any.json,"Missing sales_revops answer style bank",domain_sales_revops_lane,domain_registry_shared
+new_domain_packs,P1,backend/src/data_banks/document_intelligence/domains/sales_revops/disclaimer_policy.any.json,"Missing sales_revops disclaimer policy",domain_sales_revops_lane,domain_registry_shared
+new_domain_packs,P1,backend/src/data_banks/document_intelligence/domains/sales_revops/abbreviations/sales_revops.en.any.json,"Missing sales_revops EN abbreviations",domain_sales_revops_lane,domain_registry_shared
+new_domain_packs,P1,backend/src/data_banks/document_intelligence/domains/sales_revops/abbreviations/sales_revops.pt.any.json,"Missing sales_revops PT abbreviations",domain_sales_revops_lane,domain_registry_shared
+new_domain_packs,P1,backend/src/data_banks/document_intelligence/domains/sales_revops/lexicons/sales_revops.en.any.json,"Missing sales_revops EN lexicon",domain_sales_revops_lane,domain_registry_shared
+new_domain_packs,P1,backend/src/data_banks/document_intelligence/domains/sales_revops/lexicons/sales_revops.pt.any.json,"Missing sales_revops PT lexicon",domain_sales_revops_lane,domain_registry_shared
+new_domain_packs,P0,backend/src/data_banks/document_intelligence/domains/sales_revops/doc_types/doc_type_catalog.any.json,"Missing sales_revops doc type catalog",domain_sales_revops_lane,domain_registry_shared
+new_domain_packs,P0,backend/src/data_banks/document_intelligence/eval/domain_specific/sales_revops/doc_type_coverage.qa.jsonl,"Missing sales_revops doc type coverage eval",domain_sales_revops_lane,domain_registry_shared
+new_domain_packs,P1,backend/src/data_banks/document_intelligence/eval/domain_specific/sales_revops/core.qa.jsonl,"Missing sales_revops core eval suite",domain_sales_revops_lane,domain_registry_shared
+new_domain_packs,P0,backend/src/data_banks/document_intelligence/domains/customer_support/domain_profile.any.json,"Missing customer_support domain pack core profile",domain_customer_support_lane,domain_registry_shared
+new_domain_packs,P0,backend/src/data_banks/document_intelligence/domains/customer_support/domain_detection_rules.any.json,"Missing customer_support domain detection",domain_customer_support_lane,domain_registry_shared
+new_domain_packs,P0,backend/src/data_banks/document_intelligence/domains/customer_support/evidence_requirements.any.json,"Missing customer_support evidence requirements",domain_customer_support_lane,domain_registry_shared
+new_domain_packs,P0,backend/src/data_banks/document_intelligence/domains/customer_support/reasoning_scaffolds.any.json,"Missing customer_support reasoning scaffolds",domain_customer_support_lane,domain_registry_shared
+new_domain_packs,P0,backend/src/data_banks/document_intelligence/domains/customer_support/validation_policies.any.json,"Missing customer_support validation policies",domain_customer_support_lane,domain_registry_shared
+new_domain_packs,P0,backend/src/data_banks/document_intelligence/domains/customer_support/redaction_and_safety_rules.any.json,"Missing customer_support redaction and safety rules",domain_customer_support_lane,domain_registry_shared
+new_domain_packs,P0,backend/src/data_banks/document_intelligence/domains/customer_support/retrieval_strategies.any.json,"Missing customer_support retrieval strategies",domain_customer_support_lane,domain_registry_shared
+new_domain_packs,P1,backend/src/data_banks/document_intelligence/domains/customer_support/answer_style_bank.any.json,"Missing customer_support answer style bank",domain_customer_support_lane,domain_registry_shared
+new_domain_packs,P1,backend/src/data_banks/document_intelligence/domains/customer_support/disclaimer_policy.any.json,"Missing customer_support disclaimer policy",domain_customer_support_lane,domain_registry_shared
+new_domain_packs,P1,backend/src/data_banks/document_intelligence/domains/customer_support/abbreviations/customer_support.en.any.json,"Missing customer_support EN abbreviations",domain_customer_support_lane,domain_registry_shared
+new_domain_packs,P1,backend/src/data_banks/document_intelligence/domains/customer_support/abbreviations/customer_support.pt.any.json,"Missing customer_support PT abbreviations",domain_customer_support_lane,domain_registry_shared
+new_domain_packs,P1,backend/src/data_banks/document_intelligence/domains/customer_support/lexicons/customer_support.en.any.json,"Missing customer_support EN lexicon",domain_customer_support_lane,domain_registry_shared
+new_domain_packs,P1,backend/src/data_banks/document_intelligence/domains/customer_support/lexicons/customer_support.pt.any.json,"Missing customer_support PT lexicon",domain_customer_support_lane,domain_registry_shared
+new_domain_packs,P0,backend/src/data_banks/document_intelligence/domains/customer_support/doc_types/doc_type_catalog.any.json,"Missing customer_support doc type catalog",domain_customer_support_lane,domain_registry_shared
+new_domain_packs,P0,backend/src/data_banks/document_intelligence/eval/domain_specific/customer_support/doc_type_coverage.qa.jsonl,"Missing customer_support doc type coverage eval",domain_customer_support_lane,domain_registry_shared
+new_domain_packs,P1,backend/src/data_banks/document_intelligence/eval/domain_specific/customer_support/core.qa.jsonl,"Missing customer_support core eval suite",domain_customer_support_lane,domain_registry_shared

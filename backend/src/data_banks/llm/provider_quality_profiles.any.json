@@ -1,0 +1,152 @@
+{
+  "_meta": {
+    "id": "provider_quality_profiles",
+    "version": "1.0.0",
+    "description": "Quality acceptance and rejection profiles by model role and task family.",
+    "owner": "assistant-orchestrator",
+    "usedBy": [
+      "services/assistant/core/qualityGate.service.ts",
+      "services/llm/core/llmRouter.service.ts"
+    ],
+    "tests": [
+      "tests/llm/providerQualityProfiles.proof.test.ts"
+    ],
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13"
+  },
+  "config": {
+    "enabled": true
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "post_generation_post_validation",
+    "consumer": "quality gate",
+    "output": "accept_or_retry"
+  },
+  "profiles": [
+    {
+      "id": "planner_precision",
+      "role": "planner",
+      "checks": [
+        {
+          "id": "scope_follows_user_goal",
+          "minScore": 0.72
+        },
+        {
+          "id": "step_count_reasonable",
+          "maxSteps": 8
+        }
+      ],
+      "failureAction": "replan_with_clarifier"
+    },
+    {
+      "id": "research_precision",
+      "role": "researcher",
+      "checks": [
+        {
+          "id": "has_anchors",
+          "minCount": 1
+        },
+        {
+          "id": "tool_coverage_balance",
+          "requiredCoverage": [
+            "document_lookup",
+            "citation_fetch"
+          ]
+        }
+      ],
+      "failureAction": "tool_retry_with_evidence_retargeting"
+    },
+    {
+      "id": "evidence_fidelity",
+      "role": "evidence_specialist",
+      "checks": [
+        {
+          "id": "quote_traceability",
+          "mustHaveLineLevelAnchors": true
+        },
+        {
+          "id": "exception_handled",
+          "minScore": 0.8
+        }
+      ],
+      "failureAction": "retry_with_openai_authority"
+    },
+    {
+      "id": "numeric_integrity",
+      "role": "numeric_specialist",
+      "checks": [
+        {
+          "id": "units_bound",
+          "minScore": 0.9
+        },
+        {
+          "id": "variance_explicit",
+          "required": true
+        },
+        {
+          "id": "source_lineage_stated",
+          "required": true
+        }
+      ],
+      "failureAction": "shadow_compare_then_reduce_claims"
+    },
+    {
+      "id": "synthesis_guardrails",
+      "role": "synthesizer",
+      "checks": [
+        {
+          "id": "uncertainty_tag_present_if_weak",
+          "minConfidence": 0.7
+        },
+        {
+          "id": "no_overclaim",
+          "maxClaimStrength": "medium"
+        },
+        {
+          "id": "readability_floor",
+          "maxRepetitionScore": 0.35
+        }
+      ],
+      "failureAction": "shadow_compare_then_repair"
+    },
+    {
+      "id": "risk_gating",
+      "role": "risk_orchestrator",
+      "checks": [
+        {
+          "id": "critical_terms_neutral",
+          "minScore": 0.84
+        },
+        {
+          "id": "unsafe_claim_detected",
+          "maxAllowed": 0
+        }
+      ],
+      "failureAction": "escalate_to_decline_or_clarify"
+    }
+  ],
+  "compareHooks": {
+    "enabled": true,
+    "appliesWhen": [
+      "highImpactUserQuery",
+      "risk_gating_failures"
+    ],
+    "shadowModel": "openai:gpt-5.2",
+    "mergePolicy": "conservative_truth"
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "numeric_profile_requires_variance",
+        "input": {
+          "role": "numeric_specialist"
+        },
+        "expect": {
+          "requiredCheck": "variance_explicit"
+        }
+      }
+    ]
+  }
+}

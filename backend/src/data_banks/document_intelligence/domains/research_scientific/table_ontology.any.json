@@ -1,0 +1,162 @@
+{
+  "_meta": {
+    "id": "di_research_scientific_table_ontology",
+    "version": "1.0.0",
+    "description": "Research table ontology for cohort balancing, endpoint readouts, and model diagnostics.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/orchestration/tableResolver.service.ts",
+      "services/core/extraction/tableExtraction.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/domain-validation.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "research_scientific",
+    "axisConfidenceThreshold": 0.72,
+    "allowNestedTables": true
+  },
+  "domain": "research_scientific",
+  "tableTypes": [
+    {
+      "id": "rs_table_sample_flow",
+      "name": {
+        "en": "Sample Flow Diagram Table",
+        "pt": "Tabela de Fluxo da Amostra"
+      },
+      "aliases": [
+        "consort",
+        "attrition",
+        "fluxo da amostra"
+      ],
+      "columns": [
+        "cohort_stage",
+        "count",
+        "drop_reason",
+        "timepoint"
+      ],
+      "quality": {
+        "requiresNumericColumns": [
+          "count"
+        ],
+        "riskIfMissing": "high"
+      }
+    },
+    {
+      "id": "rs_table_baseline_table",
+      "name": {
+        "en": "Baseline Characteristics",
+        "pt": "Caracterização Basal"
+      },
+      "aliases": [
+        "baseline",
+        "participant baseline",
+        "características iniciais"
+      ],
+      "columns": [
+        "variable",
+        "unit",
+        "group_a",
+        "group_b",
+        "p_value",
+        "difference"
+      ],
+      "quality": {
+        "requiresNumericColumns": [
+          "p_value",
+          "difference"
+        ],
+        "riskIfMissing": "high"
+      }
+    },
+    {
+      "id": "rs_table_primary_outcomes",
+      "name": {
+        "en": "Primary Outcomes",
+        "pt": "Desfechos Primários"
+      },
+      "aliases": [
+        "primary endpoint",
+        "outcome table",
+        "resposta primária"
+      ],
+      "columns": [
+        "endpoint",
+        "n",
+        "estimate",
+        "ci_low",
+        "ci_high",
+        "p_value",
+        "significance"
+      ],
+      "quality": {
+        "requiresNumericColumns": [
+          "estimate",
+          "ci_low",
+          "ci_high",
+          "p_value"
+        ],
+        "riskIfMissing": "critical"
+      }
+    },
+    {
+      "id": "rs_table_subgroup_analysis",
+      "name": {
+        "en": "Subgroup Analysis",
+        "pt": "Análise de Subgrupos"
+      },
+      "aliases": [
+        "subgroup",
+        "stratified analysis",
+        "subgrupo"
+      ],
+      "columns": [
+        "subgroup",
+        "endpoint",
+        "estimate",
+        "p_for_interaction",
+        "sample_size",
+        "n_events"
+      ],
+      "quality": {
+        "requiresNumericColumns": [
+          "estimate",
+          "p_for_interaction"
+        ],
+        "riskIfMissing": "high"
+      }
+    },
+    {
+      "id": "rs_table_sensitivity_runs",
+      "name": {
+        "en": "Sensitivity and Robustness",
+        "pt": "Análises de Sensibilidade"
+      },
+      "aliases": [
+        "sensitivity analysis",
+        "robustness",
+        "análise de robustez"
+      ],
+      "columns": [
+        "scenario",
+        "assumption",
+        "estimate",
+        "ci",
+        "direction_change"
+      ],
+      "quality": {
+        "requiresScenarioColumn": [
+          "scenario"
+        ],
+        "riskIfMissing": "medium"
+      }
+    }
+  ]
+}

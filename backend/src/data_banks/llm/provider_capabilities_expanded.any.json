@@ -1,0 +1,168 @@
+{
+  "_meta": {
+    "id": "provider_capabilities_expanded",
+    "version": "1.0.0",
+    "description": "Expanded and role-aligned provider capabilities consumed by orchestration policy.",
+    "owner": "assistant-orchestrator",
+    "usedBy": [
+      "services/assistant/core/assistantOrchestrator.service.ts",
+      "services/llm/core/llmRouter.service.ts"
+    ],
+    "tests": [
+      "tests/llm/providerCapabilitiesExpanded.proof.test.ts"
+    ],
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13"
+  },
+  "config": {
+    "enabled": true
+  },
+  "providers": [
+    {
+      "provider": "gemini",
+      "model": "gemini-2.5-flash",
+      "costClass": "low",
+      "latencyClass": "fast",
+      "reliability": 0.94,
+      "maxOutputTokens": 8192,
+      "maxInputTokens": 1048576,
+      "features": {
+        "streaming": true,
+        "toolCalling": true,
+        "jsonMode": false,
+        "vision": true
+      },
+      "supportedRoles": [
+        "planner",
+        "researcher",
+        "synthesizer"
+      ],
+      "optimalFor": [
+        "clarification_repair",
+        "comparison_synthesis",
+        "operational_workflow"
+      ],
+      "antiPatterns": [
+        "high_confidence_numeric_certification",
+        "legal_clause_edge_cases"
+      ]
+    },
+    {
+      "provider": "openai",
+      "model": "gpt-5-mini",
+      "costClass": "medium",
+      "latencyClass": "medium",
+      "reliability": 0.97,
+      "maxOutputTokens": 16384,
+      "maxInputTokens": 128000,
+      "features": {
+        "streaming": true,
+        "toolCalling": true,
+        "jsonMode": true,
+        "vision": true
+      },
+      "supportedRoles": [
+        "planner",
+        "researcher",
+        "synthesizer",
+        "risk_orchestrator",
+        "numeric_specialist"
+      ],
+      "optimalFor": [
+        "synthesis_guardrails",
+        "decision_memo",
+        "numeric_checks"
+      ],
+      "antiPatterns": [
+        "deep_quantum_quotes"
+      ]
+    },
+    {
+      "provider": "openai",
+      "model": "gpt-5.2",
+      "costClass": "high",
+      "latencyClass": "high",
+      "reliability": 0.99,
+      "maxOutputTokens": 16384,
+      "maxInputTokens": 128000,
+      "features": {
+        "streaming": true,
+        "toolCalling": true,
+        "jsonMode": true,
+        "vision": true
+      },
+      "supportedRoles": [
+        "planner",
+        "researcher",
+        "evidence_specialist",
+        "numeric_specialist",
+        "synthesizer",
+        "risk_orchestrator"
+      ],
+      "optimalFor": [
+        "quote_fidelity",
+        "numeric_integrity",
+        "policy_reasoning",
+        "final_decision_memo"
+      ],
+      "antiPatterns": [
+        "low_bandwidth_mode_without_justification"
+      ]
+    },
+    {
+      "provider": "local",
+      "model": "local-default",
+      "costClass": "free",
+      "latencyClass": "fast",
+      "reliability": 0.82,
+      "maxOutputTokens": 2048,
+      "maxInputTokens": 120000,
+      "features": {
+        "streaming": true,
+        "toolCalling": false,
+        "jsonMode": false,
+        "vision": false
+      },
+      "supportedRoles": [
+        "planner"
+      ],
+      "optimalFor": [
+        "clarification_repair",
+        "operational_workflow_low_risk"
+      ],
+      "antiPatterns": [
+        "high_risk_domains",
+        "quote_rewrite",
+        "numeric_integrity"
+      ]
+    }
+  ],
+  "routingSignals": {
+    "forbid": {
+      "high_risk_domains": [
+        "medical",
+        "legal"
+      ],
+      "high_risk_taskFamilies": [
+        "numeric_audit",
+        "document_grounding"
+      ]
+    }
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "openai_authority_marked_high_reliability",
+        "input": {
+          "provider": "openai",
+          "model": "gpt-5.2"
+        },
+        "expect": {
+          "reliability": 0.99
+        }
+      }
+    ]
+  }
+}

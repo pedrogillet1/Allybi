@@ -1,0 +1,188 @@
+{
+  "_meta": {
+    "id": "ops_ambiguity_patterns",
+    "version": "1.0.0",
+    "description": "Operations ambiguity patterns for actor-role mapping, status locks, and operational metric integrity.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "domain": "ops",
+    "maxQuestions": 1,
+    "preferClarifyOverSpeculation": true
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "post-retrieval before role locks and cross-source synthesis",
+    "consumer": "ops ambiguity resolver",
+    "intent": "Resolve operator-role confusion and lifecycle ambiguities before operational conclusions.",
+    "emittedSignals": [
+      "opsAmbiguityType",
+      "opsScopeWindowCollision",
+      "opsActorRoleCollision"
+    ]
+  },
+  "patterns": [
+    {
+      "id": "OPS_AMB_001_scope_window_collision",
+      "type": "time_window_collision",
+      "triggerSignals": [
+        "query.omitsWindow == true",
+        "multipleWindowSignalsInScope",
+        "windowTypeMixed (shift/reporting/maintenance_cycle)"
+      ],
+      "askQuestion": "Should this answer use most recent window, scheduled window, or full selected reporting window?"
+    },
+    {
+      "id": "OPS_AMB_002_role_collision_requestor_assignee",
+      "type": "actor_role_collision",
+      "triggerSignals": [
+        "queryIncludesOperatorTerm",
+        "multipleActorIdsForSameTask",
+        "samePersonAppearsAsRequestorAndAssignee"
+      ],
+      "askQuestion": "Bind actor role for this query as requestor, assignee, approver, reviewer, technician, consignee, or warehouse owner?"
+    },
+    {
+      "id": "OPS_AMB_003_status_merge_risk",
+      "type": "status_mix_risk",
+      "triggerSignals": [
+        "queryIncludes_open_and_completed_metrics",
+        "workOrdersFromMultipleLifecycleStates",
+        "statusNotLocked"
+      ],
+      "askQuestion": "Keep open and closed/completed work orders separate, or return a staged matrix by status?"
+    },
+    {
+      "id": "OPS_AMB_004_unit_threshold_collision",
+      "type": "unit_scale_collision",
+      "triggerSignals": [
+        "queryUsesThresholdMetrics",
+        "mixedUnitsInScope",
+        "targetScaleNotExplicit"
+      ],
+      "askQuestion": "Compare each unit family separately, or normalize to one unit family with explicit conversion basis?"
+    },
+    {
+      "id": "OPS_AMB_005_due_vs_completion_date_collision",
+      "type": "date_axis_collision",
+      "triggerSignals": [
+        "maintenanceQueryWithDateRange",
+        "completionAndScheduledDatesDetected",
+        "queryOmitsDateAxis"
+      ],
+      "askQuestion": "Use scheduled date, completion date, or requested date as the basis for readiness and delay calculations?"
+    },
+    {
+      "id": "OPS_AMB_006_work_order_log_merge_collision",
+      "type": "document_source_collision",
+      "triggerSignals": [
+        "queryTargetsBothWorkOrderAndMaintenanceLog",
+        "requestNotLinkedToExecutionRecords"
+      ],
+      "askQuestion": "Use work order scope only, maintenance execution scope only, or joined evidence where request, execution, and completion are linked?"
+    },
+    {
+      "id": "OPS_AMB_007_incident_timeline_collision",
+      "type": "timeline_collision",
+      "triggerSignals": [
+        "incident_query",
+        "multipleTimestampsWithoutSequence",
+        "rootCauseOrImpactQuery"
+      ],
+      "askQuestion": "Prioritize impact-first, timeline-first, or evidence-anchored event sequence for this incident analysis?"
+    },
+    {
+      "id": "OPS_AMB_008_shipping_leg_collision",
+      "type": "shipment_route_collision",
+      "triggerSignals": [
+        "shipping_query",
+        "multipleCarrierOrLegIdentifiers",
+        "originDestinationNotUnique"
+      ],
+      "askQuestion": "Interpret shipment status per leg, per shipment, or as route-level aggregate?"
+    },
+    {
+      "id": "OPS_AMB_009_kpi_reference_collision",
+      "type": "sli_reference_collision",
+      "triggerSignals": [
+        "queryTargetsSLA",
+        "sameKpiInMultipleDocs",
+        "kpiTargetMissing"
+      ],
+      "askQuestion": "Use SLA source precedence as contract doc, service log, or latest measured report?"
+    },
+    {
+      "id": "OPS_AMB_010_quality_noncov_scope",
+      "type": "quality_scope_collision",
+      "triggerSignals": [
+        "quality_query",
+        "nonconformance_mentions_with_multiple_statuses",
+        "qualityScopeOrLineMissing"
+      ],
+      "askQuestion": "Return summary by inspection scope, by product line, or by nonconformance category with explicit traceability?"
+    },
+    {
+      "id": "OPS_AMB_011_safety_instruction_scope",
+      "type": "safety_language_guard",
+      "triggerSignals": [
+        "queryIncludesSafetyProtocol",
+        "safetyOrSeverityWithoutEvidence",
+        "actionInstructionLikely"
+      ],
+      "askQuestion": "Use document-grounded protocol recap only, or include a readiness-safe escalation matrix?"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "ops_amb_status_asks_once",
+        "input": {
+          "scenario": "open_and_closed_mixed"
+        },
+        "expect": {
+          "action": "askQuestion",
+          "maxQuestions": 1
+        }
+      },
+      {
+        "id": "ops_amb_actor_role_question",
+        "input": {
+          "query": "Which team is responsible for this overdue task?"
+        },
+        "expect": {
+          "mustAskContains": [
+            "assignee",
+            "approver",
+            "requestor"
+          ]
+        }
+      },
+      {
+        "id": "ops_amb_kpi_collision",
+        "input": {
+          "query": "Is SLA compliance met for this report window?"
+        },
+        "expect": {
+          "mustAskContains": [
+            "target",
+            "actual",
+            "window"
+          ]
+        }
+      }
+    ]
+  }
+}

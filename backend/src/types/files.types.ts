@@ -172,7 +172,8 @@ export type FileSortKey =
   | "sizeBytes"
   | "docType";
 
-export type SortDirection = "asc" | "desc";
+import type { SortDirection } from "./common.types";
+export type { SortDirection } from "./common.types";
 
 export interface FileSort {
   key: FileSortKey;

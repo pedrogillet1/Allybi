@@ -1,0 +1,227 @@
+{
+  "_meta": {
+    "id": "di_compliance_regulatory_doc_type_catalog",
+    "version": "1.0.0",
+    "description": "Compliance and regulatory document catalog covering policy, audits, controls, incidents, and enforcement responses.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/retrieval/domainIntentRouter.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/docint-eval-pack.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "compliance_regulatory"
+  },
+  "domain": "compliance_regulatory",
+  "docTypes": [
+    {
+      "id": "compliance_policy_pack",
+      "name": {
+        "en": "Policy Pack",
+        "pt": "Pacote de Políticas"
+      },
+      "description": "Core control policy, scope, and governance commitments.",
+      "detectionPatterns": [
+        "\\bpolicy pack\\b",
+        "\\bpolíticas\\b",
+        "\\bcompliance policy\\b",
+        "\\bnorma interna\\b"
+      ],
+      "canonicalSections": [
+        "control_objective",
+        "owner",
+        "risk_appetite",
+        "monitoring"
+      ],
+      "extractionPriority": 140,
+      "riskTier": "medium"
+    },
+    {
+      "id": "compliance_risk_map",
+      "name": {
+        "en": "Risk and Control Matrix",
+        "pt": "Matriz de Riscos e Controles"
+      },
+      "description": "Enterprise risk mapping with risk level and control mapping.",
+      "detectionPatterns": [
+        "\\brisk map\\b",
+        "\\brisco e controle\\b",
+        "\\bmatriz de risco\\b",
+        "\\bcontrol design\\b"
+      ],
+      "canonicalSections": [
+        "risk_classification",
+        "control_objective",
+        "inherent_risk",
+        "residual_risk"
+      ],
+      "extractionPriority": 139,
+      "riskTier": "high"
+    },
+    {
+      "id": "compliance_control_test_plan",
+      "name": {
+        "en": "Control Test Plan",
+        "pt": "Plano de Teste de Controles"
+      },
+      "description": "Planned internal testing of controls and sampling strategy.",
+      "detectionPatterns": [
+        "\\bcontrol test plan\\b",
+        "\\btesting plan\\b",
+        "\\bplano de teste\\b",
+        "\\bprocedimento de validação\\b"
+      ],
+      "canonicalSections": [
+        "test_plan",
+        "sample",
+        "responsibility",
+        "criteria"
+      ],
+      "extractionPriority": 137,
+      "riskTier": "medium"
+    },
+    {
+      "id": "compliance_control_test_result",
+      "name": {
+        "en": "Control Test Results",
+        "pt": "Resultado de Testes de Controle"
+      },
+      "description": "Actual control test outcomes, exception counts, and conclusions.",
+      "detectionPatterns": [
+        "\\bcontrol test results\\b",
+        "\\bresultados de teste\\b",
+        "\\bfalhas\\b",
+        "\\bdeficiência\\b"
+      ],
+      "canonicalSections": [
+        "test_result",
+        "exception",
+        "exception_type",
+        "conclusion"
+      ],
+      "extractionPriority": 136,
+      "riskTier": "high"
+    },
+    {
+      "id": "compliance_audit_report",
+      "name": {
+        "en": "Audit Report",
+        "pt": "Relatório de Auditoria"
+      },
+      "description": "Third-party or internal audit findings with remediation instructions.",
+      "detectionPatterns": [
+        "\\baudit report\\b",
+        "\\brelatório de auditoria\\b",
+        "\\bfinding\\b",
+        "\\binternal review\\b"
+      ],
+      "canonicalSections": [
+        "findings",
+        "severity",
+        "owner",
+        "recommended_action",
+        "deadline"
+      ],
+      "extractionPriority": 135,
+      "riskTier": "critical"
+    },
+    {
+      "id": "compliance_regulator_notice",
+      "name": {
+        "en": "Regulator Notice",
+        "pt": "Notificação Regulatória"
+      },
+      "description": "Notices and directives requiring compliance actions.",
+      "detectionPatterns": [
+        "\\bregulatory notice\\b",
+        "\\bregulatory communication\\b",
+        "\\bnotificação regulatória\\b",
+        "\\badmo\\b"
+      ],
+      "canonicalSections": [
+        "notice_text",
+        "required_actions",
+        "deadline",
+        "penalties"
+      ],
+      "extractionPriority": 138,
+      "riskTier": "critical"
+    },
+    {
+      "id": "compliance_incident_report",
+      "name": {
+        "en": "Incident Report",
+        "pt": "Relatório de Incidente"
+      },
+      "description": "Operational and control incidents with severity and exposure assessment.",
+      "detectionPatterns": [
+        "\\bincident report\\b",
+        "\\bincident\\b",
+        "\\bocorrência\\b",
+        "\\bincidente\\b"
+      ],
+      "canonicalSections": [
+        "incident_summary",
+        "impact",
+        "containing_action",
+        "root_cause"
+      ],
+      "extractionPriority": 134,
+      "riskTier": "high"
+    },
+    {
+      "id": "compliance_exception_request",
+      "name": {
+        "en": "Exception Request",
+        "pt": "Pedido de Exceção"
+      },
+      "description": "Formal request for control or policy exception with temporary mitigations.",
+      "detectionPatterns": [
+        "\\bexception request\\b",
+        "\\bwaiver\\b",
+        "\\bpedido de exceção\\b",
+        "\\brequisição de dispensa\\b"
+      ],
+      "canonicalSections": [
+        "justification",
+        "temporary_mitigation",
+        "expiry",
+        "approver"
+      ],
+      "extractionPriority": 133,
+      "riskTier": "high"
+    },
+    {
+      "id": "compliance_remediation_plan",
+      "name": {
+        "en": "Remediation Plan",
+        "pt": "Plano de Remediação"
+      },
+      "description": "Action plans to fix findings with owners, timelines, and evidence requirements.",
+      "detectionPatterns": [
+        "\\bremediation plan\\b",
+        "\\bcorrective action\\b",
+        "\\bplano de remediação\\b",
+        "\\bacao corretiva\\b"
+      ],
+      "canonicalSections": [
+        "remediation",
+        "owner",
+        "timeline",
+        "evidence_required",
+        "closure_criteria"
+      ],
+      "extractionPriority": 132,
+      "riskTier": "high"
+    }
+  ]
+}

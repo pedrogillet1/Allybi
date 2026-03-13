@@ -1,0 +1,81 @@
+{
+  "_meta": {
+    "id": "evidence_synthesis",
+    "version": "1.0.0",
+    "description": "Patterns for turning multiple grounded facts into one coherent finding without degenerating into evidence dumping.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "composition-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id",
+    "maxEvidencePointsBeforeSynthesis": 3
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "mid-composition when several evidence items support one answer",
+    "consumer": "composition layer",
+    "intent": "Summarize evidence clusters into a single conclusion sentence before exposing detail."
+  },
+  "synthesisPatterns": [
+    {
+      "id": "converging_rows",
+      "when": "multiple table rows support one metric claim",
+      "preferredShape": "single finding sentence then two strongest supports"
+    },
+    {
+      "id": "clause_stack",
+      "when": "several clauses jointly define an obligation or limit",
+      "preferredShape": "combined conclusion then clause-by-clause support"
+    },
+    {
+      "id": "timeline_chain",
+      "when": "several dated events create one timeline conclusion",
+      "preferredShape": "timeline takeaway then ordered events"
+    },
+    {
+      "id": "crossdoc_alignment",
+      "when": "different documents point to the same conclusion",
+      "preferredShape": "shared conclusion then document-specific anchors"
+    }
+  ],
+  "rules": [
+    {
+      "id": "ESYN_001_synthesize_before_listing",
+      "trigger": "Three or more evidence points support one claim",
+      "check": "output.evidencePointCount >= 3 AND output.hasSynthesisSentence != true",
+      "failureAction": "ADD_SYNTHESIS_SENTENCE"
+    },
+    {
+      "id": "ESYN_002_keep_detail_ranked",
+      "trigger": "Evidence detail is too long",
+      "check": "output.supportingEvidenceCount > 4",
+      "failureAction": "KEEP_TOP_RANKED_EVIDENCE_ONLY"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "evidence_synthesis_requires_takeaway",
+        "input": {
+          "evidencePointCount": 4
+        },
+        "expect": {
+          "preferredAction": "ADD_SYNTHESIS_SENTENCE"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,200 @@
+{
+  "_meta": {
+    "id": "claim_strength_language",
+    "version": "2.0.0",
+    "description": "Verb and framing inventory for strong, moderate, and weak claims across common high-signal domains.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "composition-brain",
+    "usedBy": [
+      "modules/chat/runtime/CompositionStyleResolver.ts",
+      "data_banks/prompts/compose_style_contract.any.json"
+    ],
+    "tests": [
+      "modules/chat/runtime/CompositionStyleResolver.test.ts",
+      "services/llm/prompts/promptRegistry.service.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "final claim wording",
+    "consumer": "style decision resolver and compose style contract prompt",
+    "intent": "Choose verbs and framing that fit the evidence. This prevents every answer from collapsing into either weak mush or fake certainty."
+  },
+  "levels": [
+    {
+      "id": "strong",
+      "verbs": {
+        "en": [
+          "shows",
+          "states",
+          "requires",
+          "limits",
+          "confirms",
+          "locks in"
+        ],
+        "pt": [
+          "mostra",
+          "declara",
+          "exige",
+          "limita",
+          "confirma",
+          "fecha"
+        ]
+      },
+      "framing": {
+        "en": [
+          "The document shows",
+          "The operative text requires",
+          "The record confirms"
+        ],
+        "pt": [
+          "O documento mostra",
+          "O texto operativo exige",
+          "O registro confirma"
+        ]
+      }
+    },
+    {
+      "id": "moderate",
+      "verbs": {
+        "en": [
+          "points to",
+          "indicates",
+          "supports",
+          "leans toward",
+          "is consistent with"
+        ],
+        "pt": [
+          "aponta para",
+          "indica",
+          "sustenta",
+          "inclina para",
+          "e consistente com"
+        ]
+      },
+      "framing": {
+        "en": [
+          "The best grounded reading is",
+          "The material points to",
+          "On balance, the record supports"
+        ],
+        "pt": [
+          "A leitura mais ancorada e",
+          "O material aponta para",
+          "No conjunto, o registro sustenta"
+        ]
+      }
+    },
+    {
+      "id": "weak",
+      "verbs": {
+        "en": [
+          "may reflect",
+          "suggests",
+          "leaves open",
+          "does not rule out",
+          "is directionally consistent with"
+        ],
+        "pt": [
+          "pode refletir",
+          "sugere",
+          "deixa em aberto",
+          "nao afasta",
+          "e direcionalmente consistente com"
+        ]
+      },
+      "framing": {
+        "en": [
+          "The record suggests, but does not settle,",
+          "There is some support for",
+          "The available evidence leans toward"
+        ],
+        "pt": [
+          "O registro sugere, mas nao fecha,",
+          "Ha algum suporte para",
+          "A evidencia disponivel inclina para"
+        ]
+      }
+    }
+  ],
+  "domainLexicons": [
+    {
+      "id": "legal",
+      "prefer": [
+        "requires",
+        "permits",
+        "restricts",
+        "does not by itself establish"
+      ]
+    },
+    {
+      "id": "finance",
+      "prefer": [
+        "reconciles to",
+        "falls short of",
+        "improves",
+        "compresses"
+      ]
+    },
+    {
+      "id": "medical",
+      "prefer": [
+        "reports",
+        "notes",
+        "is consistent with",
+        "does not confirm"
+      ]
+    },
+    {
+      "id": "ops",
+      "prefer": [
+        "blocks",
+        "unlocks",
+        "depends on",
+        "clears"
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "CSL_001_low_evidence_cannot_use_strong_lexicon",
+      "trigger": "Weak record paired with strong verbs",
+      "check": "context.evidenceStrength == 'low' AND output.claimStrength == 'strong'",
+      "failureAction": "DOWNGRADE_VERB_FAMILY",
+      "severity": "high"
+    },
+    {
+      "id": "CSL_002_high_evidence_should_not_hide_behind_weak_lexicon",
+      "trigger": "Strong record paired with weak verbs",
+      "check": "context.evidenceStrength == 'high' AND output.claimStrength == 'weak'",
+      "failureAction": "UPGRADE_VERB_FAMILY",
+      "severity": "medium"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "claim_strength_language_has_strong_verbs",
+        "expect": {
+          "containsLevel": "strong"
+        }
+      },
+      {
+        "id": "claim_strength_language_has_weak_verbs",
+        "expect": {
+          "containsLevel": "weak"
+        }
+      }
+    ]
+  }
+}

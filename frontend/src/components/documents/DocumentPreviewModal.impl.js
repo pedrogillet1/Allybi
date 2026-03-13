@@ -12,6 +12,11 @@ import cleanDocumentName from '../../utils/cleanDocumentName';
 import { buildRoute } from '../../constants/routes';
 import { getPreviewCountForFile, getFileExtension } from '../../utils/files/previewCount';
 import GeneratedDocumentCard from './GeneratedDocumentCard';
+import MobileExcelViewer from './excel/MobileExcelViewer';
+import MobilePdfViewer from './pdf/MobilePdfViewer';
+import MobileImageViewer from './MobileImageViewer';
+import MobileVideoViewer from './video/MobileVideoViewer';
+import MobilePreviewShell from './MobilePreviewShell';
 
 // Code-split ExcelPreview and PPTXPreview for performance
 const ExcelPreview = lazy(() => import('./previews/ExcelPreview'));
@@ -348,6 +353,140 @@ const DocumentPreviewModal = ({ isOpen, onClose, document, attachOnClose = false
   };
 
   if (!isOpen || !document) return null;
+
+  /* ── Mobile PDF/DOCX → dedicated mobile viewer ── */
+  const docType = getDocumentType();
+  const isMobilePdf = isMobile && (docType === 'pdf' || docType === 'docx');
+  if (isMobilePdf) {
+    // Show mobile viewer shell immediately; fileConfig may be null while loading
+    return (
+      <MobilePdfViewer
+        fileConfig={fileConfig}
+        pdfOptions={pdfOptions}
+        filename={cleanDocumentName(document.filename) || 'Document'}
+        initialPage={currentPage}
+        onClose={handleClose}
+        onDownload={handleDownload}
+        onDocumentLoadSuccess={onDocumentLoadSuccess}
+      />
+    );
+  }
+
+  /* ── Mobile Image → dedicated mobile viewer (same shell as PDF) ── */
+  if (isMobile && docType === 'image') {
+    return (
+      <MobileImageViewer
+        previewUrl={previewUrl}
+        filename={cleanDocumentName(document.filename) || 'Image'}
+        onClose={handleClose}
+        onDownload={handleDownload}
+      />
+    );
+  }
+
+  /* ── Mobile Video → dedicated mobile viewer ── */
+  if (isMobile && docType === 'video') {
+    return (
+      <MobileVideoViewer
+        src={previewUrl}
+        mimeType={document.mimeType}
+        filename={cleanDocumentName(document.filename) || 'Video'}
+        onClose={handleClose}
+        onDownload={handleDownload}
+      />
+    );
+  }
+
+  /* ── Mobile Excel → dedicated mobile viewer ── */
+  if (isMobile && docType === 'excel') {
+    return (
+      <MobileExcelViewer
+        document={document}
+        onClose={handleClose}
+        onDownload={handleDownload}
+      />
+    );
+  }
+
+  /* ── Mobile ALL OTHER types → MobilePreviewShell ── */
+  if (isMobile) {
+    const mobileStatusText = previewCount?.label && previewCount.label !== t('common.loading')
+      ? previewCount.label : undefined;
+
+    // Decide body content based on file type
+    let mobileBody = null;
+
+    if (isLoading) {
+      mobileBody = (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 200, width: '100%' }}>
+          <div style={{ fontSize: 14, fontWeight: 600, color: '#6C6B6E', fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
+            {t('common.loading')}…
+          </div>
+        </div>
+      );
+    } else if (document.chatDocument) {
+      mobileBody = (
+        <div style={{ width: '100%', background: 'white', borderRadius: 12, padding: '24px 16px', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
+          <GeneratedDocumentCard chatDocument={document.chatDocument} />
+        </div>
+      );
+    } else if (docType === 'powerpoint') {
+      mobileBody = (
+        <div style={{ width: '100%' }}>
+          <Suspense fallback={null}>
+            <PPTXPreview document={document} zoom={100} version={0} onCountUpdate={setTotalPages} />
+          </Suspense>
+        </div>
+      );
+    } else if (previewUrl && docType === 'audio') {
+      mobileBody = (
+        <div style={{
+          background: 'white', padding: '32px 20px', borderRadius: 12,
+          boxShadow: '0 2px 8px rgba(0,0,0,0.08)', textAlign: 'center', width: '100%',
+        }}>
+          <div style={{ fontSize: 48, marginBottom: 16 }}>🎵</div>
+          <div style={{ fontSize: 16, fontWeight: 600, color: '#32302C', fontFamily: 'Plus Jakarta Sans, sans-serif', marginBottom: 16 }}>
+            {cleanDocumentName(document.filename)}
+          </div>
+          <audio
+            src={previewUrl}
+            controls
+            preload="metadata"
+            onLoadedMetadata={(e) => {
+              const audio = e.target;
+              if (audio.duration && isFinite(audio.duration)) {
+                setVideoDuration(audio.duration);
+              }
+            }}
+            style={{ width: '100%' }}
+          >
+            {t('documentPreview.browserNotSupportAudio')}
+          </audio>
+        </div>
+      );
+    } else {
+      mobileBody = (
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          minHeight: 200, color: '#6C6B6E', fontSize: 14, fontFamily: 'Plus Jakarta Sans, sans-serif',
+        }}>
+          {t('documentPreview.previewNotAvailable')}
+        </div>
+      );
+    }
+
+    return (
+      <MobilePreviewShell
+        filename={cleanDocumentName(document.filename) || 'Document'}
+        onClose={handleClose}
+        onDownload={handleDownload}
+        onFullView={handleOpenFullPreview}
+        statusText={mobileStatusText}
+      >
+        {mobileBody}
+      </MobilePreviewShell>
+    );
+  }
 
   return (
     <>

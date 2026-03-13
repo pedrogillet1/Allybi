@@ -92,8 +92,18 @@ export interface QueryTelemetryWriteInput {
   warnings?: string[];
   totalMs?: number | null;
   ttft?: number | null;
+  ackMs?: number | null;
+  firstUsefulContentMs?: number | null;
   retrievalMs?: number | null;
   llmMs?: number | null;
+  streamStarted?: boolean;
+  firstTokenReceived?: boolean;
+  streamEnded?: boolean;
+  clientDisconnected?: boolean;
+  sseErrors?: string[];
+  chunksSent?: number | null;
+  streamDurationMs?: number | null;
+  wasAborted?: boolean;
   model?: string | null;
   inputTokens?: number | null;
   outputTokens?: number | null;
@@ -521,8 +531,30 @@ export class TraceWriterService {
         : [],
       totalMs: toIntOrNull(input.totalMs),
       ttft: toIntOrNull(input.ttft),
+      constraints:
+        input.ackMs !== undefined || input.firstUsefulContentMs !== undefined
+          ? {
+              latency: {
+                ackMs: toIntOrNull(input.ackMs),
+                firstUsefulContentMs: toIntOrNull(input.firstUsefulContentMs),
+              },
+            }
+          : null,
       retrievalMs: toIntOrNull(input.retrievalMs),
       llmMs: toIntOrNull(input.llmMs),
+      streamStarted: Boolean(input.streamStarted),
+      firstTokenReceived: Boolean(input.firstTokenReceived),
+      streamEnded: Boolean(input.streamEnded),
+      clientDisconnected: Boolean(input.clientDisconnected),
+      sseErrors: Array.isArray(input.sseErrors)
+        ? input.sseErrors
+            .map((entry) => String(entry || "").trim())
+            .filter(Boolean)
+            .slice(0, 64)
+        : [],
+      chunksSent: toIntOrNull(input.chunksSent) ?? 0,
+      streamDurationMs: toIntOrNull(input.streamDurationMs),
+      wasAborted: Boolean(input.wasAborted),
       model: cleanShort(input.model, 120),
       inputTokens,
       outputTokens,

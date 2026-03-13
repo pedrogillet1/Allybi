@@ -1,0 +1,208 @@
+{
+  "_meta": {
+    "id": "di_public_sector_section_ontology",
+    "version": "1.0.0",
+    "description": "Public sector section ontology for administrative decision control, execution, and accountability.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/orchestration/sectionResolver.service.ts",
+      "services/core/orchestration/answerPlanner.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/section-detection.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "public_sector"
+  },
+  "domain": "public_sector",
+  "sections": [
+    {
+      "id": "gov_section_legal_basis",
+      "name": {
+        "en": "Legal Basis",
+        "pt": "Fundamentação Legal"
+      },
+      "aliases": [
+        "legal basis",
+        "legal support",
+        "basis of law",
+        "lei aplicável",
+        "norma"
+      ],
+      "canonicalPurpose": "Captures law, regulation, ordinance, and authority text that justifies action.",
+      "importance": "critical"
+    },
+    {
+      "id": "gov_section_budget_breakdown",
+      "name": {
+        "en": "Budget Breakdown",
+        "pt": "Detalhamento Orçamentário"
+      },
+      "aliases": [
+        "budget lines",
+        "linha orçamentária",
+        "allocation table"
+      ],
+      "canonicalPurpose": "Records budget code, allocations, restrictions, and spending category caps.",
+      "importance": "critical",
+      "requiredIn": [
+        "calculate",
+        "validate",
+        "extract"
+      ]
+    },
+  {
+      "id": "gov_section_procurement_notice",
+      "name": {
+        "en": "Procurement Notice",
+        "pt": "Edital e Aviso"
+      },
+      "aliases": [
+        "notice",
+        "edital",
+        "chamamento público",
+        "auction file"
+      ],
+      "canonicalPurpose": "Defines modality, timeline, object, and qualification requirements."
+    },
+    {
+      "id": "gov_section_award_and_contract",
+      "name": {
+        "en": "Award and Contract",
+        "pt": "Adjudicação e Contrato"
+      },
+      "aliases": [
+        "award",
+        "adjudicação",
+        "contract award",
+        "convênio"
+      ],
+      "canonicalPurpose": "Houses winner decision criteria, selected provider, and binding contractual obligations.",
+      "importance": "critical"
+    },
+    {
+      "id": "gov_section_grant_terms",
+      "name": {
+        "en": "Grant Terms",
+        "pt": "Condições do Projeto"
+      },
+      "aliases": [
+        "grant terms",
+        "conditions",
+        "obrigations",
+        "contrapartida"
+      ],
+      "canonicalPurpose": "Captures disbursement conditions, milestones, and evidence obligations."
+    },
+    {
+      "id": "gov_section_performance_indicator",
+      "name": {
+        "en": "Performance Indicators",
+        "pt": "Indicadores de Desempenho"
+      },
+      "aliases": [
+        "indicator",
+        "kpi",
+        "metas",
+        "resultados"
+      ],
+      "canonicalPurpose": "Tracks impact and delivery metrics against approved goals."
+    },
+    {
+      "id": "gov_section_audit_findings",
+      "name": {
+        "en": "Audit Findings",
+        "pt": "Achados de Auditoria"
+      },
+      "aliases": [
+        "finding",
+        "não conformidade",
+        "recommendation",
+        "auditoria"
+      ],
+      "canonicalPurpose": "Stores risk-ranked audit defects and management reply requirements.",
+      "importance": "high"
+    },
+    {
+      "id": "gov_section_disbursement_status",
+      "name": {
+        "en": "Disbursement Status",
+        "pt": "Status de Desembolso"
+      },
+      "aliases": [
+        "disbursement",
+        "payment milestone",
+        "release",
+        "liberação"
+      ],
+      "canonicalPurpose": "Tracks progress against payment schedule and withheld amounts.",
+      "importance": "high"
+    },
+    {
+      "id": "gov_section_oversight_actions",
+      "name": {
+        "en": "Oversight Actions",
+        "pt": "Ações de Fiscalização"
+      },
+      "aliases": [
+        "oversight",
+        "follow-up",
+        "action plan",
+        "mitigation"
+      ],
+      "canonicalPurpose": "Captures monitoring obligations, inspection plans, and corrective actions."
+    },
+    {
+      "id": "gov_section_citizen_impact",
+      "name": {
+        "en": "Citizen Impact",
+        "pt": "Impacto para o Cidadão"
+      },
+      "aliases": [
+        "outcome",
+        "impact",
+        "beneficiary",
+        "beneficiário"
+      ],
+      "canonicalPurpose": "Stores beneficiary and service impact evidence tied to spending and delivery.",
+      "importance": "medium"
+    }
+  ],
+  "sectionAliases": {
+    "tender": [
+      "tender",
+      "licitação",
+      "edital"
+    ],
+    "compliance": [
+      "compliance",
+      "conformidade",
+      "regularidade"
+    ],
+    "period": [
+      "fiscal year",
+      "exercício",
+      "vigência"
+    ]
+  },
+  "runtimeHints": {
+    "priorityOrder": [
+      "gov_section_legal_basis",
+      "gov_section_procurement_notice",
+      "gov_section_award_and_contract",
+      "gov_section_budget_breakdown",
+      "gov_section_disbursement_status",
+      "gov_section_audit_findings",
+      "gov_section_performance_indicator",
+      "gov_section_oversight_actions"
+    ],
+    "mustAnchorCrossQueryIf": "queryType in ['compare','validate','evaluate','monitor']"
+  }
+}

@@ -1,0 +1,128 @@
+{
+  "_meta": {
+    "id": "di_procurement_entity_ontology",
+    "version": "1.0.0",
+    "description": "Procurement-focused entity ontology for precise sourcing and commercial interpretation.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/orchestration/entityResolver.service.ts",
+      "services/core/validation/claimValidator.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/domain-validation.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "procurement",
+    "entityNormalization": "strict"
+  },
+  "domain": "procurement",
+  "entities": [
+    {
+      "id": "proc_entity_vendor",
+      "label": {
+        "en": "Vendor",
+        "pt": "Fornecedor"
+      },
+      "aliases": [
+        "supplier",
+        "provider",
+        "fornecedor",
+        "prestador"
+      ],
+      "mustBindToCodeWhenAvailable": true
+    },
+    {
+      "id": "proc_entity_rfq_id",
+      "label": {
+        "en": "RFx ID",
+        "pt": "ID de RFx"
+      },
+      "aliases": [
+        "rfp id",
+        "rfx reference",
+        "solicitação id"
+      ],
+      "mustUseExactWhenNumeric": true
+    },
+    {
+      "id": "proc_entity_line_item",
+      "label": {
+        "en": "Line Item",
+        "pt": "Item de Linha"
+      },
+      "aliases": [
+        "item",
+        "line",
+        "sku",
+        "código"
+      ],
+      "requiresQuantityContext": true
+    },
+    {
+      "id": "proc_entity_award_value",
+      "label": {
+        "en": "Award Value",
+        "pt": "Valor de Adjudicação"
+      },
+      "aliases": [
+        "award amount",
+        "winning value",
+        "valor de adjudicação"
+      ],
+      "currencyMustMatchDocument": true
+    },
+    {
+      "id": "proc_entity_delivery_date",
+      "label": {
+        "en": "Delivery Date",
+        "pt": "Data de Entrega"
+      },
+      "aliases": [
+        "due date",
+        "lead time",
+        "prazo"
+      ]
+    },
+    {
+      "id": "proc_entity_payment_terms",
+      "label": {
+        "en": "Payment Terms",
+        "pt": "Condições de Pagamento"
+      },
+      "aliases": [
+        "net terms",
+        "prazo de pagamento",
+        "condições comerciais"
+      ]
+    },
+    {
+      "id": "proc_entity_evaluation_score",
+      "label": {
+        "en": "Evaluation Score",
+        "pt": "Pontuação de Avaliação"
+      },
+      "aliases": [
+        "bid score",
+        "scoring",
+        "nota de avaliação"
+      ],
+      "requiresNumericConfidence": true
+    }
+  ],
+  "normalization": {
+    "trimWhitespace": true,
+    "caseFold": true,
+    "aliasPriority": [
+      "vendor code",
+      "legal name",
+      "trade name"
+    ]
+  }
+}

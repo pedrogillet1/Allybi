@@ -1,4 +1,4 @@
-import prisma from "../../platform/db/prismaClient";
+import prisma from "../../config/database";
 import { getContainer } from "../../bootstrap/container";
 import { getBankLoaderInstance } from "../core/banks/bankLoader.service";
 
@@ -8,6 +8,7 @@ export interface ReadinessChecks {
   banks: boolean;
   retrievalStorage: boolean;
   retrievalEngineLoaded: boolean;
+  retrievalRuntimeHealthy: boolean;
   answerEngineLoaded: boolean;
 }
 
@@ -23,6 +24,7 @@ export async function collectReadiness(): Promise<ReadinessResult> {
     banks: false,
     retrievalStorage: false,
     retrievalEngineLoaded: false,
+    retrievalRuntimeHealthy: false,
     answerEngineLoaded: false,
   };
   const details: Record<string, unknown> = {};
@@ -54,7 +56,15 @@ export async function collectReadiness(): Promise<ReadinessResult> {
 
   try {
     const container = getContainer();
-    checks.retrievalEngineLoaded = Boolean(container.getRetrievalEngine());
+    const retrievalEngine = container.getRetrievalEngine();
+    checks.retrievalEngineLoaded = Boolean(retrievalEngine);
+    checks.retrievalRuntimeHealthy =
+      Boolean(retrievalEngine?.runtime) &&
+      Boolean(retrievalEngine?.activeEngineMode) &&
+      Boolean(retrievalEngine?.runtime?.describe?.().hasQueryNormalizer);
+    if (retrievalEngine?.runtime?.describe) {
+      details.retrievalRuntime = retrievalEngine.runtime.describe();
+    }
     checks.answerEngineLoaded = Boolean(container.getAnswerEngine());
   } catch (error: unknown) {
     details.containerError =

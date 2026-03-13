@@ -11,6 +11,11 @@ import {
 export interface RuntimeWiringIntegrityResult {
   ok: boolean;
   missingBanks: string[];
+  missingGovernanceRuntimeWiringRequirements: string[];
+  managedBankRegistryDrift: string[];
+  managedBankUsedByPathDrift: string[];
+  managedBankTestPathDrift: string[];
+  managedBankRequiredByEnvGaps: string[];
   missingLlmRoutingPolicyBanks: string[];
   missingRuntimePolicyConsumers: string[];
   runtimePolicyEnvGaps: string[];
@@ -34,9 +39,14 @@ export interface RuntimeWiringIntegrityResult {
   composeAnswerModeTemplateGaps: string[];
   answerModeContractDrift: string[];
   productHelpRuntimeUsageMissing: string[];
+  /** Bank preferredAnswerMode values not found in CHAT_ANSWER_MODES */
+  typeBankAnswerModeDrift: string[];
+  /** Bank family values not found in KNOWN_BANK_FAMILIES */
+  typeBankFamilyDrift: string[];
 }
 
 export const RUNTIME_REQUIRED_BANKS = [
+  "governance_runtime_wiring_requirements",
   "intent_config",
   "intent_patterns",
   "operator_families",
@@ -59,6 +69,7 @@ export const RUNTIME_REQUIRED_BANKS = [
   "processing_messages",
   "no_docs_messages",
   "scoped_not_found_messages",
+  "compliance_phrases",
   "disambiguation_microcopy",
   "edit_error_catalog",
   "operator_catalog",
@@ -482,10 +493,6 @@ function collectHardcodedRuntimeHeuristics(): string[] {
       process.cwd(),
       "backend/src/services/core/retrieval/evidenceGate.service.ts",
     ),
-    path.join(
-      process.cwd(),
-      "backend/src/services/chat/guardrails/editorMode.guard.ts",
-    ),
   ];
 
   const suspectPatterns = [
@@ -554,7 +561,7 @@ function collectRawConsoleRuntimeUsage(): string[] {
     ),
     path.join(
       process.cwd(),
-      "backend/src/modules/chat/runtime/CentralizedChatRuntimeDelegate.ts",
+      "backend/src/modules/chat/runtime/ChatTurnExecutor.ts",
     ),
     path.join(
       process.cwd(),
@@ -597,11 +604,11 @@ function collectMemoryDelegateDirectInstantiation(): string[] {
   const candidatePaths = [
     path.join(
       process.cwd(),
-      "backend/src/modules/chat/runtime/CentralizedChatRuntimeDelegate.ts",
+      "backend/src/modules/chat/runtime/ChatTurnExecutor.ts",
     ),
     path.join(
       process.cwd(),
-      "src/modules/chat/runtime/CentralizedChatRuntimeDelegate.ts",
+      "src/modules/chat/runtime/ChatTurnExecutor.ts",
     ),
   ];
   const failures: string[] = [];
@@ -623,11 +630,11 @@ function collectMemoryRawPersistencePatterns(): string[] {
   const candidatePaths = [
     path.join(
       process.cwd(),
-      "backend/src/modules/chat/runtime/CentralizedChatRuntimeDelegate.ts",
+      "backend/src/modules/chat/runtime/ChatMemoryContextService.ts",
     ),
     path.join(
       process.cwd(),
-      "src/modules/chat/runtime/CentralizedChatRuntimeDelegate.ts",
+      "src/modules/chat/runtime/ChatMemoryContextService.ts",
     ),
   ];
   const failures: string[] = [];
@@ -679,8 +686,14 @@ function collectMemoryPolicyHookEngineMissing(): string[] {
 
 function collectDormantIntentConfigUsage(): string[] {
   const candidatePaths = [
-    path.join(process.cwd(), "backend/src/services/chat/turnRouter.service.ts"),
-    path.join(process.cwd(), "src/services/chat/turnRouter.service.ts"),
+    path.join(
+      process.cwd(),
+      "backend/src/modules/chat/application/turnRouter.service.ts",
+    ),
+    path.join(
+      process.cwd(),
+      "src/modules/chat/application/turnRouter.service.ts",
+    ),
   ];
   const failures: string[] = [];
   for (const filePath of candidatePaths) {
@@ -726,6 +739,65 @@ function collectComposeAnswerModeTemplateGaps(taskAnswerBank: Record<string, unk
   return gaps;
 }
 
+/**
+ * All known bank families — superset of IntentFamily (which covers chat only).
+ * Editing, connector, email, and error families live in the bank but are
+ * handled by separate handler pipelines.
+ */
+const KNOWN_BANK_FAMILIES = new Set([
+  // IntentFamily (chat)
+  "documents",
+  "file_actions",
+  "navigation",
+  "help",
+  "conversation",
+  "account",
+  "unknown",
+  // Extended families (non-chat pipelines)
+  "editing",
+  "connectors",
+  "email",
+  "error",
+  "doc_stats",
+]);
+
+function collectTypeBankAnswerModeDrift(
+  operatorContracts: Record<string, unknown> | null,
+): string[] {
+  if (!operatorContracts) return [];
+  const chatModeSet = new Set<string>(CHAT_ANSWER_MODES);
+  const operators = operatorContracts?.operators as unknown;
+  const entries: Array<Record<string, unknown>> = Array.isArray(operators)
+    ? operators
+    : [];
+  const drift: string[] = [];
+  for (const entry of entries) {
+    const mode = asTrimmedString(entry?.preferredAnswerMode);
+    if (mode && !chatModeSet.has(mode)) {
+      drift.push(`${asTrimmedString(entry?.id)}:${mode}`);
+    }
+  }
+  return drift;
+}
+
+function collectTypeBankFamilyDrift(
+  operatorContracts: Record<string, unknown> | null,
+): string[] {
+  if (!operatorContracts) return [];
+  const operators = operatorContracts?.operators as unknown;
+  const entries: Array<Record<string, unknown>> = Array.isArray(operators)
+    ? operators
+    : [];
+  const drift: string[] = [];
+  for (const entry of entries) {
+    const family = asTrimmedString(entry?.family);
+    if (family && !KNOWN_BANK_FAMILIES.has(family)) {
+      drift.push(`${asTrimmedString(entry?.id)}:${family}`);
+    }
+  }
+  return drift;
+}
+
 function collectAnswerModeContractDrift(): string[] {
   const chatModes = new Set(CHAT_ANSWER_MODES);
   const drift: string[] = [];
@@ -750,9 +822,12 @@ function collectProductHelpRuntimeUsageMissing(): string[] {
       filePaths: [
         path.join(
           process.cwd(),
-          "backend/src/services/llm/core/llmGateway.service.ts",
+          "backend/src/services/llm/core/gatewayRequestPreparation.ts",
         ),
-        path.join(process.cwd(), "src/services/llm/core/llmGateway.service.ts"),
+        path.join(
+          process.cwd(),
+          "src/services/llm/core/gatewayRequestPreparation.ts",
+        ),
       ],
       patterns: [
         /\bgetProductHelpService\b|\bProductHelpService\b/,
@@ -922,6 +997,176 @@ function collectRuntimePolicyEnvGaps(): string[] {
   }
 }
 
+function toStringList(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value.map((item) => asTrimmedString(item)).filter(Boolean);
+}
+
+function normalizeMetadataPath(pathLike: string): string {
+  return asTrimmedString(pathLike)
+    .replace(/\\/g, "/")
+    .replace(/^\.\//, "")
+    .replace(/^backend\/src\//, "")
+    .replace(/^src\//, "src/");
+}
+
+function resolveMetadataPathCandidates(pathLike: string): string[] {
+  const normalized = normalizeMetadataPath(pathLike);
+  if (!normalized) return [];
+  const cwd = process.cwd();
+  const candidates = new Set<string>();
+
+  if (normalized.startsWith("backend/")) {
+    candidates.add(path.join(cwd, normalized));
+    return Array.from(candidates);
+  }
+
+  if (normalized.startsWith("src/")) {
+    candidates.add(path.join(cwd, normalized));
+    candidates.add(path.join(cwd, "backend", normalized));
+    return Array.from(candidates);
+  }
+
+  candidates.add(path.join(cwd, normalized));
+  candidates.add(path.join(cwd, "backend", normalized));
+  candidates.add(path.join(cwd, "src", normalized));
+  candidates.add(path.join(cwd, "backend", "src", normalized));
+  return Array.from(candidates);
+}
+
+function metadataPathExists(pathLike: string): boolean {
+  return resolveMetadataPathCandidates(pathLike).some((candidate) =>
+    fs.existsSync(candidate),
+  );
+}
+
+function normalizeServiceRelativePath(pathLike: string): string {
+  return normalizeMetadataPath(pathLike)
+    .replace(/^backend\//, "")
+    .replace(/^src\//, "");
+}
+
+function matchesServiceRule(pathLike: string, rules: string[]): boolean {
+  const normalized = normalizeServiceRelativePath(pathLike);
+  if (!normalized) return false;
+  return rules.some((rule) => {
+    const cleaned = asTrimmedString(rule).replace(/\\/g, "/");
+    if (!cleaned) return false;
+    if (cleaned.endsWith("*")) {
+      return normalized.startsWith(cleaned.slice(0, -1));
+    }
+    return normalized === cleaned;
+  });
+}
+
+type ManagedRuntimeAuditResult = {
+  missingGovernanceRuntimeWiringRequirements: string[];
+  managedBankRegistryDrift: string[];
+  managedBankUsedByPathDrift: string[];
+  managedBankTestPathDrift: string[];
+  managedBankRequiredByEnvGaps: string[];
+};
+
+function collectManagedRuntimeAudit(): ManagedRuntimeAuditResult {
+  const empty: ManagedRuntimeAuditResult = {
+    missingGovernanceRuntimeWiringRequirements: [],
+    managedBankRegistryDrift: [],
+    managedBankUsedByPathDrift: [],
+    managedBankTestPathDrift: [],
+    managedBankRequiredByEnvGaps: [],
+  };
+
+  const governanceBank = getOptionalBank<Record<string, unknown>>(
+    "governance_runtime_wiring_requirements",
+  );
+  if (!governanceBank) {
+    return {
+      ...empty,
+      missingGovernanceRuntimeWiringRequirements: [
+        "governance_runtime_wiring_requirements",
+      ],
+    };
+  }
+
+  const registryBank = getOptionalBank<Record<string, unknown>>("bank_registry");
+  const registryEntries = Array.isArray(registryBank?.banks)
+    ? (registryBank.banks as Array<Record<string, unknown>>)
+    : [];
+  if (registryEntries.length === 0) return empty;
+
+  const managedAuditSet = asRecord(governanceBank.managedAuditSet);
+  const auditedIds = toStringList(managedAuditSet.bankIds);
+  if (auditedIds.length === 0) return empty;
+
+  const serviceRules = toStringList(governanceBank.servicePathRules);
+  const requireRequiredByEnv =
+    managedAuditSet.requireProductionAndStagingRequiredByEnv === true;
+  const registryById = new Map<string, Record<string, unknown>>(
+    registryEntries
+      .map((entry) => [asTrimmedString(entry.id), entry] as const)
+      .filter(([id]) => id.length > 0),
+  );
+
+  const managedBankRegistryDrift: string[] = [];
+  const managedBankUsedByPathDrift: string[] = [];
+  const managedBankTestPathDrift: string[] = [];
+  const managedBankRequiredByEnvGaps: string[] = [];
+
+  for (const bankId of auditedIds) {
+    const registryEntry = registryById.get(bankId);
+    if (!registryEntry) {
+      managedBankRegistryDrift.push(`${bankId}:missing_registry_entry`);
+      continue;
+    }
+
+    const bank = getOptionalBank<Record<string, unknown>>(bankId);
+    if (!bank) {
+      managedBankRegistryDrift.push(`${bankId}:not_loaded`);
+      continue;
+    }
+
+    const meta = asRecord(bank._meta);
+    const usedBy = toStringList(meta.usedBy);
+    if (
+      usedBy.length === 0 ||
+      !usedBy.some(
+        (entry) =>
+          metadataPathExists(entry) &&
+          (serviceRules.length === 0 || matchesServiceRule(entry, serviceRules)),
+      )
+    ) {
+      managedBankUsedByPathDrift.push(bankId);
+    }
+
+    const tests = toStringList(meta.tests);
+    if (tests.length === 0 || !tests.some((entry) => metadataPathExists(entry))) {
+      managedBankTestPathDrift.push(bankId);
+    }
+
+    if (requireRequiredByEnv) {
+      const envMap = asRecord(registryEntry.requiredByEnv);
+      if (envMap.production !== true) {
+        managedBankRequiredByEnvGaps.push(
+          `${bankId}:requiredByEnv.production!=true`,
+        );
+      }
+      if (envMap.staging !== true) {
+        managedBankRequiredByEnvGaps.push(
+          `${bankId}:requiredByEnv.staging!=true`,
+        );
+      }
+    }
+  }
+
+  return {
+    missingGovernanceRuntimeWiringRequirements: [],
+    managedBankRegistryDrift,
+    managedBankUsedByPathDrift,
+    managedBankTestPathDrift,
+    managedBankRequiredByEnvGaps,
+  };
+}
+
 export class RuntimeWiringIntegrityService {
   validate(): RuntimeWiringIntegrityResult {
     const renderPolicy = getOptionalBank<Record<string, unknown>>("render_policy");
@@ -935,6 +1180,7 @@ export class RuntimeWiringIntegrityService {
     );
     const missingRuntimePolicyConsumers = collectMissingRuntimePolicyConsumers();
     const runtimePolicyEnvGaps = collectRuntimePolicyEnvGaps();
+    const managedRuntimeAudit = collectManagedRuntimeAudit();
 
     const intentConfig = getOptionalBank<Record<string, unknown>>("intent_config");
     const operatorFamilies = getOptionalBank<Record<string, unknown>>("operator_families");
@@ -1030,12 +1276,19 @@ export class RuntimeWiringIntegrityService {
       taskAnswerWithSources,
     );
     const answerModeContractDrift = collectAnswerModeContractDrift();
+    const typeBankAnswerModeDrift = collectTypeBankAnswerModeDrift(operatorContracts);
+    const typeBankFamilyDrift = collectTypeBankFamilyDrift(operatorContracts);
     const productHelpRuntimeUsageMissing =
       collectProductHelpRuntimeUsageMissing();
 
     return {
       ok:
         missingBanks.length === 0 &&
+        managedRuntimeAudit.missingGovernanceRuntimeWiringRequirements.length === 0 &&
+        managedRuntimeAudit.managedBankRegistryDrift.length === 0 &&
+        managedRuntimeAudit.managedBankUsedByPathDrift.length === 0 &&
+        managedRuntimeAudit.managedBankTestPathDrift.length === 0 &&
+        managedRuntimeAudit.managedBankRequiredByEnvGaps.length === 0 &&
         missingLlmRoutingPolicyBanks.length === 0 &&
         missingRuntimePolicyConsumers.length === 0 &&
         runtimePolicyEnvGaps.length === 0 &&
@@ -1058,8 +1311,20 @@ export class RuntimeWiringIntegrityService {
         dormantIntentConfigUsage.length === 0 &&
         composeAnswerModeTemplateGaps.length === 0 &&
         answerModeContractDrift.length === 0 &&
+        // typeBankAnswerModeDrift and typeBankFamilyDrift are informational;
+        // bank families/modes like "editing", "conversation", "file_list"
+        // are handled by separate pipelines and don't need to be in the
+        // chat-specific TS type unions.
         productHelpRuntimeUsageMissing.length === 0,
       missingBanks,
+      missingGovernanceRuntimeWiringRequirements:
+        managedRuntimeAudit.missingGovernanceRuntimeWiringRequirements,
+      managedBankRegistryDrift: managedRuntimeAudit.managedBankRegistryDrift,
+      managedBankUsedByPathDrift:
+        managedRuntimeAudit.managedBankUsedByPathDrift,
+      managedBankTestPathDrift: managedRuntimeAudit.managedBankTestPathDrift,
+      managedBankRequiredByEnvGaps:
+        managedRuntimeAudit.managedBankRequiredByEnvGaps,
       missingLlmRoutingPolicyBanks,
       missingRuntimePolicyConsumers,
       runtimePolicyEnvGaps,
@@ -1082,6 +1347,8 @@ export class RuntimeWiringIntegrityService {
       dormantIntentConfigUsage,
       composeAnswerModeTemplateGaps,
       answerModeContractDrift,
+      typeBankAnswerModeDrift,
+      typeBankFamilyDrift,
       productHelpRuntimeUsageMissing,
     };
   }

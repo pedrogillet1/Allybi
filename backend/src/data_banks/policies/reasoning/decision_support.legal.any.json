@@ -25,7 +25,8 @@
     "domain": "legal",
     "deterministic": true,
     "dedupe": true,
-    "sortBy": "id"
+    "sortBy": "id",
+    "configModeOnly": true
   },
   "domain": "legal",
   "framework": {
@@ -1567,7 +1568,33 @@
   "tests": {
     "cases": [
       {
-        "id": "LEG_DEC_SMOKE_001"
+        "id": "DECISION_SUPPORT_LEGAL_T_001",
+        "input": {},
+        "expect": {
+          "requireOptions": true
+        }
+      },
+      {
+        "id": "DECISION_SUPPORT_LEGAL_T_002",
+        "input": {},
+        "expect": {
+          "requireRiskTradeoffs": true
+        }
+      },
+      {
+        "id": "DECISION_SUPPORT_LEGAL_T_003",
+        "input": {},
+        "expect": {
+          "requireEvidenceSummary": true,
+          "requireUncertaintyStatement": true
+        }
+      },
+      {
+        "id": "DECISION_SUPPORT_LEGAL_T_004",
+        "input": {},
+        "expect": {
+          "minimumOptionCount": 2
+        }
       }
     ]
   }

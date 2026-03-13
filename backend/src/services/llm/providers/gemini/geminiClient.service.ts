@@ -79,6 +79,11 @@ interface GeminiToolSchema {
   }>;
 }
 
+interface GeminiSafetySetting {
+  category: string;
+  threshold: string;
+}
+
 interface GeminiGenerateRequest {
   contents: GeminiContent[];
   systemInstruction?: { parts: Array<{ text: string }> };
@@ -88,7 +93,7 @@ interface GeminiGenerateRequest {
     topP?: number;
     maxOutputTokens?: number;
   };
-  // safetySettings intentionally not forced here; handled by safety gate elsewhere
+  safetySettings?: GeminiSafetySetting[];
 }
 
 interface GeminiCandidate {
@@ -588,6 +593,13 @@ export class GeminiClientService implements LLMClient {
         topP: req.sampling?.topP,
         maxOutputTokens: req.sampling?.maxOutputTokens,
       },
+      safetySettings: [
+        { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_ONLY_HIGH" },
+        { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_ONLY_HIGH" },
+        { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_ONLY_HIGH" },
+        { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_ONLY_HIGH" },
+        { category: "HARM_CATEGORY_CIVIC_INTEGRITY", threshold: "BLOCK_ONLY_HIGH" },
+      ],
     };
 
     // Use top-level systemInstruction for system/developer messages

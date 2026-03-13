@@ -1,0 +1,167 @@
+{
+  "_meta": {
+    "id": "medical_ambiguity_patterns",
+    "version": "1.0.0",
+    "description": "Medical ambiguity patterns for patient identity, measurement scope, and trend comparability.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/banks/runtimeWiringIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/tests/certification/bank-wave-runtime-metadata.cert.test.ts",
+      "src/tests/certification/runtime-wiring.cert.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "maxQuestions": 1,
+    "preferClarifyOverSpeculation": true,
+    "domain": "medical"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "after retrieval for encounter-level and numeric interpretation ambiguity",
+    "consumer": "medical ambiguity resolver",
+    "intent": "Avoid false precision from mixed patients, encounters, and incomparable measurements.",
+    "emittedSignals": [
+      "medicalAmbiguityType",
+      "medicalEncounterLockNeeded",
+      "medicalMeasurementUnitConflict"
+    ]
+  },
+  "patterns": [
+    {
+      "id": "MED_AMB_001_patient_scope_collision",
+      "type": "patient_encounter_collision",
+      "triggerSignals": [
+        "multiple_patient_ids_or_encounters",
+        "queryOmitEncounterContext"
+      ],
+      "askQuestion": "Should analysis lock to the most recent encounter, a selected encounter date, or the complete care episode?"
+    },
+    {
+      "id": "MED_AMB_002_unit_or_scale_collision",
+      "type": "unit_scale_collision",
+      "triggerSignals": [
+        "same_measurement_multiple_units",
+        "query_uses_metric_without_unit"
+      ],
+      "askQuestion": "Use native units from source, normalize to one unit, or compare each unit family separately?"
+    },
+    {
+      "id": "MED_AMB_003_reference_range_absent",
+      "type": "reference_context_missing",
+      "triggerSignals": [
+        "lab_or_vitals_query",
+        "referenceRangeNotCaptured"
+      ],
+      "askQuestion": "Should interpretation default to source-provided reference context when available, or remain descriptive only?"
+    },
+    {
+      "id": "MED_AMB_004_role_actor_collision",
+      "type": "actor_role_collision",
+      "triggerSignals": [
+        "queryIncludes_patient_or_subscriber",
+        "same_person_multiple_roles_detected"
+      ],
+      "askQuestion": "Bind actor role first: patient, subscriber, provider, ordering clinician, or assignee before continuing?"
+    },
+    {
+      "id": "MED_AMB_005_medication_allergy_mismatch",
+      "type": "med_allergy_medication_collision",
+      "triggerSignals": [
+        "queryRequests_medication_plan",
+        "medicationsPresentWithoutAllergyLink"
+      ],
+      "askQuestion": "Should output include only active meds with explicit allergy/interaction linkage, or full medication history first?"
+    },
+    {
+      "id": "MED_AMB_006_critical_flag_collision",
+      "type": "criticality_collision",
+      "triggerSignals": [
+        "critical_or_abnormal_values_present",
+        "criticalityInterpretationMissing"
+      ],
+      "askQuestion": "Return criticality as documented only, or include explicit caution and follow-up action matrix?"
+    },
+    {
+      "id": "MED_AMB_007_followup_ambiguity",
+      "type": "followup_window_collision",
+      "triggerSignals": [
+        "queryIncludes_followup",
+        "followup_window_missing_or_multiple"
+      ],
+      "askQuestion": "Use the documented return window, or report all possible windows with source evidence?"
+    },
+    {
+      "id": "MED_AMB_008_trend_axis_collision",
+      "type": "trend_axis_collision",
+      "triggerSignals": [
+        "trend_query",
+        "series_has_discrete_events_or_mixed_frequencies"
+      ],
+      "askQuestion": "Compare trends by encounter, specimen date, or chart date to avoid mixed baselines?"
+    },
+    {
+      "id": "MED_AMB_009_imaging_report_conflict",
+      "type": "imaging_report_conflict",
+      "triggerSignals": [
+        "radiology_query",
+        "impression_and_finding_text_disagree"
+      ],
+      "askQuestion": "Should interpretation prioritize impression text, radiologist impression note, or both with explicit conflict markers?"
+    },
+    {
+      "id": "MED_AMB_010_clinical_tone_guard",
+      "type": "advice_level_collision",
+      "triggerSignals": [
+        "userRequestsTreatmentAdvice",
+        "safety_relevant_query"
+      ],
+      "askQuestion": "Do you want plain document-grounded recap only, or a clinician-facing care handoff summary with escalation path?"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "medical_amb_patient_scope_asks_once",
+        "input": {
+          "scenario": "multiple_encounters_merged"
+        },
+        "expect": {
+          "action": "askQuestion",
+          "maxQuestions": 1
+        }
+      },
+      {
+        "id": "medical_amb_unit_collision",
+        "input": {
+          "scenario": "same_lab_value_with_two_units"
+        },
+        "expect": {
+          "mustAskContains": [
+            "unit",
+            "normalize"
+          ]
+        }
+      },
+      {
+        "id": "medical_amb_actor_role_question",
+        "input": {
+          "query": "Who is responsible for follow-up?"
+        },
+        "expect": {
+          "mustAskContains": [
+            "patient",
+            "subscriber"
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -25,7 +25,8 @@
     "domain": "everyday",
     "deterministic": true,
     "dedupe": true,
-    "sortBy": "id"
+    "sortBy": "id",
+    "configModeOnly": true
   },
   "domain": "everyday",
   "rules": [
@@ -95,6 +96,9 @@
       "depth": "summary",
       "language": "en",
       "tone": "clear",
+      "evidenceConstraints": {
+        "requireConfidenceLabel": true
+      },
       "structure": [
         "answer",
         "top_evidence",
@@ -109,6 +113,9 @@
       "depth": "paragraph",
       "language": "en",
       "tone": "practical",
+      "evidenceConstraints": {
+        "forbidFabrication": true
+      },
       "structure": [
         "answer",
         "risks",
@@ -116,6 +123,41 @@
         "evidence"
       ],
       "template": "Based on the provided documents: {answer}."
+    },
+    {
+      "id": "EVERYDAY_EXPL_T03",
+      "audience": "consumer",
+      "depth": "summary",
+      "language": "pt",
+      "tone": "clear",
+      "evidenceConstraints": {
+        "requireConfidenceLabel": true
+      },
+      "structure": [
+        "answer",
+        "top_evidence",
+        "uncertainty",
+        "next_step"
+      ],
+      "template": "Aqui esta o que o documento diz: {answer}."
+    },
+    {
+      "id": "EVERYDAY_EXPL_T04",
+      "audience": "auditor",
+      "depth": "detailed",
+      "language": "pt",
+      "tone": "skeptical",
+      "evidenceConstraints": {
+        "minCitations": 3,
+        "forbidFabrication": true
+      },
+      "structure": [
+        "answer",
+        "evidence",
+        "uncertainty",
+        "next_step"
+      ],
+      "template": "Com base apenas nos documentos fornecidos: {answer}."
     }
   ],
   "patterns": [
@@ -124,7 +166,44 @@
   "tests": {
     "cases": [
       {
-        "id": "EVERYDAY_EXPL_SMOKE_001"
+        "id": "EXPLAIN_STYLE_EVERYDAY_T_001",
+        "input": {
+          "language": "en",
+          "depth": "summary"
+        },
+        "expect": {
+          "requireConfidenceLabel": true
+        }
+      },
+      {
+        "id": "EXPLAIN_STYLE_EVERYDAY_T_002",
+        "input": {
+          "language": "en",
+          "depth": "paragraph"
+        },
+        "expect": {
+          "forbidFabrication": true
+        }
+      },
+      {
+        "id": "EXPLAIN_STYLE_EVERYDAY_T_003",
+        "input": {
+          "language": "pt",
+          "depth": "summary"
+        },
+        "expect": {
+          "depth": "summary"
+        }
+      },
+      {
+        "id": "EXPLAIN_STYLE_EVERYDAY_T_004",
+        "input": {
+          "language": "pt",
+          "depth": "detailed"
+        },
+        "expect": {
+          "minCitations": 3
+        }
       }
     ]
   }

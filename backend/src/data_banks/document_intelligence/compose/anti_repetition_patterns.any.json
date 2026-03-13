@@ -1,0 +1,152 @@
+{
+  "_meta": {
+    "id": "anti_repetition_patterns",
+    "version": "2.0.0",
+    "description": "Repetition detection and repair patterns for answers that otherwise drift into premium-assistant sameness.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "composition-brain",
+    "usedBy": [
+      "modules/chat/runtime/CompositionStyleResolver.ts",
+      "data_banks/prompts/compose_style_contract.any.json",
+      "services/core/enforcement/qualityGateRegistry.ts"
+    ],
+    "tests": [
+      "modules/chat/runtime/CompositionStyleResolver.test.ts",
+      "services/core/enforcement/qualityGateRunner.service.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "repair pass after draft generation",
+    "consumer": "style decision resolver, style contract prompt, and quality gates",
+    "intent": "Detect repeated stems, repeated transitions, repeated answer endings, and repeated bullet verbs before the answer is finalized."
+  },
+  "patterns": [
+    {
+      "id": "repeat_same_starter",
+      "signal": "same first one to two tokens reused across adjacent sentences",
+      "repair": "swap starter class",
+      "preferredSwaps": [
+        "fact_noun_phrase",
+        "contrastive_bridge",
+        "direct_conclusion"
+      ]
+    },
+    {
+      "id": "repeat_same_transition",
+      "signal": "same transition phrase reused in adjacent paragraphs",
+      "repair": "drop or replace transition",
+      "preferredSwaps": [
+        "implicit transition",
+        "cause_result",
+        "scope_anchor"
+      ]
+    },
+    {
+      "id": "repeat_same_conclusion_shape",
+      "signal": "same takeaway sentence frame reused across answers or paragraphs",
+      "repair": "switch conclusion angle",
+      "preferredSwaps": [
+        "implication_first",
+        "boundary_first",
+        "decision_signal"
+      ]
+    },
+    {
+      "id": "repeat_same_bullet_verb",
+      "signal": "three bullets start with the same verb family",
+      "repair": "alternate verb family and sentence shape",
+      "preferredSwaps": [
+        "status_verbs",
+        "evidence_verbs",
+        "action_verbs"
+      ]
+    },
+    {
+      "id": "repeat_same_quote_wrapper",
+      "signal": "quoted evidence is introduced with the same wrapper phrase repeatedly",
+      "repair": "vary quote framing",
+      "preferredSwaps": [
+        "frame_then_quote",
+        "quote_then_translation",
+        "quote_with_limit"
+      ]
+    },
+    {
+      "id": "repeat_same_softener",
+      "signal": "same hedge or softener appears more than twice",
+      "repair": "keep strongest caveat only",
+      "preferredSwaps": [
+        "one_qualifier_only",
+        "bounded_claim",
+        "direct_claim"
+      ]
+    }
+  ],
+  "rewriteFamilies": [
+    {
+      "id": "starter_rotation",
+      "instruction": "Rotate among answer-first, evidence-first, scope-first, and implication-first sentence entries."
+    },
+    {
+      "id": "transition_suppression",
+      "instruction": "Drop transitions when adjacency already carries the relationship."
+    },
+    {
+      "id": "cadence_reset",
+      "instruction": "After two medium sentences, force a shorter or longer third sentence."
+    }
+  ],
+  "rules": [
+    {
+      "id": "ARP_001_duplicate_starter_ratio",
+      "trigger": "Duplicate sentence starters rise above threshold",
+      "check": "output.duplicateStarterRatio > 0.16",
+      "failureAction": "swap starter class",
+      "severity": "high"
+    },
+    {
+      "id": "ARP_002_transition_echo",
+      "trigger": "Transition phrase repeats across paragraphs",
+      "check": "output.repeatedTransitionCount > 1",
+      "failureAction": "drop or replace transition",
+      "severity": "medium"
+    },
+    {
+      "id": "ARP_003_bullet_verb_monotony",
+      "trigger": "Bullets overuse same verb family",
+      "check": "output.sameBulletVerbRun >= 3",
+      "failureAction": "alternate verb family and sentence shape",
+      "severity": "medium"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "anti_repetition_detects_starter_reuse",
+        "input": {
+          "duplicateStarterRatio": 0.2
+        },
+        "expect": {
+          "rewrite": "swap starter class"
+        }
+      },
+      {
+        "id": "anti_repetition_has_quote_wrapper_pattern",
+        "expect": {
+          "pattern": "repeat_same_quote_wrapper"
+        }
+      }
+    ]
+  }
+}

@@ -35,7 +35,7 @@ describe("LlmRouterService", () => {
     });
 
     expect(out.provider).toBe("openai");
-    expect(out.model).toBe("gpt-5.2-2026-01-15");
+    expect(out.model).toBe("gpt-5.2");
     expect(out.lane).toBe("final_authority_default");
     expect(out.modelFamily).toBe("gpt-5.2");
     expect(out.stage).toBe("final");
@@ -53,7 +53,7 @@ describe("LlmRouterService", () => {
 
     expect(out.provider).toBe("openai");
     expect(out.model).not.toBe("gpt-5-mini");
-    expect(out.model).toBe("gpt-5.2-2026-01-15");
+    expect(out.model).toBe("gpt-5.2");
     expect(out.lane).toBe("final_authority_default");
   });
 

@@ -60,6 +60,10 @@ import ChatInterface from '../chat/ChatInterface';
 import AllybiEditingToolbar from './editor/allybi-toolbar/AllybiEditingToolbar';
 import DocPageLayout from './editor/DocPageLayout';
 import ImageViewerCanvas from './ImageViewerCanvas';
+import MobileExcelViewer from './excel/MobileExcelViewer';
+import MobileImageViewer from './MobileImageViewer';
+import MobilePdfViewer from './pdf/MobilePdfViewer';
+import MobileVideoViewer from './video/MobileVideoViewer';
 import PdfViewerShell from './pdf/PdfViewerShell';
 import PptxViewerShell from './pptx/PptxViewerShell';
 import VideoViewerShell from './video/VideoViewerShell';
@@ -5615,6 +5619,18 @@ const DocumentViewer = () => {
             different parent branches causes React to unmount/remount it, which
             destroys manual DOM edits (contentEditable changes). */}
         {currentFileType === 'excel' ? (
+          isMobile ? (
+            <MobileExcelViewer
+              document={document}
+              onClose={() => window.history.back()}
+              onDownload={async () => {
+                try {
+                  const response = await api.get(`/api/documents/${document.id}/download`);
+                  safariDownloadFile(response.data.url, document.filename);
+                } catch (err) { showError(t('alerts.failedToDownload')); }
+              }}
+            />
+          ) : (
           <Suspense fallback={null}>
             <SpreadsheetPageLayout
               document={document}
@@ -5672,7 +5688,24 @@ const DocumentViewer = () => {
               {previewCanvas}
             </SpreadsheetPageLayout>
           </Suspense>
+          )
         ) : currentFileType === 'word' ? (
+        isMobile ? (
+        <MobilePdfViewer
+          fileConfig={fileConfig}
+          pdfOptions={pdfOptions}
+          filename={cleanDocumentName(document?.filename) || 'Document'}
+          initialPage={pendingInitialPage}
+          onClose={() => window.history.back()}
+          onDownload={async () => {
+            try {
+              const response = await api.get(`/api/documents/${document.id}/download`);
+              safariDownloadFile(response.data.url, document.filename);
+            } catch (err) { showError(t('alerts.failedToDownload')); }
+          }}
+          onDocumentLoadSuccess={onDocumentLoadSuccess}
+        />
+        ) : (
         <div style={{ width: '100%', flex: 1, minWidth: 0, minHeight: 0, display: 'flex', position: 'relative' }}>
           <DocPageLayout
             ref={documentContainerRef}
@@ -5757,7 +5790,21 @@ const DocumentViewer = () => {
             </div>
           ) : null}
         </div>
+        )
         ) : currentFileType === 'image' ? (
+        isMobile ? (
+        <MobileImageViewer
+          previewUrl={actualDocumentUrl}
+          filename={cleanDocumentName(document?.filename) || 'Image'}
+          onClose={() => window.history.back()}
+          onDownload={async () => {
+            try {
+              const response = await api.get(`/api/documents/${document.id}/download`);
+              safariDownloadFile(response.data.url, document.filename);
+            } catch (err) { showError(t('alerts.failedToDownload')); }
+          }}
+        />
+        ) : (
         <div style={{ width: '100%', flex: 1, minWidth: 0, minHeight: 0, display: 'flex', position: 'relative' }}>
           <ImageViewerCanvas
             key={`imgv-${imageRetryNonce}`}
@@ -5813,6 +5860,7 @@ const DocumentViewer = () => {
             </div>
           ) : null}
         </div>
+        )
         ) : currentFileType === 'pdf' ? (
         <div style={{ width: '100%', flex: 1, minWidth: 0, minHeight: 0, display: 'flex', position: 'relative' }}>
           <PdfViewerShell
@@ -5853,6 +5901,25 @@ const DocumentViewer = () => {
           ) : null}
         </div>
         ) : currentFileType === 'video' ? (
+        isMobile ? (
+          <MobileVideoViewer
+            src={documentUrl}
+            mimeType={document?.mimeType}
+            filename={cleanDocumentName(document?.filename) || 'Video'}
+            onClose={() => window.history.back()}
+            onDownload={async () => {
+              try {
+                const res = await api.get(`/api/documents/${document?.id}/download`);
+                if (res.data?.url) {
+                  const a = window.document.createElement('a');
+                  a.href = res.data.url;
+                  a.download = document?.filename || 'video';
+                  a.click();
+                }
+              } catch {}
+            }}
+          />
+        ) : (
         <div style={{ width: '100%', flex: 1, minWidth: 0, minHeight: 0, display: 'flex', position: 'relative' }}>
           <VideoViewerShell src={documentUrl} document={document} />
           {/* Right: Allybi panel (desktop) */}
@@ -5869,6 +5936,7 @@ const DocumentViewer = () => {
             </div>
           ) : null}
         </div>
+        )
         ) : (
         <div style={{ width: '100%', flex: 1, minWidth: 0, minHeight: 0, display: 'flex', position: 'relative' }}>
           <div style={{ flex: 1, minWidth: 0, minHeight: 0, display: 'flex', flexDirection: 'column' }}>

@@ -1,7 +1,7 @@
 {
   "_meta": {
     "id": "prompt_registry",
-    "version": "2.2.0",
+    "version": "2.3.0",
     "description": "Canonical runtime prompt registry. Defines layered prompt composition and deterministic task selection.",
     "languages": [
       "any",
@@ -67,9 +67,21 @@
       }
     },
     {
+      "id": "llm_global_guards",
+      "path": "prompts/llm_global_guards.any.json",
+      "required": true,
+      "concerns": ["global_bans"],
+      "purpose": "Universal output bans applied only through declared registry layers.",
+      "appliesTo": {
+        "allOperators": true,
+        "allDomains": true
+      }
+    },
+    {
       "id": "rag_policy",
       "path": "prompts/rag_policy.any.json",
       "required": true,
+      "concerns": ["grounding"],
       "purpose": "RAG grounding and injection resistance.",
       "appliesTo": {
         "allOperators": true,
@@ -80,7 +92,24 @@
       "id": "policy_citations",
       "path": "prompts/policy_citations.any.json",
       "required": true,
+      "concerns": ["citation_contract"],
       "purpose": "Attachment-based citation contract (no inline Sources block).",
+      "appliesTo": {
+        "allOperators": true,
+        "allDomains": true
+      }
+    },
+    {
+      "id": "compose_style_contract",
+      "path": "prompts/compose_style_contract.any.json",
+      "required": true,
+      "concerns": [
+        "voice_selection",
+        "answer_strategy",
+        "anti_robotic_repair",
+        "uncertainty_wording"
+      ],
+      "purpose": "Live composition style contract derived from runtime style decisions.",
       "appliesTo": {
         "allOperators": true,
         "allDomains": true
@@ -90,6 +119,7 @@
       "id": "task_answer_with_sources",
       "path": "prompts/task_answer_with_sources.any.json",
       "required": true,
+      "concerns": ["answer_shape"],
       "purpose": "Final user-answer composition contract.",
       "appliesTo": {
         "allOperators": true,
@@ -114,6 +144,7 @@
       "id": "editing_task_prompts",
       "path": "prompts/editing_task_prompts.any.json",
       "required": true,
+      "concerns": ["tool_contract"],
       "purpose": "Task-specific editing prompts migrated from legacy runtime strings.",
       "appliesTo": {
         "operators": [
@@ -140,6 +171,7 @@
       "id": "retrieval_prompt",
       "path": "prompts/retrieval_prompt.any.json",
       "required": true,
+      "concerns": ["retrieval_planner"],
       "purpose": "Retrieval planning contract.",
       "appliesTo": {
         "operators": [
@@ -157,6 +189,7 @@
       "id": "disambiguation_prompt",
       "path": "prompts/disambiguation_prompt.any.json",
       "required": true,
+      "concerns": ["clarification_render"],
       "purpose": "Single-question disambiguation prompt.",
       "appliesTo": {
         "operators": [
@@ -175,6 +208,7 @@
       "id": "fallback_prompt",
       "path": "prompts/fallback_prompt.any.json",
       "required": true,
+      "concerns": ["fallback_render"],
       "purpose": "Adaptive fallback message template.",
       "appliesTo": {
         "allOperators": true,
@@ -185,6 +219,7 @@
       "id": "tool_prompts",
       "path": "prompts/tool_prompts.any.json",
       "required": false,
+      "concerns": ["tool_contract"],
       "purpose": "Tool-specific helper prompts.",
       "appliesTo": {
         "operators": [
@@ -195,6 +230,41 @@
       }
     }
   ],
+  "requiredConcernsByKind": {
+    "compose_answer": [
+      "global_bans",
+      "grounding",
+      "answer_shape",
+      "citation_contract",
+      "voice_selection",
+      "answer_strategy",
+      "anti_robotic_repair",
+      "uncertainty_wording"
+    ],
+    "retrieval": [
+      "global_bans",
+      "grounding",
+      "retrieval_planner"
+    ],
+    "disambiguation": [
+      "global_bans",
+      "clarification_render"
+    ],
+    "fallback": [
+      "global_bans",
+      "fallback_render"
+    ],
+    "tool": [
+      "global_bans",
+      "tool_contract"
+    ]
+  },
+  "forbiddenConcernOverlaps": [
+    { "left": "grounding", "right": "answer_shape" },
+    { "left": "grounding", "right": "global_bans" },
+    { "left": "answer_shape", "right": "citation_contract" },
+    { "left": "clarification_render", "right": "fallback_render" }
+  ],
   "layersByKind": {
     "system": [
       "system_base"
@@ -202,30 +272,35 @@
     "compose_answer": [
       "system_base",
       "mode_chat",
+      "llm_global_guards",
       "rag_policy",
+      "compose_style_contract",
       "task_answer_with_sources",
       "policy_citations"
     ],
     "retrieval": [
       "system_base",
       "mode_chat",
+      "llm_global_guards",
       "rag_policy",
       "retrieval_prompt"
     ],
     "disambiguation": [
       "system_base",
       "mode_chat",
+      "llm_global_guards",
       "disambiguation_prompt"
     ],
     "fallback": [
       "system_base",
       "mode_chat",
-      "fallback_prompt",
-      "policy_citations"
+      "llm_global_guards",
+      "fallback_prompt"
     ],
     "tool": [
       "system_base",
       "mode_editing",
+      "llm_global_guards",
       "editing_task_prompts",
       "task_plan_generation",
       "policy_citations",

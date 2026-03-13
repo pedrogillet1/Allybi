@@ -1,0 +1,190 @@
+{
+  "_meta": {
+    "id": "di_public_sector_retrieval_strategies",
+    "version": "1.0.0",
+    "description": "Public sector retrieval strategy balancing legal anchors, budget controls, and service impact.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/retrieval/hybridRetriever.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/retrievalPrecision.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "public_sector",
+    "maxBoostRules": 95,
+    "maxQueryExpansionTerms": 140
+  },
+  "domain": "public_sector",
+  "sectionPriority": [
+    {
+      "section": "gov_section_legal_basis",
+      "weight": 9.2,
+      "operators": [
+        "extract",
+        "validate",
+        "summarize"
+      ]
+    },
+    {
+      "section": "gov_section_award_and_contract",
+      "weight": 9,
+      "operators": [
+        "compare",
+        "extract",
+        "evaluate"
+      ]
+    },
+    {
+      "section": "gov_section_budget_breakdown",
+      "weight": 8.6,
+      "operators": [
+        "calculate",
+        "extract",
+        "validate",
+        "compare"
+      ]
+    },
+    {
+      "section": "gov_section_disbursement_status",
+      "weight": 8.3,
+      "operators": [
+        "extract",
+        "monitor",
+        "validate",
+        "summarize"
+      ]
+    },
+    {
+      "section": "gov_section_performance_indicator",
+      "weight": 7.8,
+      "operators": [
+        "summarize",
+        "evaluate",
+        "compare"
+      ]
+    },
+    {
+      "section": "gov_section_audit_findings",
+      "weight": 8.9,
+      "operators": [
+        "validate",
+        "extract",
+        "summarize"
+      ]
+    },
+    {
+      "section": "gov_section_oversight_actions",
+      "weight": 8,
+      "operators": [
+        "advise",
+        "summarize",
+        "monitor"
+      ]
+    },
+    {
+      "section": "gov_section_citizen_impact",
+      "weight": 6.9,
+      "operators": [
+        "evaluate",
+        "summarize"
+      ]
+    }
+  ],
+  "tablePriority": [
+    {
+      "table": "gov_table_budget_grid",
+      "weight": 9,
+      "operators": [
+        "calculate",
+        "validate",
+        "extract"
+      ]
+    },
+    {
+      "table": "gov_table_award_rank_matrix",
+      "weight": 8.8,
+      "operators": [
+        "compare",
+        "extract",
+        "evaluate"
+      ]
+    },
+    {
+      "table": "gov_table_disbursement_plan",
+      "weight": 8.5,
+      "operators": [
+        "extract",
+        "monitor",
+        "validate"
+      ]
+    },
+    {
+      "table": "gov_table_audit_defect_register",
+      "weight": 9.1,
+      "operators": [
+        "validate",
+        "summarize"
+      ]
+    },
+    {
+      "table": "gov_table_service_metrics",
+      "weight": 7.5,
+      "operators": [
+        "compare",
+        "evaluate"
+      ]
+    }
+  ],
+  "queryExpansion": [
+    "fiscal year",
+    "budget line",
+    "award criteria",
+    "disbursement",
+    "audit finding",
+    "compliance condition",
+    "oversight action",
+    "performance indicator",
+    "vigência",
+    "contrapartida"
+  ],
+  "strategies": [
+    {
+      "id": "gov_strategy_tied_award_compare",
+      "operators": [
+        "compare",
+        "validate"
+      ],
+      "description": "Compare award candidates only after legal basis and supplier eligibility are explicit.",
+      "steps": [
+        "anchor tender notice and legal basis",
+        "load award matrix and justification",
+        "validate evaluation dimensions are same across offers",
+        "show winner rationale + exception notes"
+      ]
+    },
+    {
+      "id": "gov_strategy_execution_health",
+      "operators": [
+        "monitor",
+        "evaluate",
+        "summarize"
+      ],
+      "description": "Generate an execution-health readout from budget, milestones, and audit signals.",
+      "steps": [
+        "resolve grant or program and period",
+        "collect budget execution and disbursement status",
+        "join audit defects and mitigation owner",
+        "surface service impact with confidence intervals where available"
+      ]
+    }
+  ]
+}

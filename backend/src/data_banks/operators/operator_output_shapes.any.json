@@ -24,7 +24,7 @@
       "neverOutputJson": true,
       "preferShortParagraphs": true,
       "maxSentencesPerParagraph": 2,
-      "maxCharsPerParagraph": 260,
+      "maxCharsPerParagraph": 480,
       "bulletsMaxSentencesPerBullet": 3,
       "bulletsMaxCharsPerBulletSoft": 280,
       "tablesStrictGfm": true,
@@ -37,7 +37,7 @@
       "description": "1–N short paragraphs (each 1–2 sentences).",
       "paragraphRules": {
         "maxSentencesPerParagraph": 2,
-        "maxCharsPerParagraph": 260,
+        "maxCharsPerParagraph": 480,
         "splitLongParagraphs": true
       }
     },

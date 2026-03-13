@@ -27,8 +27,8 @@
         "hardBlockIsTerminal": true
       },
       "thresholds": {
-        "maxBulletsHard": 7,
-        "maxBulletsSoft": 5,
+        "maxBulletsHard": 14,
+        "maxBulletsSoft": 10,
         "maxBulletCharsHard": 320,
         "maxBulletCharsSoft": 240,
         "maxBulletSentencesHard": 3,
@@ -97,8 +97,8 @@
       ],
       "action": {
         "type": "enforce_bullet_limits",
-        "maxBulletsSoft": 5,
-        "maxBulletsHard": 7,
+        "maxBulletsSoft": 10,
+        "maxBulletsHard": 14,
         "maxSentencesSoft": 2,
         "maxSentencesHard": 3,
         "maxCharsSoft": 240,
@@ -197,7 +197,7 @@
           ]
         },
         "expect": {
-          "bulletCountMax": 7
+          "bulletCountMax": 14
         }
       },
       {

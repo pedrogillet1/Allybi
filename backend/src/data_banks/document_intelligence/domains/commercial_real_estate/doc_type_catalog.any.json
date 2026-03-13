@@ -1,0 +1,251 @@
+{
+  "_meta": {
+    "id": "di_commercial_real_estate_doc_type_catalog",
+    "version": "1.0.0",
+    "description": "Commercial real estate document catalog for leasing, property, valuation, and diligence workflows.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "domain-brain",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts",
+      "services/core/retrieval/domainIntentRouter.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/docint-eval-pack.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "commercial_real_estate"
+  },
+  "domain": "commercial_real_estate",
+  "docTypes": [
+    {
+      "id": "cre_property_dossier",
+      "name": {
+        "en": "Property Dossier",
+        "pt": "Dossiê do Imóvel"
+      },
+      "description": "High-level property fact base with zoning, size, and occupancy context.",
+      "detectionPatterns": [
+        "\\bproperty dossier\\b",
+        "\\bproperty profile\\b",
+        "\\bdossiê do imóvel\\b",
+        "\\bficha técnica\\b"
+      ],
+      "canonicalSections": [
+        "property master",
+        "location",
+        "zoning",
+        "area",
+        "valuation basis"
+      ],
+      "extractionPriority": 140,
+      "riskTier": "high"
+    },
+    {
+      "id": "cre_lease_agreement",
+      "name": {
+        "en": "Lease Agreement",
+        "pt": "Contrato de Locação"
+      },
+      "description": "Tenant lease terms, rent schedules, CAM, and termination rights.",
+      "detectionPatterns": [
+        "\\blease agreement\\b",
+        "\\bcontract term\\b",
+        "\\bcontrato de locação\\b",
+        "\\baluguel\\b"
+      ],
+      "canonicalSections": [
+        "lease term",
+        "rent schedule",
+        "renewal",
+        "default remedies",
+        "guarantees"
+      ],
+      "extractionPriority": 139,
+      "riskTier": "critical"
+    },
+    {
+      "id": "cre_rent_roll",
+      "name": {
+        "en": "Rent Roll",
+        "pt": "Planilha de Receitas"
+      },
+      "description": "Tenant-by-tenant revenue, area, expiry, and payment status detail.",
+      "detectionPatterns": [
+        "\\brent roll\\b",
+        "\\btenant rent\\b",
+        "\\bplanilha de locação\\b",
+        "\\brol\\b"
+      ],
+      "canonicalSections": [
+        "tenant profile",
+        "occupancy",
+        "rent",
+        "expiry"
+      ],
+      "extractionPriority": 138,
+      "riskTier": "critical"
+    },
+    {
+      "id": "cre_appraisal_report",
+      "name": {
+        "en": "Appraisal Report",
+        "pt": "Laudo de Avaliação"
+      },
+      "description": "Valuation assumptions, cap rate, comparables, and value ranges.",
+      "detectionPatterns": [
+        "\\bappraisal report\\b",
+        "\\bvaluation\\b",
+        "\\blaudo\\b",
+        "\\bcap rate\\b"
+      ],
+      "canonicalSections": [
+        "valuation basis",
+        "cap rate",
+        "comps",
+        "assumptions",
+        "sensitivity"
+      ],
+      "extractionPriority": 137,
+      "riskTier": "critical"
+    },
+    {
+      "id": "cre_due_diligence",
+      "name": {
+        "en": "Due Diligence Pack",
+        "pt": "Diligência Prévia"
+      },
+      "description": "Legal, structural, and environmental diligence findings.",
+      "detectionPatterns": [
+        "\\bdue diligence\\b",
+        "\\bdiligence\\b",
+        "\\bdue diligence\\b",
+        "\\bdue diligence imobiliária\\b"
+      ],
+      "canonicalSections": [
+        "findings",
+        "risks",
+        "action items",
+        "conditions"
+      ],
+      "extractionPriority": 136,
+      "riskTier": "high"
+    },
+    {
+      "id": "cre_title_report",
+      "name": {
+        "en": "Title Report",
+        "pt": "Certidão e Matrícula"
+      },
+      "description": "Title status, liens, easements, and ownership chain.",
+      "detectionPatterns": [
+        "\\btitle\\b",
+        "\\bcertificate\\b",
+        "\\bmatrícula\\b",
+        "\\btitulação\\b"
+      ],
+      "canonicalSections": [
+        "ownership",
+        "encumbrances",
+        "restrictions",
+        "history"
+      ],
+      "extractionPriority": 135,
+      "riskTier": "critical"
+    },
+    {
+      "id": "cre_inspection_report",
+      "name": {
+        "en": "Inspection Report",
+        "pt": "Relatório de Inspeção"
+      },
+      "description": "Building condition, compliance, and immediate remediation needs.",
+      "detectionPatterns": [
+        "\\binspection report\\b",
+        "\\bbuilding inspection\\b",
+        "\\blaudo\\b",
+        "\\brelatório de vistoria\\b"
+      ],
+      "canonicalSections": [
+        "condition",
+        "compliance",
+        "defects",
+        "capex needs"
+      ],
+      "extractionPriority": 134,
+      "riskTier": "high"
+    },
+    {
+      "id": "cre_financial_model",
+      "name": {
+        "en": "Financial Model",
+        "pt": "Modelo Financeiro"
+      },
+      "description": "Cash flow forecasts, NOI, and debt-service coverage assumptions.",
+      "detectionPatterns": [
+        "\\bfinancial model\\b",
+        "\\bnoi\\b",
+        "\\bcash flow\\b",
+        "\\bmodelagem financeira\\b"
+      ],
+      "canonicalSections": [
+        "noi",
+        "assumptions",
+        "rent projections",
+        "expenses",
+        "stress_cases"
+      ],
+      "extractionPriority": 133,
+      "riskTier": "high"
+    },
+    {
+      "id": "cre_tenant_letter",
+      "name": {
+        "en": "Tenant Letter",
+        "pt": "Carta de Inquilino"
+      },
+      "description": "Rent default notices and operational commitments from tenants.",
+      "detectionPatterns": [
+        "\\btenant letter\\b",
+        "\\blease amendment\\b",
+        "\\bcarta de inquilino\\b",
+        "\\bdefault letter\\b"
+      ],
+      "canonicalSections": [
+        "default notice",
+        "remediation",
+        "payment",
+        "timeline"
+      ],
+      "extractionPriority": 132,
+      "riskTier": "medium"
+    },
+    {
+      "id": "cre_purchase_option",
+      "name": {
+        "en": "Purchase Option",
+        "pt": "Opção de Compra"
+      },
+      "description": "Buyout terms, valuation triggers, and condition precedent requirements.",
+      "detectionPatterns": [
+        "\\bpurchase option\\b",
+        "\\bcall option\\b",
+        "\\bopção de compra\\b",
+        "\\bcondição\\b"
+      ],
+      "canonicalSections": [
+        "trigger",
+        "valuation",
+        "exercise_date",
+        "preconditions"
+      ],
+      "extractionPriority": 131,
+      "riskTier": "high"
+    }
+  ]
+}

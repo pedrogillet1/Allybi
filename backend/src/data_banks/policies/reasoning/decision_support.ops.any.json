@@ -22,7 +22,8 @@
   },
   "config": {
     "enabled": true,
-    "domain": "ops"
+    "domain": "ops",
+    "configModeOnly": true
   },
   "domain": "ops",
   "framework": {
@@ -1525,5 +1526,38 @@
         "allowInferenceWhenLabeled": true
       }
     }
-  ]
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "DECISION_SUPPORT_OPS_T_001",
+        "input": {},
+        "expect": {
+          "requireOptions": true
+        }
+      },
+      {
+        "id": "DECISION_SUPPORT_OPS_T_002",
+        "input": {},
+        "expect": {
+          "requireRiskTradeoffs": true
+        }
+      },
+      {
+        "id": "DECISION_SUPPORT_OPS_T_003",
+        "input": {},
+        "expect": {
+          "requireEvidenceSummary": true,
+          "requireUncertaintyStatement": true
+        }
+      },
+      {
+        "id": "DECISION_SUPPORT_OPS_T_004",
+        "input": {},
+        "expect": {
+          "minimumOptionCount": 2
+        }
+      }
+    ]
+  }
 }

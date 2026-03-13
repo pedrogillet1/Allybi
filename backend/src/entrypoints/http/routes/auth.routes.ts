@@ -31,7 +31,7 @@ import {
   authRefreshSchema,
 } from "../../../schemas/request.schemas";
 
-import prisma from "../../../platform/db/prismaClient";
+import prisma from "../../../config/database";
 import { config } from "../../../config/env";
 import { generateAccessToken, generateRefreshToken } from "../../../utils/jwt";
 import { setAuthCookies } from "../../../utils/authCookies";

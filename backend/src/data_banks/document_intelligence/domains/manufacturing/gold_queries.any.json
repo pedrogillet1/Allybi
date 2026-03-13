@@ -1,0 +1,152 @@
+{
+  "_meta": {
+    "id": "eval_gold_queries_manufacturing_domain",
+    "version": "1.0.0",
+    "description": "Manufacturing gold queries for operational math and quality traceability.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "eval-domain-brain",
+    "usedBy": [
+      "services/eval/goldQueryRunner.service.ts",
+      "services/core/orchestration/answerPlanner.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts",
+      "tests/document-intelligence/docint-eval-pack.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "manufacturing",
+    "scenarioType": "manufacturing_reasoning"
+  },
+  "runtimeUsageNotes": {
+    "selectionStage": "evaluation suite",
+    "consumer": "goldQueryRunner",
+    "intent": "Validate batch scoping, yield math, and downtime attribution."
+  },
+  "goldQueries": [
+    {
+      "id": "mfg_gold_001",
+      "lang": "en",
+      "query": "Compute first-pass yield for WO-2026-0301 compared with last week, and explain the top two quality deltas.",
+      "expected": {
+        "mustReadSource": [
+          "work order",
+          "yield table",
+          "inspection table"
+        ],
+        "mustExtract": [
+          "work_order_id",
+          "planned_qty",
+          "produced_qty",
+          "defect_qty",
+          "yield_rate",
+          "quality_delta_reason"
+        ],
+        "mustPreserveBatch": true,
+        "mustPreserveScope": true,
+        "failureConditions": [
+          "yield_without_batch_scope",
+          "mixing_shifts_without_hierarchy",
+          "no_quality_delta_reason"
+        ]
+      }
+    },
+    {
+      "id": "mfg_gold_002",
+      "lang": "en",
+      "query": "What was the largest downtime root cause yesterday and what was the associated MTTR?",
+      "expected": {
+        "mustFindSection": [
+          "downtime",
+          "maintenance",
+          "root cause"
+        ],
+        "mustExtract": [
+          "cause",
+          "start_time",
+          "end_time",
+          "duration_minutes",
+          "resolver",
+          "mttr"
+        ],
+        "mustShowTimeWindow": true,
+        "failureConditions": [
+          "no_downtime_duration",
+          "missing_asset",
+          "omits_mttr_method"
+        ]
+      }
+    },
+    {
+      "id": "mfg_gold_003",
+      "lang": "en",
+      "query": "Compare BOM consumption variance against WIP snapshot and identify significant material overrun risks.",
+      "expected": {
+        "mustFindSection": [
+          "materials consumption",
+          "inventory balance",
+          "wip snapshot"
+        ],
+        "mustExtract": [
+          "component",
+          "planned_qty",
+          "actual_qty",
+          "variance",
+          "risk_level"
+        ],
+        "mustPreserveCalculationPath": true,
+        "failureConditions": [
+          "missing_component_ids",
+          "omits_variance_formula",
+          "ignores_variance_significance"
+        ]
+      }
+    },
+    {
+      "id": "mfg_gold_004",
+      "lang": "pt",
+      "query": "Mostre incidentes de segurança recentes e ações corretivas, com impacto operacional.",
+      "expected": {
+        "mustInclude": [
+          "incidente",
+          "ação corretiva",
+          "impacto"
+        ],
+        "mustPreservePeriod": true,
+        "failureConditions": [
+          "agrupamento_sem_causa",
+          "sem_data"
+        ]
+      }
+    }
+  ],
+  "qualityGuards": {
+    "maxAllowedInferenceRate": 0.11,
+    "requiredAnchorDensity": 2.3,
+    "penalties": {
+      "missing_batch_scope": -32,
+      "missing_mttr": -30,
+      "missing_root_cause": -20
+    }
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "mfg_gold_requires_batch_for_yield",
+        "input": {
+          "query": "mfg_gold_001"
+        },
+        "expect": {
+          "mustCheck": [
+            "mustPreserveBatch",
+            "mustPreserveScope"
+          ]
+        }
+      }
+    ]
+  }
+}

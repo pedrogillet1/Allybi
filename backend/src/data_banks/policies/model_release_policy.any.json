@@ -80,6 +80,30 @@
         "expect": {
           "action": "block_release"
         }
+      },
+      {
+        "id": "MRP_T_001_A_002",
+        "runtime": {
+          "metrics": {
+            "severity1Failures": 1,
+            "regressionPassRate": 0.99
+          }
+        },
+        "expect": {
+          "action": "block_release"
+        }
+      },
+      {
+        "id": "MRP_T_001_A_003",
+        "runtime": {
+          "metrics": {
+            "severity1Failures": 1,
+            "regressionPassRate": 0.99
+          }
+        },
+        "expect": {
+          "action": "block_release"
+        }
       }
     ]
   }

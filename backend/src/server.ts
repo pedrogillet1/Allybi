@@ -13,7 +13,7 @@ import { Server as SocketIOServer } from "socket.io";
 import app from "./app";
 import { config } from "./config/env";
 import { createSecureServer } from "./config/ssl.config";
-import prisma from "./platform/db/prismaClient";
+import prisma from "./config/database";
 import * as gcsStorage from "./config/storage";
 import { initializeContainer, getContainer } from "./bootstrap/container";
 import { createAuthService } from "./bootstrap/authBridge";
@@ -30,9 +30,9 @@ import {
   startPreviewGenerationWorker,
   startPreviewReconciliationWorker,
   startStuckDocSweeper,
-  startConnectorWorker,
-  startEditWorker,
-} from "./app/workers";
+} from "./queues/document.queue";
+import { startWorker as startConnectorWorker } from "./workers/connector-worker";
+import { startWorker as startEditWorker } from "./workers/edit-worker";
 
 // LLM wiring
 import { LLMClientFactory } from "./services/llm/core/llmClientFactory";
@@ -51,16 +51,21 @@ import { getBankLoaderInstance } from "./services/core/banks/bankLoader.service"
 import { EncryptionService } from "./services/security/encryption.service";
 import { EnvelopeService } from "./services/security/envelope.service";
 import { TenantKeyService } from "./services/security/tenantKey.service";
-import { ConversationKeyService } from "./services/chat/conversationKey.service";
-import { ChatCryptoService } from "./services/chat/chatCrypto.service";
-import { EncryptedChatRepo } from "./services/chat/encryptedChatRepo.service";
-import { EncryptedChatContextService } from "./services/chat/encryptedChatContext.service";
+import { ConversationKeyService } from "./modules/chat/infrastructure/conversationKey.service";
+import { ChatCryptoService } from "./modules/chat/infrastructure/chatCrypto.service";
+import { EncryptedChatRepo } from "./modules/chat/infrastructure/encryptedChatRepo.service";
+import { EncryptedChatContextService } from "./modules/chat/infrastructure/encryptedChatContext.service";
 import { DocumentKeyService } from "./services/documents/documentKey.service";
 import { DocumentCryptoService } from "./services/documents/documentCrypto.service";
 import { EncryptedDocumentRepo } from "./services/documents/encryptedDocumentRepo.service";
 import { ChunkCryptoService } from "./services/retrieval/chunkCrypto.service";
+import { FolderKeyService } from "./services/folders/folderKey.service";
+import { FolderCryptoService } from "./services/folders/folderCrypto.service";
 import { bootstrapSecrets } from "./bootstrap/secrets";
 import { startOrphanCleanupScheduler } from "./jobs/orphanCleanup.scheduler";
+import { getRuntimeRole } from "./config/runtimeMode";
+import { configureSocketRedisAdapter, closeSocketRedisAdapter } from "./services/realtime/socketAdapter.service";
+import { createBackgroundRuntimeServer } from "./runtime/backgroundHttp";
 
 const driveStorage = {
   provider: "drive",
@@ -86,8 +91,10 @@ process.on("unhandledRejection", (reason: any) => {
 
 const PORT = Number(config.PORT ?? process.env.PORT ?? 3001);
 
-async function startServer() {
+export async function startServer() {
   try {
+    const runtimeRole = getRuntimeRole();
+
     // 0. Bootstrap secrets from Secret Manager (prod) or .env (dev)
     await bootstrapSecrets();
 
@@ -288,6 +295,13 @@ async function startServer() {
       docKeyService,
       docCryptoService,
     );
+    const folderKeyService = new FolderKeyService(
+      prisma,
+      encryptionService,
+      tenantKeyService,
+      envelopeService,
+    );
+    const folderCryptoService = new FolderCryptoService(encryptionService);
 
     // Wire encryption into chat service unless explicitly disabled for local/debug runs.
     const hasEncryptionKey = !!process.env.KODA_MASTER_KEY_BASE64;
@@ -306,7 +320,14 @@ async function startServer() {
 
     app.locals.services = {
       documents: new PrismaDocumentService(),
-      folders: new PrismaFolderService(),
+      folders: new PrismaFolderService(
+        hasEncryptionKey
+          ? {
+              folderKeys: folderKeyService,
+              folderCrypto: folderCryptoService,
+            }
+          : undefined,
+      ),
       history: new PrismaHistoryService(),
       auth: createAuthService(),
       adminAuth: createAdminAuthService(),
@@ -334,11 +355,18 @@ async function startServer() {
         docKeys: docKeyService,
         crypto: docCryptoService,
       },
+      encryptedFolders: {
+        folderKeys: folderKeyService,
+        crypto: folderCryptoService,
+      },
       chunkCrypto: chunkCryptoService,
     };
 
-    // 6. Start HTTPS (or HTTP fallback) + Socket.IO server
-    const httpServer = createSecureServer(app);
+    // 6. Start HTTP server for the selected runtime role
+    const httpServer =
+      runtimeRole === "api"
+        ? createSecureServer(app)
+        : createBackgroundRuntimeServer(runtimeRole);
 
     const socketOrigins = [
       "http://localhost:3000",
@@ -354,41 +382,45 @@ async function startServer() {
       config.FRONTEND_URL,
     ].filter(Boolean) as string[];
 
-    const io = new SocketIOServer(httpServer, {
-      cors: {
-        origin: socketOrigins,
-        methods: ["GET", "POST"],
-        credentials: true,
-      },
-      transports: ["websocket", "polling"],
-    });
-    setRealtimeSocketServer(io);
+    let io: SocketIOServer | null = null;
+    if (runtimeRole === "api") {
+      io = new SocketIOServer(httpServer, {
+        cors: {
+          origin: socketOrigins,
+          methods: ["GET", "POST"],
+          credentials: true,
+        },
+        transports: ["websocket", "polling"],
+      });
+      await configureSocketRedisAdapter(io);
+      setRealtimeSocketServer(io);
 
-    io.on("connection", (socket) => {
-      console.log("[Socket.IO] connected:", socket.id);
+      io.on("connection", (socket) => {
+        console.log("[Socket.IO] connected:", socket.id);
 
-      socket.on("join-user-room", (rawUserId: unknown) => {
-        const userId = String(rawUserId || "").trim();
-        if (!userId) return;
-        socket.join(userId);
-        socket.join(`user:${userId}`);
-        socket.emit("joined-user-room", { userId });
+        socket.on("join-user-room", (rawUserId: unknown) => {
+          const userId = String(rawUserId || "").trim();
+          if (!userId) return;
+          socket.join(userId);
+          socket.join(`user:${userId}`);
+          socket.emit("joined-user-room", { userId });
+        });
+
+        socket.on("disconnect", (reason) => {
+          console.log("[Socket.IO] disconnected:", socket.id, reason);
+        });
+
+        socket.on("ping", () => {
+          socket.emit("pong");
+        });
       });
 
-      socket.on("disconnect", (reason) => {
-        console.log("[Socket.IO] disconnected:", socket.id, reason);
-      });
-
-      socket.on("ping", () => {
-        socket.emit("pong");
-      });
-    });
-
-    // Expose io on app.locals so controllers can emit events
-    app.locals.io = io;
+      // Expose io on app.locals so controllers can emit events
+      app.locals.io = io;
+    }
 
     httpServer.listen(PORT, () => {
-      console.log(`[Server] Running on port ${PORT}`);
+      console.log(`[Server] Running on port ${PORT} (role=${runtimeRole})`);
       console.log(`[Server] Environment: ${config.NODE_ENV}`);
     });
 
@@ -401,6 +433,7 @@ async function startServer() {
         // Flush telemetry buffer before disconnecting Prisma (flush writes to DB)
         (async () => {
           try {
+            await closeSocketRedisAdapter();
             await telemetryService.shutdown();
             console.log("[Server] Telemetry buffer flushed.");
           } catch (err: unknown) {
@@ -430,46 +463,67 @@ async function startServer() {
         .trim()
         .toLowerCase() === "true";
 
-    if (disableBackgroundWorkers) {
+    if (disableBackgroundWorkers && runtimeRole === "api") {
       console.warn("[Server] Background workers disabled by env");
-    } else {
-      // 7. Start document queue + preview workers (non-fatal on boot failures)
+    } else if (runtimeRole === "worker-document") {
       try {
         startDocumentWorker();
         console.log("[Server] Document queue worker started");
         startPreviewGenerationWorker();
         console.log("[Server] Preview generation worker started");
-        await startPreviewReconciliationWorker();
-        console.log("[Server] Preview reconciliation worker started");
-        await startStuckDocSweeper();
-        console.log("[Server] Stuck document sweeper started");
       } catch {
         console.warn("[Server] Document queue worker not available");
       }
-
-      // 8. Start connector worker (non-fatal if missing)
+    } else if (runtimeRole === "worker-connectors") {
       try {
         startConnectorWorker();
         console.log("[Server] Connector worker started");
       } catch {
         console.warn("[Server] Connector worker not available");
       }
-
-      // 9. Start edit worker (non-fatal if missing)
+    } else if (runtimeRole === "worker-edit") {
       try {
         startEditWorker();
         console.log("[Server] Edit worker started");
       } catch {
         console.warn("[Server] Edit worker not available");
       }
-    }
+    } else if (runtimeRole === "scheduler") {
+      try {
+        await startPreviewReconciliationWorker();
+        console.log("[Server] Preview reconciliation worker started");
+        await startStuckDocSweeper();
+        console.log("[Server] Stuck document sweeper started");
+      } catch {
+        console.warn("[Server] Scheduler workers not available");
+      }
 
-    // 10. Start cleanup schedulers (session cleanup, orphan cleanup)
-    try {
-      startOrphanCleanupScheduler();
-      console.log("[Server] Orphan cleanup scheduler started");
-    } catch {
-      console.warn("[Server] Orphan cleanup scheduler not available");
+      try {
+        startOrphanCleanupScheduler();
+        console.log("[Server] Orphan cleanup scheduler started");
+      } catch {
+        console.warn("[Server] Orphan cleanup scheduler not available");
+      }
+    } else if (runtimeRole === "api" && !disableBackgroundWorkers) {
+      try {
+        const embeddedDocumentConcurrency = Number(
+          process.env.KODA_EMBEDDED_DOCUMENT_WORKER_CONCURRENCY || "2",
+        );
+        const embeddedPreviewConcurrency = Number(
+          process.env.KODA_EMBEDDED_PREVIEW_WORKER_CONCURRENCY || "1",
+        );
+
+        startDocumentWorker(embeddedDocumentConcurrency);
+        console.log(
+          `[Server] Embedded document queue worker started (concurrency=${embeddedDocumentConcurrency})`,
+        );
+        startPreviewGenerationWorker(embeddedPreviewConcurrency);
+        console.log(
+          `[Server] Embedded preview generation worker started (concurrency=${embeddedPreviewConcurrency})`,
+        );
+      } catch {
+        console.warn("[Server] Embedded document workers not available");
+      }
     }
 
     console.log("[Server] Startup complete");

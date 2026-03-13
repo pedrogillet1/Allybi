@@ -6,6 +6,11 @@
  */
 
 import type { PrismaClient } from "@prisma/client";
+import {
+  buildLatencyBuckets,
+  classifyLatencyBucket,
+  type LatencySample,
+} from "./chatLatencyGrading";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -59,6 +64,17 @@ function asObject(input: unknown): Record<string, unknown> {
 function toFiniteNumber(input: unknown): number | null {
   const parsed = Number(input);
   return Number.isFinite(parsed) ? parsed : null;
+}
+
+function extractLatencyMetrics(constraints: unknown): {
+  ackMs: number | null;
+  firstUsefulContentMs: number | null;
+} {
+  const latency = asObject(asObject(constraints).latency);
+  return {
+    ackMs: toFiniteNumber(latency.ackMs),
+    firstUsefulContentMs: toFiniteNumber(latency.firstUsefulContentMs),
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -538,35 +554,172 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
         const page = hasNext ? rows.slice(0, limit) : rows;
         const nextCursor = hasNext ? page[page.length - 1]?.id : null;
 
-        const items = page.map((r) => ({
-          id: r.id,
-          traceId: r.queryId,
-          query: r.queryText ?? "",
-          userId: r.userId,
-          userName: r.userId.slice(0, 8),
-          conversationId: r.conversationId,
-          intent: r.intent,
-          domain: r.domain || "unknown",
-          createdAt: r.timestamp.toISOString(),
-          totalLatencyMs: r.totalMs || 0,
-          totalTokens: r.totalTokens,
-          totalCost: r.estimatedCostUsd,
-          qualityOutcome: r.isUseful
-            ? "adequate"
-            : r.hadFallback
-              ? "weak"
-              : "blocked",
-          evidenceStrength: r.retrievalAdequate ? 0.85 : 0.4,
-          sourcesCount: r.distinctDocs,
-          providers: [r.model?.split("-")[0] || "unknown"],
-          hadFallback: r.hadFallback,
-          fallbackReason: r.fallbackScenario,
-        }));
+        const items = page.map((r) => {
+          const latency = extractLatencyMetrics(r.constraints);
+          const bucket = classifyLatencyBucket({
+            answerMode: r.answerMode,
+            operatorFamily: r.operatorFamily,
+            distinctDocs: r.distinctDocs,
+            retrievalAdequate: r.retrievalAdequate,
+            navOpenRequested: r.navOpenRequested,
+            navWhereRequested: r.navWhereRequested,
+            navDiscoverRequested: r.navDiscoverRequested,
+          });
+          return {
+            id: r.id,
+            traceId: r.queryId,
+            query: r.queryText ?? "",
+            userId: r.userId,
+            userName: r.userId.slice(0, 8),
+            conversationId: r.conversationId,
+            intent: r.intent,
+            domain: r.domain || "unknown",
+            createdAt: r.timestamp.toISOString(),
+            totalLatencyMs: r.totalMs || 0,
+            ackMs: latency.ackMs,
+            ttftMs: r.ttft || null,
+            firstUsefulContentMs: latency.firstUsefulContentMs,
+            retrievalMs: r.retrievalMs || null,
+            llmMs: r.llmMs || null,
+            formattingMs: r.formattingMs || null,
+            totalTokens: r.totalTokens,
+            totalCost: r.estimatedCostUsd,
+            qualityOutcome: r.isUseful
+              ? "adequate"
+              : r.hadFallback
+                ? "weak"
+                : "blocked",
+            evidenceStrength: r.retrievalAdequate ? 0.85 : 0.4,
+            sourcesCount: r.distinctDocs,
+            providers: [r.model?.split("-")[0] || "unknown"],
+            latencyBucket: bucket,
+            streamStarted: r.streamStarted,
+            firstTokenReceived: r.firstTokenReceived,
+            streamEnded: r.streamEnded,
+            chunksSent: r.chunksSent,
+            hadFallback: r.hadFallback,
+            fallbackReason: r.fallbackScenario,
+          };
+        });
 
         return { items, nextCursor };
       } catch (err) {
         console.error("[adminTelemetryAdapter] queries error:", err);
         return { items: [], nextCursor: null };
+      }
+    },
+
+    async latency({
+      range,
+      limit,
+    }: {
+      range: string;
+      limit: number;
+    }) {
+      const since = rangeToDate(range);
+      try {
+        const rows = await prisma.queryTelemetry.findMany({
+          where: { timestamp: { gte: since } },
+          orderBy: { timestamp: "desc" },
+          take: Math.min(Math.max(limit, 20), 500),
+          select: {
+            id: true,
+            queryId: true,
+            queryText: true,
+            timestamp: true,
+            answerMode: true,
+            operatorFamily: true,
+            distinctDocs: true,
+            retrievalAdequate: true,
+            navOpenRequested: true,
+            navWhereRequested: true,
+            navDiscoverRequested: true,
+            ttft: true,
+            retrievalMs: true,
+            llmMs: true,
+            formattingMs: true,
+            totalMs: true,
+            constraints: true,
+            streamStarted: true,
+            firstTokenReceived: true,
+            streamEnded: true,
+            wasAborted: true,
+            clientDisconnected: true,
+            chunksSent: true,
+            hadFallback: true,
+            fallbackScenario: true,
+          },
+        });
+
+        const samples: LatencySample[] = rows.map((row) => {
+          const latency = extractLatencyMetrics(row.constraints);
+          return {
+            ackMs: latency.ackMs,
+            ttft: row.ttft,
+            firstUsefulContentMs: latency.firstUsefulContentMs,
+            totalMs: row.totalMs,
+            streamStarted: row.streamStarted,
+            firstTokenReceived: row.firstTokenReceived,
+            streamEnded: row.streamEnded,
+            wasAborted: row.wasAborted,
+            clientDisconnected: row.clientDisconnected,
+            chunksSent: row.chunksSent,
+            answerMode: row.answerMode,
+            operatorFamily: row.operatorFamily,
+            distinctDocs: row.distinctDocs,
+            retrievalAdequate: row.retrievalAdequate,
+            navOpenRequested: row.navOpenRequested,
+            navWhereRequested: row.navWhereRequested,
+            navDiscoverRequested: row.navDiscoverRequested,
+          };
+        });
+
+        const grading = buildLatencyBuckets(samples);
+        const slowest = rows
+          .slice()
+          .sort((a, b) => (b.totalMs || 0) - (a.totalMs || 0))
+          .slice(0, Math.min(limit, 20))
+          .map((row) => {
+            const latency = extractLatencyMetrics(row.constraints);
+            return {
+              traceId: row.queryId,
+              query: row.queryText || "",
+              createdAt: row.timestamp.toISOString(),
+              answerMode: row.answerMode || "unknown",
+              operatorFamily: row.operatorFamily || "unknown",
+              latencyBucket: classifyLatencyBucket({
+                answerMode: row.answerMode,
+                operatorFamily: row.operatorFamily,
+                distinctDocs: row.distinctDocs,
+                retrievalAdequate: row.retrievalAdequate,
+                navOpenRequested: row.navOpenRequested,
+                navWhereRequested: row.navWhereRequested,
+                navDiscoverRequested: row.navDiscoverRequested,
+              }),
+              ackMs: latency.ackMs,
+              ttftMs: row.ttft || 0,
+              firstUsefulContentMs: latency.firstUsefulContentMs,
+              retrievalMs: row.retrievalMs || 0,
+              llmMs: row.llmMs || 0,
+              formattingMs: row.formattingMs || 0,
+              totalMs: row.totalMs || 0,
+              hadFallback: row.hadFallback,
+              fallbackReason: row.fallbackScenario,
+            };
+          });
+
+        return {
+          summary: grading.global,
+          buckets: grading,
+          slowest,
+        };
+      } catch (err) {
+        console.error("[adminTelemetryAdapter] latency error:", err);
+        return {
+          summary: buildLatencyBuckets([]).global,
+          buckets: buildLatencyBuckets([]),
+          slowest: [],
+        };
       }
     },
 
@@ -1100,8 +1253,38 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
           where: { queryId: traceId },
         });
         if (!query) return null;
+        const latency = extractLatencyMetrics(query.constraints);
+        const grading = buildLatencyBuckets([
+          {
+            ackMs: latency.ackMs,
+            ttft: query.ttft,
+            firstUsefulContentMs: latency.firstUsefulContentMs,
+            totalMs: query.totalMs,
+            streamStarted: query.streamStarted,
+            firstTokenReceived: query.firstTokenReceived,
+            streamEnded: query.streamEnded,
+            wasAborted: query.wasAborted,
+            clientDisconnected: query.clientDisconnected,
+            chunksSent: query.chunksSent,
+            answerMode: query.answerMode,
+            operatorFamily: query.operatorFamily,
+            distinctDocs: query.distinctDocs,
+            retrievalAdequate: query.retrievalAdequate,
+            navOpenRequested: query.navOpenRequested,
+            navWhereRequested: query.navWhereRequested,
+            navDiscoverRequested: query.navDiscoverRequested,
+          },
+        ]);
 
         const stages = [];
+        if (latency.ackMs)
+          stages.push({
+            stage: "ack",
+            durationMs: latency.ackMs,
+            success: true,
+            tokens: 0,
+            cost: 0,
+          });
         if (query.embeddingMs)
           stages.push({
             stage: "embedding",
@@ -1143,8 +1326,32 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
           intent: query.intent,
           domain: query.domain,
           totalLatencyMs: query.totalMs || 0,
+          ackMs: latency.ackMs,
+          ttftMs: query.ttft || 0,
+          firstUsefulContentMs: latency.firstUsefulContentMs,
           totalTokens: query.totalTokens,
           totalCost: query.estimatedCostUsd,
+          latencyGrade: grading.global.grade,
+          latencyScore: grading.global.score,
+          latencyBucket: classifyLatencyBucket({
+            answerMode: query.answerMode,
+            operatorFamily: query.operatorFamily,
+            distinctDocs: query.distinctDocs,
+            retrievalAdequate: query.retrievalAdequate,
+            navOpenRequested: query.navOpenRequested,
+            navWhereRequested: query.navWhereRequested,
+            navDiscoverRequested: query.navDiscoverRequested,
+          }),
+          stream: {
+            started: query.streamStarted,
+            firstTokenReceived: query.firstTokenReceived,
+            ended: query.streamEnded,
+            aborted: query.wasAborted,
+            clientDisconnected: query.clientDisconnected,
+            chunksSent: query.chunksSent,
+            durationMs: query.streamDurationMs,
+            errors: query.sseErrors,
+          },
           stages,
         };
       } catch (err) {
