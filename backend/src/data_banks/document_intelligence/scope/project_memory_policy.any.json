@@ -1,0 +1,17 @@
+{
+  "_meta": {
+    "id": "project_memory_policy",
+    "version": "1.0.0",
+    "lastUpdated": "2026-03-13",
+    "description": "Auto-registered bank payload for document_intelligence/scope/project_memory_policy.any.json",
+    "languages": [
+      "any"
+    ]
+  },
+  "policy": {
+    "docLockBlocksBroadMemoryBleed": true
+  },
+  "config": {
+    "enabled": true
+  }
+}

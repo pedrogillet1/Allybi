@@ -1,0 +1,23 @@
+{
+  "_meta": {
+    "id": "retention_and_deletion_policy",
+    "version": "1.0.0",
+    "description": "Retention and deletion guardrails shim for document intelligence.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-03-13",
+    "owner": "terminal5"
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true
+  },
+  "rules": [
+    {
+      "id": "RDP_001_no_retention_claim_without_policy_scope",
+      "trigger": "Do not claim retention windows unless the current scope is policy-backed.",
+      "check": "output.matchesPattern('\\b(retain|retention|delete after|deleted after)\\b', 'i') == true AND context.metadataRequested != true",
+      "failureAction": "LIMIT_RETENTION_CLAIM",
+      "severity": "warning"
+    }
+  ]
+}

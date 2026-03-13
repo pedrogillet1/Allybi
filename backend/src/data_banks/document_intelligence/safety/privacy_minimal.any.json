@@ -1,0 +1,23 @@
+{
+  "_meta": {
+    "id": "privacy_minimal",
+    "version": "1.0.0",
+    "description": "Privacy-minimal output shim aligned with canonical privacy minimal rules.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-03-13",
+    "owner": "terminal5"
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true
+  },
+  "rules": [
+    {
+      "id": "PM_001_hide_internal_ids_unless_requested",
+      "trigger": "Internal ids should be removed unless explicitly requested.",
+      "check": "output.matchesPattern('\\b[a-z]+-[a-z]+-[0-9]{2,}\\b', 'i') == true AND context.metadataRequested != true",
+      "failureAction": "HIDE_INTERNAL_IDS",
+      "severity": "warning"
+    }
+  ]
+}

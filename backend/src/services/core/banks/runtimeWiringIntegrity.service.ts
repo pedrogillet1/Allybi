@@ -515,6 +515,11 @@ function collectHardcodedRuntimeHeuristics(): string[] {
 
 function resolveRuntimePathCandidates(paths: string[]): string[] {
   const cwd = process.cwd();
+  const cwdBase = path.basename(cwd).toLowerCase();
+  const roots =
+    cwdBase === "backend"
+      ? [cwd, path.dirname(cwd)]
+      : [cwd, path.join(cwd, "backend")];
   const resolved = new Set<string>();
   for (const rawPath of paths) {
     const normalized = asTrimmedString(rawPath).replace(/\\/g, "/");
@@ -523,10 +528,19 @@ function resolveRuntimePathCandidates(paths: string[]): string[] {
       resolved.add(normalized);
       continue;
     }
-    resolved.add(path.join(cwd, normalized));
-    resolved.add(path.join(cwd, "backend", normalized));
     if (normalized.startsWith("backend/")) {
-      resolved.add(path.join(cwd, normalized.slice("backend/".length)));
+      const relativeToBackend = normalized.slice("backend/".length);
+      for (const root of roots) {
+        if (path.basename(root).toLowerCase() === "backend") {
+          resolved.add(path.join(root, relativeToBackend));
+        } else {
+          resolved.add(path.join(root, normalized));
+        }
+      }
+      continue;
+    }
+    for (const root of roots) {
+      resolved.add(path.join(root, normalized));
     }
   }
   return Array.from(resolved);
@@ -636,16 +650,10 @@ function collectMemoryRawPersistencePatterns(): string[] {
 }
 
 function collectMemoryPolicyHookEngineMissing(): string[] {
-  const candidatePaths = [
-    path.join(
-      process.cwd(),
-      "backend/src/services/memory/memoryPolicyEngine.service.ts",
-    ),
-    path.join(
-      process.cwd(),
-      "src/services/memory/memoryPolicyEngine.service.ts",
-    ),
-  ];
+  const candidatePaths = resolveRuntimePathCandidates([
+    "backend/src/services/memory/memoryPolicyEngine.service.ts",
+    "src/services/memory/memoryPolicyEngine.service.ts",
+  ]).map((candidate) => candidate.replace(/\\/g, "/"));
   const failures: string[] = [];
   const existingCandidates: string[] = [];
   for (const filePath of candidatePaths) {
@@ -654,7 +662,7 @@ function collectMemoryPolicyHookEngineMissing(): string[] {
     }
     existingCandidates.push(filePath);
     try {
-      const src = fs.readFileSync(filePath, "utf8");
+      const src = String(fs.readFileSync(filePath, "utf8") || "");
       if (
         !/integrationHooks/.test(src) ||
         !/memory_policy integration hook banks missing/.test(src)

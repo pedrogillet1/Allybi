@@ -1,0 +1,74 @@
+{
+  "_meta": {
+    "id": "field_role_ontology",
+    "bankId": "field_role_ontology",
+    "version": "1.0.0",
+    "owner": "document_intelligence",
+    "languages": [
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-13",
+    "description": "Canonical field-role ontology for exact semantic extraction anchors.",
+    "usedBy": [
+      "services/core/retrieval/retrievalEngine.service.ts"
+    ],
+    "tests": [
+      "services/core/retrieval/retrievalEngine.semantic-banks.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "matchMode": "exact_or_alias"
+  },
+  "roles": [
+    {
+      "id": "owner",
+      "entityRoleId": "owner",
+      "exactAnchors": {
+        "en": [
+          "owner",
+          "property owner"
+        ],
+        "pt": [
+          "proprietario",
+          "dono do imovel"
+        ]
+      },
+      "semanticAliases": {
+        "en": [
+          "landlord",
+          "lessor"
+        ],
+        "pt": [
+          "locador",
+          "senhorio"
+        ]
+      }
+    },
+    {
+      "id": "signatory",
+      "entityRoleId": "signatory",
+      "exactAnchors": {
+        "en": [
+          "signatory",
+          "signed by"
+        ],
+        "pt": [
+          "signatario",
+          "assinado por"
+        ]
+      },
+      "semanticAliases": {
+        "en": [
+          "signer",
+          "undersigned"
+        ],
+        "pt": [
+          "assinante",
+          "subscritor"
+        ]
+      }
+    }
+  ]
+}

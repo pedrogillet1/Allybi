@@ -1,0 +1,33 @@
+{
+  "_meta": {
+    "id": "entity_aliases",
+    "version": "1.0.0",
+    "lastUpdated": "2026-03-13",
+    "description": "Auto-registered bank payload for document_intelligence/language/entity_aliases.any.json",
+    "languages": [
+      "any"
+    ]
+  },
+  "aliases": [
+    {
+      "canonical": "document",
+      "variants": [
+        "doc",
+        "arquivo",
+        "documento",
+        "file"
+      ]
+    },
+    {
+      "canonical": "spreadsheet",
+      "variants": [
+        "sheet",
+        "planilha",
+        "xlsx"
+      ]
+    }
+  ],
+  "config": {
+    "enabled": true
+  }
+}

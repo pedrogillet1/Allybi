@@ -151,6 +151,11 @@
       "dependsOn": []
     },
     {
+      "id": "access_scope_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "accounting_rules",
       "dependsOn": [
         "doc_archetypes_finance"
@@ -271,6 +276,11 @@
       "optional": true
     },
     {
+      "id": "assistant_identity",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "assumption_policy",
       "dependsOn": [
         "clarification_policy"
@@ -291,8 +301,23 @@
       "dependsOn": []
     },
     {
+      "id": "bank_generation_report",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "bank_manifest",
       "dependsOn": []
+    },
+    {
+      "id": "bank_metadata_policy",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "bank_quality_contract",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "bank_registry",
@@ -308,6 +333,11 @@
     },
     {
       "id": "banned_phrases",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "behavioral_contract",
       "dependsOn": [],
       "optional": true
     },
@@ -363,6 +393,11 @@
         "calc_task_taxonomy",
         "slot_schemas_excel_calc"
       ],
+      "optional": true
+    },
+    {
+      "id": "calc_intents",
+      "dependsOn": [],
       "optional": true
     },
     {
@@ -433,6 +468,11 @@
       "optional": true
     },
     {
+      "id": "claim_strength_matrix",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "clarification_phrases",
       "dependsOn": [],
       "optional": true
@@ -455,7 +495,17 @@
       "optional": true
     },
     {
+      "id": "clarification_question_bank",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "closers",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "colloquial_phrasing",
       "dependsOn": [],
       "optional": true
     },
@@ -518,6 +568,16 @@
       "dependsOn": []
     },
     {
+      "id": "confidence_calibration",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "conflict_resolution_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "connect_intents_en",
       "dependsOn": [],
       "optional": true
@@ -537,7 +597,11 @@
     },
     {
       "id": "connector_operators_v46dbe3f4",
-      "dependsOn": [],
+      "dependsOn": [
+        "connectors_routing",
+        "email_routing",
+        "operator_families"
+      ],
       "optional": true
     },
     {
@@ -558,7 +622,17 @@
       "optional": true
     },
     {
+      "id": "context_container_profiles",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "contradiction_policy",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "conversation_state_carryover",
       "dependsOn": [],
       "optional": true
     },
@@ -4960,6 +5034,11 @@
       "optional": true
     },
     {
+      "id": "doc_reference_resolution",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "doc_taxonomy",
       "dependsOn": []
     },
@@ -4991,8 +5070,29 @@
     {
       "id": "document_intelligence_dependency_graph",
       "dependsOn": [
-        "document_intelligence_schema_registry"
+        "bank_registry",
+        "document_intelligence_bank_map"
       ]
+    },
+    {
+      "id": "document_intelligence_eval_adversarial_brain_traps",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "document_intelligence_eval_gold_queries_brain_questions",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "document_intelligence_eval_multilingual_pt_en_parity",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "document_intelligence_eval_style_composition",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "document_intelligence_implementation_report",
@@ -5008,29 +5108,27 @@
     {
       "id": "document_intelligence_orphan_allowlist",
       "dependsOn": [
-        "document_intelligence_bank_map",
         "document_intelligence_usage_manifest"
       ]
     },
     {
       "id": "document_intelligence_runtime_wiring_gates",
       "dependsOn": [
-        "document_intelligence_bank_map",
-        "document_intelligence_usage_manifest"
+        "bank_registry",
+        "document_intelligence_bank_map"
       ]
     },
     {
       "id": "document_intelligence_schema_registry",
       "dependsOn": [
-        "bank_registry",
-        "document_intelligence_manifest_schema"
+        "bank_registry"
       ]
     },
     {
       "id": "document_intelligence_usage_manifest",
       "dependsOn": [
-        "document_intelligence_bank_map",
-        "document_intelligence_dependency_graph"
+        "bank_registry",
+        "document_intelligence_bank_map"
       ]
     },
     {
@@ -5083,6 +5181,11 @@
       "dependsOn": []
     },
     {
+      "id": "editing_intents",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "editing_microcopy",
       "dependsOn": []
     },
@@ -5123,6 +5226,11 @@
       "optional": true
     },
     {
+      "id": "entity_aliases",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "entity_role_ontology",
       "dependsOn": [],
       "optional": true
@@ -5135,6 +5243,11 @@
     },
     {
       "id": "error_explanations",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "eval_gate_policy",
       "dependsOn": [],
       "optional": true
     },
@@ -5318,6 +5431,16 @@
       ]
     },
     {
+      "id": "field_exactness_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "field_role_ontology",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "file_action_operators",
       "dependsOn": [
         "operator_contracts"
@@ -5334,6 +5457,11 @@
       "dependsOn": [
         "doc_archetypes_finance"
       ]
+    },
+    {
+      "id": "folder_scope_patterns",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "followup_indicators",
@@ -5386,7 +5514,17 @@
       "optional": true
     },
     {
+      "id": "help_and_capabilities",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "help_microcopy",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "high_stakes_response_rules",
       "dependsOn": [],
       "optional": true
     },
@@ -5404,6 +5542,11 @@
     {
       "id": "incident_response_policy",
       "dependsOn": []
+    },
+    {
+      "id": "integration_intents",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "intent_config",
@@ -5506,6 +5649,156 @@
     },
     {
       "id": "layout_cues_v61e6793a",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_doc_taxonomy",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_abbreviations_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_abbreviations_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_board_resolution_extraction_hints",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_board_resolution_sections",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_board_resolution_tables",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_dpa_extraction_hints",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_dpa_sections",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_dpa_tables",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_employment_agreement_extraction_hints",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_employment_agreement_sections",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_employment_agreement_tables",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_lexicon_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_lexicon_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_msa_extraction_hints",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_msa_sections",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_msa_tables",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_nda_extraction_hints",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_nda_sections",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_nda_tables",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_privacy_policy_extraction_hints",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_privacy_policy_sections",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_privacy_policy_tables",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_sow_extraction_hints",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_sow_sections",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_legal_sow_tables",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_medical_abbreviations_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_medical_abbreviations_pt",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_medical_lexicon_en",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legacy_medical_lexicon_pt",
       "dependsOn": [],
       "optional": true
     },
@@ -6262,6 +6555,11 @@
     },
     {
       "id": "legal_privacy_policy_tables_v113ccc0c",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "legal_privilege_rules",
       "dependsOn": [],
       "optional": true
     },
@@ -7355,12 +7653,27 @@
       "optional": true
     },
     {
+      "id": "mission_and_non_goals",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "misspelling_and_variant_map",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "mode_chat",
       "dependsOn": [],
       "optional": true
     },
     {
       "id": "mode_editing",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "mode_switch",
       "dependsOn": [],
       "optional": true
     },
@@ -7380,6 +7693,11 @@
       "optional": true
     },
     {
+      "id": "multi_doc_compare_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "nav_failure_recovery",
       "dependsOn": [],
       "optional": true
@@ -7395,6 +7713,11 @@
       "optional": true
     },
     {
+      "id": "navigation_intents",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "negative_retrieval_patterns",
       "dependsOn": [],
       "optional": true
@@ -7402,6 +7725,11 @@
     {
       "id": "no_docs_messages",
       "dependsOn": []
+    },
+    {
+      "id": "not_enough_evidence",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "numeric_integrity",
@@ -7420,6 +7748,11 @@
       "optional": true
     },
     {
+      "id": "one_best_question_policy",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "ontology_schema",
       "dependsOn": [
         "bank_schema"
@@ -7432,6 +7765,11 @@
     },
     {
       "id": "openers",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "operator_canonical_registry",
       "dependsOn": [],
       "optional": true
     },
@@ -7465,57 +7803,79 @@
     },
     {
       "id": "operator_patterns_advise",
-      "dependsOn": [],
+      "dependsOn": [
+        "operator_families"
+      ],
       "optional": true
     },
     {
       "id": "operator_patterns_calculate",
-      "dependsOn": [],
+      "dependsOn": [
+        "operator_families"
+      ],
       "optional": true
     },
     {
       "id": "operator_patterns_compare",
-      "dependsOn": [],
+      "dependsOn": [
+        "operator_families"
+      ],
       "optional": true
     },
     {
       "id": "operator_patterns_evaluate",
-      "dependsOn": [],
+      "dependsOn": [
+        "operator_families"
+      ],
       "optional": true
     },
     {
       "id": "operator_patterns_extract",
-      "dependsOn": [],
+      "dependsOn": [
+        "operator_families"
+      ],
       "optional": true
     },
     {
       "id": "operator_patterns_locate",
-      "dependsOn": [],
+      "dependsOn": [
+        "operator_families"
+      ],
       "optional": true
     },
     {
       "id": "operator_patterns_monitor",
-      "dependsOn": [],
+      "dependsOn": [
+        "operator_families"
+      ],
       "optional": true
     },
     {
       "id": "operator_patterns_navigate",
-      "dependsOn": [],
+      "dependsOn": [
+        "operator_families"
+      ],
       "optional": true
     },
     {
       "id": "operator_patterns_open",
-      "dependsOn": [],
+      "dependsOn": [
+        "operator_families"
+      ],
       "optional": true
     },
     {
       "id": "operator_patterns_summarize",
-      "dependsOn": [],
+      "dependsOn": [
+        "operator_families"
+      ],
       "optional": true
     },
     {
       "id": "operator_patterns_validate",
-      "dependsOn": [],
+      "dependsOn": [
+        "operator_families"
+      ],
       "optional": true
     },
     {
@@ -7927,6 +8287,11 @@
       ]
     },
     {
+      "id": "partial_answer_recovery",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "party_patterns",
       "dependsOn": [
         "doc_taxonomy"
@@ -8101,7 +8466,10 @@
     },
     {
       "id": "patterns_editor_anchor_resolution_patterns",
-      "dependsOn": [],
+      "dependsOn": [
+        "patterns_editor_highlight_intents_en",
+        "patterns_editor_locate_target_phrases"
+      ],
       "optional": true
     },
     {
@@ -8126,7 +8494,10 @@
     },
     {
       "id": "patterns_editor_locate_target_phrases",
-      "dependsOn": [],
+      "dependsOn": [
+        "patterns_editor_highlight_intents_en",
+        "patterns_editor_highlight_intents_pt"
+      ],
       "optional": true
     },
     {
@@ -8151,27 +8522,37 @@
     },
     {
       "id": "patterns_files_bulk_actions",
-      "dependsOn": [],
+      "dependsOn": [
+        "folder_scope_patterns"
+      ],
       "optional": true
     },
     {
       "id": "patterns_files_folder_tree_en",
-      "dependsOn": [],
+      "dependsOn": [
+        "folder_scope_patterns"
+      ],
       "optional": true
     },
     {
       "id": "patterns_files_folder_tree_pt",
-      "dependsOn": [],
+      "dependsOn": [
+        "folder_scope_patterns"
+      ],
       "optional": true
     },
     {
       "id": "patterns_files_move_copy_rename_en",
-      "dependsOn": [],
+      "dependsOn": [
+        "folder_scope_patterns"
+      ],
       "optional": true
     },
     {
       "id": "patterns_files_move_copy_rename_pt",
-      "dependsOn": [],
+      "dependsOn": [
+        "folder_scope_patterns"
+      ],
       "optional": true
     },
     {
@@ -8191,7 +8572,9 @@
     },
     {
       "id": "patterns_medical_safety_boundary_triggers",
-      "dependsOn": [],
+      "dependsOn": [
+        "medical_safety_boundaries"
+      ],
       "optional": true
     },
     {
@@ -8201,17 +8584,26 @@
     },
     {
       "id": "patterns_modes_mode_switch_en",
-      "dependsOn": [],
+      "dependsOn": [
+        "patterns_editor_apply_undo_intents_en",
+        "patterns_editor_apply_undo_intents_pt"
+      ],
       "optional": true
     },
     {
       "id": "patterns_modes_mode_switch_pt",
-      "dependsOn": [],
+      "dependsOn": [
+        "patterns_editor_apply_undo_intents_en",
+        "patterns_editor_apply_undo_intents_pt"
+      ],
       "optional": true
     },
     {
       "id": "patterns_modes_preview_vs_apply",
-      "dependsOn": [],
+      "dependsOn": [
+        "patterns_modes_mode_switch_en",
+        "patterns_modes_mode_switch_pt"
+      ],
       "optional": true
     },
     {
@@ -8234,6 +8626,11 @@
       "dependsOn": []
     },
     {
+      "id": "privacy_minimal",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "privacy_minimal_rules",
       "dependsOn": [],
       "optional": true
@@ -8241,6 +8638,11 @@
     {
       "id": "processing_messages",
       "dependsOn": []
+    },
+    {
+      "id": "project_memory_policy",
+      "dependsOn": [],
+      "optional": true
     },
     {
       "id": "prompt_registry",
@@ -8315,6 +8717,11 @@
     },
     {
       "id": "quality_wrong_doc_risk_triggers",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "quarantine_2026_02_memory_audit_bank_generation_report",
       "dependsOn": [],
       "optional": true
     },
@@ -8445,6 +8852,11 @@
       "optional": true
     },
     {
+      "id": "retention_and_deletion_policy",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "retrieval_document_intelligence_schema",
       "dependsOn": [
         "bank_registry"
@@ -8567,6 +8979,16 @@
       "optional": true
     },
     {
+      "id": "sensitive_content_rules",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "sharding_policy",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
       "id": "sheetname_patterns",
       "dependsOn": [
         "doc_taxonomy"
@@ -8604,6 +9026,11 @@
     },
     {
       "id": "spreadsheet_semantics",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "ssot_contract",
       "dependsOn": [],
       "optional": true
     },
@@ -8723,6 +9150,11 @@
     },
     {
       "id": "table_header_ontology_travel",
+      "dependsOn": [],
+      "optional": true
+    },
+    {
+      "id": "table_integrity_rules",
       "dependsOn": [],
       "optional": true
     },

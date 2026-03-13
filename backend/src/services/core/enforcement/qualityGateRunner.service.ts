@@ -13,6 +13,7 @@ import { resolveOutputTokenBudget } from "./tokenBudget.service";
 import {
   getDocumentIntelligenceBanksInstance,
   type DocumentIntelligenceBanksService,
+  type DocumentIntelligenceQualityGateType,
 } from "../banks/documentIntelligenceBanks.service";
 import { getOptionalBank } from "../banks/bankLoader.service";
 import { evaluateRuleBooleanExpression } from "./qualityGateRunner.expression";
@@ -109,6 +110,9 @@ type DocumentIntelligenceQualityBank = {
   _meta?: { id?: string; version?: string };
   config?: { enabled?: boolean };
   rules?: DocumentIntelligenceRule[];
+  levels?: Array<Record<string, unknown>>;
+  patterns?: Array<Record<string, unknown>>;
+  actions?: Array<Record<string, unknown>>;
 };
 
 type DocumentIntelligenceScope = {
@@ -360,6 +364,12 @@ function detectMissingUnitWithNumber(response: string): boolean {
       response,
     );
   return !hasUnitOrCurrency;
+}
+
+function asStringArray(value: unknown): string[] {
+  return Array.isArray(value)
+    ? value.map((entry) => String(entry ?? "").trim()).filter(Boolean)
+    : [];
 }
 
 function normalizeDomain(value: unknown): string {
@@ -1002,44 +1012,43 @@ export class QualityGateRunnerService {
 
     if (gateName === "privacy_minimal") {
       const hooks = qualityBank?.config?.integrationHooks || {};
-      const piiLabelsBankId = String(hooks.piiLabelsBankId || "").trim();
-      const piiBank = piiLabelsBankId
-        ? getOptionalBank<HookBank>(piiLabelsBankId)
-        : null;
+      const privacyBank =
+        this.documentIntelligenceBanks.getQualityGateBank("privacy_minimal") ??
+        getOptionalBank<HookBank>(
+          String(hooks.privacyMinimalRulesBankId || "").trim(),
+        );
+      const piiBank =
+        this.documentIntelligenceBanks.getQualityGateBank("pii_patterns") ??
+        getOptionalBank<HookBank>(String(hooks.piiLabelsBankId || "").trim());
       const piiPatterns = [
-        /\b\d{3}-\d{2}-\d{4}\b/, // US SSN
-        /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/,
-        /\b(?:cpf|cnpj|tax\s*id|tin)\b/i,
-      ];
-      for (const pattern of piiPatterns) {
-        if (pattern.test(response)) {
+        ...asStringArray((piiBank as Record<string, unknown> | null)?.piiPatterns),
+        ...(
+          Array.isArray((piiBank as DocumentIntelligenceQualityBank | null)?.patterns)
+            ? (piiBank as DocumentIntelligenceQualityBank).patterns!.map((entry) =>
+                String((entry as Record<string, unknown>).pattern || "").trim(),
+              )
+            : []
+        ),
+        "\\b\\d{3}-\\d{2}-\\d{4}\\b",
+        "\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\\b",
+        "\\b(?:cpf|cnpj|tax\\s*id|tin)\\b",
+      ].filter(Boolean);
+      for (const raw of piiPatterns) {
+        try {
+          if (!new RegExp(raw, "i").test(response)) continue;
           return {
             gateName,
             passed: false,
             score: 0,
             issues: ["Potential PII leak detected in response content."],
             sourceBankId:
-              piiLabelsBankId || qualityBank?._meta?.id || "quality_gates",
+              (piiBank as Record<string, unknown> | null)?._meta?.id as string ||
+              (privacyBank as Record<string, unknown> | null)?._meta?.id as string ||
+              qualityBank?._meta?.id ||
+              "quality_gates",
           };
-        }
-      }
-      if (Array.isArray(piiBank?.piiPatterns)) {
-        for (const raw of piiBank.piiPatterns) {
-          try {
-            if (new RegExp(String(raw), "i").test(response)) {
-              return {
-                gateName,
-                passed: false,
-                score: 0,
-                issues: [
-                  "PII pattern match detected by pii_field_labels bank.",
-                ],
-                sourceBankId: piiLabelsBankId,
-              };
-            }
-          } catch {
-            // ignore invalid regex from bank
-          }
+        } catch {
+          // ignore invalid regex from banks
         }
       }
       return {
@@ -1047,7 +1056,9 @@ export class QualityGateRunnerService {
         passed: true,
         score: 1,
         sourceBankId:
-          piiLabelsBankId || qualityBank?._meta?.id || "quality_gates",
+          (privacyBank as Record<string, unknown> | null)?._meta?.id as string ||
+          qualityBank?._meta?.id ||
+          "quality_gates",
       };
     }
 
@@ -1128,6 +1139,7 @@ export class QualityGateRunnerService {
     ]);
 
     const baseContext = {
+      domain: this.resolveDomainForQuality(ctx, responseText),
       explicitDocRef: {
         present: Boolean(ctx.explicitDocRef),
         id:
@@ -1920,6 +1932,27 @@ export class QualityGateRunnerService {
       }
     }
 
+    const exactnessBanks: DocumentIntelligenceQualityGateType[] = [
+      "claim_strength_matrix",
+      "fact_type_requirements",
+      "field_exactness_rules",
+      "conflict_resolution_rules",
+      "table_integrity_rules",
+      "numeric_reconciliation_rules",
+      "unsafe_inference_rules",
+      "high_stakes_response_rules",
+      "medical_safety_boundaries",
+    ];
+    for (const bankType of exactnessBanks) {
+      const bank =
+        this.documentIntelligenceBanks.getQualityGateBank(
+          bankType,
+        ) as DocumentIntelligenceQualityBank | null;
+      if (!bank?.config?.enabled) continue;
+      const evaluated = this.runDocumentIntelligenceRuleBank(bankType, bank, scope);
+      results.push(...evaluated.failures);
+    }
+
     const wrongDocLockBank =
       this.documentIntelligenceBanks.getQualityGateBank(
         "wrong_doc_lock",
@@ -1982,15 +2015,32 @@ export class QualityGateRunnerService {
     }
 
     if (new Set(["identity", "tax", "banking"]).has(domain)) {
-      const piiPatterns = [
-        /\b\d{3}-\d{2}-\d{4}\b/,
-        /\b(?:cpf|cnpj|tax\s*id|tin)\s*[:#-]?\s*[A-Z0-9./-]{8,20}\b/i,
-        /\b(?:passport|passaporte|license|licenca|cnh|rg)\s*(?:no\.?|number|#)?\s*[:#-]?\s*[A-Z0-9-]{6,20}\b/i,
-        /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/,
-      ];
-      const hasUnredactedPii = piiPatterns.some((pattern) =>
-        pattern.test(responseText),
+      const piiBank =
+        this.documentIntelligenceBanks.getQualityGateBank(
+          "pii_patterns",
+        ) as DocumentIntelligenceQualityBank | null;
+      const sensitiveContentBank =
+        getOptionalBank<DocumentIntelligenceQualityBank>("sensitive_content_rules");
+      const domainPatternIds = new Set(
+        (Array.isArray(sensitiveContentBank?.rules) ? sensitiveContentBank.rules : [])
+          .filter((rule) =>
+            asStringArray((rule as Record<string, unknown>).domains).includes(domain),
+          )
+          .flatMap((rule) =>
+            asStringArray((rule as Record<string, unknown>).patternIds),
+          ),
       );
+      const patterns = Array.isArray(piiBank?.patterns) ? piiBank.patterns : [];
+      const hasUnredactedPii = patterns.some((entry) => {
+        const record = entry as Record<string, unknown>;
+        const patternId = String(record.id || "").trim();
+        if (domainPatternIds.size > 0 && !domainPatternIds.has(patternId)) return false;
+        try {
+          return new RegExp(String(record.pattern || ""), "i").test(responseText);
+        } catch {
+          return false;
+        }
+      });
       if (hasUnredactedPii) {
         results.push({
           gateName: "redaction_default_pii_identity_tax_banking",
@@ -1999,27 +2049,7 @@ export class QualityGateRunnerService {
           issues: [
             `PII detected in ${domain} response; default behavior requires redaction.`,
           ],
-        });
-      }
-    }
-
-    if (domain === "medical") {
-      const hardDiagnosisLanguage =
-        /\b(definitive diagnosis|you have|you are diagnosed|prescribe(?:d)?\s+\w+)\b/i.test(
-          responseText,
-        );
-      const hasSafetyQualifier =
-        /\b(consult|seek|professional|doctor|physician|medical advice|nao substitui|procure)\b/i.test(
-          responseText,
-        );
-      if (hardDiagnosisLanguage && !hasSafetyQualifier) {
-        results.push({
-          gateName: "medical_safety_boundaries",
-          passed: false,
-          score: 0.1,
-          issues: [
-            "Medical response contains diagnosis/prescription language without safety qualifier.",
-          ],
+          sourceBankId: piiBank?._meta?.id || sensitiveContentBank?._meta?.id,
         });
       }
     }
@@ -2138,6 +2168,30 @@ export class QualityGateRunnerService {
           }
         }
       }
+    }
+
+    const legalPrivilegeBank = getOptionalBank<DocumentIntelligenceQualityBank>(
+      "legal_privilege_rules",
+    );
+    if (legalPrivilegeBank?.config?.enabled) {
+      const scope = this.buildDocumentIntelligenceScope(response, ctx, null);
+      const legalPrivilege = this.runDocumentIntelligenceRuleBank(
+        "legal_privilege_rules",
+        legalPrivilegeBank,
+        scope,
+      );
+      results.push(...legalPrivilege.failures);
+    }
+
+    for (const bankId of [
+      "access_scope_rules",
+      "retention_and_deletion_policy",
+    ] as const) {
+      const bank = getOptionalBank<DocumentIntelligenceQualityBank>(bankId);
+      if (!bank?.config?.enabled) continue;
+      const scope = this.buildDocumentIntelligenceScope(response, ctx, null);
+      const evaluated = this.runDocumentIntelligenceRuleBank(bankId, bank, scope);
+      results.push(...evaluated.failures);
     }
 
     return results;

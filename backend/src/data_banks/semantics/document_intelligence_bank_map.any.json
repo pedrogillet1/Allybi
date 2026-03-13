@@ -1,12 +1,12 @@
 {
   "_meta": {
     "id": "document_intelligence_bank_map",
-    "version": "1.6.0",
+    "version": "1.7.0",
     "description": "Canonical map of all document-intelligence banks, required coverage, and domain/operator matrix.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-03-02",
+    "lastUpdated": "2026-03-13",
     "owner": "data-bank-governance",
     "usedBy": [
       "services/core/banks/dataBankLoader.service.ts"
@@ -167,6 +167,19 @@
     "section_priority_ops"
   ],
   "optionalBankIds": [
+    "access_scope_rules",
+    "assistant_identity",
+    "behavioral_contract",
+    "claim_strength_matrix",
+    "clarification_question_bank",
+    "confidence_calibration",
+    "conflict_resolution_rules",
+    "doc_reference_resolution",
+    "entity_aliases",
+    "field_exactness_rules",
+    "folder_scope_patterns",
+    "help_and_capabilities",
+    "high_stakes_response_rules",
     "keyword_taxonomy_finance",
     "keyword_taxonomy_legal",
     "keyword_taxonomy_medical",
@@ -205,6 +218,7 @@
     "legal_privacy_policy_extraction_hints",
     "legal_privacy_policy_sections",
     "legal_privacy_policy_tables",
+    "legal_privilege_rules",
     "legal_reasoning_scaffolds",
     "legal_redaction_and_safety_rules",
     "legal_retrieval_strategies",
@@ -253,11 +267,21 @@
     "medical_soap_note_sections",
     "medical_soap_note_tables",
     "medical_validation_policies",
+    "mission_and_non_goals",
+    "misspelling_and_variant_map",
+    "mode_switch",
+    "not_enough_evidence",
+    "one_best_question_policy",
     "pain_points_finance",
     "pain_points_legal",
     "pain_points_medical",
     "pain_points_ops",
-    "pattern_library"
+    "partial_answer_recovery",
+    "pattern_library",
+    "privacy_minimal",
+    "retention_and_deletion_policy",
+    "sensitive_content_rules",
+    "table_integrity_rules"
   ],
   "groupedByArea": {
     "taxonomy": [
@@ -462,6 +486,42 @@
       "medical_soap_note_extraction_hints",
       "medical_soap_note_sections",
       "medical_soap_note_tables"
+    ],
+    "identity_brain": [
+      "assistant_identity",
+      "behavioral_contract",
+      "confidence_calibration",
+      "help_and_capabilities",
+      "mission_and_non_goals"
+    ],
+    "language_brain_runtime": [
+      "entity_aliases",
+      "misspelling_and_variant_map"
+    ],
+    "routing_scope_runtime": [
+      "doc_reference_resolution",
+      "folder_scope_patterns",
+      "mode_switch",
+      "one_best_question_policy"
+    ],
+    "repair_brain_runtime": [
+      "clarification_question_bank",
+      "not_enough_evidence",
+      "partial_answer_recovery"
+    ],
+    "validation_runtime": [
+      "claim_strength_matrix",
+      "conflict_resolution_rules",
+      "field_exactness_rules",
+      "high_stakes_response_rules",
+      "table_integrity_rules"
+    ],
+    "safety_runtime": [
+      "access_scope_rules",
+      "legal_privilege_rules",
+      "privacy_minimal",
+      "retention_and_deletion_policy",
+      "sensitive_content_rules"
     ]
   },
   "tests": {

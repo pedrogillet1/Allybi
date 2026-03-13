@@ -1,0 +1,41 @@
+{
+  "_meta": {
+    "id": "eval_gate_policy",
+    "version": "1.0.0",
+    "description": "Evaluation gate policy for document intelligence banks. Declares the minimum proof bar before a bank is considered production-grade.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/documentIntelligenceIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/services/core/banks/documentIntelligenceIntegrity.service.test.ts",
+      "src/tests/certification/brain-layer-proof-bank.cert.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "requireProofForCanonicalBanks": true,
+    "requireRuntimeProofForHighRiskBanks": true
+  },
+  "tiers": {
+    "canonical": {
+      "requirements": [
+        "registry",
+        "consumer",
+        "proof"
+      ]
+    },
+    "high_risk": {
+      "requirements": [
+        "registry",
+        "consumer",
+        "proof",
+        "certification"
+      ]
+    }
+  }
+}

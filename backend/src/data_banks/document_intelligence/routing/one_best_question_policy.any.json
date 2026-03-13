@@ -1,0 +1,16 @@
+{
+  "_meta": {
+    "id": "one_best_question_policy",
+    "version": "1.0.0",
+    "lastUpdated": "2026-03-13",
+    "description": "Auto-registered bank payload for document_intelligence/routing/one_best_question_policy.any.json",
+    "languages": [
+      "any"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "maxQuestions": 1,
+    "preferSingleDisambiguator": true
+  }
+}

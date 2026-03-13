@@ -70,7 +70,7 @@ describe("LlmRequestBuilderService", () => {
       }),
     );
 
-    expect(req.options?.maxOutputTokens).toBe(1200);
+    expect(req.options?.maxOutputTokens).toBe(900);
   });
 
   test("keeps nav/disambiguation short caps intact", () => {
@@ -227,7 +227,7 @@ describe("LlmRequestBuilderService", () => {
       }),
     );
 
-    expect(req.options?.maxOutputTokens).toBe(1200);
+    expect(req.options?.maxOutputTokens).toBe(900);
     const promptCtx = buildPrompt.mock.calls[0]?.[1] as Record<string, any>;
     expect(promptCtx?.runtimeSignals?.styleProfile).toBe("brief");
     expect(promptCtx?.runtimeSignals?.boldingEnabled).toBe(false);
@@ -263,7 +263,7 @@ describe("LlmRequestBuilderService", () => {
     const meta = req.kodaMeta as Record<string, any>;
     expect(meta?.resolvedTokenPolicy?.docGroundedFloorApplied).toBe(true);
     expect(meta?.resolvedTokenPolicy?.docGroundedFloor).toBe(1000);
-    expect(meta?.resolvedTokenPolicy?.finalMaxOutputTokens).toBe(1200);
+    expect(meta?.resolvedTokenPolicy?.finalMaxOutputTokens).toBe(900);
   });
 
   test("combines page and section in evidence location", () => {
@@ -494,7 +494,7 @@ describe("LlmRequestBuilderService", () => {
     );
 
     const userContent = req.messages.find((m) => m.role === "user")?.content ?? "";
-    expect(userContent).toContain("Data Conflicts");
+    expect(userContent).toContain("Note: some values differ across sources.");
     expect(userContent).toContain("revenue");
     expect(userContent).toContain("1500000");
     expect(userContent).toContain("2100000");
@@ -640,5 +640,164 @@ describe("LlmRequestBuilderService", () => {
     expect(meta.evidenceRendering.tableItemsRendered).toBe(1);
     expect(meta.evidenceRendering.conflictsInjected).toBe(1);
     expect(meta.evidenceRendering.totalEvidenceItems).toBe(1);
+  });
+
+  test("injects composition-brain guidance into doc-grounded payload", () => {
+    mockedGetOptionalBank.mockImplementation((bankId: string) => {
+      if (bankId === "tone_profiles") {
+        return {
+          profiles: [
+            {
+              domain: "finance",
+              primaryTone: "precise",
+              wordingRules: ["state assumptions"],
+            },
+          ],
+        } as any;
+      }
+      if (bankId === "voice_personality_profiles") {
+        return { profiles: [{ id: "balanced", traits: ["direct"] }] } as any;
+      }
+      if (bankId === "hedging_and_uncertainty_language") {
+        return { phrases: { pt: ["com base na evidencia citada"] } } as any;
+      }
+      if (bankId === "anti_robotic_style_rules") {
+        return { rules: [{ id: "ARS_001" }] } as any;
+      }
+      if (bankId === "table_render_policy") {
+        return { config: { preserveHeaders: true, preserveUnits: true } } as any;
+      }
+      if (bankId === "verbosity_ladder") {
+        return { levels: { balanced: { maxWords: 220 }, detailed: { maxWords: 360 } } } as any;
+      }
+      if (bankId === "transition_phrases") {
+        return { phrases: { pt: ["Em seguida"] } } as any;
+      }
+      if (bankId === "verb_phrase_bank") {
+        return { phrases: { pt: ["Confirmei pelo documento"] } } as any;
+      }
+      if (bankId === "openers") {
+        return {
+          openers: [
+            {
+              intent: "extract",
+              language: "pt",
+              text: "Encontrei evidencias relevantes em {{document}} e posso resumir com seguranca.",
+            },
+          ],
+        } as any;
+      }
+      if (bankId === "closers") {
+        return { closers: [{ language: "pt", text: "Se quiser, faco tambem uma segunda passada para fechar periodo." }] } as any;
+      }
+      return null as any;
+    });
+
+    const builder = new LlmRequestBuilderService(prompts);
+    const req = builder.build(
+      createInput({
+        signals: {
+          ...createInput().signals,
+          answerMode: "doc_grounded_single",
+          domain: "finance",
+        },
+      }),
+    );
+
+    const userContent = req.messages.find((m) => m.role === "user")?.content ?? "";
+    expect(userContent).toContain("### Composition Brain");
+    expect(userContent).toContain("Lead with the answer");
+    expect(userContent).toContain("Avoid repetitive sentence starters");
+  });
+
+  test("injects brain decision frame as developer guidance and metadata", () => {
+    mockedGetOptionalBank.mockImplementation((bankId: string) => {
+      if (bankId === "query_family_catalog") {
+        return {
+          config: { enabled: true, defaultFamily: "document_retrieval" },
+          families: [
+            {
+              id: "family_extract",
+              name: "content_extraction",
+              canonicalIntents: ["extract", "summarize"],
+            },
+          ],
+        } as any;
+      }
+      if (bankId === "confidence_calibration") {
+        return { thresholds: { medium: 0.65 } } as any;
+      }
+      if (bankId === "claim_strength_matrix") {
+        return { levels: [{ id: "exact" }, { id: "inference" }] } as any;
+      }
+      if (bankId === "doc_lock_policy") {
+        return { config: { allowUnlockOnExplicitCompare: true } } as any;
+      }
+      if (bankId === "source_policy") {
+        return { rules: [{ id: "SRC_006_doc_grounded_requires_citation" }] } as any;
+      }
+      if (bankId === "one_best_question_policy") {
+        return { config: { maxQuestions: 1 } } as any;
+      }
+      if (bankId === "context_container_profiles") {
+        return { profiles: [{ id: "single_doc", requiresActiveDoc: true }] } as any;
+      }
+      if (bankId === "project_memory_policy") {
+        return { policy: { docLockBlocksBroadMemoryBleed: true } } as any;
+      }
+      if (bankId === "assistant_identity") {
+        return { identity: { name: "Allybi", stance: "evidence_first" } } as any;
+      }
+      if (bankId === "mission_and_non_goals") {
+        return { mission: { primary: "Answer with evidence." } } as any;
+      }
+      if (bankId === "help_and_capabilities") {
+        return { capabilities: { can: ["extract"], cannot: ["invent"] } } as any;
+      }
+      if (bankId === "behavioral_contract") {
+        return { rules: ["stay precise"] } as any;
+      }
+      if (bankId === "tone_profiles") {
+        return { profiles: [{ domain: "finance", primaryTone: "precise" }] } as any;
+      }
+      if (bankId === "voice_personality_profiles") {
+        return { profiles: [{ id: "balanced", traits: ["direct"] }] } as any;
+      }
+      if (bankId === "verbosity_ladder") {
+        return { levels: { balanced: { maxWords: 220 } } } as any;
+      }
+      return null as any;
+    });
+
+    const builder = new LlmRequestBuilderService(prompts);
+    const req = builder.build(
+      createInput({
+        signals: {
+          ...createInput().signals,
+          answerMode: "doc_grounded_single",
+          operator: "summarize",
+          domain: "finance",
+          explicitDocLock: true,
+          activeDocId: "doc-1",
+        },
+        evidencePack: {
+          evidence: [{ docId: "doc-1", locationKey: "p:1", snippet: "Revenue grew.", evidenceType: "text" }],
+          stats: { topScore: 0.55, uniqueDocsInEvidence: 1 },
+        } as any,
+      }),
+    );
+
+    const developerMessage = req.messages.find((msg) => msg.role === "developer");
+    expect(developerMessage?.content).toContain("### Brain Decision Frame");
+    expect(developerMessage?.content).toContain("Allowed sources: locked_doc_only");
+
+    const meta = req.kodaMeta as Record<string, any>;
+    expect(meta.brainDecisionFrame).toBeDefined();
+    expect(meta.brainDecisionFrame.whatIsThis.queryFamily).toBe(
+      "content_extraction",
+    );
+    expect(meta.brainDecisionFrame.proofPlan.requireLocationRichProvenance).toBe(
+      true,
+    );
   });
 });

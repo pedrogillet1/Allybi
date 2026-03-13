@@ -1,0 +1,22 @@
+{
+  "_meta": {
+    "id": "not_enough_evidence",
+    "version": "1.0.0",
+    "description": "Repair wording for evidence-insufficient outcomes.",
+    "languages": [
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "terminal6"
+  },
+  "config": {
+    "enabled": true
+  },
+  "messages": {
+    "en": "I could not find enough evidence in your documents to answer safely.",
+    "pt": "Nao encontrei evidencia suficiente nos documentos para responder com seguranca.",
+    "es": "No encontre evidencia suficiente en los documentos para responder con seguridad."
+  }
+}

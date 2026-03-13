@@ -1,0 +1,19 @@
+{
+  "_meta": {
+    "id": "integration_intents",
+    "version": "1.0.0",
+    "lastUpdated": "2026-03-13",
+    "description": "Auto-registered bank payload for document_intelligence/routing/integration_intents.any.json",
+    "languages": [
+      "any"
+    ]
+  },
+  "operators": [
+    "connect",
+    "sync",
+    "send"
+  ],
+  "config": {
+    "enabled": true
+  }
+}

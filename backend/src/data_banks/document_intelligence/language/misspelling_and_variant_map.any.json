@@ -1,0 +1,31 @@
+{
+  "_meta": {
+    "id": "misspelling_and_variant_map",
+    "version": "1.0.0",
+    "lastUpdated": "2026-03-13",
+    "description": "Auto-registered bank payload for document_intelligence/language/misspelling_and_variant_map.any.json",
+    "languages": [
+      "any"
+    ]
+  },
+  "variants": [
+    {
+      "canonical": "documento",
+      "forms": [
+        "documemto",
+        "document"
+      ]
+    },
+    {
+      "canonical": "comparison",
+      "forms": [
+        "comparisson",
+        "comparacao",
+        "comparação"
+      ]
+    }
+  ],
+  "config": {
+    "enabled": true
+  }
+}

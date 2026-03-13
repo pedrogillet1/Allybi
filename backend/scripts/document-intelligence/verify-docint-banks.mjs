@@ -48,6 +48,10 @@ const diBanksServicePath = path.join(
 
 const strict = process.argv.includes("--strict");
 
+function toPosix(value) {
+  return String(value || "").replace(/\\/g, "/");
+}
+
 // ── helpers ──────────────────────────────────────────────────────────────────
 
 function readJson(filePath) {
@@ -111,7 +115,7 @@ const parsedBanks = []; // { filePath, relPath, data, isEntitySchema }
 const parseErrors = [];
 
 for (const filePath of allDiFiles) {
-  const relPath = path.relative(dataBanksRoot, filePath);
+  const relPath = toPosix(path.relative(dataBanksRoot, filePath));
   const isEntitySchema = filePath.endsWith(".entities.schema.json");
 
   let data;
@@ -180,7 +184,7 @@ try {
 const registryByPath = new Map();
 const registryById = new Map();
 for (const b of registry.banks || []) {
-  if (b.path) registryByPath.set(String(b.path), b);
+  if (b.path) registryByPath.set(toPosix(String(b.path)), b);
   if (b.id) registryById.set(String(b.id), b);
 }
 

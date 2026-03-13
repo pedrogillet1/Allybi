@@ -186,6 +186,18 @@ function getPersistedIntentState(ctx: TurnContext): PersistedIntentState | undef
 
 export class TurnRouterService {
   private static _followupMisconfigWarned = false;
+  private readonly diBanks: Pick<
+    DocumentIntelligenceBanksService,
+    | "getFollowupPolicy"
+    | "getRoutingIntentPatterns"
+    | "getModeSwitch"
+    | "getOneBestQuestionPolicy"
+    | "getQueryFamilyCatalog"
+    | "getCalcIntents"
+    | "getEditingIntents"
+    | "getIntegrationIntents"
+    | "getNavigationIntents"
+  > | null;
   private readonly fileActionBankProvider:
     | Pick<DocumentIntelligenceBanksService, "getFileActionOperators">
     | ((bankId: string) => any | null);
@@ -205,8 +217,25 @@ export class TurnRouterService {
     routingBankProvider: (bankId: string) => any | null = (bankId) =>
       getOptionalBank<any>(bankId),
   ) {
+    this.diBanks =
+      typeof fileActionBankProvider === "function" ? null : fileActionBankProvider;
     this.fileActionBankProvider = fileActionBankProvider;
     this.routingBankProvider = routingBankProvider;
+  }
+
+  private getRoutingBankByDecision(kind: "intent_patterns" | "followup_policy" | "mode_switch"): any | null {
+    try {
+      if (!this.diBanks) {
+        if (kind === "intent_patterns") return this.routingBankProvider("intent_patterns") || this.routingBankProvider("query_intent_patterns");
+        if (kind === "followup_policy") return this.routingBankProvider("followup_policy") || this.routingBankProvider("followup_indicators");
+        return this.routingBankProvider(`patterns_modes_mode_switch_${kind}`);
+      }
+      if (kind === "intent_patterns") return this.diBanks.getRoutingIntentPatterns();
+      if (kind === "followup_policy") return this.diBanks.getFollowupPolicy();
+      return this.diBanks.getModeSwitch("en");
+    } catch {
+      return null;
+    }
   }
 
   private getFileActionBank(): any | null {
@@ -223,6 +252,37 @@ export class TurnRouterService {
   private getOperatorCollisionMatrixBank(): any | null {
     try {
       return this.routingBankProvider("operator_collision_matrix");
+    } catch {
+      return null;
+    }
+  }
+
+  private getOptionalRoutingBank(
+    bankId:
+      | "query_family_catalog"
+      | "calc_intents"
+      | "editing_intents"
+      | "integration_intents"
+      | "navigation_intents",
+  ): any | null {
+    try {
+      if (!this.diBanks) {
+        return this.routingBankProvider(bankId);
+      }
+      switch (bankId) {
+        case "query_family_catalog":
+          return this.diBanks.getQueryFamilyCatalog?.() ?? null;
+        case "calc_intents":
+          return this.diBanks.getCalcIntents?.() ?? null;
+        case "editing_intents":
+          return this.diBanks.getEditingIntents?.() ?? null;
+        case "integration_intents":
+          return this.diBanks.getIntegrationIntents?.() ?? null;
+        case "navigation_intents":
+          return this.diBanks.getNavigationIntents?.() ?? null;
+        default:
+          return null;
+      }
     } catch {
       return null;
     }
@@ -310,7 +370,9 @@ export class TurnRouterService {
     locale: "en" | "pt" | "es",
     docsAvailable: boolean,
   ): RouterCandidate[] {
-    const bank = this.routingBankProvider("intent_patterns");
+    const bank =
+      this.getRoutingBankByDecision("intent_patterns") ||
+      this.routingBankProvider("query_intent_patterns");
     if (!bank?.config?.enabled) return [];
     const matching = bank?.config?.matching || {};
     const normalized = normalizeForMatching(query, {
@@ -377,6 +439,200 @@ export class TurnRouterService {
     return out;
   }
 
+  private mapQueryFamilyNameToCandidate(
+    familyName: string,
+  ): Pick<RouterCandidate, "intentId" | "intentFamily" | "operatorId" | "domainId"> | null {
+    const normalized = low(familyName);
+    if (normalized === "document_retrieval") {
+      return {
+        intentId: "documents",
+        intentFamily: "documents",
+        operatorId: "locate_docs",
+        domainId: "general",
+      };
+    }
+    if (normalized === "content_extraction") {
+      return {
+        intentId: "documents",
+        intentFamily: "documents",
+        operatorId: "extract",
+        domainId: "general",
+      };
+    }
+    if (normalized === "numeric_compute") {
+      return {
+        intentId: "documents",
+        intentFamily: "documents",
+        operatorId: "calculate",
+        domainId: "general",
+      };
+    }
+    if (normalized === "cross_document_compare") {
+      return {
+        intentId: "documents",
+        intentFamily: "documents",
+        operatorId: "compare",
+        domainId: "general",
+      };
+    }
+    if (normalized === "clarification_request") {
+      return {
+        intentId: "documents",
+        intentFamily: "documents",
+        operatorId: "disambiguate",
+        domainId: "general",
+      };
+    }
+    if (normalized === "document_identity") {
+      return {
+        intentId: "documents",
+        intentFamily: "documents",
+        operatorId: "identify_doc_type",
+        domainId: "general",
+      };
+    }
+    return null;
+  }
+
+  private detectQueryFamilyCandidates(
+    query: string,
+    locale: "en" | "pt" | "es",
+    docsAvailable: boolean,
+    hasExplicitDocRef: boolean,
+  ): RouterCandidate[] {
+    const bank = this.getOptionalRoutingBank("query_family_catalog");
+    if (bank?.config?.enabled === false) return [];
+
+    const normalized = normalizeForMatching(query, {
+      caseInsensitive: true,
+      stripDiacritics: true,
+      collapseWhitespace: true,
+    });
+    if (!normalized) return [];
+
+    const out: RouterCandidate[] = [];
+    const families = Array.isArray(bank?.families) ? bank.families : [];
+    for (const family of families) {
+      const familyName = String(family?.name || family?.id || "").trim();
+      const mapped = this.mapQueryFamilyNameToCandidate(familyName);
+      if (!mapped) continue;
+
+      const aliases = this.getLocalizedPatterns(family?.aliases || {}, locale);
+      const requiredSignals = Array.isArray(family?.signals?.required)
+        ? family.signals.required
+            .map((value: unknown) => String(value || "").trim().toLowerCase())
+            .filter(Boolean)
+        : [];
+      const disambiguators = Array.isArray(family?.signals?.disambiguators)
+        ? family.signals.disambiguators
+            .map((value: unknown) => String(value || "").trim().toLowerCase())
+            .filter(Boolean)
+        : [];
+      const aliasHit =
+        aliases.length > 0 && this.regexMatchesAny(normalized, aliases);
+      const requiredHit =
+        requiredSignals.length > 0 &&
+        requiredSignals.some((token) => normalized.includes(token));
+      const disambiguatorHit =
+        disambiguators.length > 0 &&
+        disambiguators.some((token) => normalized.includes(token));
+      if (!aliasHit && !requiredHit) continue;
+
+      let score = aliasHit ? 0.78 : 0.68;
+      if (requiredHit && disambiguatorHit) score += 0.08;
+      if (hasExplicitDocRef && mapped.intentFamily === "documents") score += 0.05;
+      if (docsAvailable && mapped.intentFamily === "documents") score += 0.03;
+      out.push({
+        ...mapped,
+        score: Math.max(
+          0,
+          Math.min(1, score + this.getRoutingPriorityBoost(mapped.intentFamily)),
+        ),
+        reasons: [`query_family:${low(familyName)}`],
+      });
+    }
+    out.sort((a, b) => b.score - a.score);
+    return out;
+  }
+
+  private detectOperatorBankCandidates(query: string): RouterCandidate[] {
+    const normalized = normalizeForMatching(query, {
+      caseInsensitive: true,
+      stripDiacritics: true,
+      collapseWhitespace: true,
+    });
+    if (!normalized) return [];
+
+    const bankSpecs: Array<{
+      bankId: "calc_intents" | "editing_intents" | "integration_intents" | "navigation_intents";
+      intentId: string;
+      intentFamily: string;
+      baseScore: number;
+      domainId: string;
+    }> = [
+      {
+        bankId: "calc_intents",
+        intentId: "documents",
+        intentFamily: "documents",
+        baseScore: 0.8,
+        domainId: "general",
+      },
+      {
+        bankId: "editing_intents",
+        intentId: "editing",
+        intentFamily: "editing",
+        baseScore: 0.78,
+        domainId: "general",
+      },
+      {
+        bankId: "integration_intents",
+        intentId: "connectors",
+        intentFamily: "connectors",
+        baseScore: 0.8,
+        domainId: "connectors",
+      },
+      {
+        bankId: "navigation_intents",
+        intentId: "file_actions",
+        intentFamily: "file_actions",
+        baseScore: 0.8,
+        domainId: "general",
+      },
+    ];
+
+    const out: RouterCandidate[] = [];
+    for (const spec of bankSpecs) {
+      const bank = this.getOptionalRoutingBank(spec.bankId);
+      if (bank?.config?.enabled === false) continue;
+      const operators = Array.isArray(bank?.operators)
+        ? bank.operators
+            .map((value: unknown) => String(value || "").trim().toLowerCase())
+            .filter(Boolean)
+        : [];
+      for (const operatorId of operators) {
+        const regex = new RegExp(`\\b${operatorId.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i");
+        if (!regex.test(normalized)) continue;
+        out.push({
+          intentId: spec.intentId,
+          intentFamily: spec.intentFamily,
+          operatorId,
+          domainId: spec.domainId,
+          score: Math.max(
+            0,
+            Math.min(
+              1,
+              spec.baseScore + this.getRoutingPriorityBoost(spec.intentFamily),
+            ),
+          ),
+          reasons: [`bank_operator:${spec.bankId}`],
+        });
+      }
+    }
+
+    out.sort((a, b) => b.score - a.score);
+    return out;
+  }
+
   private hasOperatorCandidate(
     candidates: RouterCandidate[],
     operators: string[],
@@ -391,7 +647,9 @@ export class TurnRouterService {
     query: string,
     locale: "en" | "pt" | "es",
   ): FollowupDetectionResult {
-    const bank = this.routingBankProvider("intent_patterns");
+    const bank =
+      this.getRoutingBankByDecision("intent_patterns") ||
+      this.routingBankProvider("query_intent_patterns");
     const matching = bank?.config?.matching || {};
     const normalized = normalizeForMatching(query, {
       caseInsensitive: matching.caseSensitive !== true,
@@ -411,10 +669,6 @@ export class TurnRouterService {
       locale,
     );
     if (overlayPatterns.length === 0) {
-      if (!TurnRouterService._followupMisconfigWarned) {
-        TurnRouterService._followupMisconfigWarned = true;
-        console.warn("[turn-router] followup detection disabled: overlayPatterns is empty for locale", locale);
-      }
       return {
         isFollowup: false,
         confidence: null,
@@ -464,7 +718,9 @@ export class TurnRouterService {
     locale: "en" | "pt" | "es",
     hasExplicitDocRef: boolean,
   ): FollowupDetectionResult {
-    const bank = this.routingBankProvider("followup_indicators");
+    const bank =
+      this.getRoutingBankByDecision("followup_policy") ||
+      this.routingBankProvider("followup_indicators");
     if (!bank?.config?.enabled) {
       return {
         isFollowup: false,
@@ -523,7 +779,9 @@ export class TurnRouterService {
     }
 
     const minScore = Number(
-      bank?.config?.actionsContract?.thresholds?.followupScoreMin ?? 0.65,
+      bank?.config?.actionsContract?.thresholds?.followupScoreMin ??
+        bank?.config?.minConfidenceForAutoFollowup ??
+        0.65,
     );
     const capped = Math.max(0, Math.min(1, score));
     const isFollowup = !overrideNewTurn && capped >= minScore;
@@ -772,8 +1030,19 @@ export class TurnRouterService {
       locale,
       docsAvailable,
     );
+    const queryFamilyCandidates = this.detectQueryFamilyCandidates(
+      query,
+      locale,
+      docsAvailable,
+      docRef,
+    );
+    const operatorBankCandidates = this.detectOperatorBankCandidates(query);
 
-    const candidates: RouterCandidate[] = [...patternCandidates];
+    const candidates: RouterCandidate[] = [
+      ...patternCandidates,
+      ...queryFamilyCandidates,
+      ...operatorBankCandidates,
+    ];
     const hasFamily = (family: string) =>
       candidates.some(
         (candidate) => low(candidate.intentFamily || "") === low(family),
@@ -868,6 +1137,7 @@ export class TurnRouterService {
       typeof contextSignals.isFollowup === "boolean"
         ? contextSignals.isFollowup
         : null;
+    const oneBestQuestionPolicy = this.diBanks?.getOneBestQuestionPolicy?.();
     return {
       isFollowup:
         explicitFollowup !== null ? explicitFollowup : followup.isFollowup,
@@ -890,7 +1160,9 @@ export class TurnRouterService {
         contextSignals.userRequestedShort === true ||
         ctx.request.truncationRetry === true,
       userRequestedDetailed: contextSignals.userRequestedDetailed === true,
-      userSaidPickForMe: contextSignals.userSaidPickForMe === true,
+      userSaidPickForMe:
+        contextSignals.userSaidPickForMe === true ||
+        oneBestQuestionPolicy?.config?.preferSingleDisambiguator === true,
     };
   }
 

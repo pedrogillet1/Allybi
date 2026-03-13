@@ -1,0 +1,22 @@
+{
+  "_meta": {
+    "id": "clarification_question_bank",
+    "version": "1.0.0",
+    "description": "Repair framing for one-best-question clarification behavior.",
+    "languages": [
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "terminal6"
+  },
+  "config": {
+    "enabled": true
+  },
+  "questionFrames": {
+    "en": "I need one clarification to answer precisely: {{question}}",
+    "pt": "Preciso de uma clarificacao para responder com precisao: {{question}}",
+    "es": "Necesito una aclaracion para responder con precision: {{question}}"
+  }
+}

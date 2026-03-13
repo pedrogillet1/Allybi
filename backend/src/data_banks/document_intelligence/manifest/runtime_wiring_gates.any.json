@@ -1,12 +1,12 @@
 {
   "_meta": {
     "id": "document_intelligence_runtime_wiring_gates",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "description": "Runtime wiring gates for document intelligence. Defines required consumer paths, required banks, and behavioral proof tests.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-03-02",
+    "lastUpdated": "2026-03-13",
     "owner": "koda-document-intelligence",
     "dependsOn": [
       "bank_registry",
@@ -33,9 +33,16 @@
       "id": "docint_behavior_proof_tests",
       "type": "wiring_proof",
       "proofTests": [
+        "src/modules/chat/runtime/documentIntelligenceCompositionBrain.service.test.ts",
+        "src/modules/chat/runtime/documentIntelligenceBrainDecisionFrame.service.test.ts",
         "src/services/chat/turnRoutePolicy.service.test.ts",
+        "src/services/chat/turnRouter.service.test.ts",
         "src/services/core/banks/runtimeWiringProof.service.test.ts",
+        "src/services/core/enforcement/qualityGateRunner.service.test.ts",
+        "src/services/core/retrieval/retrievalEngine.semantic-banks.test.ts",
         "src/services/core/retrieval/retrievalEngine.telemetry.test.ts",
+        "src/services/core/scope/documentReferenceResolver.service.test.ts",
+        "src/services/core/scope/scopeGate.service.test.ts",
         "src/tests/document-intelligence/docint-bank-integrity.test.ts",
         "src/tests/document-intelligence/docint-orphan-detection.test.ts",
         "src/tests/document-intelligence/docint-wiring-proof.test.ts"
@@ -45,6 +52,8 @@
       "id": "docint_facade_only_runtime",
       "type": "facade_only",
       "requiredConsumerPaths": [
+        "src/modules/chat/runtime/documentIntelligenceCompositionBrain.service.ts",
+        "src/modules/chat/runtime/documentIntelligenceBrainDecisionFrame.service.ts",
         "src/services/chat/turnRoutePolicy.service.ts",
         "src/services/chat/turnRouter.service.ts",
         "src/services/core/banks/documentIntelligenceBanks.service.ts",
@@ -65,78 +74,21 @@
       "type": "wiring_proof",
       "requiredFamilies": [
         {
-          "id": "taxonomy_and_aliases",
+          "id": "brain_decision_frame_runtime",
           "sampleBankIds": [
-            "doc_taxonomy",
-            "doc_archetypes_finance",
-            "doc_aliases_finance"
-          ],
-          "bankIdPrefixes": [
-            "doc_archetypes_",
-            "doc_aliases_"
-          ],
-          "proofTests": [
-            "src/tests/document-intelligence/docint-wiring-proof.test.ts",
-            "src/tests/document-intelligence/docint-bank-integrity.test.ts"
-          ]
-        },
-        {
-          "id": "structure_semantics",
-          "sampleBankIds": [
-            "headings_map",
-            "sheetname_patterns",
-            "layout_cues",
-            "table_header_ontology_finance"
-          ],
-          "bankIdPrefixes": [
-            "table_header_ontology_"
+            "query_family_catalog",
+            "doc_lock_policy",
+            "source_policy",
+            "context_container_profiles"
           ],
           "bankIdPatterns": [
-            "^(headings_map|sheetname_patterns|layout_cues)$"
+            "^(query_family_catalog|doc_lock_policy|source_policy|context_container_profiles|project_memory_policy|claim_strength_matrix|confidence_calibration)$"
           ],
           "proofTests": [
-            "src/tests/document-intelligence/docint-wiring-proof.test.ts",
-            "src/tests/document-intelligence/docint-bank-integrity.test.ts"
-          ]
-        },
-        {
-          "id": "entity_and_ontology",
-          "sampleBankIds": [
-            "money_patterns",
-            "date_patterns",
-            "party_patterns",
-            "identifier_patterns",
-            "di_doc_type_ontology"
-          ],
-          "bankIdPrefixes": [
-            "di_doc_type_",
-            "di_domain_",
-            "di_entity_",
-            "di_metric_",
-            "di_section_",
-            "di_unit_and_measurement_"
-          ],
-          "bankIdPatterns": [
-            "^(finance_kpi_ontology|accounting_rules|finance_doc_logic|legal_clause_ontology|legal_risk_heuristics|legal_reference_rules|medical_report_ontology|medical_safety_boundaries|medical_explanation_templates|ops_kpi_ontology|ops_doc_logic)$",
-            "^(money_patterns|date_patterns|party_patterns|identifier_patterns|di_abbreviation_global|di_normalization_rules)$"
-          ],
-          "proofTests": [
-            "src/tests/document-intelligence/docint-wiring-proof.test.ts"
-          ]
-        },
-        {
-          "id": "domain_packs",
-          "bankIdPrefixes": [
-            "legal_",
-            "medical_"
-          ],
-          "sampleBankIds": [
-            "legal_domain_profile",
-            "medical_domain_profile"
-          ],
-          "proofTests": [
-            "src/tests/document-intelligence/docint-wiring-proof.test.ts",
-            "src/tests/document-intelligence/docint-orphan-detection.test.ts"
+            "src/modules/chat/runtime/documentIntelligenceBrainDecisionFrame.service.test.ts",
+            "src/services/llm/core/llmRequestBuilder.service.test.ts",
+            "src/services/core/scope/scopeGate.service.test.ts",
+            "src/services/chat/turnRouter.service.test.ts"
           ]
         },
         {
@@ -166,66 +118,107 @@
           ]
         },
         {
-          "id": "operator_playbooks",
+          "id": "domain_packs",
           "bankIdPrefixes": [
-            "operator_playbook_"
+            "legal_",
+            "medical_"
           ],
           "sampleBankIds": [
-            "operator_playbook_extract_legal"
+            "legal_domain_profile",
+            "medical_domain_profile"
           ],
           "proofTests": [
             "src/tests/document-intelligence/docint-wiring-proof.test.ts",
-            "src/tests/document-intelligence/docint-bank-integrity.test.ts"
+            "src/tests/document-intelligence/docint-orphan-detection.test.ts"
           ]
         },
         {
-          "id": "retrieval_policies",
-          "bankIdPrefixes": [
-            "query_rewrites_",
-            "boost_rules_",
-            "section_priority_"
-          ],
+          "id": "entity_and_ontology",
           "sampleBankIds": [
-            "legal_retrieval_strategies",
-            "medical_retrieval_strategies",
-            "query_rewrites_legal"
+            "money_patterns",
+            "date_patterns",
+            "party_patterns",
+            "identifier_patterns",
+            "di_doc_type_ontology"
+          ],
+          "bankIdPrefixes": [
+            "di_doc_type_",
+            "di_domain_",
+            "di_entity_",
+            "di_metric_",
+            "di_section_",
+            "di_unit_and_measurement_"
+          ],
+          "bankIdPatterns": [
+            "^(finance_kpi_ontology|accounting_rules|finance_doc_logic|legal_clause_ontology|legal_risk_heuristics|legal_reference_rules|medical_report_ontology|medical_safety_boundaries|medical_explanation_templates|ops_kpi_ontology|ops_doc_logic)$",
+            "^(money_patterns|date_patterns|party_patterns|identifier_patterns|di_abbreviation_global|di_normalization_rules)$"
           ],
           "proofTests": [
             "src/tests/document-intelligence/docint-wiring-proof.test.ts"
           ]
         },
         {
-          "id": "reasoning_policies",
-          "bankIdPrefixes": [
-            "explain_style_",
-            "decision_support_"
-          ],
+          "id": "governance_manifest_contracts",
           "sampleBankIds": [
-            "explain_style_legal",
-            "decision_support_medical",
-            "assumption_policy"
+            "ssot_contract",
+            "sharding_policy",
+            "eval_gate_policy",
+            "bank_metadata_policy",
+            "bank_quality_contract"
           ],
           "bankIdPatterns": [
-            "^assumption_policy$"
+            "^(ssot_contract|sharding_policy|eval_gate_policy|bank_metadata_policy|bank_quality_contract)$"
           ],
           "proofTests": [
+            "src/tests/document-intelligence/docint-orphan-detection.test.ts",
             "src/tests/document-intelligence/docint-wiring-proof.test.ts"
           ]
         },
         {
-          "id": "validation_policies",
+          "id": "governance_manifests",
           "sampleBankIds": [
-            "legal_validation_policies",
-            "medical_validation_policies",
-            "numeric_integrity",
-            "wrong_doc_lock",
-            "source_policy",
-            "ambiguity_questions"
+            "document_intelligence_schema_registry",
+            "document_intelligence_dependency_graph",
+            "document_intelligence_usage_manifest",
+            "document_intelligence_orphan_allowlist",
+            "document_intelligence_runtime_wiring_gates",
+            "document_intelligence_bank_map"
           ],
           "bankIdPatterns": [
-            "^(numeric_integrity|wrong_doc_lock|source_policy|ambiguity_questions)$"
+            "^document_intelligence_(schema_registry|dependency_graph|usage_manifest|orphan_allowlist|runtime_wiring_gates|bank_map)$"
           ],
           "proofTests": [
+            "src/tests/document-intelligence/docint-orphan-detection.test.ts",
+            "src/tests/document-intelligence/docint-wiring-proof.test.ts"
+          ]
+        },
+        {
+          "id": "identity_brain",
+          "sampleBankIds": [
+            "assistant_identity",
+            "behavioral_contract"
+          ],
+          "bankIdPatterns": [
+            "^(assistant_identity|behavioral_contract|confidence_calibration|help_and_capabilities|mission_and_non_goals)$"
+          ],
+          "proofTests": [
+            "src/modules/chat/runtime/documentIntelligenceCompositionBrain.service.test.ts",
+            "src/tests/document-intelligence/docint-wiring-proof.test.ts"
+          ]
+        },
+        {
+          "id": "language_runtime",
+          "sampleBankIds": [
+            "entity_aliases",
+            "misspelling_and_variant_map",
+            "colloquial_phrasing"
+          ],
+          "bankIdPatterns": [
+            "^(entity_aliases|misspelling_and_variant_map|colloquial_phrasing)$"
+          ],
+          "proofTests": [
+            "src/services/core/scope/scopeGate.service.test.ts",
+            "src/services/core/retrieval/retrievalEngine.semantic-banks.test.ts",
             "src/tests/document-intelligence/docint-wiring-proof.test.ts"
           ]
         },
@@ -248,20 +241,151 @@
           ]
         },
         {
-          "id": "governance_manifests",
-          "sampleBankIds": [
-            "document_intelligence_schema_registry",
-            "document_intelligence_dependency_graph",
-            "document_intelligence_usage_manifest",
-            "document_intelligence_orphan_allowlist",
-            "document_intelligence_runtime_wiring_gates",
-            "document_intelligence_bank_map"
+          "id": "operator_playbooks",
+          "bankIdPrefixes": [
+            "operator_playbook_"
           ],
-          "bankIdPatterns": [
-            "^document_intelligence_(schema_registry|dependency_graph|usage_manifest|orphan_allowlist|runtime_wiring_gates|bank_map)$"
+          "sampleBankIds": [
+            "operator_playbook_extract_legal"
           ],
           "proofTests": [
-            "src/tests/document-intelligence/docint-orphan-detection.test.ts",
+            "src/tests/document-intelligence/docint-wiring-proof.test.ts",
+            "src/tests/document-intelligence/docint-bank-integrity.test.ts"
+          ]
+        },
+        {
+          "id": "reasoning_policies",
+          "bankIdPrefixes": [
+            "explain_style_",
+            "decision_support_"
+          ],
+          "sampleBankIds": [
+            "explain_style_legal",
+            "decision_support_medical",
+            "assumption_policy"
+          ],
+          "bankIdPatterns": [
+            "^assumption_policy$"
+          ],
+          "proofTests": [
+            "src/tests/document-intelligence/docint-wiring-proof.test.ts"
+          ]
+        },
+        {
+          "id": "repair_runtime",
+          "sampleBankIds": [
+            "clarification_question_bank",
+            "not_enough_evidence",
+            "partial_answer_recovery"
+          ],
+          "bankIdPatterns": [
+            "^(clarification_question_bank|not_enough_evidence|partial_answer_recovery)$"
+          ],
+          "proofTests": [
+            "src/modules/chat/runtime/documentIntelligenceCompositionBrain.service.test.ts",
+            "src/tests/document-intelligence/docint-wiring-proof.test.ts"
+          ]
+        },
+        {
+          "id": "retrieval_policies",
+          "bankIdPrefixes": [
+            "query_rewrites_",
+            "boost_rules_",
+            "section_priority_"
+          ],
+          "sampleBankIds": [
+            "legal_retrieval_strategies",
+            "medical_retrieval_strategies",
+            "query_rewrites_legal"
+          ],
+          "proofTests": [
+            "src/tests/document-intelligence/docint-wiring-proof.test.ts"
+          ]
+        },
+        {
+          "id": "routing_scope_runtime",
+          "sampleBankIds": [
+            "doc_reference_resolution",
+            "folder_scope_patterns",
+            "mode_switch",
+            "one_best_question_policy"
+          ],
+          "bankIdPatterns": [
+            "^(doc_reference_resolution|folder_scope_patterns|mode_switch|one_best_question_policy)$"
+          ],
+          "proofTests": [
+            "src/services/chat/turnRouter.service.test.ts",
+            "src/services/core/scope/documentReferenceResolver.service.test.ts",
+            "src/services/core/scope/scopeGate.service.test.ts",
+            "src/tests/document-intelligence/docint-wiring-proof.test.ts"
+          ]
+        },
+        {
+          "id": "structure_semantics",
+          "sampleBankIds": [
+            "headings_map",
+            "sheetname_patterns",
+            "layout_cues",
+            "table_header_ontology_finance"
+          ],
+          "bankIdPrefixes": [
+            "table_header_ontology_"
+          ],
+          "bankIdPatterns": [
+            "^(headings_map|sheetname_patterns|layout_cues)$"
+          ],
+          "proofTests": [
+            "src/tests/document-intelligence/docint-wiring-proof.test.ts",
+            "src/tests/document-intelligence/docint-bank-integrity.test.ts"
+          ]
+        },
+        {
+          "id": "taxonomy_and_aliases",
+          "sampleBankIds": [
+            "doc_taxonomy",
+            "doc_archetypes_finance",
+            "doc_aliases_finance"
+          ],
+          "bankIdPrefixes": [
+            "doc_archetypes_",
+            "doc_aliases_"
+          ],
+          "proofTests": [
+            "src/tests/document-intelligence/docint-wiring-proof.test.ts",
+            "src/tests/document-intelligence/docint-bank-integrity.test.ts"
+          ]
+        },
+        {
+          "id": "validation_policies",
+          "sampleBankIds": [
+            "legal_validation_policies",
+            "medical_validation_policies",
+            "numeric_integrity",
+            "wrong_doc_lock",
+            "source_policy",
+            "ambiguity_questions"
+          ],
+          "bankIdPatterns": [
+            "^(numeric_integrity|wrong_doc_lock|source_policy|ambiguity_questions)$"
+          ],
+          "proofTests": [
+            "src/tests/document-intelligence/docint-wiring-proof.test.ts"
+          ]
+        },
+        {
+          "id": "validation_safety_runtime",
+          "sampleBankIds": [
+            "claim_strength_matrix",
+            "field_exactness_rules",
+            "table_integrity_rules",
+            "legal_privilege_rules",
+            "access_scope_rules"
+          ],
+          "bankIdPatterns": [
+            "^(access_scope_rules|claim_strength_matrix|conflict_resolution_rules|field_exactness_rules|high_stakes_response_rules|legal_privilege_rules|privacy_minimal|retention_and_deletion_policy|sensitive_content_rules|table_integrity_rules)$"
+          ],
+          "proofTests": [
+            "src/services/core/enforcement/qualityGateRunner.service.test.ts",
             "src/tests/document-intelligence/docint-wiring-proof.test.ts"
           ]
         }
@@ -275,14 +399,22 @@
       "id": "docint_required_runtime_banks",
       "type": "required_banks",
       "requiredBanks": [
+        "access_scope_rules",
         "ambiguity_questions",
+        "assistant_identity",
+        "bank_metadata_policy",
+        "bank_quality_contract",
+        "behavioral_contract",
         "boost_rules_accounting",
         "boost_rules_finance",
+        "claim_strength_matrix",
+        "clarification_question_bank",
         "doc_aliases_accounting",
         "doc_aliases_finance",
         "doc_aliases_legal",
         "doc_aliases_medical",
         "doc_aliases_ops",
+        "doc_reference_resolution",
         "doc_taxonomy",
         "document_intelligence_bank_map",
         "document_intelligence_dependency_graph",
@@ -290,9 +422,14 @@
         "document_intelligence_runtime_wiring_gates",
         "document_intelligence_schema_registry",
         "document_intelligence_usage_manifest",
+        "eval_gate_policy",
+        "field_exactness_rules",
+        "folder_scope_patterns",
+        "high_stakes_response_rules",
         "legal_doc_type_catalog",
         "legal_domain_profile",
         "legal_nda_sections",
+        "legal_privilege_rules",
         "legal_retrieval_strategies",
         "legal_validation_policies",
         "medical_doc_type_catalog",
@@ -300,12 +437,22 @@
         "medical_retrieval_strategies",
         "medical_soap_note_sections",
         "medical_validation_policies",
+        "mode_switch",
+        "not_enough_evidence",
         "numeric_integrity",
+        "one_best_question_policy",
+        "partial_answer_recovery",
+        "privacy_minimal",
         "query_rewrites_accounting",
         "query_rewrites_finance",
+        "retention_and_deletion_policy",
         "section_priority_accounting",
         "section_priority_finance",
+        "sensitive_content_rules",
+        "sharding_policy",
         "source_policy",
+        "ssot_contract",
+        "table_integrity_rules",
         "wrong_doc_lock"
       ]
     }

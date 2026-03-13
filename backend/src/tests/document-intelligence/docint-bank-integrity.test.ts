@@ -37,15 +37,27 @@ function resolveDataBanksRoot(): string {
 
 const DATA_BANKS_ROOT = resolveDataBanksRoot();
 
+function toPosix(value: string): string {
+  return String(value || "").replace(/\\/g, "/");
+}
+
 /**
  * Directories that contain document-intelligence-related banks.
  * These sub-trees are walked recursively for .any.json files.
  */
 const DI_SUBDIRECTORIES = [
+  "document_intelligence/identity",
+  "document_intelligence/language",
+  "document_intelligence/routing",
+  "document_intelligence/scope",
+  "document_intelligence/compose",
+  "document_intelligence/repair",
+  "document_intelligence/retrieval",
+  "document_intelligence/validation",
+  "document_intelligence/safety",
   "document_intelligence/domains",
   "document_intelligence/manifest",
   "quality/document_intelligence",
-  "retrieval",
   "semantics/domain",
   "semantics/structure",
   "semantics/entities",
@@ -117,7 +129,7 @@ function collectDiBankFiles(): string[] {
   );
 
   return files.filter((filePath) => {
-    const rel = path.relative(DATA_BANKS_ROOT, filePath);
+    const rel = toPosix(path.relative(DATA_BANKS_ROOT, filePath));
     return (
       registryPaths.has(rel) ||
       rel === "semantics/document_intelligence_bank_map.any.json" ||
@@ -628,8 +640,19 @@ describe("DI cross-domain parity", () => {
     const merged = Array.from(
       new Set([...clusterDomains, ...typeDefDomains].filter(Boolean)),
     ).sort();
+    const extendedDomains = Array.isArray(bankMap?.extendedDomains)
+      ? bankMap.extendedDomains
+          .map((domain: unknown) => normalizeDomain(domain))
+          .filter(Boolean)
+      : [];
+    const allowed = new Set([...DOMAINS, ...extendedDomains]);
 
-    expect(merged).toEqual([...DOMAINS].sort());
+    for (const domain of DOMAINS) {
+      expect(merged).toContain(domain);
+    }
+    for (const domain of merged) {
+      expect(allowed.has(domain)).toBe(true);
+    }
   });
 
   test("doc taxonomy keeps operations->ops compatibility alias", () => {

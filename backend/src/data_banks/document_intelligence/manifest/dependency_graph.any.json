@@ -1,12 +1,12 @@
 {
   "_meta": {
     "id": "document_intelligence_dependency_graph",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "description": "Document intelligence dependency graph overlay used to enforce runtime wiring and prevent manifest drift.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-03-02",
+    "lastUpdated": "2026-03-13",
     "owner": "koda-document-intelligence",
     "dependsOn": [
       "bank_registry",
@@ -27,6 +27,10 @@
   },
   "banks": [
     {
+      "id": "access_scope_rules",
+      "dependsOn": []
+    },
+    {
       "id": "accounting_rules",
       "dependsOn": [
         "doc_archetypes_finance"
@@ -39,10 +43,26 @@
       ]
     },
     {
+      "id": "assistant_identity",
+      "dependsOn": []
+    },
+    {
       "id": "assumption_policy",
       "dependsOn": [
         "clarification_policy"
       ]
+    },
+    {
+      "id": "bank_metadata_policy",
+      "dependsOn": []
+    },
+    {
+      "id": "bank_quality_contract",
+      "dependsOn": []
+    },
+    {
+      "id": "behavioral_contract",
+      "dependsOn": []
     },
     {
       "id": "boost_rules_accounting",
@@ -73,6 +93,22 @@
       "dependsOn": [
         "doc_archetypes_ops"
       ]
+    },
+    {
+      "id": "claim_strength_matrix",
+      "dependsOn": []
+    },
+    {
+      "id": "clarification_question_bank",
+      "dependsOn": []
+    },
+    {
+      "id": "confidence_calibration",
+      "dependsOn": []
+    },
+    {
+      "id": "conflict_resolution_rules",
+      "dependsOn": []
     },
     {
       "id": "date_patterns",
@@ -169,6 +205,10 @@
       ]
     },
     {
+      "id": "doc_reference_resolution",
+      "dependsOn": []
+    },
+    {
       "id": "doc_taxonomy",
       "dependsOn": []
     },
@@ -213,6 +253,14 @@
       ]
     },
     {
+      "id": "entity_aliases",
+      "dependsOn": []
+    },
+    {
+      "id": "eval_gate_policy",
+      "dependsOn": []
+    },
+    {
       "id": "explain_style_finance",
       "dependsOn": [
         "doc_archetypes_finance"
@@ -237,6 +285,10 @@
       ]
     },
     {
+      "id": "field_exactness_rules",
+      "dependsOn": []
+    },
+    {
       "id": "finance_doc_logic",
       "dependsOn": [
         "doc_archetypes_finance"
@@ -249,10 +301,22 @@
       ]
     },
     {
+      "id": "folder_scope_patterns",
+      "dependsOn": []
+    },
+    {
       "id": "headings_map",
       "dependsOn": [
         "doc_taxonomy"
       ]
+    },
+    {
+      "id": "help_and_capabilities",
+      "dependsOn": []
+    },
+    {
+      "id": "high_stakes_response_rules",
+      "dependsOn": []
     },
     {
       "id": "identifier_patterns",
@@ -497,6 +561,10 @@
       "dependsOn": [
         "legal_doc_type_catalog"
       ]
+    },
+    {
+      "id": "legal_privilege_rules",
+      "dependsOn": []
     },
     {
       "id": "legal_reasoning_scaffolds",
@@ -815,16 +883,36 @@
       ]
     },
     {
+      "id": "mission_and_non_goals",
+      "dependsOn": []
+    },
+    {
+      "id": "misspelling_and_variant_map",
+      "dependsOn": []
+    },
+    {
+      "id": "mode_switch",
+      "dependsOn": []
+    },
+    {
       "id": "money_patterns",
       "dependsOn": [
         "doc_taxonomy"
       ]
     },
     {
+      "id": "not_enough_evidence",
+      "dependsOn": []
+    },
+    {
       "id": "numeric_integrity",
       "dependsOn": [
         "quality_gates"
       ]
+    },
+    {
+      "id": "one_best_question_policy",
+      "dependsOn": []
     },
     {
       "id": "operator_playbook_advise_finance",
@@ -1215,6 +1303,10 @@
       ]
     },
     {
+      "id": "partial_answer_recovery",
+      "dependsOn": []
+    },
+    {
       "id": "party_patterns",
       "dependsOn": [
         "doc_taxonomy"
@@ -1225,6 +1317,10 @@
       "dependsOn": [
         "document_intelligence_bank_map"
       ]
+    },
+    {
+      "id": "privacy_minimal",
+      "dependsOn": []
     },
     {
       "id": "query_rewrites_accounting",
@@ -1257,6 +1353,10 @@
       ]
     },
     {
+      "id": "retention_and_deletion_policy",
+      "dependsOn": []
+    },
+    {
       "id": "section_priority_accounting",
       "dependsOn": [
         "doc_archetypes_accounting"
@@ -1287,6 +1387,14 @@
       ]
     },
     {
+      "id": "sensitive_content_rules",
+      "dependsOn": []
+    },
+    {
+      "id": "sharding_policy",
+      "dependsOn": []
+    },
+    {
       "id": "sheetname_patterns",
       "dependsOn": [
         "doc_taxonomy"
@@ -1297,6 +1405,10 @@
       "dependsOn": [
         "quality_gates"
       ]
+    },
+    {
+      "id": "ssot_contract",
+      "dependsOn": []
     },
     {
       "id": "table_header_ontology_finance",
@@ -1321,6 +1433,10 @@
       "dependsOn": [
         "doc_archetypes_ops"
       ]
+    },
+    {
+      "id": "table_integrity_rules",
+      "dependsOn": []
     },
     {
       "id": "wrong_doc_lock",

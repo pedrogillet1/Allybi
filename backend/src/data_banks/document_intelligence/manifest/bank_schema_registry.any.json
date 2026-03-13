@@ -1,12 +1,12 @@
 {
   "_meta": {
     "id": "document_intelligence_schema_registry",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "description": "Schema registry for document intelligence banks. Provides family-level and explicit bank-to-schema mappings for strict loader validation.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-03-03",
+    "lastUpdated": "2026-03-13",
     "owner": "koda-document-intelligence",
     "dependsOn": [
       "bank_registry"
@@ -25,6 +25,158 @@
     "failOnSchemaMismatchInStrict": true
   },
   "schemaFamilies": [
+    {
+      "id": "accounting_doc_type_extraction",
+      "pathPrefix": "document_intelligence/domains/accounting/doc_types/extraction/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "accounting_doc_type_sections",
+      "pathPrefix": "document_intelligence/domains/accounting/doc_types/sections/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "accounting_doc_type_tables",
+      "pathPrefix": "document_intelligence/domains/accounting/doc_types/tables/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "accounting_domain_abbreviations",
+      "pathPrefix": "document_intelligence/domains/accounting/abbreviations/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "accounting_domain_lexicons",
+      "pathPrefix": "document_intelligence/domains/accounting/lexicons/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "accounting_domain_packs",
+      "pathPrefix": "document_intelligence/domains/accounting/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "banking_doc_type_extraction",
+      "pathPrefix": "document_intelligence/domains/banking/doc_types/extraction/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "banking_doc_type_sections",
+      "pathPrefix": "document_intelligence/domains/banking/doc_types/sections/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "banking_doc_type_tables",
+      "pathPrefix": "document_intelligence/domains/banking/doc_types/tables/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "banking_domain_abbreviations",
+      "pathPrefix": "document_intelligence/domains/banking/abbreviations/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "banking_domain_lexicons",
+      "pathPrefix": "document_intelligence/domains/banking/lexicons/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "banking_domain_packs",
+      "pathPrefix": "document_intelligence/domains/banking/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "billing_doc_type_extraction",
+      "pathPrefix": "document_intelligence/domains/billing/doc_types/extraction/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "billing_doc_type_sections",
+      "pathPrefix": "document_intelligence/domains/billing/doc_types/sections/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "billing_doc_type_tables",
+      "pathPrefix": "document_intelligence/domains/billing/doc_types/tables/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "billing_domain_abbreviations",
+      "pathPrefix": "document_intelligence/domains/billing/abbreviations/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "billing_domain_lexicons",
+      "pathPrefix": "document_intelligence/domains/billing/lexicons/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "billing_domain_packs",
+      "pathPrefix": "document_intelligence/domains/billing/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "compose_banks",
+      "pathPrefix": "document_intelligence/compose/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
     {
       "id": "doc_domain_semantics",
       "pathPrefix": "semantics/domain/",
@@ -59,574 +211,404 @@
       }
     },
     {
-      "id": "accounting_doc_type_extraction",
-      "pathPrefix": "document_intelligence/domains/accounting/doc_types/extraction/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "accounting_doc_type_sections",
-      "pathPrefix": "document_intelligence/domains/accounting/doc_types/sections/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "accounting_doc_type_tables",
-      "pathPrefix": "document_intelligence/domains/accounting/doc_types/tables/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "accounting_domain_abbreviations",
-      "pathPrefix": "document_intelligence/domains/accounting/abbreviations/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "accounting_domain_lexicons",
-      "pathPrefix": "document_intelligence/domains/accounting/lexicons/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "accounting_domain_packs",
-      "pathPrefix": "document_intelligence/domains/accounting/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "banking_doc_type_extraction",
-      "pathPrefix": "document_intelligence/domains/banking/doc_types/extraction/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "banking_doc_type_sections",
-      "pathPrefix": "document_intelligence/domains/banking/doc_types/sections/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "banking_doc_type_tables",
-      "pathPrefix": "document_intelligence/domains/banking/doc_types/tables/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "banking_domain_abbreviations",
-      "pathPrefix": "document_intelligence/domains/banking/abbreviations/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "banking_domain_lexicons",
-      "pathPrefix": "document_intelligence/domains/banking/lexicons/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "banking_domain_packs",
-      "pathPrefix": "document_intelligence/domains/banking/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "billing_doc_type_extraction",
-      "pathPrefix": "document_intelligence/domains/billing/doc_types/extraction/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "billing_doc_type_sections",
-      "pathPrefix": "document_intelligence/domains/billing/doc_types/sections/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "billing_doc_type_tables",
-      "pathPrefix": "document_intelligence/domains/billing/doc_types/tables/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "billing_domain_abbreviations",
-      "pathPrefix": "document_intelligence/domains/billing/abbreviations/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "billing_domain_lexicons",
-      "pathPrefix": "document_intelligence/domains/billing/lexicons/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "billing_domain_packs",
-      "pathPrefix": "document_intelligence/domains/billing/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
       "id": "education_doc_type_extraction",
       "pathPrefix": "document_intelligence/domains/education/doc_types/extraction/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "education_doc_type_sections",
       "pathPrefix": "document_intelligence/domains/education/doc_types/sections/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "education_doc_type_tables",
       "pathPrefix": "document_intelligence/domains/education/doc_types/tables/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "education_domain_abbreviations",
       "pathPrefix": "document_intelligence/domains/education/abbreviations/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "education_domain_lexicons",
       "pathPrefix": "document_intelligence/domains/education/lexicons/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "education_domain_packs",
       "pathPrefix": "document_intelligence/domains/education/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "everyday_doc_type_extraction",
       "pathPrefix": "document_intelligence/domains/everyday/doc_types/extraction/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "everyday_doc_type_sections",
       "pathPrefix": "document_intelligence/domains/everyday/doc_types/sections/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "everyday_doc_type_tables",
       "pathPrefix": "document_intelligence/domains/everyday/doc_types/tables/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "everyday_domain_abbreviations",
       "pathPrefix": "document_intelligence/domains/everyday/abbreviations/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "everyday_domain_lexicons",
       "pathPrefix": "document_intelligence/domains/everyday/lexicons/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "everyday_domain_packs",
       "pathPrefix": "document_intelligence/domains/everyday/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "finance_doc_type_extraction",
       "pathPrefix": "document_intelligence/domains/finance/doc_types/extraction/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "finance_doc_type_sections",
       "pathPrefix": "document_intelligence/domains/finance/doc_types/sections/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "finance_doc_type_tables",
       "pathPrefix": "document_intelligence/domains/finance/doc_types/tables/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "finance_domain_abbreviations",
       "pathPrefix": "document_intelligence/domains/finance/abbreviations/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "finance_domain_lexicons",
       "pathPrefix": "document_intelligence/domains/finance/lexicons/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "finance_domain_packs",
       "pathPrefix": "document_intelligence/domains/finance/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "housing_doc_type_extraction",
       "pathPrefix": "document_intelligence/domains/housing/doc_types/extraction/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "housing_doc_type_sections",
       "pathPrefix": "document_intelligence/domains/housing/doc_types/sections/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "housing_doc_type_tables",
       "pathPrefix": "document_intelligence/domains/housing/doc_types/tables/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "housing_domain_abbreviations",
       "pathPrefix": "document_intelligence/domains/housing/abbreviations/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "housing_domain_lexicons",
       "pathPrefix": "document_intelligence/domains/housing/lexicons/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "housing_domain_packs",
       "pathPrefix": "document_intelligence/domains/housing/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "hr_payroll_doc_type_extraction",
       "pathPrefix": "document_intelligence/domains/hr_payroll/doc_types/extraction/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "hr_payroll_doc_type_sections",
       "pathPrefix": "document_intelligence/domains/hr_payroll/doc_types/sections/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "hr_payroll_doc_type_tables",
       "pathPrefix": "document_intelligence/domains/hr_payroll/doc_types/tables/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "hr_payroll_domain_abbreviations",
       "pathPrefix": "document_intelligence/domains/hr_payroll/abbreviations/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "hr_payroll_domain_lexicons",
       "pathPrefix": "document_intelligence/domains/hr_payroll/lexicons/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "hr_payroll_domain_packs",
       "pathPrefix": "document_intelligence/domains/hr_payroll/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "identity_banks",
+      "pathPrefix": "document_intelligence/identity/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "identity_doc_type_extraction",
       "pathPrefix": "document_intelligence/domains/identity/doc_types/extraction/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "identity_doc_type_sections",
       "pathPrefix": "document_intelligence/domains/identity/doc_types/sections/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "identity_doc_type_tables",
       "pathPrefix": "document_intelligence/domains/identity/doc_types/tables/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "identity_domain_abbreviations",
       "pathPrefix": "document_intelligence/domains/identity/abbreviations/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "identity_domain_lexicons",
       "pathPrefix": "document_intelligence/domains/identity/lexicons/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "identity_domain_packs",
       "pathPrefix": "document_intelligence/domains/identity/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "insurance_doc_type_extraction",
       "pathPrefix": "document_intelligence/domains/insurance/doc_types/extraction/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "insurance_doc_type_sections",
       "pathPrefix": "document_intelligence/domains/insurance/doc_types/sections/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "insurance_doc_type_tables",
       "pathPrefix": "document_intelligence/domains/insurance/doc_types/tables/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "insurance_domain_abbreviations",
       "pathPrefix": "document_intelligence/domains/insurance/abbreviations/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "insurance_domain_lexicons",
       "pathPrefix": "document_intelligence/domains/insurance/lexicons/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "insurance_domain_packs",
       "pathPrefix": "document_intelligence/domains/insurance/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "legal_doc_type_extraction",
-      "pathPrefix": "document_intelligence/domains/legal/doc_types/extraction/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "legal_doc_type_sections",
-      "pathPrefix": "document_intelligence/domains/legal/doc_types/sections/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "legal_doc_type_tables",
-      "pathPrefix": "document_intelligence/domains/legal/doc_types/tables/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "legal_domain_abbreviations",
-      "pathPrefix": "document_intelligence/domains/legal/abbreviations/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "legal_domain_lexicons",
-      "pathPrefix": "document_intelligence/domains/legal/lexicons/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "legal_domain_packs",
-      "pathPrefix": "document_intelligence/domains/legal/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "medical_doc_type_extraction",
-      "pathPrefix": "document_intelligence/domains/medical/doc_types/extraction/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "medical_doc_type_sections",
-      "pathPrefix": "document_intelligence/domains/medical/doc_types/sections/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "medical_doc_type_tables",
-      "pathPrefix": "document_intelligence/domains/medical/doc_types/tables/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "medical_domain_abbreviations",
-      "pathPrefix": "document_intelligence/domains/medical/abbreviations/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "medical_domain_lexicons",
-      "pathPrefix": "document_intelligence/domains/medical/lexicons/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "medical_domain_packs",
-      "pathPrefix": "document_intelligence/domains/medical/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "ops_doc_type_extraction",
-      "pathPrefix": "document_intelligence/domains/ops/doc_types/extraction/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "ops_doc_type_sections",
-      "pathPrefix": "document_intelligence/domains/ops/doc_types/sections/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "ops_doc_type_tables",
-      "pathPrefix": "document_intelligence/domains/ops/doc_types/tables/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "ops_domain_abbreviations",
-      "pathPrefix": "document_intelligence/domains/ops/abbreviations/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "ops_domain_lexicons",
-      "pathPrefix": "document_intelligence/domains/ops/lexicons/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "ops_domain_packs",
-      "pathPrefix": "document_intelligence/domains/ops/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "tax_doc_type_extraction",
-      "pathPrefix": "document_intelligence/domains/tax/doc_types/extraction/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "tax_doc_type_sections",
-      "pathPrefix": "document_intelligence/domains/tax/doc_types/sections/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "tax_doc_type_tables",
-      "pathPrefix": "document_intelligence/domains/tax/doc_types/tables/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "tax_domain_abbreviations",
-      "pathPrefix": "document_intelligence/domains/tax/abbreviations/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "tax_domain_lexicons",
-      "pathPrefix": "document_intelligence/domains/tax/lexicons/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "tax_domain_packs",
-      "pathPrefix": "document_intelligence/domains/tax/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "travel_doc_type_extraction",
-      "pathPrefix": "document_intelligence/domains/travel/doc_types/extraction/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "travel_doc_type_sections",
-      "pathPrefix": "document_intelligence/domains/travel/doc_types/sections/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "travel_doc_type_tables",
-      "pathPrefix": "document_intelligence/domains/travel/doc_types/tables/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "travel_domain_abbreviations",
-      "pathPrefix": "document_intelligence/domains/travel/abbreviations/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "travel_domain_lexicons",
-      "pathPrefix": "document_intelligence/domains/travel/lexicons/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "travel_domain_packs",
-      "pathPrefix": "document_intelligence/domains/travel/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "compose_banks",
-      "pathPrefix": "document_intelligence/compose/",
-      "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
-    },
-    {
-      "id": "retrieval_di_banks",
-      "pathPrefix": "document_intelligence/retrieval/",
-      "schemaId": "retrieval_document_intelligence_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "language_banks",
       "pathPrefix": "document_intelligence/language/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
-      "id": "validation_banks",
-      "pathPrefix": "document_intelligence/validation/",
+      "id": "legal_doc_type_extraction",
+      "pathPrefix": "document_intelligence/domains/legal/doc_types/extraction/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
-      "id": "routing_banks",
-      "pathPrefix": "document_intelligence/routing/",
+      "id": "legal_doc_type_sections",
+      "pathPrefix": "document_intelligence/domains/legal/doc_types/sections/",
       "schemaId": "bank_schema",
-      "versionRules": { "requiredMetaVersion": ">=1.0.0" }
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "legal_doc_type_tables",
+      "pathPrefix": "document_intelligence/domains/legal/doc_types/tables/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "legal_domain_abbreviations",
+      "pathPrefix": "document_intelligence/domains/legal/abbreviations/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "legal_domain_lexicons",
+      "pathPrefix": "document_intelligence/domains/legal/lexicons/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "legal_domain_packs",
+      "pathPrefix": "document_intelligence/domains/legal/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "marketing_probes",
@@ -634,9 +616,105 @@
       "schemaId": "marketing_probe_schema"
     },
     {
+      "id": "medical_doc_type_extraction",
+      "pathPrefix": "document_intelligence/domains/medical/doc_types/extraction/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "medical_doc_type_sections",
+      "pathPrefix": "document_intelligence/domains/medical/doc_types/sections/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "medical_doc_type_tables",
+      "pathPrefix": "document_intelligence/domains/medical/doc_types/tables/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "medical_domain_abbreviations",
+      "pathPrefix": "document_intelligence/domains/medical/abbreviations/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "medical_domain_lexicons",
+      "pathPrefix": "document_intelligence/domains/medical/lexicons/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "medical_domain_packs",
+      "pathPrefix": "document_intelligence/domains/medical/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
       "id": "operator_playbooks",
       "pathPrefix": "operators/playbooks/",
       "schemaId": "operator_playbook_schema"
+    },
+    {
+      "id": "ops_doc_type_extraction",
+      "pathPrefix": "document_intelligence/domains/ops/doc_types/extraction/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "ops_doc_type_sections",
+      "pathPrefix": "document_intelligence/domains/ops/doc_types/sections/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "ops_doc_type_tables",
+      "pathPrefix": "document_intelligence/domains/ops/doc_types/tables/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "ops_domain_abbreviations",
+      "pathPrefix": "document_intelligence/domains/ops/abbreviations/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "ops_domain_lexicons",
+      "pathPrefix": "document_intelligence/domains/ops/lexicons/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "ops_domain_packs",
+      "pathPrefix": "document_intelligence/domains/ops/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "quality_docint",
@@ -649,9 +727,25 @@
       "schemaId": "reasoning_policy_schema"
     },
     {
+      "id": "repair_banks",
+      "pathPrefix": "document_intelligence/repair/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
       "id": "retrieval_boost_rules",
       "pathPrefix": "retrieval/boost_rules.",
       "schemaId": "retrieval_document_intelligence_schema"
+    },
+    {
+      "id": "retrieval_di_banks",
+      "pathPrefix": "document_intelligence/retrieval/",
+      "schemaId": "retrieval_document_intelligence_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     },
     {
       "id": "retrieval_query_rewrites",
@@ -662,9 +756,145 @@
       "id": "retrieval_section_priority",
       "pathPrefix": "retrieval/section_priority.",
       "schemaId": "retrieval_document_intelligence_schema"
+    },
+    {
+      "id": "routing_banks",
+      "pathPrefix": "document_intelligence/routing/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "safety_banks",
+      "pathPrefix": "document_intelligence/safety/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "scope_banks",
+      "pathPrefix": "document_intelligence/scope/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "tax_doc_type_extraction",
+      "pathPrefix": "document_intelligence/domains/tax/doc_types/extraction/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "tax_doc_type_sections",
+      "pathPrefix": "document_intelligence/domains/tax/doc_types/sections/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "tax_doc_type_tables",
+      "pathPrefix": "document_intelligence/domains/tax/doc_types/tables/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "tax_domain_abbreviations",
+      "pathPrefix": "document_intelligence/domains/tax/abbreviations/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "tax_domain_lexicons",
+      "pathPrefix": "document_intelligence/domains/tax/lexicons/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "tax_domain_packs",
+      "pathPrefix": "document_intelligence/domains/tax/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "travel_doc_type_extraction",
+      "pathPrefix": "document_intelligence/domains/travel/doc_types/extraction/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "travel_doc_type_sections",
+      "pathPrefix": "document_intelligence/domains/travel/doc_types/sections/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "travel_doc_type_tables",
+      "pathPrefix": "document_intelligence/domains/travel/doc_types/tables/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "travel_domain_abbreviations",
+      "pathPrefix": "document_intelligence/domains/travel/abbreviations/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "travel_domain_lexicons",
+      "pathPrefix": "document_intelligence/domains/travel/lexicons/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "travel_domain_packs",
+      "pathPrefix": "document_intelligence/domains/travel/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
+    },
+    {
+      "id": "validation_banks",
+      "pathPrefix": "document_intelligence/validation/",
+      "schemaId": "bank_schema",
+      "versionRules": {
+        "requiredMetaVersion": ">=1.0.0"
+      }
     }
   ],
   "schemaAssignments": [
+    {
+      "bankId": "bank_metadata_policy",
+      "schemaId": "document_intelligence_manifest_schema"
+    },
+    {
+      "bankId": "bank_quality_contract",
+      "schemaId": "document_intelligence_manifest_schema"
+    },
     {
       "bankId": "document_intelligence_bank_map",
       "schemaId": "bank_schema"
@@ -691,6 +921,18 @@
     },
     {
       "bankId": "document_intelligence_usage_manifest",
+      "schemaId": "document_intelligence_manifest_schema"
+    },
+    {
+      "bankId": "eval_gate_policy",
+      "schemaId": "document_intelligence_manifest_schema"
+    },
+    {
+      "bankId": "sharding_policy",
+      "schemaId": "document_intelligence_manifest_schema"
+    },
+    {
+      "bankId": "ssot_contract",
       "schemaId": "document_intelligence_manifest_schema"
     }
   ]

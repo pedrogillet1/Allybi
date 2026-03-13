@@ -1,0 +1,34 @@
+{
+  "_meta": {
+    "id": "bank_metadata_policy",
+    "version": "1.0.0",
+    "description": "Metadata policy for document intelligence banks. Standardizes ownership, dates, descriptions, and proof metadata.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/documentIntelligenceIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/services/core/banks/documentIntelligenceIntegrity.service.test.ts",
+      "src/tests/document-intelligence/docint-bank-integrity.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "requiredMetaFields": [
+      "id",
+      "version",
+      "description",
+      "languages",
+      "lastUpdated"
+    ],
+    "recommendedMetaFields": [
+      "owner",
+      "usedBy",
+      "tests"
+    ]
+  }
+}

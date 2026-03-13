@@ -66,4 +66,14 @@ describe("DocumentReferenceResolver", () => {
     expect(result.resolvedDocId).toBeNull();
     expect(result.matchedDocIds).toEqual([]);
   });
+
+  test("resolves explicit doc reference without broad-memory bleed", () => {
+    const result = resolveDocumentReference(
+      "use the document Trabalho projeto",
+      DOCS,
+    );
+    expect(result.explicitDocRef).toBe(true);
+    expect(result.resolvedDocId).toBe("doc-project");
+    expect(result.matchedDocIds).not.toContain("doc-scrum");
+  });
 });

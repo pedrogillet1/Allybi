@@ -1,0 +1,42 @@
+{
+  "_meta": {
+    "id": "bank_quality_contract",
+    "version": "1.0.0",
+    "description": "Quality contract for document intelligence banks. Defines the minimum bar for canonical, runtime-wired, and proof-backed banks.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/documentIntelligenceIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/services/core/banks/documentIntelligenceIntegrity.service.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true
+  },
+  "levels": {
+    "decorative": {
+      "allowed": false
+    },
+    "runtime_wired": {
+      "requirements": [
+        "registry",
+        "usage_manifest",
+        "consumer_path"
+      ]
+    },
+    "brain_grade": {
+      "requirements": [
+        "registry",
+        "usage_manifest",
+        "consumer_path",
+        "dependency_graph",
+        "proof_test"
+      ]
+    }
+  }
+}

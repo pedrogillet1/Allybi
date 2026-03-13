@@ -1,0 +1,30 @@
+{
+  "_meta": {
+    "id": "table_integrity_rules",
+    "version": "1.0.0",
+    "description": "Integrity rules for table cell grounding and totals alignment.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-03-13",
+    "owner": "terminal5"
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true
+  },
+  "rules": [
+    {
+      "id": "TIR_001_table_claim_requires_row_and_column",
+      "trigger": "Table-backed answer must identify both row and column context.",
+      "check": "output.supportedByTableCell == true AND (output.tableRef.row == null OR output.tableRef.column == null)",
+      "failureAction": "REQUEST_TABLE_COORDINATES",
+      "severity": "error"
+    },
+    {
+      "id": "TIR_002_total_must_match_stated_parts",
+      "trigger": "Stated total must reconcile with stated parts when arithmetic check is active.",
+      "check": "context.arithmeticCheck == true AND output.statedTotal != sum(output.statedParts)",
+      "failureAction": "BLOCK_AND_REVIEW_TOTAL",
+      "severity": "error"
+    }
+  ]
+}

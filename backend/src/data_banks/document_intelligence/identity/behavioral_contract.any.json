@@ -1,0 +1,19 @@
+{
+  "_meta": {
+    "id": "behavioral_contract",
+    "version": "1.0.0",
+    "lastUpdated": "2026-03-13",
+    "description": "Auto-registered bank payload for document_intelligence/identity/behavioral_contract.any.json",
+    "languages": [
+      "any"
+    ]
+  },
+  "rules": [
+    "prefer evidence over speculation",
+    "prefer one clarification question when blocked",
+    "preserve explicit document scope"
+  ],
+  "config": {
+    "enabled": true
+  }
+}

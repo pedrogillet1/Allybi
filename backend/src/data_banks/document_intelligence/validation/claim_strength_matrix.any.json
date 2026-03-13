@@ -1,0 +1,47 @@
+{
+  "_meta": {
+    "id": "claim_strength_matrix",
+    "version": "1.0.0",
+    "description": "Evidence-backed claim strength labels for exact, inferred, and speculative response wording.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-03-13",
+    "owner": "terminal5"
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true
+  },
+  "levels": [
+    {
+      "id": "exact",
+      "requires": {
+        "answerMethod": ["extract", "quote", "table_cell"],
+        "evidenceStrength": ["strong", "moderate"]
+      },
+      "allowedLabels": ["exact", "verbatim", "directly_stated"]
+    },
+    {
+      "id": "inference",
+      "requires": {
+        "answerMethod": ["inferred", "derived", "calculated"]
+      },
+      "allowedLabels": ["inference", "derived", "calculated_from_source"]
+    },
+    {
+      "id": "speculative",
+      "requires": {
+        "answerMethod": ["guess", "estimate", "speculative"]
+      },
+      "allowedLabels": ["estimate", "speculative"]
+    }
+  ],
+  "rules": [
+    {
+      "id": "CSM_001_inference_must_be_labeled",
+      "trigger": "Derived answers must be labeled as inference instead of exact fact.",
+      "check": "output.answerMethod.in(['inferred','derived','calculated']) == true AND output.claimLabel.in(['exact','verbatim','directly_stated']) == true",
+      "failureAction": "DOWNGRADE_TO_INFERENCE",
+      "severity": "error"
+    }
+  ]
+}

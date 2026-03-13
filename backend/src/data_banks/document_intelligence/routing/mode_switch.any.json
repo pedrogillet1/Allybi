@@ -1,0 +1,24 @@
+{
+  "_meta": {
+    "id": "mode_switch",
+    "version": "1.0.0",
+    "lastUpdated": "2026-03-13",
+    "description": "Auto-registered bank payload for document_intelligence/routing/mode_switch.any.json",
+    "languages": [
+      "any"
+    ]
+  },
+  "locales": [
+    "en",
+    "pt"
+  ],
+  "compat": {
+    "delegatesTo": [
+      "patterns_modes_mode_switch_en",
+      "patterns_modes_mode_switch_pt"
+    ]
+  },
+  "config": {
+    "enabled": true
+  }
+}

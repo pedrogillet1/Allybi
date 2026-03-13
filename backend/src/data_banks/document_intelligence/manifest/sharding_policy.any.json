@@ -1,0 +1,38 @@
+{
+  "_meta": {
+    "id": "sharding_policy",
+    "version": "1.0.0",
+    "description": "Sharding policy for document intelligence banks. Keeps bank families small, coherent, and maintainable.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/documentIntelligenceIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/services/core/banks/documentIntelligenceIntegrity.service.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "preferredShardSizeSoft": 40,
+    "preferredShardSizeHard": 80,
+    "failOnMonolithInStrict": false
+  },
+  "rules": [
+    {
+      "id": "SHARD_001_family_first",
+      "requirement": "Prefer family folders such as identity, language, routing, scope, retrieval, validation, compose, repair, safety, manifest."
+    },
+    {
+      "id": "SHARD_002_domain_then_doctype",
+      "requirement": "For domain packs, shard by domain first and docType second."
+    },
+    {
+      "id": "SHARD_003_no_cross_family_dumping",
+      "requirement": "Do not place unrelated banks into one generic folder just to satisfy coverage."
+    }
+  ]
+}

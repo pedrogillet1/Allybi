@@ -601,6 +601,108 @@ describe("TurnRouterService.decide()", () => {
     expect(intentConfig.decide).toHaveBeenCalled();
   });
 
+  test("uses one-best-question policy to bias single clarification selection", () => {
+    const routePolicy = {
+      isConnectorTurn: jest.fn<() => boolean>().mockReturnValue(false),
+    };
+    const intentConfig = {
+      decide: jest.fn((input: { signals?: { userSaidPickForMe?: boolean } }) => {
+        expect(input.signals?.userSaidPickForMe).toBe(true);
+        return makeDecisionOutput("documents");
+      }),
+    };
+    const diBanks = {
+      getFileActionOperators: () => null,
+      getFollowupPolicy: () => null,
+      getRoutingIntentPatterns: () => null,
+      getModeSwitch: () => null,
+      getOneBestQuestionPolicy: () => ({ config: { preferSingleDisambiguator: true } }),
+    };
+    const router = new TurnRouterService(routePolicy, intentConfig as any, diBanks as any);
+
+    expect(router.decide(makeCtx({ messageText: "which one?" }))).toBe("KNOWLEDGE");
+  });
+
+  test("uses query_family_catalog to emit compare candidate", () => {
+    const routePolicy = {
+      isConnectorTurn: jest.fn<() => boolean>().mockReturnValue(false),
+    };
+    let capturedCandidates: Array<{ operatorId?: string; intentFamily?: string }> = [];
+    const intentConfig = {
+      decide: jest.fn((input: { candidates: Array<{ operatorId?: string; intentFamily?: string }> }) => {
+        capturedCandidates = input.candidates;
+        return makeDecisionOutput("documents");
+      }),
+    };
+    const diBanks = {
+      getFileActionOperators: () => null,
+      getFollowupPolicy: () => null,
+      getRoutingIntentPatterns: () => ({ config: { enabled: false } }),
+      getModeSwitch: () => null,
+      getOneBestQuestionPolicy: () => null,
+      getQueryFamilyCatalog: () => ({
+        config: { enabled: true, defaultFamily: "document_retrieval" },
+        families: [
+          {
+            id: "family_compare",
+            name: "cross_document_compare",
+            signals: {
+              required: ["compare", "versus"],
+              disambiguators: ["between"],
+            },
+          },
+        ],
+      }),
+      getCalcIntents: () => null,
+      getEditingIntents: () => null,
+      getIntegrationIntents: () => null,
+      getNavigationIntents: () => null,
+    };
+    const router = new TurnRouterService(routePolicy, intentConfig as any, diBanks as any);
+
+    expect(
+      router.decide(makeCtx({ messageText: "compare budget versus forecast" })),
+    ).toBe("KNOWLEDGE");
+    const compareCandidate = capturedCandidates.find(
+      (candidate) => candidate.operatorId === "compare",
+    );
+    expect(compareCandidate?.intentFamily).toBe("documents");
+  });
+
+  test("uses calc_intents bank to emit calculate operator candidate", () => {
+    const routePolicy = {
+      isConnectorTurn: jest.fn<() => boolean>().mockReturnValue(false),
+    };
+    let capturedCandidates: Array<{ operatorId?: string; intentFamily?: string }> = [];
+    const intentConfig = {
+      decide: jest.fn((input: { candidates: Array<{ operatorId?: string; intentFamily?: string }> }) => {
+        capturedCandidates = input.candidates;
+        return makeDecisionOutput("documents");
+      }),
+    };
+    const diBanks = {
+      getFileActionOperators: () => null,
+      getFollowupPolicy: () => null,
+      getRoutingIntentPatterns: () => ({ config: { enabled: false } }),
+      getModeSwitch: () => null,
+      getOneBestQuestionPolicy: () => null,
+      getQueryFamilyCatalog: () => null,
+      getCalcIntents: () => ({ config: { enabled: true }, operators: ["calculate"] }),
+      getEditingIntents: () => null,
+      getIntegrationIntents: () => null,
+      getNavigationIntents: () => null,
+    };
+    const router = new TurnRouterService(routePolicy, intentConfig as any, diBanks as any);
+
+    expect(
+      router.decide(makeCtx({ messageText: "calculate the total margin" })),
+    ).toBe("KNOWLEDGE");
+    const calcCandidate = capturedCandidates.find(
+      (candidate) => candidate.operatorId === "calculate",
+    );
+    expect(calcCandidate?.intentFamily).toBe("documents");
+  });
+
   test("does not mark generic 'file' wording as explicit document reference", () => {
     const routePolicy = {
       isConnectorTurn: jest.fn<() => boolean>().mockReturnValue(false),

@@ -1,0 +1,23 @@
+{
+  "_meta": {
+    "id": "legal_privilege_rules",
+    "version": "1.0.0",
+    "description": "Privilege and counsel-only content handling rules.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-03-13",
+    "owner": "terminal5"
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true
+  },
+  "rules": [
+    {
+      "id": "LPR_001_privileged_label_requires_minimal_response",
+      "trigger": "Privileged material should not be expanded beyond minimal acknowledgement.",
+      "check": "context.domain == 'legal' AND output.matchesPattern('\\b(attorney-client|privileged and confidential|work product)\\b', 'i') == true",
+      "failureAction": "MINIMIZE_PRIVILEGED_OUTPUT",
+      "severity": "error"
+    }
+  ]
+}

@@ -301,6 +301,22 @@ function simpleTokens(s: string): string[] {
     .filter(Boolean);
 }
 
+function escapeRegex(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function containsAnyPhrase(query: string, phrases: string[]): boolean {
+  const normalized = lower(query);
+  if (!normalized) return false;
+  return phrases.some((phrase) => {
+    const cleaned = lower(phrase);
+    if (!cleaned) return false;
+    return new RegExp(`(^|\\b)${escapeRegex(cleaned)}(\\b|$)`, "i").test(
+      normalized,
+    );
+  });
+}
+
 // -----------------------------
 // Service
 // -----------------------------
@@ -311,7 +327,19 @@ export class ScopeGateService {
     private readonly docStore: DocStore,
     private readonly documentIntelligenceBanks: Pick<
       DocumentIntelligenceBanksService,
-      "getMergedDocAliasesBank" | "getDocAliasPhrases" | "getDocTaxonomy"
+      | "getMergedDocAliasesBank"
+      | "getLanguageBank"
+      | "getDocAliasPhrases"
+      | "getDocTaxonomy"
+      | "getScopeResolutionRules"
+      | "getFollowupPolicy"
+      | "getDocLockPolicy"
+      | "getFolderScopePatterns"
+      | "getOneBestQuestionPolicy"
+      | "getContextContainerProfiles"
+      | "getConversationStateCarryover"
+      | "getMultiDocCompareRules"
+      | "getProjectMemoryPolicy"
     > = getDocumentIntelligenceBanksInstance(),
   ) {}
 
@@ -347,8 +375,56 @@ export class ScopeGateService {
     // 1) Load relevant banks (soft if missing)
     const scopeHintsBank = this.safeGetBank<Record<string, unknown>>("scope_hints");
     const scopeResolutionBank =
+      ("getScopeResolutionRules" in this.documentIntelligenceBanks
+        ? (this.documentIntelligenceBanks as Record<string, any>).getScopeResolutionRules?.()
+        : null) ??
       this.safeGetBank<ScopeResolutionBank>("scope_resolution");
-    const followupBank = this.safeGetBank<Record<string, unknown>>("followup_indicators");
+    const followupBank =
+      ("getFollowupPolicy" in this.documentIntelligenceBanks
+        ? (this.documentIntelligenceBanks as Record<string, any>).getFollowupPolicy?.()
+        : null) ??
+      this.safeGetBank<Record<string, unknown>>("followup_indicators");
+    const docLockPolicy =
+      ("getDocLockPolicy" in this.documentIntelligenceBanks
+        ? (this.documentIntelligenceBanks as Record<string, any>).getDocLockPolicy?.()
+        : null) ??
+      this.safeGetBank<Record<string, unknown>>("doc_lock_policy");
+    const folderScopePatterns =
+      ("getFolderScopePatterns" in this.documentIntelligenceBanks
+        ? (this.documentIntelligenceBanks as Record<string, any>).getFolderScopePatterns?.()
+        : null) ??
+      this.safeGetBank<Record<string, unknown>>("folder_scope_patterns");
+    const contextContainerProfiles =
+      ("getContextContainerProfiles" in this.documentIntelligenceBanks
+        ? (this.documentIntelligenceBanks as Record<string, any>).getContextContainerProfiles?.()
+        : null) ??
+      this.safeGetBank<Record<string, unknown>>("context_container_profiles");
+    const conversationStateCarryover =
+      ("getConversationStateCarryover" in this.documentIntelligenceBanks
+        ? (this.documentIntelligenceBanks as Record<string, any>).getConversationStateCarryover?.()
+        : null) ??
+      this.safeGetBank<Record<string, unknown>>("conversation_state_carryover");
+    const multiDocCompareRules =
+      ("getMultiDocCompareRules" in this.documentIntelligenceBanks
+        ? (this.documentIntelligenceBanks as Record<string, any>).getMultiDocCompareRules?.()
+        : null) ??
+      this.safeGetBank<Record<string, unknown>>("multi_doc_compare_rules");
+    const projectMemoryPolicy =
+      ("getProjectMemoryPolicy" in this.documentIntelligenceBanks
+        ? (this.documentIntelligenceBanks as Record<string, any>).getProjectMemoryPolicy?.()
+        : null) ??
+      this.safeGetBank<Record<string, unknown>>("project_memory_policy");
+    const colloquialPhrasing =
+      ("getLanguageBank" in this.documentIntelligenceBanks
+        ? (this.documentIntelligenceBanks as Record<string, any>).getLanguageBank?.(
+            "colloquial_phrasing",
+          )
+        : null) ??
+      this.safeGetBank<Record<string, unknown>>("colloquial_phrasing");
+    const oneBestQuestionPolicy =
+      ("getOneBestQuestionPolicy" in this.documentIntelligenceBanks
+        ? (this.documentIntelligenceBanks as Record<string, any>).getOneBestQuestionPolicy?.()
+        : null) ?? null;
     const discourseBank = this.safeGetBank<Record<string, unknown>>("discourse_markers");
     const docAliasesBank =
       this.documentIntelligenceBanks.getMergedDocAliasesBank();
@@ -403,9 +479,11 @@ export class ScopeGateService {
     const isDiscovery =
       Boolean(input.overrides?.forceDiscovery) ||
       input.signals.intentFamily === "doc_discovery";
-    const corpusAllowed = Boolean(
+    let corpusAllowed = Boolean(
       input.signals.corpusSearchAllowed ?? isDiscovery,
     );
+    const forceSingleQuestion =
+      oneBestQuestionPolicy?.config?.maxQuestions === 1;
 
     // Discourse: topic shift breaks continuity; correction can still be follow-up but may change target
     const discourse = input.signals.discourse ?? {};
@@ -439,6 +517,20 @@ export class ScopeGateService {
     const isFollowup =
       Boolean(input.signals.isFollowup) ||
       followupStrengthScore >= clamp01(followupMinScore);
+    const compareConfig = asObject(multiDocCompareRules?.config);
+    const compareIntent =
+      String(input.signals.operator || "").trim().toLowerCase() === "compare" ||
+      /\b(compare|versus|vs\.?|against|between|delta|difference|trend)\b/i.test(
+        qNorm,
+      );
+    const compareAcrossCorpus =
+      compareConfig.allowCorpusTrendMode === true &&
+      compareIntent &&
+      /\b(all|every|across|trend)\b/i.test(qLower);
+    if (compareAcrossCorpus) {
+      corpusAllowed = true;
+      debug.appliedRules.push("scope_compare_allows_corpus_trend_mode");
+    }
 
     // 4) Extract explicit filename token if present
     const filenameToken = detectFilenameToken(qNorm);
@@ -446,6 +538,27 @@ export class ScopeGateService {
     // 5) Establish base active doc and lock signals from state
     const stateActiveDocId = state.persistent.scope.activeDocId;
     const stateHardDocLock = Boolean(state.persistent.scope.hardDocLock);
+    const userLanguage = String(state.session.userLanguage || "en")
+      .trim()
+      .toLowerCase();
+    const colloquialPhraseMap = asObject(colloquialPhrasing?.phrases);
+    const colloquialPhrases = [
+      ...(Array.isArray(colloquialPhraseMap[userLanguage])
+        ? (colloquialPhraseMap[userLanguage] as unknown[])
+        : []),
+      ...(Array.isArray(colloquialPhraseMap.any)
+        ? (colloquialPhraseMap.any as unknown[])
+        : []),
+    ]
+      .map((value) => String(value || "").trim())
+      .filter(Boolean);
+    const colloquialRefersToActiveDoc =
+      Boolean(stateActiveDocId) &&
+      !Boolean(input.signals.explicitDocRef) &&
+      containsAnyPhrase(qNorm, colloquialPhrases);
+    if (colloquialRefersToActiveDoc) {
+      debug.appliedRules.push("scope_colloquial_reference_to_active_doc");
+    }
 
     // 6) Determine whether this turn provides explicit doc reference
     const explicitDocRefFromUpstream = Boolean(input.signals.explicitDocRef);
@@ -493,7 +606,9 @@ export class ScopeGateService {
     // - If user explicitly references a doc: hard lock to it (doc_access_policy will enforce too)
     // - If explicitDocLock signal is present: set lock
     // - Otherwise retain existing lock unless topic shift (topic shift does NOT auto-unlock; it only reduces continuity)
-    let hardDocLock = stateHardDocLock;
+    let hardDocLock =
+      stateHardDocLock ||
+      docLockPolicy?.policy?.retainHardLockAcrossFollowups === true;
     let activeDocId = stateActiveDocId;
     const scopeResolutionConfig = asObject(scopeResolutionBank?.config);
     const scopeResolutionPolicy = asObject(scopeResolutionConfig.policy);
@@ -546,6 +661,24 @@ export class ScopeGateService {
       hardDocLock = true;
     }
 
+    const contextProfiles = Array.isArray(contextContainerProfiles?.profiles)
+      ? contextContainerProfiles.profiles
+      : [];
+    const activeContextProfile = contextProfiles.find(
+      (profile: Record<string, unknown>) =>
+        String(profile?.id || "")
+          .trim()
+          .toLowerCase() === (corpusAllowed ? "corpus" : "single_doc"),
+    );
+    if (
+      activeContextProfile?.requiresActiveDoc === true &&
+      !activeDocId &&
+      !explicitResolved.docId
+    ) {
+      corpusAllowed = true;
+      debug.appliedRules.push("scope_context_profile_fallback_to_corpus");
+    }
+
     // If no active doc in state and no explicit doc, we stay unlocked.
     // If follow-up is strong and no topic shift and we have active doc, we keep it as soft continuity.
     const preferActiveDocOnFollowup =
@@ -564,7 +697,18 @@ export class ScopeGateService {
 
     // If topic shift and NOT explicitly locked, we should not force carryover.
     // We do NOT clear the state; we just avoid using active doc as a hard constraint.
-    const continuityAllowed = isFollowup && !topicShift;
+    const carryoverRules = asObject(conversationStateCarryover?.rules);
+    let continuityAllowed =
+      (isFollowup || colloquialRefersToActiveDoc) &&
+      (carryoverRules.followupKeepsActiveDoc !== false ||
+        colloquialRefersToActiveDoc);
+    if (
+      topicShift &&
+      carryoverRules.topicShiftBreaksSoftCarryover !== false &&
+      !stateHardDocLock
+    ) {
+      continuityAllowed = false;
+    }
 
     // 9) Sheet/range scope hints
     const sheetName =
@@ -583,6 +727,13 @@ export class ScopeGateService {
 
     // If sheet/range explicit, treat as hard sheet lock within the doc (if doc is known)
     const hardSheetLock = Boolean(sheetHintPresent || rangeExplicit);
+    if (
+      folderScopePatterns &&
+      !hardSheetLock &&
+      /folder|pasta/i.test(qNorm)
+    ) {
+      debug.notes.push("folder_scope_patterns_detected");
+    }
 
     // 10) Candidate doc IDs determination
     let candidateDocIds: string[] = docs.map((d) => d.docId);
@@ -614,6 +765,31 @@ export class ScopeGateService {
     } else {
       // corpus-wide (default)
       candidateDocIds = docs.map((d) => d.docId);
+    }
+
+    if (
+      compareIntent &&
+      compareConfig.requireTwoDocs === true &&
+      candidateDocIds.length === 1 &&
+      docs.length > 1 &&
+      !explicitDocResolvedHard &&
+      !hardDocLock
+    ) {
+      candidateDocIds = docs.slice(0, 2).map((doc) => doc.docId);
+      debug.appliedRules.push("scope_compare_requires_two_docs");
+    }
+
+    if (
+      projectMemoryPolicy?.policy?.docLockBlocksBroadMemoryBleed === true &&
+      hardDocLock &&
+      activeDocId &&
+      corpusAllowed &&
+      !isDiscovery &&
+      !compareAcrossCorpus
+    ) {
+      corpusAllowed = false;
+      candidateDocIds = [activeDocId];
+      debug.appliedRules.push("scope_project_memory_blocks_broad_memory_bleed");
     }
 
     const maxDocAllowlist = Math.max(
@@ -716,7 +892,7 @@ export class ScopeGateService {
             filename: o.filename ?? null,
           })),
           maxOptions,
-          maxQuestions: 1,
+          maxQuestions: forceSingleQuestion ? 1 : 1,
           reasonCode: "needs_doc_choice",
         },
         debug: isProd(input.env) ? undefined : debug,

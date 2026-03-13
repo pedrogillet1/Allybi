@@ -1,0 +1,16 @@
+{
+  "_meta": {
+    "id": "doc_reference_resolution",
+    "version": "1.0.0",
+    "lastUpdated": "2026-03-13",
+    "description": "Auto-registered bank payload for document_intelligence/scope/doc_reference_resolution.any.json",
+    "languages": [
+      "any"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "usesAliases": true,
+    "autopickSingleStrongMatch": true
+  }
+}

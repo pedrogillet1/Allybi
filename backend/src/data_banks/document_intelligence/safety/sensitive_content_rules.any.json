@@ -1,0 +1,22 @@
+{
+  "_meta": {
+    "id": "sensitive_content_rules",
+    "version": "1.0.0",
+    "description": "Sensitive content escalation rules for document-grounded outputs.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-03-13",
+    "owner": "terminal5"
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true
+  },
+  "rules": [
+    {
+      "id": "SCR_001_identity_tax_banking_pii_requires_redaction",
+      "domains": ["identity", "tax", "banking"],
+      "patternIds": ["PII_EMAIL", "PII_SSN", "PII_TAX_ID_GENERIC", "PII_PASSPORT", "PII_BANK_ROUTING"],
+      "actionOnMatch": "REDACT"
+    }
+  ]
+}

@@ -1,0 +1,91 @@
+{
+  "suite": "style",
+  "version": 1,
+  "cases": [
+    {
+      "id": "style_01_analytical_blocks_en",
+      "brainLayer": "composition",
+      "dimension": "analytical_format_blocks",
+      "language": "en",
+      "draft": "The main issue is customer concentration risk.",
+      "expectedMarkers": [
+        "Direct answer:",
+        "Key evidence:",
+        "Sources used:",
+        "In summary,",
+        "If you'd like,"
+      ]
+    },
+    {
+      "id": "style_02_analytical_blocks_pt",
+      "brainLayer": "composition",
+      "dimension": "analytical_format_blocks",
+      "language": "pt",
+      "draft": "O principal risco e a concentracao de clientes.",
+      "expectedMarkers": [
+        "Direct answer:",
+        "Key evidence:",
+        "Sources used:",
+        "Em resumo,",
+        "Se quiser,"
+      ]
+    },
+    {
+      "id": "style_03_evidence_first",
+      "brainLayer": "composition",
+      "dimension": "evidence_first_structure",
+      "language": "en",
+      "draft": "Revenue appears likely to be seasonal based on the cited chart.",
+      "expectedMarkers": [
+        "Direct answer:",
+        "Key evidence:",
+        "Sources used:"
+      ]
+    },
+    {
+      "id": "style_04_non_robotic",
+      "brainLayer": "composition",
+      "dimension": "non_robotic_tone",
+      "language": "en",
+      "draft": "Here is the grounded answer without boilerplate filler.",
+      "bannedPhrases": [
+        "as an ai language model",
+        "i cannot access the document directly"
+      ]
+    },
+    {
+      "id": "style_05_uncertainty_language",
+      "brainLayer": "composition",
+      "dimension": "uncertainty_language",
+      "language": "en",
+      "draft": "Based on the cited evidence, this likely reflects a short-term timing issue rather than a confirmed structural decline.",
+      "expectedPhrases": [
+        "likely",
+        "based on the cited evidence"
+      ]
+    },
+    {
+      "id": "style_06_weak_answer_recovery",
+      "brainLayer": "weak_answer_recovery",
+      "dimension": "weak_answer_recovery",
+      "language": "en",
+      "draft": "Not enough evidence yet.",
+      "expectedMarkers": [
+        "Key evidence:",
+        "Sources used:"
+      ]
+    }
+  ],
+  "_meta": {
+    "id": "document_intelligence_eval_style_composition",
+    "version": "1.0.0",
+    "description": "Auto-registered bank payload for document_intelligence/eval/style/composition.any.json",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13"
+  },
+  "config": {
+    "enabled": true
+  }
+}

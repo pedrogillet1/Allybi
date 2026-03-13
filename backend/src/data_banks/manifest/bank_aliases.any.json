@@ -46,6 +46,12 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "access_scope_rules",
+      "canonicalId": "access_scope_rules",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "accounting_rules",
       "canonicalId": "accounting_rules",
       "source": "runtime_self_alias",
@@ -198,6 +204,12 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "assistant_identity",
+      "canonicalId": "assistant_identity",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "assumption_policy",
       "canonicalId": "assumption_policy",
       "source": "runtime_self_alias",
@@ -229,8 +241,26 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "bank_generation_report",
+      "canonicalId": "bank_generation_report",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "bank_manifest",
       "canonicalId": "bank_manifest",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "bank_metadata_policy",
+      "canonicalId": "bank_metadata_policy",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "bank_quality_contract",
+      "canonicalId": "bank_quality_contract",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -249,6 +279,12 @@
     {
       "alias": "banned_phrases",
       "canonicalId": "banned_phrases",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "behavioral_contract",
+      "canonicalId": "behavioral_contract",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -342,6 +378,12 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "calc_intents",
+      "canonicalId": "calc_intents",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "calc_task_taxonomy",
       "canonicalId": "calc_task_taxonomy",
       "source": "runtime_self_alias",
@@ -402,6 +444,12 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "claim_strength_matrix",
+      "canonicalId": "claim_strength_matrix",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "clarification_phrases",
       "canonicalId": "clarification_phrases",
       "source": "runtime_self_alias",
@@ -426,6 +474,12 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "clarification_question_bank",
+      "canonicalId": "clarification_question_bank",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "clarify_phrases",
       "canonicalId": "clarification_phrases",
       "reason": "Legacy name used before 'clarification_phrases' became standard.",
@@ -435,6 +489,12 @@
     {
       "alias": "closers",
       "canonicalId": "closers",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "colloquial_phrasing",
+      "canonicalId": "colloquial_phrasing",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -511,6 +571,18 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "confidence_calibration",
+      "canonicalId": "confidence_calibration",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "conflict_resolution_rules",
+      "canonicalId": "conflict_resolution_rules",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "connect_intents_en",
       "canonicalId": "connect_intents_en",
       "source": "runtime_self_alias",
@@ -558,8 +630,20 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "context_container_profiles",
+      "canonicalId": "context_container_profiles",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "contradiction_policy",
       "canonicalId": "contradiction_policy",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "conversation_state_carryover",
+      "canonicalId": "conversation_state_carryover",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -5372,6 +5456,12 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "doc_reference_resolution",
+      "canonicalId": "doc_reference_resolution",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "doc_taxonomy",
       "canonicalId": "doc_taxonomy",
       "source": "runtime_self_alias",
@@ -5494,6 +5584,30 @@
     {
       "alias": "document_intelligence_dependency_graph",
       "canonicalId": "document_intelligence_dependency_graph",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "document_intelligence_eval_adversarial_brain_traps",
+      "canonicalId": "document_intelligence_eval_adversarial_brain_traps",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "document_intelligence_eval_gold_queries_brain_questions",
+      "canonicalId": "document_intelligence_eval_gold_queries_brain_questions",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "document_intelligence_eval_multilingual_pt_en_parity",
+      "canonicalId": "document_intelligence_eval_multilingual_pt_en_parity",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "document_intelligence_eval_style_composition",
+      "canonicalId": "document_intelligence_eval_style_composition",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -5650,6 +5764,12 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "editing_intents",
+      "canonicalId": "editing_intents",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "editing_microcopy",
       "canonicalId": "editing_microcopy",
       "source": "runtime_self_alias",
@@ -5698,6 +5818,12 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "entity_aliases",
+      "canonicalId": "entity_aliases",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "entity_role_ontology",
       "canonicalId": "entity_role_ontology",
       "source": "runtime_self_alias",
@@ -5712,6 +5838,12 @@
     {
       "alias": "error_explanations",
       "canonicalId": "error_explanations",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "eval_gate_policy",
+      "canonicalId": "eval_gate_policy",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -5976,6 +6108,18 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "field_exactness_rules",
+      "canonicalId": "field_exactness_rules",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "field_role_ontology",
+      "canonicalId": "field_role_ontology",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "file_action_operators",
       "canonicalId": "file_action_operators",
       "source": "runtime_self_alias",
@@ -6006,6 +6150,12 @@
       "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
       "addedAt": "2026-02-27",
       "expiresInDays": null
+    },
+    {
+      "alias": "folder_scope_patterns",
+      "canonicalId": "folder_scope_patterns",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
     },
     {
       "alias": "followup_indicators",
@@ -6075,8 +6225,20 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "help_and_capabilities",
+      "canonicalId": "help_and_capabilities",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "help_microcopy",
       "canonicalId": "help_microcopy",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "high_stakes_response_rules",
+      "canonicalId": "high_stakes_response_rules",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -6102,6 +6264,12 @@
     {
       "alias": "incident_response_policy",
       "canonicalId": "incident_response_policy",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "integration_intents",
+      "canonicalId": "integration_intents",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -6247,6 +6415,186 @@
       "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
       "addedAt": "2026-02-27",
       "expiresInDays": null
+    },
+    {
+      "alias": "legacy_doc_taxonomy",
+      "canonicalId": "legacy_doc_taxonomy",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_abbreviations_en",
+      "canonicalId": "legacy_legal_abbreviations_en",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_abbreviations_pt",
+      "canonicalId": "legacy_legal_abbreviations_pt",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_board_resolution_extraction_hints",
+      "canonicalId": "legacy_legal_board_resolution_extraction_hints",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_board_resolution_sections",
+      "canonicalId": "legacy_legal_board_resolution_sections",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_board_resolution_tables",
+      "canonicalId": "legacy_legal_board_resolution_tables",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_dpa_extraction_hints",
+      "canonicalId": "legacy_legal_dpa_extraction_hints",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_dpa_sections",
+      "canonicalId": "legacy_legal_dpa_sections",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_dpa_tables",
+      "canonicalId": "legacy_legal_dpa_tables",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_employment_agreement_extraction_hints",
+      "canonicalId": "legacy_legal_employment_agreement_extraction_hints",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_employment_agreement_sections",
+      "canonicalId": "legacy_legal_employment_agreement_sections",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_employment_agreement_tables",
+      "canonicalId": "legacy_legal_employment_agreement_tables",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_lexicon_en",
+      "canonicalId": "legacy_legal_lexicon_en",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_lexicon_pt",
+      "canonicalId": "legacy_legal_lexicon_pt",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_msa_extraction_hints",
+      "canonicalId": "legacy_legal_msa_extraction_hints",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_msa_sections",
+      "canonicalId": "legacy_legal_msa_sections",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_msa_tables",
+      "canonicalId": "legacy_legal_msa_tables",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_nda_extraction_hints",
+      "canonicalId": "legacy_legal_nda_extraction_hints",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_nda_sections",
+      "canonicalId": "legacy_legal_nda_sections",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_nda_tables",
+      "canonicalId": "legacy_legal_nda_tables",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_privacy_policy_extraction_hints",
+      "canonicalId": "legacy_legal_privacy_policy_extraction_hints",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_privacy_policy_sections",
+      "canonicalId": "legacy_legal_privacy_policy_sections",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_privacy_policy_tables",
+      "canonicalId": "legacy_legal_privacy_policy_tables",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_sow_extraction_hints",
+      "canonicalId": "legacy_legal_sow_extraction_hints",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_sow_sections",
+      "canonicalId": "legacy_legal_sow_sections",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_legal_sow_tables",
+      "canonicalId": "legacy_legal_sow_tables",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_medical_abbreviations_en",
+      "canonicalId": "legacy_medical_abbreviations_en",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_medical_abbreviations_pt",
+      "canonicalId": "legacy_medical_abbreviations_pt",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_medical_lexicon_en",
+      "canonicalId": "legacy_medical_lexicon_en",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legacy_medical_lexicon_pt",
+      "canonicalId": "legacy_medical_lexicon_pt",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
     },
     {
       "alias": "legal_abbreviations_en",
@@ -6935,6 +7283,12 @@
     {
       "alias": "legal_privacy_policy_tables_v113ccc0c",
       "canonicalId": "legal_privacy_policy_tables_v113ccc0c",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "legal_privilege_rules",
+      "canonicalId": "legal_privilege_rules",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -8545,6 +8899,18 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "mission_and_non_goals",
+      "canonicalId": "mission_and_non_goals",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "misspelling_and_variant_map",
+      "canonicalId": "misspelling_and_variant_map",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "mode_chat",
       "canonicalId": "mode_chat",
       "source": "runtime_self_alias",
@@ -8553,6 +8919,12 @@
     {
       "alias": "mode_editing",
       "canonicalId": "mode_editing",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "mode_switch",
+      "canonicalId": "mode_switch",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -8582,6 +8954,12 @@
       "expiresInDays": null
     },
     {
+      "alias": "multi_doc_compare_rules",
+      "canonicalId": "multi_doc_compare_rules",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "nav_failure_recovery",
       "canonicalId": "nav_failure_recovery",
       "source": "runtime_self_alias",
@@ -8600,6 +8978,12 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "navigation_intents",
+      "canonicalId": "navigation_intents",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "negative_retrieval_patterns",
       "canonicalId": "negative_retrieval_patterns",
       "source": "runtime_self_alias",
@@ -8608,6 +8992,12 @@
     {
       "alias": "no_docs_messages",
       "canonicalId": "no_docs_messages",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "not_enough_evidence",
+      "canonicalId": "not_enough_evidence",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -8637,6 +9027,12 @@
       "expiresInDays": null
     },
     {
+      "alias": "one_best_question_policy",
+      "canonicalId": "one_best_question_policy",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "ontology_schema",
       "canonicalId": "ontology_schema",
       "source": "runtime_self_alias",
@@ -8651,6 +9047,12 @@
     {
       "alias": "openers",
       "canonicalId": "openers",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "operator_canonical_registry",
+      "canonicalId": "operator_canonical_registry",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -9419,6 +9821,12 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "partial_answer_recovery",
+      "canonicalId": "partial_answer_recovery",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "party_patterns",
       "canonicalId": "party_patterns",
       "source": "runtime_self_alias",
@@ -9799,6 +10207,12 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "privacy_minimal",
+      "canonicalId": "privacy_minimal",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "privacy_minimal_rules",
       "canonicalId": "privacy_minimal_rules",
       "source": "runtime_self_alias",
@@ -9807,6 +10221,12 @@
     {
       "alias": "processing_messages",
       "canonicalId": "processing_messages",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "project_memory_policy",
+      "canonicalId": "project_memory_policy",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -9891,6 +10311,12 @@
     {
       "alias": "quality_wrong_doc_risk_triggers",
       "canonicalId": "quality_wrong_doc_risk_triggers",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "quarantine_2026_02_memory_audit_bank_generation_report",
+      "canonicalId": "quarantine_2026_02_memory_audit_bank_generation_report",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -10080,6 +10506,12 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "retention_and_deletion_policy",
+      "canonicalId": "retention_and_deletion_policy",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "retrieval_document_intelligence_schema",
       "canonicalId": "retrieval_document_intelligence_schema",
       "source": "runtime_self_alias",
@@ -10259,6 +10691,18 @@
       "notes": "Generated self-alias for governance integrity."
     },
     {
+      "alias": "sensitive_content_rules",
+      "canonicalId": "sensitive_content_rules",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "sharding_policy",
+      "canonicalId": "sharding_policy",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
       "alias": "sheetname_patterns",
       "canonicalId": "sheetname_patterns",
       "source": "runtime_self_alias",
@@ -10317,6 +10761,12 @@
     {
       "alias": "spreadsheet_semantics",
       "canonicalId": "spreadsheet_semantics",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "ssot_contract",
+      "canonicalId": "ssot_contract",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },
@@ -10469,6 +10919,12 @@
     {
       "alias": "table_header_ontology_travel",
       "canonicalId": "table_header_ontology_travel",
+      "source": "runtime_self_alias",
+      "notes": "Generated self-alias for governance integrity."
+    },
+    {
+      "alias": "table_integrity_rules",
+      "canonicalId": "table_integrity_rules",
       "source": "runtime_self_alias",
       "notes": "Generated self-alias for governance integrity."
     },

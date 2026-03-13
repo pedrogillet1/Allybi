@@ -48,6 +48,10 @@ import { BRAND_NAME } from "../../../config/brand";
 import { resolveOutputTokenBudget } from "../../core/enforcement/tokenBudget.service";
 import { ReasoningPolicyService } from "../../core/policy/reasoningPolicy.service";
 import { getOptionalBank } from "../../core/banks/bankLoader.service";
+import { DocumentIntelligenceCompositionBrainService } from "../../../modules/chat/runtime/documentIntelligenceCompositionBrain.service";
+import {
+  DocumentIntelligenceBrainDecisionFrameService,
+} from "../../../modules/chat/runtime/documentIntelligenceBrainDecisionFrame.service";
 
 export type LangCode = "any" | "en" | "pt" | "es";
 
@@ -448,6 +452,8 @@ function estimateTokensFromChars(chars: number): number {
 
 export class LlmRequestBuilderService {
   private readonly reasoningPolicy: ReasoningPolicyService;
+  private readonly compositionBrain: DocumentIntelligenceCompositionBrainService;
+  private readonly brainDecisionFrame: DocumentIntelligenceBrainDecisionFrameService;
 
   constructor(
     private readonly prompts: PromptRegistryService,
@@ -455,6 +461,8 @@ export class LlmRequestBuilderService {
   ) {
     this.reasoningPolicy =
       opts?.reasoningPolicy || new ReasoningPolicyService();
+    this.compositionBrain = new DocumentIntelligenceCompositionBrainService();
+    this.brainDecisionFrame = new DocumentIntelligenceBrainDecisionFrameService();
   }
 
   build(input: BuildRequestInput): LlmRequest {
@@ -492,6 +500,22 @@ export class LlmRequestBuilderService {
     for (const m of prompt.messages) {
       messages.push({ role: m.role, content: m.content });
     }
+
+    const brainDecisionFrame = this.brainDecisionFrame.build({
+      outputLanguage: input.outputLanguage,
+      userText: input.userText,
+      signals: input.signals,
+      evidencePack: input.evidencePack,
+      toolContext: input.toolContext,
+    });
+    messages.push({
+      role: "developer",
+      content: this.brainDecisionFrame.buildDeveloperMessage(brainDecisionFrame),
+      meta: {
+        brainDecisionFrame: true,
+        contributingBankIds: brainDecisionFrame.contributingBankIds,
+      },
+    });
 
     const builderPolicy = getBuilderRuntimePolicy();
     const userPayload = this.buildUserPayload(
@@ -657,6 +681,7 @@ export class LlmRequestBuilderService {
         provenanceSchemaVersion: "v1",
         evidenceMap: this.buildEvidenceMapMetadata(input.evidencePack),
         evidenceRendering: userPayload.evidenceRendering,
+        brainDecisionFrame,
       },
     };
   }
@@ -997,6 +1022,20 @@ export class LlmRequestBuilderService {
     // style hints with mode-specific guidance while staying compatible with
     // global table/body constraints from prompt banks.
     const am = input.signals.answerMode ?? "";
+    if (am.startsWith("doc_grounded") || am === "help_steps") {
+      const compositionBlock = this.compositionBrain.buildPromptAddendum({
+        preferredLanguage: input.outputLanguage,
+        answerMode: am,
+        domain: input.signals.domain ?? null,
+        evidenceConfidence:
+          typeof input.evidencePack?.stats?.topScore === "number"
+            ? input.evidencePack.stats.topScore
+            : null,
+      });
+      if (compositionBlock.length > 0) {
+        parts.push(compositionBlock.join("\n"));
+      }
+    }
     if (am.startsWith("doc_grounded")) {
       const isTable = am === "doc_grounded_table";
       const answerDepthBlock =

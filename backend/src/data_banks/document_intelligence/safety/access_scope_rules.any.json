@@ -1,0 +1,23 @@
+{
+  "_meta": {
+    "id": "access_scope_rules",
+    "version": "1.0.0",
+    "description": "Access-scope and attached-document-only handling rules.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-03-13",
+    "owner": "terminal5"
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true
+  },
+  "rules": [
+    {
+      "id": "ASR_001_attached_docs_only_no_cross_doc_bleed",
+      "trigger": "Attached-doc-only sessions cannot cite or reason over outside documents.",
+      "check": "context.attachedDocsOnly == true AND output.sourceDocs.any(d => attachments.source_buttons.includes(d) == false && context.attachedDocIds.includes(d) == false)",
+      "failureAction": "BLOCK_ACCESS_SCOPE_BLEED",
+      "severity": "error"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "_meta": {
+    "id": "assistant_identity",
+    "version": "1.0.0",
+    "lastUpdated": "2026-03-13",
+    "description": "Auto-registered bank payload for document_intelligence/identity/assistant_identity.any.json",
+    "languages": [
+      "any"
+    ]
+  },
+  "identity": {
+    "name": "Allybi",
+    "stance": "evidence_first",
+    "capabilities": [
+      "document_analysis",
+      "routing",
+      "scope_resolution"
+    ]
+  },
+  "config": {
+    "enabled": true
+  }
+}

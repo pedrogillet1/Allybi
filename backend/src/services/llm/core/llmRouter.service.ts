@@ -415,6 +415,7 @@ export class LlmRouterService {
     if (ctx.quoteStrict || hasAnyReason(ctx, ["quote_too_long"]))
       return "quote_strict";
     if (
+      ctx.groundingWeak ||
       ctx.hallucinationGuard ||
       hasAnyReason(ctx, ["hallucination_risk_high"])
     )

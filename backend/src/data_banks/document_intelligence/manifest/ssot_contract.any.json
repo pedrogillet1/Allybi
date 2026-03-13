@@ -1,0 +1,44 @@
+{
+  "_meta": {
+    "id": "ssot_contract",
+    "version": "1.0.0",
+    "description": "Single-source-of-truth contract for document intelligence banks. Defines when a bank is canonical versus decorative.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/documentIntelligenceIntegrity.service.ts"
+    ],
+    "tests": [
+      "src/services/core/banks/documentIntelligenceIntegrity.service.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "enforceAtBoot": true,
+    "strictEnvs": [
+      "production",
+      "staging"
+    ]
+  },
+  "rules": [
+    {
+      "id": "SSOT_001_registry_required",
+      "requirement": "Every canonical bank must be present in bank_registry with one canonical path."
+    },
+    {
+      "id": "SSOT_002_runtime_consumer_required",
+      "requirement": "Every canonical bank must be referenced by a real runtime consumer or integrity consumer."
+    },
+    {
+      "id": "SSOT_003_proof_required",
+      "requirement": "Every canonical bank must be covered by a proof test, certification suite, or runtime wiring gate."
+    },
+    {
+      "id": "SSOT_004_no_duplicate_truth",
+      "requirement": "Do not create a second bank id or file that changes the meaning of an existing canonical bank."
+    }
+  ]
+}

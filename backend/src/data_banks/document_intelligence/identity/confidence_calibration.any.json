@@ -1,0 +1,19 @@
+{
+  "_meta": {
+    "id": "confidence_calibration",
+    "version": "1.0.0",
+    "lastUpdated": "2026-03-13",
+    "description": "Auto-registered bank payload for document_intelligence/identity/confidence_calibration.any.json",
+    "languages": [
+      "any"
+    ]
+  },
+  "thresholds": {
+    "low": 0.45,
+    "medium": 0.65,
+    "high": 0.85
+  },
+  "config": {
+    "enabled": true
+  }
+}

@@ -1,0 +1,186 @@
+{
+  "suite": "gold_queries",
+  "version": 1,
+  "cases": [
+    {
+      "id": "bq_01_scope_lock",
+      "brainQuestionId": "BQ1",
+      "brainQuestion": "Which attached document is actually in scope?",
+      "brainLayer": "scope_lock",
+      "lang": "en",
+      "category": "wrong_doc_trap",
+      "query": "Use only the active lease and extract the tenant name.",
+      "expected": {
+        "topDocId": "lease_active",
+        "blockedDocIds": [
+          "lease_old",
+          "rent_receipt"
+        ],
+        "fieldName": "tenant_name",
+        "fieldValue": "Avery Stone"
+      },
+      "regressionLinks": [
+        "reports/query-grading/GRADING-REPORT.md#L144",
+        "frontend/e2e/reports/latest/a-plus-gap-deep-dive.md#L93"
+      ]
+    },
+    {
+      "id": "bq_02_user_ask",
+      "brainQuestionId": "BQ2",
+      "brainQuestion": "What exact field or task is the user asking for?",
+      "brainLayer": "intent_resolution",
+      "lang": "en",
+      "category": "field_exactness",
+      "query": "Pull only the due date from the ATT bill.",
+      "expected": {
+        "topDocId": "att_bill_april",
+        "blockedDocIds": [
+          "att_bill_march"
+        ],
+        "fieldName": "due_date",
+        "fieldValue": "2026-04-18"
+      },
+      "regressionLinks": [
+        "reports/query-grading/GRADING-REPORT.md#L87"
+      ]
+    },
+    {
+      "id": "bq_03_retrieval_precision",
+      "brainQuestionId": "BQ3",
+      "brainQuestion": "Which evidence chunk best answers the question?",
+      "brainLayer": "retrieval_precision",
+      "lang": "en",
+      "category": "retrieval_precision",
+      "query": "Find the cash runway statement in the investor deck.",
+      "expected": {
+        "topDocId": "bess_investor_deck",
+        "blockedDocIds": [
+          "mayfair_pitch",
+          "sevis_rti"
+        ],
+        "fieldName": "cash_runway",
+        "fieldValue": "18 months"
+      },
+      "regressionLinks": [
+        "reports/query-grading/GRADING-REPORT.md#L243"
+      ]
+    },
+    {
+      "id": "bq_04_field_exactness",
+      "brainQuestionId": "BQ4",
+      "brainQuestion": "What exact field value is justified by the evidence?",
+      "brainLayer": "field_exactness",
+      "lang": "pt",
+      "category": "field_exactness",
+      "query": "Extraia apenas a data de nascimento da certidao.",
+      "expected": {
+        "topDocId": "certidao_nascimento",
+        "blockedDocIds": [
+          "rg_frente",
+          "rg_verso"
+        ],
+        "fieldName": "data_nascimento",
+        "fieldValue": "2008-11-03"
+      },
+      "regressionLinks": [
+        "reports/query-grading/GRADING-REPORT.md#L97"
+      ]
+    },
+    {
+      "id": "bq_05_wrong_doc_defense",
+      "brainQuestionId": "BQ5",
+      "brainQuestion": "Which nearby documents must be rejected as distractors?",
+      "brainLayer": "wrong_doc_defense",
+      "lang": "en",
+      "category": "wrong_doc_trap",
+      "query": "Summarize only the move-out notice, not the attached checklist.",
+      "expected": {
+        "topDocId": "move_out_notice",
+        "blockedDocIds": [
+          "move_out_checklist",
+          "rent_invoice"
+        ],
+        "fieldName": "vacate_deadline",
+        "fieldValue": "2026-05-31"
+      },
+      "regressionLinks": [
+        "frontend/e2e/reports/latest/a-plus-gap-deep-dive.md#L118"
+      ]
+    },
+    {
+      "id": "bq_06_provenance_richness",
+      "brainQuestionId": "BQ6",
+      "brainQuestion": "Do we have rich provenance for every grounded claim?",
+      "brainLayer": "provenance_richness",
+      "lang": "en",
+      "category": "provenance_richness",
+      "query": "List the key diligence concerns from the Mayfair deck with page-level support.",
+      "expected": {
+        "topDocId": "mayfair_deck",
+        "blockedDocIds": [
+          "bess_investor_deck"
+        ],
+        "fieldName": "risk_cluster",
+        "fieldValue": "customer concentration"
+      },
+      "regressionLinks": [
+        "frontend/e2e/reports/latest/a-plus-gap-deep-dive.md#L152",
+        "reports/query-grading/GRADING-REPORT.md#L143"
+      ]
+    },
+    {
+      "id": "bq_07_false_clarification",
+      "brainQuestionId": "BQ7",
+      "brainQuestion": "Is clarification truly required, or is the question already answerable?",
+      "brainLayer": "clarification_guard",
+      "lang": "en",
+      "category": "false_clarification_trap",
+      "query": "Put the core findings into a table.",
+      "expected": {
+        "topDocId": "guarda_bens_report",
+        "blockedDocIds": [
+          "blank_attachment"
+        ],
+        "fieldName": "finding_count",
+        "fieldValue": "3"
+      },
+      "regressionLinks": [
+        "reports/query-grading/GRADING-REPORT.md#L144",
+        "reports/query-grading/GRADING-REPORT.md#L275"
+      ]
+    },
+    {
+      "id": "bq_08_composition",
+      "brainQuestionId": "BQ8",
+      "brainQuestion": "How should the answer be composed so it is evidence-first, human, and calibrated?",
+      "brainLayer": "composition",
+      "lang": "pt",
+      "category": "composition",
+      "query": "Explique os riscos principais em blocos analiticos, com evidencias e linguagem cautelosa.",
+      "expected": {
+        "topDocId": "sevis_rti",
+        "blockedDocIds": [
+          "trabalho_final_img"
+        ],
+        "fieldName": "risco_principal",
+        "fieldValue": "desalinhamento de prazo"
+      },
+      "regressionLinks": [
+        "frontend/e2e/reports/latest/a-plus-gap-deep-dive.md#L177",
+        "frontend/e2e/reports/latest/a-plus-gap-deep-dive.md#L210"
+      ]
+    }
+  ],
+  "_meta": {
+    "id": "document_intelligence_eval_gold_queries_brain_questions",
+    "version": "1.0.0",
+    "description": "Auto-registered bank payload for document_intelligence/eval/gold_queries/brain_questions.any.json",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13"
+  },
+  "config": {
+    "enabled": true
+  }
+}

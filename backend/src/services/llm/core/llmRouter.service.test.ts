@@ -87,4 +87,42 @@ describe("LlmRouterService", () => {
     expect(out[0]).toEqual({ provider: "openai", model: "gpt-5.2" });
     expect(out[1]).toEqual({ provider: "gemini", model: "gemini-2.5-flash" });
   });
+
+  test("groundingWeak escalates draft route into authority lane", () => {
+    const router = new LlmRouterService(makePolicyAwareLoader());
+    const out = router.route({
+      env: "production",
+      stage: "draft",
+      answerMode: "doc_grounded_multi",
+      groundingWeak: true,
+      requireStreaming: true,
+      allowTools: false,
+    });
+
+    expect(out.reason).toBe("hallucination_guard");
+    expect(out.stage).toBe("final");
+    expect(out.provider).toBe("openai");
+    expect(out.model).toBe("gpt-5.2-2026-01-15");
+  });
+
+  test("unhealthy primary provider falls back using policy ladder", () => {
+    const router = new LlmRouterService(makePolicyAwareLoader());
+    const out = router.route({
+      env: "production",
+      stage: "draft",
+      answerMode: "nav_pills",
+      requireStreaming: true,
+      allowTools: false,
+      providerHealth: [
+        {
+          provider: "gemini",
+          ok: false,
+        },
+      ],
+    });
+
+    expect(out.provider).toBe("openai");
+    expect(out.model).toBe("gpt-5.2-2026-01-15");
+    expect(out.policyRuleId).toBe("provider_fallbacks");
+  });
 });

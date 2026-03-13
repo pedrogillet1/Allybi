@@ -109,6 +109,11 @@ export class DocumentIntelligenceIntegrityService {
       "document_intelligence_usage_manifest",
       "document_intelligence_orphan_allowlist",
       "document_intelligence_runtime_wiring_gates",
+      "ssot_contract",
+      "sharding_policy",
+      "eval_gate_policy",
+      "bank_metadata_policy",
+      "bank_quality_contract",
     ];
     const missingManifestBanks = requiredManifestIds.filter(
       (id) => !getOptionalBank(id),

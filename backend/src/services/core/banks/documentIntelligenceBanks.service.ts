@@ -32,6 +32,7 @@ export type DocumentIntelligenceOntologyType =
   | "entity"
   | "metric"
   | "section"
+  | "table"
   | "unit_and_measurement";
 
 export type DocumentIntelligenceDomainBankFamily =
@@ -59,8 +60,20 @@ export type DocumentIntelligenceOperator =
 
 export type DocumentIntelligenceQualityGateType =
   | "ambiguity_questions"
+  | "claim_strength_matrix"
+  | "conflict_resolution_rules"
+  | "fact_type_requirements"
+  | "field_exactness_rules"
+  | "high_stakes_response_rules"
+  | "medical_safety_boundaries"
   | "numeric_integrity"
+  | "numeric_reconciliation_rules"
+  | "pii_patterns"
+  | "privacy_minimal"
+  | "redaction_actions"
   | "source_policy"
+  | "table_integrity_rules"
+  | "unsafe_inference_rules"
   | "wrong_doc_lock";
 
 export type DocumentIntelligenceEntityPatternType =
@@ -111,6 +124,8 @@ export interface DocumentIntelligenceBankDiagnostics {
   validationWarnings: string[];
   documentIntelligenceFamilyCounts: Record<string, number>;
 }
+
+type LocaleCode = "en" | "pt" | "es";
 
 interface BankLoaderLike {
   getBank<T = unknown>(bankId: string): T;
@@ -213,8 +228,58 @@ const DI_ONTOLOGY_TYPES: DocumentIntelligenceOntologyType[] = [
   "entity",
   "metric",
   "section",
+  "table",
   "unit_and_measurement",
 ];
+
+interface DiDomainOntologyEntry {
+  id: string;
+  label?: string;
+  labelPt?: string;
+  crossDomainLinks?: string[];
+}
+
+interface DiDocTypeOntologyEntry {
+  id: string;
+  domainId?: string;
+  label?: string;
+  labelPt?: string;
+  aliases?: Record<string, string[]>;
+  packRefs?: {
+    sections?: string[];
+    entities?: string[];
+    tables?: string[];
+    extraction?: string[];
+  };
+}
+
+interface DiSectionOntologyEntry {
+  id: string;
+  label?: string;
+  labelPt?: string;
+  headerVariants?: Record<string, string[]>;
+  families?: string[];
+  domains?: string[];
+}
+
+interface DiMetricOntologyEntry {
+  id: string;
+  label?: string;
+  labelPt?: string;
+  domain?: string;
+  unitId?: string;
+  aliases?: Record<string, string[]>;
+  typicalTableHeaders?: Record<string, string[]>;
+}
+
+interface DiUnitOntologyEntry {
+  id: string;
+  familyId?: string;
+  label?: string;
+  labelPt?: string;
+  symbols?: string[];
+  aliases?: Record<string, string[]>;
+}
 
 function domainBankPrefix(domain: DocumentIntelligenceDomain): string {
   // Legacy bank IDs for legal/medical are prefix-less; all others are di_<domain>.
@@ -529,8 +594,114 @@ export class DocumentIntelligenceBanksService {
     return this.getCachedOptional<Record<string, any>>("allybi_crossdoc_grounding");
   }
 
+  getRetrievalRankerConfig(): Record<string, any> | null {
+    return this.getFirstAvailableBank<Record<string, any>>([
+      "ranker_config",
+      "retrieval_ranker_config",
+    ]);
+  }
+
+  getRetrievalQueryRewritePolicy(
+    domain?: DocumentIntelligenceDomain | null,
+  ): Record<string, any> | null {
+    const candidates = ["query_rewrite_policies"];
+    if (domain) {
+      const normalized = this.normalizeDomainOrThrow(
+        domain,
+        "getRetrievalQueryRewritePolicy",
+      );
+      candidates.push(`query_rewrites_${normalized}`);
+    }
+    return this.getFirstAvailableBank<Record<string, any>>(candidates);
+  }
+
+  getRetrievalSectionBoostRules(
+    domain?: DocumentIntelligenceDomain | null,
+  ): Record<string, any> | null {
+    const candidates = ["section_boost_rules"];
+    if (domain) {
+      const normalized = this.normalizeDomainOrThrow(
+        domain,
+        "getRetrievalSectionBoostRules",
+      );
+      candidates.push(`section_priority_${normalized}`);
+    }
+    return this.getFirstAvailableBank<Record<string, any>>(candidates);
+  }
+
+  getRetrievalTableBoostRules(): Record<string, any> | null {
+    return this.getFirstAvailableBank<Record<string, any>>(["table_boost_rules"]);
+  }
+
+  getFieldLockPatterns(): Record<string, any> | null {
+    return this.getFirstAvailableBank<Record<string, any>>([
+      "field_lock_patterns",
+      "doc_lock_policy",
+    ]);
+  }
+
+  getQuoteSpanRules(): Record<string, any> | null {
+    return this.getFirstAvailableBank<Record<string, any>>([
+      "quote_span_rules",
+      "snippet_compression_policy",
+    ]);
+  }
+
+  getEvidenceBindingContract(): Record<string, any> | null {
+    return this.getFirstAvailableBank<Record<string, any>>([
+      "evidence_binding_contract",
+      "evidence_packaging_policy",
+      "evidence_packaging",
+    ]);
+  }
+
+  getCrossDocSynthesisRules(): Record<string, any> | null {
+    return this.getFirstAvailableBank<Record<string, any>>([
+      "cross_doc_synthesis_rules",
+      "crossdoc_alignment_rules",
+      "allybi_crossdoc_grounding",
+    ]);
+  }
+
+  getEvidencePackagingStrategies(): Record<string, any> | null {
+    return this.getFirstAvailableBank<Record<string, any>>([
+      "evidence_packaging_strategies",
+      "evidence_packaging_policy",
+      "evidence_packaging",
+    ]);
+  }
+
+  getNegativeRetrievalPatterns(): Record<string, any> | null {
+    return this.getFirstAvailableBank<Record<string, any>>([
+      "negative_retrieval_patterns",
+      "retrieval_negatives",
+    ]);
+  }
+
   getQualityGateBank(type: DocumentIntelligenceQualityGateType): Record<string, any> | null {
-    return this.getCachedOptional<Record<string, any>>(type);
+    const candidateIds: Record<DocumentIntelligenceQualityGateType, string[]> = {
+      ambiguity_questions: ["ambiguity_questions"],
+      claim_strength_matrix: ["claim_strength_matrix"],
+      conflict_resolution_rules: ["conflict_resolution_rules", "contradiction_policy"],
+      fact_type_requirements: ["fact_type_requirements"],
+      field_exactness_rules: ["field_exactness_rules", "table_cell_evidence_rules"],
+      high_stakes_response_rules: ["high_stakes_response_rules", "domain_sensitive_content"],
+      medical_safety_boundaries: ["medical_safety_boundaries"],
+      numeric_integrity: ["numeric_integrity"],
+      numeric_reconciliation_rules: [
+        "numeric_reconciliation_rules",
+        "numeric_integrity",
+      ],
+      pii_patterns: ["pii_patterns"],
+      privacy_minimal: ["privacy_minimal", "privacy_minimal_rules"],
+      redaction_actions: ["redaction_actions"],
+      source_policy: ["source_policy"],
+      table_integrity_rules: ["table_integrity_rules", "table_cell_evidence_rules"],
+      unsafe_inference_rules: ["unsafe_inference_rules"],
+      wrong_doc_lock: ["wrong_doc_lock"],
+    };
+
+    return this.getFirstAvailableBank<Record<string, any>>(candidateIds[type]);
   }
 
   getEntityPatterns(type: DocumentIntelligenceEntityPatternType): Record<string, any> {
@@ -763,12 +934,189 @@ export class DocumentIntelligenceBanksService {
     return this.getCachedOptional<Record<string, any>>(`di_${type}_ontology`);
   }
 
+  getFieldRoleOntology(): Record<string, any> | null {
+    return this.getCachedOptional<Record<string, any>>("field_role_ontology");
+  }
+
+  getDiDomains(): DiDomainOntologyEntry[] {
+    const ontology = this.getDiOntology("domain");
+    return Array.isArray(ontology?.domains)
+      ? (ontology?.domains as DiDomainOntologyEntry[])
+      : [];
+  }
+
+  getDiDocTypes(): DiDocTypeOntologyEntry[] {
+    const ontology = this.getDiOntology("doc_type");
+    return Array.isArray(ontology?.docTypes)
+      ? (ontology?.docTypes as DiDocTypeOntologyEntry[])
+      : [];
+  }
+
+  getDiSections(): DiSectionOntologyEntry[] {
+    const ontology = this.getDiOntology("section");
+    return Array.isArray(ontology?.sections)
+      ? (ontology?.sections as DiSectionOntologyEntry[])
+      : [];
+  }
+
+  getDiMetrics(): DiMetricOntologyEntry[] {
+    const ontology = this.getDiOntology("metric");
+    return Array.isArray(ontology?.metrics)
+      ? (ontology?.metrics as DiMetricOntologyEntry[])
+      : [];
+  }
+
+  getDiUnits(): DiUnitOntologyEntry[] {
+    const ontology = this.getDiOntology("unit_and_measurement");
+    return Array.isArray(ontology?.units)
+      ? (ontology?.units as DiUnitOntologyEntry[])
+      : [];
+  }
+
   getDiNormalizationRules(): Record<string, any> | null {
     return this.getCachedOptional<Record<string, any>>("di_normalization_rules");
   }
 
   getDiAbbreviationGlobal(): Record<string, any> | null {
     return this.getCachedOptional<Record<string, any>>("di_abbreviation_global");
+  }
+
+  getIdentityBank(
+    bankId:
+      | "system_base"
+      | "assistant_identity"
+      | "mission_and_non_goals"
+      | "behavioral_contract"
+      | "confidence_calibration"
+      | "help_and_capabilities",
+  ): Record<string, any> | null {
+    return this.getCachedOptional<Record<string, any>>(bankId);
+  }
+
+  getLanguageIndicators(): Record<string, any> | null {
+    return this.getFirstAvailableBank<Record<string, any>>([
+      "language_indicators",
+    ]);
+  }
+
+  getSynonymExpansion(): Record<string, any> | null {
+    return this.getFirstAvailableBank<Record<string, any>>([
+      "synonym_expansion",
+    ]);
+  }
+
+  getLanguageBank(
+    bankId:
+      | "abbreviation_global"
+      | "locale_number_formats"
+      | "date_locale_rules"
+      | "language_indicators"
+      | "synonym_expansion"
+      | "entity_aliases"
+      | "colloquial_phrasing"
+      | "misspelling_and_variant_map"
+      | "doc_aliases",
+  ): Record<string, any> | null {
+    const candidates: Record<string, string[]> = {
+      abbreviation_global: ["di_abbreviation_global", "abbreviation_global"],
+      locale_number_formats: ["locale_number_formats"],
+      date_locale_rules: ["date_locale_rules"],
+      language_indicators: ["language_indicators"],
+      synonym_expansion: ["synonym_expansion"],
+      entity_aliases: ["entity_aliases"],
+      colloquial_phrasing: ["colloquial_phrasing"],
+      misspelling_and_variant_map: ["misspelling_and_variant_map"],
+      doc_aliases: ["doc_aliases"],
+    };
+    return this.getFirstAvailableBank<Record<string, any>>(candidates[bankId] || []);
+  }
+
+  getRoutingIntentPatterns(): Record<string, any> | null {
+    return this.getFirstAvailableBank<Record<string, any>>([
+      "intent_patterns",
+      "query_intent_patterns",
+    ]);
+  }
+
+  getQueryFamilyCatalog(): Record<string, any> | null {
+    return this.getCachedOptional<Record<string, any>>("query_family_catalog");
+  }
+
+  getCalcIntents(): Record<string, any> | null {
+    return this.getCachedOptional<Record<string, any>>("calc_intents");
+  }
+
+  getEditingIntents(): Record<string, any> | null {
+    return this.getCachedOptional<Record<string, any>>("editing_intents");
+  }
+
+  getIntegrationIntents(): Record<string, any> | null {
+    return this.getCachedOptional<Record<string, any>>("integration_intents");
+  }
+
+  getNavigationIntents(): Record<string, any> | null {
+    return this.getCachedOptional<Record<string, any>>("navigation_intents");
+  }
+
+  getFollowupPolicy(): Record<string, any> | null {
+    return this.getFirstAvailableBank<Record<string, any>>([
+      "followup_policy",
+      "followup_indicators",
+    ]);
+  }
+
+  getOneBestQuestionPolicy(): Record<string, any> | null {
+    return this.getCachedOptional<Record<string, any>>("one_best_question_policy");
+  }
+
+  getScopeResolutionRules(): Record<string, any> | null {
+    return this.getFirstAvailableBank<Record<string, any>>([
+      "scope_resolution_rules",
+      "scope_resolution",
+    ]);
+  }
+
+  getDocLockPolicy(): Record<string, any> | null {
+    return this.getCachedOptional<Record<string, any>>("doc_lock_policy");
+  }
+
+  getFolderScopePatterns(): Record<string, any> | null {
+    return this.getFirstAvailableBank<Record<string, any>>([
+      "folder_scope_patterns",
+      "patterns_doc_refs_folder_scope_patterns",
+    ]);
+  }
+
+  getContextContainerProfiles(): Record<string, any> | null {
+    return this.getCachedOptional<Record<string, any>>(
+      "context_container_profiles",
+    );
+  }
+
+  getConversationStateCarryover(): Record<string, any> | null {
+    return this.getCachedOptional<Record<string, any>>(
+      "conversation_state_carryover",
+    );
+  }
+
+  getMultiDocCompareRules(): Record<string, any> | null {
+    return this.getCachedOptional<Record<string, any>>(
+      "multi_doc_compare_rules",
+    );
+  }
+
+  getProjectMemoryPolicy(): Record<string, any> | null {
+    return this.getCachedOptional<Record<string, any>>("project_memory_policy");
+  }
+
+  getModeSwitch(locale: LocaleCode): Record<string, any> | null {
+    return this.getFirstAvailableBank<Record<string, any>>([
+      "mode_switch",
+      `mode_switch_${locale}`,
+      `patterns_modes_mode_switch_${locale}`,
+      locale === "en" ? "patterns_modes_mode_switch_en" : "",
+      locale === "pt" ? "patterns_modes_mode_switch_pt" : "",
+    ].filter(Boolean));
   }
 
   // ── Document Intelligence Manifest Banks ────────────────────────────

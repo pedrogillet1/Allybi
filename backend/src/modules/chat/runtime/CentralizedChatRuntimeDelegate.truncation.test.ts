@@ -172,6 +172,24 @@ describe("CentralizedChatRuntimeDelegate provider overflow repair", () => {
 
     expect(repaired).toBe(incompleteText);
   });
+
+  test("uses composition-brain overflow fallback when only a broken table scaffold remains", () => {
+    const delegate = Object.create(
+      CentralizedChatRuntimeDelegate.prototype,
+    ) as any;
+    delegate.compositionBrain = {
+      resolveOverflowRepairMessage: () =>
+        "The table was cut before completion. I can resend it as bullets to avoid truncation.",
+    };
+
+    const repaired = delegate.repairProviderOverflowStructuredOutput(
+      "| Metric | Value |\n| --- | --- |\n| Revenue |",
+      { finishReason: "length" },
+      "en",
+    );
+
+    expect(repaired).toContain("resend it as bullets");
+  });
 });
 
 describe("CentralizedChatRuntimeDelegate answer mode routing", () => {
@@ -240,6 +258,40 @@ describe("CentralizedChatRuntimeDelegate answer mode routing", () => {
     );
 
     expect(mode).toBe("help_steps");
+  });
+
+  test("uses bank-driven followup suggestions instead of generic fallback text", () => {
+    const delegate = Object.create(
+      CentralizedChatRuntimeDelegate.prototype,
+    ) as any;
+    delegate.compositionBrain = {
+      buildFollowups: () => [
+        {
+          label: "Check whether the same amount appears in another section or period.",
+          query: "Show the same amount in the adjacent period from Q1 Report.",
+        },
+      ],
+    };
+    delegate.extractQueryKeywords = () => ["revenue"];
+
+    const followups = delegate.generateFollowups(
+      {
+        userId: "user-1",
+        message: "Explain the revenue variance",
+        preferredLanguage: "en",
+      },
+      "doc_grounded_single",
+      {
+        evidence: [{ docId: "doc-1", title: "Q1 Report" }],
+      },
+    );
+
+    expect(followups).toEqual([
+      {
+        label: "Check whether the same amount appears in another section or period.",
+        query: "Show the same amount in the adjacent period from Q1 Report.",
+      },
+    ]);
   });
 });
 
@@ -371,6 +423,34 @@ describe("CentralizedChatRuntimeDelegate fallback signal resolution", () => {
     expect(meta.fallbackTelemetry).toEqual({
       reasonCode: "low_confidence",
       policy: { reasonCode: "low_confidence", routerAction: "regen" },
+    });
+  });
+
+  test("clarification bypass uses composition-brain framing and one-best question", () => {
+    const delegate = Object.create(CentralizedChatRuntimeDelegate.prototype) as any;
+    delegate.clarificationPolicy = {
+      enforceClarificationQuestion: ({ question }: { question: string }) => question,
+    };
+    delegate.compositionBrain = {
+      resolveClarificationBypass: ({ question }: { question: string }) =>
+        `I need one clarification to answer precisely: ${question}`,
+    };
+
+    const result = delegate.resolveEvidenceGateBypass(
+      {
+        suggestedAction: "clarify",
+        clarifyQuestion: "Which period should I use?",
+      },
+      "en",
+      {
+        attachedDocumentIds: [],
+        evidenceCount: 0,
+      },
+    );
+
+    expect(result).toEqual({
+      text: "I need one clarification to answer precisely: Which period should I use?",
+      failureCode: "EVIDENCE_NEEDS_CLARIFICATION",
     });
   });
 });

@@ -1,0 +1,30 @@
+{
+  "_meta": {
+    "id": "field_exactness_rules",
+    "version": "1.0.0",
+    "description": "Field-level exactness and bilingual alignment rules for document-grounded answers.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-03-13",
+    "owner": "terminal5"
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true
+  },
+  "rules": [
+    {
+      "id": "FER_001_exact_field_requires_source_alignment",
+      "trigger": "Exact field answers require explicit source cell or span support.",
+      "check": "output.claimLabel.in(['exact','verbatim','directly_stated']) == true AND output.supportedByTableCell == false AND output.supportedBySpan == false",
+      "failureAction": "REQUEST_CITED_FIELD",
+      "severity": "error"
+    },
+    {
+      "id": "FER_002_language_mismatch_requires_label",
+      "trigger": "Bilingual mismatch must be acknowledged instead of silently translating a field as exact.",
+      "check": "context.queryLang != null AND context.docLang != null AND context.queryLang != context.docLang AND context.translationAmbiguity == true AND output.claimLabel == 'exact'",
+      "failureAction": "LABEL_TRANSLATED_FIELD",
+      "severity": "warning"
+    }
+  ]
+}

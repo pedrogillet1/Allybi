@@ -1,0 +1,30 @@
+{
+  "_meta": {
+    "id": "high_stakes_response_rules",
+    "version": "1.0.0",
+    "description": "High-stakes response boundaries for legal and medical document intelligence answers.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-03-13",
+    "owner": "terminal5"
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true
+  },
+  "rules": [
+    {
+      "id": "HSR_001_medical_diagnosis_without_qualifier",
+      "trigger": "Medical diagnosis or treatment language requires explicit safety qualifier.",
+      "check": "context.domain == 'medical' AND output.matchesPattern('\\b(definitive diagnosis|you have|you are diagnosed|prescribe(?:d)?\\s+\\w+)\\b', 'i') == true AND output.matchesPattern('\\b(consult|seek|professional|doctor|physician|medical advice|nao substitui|procure)\\b', 'i') == false",
+      "failureAction": "BLOCK_HIGH_STAKES_MEDICAL",
+      "severity": "error"
+    },
+    {
+      "id": "HSR_002_legal_instruction_without_scope_limit",
+      "trigger": "Legal instruction language should be constrained to document interpretation, not direct legal advice.",
+      "check": "context.domain == 'legal' AND output.matchesPattern('\\b(you should sue|file this immediately|ignore this obligation|sign this now)\\b', 'i') == true",
+      "failureAction": "BLOCK_HIGH_STAKES_LEGAL",
+      "severity": "error"
+    }
+  ]
+}

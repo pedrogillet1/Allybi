@@ -1,0 +1,23 @@
+{
+  "_meta": {
+    "id": "conflict_resolution_rules",
+    "version": "1.0.0",
+    "description": "Conflict handling rules for contradictory document facts and version clashes.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-03-13",
+    "owner": "terminal5"
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true
+  },
+  "rules": [
+    {
+      "id": "CRR_001_conflicting_values_block_exact_answer",
+      "trigger": "Conflicting values cannot be returned as a single exact fact.",
+      "check": "context.valuesConflict == true AND output.claimLabel.in(['exact','verbatim','directly_stated']) == true",
+      "failureAction": "SURFACE_CONFLICT",
+      "severity": "error"
+    }
+  ]
+}

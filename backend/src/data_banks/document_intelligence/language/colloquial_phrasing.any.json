@@ -1,0 +1,26 @@
+{
+  "_meta": {
+    "id": "colloquial_phrasing",
+    "version": "1.0.0",
+    "lastUpdated": "2026-03-13",
+    "description": "Auto-registered bank payload for document_intelligence/language/colloquial_phrasing.any.json",
+    "languages": [
+      "any"
+    ]
+  },
+  "phrases": {
+    "pt": [
+      "esse aqui",
+      "aquele arquivo",
+      "segue nisso"
+    ],
+    "en": [
+      "this one",
+      "that file",
+      "stay on this"
+    ]
+  },
+  "config": {
+    "enabled": true
+  }
+}

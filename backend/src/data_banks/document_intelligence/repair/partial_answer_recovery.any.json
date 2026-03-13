@@ -1,0 +1,22 @@
+{
+  "_meta": {
+    "id": "partial_answer_recovery",
+    "version": "1.0.0",
+    "description": "Recovery wording for truncated structured answers.",
+    "languages": [
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-03-13",
+    "owner": "terminal6"
+  },
+  "config": {
+    "enabled": true
+  },
+  "overflowRecovery": {
+    "en": "The table was cut before completion. I can resend it as bullets to avoid truncation.",
+    "pt": "A tabela foi interrompida antes de concluir. Posso reenviar em bullets para evitar corte.",
+    "es": "La tabla se interrumpio antes de terminar. Puedo reenviarla en vietas para evitar cortes."
+  }
+}

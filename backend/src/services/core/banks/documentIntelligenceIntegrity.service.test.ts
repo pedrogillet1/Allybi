@@ -63,7 +63,12 @@ describe("DocumentIntelligenceIntegrityService", () => {
       if (
         id === "document_intelligence_schema_registry" ||
         id === "document_intelligence_dependency_graph" ||
-        id === "document_intelligence_runtime_wiring_gates"
+        id === "document_intelligence_runtime_wiring_gates" ||
+        id === "ssot_contract" ||
+        id === "sharding_policy" ||
+        id === "eval_gate_policy" ||
+        id === "bank_metadata_policy" ||
+        id === "bank_quality_contract"
       ) {
         return { _meta: { id } } as any;
       }

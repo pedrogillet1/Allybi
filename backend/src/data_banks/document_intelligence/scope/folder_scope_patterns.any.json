@@ -1,0 +1,17 @@
+{
+  "_meta": {
+    "id": "folder_scope_patterns",
+    "version": "1.0.0",
+    "lastUpdated": "2026-03-13",
+    "description": "Auto-registered bank payload for document_intelligence/scope/folder_scope_patterns.any.json",
+    "languages": [
+      "any"
+    ]
+  },
+  "compat": {
+    "delegatesTo": "patterns/doc_refs/folder_scope_patterns.any.json"
+  },
+  "config": {
+    "enabled": true
+  }
+}

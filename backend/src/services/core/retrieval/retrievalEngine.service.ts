@@ -264,6 +264,12 @@ export interface EvidenceItem {
   title?: string | null;
   filename?: string | null;
   location: ChunkLocation;
+  page?: number | null;
+  slide?: number | null;
+  sheet?: string | null;
+  cell?: string | null;
+  section?: string | null;
+  locationLabel?: string | null;
   locationKey: string;
 
   snippet?: string; // text evidence
@@ -390,6 +396,18 @@ interface DocTypeBoostPlan {
   sectionAnchors: string[];
   tableAnchors: string[];
   reasons: string[];
+}
+
+interface SemanticFieldRoleMatch {
+  roleId: string;
+  entityRoleId: string | null;
+  matchedAnchor: string;
+  score: number;
+}
+
+interface SemanticUnitMetricMatch {
+  metricId: string | null;
+  unitId: string | null;
 }
 
 interface RetrievalPhaseCounts {
@@ -554,14 +572,34 @@ export class RetrievalEngineService {
     private readonly documentIntelligenceBanks: Pick<
       DocumentIntelligenceBanksService,
       | "getCrossDocGroundingPolicy"
+      | "getCrossDocSynthesisRules"
+      | "getDiDocTypes"
+      | "getDiDomains"
+      | "getDiMetrics"
+      | "getDiSections"
+      | "getDiUnits"
       | "getDocumentIntelligenceDomains"
+      | "getEvidenceBindingContract"
+      | "getEvidencePackagingStrategies"
+      | "getFieldLockPatterns"
+      | "getFieldRoleOntology"
+      | "getNegativeRetrievalPatterns"
+      | "getQuoteSpanRules"
       | "getDocTypeCatalog"
       | "getDocTypeSections"
       | "getDocTypeTables"
       | "getDomainDetectionRules"
       | "getRetrievalBoostRules"
+      | "getRetrievalQueryRewritePolicy"
+      | "getRetrievalRankerConfig"
+      | "getRetrievalSectionBoostRules"
+      | "getRetrievalTableBoostRules"
       | "getQueryRewriteRules"
       | "getSectionPriorityRules"
+      | "getSynonymExpansion"
+      | "getLanguageIndicators"
+      | "getScopeResolutionRules"
+      | "getDocLockPolicy"
     > &
       Partial<
         Pick<DocumentIntelligenceBanksService, "getDocTypeExtractionHints">
@@ -579,6 +617,52 @@ export class RetrievalEngineService {
     return ["1", "true", "yes", "on"].includes(raw);
   }
 
+  private mergeRankerConfigs(
+    baseConfig: Record<string, any> | null,
+    overrideConfig: Record<string, any> | null,
+  ): Record<string, any> {
+    if (!overrideConfig) return baseConfig || {};
+    return {
+      ...(baseConfig || {}),
+      ...(overrideConfig || {}),
+      config: {
+        ...((baseConfig as Record<string, any>)?.config || {}),
+        ...((overrideConfig as Record<string, any>)?.config || {}),
+      },
+      weights: {
+        ...((baseConfig as Record<string, any>)?.config?.weights || {}),
+        ...((baseConfig as Record<string, any>)?.weights || {}),
+        ...((overrideConfig as Record<string, any>)?.weights || {}),
+      },
+    };
+  }
+
+  private collectRewriteRules(
+    rewritePolicyBank: Record<string, any> | null,
+    domainRewriteBank: Record<string, any> | null,
+  ): RewriteRule[] {
+    const out: RewriteRule[] = [];
+    const rawRewrites = Array.isArray(rewritePolicyBank?.rewrites)
+      ? rewritePolicyBank.rewrites
+      : [];
+    for (const rewrite of rawRewrites) {
+      const pattern = String(rewrite?.pattern || "").trim();
+      const value = String(rewrite?.replaceWith || rewrite?.value || "").trim();
+      if (!pattern || !value) continue;
+      out.push({
+        id: String(rewrite?.id || `policy_${out.length + 1}`),
+        enabled: true,
+        priority: safeNumber(rewrite?.priority, 50),
+        patterns: [pattern],
+        rewrites: [{ value, weight: safeNumber(rewrite?.weight, 1) }],
+      } as RewriteRule);
+    }
+    if (Array.isArray(domainRewriteBank?.rules)) {
+      out.push(...(domainRewriteBank.rules as RewriteRule[]));
+    }
+    return out;
+  }
+
   /**
    * Primary entrypoint: run full retrieval pipeline and return EvidencePack.
    */
@@ -593,7 +677,7 @@ export class RetrievalEngineService {
 
     // 1) Load banks (single source of truth)
     const semanticCfg = this.getRequiredBank<any>("semantic_search_config");
-    const rankerCfg = this.getRequiredBank<any>("retrieval_ranker_config");
+    const rankerCfgBase = this.getRequiredBank<any>("retrieval_ranker_config");
     const boostsKeyword = this.safeGetBank<Record<string, any>>("keyword_boost_rules");
     const boostsTitle = this.safeGetBank<Record<string, any>>("doc_title_boost_rules");
     const boostsType = this.safeGetBank<Record<string, any>>("doc_type_boost_rules");
@@ -602,8 +686,15 @@ export class RetrievalEngineService {
     const diversification = this.getRequiredBank<any>("diversification_rules");
     const negatives = this.getRequiredBank<any>("retrieval_negatives");
     const packaging = this.getRequiredBank<any>("evidence_packaging");
+    const diRankerCfg =
+      typeof this.documentIntelligenceBanks.getRetrievalRankerConfig === "function"
+        ? this.documentIntelligenceBanks.getRetrievalRankerConfig()
+        : null;
+    const rankerCfg = this.mergeRankerConfigs(rankerCfgBase, diRankerCfg);
     const crossDocGrounding =
-      this.documentIntelligenceBanks.getCrossDocGroundingPolicy();
+      (typeof this.documentIntelligenceBanks.getCrossDocSynthesisRules === "function"
+        ? this.documentIntelligenceBanks.getCrossDocSynthesisRules()
+        : null) ?? this.documentIntelligenceBanks.getCrossDocGroundingPolicy();
 
     // 2) Normalize query (bank-driven normalization should happen upstream, but we support it here too)
     const norm = await this.normalizeQuery(req);
@@ -780,9 +871,41 @@ export class RetrievalEngineService {
       domain && includeBank(`query_rewrites_${domain}`)
         ? this.documentIntelligenceBanks.getQueryRewriteRules(domain)
         : null;
+    const rewritePolicyBank =
+      typeof this.documentIntelligenceBanks.getRetrievalQueryRewritePolicy === "function"
+        ? this.documentIntelligenceBanks.getRetrievalQueryRewritePolicy(domain)
+        : null;
     const sectionPriorityBank =
       domain && includeBank(`section_priority_${domain}`)
         ? this.documentIntelligenceBanks.getSectionPriorityRules(domain)
+        : null;
+    const sectionBoostBank =
+      typeof this.documentIntelligenceBanks.getRetrievalSectionBoostRules === "function"
+        ? this.documentIntelligenceBanks.getRetrievalSectionBoostRules(domain)
+        : null;
+    const tableBoostBank =
+      typeof this.documentIntelligenceBanks.getRetrievalTableBoostRules === "function"
+        ? this.documentIntelligenceBanks.getRetrievalTableBoostRules()
+        : null;
+    const fieldLockBank =
+      typeof this.documentIntelligenceBanks.getFieldLockPatterns === "function"
+        ? this.documentIntelligenceBanks.getFieldLockPatterns()
+        : null;
+    const quoteSpanRules =
+      typeof this.documentIntelligenceBanks.getQuoteSpanRules === "function"
+        ? this.documentIntelligenceBanks.getQuoteSpanRules()
+        : null;
+    const evidenceBindingContract =
+      typeof this.documentIntelligenceBanks.getEvidenceBindingContract === "function"
+        ? this.documentIntelligenceBanks.getEvidenceBindingContract()
+        : null;
+    const evidencePackagingStrategies =
+      typeof this.documentIntelligenceBanks.getEvidencePackagingStrategies === "function"
+        ? this.documentIntelligenceBanks.getEvidencePackagingStrategies()
+        : null;
+    const negativePatternsBank =
+      typeof this.documentIntelligenceBanks.getNegativeRetrievalPatterns === "function"
+        ? this.documentIntelligenceBanks.getNegativeRetrievalPatterns()
         : null;
     const boostRules = Array.isArray(domainBoostBank?.rules)
       ? (domainBoostBank.rules as BoostRule[])
@@ -836,9 +959,10 @@ export class RetrievalEngineService {
         ? []
         : this.expandQuery(queryNormalized, signals)
       : [];
-    const rewriteRules = Array.isArray(domainRewriteBank?.rules)
-      ? (domainRewriteBank.rules as RewriteRule[])
-      : [];
+    const rewriteRules = this.collectRewriteRules(
+      rewritePolicyBank,
+      domainRewriteBank,
+    );
     const rewriteCacheEnabled =
       process.env.BANK_MULTI_LEVEL_CACHE_ENABLED === "true";
     const rewriteCacheKeyBase = crypto
@@ -977,6 +1101,7 @@ export class RetrievalEngineService {
       signals,
       scope,
       negatives,
+      negativePatternsBank,
       scopeMetrics,
     );
     phaseCounts.afterNegatives = candidates.length;
@@ -1034,6 +1159,20 @@ export class RetrievalEngineService {
       candidates,
       runtimeBoostRules,
     ) as CandidateChunk[];
+    candidates = this.applyFieldLockBoosts(
+      candidates,
+      queryNormalized,
+      fieldLockBank,
+    );
+    candidates = this.applyStructuralPreferenceBoosts(
+      candidates,
+      {
+        queryNormalized,
+        wantsTable: Boolean(signals.tableExpected || signals.userAskedForTable),
+      },
+      sectionBoostBank,
+      tableBoostBank,
+    );
     candidates = this.applyRetrievalPlanHints(candidates, req.retrievalPlan);
     phaseCounts.afterBoosts = candidates.length;
 
@@ -1078,6 +1217,9 @@ export class RetrievalEngineService {
       resolvedDocTypes,
       phaseCounts,
       scopeMetrics,
+      quoteSpanRules,
+      evidenceBindingContract,
+      evidencePackagingStrategies,
     });
     pack.telemetry = this.buildTelemetryDiagnostics({
       ruleEvents: retrievalRuleEvents,
@@ -1351,7 +1493,9 @@ export class RetrievalEngineService {
     normalizedQuery: string,
     signals: RetrievalRequest["signals"],
   ): string[] {
-    const synonymBank = this.safeGetBank<Record<string, any>>("synonym_expansion");
+    const synonymBank =
+      this.documentIntelligenceBanks.getSynonymExpansion() ??
+      this.safeGetBank<Record<string, any>>("synonym_expansion");
     if (!synonymBank?.config?.enabled || !synonymBank?.groups) {
       return [normalizedQuery];
     }
@@ -1366,32 +1510,70 @@ export class RetrievalEngineService {
     const queryTokens = this.simpleTokens(normalizedQuery);
     const expansions = new Set<string>([normalizedQuery]);
 
+    const entityAliasBank =
+      this.documentIntelligenceBanks.getLanguageBank?.("entity_aliases") ??
+      this.safeGetBank<Record<string, any>>("entity_aliases");
+    const misspellingBank =
+      this.documentIntelligenceBanks.getLanguageBank?.(
+        "misspelling_and_variant_map",
+      ) ?? this.safeGetBank<Record<string, any>>("misspelling_and_variant_map");
+
     // Build lookup map from all groups: variant -> canonical and canonical -> variants
     const variantToCanonical = new Map<string, string>();
     const canonicalToVariants = new Map<string, string[]>();
+    const registerVariants = (canonicalRaw: unknown, variantsRaw: unknown[]) => {
+      const canonical = String(canonicalRaw || "")
+        .toLowerCase()
+        .trim();
+      if (!canonical) return;
+
+      const variants = variantsRaw
+        .map((value) =>
+          String(value || "")
+            .toLowerCase()
+            .trim(),
+        )
+        .filter(Boolean);
+
+      const existing = canonicalToVariants.get(canonical) || [];
+      canonicalToVariants.set(
+        canonical,
+        Array.from(new Set(existing.concat(variants))),
+      );
+
+      for (const variant of variants) {
+        variantToCanonical.set(variant, canonical);
+      }
+      variantToCanonical.set(canonical, canonical);
+    };
 
     for (const group of synonymBank.groups) {
       if (!group.synonyms) continue;
       for (const entry of group.synonyms) {
-        const canonical = (entry.canonical ?? "").toLowerCase().trim();
-        if (!canonical) continue;
-
-        const variants = (entry.variants ?? [])
-          .map((v: string) => v.toLowerCase().trim())
-          .filter(Boolean);
-
-        // Map canonical to all variants (for expansion)
-        const existing = canonicalToVariants.get(canonical) || [];
-        const merged = existing.concat(variants);
-        canonicalToVariants.set(canonical, Array.from(new Set(merged)));
-
-        // Map each variant to canonical (for lookup)
-        for (const v of variants) {
-          variantToCanonical.set(v, canonical);
-        }
-        // Also map canonical to itself
-        variantToCanonical.set(canonical, canonical);
+        registerVariants(entry.canonical, Array.isArray(entry.variants) ? entry.variants : []);
       }
+    }
+
+    for (const entry of Array.isArray(entityAliasBank?.aliases)
+      ? entityAliasBank.aliases
+      : []) {
+      registerVariants(
+        (entry as Record<string, unknown>).canonical,
+        Array.isArray((entry as Record<string, unknown>).variants)
+          ? ((entry as Record<string, unknown>).variants as unknown[])
+          : [],
+      );
+    }
+
+    for (const entry of Array.isArray(misspellingBank?.variants)
+      ? misspellingBank.variants
+      : []) {
+      registerVariants(
+        (entry as Record<string, unknown>).canonical,
+        Array.isArray((entry as Record<string, unknown>).forms)
+          ? ((entry as Record<string, unknown>).forms as unknown[])
+          : [],
+      );
     }
 
     // For each query token, check if it matches a canonical or variant
@@ -1522,7 +1704,12 @@ export class RetrievalEngineService {
   }
 
   private resolveLanguageHint(signals: RetrievalRequest["signals"]): string {
-    return String(signals.languageHint || "any")
+    const explicit = String(signals.languageHint || "")
+      .trim()
+      .toLowerCase();
+    if (explicit) return explicit;
+    const bank = this.documentIntelligenceBanks.getLanguageIndicators();
+    return String(bank?.config?.defaultLanguage || "any")
       .trim()
       .toLowerCase();
   }
@@ -1637,6 +1824,53 @@ export class RetrievalEngineService {
     return matches[0];
   }
 
+  private classifyDocTypeFromOntology(
+    domain: DocumentIntelligenceDomain,
+    normalizedQuery: string,
+  ): {
+    docTypeId: string;
+    score: number;
+    reasons: string[];
+  } | null {
+    const provider = this.documentIntelligenceBanks as Record<string, any>;
+    const docTypes = Array.isArray(provider.getDiDocTypes?.())
+      ? provider.getDiDocTypes()
+      : [];
+    const matches: Array<{
+      docTypeId: string;
+      score: number;
+      reasons: string[];
+    }> = [];
+
+    for (const entry of docTypes) {
+      if (this.normalizeDomainHint(entry?.domainId) !== domain) continue;
+      const docTypeId = this.normalizeDocType(entry?.id);
+      if (!docTypeId) continue;
+      const aliases = [
+        String(entry?.label || ""),
+        String(entry?.labelPt || ""),
+        ...((entry?.aliases?.en as string[] | undefined) || []),
+        ...((entry?.aliases?.pt as string[] | undefined) || []),
+      ]
+        .map((value) => String(value || "").trim().toLowerCase())
+        .filter(Boolean);
+      const matched = aliases.filter((alias) => normalizedQuery.includes(alias));
+      if (!matched.length) continue;
+      matches.push({
+        docTypeId,
+        score: matched.length,
+        reasons: matched.slice(0, 4).map((value) => `doc_type_ontology:${value}`),
+      });
+    }
+
+    if (!matches.length) return null;
+    matches.sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score;
+      return a.docTypeId.localeCompare(b.docTypeId);
+    });
+    return matches[0];
+  }
+
   private classifyDocumentContext(params: {
     query: string;
     normalizedQuery: string;
@@ -1647,6 +1881,10 @@ export class RetrievalEngineService {
     const reasons: string[] = [];
     const matchedDomainRuleIds: string[] = [];
     const domains = this.listClassificationDomains();
+    const provider = this.documentIntelligenceBanks as Record<string, any>;
+    const ontologyDomains = Array.isArray(provider.getDiDomains?.())
+      ? provider.getDiDomains()
+      : [];
 
     let domain = params.hintedDomain;
     if (domain) {
@@ -1670,7 +1908,9 @@ export class RetrievalEngineService {
       }> = [];
 
       for (const candidateDomain of domains) {
-        const provider = this.documentIntelligenceBanks as Record<string, any>;
+        const ontologyDomain = ontologyDomains.find(
+          (entry: Record<string, any>) => entry?.id === candidateDomain,
+        );
         const bank =
           typeof provider.getDomainDetectionRules === "function"
             ? provider.getDomainDetectionRules(candidateDomain)
@@ -1704,7 +1944,19 @@ export class RetrievalEngineService {
           );
         }
 
-        if (!ruleIds.length) continue;
+        const ontologyAliases = [
+          String(ontologyDomain?.label || ""),
+          String(ontologyDomain?.labelPt || ""),
+        ]
+          .map((value) => value.trim().toLowerCase())
+          .filter(Boolean);
+        for (const alias of ontologyAliases) {
+          if (!params.normalizedQuery.includes(alias)) continue;
+          score += 1.2;
+          domainReasons.push(`domain_ontology:${alias}`);
+        }
+
+        if (!ruleIds.length && domainReasons.length === 0) continue;
         candidates.push({
           domain: candidateDomain,
           score,
@@ -1738,7 +1990,9 @@ export class RetrievalEngineService {
     }
 
     if (!docTypeId && domain) {
-      const docTypeMatch = this.classifyDocTypeForDomain(
+      const docTypeMatch =
+        this.classifyDocTypeFromOntology(domain, params.normalizedQuery) ??
+        this.classifyDocTypeForDomain(
         domain,
         params.normalizedQuery,
       );
@@ -1796,6 +2050,14 @@ export class RetrievalEngineService {
     if (!normalizedDocType) return null;
 
     const provider = this.documentIntelligenceBanks as Record<string, any>;
+    const ontologySections = this.lookupSemanticSectionsForDocType(
+      domain,
+      normalizedDocType,
+    );
+    const ontologyTableAnchors = this.lookupSemanticTableAnchorsForDocType(
+      domain,
+      normalizedDocType,
+    );
     const sectionsBank =
       typeof provider.getDocTypeSections === "function"
         ? provider.getDocTypeSections(domain, normalizedDocType)
@@ -1874,21 +2136,184 @@ export class RetrievalEngineService {
       0,
       16,
     );
-    const normalizedTableAnchors = Array.from(new Set(tableAnchors)).slice(
-      0,
-      16,
-    );
+    const normalizedTableAnchors = Array.from(
+      new Set([...tableAnchors, ...ontologyTableAnchors]),
+    ).slice(0, 16);
 
     return {
       domain,
       docTypeId: normalizedDocType,
-      sectionAnchors: normalizedSectionAnchors,
+      sectionAnchors: Array.from(
+        new Set([...normalizedSectionAnchors, ...ontologySections]),
+      ).slice(0, 16),
       tableAnchors: normalizedTableAnchors,
       reasons: [
-        `doc_type_sections:${normalizedSectionAnchors.length}`,
+        `doc_type_sections:${normalizedSectionAnchors.length + ontologySections.length}`,
         `doc_type_tables:${normalizedTableAnchors.length}`,
       ],
     };
+  }
+
+  private lookupSemanticSectionsForDocType(
+    domain: DocumentIntelligenceDomain,
+    docTypeId: string,
+  ): string[] {
+    const provider = this.documentIntelligenceBanks as Record<string, any>;
+    const docTypes = Array.isArray(provider.getDiDocTypes?.())
+      ? provider.getDiDocTypes()
+      : [];
+    const sections = Array.isArray(provider.getDiSections?.())
+      ? provider.getDiSections()
+      : [];
+    const headingsMap = this.safeGetBank<Record<string, any>>("headings_map");
+    const docType = docTypes.find(
+      (entry: Record<string, any>) =>
+        this.normalizeDocType(entry?.id) === docTypeId &&
+        this.normalizeDomainHint(entry?.domainId) === domain,
+    );
+    const sectionIds = Array.isArray(docType?.packRefs?.sections)
+      ? docType.packRefs.sections
+      : [];
+    const headingRows = Array.isArray(headingsMap?.headings)
+      ? headingsMap.headings
+      : [];
+    const out = new Set<string>();
+    for (const sectionId of sectionIds) {
+      const section = sections.find(
+        (entry: Record<string, any>) => String(entry?.id || "") === String(sectionId),
+      );
+      if (!section) continue;
+      out.add(String(section.id || "").trim().toLowerCase());
+      out.add(String(section.label || "").trim().toLowerCase());
+      out.add(String(section.labelPt || "").trim().toLowerCase());
+      for (const value of section?.headerVariants?.en || []) out.add(String(value).trim().toLowerCase());
+      for (const value of section?.headerVariants?.pt || []) out.add(String(value).trim().toLowerCase());
+    }
+    for (const heading of headingRows) {
+      const domainTags = Array.isArray(heading?.domainTags) ? heading.domainTags : [];
+      if (!domainTags.includes(domain)) continue;
+      out.add(String(heading?.canonical || "").trim().toLowerCase());
+    }
+    return [...out].filter(Boolean);
+  }
+
+  private lookupSemanticTableAnchorsForDocType(
+    domain: DocumentIntelligenceDomain,
+    docTypeId: string,
+  ): string[] {
+    const provider = this.documentIntelligenceBanks as Record<string, any>;
+    const docTypes = Array.isArray(provider.getDiDocTypes?.())
+      ? provider.getDiDocTypes()
+      : [];
+    const metrics = Array.isArray(provider.getDiMetrics?.())
+      ? provider.getDiMetrics()
+      : [];
+    const tablesBank = this.safeGetBank<Record<string, any>>(
+      `table_header_ontology_${domain}`,
+    );
+    const headers = Array.isArray(tablesBank?.headers) ? tablesBank.headers : [];
+    const docType = docTypes.find(
+      (entry: Record<string, any>) =>
+        this.normalizeDocType(entry?.id) === docTypeId &&
+        this.normalizeDomainHint(entry?.domainId) === domain,
+    );
+    const tableRefs = Array.isArray(docType?.packRefs?.tables)
+      ? docType.packRefs.tables
+      : [];
+    const out = new Set<string>();
+    for (const tableRef of tableRefs) {
+      out.add(String(tableRef || "").trim().toLowerCase());
+    }
+    for (const header of headers) {
+      out.add(String(header?.canonical || "").trim().toLowerCase());
+      for (const synonym of Array.isArray(header?.synonyms) ? header.synonyms : []) {
+        out.add(String(synonym || "").trim().toLowerCase());
+      }
+    }
+    for (const metric of metrics) {
+      if (this.normalizeDomainHint(metric?.domain) !== domain) continue;
+      for (const header of metric?.typicalTableHeaders?.en || []) {
+        out.add(String(header).trim().toLowerCase());
+      }
+      for (const header of metric?.typicalTableHeaders?.pt || []) {
+        out.add(String(header).trim().toLowerCase());
+      }
+    }
+    return [...out].filter(Boolean);
+  }
+
+  private matchFieldRole(query: string, language: string): SemanticFieldRoleMatch | null {
+    const bank = (this.documentIntelligenceBanks as Record<string, any>).getFieldRoleOntology?.();
+    const roles = Array.isArray(bank?.roles) ? bank.roles : [];
+    const normalizedQuery = String(query || "").trim().toLowerCase();
+    const lang = String(language || "en").trim().toLowerCase() === "pt" ? "pt" : "en";
+    let best: SemanticFieldRoleMatch | null = null;
+    for (const role of roles) {
+      const anchors = [
+        ...((role?.exactAnchors?.[lang] as string[] | undefined) || []),
+        ...((role?.semanticAliases?.[lang] as string[] | undefined) || []),
+      ]
+        .map((value) => String(value || "").trim().toLowerCase())
+        .filter(Boolean);
+      for (const anchor of anchors) {
+        if (!normalizedQuery.includes(anchor)) continue;
+        const score = (role?.exactAnchors?.[lang] || []).includes(anchor) ? 1 : 0.8;
+        if (!best || score > best.score) {
+          best = {
+            roleId: String(role?.id || "").trim(),
+            entityRoleId: String(role?.entityRoleId || "").trim() || null,
+            matchedAnchor: anchor,
+            score,
+          };
+        }
+      }
+    }
+    return best;
+  }
+
+  private normalizeMetricAndUnit(text: string, domain: DocumentIntelligenceDomain | null): SemanticUnitMetricMatch {
+    const provider = this.documentIntelligenceBanks as Record<string, any>;
+    const metrics = Array.isArray(provider.getDiMetrics?.()) ? provider.getDiMetrics() : [];
+    const units = Array.isArray(provider.getDiUnits?.()) ? provider.getDiUnits() : [];
+    const normalized = String(text || "").trim().toLowerCase();
+    let metricId: string | null = null;
+    let unitId: string | null = null;
+
+    for (const metric of metrics) {
+      if (domain && this.normalizeDomainHint(metric?.domain) !== domain) continue;
+      const aliases = [
+        String(metric?.label || ""),
+        String(metric?.labelPt || ""),
+        ...((metric?.aliases?.en as string[] | undefined) || []),
+        ...((metric?.aliases?.pt as string[] | undefined) || []),
+        ...((metric?.typicalTableHeaders?.en as string[] | undefined) || []),
+        ...((metric?.typicalTableHeaders?.pt as string[] | undefined) || []),
+      ]
+        .map((value) => String(value || "").trim().toLowerCase())
+        .filter(Boolean);
+      if (aliases.some((alias) => normalized.includes(alias))) {
+        metricId = String(metric?.id || "").trim() || null;
+        unitId = String(metric?.unitId || "").trim() || null;
+        break;
+      }
+    }
+
+    for (const unit of units) {
+      const aliases = [
+        String(unit?.label || ""),
+        String(unit?.labelPt || ""),
+        ...((unit?.symbols as string[] | undefined) || []),
+        ...((unit?.aliases?.en as string[] | undefined) || []),
+        ...((unit?.aliases?.pt as string[] | undefined) || []),
+      ]
+        .map((value) => String(value || "").trim().toLowerCase())
+        .filter(Boolean);
+      if (!aliases.some((alias) => alias && normalized.includes(alias))) continue;
+      unitId = String(unit?.id || "").trim() || unitId;
+      break;
+    }
+
+    return { metricId, unitId };
   }
 
   private buildDocTypeMatchedRule(
@@ -2528,6 +2953,7 @@ export class RetrievalEngineService {
       rangeA1?: string | null;
     },
     negativesBank: Record<string, any> | null,
+    negativePatternsBank: Record<string, any> | null,
     scopeMetrics?: RetrievalScopeMetrics,
   ): CandidateChunk[] {
     if (!negativesBank?.config?.enabled) return candidates;
@@ -2614,6 +3040,10 @@ export class RetrievalEngineService {
         continue;
       }
 
+      if (this.matchesNegativePattern(c, negativePatternsBank)) {
+        continue;
+      }
+
       // Slot extraction: role-confusion penalty
       if (isExtraction && slotContract) {
         const snippetLower = (c.snippet ?? "").toLowerCase();
@@ -2650,6 +3080,132 @@ export class RetrievalEngineService {
     }
 
     return out;
+  }
+
+  private matchesNegativePattern(
+    candidate: CandidateChunk,
+    negativePatternsBank: Record<string, any> | null,
+  ): boolean {
+    const patterns = Array.isArray(negativePatternsBank?.patterns)
+      ? negativePatternsBank.patterns
+      : [];
+    if (!patterns.length) return false;
+    const haystack = [
+      candidate.snippet,
+      candidate.title,
+      candidate.filename,
+      candidate.location?.sectionKey,
+    ]
+      .map((value) => String(value || "").trim())
+      .filter(Boolean)
+      .join("\n");
+    if (!haystack) return false;
+
+    for (const entry of patterns) {
+      const regex = String(entry?.regex || "").trim();
+      const action = String(entry?.action || "").trim().toUpperCase();
+      if (!regex || (action && action !== "DROP_CANDIDATE")) continue;
+      try {
+        if (new RegExp(regex, "i").test(haystack)) return true;
+      } catch {
+        continue;
+      }
+    }
+    return false;
+  }
+
+  private applyFieldLockBoosts(
+    candidates: CandidateChunk[],
+    queryNormalized: string,
+    fieldLockBank: Record<string, any> | null,
+  ): CandidateChunk[] {
+    const hints = this.extractFieldLockHints(queryNormalized, fieldLockBank);
+    if (!hints.length) return candidates;
+
+    for (const candidate of candidates) {
+      const snippet = String(candidate.snippet || "").toLowerCase();
+      if (!snippet) continue;
+      if (hints.some((hint) => snippet.includes(hint))) {
+        candidate.scores.keywordBoost = clamp01(
+          (candidate.scores.keywordBoost ?? 0) + 0.12,
+        );
+      }
+    }
+    return candidates;
+  }
+
+  private extractFieldLockHints(
+    queryNormalized: string,
+    fieldLockBank: Record<string, any> | null,
+  ): string[] {
+    const explicitMatches = Array.from(
+      queryNormalized.matchAll(/\b([a-z][a-z0-9_ ]{2,40})\s*(?:field|column|metric|value)\b/gi),
+    )
+      .map((match) => String(match[1] || "").trim().toLowerCase())
+      .filter(Boolean);
+    const quotedMatches = Array.from(queryNormalized.matchAll(/"([^"]{2,80})"/g))
+      .map((match) => String(match[1] || "").trim().toLowerCase())
+      .filter(Boolean);
+    const bankAnchors = [
+      ...(Array.isArray(fieldLockBank?.patterns) ? fieldLockBank.patterns : []),
+      ...(Array.isArray(fieldLockBank?.rules) ? fieldLockBank.rules : []),
+    ]
+      .map((entry) =>
+        String(entry?.field || entry?.label || entry?.anchor || "").trim().toLowerCase(),
+      )
+      .filter(Boolean);
+    return Array.from(new Set([...explicitMatches, ...quotedMatches, ...bankAnchors])).slice(
+      0,
+      8,
+    );
+  }
+
+  private applyStructuralPreferenceBoosts(
+    candidates: CandidateChunk[],
+    ctx: {
+      queryNormalized: string;
+      wantsTable: boolean;
+    },
+    sectionBoostBank: Record<string, any> | null,
+    tableBoostBank: Record<string, any> | null,
+  ): CandidateChunk[] {
+    const sectionAnchors = this.extractStructuralAnchors(sectionBoostBank);
+    const tableAnchors = this.extractStructuralAnchors(tableBoostBank);
+    for (const candidate of candidates) {
+      const sectionKey = String(candidate.location?.sectionKey || "").toLowerCase();
+      if (sectionKey && sectionAnchors.includes(sectionKey)) {
+        candidate.scores.documentIntelligenceBoost = clamp01(
+          (candidate.scores.documentIntelligenceBoost ?? 0) + 0.08,
+        );
+      }
+      if (
+        ctx.wantsTable &&
+        (candidate.type === "table" || tableAnchors.includes(sectionKey))
+      ) {
+        candidate.scores.documentIntelligenceBoost = clamp01(
+          (candidate.scores.documentIntelligenceBoost ?? 0) + 0.1,
+        );
+      }
+    }
+    return candidates;
+  }
+
+  private extractStructuralAnchors(bank: Record<string, any> | null): string[] {
+    const entries = [
+      ...(Array.isArray(bank?.priorities) ? bank.priorities : []),
+      ...(Array.isArray(bank?.rules) ? bank.rules : []),
+    ];
+    return Array.from(
+      new Set(
+        entries
+          .flatMap((entry) => [
+            ...(Array.isArray(entry?.sections) ? entry.sections : []),
+            ...(Array.isArray(entry?.anchors) ? entry.anchors : []),
+          ])
+          .map((value) => String(value || "").trim().toLowerCase())
+          .filter(Boolean),
+      ),
+    );
   }
 
   // -----------------------------
@@ -3658,6 +4214,124 @@ export class RetrievalEngineService {
     return truncated.length < snippet.length ? truncated + "..." : truncated;
   }
 
+  private extractEvidenceSnippet(
+    snippet: string,
+    req: RetrievalRequest,
+    quoteSpanRules: Record<string, any> | null | undefined,
+    compressOpts: {
+      maxChars: number;
+      preserveNumericUnits: boolean;
+      preserveHeadings: boolean;
+      hasQuotedText: boolean;
+      compareIntent: boolean;
+    },
+  ): string {
+    const extracted = this.extractQuotedSpan(snippet, req.query, quoteSpanRules);
+    if (extracted) return extracted;
+    return this.compressSnippet(snippet, compressOpts);
+  }
+
+  private extractQuotedSpan(
+    snippet: string,
+    query: string,
+    quoteSpanRules: Record<string, any> | null | undefined,
+  ): string | null {
+    const quoted = Array.from(String(query || "").matchAll(/"([^"]{2,160})"/g))
+      .map((match) => String(match[1] || "").trim())
+      .filter(Boolean);
+    if (!quoted.length) return null;
+    const contextWindow = Math.max(
+      24,
+      safeNumber(quoteSpanRules?.config?.contextWindowChars, 80),
+    );
+    const exact = quoted.find((piece) =>
+      snippet.toLowerCase().includes(piece.toLowerCase()),
+    );
+    if (!exact) return null;
+    const index = snippet.toLowerCase().indexOf(exact.toLowerCase());
+    const start = Math.max(0, index - contextWindow);
+    const end = Math.min(snippet.length, index + exact.length + contextWindow);
+    return snippet.slice(start, end).trim();
+  }
+
+  private shouldRequireRichLocation(
+    evidenceBindingContract: Record<string, any> | null | undefined,
+    evidencePackagingStrategies: Record<string, any> | null | undefined,
+  ): boolean {
+    const bindingEnabled = evidenceBindingContract?.config?.enabled !== false;
+    const richByBinding =
+      evidenceBindingContract?.config?.requireRichLocationProvenance !== false;
+    const richByPackaging =
+      evidencePackagingStrategies?.config?.requireLocation !== false;
+    return bindingEnabled && richByBinding && richByPackaging;
+  }
+
+  private buildEvidenceProvenance(
+    candidate: CandidateChunk,
+    requireRichLocation: boolean,
+  ): {
+    page: number | null;
+    slide: number | null;
+    sheet: string | null;
+    cell: string | null;
+    section: string | null;
+    locationLabel: string | null;
+  } {
+    const location = candidate.location || {};
+    const page = this.extractLocationNumber(candidate.locationKey, "p", location.page);
+    const slide = this.extractLocationNumber(candidate.locationKey, "sl", location.slide);
+    const sheet =
+      String(location.sheet || this.extractLocationToken(candidate.locationKey, "s") || "").trim() ||
+      null;
+    const section =
+      String(
+        location.sectionKey ||
+          this.extractLocationToken(candidate.locationKey, "sec") ||
+          this.extractLocationToken(candidate.locationKey, "s"),
+      ).trim() || null;
+    const cell = this.extractCellReference(candidate.locationKey, section);
+    const parts = [
+      page ? `Page ${page}` : "",
+      slide ? `Slide ${slide}` : "",
+      sheet ? `Sheet ${sheet}` : "",
+      cell ? `Cell ${cell}` : "",
+      section ? `Section ${section}` : "",
+    ].filter(Boolean);
+    return {
+      page,
+      slide,
+      sheet,
+      cell,
+      section,
+      locationLabel: parts.join(" | ") || (requireRichLocation ? candidate.locationKey : null),
+    };
+  }
+
+  private extractLocationNumber(
+    locationKey: string,
+    token: string,
+    fallback?: number | null,
+  ): number | null {
+    const match = String(locationKey || "").match(new RegExp(`\\|${token}:(-?\\d+)`, "i"));
+    if (match) {
+      const value = Number(match[1]);
+      return Number.isFinite(value) && value > 0 ? value : null;
+    }
+    return typeof fallback === "number" && Number.isFinite(fallback) ? fallback : null;
+  }
+
+  private extractLocationToken(locationKey: string, token: string): string | null {
+    const match = String(locationKey || "").match(new RegExp(`\\|${token}:([^|]+)`, "i"));
+    return match ? String(match[1] || "").trim() || null : null;
+  }
+
+  private extractCellReference(locationKey: string, section: string | null): string | null {
+    const direct = this.extractLocationToken(locationKey, "cell");
+    if (direct) return direct;
+    const candidate = String(section || "").trim();
+    return /^[A-Z]{1,4}\d{1,6}$/i.test(candidate) ? candidate : null;
+  }
+
   // -----------------------------
   // Packaging
   // -----------------------------
@@ -3709,6 +4383,9 @@ export class RetrievalEngineService {
       resolvedDocTypes: string[];
       phaseCounts: RetrievalPhaseCounts;
       scopeMetrics: RetrievalScopeMetrics;
+      quoteSpanRules?: Record<string, any> | null;
+      evidenceBindingContract?: Record<string, any> | null;
+      evidencePackagingStrategies?: Record<string, any> | null;
     },
   ): EvidencePack {
     const cfg = packagingBank?.config ?? {};
@@ -3803,6 +4480,10 @@ export class RetrievalEngineService {
     const effectiveMinFinalScore = this.isEncryptedOnlyMode()
       ? Math.min(minFinalScore, 0.05)
       : minFinalScore;
+    const requireRichLocation = this.shouldRequireRichLocation(
+      ctx.evidenceBindingContract,
+      ctx.evidencePackagingStrategies,
+    );
 
     // When extraction query is active, apply a lower threshold for scoped docs
     // so that we don't discard evidence that the extraction compiler needs.
@@ -3938,6 +4619,16 @@ export class RetrievalEngineService {
       if (enforceNonComparePurity) {
         selectedDocs.add(c.docId);
       }
+      const provenance = this.buildEvidenceProvenance(c, requireRichLocation);
+      const snippet = c.snippet
+        ? this.extractEvidenceSnippet(c.snippet, req, ctx.quoteSpanRules, {
+            maxChars: maxSnippetChars,
+            preserveNumericUnits,
+            preserveHeadings,
+            hasQuotedText,
+            compareIntent: ctx.compareIntent,
+          })
+        : undefined;
 
       evidence.push({
         evidenceType: c.type,
@@ -3945,16 +4636,14 @@ export class RetrievalEngineService {
         title: c.title ?? null,
         filename: c.filename ?? null,
         location: c.location,
+        page: provenance.page,
+        slide: provenance.slide,
+        sheet: provenance.sheet,
+        cell: provenance.cell,
+        section: provenance.section,
+        locationLabel: provenance.locationLabel,
         locationKey: c.locationKey,
-        snippet: c.snippet
-          ? this.compressSnippet(c.snippet, {
-              maxChars: maxSnippetChars,
-              preserveNumericUnits,
-              preserveHeadings,
-              hasQuotedText,
-              compareIntent: ctx.compareIntent,
-            })
-          : undefined,
+        snippet,
         table: c.type === "table" ? (c.table ?? undefined) : undefined,
         imageRef: c.type === "image" ? null : undefined,
         score: {

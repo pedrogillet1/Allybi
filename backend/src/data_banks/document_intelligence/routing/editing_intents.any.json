@@ -1,0 +1,19 @@
+{
+  "_meta": {
+    "id": "editing_intents",
+    "version": "1.0.0",
+    "lastUpdated": "2026-03-13",
+    "description": "Auto-registered bank payload for document_intelligence/routing/editing_intents.any.json",
+    "languages": [
+      "any"
+    ]
+  },
+  "operators": [
+    "highlight",
+    "apply",
+    "undo"
+  ],
+  "config": {
+    "enabled": true
+  }
+}

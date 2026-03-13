@@ -1,0 +1,131 @@
+{
+  "suite": "adversarial",
+  "version": 1,
+  "cases": [
+    {
+      "id": "adv_01_small_doc_provenance",
+      "brainLayer": "provenance_richness",
+      "category": "provenance_richness",
+      "lang": "en",
+      "query": "Extract the contract start date from the tiny OBA document without fabricating source support.",
+      "expected": {
+        "topDocId": "oba_marketing_services",
+        "blockedDocIds": [
+          "pedro_gillet_profile"
+        ],
+        "failureRisk": "missing_provenance",
+        "recoveryMode": "cite_location_or_fail_closed"
+      },
+      "regressionLinks": [
+        "reports/query-grading/GRADING-REPORT.md#L154",
+        "reports/query-grading/GRADING-REPORT.md#L273"
+      ]
+    },
+    {
+      "id": "adv_02_image_doc_trap",
+      "brainLayer": "weak_answer_recovery",
+      "category": "weak_answer_recovery",
+      "lang": "pt",
+      "query": "No TRABALHO FINAL em imagem, responda somente se houver evidencia rastreavel; caso contrario, seja explicito sobre a limitacao.",
+      "expected": {
+        "topDocId": "trabalho_final_img",
+        "blockedDocIds": [
+          "trabalho_texto"
+        ],
+        "failureRisk": "missing_provenance",
+        "recoveryMode": "transparent_limitation"
+      },
+      "regressionLinks": [
+        "reports/query-grading/GRADING-REPORT.md#L157",
+        "reports/query-grading/GRADING-REPORT.md#L271"
+      ]
+    },
+    {
+      "id": "adv_03_bilingual_doc_query",
+      "brainLayer": "multilingual_parity",
+      "category": "multilingual_parity",
+      "lang": "en",
+      "query": "What is the name on the Portuguese birth certificate?",
+      "expected": {
+        "topDocId": "certidao_nascimento",
+        "blockedDocIds": [
+          "passport_scan"
+        ],
+        "failureRisk": "language_contract_mismatch",
+        "recoveryMode": "answer_in_user_language_with_doc_grounding"
+      },
+      "regressionLinks": [
+        "reports/query-grading/GRADING-REPORT.md#L146",
+        "reports/query-grading/GRADING-REPORT.md#L269"
+      ]
+    },
+    {
+      "id": "adv_04_false_clarification",
+      "brainLayer": "clarification_guard",
+      "category": "false_clarification_trap",
+      "lang": "en",
+      "query": "Pull out the billing period, due date, and total amount due.",
+      "expected": {
+        "topDocId": "att_bill_april",
+        "blockedDocIds": [
+          "att_bill_march"
+        ],
+        "failureRisk": "INTENT_NEEDS_CLARIFICATION",
+        "recoveryMode": "answer_without_clarification"
+      },
+      "regressionLinks": [
+        "reports/query-grading/GRADING-REPORT.md#L275"
+      ]
+    },
+    {
+      "id": "adv_05_wrong_doc_source_bleed",
+      "brainLayer": "wrong_doc_defense",
+      "category": "wrong_doc_trap",
+      "lang": "en",
+      "query": "Summarize only the SEVIS RTI letter and ignore the resume PDF in the same thread.",
+      "expected": {
+        "topDocId": "sevis_rti",
+        "blockedDocIds": [
+          "pedro_gillet_profile",
+          "rf2_gillet_neto_paulo"
+        ],
+        "failureRisk": "irrelevant_citation",
+        "recoveryMode": "source_lock"
+      },
+      "regressionLinks": [
+        "frontend/e2e/reports/latest/a-plus-gap-deep-dive.md#L130"
+      ]
+    },
+    {
+      "id": "adv_06_analytical_block_gap",
+      "brainLayer": "composition",
+      "category": "composition",
+      "lang": "en",
+      "query": "Answer in analytical blocks with a direct answer, key evidence, and sources used.",
+      "expected": {
+        "topDocId": "mayfair_deck",
+        "blockedDocIds": [
+          "trabalho_projeto"
+        ],
+        "failureRisk": "missing_analytical_blocks",
+        "recoveryMode": "analytical_template"
+      },
+      "regressionLinks": [
+        "frontend/e2e/reports/latest/a-plus-gap-deep-dive.md#L177",
+        "frontend/e2e/reports/latest/a-plus-gap-deep-dive.md#L210"
+      ]
+    }
+  ],
+  "_meta": {
+    "id": "document_intelligence_eval_adversarial_brain_traps",
+    "version": "1.0.0",
+    "description": "Auto-registered bank payload for document_intelligence/eval/adversarial/brain_traps.any.json",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13"
+  },
+  "config": {
+    "enabled": true
+  }
+}

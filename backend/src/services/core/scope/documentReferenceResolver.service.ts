@@ -154,6 +154,8 @@ function parseRegexList(patterns: unknown, fallback: string[]): RegExp[] {
 function resolveConfig(): ResolverConfig {
   const loader = getBankLoaderInstance();
   const documentIntelligenceBanks = getDocumentIntelligenceBanksInstance();
+  const docReferenceResolution =
+    loader.getOptionalBank<Record<string, unknown>>("doc_reference_resolution");
   const memoryPolicy = loader.getBank<Record<string, unknown>>("memory_policy");
   const docAliases = documentIntelligenceBanks.getMergedDocAliasesBank();
   const aliasThresholds = documentIntelligenceBanks.getDocAliasThresholds();
@@ -213,12 +215,20 @@ function resolveConfig(): ResolverConfig {
       Number.isFinite(minAliasConfidence) && minAliasConfidence > 0
         ? minAliasConfidence
         : 0.75,
-    autopickConfidence:
-      Number.isFinite(autopickConfidence) && autopickConfidence > 0
+    autopickConfidence: Number.isFinite(
+      Number(asObject(docReferenceResolution?.config).autopickConfidence),
+    ) && Number(asObject(docReferenceResolution?.config).autopickConfidence) > 0
+      ? Number(asObject(docReferenceResolution?.config).autopickConfidence)
+      : Number.isFinite(autopickConfidence) && autopickConfidence > 0
         ? autopickConfidence
         : 0.7,
-    autopickGap:
-      Number.isFinite(autopickGap) && autopickGap >= 0 ? autopickGap : 0.15,
+    autopickGap: Number.isFinite(
+      Number(asObject(docReferenceResolution?.config).autopickGap),
+    ) && Number(asObject(docReferenceResolution?.config).autopickGap) >= 0
+      ? Number(asObject(docReferenceResolution?.config).autopickGap)
+      : Number.isFinite(autopickGap) && autopickGap >= 0
+        ? autopickGap
+        : 0.15,
     filenamePatterns,
     docReferencePatterns,
     stopWords,

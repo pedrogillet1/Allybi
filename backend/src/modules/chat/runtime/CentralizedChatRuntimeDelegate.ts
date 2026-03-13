@@ -97,6 +97,7 @@ import { ClarificationPolicyService } from "../../../services/core/policy/clarif
 import { CompliancePolicyService } from "../../../services/core/policy/compliancePolicy.service";
 import { FallbackDecisionPolicyService } from "../../../services/core/policy/fallbackDecisionPolicy.service";
 import { stableLocationKey } from "../../../services/core/retrieval/retrievalEngine.utils";
+import { DocumentIntelligenceCompositionBrainService } from "./documentIntelligenceCompositionBrain.service";
 
 type _CertificationTraceMarkerSpanWriter = {
   startSpan: (_traceId: string, _step: string) => string;
@@ -1425,6 +1426,7 @@ export class CentralizedChatRuntimeDelegate {
   private readonly clarificationPolicy = new ClarificationPolicyService();
   private readonly compliancePolicy = new CompliancePolicyService();
   private readonly fallbackDecisionPolicy = new FallbackDecisionPolicyService();
+  private readonly compositionBrain = new DocumentIntelligenceCompositionBrainService();
   private readonly traceWriter = new TraceWriterService(prisma as any);
   private readonly retrievalPlanParser = getRetrievalPlanParser();
   private readonly lowConfidenceSurfaceFallback =
@@ -3817,6 +3819,17 @@ export class CentralizedChatRuntimeDelegate {
     const incompleteTable =
       contentRows.length <= 1 || /\|\s*$/.test(value) || lines.length < 3;
     if (!incompleteTable) return text;
+    const localizedFallback =
+      this.compositionBrain.resolveOverflowRepairMessage(
+        normalizeChatLanguage(preferredLanguage),
+      );
+    const narrativeOnly = lines
+      .filter((line) => !line.includes("|"))
+      .join(" ")
+      .trim();
+    const baseText =
+      narrativeOnly.length >= 60 ? narrativeOnly : narrativeOnly || localizedFallback;
+    return /[.!?]$/.test(baseText) ? baseText : `${baseText}.`;
 
     const lang = normalizeChatLanguage(preferredLanguage);
     const narrative = lines
@@ -3860,6 +3873,23 @@ export class CentralizedChatRuntimeDelegate {
     // Extract key topic from query for contextual follow-ups
     const topicKeywords = this.extractQueryKeywords(req.message).slice(0, 3);
     const topic = topicKeywords.join(" ");
+    const desiredCountFromBrain =
+      1 + (hashSeed(`${req.userId}:${req.message}:${answerMode}`) % 3);
+    const primaryDocument = String(
+      retrievalPack.evidence[0]?.filename ||
+        retrievalPack.evidence[0]?.title ||
+        retrievalPack.evidence[0]?.docId ||
+        "this document",
+    ).trim();
+    return this.compositionBrain.buildFollowups({
+      preferredLanguage: lang,
+      answerMode,
+      topic,
+      document: primaryDocument,
+      otherDocument: hasMultipleDocs ? "the other document" : "another document",
+      hasMultipleDocs,
+      desiredCount: evidenceCount >= 1 ? desiredCountFromBrain : 1,
+    });
 
     // Always suggest a deeper-dive question
     if (lang === "pt") {
@@ -5788,6 +5818,20 @@ export class CentralizedChatRuntimeDelegate {
         // The hedge mechanism will add uncertainty prefix if needed.
         return null;
       }
+      const terminal6ClarificationQuestion =
+        this.clarificationPolicy.enforceClarificationQuestion({
+          question:
+            String(decision.clarifyQuestion || "").trim() ||
+            "Which exact part do you want me to validate in the document?",
+          preferredLanguage: lang,
+        });
+      return {
+        text: this.compositionBrain.resolveClarificationBypass({
+          question: terminal6ClarificationQuestion,
+          preferredLanguage: lang,
+        }),
+        failureCode: "EVIDENCE_NEEDS_CLARIFICATION",
+      };
       const question =
         String(decision.clarifyQuestion || "").trim() ||
         (lang === "pt"
@@ -6106,6 +6150,17 @@ export class CentralizedChatRuntimeDelegate {
       boldingBank?.config?.defaultBoldingEnabled !== false &&
       modeSuppression?.boldingEnabled !== false &&
       familySuppression?.boldingEnabled !== false;
+    const compositionSignals = this.compositionBrain.buildPromptSignals({
+      preferredLanguage: req.preferredLanguage,
+      answerMode,
+      domain:
+        typeof (req.meta as any)?.domain === "string"
+          ? String((req.meta as any).domain)
+          : typeof (req.meta as any)?.domainId === "string"
+            ? String((req.meta as any).domainId)
+            : null,
+      userRequestedShort,
+    });
 
     return {
       styleProfile: styleProfile || null,
@@ -6125,6 +6180,7 @@ export class CentralizedChatRuntimeDelegate {
         boldingBank?.densityControl?.maxBoldSpansTotal,
       ),
       operatorFamily: operatorFamily || undefined,
+      ...compositionSignals,
     };
   }
 

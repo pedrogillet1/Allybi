@@ -1,0 +1,86 @@
+{
+  "suite": "multilingual",
+  "version": 1,
+  "pairs": [
+    {
+      "pairId": "parity_01_due_date",
+      "brainLayer": "multilingual_parity",
+      "category": "field_exactness",
+      "docId": "att_bill_april",
+      "expectedField": "due_date",
+      "expectedValue": "2026-04-18",
+      "en": {
+        "query": "What is the due date on the ATT bill?"
+      },
+      "pt": {
+        "query": "Qual e a data de vencimento da fatura da ATT?"
+      },
+      "regressionLinks": [
+        "reports/query-grading/GRADING-REPORT.md#L146"
+      ]
+    },
+    {
+      "pairId": "parity_02_birth_name",
+      "brainLayer": "multilingual_parity",
+      "category": "field_exactness",
+      "docId": "certidao_nascimento",
+      "expectedField": "nome_registrado",
+      "expectedValue": "Lucas Almeida",
+      "en": {
+        "query": "What name appears on the birth certificate?"
+      },
+      "pt": {
+        "query": "Qual nome aparece na certidao de nascimento?"
+      },
+      "regressionLinks": [
+        "reports/query-grading/GRADING-REPORT.md#L159"
+      ]
+    },
+    {
+      "pairId": "parity_03_move_out_deadline",
+      "brainLayer": "multilingual_parity",
+      "category": "wrong_doc_trap",
+      "docId": "move_out_notice",
+      "expectedField": "vacate_deadline",
+      "expectedValue": "2026-05-31",
+      "en": {
+        "query": "What is the move-out deadline in the notice?"
+      },
+      "pt": {
+        "query": "Qual e o prazo de desocupacao no aviso?"
+      },
+      "regressionLinks": [
+        "frontend/e2e/reports/latest/a-plus-gap-deep-dive.md#L118"
+      ]
+    },
+    {
+      "pairId": "parity_04_risk_summary",
+      "brainLayer": "multilingual_parity",
+      "category": "composition",
+      "docId": "mayfair_deck",
+      "expectedField": "risk_cluster",
+      "expectedValue": "customer concentration",
+      "en": {
+        "query": "Summarize the main risk in one cautious sentence."
+      },
+      "pt": {
+        "query": "Resuma o principal risco em uma frase cautelosa."
+      },
+      "regressionLinks": [
+        "frontend/e2e/reports/latest/a-plus-gap-deep-dive.md#L116"
+      ]
+    }
+  ],
+  "_meta": {
+    "id": "document_intelligence_eval_multilingual_pt_en_parity",
+    "version": "1.0.0",
+    "description": "Auto-registered bank payload for document_intelligence/eval/multilingual/pt_en_parity.any.json",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-13"
+  },
+  "config": {
+    "enabled": true
+  }
+}
