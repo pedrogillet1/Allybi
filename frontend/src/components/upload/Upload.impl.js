@@ -60,6 +60,8 @@ const Upload = () => {
         multiple: true,
         noClick: false,
         noKeyboard: false,
+        // Disable File System Access API — its async fallback breaks on non-HTTPS (localhost)
+        useFsAccessApi: false,
     });
 
     // Check upload status and show notifications

@@ -81,6 +81,8 @@ export default function FirstDocumentUpload() {
     accept: DROPZONE_ACCEPT,
     multiple: true,
     noClick: false,
+    // Disable File System Access API — its async fallback breaks on non-HTTPS (localhost)
+    useFsAccessApi: false,
   });
 
   const removeFile = useCallback((id) => {

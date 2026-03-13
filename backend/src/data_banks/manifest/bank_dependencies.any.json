@@ -127,8 +127,7 @@
     "ambiguity": [
       "operators",
       "retrieval",
-      "routing",
-      "semantics"
+      "routing"
     ],
     "probes": [
       "formatting",
@@ -245,13 +244,6 @@
     {
       "id": "ambiguity_rank_features",
       "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "amendment_chain_schema",
-      "dependsOn": [
-        "patterns_doc_refs_versioning_patterns"
-      ],
       "optional": true
     },
     {
@@ -561,12 +553,6 @@
       "id": "contradiction_policy",
       "dependsOn": [],
       "optional": true
-    },
-    {
-      "id": "cross_domain_tiebreak_policy",
-      "dependsOn": [
-        "doc_taxonomy"
-      ]
     },
     {
       "id": "crossdoc_alignment_rules",
@@ -5104,13 +5090,6 @@
       "dependsOn": []
     },
     {
-      "id": "effective_date_resolution",
-      "dependsOn": [
-        "patterns_doc_refs_versioning_patterns"
-      ],
-      "optional": true
-    },
-    {
       "id": "email_routing",
       "dependsOn": [
         "intent_patterns",
@@ -8512,14 +8491,6 @@
       "optional": true
     },
     {
-      "id": "section_disambiguation_policy",
-      "dependsOn": [
-        "di_section_ontology",
-        "disambiguation_policies"
-      ],
-      "optional": true
-    },
-    {
       "id": "section_priority_accounting",
       "dependsOn": []
     },
@@ -8663,11 +8634,6 @@
       "optional": true
     },
     {
-      "id": "table_header_ontology_education",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
       "id": "table_header_ontology_everyday",
       "dependsOn": [],
       "optional": true
@@ -8677,21 +8643,6 @@
       "dependsOn": [
         "doc_archetypes_finance"
       ]
-    },
-    {
-      "id": "table_header_ontology_housing",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "table_header_ontology_hr_payroll",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "table_header_ontology_identity",
-      "dependsOn": [],
-      "optional": true
     },
     {
       "id": "table_header_ontology_insurance",
@@ -8718,11 +8669,6 @@
     },
     {
       "id": "table_header_ontology_tax",
-      "dependsOn": [],
-      "optional": true
-    },
-    {
-      "id": "table_header_ontology_travel",
       "dependsOn": [],
       "optional": true
     },
@@ -8854,6 +8800,51 @@
       "dependsOn": [
         "quality_gates"
       ]
+    },
+    {
+      "id": "amendment_chain_schema",
+      "dependsOn": [
+        "patterns_doc_refs_versioning_patterns"
+      ]
+    },
+    {
+      "id": "cross_domain_tiebreak_policy",
+      "dependsOn": [
+        "doc_taxonomy"
+      ]
+    },
+    {
+      "id": "effective_date_resolution",
+      "dependsOn": [
+        "patterns_doc_refs_versioning_patterns"
+      ]
+    },
+    {
+      "id": "section_disambiguation_policy",
+      "dependsOn": [
+        "disambiguation_policies",
+        "di_section_ontology"
+      ]
+    },
+    {
+      "id": "table_header_ontology_education",
+      "dependsOn": []
+    },
+    {
+      "id": "table_header_ontology_housing",
+      "dependsOn": []
+    },
+    {
+      "id": "table_header_ontology_hr_payroll",
+      "dependsOn": []
+    },
+    {
+      "id": "table_header_ontology_identity",
+      "dependsOn": []
+    },
+    {
+      "id": "table_header_ontology_travel",
+      "dependsOn": []
     },
     {
       "id": "wrong_section_lock",

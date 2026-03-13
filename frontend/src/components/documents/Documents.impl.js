@@ -578,7 +578,8 @@ const Documents = () => {
   };
 
   // ✅ Show loading skeleton during initial data fetch
-  if (loading && contextDocuments.length === 0 && contextFolders.length === 0) {
+  // Skip skeleton when upload modal is open — unmounting destroys its local state (selected files)
+  if (loading && contextDocuments.length === 0 && contextFolders.length === 0 && !showUniversalUploadModal) {
     return <DocumentsSkeleton />;
   }
 
